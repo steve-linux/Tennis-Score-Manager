@@ -5,12 +5,18 @@ package com.tennis.scoremanager.desk
 
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.ClubServerError
+import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtPlans
 import com.tennis.scoremanager.data.Course
 import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Fixture
 import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.ClubTournaments
@@ -28,7 +34,7 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     var courtPlan = CourtPlan(CourtSettings(centsPerHour = 1200, centsPerHourLights = 1600))
     var cups = emptyList<ClubTournament>()
     override fun <T> tx(f: () -> T): T = synchronized(this) { f() }
-    override val club = "TC Prova"
+    override var club = "TC Prova"
     override var lang = "it"
     override fun now() = time
     override fun players() = list
@@ -56,7 +62,41 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     var school = emptyList<Course>()
     override fun features() = on
     override fun courses() = school
-    override fun teams() = emptyList<Team>()
+    var squads = emptyList<Team>()
+    override fun teams() = squads
+    override fun saveTeam(t: Team) { squads = squads.filter { it.id != t.id } + t }
+    override fun deleteTeam(t: Team) { squads = squads.filter { it.id != t.id } }
+    var noticed: String? = null
+    override fun teamNotice(t: Team, f: Fixture, kind: String) { noticed = kind }
+    override fun setClubName(name: String) { club = name }
+    override fun saveCourtSettings(st: CourtSettings) { courtPlan = courtPlan.copy(settings = st) }
+    override fun addCourt(info: CourtInfo): Boolean {
+        if (pitches.any { it.equals(info.name, ignoreCase = true) }) return false
+        pitches = pitches + info.name; saveCourtInfo(info); return true
+    }
+    override fun renameCourt(old: String, new: String): Boolean {
+        if (pitches.any { it != old && it.equals(new, ignoreCase = true) }) return false
+        pitches = pitches.map { if (it == old) new else it }
+        courtPlan = courtPlan.copy(bookings = courtPlan.bookings.map { if (it.court == old) it.copy(court = new) else it },
+            settings = courtPlan.settings.copy(courts = courtPlan.settings.courts.map { if (it.name == old) it.copy(name = new) else it }))
+        return true
+    }
+    override fun saveCourtInfo(info: CourtInfo) { courtPlan = courtPlan.copy(settings = courtPlan.settings.copy(courts = courtPlan.settings.courts.filter { it.name != info.name } + info)) }
+    override fun deleteCourt(name: String) { pitches = pitches - name; courtPlan = courtPlan.copy(bookings = courtPlan.bookings.filter { it.court != name }) }
+    override fun moveCourt(name: String, up: Boolean) {
+        val l = pitches.toMutableList(); val i = l.indexOf(name); val j = if (up) i - 1 else i + 1
+        if (i >= 0 && j in l.indices) { l[i] = l[j].also { l[j] = l[i] }; pitches = l }
+    }
+    override fun savePayTypes(list: List<PayType>) { ledger = ledger.copy(payTypes = list) }
+    var server = ClubServerConf()
+    var remote = SrvAdmin(0, emptyList(), emptyList())
+    var remoteDown = false
+    var removed = mutableListOf<String>()
+    override fun serverConf() = server
+    override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) { server = server.copy(rules = rules, payInfo = payInfo, alerts = alerts) }
+    override fun serverState(): SrvAdmin = if (remoteDown) throw ClubServerError("NET") else remote
+    override fun serverSync(): String? = if (remoteDown) "NET" else { server = server.copy(lastSync = time); null }
+    override fun serverRemove(kind: String, id: String) { removed += "$kind:$id" }
     override fun ladders() = emptyList<Ladder>()
     override fun saveCourse(c: Course) { school = school.filter { it.id != c.id } + c }
     override fun deleteCourse(c: Course) { school = school.filter { it.id != c.id } }

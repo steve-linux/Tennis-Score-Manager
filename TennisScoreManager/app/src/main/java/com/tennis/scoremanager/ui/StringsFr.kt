@@ -1502,7 +1502,7 @@ object FrStrings : Strings {
     override val deskStop = "Désactiver"
     override val deskFailed = "Le démarrage a échoué : réessayez."
     override val deskAddress = "Saisissez cette adresse dans le navigateur de l'ordinateur"
-    override val deskWarning = "La première fois, le navigateur signale que la connexion n'est pas privée : c'est normal avec un certificat créé par le téléphone. Choisissez Avancé puis Continuer ; si l'alerte revient sans raison, n'allez pas plus loin."
+    override val deskWarning = "Ensuite le navigateur s'en souvient. Si l'alerte revient sans que vous ayez changé de téléphone ou réinstallé l'app, n'allez pas plus loin et comparez l'empreinte ci-dessous avec celle du navigateur."
     override val deskCode = "Code d'accès"
     override val deskCodeHint = "Sans caméra, saisissez-le sur l'ordinateur. Il ne sert qu'une fois et change toutes les 5 minutes. Ne le communiquez à personne."
     override val deskNoNetwork = "Aucun réseau : connectez le téléphone au Wi-Fi ou activez le point d'accès."
@@ -1761,6 +1761,9 @@ object FrStrings : Strings {
     override val moreGroupDevices = "Appareils et voix"
     override val moreGroupData = "Données"
     override val moreGroupHelp = "Aide"
+    override val deskFirstTitle = "La première fois, le navigateur dira « Votre connexion n'est pas privée »"
+    override val deskFirstWhy = "C'est normal et sans danger : la page est servie par ce téléphone, avec un certificat qu'il a créé lui-même et non par une société que le navigateur connaît. La liaison reste chiffrée."
+    override val deskFirstSteps = "• Chrome ou Edge : Paramètres avancés › Continuer vers … (dangereux)\n• Firefox : Avancé… › Accepter le risque et poursuivre\n• Safari : Afficher les détails › visiter ce site web"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

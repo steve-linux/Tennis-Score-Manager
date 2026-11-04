@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.GppMaybe
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.PowerSettingsNew
@@ -56,10 +57,17 @@ fun DeskScreen(c: MatchController) {
         icon = Icons.Filled.Computer,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // L'avviso del browser, detto prima: così la prima volta non spaventa.
+        @Composable fun firstTime() = SectionCard(s.deskFirstTitle, Icons.Filled.GppMaybe) {
+            Text(s.deskFirstWhy, color = TsmColors.TextMain, fontSize = 14.sp)
+            Text(s.deskFirstSteps, color = TsmColors.TextMain, fontSize = 14.sp, lineHeight = 22.sp)
+            Text(s.deskWarning, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
         if (!ui.running) {
             Text(s.deskIntro, color = TsmColors.TextDim)
             if (ui.failed) Text(s.deskFailed, color = TsmColors.Orange)
             GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start() }, Modifier.fillMaxWidth())
+            firstTime()
             return@ScreenScaffold
         }
         val ip = ui.connectedIp
@@ -78,8 +86,8 @@ fun DeskScreen(c: MatchController) {
                         context.startActivity(Intent.createChooser(send, s.deskShare))
                     }, Modifier.fillMaxWidth())
                 }
-                Text(s.deskWarning, color = TsmColors.TextDim, fontSize = 13.sp)
             }
+            firstTime()
             SectionCard(s.deskScan, Icons.Filled.QrCodeScanner) {
                 Text(s.deskScanHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 if (scanBad) Text(s.deskScanBad, color = TsmColors.Orange)

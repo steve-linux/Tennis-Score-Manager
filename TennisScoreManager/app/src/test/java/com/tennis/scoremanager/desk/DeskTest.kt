@@ -400,6 +400,117 @@ class DeskTest {
         assertEquals(400, req("GET", "/stats", token = k, q = mapOf("from" to "2026-11-30", "to" to "2026-11-01")).first)
     }
 
+    @Test fun squadraDalPc() {
+        val k = login()
+        for (n in listOf("Anna", "Bea", "Cora")) req("POST", "/people", """{"firstName":"$n","lastName":"X","member":true,"medicalUntil":"2030-01-01"}""", k)
+        val ids = data.list.associate { it.firstName to it.id }
+        assertEquals(400, req("POST", "/teams", """{"name":""}""", k).first)
+        val id = field(req("POST", "/teams", """{"name":"TC Prova D1","championship":"Serie D1","singles":2,"doubles":1,"fitp":false}""", k).second, "id")!!
+        assertEquals(200, req("POST", "/teams/$id/roster", """{"ids":["${ids["Anna"]}","${ids["Bea"]}","${ids["Cora"]}"]}""", k).first)
+        assertEquals(400, req("PUT", "/teams/$id", """{"name":"TC Prova D1","captain":"nessuno"}""", k).first)
+        assertEquals(200, req("PUT", "/teams/$id", """{"name":"TC Prova D1","captain":"${ids["Anna"]}","singles":2,"doubles":1,"fitp":false}""", k).first)
+        // Incontro in casa col Campo 1 tenuto: le partite si fanno dalla formula (2 singolari e 1 doppio).
+        val (st, out) = req("POST", "/teams/$id/fixtures", """{"opponent":"TC Altro","date":"2026-11-15","startMin":540,"courts":["Campo 1","Campo 9"]}""", k)
+        assertEquals(404, st)
+        assertTrue(out, "NOT_FOUND" in out)
+        assertEquals(200, req("POST", "/teams/$id/fixtures", """{"opponent":"TC Altro","date":"2026-11-15","startMin":540,"courts":["Campo 1"]}""", k).first)
+        var t = data.squads.single()
+        val f = t.fixtures.single()
+        assertEquals(listOf(false, false, true), f.rubbers.map { it.doubles })
+        assertEquals(listOf("Campo 1"), f.courts)
+        // Disponibilità, convocati, risultati.
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"${ids["Anna"]}","answer":"YES"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"${ids["Bea"]}","answer":"MAYBE"}""", k).first)
+        assertEquals(404, req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"nessuno","answer":"YES"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/callup", """{"ids":["${ids["Bea"]}","${ids["Anna"]}"]}""", k).first)
+        t = data.squads.single()
+        assertEquals(listOf(ids["Anna"], ids["Bea"]), t.fixtures.single().callUp)
+        assertEquals(400, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":0,"ours":["${ids["Anna"]}","${ids["Bea"]}"]}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":0,"ours":["${ids["Anna"]}"],"theirs":["Rossi"],"score":"6-3 6-4"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":1,"ours":["${ids["Bea"]}"],"theirs":["Verdi"],"score":"2-6 6-7"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":2,"ours":["${ids["Anna"]}","${ids["Bea"]}"],"theirs":["Rossi","Verdi"],"score":"6-4 6-4"}""", k).first)
+        val (_, list) = req("GET", "/teams", token = k)
+        assertTrue(list, "\"won\":2,\"lost\":1,\"decided\":true,\"outcome\":true" in list && "\"won\":1,\"lost\":0,\"drawn\":0" in list)
+        // Gli avvisi partono dal telefono; senza nessuno da avvisare no.
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/notice", """{"kind":"MISSING"}""", k).first)
+        assertEquals("MISSING", data.noticed)
+        req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"${ids["Cora"]}","answer":"NO"}""", k)
+        assertEquals(409, req("POST", "/teams/$id/fixtures/${f.id}/notice", """{"kind":"MISSING"}""", k).first)
+        assertEquals(400, req("POST", "/teams/$id/fixtures/${f.id}/notice", """{"kind":"BOH"}""", k).first)
+        // Fuori dalla rosa: non è più capitano né convocato.
+        assertEquals(200, req("DELETE", "/teams/$id/roster/${ids["Anna"]}", token = k).first)
+        t = data.squads.single()
+        assertEquals(null, t.captain)
+        assertEquals(listOf(ids["Bea"]), t.fixtures.single().callUp)
+        assertEquals(200, req("DELETE", "/teams/$id/fixtures/${f.id}", token = k).first)
+        assertTrue(data.squads.single().fixtures.isEmpty())
+        assertEquals(200, req("DELETE", "/teams/$id", token = k).first)
+        assertTrue(data.squads.isEmpty())
+    }
+
+    @Test fun impostazioniDelCircolo() {
+        val k = login()
+        val (st, out) = req("GET", "/settings", token = k)
+        assertEquals(200, st)
+        assertTrue(out, "\"club\":\"TC Prova\"" in out && "\"centsPerHour\":1200" in out && "\"name\":\"Campo 2\"" in out)
+        assertEquals(200, req("PUT", "/settings/club", """{"name":"TC Nuovo"}""", k).first)
+        assertEquals("TC Nuovo", data.club)
+        // Orari e prezzi: chiusura prima dell'apertura no; caselle solo da 30, 60 o 90 minuti.
+        assertEquals(400, req("PUT", "/settings/hours", """{"openHour":20,"closeHour":8,"slotMinutes":60}""", k).first)
+        assertEquals(400, req("PUT", "/settings/hours", """{"openHour":8,"closeHour":22,"slotMinutes":45}""", k).first)
+        assertEquals(200, req("PUT", "/settings/hours", """{"openHour":7,"closeHour":22,"slotMinutes":30,"centsPerHour":1500,"centsPerHourLights":2000,"lightsFrom":17,"tournamentMinutes":120}""", k).first)
+        val set = data.courtPlan.settings
+        assertEquals(listOf(7, 22, 30, 1500, 2000, 17, 120), listOf(set.openHour, set.closeHour, set.slotMinutes, set.centsPerHour, set.centsPerHourLights, set.lightsFrom, set.tournamentMinutes))
+        // Campi: nuovo, doppione no, cambiato di nome con le sue prenotazioni, spostato, tolto.
+        assertEquals(200, req("POST", "/settings/courts", """{"info":{"name":"Centrale","surface":"CLAY","covered":true,"centsPerHour":2500}}""", k).first)
+        assertEquals(409, req("POST", "/settings/courts", """{"info":{"name":"centrale"}}""", k).first)
+        assertEquals(2500, data.courtPlan.settings.info("Centrale").centsPerHour)
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2030-11-10","startMin":600,"minutes":60,"names":["Rossi"]}""", k)
+        assertEquals(409, req("POST", "/settings/courts", """{"old":"Campo 1","info":{"name":"Campo 2"}}""", k).first)
+        assertEquals(200, req("POST", "/settings/courts", """{"old":"Campo 1","info":{"name":"Campo A","lights":false}}""", k).first)
+        assertEquals("Campo A", data.courtPlan.bookings.single().court)
+        assertEquals(false, data.courtPlan.settings.info("Campo A").lights)
+        assertEquals(200, req("POST", "/settings/courts/move", """{"name":"Centrale","up":true}""", k).first)
+        assertEquals(listOf("Campo A", "Centrale", "Campo 2"), data.pitches)
+        assertEquals(200, req("DELETE", "/settings/courts", token = k, q = mapOf("name" to "Campo 2")).first)
+        assertEquals(404, req("DELETE", "/settings/courts", token = k, q = mapOf("name" to "Campo 2")).first)
+        // Modi di pagamento: i vecchi tengono il loro tipo, i nuovi sono "altro"; niente doppioni.
+        val cash = data.payTypes().first { it.method == com.tennis.scoremanager.data.PayMethod.CASH }
+        assertEquals(409, req("PUT", "/settings/paytypes", """{"list":[{"id":"${cash.id}","name":"Contanti"},{"name":"contanti"}]}""", k).first)
+        assertEquals(200, req("PUT", "/settings/paytypes", """{"list":[{"id":"${cash.id}","name":"Cassa"},{"name":"Satispay","details":"https://satispay.example/x","online":true}]}""", k).first)
+        assertEquals(listOf("Cassa", "Satispay"), data.ledger.payTypes.map { it.name })
+        assertEquals(com.tennis.scoremanager.data.PayMethod.CASH, data.ledger.payTypes[0].method)
+        assertTrue(data.ledger.payTypes[1].online)
+    }
+
+    @Test fun serverDellePrenotazioni() {
+        val k = login()
+        assertEquals(409, req("GET", "/online", token = k).first)
+        data.server = com.tennis.scoremanager.data.ClubServerConf(url = "http://srv", token = "t", club = "TC Prova")
+        val at = java.time.LocalDateTime.of(2030, 5, 4, 10, 0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        data.remote = com.tennis.scoremanager.data.SrvAdmin(
+            1, listOf(com.tennis.scoremanager.data.OnlineBooking("b1", "Campo 1", at, 60, "p9", "Mario", 1200)),
+            listOf(com.tennis.scoremanager.data.SrvPlayer("p9", "Mario", 0, 0, 1)),
+            listOf(com.tennis.scoremanager.data.Wait("w1", "p9", null, at, 60)),
+            listOf(com.tennis.scoremanager.data.Seek("s1", com.tennis.scoremanager.data.SeekPlayer("p9", "Mario"), "2030-05-05", 540, 720, level = "NC")),
+        )
+        val (st, out) = req("GET", "/online", token = k)
+        assertEquals(200, st)
+        assertTrue(out, "\"date\":\"2030-05-04\",\"startMin\":600" in out && "\"name\":\"Mario\"" in out && "\"need\":1" in out && "\"waits\":[{\"id\":\"w1\",\"name\":\"Mario\",\"date\"" in out)
+        assertEquals(200, req("DELETE", "/online/seeks/s1", token = k).first)
+        assertEquals(200, req("DELETE", "/online/waits/w1", token = k).first)
+        assertEquals(listOf("seek:s1", "wait:w1"), data.removed)
+        assertEquals(200, req("POST", "/online/sync", token = k).first)
+        // Il server non risponde: la pagina c'è lo stesso, col motivo.
+        data.remoteDown = true
+        assertTrue(req("GET", "/online", token = k).second.contains("\"stateError\":\"NET\""))
+        assertEquals(502, req("POST", "/online/sync", token = k).first)
+        // Le regole: i limiti fuori misura si riportano dentro.
+        assertEquals(200, req("PUT", "/online/rules", """{"rules":{"open":false,"daysAhead":99,"maxFuture":3,"courts":["Campo 2"]},"payInfo":"al campo","alerts":false}""", k).first)
+        assertEquals(listOf(false, 60, 3, false), listOf(data.server.rules.open, data.server.rules.daysAhead, data.server.rules.maxFuture, data.server.alerts))
+        assertEquals(404, req("PUT", "/online/rules", """{"rules":{"courts":["Campo 9"]}}""", k).first)
+    }
+
     @Test fun prenotazioniSenzaSovrapposizioni() {
         val k = login()
         val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"]}"""

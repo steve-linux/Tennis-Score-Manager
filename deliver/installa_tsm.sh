@@ -382,6 +382,30 @@ const APP_I18N = {
     blkTitle: "Campi non prenotabili",
     blkTo: "Al",
     blkTournament: "Torneo",
+    crtClay: "Terra",
+    crtCovered: "coperto",
+    crtDelete: "Elimina il campo",
+    crtExists: "C'è già un campo con questo nome.",
+    crtGrass: "Erba",
+    crtHard: "Cemento",
+    crtHeatedShort: "riscaldato",
+    crtHeating: "Riscaldamento",
+    crtHeatingPrice: (it) => `+${it} all'ora`,
+    crtHeatingSupplement: "Supplemento riscaldamento all'ora",
+    crtLights: "Luci",
+    crtLightsShort: "luci",
+    crtName: "Nome del campo",
+    crtNew: "Nuovo campo",
+    crtNoLightsWarn: "Questo campo non ha le luci.",
+    crtOpen: "scoperto",
+    crtPhotoAdd: "Aggiungi foto",
+    crtPhotoRemove: "Togli la foto",
+    crtPhotos: "Foto",
+    crtPhotosAfter: "Le foto si aggiungono dopo aver salvato il campo.",
+    crtPhotosCount: (it) => `${it} foto`,
+    crtPricesHint: "Prezzi di questo campo: vuoti = quelli generali.",
+    crtTapToSet: "tocca per impostarlo",
+    crtTitle: "Campi",
     ctAddEntry: "Iscrivi",
     ctBye: "bye",
     ctCategory: "Categoria (es. Singolare maschile, Over 45)",
@@ -472,6 +496,128 @@ const APP_I18N = {
     ctWalkoverLong: "Vinta a tavolino (w.o.)",
     ctWhere: "Dove e quando",
     ctWinner: "Chi ha vinto",
+    pbAlertChannel: "Le tue prenotazioni",
+    pbAlertFreed: "Si è liberato un campo: prenotalo!",
+    pbAlertReminder: "Promemoria della partita",
+    pbAlertRemoved: "Prenotazione tolta dalla segreteria",
+    pbBlocked: "Non prenotabile",
+    pbBookNow: "Prenota",
+    pbBooked: "Prenotato!",
+    pbBusy: "Occupato",
+    pbCallOffice: "Per disdirla ora chiama la segreteria.",
+    pbCancel: "Disdici",
+    pbCancelAsk: "Disdire questa prenotazione?",
+    pbCancelRule: (it) => `Disdici da solo fino a ${it} ore prima.`,
+    pbCancelled: "Prenotazione disdetta",
+    pbClosed: "Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.",
+    pbConfirm: "Conferma",
+    pbDay: "Scegli il giorno",
+    pbDuration: "Durata",
+    pbEntryHint: "Se il tuo circolo ha il server TSM: entri con l'invito della segreteria",
+    pbEntryJoined: (it) => `${it}: campi liberi e le tue prenotazioni`,
+    pbErrAuth: "Questo telefono non è più collegato al circolo: chiedi un nuovo invito alla segreteria.",
+    pbErrBlocked: "In quest'ora il campo non è prenotabile.",
+    pbErrClosed: "Le prenotazioni online sono chiuse.",
+    pbErrCourt: "Questo campo non si prenota online.",
+    pbErrFar: "Non si può ancora prenotare questo giorno.",
+    pbErrFreeNow: "Si è appena liberata: prenotala subito!",
+    pbErrFull: "L'annuncio è già al completo.",
+    pbErrInvite: "Invito sbagliato o scaduto: chiedine uno nuovo alla segreteria.",
+    pbErrLate: "È tardi per disdire da solo: chiama la segreteria.",
+    pbErrLong: "La prenotazione è troppo lunga.",
+    pbErrMany: "Hai già il massimo di prenotazioni: aspetta di giocarne una o disdicine una.",
+    pbErrManySeeks: "Hai già 3 annunci aperti: togline uno prima.",
+    pbErrManyWaits: "Sei già in attesa per 3 caselle: togline una prima.",
+    pbErrNet: "Il server del circolo non risponde. Riprova tra poco.",
+    pbErrPast: "Quest'ora è già passata.",
+    pbErrSlot: "Scegli un orario del planning.",
+    pbErrSoon: "È troppo tardi per prenotare quest'ora: chiama la segreteria.",
+    pbErrSynced: "Il circolo non ha ancora pubblicato il planning.",
+    pbErrTaken: "Qualcuno ha appena prenotato quest'ora.",
+    pbErrTries: "Troppi tentativi: riprova tra un quarto d'ora.",
+    pbErrUrl: "Col codice serve anche l'indirizzo del circolo (o usa il link dell'invito).",
+    pbFree: "Libero",
+    pbFreePrice: "gratis",
+    pbHeating: "Riscaldamento",
+    pbInvite: "Link o codice d'invito",
+    pbJoin: "Entra",
+    pbJoinIntro: "Inquadra il QR d'invito che ti ha dato la segreteria del circolo, oppure incolla il link dell'invito (o scrivi il codice e l'indirizzo del circolo).",
+    pbLeave: "Esci da questo circolo",
+    pbLeaveAsk: "Uscire su questo telefono? Per rientrare serve un nuovo invito della segreteria.",
+    pbLights: "Con le luci",
+    pbMine: "Le tue prenotazioni",
+    pbMineCell: "Tuo",
+    pbNone: "Nessuna prenotazione",
+    pbPay: (it) => `Pagamento: ${it}`,
+    pbPrice: "Prezzo",
+    pbReminders: "Promemoria sul telefono",
+    pbRemindersHint: (it) => `Una notifica ${it} ore prima della partita e se la segreteria toglie una tua prenotazione`,
+    pbRules: (a, b) => `Prenoti fino a ${a} giorni avanti, al massimo ${b} prenotazioni per volta.`,
+    pbScan: "Inquadra il QR",
+    pbScanPrompt: "Inquadra il QR d'invito del circolo",
+    pbSeekAlertFound: "Partita trovata: campo prenotato!",
+    pbSeekAlertJoined: "Qualcuno risponde al tuo annuncio",
+    pbSeekAlertNoCourt: "Giocatori trovati, ma nessun campo libero",
+    pbSeekBooked: (it) => `Campo prenotato: ${it}`,
+    pbSeekDay: "Giorno",
+    pbSeekDoubles: "Doppio",
+    pbSeekFrom: "Dalle",
+    pbSeekHint: "Gli altri giocatori lo vedono e toccano Ci sto; quando siete al completo il server prenota il primo campo libero nella fascia scelta.",
+    pbSeekJoin: "Ci sto",
+    pbSeekJoined: "Ci sei! Quando siete al completo il campo si prenota da solo.",
+    pbSeekLeave: "Mi tolgo",
+    pbSeekLevel: "Livello (es. NC, 4.3)",
+    pbSeekNeed: (it) => it === 1 ? `ne manca 1` : `ne mancano ${it}`,
+    pbSeekNew: "Pubblica un annuncio",
+    pbSeekNoCourt: "Al completo, ma nessun campo libero: prenotatelo voi.",
+    pbSeekNone: "Nessun annuncio: pubblicane uno, gli altri giocatori del circolo lo vedranno.",
+    pbSeekNote: "Nota (facoltativa)",
+    pbSeekPublish: "Pubblica",
+    pbSeekPublished: "Annuncio pubblicato",
+    pbSeekRemove: "Togli l'annuncio",
+    pbSeekSingles: "Singolo",
+    pbSeekTitle: "Cerco compagno",
+    pbSeekTo: "Alle",
+    pbSeekWho: (it) => `Ci sono: ${it}`,
+    pbSeekYours: "Il tuo annuncio",
+    pbServer: "Indirizzo del circolo (solo col codice)",
+    pbTabBook: "Prenota",
+    pbTabMine: (it) => `Le mie (${it})`,
+    pbTabSeek: "Compagni",
+    pbTitle: "Prenota un campo",
+    pbToday: "Oggi",
+    pbWaitAdded: "Sei in lista d'attesa",
+    pbWaitAny: "Va bene un campo qualsiasi a quest'ora",
+    pbWaitAnyCourt: "Un campo qualsiasi",
+    pbWaitAsk: "Avvisami se si libera",
+    pbWaitFreed: "Si è liberato!",
+    pbWaitList: "In lista d'attesa",
+    pbWaitRemove: "Togli",
+    pbWaitText: "Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo.",
+    pbWaiting: "In attesa",
+    planBusy: (it) => `${it}h occupato`,
+    planClose: "Chiusura",
+    planDay: "Giorno",
+    planHint: "Prenotazioni, lezioni e chiusure, giorno per giorno; le partite dei tornei ci sono già",
+    planLightsFrom: "Luci dalle",
+    planOpen: "Apertura",
+    planPrice: "Prezzo all'ora",
+    planPriceLights: "Prezzo all'ora con le luci",
+    planSettings: "Orari e prezzi",
+    planSlot: "Durata di una casella",
+    planTitle: "Planning dei campi",
+    planToday: "Torna a oggi",
+    planTournamentMinutes: "Durata di una partita di torneo",
+    ptAtClub: "in segreteria",
+    ptDelete: "Elimina",
+    ptDetails: "Link, IBAN o numero (facoltativo)",
+    ptHint: "Quelli che il circolo accetta, scelti da chi lo gestisce: si scelgono quando si registra un pagamento. Quelli a distanza (Satispay, PayPal, Revolut, Bancomat Pay, bonifico, un link SumUp…) con link, IBAN o numero vanno negli avvisi e nei solleciti.",
+    ptName: "Nome (es. Satispay, PayPal, Bonifico)",
+    ptNew: "Nuovo modo di pagamento",
+    ptOnline: "Si paga a distanza",
+    ptOnlineHint: "Va negli avvisi e nei solleciti, con il link, l'IBAN o il numero.",
+    ptOnlineShort: "a distanza",
+    ptTitle: "Modi di pagamento",
     scAddSlot: "Aggiungi un orario",
     scAddStudent: "Aggiungi allievo",
     scAttendance: (p, t) => `presente ${p} su ${t}`,
@@ -516,6 +662,57 @@ const APP_I18N = {
     scToMark: "da segnare",
     scUpcoming: "Prossime",
     scWhoWasThere: "Chi c'era",
+    srvAddress: "Indirizzo del server",
+    srvAddressHint: "Come lo scrive il server all'avvio, es. http://192.168.1.50:8080 (o https://… da internet)",
+    srvAlertChannel: "Prenotazioni online",
+    srvAlertGone: (it) => `Disdetta: ${it}`,
+    srvAlertMany: (it) => `${it} novità nelle prenotazioni online`,
+    srvAlertNew: (it) => `Nuova prenotazione: ${it}`,
+    srvAlerts: "Avvisami delle prenotazioni online",
+    srvAlertsHint: "Una notifica quando un giocatore prenota o disdice: ogni 15 minuti circa, anche ad app chiusa",
+    srvAlertsOff: "Le notifiche di TSM sono spente nelle impostazioni del telefono: accendile per ricevere gli avvisi.",
+    srvButtonHint: "Facoltativo: i giocatori prenotano da soli",
+    srvCancelHours: "Disdetta da soli fino a (ore prima)",
+    srvConnected: (it) => `Collegato a ${it}`,
+    srvCourts: "Campi prenotabili online",
+    srvDaysAhead: "Fin quanti giorni avanti",
+    srvErrAuth: "Il server non riconosce più questo telefono: scollega e abbina di nuovo.",
+    srvErrCode: "Codice sbagliato o già usato.",
+    srvErrNet: "Il server non risponde: controlla l'indirizzo e che il telefono sia sulla stessa rete (o su internet).",
+    srvErrNotTsm: "A quell'indirizzo non c'è un server del circolo TSM.",
+    srvErrOther: (it) => `Errore del server: ${it}`,
+    srvErrPairLocal: "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080).",
+    srvIntro: "Facoltativo. Con un piccolo server al circolo (un Raspberry Pi o un vecchio PC) i giocatori invitati prenotano i campi da soli dal telefono, anche da iPhone, con le regole decise qui. Senza server tutto resta com'è: si prenota in segreteria.",
+    srvInvite: "Invito per prenotare online",
+    srvInviteCode: (it) => `Codice: ${it}`,
+    srvInviteHint: "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Gioca › Prenota un campo › Inquadra il QR.",
+    srvInviteHow: "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online.",
+    srvInviteUntil: (it) => `Vale una volta, fino al ${it}`,
+    srvLastSync: (it) => `Planning inviato: ${it}`,
+    srvLinked: (it) => `Prenota online · ultimo accesso ${it}`,
+    srvMaxFuture: "Prenotazioni per giocatore",
+    srvMaxMinutes: "Durata massima",
+    srvNeverSynced: "Planning non ancora inviato",
+    srvNotice: "Prenota fino a (minuti prima)",
+    srvOnlineTag: "online",
+    srvOpen: "Prenotazioni online aperte",
+    srvOpenHint: "Spente: i giocatori vedono il planning ma non prenotano",
+    srvPair: "Abbina",
+    srvPayInfo: "Come si paga (lo leggono i giocatori)",
+    srvPlayers: (it) => `Giocatori collegati: ${it}`,
+    srvPublicUrl: "Indirizzo da internet (facoltativo)",
+    srvPublicUrlHint: "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo",
+    srvRemind: "Promemoria ai giocatori (ore prima, 0 = no)",
+    srvRevoke: "Togli l'accesso online",
+    srvSetupCode: "Codice di abbinamento",
+    srvSetupHint: "Lo scrive il server all'avvio e nel file setup-code.txt. Vale una volta sola.",
+    srvShare: "Condividi il link",
+    srvShareText: (a, b) => `Prenota i campi di ${a} da qui: ${b}`,
+    srvSyncNow: "Invia ora",
+    srvSynced: "Planning inviato",
+    srvTitle: "Server del circolo",
+    srvUnpair: "Scollega il server",
+    srvUnpairAsk: "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano.",
     stBlocked: (it) => `non prenotabili ${it} h`,
     stBookings: "Prenotazioni",
     stByCourt: "Campo per campo",
@@ -546,6 +743,70 @@ const APP_I18N = {
     tdPeople: (it) => it === 1 ? `da 1 persona` : `da ${it} persone`,
     tdTitle: "Oggi",
     tdToCollect: (it) => `Da incassare: ${it}`,
+    tmAddPlayer: "Aggiungi giocatore",
+    tmAskAll: "Chiedi la disponibilità a tutti",
+    tmAskAvailability: (it) => `sei disponibile per ${it}?`,
+    tmAskMissing: (it) => `Richiedi a chi non ha risposto (${it})`,
+    tmAvailability: "Disponibilità",
+    tmAvailabilityTitle: "Disponibilità",
+    tmAway: "trasferta",
+    tmCallUp: "Convocati",
+    tmCallUpTitle: "Convocazione",
+    tmCalledUp: (it) => `sei convocato per ${it}.`,
+    tmCaptain: "capitano",
+    tmCaptainLine: (it) => `Capitano: ${it}`,
+    tmChampionship: "Campionato (es. Serie D1 maschile)",
+    tmCourtsHeld: (it) => `Campi tenuti: ${it}`,
+    tmDelete: "Elimina la squadra",
+    tmDeleteAsk: (it) => `Eliminare la squadra ${it} con i suoi incontri? I campi tenuti tornano prenotabili.`,
+    tmDeleteFixture: "Elimina l'incontro",
+    tmDeleteFixtureAsk: "Eliminare questo incontro? I campi tenuti tornano prenotabili.",
+    tmDoubleN: (it) => `Doppio ${it}`,
+    tmDoubles: "Doppi per incontro",
+    tmDraw: "pari",
+    tmDrawn: (it) => `N ${it}`,
+    tmFitp: "Campionato FITP",
+    tmFitpHint: "In rosa e tra i convocati si controllano tessera agonistica e certificato agonistico del giorno dell'incontro.",
+    tmHint: "Rosa, incontri, disponibilità, convocazioni e risultati dei campionati a squadre",
+    tmHoldCourts: "Campi tenuti per l'incontro (non prenotabili nel planning)",
+    tmHome: "in casa",
+    tmHours: (it) => `Per ${it} ore`,
+    tmLost: "perso",
+    tmMaybe: "Forse",
+    tmMeeting: "Ritrovo (ora e luogo)",
+    tmMeetingLine: (it) => `Ritrovo: ${it}`,
+    tmName: "Nome della squadra (es. TC Prova D1)",
+    tmNew: "Nuova squadra",
+    tmNewFixture: "Nuovo incontro",
+    tmNo: "No",
+    tmNoFixtures: "Nessun incontro: aggiungilo con Nuovo incontro.",
+    tmNone: "Nessuna squadra: creala con Nuova squadra.",
+    tmOngoing: "in corso",
+    tmOpponent: "Squadra avversaria (es. TC Altro)",
+    tmOurs: (it) => it === 1 ? `Il nostro giocatore` : `I nostri due giocatori`,
+    tmPickCaptain: "Scegli il capitano",
+    tmPlace: "Dove si gioca",
+    tmPlayers: (it) => `${it} ${it === 1 ? "giocatore" : "giocatori"}`,
+    tmRecord: (w, l) => `V ${w} · P ${l}`,
+    tmReplyYesNo: "Rispondi a questo messaggio con SÌ, NO o FORSE.",
+    tmResultTitle: "Risultato",
+    tmRosterEmpty: "Nessun giocatore in rosa.",
+    tmRubbers: "Partite",
+    tmScoreOurs: "Punteggio dal nostro lato (es. 6-4 3-6 10-8)",
+    tmSeason: "Stagione",
+    tmSendCallUp: (it) => `Manda la convocazione (${it})`,
+    tmSendResult: "Manda il risultato",
+    tmSingleN: (it) => `Singolare ${it}`,
+    tmSingles: "Singolari per incontro",
+    tmTabFixtures: "Incontri",
+    tmTabRoster: "Rosa",
+    tmTheirs: "Avversario",
+    tmTheirs2: "Secondo avversario",
+    tmTheyWon: "Persa",
+    tmTitle: "Squadre e campionati",
+    tmWeWon: "Vinta",
+    tmWon: "vinto",
+    tmYes: "Sì",
   },
   en: {
     bkOther: "Other",
@@ -570,6 +831,30 @@ const APP_I18N = {
     blkTitle: "Non-bookable courts",
     blkTo: "To",
     blkTournament: "Tournament",
+    crtClay: "Clay",
+    crtCovered: "indoor",
+    crtDelete: "Delete the court",
+    crtExists: "There is already a court with this name.",
+    crtGrass: "Grass",
+    crtHard: "Hard",
+    crtHeatedShort: "heated",
+    crtHeating: "Heating",
+    crtHeatingPrice: (it) => `+${it} per hour`,
+    crtHeatingSupplement: "Heating supplement per hour",
+    crtLights: "Lights",
+    crtLightsShort: "lights",
+    crtName: "Court name",
+    crtNew: "New court",
+    crtNoLightsWarn: "This court has no lights.",
+    crtOpen: "outdoor",
+    crtPhotoAdd: "Add photos",
+    crtPhotoRemove: "Remove photo",
+    crtPhotos: "Photos",
+    crtPhotosAfter: "Photos can be added once the court is saved.",
+    crtPhotosCount: (it) => `${it} ${it === 1 ? "photo" : "photos"}`,
+    crtPricesHint: "Prices for this court: empty = the general ones.",
+    crtTapToSet: "tap to set it up",
+    crtTitle: "Courts",
     ctAddEntry: "Enter",
     ctBye: "bye",
     ctCategory: "Category (e.g. Men's singles, Over 45)",
@@ -660,6 +945,128 @@ const APP_I18N = {
     ctWalkoverLong: "Won by walkover (w/o)",
     ctWhere: "Where and when",
     ctWinner: "Winner",
+    pbAlertChannel: "Your bookings",
+    pbAlertFreed: "A court is free: book it!",
+    pbAlertReminder: "Match reminder",
+    pbAlertRemoved: "Booking removed by the club office",
+    pbBlocked: "Not bookable",
+    pbBookNow: "Book",
+    pbBooked: "Booked!",
+    pbBusy: "Taken",
+    pbCallOffice: "To cancel it now, call the club office.",
+    pbCancel: "Cancel",
+    pbCancelAsk: "Cancel this booking?",
+    pbCancelRule: (it) => `You can cancel yourself up to ${it} hours before.`,
+    pbCancelled: "Booking cancelled",
+    pbClosed: "Online booking is closed right now: you can see the schedule but not book.",
+    pbConfirm: "Confirm",
+    pbDay: "Pick the day",
+    pbDuration: "Length",
+    pbEntryHint: "If your club has the TSM server: join with the office invitation",
+    pbEntryJoined: (it) => `${it}: free courts and your bookings`,
+    pbErrAuth: "This phone is no longer connected to the club: ask the office for a new invitation.",
+    pbErrBlocked: "The court cannot be booked at this time.",
+    pbErrClosed: "Online booking is closed.",
+    pbErrCourt: "This court cannot be booked online.",
+    pbErrFar: "This day cannot be booked yet.",
+    pbErrFreeNow: "It has just become free: book it now!",
+    pbErrFull: "This request is already complete.",
+    pbErrInvite: "Wrong or expired invitation: ask the club office for a new one.",
+    pbErrLate: "It is too late to cancel yourself: call the club office.",
+    pbErrLong: "The booking is too long.",
+    pbErrMany: "You already have the most bookings allowed: play one or cancel one first.",
+    pbErrManySeeks: "You already have 3 open requests: remove one first.",
+    pbErrManyWaits: "You are already waiting for 3 slots: remove one first.",
+    pbErrNet: "The club server is not answering. Try again shortly.",
+    pbErrPast: "This time has already passed.",
+    pbErrSlot: "Pick a time from the schedule.",
+    pbErrSoon: "It is too late to book this time: call the club office.",
+    pbErrSynced: "The club has not published the schedule yet.",
+    pbErrTaken: "Someone has just booked this time.",
+    pbErrTries: "Too many attempts: try again in fifteen minutes.",
+    pbErrUrl: "With the code you also need the club address (or use the invitation link).",
+    pbFree: "Free",
+    pbFreePrice: "free",
+    pbHeating: "Heating",
+    pbInvite: "Invitation link or code",
+    pbJoin: "Join",
+    pbJoinIntro: "Scan the invitation QR the club office gave you, or paste the invitation link (or type the code and the club address).",
+    pbLeave: "Leave this club",
+    pbLeaveAsk: "Sign out on this phone? You will need a new invitation from the office to come back.",
+    pbLights: "With lights",
+    pbMine: "Your bookings",
+    pbMineCell: "Yours",
+    pbNone: "No bookings",
+    pbPay: (it) => `Payment: ${it}`,
+    pbPrice: "Price",
+    pbReminders: "Reminders on the phone",
+    pbRemindersHint: (it) => `A notification ${it} hours before the match and if the office removes one of your bookings`,
+    pbRules: (a, b) => `You can book up to ${a} days ahead, at most ${b} bookings at a time.`,
+    pbScan: "Scan the QR",
+    pbScanPrompt: "Scan the club invitation QR",
+    pbSeekAlertFound: "Match found: court booked!",
+    pbSeekAlertJoined: "Someone answered your post",
+    pbSeekAlertNoCourt: "Players found, but no free court",
+    pbSeekBooked: (it) => `Court booked: ${it}`,
+    pbSeekDay: "Day",
+    pbSeekDoubles: "Doubles",
+    pbSeekFrom: "From",
+    pbSeekHint: "Other players see it and tap I'm in; when you are complete the server books the first free court in the chosen time.",
+    pbSeekJoin: "I'm in",
+    pbSeekJoined: "You're in! When you are complete the court is booked by itself.",
+    pbSeekLeave: "I'm out",
+    pbSeekLevel: "Level (e.g. NC, 4.3)",
+    pbSeekNeed: (it) => `${it} missing`,
+    pbSeekNew: "Post a request",
+    pbSeekNoCourt: "Complete, but no free court: book one yourselves.",
+    pbSeekNone: "No requests: post one, the other club players will see it.",
+    pbSeekNote: "Note (optional)",
+    pbSeekPublish: "Post",
+    pbSeekPublished: "Request posted",
+    pbSeekRemove: "Remove the request",
+    pbSeekSingles: "Singles",
+    pbSeekTitle: "Looking for a partner",
+    pbSeekTo: "To",
+    pbSeekWho: (it) => `In: ${it}`,
+    pbSeekYours: "Your request",
+    pbServer: "Club address (code only)",
+    pbTabBook: "Book",
+    pbTabMine: (it) => `Mine (${it})`,
+    pbTabSeek: "Partners",
+    pbTitle: "Book a court",
+    pbToday: "Today",
+    pbWaitAdded: "You are on the waiting list",
+    pbWaitAny: "Any court at this time is fine",
+    pbWaitAnyCourt: "Any court",
+    pbWaitAsk: "Tell me if it frees up",
+    pbWaitFreed: "It's free now!",
+    pbWaitList: "On the waiting list",
+    pbWaitRemove: "Remove",
+    pbWaitText: "This slot is taken. If it becomes free we tell you right away: whoever books first gets it.",
+    pbWaiting: "Waiting",
+    planBusy: (it) => `${it}h booked`,
+    planClose: "Closing",
+    planDay: "Day",
+    planHint: "Bookings, lessons and closures, day by day; tournament matches are already in",
+    planLightsFrom: "Lights from",
+    planOpen: "Opening",
+    planPrice: "Price per hour",
+    planPriceLights: "Price per hour with lights",
+    planSettings: "Hours and prices",
+    planSlot: "Length of a slot",
+    planTitle: "Court planner",
+    planToday: "Back to today",
+    planTournamentMinutes: "Length of a tournament match",
+    ptAtClub: "at the office",
+    ptDelete: "Delete",
+    ptDetails: "Link, IBAN or number (optional)",
+    ptHint: "The ones the club accepts, chosen by whoever runs it: you pick one when recording a payment. Remote ones (Satispay, PayPal, Revolut, Bancomat Pay, bank transfer, a SumUp link…) with a link, IBAN or number go into notices and reminders.",
+    ptName: "Name (e.g. Satispay, PayPal, Bank transfer)",
+    ptNew: "New payment method",
+    ptOnline: "Paid remotely",
+    ptOnlineHint: "It goes into notices and reminders, with the link, IBAN or number.",
+    ptOnlineShort: "remote",
+    ptTitle: "Payment methods",
     scAddSlot: "Add a time",
     scAddStudent: "Add student",
     scAttendance: (p, t) => `attended ${p} of ${t}`,
@@ -704,6 +1111,57 @@ const APP_I18N = {
     scToMark: "to mark",
     scUpcoming: "Upcoming",
     scWhoWasThere: "Who was there",
+    srvAddress: "Server address",
+    srvAddressHint: "As the server prints it at start-up, e.g. http://192.168.1.50:8080 (or https://… from the internet)",
+    srvAlertChannel: "Online bookings",
+    srvAlertGone: (it) => `Cancelled: ${it}`,
+    srvAlertMany: (it) => `${it} changes in online bookings`,
+    srvAlertNew: (it) => `New booking: ${it}`,
+    srvAlerts: "Notify me of online bookings",
+    srvAlertsHint: "A notification when a player books or cancels: about every 15 minutes, even with the app closed",
+    srvAlertsOff: "TSM notifications are off in the phone settings: turn them on to get the alerts.",
+    srvButtonHint: "Optional: players book by themselves",
+    srvCancelHours: "Self-cancel up to (hours before)",
+    srvConnected: (it) => `Connected to ${it}`,
+    srvCourts: "Courts bookable online",
+    srvDaysAhead: "How many days ahead",
+    srvErrAuth: "The server no longer knows this phone: disconnect and pair again.",
+    srvErrCode: "Wrong or already used code.",
+    srvErrNet: "The server does not answer: check the address and that the phone is on the same network (or online).",
+    srvErrNotTsm: "There is no TSM club server at that address.",
+    srvErrOther: (it) => `Server error: ${it}`,
+    srvErrPairLocal: "Pairing works only from the club network: use the local address (http://…:8080).",
+    srvIntro: "Optional. With a small server at the club (a Raspberry Pi or an old PC) invited players book courts by themselves from their phone, iPhone too, with the rules set here. Without a server nothing changes: bookings go through the club office.",
+    srvInvite: "Invite to book online",
+    srvInviteCode: (it) => `Code: ${it}`,
+    srvInviteHint: "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: Play › Book a court › Scan the QR.",
+    srvInviteHow: "To invite a player: open their card and tap Invite to book online.",
+    srvInviteUntil: (it) => `Works once, until ${it}`,
+    srvLastSync: (it) => `Schedule sent: ${it}`,
+    srvLinked: (it) => `Books online · last seen ${it}`,
+    srvMaxFuture: "Bookings per player",
+    srvMaxMinutes: "Longest booking",
+    srvNeverSynced: "Schedule not sent yet",
+    srvNotice: "Book up to (minutes before)",
+    srvOnlineTag: "online",
+    srvOpen: "Online booking open",
+    srvOpenHint: "Off: players see the schedule but cannot book",
+    srvPair: "Pair",
+    srvPayInfo: "How to pay (players read this)",
+    srvPlayers: (it) => `Connected players: ${it}`,
+    srvPublicUrl: "Address from the internet (optional)",
+    srvPublicUrlHint: "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club",
+    srvRemind: "Reminder to players (hours before, 0 = none)",
+    srvRevoke: "Remove online access",
+    srvSetupCode: "Pairing code",
+    srvSetupHint: "The server prints it at start-up and in the file setup-code.txt. It works only once.",
+    srvShare: "Share the link",
+    srvShareText: (a, b) => `Book the courts at ${a} here: ${b}`,
+    srvSyncNow: "Send now",
+    srvSynced: "Schedule sent",
+    srvTitle: "Club server",
+    srvUnpair: "Disconnect the server",
+    srvUnpairAsk: "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay.",
     stBlocked: (it) => `not bookable ${it} h`,
     stBookings: "Bookings",
     stByCourt: "Court by court",
@@ -734,6 +1192,70 @@ const APP_I18N = {
     tdPeople: (it) => it === 1 ? `from 1 person` : `from ${it} people`,
     tdTitle: "Today",
     tdToCollect: (it) => `To collect: ${it}`,
+    tmAddPlayer: "Add player",
+    tmAskAll: "Ask everyone's availability",
+    tmAskAvailability: (it) => `are you available for ${it}?`,
+    tmAskMissing: (it) => `Ask those who haven't replied (${it})`,
+    tmAvailability: "Availability",
+    tmAvailabilityTitle: "Availability",
+    tmAway: "away",
+    tmCallUp: "Called up",
+    tmCallUpTitle: "Call-up",
+    tmCalledUp: (it) => `you're called up for ${it}.`,
+    tmCaptain: "captain",
+    tmCaptainLine: (it) => `Captain: ${it}`,
+    tmChampionship: "Championship (e.g. Men's Series D1)",
+    tmCourtsHeld: (it) => `Courts held: ${it}`,
+    tmDelete: "Delete the team",
+    tmDeleteAsk: (it) => `Delete the team ${it} with its fixtures? Held courts become bookable again.`,
+    tmDeleteFixture: "Delete the fixture",
+    tmDeleteFixtureAsk: "Delete this fixture? Held courts become bookable again.",
+    tmDoubleN: (it) => `Doubles ${it}`,
+    tmDoubles: "Doubles per fixture",
+    tmDraw: "draw",
+    tmDrawn: (it) => `D ${it}`,
+    tmFitp: "FITP championship",
+    tmFitpHint: "In the roster and call-up, the competitive card and competitive certificate for the match day are checked.",
+    tmHint: "Roster, fixtures, availability, call-ups and results for team championships",
+    tmHoldCourts: "Courts held for the fixture (not bookable in the planner)",
+    tmHome: "home",
+    tmHours: (it) => `For ${it} hours`,
+    tmLost: "lost",
+    tmMaybe: "Maybe",
+    tmMeeting: "Meeting point (time and place)",
+    tmMeetingLine: (it) => `Meeting: ${it}`,
+    tmName: "Team name (e.g. TC Test D1)",
+    tmNew: "New team",
+    tmNewFixture: "New fixture",
+    tmNo: "No",
+    tmNoFixtures: "No fixtures: add one with New fixture.",
+    tmNone: "No teams: create one with New team.",
+    tmOngoing: "in progress",
+    tmOpponent: "Opposing team (e.g. TC Other)",
+    tmOurs: (it) => it === 1 ? `Our player` : `Our two players`,
+    tmPickCaptain: "Pick the captain",
+    tmPlace: "Where it's played",
+    tmPlayers: (it) => `${it} ${it === 1 ? "player" : "players"}`,
+    tmRecord: (w, l) => `W ${w} · L ${l}`,
+    tmReplyYesNo: "Reply to this message with YES, NO or MAYBE.",
+    tmResultTitle: "Result",
+    tmRosterEmpty: "No players in the roster.",
+    tmRubbers: "Rubbers",
+    tmScoreOurs: "Score from our side (e.g. 6-4 3-6 10-8)",
+    tmSeason: "Season",
+    tmSendCallUp: (it) => `Send the call-up (${it})`,
+    tmSendResult: "Send the result",
+    tmSingleN: (it) => `Singles ${it}`,
+    tmSingles: "Singles per fixture",
+    tmTabFixtures: "Fixtures",
+    tmTabRoster: "Roster",
+    tmTheirs: "Opponent",
+    tmTheirs2: "Second opponent",
+    tmTheyWon: "Lost",
+    tmTitle: "Teams and leagues",
+    tmWeWon: "Won",
+    tmWon: "won",
+    tmYes: "Yes",
   },
   fr: {
     bkOther: "Autre",
@@ -758,6 +1280,30 @@ const APP_I18N = {
     blkTitle: "Terrains non réservables",
     blkTo: "Au",
     blkTournament: "Tournoi",
+    crtClay: "Terre battue",
+    crtCovered: "couvert",
+    crtDelete: "Supprimer le terrain",
+    crtExists: "Il y a déjà un terrain avec ce nom.",
+    crtGrass: "Gazon",
+    crtHard: "Dur",
+    crtHeatedShort: "chauffé",
+    crtHeating: "Chauffage",
+    crtHeatingPrice: (it) => `+${it} de l'heure`,
+    crtHeatingSupplement: "Supplément chauffage par heure",
+    crtLights: "Éclairage",
+    crtLightsShort: "éclairage",
+    crtName: "Nom du terrain",
+    crtNew: "Nouveau terrain",
+    crtNoLightsWarn: "Ce terrain n'a pas d'éclairage.",
+    crtOpen: "extérieur",
+    crtPhotoAdd: "Ajouter des photos",
+    crtPhotoRemove: "Retirer la photo",
+    crtPhotos: "Photos du terrain",
+    crtPhotosAfter: "Les photos s'ajoutent une fois le terrain enregistré.",
+    crtPhotosCount: (it) => `${it} image${it === 1 ? "" : "s"}`,
+    crtPricesHint: "Tarifs de ce terrain : vides = les tarifs généraux.",
+    crtTapToSet: "touchez pour le configurer",
+    crtTitle: "Terrains",
     ctAddEntry: "Inscrire",
     ctBye: "exempt",
     ctCategory: "Catégorie (ex. Simple messieurs, Plus de 45 ans)",
@@ -848,6 +1394,128 @@ const APP_I18N = {
     ctWalkoverLong: "Gagné par forfait",
     ctWhere: "Où et quand",
     ctWinner: "Vainqueur",
+    pbAlertChannel: "Vos réservations",
+    pbAlertFreed: "Un terrain s'est libéré : réservez-le !",
+    pbAlertReminder: "Rappel du match",
+    pbAlertRemoved: "Réservation retirée par le secrétariat",
+    pbBlocked: "Non réservable",
+    pbBookNow: "Réserver",
+    pbBooked: "Réservé !",
+    pbBusy: "Occupé",
+    pbCallOffice: "Pour l'annuler maintenant, appelez le secrétariat.",
+    pbCancel: "Annuler",
+    pbCancelAsk: "Annuler cette réservation ?",
+    pbCancelRule: (it) => `Annulation par vous-même jusqu'à ${it} heures avant.`,
+    pbCancelled: "Réservation annulée",
+    pbClosed: "Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.",
+    pbConfirm: "Confirmer",
+    pbDay: "Choisissez le jour",
+    pbDuration: "Durée",
+    pbEntryHint: "Si votre club a le serveur TSM : entrez avec l'invitation du secrétariat",
+    pbEntryJoined: (it) => `${it} : terrains libres et vos réservations`,
+    pbErrAuth: "Ce téléphone n'est plus connecté au club : demandez une nouvelle invitation au secrétariat.",
+    pbErrBlocked: "Le terrain n'est pas réservable à cette heure.",
+    pbErrClosed: "Les réservations en ligne sont fermées.",
+    pbErrCourt: "Ce terrain ne se réserve pas en ligne.",
+    pbErrFar: "Ce jour n'est pas encore réservable.",
+    pbErrFreeNow: "Il vient de se libérer : réservez-le vite !",
+    pbErrFull: "Cette annonce est déjà complète.",
+    pbErrInvite: "Invitation erronée ou expirée : demandez-en une nouvelle au secrétariat.",
+    pbErrLate: "Il est trop tard pour annuler vous-même : appelez le secrétariat.",
+    pbErrLong: "La réservation est trop longue.",
+    pbErrMany: "Vous avez déjà le maximum de réservations : jouez-en ou annulez-en une d'abord.",
+    pbErrManySeeks: "Vous avez déjà 3 annonces ouvertes : retirez-en une d'abord.",
+    pbErrManyWaits: "Vous attendez déjà 3 créneaux : retirez-en un d'abord.",
+    pbErrNet: "Le serveur du club ne répond pas. Réessayez dans un instant.",
+    pbErrPast: "Cette heure est déjà passée.",
+    pbErrSlot: "Choisissez un horaire du planning.",
+    pbErrSoon: "Il est trop tard pour réserver cette heure : appelez le secrétariat.",
+    pbErrSynced: "Le club n'a pas encore publié le planning.",
+    pbErrTaken: "Quelqu'un vient de réserver cette heure.",
+    pbErrTries: "Trop de tentatives : réessayez dans un quart d'heure.",
+    pbErrUrl: "Avec le code il faut aussi l'adresse du club (ou utilisez le lien d'invitation).",
+    pbFree: "Libre",
+    pbFreePrice: "gratuit",
+    pbHeating: "Chauffage",
+    pbInvite: "Lien ou code d'invitation",
+    pbJoin: "Entrer",
+    pbJoinIntro: "Scannez le QR d'invitation donné par le secrétariat du club, ou collez le lien d'invitation (ou saisissez le code et l'adresse du club).",
+    pbLeave: "Quitter ce club",
+    pbLeaveAsk: "Se déconnecter sur ce téléphone ? Il faudra une nouvelle invitation du secrétariat pour revenir.",
+    pbLights: "Avec éclairage",
+    pbMine: "Vos réservations",
+    pbMineCell: "À vous",
+    pbNone: "Aucune réservation",
+    pbPay: (it) => `Paiement : ${it}`,
+    pbPrice: "Prix",
+    pbReminders: "Rappels sur le téléphone",
+    pbRemindersHint: (it) => `Une notification ${it} heures avant le match et si le secrétariat retire une de vos réservations`,
+    pbRules: (a, b) => `Réservation jusqu'à ${a} jours à l'avance, ${b} réservations au maximum à la fois.`,
+    pbScan: "Scanner le QR",
+    pbScanPrompt: "Scannez le QR d'invitation du club",
+    pbSeekAlertFound: "Match trouvé : terrain réservé !",
+    pbSeekAlertJoined: "Quelqu'un répond à votre annonce",
+    pbSeekAlertNoCourt: "Joueurs trouvés, mais aucun terrain libre",
+    pbSeekBooked: (it) => `Terrain réservé : ${it}`,
+    pbSeekDay: "Jour",
+    pbSeekDoubles: "Double",
+    pbSeekFrom: "De",
+    pbSeekHint: "Les autres joueurs la voient et touchent Je viens ; quand vous êtes au complet, le serveur réserve le premier terrain libre dans le créneau choisi.",
+    pbSeekJoin: "Je viens",
+    pbSeekJoined: "C'est noté ! Quand vous êtes au complet, le terrain se réserve tout seul.",
+    pbSeekLeave: "Je me retire",
+    pbSeekLevel: "Niveau (ex. NC, 4.3)",
+    pbSeekNeed: (it) => `il en manque ${it}`,
+    pbSeekNew: "Publier une annonce",
+    pbSeekNoCourt: "Au complet, mais aucun terrain libre : réservez-en un vous-mêmes.",
+    pbSeekNone: "Aucune annonce : publiez-en une, les autres joueurs du club la verront.",
+    pbSeekNote: "Note (facultative)",
+    pbSeekPublish: "Publier",
+    pbSeekPublished: "Annonce publiée",
+    pbSeekRemove: "Retirer l'annonce",
+    pbSeekSingles: "Simple",
+    pbSeekTitle: "Je cherche un partenaire",
+    pbSeekTo: "À",
+    pbSeekWho: (it) => `Inscrits : ${it}`,
+    pbSeekYours: "Votre annonce",
+    pbServer: "Adresse du club (avec le code seul)",
+    pbTabBook: "Réserver",
+    pbTabMine: (it) => `Les miennes (${it})`,
+    pbTabSeek: "Partenaires",
+    pbTitle: "Réserver un terrain",
+    pbToday: "Aujourd'hui",
+    pbWaitAdded: "Vous êtes sur liste d'attente",
+    pbWaitAny: "N'importe quel terrain à cette heure",
+    pbWaitAnyCourt: "N'importe quel terrain",
+    pbWaitAsk: "Me prévenir s'il se libère",
+    pbWaitFreed: "Il s'est libéré !",
+    pbWaitList: "Sur liste d'attente",
+    pbWaitRemove: "Retirer",
+    pbWaitText: "Ce créneau est occupé. S'il se libère, nous vous prévenons tout de suite : le premier qui réserve l'obtient.",
+    pbWaiting: "En attente",
+    planBusy: (it) => `${it}h occupé`,
+    planClose: "Fermeture",
+    planDay: "Jour",
+    planHint: "Réservations, leçons et fermetures, jour par jour ; les matchs des tournois y sont déjà",
+    planLightsFrom: "Éclairage à partir de",
+    planOpen: "Ouverture",
+    planPrice: "Tarif horaire",
+    planPriceLights: "Tarif horaire avec éclairage",
+    planSettings: "Horaires et tarifs",
+    planSlot: "Durée d'une case",
+    planTitle: "Planning des terrains",
+    planToday: "Revenir à aujourd'hui",
+    planTournamentMinutes: "Durée d'un match de tournoi",
+    ptAtClub: "au secrétariat",
+    ptDelete: "Supprimer",
+    ptDetails: "Lien, IBAN ou numéro (facultatif)",
+    ptHint: "Ceux que le club accepte, choisis par qui le gère : on en choisit un en enregistrant un paiement. Ceux à distance (Satispay, PayPal, Revolut, Bancomat Pay, virement, un lien SumUp…) avec lien, IBAN ou numéro figurent dans les avis et les relances.",
+    ptName: "Nom (ex. Satispay, PayPal, Virement)",
+    ptNew: "Nouveau moyen de paiement",
+    ptOnline: "Paiement à distance",
+    ptOnlineHint: "Il figure dans les avis et les relances, avec le lien, l'IBAN ou le numéro.",
+    ptOnlineShort: "à distance",
+    ptTitle: "Moyens de paiement",
     scAddSlot: "Ajouter un horaire",
     scAddStudent: "Ajouter un élève",
     scAttendance: (p, t) => `présent ${p} sur ${t}`,
@@ -892,6 +1560,57 @@ const APP_I18N = {
     scToMark: "à pointer",
     scUpcoming: "À venir",
     scWhoWasThere: "Qui était là",
+    srvAddress: "Adresse du serveur",
+    srvAddressHint: "Comme l'affiche le serveur au démarrage, ex. http://192.168.1.50:8080 (ou https://… depuis internet)",
+    srvAlertChannel: "Réservations en ligne",
+    srvAlertGone: (it) => `Annulée : ${it}`,
+    srvAlertMany: (it) => `${it} nouveautés dans les réservations en ligne`,
+    srvAlertNew: (it) => `Nouvelle réservation : ${it}`,
+    srvAlerts: "Me prévenir des réservations en ligne",
+    srvAlertsHint: "Une notification quand un joueur réserve ou annule : environ toutes les 15 minutes, même app fermée",
+    srvAlertsOff: "Les notifications de TSM sont désactivées dans les réglages du téléphone : activez-les pour recevoir les alertes.",
+    srvButtonHint: "Facultatif : les joueurs réservent eux-mêmes",
+    srvCancelHours: "Annulation seul jusqu'à (heures avant)",
+    srvConnected: (it) => `Connecté à ${it}`,
+    srvCourts: "Terrains réservables en ligne",
+    srvDaysAhead: "Combien de jours à l'avance",
+    srvErrAuth: "Le serveur ne reconnaît plus ce téléphone : déconnectez et appairez à nouveau.",
+    srvErrCode: "Code erroné ou déjà utilisé.",
+    srvErrNet: "Le serveur ne répond pas : vérifiez l'adresse et que le téléphone est sur le même réseau (ou sur internet).",
+    srvErrNotTsm: "Il n'y a pas de serveur de club TSM à cette adresse.",
+    srvErrOther: (it) => `Erreur du serveur : ${it}`,
+    srvErrPairLocal: "L'appairage se fait seulement depuis le réseau du club : utilisez l'adresse locale (http://…:8080).",
+    srvIntro: "Facultatif. Avec un petit serveur au club (un Raspberry Pi ou un vieux PC), les joueurs invités réservent eux-mêmes depuis leur téléphone, iPhone compris, avec les règles fixées ici. Sans serveur rien ne change : on réserve au secrétariat.",
+    srvInvite: "Invitation à réserver en ligne",
+    srvInviteCode: (it) => `Code : ${it}`,
+    srvInviteHint: "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Jouer › Réserver un terrain › Scanner le QR.",
+    srvInviteHow: "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne.",
+    srvInviteUntil: (it) => `Valable une fois, jusqu'au ${it}`,
+    srvLastSync: (it) => `Planning envoyé : ${it}`,
+    srvLinked: (it) => `Réserve en ligne · vu le ${it}`,
+    srvMaxFuture: "Réservations par joueur",
+    srvMaxMinutes: "Durée maximale",
+    srvNeverSynced: "Planning pas encore envoyé",
+    srvNotice: "Réserver jusqu'à (minutes avant)",
+    srvOnlineTag: "en ligne",
+    srvOpen: "Réservations en ligne ouvertes",
+    srvOpenHint: "Désactivées : les joueurs voient le planning sans réserver",
+    srvPair: "Appairer",
+    srvPayInfo: "Comment payer (les joueurs le lisent)",
+    srvPlayers: (it) => `Joueurs connectés : ${it}`,
+    srvPublicUrl: "Adresse depuis internet (facultatif)",
+    srvPublicUrlHint: "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club",
+    srvRemind: "Rappel aux joueurs (heures avant, 0 = aucun)",
+    srvRevoke: "Retirer l'accès en ligne",
+    srvSetupCode: "Code d'appairage",
+    srvSetupHint: "Le serveur l'affiche au démarrage et dans le fichier setup-code.txt. Il ne sert qu'une fois.",
+    srvShare: "Partager le lien",
+    srvShareText: (a, b) => `Réservez les terrains de ${a} ici : ${b}`,
+    srvSyncNow: "Envoyer maintenant",
+    srvSynced: "Planning envoyé",
+    srvTitle: "Serveur du club",
+    srvUnpair: "Déconnecter le serveur",
+    srvUnpairAsk: "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : java -jar tsm-server.jar --reset-admin). Les réservations déjà au planning restent.",
     stBlocked: (it) => `non réservables ${it} h`,
     stBookings: "Réservations",
     stByCourt: "Terrain par terrain",
@@ -922,6 +1641,70 @@ const APP_I18N = {
     tdPeople: (it) => it === 1 ? `de 1 personne` : `de ${it} personnes`,
     tdTitle: "Aujourd'hui",
     tdToCollect: (it) => `À encaisser : ${it}`,
+    tmAddPlayer: "Ajouter un joueur",
+    tmAskAll: "Demander la disponibilité à tous",
+    tmAskAvailability: (it) => `êtes-vous disponible pour ${it} ?`,
+    tmAskMissing: (it) => `Relancer ceux qui n'ont pas répondu (${it})`,
+    tmAvailability: "Disponibilités",
+    tmAvailabilityTitle: "Disponibilité",
+    tmAway: "à l'extérieur",
+    tmCallUp: "Convoqués",
+    tmCallUpTitle: "Convocation",
+    tmCalledUp: (it) => `vous êtes convoqué pour ${it}.`,
+    tmCaptain: "capitaine",
+    tmCaptainLine: (it) => `Capitaine : ${it}`,
+    tmChampionship: "Championnat (ex. Division D1 messieurs)",
+    tmCourtsHeld: (it) => `Terrains réservés : ${it}`,
+    tmDelete: "Supprimer l'équipe",
+    tmDeleteAsk: (it) => `Supprimer l'équipe ${it} avec ses rencontres ? Les terrains réservés redeviennent disponibles.`,
+    tmDeleteFixture: "Supprimer la rencontre",
+    tmDeleteFixtureAsk: "Supprimer cette rencontre ? Les terrains réservés redeviennent disponibles.",
+    tmDoubleN: (it) => `Double ${it}`,
+    tmDoubles: "Doubles par rencontre",
+    tmDraw: "nul",
+    tmDrawn: (it) => `N ${it}`,
+    tmFitp: "Championnat FITP",
+    tmFitpHint: "Dans l'effectif et les convoqués, on vérifie licence et certificat compétition du jour de la rencontre.",
+    tmHint: "Effectif, rencontres, disponibilités, convocations et résultats des championnats par équipes",
+    tmHoldCourts: "Terrains réservés pour la rencontre (non réservables dans le planning)",
+    tmHome: "à domicile",
+    tmHours: (it) => `Pendant ${it} heures`,
+    tmLost: "perdue",
+    tmMaybe: "Peut-être",
+    tmMeeting: "Rendez-vous (heure et lieu)",
+    tmMeetingLine: (it) => `Rendez-vous : ${it}`,
+    tmName: "Nom de l'équipe (ex. TC Essai D1)",
+    tmNew: "Nouvelle équipe",
+    tmNewFixture: "Nouvelle rencontre",
+    tmNo: "Non",
+    tmNoFixtures: "Aucune rencontre : ajoutez-en une avec Nouvelle rencontre.",
+    tmNone: "Aucune équipe : créez-en une avec Nouvelle équipe.",
+    tmOngoing: "en cours",
+    tmOpponent: "Équipe adverse (ex. TC Autre)",
+    tmOurs: (it) => it === 1 ? `Notre joueur` : `Nos deux joueurs`,
+    tmPickCaptain: "Choisir le capitaine",
+    tmPlace: "Lieu",
+    tmPlayers: (it) => `${it} ${it === 1 ? "joueur" : "joueurs"}`,
+    tmRecord: (w, l) => `V ${w} · D ${l}`,
+    tmReplyYesNo: "Répondez à ce message par OUI, NON ou PEUT-ÊTRE.",
+    tmResultTitle: "Résultat",
+    tmRosterEmpty: "Aucun joueur dans l'effectif.",
+    tmRubbers: "Matchs",
+    tmScoreOurs: "Score de notre côté (ex. 6-4 3-6 10-8)",
+    tmSeason: "Saison",
+    tmSendCallUp: (it) => `Envoyer la convocation (${it})`,
+    tmSendResult: "Envoyer le résultat",
+    tmSingleN: (it) => `Simple ${it}`,
+    tmSingles: "Simples par rencontre",
+    tmTabFixtures: "Rencontres",
+    tmTabRoster: "Effectif",
+    tmTheirs: "Adversaire",
+    tmTheirs2: "Second adversaire",
+    tmTheyWon: "Perdu",
+    tmTitle: "Équipes et championnats",
+    tmWeWon: "Gagné",
+    tmWon: "gagnée",
+    tmYes: "Oui",
   },
   de: {
     bkOther: "Sonstiges",
@@ -946,6 +1729,30 @@ const APP_I18N = {
     blkTitle: "Nicht buchbare Plätze",
     blkTo: "Bis",
     blkTournament: "Turnier",
+    crtClay: "Sand",
+    crtCovered: "Halle",
+    crtDelete: "Platz löschen",
+    crtExists: "Es gibt schon einen Platz mit diesem Namen.",
+    crtGrass: "Rasen",
+    crtHard: "Hartplatz",
+    crtHeatedShort: "beheizt",
+    crtHeating: "Heizung",
+    crtHeatingPrice: (it) => `+${it} pro Stunde`,
+    crtHeatingSupplement: "Heizungszuschlag pro Stunde",
+    crtLights: "Licht",
+    crtLightsShort: "Licht",
+    crtName: "Name des Platzes",
+    crtNew: "Neuer Platz",
+    crtNoLightsWarn: "Dieser Platz hat kein Licht.",
+    crtOpen: "Freiplatz",
+    crtPhotoAdd: "Fotos hinzufügen",
+    crtPhotoRemove: "Foto entfernen",
+    crtPhotos: "Fotos",
+    crtPhotosAfter: "Fotos lassen sich hinzufügen, wenn der Platz gespeichert ist.",
+    crtPhotosCount: (it) => `${it} ${it === 1 ? "Foto" : "Fotos"}`,
+    crtPricesHint: "Preise dieses Platzes: leer = die allgemeinen.",
+    crtTapToSet: "antippen zum Einrichten",
+    crtTitle: "Plätze",
     ctAddEntry: "Anmelden",
     ctBye: "Freilos",
     ctCategory: "Kategorie (z. B. Herreneinzel, Ü45)",
@@ -1036,6 +1843,128 @@ const APP_I18N = {
     ctWalkoverLong: "Kampflos gewonnen",
     ctWhere: "Wo und wann",
     ctWinner: "Sieger",
+    pbAlertChannel: "Deine Buchungen",
+    pbAlertFreed: "Ein Platz ist frei geworden: Buch ihn!",
+    pbAlertReminder: "Erinnerung an dein Spiel",
+    pbAlertRemoved: "Buchung vom Vereinsbüro entfernt",
+    pbBlocked: "Nicht buchbar",
+    pbBookNow: "Buchen",
+    pbBooked: "Gebucht!",
+    pbBusy: "Belegt",
+    pbCallOffice: "Um sie jetzt zu stornieren, ruf das Vereinsbüro an.",
+    pbCancel: "Stornieren",
+    pbCancelAsk: "Diese Buchung stornieren?",
+    pbCancelRule: (it) => `Selbst stornieren bis ${it} Stunden vorher.`,
+    pbCancelled: "Buchung storniert",
+    pbClosed: "Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.",
+    pbConfirm: "Bestätigen",
+    pbDay: "Tag wählen",
+    pbDuration: "Dauer",
+    pbEntryHint: "Wenn dein Verein den TSM-Server hat: mit der Einladung des Büros",
+    pbEntryJoined: (it) => `${it}: freie Plätze und deine Buchungen`,
+    pbErrAuth: "Dieses Handy ist nicht mehr mit dem Verein verbunden: Frag im Büro nach einer neuen Einladung.",
+    pbErrBlocked: "Der Platz ist zu dieser Zeit nicht buchbar.",
+    pbErrClosed: "Online-Buchungen sind geschlossen.",
+    pbErrCourt: "Dieser Platz ist online nicht buchbar.",
+    pbErrFar: "Dieser Tag ist noch nicht buchbar.",
+    pbErrFreeNow: "Gerade frei geworden: Buch es jetzt!",
+    pbErrFull: "Diese Anzeige ist schon vollständig.",
+    pbErrInvite: "Falsche oder abgelaufene Einladung: Frag im Vereinsbüro nach einer neuen.",
+    pbErrLate: "Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an.",
+    pbErrLong: "Die Buchung ist zu lang.",
+    pbErrMany: "Du hast schon die meisten erlaubten Buchungen: Spiel oder storniere zuerst eine.",
+    pbErrManySeeks: "Du hast schon 3 offene Anzeigen: Entferne zuerst eine.",
+    pbErrManyWaits: "Du wartest schon auf 3 Felder: Entferne zuerst eins.",
+    pbErrNet: "Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.",
+    pbErrPast: "Diese Uhrzeit ist schon vorbei.",
+    pbErrSlot: "Wähle eine Uhrzeit aus dem Plan.",
+    pbErrSoon: "Für diese Uhrzeit ist es zu spät: Ruf das Vereinsbüro an.",
+    pbErrSynced: "Der Verein hat den Plan noch nicht veröffentlicht.",
+    pbErrTaken: "Jemand hat diese Uhrzeit gerade gebucht.",
+    pbErrTries: "Zu viele Versuche: Versuch es in einer Viertelstunde wieder.",
+    pbErrUrl: "Mit dem Code braucht es auch die Vereinsadresse (oder nutze den Einladungslink).",
+    pbFree: "Frei",
+    pbFreePrice: "kostenlos",
+    pbHeating: "Heizung",
+    pbInvite: "Einladungslink oder -code",
+    pbJoin: "Beitreten",
+    pbJoinIntro: "Scanne den Einladungs-QR-Code vom Vereinsbüro oder füge den Einladungslink ein (oder gib Code und Vereinsadresse ein).",
+    pbLeave: "Diesen Verein verlassen",
+    pbLeaveAsk: "Auf diesem Handy abmelden? Zum Zurückkommen brauchst du eine neue Einladung vom Büro.",
+    pbLights: "Mit Licht",
+    pbMine: "Deine Buchungen",
+    pbMineCell: "Deine",
+    pbNone: "Keine Buchungen",
+    pbPay: (it) => `Bezahlung: ${it}`,
+    pbPrice: "Preis",
+    pbReminders: "Erinnerungen auf dem Handy",
+    pbRemindersHint: (it) => `Eine Benachrichtigung ${it} Stunden vor dem Spiel und wenn das Büro eine deiner Buchungen entfernt`,
+    pbRules: (a, b) => `Buchbar bis ${a} Tage im Voraus, höchstens ${b} Buchungen gleichzeitig.`,
+    pbScan: "QR-Code scannen",
+    pbScanPrompt: "Scanne den Einladungs-QR-Code des Vereins",
+    pbSeekAlertFound: "Spiel gefunden: Platz gebucht!",
+    pbSeekAlertJoined: "Jemand antwortet auf deine Anzeige",
+    pbSeekAlertNoCourt: "Spieler gefunden, aber kein Platz frei",
+    pbSeekBooked: (it) => `Platz gebucht: ${it}`,
+    pbSeekDay: "Tag",
+    pbSeekDoubles: "Doppel",
+    pbSeekFrom: "Von",
+    pbSeekHint: "Die anderen Spieler sehen sie und tippen auf Bin dabei; seid ihr vollständig, bucht der Server den ersten freien Platz in der gewählten Zeit.",
+    pbSeekJoin: "Bin dabei",
+    pbSeekJoined: "Du bist dabei! Seid ihr vollständig, wird der Platz von selbst gebucht.",
+    pbSeekLeave: "Doch nicht",
+    pbSeekLevel: "Niveau (z. B. NC, 4.3)",
+    pbSeekNeed: (it) => it === 1 ? `1 fehlt` : `${it} fehlen`,
+    pbSeekNew: "Anzeige aufgeben",
+    pbSeekNoCourt: "Vollständig, aber kein Platz frei: Bucht selbst einen.",
+    pbSeekNone: "Keine Anzeigen: Gib eine auf, die anderen Spieler des Vereins sehen sie.",
+    pbSeekNote: "Notiz (optional)",
+    pbSeekPublish: "Veröffentlichen",
+    pbSeekPublished: "Anzeige veröffentlicht",
+    pbSeekRemove: "Anzeige entfernen",
+    pbSeekSingles: "Einzel",
+    pbSeekTitle: "Partner gesucht",
+    pbSeekTo: "Bis",
+    pbSeekWho: (it) => `Dabei: ${it}`,
+    pbSeekYours: "Deine Anzeige",
+    pbServer: "Vereinsadresse (nur mit Code)",
+    pbTabBook: "Buchen",
+    pbTabMine: (it) => `Meine (${it})`,
+    pbTabSeek: "Partner",
+    pbTitle: "Platz buchen",
+    pbToday: "Heute",
+    pbWaitAdded: "Du stehst auf der Warteliste",
+    pbWaitAny: "Jeder Platz zu dieser Zeit ist recht",
+    pbWaitAnyCourt: "Beliebiger Platz",
+    pbWaitAsk: "Benachrichtigen, wenn frei",
+    pbWaitFreed: "Jetzt frei!",
+    pbWaitList: "Auf der Warteliste",
+    pbWaitRemove: "Entfernen",
+    pbWaitText: "Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es.",
+    pbWaiting: "Wartend",
+    planBusy: (it) => `${it} Std. belegt`,
+    planClose: "Schließung",
+    planDay: "Tag",
+    planHint: "Buchungen, Stunden und Sperrungen, Tag für Tag; Turniermatches sind schon drin",
+    planLightsFrom: "Licht ab",
+    planOpen: "Öffnung",
+    planPrice: "Preis pro Stunde",
+    planPriceLights: "Preis pro Stunde mit Licht",
+    planSettings: "Zeiten und Preise",
+    planSlot: "Länge eines Feldes",
+    planTitle: "Platzbelegung",
+    planToday: "Zurück zu heute",
+    planTournamentMinutes: "Dauer eines Turniermatches",
+    ptAtClub: "in der Geschäftsstelle",
+    ptDelete: "Löschen",
+    ptDetails: "Link, IBAN oder Nummer (optional)",
+    ptHint: "Die der Verein annimmt, festgelegt von der Verwaltung: man wählt eine beim Erfassen einer Zahlung. Fernzahlungen (Satispay, PayPal, Revolut, Bancomat Pay, Überweisung, ein SumUp-Link…) mit Link, IBAN oder Nummer stehen in Nachrichten und Erinnerungen.",
+    ptName: "Name (z. B. Satispay, PayPal, Überweisung)",
+    ptNew: "Neue Zahlungsart",
+    ptOnline: "Fernzahlung",
+    ptOnlineHint: "Steht in Nachrichten und Erinnerungen, mit Link, IBAN oder Nummer.",
+    ptOnlineShort: "aus der Ferne",
+    ptTitle: "Zahlungsarten",
     scAddSlot: "Zeit hinzufügen",
     scAddStudent: "Schüler hinzufügen",
     scAttendance: (p, t) => `anwesend ${p} von ${t}`,
@@ -1080,6 +2009,57 @@ const APP_I18N = {
     scToMark: "einzutragen",
     scUpcoming: "Kommende",
     scWhoWasThere: "Wer da war",
+    srvAddress: "Serveradresse",
+    srvAddressHint: "Wie der Server sie beim Start anzeigt, z. B. http://192.168.1.50:8080 (oder https://… aus dem Internet)",
+    srvAlertChannel: "Online-Buchungen",
+    srvAlertGone: (it) => `Storniert: ${it}`,
+    srvAlertMany: (it) => `${it} Änderungen bei den Online-Buchungen`,
+    srvAlertNew: (it) => `Neue Buchung: ${it}`,
+    srvAlerts: "Bei Online-Buchungen benachrichtigen",
+    srvAlertsHint: "Eine Benachrichtigung, wenn ein Spieler bucht oder storniert: etwa alle 15 Minuten, auch bei geschlossener App",
+    srvAlertsOff: "TSM-Benachrichtigungen sind in den Handy-Einstellungen aus: Schalte sie ein, um die Hinweise zu bekommen.",
+    srvButtonHint: "Optional: Spieler buchen selbst",
+    srvCancelHours: "Selbst stornieren bis (Stunden vorher)",
+    srvConnected: (it) => `Verbunden mit ${it}`,
+    srvCourts: "Online buchbare Plätze",
+    srvDaysAhead: "Wie viele Tage im Voraus",
+    srvErrAuth: "Der Server kennt dieses Handy nicht mehr: Trennen und neu koppeln.",
+    srvErrCode: "Falscher oder schon benutzter Code.",
+    srvErrNet: "Der Server antwortet nicht: Prüfe die Adresse und ob das Handy im selben Netz (oder online) ist.",
+    srvErrNotTsm: "Unter dieser Adresse ist kein TSM-Vereinsserver.",
+    srvErrOther: (it) => `Serverfehler: ${it}`,
+    srvErrPairLocal: "Koppeln geht nur aus dem Vereinsnetz: Nutze die lokale Adresse (http://…:8080).",
+    srvIntro: "Optional. Mit einem kleinen Server im Verein (ein Raspberry Pi oder ein alter PC) buchen eingeladene Spieler die Plätze selbst am Handy, auch am iPhone, nach den hier festgelegten Regeln. Ohne Server bleibt alles wie gehabt: gebucht wird im Vereinsbüro.",
+    srvInvite: "Einladung zum Online-Buchen",
+    srvInviteCode: (it) => `Code: ${it}`,
+    srvInviteHint: "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm. Mit der TSM-App: Spielen › Platz buchen › QR-Code scannen.",
+    srvInviteHow: "Um einen Spieler einzuladen: Öffne seine Karte und tippe auf Einladung zum Online-Buchen.",
+    srvInviteUntil: (it) => `Gilt einmal, bis ${it}`,
+    srvLastSync: (it) => `Plan gesendet: ${it}`,
+    srvLinked: (it) => `Bucht online · zuletzt ${it}`,
+    srvMaxFuture: "Buchungen pro Spieler",
+    srvMaxMinutes: "Längste Buchung",
+    srvNeverSynced: "Plan noch nicht gesendet",
+    srvNotice: "Buchen bis (Minuten vorher)",
+    srvOnlineTag: "online",
+    srvOpen: "Online-Buchung offen",
+    srvOpenHint: "Aus: Spieler sehen den Plan, buchen aber nicht",
+    srvPair: "Koppeln",
+    srvPayInfo: "Wie bezahlt wird (lesen die Spieler)",
+    srvPlayers: (it) => `Verbundene Spieler: ${it}`,
+    srvPublicUrl: "Adresse aus dem Internet (optional)",
+    srvPublicUrlHint: "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins",
+    srvRemind: "Erinnerung an Spieler (Stunden vorher, 0 = keine)",
+    srvRevoke: "Online-Zugang entfernen",
+    srvSetupCode: "Kopplungscode",
+    srvSetupHint: "Der Server zeigt ihn beim Start und in der Datei setup-code.txt. Er gilt nur einmal.",
+    srvShare: "Link teilen",
+    srvShareText: (a, b) => `Buche die Plätze von ${a} hier: ${b}`,
+    srvSyncNow: "Jetzt senden",
+    srvSynced: "Plan gesendet",
+    srvTitle: "Vereinsserver",
+    srvUnpair: "Server trennen",
+    srvUnpairAsk: "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: java -jar tsm-server.jar --reset-admin). Buchungen im Plan bleiben.",
     stBlocked: (it) => `nicht buchbar ${it} Std.`,
     stBookings: "Buchungen",
     stByCourt: "Platz für Platz",
@@ -1110,6 +2090,70 @@ const APP_I18N = {
     tdPeople: (it) => it === 1 ? `von 1 Person` : `von ${it} Personen`,
     tdTitle: "Heute",
     tdToCollect: (it) => `Offen: ${it}`,
+    tmAddPlayer: "Spieler hinzufügen",
+    tmAskAll: "Alle nach Verfügbarkeit fragen",
+    tmAskAvailability: (it) => `bist du verfügbar für ${it}?`,
+    tmAskMissing: (it) => `Wer nicht geantwortet hat (${it})`,
+    tmAvailability: "Verfügbarkeit",
+    tmAvailabilityTitle: "Verfügbarkeit",
+    tmAway: "Auswärts",
+    tmCallUp: "Aufgestellt",
+    tmCallUpTitle: "Aufstellung",
+    tmCalledUp: (it) => `du bist aufgestellt für ${it}.`,
+    tmCaptain: "Kapitän",
+    tmCaptainLine: (it) => `Kapitän: ${it}`,
+    tmChampionship: "Meisterschaft (z. B. Herren Serie D1)",
+    tmCourtsHeld: (it) => `Reservierte Plätze: ${it}`,
+    tmDelete: "Mannschaft löschen",
+    tmDeleteAsk: (it) => `Mannschaft ${it} mit ihren Begegnungen löschen? Reservierte Plätze werden wieder buchbar.`,
+    tmDeleteFixture: "Begegnung löschen",
+    tmDeleteFixtureAsk: "Diese Begegnung löschen? Reservierte Plätze werden wieder buchbar.",
+    tmDoubleN: (it) => `Doppel ${it}`,
+    tmDoubles: "Doppel pro Begegnung",
+    tmDraw: "unentschieden",
+    tmDrawn: (it) => `U ${it}`,
+    tmFitp: "FITP-Meisterschaft",
+    tmFitpHint: "Im Kader und bei der Aufstellung werden Wettkampfausweis und Wettkampfattest zum Spieltag geprüft.",
+    tmHint: "Kader, Begegnungen, Verfügbarkeit, Aufstellungen und Ergebnisse der Mannschaftsmeisterschaften",
+    tmHoldCourts: "Für die Begegnung reservierte Plätze (in der Belegung nicht buchbar)",
+    tmHome: "Heimspiel",
+    tmHours: (it) => `Für ${it} Stunden`,
+    tmLost: "verloren",
+    tmMaybe: "Vielleicht",
+    tmMeeting: "Treffpunkt (Zeit und Ort)",
+    tmMeetingLine: (it) => `Treffpunkt: ${it}`,
+    tmName: "Name der Mannschaft (z. B. TC Test D1)",
+    tmNew: "Neue Mannschaft",
+    tmNewFixture: "Neue Begegnung",
+    tmNo: "Nein",
+    tmNoFixtures: "Keine Begegnungen: mit Neue Begegnung hinzufügen.",
+    tmNone: "Keine Mannschaften: mit Neue Mannschaft anlegen.",
+    tmOngoing: "läuft",
+    tmOpponent: "Gegnerische Mannschaft (z. B. TC Andere)",
+    tmOurs: (it) => it === 1 ? `Unser Spieler` : `Unsere zwei Spieler`,
+    tmPickCaptain: "Kapitän wählen",
+    tmPlace: "Spielort",
+    tmPlayers: (it) => `${it} Spieler`,
+    tmRecord: (w, l) => `S ${w} · N ${l}`,
+    tmReplyYesNo: "Antworte auf diese Nachricht mit JA, NEIN oder VIELLEICHT.",
+    tmResultTitle: "Ergebnis",
+    tmRosterEmpty: "Keine Spieler im Kader.",
+    tmRubbers: "Spiele",
+    tmScoreOurs: "Ergebnis aus unserer Sicht (z. B. 6-4 3-6 10-8)",
+    tmSeason: "Saison",
+    tmSendCallUp: (it) => `Aufstellung senden (${it})`,
+    tmSendResult: "Ergebnis senden",
+    tmSingleN: (it) => `Einzel ${it}`,
+    tmSingles: "Einzel pro Begegnung",
+    tmTabFixtures: "Begegnungen",
+    tmTabRoster: "Kader",
+    tmTheirs: "Gegner",
+    tmTheirs2: "Zweiter Gegner",
+    tmTheyWon: "Verloren",
+    tmTitle: "Mannschaften und Ligen",
+    tmWeWon: "Gewonnen",
+    tmWon: "gewonnen",
+    tmYes: "Ja",
   },
   es: {
     bkOther: "Otro",
@@ -1134,6 +2178,30 @@ const APP_I18N = {
     blkTitle: "Pistas no reservables",
     blkTo: "Hasta",
     blkTournament: "Torneo",
+    crtClay: "Tierra batida",
+    crtCovered: "cubierta",
+    crtDelete: "Eliminar la pista",
+    crtExists: "Ya hay una pista con este nombre.",
+    crtGrass: "Hierba",
+    crtHard: "Cemento",
+    crtHeatedShort: "climatizada",
+    crtHeating: "Calefacción",
+    crtHeatingPrice: (it) => `+${it} por hora`,
+    crtHeatingSupplement: "Suplemento de calefacción por hora",
+    crtLights: "Luz",
+    crtLightsShort: "luz",
+    crtName: "Nombre de la pista",
+    crtNew: "Nueva pista",
+    crtNoLightsWarn: "Esta pista no tiene luz.",
+    crtOpen: "descubierta",
+    crtPhotoAdd: "Añadir fotos",
+    crtPhotoRemove: "Quitar la foto",
+    crtPhotos: "Fotos",
+    crtPhotosAfter: "Las fotos se añaden después de guardar la pista.",
+    crtPhotosCount: (it) => `${it} ${it === 1 ? "foto" : "fotos"}`,
+    crtPricesHint: "Precios de esta pista: vacíos = los generales.",
+    crtTapToSet: "toca para configurarla",
+    crtTitle: "Pistas",
     ctAddEntry: "Inscribir",
     ctBye: "bye",
     ctCategory: "Categoría (p. ej. Individual masculino, +45)",
@@ -1224,6 +2292,128 @@ const APP_I18N = {
     ctWalkoverLong: "Ganado por w.o.",
     ctWhere: "Dónde y cuándo",
     ctWinner: "Ganador",
+    pbAlertChannel: "Tus reservas",
+    pbAlertFreed: "Se ha liberado una pista: ¡resérvala!",
+    pbAlertReminder: "Recordatorio del partido",
+    pbAlertRemoved: "Reserva quitada por la secretaría",
+    pbBlocked: "No reservable",
+    pbBookNow: "Reservar",
+    pbBooked: "¡Reservada!",
+    pbBusy: "Ocupada",
+    pbCallOffice: "Para anularla ahora llama a la secretaría.",
+    pbCancel: "Anular",
+    pbCancelAsk: "¿Anular esta reserva?",
+    pbCancelRule: (it) => `Anulas tú mismo hasta ${it} horas antes.`,
+    pbCancelled: "Reserva anulada",
+    pbClosed: "Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.",
+    pbConfirm: "Confirmar",
+    pbDay: "Elige el día",
+    pbDuration: "Duración",
+    pbEntryHint: "Si tu club tiene el servidor TSM: entra con la invitación de secretaría",
+    pbEntryJoined: (it) => `${it}: pistas libres y tus reservas`,
+    pbErrAuth: "Este teléfono ya no está conectado al club: pide una nueva invitación a secretaría.",
+    pbErrBlocked: "La pista no se puede reservar a esta hora.",
+    pbErrClosed: "Las reservas en línea están cerradas.",
+    pbErrCourt: "Esta pista no se reserva en línea.",
+    pbErrFar: "Este día aún no se puede reservar.",
+    pbErrFreeNow: "Se acaba de liberar: ¡resérvala ya!",
+    pbErrFull: "El anuncio ya está completo.",
+    pbErrInvite: "Invitación errónea o caducada: pide una nueva a la secretaría.",
+    pbErrLate: "Es tarde para anular tú mismo: llama a la secretaría.",
+    pbErrLong: "La reserva es demasiado larga.",
+    pbErrMany: "Ya tienes el máximo de reservas: juega o anula una primero.",
+    pbErrManySeeks: "Ya tienes 3 anuncios abiertos: quita uno primero.",
+    pbErrManyWaits: "Ya esperas 3 casillas: quita una primero.",
+    pbErrNet: "El servidor del club no responde. Inténtalo en un momento.",
+    pbErrPast: "Esta hora ya ha pasado.",
+    pbErrSlot: "Elige un horario del planning.",
+    pbErrSoon: "Es demasiado tarde para reservar esta hora: llama a la secretaría.",
+    pbErrSynced: "El club aún no ha publicado el planning.",
+    pbErrTaken: "Alguien acaba de reservar esta hora.",
+    pbErrTries: "Demasiados intentos: vuelve a probar en un cuarto de hora.",
+    pbErrUrl: "Con el código hace falta también la dirección del club (o usa el enlace de la invitación).",
+    pbFree: "Libre",
+    pbFreePrice: "gratis",
+    pbHeating: "Calefacción",
+    pbInvite: "Enlace o código de invitación",
+    pbJoin: "Entrar",
+    pbJoinIntro: "Escanea el QR de invitación que te dio la secretaría del club, o pega el enlace de la invitación (o escribe el código y la dirección del club).",
+    pbLeave: "Salir de este club",
+    pbLeaveAsk: "¿Salir en este teléfono? Para volver hará falta una nueva invitación de secretaría.",
+    pbLights: "Con luz",
+    pbMine: "Tus reservas",
+    pbMineCell: "Tuya",
+    pbNone: "Ninguna reserva",
+    pbPay: (it) => `Pago: ${it}`,
+    pbPrice: "Precio",
+    pbReminders: "Recordatorios en el teléfono",
+    pbRemindersHint: (it) => `Una notificación ${it} horas antes del partido y si la secretaría quita una de tus reservas`,
+    pbRules: (a, b) => `Reservas hasta ${a} días antes, como mucho ${b} reservas a la vez.`,
+    pbScan: "Escanear el QR",
+    pbScanPrompt: "Escanea el QR de invitación del club",
+    pbSeekAlertFound: "Partido encontrado: ¡pista reservada!",
+    pbSeekAlertJoined: "Alguien responde a tu anuncio",
+    pbSeekAlertNoCourt: "Jugadores encontrados, pero ninguna pista libre",
+    pbSeekBooked: (it) => `Pista reservada: ${it}`,
+    pbSeekDay: "Día",
+    pbSeekDoubles: "Dobles",
+    pbSeekFrom: "Desde",
+    pbSeekHint: "Los demás jugadores lo ven y tocan Me apunto; cuando estéis completos el servidor reserva la primera pista libre en la franja elegida.",
+    pbSeekJoin: "Me apunto",
+    pbSeekJoined: "¡Estás dentro! Cuando estéis completos la pista se reserva sola.",
+    pbSeekLeave: "Me borro",
+    pbSeekLevel: "Nivel (p. ej. NC, 4.3)",
+    pbSeekNeed: (it) => it === 1 ? `falta 1` : `faltan ${it}`,
+    pbSeekNew: "Publicar un anuncio",
+    pbSeekNoCourt: "Completos, pero ninguna pista libre: reservadla vosotros.",
+    pbSeekNone: "Ningún anuncio: publica uno, los demás jugadores del club lo verán.",
+    pbSeekNote: "Nota (opcional)",
+    pbSeekPublish: "Publicar",
+    pbSeekPublished: "Anuncio publicado",
+    pbSeekRemove: "Quitar el anuncio",
+    pbSeekSingles: "Individual",
+    pbSeekTitle: "Busco compañero",
+    pbSeekTo: "Hasta",
+    pbSeekWho: (it) => `Apuntados: ${it}`,
+    pbSeekYours: "Tu anuncio",
+    pbServer: "Dirección del club (solo con el código)",
+    pbTabBook: "Reservar",
+    pbTabMine: (it) => `Mías (${it})`,
+    pbTabSeek: "Compañeros",
+    pbTitle: "Reservar pista",
+    pbToday: "Hoy",
+    pbWaitAdded: "Estás en la lista de espera",
+    pbWaitAny: "Me vale cualquier pista a esta hora",
+    pbWaitAnyCourt: "Cualquier pista",
+    pbWaitAsk: "Avísame si se libera",
+    pbWaitFreed: "¡Se ha liberado!",
+    pbWaitList: "En lista de espera",
+    pbWaitRemove: "Quitar",
+    pbWaitText: "Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero.",
+    pbWaiting: "En espera",
+    planBusy: (it) => `${it}h ocupada`,
+    planClose: "Cierre",
+    planDay: "Día",
+    planHint: "Reservas, clases y cierres, día a día; los partidos de los torneos ya están",
+    planLightsFrom: "Luz desde las",
+    planOpen: "Apertura",
+    planPrice: "Precio por hora",
+    planPriceLights: "Precio por hora con luz",
+    planSettings: "Horarios y precios",
+    planSlot: "Duración de una casilla",
+    planTitle: "Planning de pistas",
+    planToday: "Volver a hoy",
+    planTournamentMinutes: "Duración de un partido de torneo",
+    ptAtClub: "en secretaría",
+    ptDelete: "Eliminar",
+    ptDetails: "Enlace, IBAN o número (opcional)",
+    ptHint: "Los que acepta el club, elegidos por quien lo gestiona: se elige uno al registrar un pago. Los de pago a distancia (Satispay, PayPal, Revolut, Bancomat Pay, transferencia, un enlace SumUp…) con enlace, IBAN o número van en los avisos y recordatorios.",
+    ptName: "Nombre (p. ej. Satispay, PayPal, Transferencia)",
+    ptNew: "Nuevo medio de pago",
+    ptOnline: "Se paga a distancia",
+    ptOnlineHint: "Va en los avisos y recordatorios, con el enlace, el IBAN o el número.",
+    ptOnlineShort: "a distancia",
+    ptTitle: "Medios de pago",
     scAddSlot: "Añadir un horario",
     scAddStudent: "Añadir alumno",
     scAttendance: (p, t) => `asistió a ${p} de ${t}`,
@@ -1268,6 +2458,57 @@ const APP_I18N = {
     scToMark: "por pasar lista",
     scUpcoming: "Próximas",
     scWhoWasThere: "Quién estuvo",
+    srvAddress: "Dirección del servidor",
+    srvAddressHint: "Como la muestra el servidor al arrancar, p. ej. http://192.168.1.50:8080 (o https://… desde internet)",
+    srvAlertChannel: "Reservas en línea",
+    srvAlertGone: (it) => `Anulada: ${it}`,
+    srvAlertMany: (it) => `${it} novedades en las reservas en línea`,
+    srvAlertNew: (it) => `Nueva reserva: ${it}`,
+    srvAlerts: "Avisarme de las reservas en línea",
+    srvAlertsHint: "Una notificación cuando un jugador reserva o anula: cada 15 minutos más o menos, también con la app cerrada",
+    srvAlertsOff: "Las notificaciones de TSM están apagadas en los ajustes del teléfono: enciéndelas para recibir los avisos.",
+    srvButtonHint: "Opcional: los jugadores reservan solos",
+    srvCancelHours: "Anular solo hasta (horas antes)",
+    srvConnected: (it) => `Conectado a ${it}`,
+    srvCourts: "Pistas reservables en línea",
+    srvDaysAhead: "Cuántos días antes",
+    srvErrAuth: "El servidor ya no reconoce este teléfono: desconecta y empareja de nuevo.",
+    srvErrCode: "Código erróneo o ya usado.",
+    srvErrNet: "El servidor no responde: revisa la dirección y que el teléfono esté en la misma red (o en internet).",
+    srvErrNotTsm: "En esa dirección no hay un servidor de club TSM.",
+    srvErrOther: (it) => `Error del servidor: ${it}`,
+    srvErrPairLocal: "El emparejamiento solo se hace desde la red del club: usa la dirección local (http://…:8080).",
+    srvIntro: "Opcional. Con un pequeño servidor en el club (una Raspberry Pi o un PC viejo) los jugadores invitados reservan las pistas solos desde el teléfono, también iPhone, con las reglas fijadas aquí. Sin servidor todo sigue igual: se reserva en secretaría.",
+    srvInvite: "Invitación para reservar en línea",
+    srvInviteCode: (it) => `Código: ${it}`,
+    srvInviteHint: "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio. Con la app TSM: Jugar › Reservar pista › Escanear el QR.",
+    srvInviteHow: "Para invitar a un jugador: abre su ficha y toca Invitación para reservar en línea.",
+    srvInviteUntil: (it) => `Vale una vez, hasta el ${it}`,
+    srvLastSync: (it) => `Planning enviado: ${it}`,
+    srvLinked: (it) => `Reserva en línea · último acceso ${it}`,
+    srvMaxFuture: "Reservas por jugador",
+    srvMaxMinutes: "Duración máxima",
+    srvNeverSynced: "Planning aún no enviado",
+    srvNotice: "Reservar hasta (minutos antes)",
+    srvOnlineTag: "en línea",
+    srvOpen: "Reservas en línea abiertas",
+    srvOpenHint: "Apagadas: los jugadores ven el planning pero no reservan",
+    srvPair: "Emparejar",
+    srvPayInfo: "Cómo se paga (lo leen los jugadores)",
+    srvPlayers: (it) => `Jugadores conectados: ${it}`,
+    srvPublicUrl: "Dirección desde internet (opcional)",
+    srvPublicUrlHint: "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club",
+    srvRemind: "Recordatorio a los jugadores (horas antes, 0 = no)",
+    srvRevoke: "Quitar el acceso en línea",
+    srvSetupCode: "Código de emparejamiento",
+    srvSetupHint: "El servidor lo muestra al arrancar y en el archivo setup-code.txt. Vale una sola vez.",
+    srvShare: "Compartir el enlace",
+    srvShareText: (a, b) => `Reserva las pistas de ${a} aquí: ${b}`,
+    srvSyncNow: "Enviar ahora",
+    srvSynced: "Planning enviado",
+    srvTitle: "Servidor del club",
+    srvUnpair: "Desconectar el servidor",
+    srvUnpairAsk: "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: java -jar tsm-server.jar --reset-admin). Las reservas ya en el planning se quedan.",
     stBlocked: (it) => `no reservables ${it} h`,
     stBookings: "Reservas",
     stByCourt: "Pista por pista",
@@ -1298,6 +2539,70 @@ const APP_I18N = {
     tdPeople: (it) => it === 1 ? `de 1 persona` : `de ${it} personas`,
     tdTitle: "Hoy",
     tdToCollect: (it) => `Por cobrar: ${it}`,
+    tmAddPlayer: "Añadir jugador",
+    tmAskAll: "Pedir disponibilidad a todos",
+    tmAskAvailability: (it) => `¿estás disponible para ${it}?`,
+    tmAskMissing: (it) => `Pedir a quien no ha respondido (${it})`,
+    tmAvailability: "Disponibilidad",
+    tmAvailabilityTitle: "Disponibilidad",
+    tmAway: "fuera",
+    tmCallUp: "Convocados",
+    tmCallUpTitle: "Convocatoria",
+    tmCalledUp: (it) => `estás convocado para ${it}.`,
+    tmCaptain: "capitán",
+    tmCaptainLine: (it) => `Capitán: ${it}`,
+    tmChampionship: "Campeonato (p. ej. Serie D1 masculina)",
+    tmCourtsHeld: (it) => `Pistas reservadas: ${it}`,
+    tmDelete: "Eliminar el equipo",
+    tmDeleteAsk: (it) => `¿Eliminar el equipo ${it} con sus encuentros? Las pistas reservadas vuelven a estar libres.`,
+    tmDeleteFixture: "Eliminar el encuentro",
+    tmDeleteFixtureAsk: "¿Eliminar este encuentro? Las pistas reservadas vuelven a estar libres.",
+    tmDoubleN: (it) => `Dobles ${it}`,
+    tmDoubles: "Dobles por encuentro",
+    tmDraw: "empate",
+    tmDrawn: (it) => `E ${it}`,
+    tmFitp: "Campeonato FITP",
+    tmFitpHint: "En la plantilla y los convocados se comprueban licencia y certificado de competición del día del encuentro.",
+    tmHint: "Plantilla, encuentros, disponibilidad, convocatorias y resultados de los campeonatos por equipos",
+    tmHoldCourts: "Pistas reservadas para el encuentro (no reservables en el planning)",
+    tmHome: "en casa",
+    tmHours: (it) => `Durante ${it} horas`,
+    tmLost: "perdido",
+    tmMaybe: "Quizá",
+    tmMeeting: "Punto de encuentro (hora y lugar)",
+    tmMeetingLine: (it) => `Punto de encuentro: ${it}`,
+    tmName: "Nombre del equipo (p. ej. CT Prueba D1)",
+    tmNew: "Nuevo equipo",
+    tmNewFixture: "Nuevo encuentro",
+    tmNo: "No",
+    tmNoFixtures: "Ningún encuentro: añádelo con Nuevo encuentro.",
+    tmNone: "Ningún equipo: crea uno con Nuevo equipo.",
+    tmOngoing: "en curso",
+    tmOpponent: "Equipo rival (p. ej. CT Otro)",
+    tmOurs: (it) => it === 1 ? `Nuestro jugador` : `Nuestros dos jugadores`,
+    tmPickCaptain: "Elegir el capitán",
+    tmPlace: "Dónde se juega",
+    tmPlayers: (it) => `${it} ${it === 1 ? "jugador" : "jugadores"}`,
+    tmRecord: (w, l) => `G ${w} · P ${l}`,
+    tmReplyYesNo: "Responde a este mensaje con SÍ, NO o QUIZÁ.",
+    tmResultTitle: "Resultado",
+    tmRosterEmpty: "Ningún jugador en la plantilla.",
+    tmRubbers: "Partidos",
+    tmScoreOurs: "Resultado desde nuestro lado (p. ej. 6-4 3-6 10-8)",
+    tmSeason: "Temporada",
+    tmSendCallUp: (it) => `Enviar la convocatoria (${it})`,
+    tmSendResult: "Enviar el resultado",
+    tmSingleN: (it) => `Individual ${it}`,
+    tmSingles: "Individuales por encuentro",
+    tmTabFixtures: "Encuentros",
+    tmTabRoster: "Plantilla",
+    tmTheirs: "Rival",
+    tmTheirs2: "Segundo rival",
+    tmTheyWon: "Perdido",
+    tmTitle: "Equipos y ligas",
+    tmWeWon: "Ganado",
+    tmWon: "ganado",
+    tmYes: "Sí",
   },
   pt: {
     bkOther: "Outro",
@@ -1322,6 +2627,30 @@ const APP_I18N = {
     blkTitle: "Quadras não reserváveis",
     blkTo: "Até",
     blkTournament: "Torneio",
+    crtClay: "Saibro",
+    crtCovered: "coberta",
+    crtDelete: "Excluir a quadra",
+    crtExists: "Já existe uma quadra com este nome.",
+    crtGrass: "Grama",
+    crtHard: "Rápida",
+    crtHeatedShort: "aquecida",
+    crtHeating: "Aquecimento",
+    crtHeatingPrice: (it) => `+${it} por hora`,
+    crtHeatingSupplement: "Adicional de aquecimento por hora",
+    crtLights: "Iluminação",
+    crtLightsShort: "iluminação",
+    crtName: "Nome da quadra",
+    crtNew: "Nova quadra",
+    crtNoLightsWarn: "Esta quadra não tem iluminação.",
+    crtOpen: "descoberta",
+    crtPhotoAdd: "Adicionar fotos",
+    crtPhotoRemove: "Tirar a foto",
+    crtPhotos: "Fotos",
+    crtPhotosAfter: "As fotos se adicionam depois de salvar a quadra.",
+    crtPhotosCount: (it) => `${it} ${it === 1 ? "foto" : "fotos"}`,
+    crtPricesHint: "Preços desta quadra: vazios = os gerais.",
+    crtTapToSet: "toque para configurar",
+    crtTitle: "Quadras",
     ctAddEntry: "Inscrever",
     ctBye: "bye",
     ctCategory: "Categoria (ex. Simples masculino, 45+)",
@@ -1412,6 +2741,128 @@ const APP_I18N = {
     ctWalkoverLong: "Vitória por W.O.",
     ctWhere: "Onde e quando",
     ctWinner: "Vencedor",
+    pbAlertChannel: "As tuas reservas",
+    pbAlertFreed: "Ficou livre uma quadra: reserva-a!",
+    pbAlertReminder: "Lembrete do jogo",
+    pbAlertRemoved: "Reserva retirada pela secretaria",
+    pbBlocked: "Não reservável",
+    pbBookNow: "Reservar",
+    pbBooked: "Reservada!",
+    pbBusy: "Ocupada",
+    pbCallOffice: "Para a cancelar agora liga para a secretaria.",
+    pbCancel: "Cancelar",
+    pbCancelAsk: "Cancelar esta reserva?",
+    pbCancelRule: (it) => `Cancelas sozinho até ${it} horas antes.`,
+    pbCancelled: "Reserva cancelada",
+    pbClosed: "As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.",
+    pbConfirm: "Confirmar",
+    pbDay: "Escolhe o dia",
+    pbDuration: "Duração",
+    pbEntryHint: "Se o teu clube tem o servidor TSM: entra com o convite da secretaria",
+    pbEntryJoined: (it) => `${it}: quadras livres e as tuas reservas`,
+    pbErrAuth: "Este telemóvel já não está ligado ao clube: pede um novo convite à secretaria.",
+    pbErrBlocked: "A quadra não se pode reservar a esta hora.",
+    pbErrClosed: "As reservas online estão fechadas.",
+    pbErrCourt: "Esta quadra não se reserva online.",
+    pbErrFar: "Este dia ainda não se pode reservar.",
+    pbErrFreeNow: "Acabou de ficar livre: reserva-a já!",
+    pbErrFull: "O anúncio já está completo.",
+    pbErrInvite: "Convite errado ou expirado: pede um novo à secretaria.",
+    pbErrLate: "É tarde para cancelares sozinho: liga para a secretaria.",
+    pbErrLong: "A reserva é demasiado longa.",
+    pbErrMany: "Já tens o máximo de reservas: joga ou cancela uma primeiro.",
+    pbErrManySeeks: "Já tens 3 anúncios abertos: tira um primeiro.",
+    pbErrManyWaits: "Já esperas por 3 casas: tira uma primeiro.",
+    pbErrNet: "O servidor do clube não responde. Tenta daqui a pouco.",
+    pbErrPast: "Esta hora já passou.",
+    pbErrSlot: "Escolhe um horário da agenda.",
+    pbErrSoon: "É tarde demais para reservar esta hora: liga para a secretaria.",
+    pbErrSynced: "O clube ainda não publicou a agenda.",
+    pbErrTaken: "Alguém acabou de reservar esta hora.",
+    pbErrTries: "Demasiadas tentativas: tenta de novo daqui a um quarto de hora.",
+    pbErrUrl: "Com o código é preciso também o endereço do clube (ou usa a ligação do convite).",
+    pbFree: "Livre",
+    pbFreePrice: "grátis",
+    pbHeating: "Aquecimento",
+    pbInvite: "Ligação ou código de convite",
+    pbJoin: "Entrar",
+    pbJoinIntro: "Lê o QR de convite que a secretaria do clube te deu, ou cola a ligação do convite (ou escreve o código e o endereço do clube).",
+    pbLeave: "Sair deste clube",
+    pbLeaveAsk: "Sair neste telemóvel? Para voltar é preciso um novo convite da secretaria.",
+    pbLights: "Com luz",
+    pbMine: "As tuas reservas",
+    pbMineCell: "Tua",
+    pbNone: "Nenhuma reserva",
+    pbPay: (it) => `Pagamento: ${it}`,
+    pbPrice: "Preço",
+    pbReminders: "Lembretes no telemóvel",
+    pbRemindersHint: (it) => `Uma notificação ${it} horas antes do jogo e se a secretaria retirar uma das tuas reservas`,
+    pbRules: (a, b) => `Reservas até ${a} dias antes, no máximo ${b} reservas de cada vez.`,
+    pbScan: "Ler o QR",
+    pbScanPrompt: "Lê o QR de convite do clube",
+    pbSeekAlertFound: "Jogo encontrado: quadra reservada!",
+    pbSeekAlertJoined: "Alguém respondeu ao teu anúncio",
+    pbSeekAlertNoCourt: "Jogadores encontrados, mas nenhuma quadra livre",
+    pbSeekBooked: (it) => `Quadra reservada: ${it}`,
+    pbSeekDay: "Dia",
+    pbSeekDoubles: "Pares",
+    pbSeekFrom: "Das",
+    pbSeekHint: "Os outros jogadores veem-no e tocam em Conta comigo; quando estiverem completos o servidor reserva a primeira quadra livre na faixa escolhida.",
+    pbSeekJoin: "Conta comigo",
+    pbSeekJoined: "Estás dentro! Quando estiverem completos a quadra reserva-se sozinha.",
+    pbSeekLeave: "Saio",
+    pbSeekLevel: "Nível (ex. NC, 4.3)",
+    pbSeekNeed: (it) => it === 1 ? `falta 1` : `faltam ${it}`,
+    pbSeekNew: "Publicar um anúncio",
+    pbSeekNoCourt: "Completos, mas nenhuma quadra livre: reservem vocês.",
+    pbSeekNone: "Nenhum anúncio: publica um, os outros jogadores do clube vão vê-lo.",
+    pbSeekNote: "Nota (opcional)",
+    pbSeekPublish: "Publicar",
+    pbSeekPublished: "Anúncio publicado",
+    pbSeekRemove: "Tirar o anúncio",
+    pbSeekSingles: "Singulares",
+    pbSeekTitle: "Procuro parceiro",
+    pbSeekTo: "Às",
+    pbSeekWho: (it) => `Já estão: ${it}`,
+    pbSeekYours: "O teu anúncio",
+    pbServer: "Endereço do clube (só com o código)",
+    pbTabBook: "Reservar",
+    pbTabMine: (it) => `Minhas (${it})`,
+    pbTabSeek: "Parceiros",
+    pbTitle: "Reservar quadra",
+    pbToday: "Hoje",
+    pbWaitAdded: "Estás na lista de espera",
+    pbWaitAny: "Serve qualquer quadra a esta hora",
+    pbWaitAnyCourt: "Qualquer quadra",
+    pbWaitAsk: "Avisa-me se ficar livre",
+    pbWaitFreed: "Ficou livre!",
+    pbWaitList: "Na lista de espera",
+    pbWaitRemove: "Tirar",
+    pbWaitText: "Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro.",
+    pbWaiting: "Em espera",
+    planBusy: (it) => `${it}h ocupada`,
+    planClose: "Fechamento",
+    planDay: "Dia",
+    planHint: "Reservas, aulas e fechamentos, dia a dia; as partidas dos torneios já estão",
+    planLightsFrom: "Iluminação a partir das",
+    planOpen: "Abertura",
+    planPrice: "Preço por hora",
+    planPriceLights: "Preço por hora com iluminação",
+    planSettings: "Horários e preços",
+    planSlot: "Duração de um horário",
+    planTitle: "Agenda das quadras",
+    planToday: "Voltar para hoje",
+    planTournamentMinutes: "Duração de uma partida de torneio",
+    ptAtClub: "na secretaria",
+    ptDelete: "Excluir",
+    ptDetails: "Link, IBAN ou número (opcional)",
+    ptHint: "Os que o clube aceita, escolhidos por quem o administra: escolhe-se um ao registrar um pagamento. Os a distância (Satispay, PayPal, Revolut, Bancomat Pay, transferência, um link SumUp…) com link, IBAN ou número vão nos avisos e lembretes.",
+    ptName: "Nome (ex. Satispay, PayPal, Transferência)",
+    ptNew: "Novo meio de pagamento",
+    ptOnline: "Paga-se a distância",
+    ptOnlineHint: "Vai nos avisos e lembretes, com o link, o IBAN ou o número.",
+    ptOnlineShort: "a distância",
+    ptTitle: "Meios de pagamento",
     scAddSlot: "Adicionar um horário",
     scAddStudent: "Adicionar aluno",
     scAttendance: (p, t) => `presente em ${p} de ${t}`,
@@ -1456,6 +2907,57 @@ const APP_I18N = {
     scToMark: "a marcar",
     scUpcoming: "Próximas",
     scWhoWasThere: "Quem estava",
+    srvAddress: "Endereço do servidor",
+    srvAddressHint: "Como o servidor o mostra ao arrancar, ex. http://192.168.1.50:8080 (ou https://… pela internet)",
+    srvAlertChannel: "Reservas online",
+    srvAlertGone: (it) => `Cancelada: ${it}`,
+    srvAlertMany: (it) => `${it} novidades nas reservas online`,
+    srvAlertNew: (it) => `Nova reserva: ${it}`,
+    srvAlerts: "Avisar-me das reservas online",
+    srvAlertsHint: "Uma notificação quando um jogador reserva ou cancela: mais ou menos a cada 15 minutos, mesmo com a app fechada",
+    srvAlertsOff: "As notificações do TSM estão desligadas nas definições do telemóvel: liga-as para receber os avisos.",
+    srvButtonHint: "Opcional: os jogadores reservam sozinhos",
+    srvCancelHours: "Cancelar sozinho até (horas antes)",
+    srvConnected: (it) => `Ligado a ${it}`,
+    srvCourts: "Quadras reserváveis online",
+    srvDaysAhead: "Quantos dias antes",
+    srvErrAuth: "O servidor já não reconhece este telemóvel: desliga e emparelha de novo.",
+    srvErrCode: "Código errado ou já usado.",
+    srvErrNet: "O servidor não responde: verifica o endereço e se o telemóvel está na mesma rede (ou na internet).",
+    srvErrNotTsm: "Nesse endereço não há um servidor de clube TSM.",
+    srvErrOther: (it) => `Erro do servidor: ${it}`,
+    srvErrPairLocal: "O emparelhamento só se faz a partir da rede do clube: usa o endereço local (http://…:8080).",
+    srvIntro: "Opcional. Com um pequeno servidor no clube (um Raspberry Pi ou um PC antigo) os jogadores convidados reservam as quadras sozinhos no telemóvel, também iPhone, com as regras definidas aqui. Sem servidor tudo fica igual: reserva-se na secretaria.",
+    srvInvite: "Convite para reservar online",
+    srvInviteCode: (it) => `Código: ${it}`,
+    srvInviteHint: "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal. Com a app TSM: Jogar › Reservar quadra › Ler o QR.",
+    srvInviteHow: "Para convidar um jogador: abre a sua ficha e toca em Convite para reservar online.",
+    srvInviteUntil: (it) => `Vale uma vez, até ${it}`,
+    srvLastSync: (it) => `Agenda enviada: ${it}`,
+    srvLinked: (it) => `Reserva online · último acesso ${it}`,
+    srvMaxFuture: "Reservas por jogador",
+    srvMaxMinutes: "Duração máxima",
+    srvNeverSynced: "Agenda ainda não enviada",
+    srvNotice: "Reservar até (minutos antes)",
+    srvOnlineTag: "online",
+    srvOpen: "Reservas online abertas",
+    srvOpenHint: "Desligadas: os jogadores veem a agenda mas não reservam",
+    srvPair: "Emparelhar",
+    srvPayInfo: "Como se paga (os jogadores leem)",
+    srvPlayers: (it) => `Jogadores ligados: ${it}`,
+    srvPublicUrl: "Endereço pela internet (opcional)",
+    srvPublicUrlHint: "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube",
+    srvRemind: "Lembrete aos jogadores (horas antes, 0 = não)",
+    srvRevoke: "Retirar o acesso online",
+    srvSetupCode: "Código de emparelhamento",
+    srvSetupHint: "O servidor mostra-o ao arrancar e no ficheiro setup-code.txt. Só vale uma vez.",
+    srvShare: "Partilhar a ligação",
+    srvShareText: (a, b) => `Reserva as quadras de ${a} aqui: ${b}`,
+    srvSyncNow: "Enviar agora",
+    srvSynced: "Agenda enviada",
+    srvTitle: "Servidor do clube",
+    srvUnpair: "Desligar o servidor",
+    srvUnpairAsk: "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: java -jar tsm-server.jar --reset-admin). As reservas já na agenda ficam.",
     stBlocked: (it) => `não reserváveis ${it} h`,
     stBookings: "Reservas",
     stByCourt: "Quadra a quadra",
@@ -1486,6 +2988,70 @@ const APP_I18N = {
     tdPeople: (it) => it === 1 ? `de 1 pessoa` : `de ${it} pessoas`,
     tdTitle: "Hoje",
     tdToCollect: (it) => `Por receber: ${it}`,
+    tmAddPlayer: "Adicionar jogador",
+    tmAskAll: "Pedir disponibilidade a todos",
+    tmAskAvailability: (it) => `você está disponível para ${it}?`,
+    tmAskMissing: (it) => `Pedir a quem não respondeu (${it})`,
+    tmAvailability: "Disponibilidade",
+    tmAvailabilityTitle: "Disponibilidade",
+    tmAway: "fora",
+    tmCallUp: "Convocados",
+    tmCallUpTitle: "Convocação",
+    tmCalledUp: (it) => `você está convocado para ${it}.`,
+    tmCaptain: "capitão",
+    tmCaptainLine: (it) => `Capitão: ${it}`,
+    tmChampionship: "Campeonato (ex. Série D1 masculina)",
+    tmCourtsHeld: (it) => `Quadras reservadas: ${it}`,
+    tmDelete: "Excluir a equipe",
+    tmDeleteAsk: (it) => `Excluir a equipe ${it} com os confrontos dela? As quadras reservadas voltam a ficar livres.`,
+    tmDeleteFixture: "Excluir o confronto",
+    tmDeleteFixtureAsk: "Excluir este confronto? As quadras reservadas voltam a ficar livres.",
+    tmDoubleN: (it) => `Duplas ${it}`,
+    tmDoubles: "Duplas por confronto",
+    tmDraw: "empate",
+    tmDrawn: (it) => `E ${it}`,
+    tmFitp: "Campeonato FITP",
+    tmFitpHint: "No elenco e nos convocados se verificam cartão e atestado de competição do dia do confronto.",
+    tmHint: "Elenco, confrontos, disponibilidade, convocações e resultados dos campeonatos por equipes",
+    tmHoldCourts: "Quadras reservadas para o confronto (não reserváveis na agenda)",
+    tmHome: "em casa",
+    tmHours: (it) => `Por ${it} horas`,
+    tmLost: "perdido",
+    tmMaybe: "Talvez",
+    tmMeeting: "Ponto de encontro (hora e local)",
+    tmMeetingLine: (it) => `Ponto de encontro: ${it}`,
+    tmName: "Nome da equipe (ex. TC Teste D1)",
+    tmNew: "Nova equipe",
+    tmNewFixture: "Novo confronto",
+    tmNo: "Não",
+    tmNoFixtures: "Nenhum confronto: adicione com Novo confronto.",
+    tmNone: "Nenhuma equipe: crie uma com Nova equipe.",
+    tmOngoing: "em andamento",
+    tmOpponent: "Equipe adversária (ex. TC Outro)",
+    tmOurs: (it) => it === 1 ? `Nosso jogador` : `Nossos dois jogadores`,
+    tmPickCaptain: "Escolher o capitão",
+    tmPlace: "Onde se joga",
+    tmPlayers: (it) => `${it} ${it === 1 ? "jogador" : "jogadores"}`,
+    tmRecord: (w, l) => `V ${w} · D ${l}`,
+    tmReplyYesNo: "Responda a esta mensagem com SIM, NÃO ou TALVEZ.",
+    tmResultTitle: "Resultado",
+    tmRosterEmpty: "Nenhum jogador no elenco.",
+    tmRubbers: "Partidas",
+    tmScoreOurs: "Placar do nosso lado (ex. 6-4 3-6 10-8)",
+    tmSeason: "Temporada",
+    tmSendCallUp: (it) => `Enviar a convocação (${it})`,
+    tmSendResult: "Enviar o resultado",
+    tmSingleN: (it) => `Simples ${it}`,
+    tmSingles: "Simples por confronto",
+    tmTabFixtures: "Confrontos",
+    tmTabRoster: "Elenco",
+    tmTheirs: "Adversário",
+    tmTheirs2: "Segundo adversário",
+    tmTheyWon: "Perdida",
+    tmTitle: "Equipes e campeonatos",
+    tmWeWon: "Vencida",
+    tmWon: "vencido",
+    tmYes: "Sim",
   },
 };
 for (const l in APP_I18N) Object.assign(DESK_I18N[l], APP_I18N[l]);
@@ -1699,7 +3265,7 @@ async function start() {
 const VIEWS = () => {
   const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
   return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')],
-    ['school', T.scTitle, on('SCHOOL')], ['stats', T.stTitle, on('STATS')]]
+    ['school', T.scTitle, on('SCHOOL')], ['teams', T.tmTitle, on('TEAMS')], ['online', T.onlineTitle, on('SERVER')], ['stats', T.stTitle, on('STATS')], ['settings', T.settingsTitle, true]]
     .filter((v) => v[2]).map(([v, l]) => [v, l]);
 };
 const main = () => document.querySelector('main');
@@ -1709,12 +3275,12 @@ async function render() {
   put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } }, l)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, stats: showStats })[view](); }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, teams: showTeams, online: showOnline, stats: showStats, settings: showSettings })[view](); }
   catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
@@ -1748,7 +3314,7 @@ async function showToday() {
       () => go('cups', () => { cupId = cups.length === 1 ? cups[0] : null; cupTab = 'matches'; })));
   }
   if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at), () => go('school', () => { courseId = null; })));
-  if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text)));
+  if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text), () => go('teams', () => { teamId = null; fixtureId = null; })));
   if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
   const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)),
@@ -2665,6 +4231,381 @@ async function showStats() {
     st.top.length ? h('div.section', h('h2', T.stTop), h('div.panel', h('table', h('tbody', st.top.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td.num', T.stCount(x.count)))))))) : null);
 }
 
+// --- Server delle prenotazioni ---
+
+const srvError = (c) => ({ NET: T.srvErrNet, UNAUTHORIZED: T.srvErrAuth, NOT_TSM: T.srvErrNotTsm })[c] || T.srvErrOther(c);
+
+async function showOnline() {
+  let o;
+  try { o = await api('GET', '/online'); }
+  catch (e) {
+    if (e instanceof ApiError && e.message === 'NOT_PAIRED') { put(main(), h('div.head', h('h1', T.onlineTitle)), h('div.panel', h('div.empty', T.notPaired))); return; }
+    throw e;
+  }
+  const act = async (method, path, ask) => {
+    if (ask && !confirm(ask)) return;
+    try { await api(method, path); toast(T.saved); } catch (e) { toast(e instanceof ApiError && T.err[e.message] ? errText(e) : srvError(e.message)); }
+    await showOnline();
+  };
+  const when = (d, m) => shortDay(d) + ' ' + hhmm(m);
+  const rules = o.rules;
+  const num = (v, min, max) => h('input', { type: 'number', min, max, value: v });
+  const open = h('input', { type: 'checkbox', checked: rules.open });
+  const days = num(rules.daysAhead, 0, 60), most = num(rules.maxFuture, 1, 20), long = num(rules.maxMinutes, 30, 480);
+  const cancel = num(rules.cancelHours, 0, 168), notice = num(rules.noticeMinutes, 0, 1440), remind = num(rules.remindHours, 0, 48);
+  const courts = o.courts.map((c) => [c, h('input', { type: 'checkbox', checked: rules.courts.includes(c) })]);
+  const pay = h('textarea', { rows: 2, maxlength: 300 }, o.payInfo);
+  const alerts = h('input', { type: 'checkbox', checked: o.alerts });
+  const saveRules = async () => {
+    const body = { rules: { ...rules, open: open.checked, daysAhead: Number(days.value), maxFuture: Number(most.value), maxMinutes: Number(long.value),
+      cancelHours: Number(cancel.value), noticeMinutes: Number(notice.value), remindHours: Number(remind.value), courts: courts.filter(([, x]) => x.checked).map(([c]) => c) },
+    payInfo: pay.value, alerts: alerts.checked };
+    try {
+      await api('PUT', '/online/rules', body);
+      // Al server subito: così i giocatori le vedono già.
+      try { await api('POST', '/online/sync'); toast(T.rulesSent); } catch (_) { toast(T.rulesLater); }
+    } catch (e) { toast(errText(e)); }
+    await showOnline();
+  };
+  const sync = o.lastSync ? T.srvLastSync(dateText(o.lastSync) + ' ' + hhmm(o.lastSyncMin)) : T.srvNeverSynced;
+  put(main(),
+    h('div.head', h('h1', T.onlineTitle), h('button', { onclick: () => act('POST', '/online/sync') }, T.srvSyncNow), h('button', { onclick: () => window.print() }, T.print)),
+    h('p.dim', T.srvConnected(o.club || o.url), ' · ', sync, o.publicUrl ? ' · ' + o.publicUrl : ''),
+    o.error ? h('p', h('span.tag.bad', srvError(o.error))) : null,
+    o.stateError ? h('div.panel', h('div.empty', srvError(o.stateError))) : null,
+    printHead(T.onlineTitle),
+    h('div.section', h('h2', T.onlineBookings + ' (' + o.bookings.length + ')'),
+      o.bookings.length ? h('div.panel', h('table',
+        h('thead', h('tr', [T.cupWhen, T.ctTime, T.court, T.name, T.price, T.bookedOn].map((x) => h('th', { scope: 'col' }, x)))),
+        h('tbody', o.bookings.map((b) => h('tr.row', { tabindex: 0, title: T.plan, onclick: () => go('plan', () => { planDate = b.date; planView = 'day'; }) },
+          h('td', shortDay(b.date)), h('td', hhmm(b.startMin) + '–' + hhmm(b.startMin + b.minutes)), h('td', b.court), h('td', b.name),
+          h('td.num', b.cents ? eur(b.cents) : T.pbFreePrice), h('td.dim', b.createdAt ? dateText(b.createdAt) : '')))))) : h('p.dim', T.pbNone)),
+    h('div.section', h('h2', T.pbWaitList + ' (' + o.waits.length + ')'),
+      o.waits.length ? h('div.panel', h('table', h('tbody', o.waits.map((w) => h('tr',
+        h('td', when(w.date, w.startMin) + '–' + hhmm(w.startMin + w.minutes)), h('td', w.court || h('span.dim', T.pbWaitAnyCourt)), h('td', w.name),
+        h('td', w.freedCourt ? h('span.tag.ok', T.pbWaitFreed + ' ' + w.freedCourt) : h('span.tag.warn', T.pbWaiting)),
+        h('td.num.noprint', h('button.danger', { type: 'button', onclick: () => act('DELETE', '/online/waits/' + encodeURIComponent(w.id), T.removeWaitAsk(w.name)) }, T.pbWaitRemove)))))))
+        : h('p.dim', T.noWaits)),
+    h('div.section', h('h2', T.pbSeekTitle + ' (' + o.seeks.length + ')'),
+      o.seeks.length ? h('div.panel', h('table', h('tbody', o.seeks.map((k) => h('tr',
+        h('td', shortDay(k.date) + ' ' + hhmm(k.fromMin) + '–' + hhmm(k.toMin)), h('td', k.doubles ? T.pbSeekDoubles : T.pbSeekSingles, k.level ? h('span.dim', ' · ' + k.level) : null),
+        h('td', T.pbSeekWho(k.players.join(', ')), k.note ? h('div.dim', k.note) : null),
+        h('td', k.booked ? h('span.tag.ok', T.seekBooked) : k.noCourt ? h('span.tag.bad', T.pbSeekNoCourt) : h('span.tag.warn', T.pbSeekNeed(k.need))),
+        h('td.num.noprint', h('button.danger', { type: 'button', onclick: () => act('DELETE', '/online/seeks/' + encodeURIComponent(k.id), T.removeSeekAsk(k.players[0] || '')) }, T.pbSeekRemove)))))))
+        : h('p.dim', T.noSeeks)),
+    h('div.section.noprint', h('h2', T.rulesTitle), h('div.panel', h('div.pad', h('div.form',
+      h('label.check.full', open, T.srvOpen), h('p.full.dim', T.srvOpenHint),
+      field(T.srvDaysAhead, days), field(T.srvMaxFuture, most), field(T.srvMaxMinutes + ' (min)', long), field(T.srvCancelHours, cancel),
+      field(T.srvNotice, notice), field(T.srvRemind, remind),
+      h('h3', T.srvCourts), h('div.full.checks', courts.map(([c, x]) => h('label.check', x, c))), h('p.full.dim', T.allCourtsHint),
+      field(T.srvPayInfo, pay, 'full'), h('label.check.full', alerts, T.onlineAlerts),
+      h('div.full.actions', h('button.primary', { type: 'button', onclick: saveRules }, T.save)))))),
+    h('p.dim.noprint', T.srvInviteHow));
+}
+
+// --- Impostazioni del circolo ---
+
+const moneyIn = (c) => h('input', { inputmode: 'decimal', value: c === null || c === undefined ? '' : (c / 100).toFixed(2).replace('.', ',') });
+/** Un importo scritto: vuoto = [empty]; null se non è un importo. */
+const moneyOut = (input, empty) => (input.value.trim() ? cents(input.value) : empty);
+const SURFACES = () => [['', '—'], ['CLAY', T.crtClay], ['GRASS', T.crtGrass], ['HARD', T.crtHard], ['OTHER', T.bkOther]];
+
+async function showSettings() {
+  const st = await api('GET', '/settings');
+  const save = async (method, path, body, after) => {
+    try { await api(method, path, body); toast(T.saved); if (after) await after(); await showSettings(); } catch (e) { toast(e instanceof ApiError ? errText(e) : String(e.message || e)); }
+  };
+  // Il circolo.
+  const club = h('input', { maxlength: 80, value: st.club, required: true });
+  // Orari e prezzi.
+  const hours = (from, to, v) => { const o = []; for (let x = from; x <= to; x++) o.push([String(x), String(x).padStart(2, '0') + ':00']); return select(o, String(v)); };
+  const open = hours(0, 23, st.openHour), close = hours(1, 24, st.closeHour), lights = hours(0, 24, st.lightsFrom);
+  const slot = select([30, 60, 90].map((m) => [String(m), m + ' min']), String(st.slotMinutes));
+  const tmin = select([60, 90, 120].map((m) => [String(m), m + ' min']), String(st.tournamentMinutes));
+  const price = moneyIn(st.centsPerHour), priceL = moneyIn(st.centsPerHourLights);
+  // Modi di pagamento: si cambiano tutti insieme e si salvano con un tasto.
+  const pays = st.payTypes.map((t) => ({ ...t }));
+  const payBox = h('div');
+  function drawPays() {
+    put(payBox, h('div.panel', h('table', h('tbody', pays.map((t, i) => {
+      const name = h('input', { value: t.name, maxlength: 40, 'aria-label': T.ptName, oninput: () => { t.name = name.value; } });
+      const det = h('input', { value: t.details, maxlength: 200, placeholder: T.ptDetails, 'aria-label': T.ptDetails, oninput: () => { t.details = det.value; } });
+      const on = h('input', { type: 'checkbox', checked: t.online, onchange: () => { t.online = on.checked; } });
+      return h('tr', h('td', name), h('td', det), h('td', h('label.check', on, T.ptOnlineShort)),
+        h('td.num', h('button.danger', { type: 'button', title: T.ptDelete, onclick: () => { pays.splice(i, 1); drawPays(); } }, '×')));
+    })))), h('div.actions', h('button', { type: 'button', onclick: () => { pays.push({ id: '', name: '', details: '', online: false }); drawPays(); } }, T.ptNew),
+      h('button.primary', { type: 'button', onclick: () => save('PUT', '/settings/paytypes', { list: pays }) }, T.save)));
+  }
+  drawPays();
+  const courtRow = (c, i) => h('tr',
+    h('td', h('b', c.name)),
+    h('td', [SURFACES().find(([v]) => v === (c.surface || ''))[1], c.covered ? T.crtCovered : T.crtOpen, c.lights ? T.crtLightsShort : '', c.heating ? T.crtHeatedShort : ''].filter((x) => x && x !== '—').join(' · ')),
+    h('td.num', c.centsPerHour !== null && c.centsPerHour !== undefined ? eur(c.centsPerHour) : h('span.dim', eur(st.centsPerHour)),
+      c.lights ? h('div.dim', T.lights + ' ' + eur(c.centsPerHourLights ?? st.centsPerHourLights)) : null),
+    h('td.num', c.futureBookings ? T.nBookings(c.futureBookings) : ''),
+    h('td.num.nowrap', h('button', { type: 'button', disabled: i === 0, title: T.moveUp, onclick: () => save('POST', '/settings/courts/move', { name: c.name, up: true }) }, '↑'),
+      h('button', { type: 'button', disabled: i === st.courts.length - 1, title: T.moveDown, onclick: () => save('POST', '/settings/courts/move', { name: c.name, up: false }) }, '↓'),
+      h('button', { type: 'button', onclick: () => editCourt(st, c) }, T.edit)));
+  put(main(),
+    h('div.head', h('h1', T.settingsTitle)), h('p.dim', T.settingsHint),
+    h('div.section', h('h2', T.clubSection), h('div.panel', h('div.pad', h('div.form',
+      field(T.clubNameLabel, club, 'full'), h('div.full.actions', h('button.primary', { type: 'button', onclick: () => save('PUT', '/settings/club', { name: club.value }, async () => { info = await api('GET', '/info'); document.title = T.title + ' · ' + info.club; render(); }) }, T.save)))))),
+    h('div.section', h('h2', T.planSettings), h('div.panel', h('div.pad', h('div.form',
+      field(T.planOpen, open), field(T.planClose, close), field(T.planSlot, slot), field(T.planTournamentMinutes, tmin),
+      field(T.planPrice, price), field(T.planPriceLights, priceL), field(T.planLightsFrom, lights), h('span'),
+      h('div.full.actions', h('button.primary', { type: 'button', onclick: () => {
+        const a = moneyOut(price, 0), b = moneyOut(priceL, 0);
+        if (a === null || b === null) { toast(T.err.BAD_AMOUNT); return; }
+        save('PUT', '/settings/hours', { openHour: Number(open.value), closeHour: Number(close.value), slotMinutes: Number(slot.value), centsPerHour: a, centsPerHourLights: b,
+          lightsFrom: Number(lights.value), tournamentMinutes: Number(tmin.value) });
+      } }, T.save)))))),
+    h('div.section', h('div.head', h('h2', T.crtTitle), h('button.primary', { type: 'button', onclick: () => editCourt(st, null) }, T.crtNew)),
+      st.courts.length ? h('div.panel', h('table', h('tbody', st.courts.map(courtRow)))) : h('div.panel', h('div.empty', T.noCourts)),
+      h('p.dim', T.courtsHint)),
+    h('div.section', h('h2', T.ptTitle), h('p.dim', T.ptHint), payBox));
+}
+
+function editCourt(st, c) {
+  const v = c || { name: '', surface: null, covered: false, lights: true, heating: false, centsPerHour: null, centsPerHourLights: null, heatingCentsPerHour: 0, futureBookings: 0, photos: 0 };
+  const name = h('input', { required: true, maxlength: 40, value: v.name });
+  const surface = select(SURFACES(), v.surface || '');
+  const covered = h('input', { type: 'checkbox', checked: v.covered });
+  const lights = h('input', { type: 'checkbox', checked: v.lights });
+  const heating = h('input', { type: 'checkbox', checked: v.heating });
+  const price = moneyIn(v.centsPerHour), priceL = moneyIn(v.centsPerHourLights), heat = moneyIn(v.heatingCentsPerHour || null);
+  price.placeholder = eur(st.centsPerHour); priceL.placeholder = eur(st.centsPerHourLights);
+  const fHeat = field(T.crtHeatingSupplement, heat);
+  const fLights = field(T.planPriceLights, priceL);
+  const update = () => { fHeat.hidden = !heating.checked; fLights.hidden = !lights.checked; };
+  heating.addEventListener('change', update); lights.addEventListener('change', update); update();
+  const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.crtDeleteAsk(c.name, c.futureBookings))) return;
+    try { await api('DELETE', '/settings/courts?name=' + encodeURIComponent(c.name)); dlg.close(); toast(T.saved); info = await api('GET', '/info'); await showSettings(); } catch (e) { toast(errText(e)); }
+  } }, T.crtDelete);
+  const dlg = dialog(c ? c.name : T.crtNew, h('div.form',
+    field(T.crtName, name, 'full'), field(T.kind, surface), h('span'),
+    h('label.check', covered, T.crtCovered), h('label.check', lights, T.crtLights), h('label.check.full', heating, T.crtHeating),
+    h('p.full.dim', T.crtPricesHint), field(T.planPrice, price), fLights, fHeat,
+    c && c.photos ? h('p.full.dim', T.crtPhotosCount(c.photos) + ' · ' + T.photosInApp) : null), async () => {
+    const a = moneyOut(price, null), b = moneyOut(priceL, null), hc = moneyOut(heat, 0);
+    if (a === null && price.value.trim() || b === null && priceL.value.trim() || hc === null) throw new Error(T.err.BAD_AMOUNT);
+    await api('POST', '/settings/courts', { old: c ? c.name : '', info: { name: name.value, surface: surface.value || null, covered: covered.checked, lights: lights.checked,
+      heating: heating.checked, centsPerHour: a, centsPerHourLights: lights.checked ? b : null, heatingCentsPerHour: hc } });
+    info = await api('GET', '/info');
+    toast(T.saved);
+    await showSettings();
+  }, { left: del });
+}
+
+// --- Squadre e campionati ---
+
+let teamId = null;
+let teamTab = 'fixtures';
+let fixtureId = null;
+
+const ANSWERS = () => [['YES', T.tmYes, 'ok'], ['MAYBE', T.tmMaybe, 'warn'], ['NO', T.tmNo, 'bad']];
+const outcomeTag = (f) => (f.decided ? h('span.tag.' + (f.outcome === true ? 'ok' : f.outcome === false ? 'bad' : 'warn'), f.outcome === true ? T.tmWon : f.outcome === false ? T.tmLost : T.tmDraw)
+  : f.won || f.lost ? h('span.tag', T.tmOngoing) : null);
+const recordText = (t) => T.tmRecord(t.won, t.lost) + (t.drawn ? ' · ' + T.tmDrawn(t.drawn) : '');
+const rubberName = (t, i) => (i < t.singles ? T.tmSingleN(i + 1) : T.tmDoubleN(i - t.singles + 1));
+
+async function showTeams() {
+  people = await api('GET', '/people');
+  const list = await api('GET', '/teams');
+  const t = teamId && list.find((x) => x.id === teamId);
+  if (t) return showTeam(t);
+  teamId = null;
+  put(main(), h('div.head', h('h1', T.tmTitle), h('button.primary', { onclick: () => editTeam(null) }, T.tmNew)), h('p.dim', T.tmHint),
+    list.length ? h('div.cards', list.map((x) => {
+      const next = x.fixtures.find((f) => f.date >= info.today);
+      return h('button.card', { type: 'button', onclick: () => { teamId = x.id; fixtureId = null; teamTab = 'fixtures'; showTeams(); } },
+        h('h2', x.name), h('p.dim', [x.championship, x.season].filter(Boolean).join(' · ')),
+        h('p', T.tmPlayers(x.roster.length) + ' · ' + recordText(x)),
+        next ? h('p.dim', shortDay(next.date) + ' ' + hhmm(next.startMin) + ' · ' + next.opponent + ' · ' + (next.home ? T.tmHome : T.tmAway)) : null);
+    })) : h('div.panel', h('div.empty', T.tmNone)));
+}
+
+/** Una chiamata sulla squadra aperta, poi la scheda si ridisegna. */
+async function teamDo(method, path, body) {
+  let ok = true;
+  try { await api(method, '/teams/' + encodeURIComponent(teamId) + path, body); toast(T.saved); }
+  catch (e) { ok = false; toast(errText(e)); }
+  await showTeams();
+  return ok;
+}
+
+function showTeam(t) {
+  const f = fixtureId && t.fixtures.find((x) => x.id === fixtureId);
+  if (f) return showFixture(t, f);
+  fixtureId = null;
+  const captain = t.roster.find((p) => p.id === t.captain);
+  const tabs = [['fixtures', T.tmTabFixtures + ' (' + t.fixtures.length + ')'], ['roster', T.tmTabRoster + ' (' + t.roster.length + ')']];
+  const body = h('div');
+  put(main(),
+    h('div.head', h('button', { onclick: () => { teamId = null; showTeams(); }, 'aria-label': T.tmTitle, title: T.tmTitle }, '←'), h('h1', t.name),
+      h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editTeam(t) }, T.edit)),
+    h('p.dim', [t.championship, t.season, t.fitp ? T.tmFitp : '', T.formulaLine(t.singles, t.doubles), recordText(t), captain ? T.tmCaptainLine(captain.name) : ''].filter(Boolean).join(' · ')),
+    printHead(T.tmTitle + ' · ' + t.name + ' · ' + Object.fromEntries(tabs)[teamTab]),
+    h('div.tabs', { role: 'tablist' }, tabs.map(([v, l]) => h('button' + (v === teamTab ? '.on' : ''), {
+      type: 'button', role: 'tab', 'aria-selected': v === teamTab ? 'true' : 'false', onclick: () => { teamTab = v; showTeam(t); },
+    }, l))),
+    body);
+  (teamTab === 'roster' ? teamRoster : teamFixtures)(t, body);
+}
+
+function teamRoster(t, body) {
+  const inside = new Set(t.roster.map((p) => p.id));
+  const input = h('input', { type: 'search', placeholder: T.tmAddPlayer, 'aria-label': T.tmAddPlayer, autocomplete: 'off' });
+  const hits = h('div.hits');
+  function refresh() {
+    const q = input.value.trim().toLowerCase();
+    const list = q ? people.filter((p) => !inside.has(p.id) && p.name.toLowerCase().includes(q)).slice(0, 8) : [];
+    put(hits, list.map((p) => h('button', { type: 'button', onclick: async () => {
+      input.disabled = true;
+      await teamDo('POST', '/roster', { ids: [p.id] });
+      const again = document.querySelector('.picker input');
+      if (again) again.focus();
+    } }, p.name, p.ranking ? h('span.dim', ' · ' + p.ranking) : null)), q && !list.length ? h('div.dim.pad', T.noResults) : null);
+  }
+  input.addEventListener('input', refresh);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+  // I problemi per il prossimo incontro (tessera, certificato), se c'è.
+  const next = t.fixtures.find((f) => f.date >= info.today);
+  put(body,
+    h('div.picker.noprint', input, hits),
+    t.roster.length ? h('div.panel', h('table',
+      h('thead', h('tr', h('th.num', '#'), h('th', T.name), h('th', next ? T.status + ' · ' + shortDay(next.date) : T.status), h('th.noprint'))),
+      h('tbody', t.roster.map((p, i) => {
+        const pr = next ? next.problems[p.id] || [] : [];
+        return h('tr', h('td.num', i + 1), h('td', p.name, p.id === t.captain ? h('span.dim', ' · ' + T.tmCaptain) : null),
+          h('td', next ? (pr.length ? pr.map((x) => h('span.tag.' + (x.blocking ? 'bad' : 'warn'), PROBLEM()[x.code] || x.code)) : h('span.tag.ok', T.ctInOrder)) : ''),
+          h('td.num.noprint', h('button.danger', { type: 'button', onclick: async () => { if (confirm(T.remove + ': ' + p.name + '?')) await teamDo('DELETE', '/roster/' + encodeURIComponent(p.id)); } }, T.remove)));
+      })))) : h('div.panel', h('div.empty', T.tmRosterEmpty)),
+    t.fitp ? h('p.dim', T.tmFitpHint) : null);
+}
+
+function teamFixtures(t, body) {
+  put(body,
+    h('div.tools.noprint', h('button.primary', { type: 'button', onclick: () => editFixture(t, null) }, T.tmNewFixture)),
+    t.fixtures.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.cupWhen, T.ctTime, T.tmTheirs, '', T.cupResult, T.tmCallUp, T.tmAvailability].map((x) => h('th', { scope: 'col' }, x)))),
+      h('tbody', t.fixtures.map((f) => {
+        const yes = Object.values(f.availability).filter((a) => a === 'YES').length;
+        return h('tr.row', { tabindex: 0, onclick: () => { fixtureId = f.id; showTeam(t); }, onkeydown: (e) => { if (e.key === 'Enter') { fixtureId = f.id; showTeam(t); } } },
+          h('td', shortDay(f.date)), h('td', hhmm(f.startMin)), h('td', f.opponent), h('td.dim', f.home ? T.tmHome : T.tmAway),
+          h('td', f.won || f.lost ? f.won + '-' + f.lost + ' ' : '', outcomeTag(f)), h('td.num', f.callUp.length || ''),
+          h('td', T.answersLine(Object.keys(f.availability).length, t.roster.length), yes ? h('span.dim', ' · ' + yes + ' ' + T.tmYes.toLowerCase()) : null));
+      })))) : h('div.panel', h('div.empty', T.tmNoFixtures)));
+}
+
+/** Un incontro: dettagli, disponibilità, convocati e partite; gli avvisi partono dal telefono. */
+function showFixture(t, f) {
+  const fixDo = (path, body) => teamDo('POST', '/fixtures/' + encodeURIComponent(f.id) + path, body);
+  const notice = async (kind) => { if (await fixDo('/notice', { kind })) alert(T.noticeOpened); };
+  const names = Object.fromEntries(t.roster.map((p) => [p.id, p.name]));
+  const missing = t.roster.filter((p) => !f.availability[p.id]).length;
+  const problems = (id) => (f.problems[id] || []).map((x) => h('span.tag.' + (x.blocking ? 'bad' : 'warn'), PROBLEM()[x.code] || x.code));
+
+  const avail = h('div.panel', h('table', h('tbody', t.roster.map((p) => h('tr', h('td', p.name), h('td', problems(p.id)),
+    h('td.num', h('div.seg.noprint', ANSWERS().map(([v, l]) => h('button' + (f.availability[p.id] === v ? '.on' : ''), {
+      type: 'button', 'aria-pressed': f.availability[p.id] === v ? 'true' : 'false',
+      onclick: () => fixDo('/availability', { player: p.id, answer: f.availability[p.id] === v ? null : v }),
+    }, l))), h('span.printonly', (ANSWERS().find(([v]) => v === f.availability[p.id]) || [0, ''])[1])))))));
+
+  const order = t.roster.slice().sort((a, b) => ['YES', 'MAYBE', undefined, 'NO'].indexOf(f.availability[a.id]) - ['YES', 'MAYBE', undefined, 'NO'].indexOf(f.availability[b.id]));
+  const boxes = order.map((p) => [p.id, h('input', { type: 'checkbox', checked: f.callUp.includes(p.id) })]);
+  const callUp = h('div.panel', h('div.pad',
+    h('div.checks', boxes.map(([id, x]) => h('label.check', x, names[id], f.availability[id] ? h('span.dim', ' · ' + (ANSWERS().find(([v]) => v === f.availability[id]) || [0, ''])[1]) : null, problems(id)))),
+    h('div.actions.noprint', h('button', { type: 'button', onclick: () => fixDo('/callup', { ids: boxes.filter(([, x]) => x.checked).map(([id]) => id) }) }, T.save),
+      h('button', { type: 'button', disabled: !f.callUp.length, onclick: () => notice('CALLUP') }, T.tmSendCallUp(f.callUp.length)))));
+
+  const pool = (f.callUp.length ? f.callUp : t.roster.map((p) => p.id)).map((id) => [id, names[id] || id]);
+  const rubbers = h('div.panel', h('table', h('tbody', f.rubbers.map((ru, i) => {
+    const n = ru.doubles ? 2 : 1;
+    const ours = [...Array(n)].map((_, k) => select([['', '—']].concat(pool), ru.ours[k] || ''));
+    const theirs = [...Array(n)].map((_, k) => h('input', { value: ru.theirs[k] || '', placeholder: k ? T.tmTheirs2 : T.tmTheirs, maxlength: 80 }));
+    const score = h('input', { value: ru.score, placeholder: '6-4 3-6 10-8', maxlength: 60, 'aria-label': T.tmScoreOurs });
+    const won = select([['', '—'], ['true', T.tmWeWon], ['false', T.tmTheyWon]], ru.won === null ? '' : String(ru.won));
+    score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
+    const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true' });
+    return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won),
+      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
+  }))));
+
+  put(main(),
+    h('div.head', h('button', { onclick: () => { fixtureId = null; showTeam(t); }, 'aria-label': t.name, title: t.name }, '←'),
+      h('h1', t.name + ' – ' + f.opponent), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editFixture(t, f) }, T.edit)),
+    h('p.dim', [shortDay(f.date) + ' ' + hhmm(f.startMin), f.home ? T.tmHome : T.tmAway, f.place, f.meeting ? T.tmMeetingLine(f.meeting) : '', f.courts.length ? T.tmCourtsHeld(f.courts.join(', ')) : ''].filter(Boolean).join(' · '),
+      f.won || f.lost ? h('span', ' · ' + f.won + '-' + f.lost + ' ', outcomeTag(f)) : null),
+    f.note ? h('p', f.note) : null,
+    printHead(t.name + ' – ' + f.opponent),
+    h('div.section', h('div.head', h('h2', T.tmAvailability),
+      h('button.noprint', { type: 'button', onclick: () => notice('AVAILABILITY') }, T.tmAskAll),
+      missing && missing < t.roster.length ? h('button.noprint', { type: 'button', onclick: () => notice('MISSING') }, T.tmAskMissing(missing)) : null),
+      t.roster.length ? avail : h('p.dim', T.tmRosterEmpty)),
+    h('div.section', h('h2', T.tmCallUp), t.roster.length ? callUp : h('p.dim', T.tmRosterEmpty)),
+    h('div.section', h('div.head', h('h2', T.tmRubbers), h('button.noprint', { type: 'button', disabled: !(f.won || f.lost), onclick: () => notice('RESULT') }, T.tmSendResult)), rubbers),
+    h('p.dim.noprint', T.teamNoticeHint));
+}
+
+function editTeam(t) {
+  const v = t || { name: '', championship: '', season: '', captain: null, singles: 4, doubles: 2, fitp: true, roster: [] };
+  const name = h('input', { required: true, maxlength: 80, value: v.name });
+  const champ = h('input', { maxlength: 80, value: v.championship });
+  const season = h('input', { maxlength: 30, value: v.season, placeholder: info.today.slice(0, 4) });
+  const captain = select([['', '—']].concat(v.roster.map((p) => [p.id, p.name])), v.captain || '');
+  const nums = (n) => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((x) => [String(x), String(x)]);
+  const singles = select(nums(), String(v.singles)), doubles = select(nums(), String(v.doubles));
+  const fitp = h('input', { type: 'checkbox', checked: v.fitp });
+  const del = t && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.tmDeleteAsk(t.name))) return;
+    try { await api('DELETE', '/teams/' + encodeURIComponent(t.id)); dlg.close(); teamId = null; toast(T.saved); await showTeams(); } catch (e) { toast(errText(e)); }
+  } }, T.tmDelete);
+  const dlg = dialog(t ? t.name : T.tmNew, h('div.form',
+    field(T.tmName, name, 'full'), field(T.tmChampionship, champ), field(T.tmSeason, season),
+    field(T.tmSingles, singles), field(T.tmDoubles, doubles),
+    t ? field(T.tmPickCaptain, captain, 'full') : null,
+    h('label.check.full', fitp, T.tmFitp), h('p.full.dim', T.tmFitpHint),
+    t ? h('p.full.dim', T.teamFormulaHint) : null), async () => {
+    const body = { name: name.value, championship: champ.value, season: season.value, captain: captain.value || null, singles: Number(singles.value), doubles: Number(doubles.value), fitp: fitp.checked };
+    if (t) await api('PUT', '/teams/' + encodeURIComponent(t.id), body);
+    else { const out = await api('POST', '/teams', body); teamId = out.id; teamTab = 'roster'; }
+    toast(T.saved);
+    await showTeams();
+  }, { left: del });
+}
+
+function editFixture(t, f) {
+  const v = f || { opponent: '', date: info.today, startMin: 9 * 60, home: true, place: '', meeting: '', courts: [], hours: 6, note: '' };
+  const opp = h('input', { required: true, maxlength: 80, value: v.opponent });
+  const date = h('input', { type: 'date', required: true, value: v.date });
+  const time = h('input', { type: 'time', required: true, value: hhmm(v.startMin), step: 300 });
+  const home = select([['1', T.tmHome], ['0', T.tmAway]], v.home ? '1' : '0');
+  const place = h('input', { maxlength: 120, value: v.place });
+  const meeting = h('input', { maxlength: 120, value: v.meeting });
+  const courts = (info.courts || []).map((c) => [c, h('input', { type: 'checkbox', checked: v.courts.includes(c) })]);
+  const hours = select([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => [String(n), T.tmHours(n)]), String(v.hours));
+  const note = h('input', { maxlength: 500, value: v.note });
+  const held = h('div.full', h('h3', T.tmHoldCourts), h('div.checks', courts.map(([c, x]) => h('label.check', x, c))), field(T.duration, hours));
+  const update = () => { held.hidden = home.value !== '1'; };
+  home.addEventListener('change', update); update();
+  const del = f && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.tmDeleteFixtureAsk)) return;
+    try { await api('DELETE', '/teams/' + encodeURIComponent(t.id) + '/fixtures/' + encodeURIComponent(f.id)); dlg.close(); fixtureId = null; toast(T.saved); await showTeams(); } catch (e) { toast(errText(e)); }
+  } }, T.tmDeleteFixture);
+  const dlg = dialog(f ? t.name + ' – ' + f.opponent : T.tmNewFixture, h('div.form',
+    field(T.tmOpponent, opp, 'full'), field(T.date, date), field(T.ctTime, time), field(T.homeAway, home), field(T.tmPlace, place),
+    field(T.tmMeeting, meeting, 'full'), held, field(T.note, note, 'full')), async () => {
+    if (!time.value) throw new Error(T.err.BAD_TIME);
+    const body = { opponent: opp.value, date: date.value, startMin: toMin(time.value), home: home.value === '1', place: place.value, meeting: meeting.value,
+      courts: courts.filter(([, x]) => x.checked).map(([c]) => c), hours: Number(hours.value), note: note.value };
+    if (f) await api('PUT', '/teams/' + encodeURIComponent(t.id) + '/fixtures/' + encodeURIComponent(f.id), body);
+    else await api('POST', '/teams/' + encodeURIComponent(t.id) + '/fixtures', body);
+    toast(T.saved);
+    await showTeams();
+  }, { left: del });
+}
+
 // --- Scuola tennis ---
 
 let courseId = null;
@@ -3030,6 +4971,35 @@ const DESK_I18N = {
     scStudentsCount: (n, max) => (n === 1 ? '1 allievo' : n + ' allievi') + (max > 0 ? ' su ' + max : ''),
     showPeriod: "Mostra",
     badPeriod: "Scegli un periodo valido: la prima data prima della seconda, al massimo un anno.",
+    noticeOpened: "Sul telefono si è aperto l'avviso: mandalo da lì, uno per uno.",
+    teamNoticeHint: "Gli avvisi (disponibilità, convocazione, risultato) si aprono sul telefono e si mandano da lì col suo WhatsApp. Le risposte le segni qui.",
+    teamFormulaHint: "Cambiando singolari e doppi, gli incontri già creati restano com'erano.",
+    homeAway: "In casa o in trasferta",
+    formulaLine: (s, d) => `${s} ${s === 1 ? 'singolare' : 'singolari'} + ${d} ${d === 1 ? 'doppio' : 'doppi'}`,
+    answersLine: (a, t) => `${a} risposte su ${t}`,
+    settingsTitle: "Impostazioni",
+    settingsHint: "Le stesse dell'app: nome del circolo, orari e prezzi, campi e modi di pagamento. Valgono subito anche sul telefono.",
+    clubSection: "Il circolo",
+    clubNameLabel: "Nome del circolo (negli avvisi e sulle ricevute)",
+    courtsHint: "Cambiando nome a un campo, prenotazioni, chiusure e partite lo seguono. Eliminandolo si cancellano le sue prenotazioni da oggi in poi.",
+    moveUp: "Su",
+    moveDown: "Giù",
+    photosInApp: "le foto si cambiano nell'app",
+    crtDeleteAsk: (name, n) => n > 0 ? `Eliminare ${name}? Si cancellano anche le ${n} prenotazioni da oggi in poi.` : `Eliminare ${name}?`,
+    onlineTitle: "Prenotazioni online",
+    notPaired: "Il server delle prenotazioni non è abbinato: si abbina dall'app, in Campi › Server del circolo.",
+    onlineBookings: "Prossime prenotazioni online",
+    bookedOn: "Fatta il",
+    noWaits: "Nessuno in lista d'attesa.",
+    noSeeks: "Nessun annuncio di Cerco compagno.",
+    seekBooked: "Al completo, campo prenotato",
+    rulesTitle: "Regole per i giocatori",
+    allCourtsHint: "Nessun campo scelto = tutti i campi.",
+    onlineAlerts: "Avvisa la segreteria delle prenotazioni online nuove e disdette",
+    rulesSent: "Regole salvate e mandate al server",
+    rulesLater: "Regole salvate: vanno al server col prossimo invio",
+    removeWaitAsk: (n) => `Togliere ${n} dalla lista d'attesa?`,
+    removeSeekAsk: (n) => `Togliere l'annuncio di ${n}?`,
     kindMembership: "Quota sociale",
     kindFitp: "Tessera FITP",
     kindCourse: "Corso",
@@ -3083,6 +5053,10 @@ const DESK_I18N = {
       OTHER: "Altro",
     },
     err: {
+      NOT_PAIRED: "Il server delle prenotazioni non è abbinato.",
+      COURT_EXISTS: "C'è già un campo con questo nome.",
+      PAYTYPE_EXISTS: "Due modi di pagamento hanno lo stesso nome.",
+      NOBODY: "Nessuno da avvisare.",
       NOTHING_DUE: "Nessuno da sollecitare.",
       COURSE_FULL: "Il corso è pieno: aumenta i posti in Modifica.",
       NO_FEE: "Il corso non ha una quota: impostala in Modifica.",
@@ -3287,6 +5261,35 @@ const DESK_I18N = {
     scStudentsCount: (n, max) => (n === 1 ? '1 student' : n + ' students') + (max > 0 ? ' of ' + max : ''),
     showPeriod: "Show",
     badPeriod: "Choose a valid period: the first date before the second, at most one year.",
+    noticeOpened: "The notice is open on the phone: send it from there, one by one.",
+    teamNoticeHint: "Notices (availability, call-up, result) open on the phone and are sent from there with its WhatsApp. You record the answers here.",
+    teamFormulaHint: "Changing singles and doubles leaves fixtures already created as they were.",
+    homeAway: "Home or away",
+    formulaLine: (s, d) => `${s} ${s === 1 ? 'single' : 'singles'} + ${d} ${d === 1 ? 'double' : 'doubles'}`,
+    answersLine: (a, t) => `${a} answers of ${t}`,
+    settingsTitle: "Settings",
+    settingsHint: "The same as in the app: club name, hours and prices, courts and payment methods. They apply right away on the phone too.",
+    clubSection: "The club",
+    clubNameLabel: "Club name (in notices and on receipts)",
+    courtsHint: "Renaming a court carries its bookings, closures and matches along. Deleting it removes its bookings from today on.",
+    moveUp: "Up",
+    moveDown: "Down",
+    photosInApp: "photos are changed in the app",
+    crtDeleteAsk: (name, n) => n > 0 ? `Delete ${name}? Its ${n} bookings from today on are deleted too.` : `Delete ${name}?`,
+    onlineTitle: "Online bookings",
+    notPaired: "The booking server isn't paired: pair it in the app, under Courts › Club server.",
+    onlineBookings: "Upcoming online bookings",
+    bookedOn: "Booked on",
+    noWaits: "Nobody on the waiting list.",
+    noSeeks: "No Looking for a partner posts.",
+    seekBooked: "Full, court booked",
+    rulesTitle: "Rules for players",
+    allCourtsHint: "No court chosen = all courts.",
+    onlineAlerts: "Notify the office of new and cancelled online bookings",
+    rulesSent: "Rules saved and sent to the server",
+    rulesLater: "Rules saved: they go to the server with the next send",
+    removeWaitAsk: (n) => `Remove ${n} from the waiting list?`,
+    removeSeekAsk: (n) => `Remove ${n}'s post?`,
     kindMembership: "Membership",
     kindFitp: "Federation card",
     kindCourse: "Course",
@@ -3340,6 +5343,10 @@ const DESK_I18N = {
       OTHER: "Other",
     },
     err: {
+      NOT_PAIRED: "The booking server isn't paired.",
+      COURT_EXISTS: "There's already a court with this name.",
+      PAYTYPE_EXISTS: "Two payment methods have the same name.",
+      NOBODY: "Nobody to notify.",
       NOTHING_DUE: "Nobody to remind.",
       COURSE_FULL: "The course is full: raise the places in Edit.",
       NO_FEE: "The course has no fee: set it in Edit.",
@@ -3545,6 +5552,35 @@ const DESK_I18N = {
     scStudentsCount: (n, max) => (n === 1 ? '1 élève' : n + ' élèves') + (max > 0 ? ' sur ' + max : ''),
     showPeriod: "Afficher",
     badPeriod: "Choisissez une période valable : la première date avant la seconde, un an au maximum.",
+    noticeOpened: "L'avis est ouvert sur le téléphone : envoyez-le de là, un par un.",
+    teamNoticeHint: "Les avis (disponibilité, convocation, résultat) s'ouvrent sur le téléphone et partent de là avec son WhatsApp. Les réponses, vous les notez ici.",
+    teamFormulaHint: "En changeant simples et doubles, les rencontres déjà créées restent telles quelles.",
+    homeAway: "À domicile ou à l'extérieur",
+    formulaLine: (s, d) => `${s} ${s === 1 ? 'simple' : 'simples'} + ${d} ${d === 1 ? 'double' : 'doubles'}`,
+    answersLine: (a, t) => `${a} réponses sur ${t}`,
+    settingsTitle: "Réglages",
+    settingsHint: "Les mêmes que dans l'app : nom du club, horaires et tarifs, courts et modes de paiement. Ils valent tout de suite aussi sur le téléphone.",
+    clubSection: "Le club",
+    clubNameLabel: "Nom du club (dans les avis et sur les reçus)",
+    courtsHint: "En renommant un court, ses réservations, fermetures et matchs suivent. En le supprimant, ses réservations à partir d'aujourd'hui sont effacées.",
+    moveUp: "Monter",
+    moveDown: "Descendre",
+    photosInApp: "les photos se changent dans l'app",
+    crtDeleteAsk: (name, n) => n > 0 ? `Supprimer ${name} ? Ses ${n} réservations à partir d'aujourd'hui sont aussi effacées.` : `Supprimer ${name} ?`,
+    onlineTitle: "Réservations en ligne",
+    notPaired: "Le serveur des réservations n'est pas associé : on l'associe dans l'app, Terrains › Serveur du club.",
+    onlineBookings: "Prochaines réservations en ligne",
+    bookedOn: "Faite le",
+    noWaits: "Personne en liste d'attente.",
+    noSeeks: "Aucune annonce « Je cherche un partenaire ».",
+    seekBooked: "Complet, court réservé",
+    rulesTitle: "Règles pour les joueurs",
+    allCourtsHint: "Aucun court choisi = tous les courts.",
+    onlineAlerts: "Prévenir le secrétariat des réservations en ligne nouvelles et annulées",
+    rulesSent: "Règles enregistrées et envoyées au serveur",
+    rulesLater: "Règles enregistrées : elles partent au serveur au prochain envoi",
+    removeWaitAsk: (n) => `Retirer ${n} de la liste d'attente ?`,
+    removeSeekAsk: (n) => `Retirer l'annonce de ${n} ?`,
     kindMembership: "Cotisation",
     kindFitp: "Licence fédérale",
     kindCourse: "Cours",
@@ -3598,6 +5634,10 @@ const DESK_I18N = {
       OTHER: "Autre",
     },
     err: {
+      NOT_PAIRED: "Le serveur des réservations n'est pas associé.",
+      COURT_EXISTS: "Il y a déjà un court avec ce nom.",
+      PAYTYPE_EXISTS: "Deux modes de paiement ont le même nom.",
+      NOBODY: "Personne à prévenir.",
       NOTHING_DUE: "Personne à relancer.",
       COURSE_FULL: "Le groupe est complet : augmentez les places dans Modifier.",
       NO_FEE: "Le groupe n'a pas de frais : réglez-les dans Modifier.",
@@ -3802,6 +5842,35 @@ const DESK_I18N = {
     scStudentsCount: (n, max) => (n === 1 ? '1 Schüler' : n + ' Schüler') + (max > 0 ? ' von ' + max : ''),
     showPeriod: "Anzeigen",
     badPeriod: "Wähle einen gültigen Zeitraum: das erste Datum vor dem zweiten, höchstens ein Jahr.",
+    noticeOpened: "Die Nachricht ist auf dem Handy geöffnet: schicke sie von dort, eine nach der anderen.",
+    teamNoticeHint: "Nachrichten (Verfügbarkeit, Aufstellung, Ergebnis) öffnen sich auf dem Handy und gehen von dort mit seinem WhatsApp raus. Die Antworten trägst du hier ein.",
+    teamFormulaHint: "Änderst du Einzel und Doppel, bleiben schon angelegte Begegnungen wie sie waren.",
+    homeAway: "Heim oder auswärts",
+    formulaLine: (s, d) => `${s} ${s === 1 ? 'Einzel' : 'Einzel'} + ${d} ${d === 1 ? 'Doppel' : 'Doppel'}`,
+    answersLine: (a, t) => `${a} Antworten von ${t}`,
+    settingsTitle: "Einstellungen",
+    settingsHint: "Die gleichen wie in der App: Vereinsname, Zeiten und Preise, Plätze und Zahlungsarten. Sie gelten sofort auch auf dem Handy.",
+    clubSection: "Der Verein",
+    clubNameLabel: "Vereinsname (in Nachrichten und auf Belegen)",
+    courtsHint: "Benennst du einen Platz um, gehen Buchungen, Sperren und Spiele mit. Löschst du ihn, werden seine Buchungen ab heute gelöscht.",
+    moveUp: "Nach oben",
+    moveDown: "Nach unten",
+    photosInApp: "Fotos werden in der App geändert",
+    crtDeleteAsk: (name, n) => n > 0 ? `${name} löschen? Auch die ${n} Buchungen ab heute werden gelöscht.` : `${name} löschen?`,
+    onlineTitle: "Online-Buchungen",
+    notPaired: "Der Buchungsserver ist nicht gekoppelt: das geht in der App unter Plätze › Vereinsserver.",
+    onlineBookings: "Nächste Online-Buchungen",
+    bookedOn: "Gebucht am",
+    noWaits: "Niemand auf der Warteliste.",
+    noSeeks: "Keine Anzeigen bei Partner gesucht.",
+    seekBooked: "Voll, Platz gebucht",
+    rulesTitle: "Regeln für die Spieler",
+    allCourtsHint: "Kein Platz gewählt = alle Plätze.",
+    onlineAlerts: "Das Büro über neue und stornierte Online-Buchungen benachrichtigen",
+    rulesSent: "Regeln gespeichert und an den Server geschickt",
+    rulesLater: "Regeln gespeichert: sie gehen beim nächsten Senden an den Server",
+    removeWaitAsk: (n) => `${n} von der Warteliste nehmen?`,
+    removeSeekAsk: (n) => `Die Anzeige von ${n} entfernen?`,
     kindMembership: "Mitgliedsbeitrag",
     kindFitp: "Verbandslizenz",
     kindCourse: "Kurs",
@@ -3855,6 +5924,10 @@ const DESK_I18N = {
       OTHER: "Andere",
     },
     err: {
+      NOT_PAIRED: "Der Buchungsserver ist nicht gekoppelt.",
+      COURT_EXISTS: "Es gibt schon einen Platz mit diesem Namen.",
+      PAYTYPE_EXISTS: "Zwei Zahlungsarten haben denselben Namen.",
+      NOBODY: "Niemand zu benachrichtigen.",
       NOTHING_DUE: "Niemand zu mahnen.",
       COURSE_FULL: "Der Kurs ist voll: erhöhe die Plätze unter Bearbeiten.",
       NO_FEE: "Der Kurs hat keine Gebühr: lege sie unter Bearbeiten fest.",
@@ -4059,6 +6132,35 @@ const DESK_I18N = {
     scStudentsCount: (n, max) => (n === 1 ? '1 alumno' : n + ' alumnos') + (max > 0 ? ' de ' + max : ''),
     showPeriod: "Mostrar",
     badPeriod: "Elige un periodo válido: la primera fecha antes de la segunda, como mucho un año.",
+    noticeOpened: "El aviso está abierto en el teléfono: envíalo desde allí, uno a uno.",
+    teamNoticeHint: "Los avisos (disponibilidad, convocatoria, resultado) se abren en el teléfono y salen de allí con su WhatsApp. Las respuestas las anotas aquí.",
+    teamFormulaHint: "Cambiando individuales y dobles, los encuentros ya creados quedan como estaban.",
+    homeAway: "En casa o fuera",
+    formulaLine: (s, d) => `${s} ${s === 1 ? 'individual' : 'individuales'} + ${d} ${d === 1 ? 'doble' : 'dobles'}`,
+    answersLine: (a, t) => `${a} respuestas de ${t}`,
+    settingsTitle: "Ajustes",
+    settingsHint: "Los mismos que en la app: nombre del club, horarios y precios, pistas y formas de pago. Valen enseguida también en el teléfono.",
+    clubSection: "El club",
+    clubNameLabel: "Nombre del club (en los avisos y en los recibos)",
+    courtsHint: "Al cambiar el nombre de una pista, sus reservas, cierres y partidos la siguen. Al borrarla se eliminan sus reservas desde hoy.",
+    moveUp: "Subir",
+    moveDown: "Bajar",
+    photosInApp: "las fotos se cambian en la app",
+    crtDeleteAsk: (name, n) => n > 0 ? `¿Borrar ${name}? También se borran sus ${n} reservas desde hoy.` : `¿Borrar ${name}?`,
+    onlineTitle: "Reservas online",
+    notPaired: "El servidor de reservas no está vinculado: se vincula en la app, en Pistas › Servidor del club.",
+    onlineBookings: "Próximas reservas online",
+    bookedOn: "Hecha el",
+    noWaits: "Nadie en lista de espera.",
+    noSeeks: "Ningún anuncio de Busco compañero.",
+    seekBooked: "Completo, pista reservada",
+    rulesTitle: "Reglas para los jugadores",
+    allCourtsHint: "Ninguna pista elegida = todas las pistas.",
+    onlineAlerts: "Avisar a la secretaría de las reservas online nuevas y anuladas",
+    rulesSent: "Reglas guardadas y enviadas al servidor",
+    rulesLater: "Reglas guardadas: van al servidor con el próximo envío",
+    removeWaitAsk: (n) => `¿Quitar a ${n} de la lista de espera?`,
+    removeSeekAsk: (n) => `¿Quitar el anuncio de ${n}?`,
     kindMembership: "Cuota social",
     kindFitp: "Licencia federativa",
     kindCourse: "Curso",
@@ -4112,6 +6214,10 @@ const DESK_I18N = {
       OTHER: "Otro",
     },
     err: {
+      NOT_PAIRED: "El servidor de reservas no está vinculado.",
+      COURT_EXISTS: "Ya hay una pista con este nombre.",
+      PAYTYPE_EXISTS: "Dos formas de pago tienen el mismo nombre.",
+      NOBODY: "Nadie a quien avisar.",
       NOTHING_DUE: "Nadie a quien recordar.",
       COURSE_FULL: "El curso está lleno: aumenta las plazas en Editar.",
       NO_FEE: "El curso no tiene cuota: ponla en Editar.",
@@ -4316,6 +6422,35 @@ const DESK_I18N = {
     scStudentsCount: (n, max) => (n === 1 ? '1 aluno' : n + ' alunos') + (max > 0 ? ' de ' + max : ''),
     showPeriod: "Mostrar",
     badPeriod: "Escolha um período válido: a primeira data antes da segunda, no máximo um ano.",
+    noticeOpened: "O aviso está aberto no telefone: envie-o de lá, um a um.",
+    teamNoticeHint: "Os avisos (disponibilidade, convocação, resultado) abrem-se no telefone e saem de lá com o seu WhatsApp. As respostas registam-se aqui.",
+    teamFormulaHint: "Mudando simples e duplas, os encontros já criados ficam como estavam.",
+    homeAway: "Em casa ou fora",
+    formulaLine: (s, d) => `${s} ${s === 1 ? 'simples' : 'simples'} + ${d} ${d === 1 ? 'dupla' : 'duplas'}`,
+    answersLine: (a, t) => `${a} respostas de ${t}`,
+    settingsTitle: "Definições",
+    settingsHint: "As mesmas do app: nome do clube, horários e preços, quadras e formas de pagamento. Valem logo também no telefone.",
+    clubSection: "O clube",
+    clubNameLabel: "Nome do clube (nos avisos e nos recibos)",
+    courtsHint: "Mudando o nome de uma quadra, as suas reservas, fechos e jogos acompanham-na. Apagando-a, as suas reservas de hoje em diante são apagadas.",
+    moveUp: "Subir",
+    moveDown: "Descer",
+    photosInApp: "as fotos mudam-se no app",
+    crtDeleteAsk: (name, n) => n > 0 ? `Apagar ${name}? Também se apagam as ${n} reservas de hoje em diante.` : `Apagar ${name}?`,
+    onlineTitle: "Reservas online",
+    notPaired: "O servidor de reservas não está associado: associa-se no app, em Quadras › Servidor do clube.",
+    onlineBookings: "Próximas reservas online",
+    bookedOn: "Feita a",
+    noWaits: "Ninguém na lista de espera.",
+    noSeeks: "Nenhum anúncio de Procuro parceiro.",
+    seekBooked: "Completo, quadra reservada",
+    rulesTitle: "Regras para os jogadores",
+    allCourtsHint: "Nenhuma quadra escolhida = todas as quadras.",
+    onlineAlerts: "Avisar a secretaria das reservas online novas e canceladas",
+    rulesSent: "Regras guardadas e enviadas ao servidor",
+    rulesLater: "Regras guardadas: vão para o servidor no próximo envio",
+    removeWaitAsk: (n) => `Tirar ${n} da lista de espera?`,
+    removeSeekAsk: (n) => `Tirar o anúncio de ${n}?`,
     kindMembership: "Mensalidade",
     kindFitp: "Carteira federativa",
     kindCourse: "Curso",
@@ -4369,6 +6504,10 @@ const DESK_I18N = {
       OTHER: "Outro",
     },
     err: {
+      NOT_PAIRED: "O servidor de reservas não está associado.",
+      COURT_EXISTS: "Já há uma quadra com este nome.",
+      PAYTYPE_EXISTS: "Duas formas de pagamento têm o mesmo nome.",
+      NOBODY: "Ninguém a avisar.",
       NOTHING_DUE: "Ninguém a lembrar.",
       COURSE_FULL: "O curso está cheio: aumente as vagas em Editar.",
       NO_FEE: "O curso não tem mensalidade: defina-a em Editar.",
@@ -4608,6 +6747,8 @@ tr.pass td:first-child { font-weight: 700; }
 .slot { display: flex; gap: 6px; flex-wrap: wrap; }
 .slot select, .slot input { width: auto; }
 @media print { .heat td { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .pbar i { background: #555; } }
+.rubber select, .rubber input { width: auto; max-width: 150px; margin: 2px; }
+.section > .head { margin-bottom: 8px; } .section > .head h2 { margin: 0 auto 0 0; }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -5084,7 +7225,7 @@ Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **
 - **Einschalten**: *Vereinsfunktionen* › **Büro am PC**, dann der Eintrag im Plätze-Tab und **Einschalten**. Das Telefon zeigt die Adresse (z. B. `https://192.168.1.20:8443`) und einen Code.
 - **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
 - **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
-- **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). **Tennisschule** (Kurse mit Zeiten und Plätzen, Schüler, Anwesenheit, abgesagte Stunden, Monats- oder Saisongebühren zum Belasten), **Platzstatistik** (Auslastung, Einnahmen, Platz für Platz, vollste Tage und Stunden, wer am meisten bucht, nach Zeitraum, druckbar). Mit **Mahnung vorbereiten** in Beiträge und Zahlungen wählst du unter den angezeigten Forderungen, wem du schreibst: die Nachricht öffnet sich auf dem Handy und du schickst sie von dort. WhatsApp-Nachrichten, Live-Zählung und Mannschaften bleiben in der App.
+- **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). **Tennisschule** (Kurse mit Zeiten und Plätzen, Schüler, Anwesenheit, abgesagte Stunden, Monats- oder Saisongebühren zum Belasten), **Platzstatistik** (Auslastung, Einnahmen, Platz für Platz, vollste Tage und Stunden, wer am meisten bucht, nach Zeitraum, druckbar). Mit **Mahnung vorbereiten** in Beiträge und Zahlungen wählst du unter den angezeigten Forderungen, wem du schreibst: die Nachricht öffnet sich auf dem Handy und du schickst sie von dort. **Mannschaften und Ligen** (Kader, Heim- oder Auswärtsbegegnungen mit reservierten Plätzen, Verfügbarkeit, Aufstellung, Spiele und Ergebnis; Nachrichten öffnen sich auf dem Handy). **Online-Buchungen**, mit dem Vereinsserver (nächste Buchungen der Spieler, Warteliste, Anzeigen bei Partner gesucht zum Entfernen bei Bedarf, Regeln für die Spieler, **Jetzt senden**), **Einstellungen** (Vereinsname, Zeiten und Preise, Plätze mit Belag, Licht und eigenen Preisen, Zahlungsarten). WhatsApp-Nachrichten, Platzfotos und Live-Zählung bleiben in der App.
 - **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
 - **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
 
@@ -5639,7 +7780,7 @@ Entering members and payments is easier with a keyboard and mouse. **A computer 
 - **Turn on**: *Club features* › **Office from PC**, then the entry in the courts tab and **Turn on**. The phone shows the address (e.g. `https://192.168.1.20:8443`) and a code.
 - **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
 - **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
-- **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). **Tennis school** (courses with times and courts, students, attendance, cancelled lessons, monthly or season fees to charge), **Court statistics** (occupancy, takings, court by court, busiest days and hours, who books most, by period, printable). With **Prepare reminder** in Fees and payments you pick whom to write to among the charges you see: the message opens on the phone and you send it from there. WhatsApp notices, live scoring and teams stay in the app.
+- **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). **Tennis school** (courses with times and courts, students, attendance, cancelled lessons, monthly or season fees to charge), **Court statistics** (occupancy, takings, court by court, busiest days and hours, who books most, by period, printable). With **Prepare reminder** in Fees and payments you pick whom to write to among the charges you see: the message opens on the phone and you send it from there. **Teams and leagues** (roster, home or away fixtures with held courts, availability, call-ups, rubbers and result; notices open on the phone). **Online bookings**, with the club server (players' upcoming bookings, waiting list, Looking for a partner posts to remove if needed, rules for players, **Send now**), **Settings** (club name, hours and prices, courts with surface, lights and their own prices, payment methods). WhatsApp notices, court photos and live scoring stay in the app.
 - **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
 - **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
 
@@ -6193,7 +8334,7 @@ Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (
 - **Encender**: *Funciones del club* › **Secretaría desde el PC**, luego la entrada de la pestaña de pistas y **Encender**. El teléfono muestra la dirección (p. ej. `https://192.168.1.20:8443`) y un código.
 - **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
 - **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
-- **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). **Escuela de tenis** (cursos con horarios y pistas, alumnos, lista de las clases, clases anuladas, cuotas del mes o de la temporada por cargar), **Estadísticas de las pistas** (ocupación, ingresos, pista por pista, días y horas más llenos, quién reserva más, por periodo, para imprimir). Con **Preparar recordatorio** en Cuotas y pagos eliges a quién escribir entre los cargos que ves: el mensaje se abre en el teléfono y lo envías desde allí. Avisos de WhatsApp, marcador en directo y equipos siguen en la app.
+- **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). **Escuela de tenis** (cursos con horarios y pistas, alumnos, lista de las clases, clases anuladas, cuotas del mes o de la temporada por cargar), **Estadísticas de las pistas** (ocupación, ingresos, pista por pista, días y horas más llenos, quién reserva más, por periodo, para imprimir). Con **Preparar recordatorio** en Cuotas y pagos eliges a quién escribir entre los cargos que ves: el mensaje se abre en el teléfono y lo envías desde allí. **Equipos y ligas** (plantilla, encuentros en casa o fuera con pistas reservadas, disponibilidad, convocados, partidos y resultado; los avisos se abren en el teléfono). **Reservas online**, con el servidor del club (próximas reservas de los jugadores, lista de espera, anuncios de Busco compañero que quitar si hace falta, reglas para los jugadores, **Enviar ahora**), **Ajustes** (nombre del club, horarios y precios, pistas con superficie, luces y precios propios, formas de pago). Avisos de WhatsApp, fotos de las pistas y marcador en directo siguen en la app.
 - **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
 - **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
 
@@ -6747,7 +8888,7 @@ Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un 
 - **Activer** : *Fonctions du club* › **Secrétariat sur PC**, puis l'entrée dans l'onglet des terrains et **Activer**. Le téléphone affiche l'adresse (par ex. `https://192.168.1.20:8443`) et un code.
 - **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
 - **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
-- **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). **École de tennis** (groupes avec horaires et courts, élèves, appel des cours, cours annulés, frais du mois ou de la saison à débiter), **Statistiques des terrains** (occupation, recettes, court par court, jours et heures les plus pleins, qui réserve le plus, par période, à imprimer). Avec **Préparer une relance** dans Cotisations et paiements, vous choisissez à qui écrire parmi les débits affichés : le message s'ouvre sur le téléphone et vous l'envoyez de là. Avis WhatsApp, marquage en direct et équipes restent dans l'app.
+- **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). **École de tennis** (groupes avec horaires et courts, élèves, appel des cours, cours annulés, frais du mois ou de la saison à débiter), **Statistiques des terrains** (occupation, recettes, court par court, jours et heures les plus pleins, qui réserve le plus, par période, à imprimer). Avec **Préparer une relance** dans Cotisations et paiements, vous choisissez à qui écrire parmi les débits affichés : le message s'ouvre sur le téléphone et vous l'envoyez de là. **Équipes et championnats** (effectif, rencontres à domicile ou à l'extérieur avec courts réservés, disponibilités, convocations, matchs et résultat ; les avis s'ouvrent sur le téléphone). **Réservations en ligne**, avec le serveur du club (prochaines réservations des joueurs, liste d'attente, annonces de « Je cherche un partenaire » à retirer si besoin, règles pour les joueurs, **Envoyer maintenant**), **Réglages** (nom du club, horaires et tarifs, courts avec surface, éclairage et tarifs propres, modes de paiement). Avis WhatsApp, photos des courts et marquage en direct restent dans l'app.
 - **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
 - **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
 
@@ -7301,7 +9442,7 @@ Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Wi
 - **Accendere**: *Funzioni del circolo* › **Segreteria da PC**, poi la voce nella scheda dei campi e **Accendi**. Il telefono mostra indirizzo (es. `https://192.168.1.20:8443`) e codice.
 - **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
 - **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
-- **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). **Scuola tennis** (corsi con orari e campi, allievi, appello delle lezioni, lezioni annullate, quote del mese o della stagione da addebitare), **Statistiche dei campi** (occupazione, incassi, campo per campo, giorni e ore più pieni, chi prenota di più, per periodo, da stampare). Con **Prepara sollecito** in Quote e pagamenti scegli a chi scrivere tra gli addebiti che vedi: il messaggio si apre sul telefono e lo mandi da lì. Avvisi WhatsApp, segnapunti dal vivo e squadre restano nell'app.
+- **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). **Scuola tennis** (corsi con orari e campi, allievi, appello delle lezioni, lezioni annullate, quote del mese o della stagione da addebitare), **Statistiche dei campi** (occupazione, incassi, campo per campo, giorni e ore più pieni, chi prenota di più, per periodo, da stampare). Con **Prepara sollecito** in Quote e pagamenti scegli a chi scrivere tra gli addebiti che vedi: il messaggio si apre sul telefono e lo mandi da lì. **Squadre e campionati** (rosa, incontri in casa o in trasferta coi campi tenuti, disponibilità, convocati, partite e risultato; gli avvisi si aprono sul telefono). **Prenotazioni online**, col server del circolo (prossime prenotazioni dei giocatori, lista d'attesa, annunci di Cerco compagno da togliere se serve, regole per i giocatori, **Invia ora**), **Impostazioni** (nome del circolo, orari e prezzi, campi con superficie, luci e prezzi propri, modi di pagamento). Avvisi WhatsApp, foto dei campi e segnapunti dal vivo restano nell'app.
 - **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
 - **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
 
@@ -7855,7 +9996,7 @@ Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computado
 - **Ativar**: *Funções do clube* › **Secretaria no PC**, depois a entrada na aba das quadras e **Ativar**. O telefone mostra o endereço (ex. `https://192.168.1.20:8443`) e um código.
 - **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
 - **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
-- **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). **Escola de tênis** (cursos com horários e quadras, alunos, chamada das aulas, aulas canceladas, mensalidades do mês ou da temporada a debitar), **Estatísticas das quadras** (ocupação, receitas, quadra a quadra, dias e horas mais cheios, quem reserva mais, por período, para imprimir). Com **Preparar lembrete** em Mensalidades e pagamentos escolhe a quem escrever entre os débitos que vê: a mensagem abre-se no telefone e envia-a de lá. Avisos de WhatsApp, marcador ao vivo e equipes continuam no app.
+- **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). **Escola de tênis** (cursos com horários e quadras, alunos, chamada das aulas, aulas canceladas, mensalidades do mês ou da temporada a debitar), **Estatísticas das quadras** (ocupação, receitas, quadra a quadra, dias e horas mais cheios, quem reserva mais, por período, para imprimir). Com **Preparar lembrete** em Mensalidades e pagamentos escolhe a quem escrever entre os débitos que vê: a mensagem abre-se no telefone e envia-a de lá. **Equipes e campeonatos** (plantel, encontros em casa ou fora com quadras reservadas, disponibilidade, convocados, jogos e resultado; os avisos abrem-se no telefone). **Reservas online**, com o servidor do clube (próximas reservas dos jogadores, lista de espera, anúncios de Procuro parceiro a tirar se preciso, regras para os jogadores, **Enviar agora**), **Definições** (nome do clube, horários e preços, quadras com piso, luzes e preços próprios, formas de pagamento). Avisos de WhatsApp, fotos das quadras e marcador ao vivo continuam no app.
 - **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
 - **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
 
@@ -15618,6 +17759,8 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun removeWaitAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/waits/$id", null, null, SrvOk.serializer())
+    fun removeSeekAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/seeks/$id", null, null, SrvOk.serializer())
 
     // Il giocatore (con la chiave avuta dall'invito).
     private fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")
@@ -21982,6 +24125,9 @@ package com.tennis.scoremanager.desk
 
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.data.BlockReason
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
@@ -21990,7 +24136,11 @@ import com.tennis.scoremanager.data.CourseSlot
 import com.tennis.scoremanager.data.CourtStats
 import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Availability
+import com.tennis.scoremanager.data.Fixture
+import com.tennis.scoremanager.data.Rubber
 import com.tennis.scoremanager.data.Team
+import com.tennis.scoremanager.data.Teams
 import com.tennis.scoremanager.data.Charge
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.data.CTEntry
@@ -22000,6 +24150,10 @@ import com.tennis.scoremanager.data.CTMatch
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.ClubTournaments
 import com.tennis.scoremanager.data.CourtBooking
+import com.tennis.scoremanager.data.CourtInfo
+import com.tennis.scoremanager.data.CourtSettings
+import com.tennis.scoremanager.data.PayMethod
+import com.tennis.scoremanager.data.Surface
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.CourtPlans
 import com.tennis.scoremanager.data.Fee
@@ -22063,6 +24217,32 @@ interface DeskData {
     fun dues(charges: Set<String>): List<DeskDue>
     /** Apre sul telefono gli avvisi del sollecito, da mandare da lì uno per uno. */
     fun sendDues(charges: Set<String>)
+    /** Salva la squadra (e i campi tenuti per gli incontri in casa nel planning) o la toglie. */
+    fun saveTeam(t: Team)
+    fun deleteTeam(t: Team)
+    /** Apre sul telefono l'avviso dell'incontro: disponibilità (a tutti o a chi non ha risposto), convocazione, risultato. */
+    fun teamNotice(t: Team, f: Fixture, kind: String)
+    /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
+    fun setClubName(name: String)
+    fun saveCourtSettings(st: CourtSettings)
+    /** Un campo nuovo; false se il nome c'è già. */
+    fun addCourt(info: CourtInfo): Boolean
+    /** Cambia nome (anche in prenotazioni, chiusure e partite); false se il nome c'è già. */
+    fun renameCourt(old: String, new: String): Boolean
+    fun saveCourtInfo(info: CourtInfo)
+    /** Toglie il campo con le sue prenotazioni da oggi in poi. */
+    fun deleteCourt(name: String)
+    fun moveCourt(name: String, up: Boolean)
+    fun savePayTypes(list: List<PayType>)
+    /** Il server delle prenotazioni: come è collegato e le sue regole. */
+    fun serverConf(): ClubServerConf
+    fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean)
+    /** Dal server, fuori da [tx] (è rete): prenotazioni online, lista d'attesa, Cerco compagno. */
+    fun serverState(): SrvAdmin
+    /** Manda subito il planning e prende le prenotazioni nuove, fuori da [tx]; null = fatto, se no il codice dell'errore. */
+    fun serverSync(): String?
+    /** La segreteria toglie un'attesa ([kind] "wait") o un annuncio ("seek") dal server, fuori da [tx]. */
+    fun serverRemove(kind: String, id: String)
     fun paymentsCsv(year: Int): ByteArray?
     /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
     fun saveTournament(t: ClubTournament)
@@ -22164,6 +24344,58 @@ interface DeskData {
 )
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
+@Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?)
+@Serializable data class DeskFixture(
+    val id: String, val opponent: String, val date: String, val startMin: Int, val home: Boolean, val place: String, val meeting: String,
+    val courts: List<String>, val hours: Int, val note: String, val availability: Map<String, Availability>, val callUp: List<String>,
+    val rubbers: List<DeskRubber>, val won: Int, val lost: Int, val decided: Boolean, val outcome: Boolean?,
+    /** Per ogni giocatore della rosa i problemi per quel giorno (tessera, certificato), come nell'app. */
+    val problems: Map<String, List<DeskProblem>>,
+)
+@Serializable data class DeskTeamPlayer(val id: String, val name: String)
+@Serializable data class DeskTeam(
+    val id: String, val name: String, val championship: String, val season: String, val captain: String?, val roster: List<DeskTeamPlayer>,
+    val singles: Int, val doubles: Int, val fitp: Boolean, val won: Int, val lost: Int, val drawn: Int, val fixtures: List<DeskFixture>,
+)
+@Serializable data class DeskTeamIn(
+    val name: String, val championship: String = "", val season: String = "", val captain: String? = null, val singles: Int = 4, val doubles: Int = 2, val fitp: Boolean = true,
+)
+@Serializable data class DeskFixtureIn(
+    val opponent: String, val date: String, val startMin: Int, val home: Boolean = true, val place: String = "", val meeting: String = "",
+    val courts: List<String> = emptyList(), val hours: Int = 6, val note: String = "",
+)
+@Serializable data class DeskAnswerIn(val player: String, val answer: Availability? = null)
+@Serializable data class DeskRubberIn(val index: Int, val ours: List<String> = emptyList(), val theirs: List<String> = emptyList(), val score: String = "", val won: Boolean? = null)
+@Serializable data class DeskNoticeIn(val kind: String)
+@Serializable data class DeskCourtInfo(
+    val name: String, val surface: Surface? = null, val covered: Boolean = false, val lights: Boolean = true, val heating: Boolean = false,
+    val centsPerHour: Int? = null, val centsPerHourLights: Int? = null, val heatingCentsPerHour: Int = 0, val futureBookings: Int = 0, val photos: Int = 0,
+)
+@Serializable data class DeskPayTypeFull(val id: String = "", val name: String, val details: String = "", val online: Boolean = false, val method: PayMethod = PayMethod.OTHER)
+@Serializable data class DeskSettings(
+    val club: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val centsPerHour: Int, val centsPerHourLights: Int, val lightsFrom: Int,
+    val tournamentMinutes: Int, val courts: List<DeskCourtInfo>, val payTypes: List<DeskPayTypeFull>,
+)
+@Serializable data class DeskHoursIn(
+    val openHour: Int, val closeHour: Int, val slotMinutes: Int, val centsPerHour: Int = 0, val centsPerHourLights: Int = 0, val lightsFrom: Int = 18, val tournamentMinutes: Int = 90,
+)
+@Serializable data class DeskClubIn(val name: String)
+@Serializable data class DeskCourtIn(val old: String = "", val info: DeskCourtInfo)
+@Serializable data class DeskMoveIn(val name: String, val up: Boolean)
+@Serializable data class DeskPayTypesIn(val list: List<DeskPayTypeFull>)
+@Serializable data class DeskOnlineBooking(val id: String, val court: String, val date: String, val startMin: Int, val minutes: Int, val name: String, val cents: Int, val createdAt: String?)
+@Serializable data class DeskWait(val id: String, val name: String, val court: String?, val date: String, val startMin: Int, val minutes: Int, val freedCourt: String?)
+@Serializable data class DeskSeek(
+    val id: String, val players: List<String>, val date: String, val fromMin: Int, val toMin: Int, val doubles: Boolean, val level: String, val note: String,
+    val need: Int, val booked: Boolean, val noCourt: Boolean,
+)
+@Serializable data class DeskOnline(
+    val paired: Boolean, val club: String, val url: String, val publicUrl: String, val lastSync: String?, val lastSyncMin: Int?, val error: String?,
+    val rules: BookingRules, val payInfo: String, val alerts: Boolean, val courts: List<String>,
+    /** Quello che sta sul server; [stateError] se non risponde. */
+    val bookings: List<DeskOnlineBooking>, val waits: List<DeskWait>, val seeks: List<DeskSeek>, val stateError: String? = null,
+)
+@Serializable data class DeskRulesIn(val rules: BookingRules, val payInfo: String = "", val alerts: Boolean = true)
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
@@ -22239,6 +24471,8 @@ class DeskApi(
         if (m == "GET" && p.size == 2 && p[0] == "pair") return pairState(p[1], r.ip)
         if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
+        // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
+        if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p)
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
@@ -22273,6 +24507,29 @@ class DeskApi(
                     data.sendDues(ids)
                     done()
                 }
+                m == "PUT" && p == listOf("online", "rules") -> saveRules(read(DeskRulesIn.serializer(), r))
+                m == "GET" && p == listOf("settings") -> settings()
+                m == "PUT" && p == listOf("settings", "club") -> {
+                    val name = text(read(DeskClubIn.serializer(), r).name, 80)
+                    if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+                    data.setClubName(name); settings()
+                }
+                m == "PUT" && p == listOf("settings", "hours") -> saveHours(read(DeskHoursIn.serializer(), r))
+                m == "POST" && p == listOf("settings", "courts") -> saveCourt(read(DeskCourtIn.serializer(), r))
+                m == "DELETE" && p == listOf("settings", "courts") -> {
+                    val name = r.query["name"].orEmpty()
+                    if (name !in data.courts()) throw Fail(404, "NOT_FOUND")
+                    data.deleteCourt(name); settings()
+                }
+                m == "POST" && p == listOf("settings", "courts", "move") -> {
+                    val i = read(DeskMoveIn.serializer(), r)
+                    if (i.name !in data.courts()) throw Fail(404, "NOT_FOUND")
+                    data.moveCourt(i.name, i.up); settings()
+                }
+                m == "PUT" && p == listOf("settings", "paytypes") -> savePayTypes(read(DeskPayTypesIn.serializer(), r).list)
+                m == "GET" && p == listOf("teams") -> ok(ListSerializer(DeskTeam.serializer()), data.teams().sortedBy { it.name.lowercase() }.map(::teamOut))
+                m == "POST" && p == listOf("teams") -> saveTeam(null, read(DeskTeamIn.serializer(), r))
+                p.size >= 2 && p[0] == "teams" -> teamRoute(m, p.drop(1), r)
                 m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
                 m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
                 p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
@@ -22589,6 +24846,248 @@ class DeskApi(
             rep.occupancy, rep.cents, rep.bookings, rep.online, rep.tournamentHours, rep.firstHour, rep.heat,
             rep.top.map { (who, n) -> DeskTop(Players.byId(people, who)?.name ?: who, n) },
         ))
+    }
+
+    // --- Server delle prenotazioni ---
+
+    private fun clock(t: Long): Pair<String, Int> {
+        val z = Instant.ofEpochMilli(t).atZone(zone())
+        return z.toLocalDate().toString() to z.hour * 60 + z.minute
+    }
+
+    private fun online(m: String, p: List<String>): Resp {
+        val conf = data.tx { data.serverConf() }
+        if (!conf.paired) throw Fail(409, "NOT_PAIRED")
+        return when {
+            m == "GET" && p == listOf("online") -> onlineOut()
+            m == "POST" && p == listOf("online", "sync") -> {
+                data.serverSync()?.let { throw Fail(502, it) }
+                onlineOut()
+            }
+            m == "DELETE" && p.size == 3 && p[1] in setOf("waits", "seeks") -> {
+                try { data.serverRemove(if (p[1] == "waits") "wait" else "seek", p[2]) } catch (e: Exception) {
+                    throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET")
+                }
+                onlineOut()
+            }
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun onlineOut(): Resp {
+        val (conf, courts, people) = data.tx { Triple(data.serverConf(), data.courts(), data.players()) }
+        var stateError: String? = null
+        val st = try { data.serverState() } catch (e: Exception) {
+            stateError = (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET"; null
+        }
+        val now = data.now()
+        val names = (st?.players.orEmpty().associate { it.id to it.name }) + people.associate { it.id to it.name }
+        return ok(DeskOnline.serializer(), DeskOnline(
+            conf.paired, conf.club, conf.url, conf.publicUrl, conf.lastSync.takeIf { it > 0 }?.let { day(it) }, conf.lastSync.takeIf { it > 0 }?.let { clock(it).second },
+            conf.error, conf.rules, conf.payInfo, conf.alerts, courts,
+            st?.bookings.orEmpty().filter { it.end > now }.map { b ->
+                val (d, mm) = clock(b.start)
+                DeskOnlineBooking(b.id, b.court, d, mm, b.minutes, b.name, b.cents, b.createdAt.takeIf { it > 0 }?.let { day(it) })
+            },
+            st?.waits.orEmpty().map { w -> val (d, mm) = clock(w.start); DeskWait(w.id, names[w.player] ?: w.player, w.court, d, mm, w.minutes, w.freedCourt) },
+            st?.seeks.orEmpty().map { k -> DeskSeek(k.id, k.everyone.map { it.name }, k.date, k.fromMin, k.toMin, k.doubles, k.level, k.note, k.need, k.booking != null, k.noCourt) },
+            stateError,
+        ))
+    }
+
+    private fun saveRules(i: DeskRulesIn): Resp {
+        val r0 = i.rules
+        if (r0.courts.any { it !in data.courts() }) throw Fail(404, "NOT_FOUND")
+        val rules = r0.copy(
+            daysAhead = r0.daysAhead.coerceIn(0, 60), maxFuture = r0.maxFuture.coerceIn(1, 20), maxMinutes = r0.maxMinutes.coerceIn(30, 480),
+            cancelHours = r0.cancelHours.coerceIn(0, 168), noticeMinutes = r0.noticeMinutes.coerceIn(0, 24 * 60), remindHours = r0.remindHours.coerceIn(0, 48),
+        )
+        data.saveServerRules(rules, text(i.payInfo, 300), i.alerts)
+        return done()
+    }
+
+    // --- Impostazioni del circolo ---
+
+    private fun settings(): Resp {
+        val st = data.plan().settings
+        val today = CourtPlans.dayStart(data.now())
+        val bookings = data.plan().bookings
+        return ok(DeskSettings.serializer(), DeskSettings(
+            data.club, st.openHour, st.closeHour, st.slotMinutes, st.centsPerHour, st.centsPerHourLights, st.lightsFrom, st.tournamentMinutes,
+            data.courts().map { n ->
+                val c = st.info(n)
+                DeskCourtInfo(n, c.surface, c.covered, c.lights, c.heating, c.centsPerHour, c.centsPerHourLights, c.heatingCentsPerHour,
+                    bookings.count { it.court == n && it.start >= today }, c.photos.size)
+            },
+            data.payTypes().map { DeskPayTypeFull(it.id, it.name, it.details, it.online, it.method) },
+        ))
+    }
+
+    private fun price(c: Int): Int = if (c in 0..MAX_CENTS) c else throw Fail(400, "BAD_AMOUNT")
+
+    private fun saveHours(i: DeskHoursIn): Resp {
+        if (i.openHour !in 0..23 || i.closeHour !in 1..24 || i.closeHour <= i.openHour || i.lightsFrom !in 0..24) throw Fail(400, "BAD_TIME")
+        if (i.slotMinutes !in listOf(30, 60, 90) || i.tournamentMinutes !in listOf(60, 90, 120)) throw Fail(400, "BAD_TIME")
+        val st = data.plan().settings
+        data.saveCourtSettings(st.copy(
+            openHour = i.openHour, closeHour = i.closeHour, slotMinutes = i.slotMinutes, centsPerHour = price(i.centsPerHour),
+            centsPerHourLights = price(i.centsPerHourLights), lightsFrom = i.lightsFrom, tournamentMinutes = i.tournamentMinutes,
+        ))
+        return settings()
+    }
+
+    /** Un campo nuovo ([DeskCourtIn.old] vuoto) o cambiato, anche di nome; le foto restano quelle del telefono. */
+    private fun saveCourt(i: DeskCourtIn): Resp {
+        val x = i.info
+        val name = text(x.name, 40)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        listOfNotNull(x.centsPerHour, x.centsPerHourLights, x.heatingCentsPerHour).forEach(::price)
+        val courts = data.courts()
+        val old = i.old.takeIf { it.isNotEmpty() }
+        if (old != null && old !in courts) throw Fail(404, "NOT_FOUND")
+        val clash = courts.any { it != old && it.equals(name, ignoreCase = true) }
+        if (clash) throw Fail(409, "COURT_EXISTS")
+        val base = data.plan().settings.info(old ?: name)
+        val info = base.copy(
+            name = name, surface = x.surface, covered = x.covered, lights = x.lights, heating = x.heating,
+            centsPerHour = x.centsPerHour, centsPerHourLights = x.centsPerHourLights, heatingCentsPerHour = if (x.heating) x.heatingCentsPerHour else 0,
+        )
+        if (old == null) { if (!data.addCourt(info)) throw Fail(409, "COURT_EXISTS") }
+        else {
+            if (old != name && !data.renameCourt(old, name)) throw Fail(409, "COURT_EXISTS")
+            data.saveCourtInfo(info.copy(photos = data.plan().settings.info(name).photos))
+        }
+        return settings()
+    }
+
+    private fun savePayTypes(list: List<DeskPayTypeFull>): Resp {
+        val old = data.payTypes().associateBy { it.id }
+        val clean = list.map { t ->
+            val name = text(t.name, 40)
+            if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+            // Il tipo per il registro resta quello che era (i nuovi sono "altro").
+            PayType(t.id.takeIf { it in old } ?: Fees.newId("t"), name, text(t.details, 200), t.online, old[t.id]?.method ?: PayMethod.OTHER)
+        }
+        if (clean.isEmpty()) throw Fail(400, "BAD_REQUEST")
+        if (clean.map { it.name.lowercase() }.toSet().size != clean.size) throw Fail(409, "PAYTYPE_EXISTS")
+        data.savePayTypes(clean)
+        return settings()
+    }
+
+    // --- Squadre e campionati ---
+
+    private fun team(id: String): Team = data.teams().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    private fun teamOut(t: Team): DeskTeam {
+        val people = data.players()
+        val rec = Teams.record(t)
+        return DeskTeam(
+            t.id, t.name, t.championship, t.season, t.captain, t.roster.map { DeskTeamPlayer(it, Players.byId(people, it)?.name ?: it) },
+            t.singles, t.doubles, t.fitp, rec.won, rec.lost, rec.drawn,
+            t.fixtures.sortedBy { it.at }.map { f ->
+                val start = CourtPlans.dayStart(f.at)
+                val (w, l) = Teams.result(f)
+                val problems = t.roster.associateWith { id ->
+                    Players.byId(people, id)?.let { pp -> Teams.problems(t, pp, f.at).map { DeskProblem(pp.name, it.name, ClubTournaments.blocking(it)) } } ?: listOf(DeskProblem(id, "NO_PLAYER", true))
+                }.filterValues { it.isNotEmpty() }
+                DeskFixture(
+                    f.id, f.opponent, day(f.at)!!, ((f.at - start) / 60_000L).toInt(), f.home, f.place, f.meeting, f.courts, f.hours, f.note, f.availability, f.callUp,
+                    f.rubbers.map { DeskRubber(it.doubles, it.ours, it.theirs, it.score, it.won) }, w, l, Teams.decided(f), Teams.outcome(f), problems,
+                )
+            },
+        )
+    }
+
+    private fun teamSaved(t: Team): Resp { data.saveTeam(t); return ok(DeskTeam.serializer(), teamOut(team(t.id))) }
+
+    private fun saveTeam(old: Team?, i: DeskTeamIn): Resp {
+        val name = text(i.name, 80)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val base = old ?: Team(Teams.newId("t"), name, createdAt = data.now())
+        val captain = i.captain?.takeIf { it.isNotEmpty() }?.let { id -> if (id in base.roster) id else throw Fail(400, "BAD_REQUEST") }
+        val t = base.copy(
+            name = name, championship = text(i.championship, 80), season = text(i.season, 30), captain = captain,
+            singles = i.singles.coerceIn(0, 9), doubles = i.doubles.coerceIn(0, 9), fitp = i.fitp,
+        )
+        data.saveTeam(t)
+        return ok(DeskId.serializer(), DeskId(t.id))
+    }
+
+    private fun teamRoute(m: String, p: List<String>, r: Req): Resp {
+        val t = team(p[0])
+        val rest = p.drop(1)
+        return when {
+            m == "PUT" && rest.isEmpty() -> saveTeam(t, read(DeskTeamIn.serializer(), r))
+            m == "DELETE" && rest.isEmpty() -> { data.deleteTeam(t); done() }
+            m == "POST" && rest == listOf("roster") -> {
+                val people = data.players()
+                val add = read(DeskIds.serializer(), r).ids.map { Players.byId(people, it)?.id ?: throw Fail(404, "NOT_FOUND") }.filter { it !in t.roster }.distinct()
+                teamSaved(t.copy(roster = t.roster + add))
+            }
+            m == "DELETE" && rest.size == 2 && rest[0] == "roster" -> {
+                val id = rest[1]
+                teamSaved(t.copy(roster = t.roster - id, captain = t.captain.takeIf { it != id }, fixtures = t.fixtures.map { f -> f.copy(callUp = f.callUp - id) }))
+            }
+            m == "POST" && rest == listOf("fixtures") -> saveFixture(t, null, read(DeskFixtureIn.serializer(), r))
+            rest.size >= 2 && rest[0] == "fixtures" -> {
+                val f = t.fixtures.firstOrNull { it.id == rest[1] } ?: throw Fail(404, "NOT_FOUND")
+                fixtureRoute(m, t, f, rest.drop(2), r)
+            }
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun withFixture(t: Team, f: Fixture): Resp = teamSaved(t.copy(fixtures = (t.fixtures.filter { it.id != f.id } + f).sortedBy { it.at }))
+
+    private fun saveFixture(t: Team, old: Fixture?, i: DeskFixtureIn): Resp {
+        val opponent = text(i.opponent, 80)
+        if (opponent.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        if (i.startMin !in 0 until 24 * 60) throw Fail(400, "BAD_TIME")
+        val at = dayStart(i.date) + i.startMin * 60_000L
+        val courts = data.courts()
+        if (i.courts.any { it !in courts }) throw Fail(404, "NOT_FOUND")
+        val base = old ?: Fixture(Teams.newId("f"), opponent, at, rubbers = Teams.emptyRubbers(t))
+        val f = base.copy(
+            opponent = opponent, at = at, home = i.home, place = text(i.place, 120), meeting = text(i.meeting, 120),
+            courts = if (i.home) i.courts.distinct() else emptyList(), hours = i.hours.coerceIn(1, 12), note = text(i.note, 500),
+        )
+        return withFixture(t, f)
+    }
+
+    private fun fixtureRoute(m: String, t: Team, f: Fixture, rest: List<String>, r: Req): Resp = when {
+        m == "PUT" && rest.isEmpty() -> saveFixture(t, f, read(DeskFixtureIn.serializer(), r))
+        m == "DELETE" && rest.isEmpty() -> teamSaved(t.copy(fixtures = t.fixtures - f))
+        m == "POST" && rest == listOf("availability") -> {
+            val i = read(DeskAnswerIn.serializer(), r)
+            if (i.player !in t.roster) throw Fail(404, "NOT_FOUND")
+            withFixture(t, f.copy(availability = if (i.answer == null) f.availability - i.player else f.availability + (i.player to i.answer)))
+        }
+        m == "POST" && rest == listOf("callup") -> {
+            val ids = read(DeskIds.serializer(), r).ids
+            if (ids.any { it !in t.roster }) throw Fail(400, "BAD_REQUEST")
+            withFixture(t, f.copy(callUp = t.roster.filter { it in ids }))
+        }
+        m == "POST" && rest == listOf("rubber") -> {
+            val i = read(DeskRubberIn.serializer(), r)
+            val old = f.rubbers.getOrNull(i.index) ?: throw Fail(404, "NOT_FOUND")
+            val size = if (old.doubles) 2 else 1
+            if (i.ours.size > size || i.theirs.size > size || i.ours.any { it.isNotEmpty() && it !in t.roster }) throw Fail(400, "BAD_REQUEST")
+            val withPlayers = f.copy(rubbers = f.rubbers.mapIndexed { k, x ->
+                if (k == i.index) x.copy(ours = i.ours.filter { it.isNotEmpty() }, theirs = i.theirs.map { text(it, 80) }.filter { it.isNotEmpty() }) else x
+            })
+            val score = text(i.score, 60)
+            withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
+                else Teams.setRubber(withPlayers, i.index, score, i.won))
+        }
+        m == "POST" && rest == listOf("notice") -> {
+            val kind = read(DeskNoticeIn.serializer(), r).kind
+            if (kind !in setOf("AVAILABILITY", "MISSING", "CALLUP", "RESULT")) throw Fail(400, "BAD_REQUEST")
+            val who = when (kind) { "MISSING" -> Teams.noAnswer(t, f); "CALLUP" -> f.callUp; else -> t.roster }
+            if (who.isEmpty()) throw Fail(409, "NOBODY")
+            data.teamNotice(t, f, kind)
+            done()
+        }
+        else -> throw Fail(404, "NOT_FOUND")
     }
 
     // --- Scuola tennis ---
@@ -23235,10 +25734,17 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.ClubServers
+import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.CourtInfo
+import com.tennis.scoremanager.data.CourtSettings
 import com.tennis.scoremanager.data.Course
 import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Fixture
 import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.CourtBooking
@@ -23286,6 +25792,33 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
     override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
     override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
+    override fun saveTeam(t: Team) = c.saveTeam(t)
+    override fun deleteTeam(t: Team) = c.deleteTeam(t.id)
+    override fun teamNotice(t: Team, f: Fixture, kind: String) = when (kind) {
+        "AVAILABILITY" -> c.noticeAvailability(t, f, missingOnly = false)
+        "MISSING" -> c.noticeAvailability(t, f, missingOnly = true)
+        "CALLUP" -> c.noticeCallUp(t, f)
+        else -> c.noticeResult(t, f)
+    }
+    override fun setClubName(name: String) { c.storage.clubName = name }
+    override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
+    override fun addCourt(info: CourtInfo): Boolean = c.addCourt(info)
+    override fun renameCourt(old: String, new: String): Boolean = c.renameCourt(old, new)
+    override fun saveCourtInfo(info: CourtInfo) = c.saveCourtInfo(info)
+    override fun deleteCourt(name: String) = c.deleteCourt(name)
+    override fun moveCourt(name: String, up: Boolean) = c.moveCourt(name, up)
+    override fun savePayTypes(list: List<PayType>) = c.savePayTypes(list)
+    override fun serverConf(): ClubServerConf = c.clubServer.value
+    override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) {
+        c.saveServerRules(rules, payInfo)
+        c.setServerAlerts(alerts)
+    }
+    // Rete: gira sul filo della richiesta, mai su quello principale.
+    override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
+    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
+    override fun serverRemove(kind: String, id: String) {
+        ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
+    }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
@@ -33234,6 +35767,10 @@ interface Strings {
     val moreGroupDevices: String
     val moreGroupData: String
     val moreGroupHelp: String
+    /** Segreteria da PC: l'avviso del browser spiegato prima, browser per browser. */
+    val deskFirstTitle: String
+    val deskFirstWhy: String
+    val deskFirstSteps: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -35033,7 +37570,7 @@ object ItStrings : Strings {
     override val deskStop = "Spegni"
     override val deskFailed = "Non si è acceso: riprova."
     override val deskAddress = "Scrivi questo indirizzo nel browser del computer"
-    override val deskWarning = "La prima volta il browser avvisa che la connessione non è privata: è normale con un certificato del telefono. Scegli Avanzate e Procedi; se l'avviso torna senza motivo, non proseguire."
+    override val deskWarning = "Poi il browser se lo ricorda. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire e confronta l'impronta qui sotto con quella del browser."
     override val deskCode = "Codice di accesso"
     override val deskCodeHint = "Se non puoi usare la fotocamera, scrivilo sul computer. Vale una volta sola e cambia ogni 5 minuti. Non dirlo a nessuno."
     override val deskNoNetwork = "Nessuna rete: collega il telefono al Wi-Fi o accendi l'hotspot."
@@ -35292,6 +37829,9 @@ object ItStrings : Strings {
     override val moreGroupDevices = "Dispositivi e voce"
     override val moreGroupData = "Dati"
     override val moreGroupHelp = "Aiuto"
+    override val deskFirstTitle = "La prima volta il browser dirà «La connessione non è privata»"
+    override val deskFirstWhy = "È normale e non è un pericolo: la pagina la serve questo telefono, con un certificato fatto da lui e non da un'azienda che il browser conosce. Il collegamento resta cifrato."
+    override val deskFirstSteps = "• Chrome o Edge: Avanzate › Procedi su … (non sicuro)\n• Firefox: Avanzate… › Accetta il rischio e continua\n• Safari: Mostra dettagli › visita questo sito web"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -37072,7 +39612,7 @@ object EnStrings : Strings {
     override val deskStop = "Turn off"
     override val deskFailed = "It did not start: try again."
     override val deskAddress = "Type this address in the computer's browser"
-    override val deskWarning = "The first time, the browser warns that the connection is not private: this is normal with a certificate made by the phone. Choose Advanced and Proceed; if the warning comes back for no reason, do not continue."
+    override val deskWarning = "After that the browser remembers it. If the warning comes back without you changing phone or reinstalling the app, do not continue and compare the fingerprint below with the browser's."
     override val deskCode = "Access code"
     override val deskCodeHint = "If you cannot use the camera, type it on the computer. It works once and changes every 5 minutes. Keep it to yourself."
     override val deskNoNetwork = "No network: connect the phone to Wi-Fi or turn on the hotspot."
@@ -37331,6 +39871,9 @@ object EnStrings : Strings {
     override val moreGroupDevices = "Devices and voice"
     override val moreGroupData = "Data"
     override val moreGroupHelp = "Help"
+    override val deskFirstTitle = "The first time, the browser will say “Your connection is not private”"
+    override val deskFirstWhy = "That's normal and not a danger: the page is served by this phone, with a certificate it made itself rather than one from a company the browser knows. The connection stays encrypted."
+    override val deskFirstSteps = "• Chrome or Edge: Advanced › Proceed to … (unsafe)\n• Firefox: Advanced… › Accept the Risk and Continue\n• Safari: Show Details › visit this website"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -39134,7 +41677,7 @@ object DeStrings : Strings {
     override val deskStop = "Ausschalten"
     override val deskFailed = "Start fehlgeschlagen: Versuche es erneut."
     override val deskAddress = "Gib diese Adresse im Browser des Computers ein"
-    override val deskWarning = "Beim ersten Mal warnt der Browser, die Verbindung sei nicht privat: Das ist bei einem Zertifikat des Telefons normal. Wähle Erweitert und Weiter; kommt die Warnung ohne Grund wieder, mach nicht weiter."
+    override val deskWarning = "Danach merkt sich der Browser das. Kommt die Warnung wieder, ohne dass du das Handy gewechselt oder die App neu installiert hast, mach nicht weiter und vergleiche den Fingerabdruck unten mit dem im Browser."
     override val deskCode = "Zugangscode"
     override val deskCodeHint = "Ohne Kamera gib ihn am Computer ein. Er gilt einmal und ändert sich alle 5 Minuten. Gib ihn nicht weiter."
     override val deskNoNetwork = "Kein Netz: Verbinde das Telefon mit dem WLAN oder schalte den Hotspot ein."
@@ -39393,6 +41936,9 @@ object DeStrings : Strings {
     override val moreGroupDevices = "Geräte und Stimme"
     override val moreGroupData = "Daten"
     override val moreGroupHelp = "Hilfe"
+    override val deskFirstTitle = "Beim ersten Mal sagt der Browser „Dies ist keine sichere Verbindung“"
+    override val deskFirstWhy = "Das ist normal und keine Gefahr: Die Seite kommt von diesem Handy, mit einem selbst erstellten Zertifikat statt einem von einer Firma, die der Browser kennt. Die Verbindung bleibt verschlüsselt."
+    override val deskFirstSteps = "• Chrome oder Edge: Erweitert › Weiter zu … (unsicher)\n• Firefox: Erweitert… › Risiko akzeptieren und fortfahren\n• Safari: Details einblenden › diese Website besuchen"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -41189,7 +43735,7 @@ object EsStrings : Strings {
     override val deskStop = "Apagar"
     override val deskFailed = "No se ha encendido: inténtalo de nuevo."
     override val deskAddress = "Escribe esta dirección en el navegador del ordenador"
-    override val deskWarning = "La primera vez el navegador avisa de que la conexión no es privada: es normal con un certificado del teléfono. Elige Avanzado y Continuar; si el aviso vuelve sin motivo, no sigas."
+    override val deskWarning = "Después el navegador lo recuerda. Si el aviso vuelve sin que hayas cambiado de teléfono o reinstalado la app, no sigas y compara la huella de abajo con la del navegador."
     override val deskCode = "Código de acceso"
     override val deskCodeHint = "Si no puedes usar la cámara, escríbelo en el ordenador. Vale una sola vez y cambia cada 5 minutos. No se lo digas a nadie."
     override val deskNoNetwork = "Sin red: conecta el teléfono al Wi-Fi o enciende el punto de acceso."
@@ -41448,6 +43994,9 @@ object EsStrings : Strings {
     override val moreGroupDevices = "Dispositivos y voz"
     override val moreGroupData = "Datos"
     override val moreGroupHelp = "Ayuda"
+    override val deskFirstTitle = "La primera vez el navegador dirá «La conexión no es privada»"
+    override val deskFirstWhy = "Es normal y no es un peligro: la página la sirve este teléfono, con un certificado hecho por él y no por una empresa que el navegador conoce. La conexión sigue cifrada."
+    override val deskFirstSteps = "• Chrome o Edge: Configuración avanzada › Acceder a … (sitio no seguro)\n• Firefox: Avanzado… › Aceptar el riesgo y continuar\n• Safari: Mostrar detalles › visitar este sitio web"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -43246,7 +45795,7 @@ object FrStrings : Strings {
     override val deskStop = "Désactiver"
     override val deskFailed = "Le démarrage a échoué : réessayez."
     override val deskAddress = "Saisissez cette adresse dans le navigateur de l'ordinateur"
-    override val deskWarning = "La première fois, le navigateur signale que la connexion n'est pas privée : c'est normal avec un certificat créé par le téléphone. Choisissez Avancé puis Continuer ; si l'alerte revient sans raison, n'allez pas plus loin."
+    override val deskWarning = "Ensuite le navigateur s'en souvient. Si l'alerte revient sans que vous ayez changé de téléphone ou réinstallé l'app, n'allez pas plus loin et comparez l'empreinte ci-dessous avec celle du navigateur."
     override val deskCode = "Code d'accès"
     override val deskCodeHint = "Sans caméra, saisissez-le sur l'ordinateur. Il ne sert qu'une fois et change toutes les 5 minutes. Ne le communiquez à personne."
     override val deskNoNetwork = "Aucun réseau : connectez le téléphone au Wi-Fi ou activez le point d'accès."
@@ -43505,6 +46054,9 @@ object FrStrings : Strings {
     override val moreGroupDevices = "Appareils et voix"
     override val moreGroupData = "Données"
     override val moreGroupHelp = "Aide"
+    override val deskFirstTitle = "La première fois, le navigateur dira « Votre connexion n'est pas privée »"
+    override val deskFirstWhy = "C'est normal et sans danger : la page est servie par ce téléphone, avec un certificat qu'il a créé lui-même et non par une société que le navigateur connaît. La liaison reste chiffrée."
+    override val deskFirstSteps = "• Chrome ou Edge : Paramètres avancés › Continuer vers … (dangereux)\n• Firefox : Avancé… › Accepter le risque et poursuivre\n• Safari : Afficher les détails › visiter ce site web"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -45304,7 +47856,7 @@ object PtStrings : Strings {
     override val deskStop = "Desativar"
     override val deskFailed = "Não ligou: tente de novo."
     override val deskAddress = "Digite este endereço no navegador do computador"
-    override val deskWarning = "Da primeira vez o navegador avisa que a conexão não é privada: é normal com um certificado do telefone. Escolha Avançado e Continuar; se o aviso voltar sem motivo, não prossiga."
+    override val deskWarning = "Depois o navegador lembra-se. Se o aviso voltar sem ter mudado de telefone ou reinstalado o app, não prossiga e compare a impressão digital abaixo com a do navegador."
     override val deskCode = "Código de acesso"
     override val deskCodeHint = "Se não puder usar a câmera, digite-o no computador. Vale uma só vez e muda a cada 5 minutos. Não o diga a ninguém."
     override val deskNoNetwork = "Sem rede: ligue o telefone ao Wi-Fi ou ative o hotspot."
@@ -45563,6 +48115,9 @@ object PtStrings : Strings {
     override val moreGroupDevices = "Dispositivos e voz"
     override val moreGroupData = "Dados"
     override val moreGroupHelp = "Ajuda"
+    override val deskFirstTitle = "Da primeira vez o navegador dirá «A sua ligação não é privada»"
+    override val deskFirstWhy = "É normal e não é um perigo: a página é servida por este telefone, com um certificado feito por ele e não por uma empresa que o navegador conhece. A ligação continua cifrada."
+    override val deskFirstSteps = "• Chrome ou Edge: Avançadas › Continuar para … (não seguro)\n• Firefox: Avançado… › Aceitar o risco e continuar\n• Safari: Mostrar detalhes › visitar este site"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -48611,6 +51166,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.GppMaybe
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.PowerSettingsNew
@@ -48657,10 +51213,17 @@ fun DeskScreen(c: MatchController) {
         icon = Icons.Filled.Computer,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // L'avviso del browser, detto prima: così la prima volta non spaventa.
+        @Composable fun firstTime() = SectionCard(s.deskFirstTitle, Icons.Filled.GppMaybe) {
+            Text(s.deskFirstWhy, color = TsmColors.TextMain, fontSize = 14.sp)
+            Text(s.deskFirstSteps, color = TsmColors.TextMain, fontSize = 14.sp, lineHeight = 22.sp)
+            Text(s.deskWarning, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
         if (!ui.running) {
             Text(s.deskIntro, color = TsmColors.TextDim)
             if (ui.failed) Text(s.deskFailed, color = TsmColors.Orange)
             GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start() }, Modifier.fillMaxWidth())
+            firstTime()
             return@ScreenScaffold
         }
         val ip = ui.connectedIp
@@ -48679,8 +51242,8 @@ fun DeskScreen(c: MatchController) {
                         context.startActivity(Intent.createChooser(send, s.deskShare))
                     }, Modifier.fillMaxWidth())
                 }
-                Text(s.deskWarning, color = TsmColors.TextDim, fontSize = 13.sp)
             }
+            firstTime()
             SectionCard(s.deskScan, Icons.Filled.QrCodeScanner) {
                 Text(s.deskScanHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 if (scanBad) Text(s.deskScanBad, color = TsmColors.Orange)
@@ -78708,6 +81271,117 @@ class DeskTest {
         assertEquals(400, req("GET", "/stats", token = k, q = mapOf("from" to "2026-11-30", "to" to "2026-11-01")).first)
     }
 
+    @Test fun squadraDalPc() {
+        val k = login()
+        for (n in listOf("Anna", "Bea", "Cora")) req("POST", "/people", """{"firstName":"$n","lastName":"X","member":true,"medicalUntil":"2030-01-01"}""", k)
+        val ids = data.list.associate { it.firstName to it.id }
+        assertEquals(400, req("POST", "/teams", """{"name":""}""", k).first)
+        val id = field(req("POST", "/teams", """{"name":"TC Prova D1","championship":"Serie D1","singles":2,"doubles":1,"fitp":false}""", k).second, "id")!!
+        assertEquals(200, req("POST", "/teams/$id/roster", """{"ids":["${ids["Anna"]}","${ids["Bea"]}","${ids["Cora"]}"]}""", k).first)
+        assertEquals(400, req("PUT", "/teams/$id", """{"name":"TC Prova D1","captain":"nessuno"}""", k).first)
+        assertEquals(200, req("PUT", "/teams/$id", """{"name":"TC Prova D1","captain":"${ids["Anna"]}","singles":2,"doubles":1,"fitp":false}""", k).first)
+        // Incontro in casa col Campo 1 tenuto: le partite si fanno dalla formula (2 singolari e 1 doppio).
+        val (st, out) = req("POST", "/teams/$id/fixtures", """{"opponent":"TC Altro","date":"2026-11-15","startMin":540,"courts":["Campo 1","Campo 9"]}""", k)
+        assertEquals(404, st)
+        assertTrue(out, "NOT_FOUND" in out)
+        assertEquals(200, req("POST", "/teams/$id/fixtures", """{"opponent":"TC Altro","date":"2026-11-15","startMin":540,"courts":["Campo 1"]}""", k).first)
+        var t = data.squads.single()
+        val f = t.fixtures.single()
+        assertEquals(listOf(false, false, true), f.rubbers.map { it.doubles })
+        assertEquals(listOf("Campo 1"), f.courts)
+        // Disponibilità, convocati, risultati.
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"${ids["Anna"]}","answer":"YES"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"${ids["Bea"]}","answer":"MAYBE"}""", k).first)
+        assertEquals(404, req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"nessuno","answer":"YES"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/callup", """{"ids":["${ids["Bea"]}","${ids["Anna"]}"]}""", k).first)
+        t = data.squads.single()
+        assertEquals(listOf(ids["Anna"], ids["Bea"]), t.fixtures.single().callUp)
+        assertEquals(400, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":0,"ours":["${ids["Anna"]}","${ids["Bea"]}"]}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":0,"ours":["${ids["Anna"]}"],"theirs":["Rossi"],"score":"6-3 6-4"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":1,"ours":["${ids["Bea"]}"],"theirs":["Verdi"],"score":"2-6 6-7"}""", k).first)
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/rubber", """{"index":2,"ours":["${ids["Anna"]}","${ids["Bea"]}"],"theirs":["Rossi","Verdi"],"score":"6-4 6-4"}""", k).first)
+        val (_, list) = req("GET", "/teams", token = k)
+        assertTrue(list, "\"won\":2,\"lost\":1,\"decided\":true,\"outcome\":true" in list && "\"won\":1,\"lost\":0,\"drawn\":0" in list)
+        // Gli avvisi partono dal telefono; senza nessuno da avvisare no.
+        assertEquals(200, req("POST", "/teams/$id/fixtures/${f.id}/notice", """{"kind":"MISSING"}""", k).first)
+        assertEquals("MISSING", data.noticed)
+        req("POST", "/teams/$id/fixtures/${f.id}/availability", """{"player":"${ids["Cora"]}","answer":"NO"}""", k)
+        assertEquals(409, req("POST", "/teams/$id/fixtures/${f.id}/notice", """{"kind":"MISSING"}""", k).first)
+        assertEquals(400, req("POST", "/teams/$id/fixtures/${f.id}/notice", """{"kind":"BOH"}""", k).first)
+        // Fuori dalla rosa: non è più capitano né convocato.
+        assertEquals(200, req("DELETE", "/teams/$id/roster/${ids["Anna"]}", token = k).first)
+        t = data.squads.single()
+        assertEquals(null, t.captain)
+        assertEquals(listOf(ids["Bea"]), t.fixtures.single().callUp)
+        assertEquals(200, req("DELETE", "/teams/$id/fixtures/${f.id}", token = k).first)
+        assertTrue(data.squads.single().fixtures.isEmpty())
+        assertEquals(200, req("DELETE", "/teams/$id", token = k).first)
+        assertTrue(data.squads.isEmpty())
+    }
+
+    @Test fun impostazioniDelCircolo() {
+        val k = login()
+        val (st, out) = req("GET", "/settings", token = k)
+        assertEquals(200, st)
+        assertTrue(out, "\"club\":\"TC Prova\"" in out && "\"centsPerHour\":1200" in out && "\"name\":\"Campo 2\"" in out)
+        assertEquals(200, req("PUT", "/settings/club", """{"name":"TC Nuovo"}""", k).first)
+        assertEquals("TC Nuovo", data.club)
+        // Orari e prezzi: chiusura prima dell'apertura no; caselle solo da 30, 60 o 90 minuti.
+        assertEquals(400, req("PUT", "/settings/hours", """{"openHour":20,"closeHour":8,"slotMinutes":60}""", k).first)
+        assertEquals(400, req("PUT", "/settings/hours", """{"openHour":8,"closeHour":22,"slotMinutes":45}""", k).first)
+        assertEquals(200, req("PUT", "/settings/hours", """{"openHour":7,"closeHour":22,"slotMinutes":30,"centsPerHour":1500,"centsPerHourLights":2000,"lightsFrom":17,"tournamentMinutes":120}""", k).first)
+        val set = data.courtPlan.settings
+        assertEquals(listOf(7, 22, 30, 1500, 2000, 17, 120), listOf(set.openHour, set.closeHour, set.slotMinutes, set.centsPerHour, set.centsPerHourLights, set.lightsFrom, set.tournamentMinutes))
+        // Campi: nuovo, doppione no, cambiato di nome con le sue prenotazioni, spostato, tolto.
+        assertEquals(200, req("POST", "/settings/courts", """{"info":{"name":"Centrale","surface":"CLAY","covered":true,"centsPerHour":2500}}""", k).first)
+        assertEquals(409, req("POST", "/settings/courts", """{"info":{"name":"centrale"}}""", k).first)
+        assertEquals(2500, data.courtPlan.settings.info("Centrale").centsPerHour)
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2030-11-10","startMin":600,"minutes":60,"names":["Rossi"]}""", k)
+        assertEquals(409, req("POST", "/settings/courts", """{"old":"Campo 1","info":{"name":"Campo 2"}}""", k).first)
+        assertEquals(200, req("POST", "/settings/courts", """{"old":"Campo 1","info":{"name":"Campo A","lights":false}}""", k).first)
+        assertEquals("Campo A", data.courtPlan.bookings.single().court)
+        assertEquals(false, data.courtPlan.settings.info("Campo A").lights)
+        assertEquals(200, req("POST", "/settings/courts/move", """{"name":"Centrale","up":true}""", k).first)
+        assertEquals(listOf("Campo A", "Centrale", "Campo 2"), data.pitches)
+        assertEquals(200, req("DELETE", "/settings/courts", token = k, q = mapOf("name" to "Campo 2")).first)
+        assertEquals(404, req("DELETE", "/settings/courts", token = k, q = mapOf("name" to "Campo 2")).first)
+        // Modi di pagamento: i vecchi tengono il loro tipo, i nuovi sono "altro"; niente doppioni.
+        val cash = data.payTypes().first { it.method == com.tennis.scoremanager.data.PayMethod.CASH }
+        assertEquals(409, req("PUT", "/settings/paytypes", """{"list":[{"id":"${cash.id}","name":"Contanti"},{"name":"contanti"}]}""", k).first)
+        assertEquals(200, req("PUT", "/settings/paytypes", """{"list":[{"id":"${cash.id}","name":"Cassa"},{"name":"Satispay","details":"https://satispay.example/x","online":true}]}""", k).first)
+        assertEquals(listOf("Cassa", "Satispay"), data.ledger.payTypes.map { it.name })
+        assertEquals(com.tennis.scoremanager.data.PayMethod.CASH, data.ledger.payTypes[0].method)
+        assertTrue(data.ledger.payTypes[1].online)
+    }
+
+    @Test fun serverDellePrenotazioni() {
+        val k = login()
+        assertEquals(409, req("GET", "/online", token = k).first)
+        data.server = com.tennis.scoremanager.data.ClubServerConf(url = "http://srv", token = "t", club = "TC Prova")
+        val at = java.time.LocalDateTime.of(2030, 5, 4, 10, 0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        data.remote = com.tennis.scoremanager.data.SrvAdmin(
+            1, listOf(com.tennis.scoremanager.data.OnlineBooking("b1", "Campo 1", at, 60, "p9", "Mario", 1200)),
+            listOf(com.tennis.scoremanager.data.SrvPlayer("p9", "Mario", 0, 0, 1)),
+            listOf(com.tennis.scoremanager.data.Wait("w1", "p9", null, at, 60)),
+            listOf(com.tennis.scoremanager.data.Seek("s1", com.tennis.scoremanager.data.SeekPlayer("p9", "Mario"), "2030-05-05", 540, 720, level = "NC")),
+        )
+        val (st, out) = req("GET", "/online", token = k)
+        assertEquals(200, st)
+        assertTrue(out, "\"date\":\"2030-05-04\",\"startMin\":600" in out && "\"name\":\"Mario\"" in out && "\"need\":1" in out && "\"waits\":[{\"id\":\"w1\",\"name\":\"Mario\",\"date\"" in out)
+        assertEquals(200, req("DELETE", "/online/seeks/s1", token = k).first)
+        assertEquals(200, req("DELETE", "/online/waits/w1", token = k).first)
+        assertEquals(listOf("seek:s1", "wait:w1"), data.removed)
+        assertEquals(200, req("POST", "/online/sync", token = k).first)
+        // Il server non risponde: la pagina c'è lo stesso, col motivo.
+        data.remoteDown = true
+        assertTrue(req("GET", "/online", token = k).second.contains("\"stateError\":\"NET\""))
+        assertEquals(502, req("POST", "/online/sync", token = k).first)
+        // Le regole: i limiti fuori misura si riportano dentro.
+        assertEquals(200, req("PUT", "/online/rules", """{"rules":{"open":false,"daysAhead":99,"maxFuture":3,"courts":["Campo 2"]},"payInfo":"al campo","alerts":false}""", k).first)
+        assertEquals(listOf(false, 60, 3, false), listOf(data.server.rules.open, data.server.rules.daysAhead, data.server.rules.maxFuture, data.server.alerts))
+        assertEquals(404, req("PUT", "/online/rules", """{"rules":{"courts":["Campo 9"]}}""", k).first)
+    }
+
     @Test fun prenotazioniSenzaSovrapposizioni() {
         val k = login()
         val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"]}"""
@@ -78839,12 +81513,18 @@ package com.tennis.scoremanager.desk
 
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.ClubServerError
+import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtPlans
 import com.tennis.scoremanager.data.Course
 import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Fixture
 import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.ClubTournaments
@@ -78862,7 +81542,7 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     var courtPlan = CourtPlan(CourtSettings(centsPerHour = 1200, centsPerHourLights = 1600))
     var cups = emptyList<ClubTournament>()
     override fun <T> tx(f: () -> T): T = synchronized(this) { f() }
-    override val club = "TC Prova"
+    override var club = "TC Prova"
     override var lang = "it"
     override fun now() = time
     override fun players() = list
@@ -78890,7 +81570,41 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     var school = emptyList<Course>()
     override fun features() = on
     override fun courses() = school
-    override fun teams() = emptyList<Team>()
+    var squads = emptyList<Team>()
+    override fun teams() = squads
+    override fun saveTeam(t: Team) { squads = squads.filter { it.id != t.id } + t }
+    override fun deleteTeam(t: Team) { squads = squads.filter { it.id != t.id } }
+    var noticed: String? = null
+    override fun teamNotice(t: Team, f: Fixture, kind: String) { noticed = kind }
+    override fun setClubName(name: String) { club = name }
+    override fun saveCourtSettings(st: CourtSettings) { courtPlan = courtPlan.copy(settings = st) }
+    override fun addCourt(info: CourtInfo): Boolean {
+        if (pitches.any { it.equals(info.name, ignoreCase = true) }) return false
+        pitches = pitches + info.name; saveCourtInfo(info); return true
+    }
+    override fun renameCourt(old: String, new: String): Boolean {
+        if (pitches.any { it != old && it.equals(new, ignoreCase = true) }) return false
+        pitches = pitches.map { if (it == old) new else it }
+        courtPlan = courtPlan.copy(bookings = courtPlan.bookings.map { if (it.court == old) it.copy(court = new) else it },
+            settings = courtPlan.settings.copy(courts = courtPlan.settings.courts.map { if (it.name == old) it.copy(name = new) else it }))
+        return true
+    }
+    override fun saveCourtInfo(info: CourtInfo) { courtPlan = courtPlan.copy(settings = courtPlan.settings.copy(courts = courtPlan.settings.courts.filter { it.name != info.name } + info)) }
+    override fun deleteCourt(name: String) { pitches = pitches - name; courtPlan = courtPlan.copy(bookings = courtPlan.bookings.filter { it.court != name }) }
+    override fun moveCourt(name: String, up: Boolean) {
+        val l = pitches.toMutableList(); val i = l.indexOf(name); val j = if (up) i - 1 else i + 1
+        if (i >= 0 && j in l.indices) { l[i] = l[j].also { l[j] = l[i] }; pitches = l }
+    }
+    override fun savePayTypes(list: List<PayType>) { ledger = ledger.copy(payTypes = list) }
+    var server = ClubServerConf()
+    var remote = SrvAdmin(0, emptyList(), emptyList())
+    var remoteDown = false
+    var removed = mutableListOf<String>()
+    override fun serverConf() = server
+    override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) { server = server.copy(rules = rules, payInfo = payInfo, alerts = alerts) }
+    override fun serverState(): SrvAdmin = if (remoteDown) throw ClubServerError("NET") else remote
+    override fun serverSync(): String? = if (remoteDown) "NET" else { server = server.copy(lastSync = time); null }
+    override fun serverRemove(kind: String, id: String) { removed += "$kind:$id" }
     override fun ladders() = emptyList<Ladder>()
     override fun saveCourse(c: Course) { school = school.filter { it.id != c.id } + c }
     override fun deleteCourse(c: Course) { school = school.filter { it.id != c.id } }
@@ -81361,7 +84075,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvInviteIn(val player: String, val name: String, val days: Int = 14)
 @Serializable data class SrvInvite(val code: String, val expires: Long)
 @Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
-@Serializable data class SrvAdmin(val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>)
+@Serializable data class SrvAdmin(
+    val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>,
+    /** Per la segreteria: chi è in lista d'attesa e gli annunci di Cerco compagno ancora da giocare (vuoti dai server vecchi). */
+    val waits: List<Wait> = emptyList(), val seeks: List<Seek> = emptyList(),
+)
 @Serializable data class SrvOk(val ok: Boolean = true)
 
 /** Il giocatore: le sue prenotazioni, il giorno, il prezzo prima di confermare (la pagina web e l'app). */
@@ -83995,6 +86713,8 @@ class Api(
             r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "waits" -> { admin(r); adminRemove { s -> s.copy(waits = s.waits.filter { it.id != p[2] }) } }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "seeks" -> { admin(r); adminRemove { s -> s.copy(seeks = s.seeks.filter { it.id != p[2] }) } }
             r.method == "POST" && p == listOf("claim") -> claim(r)
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
@@ -84079,7 +86799,18 @@ class Api(
 
     private fun adminState(): Resp {
         val s = store.state
-        return ok(SrvAdmin.serializer(), SrvAdmin(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
+        val now = store.now()
+        val today = java.time.Instant.ofEpochMilli(now).atZone(java.time.ZoneId.of(s.sync.timeZone)).toLocalDate().toString()
+        return ok(SrvAdmin.serializer(), SrvAdmin(
+            s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) },
+            s.waits.filter { it.start > now }.sortedBy { it.start }, s.seeks.filter { it.date >= today }.sortedWith(compareBy({ it.date }, { it.fromMin })),
+        ))
+    }
+
+    /** La segreteria toglie un'attesa o un annuncio (fuori luogo, o già sistemato a voce). */
+    private fun adminRemove(f: (State) -> State): Resp {
+        store.update { s -> f(s) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     private fun invite(r: Req): Resp {
@@ -86758,6 +89489,22 @@ class SeekApiTest {
 
     private fun seeks(t: String) = json.decodeFromString(ListSerializer(SrvSeek.serializer()), call("GET", "/seeks", token = t).body)
     private fun me(t: String) = json.decodeFromString(SrvMe.serializer(), call("GET", "/me", token = t).body)
+
+    @Test fun theOfficeSeesAndRemovesSeeksAndWaits() {
+        val mario = player("p1", "Mario")
+        sync(listOf(Busy("Campo 1", at(10, 9), at(10, 10))))
+        val seek = field(call("POST", "/seeks", """{"date":"2026-11-14","fromMin":540,"toMin":720}""", mario).body, "id")
+        assertEquals(201, call("POST", "/waits", """{"court":"Campo 1","start":${at(10, 9)},"minutes":60}""", mario).status)
+        val st = json.decodeFromString(com.tennis.scoremanager.data.SrvAdmin.serializer(), call("GET", "/admin/state", token = admin).body)
+        assertEquals(listOf(seek), st.seeks.map { it.id })
+        assertEquals("p1", st.waits.single().player)
+        // Solo la segreteria: col token del giocatore no.
+        assertEquals(401, call("DELETE", "/admin/seeks/$seek", token = mario).status)
+        assertEquals(200, call("DELETE", "/admin/seeks/$seek", token = admin).status)
+        assertEquals(200, call("DELETE", "/admin/waits/${st.waits.single().id}", token = admin).status)
+        val after = json.decodeFromString(com.tennis.scoremanager.data.SrvAdmin.serializer(), call("GET", "/admin/state", token = admin).body)
+        assertTrue(after.seeks.isEmpty() && after.waits.isEmpty())
+    }
 
     @Test fun singlesFindsACourtAndBooksIt() {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); sent.clear()

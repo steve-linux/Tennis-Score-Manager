@@ -204,7 +204,7 @@ async function start() {
 const VIEWS = () => {
   const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
   return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')],
-    ['school', T.scTitle, on('SCHOOL')], ['stats', T.stTitle, on('STATS')]]
+    ['school', T.scTitle, on('SCHOOL')], ['teams', T.tmTitle, on('TEAMS')], ['online', T.onlineTitle, on('SERVER')], ['stats', T.stTitle, on('STATS')], ['settings', T.settingsTitle, true]]
     .filter((v) => v[2]).map(([v, l]) => [v, l]);
 };
 const main = () => document.querySelector('main');
@@ -214,12 +214,12 @@ async function render() {
   put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } }, l)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, stats: showStats })[view](); }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, teams: showTeams, online: showOnline, stats: showStats, settings: showSettings })[view](); }
   catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
@@ -253,7 +253,7 @@ async function showToday() {
       () => go('cups', () => { cupId = cups.length === 1 ? cups[0] : null; cupTab = 'matches'; })));
   }
   if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at), () => go('school', () => { courseId = null; })));
-  if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text)));
+  if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text), () => go('teams', () => { teamId = null; fixtureId = null; })));
   if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
   const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)),
@@ -1168,6 +1168,381 @@ async function showStats() {
     h('p.dim', T.stRevenueHint),
     heat ? h('div.section', h('h2', T.stHeat), h('p.dim', T.stHeatHint), heat) : null,
     st.top.length ? h('div.section', h('h2', T.stTop), h('div.panel', h('table', h('tbody', st.top.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td.num', T.stCount(x.count)))))))) : null);
+}
+
+// --- Server delle prenotazioni ---
+
+const srvError = (c) => ({ NET: T.srvErrNet, UNAUTHORIZED: T.srvErrAuth, NOT_TSM: T.srvErrNotTsm })[c] || T.srvErrOther(c);
+
+async function showOnline() {
+  let o;
+  try { o = await api('GET', '/online'); }
+  catch (e) {
+    if (e instanceof ApiError && e.message === 'NOT_PAIRED') { put(main(), h('div.head', h('h1', T.onlineTitle)), h('div.panel', h('div.empty', T.notPaired))); return; }
+    throw e;
+  }
+  const act = async (method, path, ask) => {
+    if (ask && !confirm(ask)) return;
+    try { await api(method, path); toast(T.saved); } catch (e) { toast(e instanceof ApiError && T.err[e.message] ? errText(e) : srvError(e.message)); }
+    await showOnline();
+  };
+  const when = (d, m) => shortDay(d) + ' ' + hhmm(m);
+  const rules = o.rules;
+  const num = (v, min, max) => h('input', { type: 'number', min, max, value: v });
+  const open = h('input', { type: 'checkbox', checked: rules.open });
+  const days = num(rules.daysAhead, 0, 60), most = num(rules.maxFuture, 1, 20), long = num(rules.maxMinutes, 30, 480);
+  const cancel = num(rules.cancelHours, 0, 168), notice = num(rules.noticeMinutes, 0, 1440), remind = num(rules.remindHours, 0, 48);
+  const courts = o.courts.map((c) => [c, h('input', { type: 'checkbox', checked: rules.courts.includes(c) })]);
+  const pay = h('textarea', { rows: 2, maxlength: 300 }, o.payInfo);
+  const alerts = h('input', { type: 'checkbox', checked: o.alerts });
+  const saveRules = async () => {
+    const body = { rules: { ...rules, open: open.checked, daysAhead: Number(days.value), maxFuture: Number(most.value), maxMinutes: Number(long.value),
+      cancelHours: Number(cancel.value), noticeMinutes: Number(notice.value), remindHours: Number(remind.value), courts: courts.filter(([, x]) => x.checked).map(([c]) => c) },
+    payInfo: pay.value, alerts: alerts.checked };
+    try {
+      await api('PUT', '/online/rules', body);
+      // Al server subito: così i giocatori le vedono già.
+      try { await api('POST', '/online/sync'); toast(T.rulesSent); } catch (_) { toast(T.rulesLater); }
+    } catch (e) { toast(errText(e)); }
+    await showOnline();
+  };
+  const sync = o.lastSync ? T.srvLastSync(dateText(o.lastSync) + ' ' + hhmm(o.lastSyncMin)) : T.srvNeverSynced;
+  put(main(),
+    h('div.head', h('h1', T.onlineTitle), h('button', { onclick: () => act('POST', '/online/sync') }, T.srvSyncNow), h('button', { onclick: () => window.print() }, T.print)),
+    h('p.dim', T.srvConnected(o.club || o.url), ' · ', sync, o.publicUrl ? ' · ' + o.publicUrl : ''),
+    o.error ? h('p', h('span.tag.bad', srvError(o.error))) : null,
+    o.stateError ? h('div.panel', h('div.empty', srvError(o.stateError))) : null,
+    printHead(T.onlineTitle),
+    h('div.section', h('h2', T.onlineBookings + ' (' + o.bookings.length + ')'),
+      o.bookings.length ? h('div.panel', h('table',
+        h('thead', h('tr', [T.cupWhen, T.ctTime, T.court, T.name, T.price, T.bookedOn].map((x) => h('th', { scope: 'col' }, x)))),
+        h('tbody', o.bookings.map((b) => h('tr.row', { tabindex: 0, title: T.plan, onclick: () => go('plan', () => { planDate = b.date; planView = 'day'; }) },
+          h('td', shortDay(b.date)), h('td', hhmm(b.startMin) + '–' + hhmm(b.startMin + b.minutes)), h('td', b.court), h('td', b.name),
+          h('td.num', b.cents ? eur(b.cents) : T.pbFreePrice), h('td.dim', b.createdAt ? dateText(b.createdAt) : '')))))) : h('p.dim', T.pbNone)),
+    h('div.section', h('h2', T.pbWaitList + ' (' + o.waits.length + ')'),
+      o.waits.length ? h('div.panel', h('table', h('tbody', o.waits.map((w) => h('tr',
+        h('td', when(w.date, w.startMin) + '–' + hhmm(w.startMin + w.minutes)), h('td', w.court || h('span.dim', T.pbWaitAnyCourt)), h('td', w.name),
+        h('td', w.freedCourt ? h('span.tag.ok', T.pbWaitFreed + ' ' + w.freedCourt) : h('span.tag.warn', T.pbWaiting)),
+        h('td.num.noprint', h('button.danger', { type: 'button', onclick: () => act('DELETE', '/online/waits/' + encodeURIComponent(w.id), T.removeWaitAsk(w.name)) }, T.pbWaitRemove)))))))
+        : h('p.dim', T.noWaits)),
+    h('div.section', h('h2', T.pbSeekTitle + ' (' + o.seeks.length + ')'),
+      o.seeks.length ? h('div.panel', h('table', h('tbody', o.seeks.map((k) => h('tr',
+        h('td', shortDay(k.date) + ' ' + hhmm(k.fromMin) + '–' + hhmm(k.toMin)), h('td', k.doubles ? T.pbSeekDoubles : T.pbSeekSingles, k.level ? h('span.dim', ' · ' + k.level) : null),
+        h('td', T.pbSeekWho(k.players.join(', ')), k.note ? h('div.dim', k.note) : null),
+        h('td', k.booked ? h('span.tag.ok', T.seekBooked) : k.noCourt ? h('span.tag.bad', T.pbSeekNoCourt) : h('span.tag.warn', T.pbSeekNeed(k.need))),
+        h('td.num.noprint', h('button.danger', { type: 'button', onclick: () => act('DELETE', '/online/seeks/' + encodeURIComponent(k.id), T.removeSeekAsk(k.players[0] || '')) }, T.pbSeekRemove)))))))
+        : h('p.dim', T.noSeeks)),
+    h('div.section.noprint', h('h2', T.rulesTitle), h('div.panel', h('div.pad', h('div.form',
+      h('label.check.full', open, T.srvOpen), h('p.full.dim', T.srvOpenHint),
+      field(T.srvDaysAhead, days), field(T.srvMaxFuture, most), field(T.srvMaxMinutes + ' (min)', long), field(T.srvCancelHours, cancel),
+      field(T.srvNotice, notice), field(T.srvRemind, remind),
+      h('h3', T.srvCourts), h('div.full.checks', courts.map(([c, x]) => h('label.check', x, c))), h('p.full.dim', T.allCourtsHint),
+      field(T.srvPayInfo, pay, 'full'), h('label.check.full', alerts, T.onlineAlerts),
+      h('div.full.actions', h('button.primary', { type: 'button', onclick: saveRules }, T.save)))))),
+    h('p.dim.noprint', T.srvInviteHow));
+}
+
+// --- Impostazioni del circolo ---
+
+const moneyIn = (c) => h('input', { inputmode: 'decimal', value: c === null || c === undefined ? '' : (c / 100).toFixed(2).replace('.', ',') });
+/** Un importo scritto: vuoto = [empty]; null se non è un importo. */
+const moneyOut = (input, empty) => (input.value.trim() ? cents(input.value) : empty);
+const SURFACES = () => [['', '—'], ['CLAY', T.crtClay], ['GRASS', T.crtGrass], ['HARD', T.crtHard], ['OTHER', T.bkOther]];
+
+async function showSettings() {
+  const st = await api('GET', '/settings');
+  const save = async (method, path, body, after) => {
+    try { await api(method, path, body); toast(T.saved); if (after) await after(); await showSettings(); } catch (e) { toast(e instanceof ApiError ? errText(e) : String(e.message || e)); }
+  };
+  // Il circolo.
+  const club = h('input', { maxlength: 80, value: st.club, required: true });
+  // Orari e prezzi.
+  const hours = (from, to, v) => { const o = []; for (let x = from; x <= to; x++) o.push([String(x), String(x).padStart(2, '0') + ':00']); return select(o, String(v)); };
+  const open = hours(0, 23, st.openHour), close = hours(1, 24, st.closeHour), lights = hours(0, 24, st.lightsFrom);
+  const slot = select([30, 60, 90].map((m) => [String(m), m + ' min']), String(st.slotMinutes));
+  const tmin = select([60, 90, 120].map((m) => [String(m), m + ' min']), String(st.tournamentMinutes));
+  const price = moneyIn(st.centsPerHour), priceL = moneyIn(st.centsPerHourLights);
+  // Modi di pagamento: si cambiano tutti insieme e si salvano con un tasto.
+  const pays = st.payTypes.map((t) => ({ ...t }));
+  const payBox = h('div');
+  function drawPays() {
+    put(payBox, h('div.panel', h('table', h('tbody', pays.map((t, i) => {
+      const name = h('input', { value: t.name, maxlength: 40, 'aria-label': T.ptName, oninput: () => { t.name = name.value; } });
+      const det = h('input', { value: t.details, maxlength: 200, placeholder: T.ptDetails, 'aria-label': T.ptDetails, oninput: () => { t.details = det.value; } });
+      const on = h('input', { type: 'checkbox', checked: t.online, onchange: () => { t.online = on.checked; } });
+      return h('tr', h('td', name), h('td', det), h('td', h('label.check', on, T.ptOnlineShort)),
+        h('td.num', h('button.danger', { type: 'button', title: T.ptDelete, onclick: () => { pays.splice(i, 1); drawPays(); } }, '×')));
+    })))), h('div.actions', h('button', { type: 'button', onclick: () => { pays.push({ id: '', name: '', details: '', online: false }); drawPays(); } }, T.ptNew),
+      h('button.primary', { type: 'button', onclick: () => save('PUT', '/settings/paytypes', { list: pays }) }, T.save)));
+  }
+  drawPays();
+  const courtRow = (c, i) => h('tr',
+    h('td', h('b', c.name)),
+    h('td', [SURFACES().find(([v]) => v === (c.surface || ''))[1], c.covered ? T.crtCovered : T.crtOpen, c.lights ? T.crtLightsShort : '', c.heating ? T.crtHeatedShort : ''].filter((x) => x && x !== '—').join(' · ')),
+    h('td.num', c.centsPerHour !== null && c.centsPerHour !== undefined ? eur(c.centsPerHour) : h('span.dim', eur(st.centsPerHour)),
+      c.lights ? h('div.dim', T.lights + ' ' + eur(c.centsPerHourLights ?? st.centsPerHourLights)) : null),
+    h('td.num', c.futureBookings ? T.nBookings(c.futureBookings) : ''),
+    h('td.num.nowrap', h('button', { type: 'button', disabled: i === 0, title: T.moveUp, onclick: () => save('POST', '/settings/courts/move', { name: c.name, up: true }) }, '↑'),
+      h('button', { type: 'button', disabled: i === st.courts.length - 1, title: T.moveDown, onclick: () => save('POST', '/settings/courts/move', { name: c.name, up: false }) }, '↓'),
+      h('button', { type: 'button', onclick: () => editCourt(st, c) }, T.edit)));
+  put(main(),
+    h('div.head', h('h1', T.settingsTitle)), h('p.dim', T.settingsHint),
+    h('div.section', h('h2', T.clubSection), h('div.panel', h('div.pad', h('div.form',
+      field(T.clubNameLabel, club, 'full'), h('div.full.actions', h('button.primary', { type: 'button', onclick: () => save('PUT', '/settings/club', { name: club.value }, async () => { info = await api('GET', '/info'); document.title = T.title + ' · ' + info.club; render(); }) }, T.save)))))),
+    h('div.section', h('h2', T.planSettings), h('div.panel', h('div.pad', h('div.form',
+      field(T.planOpen, open), field(T.planClose, close), field(T.planSlot, slot), field(T.planTournamentMinutes, tmin),
+      field(T.planPrice, price), field(T.planPriceLights, priceL), field(T.planLightsFrom, lights), h('span'),
+      h('div.full.actions', h('button.primary', { type: 'button', onclick: () => {
+        const a = moneyOut(price, 0), b = moneyOut(priceL, 0);
+        if (a === null || b === null) { toast(T.err.BAD_AMOUNT); return; }
+        save('PUT', '/settings/hours', { openHour: Number(open.value), closeHour: Number(close.value), slotMinutes: Number(slot.value), centsPerHour: a, centsPerHourLights: b,
+          lightsFrom: Number(lights.value), tournamentMinutes: Number(tmin.value) });
+      } }, T.save)))))),
+    h('div.section', h('div.head', h('h2', T.crtTitle), h('button.primary', { type: 'button', onclick: () => editCourt(st, null) }, T.crtNew)),
+      st.courts.length ? h('div.panel', h('table', h('tbody', st.courts.map(courtRow)))) : h('div.panel', h('div.empty', T.noCourts)),
+      h('p.dim', T.courtsHint)),
+    h('div.section', h('h2', T.ptTitle), h('p.dim', T.ptHint), payBox));
+}
+
+function editCourt(st, c) {
+  const v = c || { name: '', surface: null, covered: false, lights: true, heating: false, centsPerHour: null, centsPerHourLights: null, heatingCentsPerHour: 0, futureBookings: 0, photos: 0 };
+  const name = h('input', { required: true, maxlength: 40, value: v.name });
+  const surface = select(SURFACES(), v.surface || '');
+  const covered = h('input', { type: 'checkbox', checked: v.covered });
+  const lights = h('input', { type: 'checkbox', checked: v.lights });
+  const heating = h('input', { type: 'checkbox', checked: v.heating });
+  const price = moneyIn(v.centsPerHour), priceL = moneyIn(v.centsPerHourLights), heat = moneyIn(v.heatingCentsPerHour || null);
+  price.placeholder = eur(st.centsPerHour); priceL.placeholder = eur(st.centsPerHourLights);
+  const fHeat = field(T.crtHeatingSupplement, heat);
+  const fLights = field(T.planPriceLights, priceL);
+  const update = () => { fHeat.hidden = !heating.checked; fLights.hidden = !lights.checked; };
+  heating.addEventListener('change', update); lights.addEventListener('change', update); update();
+  const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.crtDeleteAsk(c.name, c.futureBookings))) return;
+    try { await api('DELETE', '/settings/courts?name=' + encodeURIComponent(c.name)); dlg.close(); toast(T.saved); info = await api('GET', '/info'); await showSettings(); } catch (e) { toast(errText(e)); }
+  } }, T.crtDelete);
+  const dlg = dialog(c ? c.name : T.crtNew, h('div.form',
+    field(T.crtName, name, 'full'), field(T.kind, surface), h('span'),
+    h('label.check', covered, T.crtCovered), h('label.check', lights, T.crtLights), h('label.check.full', heating, T.crtHeating),
+    h('p.full.dim', T.crtPricesHint), field(T.planPrice, price), fLights, fHeat,
+    c && c.photos ? h('p.full.dim', T.crtPhotosCount(c.photos) + ' · ' + T.photosInApp) : null), async () => {
+    const a = moneyOut(price, null), b = moneyOut(priceL, null), hc = moneyOut(heat, 0);
+    if (a === null && price.value.trim() || b === null && priceL.value.trim() || hc === null) throw new Error(T.err.BAD_AMOUNT);
+    await api('POST', '/settings/courts', { old: c ? c.name : '', info: { name: name.value, surface: surface.value || null, covered: covered.checked, lights: lights.checked,
+      heating: heating.checked, centsPerHour: a, centsPerHourLights: lights.checked ? b : null, heatingCentsPerHour: hc } });
+    info = await api('GET', '/info');
+    toast(T.saved);
+    await showSettings();
+  }, { left: del });
+}
+
+// --- Squadre e campionati ---
+
+let teamId = null;
+let teamTab = 'fixtures';
+let fixtureId = null;
+
+const ANSWERS = () => [['YES', T.tmYes, 'ok'], ['MAYBE', T.tmMaybe, 'warn'], ['NO', T.tmNo, 'bad']];
+const outcomeTag = (f) => (f.decided ? h('span.tag.' + (f.outcome === true ? 'ok' : f.outcome === false ? 'bad' : 'warn'), f.outcome === true ? T.tmWon : f.outcome === false ? T.tmLost : T.tmDraw)
+  : f.won || f.lost ? h('span.tag', T.tmOngoing) : null);
+const recordText = (t) => T.tmRecord(t.won, t.lost) + (t.drawn ? ' · ' + T.tmDrawn(t.drawn) : '');
+const rubberName = (t, i) => (i < t.singles ? T.tmSingleN(i + 1) : T.tmDoubleN(i - t.singles + 1));
+
+async function showTeams() {
+  people = await api('GET', '/people');
+  const list = await api('GET', '/teams');
+  const t = teamId && list.find((x) => x.id === teamId);
+  if (t) return showTeam(t);
+  teamId = null;
+  put(main(), h('div.head', h('h1', T.tmTitle), h('button.primary', { onclick: () => editTeam(null) }, T.tmNew)), h('p.dim', T.tmHint),
+    list.length ? h('div.cards', list.map((x) => {
+      const next = x.fixtures.find((f) => f.date >= info.today);
+      return h('button.card', { type: 'button', onclick: () => { teamId = x.id; fixtureId = null; teamTab = 'fixtures'; showTeams(); } },
+        h('h2', x.name), h('p.dim', [x.championship, x.season].filter(Boolean).join(' · ')),
+        h('p', T.tmPlayers(x.roster.length) + ' · ' + recordText(x)),
+        next ? h('p.dim', shortDay(next.date) + ' ' + hhmm(next.startMin) + ' · ' + next.opponent + ' · ' + (next.home ? T.tmHome : T.tmAway)) : null);
+    })) : h('div.panel', h('div.empty', T.tmNone)));
+}
+
+/** Una chiamata sulla squadra aperta, poi la scheda si ridisegna. */
+async function teamDo(method, path, body) {
+  let ok = true;
+  try { await api(method, '/teams/' + encodeURIComponent(teamId) + path, body); toast(T.saved); }
+  catch (e) { ok = false; toast(errText(e)); }
+  await showTeams();
+  return ok;
+}
+
+function showTeam(t) {
+  const f = fixtureId && t.fixtures.find((x) => x.id === fixtureId);
+  if (f) return showFixture(t, f);
+  fixtureId = null;
+  const captain = t.roster.find((p) => p.id === t.captain);
+  const tabs = [['fixtures', T.tmTabFixtures + ' (' + t.fixtures.length + ')'], ['roster', T.tmTabRoster + ' (' + t.roster.length + ')']];
+  const body = h('div');
+  put(main(),
+    h('div.head', h('button', { onclick: () => { teamId = null; showTeams(); }, 'aria-label': T.tmTitle, title: T.tmTitle }, '←'), h('h1', t.name),
+      h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editTeam(t) }, T.edit)),
+    h('p.dim', [t.championship, t.season, t.fitp ? T.tmFitp : '', T.formulaLine(t.singles, t.doubles), recordText(t), captain ? T.tmCaptainLine(captain.name) : ''].filter(Boolean).join(' · ')),
+    printHead(T.tmTitle + ' · ' + t.name + ' · ' + Object.fromEntries(tabs)[teamTab]),
+    h('div.tabs', { role: 'tablist' }, tabs.map(([v, l]) => h('button' + (v === teamTab ? '.on' : ''), {
+      type: 'button', role: 'tab', 'aria-selected': v === teamTab ? 'true' : 'false', onclick: () => { teamTab = v; showTeam(t); },
+    }, l))),
+    body);
+  (teamTab === 'roster' ? teamRoster : teamFixtures)(t, body);
+}
+
+function teamRoster(t, body) {
+  const inside = new Set(t.roster.map((p) => p.id));
+  const input = h('input', { type: 'search', placeholder: T.tmAddPlayer, 'aria-label': T.tmAddPlayer, autocomplete: 'off' });
+  const hits = h('div.hits');
+  function refresh() {
+    const q = input.value.trim().toLowerCase();
+    const list = q ? people.filter((p) => !inside.has(p.id) && p.name.toLowerCase().includes(q)).slice(0, 8) : [];
+    put(hits, list.map((p) => h('button', { type: 'button', onclick: async () => {
+      input.disabled = true;
+      await teamDo('POST', '/roster', { ids: [p.id] });
+      const again = document.querySelector('.picker input');
+      if (again) again.focus();
+    } }, p.name, p.ranking ? h('span.dim', ' · ' + p.ranking) : null)), q && !list.length ? h('div.dim.pad', T.noResults) : null);
+  }
+  input.addEventListener('input', refresh);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+  // I problemi per il prossimo incontro (tessera, certificato), se c'è.
+  const next = t.fixtures.find((f) => f.date >= info.today);
+  put(body,
+    h('div.picker.noprint', input, hits),
+    t.roster.length ? h('div.panel', h('table',
+      h('thead', h('tr', h('th.num', '#'), h('th', T.name), h('th', next ? T.status + ' · ' + shortDay(next.date) : T.status), h('th.noprint'))),
+      h('tbody', t.roster.map((p, i) => {
+        const pr = next ? next.problems[p.id] || [] : [];
+        return h('tr', h('td.num', i + 1), h('td', p.name, p.id === t.captain ? h('span.dim', ' · ' + T.tmCaptain) : null),
+          h('td', next ? (pr.length ? pr.map((x) => h('span.tag.' + (x.blocking ? 'bad' : 'warn'), PROBLEM()[x.code] || x.code)) : h('span.tag.ok', T.ctInOrder)) : ''),
+          h('td.num.noprint', h('button.danger', { type: 'button', onclick: async () => { if (confirm(T.remove + ': ' + p.name + '?')) await teamDo('DELETE', '/roster/' + encodeURIComponent(p.id)); } }, T.remove)));
+      })))) : h('div.panel', h('div.empty', T.tmRosterEmpty)),
+    t.fitp ? h('p.dim', T.tmFitpHint) : null);
+}
+
+function teamFixtures(t, body) {
+  put(body,
+    h('div.tools.noprint', h('button.primary', { type: 'button', onclick: () => editFixture(t, null) }, T.tmNewFixture)),
+    t.fixtures.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.cupWhen, T.ctTime, T.tmTheirs, '', T.cupResult, T.tmCallUp, T.tmAvailability].map((x) => h('th', { scope: 'col' }, x)))),
+      h('tbody', t.fixtures.map((f) => {
+        const yes = Object.values(f.availability).filter((a) => a === 'YES').length;
+        return h('tr.row', { tabindex: 0, onclick: () => { fixtureId = f.id; showTeam(t); }, onkeydown: (e) => { if (e.key === 'Enter') { fixtureId = f.id; showTeam(t); } } },
+          h('td', shortDay(f.date)), h('td', hhmm(f.startMin)), h('td', f.opponent), h('td.dim', f.home ? T.tmHome : T.tmAway),
+          h('td', f.won || f.lost ? f.won + '-' + f.lost + ' ' : '', outcomeTag(f)), h('td.num', f.callUp.length || ''),
+          h('td', T.answersLine(Object.keys(f.availability).length, t.roster.length), yes ? h('span.dim', ' · ' + yes + ' ' + T.tmYes.toLowerCase()) : null));
+      })))) : h('div.panel', h('div.empty', T.tmNoFixtures)));
+}
+
+/** Un incontro: dettagli, disponibilità, convocati e partite; gli avvisi partono dal telefono. */
+function showFixture(t, f) {
+  const fixDo = (path, body) => teamDo('POST', '/fixtures/' + encodeURIComponent(f.id) + path, body);
+  const notice = async (kind) => { if (await fixDo('/notice', { kind })) alert(T.noticeOpened); };
+  const names = Object.fromEntries(t.roster.map((p) => [p.id, p.name]));
+  const missing = t.roster.filter((p) => !f.availability[p.id]).length;
+  const problems = (id) => (f.problems[id] || []).map((x) => h('span.tag.' + (x.blocking ? 'bad' : 'warn'), PROBLEM()[x.code] || x.code));
+
+  const avail = h('div.panel', h('table', h('tbody', t.roster.map((p) => h('tr', h('td', p.name), h('td', problems(p.id)),
+    h('td.num', h('div.seg.noprint', ANSWERS().map(([v, l]) => h('button' + (f.availability[p.id] === v ? '.on' : ''), {
+      type: 'button', 'aria-pressed': f.availability[p.id] === v ? 'true' : 'false',
+      onclick: () => fixDo('/availability', { player: p.id, answer: f.availability[p.id] === v ? null : v }),
+    }, l))), h('span.printonly', (ANSWERS().find(([v]) => v === f.availability[p.id]) || [0, ''])[1])))))));
+
+  const order = t.roster.slice().sort((a, b) => ['YES', 'MAYBE', undefined, 'NO'].indexOf(f.availability[a.id]) - ['YES', 'MAYBE', undefined, 'NO'].indexOf(f.availability[b.id]));
+  const boxes = order.map((p) => [p.id, h('input', { type: 'checkbox', checked: f.callUp.includes(p.id) })]);
+  const callUp = h('div.panel', h('div.pad',
+    h('div.checks', boxes.map(([id, x]) => h('label.check', x, names[id], f.availability[id] ? h('span.dim', ' · ' + (ANSWERS().find(([v]) => v === f.availability[id]) || [0, ''])[1]) : null, problems(id)))),
+    h('div.actions.noprint', h('button', { type: 'button', onclick: () => fixDo('/callup', { ids: boxes.filter(([, x]) => x.checked).map(([id]) => id) }) }, T.save),
+      h('button', { type: 'button', disabled: !f.callUp.length, onclick: () => notice('CALLUP') }, T.tmSendCallUp(f.callUp.length)))));
+
+  const pool = (f.callUp.length ? f.callUp : t.roster.map((p) => p.id)).map((id) => [id, names[id] || id]);
+  const rubbers = h('div.panel', h('table', h('tbody', f.rubbers.map((ru, i) => {
+    const n = ru.doubles ? 2 : 1;
+    const ours = [...Array(n)].map((_, k) => select([['', '—']].concat(pool), ru.ours[k] || ''));
+    const theirs = [...Array(n)].map((_, k) => h('input', { value: ru.theirs[k] || '', placeholder: k ? T.tmTheirs2 : T.tmTheirs, maxlength: 80 }));
+    const score = h('input', { value: ru.score, placeholder: '6-4 3-6 10-8', maxlength: 60, 'aria-label': T.tmScoreOurs });
+    const won = select([['', '—'], ['true', T.tmWeWon], ['false', T.tmTheyWon]], ru.won === null ? '' : String(ru.won));
+    score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
+    const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true' });
+    return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won),
+      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
+  }))));
+
+  put(main(),
+    h('div.head', h('button', { onclick: () => { fixtureId = null; showTeam(t); }, 'aria-label': t.name, title: t.name }, '←'),
+      h('h1', t.name + ' – ' + f.opponent), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editFixture(t, f) }, T.edit)),
+    h('p.dim', [shortDay(f.date) + ' ' + hhmm(f.startMin), f.home ? T.tmHome : T.tmAway, f.place, f.meeting ? T.tmMeetingLine(f.meeting) : '', f.courts.length ? T.tmCourtsHeld(f.courts.join(', ')) : ''].filter(Boolean).join(' · '),
+      f.won || f.lost ? h('span', ' · ' + f.won + '-' + f.lost + ' ', outcomeTag(f)) : null),
+    f.note ? h('p', f.note) : null,
+    printHead(t.name + ' – ' + f.opponent),
+    h('div.section', h('div.head', h('h2', T.tmAvailability),
+      h('button.noprint', { type: 'button', onclick: () => notice('AVAILABILITY') }, T.tmAskAll),
+      missing && missing < t.roster.length ? h('button.noprint', { type: 'button', onclick: () => notice('MISSING') }, T.tmAskMissing(missing)) : null),
+      t.roster.length ? avail : h('p.dim', T.tmRosterEmpty)),
+    h('div.section', h('h2', T.tmCallUp), t.roster.length ? callUp : h('p.dim', T.tmRosterEmpty)),
+    h('div.section', h('div.head', h('h2', T.tmRubbers), h('button.noprint', { type: 'button', disabled: !(f.won || f.lost), onclick: () => notice('RESULT') }, T.tmSendResult)), rubbers),
+    h('p.dim.noprint', T.teamNoticeHint));
+}
+
+function editTeam(t) {
+  const v = t || { name: '', championship: '', season: '', captain: null, singles: 4, doubles: 2, fitp: true, roster: [] };
+  const name = h('input', { required: true, maxlength: 80, value: v.name });
+  const champ = h('input', { maxlength: 80, value: v.championship });
+  const season = h('input', { maxlength: 30, value: v.season, placeholder: info.today.slice(0, 4) });
+  const captain = select([['', '—']].concat(v.roster.map((p) => [p.id, p.name])), v.captain || '');
+  const nums = (n) => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((x) => [String(x), String(x)]);
+  const singles = select(nums(), String(v.singles)), doubles = select(nums(), String(v.doubles));
+  const fitp = h('input', { type: 'checkbox', checked: v.fitp });
+  const del = t && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.tmDeleteAsk(t.name))) return;
+    try { await api('DELETE', '/teams/' + encodeURIComponent(t.id)); dlg.close(); teamId = null; toast(T.saved); await showTeams(); } catch (e) { toast(errText(e)); }
+  } }, T.tmDelete);
+  const dlg = dialog(t ? t.name : T.tmNew, h('div.form',
+    field(T.tmName, name, 'full'), field(T.tmChampionship, champ), field(T.tmSeason, season),
+    field(T.tmSingles, singles), field(T.tmDoubles, doubles),
+    t ? field(T.tmPickCaptain, captain, 'full') : null,
+    h('label.check.full', fitp, T.tmFitp), h('p.full.dim', T.tmFitpHint),
+    t ? h('p.full.dim', T.teamFormulaHint) : null), async () => {
+    const body = { name: name.value, championship: champ.value, season: season.value, captain: captain.value || null, singles: Number(singles.value), doubles: Number(doubles.value), fitp: fitp.checked };
+    if (t) await api('PUT', '/teams/' + encodeURIComponent(t.id), body);
+    else { const out = await api('POST', '/teams', body); teamId = out.id; teamTab = 'roster'; }
+    toast(T.saved);
+    await showTeams();
+  }, { left: del });
+}
+
+function editFixture(t, f) {
+  const v = f || { opponent: '', date: info.today, startMin: 9 * 60, home: true, place: '', meeting: '', courts: [], hours: 6, note: '' };
+  const opp = h('input', { required: true, maxlength: 80, value: v.opponent });
+  const date = h('input', { type: 'date', required: true, value: v.date });
+  const time = h('input', { type: 'time', required: true, value: hhmm(v.startMin), step: 300 });
+  const home = select([['1', T.tmHome], ['0', T.tmAway]], v.home ? '1' : '0');
+  const place = h('input', { maxlength: 120, value: v.place });
+  const meeting = h('input', { maxlength: 120, value: v.meeting });
+  const courts = (info.courts || []).map((c) => [c, h('input', { type: 'checkbox', checked: v.courts.includes(c) })]);
+  const hours = select([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => [String(n), T.tmHours(n)]), String(v.hours));
+  const note = h('input', { maxlength: 500, value: v.note });
+  const held = h('div.full', h('h3', T.tmHoldCourts), h('div.checks', courts.map(([c, x]) => h('label.check', x, c))), field(T.duration, hours));
+  const update = () => { held.hidden = home.value !== '1'; };
+  home.addEventListener('change', update); update();
+  const del = f && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.tmDeleteFixtureAsk)) return;
+    try { await api('DELETE', '/teams/' + encodeURIComponent(t.id) + '/fixtures/' + encodeURIComponent(f.id)); dlg.close(); fixtureId = null; toast(T.saved); await showTeams(); } catch (e) { toast(errText(e)); }
+  } }, T.tmDeleteFixture);
+  const dlg = dialog(f ? t.name + ' – ' + f.opponent : T.tmNewFixture, h('div.form',
+    field(T.tmOpponent, opp, 'full'), field(T.date, date), field(T.ctTime, time), field(T.homeAway, home), field(T.tmPlace, place),
+    field(T.tmMeeting, meeting, 'full'), held, field(T.note, note, 'full')), async () => {
+    if (!time.value) throw new Error(T.err.BAD_TIME);
+    const body = { opponent: opp.value, date: date.value, startMin: toMin(time.value), home: home.value === '1', place: place.value, meeting: meeting.value,
+      courts: courts.filter(([, x]) => x.checked).map(([c]) => c), hours: Number(hours.value), note: note.value };
+    if (f) await api('PUT', '/teams/' + encodeURIComponent(t.id) + '/fixtures/' + encodeURIComponent(f.id), body);
+    else await api('POST', '/teams/' + encodeURIComponent(t.id) + '/fixtures', body);
+    toast(T.saved);
+    await showTeams();
+  }, { left: del });
 }
 
 // --- Scuola tennis ---

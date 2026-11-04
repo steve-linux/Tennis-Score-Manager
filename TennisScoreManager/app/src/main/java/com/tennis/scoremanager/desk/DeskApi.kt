@@ -5,6 +5,9 @@ package com.tennis.scoremanager.desk
 
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.data.BlockReason
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
@@ -13,7 +16,11 @@ import com.tennis.scoremanager.data.CourseSlot
 import com.tennis.scoremanager.data.CourtStats
 import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Availability
+import com.tennis.scoremanager.data.Fixture
+import com.tennis.scoremanager.data.Rubber
 import com.tennis.scoremanager.data.Team
+import com.tennis.scoremanager.data.Teams
 import com.tennis.scoremanager.data.Charge
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.data.CTEntry
@@ -23,6 +30,10 @@ import com.tennis.scoremanager.data.CTMatch
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.ClubTournaments
 import com.tennis.scoremanager.data.CourtBooking
+import com.tennis.scoremanager.data.CourtInfo
+import com.tennis.scoremanager.data.CourtSettings
+import com.tennis.scoremanager.data.PayMethod
+import com.tennis.scoremanager.data.Surface
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.CourtPlans
 import com.tennis.scoremanager.data.Fee
@@ -86,6 +97,32 @@ interface DeskData {
     fun dues(charges: Set<String>): List<DeskDue>
     /** Apre sul telefono gli avvisi del sollecito, da mandare da lì uno per uno. */
     fun sendDues(charges: Set<String>)
+    /** Salva la squadra (e i campi tenuti per gli incontri in casa nel planning) o la toglie. */
+    fun saveTeam(t: Team)
+    fun deleteTeam(t: Team)
+    /** Apre sul telefono l'avviso dell'incontro: disponibilità (a tutti o a chi non ha risposto), convocazione, risultato. */
+    fun teamNotice(t: Team, f: Fixture, kind: String)
+    /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
+    fun setClubName(name: String)
+    fun saveCourtSettings(st: CourtSettings)
+    /** Un campo nuovo; false se il nome c'è già. */
+    fun addCourt(info: CourtInfo): Boolean
+    /** Cambia nome (anche in prenotazioni, chiusure e partite); false se il nome c'è già. */
+    fun renameCourt(old: String, new: String): Boolean
+    fun saveCourtInfo(info: CourtInfo)
+    /** Toglie il campo con le sue prenotazioni da oggi in poi. */
+    fun deleteCourt(name: String)
+    fun moveCourt(name: String, up: Boolean)
+    fun savePayTypes(list: List<PayType>)
+    /** Il server delle prenotazioni: come è collegato e le sue regole. */
+    fun serverConf(): ClubServerConf
+    fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean)
+    /** Dal server, fuori da [tx] (è rete): prenotazioni online, lista d'attesa, Cerco compagno. */
+    fun serverState(): SrvAdmin
+    /** Manda subito il planning e prende le prenotazioni nuove, fuori da [tx]; null = fatto, se no il codice dell'errore. */
+    fun serverSync(): String?
+    /** La segreteria toglie un'attesa ([kind] "wait") o un annuncio ("seek") dal server, fuori da [tx]. */
+    fun serverRemove(kind: String, id: String)
     fun paymentsCsv(year: Int): ByteArray?
     /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
     fun saveTournament(t: ClubTournament)
@@ -187,6 +224,58 @@ interface DeskData {
 )
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
+@Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?)
+@Serializable data class DeskFixture(
+    val id: String, val opponent: String, val date: String, val startMin: Int, val home: Boolean, val place: String, val meeting: String,
+    val courts: List<String>, val hours: Int, val note: String, val availability: Map<String, Availability>, val callUp: List<String>,
+    val rubbers: List<DeskRubber>, val won: Int, val lost: Int, val decided: Boolean, val outcome: Boolean?,
+    /** Per ogni giocatore della rosa i problemi per quel giorno (tessera, certificato), come nell'app. */
+    val problems: Map<String, List<DeskProblem>>,
+)
+@Serializable data class DeskTeamPlayer(val id: String, val name: String)
+@Serializable data class DeskTeam(
+    val id: String, val name: String, val championship: String, val season: String, val captain: String?, val roster: List<DeskTeamPlayer>,
+    val singles: Int, val doubles: Int, val fitp: Boolean, val won: Int, val lost: Int, val drawn: Int, val fixtures: List<DeskFixture>,
+)
+@Serializable data class DeskTeamIn(
+    val name: String, val championship: String = "", val season: String = "", val captain: String? = null, val singles: Int = 4, val doubles: Int = 2, val fitp: Boolean = true,
+)
+@Serializable data class DeskFixtureIn(
+    val opponent: String, val date: String, val startMin: Int, val home: Boolean = true, val place: String = "", val meeting: String = "",
+    val courts: List<String> = emptyList(), val hours: Int = 6, val note: String = "",
+)
+@Serializable data class DeskAnswerIn(val player: String, val answer: Availability? = null)
+@Serializable data class DeskRubberIn(val index: Int, val ours: List<String> = emptyList(), val theirs: List<String> = emptyList(), val score: String = "", val won: Boolean? = null)
+@Serializable data class DeskNoticeIn(val kind: String)
+@Serializable data class DeskCourtInfo(
+    val name: String, val surface: Surface? = null, val covered: Boolean = false, val lights: Boolean = true, val heating: Boolean = false,
+    val centsPerHour: Int? = null, val centsPerHourLights: Int? = null, val heatingCentsPerHour: Int = 0, val futureBookings: Int = 0, val photos: Int = 0,
+)
+@Serializable data class DeskPayTypeFull(val id: String = "", val name: String, val details: String = "", val online: Boolean = false, val method: PayMethod = PayMethod.OTHER)
+@Serializable data class DeskSettings(
+    val club: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val centsPerHour: Int, val centsPerHourLights: Int, val lightsFrom: Int,
+    val tournamentMinutes: Int, val courts: List<DeskCourtInfo>, val payTypes: List<DeskPayTypeFull>,
+)
+@Serializable data class DeskHoursIn(
+    val openHour: Int, val closeHour: Int, val slotMinutes: Int, val centsPerHour: Int = 0, val centsPerHourLights: Int = 0, val lightsFrom: Int = 18, val tournamentMinutes: Int = 90,
+)
+@Serializable data class DeskClubIn(val name: String)
+@Serializable data class DeskCourtIn(val old: String = "", val info: DeskCourtInfo)
+@Serializable data class DeskMoveIn(val name: String, val up: Boolean)
+@Serializable data class DeskPayTypesIn(val list: List<DeskPayTypeFull>)
+@Serializable data class DeskOnlineBooking(val id: String, val court: String, val date: String, val startMin: Int, val minutes: Int, val name: String, val cents: Int, val createdAt: String?)
+@Serializable data class DeskWait(val id: String, val name: String, val court: String?, val date: String, val startMin: Int, val minutes: Int, val freedCourt: String?)
+@Serializable data class DeskSeek(
+    val id: String, val players: List<String>, val date: String, val fromMin: Int, val toMin: Int, val doubles: Boolean, val level: String, val note: String,
+    val need: Int, val booked: Boolean, val noCourt: Boolean,
+)
+@Serializable data class DeskOnline(
+    val paired: Boolean, val club: String, val url: String, val publicUrl: String, val lastSync: String?, val lastSyncMin: Int?, val error: String?,
+    val rules: BookingRules, val payInfo: String, val alerts: Boolean, val courts: List<String>,
+    /** Quello che sta sul server; [stateError] se non risponde. */
+    val bookings: List<DeskOnlineBooking>, val waits: List<DeskWait>, val seeks: List<DeskSeek>, val stateError: String? = null,
+)
+@Serializable data class DeskRulesIn(val rules: BookingRules, val payInfo: String = "", val alerts: Boolean = true)
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
@@ -262,6 +351,8 @@ class DeskApi(
         if (m == "GET" && p.size == 2 && p[0] == "pair") return pairState(p[1], r.ip)
         if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
+        // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
+        if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p)
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
@@ -296,6 +387,29 @@ class DeskApi(
                     data.sendDues(ids)
                     done()
                 }
+                m == "PUT" && p == listOf("online", "rules") -> saveRules(read(DeskRulesIn.serializer(), r))
+                m == "GET" && p == listOf("settings") -> settings()
+                m == "PUT" && p == listOf("settings", "club") -> {
+                    val name = text(read(DeskClubIn.serializer(), r).name, 80)
+                    if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+                    data.setClubName(name); settings()
+                }
+                m == "PUT" && p == listOf("settings", "hours") -> saveHours(read(DeskHoursIn.serializer(), r))
+                m == "POST" && p == listOf("settings", "courts") -> saveCourt(read(DeskCourtIn.serializer(), r))
+                m == "DELETE" && p == listOf("settings", "courts") -> {
+                    val name = r.query["name"].orEmpty()
+                    if (name !in data.courts()) throw Fail(404, "NOT_FOUND")
+                    data.deleteCourt(name); settings()
+                }
+                m == "POST" && p == listOf("settings", "courts", "move") -> {
+                    val i = read(DeskMoveIn.serializer(), r)
+                    if (i.name !in data.courts()) throw Fail(404, "NOT_FOUND")
+                    data.moveCourt(i.name, i.up); settings()
+                }
+                m == "PUT" && p == listOf("settings", "paytypes") -> savePayTypes(read(DeskPayTypesIn.serializer(), r).list)
+                m == "GET" && p == listOf("teams") -> ok(ListSerializer(DeskTeam.serializer()), data.teams().sortedBy { it.name.lowercase() }.map(::teamOut))
+                m == "POST" && p == listOf("teams") -> saveTeam(null, read(DeskTeamIn.serializer(), r))
+                p.size >= 2 && p[0] == "teams" -> teamRoute(m, p.drop(1), r)
                 m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
                 m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
                 p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
@@ -612,6 +726,248 @@ class DeskApi(
             rep.occupancy, rep.cents, rep.bookings, rep.online, rep.tournamentHours, rep.firstHour, rep.heat,
             rep.top.map { (who, n) -> DeskTop(Players.byId(people, who)?.name ?: who, n) },
         ))
+    }
+
+    // --- Server delle prenotazioni ---
+
+    private fun clock(t: Long): Pair<String, Int> {
+        val z = Instant.ofEpochMilli(t).atZone(zone())
+        return z.toLocalDate().toString() to z.hour * 60 + z.minute
+    }
+
+    private fun online(m: String, p: List<String>): Resp {
+        val conf = data.tx { data.serverConf() }
+        if (!conf.paired) throw Fail(409, "NOT_PAIRED")
+        return when {
+            m == "GET" && p == listOf("online") -> onlineOut()
+            m == "POST" && p == listOf("online", "sync") -> {
+                data.serverSync()?.let { throw Fail(502, it) }
+                onlineOut()
+            }
+            m == "DELETE" && p.size == 3 && p[1] in setOf("waits", "seeks") -> {
+                try { data.serverRemove(if (p[1] == "waits") "wait" else "seek", p[2]) } catch (e: Exception) {
+                    throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET")
+                }
+                onlineOut()
+            }
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun onlineOut(): Resp {
+        val (conf, courts, people) = data.tx { Triple(data.serverConf(), data.courts(), data.players()) }
+        var stateError: String? = null
+        val st = try { data.serverState() } catch (e: Exception) {
+            stateError = (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET"; null
+        }
+        val now = data.now()
+        val names = (st?.players.orEmpty().associate { it.id to it.name }) + people.associate { it.id to it.name }
+        return ok(DeskOnline.serializer(), DeskOnline(
+            conf.paired, conf.club, conf.url, conf.publicUrl, conf.lastSync.takeIf { it > 0 }?.let { day(it) }, conf.lastSync.takeIf { it > 0 }?.let { clock(it).second },
+            conf.error, conf.rules, conf.payInfo, conf.alerts, courts,
+            st?.bookings.orEmpty().filter { it.end > now }.map { b ->
+                val (d, mm) = clock(b.start)
+                DeskOnlineBooking(b.id, b.court, d, mm, b.minutes, b.name, b.cents, b.createdAt.takeIf { it > 0 }?.let { day(it) })
+            },
+            st?.waits.orEmpty().map { w -> val (d, mm) = clock(w.start); DeskWait(w.id, names[w.player] ?: w.player, w.court, d, mm, w.minutes, w.freedCourt) },
+            st?.seeks.orEmpty().map { k -> DeskSeek(k.id, k.everyone.map { it.name }, k.date, k.fromMin, k.toMin, k.doubles, k.level, k.note, k.need, k.booking != null, k.noCourt) },
+            stateError,
+        ))
+    }
+
+    private fun saveRules(i: DeskRulesIn): Resp {
+        val r0 = i.rules
+        if (r0.courts.any { it !in data.courts() }) throw Fail(404, "NOT_FOUND")
+        val rules = r0.copy(
+            daysAhead = r0.daysAhead.coerceIn(0, 60), maxFuture = r0.maxFuture.coerceIn(1, 20), maxMinutes = r0.maxMinutes.coerceIn(30, 480),
+            cancelHours = r0.cancelHours.coerceIn(0, 168), noticeMinutes = r0.noticeMinutes.coerceIn(0, 24 * 60), remindHours = r0.remindHours.coerceIn(0, 48),
+        )
+        data.saveServerRules(rules, text(i.payInfo, 300), i.alerts)
+        return done()
+    }
+
+    // --- Impostazioni del circolo ---
+
+    private fun settings(): Resp {
+        val st = data.plan().settings
+        val today = CourtPlans.dayStart(data.now())
+        val bookings = data.plan().bookings
+        return ok(DeskSettings.serializer(), DeskSettings(
+            data.club, st.openHour, st.closeHour, st.slotMinutes, st.centsPerHour, st.centsPerHourLights, st.lightsFrom, st.tournamentMinutes,
+            data.courts().map { n ->
+                val c = st.info(n)
+                DeskCourtInfo(n, c.surface, c.covered, c.lights, c.heating, c.centsPerHour, c.centsPerHourLights, c.heatingCentsPerHour,
+                    bookings.count { it.court == n && it.start >= today }, c.photos.size)
+            },
+            data.payTypes().map { DeskPayTypeFull(it.id, it.name, it.details, it.online, it.method) },
+        ))
+    }
+
+    private fun price(c: Int): Int = if (c in 0..MAX_CENTS) c else throw Fail(400, "BAD_AMOUNT")
+
+    private fun saveHours(i: DeskHoursIn): Resp {
+        if (i.openHour !in 0..23 || i.closeHour !in 1..24 || i.closeHour <= i.openHour || i.lightsFrom !in 0..24) throw Fail(400, "BAD_TIME")
+        if (i.slotMinutes !in listOf(30, 60, 90) || i.tournamentMinutes !in listOf(60, 90, 120)) throw Fail(400, "BAD_TIME")
+        val st = data.plan().settings
+        data.saveCourtSettings(st.copy(
+            openHour = i.openHour, closeHour = i.closeHour, slotMinutes = i.slotMinutes, centsPerHour = price(i.centsPerHour),
+            centsPerHourLights = price(i.centsPerHourLights), lightsFrom = i.lightsFrom, tournamentMinutes = i.tournamentMinutes,
+        ))
+        return settings()
+    }
+
+    /** Un campo nuovo ([DeskCourtIn.old] vuoto) o cambiato, anche di nome; le foto restano quelle del telefono. */
+    private fun saveCourt(i: DeskCourtIn): Resp {
+        val x = i.info
+        val name = text(x.name, 40)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        listOfNotNull(x.centsPerHour, x.centsPerHourLights, x.heatingCentsPerHour).forEach(::price)
+        val courts = data.courts()
+        val old = i.old.takeIf { it.isNotEmpty() }
+        if (old != null && old !in courts) throw Fail(404, "NOT_FOUND")
+        val clash = courts.any { it != old && it.equals(name, ignoreCase = true) }
+        if (clash) throw Fail(409, "COURT_EXISTS")
+        val base = data.plan().settings.info(old ?: name)
+        val info = base.copy(
+            name = name, surface = x.surface, covered = x.covered, lights = x.lights, heating = x.heating,
+            centsPerHour = x.centsPerHour, centsPerHourLights = x.centsPerHourLights, heatingCentsPerHour = if (x.heating) x.heatingCentsPerHour else 0,
+        )
+        if (old == null) { if (!data.addCourt(info)) throw Fail(409, "COURT_EXISTS") }
+        else {
+            if (old != name && !data.renameCourt(old, name)) throw Fail(409, "COURT_EXISTS")
+            data.saveCourtInfo(info.copy(photos = data.plan().settings.info(name).photos))
+        }
+        return settings()
+    }
+
+    private fun savePayTypes(list: List<DeskPayTypeFull>): Resp {
+        val old = data.payTypes().associateBy { it.id }
+        val clean = list.map { t ->
+            val name = text(t.name, 40)
+            if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+            // Il tipo per il registro resta quello che era (i nuovi sono "altro").
+            PayType(t.id.takeIf { it in old } ?: Fees.newId("t"), name, text(t.details, 200), t.online, old[t.id]?.method ?: PayMethod.OTHER)
+        }
+        if (clean.isEmpty()) throw Fail(400, "BAD_REQUEST")
+        if (clean.map { it.name.lowercase() }.toSet().size != clean.size) throw Fail(409, "PAYTYPE_EXISTS")
+        data.savePayTypes(clean)
+        return settings()
+    }
+
+    // --- Squadre e campionati ---
+
+    private fun team(id: String): Team = data.teams().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    private fun teamOut(t: Team): DeskTeam {
+        val people = data.players()
+        val rec = Teams.record(t)
+        return DeskTeam(
+            t.id, t.name, t.championship, t.season, t.captain, t.roster.map { DeskTeamPlayer(it, Players.byId(people, it)?.name ?: it) },
+            t.singles, t.doubles, t.fitp, rec.won, rec.lost, rec.drawn,
+            t.fixtures.sortedBy { it.at }.map { f ->
+                val start = CourtPlans.dayStart(f.at)
+                val (w, l) = Teams.result(f)
+                val problems = t.roster.associateWith { id ->
+                    Players.byId(people, id)?.let { pp -> Teams.problems(t, pp, f.at).map { DeskProblem(pp.name, it.name, ClubTournaments.blocking(it)) } } ?: listOf(DeskProblem(id, "NO_PLAYER", true))
+                }.filterValues { it.isNotEmpty() }
+                DeskFixture(
+                    f.id, f.opponent, day(f.at)!!, ((f.at - start) / 60_000L).toInt(), f.home, f.place, f.meeting, f.courts, f.hours, f.note, f.availability, f.callUp,
+                    f.rubbers.map { DeskRubber(it.doubles, it.ours, it.theirs, it.score, it.won) }, w, l, Teams.decided(f), Teams.outcome(f), problems,
+                )
+            },
+        )
+    }
+
+    private fun teamSaved(t: Team): Resp { data.saveTeam(t); return ok(DeskTeam.serializer(), teamOut(team(t.id))) }
+
+    private fun saveTeam(old: Team?, i: DeskTeamIn): Resp {
+        val name = text(i.name, 80)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val base = old ?: Team(Teams.newId("t"), name, createdAt = data.now())
+        val captain = i.captain?.takeIf { it.isNotEmpty() }?.let { id -> if (id in base.roster) id else throw Fail(400, "BAD_REQUEST") }
+        val t = base.copy(
+            name = name, championship = text(i.championship, 80), season = text(i.season, 30), captain = captain,
+            singles = i.singles.coerceIn(0, 9), doubles = i.doubles.coerceIn(0, 9), fitp = i.fitp,
+        )
+        data.saveTeam(t)
+        return ok(DeskId.serializer(), DeskId(t.id))
+    }
+
+    private fun teamRoute(m: String, p: List<String>, r: Req): Resp {
+        val t = team(p[0])
+        val rest = p.drop(1)
+        return when {
+            m == "PUT" && rest.isEmpty() -> saveTeam(t, read(DeskTeamIn.serializer(), r))
+            m == "DELETE" && rest.isEmpty() -> { data.deleteTeam(t); done() }
+            m == "POST" && rest == listOf("roster") -> {
+                val people = data.players()
+                val add = read(DeskIds.serializer(), r).ids.map { Players.byId(people, it)?.id ?: throw Fail(404, "NOT_FOUND") }.filter { it !in t.roster }.distinct()
+                teamSaved(t.copy(roster = t.roster + add))
+            }
+            m == "DELETE" && rest.size == 2 && rest[0] == "roster" -> {
+                val id = rest[1]
+                teamSaved(t.copy(roster = t.roster - id, captain = t.captain.takeIf { it != id }, fixtures = t.fixtures.map { f -> f.copy(callUp = f.callUp - id) }))
+            }
+            m == "POST" && rest == listOf("fixtures") -> saveFixture(t, null, read(DeskFixtureIn.serializer(), r))
+            rest.size >= 2 && rest[0] == "fixtures" -> {
+                val f = t.fixtures.firstOrNull { it.id == rest[1] } ?: throw Fail(404, "NOT_FOUND")
+                fixtureRoute(m, t, f, rest.drop(2), r)
+            }
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun withFixture(t: Team, f: Fixture): Resp = teamSaved(t.copy(fixtures = (t.fixtures.filter { it.id != f.id } + f).sortedBy { it.at }))
+
+    private fun saveFixture(t: Team, old: Fixture?, i: DeskFixtureIn): Resp {
+        val opponent = text(i.opponent, 80)
+        if (opponent.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        if (i.startMin !in 0 until 24 * 60) throw Fail(400, "BAD_TIME")
+        val at = dayStart(i.date) + i.startMin * 60_000L
+        val courts = data.courts()
+        if (i.courts.any { it !in courts }) throw Fail(404, "NOT_FOUND")
+        val base = old ?: Fixture(Teams.newId("f"), opponent, at, rubbers = Teams.emptyRubbers(t))
+        val f = base.copy(
+            opponent = opponent, at = at, home = i.home, place = text(i.place, 120), meeting = text(i.meeting, 120),
+            courts = if (i.home) i.courts.distinct() else emptyList(), hours = i.hours.coerceIn(1, 12), note = text(i.note, 500),
+        )
+        return withFixture(t, f)
+    }
+
+    private fun fixtureRoute(m: String, t: Team, f: Fixture, rest: List<String>, r: Req): Resp = when {
+        m == "PUT" && rest.isEmpty() -> saveFixture(t, f, read(DeskFixtureIn.serializer(), r))
+        m == "DELETE" && rest.isEmpty() -> teamSaved(t.copy(fixtures = t.fixtures - f))
+        m == "POST" && rest == listOf("availability") -> {
+            val i = read(DeskAnswerIn.serializer(), r)
+            if (i.player !in t.roster) throw Fail(404, "NOT_FOUND")
+            withFixture(t, f.copy(availability = if (i.answer == null) f.availability - i.player else f.availability + (i.player to i.answer)))
+        }
+        m == "POST" && rest == listOf("callup") -> {
+            val ids = read(DeskIds.serializer(), r).ids
+            if (ids.any { it !in t.roster }) throw Fail(400, "BAD_REQUEST")
+            withFixture(t, f.copy(callUp = t.roster.filter { it in ids }))
+        }
+        m == "POST" && rest == listOf("rubber") -> {
+            val i = read(DeskRubberIn.serializer(), r)
+            val old = f.rubbers.getOrNull(i.index) ?: throw Fail(404, "NOT_FOUND")
+            val size = if (old.doubles) 2 else 1
+            if (i.ours.size > size || i.theirs.size > size || i.ours.any { it.isNotEmpty() && it !in t.roster }) throw Fail(400, "BAD_REQUEST")
+            val withPlayers = f.copy(rubbers = f.rubbers.mapIndexed { k, x ->
+                if (k == i.index) x.copy(ours = i.ours.filter { it.isNotEmpty() }, theirs = i.theirs.map { text(it, 80) }.filter { it.isNotEmpty() }) else x
+            })
+            val score = text(i.score, 60)
+            withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
+                else Teams.setRubber(withPlayers, i.index, score, i.won))
+        }
+        m == "POST" && rest == listOf("notice") -> {
+            val kind = read(DeskNoticeIn.serializer(), r).kind
+            if (kind !in setOf("AVAILABILITY", "MISSING", "CALLUP", "RESULT")) throw Fail(400, "BAD_REQUEST")
+            val who = when (kind) { "MISSING" -> Teams.noAnswer(t, f); "CALLUP" -> f.callUp; else -> t.roster }
+            if (who.isEmpty()) throw Fail(409, "NOBODY")
+            data.teamNotice(t, f, kind)
+            done()
+        }
+        else -> throw Fail(404, "NOT_FOUND")
     }
 
     // --- Scuola tennis ---

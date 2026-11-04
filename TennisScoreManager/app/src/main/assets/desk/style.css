@@ -180,3 +180,5 @@ tr.pass td:first-child { font-weight: 700; }
 .slot { display: flex; gap: 6px; flex-wrap: wrap; }
 .slot select, .slot input { width: auto; }
 @media print { .heat td { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .pbar i { background: #555; } }
+.rubber select, .rubber input { width: auto; max-width: 150px; margin: 2px; }
+.section > .head { margin-bottom: 8px; } .section > .head h2 { margin: 0 auto 0 0; }

@@ -57,6 +57,22 @@ class SeekApiTest {
     private fun seeks(t: String) = json.decodeFromString(ListSerializer(SrvSeek.serializer()), call("GET", "/seeks", token = t).body)
     private fun me(t: String) = json.decodeFromString(SrvMe.serializer(), call("GET", "/me", token = t).body)
 
+    @Test fun theOfficeSeesAndRemovesSeeksAndWaits() {
+        val mario = player("p1", "Mario")
+        sync(listOf(Busy("Campo 1", at(10, 9), at(10, 10))))
+        val seek = field(call("POST", "/seeks", """{"date":"2026-11-14","fromMin":540,"toMin":720}""", mario).body, "id")
+        assertEquals(201, call("POST", "/waits", """{"court":"Campo 1","start":${at(10, 9)},"minutes":60}""", mario).status)
+        val st = json.decodeFromString(com.tennis.scoremanager.data.SrvAdmin.serializer(), call("GET", "/admin/state", token = admin).body)
+        assertEquals(listOf(seek), st.seeks.map { it.id })
+        assertEquals("p1", st.waits.single().player)
+        // Solo la segreteria: col token del giocatore no.
+        assertEquals(401, call("DELETE", "/admin/seeks/$seek", token = mario).status)
+        assertEquals(200, call("DELETE", "/admin/seeks/$seek", token = admin).status)
+        assertEquals(200, call("DELETE", "/admin/waits/${st.waits.single().id}", token = admin).status)
+        val after = json.decodeFromString(com.tennis.scoremanager.data.SrvAdmin.serializer(), call("GET", "/admin/state", token = admin).body)
+        assertTrue(after.seeks.isEmpty() && after.waits.isEmpty())
+    }
+
     @Test fun singlesFindsACourtAndBooksIt() {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); sent.clear()
         // Sabato 14 è troppo lontano (7 giorni avanti da lunedì 9 vanno fino a lunedì 16: va bene).

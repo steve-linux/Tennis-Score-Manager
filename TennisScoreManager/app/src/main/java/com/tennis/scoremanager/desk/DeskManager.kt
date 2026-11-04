@@ -11,10 +11,17 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.ClubServers
+import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.CourtInfo
+import com.tennis.scoremanager.data.CourtSettings
 import com.tennis.scoremanager.data.Course
 import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Fixture
 import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.CourtBooking
@@ -62,6 +69,33 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
     override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
     override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
+    override fun saveTeam(t: Team) = c.saveTeam(t)
+    override fun deleteTeam(t: Team) = c.deleteTeam(t.id)
+    override fun teamNotice(t: Team, f: Fixture, kind: String) = when (kind) {
+        "AVAILABILITY" -> c.noticeAvailability(t, f, missingOnly = false)
+        "MISSING" -> c.noticeAvailability(t, f, missingOnly = true)
+        "CALLUP" -> c.noticeCallUp(t, f)
+        else -> c.noticeResult(t, f)
+    }
+    override fun setClubName(name: String) { c.storage.clubName = name }
+    override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
+    override fun addCourt(info: CourtInfo): Boolean = c.addCourt(info)
+    override fun renameCourt(old: String, new: String): Boolean = c.renameCourt(old, new)
+    override fun saveCourtInfo(info: CourtInfo) = c.saveCourtInfo(info)
+    override fun deleteCourt(name: String) = c.deleteCourt(name)
+    override fun moveCourt(name: String, up: Boolean) = c.moveCourt(name, up)
+    override fun savePayTypes(list: List<PayType>) = c.savePayTypes(list)
+    override fun serverConf(): ClubServerConf = c.clubServer.value
+    override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) {
+        c.saveServerRules(rules, payInfo)
+        c.setServerAlerts(alerts)
+    }
+    // Rete: gira sul filo della richiesta, mai su quello principale.
+    override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
+    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
+    override fun serverRemove(kind: String, id: String) {
+        ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
+    }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)

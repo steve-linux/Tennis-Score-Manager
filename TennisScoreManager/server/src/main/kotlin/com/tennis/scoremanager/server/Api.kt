@@ -97,6 +97,8 @@ class Api(
             r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "waits" -> { admin(r); adminRemove { s -> s.copy(waits = s.waits.filter { it.id != p[2] }) } }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "seeks" -> { admin(r); adminRemove { s -> s.copy(seeks = s.seeks.filter { it.id != p[2] }) } }
             r.method == "POST" && p == listOf("claim") -> claim(r)
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
@@ -181,7 +183,18 @@ class Api(
 
     private fun adminState(): Resp {
         val s = store.state
-        return ok(SrvAdmin.serializer(), SrvAdmin(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
+        val now = store.now()
+        val today = java.time.Instant.ofEpochMilli(now).atZone(java.time.ZoneId.of(s.sync.timeZone)).toLocalDate().toString()
+        return ok(SrvAdmin.serializer(), SrvAdmin(
+            s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) },
+            s.waits.filter { it.start > now }.sortedBy { it.start }, s.seeks.filter { it.date >= today }.sortedWith(compareBy({ it.date }, { it.fromMin })),
+        ))
+    }
+
+    /** La segreteria toglie un'attesa o un annuncio (fuori luogo, o già sistemato a voce). */
+    private fun adminRemove(f: (State) -> State): Resp {
+        store.update { s -> f(s) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     private fun invite(r: Req): Resp {

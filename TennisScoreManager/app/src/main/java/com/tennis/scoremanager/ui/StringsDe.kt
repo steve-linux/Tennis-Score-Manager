@@ -1499,7 +1499,7 @@ object DeStrings : Strings {
     override val deskStop = "Ausschalten"
     override val deskFailed = "Start fehlgeschlagen: Versuche es erneut."
     override val deskAddress = "Gib diese Adresse im Browser des Computers ein"
-    override val deskWarning = "Beim ersten Mal warnt der Browser, die Verbindung sei nicht privat: Das ist bei einem Zertifikat des Telefons normal. Wähle Erweitert und Weiter; kommt die Warnung ohne Grund wieder, mach nicht weiter."
+    override val deskWarning = "Danach merkt sich der Browser das. Kommt die Warnung wieder, ohne dass du das Handy gewechselt oder die App neu installiert hast, mach nicht weiter und vergleiche den Fingerabdruck unten mit dem im Browser."
     override val deskCode = "Zugangscode"
     override val deskCodeHint = "Ohne Kamera gib ihn am Computer ein. Er gilt einmal und ändert sich alle 5 Minuten. Gib ihn nicht weiter."
     override val deskNoNetwork = "Kein Netz: Verbinde das Telefon mit dem WLAN oder schalte den Hotspot ein."
@@ -1758,6 +1758,9 @@ object DeStrings : Strings {
     override val moreGroupDevices = "Geräte und Stimme"
     override val moreGroupData = "Daten"
     override val moreGroupHelp = "Hilfe"
+    override val deskFirstTitle = "Beim ersten Mal sagt der Browser „Dies ist keine sichere Verbindung“"
+    override val deskFirstWhy = "Das ist normal und keine Gefahr: Die Seite kommt von diesem Handy, mit einem selbst erstellten Zertifikat statt einem von einer Firma, die der Browser kennt. Die Verbindung bleibt verschlüsselt."
+    override val deskFirstSteps = "• Chrome oder Edge: Erweitert › Weiter zu … (unsicher)\n• Firefox: Erweitert… › Risiko akzeptieren und fortfahren\n• Safari: Details einblenden › diese Website besuchen"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

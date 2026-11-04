@@ -14,7 +14,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvInviteIn(val player: String, val name: String, val days: Int = 14)
 @Serializable data class SrvInvite(val code: String, val expires: Long)
 @Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
-@Serializable data class SrvAdmin(val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>)
+@Serializable data class SrvAdmin(
+    val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>,
+    /** Per la segreteria: chi è in lista d'attesa e gli annunci di Cerco compagno ancora da giocare (vuoti dai server vecchi). */
+    val waits: List<Wait> = emptyList(), val seeks: List<Seek> = emptyList(),
+)
 @Serializable data class SrvOk(val ok: Boolean = true)
 
 /** Il giocatore: le sue prenotazioni, il giorno, il prezzo prima di confermare (la pagina web e l'app). */

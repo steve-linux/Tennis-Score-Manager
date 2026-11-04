@@ -1503,7 +1503,7 @@ object PtStrings : Strings {
     override val deskStop = "Desativar"
     override val deskFailed = "Não ligou: tente de novo."
     override val deskAddress = "Digite este endereço no navegador do computador"
-    override val deskWarning = "Da primeira vez o navegador avisa que a conexão não é privada: é normal com um certificado do telefone. Escolha Avançado e Continuar; se o aviso voltar sem motivo, não prossiga."
+    override val deskWarning = "Depois o navegador lembra-se. Se o aviso voltar sem ter mudado de telefone ou reinstalado o app, não prossiga e compare a impressão digital abaixo com a do navegador."
     override val deskCode = "Código de acesso"
     override val deskCodeHint = "Se não puder usar a câmera, digite-o no computador. Vale uma só vez e muda a cada 5 minutos. Não o diga a ninguém."
     override val deskNoNetwork = "Sem rede: ligue o telefone ao Wi-Fi ou ative o hotspot."
@@ -1762,6 +1762,9 @@ object PtStrings : Strings {
     override val moreGroupDevices = "Dispositivos e voz"
     override val moreGroupData = "Dados"
     override val moreGroupHelp = "Ajuda"
+    override val deskFirstTitle = "Da primeira vez o navegador dirá «A sua ligação não é privada»"
+    override val deskFirstWhy = "É normal e não é um perigo: a página é servida por este telefone, com um certificado feito por ele e não por uma empresa que o navegador conhece. A ligação continua cifrada."
+    override val deskFirstSteps = "• Chrome ou Edge: Avançadas › Continuar para … (não seguro)\n• Firefox: Avançado… › Aceitar o risco e continuar\n• Safari: Mostrar detalhes › visitar este site"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

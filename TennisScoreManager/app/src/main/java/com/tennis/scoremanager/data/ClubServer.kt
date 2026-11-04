@@ -250,6 +250,8 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun removeWaitAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/waits/$id", null, null, SrvOk.serializer())
+    fun removeSeekAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/seeks/$id", null, null, SrvOk.serializer())
 
     // Il giocatore (con la chiave avuta dall'invito).
     private fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")

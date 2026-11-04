@@ -1804,6 +1804,10 @@ interface Strings {
     val moreGroupDevices: String
     val moreGroupData: String
     val moreGroupHelp: String
+    /** Segreteria da PC: l'avviso del browser spiegato prima, browser per browser. */
+    val deskFirstTitle: String
+    val deskFirstWhy: String
+    val deskFirstSteps: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3603,7 +3607,7 @@ object ItStrings : Strings {
     override val deskStop = "Spegni"
     override val deskFailed = "Non si è acceso: riprova."
     override val deskAddress = "Scrivi questo indirizzo nel browser del computer"
-    override val deskWarning = "La prima volta il browser avvisa che la connessione non è privata: è normale con un certificato del telefono. Scegli Avanzate e Procedi; se l'avviso torna senza motivo, non proseguire."
+    override val deskWarning = "Poi il browser se lo ricorda. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire e confronta l'impronta qui sotto con quella del browser."
     override val deskCode = "Codice di accesso"
     override val deskCodeHint = "Se non puoi usare la fotocamera, scrivilo sul computer. Vale una volta sola e cambia ogni 5 minuti. Non dirlo a nessuno."
     override val deskNoNetwork = "Nessuna rete: collega il telefono al Wi-Fi o accendi l'hotspot."
@@ -3862,6 +3866,9 @@ object ItStrings : Strings {
     override val moreGroupDevices = "Dispositivi e voce"
     override val moreGroupData = "Dati"
     override val moreGroupHelp = "Aiuto"
+    override val deskFirstTitle = "La prima volta il browser dirà «La connessione non è privata»"
+    override val deskFirstWhy = "È normale e non è un pericolo: la pagina la serve questo telefono, con un certificato fatto da lui e non da un'azienda che il browser conosce. Il collegamento resta cifrato."
+    override val deskFirstSteps = "• Chrome o Edge: Avanzate › Procedi su … (non sicuro)\n• Firefox: Avanzate… › Accetta il rischio e continua\n• Safari: Mostra dettagli › visita questo sito web"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5642,7 +5649,7 @@ object EnStrings : Strings {
     override val deskStop = "Turn off"
     override val deskFailed = "It did not start: try again."
     override val deskAddress = "Type this address in the computer's browser"
-    override val deskWarning = "The first time, the browser warns that the connection is not private: this is normal with a certificate made by the phone. Choose Advanced and Proceed; if the warning comes back for no reason, do not continue."
+    override val deskWarning = "After that the browser remembers it. If the warning comes back without you changing phone or reinstalling the app, do not continue and compare the fingerprint below with the browser's."
     override val deskCode = "Access code"
     override val deskCodeHint = "If you cannot use the camera, type it on the computer. It works once and changes every 5 minutes. Keep it to yourself."
     override val deskNoNetwork = "No network: connect the phone to Wi-Fi or turn on the hotspot."
@@ -5901,6 +5908,9 @@ object EnStrings : Strings {
     override val moreGroupDevices = "Devices and voice"
     override val moreGroupData = "Data"
     override val moreGroupHelp = "Help"
+    override val deskFirstTitle = "The first time, the browser will say “Your connection is not private”"
+    override val deskFirstWhy = "That's normal and not a danger: the page is served by this phone, with a certificate it made itself rather than one from a company the browser knows. The connection stays encrypted."
+    override val deskFirstSteps = "• Chrome or Edge: Advanced › Proceed to … (unsafe)\n• Firefox: Advanced… › Accept the Risk and Continue\n• Safari: Show Details › visit this website"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
