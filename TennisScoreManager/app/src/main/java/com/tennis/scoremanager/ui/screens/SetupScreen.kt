@@ -142,7 +142,7 @@ fun SetupScreen(c: MatchController) {
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+        if (c.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
                 selected = su.sport.ordinal,

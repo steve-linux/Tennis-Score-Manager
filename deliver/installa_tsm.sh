@@ -683,6 +683,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 
 - Unter **Mehr › Profil und Daten › Rollen** (und beim ersten Start) wählst du, wer die App nutzt; du kannst mehrere haben. Rollen ändern die Reiter des ersten Bildschirms, **die Daten bleiben dieselben**; bei mehreren Rollen steht oben die aktive: antippen, um zu wechseln.
   - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
+  - **Was du nutzt** (Mehr): Behalte nur, was du brauchst. Armbänder und Fernbedienungen, Herzfrequenzgurte, Schlagtraining und Schüler, Video und Kamera, Fortschritte und Rating, Schläger, Padel: Was du ausschaltest, erscheint nicht, und leere Reiter (Trainieren, Video) verschwinden; der Verlauf bleibt immer (ohne Fortschritt kommt er zu Spielen). Anfangs ist alles an; bei der ersten Einführung schlägt die App aus der Antwort auf „Wie wirst du sie nutzen“ vor, was bleiben soll. Mehr ist in Gruppen geteilt: Geräte und Stimme, Daten, Hilfe.
   - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
   - **Verein**: **Heute** (die Buchungen des Tages, was offen ist, Mitglieder zu klären, Turnierspiele, Trainingsstunden, Mannschaftsspiele und Forderungen: Antippen führt dorthin), **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
   - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik und Vereinsserver. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
@@ -1226,6 +1227,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 
 - In **More › Profile and data › Roles** (and at the first start) you choose who uses the app; you can have more than one. Roles change the tabs of the first screen, **the data is the same**; with several roles the active one is shown at the top: tap it to switch to another.
   - **You**: Play, Practice, Video, Progress, More (the app as always).
+  - **What you use** (More): keep only what you need. Wristbands and remotes, heart rate straps, stroke training and students, video and camera, progress and rating, rackets, padel: what you turn off does not appear, and tabs left empty (Practice, Video) disappear; the history always stays (without Progress it moves to Play). At first everything is on; on the first introduction the app suggests what to keep from the answer to "how will you use it". More is split into groups: Devices and voice, Data, Help.
   - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
   - **Club**: **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
   - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics and Club server. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
@@ -1768,6 +1770,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 
 - En **Más › Perfil y datos › Roles** (y en el primer arranque) eliges quién usa la app; puedes tener más de uno. Los roles cambian las pestañas de la primera pantalla, **los datos son los mismos**; con varios roles, arriba está el activo: tócalo para pasar a otro.
   - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
+  - **Lo que usas** (Más): te quedas solo con lo que necesitas. Pulseras y mandos, bandas de pulso, entrenamiento de golpes y alumnos, vídeo y cámara, progresos y rating, raquetas, pádel: lo que apagas no aparece, y las pestañas que quedan vacías (Entrenar, Vídeo) desaparecen; el historial se queda siempre (sin Progresos pasa a Jugar). Al principio todo está encendido; en la primera presentación la app propone qué dejar según la respuesta a «cómo la usarás». Más se divide en grupos: Dispositivos y voz, Datos, Ayuda.
   - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
   - **Club**: **Hoy** (las reservas del día, lo que hay por cobrar, los socios por regularizar, los partidos de torneo, las clases, los encuentros y los desafíos: se toca un recuadro para ir), **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
   - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas y Servidor del club. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
@@ -2310,6 +2313,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 
 - Dans **Plus › Profil et données › Rôles** (et au premier démarrage) vous choisissez qui utilise l'appli ; vous pouvez en avoir plusieurs. Les rôles changent les onglets du premier écran, **les données sont les mêmes** ; avec plusieurs rôles, le rôle actif est en haut : touchez-le pour passer à un autre.
   - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
+  - **Ce que vous utilisez** (Plus) : on garde seulement ce qui sert. Bracelets et télécommandes, ceintures cardio, entraînement des coups et élèves, vidéo et caméra, progrès et classement, raquettes, padel : ce qu'on désactive n'apparaît pas, et les onglets restés vides (S'entraîner, Vidéo) disparaissent ; l'historique reste toujours (sans Progrès il passe dans Jouer). Au début tout est activé ; à la première présentation, l'app propose quoi garder d'après la réponse à « comment l'utiliserez-vous ». Plus est divisé en groupes : Appareils et voix, Données, Aide.
   - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
   - **Club** : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs de tournoi, les leçons, les rencontres et les défis : on touche un encadré pour y aller), **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
   - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains et Serveur du club. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
@@ -2852,6 +2856,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 
 - In **Altro › Profilo e dati › Ruoli** (e alla prima apertura) scegli chi usa l'app; puoi averne più di uno. I ruoli cambiano le schede della prima schermata, **i dati sono gli stessi**; con più ruoli, in alto c'è il ruolo attivo: toccandolo passi a un altro.
   - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
+  - **Cosa usi** (Altro): si tiene solo quello che serve. Braccialetti e telecomandi, fasce cardio, allenamento dei colpi e allievi, video e telecamera, progressi e rating, racchette, padel: quello che si spegne non compare, e le schede rimaste vuote (Allenati, Video) spariscono; lo storico resta sempre (senza Progressi va in Gioca). All'inizio è tutto acceso; alla prima presentazione l'app propone cosa tenere dalla risposta a "come la userai". Altro è diviso in gruppi: Dispositivi e voce, Dati, Aiuto.
   - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
   - **Circolo**: **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
   - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi e Server del circolo. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
@@ -3394,6 +3399,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 
 - Em **Mais › Perfil e dados › Papéis** (e na primeira abertura) você escolhe quem usa o app; pode ter mais de um. Os papéis mudam as abas da primeira tela, **os dados são os mesmos**; com vários papéis, no alto aparece o ativo: toque para passar a outro.
   - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
+  - **O que usas** (Mais): fica-se só com o que é preciso. Pulseiras e comandos, cintas cardíacas, treino de pancadas e alunos, vídeo e câmara, progressos e rating, raquetes, padel: o que se desliga não aparece, e os separadores que ficam vazios (Treinar, Vídeo) desaparecem; o histórico fica sempre (sem Progressos passa para Jogar). No início está tudo ligado; na primeira apresentação a app propõe o que manter a partir da resposta a «como vais usá-la». Mais está dividido em grupos: Dispositivos e voz, Dados, Ajuda.
   - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
   - **Clube**: **Hoje** (as reservas do dia, o que há por receber, os sócios por regularizar, os jogos de torneio, as aulas, os encontros e os desafios: toca-se num quadro para lá ir), **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
   - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras e Servidor do clube. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
@@ -4482,6 +4488,9 @@ enum class Role(val tabs: List<HomeTab>) {
     /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
     CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
 }
+
+/** Cosa usa chi gioca (ruoli Tu e Allenatore): quello che non usa non compare (i dati restano). */
+enum class PlayerFeature { BANDS, HEART, TRAINING, VIDEO, PROGRESS, RACKETS, PADEL }
 
 /**
  * Le funzioni del ruolo Circolo, da accendere o spegnere: quelle spente non compaiono nei menu (i dati restano).
@@ -6381,6 +6390,27 @@ class MatchController(
     fun openPlanAt(day: Long) {
         planDayRequest.value = day
         openCourtsPlan()
+    }
+
+    // ---- Cosa usi (Tu e Allenatore) ----
+
+    /** Finché non si sceglie, tutto acceso: a chi usa già l'app non sparisce niente. */
+    val playerFeatures = MutableStateFlow(
+        storage.playerFeatures?.mapNotNull { n -> PlayerFeature.entries.firstOrNull { it.name == n } }?.toSet() ?: PlayerFeature.entries.toSet(),
+    )
+
+    fun uses(f: PlayerFeature): Boolean = f in playerFeatures.value
+
+    fun setPlayerFeature(f: PlayerFeature, on: Boolean) = setPlayerFeatures(if (on) playerFeatures.value + f else playerFeatures.value - f)
+
+    fun setPlayerFeatures(set: Set<PlayerFeature>) {
+        playerFeatures.value = set
+        storage.playerFeatures = set.map { it.name }.toSet()
+    }
+
+    /** La prima presentazione propone cosa tenere dalla risposta a "come la userai" (solo se non si è mai scelto). */
+    fun suggestPlayerFeatures(base: Set<PlayerFeature>) {
+        if (storage.playerFeatures == null) setPlayerFeatures(base + PlayerFeature.PROGRESS + PlayerFeature.RACKETS)
     }
 
     // ---- Funzioni del circolo ----
@@ -16162,6 +16192,15 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Cosa usa chi gioca (PlayerFeature.name); null = mai scelto (tutto acceso, come prima). */
+    var playerFeatures: Set<String>?
+        get() = prefs.getStringSet("player_features", null)?.toSet()
+        set(v) = prefs.edit().putStringSet("player_features", v).apply()
+
+    var playerFeaturesSeen: Boolean
+        get() = prefs.getBoolean("player_features_seen", false)
+        set(v) = prefs.edit().putBoolean("player_features_seen", v).apply()
+
     /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
     var clubFeatures: Set<String>?
         get() = prefs.getStringSet("club_features", null)?.toSet()
@@ -23439,6 +23478,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var last by remember { mutableStateOf("") }
     var nick by remember { mutableStateOf("") }
     fun finish() {
+        // Solo alla prima presentazione si propone cosa tenere: rifatta da Altro, non spegne niente.
+        val firstTime = !c.storage.onboarded
         c.storage.onboarded = true
         c.setRoles(roles)
         if (com.tennis.scoremanager.Role.CLUB in roles) {
@@ -23461,10 +23502,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         val first = com.tennis.scoremanager.Role.entries.first { it in roles }
         c.setActiveRole(first)
         if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
-            Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
-            Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
-            Use.TRAIN -> c.home(HomeTab.TRAIN)
-            Use.VIDEO -> c.home(HomeTab.VIDEO)
+            Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
+            Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
+            Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
+            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.VIDEO) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()
@@ -23592,6 +23633,96 @@ fun ProfileDialog(c: MatchController, onDone: () -> Unit) {
         confirmButton = { TextButton(onClick = { create = true }) { Text(s.meNew) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/PlayerFeaturesUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/PlayerFeaturesUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.SportsBaseball
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.PlayerFeature
+
+/** Nome, spiegazione e icona di una cosa che si può usare. */
+fun playerFeatureInfo(s: Strings, f: PlayerFeature): Triple<String, String, ImageVector> = when (f) {
+    PlayerFeature.BANDS -> Triple(s.pfBands, s.pfBandsHint, Icons.Filled.Watch)
+    PlayerFeature.HEART -> Triple(s.pfHeart, s.pfHeartHint, Icons.Filled.MonitorHeart)
+    PlayerFeature.TRAINING -> Triple(s.pfTraining, s.pfTrainingHint, Icons.Filled.FitnessCenter)
+    PlayerFeature.VIDEO -> Triple(s.pfVideo, s.pfVideoHint, Icons.Filled.Videocam)
+    PlayerFeature.PROGRESS -> Triple(s.pfProgress, s.pfProgressHint, Icons.Filled.Timeline)
+    PlayerFeature.RACKETS -> Triple(s.pfRackets, s.pfRacketsHint, Icons.Filled.SportsTennis)
+    PlayerFeature.PADEL -> Triple(s.sportPadel, s.pfPadelHint, Icons.Filled.SportsBaseball)
+}
+
+/** Cosa usi: un interruttore per ognuna; quello che è spento non compare, i dati restano. */
+@Composable
+fun PlayerFeaturesDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val on by c.playerFeatures.collectAsState()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.pfTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(s.pfHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (f in PlayerFeature.entries) {
+                    val (name, hint, icon) = playerFeatureInfo(s, f)
+                    SwitchRow(icon, name, hint, f in on) { c.setPlayerFeature(f, it) }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+}
+
+/** In cima a Gioca, finché non si è guardato: l'invito a tenere solo quello che si usa. */
+@Composable
+fun PlayerFeaturesHint(c: MatchController) {
+    val s = LocalStrings.current
+    var seen by remember { mutableStateOf(c.storage.playerFeaturesSeen) }
+    var open by remember { mutableStateOf(false) }
+    if (!seen) Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.SurfaceHigh).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.pfAsk, color = TsmColors.TextMain, fontSize = 14.sp)
+        GhostButton(s.pfChoose, Icons.Filled.Tune, { open = true }, Modifier.fillMaxWidth())
+    }
+    if (open) PlayerFeaturesDialog(c) { open = false; seen = true; c.storage.playerFeaturesSeen = true }
 }
 TSM_EOF
 
@@ -26876,6 +27007,28 @@ interface Strings {
     val tdChallenges: (Int) -> String
     val tdLate: (Int) -> String
     val tdNothing: String
+    // Cosa usi (Tu e Allenatore) e Altro a gruppi.
+    val pfTitle: String
+    val pfEntryHint: String
+    val pfHint: String
+    val pfAsk: String
+    val pfChoose: String
+    val pfBands: String
+    val pfBandsHint: String
+    val pfHeart: String
+    val pfHeartHint: String
+    val pfTraining: String
+    val pfTrainingHint: String
+    val pfVideo: String
+    val pfVideoHint: String
+    val pfProgress: String
+    val pfProgressHint: String
+    val pfRackets: String
+    val pfRacketsHint: String
+    val pfPadelHint: String
+    val moreGroupDevices: String
+    val moreGroupData: String
+    val moreGroupHelp: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -28890,6 +29043,27 @@ object ItStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Sfide da giocare: $it" }
     override val tdLate: (Int) -> String = { if (it == 1) "1 scaduta" else "$it scadute" }
     override val tdNothing = "Niente in programma oggi."
+    override val pfTitle = "Cosa usi"
+    override val pfEntryHint = "Tieni solo quello che ti serve: il resto non compare"
+    override val pfHint = "Quello che spegni non compare nei menu e nelle schermate. Puoi cambiarlo quando vuoi, i dati restano."
+    override val pfAsk = "Usi solo una parte dell'app? Scegli cosa usi: il resto sparisce dai menu."
+    override val pfChoose = "Scegli cosa usi"
+    override val pfBands = "Braccialetti e telecomandi"
+    override val pfBandsHint = "I giocatori segnano il punto dal polso o da un telecomando; spento, si segna solo da arbitro"
+    override val pfHeart = "Fasce cardio"
+    override val pfHeartHint = "Battito nella partita e allenamento con la fascia"
+    override val pfTraining = "Allenamento dei colpi e allievi"
+    override val pfTrainingHint = "Servizio, dritto, rovescio e volée col braccialetto; gli allievi per chi allena"
+    override val pfVideo = "Video e telecamera"
+    override val pfVideoHint = "Il telefono che riprende la partita, gli highlights e la moviola"
+    override val pfProgress = "Progressi e rating"
+    override val pfProgressHint = "Il tuo andamento partita dopo partita; lo storico resta comunque"
+    override val pfRackets = "Racchette"
+    override val pfRacketsHint = "Le tue racchette, le corde e la racchetta virtuale"
+    override val pfPadelHint = "La scelta tennis o padel nella nuova partita"
+    override val moreGroupDevices = "Dispositivi e voce"
+    override val moreGroupData = "Dati"
+    override val moreGroupHelp = "Aiuto"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -30885,6 +31059,27 @@ object EnStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Challenges to play: $it" }
     override val tdLate: (Int) -> String = { "$it overdue" }
     override val tdNothing = "Nothing planned today."
+    override val pfTitle = "What you use"
+    override val pfEntryHint = "Keep only what you need: the rest does not appear"
+    override val pfHint = "What you turn off does not appear in menus and screens. You can change it any time, the data stays."
+    override val pfAsk = "Do you use only part of the app? Choose what you use: the rest disappears from the menus."
+    override val pfChoose = "Choose what you use"
+    override val pfBands = "Wristbands and remotes"
+    override val pfBandsHint = "Players score from the wrist or a remote; off, you score as umpire only"
+    override val pfHeart = "Heart rate straps"
+    override val pfHeartHint = "Heart rate in the match and training with the strap"
+    override val pfTraining = "Stroke training and students"
+    override val pfTrainingHint = "Serve, forehand, backhand and volley with the wristband; students for coaches"
+    override val pfVideo = "Video and camera"
+    override val pfVideoHint = "The phone filming the match, highlights and replay"
+    override val pfProgress = "Progress and rating"
+    override val pfProgressHint = "Your trend match after match; the history stays anyway"
+    override val pfRackets = "Rackets"
+    override val pfRacketsHint = "Your rackets, strings and the virtual racket"
+    override val pfPadelHint = "The tennis or padel choice in a new match"
+    override val moreGroupDevices = "Devices and voice"
+    override val moreGroupData = "Data"
+    override val moreGroupHelp = "Help"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -32903,6 +33098,27 @@ object DeStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Offene Forderungen: $it" }
     override val tdLate: (Int) -> String = { "$it überfällig" }
     override val tdNothing = "Heute nichts geplant."
+    override val pfTitle = "Was du nutzt"
+    override val pfEntryHint = "Behalte nur, was du brauchst: Der Rest erscheint nicht"
+    override val pfHint = "Was du ausschaltest, erscheint nicht in Menüs und Bildschirmen. Du kannst es jederzeit ändern, die Daten bleiben."
+    override val pfAsk = "Nutzt du nur einen Teil der App? Wähle, was du nutzt: Der Rest verschwindet aus den Menüs."
+    override val pfChoose = "Auswählen"
+    override val pfBands = "Armbänder und Fernbedienungen"
+    override val pfBandsHint = "Die Spieler zählen am Handgelenk oder mit einer Fernbedienung; aus, zählt man nur als Schiedsrichter"
+    override val pfHeart = "Herzfrequenzgurte"
+    override val pfHeartHint = "Puls im Match und Training mit dem Gurt"
+    override val pfTraining = "Schlagtraining und Schüler"
+    override val pfTrainingHint = "Aufschlag, Vorhand, Rückhand und Volley mit dem Armband; Schüler für Trainer"
+    override val pfVideo = "Video und Kamera"
+    override val pfVideoHint = "Das Handy, das das Match filmt, Highlights und Zeitlupe"
+    override val pfProgress = "Fortschritte und Rating"
+    override val pfProgressHint = "Dein Verlauf Match für Match; der Verlauf der Matches bleibt trotzdem"
+    override val pfRackets = "Schläger"
+    override val pfRacketsHint = "Deine Schläger, Saiten und der virtuelle Schläger"
+    override val pfPadelHint = "Die Wahl Tennis oder Padel im neuen Match"
+    override val moreGroupDevices = "Geräte und Stimme"
+    override val moreGroupData = "Daten"
+    override val moreGroupHelp = "Hilfe"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -34914,6 +35130,27 @@ object EsStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Desafíos por jugar: $it" }
     override val tdLate: (Int) -> String = { if (it == 1) "1 vencido" else "$it vencidos" }
     override val tdNothing = "Nada previsto hoy."
+    override val pfTitle = "Lo que usas"
+    override val pfEntryHint = "Quédate solo con lo que necesitas: el resto no aparece"
+    override val pfHint = "Lo que apagas no aparece en los menús ni en las pantallas. Puedes cambiarlo cuando quieras, los datos se quedan."
+    override val pfAsk = "¿Usas solo una parte de la app? Elige lo que usas: el resto desaparece de los menús."
+    override val pfChoose = "Elegir lo que usas"
+    override val pfBands = "Pulseras y mandos"
+    override val pfBandsHint = "Los jugadores marcan desde la muñeca o con un mando; apagado, solo se marca como árbitro"
+    override val pfHeart = "Bandas de pulso"
+    override val pfHeartHint = "Pulso en el partido y entrenamiento con la banda"
+    override val pfTraining = "Entrenamiento de golpes y alumnos"
+    override val pfTrainingHint = "Saque, derecha, revés y volea con la pulsera; los alumnos para quien entrena"
+    override val pfVideo = "Vídeo y cámara"
+    override val pfVideoHint = "El teléfono que graba el partido, los mejores momentos y la moviola"
+    override val pfProgress = "Progresos y rating"
+    override val pfProgressHint = "Tu evolución partido a partido; el historial se queda igualmente"
+    override val pfRackets = "Raquetas"
+    override val pfRacketsHint = "Tus raquetas, los cordajes y la raqueta virtual"
+    override val pfPadelHint = "La elección tenis o pádel en el nuevo partido"
+    override val moreGroupDevices = "Dispositivos y voz"
+    override val moreGroupData = "Datos"
+    override val moreGroupHelp = "Ayuda"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -36927,6 +37164,27 @@ object FrStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Défis à jouer : $it" }
     override val tdLate: (Int) -> String = { "$it en retard" }
     override val tdNothing = "Rien de prévu aujourd'hui."
+    override val pfTitle = "Ce que vous utilisez"
+    override val pfEntryHint = "Gardez seulement ce qui vous sert : le reste n'apparaît pas"
+    override val pfHint = "Ce que vous désactivez n'apparaît pas dans les menus et les écrans. Vous pouvez le changer quand vous voulez, les données restent."
+    override val pfAsk = "Vous n'utilisez qu'une partie de l'app ? Choisissez ce que vous utilisez : le reste disparaît des menus."
+    override val pfChoose = "Choisir"
+    override val pfBands = "Bracelets et télécommandes"
+    override val pfBandsHint = "Les joueurs marquent depuis le poignet ou une télécommande ; désactivé, on marque seulement en arbitre"
+    override val pfHeart = "Ceintures cardio"
+    override val pfHeartHint = "Fréquence cardiaque pendant le match et entraînement avec la ceinture"
+    override val pfTraining = "Entraînement des coups et élèves"
+    override val pfTrainingHint = "Service, coup droit, revers et volée avec le bracelet ; les élèves pour qui entraîne"
+    override val pfVideo = "Vidéo et caméra"
+    override val pfVideoHint = "Le téléphone qui filme le match, les meilleurs moments et le ralenti"
+    override val pfProgress = "Progrès et classement"
+    override val pfProgressHint = "Votre évolution match après match ; l'historique reste de toute façon"
+    override val pfRackets = "Raquettes"
+    override val pfRacketsHint = "Vos raquettes, les cordages et la raquette virtuelle"
+    override val pfPadelHint = "Le choix tennis ou padel dans un nouveau match"
+    override val moreGroupDevices = "Appareils et voix"
+    override val moreGroupData = "Données"
+    override val moreGroupHelp = "Aide"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -38941,6 +39199,27 @@ object PtStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Desafios por jogar: $it" }
     override val tdLate: (Int) -> String = { "$it em atraso" }
     override val tdNothing = "Nada previsto para hoje."
+    override val pfTitle = "O que usas"
+    override val pfEntryHint = "Fica só com o que precisas: o resto não aparece"
+    override val pfHint = "O que desligas não aparece nos menus nem nos ecrãs. Podes mudar quando quiseres, os dados ficam."
+    override val pfAsk = "Usas só uma parte da app? Escolhe o que usas: o resto desaparece dos menus."
+    override val pfChoose = "Escolher o que usas"
+    override val pfBands = "Pulseiras e comandos"
+    override val pfBandsHint = "Os jogadores marcam pelo pulso ou por um comando; desligado, marca-se só como árbitro"
+    override val pfHeart = "Cintas cardíacas"
+    override val pfHeartHint = "Batimento no jogo e treino com a cinta"
+    override val pfTraining = "Treino de pancadas e alunos"
+    override val pfTrainingHint = "Serviço, direita, esquerda e vólei com a pulseira; os alunos para quem treina"
+    override val pfVideo = "Vídeo e câmara"
+    override val pfVideoHint = "O telemóvel que filma o jogo, os melhores momentos e a repetição"
+    override val pfProgress = "Progressos e rating"
+    override val pfProgressHint = "A tua evolução jogo a jogo; o histórico fica na mesma"
+    override val pfRackets = "Raquetes"
+    override val pfRacketsHint = "As tuas raquetes, as cordas e a raquete virtual"
+    override val pfPadelHint = "A escolha ténis ou padel no novo jogo"
+    override val moreGroupDevices = "Dispositivos e voz"
+    override val moreGroupData = "Dados"
+    override val moreGroupHelp = "Ajuda"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -42759,6 +43038,7 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Videocam
@@ -42785,6 +43065,7 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.PlayerFeature
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.ble.StrapState
@@ -42826,7 +43107,16 @@ fun HomeScreen(c: MatchController) {
     // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
     val role by c.activeRole.collectAsState()
     val roles by c.roles.collectAsState()
-    val tabs = role.tabs
+    // Le schede di Tu e Allenatore che restano vuote con quello che non si usa spariscono.
+    val pf by c.playerFeatures.collectAsState()
+    val tabs = role.tabs.filter { t ->
+        when (t) {
+            HomeTab.TRAIN -> PlayerFeature.HEART in pf || PlayerFeature.TRAINING in pf
+            HomeTab.VIDEO -> PlayerFeature.VIDEO in pf
+            HomeTab.PROGRESS -> PlayerFeature.PROGRESS in pf || PlayerFeature.RACKETS in pf || PlayerFeature.TRAINING in pf
+            else -> true
+        }
+    }
     LaunchedEffect(role, tab) { if (tab !in tabs) c.homeTab.value = tabs.first() }
     // Da un'altra scheda "Indietro" torna alla prima; dalla prima esce dall'app come sempre.
     BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
@@ -43058,6 +43348,9 @@ private fun PlayTab(c: MatchController) {
         c.refreshHistory()
     }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
+    val pf by c.playerFeatures.collectAsState()
+    // La prima volta: l'invito a tenere solo quello che si usa.
+    com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -43087,22 +43380,27 @@ private fun PlayTab(c: MatchController) {
         }
     }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
+    // Senza la scheda Progressi lo storico sta qui.
+    if (PlayerFeature.PROGRESS !in pf && PlayerFeature.RACKETS !in pf && PlayerFeature.TRAINING !in pf) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Il server del circolo (se il circolo ce l'ha): prenotare i campi da qui, con l'invito della segreteria.
     val booking by c.bookingAccount.collectAsState()
     Entry(Icons.Filled.CalendarMonth, s.pbTitle, if (booking.joined) s.pbEntryJoined(booking.club.ifBlank { booking.url }) else s.pbEntryHint) { c.go(Screen.BOOK_COURT) }
     SectionLabel(s.playUseAs)
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
-    Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
 }
 
 @Composable
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
-    // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
-    ServeTrainingCard(c)
-    // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
-    Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    val pf by c.playerFeatures.collectAsState()
+    if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
+    if (PlayerFeature.TRAINING in pf) {
+        // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
+        ServeTrainingCard(c)
+        // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
+        Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    }
 }
 
 @Composable
@@ -43123,19 +43421,20 @@ private fun ProgressTab(c: MatchController) {
     val mine = remember(history, me) {
         if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
     }
-    Entry(
+    val pf by c.playerFeatures.collectAsState()
+    if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
-    Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     val trainee by c.trainStudent.collectAsState()
     val ofTrainee = sessions.filter { it.student == trainee }
     val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> ofTrainee.any { it.stroke == t } }
-    if (done.isNotEmpty()) {
+    if (done.isNotEmpty() && PlayerFeature.TRAINING in pf) {
         com.tennis.scoremanager.ui.SectionCard(s.progressStrokes + (c.studentById(trainee)?.name?.let { " · $it" } ?: ""), Icons.Filled.SportsTennis) {
             Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
             for (t in done) {
@@ -43166,14 +43465,21 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
         if (mine != null) c.openStudent(mine.id) else profile = true
     }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    val pf by c.playerFeatures.collectAsState()
+    var uses by remember { mutableStateOf(false) }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
-    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    Entry(Icons.Filled.Tune, s.pfTitle, s.pfEntryHint) { uses = true }
+    SectionLabel(s.moreGroupDevices)
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
-    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
-    Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    SectionLabel(s.moreGroupData)
+    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
     Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
+    SectionLabel(s.moreGroupHelp)
+    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
+    if (uses) com.tennis.scoremanager.ui.PlayerFeaturesDialog(c) { uses = false; c.storage.playerFeaturesSeen = true }
     // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
     AboutFooter()
 }
@@ -45441,8 +45747,9 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
         // Modalità
         if (match) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
-            // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue.
-            Segmented(
+            // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
+            // telecomandi (Altro › Cosa usi) si segna solo da arbitro: niente scelta.
+            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
                 listOf(
                     SegOption(s.modeReferee, Icons.Filled.Gavel),
                     SegOption(s.modeBands, Icons.Filled.Watch),
@@ -45452,7 +45759,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 onSelect = { i -> c.updateOptions { it.copy(mode = PlayMode.entries[i]) } },
                 columns = 1,
             )
-            Text(
+            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Text(
                 when (o.mode) {
                     PlayMode.REFEREE -> s.modeRefereeHint
                     PlayMode.BANDS -> s.modeBandsHint
@@ -45474,7 +45781,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        if (match || devices) HeartSection(
+        if (devices || (match && c.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -48119,7 +48426,7 @@ fun SetupScreen(c: MatchController) {
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+        if (c.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
                 selected = su.sport.ordinal,
@@ -82506,6 +82813,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 281 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 282 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

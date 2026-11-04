@@ -90,6 +90,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var last by remember { mutableStateOf("") }
     var nick by remember { mutableStateOf("") }
     fun finish() {
+        // Solo alla prima presentazione si propone cosa tenere: rifatta da Altro, non spegne niente.
+        val firstTime = !c.storage.onboarded
         c.storage.onboarded = true
         c.setRoles(roles)
         if (com.tennis.scoremanager.Role.CLUB in roles) {
@@ -112,10 +114,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         val first = com.tennis.scoremanager.Role.entries.first { it in roles }
         c.setActiveRole(first)
         if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
-            Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
-            Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
-            Use.TRAIN -> c.home(HomeTab.TRAIN)
-            Use.VIDEO -> c.home(HomeTab.VIDEO)
+            Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
+            Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
+            Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
+            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.VIDEO) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()

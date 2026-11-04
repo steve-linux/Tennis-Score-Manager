@@ -1758,6 +1758,28 @@ interface Strings {
     val tdChallenges: (Int) -> String
     val tdLate: (Int) -> String
     val tdNothing: String
+    // Cosa usi (Tu e Allenatore) e Altro a gruppi.
+    val pfTitle: String
+    val pfEntryHint: String
+    val pfHint: String
+    val pfAsk: String
+    val pfChoose: String
+    val pfBands: String
+    val pfBandsHint: String
+    val pfHeart: String
+    val pfHeartHint: String
+    val pfTraining: String
+    val pfTrainingHint: String
+    val pfVideo: String
+    val pfVideoHint: String
+    val pfProgress: String
+    val pfProgressHint: String
+    val pfRackets: String
+    val pfRacketsHint: String
+    val pfPadelHint: String
+    val moreGroupDevices: String
+    val moreGroupData: String
+    val moreGroupHelp: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3772,6 +3794,27 @@ object ItStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Sfide da giocare: $it" }
     override val tdLate: (Int) -> String = { if (it == 1) "1 scaduta" else "$it scadute" }
     override val tdNothing = "Niente in programma oggi."
+    override val pfTitle = "Cosa usi"
+    override val pfEntryHint = "Tieni solo quello che ti serve: il resto non compare"
+    override val pfHint = "Quello che spegni non compare nei menu e nelle schermate. Puoi cambiarlo quando vuoi, i dati restano."
+    override val pfAsk = "Usi solo una parte dell'app? Scegli cosa usi: il resto sparisce dai menu."
+    override val pfChoose = "Scegli cosa usi"
+    override val pfBands = "Braccialetti e telecomandi"
+    override val pfBandsHint = "I giocatori segnano il punto dal polso o da un telecomando; spento, si segna solo da arbitro"
+    override val pfHeart = "Fasce cardio"
+    override val pfHeartHint = "Battito nella partita e allenamento con la fascia"
+    override val pfTraining = "Allenamento dei colpi e allievi"
+    override val pfTrainingHint = "Servizio, dritto, rovescio e volée col braccialetto; gli allievi per chi allena"
+    override val pfVideo = "Video e telecamera"
+    override val pfVideoHint = "Il telefono che riprende la partita, gli highlights e la moviola"
+    override val pfProgress = "Progressi e rating"
+    override val pfProgressHint = "Il tuo andamento partita dopo partita; lo storico resta comunque"
+    override val pfRackets = "Racchette"
+    override val pfRacketsHint = "Le tue racchette, le corde e la racchetta virtuale"
+    override val pfPadelHint = "La scelta tennis o padel nella nuova partita"
+    override val moreGroupDevices = "Dispositivi e voce"
+    override val moreGroupData = "Dati"
+    override val moreGroupHelp = "Aiuto"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5767,6 +5810,27 @@ object EnStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Challenges to play: $it" }
     override val tdLate: (Int) -> String = { "$it overdue" }
     override val tdNothing = "Nothing planned today."
+    override val pfTitle = "What you use"
+    override val pfEntryHint = "Keep only what you need: the rest does not appear"
+    override val pfHint = "What you turn off does not appear in menus and screens. You can change it any time, the data stays."
+    override val pfAsk = "Do you use only part of the app? Choose what you use: the rest disappears from the menus."
+    override val pfChoose = "Choose what you use"
+    override val pfBands = "Wristbands and remotes"
+    override val pfBandsHint = "Players score from the wrist or a remote; off, you score as umpire only"
+    override val pfHeart = "Heart rate straps"
+    override val pfHeartHint = "Heart rate in the match and training with the strap"
+    override val pfTraining = "Stroke training and students"
+    override val pfTrainingHint = "Serve, forehand, backhand and volley with the wristband; students for coaches"
+    override val pfVideo = "Video and camera"
+    override val pfVideoHint = "The phone filming the match, highlights and replay"
+    override val pfProgress = "Progress and rating"
+    override val pfProgressHint = "Your trend match after match; the history stays anyway"
+    override val pfRackets = "Rackets"
+    override val pfRacketsHint = "Your rackets, strings and the virtual racket"
+    override val pfPadelHint = "The tennis or padel choice in a new match"
+    override val moreGroupDevices = "Devices and voice"
+    override val moreGroupData = "Data"
+    override val moreGroupHelp = "Help"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
