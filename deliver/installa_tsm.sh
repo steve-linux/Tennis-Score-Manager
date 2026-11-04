@@ -26,10 +26,12 @@ echo ">> Creo le cartelle / creating folders"
 mkdir -p "$DEST/app"
 mkdir -p "$DEST/app/src/main"
 mkdir -p "$DEST/app/src/main/assets"
+mkdir -p "$DEST/app/src/main/assets/desk"
 mkdir -p "$DEST/app/src/main/assets/help"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/desk"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/relay"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/remote"
@@ -49,6 +51,7 @@ mkdir -p "$DEST/app/src/main/res/values"
 mkdir -p "$DEST/app/src/main/res/xml"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/desk"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/relay"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/remote"
@@ -324,6 +327,12 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!-- Segreteria da PC: server HTTPS sulla rete locale, solo quando lo si accende -->
+        <service
+            android:name=".service.DeskService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
         <service
             android:name=".service.MatchService"
             android:exported="false"
@@ -340,6 +349,1715 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         </provider>
     </application>
 </manifest>
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/desk/app.js
+cat > "$DEST/app/src/main/assets/desk/app.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+// La Segreteria da PC. Tutti i testi entrano come testo (mai come HTML) e la chiave resta in questa scheda:
+// chiudendola, o dopo mezz'ora ferma, si riabbina.
+'use strict';
+
+const root = document.getElementById('app');
+const KEY = 'tsm-desk';
+let token = read();
+let info = null;
+let T = pick((navigator.language || 'it').slice(0, 2));
+let view = 'people';
+let people = [];
+
+function read() { try { return sessionStorage.getItem(KEY); } catch (_) { return null; } }
+function write(t) { try { if (t) sessionStorage.setItem(KEY, t); else sessionStorage.removeItem(KEY); } catch (_) { /* resta in memoria */ } }
+function pick(l) { return DESK_I18N[l] || DESK_I18N.en; }
+
+/** Crea un elemento: h('td.num', {onclick}, 'testo', figlio…). */
+function h(spec, attrs, ...kids) {
+  const [tag, ...cls] = spec.split('.');
+  const e = document.createElement(tag || 'div');
+  if (cls.length) e.className = cls.join(' ');
+  if (attrs instanceof Node || typeof attrs !== 'object' || attrs === null || Array.isArray(attrs)) { kids.unshift(attrs); attrs = {}; }
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === undefined || v === null || v === false) continue;
+    if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'value') e.value = v;
+    else if (k === 'checked' || k === 'selected' || k === 'disabled' || k === 'required') e[k] = !!v;
+    else e.setAttribute(k, v);
+  }
+  for (const c of kids.flat(3)) if (c !== null && c !== undefined && c !== false) e.append(c instanceof Node ? c : String(c));
+  return e;
+}
+
+class ApiError extends Error {}
+
+async function api(method, path, body, raw) {
+  const headers = {};
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  let r;
+  try {
+    r = await fetch('/api' + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), cache: 'no-store' });
+  } catch (_) { throw new ApiError('NET'); }
+  if (r.ok) return raw ? r.blob() : r.json();
+  const code = (await r.json().catch(() => ({}))).error || 'SERVER';
+  if (r.status === 401 && token) { token = null; write(null); info = null; showLogin(T.expired); }
+  throw new ApiError(code);
+}
+
+const errText = (e) => (T.err && T.err[e.message]) || T.err.SERVER;
+function toast(text) {
+  document.querySelectorAll('.toast').forEach((x) => x.remove());
+  const t = h('div.toast', { role: 'status' }, text);
+  document.body.append(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+const eur = (c) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR' }).format((c || 0) / 100);
+const locale = () => (info ? info.lang : navigator.language) || 'it';
+const dateText = (d) => (d ? new Date(d + 'T12:00:00').toLocaleDateString(locale(), { day: '2-digit', month: '2-digit', year: 'numeric' }) : '');
+const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+function addDay(d, n) { const t = new Date(d + 'T12:00:00'); t.setDate(t.getDate() + n); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); }
+
+/** "150", "150,50", "1.234,56" → centesimi; null se non è un importo. */
+function cents(text) {
+  let t = String(text).replace(/[€\s]/g, '');
+  const c = t.lastIndexOf(','), d = t.lastIndexOf('.');
+  if (c >= 0 && d >= 0) t = c > d ? t.replace(/\./g, '').replace(',', '.') : t.replace(/,/g, '');
+  else if (c >= 0) t = t.replace(',', '.');
+  if (!/^\d{1,6}(\.\d{1,2})?$/.test(t)) return null;
+  return Math.round(Number(t) * 100);
+}
+
+function field(label, input, cls) { return h('label' + (cls ? '.' + cls : ''), label, input); }
+function select(options, value) { return h('select', {}, options.map(([v, l]) => h('option', { value: v, selected: v === value }, l))); }
+
+/** Una finestra con modulo: [save] riceve i valori; se dà errore resta aperta e lo mostra. */
+function dialog(title, body, save, opts = {}) {
+  const err = h('div.err', { role: 'alert' });
+  const d = h('dialog' + (opts.wide ? '.wide' : ''));
+  const close = () => { d.close(); d.remove(); };
+  const ok = save && h('button.primary', { type: 'submit' }, opts.saveText || T.save);
+  const form = h('form', {
+    onsubmit: async (ev) => {
+      ev.preventDefault();
+      if (!save) return;
+      err.textContent = '';
+      ok.disabled = true;
+      try { if (await save(err) !== false) close(); }
+      catch (e) { if (d.open) err.textContent = e instanceof ApiError ? errText(e) : String(e.message || e); }
+      ok.disabled = false;
+    },
+  }, h('h2', title), body, err, h('div.actions', opts.left, h('button', { type: 'button', onclick: close }, save ? T.cancel : T.close), ok));
+  d.append(form);
+  d.addEventListener('close', () => d.remove());
+  document.body.append(d);
+  d.showModal();
+  return { close };
+}
+
+// --- Entrare ---
+
+let loginRun = 0;
+const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+/** Il QR su sfondo bianco anche col tema scuro, con il margine che serve ai lettori. */
+function drawQr(canvas, rows) {
+  const n = rows.length, cell = Math.max(3, Math.floor(280 / (n + 8)));
+  canvas.width = canvas.height = (n + 8) * cell;
+  const g = canvas.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, canvas.width, canvas.height);
+  g.fillStyle = '#000';
+  rows.forEach((row, y) => [...row].forEach((c, x) => { if (c === '1') g.fillRect((x + 4) * cell, (y + 4) * cell, cell, cell); }));
+}
+
+/** Mostra il QR, lo rinnova prima che scada e aspetta che il telefono lo inquadri. */
+async function qrLoop(canvas, status) {
+  const run = ++loginRun;
+  while (run === loginRun) {
+    try {
+      const q = await api('POST', '/pair/qr', {});
+      if (run !== loginRun) return;
+      drawQr(canvas, q.rows);
+      canvas.hidden = false;
+      status.textContent = '';
+      const until = Date.now() + 100000;
+      let confirm = false;
+      while (run === loginRun && (confirm || Date.now() < until)) {
+        const r = await api('GET', '/pair/' + encodeURIComponent(q.id));
+        if (run !== loginRun) return;
+        if (r.state === 'OK') { loginRun++; token = r.token; write(token); await start(); return; }
+        if (r.state === 'CONFIRM') { confirm = true; canvas.hidden = true; status.textContent = T.waitPhone; }
+        await sleep(1000);
+      }
+    } catch (e) {
+      if (run !== loginRun) return;
+      canvas.hidden = true;
+      status.textContent = errText(e);
+      await sleep(4000);
+    }
+  }
+}
+
+function showLogin(message) {
+  document.title = T.title;
+  document.documentElement.lang = T.lang;
+  const code = h('input', { autocomplete: 'off', spellcheck: 'false', maxlength: 12, 'aria-label': T.code, required: true });
+  const msg = h('div.err', { role: 'alert' }, message || '');
+  const btn = h('button.primary', { type: 'submit' }, T.enter);
+  const form = h('form', {
+    onsubmit: async (ev) => {
+      ev.preventDefault();
+      msg.textContent = '';
+      btn.disabled = true;
+      loginRun++;
+      try {
+        const r = await api('POST', '/pair', { code: code.value });
+        btn.textContent = T.waitPhone;
+        msg.textContent = '';
+        await waitApproval(r.id);
+        await start();
+      } catch (e) {
+        msg.textContent = errText(e);
+        btn.disabled = false;
+        btn.textContent = T.enter;
+        qrLoop(canvas, status);
+      }
+    },
+  }, code, btn, msg);
+  const canvas = h('canvas.qr', { role: 'img', 'aria-label': T.qrAlt });
+  canvas.hidden = true;
+  const status = h('div.status', { role: 'status' }, message || '');
+  root.replaceChildren(h('div.login', h('div.box', h('h1', T.title), h('p', T.qrHint), canvas, status,
+    h('details', h('summary', T.useCode), h('p', T.loginHint), form, h('ol', h('li', T.step1))))));
+  qrLoop(canvas, status);
+}
+
+async function waitApproval(id) {
+  for (let i = 0; i < 130; i++) {
+    const r = await api('GET', '/pair/' + encodeURIComponent(id));
+    if (r.state === 'OK') { token = r.token; write(token); return; }
+    await new Promise((ok) => setTimeout(ok, 1000));
+  }
+  throw new ApiError('REFUSED');
+}
+
+async function start() {
+  info = await api('GET', '/info');
+  T = pick(info.lang);
+  document.documentElement.lang = T.lang;
+  document.title = T.title + ' · ' + info.club;
+  planDate = info.today;
+  await render();
+}
+
+// --- Telaio ---
+
+const VIEWS = () => [['people', T.members], ['money', T.money], ['plan', T.plan], ['cups', T.cups]];
+const main = () => document.querySelector('main');
+
+async function render() {
+  root.replaceChildren(h('div.shell',
+    h('nav.side', { 'aria-label': T.title },
+      h('div.brand', info.club || T.title, h('small', T.title)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; render(); } }, l)),
+      h('div.spacer'),
+      h('div.note', T.phoneNote),
+      h('button', { onclick: logout }, T.logout)),
+    h('main')));
+  try { await ({ people: showPeople, money: showMoney, plan: showPlan, cups: showCups })[view](); }
+  catch (e) { if (e instanceof ApiError && token) main().replaceChildren(h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
+}
+
+async function logout() {
+  try { await api('POST', '/logout'); } catch (_) { /* si esce comunque */ }
+  token = null; write(null); info = null;
+  showLogin(T.loggedOut);
+}
+
+// --- Soci ---
+
+let filter = { text: '', kind: 'members' };
+
+function issueTag(i) {
+  const bad = ['NO_MEDICAL', 'MEDICAL_EXPIRED', 'NO_FITP'].includes(i);
+  return h('span.tag.' + (bad ? 'bad' : 'warn'), T.issue[i] || i);
+}
+
+async function showPeople() {
+  people = await api('GET', '/people');
+  const body = h('div');
+  const search = h('input', { type: 'search', placeholder: T.search, 'aria-label': T.search, value: filter.text, oninput: () => { filter.text = search.value; list(); } });
+  const kind = select([['members', T.onlyMembers], ['todo', T.todo], ['all', T.everyone]], filter.kind);
+  kind.addEventListener('change', () => { filter.kind = kind.value; list(); });
+  function list() {
+    const q = filter.text.trim().toLowerCase();
+    const rows = people.filter((p) => (filter.kind === 'all' || (p.member && (filter.kind === 'members' || p.issues.length)))
+      && (!q || [p.name, p.firstName, p.lastName, p.phone, p.email, p.fitpNumber, p.number].some((x) => (x || '').toLowerCase().includes(q))));
+    body.replaceChildren(rows.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.name, T.phone, T.email, T.fitp, T.medical, T.status].map((x) => h('th', { scope: 'col' }, x)), h('th.num', { scope: 'col' }, T.owed))),
+      h('tbody', rows.map((p) => h('tr.row', { tabindex: 0, onclick: () => editPerson(p), onkeydown: (e) => { if (e.key === 'Enter') editPerson(p); } },
+        h('td', p.name), h('td.nowrap', p.phone), h('td', p.email), h('td', p.fitpNumber, p.ranking ? h('span.dim', ' · ' + p.ranking) : null), h('td', dateText(p.medicalUntil)),
+        h('td', p.member ? (p.issues.length ? p.issues.map(issueTag) : h('span.tag.ok', T.inOrder)) : h('span.dim', T.notMember)),
+        h('td.num', p.owedCents ? eur(p.owedCents) : '')))))) : h('div.panel', h('div.empty', people.length ? T.noResults : T.noPeople)));
+  }
+  main().replaceChildren(
+    h('div.head', h('h1', T.members), h('button', { onclick: importDialog }, T.importCsv), h('button.primary', { onclick: () => editPerson(null) }, T.newMember)),
+    h('div.tools', search, kind), body);
+  list();
+}
+
+function editPerson(p) {
+  const v = p || { member: true };
+  const inp = (k, type, extra) => h('input', { type: type || 'text', value: v[k] || '', ...extra });
+  const f = {
+    firstName: inp('firstName', 'text', { required: true, autocomplete: 'off' }), lastName: inp('lastName', 'text', { required: true, autocomplete: 'off' }), nickname: inp('nickname'),
+    phone: inp('phone', 'tel'), email: inp('email', 'email'), birth: inp('birth', 'date'),
+    since: inp('since', 'date'), number: inp('number'), fitpNumber: inp('fitpNumber'), fitpYear: h('input', { type: 'number', min: 2000, max: 2100, value: v.fitpYear || '' }), ranking: inp('ranking'),
+    medicalUntil: inp('medicalUntil', 'date'), privacy: inp('privacy', 'date'), guardian: inp('guardian'), guardianPhone: inp('guardianPhone', 'tel'),
+    note: h('textarea', { rows: 2, maxlength: 2000 }, v.note || ''),
+  };
+  const member = h('input', { type: 'checkbox', checked: v.member });
+  const photos = h('input', { type: 'checkbox', checked: v.photosOk });
+  const card = select([['', '—'], ['AGONIST', T.cardAgonist], ['NON_AGONIST', T.cardNon], ['OTHER', T.cardOther]], v.fitpCard || '');
+  const med = select([['', '—'], ['AGONISTIC', T.medAgonistic], ['NON_AGONISTIC', T.medNon]], v.medical || '');
+  const body = h('div.form',
+    field(T.firstName, f.firstName), field(T.lastName, f.lastName), field(T.nickname, f.nickname), field(T.birth, f.birth), field(T.phone, f.phone), field(T.email, f.email),
+    h('label.check.full', member, T.isMember),
+    h('h3', T.memberData), field(T.since, f.since), field(T.number, f.number), field(T.fitp, f.fitpNumber), field(T.fitpCard, card), field(T.fitpYear, f.fitpYear), field(T.ranking, f.ranking),
+    field(T.medicalKind, med), field(T.medical, f.medicalUntil), field(T.privacy, f.privacy), h('label.check', photos, T.photos),
+    h('h3', T.guardianTitle), field(T.guardian, f.guardian), field(T.guardianPhone, f.guardianPhone),
+    field(T.note, f.note, 'full'));
+  dialog(p ? p.name : T.newMember, body, async () => {
+    const out = { firstName: f.firstName.value, lastName: f.lastName.value, nickname: f.nickname.value, phone: f.phone.value, email: f.email.value, birth: f.birth.value || null, note: f.note.value,
+      member: member.checked, since: f.since.value || null, number: f.number.value, fitpNumber: f.fitpNumber.value, fitpCard: card.value || null, fitpYear: f.fitpYear.value ? Number(f.fitpYear.value) : null,
+      ranking: f.ranking.value, medical: med.value || null, medicalUntil: f.medicalUntil.value || null, privacy: f.privacy.value || null, photosOk: photos.checked, guardian: f.guardian.value, guardianPhone: f.guardianPhone.value };
+    if (p) await api('PUT', '/people/' + encodeURIComponent(p.id), out); else await api('POST', '/people', out);
+    toast(T.saved);
+    await showPeople();
+  });
+}
+
+/** Un CSV di Excel in italiano è spesso in Windows-1252, non in UTF-8. */
+async function readFile(file) {
+  const bytes = await file.arrayBuffer();
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch (_) { return new TextDecoder('windows-1252').decode(bytes); }
+}
+
+function importDialog() {
+  const input = h('input', { type: 'file', accept: '.csv,.txt,text/csv', 'aria-label': T.importCsv });
+  const area = h('div');
+  let text = null;
+  input.addEventListener('change', async () => {
+    text = null;
+    area.replaceChildren();
+    if (!input.files[0]) return;
+    if (input.files[0].size > 900 * 1024) { area.replaceChildren(h('div.err', T.err.TOO_BIG)); return; }
+    try {
+      const body = { text: await readFile(input.files[0]) };
+      const r = await api('POST', '/people/import/preview', body);
+      text = body.text;
+      const good = r.rows.filter((x) => !x.error);
+      area.replaceChildren(
+        h('p', T.importSummary(good.filter((x) => !x.update).length, good.filter((x) => x.update).length, r.rows.length - good.length)),
+        h('div.panel', h('table', h('thead', h('tr', [T.line, T.name, T.phone, T.email, T.birth, T.fitp, ''].map((x) => h('th', x)))),
+          h('tbody', r.rows.slice(0, 200).map((x) => h('tr', h('td.dim', x.line), h('td', x.firstName + ' ' + x.lastName), h('td', x.phone), h('td', x.email), h('td', dateText(x.birth)), h('td', x.fitp),
+            h('td', x.error ? h('span.tag.bad', T.rowErr[x.error]) : h('span.tag.' + (x.update ? 'warn' : 'ok'), x.update ? T.willUpdate : T.willAdd))))))));
+    } catch (e) { area.replaceChildren(h('div.err', e instanceof ApiError ? errText(e) : String(e))); }
+  });
+  dialog(T.importCsv, h('div', h('p.dim', T.importHint), input, area), async (err) => {
+    if (text === null) { err.textContent = T.chooseFile; return false; }
+    const r = await api('POST', '/people/import', { text });
+    toast(T.imported(r.added, r.updated));
+    await showPeople();
+  }, { wide: true, saveText: T.importNow });
+}
+
+// --- Quote e pagamenti ---
+
+let moneyYear = null;
+let moneyFilter = 'open';
+
+const STATUS = { PAID: 'ok', PARTIAL: 'warn', UNPAID: 'warn', LATE: 'bad', CANCELLED: 'dim' };
+
+async function showMoney() {
+  const m = await api('GET', '/money' + (moneyYear ? '?year=' + moneyYear : ''));
+  moneyYear = m.year;
+  const year = h('input', { type: 'number', min: 2000, max: 2100, value: m.year, 'aria-label': T.year, onchange: () => { moneyYear = Number(year.value) || m.year; showMoney(); } });
+  year.classList.add('year');
+  const show = select([['open', T.toCollect], ['all', T.allCharges]], moneyFilter);
+  show.addEventListener('change', () => { moneyFilter = show.value; showMoney(); });
+  const rows = m.charges.filter((c) => moneyFilter === 'all' || c.leftCents > 0);
+  main().replaceChildren(
+    h('div.head', h('h1', T.money), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
+    h('div.kpis',
+      h('div.kpi', h('b', eur(m.incomeCents)), h('span', T.income(m.year))),
+      h('div.kpi', h('b', eur(m.openCents)), h('span', T.open)),
+      h('div.kpi', h('b', m.openPeople), h('span', T.openPeople))),
+    h('div.tools', show, h('label', T.year + ' ', year)),
+    rows.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.name, T.what, T.due, T.status].map((x) => h('th', { scope: 'col' }, x)), h('th.num', T.amount), h('th.num', T.left))),
+      h('tbody', rows.map((c) => h('tr.row', { tabindex: 0, onclick: () => openCharge(c, m), onkeydown: (e) => { if (e.key === 'Enter') openCharge(c, m); } },
+        h('td', c.name), h('td', c.label), h('td', dateText(c.due)), h('td', h('span.tag.' + STATUS[c.status], T.chargeStatus[c.status])), h('td.num', eur(c.cents)), h('td.num', eur(c.leftCents))))))) : h('div.panel', h('div.empty', T.noCharges)),
+    m.fees.length ? h('div.section', h('h2', T.fees), h('div.panel', h('table', h('thead', h('tr', h('th', T.name), h('th', T.due), h('th.num', T.amount), h('th.num', T.paidOf))),
+      h('tbody', m.fees.map((f) => h('tr', h('td', f.name), h('td', dateText(f.due)), h('td.num', eur(f.cents)), h('td.num', f.paid + ' / ' + f.total))))))) : null);
+}
+
+function openCharge(c, m) {
+  const amount = h('input', { value: (c.leftCents / 100).toFixed(2).replace('.', ','), inputmode: 'decimal', required: true });
+  const date = h('input', { type: 'date', value: info.today, required: true });
+  const type = select(m.payTypes.map((t) => [t.id, t.name]));
+  const ref = h('input', { maxlength: 120 });
+  const history = c.payments.length ? h('div.full', h('h2', T.payments), h('div.panel', h('table', h('tbody', c.payments.map((p) => h('tr',
+    h('td', dateText(p.date)), h('td', p.method), h('td.dim', p.receipt), h('td.dim', p.ref), h('td.num', eur(p.cents)),
+    h('td.num', h('button.danger', { type: 'button', onclick: async () => {
+      if (!confirm(T.removePaymentAsk)) return;
+      try { await api('DELETE', '/charges/' + encodeURIComponent(c.id) + '/payments/' + encodeURIComponent(p.id)); d.close(); toast(T.saved); await showMoney(); } catch (e) { toast(errText(e)); }
+    } }, T.remove)))))))) : null;
+  const canPay = c.leftCents > 0;
+  const form = h('div.form',
+    h('p.full.dim', c.label + ' · ' + eur(c.cents)),
+    canPay ? [field(T.amount, amount), field(T.date, date), field(T.payType, type), field(T.ref, ref)] : null,
+    history);
+  const cancel = c.status !== 'CANCELLED' && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.cancelChargeAsk)) return;
+    try { await api('POST', '/charges/' + encodeURIComponent(c.id) + '/cancel'); d.close(); toast(T.saved); await showMoney(); } catch (e) { toast(errText(e)); }
+  } }, T.cancelCharge);
+  const d = dialog(c.name, form, canPay ? async () => {
+    const v = cents(amount.value);
+    if (v === null) throw new Error(T.err.BAD_AMOUNT);
+    await api('POST', '/charges/' + encodeURIComponent(c.id) + '/pay', { cents: v, date: date.value, type: type.value, ref: ref.value });
+    toast(T.saved);
+    await showMoney();
+  } : null, { saveText: T.register, left: cancel });
+}
+
+function newFee() {
+  const name = h('input', { required: true, maxlength: 120 });
+  const amount = h('input', { required: true, inputmode: 'decimal' });
+  const due = h('input', { type: 'date' });
+  const kind = select([['MEMBERSHIP', T.kindMembership], ['FITP', T.kindFitp], ['COURSE', T.kindCourse], ['TOURNAMENT', T.kindTournament], ['OTHER', T.kindOther]], 'MEMBERSHIP');
+  const all = h('input', { type: 'checkbox', checked: true });
+  dialog(T.newFee, h('div.form', field(T.name, name, 'full'), field(T.amount, amount), field(T.due, due), field(T.kind, kind), h('label.check.full', all, T.chargeAll)), async () => {
+    const v = cents(amount.value);
+    if (v === null) throw new Error(T.err.BAD_AMOUNT);
+    const r = await api('POST', '/fees', { name: name.value, cents: v, kind: kind.value, due: due.value || null, chargeMembers: all.checked });
+    toast(T.charged(r.count));
+    await showMoney();
+  });
+}
+
+async function newCharge() {
+  people = await api('GET', '/people');
+  const who = select(people.map((p) => [p.id, p.name]));
+  const label = h('input', { required: true, maxlength: 120 });
+  const amount = h('input', { required: true, inputmode: 'decimal' });
+  const due = h('input', { type: 'date' });
+  dialog(T.newCharge, h('div.form', field(T.name, who, 'full'), field(T.what, label, 'full'), field(T.amount, amount), field(T.due, due)), async () => {
+    const v = cents(amount.value);
+    if (v === null) throw new Error(T.err.BAD_AMOUNT);
+    await api('POST', '/charges', { player: who.value, label: label.value, cents: v, due: due.value || null });
+    toast(T.saved);
+    await showMoney();
+  });
+}
+
+async function exportCsv(year) {
+  try {
+    const blob = await api('GET', '/payments.csv?year=' + year, undefined, true);
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: T.csvName + ' ' + year + '.csv' });
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch (e) { toast(errText(e)); }
+}
+
+// --- Planning ---
+
+let planDate = null;
+const ROW = 22;
+
+async function showPlan() {
+  const d = await api('GET', '/day?date=' + planDate);
+  if (!people.length) people = await api('GET', '/people');
+  const label = new Date(planDate + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const date = h('input', { type: 'date', value: planDate, 'aria-label': T.date, onchange: () => { if (date.value) { planDate = date.value; showPlan(); } } });
+  date.classList.add('year');
+  const head = h('div.head', h('h1', label),
+    h('button', { onclick: () => { planDate = addDay(planDate, -1); showPlan(); }, 'aria-label': T.prevDay }, '←'),
+    h('button', { onclick: () => { planDate = info.today; showPlan(); } }, T.today),
+    h('button', { onclick: () => { planDate = addDay(planDate, 1); showPlan(); }, 'aria-label': T.nextDay }, '→'), date);
+  if (!d.courts.length) { main().replaceChildren(head, h('div.panel', h('div.empty', T.noCourts))); return; }
+  const slot = d.slotMinutes;
+  const open = d.openHour * 60, close = d.closeHour * 60;
+  const rows = Math.ceil((close - open) / slot);
+  const grid = h('div.grid');
+  grid.style.gridTemplateColumns = '56px repeat(' + d.courts.length + ', minmax(110px, 1fr))';
+  grid.style.gridTemplateRows = 'auto repeat(' + rows + ', ' + Math.max(ROW, Math.round(ROW * slot / 30)) + 'px)';
+  const put = (e, row, col, span, cols) => { e.style.gridRow = row + ' / span ' + span; e.style.gridColumn = col + ' / span ' + (cols || 1); grid.append(e); };
+  put(h('div'), 1, 1, 1);
+  d.courts.forEach((c, i) => put(h('div.gcourt', c), 1, i + 2, 1));
+  for (let r = 0; r < rows; r++) {
+    const start = open + r * slot;
+    put(h('div.ghour', hhmm(start)), r + 2, 1, 1);
+    d.courts.forEach((c, i) => put(h('button.gcell', { type: 'button', 'aria-label': c + ' ' + hhmm(start), title: hhmm(start), onclick: () => newBooking(d, c, start) }), r + 2, i + 2, 1));
+  }
+  for (const it of d.items) {
+    const from = Math.max(0, Math.floor((it.startMin - open) / slot));
+    const span = Math.max(1, Math.ceil((Math.min(it.endMin, close) - open) / slot) - from);
+    if (from >= rows) continue;
+    const text = [hhmm(it.startMin) + '–' + hhmm(it.endMin), it.label || (it.kind ? T.bookingKind[it.kind] : '')].filter(Boolean).join(' ');
+    const all = it.court === '';
+    const col = all ? 2 : d.courts.indexOf(it.court) + 2;
+    if (col < 2) continue;
+    const cls = 'button.gitem.' + it.type + (it.online ? '.online' : '');
+    put(h(cls, { type: 'button', title: text, onclick: it.type === 'BOOKING' ? () => openBooking(it) : null }, text), from + 2, col, span, all ? d.courts.length : 1);
+  }
+  main().replaceChildren(head, h('div.panel', grid));
+}
+
+function newBooking(d, court, start) {
+  const courtS = select(d.courts.map((c) => [c, c]), court);
+  const times = [];
+  for (let m = d.openHour * 60; m < d.closeHour * 60; m += d.slotMinutes) times.push([String(m), hhmm(m)]);
+  const startS = select(times, String(start));
+  const lengths = [];
+  for (let m = d.slotMinutes; m <= 240; m += d.slotMinutes) lengths.push([String(m), m + ' min']);
+  const dur = select(lengths, String(lengths.some(([v]) => v === '60') ? 60 : d.slotMinutes));
+  const kind = select(Object.entries(T.bookingKind));
+  const price = h('span');
+  const who = h('input', { list: 'desk-people', placeholder: T.addPlayer });
+  const list = h('datalist', { id: 'desk-people' }, people.map((p) => h('option', { value: p.name })));
+  const chips = h('div.chips full');
+  const picked = [];
+  function add() {
+    const n = who.value.trim();
+    if (!n) return;
+    picked.push({ name: n, id: (people.find((p) => p.name === n) || {}).id });
+    who.value = '';
+    drawChips();
+  }
+  function drawChips() { chips.replaceChildren(...picked.map((p, i) => h('button.chip', { type: 'button', title: T.remove, onclick: () => { picked.splice(i, 1); drawChips(); } }, p.name + ' ×'))); }
+  who.addEventListener('change', add);
+  const charge = h('input', { type: 'checkbox' });
+  const note = h('input', { maxlength: 500 });
+  async function quote() {
+    try {
+      const q = await api('GET', '/quote?date=' + planDate + '&court=' + encodeURIComponent(courtS.value) + '&startMin=' + startS.value + '&minutes=' + dur.value + '&kind=' + kind.value);
+      price.textContent = eur(q.cents) + (q.lights ? ' · ' + T.lights : '');
+    } catch (_) { price.textContent = ''; }
+  }
+  [courtS, startS, dur, kind].forEach((e) => e.addEventListener('change', quote));
+  quote();
+  dialog(T.newBooking + ' · ' + dateText(planDate), h('div.form', list, field(T.court, courtS), field(T.start, startS), field(T.duration, dur), field(T.kind, kind),
+    h('label.full', T.players, who), chips, field(T.note, note, 'full'), h('label.check.full', charge, T.chargeSplit), h('div.full', T.price + ': ', price)), async () => {
+    add();
+    await api('POST', '/bookings', { court: courtS.value, date: planDate, startMin: Number(startS.value), minutes: Number(dur.value), kind: kind.value,
+      players: picked.filter((p) => p.id).map((p) => p.id), names: picked.filter((p) => !p.id).map((p) => p.name), note: note.value, charge: charge.checked });
+    toast(T.saved);
+    await showPlan();
+  });
+}
+
+function openBooking(it) {
+  const remove = h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.deleteBookingAsk)) return;
+    try { await api('DELETE', '/bookings/' + encodeURIComponent(it.id)); d.close(); toast(T.saved); await showPlan(); } catch (e) { toast(errText(e)); }
+  } }, T.deleteBooking);
+  const d = dialog(it.court + ' · ' + hhmm(it.startMin) + '–' + hhmm(it.endMin), h('div',
+    h('p', it.label || T.bookingKind[it.kind]), it.note ? h('p.dim', it.note) : null, h('p.dim', T.price + ': ' + eur(it.cents) + (it.online ? ' · online' : ''))), null, { left: remove });
+}
+
+// --- Tornei ---
+
+async function showCups() {
+  const list = await api('GET', '/tournaments');
+  main().replaceChildren(h('div.head', h('h1', T.cups)), h('p.dim', T.cupsNote),
+    list.length ? h('div.cards', list.map((t) => h('div.panel', h('div.pad',
+      h('h2', t.name), h('p.dim', [t.category, t.start ? dateText(t.start) + (t.end ? ' – ' + dateText(t.end) : '') : ''].filter(Boolean).join(' · ')),
+      h('p', T.cupEntries(t.entries.length) + (t.matches ? ' · ' + T.cupPlayed(t.played, t.matches) : '')),
+      t.entries.length ? h('details', h('summary', T.entriesList), h('ul', t.entries.map((e) => h('li', e)))) : null)))) : h('div.panel', h('div.empty', T.noCups)));
+}
+
+// --- Via ---
+
+(async () => {
+  if (!token) { showLogin(); return; }
+  try { await start(); } catch (_) { if (!info) showLogin(); }
+})();
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/desk/i18n.js
+cat > "$DEST/app/src/main/assets/desk/i18n.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+// I testi della Segreteria da PC nelle sei lingue dell'app.
+'use strict';
+
+const DESK_I18N = {
+  it: {
+    lang: "it",
+    title: "Segreteria da PC",
+    qrHint: "Sul telefono apri Segreteria da PC, tocca Inquadra il QR e poi Consenti.",
+    qrAlt: "QR per entrare",
+    useCode: "Non puoi usare la fotocamera? Entra col codice",
+    expired: "Sessione scaduta: abbina di nuovo.",
+    code: "Codice",
+    enter: "Entra",
+    waitPhone: "Tocca Consenti sul telefono…",
+    loginHint: "Scrivi il codice che vedi nell'app, nella pagina Segreteria da PC.",
+    step1: "Il codice vale una volta sola e cambia ogni 5 minuti.",
+    step2: "Poi conferma sul telefono che il computer sei tu.",
+    loggedOut: "Sei uscito.",
+    logout: "Esci",
+    phoneNote: "I dati restano sul telefono: qui li vedi e li modifichi, senza copie.",
+    members: "Soci",
+    money: "Quote e pagamenti",
+    plan: "Planning",
+    cups: "Tornei",
+    save: "Salva",
+    cancel: "Annulla",
+    close: "Chiudi",
+    saved: "Salvato sul telefono",
+    search: "Cerca nome, telefono, tessera…",
+    onlyMembers: "Soci",
+    todo: "Da sistemare",
+    everyone: "Tutti i giocatori",
+    name: "Nome",
+    phone: "Telefono",
+    email: "Email",
+    fitp: "Tessera FITP",
+    medical: "Certificato fino al",
+    status: "Stato",
+    owed: "Deve",
+    inOrder: "In regola",
+    notMember: "Non socio",
+    noResults: "Nessun risultato.",
+    noPeople: "Ancora nessun socio: aggiungilo o importa un foglio di calcolo.",
+    importCsv: "Importa da CSV",
+    newMember: "Nuovo socio",
+    firstName: "Nome",
+    lastName: "Cognome",
+    nickname: "Soprannome",
+    birth: "Data di nascita",
+    isMember: "Socio del circolo",
+    memberData: "Tessera e certificato",
+    since: "Socio dal",
+    number: "Tessera del circolo",
+    fitpCard: "Tipo di tessera",
+    fitpYear: "Anno della tessera",
+    ranking: "Classifica",
+    medicalKind: "Tipo di certificato",
+    privacy: "Consenso privacy dato il",
+    photos: "Consenso a foto e video",
+    guardianTitle: "Per i minorenni",
+    guardian: "Genitore o tutore",
+    guardianPhone: "Telefono del genitore",
+    note: "Note",
+    cardAgonist: "Atleta agonista",
+    cardNon: "Atleta non agonista",
+    cardOther: "Altro",
+    medAgonistic: "Agonistico",
+    medNon: "Non agonistico",
+    importHint: "Salva l'elenco da Excel o Fogli come CSV. Servono le colonne Nome e Cognome; le altre (telefono, email, nascita, tessera, FITP, classifica, certificato) si riconoscono dal titolo. Prima vedi cosa entra; i soci già presenti si completano, senza cancellare niente.",
+    line: "Riga",
+    willUpdate: "Si completa",
+    willAdd: "Nuovo",
+    chooseFile: "Scegli un file CSV.",
+    importNow: "Importa",
+    exportCsv: "Esporta CSV",
+    newCharge: "Nuovo addebito",
+    newFee: "Nuova quota",
+    open: "Da incassare",
+    openPeople: "Persone con quote aperte",
+    toCollect: "Da incassare",
+    allCharges: "Tutti gli addebiti",
+    year: "Anno",
+    what: "Descrizione",
+    due: "Scadenza",
+    amount: "Importo",
+    left: "Resta",
+    noCharges: "Nessun addebito da mostrare.",
+    fees: "Quote",
+    paidOf: "Pagate",
+    payments: "Pagamenti",
+    removePaymentAsk: "Togliere questo pagamento? Il numero di ricevuta non si riusa.",
+    remove: "Togli",
+    date: "Data",
+    payType: "Modo di pagamento",
+    ref: "Riferimento (CRO, scontrino…)",
+    register: "Registra pagamento",
+    cancelCharge: "Annulla addebito",
+    cancelChargeAsk: "Annullare questo addebito?",
+    kind: "Tipo",
+    kindMembership: "Quota sociale",
+    kindFitp: "Tessera FITP",
+    kindCourse: "Corso",
+    kindTournament: "Torneo",
+    kindOther: "Altro",
+    chargeAll: "Addebitala subito a tutti i soci",
+    csvName: "Pagamenti",
+    prevDay: "Giorno prima",
+    nextDay: "Giorno dopo",
+    today: "Oggi",
+    noCourts: "Nessun campo: aggiungili nell'app.",
+    court: "Campo",
+    start: "Inizio",
+    duration: "Durata",
+    players: "Giocatori",
+    addPlayer: "Scrivi un nome e premi Invio",
+    chargeSplit: "Addebita il prezzo ai giocatori del database",
+    price: "Prezzo",
+    lights: "con le luci",
+    newBooking: "Nuova prenotazione",
+    deleteBooking: "Cancella prenotazione",
+    deleteBookingAsk: "Cancellare questa prenotazione?",
+    cupsNote: "Qui si guardano soltanto: iscrizioni, sorteggio e risultati si gestiscono dall'app.",
+    entriesList: "Elenco iscritti",
+    noCups: "Nessun torneo.",
+    importSummary: (a, b, c) => `${a} nuovi, ${b} da completare, ${c} con errori`,
+    imported: (a, b) => `Importati: ${a} nuovi, ${b} completati`,
+    income: (a) => `Incassato nel ${a}`,
+    charged: (a) => `Quota creata, addebiti: ${a}`,
+    cupEntries: (a) => `Iscritti: ${a}`,
+    cupPlayed: (a, b) => `Partite giocate: ${a} su ${b}`,
+    rowErr: {
+      NAME: "Manca il nome",
+      DATE: "Data non valida",
+    },
+    issue: {
+      NO_PRIVACY: "Privacy mancante",
+      NO_FITP: "Tessera mancante",
+      NO_MEDICAL: "Certificato mancante",
+      MEDICAL_EXPIRED: "Certificato scaduto",
+      MEDICAL_SOON: "Certificato in scadenza",
+      NO_GUARDIAN: "Manca il genitore",
+      NO_CONTACT: "Nessun contatto",
+    },
+    chargeStatus: {
+      PAID: "Pagato",
+      PARTIAL: "Parziale",
+      UNPAID: "Da pagare",
+      LATE: "In ritardo",
+      CANCELLED: "Annullato",
+    },
+    bookingKind: {
+      PLAY: "Gioco",
+      LESSON: "Lezione",
+      CLOSED: "Chiuso",
+      OTHER: "Altro",
+    },
+    err: {
+      NET: "Il telefono non risponde: controlla che sia acceso e sulla stessa rete.",
+      BAD_CODE: "Codice sbagliato.",
+      TOO_MANY_TRIES: "Troppi tentativi: aspetta e usa il nuovo codice.",
+      BUSY: "Un altro computer è già collegato.",
+      REFUSED: "Accesso non consentito dal telefono.",
+      UNAUTHORIZED: "Sessione scaduta.",
+      NAME_REQUIRED: "Nome e cognome sono obbligatori.",
+      BAD_AMOUNT: "Importo non valido.",
+      BAD_DATE: "Data non valida.",
+      BAD_TIME: "Orario non valido.",
+      BAD_TYPE: "Modo di pagamento non valido.",
+      CONFLICT: "Il campo è già occupato in quell'orario.",
+      BLOCKED: "Il campo non è prenotabile in quell'orario.",
+      CSV_NO_COLUMNS: "Non trovo le colonne Nome e Cognome.",
+      TOO_BIG: "File troppo grande (massimo 900 KB).",
+      NOT_FOUND: "Non trovato: forse è stato cambiato dal telefono.",
+      BAD_REQUEST: "Richiesta non valida.",
+      SERVER: "Qualcosa non ha funzionato sul telefono: riprova.",
+    },
+  },
+  en: {
+    lang: "en",
+    title: "Office from PC",
+    qrHint: "On the phone, open Office from PC, tap Scan the computer's QR, then Allow.",
+    qrAlt: "QR to sign in",
+    useCode: "Cannot use the camera? Sign in with the code",
+    expired: "Session expired: pair again.",
+    code: "Code",
+    enter: "Sign in",
+    waitPhone: "Tap Allow on the phone…",
+    loginHint: "Enter the code shown in the app, on the Office from PC page.",
+    step1: "The code works once and changes every 5 minutes.",
+    step2: "Then confirm on the phone that this computer is yours.",
+    loggedOut: "You have signed out.",
+    logout: "Sign out",
+    phoneNote: "The data stays on the phone: here you view and edit it, with no copies.",
+    members: "Members",
+    money: "Fees and payments",
+    plan: "Planner",
+    cups: "Tournaments",
+    save: "Save",
+    cancel: "Cancel",
+    close: "Close",
+    saved: "Saved on the phone",
+    search: "Search name, phone, card…",
+    onlyMembers: "Members",
+    todo: "To fix",
+    everyone: "All players",
+    name: "Name",
+    phone: "Phone",
+    email: "Email",
+    fitp: "Federation card",
+    medical: "Medical until",
+    status: "Status",
+    owed: "Owes",
+    inOrder: "In order",
+    notMember: "Not a member",
+    noResults: "No results.",
+    noPeople: "No members yet: add one or import a spreadsheet.",
+    importCsv: "Import from CSV",
+    newMember: "New member",
+    firstName: "First name",
+    lastName: "Last name",
+    nickname: "Nickname",
+    birth: "Date of birth",
+    isMember: "Club member",
+    memberData: "Card and certificate",
+    since: "Member since",
+    number: "Club card",
+    fitpCard: "Card type",
+    fitpYear: "Card year",
+    ranking: "Ranking",
+    medicalKind: "Certificate type",
+    privacy: "Privacy consent on",
+    photos: "Photo and video consent",
+    guardianTitle: "For minors",
+    guardian: "Parent or guardian",
+    guardianPhone: "Guardian's phone",
+    note: "Notes",
+    cardAgonist: "Competitive athlete",
+    cardNon: "Non-competitive athlete",
+    cardOther: "Other",
+    medAgonistic: "Competitive",
+    medNon: "Non-competitive",
+    importHint: "Save the list from Excel or Sheets as CSV. First and last name columns are needed; the others (phone, email, birth, card, federation, ranking, certificate) are recognised by their title. You see what comes in first; existing members are completed and nothing is erased.",
+    line: "Line",
+    willUpdate: "Will update",
+    willAdd: "New",
+    chooseFile: "Choose a CSV file.",
+    importNow: "Import",
+    exportCsv: "Export CSV",
+    newCharge: "New charge",
+    newFee: "New fee",
+    open: "To collect",
+    openPeople: "People with open charges",
+    toCollect: "To collect",
+    allCharges: "All charges",
+    year: "Year",
+    what: "Description",
+    due: "Due",
+    amount: "Amount",
+    left: "Left",
+    noCharges: "No charges to show.",
+    fees: "Fees",
+    paidOf: "Paid",
+    payments: "Payments",
+    removePaymentAsk: "Remove this payment? The receipt number is not reused.",
+    remove: "Remove",
+    date: "Date",
+    payType: "Payment method",
+    ref: "Reference",
+    register: "Record payment",
+    cancelCharge: "Cancel charge",
+    cancelChargeAsk: "Cancel this charge?",
+    kind: "Type",
+    kindMembership: "Membership",
+    kindFitp: "Federation card",
+    kindCourse: "Course",
+    kindTournament: "Tournament",
+    kindOther: "Other",
+    chargeAll: "Charge it to all members now",
+    csvName: "Payments",
+    prevDay: "Previous day",
+    nextDay: "Next day",
+    today: "Today",
+    noCourts: "No courts: add them in the app.",
+    court: "Court",
+    start: "Start",
+    duration: "Duration",
+    players: "Players",
+    addPlayer: "Type a name and press Enter",
+    chargeSplit: "Charge the price to the database players",
+    price: "Price",
+    lights: "with lights",
+    newBooking: "New booking",
+    deleteBooking: "Delete booking",
+    deleteBookingAsk: "Delete this booking?",
+    cupsNote: "View only here: entries, draw and results are handled in the app.",
+    entriesList: "Entry list",
+    noCups: "No tournaments.",
+    importSummary: (a, b, c) => `${a} new, ${b} to update, ${c} with errors`,
+    imported: (a, b) => `Imported: ${a} new, ${b} updated`,
+    income: (a) => `Collected in ${a}`,
+    charged: (a) => `Fee created, charges: ${a}`,
+    cupEntries: (a) => `Entries: ${a}`,
+    cupPlayed: (a, b) => `Matches played: ${a} of ${b}`,
+    rowErr: {
+      NAME: "Name missing",
+      DATE: "Invalid date",
+    },
+    issue: {
+      NO_PRIVACY: "No privacy consent",
+      NO_FITP: "No card this year",
+      NO_MEDICAL: "No certificate",
+      MEDICAL_EXPIRED: "Certificate expired",
+      MEDICAL_SOON: "Certificate expiring",
+      NO_GUARDIAN: "Guardian missing",
+      NO_CONTACT: "No contact",
+    },
+    chargeStatus: {
+      PAID: "Paid",
+      PARTIAL: "Partial",
+      UNPAID: "Unpaid",
+      LATE: "Late",
+      CANCELLED: "Cancelled",
+    },
+    bookingKind: {
+      PLAY: "Play",
+      LESSON: "Lesson",
+      CLOSED: "Closed",
+      OTHER: "Other",
+    },
+    err: {
+      NET: "The phone is not answering: check that it is on and on the same network.",
+      BAD_CODE: "Wrong code.",
+      TOO_MANY_TRIES: "Too many tries: wait and use the new code.",
+      BUSY: "Another computer is already connected.",
+      REFUSED: "Access was not allowed on the phone.",
+      UNAUTHORIZED: "Session expired.",
+      NAME_REQUIRED: "First and last name are required.",
+      BAD_AMOUNT: "Invalid amount.",
+      BAD_DATE: "Invalid date.",
+      BAD_TIME: "Invalid time.",
+      BAD_TYPE: "Invalid payment method.",
+      CONFLICT: "The court is already taken at that time.",
+      BLOCKED: "The court cannot be booked at that time.",
+      CSV_NO_COLUMNS: "First and last name columns not found.",
+      TOO_BIG: "File too large (900 KB maximum).",
+      NOT_FOUND: "Not found: it may have been changed on the phone.",
+      BAD_REQUEST: "Invalid request.",
+      SERVER: "Something went wrong on the phone: try again.",
+    },
+  },
+  fr: {
+    lang: "fr",
+    title: "Secrétariat sur PC",
+    qrHint: "Sur le téléphone, ouvrez Secrétariat sur PC, touchez Scanner le QR de l'ordinateur, puis Autoriser.",
+    qrAlt: "QR pour entrer",
+    useCode: "Pas de caméra ? Entrez avec le code",
+    expired: "Session expirée : associez à nouveau.",
+    code: "Code",
+    enter: "Entrer",
+    waitPhone: "Touchez Autoriser sur le téléphone…",
+    loginHint: "Saisissez le code affiché dans l'app, page Secrétariat sur PC.",
+    step1: "Le code ne sert qu'une fois et change toutes les 5 minutes.",
+    step2: "Confirmez ensuite sur le téléphone que cet ordinateur est le vôtre.",
+    loggedOut: "Vous êtes déconnecté.",
+    logout: "Se déconnecter",
+    phoneNote: "Les données restent sur le téléphone : ici vous les consultez et les modifiez, sans copie.",
+    members: "Adhérents",
+    money: "Cotisations et paiements",
+    plan: "Planning",
+    cups: "Tournois",
+    save: "Enregistrer",
+    cancel: "Annuler",
+    close: "Fermer",
+    saved: "Enregistré sur le téléphone",
+    search: "Chercher nom, téléphone, licence…",
+    onlyMembers: "Adhérents",
+    todo: "À régulariser",
+    everyone: "Tous les joueurs",
+    name: "Nom",
+    phone: "Téléphone",
+    email: "E-mail",
+    fitp: "Licence fédérale",
+    medical: "Certificat jusqu'au",
+    status: "État",
+    owed: "Doit",
+    inOrder: "En règle",
+    notMember: "Non adhérent",
+    noResults: "Aucun résultat.",
+    noPeople: "Aucun adhérent : ajoutez-en un ou importez un tableur.",
+    importCsv: "Importer un CSV",
+    newMember: "Nouvel adhérent",
+    firstName: "Prénom",
+    lastName: "Nom",
+    nickname: "Surnom",
+    birth: "Date de naissance",
+    isMember: "Adhérent du club",
+    memberData: "Licence et certificat",
+    since: "Adhérent depuis",
+    number: "Carte du club",
+    fitpCard: "Type de licence",
+    fitpYear: "Année de la licence",
+    ranking: "Classement",
+    medicalKind: "Type de certificat",
+    privacy: "Consentement donné le",
+    photos: "Consentement photos et vidéos",
+    guardianTitle: "Pour les mineurs",
+    guardian: "Parent ou tuteur",
+    guardianPhone: "Téléphone du parent",
+    note: "Notes",
+    cardAgonist: "Athlète compétiteur",
+    cardNon: "Athlète loisir",
+    cardOther: "Autre",
+    medAgonistic: "Compétition",
+    medNon: "Loisir",
+    importHint: "Enregistrez la liste d'Excel ou Sheets en CSV. Les colonnes Prénom et Nom sont nécessaires ; les autres (téléphone, e-mail, naissance, carte, licence, classement, certificat) sont reconnues par leur titre. Vous voyez d'abord ce qui entre ; les adhérents existants sont complétés, rien n'est effacé.",
+    line: "Ligne",
+    willUpdate: "Sera complété",
+    willAdd: "Nouveau",
+    chooseFile: "Choisissez un fichier CSV.",
+    importNow: "Importer",
+    exportCsv: "Exporter en CSV",
+    newCharge: "Nouveau débit",
+    newFee: "Nouvelle cotisation",
+    open: "À encaisser",
+    openPeople: "Personnes avec un solde",
+    toCollect: "À encaisser",
+    allCharges: "Tous les débits",
+    year: "Année",
+    what: "Description",
+    due: "Échéance",
+    amount: "Montant",
+    left: "Reste",
+    noCharges: "Aucun débit à afficher.",
+    fees: "Cotisations",
+    paidOf: "Payées",
+    payments: "Paiements",
+    removePaymentAsk: "Supprimer ce paiement ? Le numéro de reçu n'est pas réutilisé.",
+    remove: "Retirer",
+    date: "Date",
+    payType: "Mode de paiement",
+    ref: "Référence",
+    register: "Enregistrer le paiement",
+    cancelCharge: "Annuler le débit",
+    cancelChargeAsk: "Annuler ce débit ?",
+    kind: "Type",
+    kindMembership: "Cotisation",
+    kindFitp: "Licence fédérale",
+    kindCourse: "Cours",
+    kindTournament: "Tournoi",
+    kindOther: "Autre",
+    chargeAll: "La débiter à tous les adhérents",
+    csvName: "Paiements",
+    prevDay: "Jour précédent",
+    nextDay: "Jour suivant",
+    today: "Aujourd'hui",
+    noCourts: "Aucun terrain : ajoutez-les dans l'app.",
+    court: "Terrain",
+    start: "Début",
+    duration: "Durée",
+    players: "Joueurs",
+    addPlayer: "Saisissez un nom et Entrée",
+    chargeSplit: "Débiter le prix aux joueurs de la base",
+    price: "Prix",
+    lights: "avec éclairage",
+    newBooking: "Nouvelle réservation",
+    deleteBooking: "Supprimer la réservation",
+    deleteBookingAsk: "Supprimer cette réservation ?",
+    cupsNote: "Consultation seule : inscriptions, tirage et résultats se gèrent dans l'app.",
+    entriesList: "Liste des inscrits",
+    noCups: "Aucun tournoi.",
+    importSummary: (a, b, c) => `${a} nouveaux, ${b} à compléter, ${c} en erreur`,
+    imported: (a, b) => `Importés : ${a} nouveaux, ${b} complétés`,
+    income: (a) => `Encaissé en ${a}`,
+    charged: (a) => `Cotisation créée, débits : ${a}`,
+    cupEntries: (a) => `Inscrits : ${a}`,
+    cupPlayed: (a, b) => `Matchs joués : ${a} sur ${b}`,
+    rowErr: {
+      NAME: "Nom manquant",
+      DATE: "Date non valide",
+    },
+    issue: {
+      NO_PRIVACY: "Consentement manquant",
+      NO_FITP: "Licence manquante",
+      NO_MEDICAL: "Certificat manquant",
+      MEDICAL_EXPIRED: "Certificat expiré",
+      MEDICAL_SOON: "Certificat bientôt expiré",
+      NO_GUARDIAN: "Parent manquant",
+      NO_CONTACT: "Aucun contact",
+    },
+    chargeStatus: {
+      PAID: "Payé",
+      PARTIAL: "Partiel",
+      UNPAID: "À payer",
+      LATE: "En retard",
+      CANCELLED: "Annulé",
+    },
+    bookingKind: {
+      PLAY: "Jeu",
+      LESSON: "Cours",
+      CLOSED: "Fermé",
+      OTHER: "Autre",
+    },
+    err: {
+      NET: "Le téléphone ne répond pas : vérifiez qu'il est allumé et sur le même réseau.",
+      BAD_CODE: "Code incorrect.",
+      TOO_MANY_TRIES: "Trop d'essais : attendez et utilisez le nouveau code.",
+      BUSY: "Un autre ordinateur est déjà connecté.",
+      REFUSED: "Accès non autorisé sur le téléphone.",
+      UNAUTHORIZED: "Session expirée.",
+      NAME_REQUIRED: "Prénom et nom sont obligatoires.",
+      BAD_AMOUNT: "Montant non valide.",
+      BAD_DATE: "Date non valide.",
+      BAD_TIME: "Horaire non valide.",
+      BAD_TYPE: "Mode de paiement non valide.",
+      CONFLICT: "Le terrain est déjà occupé à cette heure.",
+      BLOCKED: "Le terrain n'est pas réservable à cette heure.",
+      CSV_NO_COLUMNS: "Colonnes Prénom et Nom introuvables.",
+      TOO_BIG: "Fichier trop volumineux (900 Ko maximum).",
+      NOT_FOUND: "Introuvable : il a peut-être été modifié sur le téléphone.",
+      BAD_REQUEST: "Requête non valide.",
+      SERVER: "Un problème est survenu sur le téléphone : réessayez.",
+    },
+  },
+  de: {
+    lang: "de",
+    title: "Büro am PC",
+    qrHint: "Öffne am Telefon Büro am PC, tippe auf QR des Computers scannen und dann auf Erlauben.",
+    qrAlt: "QR zum Anmelden",
+    useCode: "Keine Kamera? Mit dem Code anmelden",
+    expired: "Sitzung abgelaufen: bitte neu koppeln.",
+    code: "Code",
+    enter: "Anmelden",
+    waitPhone: "Tippe am Telefon auf Erlauben…",
+    loginHint: "Gib den Code ein, den die App auf der Seite Büro am PC zeigt.",
+    step1: "Der Code gilt einmal und ändert sich alle 5 Minuten.",
+    step2: "Bestätige dann am Telefon, dass dieser Computer deiner ist.",
+    loggedOut: "Du bist abgemeldet.",
+    logout: "Abmelden",
+    phoneNote: "Die Daten bleiben auf dem Telefon: Hier siehst und änderst du sie, ohne Kopien.",
+    members: "Mitglieder",
+    money: "Beiträge und Zahlungen",
+    plan: "Platzplan",
+    cups: "Turniere",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    saved: "Auf dem Telefon gespeichert",
+    search: "Name, Telefon, Ausweis suchen…",
+    onlyMembers: "Mitglieder",
+    todo: "Zu klären",
+    everyone: "Alle Spieler",
+    name: "Name",
+    phone: "Telefon",
+    email: "E-Mail",
+    fitp: "Verbandslizenz",
+    medical: "Attest bis",
+    status: "Status",
+    owed: "Offen",
+    inOrder: "In Ordnung",
+    notMember: "Kein Mitglied",
+    noResults: "Keine Treffer.",
+    noPeople: "Noch keine Mitglieder: füge eines hinzu oder importiere eine Tabelle.",
+    importCsv: "Aus CSV importieren",
+    newMember: "Neues Mitglied",
+    firstName: "Vorname",
+    lastName: "Nachname",
+    nickname: "Spitzname",
+    birth: "Geburtsdatum",
+    isMember: "Vereinsmitglied",
+    memberData: "Ausweis und Attest",
+    since: "Mitglied seit",
+    number: "Vereinsausweis",
+    fitpCard: "Lizenztyp",
+    fitpYear: "Lizenzjahr",
+    ranking: "Rangliste",
+    medicalKind: "Attestart",
+    privacy: "Datenschutz-Einwilligung am",
+    photos: "Einwilligung für Fotos und Videos",
+    guardianTitle: "Für Minderjährige",
+    guardian: "Elternteil oder Vormund",
+    guardianPhone: "Telefon der Eltern",
+    note: "Notizen",
+    cardAgonist: "Wettkampfathlet",
+    cardNon: "Freizeitathlet",
+    cardOther: "Andere",
+    medAgonistic: "Wettkampf",
+    medNon: "Freizeit",
+    importHint: "Speichere die Liste aus Excel oder Sheets als CSV. Vorname und Nachname sind nötig; die anderen Spalten (Telefon, E-Mail, Geburt, Ausweis, Lizenz, Rangliste, Attest) werden am Titel erkannt. Du siehst zuerst, was übernommen wird; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht.",
+    line: "Zeile",
+    willUpdate: "Wird ergänzt",
+    willAdd: "Neu",
+    chooseFile: "Wähle eine CSV-Datei.",
+    importNow: "Importieren",
+    exportCsv: "CSV exportieren",
+    newCharge: "Neue Forderung",
+    newFee: "Neuer Beitrag",
+    open: "Offen",
+    openPeople: "Personen mit offenen Beträgen",
+    toCollect: "Offen",
+    allCharges: "Alle Forderungen",
+    year: "Jahr",
+    what: "Beschreibung",
+    due: "Fällig",
+    amount: "Betrag",
+    left: "Rest",
+    noCharges: "Keine Forderungen.",
+    fees: "Beiträge",
+    paidOf: "Bezahlt",
+    payments: "Zahlungen",
+    removePaymentAsk: "Diese Zahlung entfernen? Die Belegnummer wird nicht wiederverwendet.",
+    remove: "Entfernen",
+    date: "Datum",
+    payType: "Zahlungsart",
+    ref: "Referenz",
+    register: "Zahlung erfassen",
+    cancelCharge: "Forderung stornieren",
+    cancelChargeAsk: "Diese Forderung stornieren?",
+    kind: "Art",
+    kindMembership: "Mitgliedsbeitrag",
+    kindFitp: "Verbandslizenz",
+    kindCourse: "Kurs",
+    kindTournament: "Turnier",
+    kindOther: "Andere",
+    chargeAll: "Sofort allen Mitgliedern berechnen",
+    csvName: "Zahlungen",
+    prevDay: "Vortag",
+    nextDay: "Nächster Tag",
+    today: "Heute",
+    noCourts: "Keine Plätze: füge sie in der App hinzu.",
+    court: "Platz",
+    start: "Beginn",
+    duration: "Dauer",
+    players: "Spieler",
+    addPlayer: "Name eingeben und Enter drücken",
+    chargeSplit: "Preis den Spielern der Datenbank berechnen",
+    price: "Preis",
+    lights: "mit Licht",
+    newBooking: "Neue Buchung",
+    deleteBooking: "Buchung löschen",
+    deleteBookingAsk: "Diese Buchung löschen?",
+    cupsNote: "Hier nur zur Ansicht: Meldungen, Auslosung und Ergebnisse laufen über die App.",
+    entriesList: "Meldeliste",
+    noCups: "Keine Turniere.",
+    importSummary: (a, b, c) => `${a} neu, ${b} zu ergänzen, ${c} mit Fehlern`,
+    imported: (a, b) => `Importiert: ${a} neu, ${b} ergänzt`,
+    income: (a) => `Eingenommen ${a}`,
+    charged: (a) => `Beitrag erstellt, Forderungen: ${a}`,
+    cupEntries: (a) => `Meldungen: ${a}`,
+    cupPlayed: (a, b) => `Gespielte Partien: ${a} von ${b}`,
+    rowErr: {
+      NAME: "Name fehlt",
+      DATE: "Ungültiges Datum",
+    },
+    issue: {
+      NO_PRIVACY: "Einwilligung fehlt",
+      NO_FITP: "Lizenz fehlt",
+      NO_MEDICAL: "Attest fehlt",
+      MEDICAL_EXPIRED: "Attest abgelaufen",
+      MEDICAL_SOON: "Attest läuft ab",
+      NO_GUARDIAN: "Elternteil fehlt",
+      NO_CONTACT: "Kein Kontakt",
+    },
+    chargeStatus: {
+      PAID: "Bezahlt",
+      PARTIAL: "Teilweise",
+      UNPAID: "Unbezahlt",
+      LATE: "Überfällig",
+      CANCELLED: "Storniert",
+    },
+    bookingKind: {
+      PLAY: "Spiel",
+      LESSON: "Unterricht",
+      CLOSED: "Gesperrt",
+      OTHER: "Andere",
+    },
+    err: {
+      NET: "Das Telefon antwortet nicht: Prüfe, ob es an und im selben Netz ist.",
+      BAD_CODE: "Falscher Code.",
+      TOO_MANY_TRIES: "Zu viele Versuche: warte und nutze den neuen Code.",
+      BUSY: "Ein anderer Computer ist schon verbunden.",
+      REFUSED: "Zugriff am Telefon nicht erlaubt.",
+      UNAUTHORIZED: "Sitzung abgelaufen.",
+      NAME_REQUIRED: "Vor- und Nachname sind nötig.",
+      BAD_AMOUNT: "Ungültiger Betrag.",
+      BAD_DATE: "Ungültiges Datum.",
+      BAD_TIME: "Ungültige Zeit.",
+      BAD_TYPE: "Ungültige Zahlungsart.",
+      CONFLICT: "Der Platz ist zu dieser Zeit belegt.",
+      BLOCKED: "Der Platz ist zu dieser Zeit nicht buchbar.",
+      CSV_NO_COLUMNS: "Spalten Vorname und Nachname nicht gefunden.",
+      TOO_BIG: "Datei zu groß (maximal 900 KB).",
+      NOT_FOUND: "Nicht gefunden: Vielleicht wurde es am Telefon geändert.",
+      BAD_REQUEST: "Ungültige Anfrage.",
+      SERVER: "Am Telefon ist etwas schiefgelaufen: Versuche es erneut.",
+    },
+  },
+  es: {
+    lang: "es",
+    title: "Secretaría desde el PC",
+    qrHint: "En el teléfono, abre Secretaría desde el PC, toca Escanea el QR del ordenador y luego Permitir.",
+    qrAlt: "QR para entrar",
+    useCode: "¿No puedes usar la cámara? Entra con el código",
+    expired: "Sesión caducada: vincula de nuevo.",
+    code: "Código",
+    enter: "Entrar",
+    waitPhone: "Toca Permitir en el teléfono…",
+    loginHint: "Escribe el código que ves en la app, en la página Secretaría desde el PC.",
+    step1: "El código vale una sola vez y cambia cada 5 minutos.",
+    step2: "Luego confirma en el teléfono que este ordenador es el tuyo.",
+    loggedOut: "Has salido.",
+    logout: "Salir",
+    phoneNote: "Los datos se quedan en el teléfono: aquí los ves y los cambias, sin copias.",
+    members: "Socios",
+    money: "Cuotas y pagos",
+    plan: "Planning",
+    cups: "Torneos",
+    save: "Guardar",
+    cancel: "Cancelar",
+    close: "Cerrar",
+    saved: "Guardado en el teléfono",
+    search: "Buscar nombre, teléfono, licencia…",
+    onlyMembers: "Socios",
+    todo: "Por arreglar",
+    everyone: "Todos los jugadores",
+    name: "Nombre",
+    phone: "Teléfono",
+    email: "Correo",
+    fitp: "Licencia federativa",
+    medical: "Certificado hasta",
+    status: "Estado",
+    owed: "Debe",
+    inOrder: "En regla",
+    notMember: "No socio",
+    noResults: "Sin resultados.",
+    noPeople: "Aún no hay socios: añade uno o importa una hoja de cálculo.",
+    importCsv: "Importar de CSV",
+    newMember: "Nuevo socio",
+    firstName: "Nombre",
+    lastName: "Apellido",
+    nickname: "Apodo",
+    birth: "Fecha de nacimiento",
+    isMember: "Socio del club",
+    memberData: "Licencia y certificado",
+    since: "Socio desde",
+    number: "Carné del club",
+    fitpCard: "Tipo de licencia",
+    fitpYear: "Año de la licencia",
+    ranking: "Clasificación",
+    medicalKind: "Tipo de certificado",
+    privacy: "Consentimiento dado el",
+    photos: "Consentimiento de fotos y vídeos",
+    guardianTitle: "Para menores",
+    guardian: "Padre, madre o tutor",
+    guardianPhone: "Teléfono del tutor",
+    note: "Notas",
+    cardAgonist: "Atleta de competición",
+    cardNon: "Atleta no competitivo",
+    cardOther: "Otro",
+    medAgonistic: "Competición",
+    medNon: "No competitivo",
+    importHint: "Guarda la lista de Excel o Sheets como CSV. Hacen falta las columnas Nombre y Apellido; las demás (teléfono, correo, nacimiento, carné, licencia, clasificación, certificado) se reconocen por el título. Primero ves lo que entra; los socios existentes se completan, sin borrar nada.",
+    line: "Fila",
+    willUpdate: "Se completa",
+    willAdd: "Nuevo",
+    chooseFile: "Elige un archivo CSV.",
+    importNow: "Importar",
+    exportCsv: "Exportar CSV",
+    newCharge: "Nuevo cargo",
+    newFee: "Nueva cuota",
+    open: "Por cobrar",
+    openPeople: "Personas con cuotas pendientes",
+    toCollect: "Por cobrar",
+    allCharges: "Todos los cargos",
+    year: "Año",
+    what: "Descripción",
+    due: "Vencimiento",
+    amount: "Importe",
+    left: "Falta",
+    noCharges: "Ningún cargo que mostrar.",
+    fees: "Cuotas",
+    paidOf: "Pagadas",
+    payments: "Pagos",
+    removePaymentAsk: "¿Quitar este pago? El número de recibo no se reutiliza.",
+    remove: "Quitar",
+    date: "Fecha",
+    payType: "Forma de pago",
+    ref: "Referencia",
+    register: "Registrar pago",
+    cancelCharge: "Anular cargo",
+    cancelChargeAsk: "¿Anular este cargo?",
+    kind: "Tipo",
+    kindMembership: "Cuota social",
+    kindFitp: "Licencia federativa",
+    kindCourse: "Curso",
+    kindTournament: "Torneo",
+    kindOther: "Otro",
+    chargeAll: "Cargarla ya a todos los socios",
+    csvName: "Pagos",
+    prevDay: "Día anterior",
+    nextDay: "Día siguiente",
+    today: "Hoy",
+    noCourts: "Sin pistas: añádelas en la app.",
+    court: "Pista",
+    start: "Inicio",
+    duration: "Duración",
+    players: "Jugadores",
+    addPlayer: "Escribe un nombre y pulsa Intro",
+    chargeSplit: "Cargar el precio a los jugadores de la base",
+    price: "Precio",
+    lights: "con luces",
+    newBooking: "Nueva reserva",
+    deleteBooking: "Borrar reserva",
+    deleteBookingAsk: "¿Borrar esta reserva?",
+    cupsNote: "Aquí solo se consultan: inscripciones, sorteo y resultados se gestionan en la app.",
+    entriesList: "Lista de inscritos",
+    noCups: "Ningún torneo.",
+    importSummary: (a, b, c) => `${a} nuevos, ${b} por completar, ${c} con errores`,
+    imported: (a, b) => `Importados: ${a} nuevos, ${b} completados`,
+    income: (a) => `Cobrado en ${a}`,
+    charged: (a) => `Cuota creada, cargos: ${a}`,
+    cupEntries: (a) => `Inscritos: ${a}`,
+    cupPlayed: (a, b) => `Partidos jugados: ${a} de ${b}`,
+    rowErr: {
+      NAME: "Falta el nombre",
+      DATE: "Fecha no válida",
+    },
+    issue: {
+      NO_PRIVACY: "Falta consentimiento",
+      NO_FITP: "Falta licencia",
+      NO_MEDICAL: "Falta certificado",
+      MEDICAL_EXPIRED: "Certificado caducado",
+      MEDICAL_SOON: "Certificado por caducar",
+      NO_GUARDIAN: "Falta el tutor",
+      NO_CONTACT: "Sin contacto",
+    },
+    chargeStatus: {
+      PAID: "Pagado",
+      PARTIAL: "Parcial",
+      UNPAID: "Por pagar",
+      LATE: "Con retraso",
+      CANCELLED: "Anulado",
+    },
+    bookingKind: {
+      PLAY: "Juego",
+      LESSON: "Clase",
+      CLOSED: "Cerrado",
+      OTHER: "Otro",
+    },
+    err: {
+      NET: "El teléfono no responde: comprueba que esté encendido y en la misma red.",
+      BAD_CODE: "Código incorrecto.",
+      TOO_MANY_TRIES: "Demasiados intentos: espera y usa el nuevo código.",
+      BUSY: "Otro ordenador ya está conectado.",
+      REFUSED: "Acceso no permitido en el teléfono.",
+      UNAUTHORIZED: "Sesión caducada.",
+      NAME_REQUIRED: "Nombre y apellido son obligatorios.",
+      BAD_AMOUNT: "Importe no válido.",
+      BAD_DATE: "Fecha no válida.",
+      BAD_TIME: "Horario no válido.",
+      BAD_TYPE: "Forma de pago no válida.",
+      CONFLICT: "La pista ya está ocupada a esa hora.",
+      BLOCKED: "La pista no se puede reservar a esa hora.",
+      CSV_NO_COLUMNS: "No encuentro las columnas Nombre y Apellido.",
+      TOO_BIG: "Archivo demasiado grande (900 KB como máximo).",
+      NOT_FOUND: "No encontrado: quizá se cambió en el teléfono.",
+      BAD_REQUEST: "Solicitud no válida.",
+      SERVER: "Algo ha fallado en el teléfono: inténtalo de nuevo.",
+    },
+  },
+  pt: {
+    lang: "pt",
+    title: "Secretaria no PC",
+    qrHint: "No telefone, abra Secretaria no PC, toque em Escaneie o QR do computador e depois em Permitir.",
+    qrAlt: "QR para entrar",
+    useCode: "Não pode usar a câmera? Entre com o código",
+    expired: "Sessão expirada: emparelhe de novo.",
+    code: "Código",
+    enter: "Entrar",
+    waitPhone: "Toque em Permitir no telefone…",
+    loginHint: "Digite o código que vê no app, na página Secretaria no PC.",
+    step1: "O código vale uma só vez e muda a cada 5 minutos.",
+    step2: "Depois confirme no telefone que este computador é o seu.",
+    loggedOut: "Saiu.",
+    logout: "Sair",
+    phoneNote: "Os dados ficam no telefone: aqui vê e altera os dados, sem cópias.",
+    members: "Sócios",
+    money: "Mensalidades e pagamentos",
+    plan: "Agenda",
+    cups: "Torneios",
+    save: "Guardar",
+    cancel: "Cancelar",
+    close: "Fechar",
+    saved: "Guardado no telefone",
+    search: "Procurar nome, telefone, cartão…",
+    onlyMembers: "Sócios",
+    todo: "Por tratar",
+    everyone: "Todos os jogadores",
+    name: "Nome",
+    phone: "Telefone",
+    email: "E-mail",
+    fitp: "Carteira federativa",
+    medical: "Atestado até",
+    status: "Estado",
+    owed: "Deve",
+    inOrder: "Em ordem",
+    notMember: "Não sócio",
+    noResults: "Sem resultados.",
+    noPeople: "Ainda sem sócios: adicione um ou importe uma folha de cálculo.",
+    importCsv: "Importar de CSV",
+    newMember: "Novo sócio",
+    firstName: "Nome",
+    lastName: "Sobrenome",
+    nickname: "Alcunha",
+    birth: "Data de nascimento",
+    isMember: "Sócio do clube",
+    memberData: "Cartão e atestado",
+    since: "Sócio desde",
+    number: "Cartão do clube",
+    fitpCard: "Tipo de cartão",
+    fitpYear: "Ano do cartão",
+    ranking: "Classificação",
+    medicalKind: "Tipo de atestado",
+    privacy: "Consentimento dado em",
+    photos: "Consentimento de fotos e vídeos",
+    guardianTitle: "Para menores",
+    guardian: "Pai, mãe ou tutor",
+    guardianPhone: "Telefone do tutor",
+    note: "Notas",
+    cardAgonist: "Atleta de competição",
+    cardNon: "Atleta não competitivo",
+    cardOther: "Outro",
+    medAgonistic: "Competição",
+    medNon: "Não competitivo",
+    importHint: "Guarde a lista do Excel ou Sheets como CSV. São precisas as colunas Nome e Sobrenome; as outras (telefone, e-mail, nascimento, cartão, federação, classificação, atestado) reconhecem-se pelo título. Primeiro vê o que entra; os sócios existentes são completados, sem apagar nada.",
+    line: "Linha",
+    willUpdate: "Será completado",
+    willAdd: "Novo",
+    chooseFile: "Escolha um arquivo CSV.",
+    importNow: "Importar",
+    exportCsv: "Exportar CSV",
+    newCharge: "Novo débito",
+    newFee: "Nova mensalidade",
+    open: "Por receber",
+    openPeople: "Pessoas com valores em aberto",
+    toCollect: "Por receber",
+    allCharges: "Todos os débitos",
+    year: "Ano",
+    what: "Descrição",
+    due: "Prazo",
+    amount: "Valor",
+    left: "Falta",
+    noCharges: "Nenhum débito a mostrar.",
+    fees: "Mensalidades",
+    paidOf: "Pagas",
+    payments: "Pagamentos",
+    removePaymentAsk: "Remover este pagamento? O número do recibo não é reutilizado.",
+    remove: "Remover",
+    date: "Data",
+    payType: "Forma de pagamento",
+    ref: "Referência",
+    register: "Registar pagamento",
+    cancelCharge: "Anular débito",
+    cancelChargeAsk: "Anular este débito?",
+    kind: "Tipo",
+    kindMembership: "Mensalidade",
+    kindFitp: "Carteira federativa",
+    kindCourse: "Curso",
+    kindTournament: "Torneio",
+    kindOther: "Outro",
+    chargeAll: "Cobrar agora de todos os sócios",
+    csvName: "Pagamentos",
+    prevDay: "Dia anterior",
+    nextDay: "Dia seguinte",
+    today: "Hoje",
+    noCourts: "Sem quadras: adicione-as no app.",
+    court: "Quadra",
+    start: "Início",
+    duration: "Duração",
+    players: "Jogadores",
+    addPlayer: "Digite um nome e prima Enter",
+    chargeSplit: "Debitar o preço aos jogadores da base",
+    price: "Preço",
+    lights: "com luzes",
+    newBooking: "Nova reserva",
+    deleteBooking: "Apagar reserva",
+    deleteBookingAsk: "Apagar esta reserva?",
+    cupsNote: "Aqui só se consultam: inscrições, sorteio e resultados gerem-se no app.",
+    entriesList: "Lista de inscritos",
+    noCups: "Nenhum torneio.",
+    importSummary: (a, b, c) => `${a} novos, ${b} a completar, ${c} com erros`,
+    imported: (a, b) => `Importados: ${a} novos, ${b} completados`,
+    income: (a) => `Recebido em ${a}`,
+    charged: (a) => `Mensalidade criada, débitos: ${a}`,
+    cupEntries: (a) => `Inscritos: ${a}`,
+    cupPlayed: (a, b) => `Jogos realizados: ${a} de ${b}`,
+    rowErr: {
+      NAME: "Falta o nome",
+      DATE: "Data inválida",
+    },
+    issue: {
+      NO_PRIVACY: "Falta consentimento",
+      NO_FITP: "Falta cartão",
+      NO_MEDICAL: "Falta atestado",
+      MEDICAL_EXPIRED: "Atestado expirado",
+      MEDICAL_SOON: "Atestado a expirar",
+      NO_GUARDIAN: "Falta o tutor",
+      NO_CONTACT: "Sem contacto",
+    },
+    chargeStatus: {
+      PAID: "Pago",
+      PARTIAL: "Parcial",
+      UNPAID: "Por pagar",
+      LATE: "Em atraso",
+      CANCELLED: "Anulado",
+    },
+    bookingKind: {
+      PLAY: "Jogo",
+      LESSON: "Aula",
+      CLOSED: "Fechado",
+      OTHER: "Outro",
+    },
+    err: {
+      NET: "O telefone não responde: verifique se está ligado e na mesma rede.",
+      BAD_CODE: "Código errado.",
+      TOO_MANY_TRIES: "Demasiadas tentativas: aguarde e use o novo código.",
+      BUSY: "Outro computador já está conectado.",
+      REFUSED: "Acesso não permitido no telefone.",
+      UNAUTHORIZED: "Sessão expirada.",
+      NAME_REQUIRED: "Nome e sobrenome são obrigatórios.",
+      BAD_AMOUNT: "Valor inválido.",
+      BAD_DATE: "Data inválida.",
+      BAD_TIME: "Horário inválido.",
+      BAD_TYPE: "Forma de pagamento inválida.",
+      CONFLICT: "A quadra já está ocupada a essa hora.",
+      BLOCKED: "A quadra não pode ser reservada a essa hora.",
+      CSV_NO_COLUMNS: "Não encontro as colunas Nome e Sobrenome.",
+      TOO_BIG: "Ficheiro demasiado grande (máximo 900 KB).",
+      NOT_FOUND: "Não encontrado: talvez tenha sido alterado no telefone.",
+      BAD_REQUEST: "Pedido inválido.",
+      SERVER: "Algo correu mal no telefone: tente de novo.",
+    },
+  },
+};
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/desk/index.html
+cat > "$DEST/app/src/main/assets/desk/index.html" << 'TSM_EOF'
+<!doctype html>
+<!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Tennis Score Manager</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/desk/style.css
+cat > "$DEST/app/src/main/assets/desk/style.css" << 'TSM_EOF'
+/* SPDX-FileCopyrightText: 2026 Stefano Spagnolo */
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Segreteria da PC: strumento da scrivania, denso e leggibile. Nessun font esterno: la pagina non esce dal telefono. */
+:root {
+  --bg: #f4f5f1; --panel: #ffffff; --side: #17301f; --side-text: #e7efe6; --side-dim: #a5b8a7; --text: #1c211d; --dim: #5e6a60;
+  --line: #dde1d9; --accent: #2f6b3f; --accent-text: #ffffff; --ball: #cfe34a; --bad: #b3261e; --warn: #9a5b00; --ok: #2f6b3f; --hover: #eef1ea;
+  --book: #dcebd9; --block: #e7e4dc; --cup: #f4e8bf; --online: #d5e6f5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111512; --panel: #1a201b; --side: #0c100d; --side-text: #e7efe6; --side-dim: #8fa292; --text: #e7ece6; --dim: #9aa79c;
+    --line: #2d352e; --accent: #7fc48f; --accent-text: #0e1a11; --bad: #f2867e; --warn: #e6b45c; --ok: #7fc48f; --hover: #232b24;
+    --book: #24432c; --block: #33332d; --cup: #4c4320; --online: #1f3c56;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+h1 { font-size: 22px; margin: 0; } h2 { font-size: 16px; margin: 0 0 10px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0; }
+input[type=checkbox] { width: auto; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+button:hover { background: var(--hover); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+button.danger { color: var(--bad); }
+button:disabled { opacity: .55; cursor: default; }
+.shell { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: 100vh; }
+.side { background: var(--side); color: var(--side-text); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; }
+.brand { font-weight: 700; font-size: 15px; padding: 0 8px; } .brand small { display: block; font-weight: 400; color: var(--side-dim); font-size: 12px; margin-bottom: 16px; }
+.side button { background: none; border: 0; color: var(--side-text); text-align: left; padding: 9px 10px; }
+.side button:hover { background: rgba(255,255,255,.08); }
+.side button.on { background: var(--ball); color: #17301f; font-weight: 600; }
+.side .spacer { flex: 1; }
+.side .note { font-size: 12px; color: var(--side-dim); padding: 8px; }
+main { padding: 22px 26px; min-width: 0; }
+.head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.head h1 { margin-right: auto; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.tools input[type=search] { max-width: 280px; }
+.tools select { width: auto; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+.pad { padding: 14px; }
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; font-size: 12px; color: var(--dim); font-weight: 600; position: sticky; top: 0; background: var(--panel); }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+tr.row { cursor: pointer; } tr.row:hover td { background: var(--hover); }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dim { color: var(--dim); }
+.tag { display: inline-block; font-size: 12px; padding: 1px 7px; border-radius: 10px; border: 1px solid currentColor; margin: 0 4px 2px 0; white-space: nowrap; }
+.tag.bad { color: var(--bad); } .tag.warn { color: var(--warn); } .tag.ok { color: var(--ok); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.kpi b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; } .kpi span { color: var(--dim); font-size: 12px; }
+.section { margin-top: 18px; }
+.grid { display: grid; position: relative; min-width: 560px; }
+.gcourt { font-weight: 600; padding: 8px; border-bottom: 1px solid var(--line); border-left: 1px solid var(--line); text-align: center; }
+.ghour { font-size: 12px; color: var(--dim); padding: 2px 6px; border-top: 1px solid var(--line); }
+.gcell { border: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); border-radius: 0; background: none; padding: 0; min-height: 0; }
+.gcell:hover { background: var(--hover); }
+.gitem { border: 1px solid var(--line); border-radius: 5px; margin: 1px 3px; padding: 2px 6px; font-size: 12px; overflow: hidden; text-align: left; white-space: normal; z-index: 1; min-width: 0; }
+.gitem.BOOKING { background: var(--book); } .gitem.BLOCK { background: var(--block); cursor: default; } .gitem.TOURNAMENT { background: var(--cup); cursor: default; } .gitem.online { background: var(--online); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+dialog { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); padding: 18px; width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
+dialog.wide { width: min(900px, calc(100vw - 32px)); }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+.form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--dim); min-width: 0; }
+.form label.full, .form .full { grid-column: 1 / -1; }
+.form label.check { flex-direction: row; align-items: center; gap: 7px; color: var(--text); font-size: 14px; }
+.form h3 { grid-column: 1 / -1; margin: 8px 0 0; font-size: 13px; }
+.actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.actions .left { margin-right: auto; }
+.err { color: var(--bad); margin-top: 8px; min-height: 1.2em; }
+.chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.chip { background: var(--hover); border-color: var(--line); padding: 2px 8px; font-size: 12px; border-radius: 10px; }
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--side); color: var(--side-text); padding: 9px 16px; border-radius: 8px; z-index: 9; max-width: calc(100vw - 32px); }
+.login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.login .box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 26px; width: min(430px, 100%); }
+.login h1 { margin-bottom: 4px; } .login p { color: var(--dim); margin: 8px 0 14px; }
+.login input { font-size: 22px; letter-spacing: 3px; text-transform: uppercase; text-align: center; }
+.login button { width: 100%; margin-top: 10px; padding: 10px; }
+.login ol { color: var(--dim); padding-left: 20px; margin: 12px 0 0; font-size: 13px; }
+.empty { padding: 26px; text-align: center; color: var(--dim); }
+@media (max-width: 800px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: 8px; }
+  .brand small, .side .note, .side .spacer { display: none; }
+  .brand { width: 100%; }
+  main { padding: 14px 16px; }
+  .form { grid-template-columns: minmax(0, 1fr); }
+}
+.tools label { color: var(--dim); display: flex; align-items: center; gap: 6px; }
+input.year { width: 150px; max-width: 150px; }
+td:first-child, td.nowrap { white-space: nowrap; }
+.qr { display: block; margin: 0 auto; max-width: 100%; border-radius: 8px; image-rendering: pixelated; }
+.status { text-align: center; color: var(--dim); min-height: 1.4em; margin-top: 8px; }
+.login details { margin-top: 12px; } .login summary { cursor: pointer; color: var(--dim); }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -685,7 +2403,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
   - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
   - **Verein**: **Heute** (die Buchungen des Tages, was offen ist, Mitglieder zu klären, Turnierspiele, Trainingsstunden, Mannschaftsspiele und Forderungen: Antippen führt dorthin), **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
-  - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik und Vereinsserver. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
+  - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik, Vereinsserver und Büro am PC. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
   - Das **?** oben in vielen Bildschirmen öffnet die Anleitung genau beim Abschnitt dieses Bildschirms.
 - Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
 - **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
@@ -807,6 +2525,17 @@ Mit der Rolle **Verein**, unter **Turniere › Forderungsrangliste**.
 - **Neue Forderung**: Zuerst wählt man, wer fordert, dann, wer gefordert wird, höchstens *N* Plätze höher (**Regeln**: wie viele Plätze, meist 3, und in wie vielen Tagen gespielt werden muss, meist 14). Jeder hat nur eine offene Forderung. **Benachrichtigen** schickt beiden, wer wen bis wann fordert.
 - **Mit dem Zähler spielen**: Der Fordernde ist Spieler 1; am Ende kommt das Ergebnis von selbst zurück. Oder **Ergebnis** von Hand (aus Sicht des Fordernden: Die App erkennt, wer gewonnen hat).
 - **Gewinnt der Fordernde, übernimmt er den Platz** des Geforderten, und wer dazwischen stand, rückt einen Platz nach unten; gewinnt der Geforderte, ändert sich nichts. **Gespielte Forderungen** zeigt den Verlauf mit den Plätzen vorher und nachher.
+
+### 7.20 Büro am PC
+
+Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **Ein Computer (Windows, Mac oder Linux) im selben Netz wie das Telefon** öffnet im Browser eine Seite, die das Telefon bereitstellt, ohne Installation und ohne Server: **Die Daten bleiben auf dem Telefon**; der Computer sieht und ändert sie, solange er verbunden ist, und behält keine Kopien. Immer nur eine Person. Der *Vereinsserver* (7.18) ist etwas anderes und dient nur den Buchungen der Spieler.
+
+- **Einschalten**: *Vereinsfunktionen* › **Büro am PC**, dann der Eintrag im Plätze-Tab und **Einschalten**. Das Telefon zeigt die Adresse (z. B. `https://192.168.1.20:8443`) und einen Code.
+- **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
+- **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
+- **Was geht**: **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen mit Beleg, CSV-Export), **Platzplan** (Tag ansehen, Buchungen hinzufügen und entfernen), **Turniere** nur zum Ansehen. PDF-Belege, WhatsApp-Nachrichten, Auslosungen, Tennisschule und Mannschaften bleiben in der App.
+- **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
+- **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
 
 ## 8. Anzeigetafel auf TV oder Monitor
 
@@ -1228,7 +2957,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **You**: Play, Practice, Video, Progress, More (the app as always).
   - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
   - **Club**: **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
-  - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics and Club server. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
+  - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
   - The **?** at the top of many screens opens the guide right at that screen's section.
 - The scoreboard is there in every role: nothing stops you from scoring a match.
 - **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
@@ -1350,6 +3079,17 @@ With the **Club** role, in **Tournaments › Challenge ladder**.
 - **New challenge**: choose who challenges and then who is challenged, at most *N* places above (**Rules**: how many places, usually 3, and within how many days it must be played, usually 14). Everyone has one open challenge at a time. **Notify** tells both who challenges whom and by when.
 - **Play with the scorer**: the challenger is Player 1; at the end the result comes back by itself. Or **Result** by hand (the score from the challenger's side: the app works out who won).
 - If the **challenger wins they take the place** of the challenged player and those in between move down one; if the challenged player wins nothing changes. **Challenges played** keeps the history, with the places before and after.
+
+### 7.20 Office from PC
+
+Entering members and payments is easier with a keyboard and mouse. **A computer (Windows, Mac or Linux) on the same network as the phone** opens a page served by the phone in its browser, with nothing to install and no server: **the data stays on the phone**; the computer views and edits it while connected and keeps no copies. One person at a time. The *club server* (7.18) is something else, only for players' bookings.
+
+- **Turn on**: *Club features* › **Office from PC**, then the entry in the courts tab and **Turn on**. The phone shows the address (e.g. `https://192.168.1.20:8443`) and a code.
+- **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
+- **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
+- **What you can do**: **Members** (search, add, edit, *To fix*), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments with receipt, CSV export), **Planner** (see the day, add and remove bookings), **Tournaments** read-only. PDF receipts, WhatsApp notices, draws, tennis school and teams stay in the app.
+- **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
+- **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
 
 ## 8. Scoreboard on a TV or monitor
 
@@ -1770,7 +3510,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
   - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
   - **Club**: **Hoy** (las reservas del día, lo que hay por cobrar, los socios por regularizar, los partidos de torneo, las clases, los encuentros y los desafíos: se toca un recuadro para ir), **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
-  - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas y Servidor del club. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
+  - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas, Servidor del club y Secretaría desde el PC. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
   - El **?** arriba en muchas pantallas abre la guía justo en la sección de esa pantalla.
 - El marcador está en todos los roles: nada te impide anotar un partido.
 - **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
@@ -1892,6 +3632,17 @@ Con el rol **Club**, en **Torneos › Clasificación por desafíos**.
 - **Nuevo desafío**: se elige quién desafía y luego a quién, como mucho *N* puestos más arriba (**Reglas**: cuántos puestos, normalmente 3, y en cuántos días hay que jugarlo, normalmente 14). Cada uno tiene un solo desafío abierto. **Avisar** manda a los dos quién desafía a quién y antes de cuándo.
 - **Jugar con el marcador**: el retador es el Jugador 1; al terminar el resultado vuelve solo. O **Resultado** a mano (desde el lado del retador: la app sabe quién ganó).
 - Si **gana el retador ocupa el puesto** del desafiado y los de en medio bajan uno; si gana el desafiado no cambia nada. **Desafíos jugados** guarda el historial, con los puestos de antes y después.
+
+### 7.20 Secretaría desde el PC
+
+Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (Windows, Mac o Linux) en la misma red que el teléfono** abre en el navegador una página servida por el teléfono, sin instalar nada y sin servidor: **los datos se quedan en el teléfono**; el ordenador los ve y los cambia mientras está conectado y no guarda copias. Una persona cada vez. El *servidor del club* (7.18) es otra cosa y solo sirve para las reservas de los jugadores.
+
+- **Encender**: *Funciones del club* › **Secretaría desde el PC**, luego la entrada de la pestaña de pistas y **Encender**. El teléfono muestra la dirección (p. ej. `https://192.168.1.20:8443`) y un código.
+- **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
+- **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
+- **Qué se puede hacer**: **Socios** (buscar, añadir, cambiar, *Por arreglar*), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos con recibo, exportación CSV), **Planning** (ver el día, añadir y quitar reservas), **Torneos** solo de lectura. Recibos PDF, avisos de WhatsApp, sorteos, escuela de tenis y equipos siguen en la app.
+- **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
+- **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2312,7 +4063,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
   - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
   - **Club** : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs de tournoi, les leçons, les rencontres et les défis : on touche un encadré pour y aller), **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
-  - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains et Serveur du club. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
+  - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains, Serveur du club et Secrétariat sur PC. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
   - Le **?** en haut de nombreux écrans ouvre le guide à la section de cet écran.
 - Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
 - **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
@@ -2434,6 +4185,17 @@ Avec le rôle **Club**, dans **Tournois › Classement à défis**.
 - **Nouveau défi** : on choisit qui défie puis qui est défié, au plus *N* places au-dessus (**Règles** : combien de places, en général 3, et en combien de jours le jouer, en général 14). Chacun a un seul défi ouvert à la fois. **Prévenir** envoie aux deux qui défie qui et avant quand.
 - **Jouer avec le marqueur** : le challenger est le Joueur 1 ; à la fin le résultat revient tout seul. Ou **Résultat** à la main (le score du côté du challenger : l'app comprend qui a gagné).
 - Si le **challenger gagne, il prend la place** du joueur défié et ceux entre les deux descendent d'une place ; si le joueur défié gagne, rien ne change. **Défis joués** garde l'historique, avec les places avant et après.
+
+### 7.20 Secrétariat sur PC
+
+Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un ordinateur (Windows, Mac ou Linux) sur le même réseau que le téléphone** ouvre dans le navigateur une page servie par le téléphone, sans rien installer et sans serveur : **les données restent sur le téléphone** ; l'ordinateur les consulte et les modifie tant qu'il est connecté, sans en garder de copie. Une personne à la fois. Le *serveur du club* (7.18) est autre chose : il ne sert qu'aux réservations des joueurs.
+
+- **Activer** : *Fonctions du club* › **Secrétariat sur PC**, puis l'entrée dans l'onglet des terrains et **Activer**. Le téléphone affiche l'adresse (par ex. `https://192.168.1.20:8443`) et un code.
+- **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
+- **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
+- **Ce qu'on peut faire** : **Adhérents** (chercher, ajouter, modifier, *À régulariser*), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements avec reçu, export CSV), **Planning** (voir la journée, ajouter et retirer des réservations), **Tournois** en lecture seule. Reçus PDF, avis WhatsApp, tirages, école de tennis et équipes restent dans l'app.
+- **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
+- **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
 
 ## 8. Tableau d'affichage sur TV ou écran
 
@@ -2854,7 +4616,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
   - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
   - **Circolo**: **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
-  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi e Server del circolo. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
+  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi Server del circolo e Segreteria da PC. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
   - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
 - Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
 - **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
@@ -2976,6 +4738,17 @@ Col ruolo **Circolo**, in **Tornei › Classifica a sfida**.
 - **Nuova sfida**: si sceglie chi sfida e poi chi è sfidato, al massimo *N* posti più su (**Regole**: quanti posti, di solito 3, e in quanti giorni va giocata, di solito 14). Ognuno ha una sola sfida aperta per volta. **Avvisa** manda ai due chi sfida chi ed entro quando.
 - **Gioca col segnapunti**: lo sfidante è il Giocatore 1; a fine partita il risultato torna da solo. Oppure **Risultato** a mano (il punteggio dal lato dello sfidante: l'app capisce chi ha vinto).
 - Se vince lo **sfidante prende il posto** dello sfidato e chi stava in mezzo scende di uno; se vince lo sfidato non cambia niente. In **Sfide giocate** la cronologia, con i posti di prima e di dopo.
+
+### 7.20 Segreteria da PC
+
+Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Windows, Mac o Linux) sulla stessa rete del telefono** apre nel browser una pagina servita dal telefono, senza installare niente e senza server: **i dati restano sul telefono**, il computer li vede e li modifica finché è collegato e non ne tiene copie. Lo usa una persona alla volta. Il *server del circolo* (7.18) è un'altra cosa e serve solo alle prenotazioni dei giocatori.
+
+- **Accendere**: *Funzioni del circolo* › **Segreteria da PC**, poi la voce nella scheda dei campi e **Accendi**. Il telefono mostra indirizzo (es. `https://192.168.1.20:8443`) e codice.
+- **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
+- **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
+- **Cosa si fa**: **Soci** (cerca, aggiungi, modifica, *Da sistemare*), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti con ricevuta, esportazione CSV), **Planning** (vedi il giorno, aggiungi e togli prenotazioni), **Tornei** in sola lettura. Ricevute PDF, avvisi WhatsApp, sorteggi, scuola tennis e squadre restano nell'app.
+- **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
+- **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
 
 ## 8. Tabellone su TV o monitor
 
@@ -3396,7 +5169,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
   - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
   - **Clube**: **Hoje** (as reservas do dia, o que há por receber, os sócios por regularizar, os jogos de torneio, as aulas, os encontros e os desafios: toca-se num quadro para lá ir), **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
-  - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras e Servidor do clube. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
+  - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras, Servidor do clube e Secretaria no PC. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
   - O **?** em cima em muitos ecrãs abre o guia logo na secção desse ecrã.
 - O placar está em todos os papéis: nada impede você de marcar uma partida.
 - **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
@@ -3518,6 +5291,17 @@ Com o papel **Clube**, em **Torneios › Classificação por desafios**.
 - **Novo desafio**: escolhe-se quem desafia e depois quem é desafiado, no máximo *N* lugares acima (**Regras**: quantos lugares, normalmente 3, e em quantos dias tem de ser jogado, normalmente 14). Cada um tem um só desafio aberto. **Avisar** manda aos dois quem desafia quem e até quando.
 - **Jogar com o marcador**: o desafiante é o Jogador 1; no fim o resultado volta sozinho. Ou **Resultado** à mão (do lado do desafiante: a app percebe quem ganhou).
 - Se **ganha o desafiante fica com o lugar** do desafiado e os que estavam no meio descem um; se ganha o desafiado nada muda. **Desafios jogados** guarda o histórico, com os lugares antes e depois.
+
+### 7.20 Secretaria no PC
+
+Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computador (Windows, Mac ou Linux) na mesma rede do telefone** abre no navegador uma página servida pelo telefone, sem instalar nada e sem servidor: **os dados ficam no telefone**; o computador vê e altera os dados enquanto está conectado e não guarda cópias. Uma pessoa de cada vez. O *servidor do clube* (7.18) é outra coisa e serve só para as reservas dos jogadores.
+
+- **Ativar**: *Funções do clube* › **Secretaria no PC**, depois a entrada na aba das quadras e **Ativar**. O telefone mostra o endereço (ex. `https://192.168.1.20:8443`) e um código.
+- **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
+- **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
+- **O que se pode fazer**: **Sócios** (procurar, adicionar, alterar, *Por tratar*), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos com recibo, exportação CSV), **Agenda** (ver o dia, adicionar e remover reservas), **Torneios** só de leitura. Recibos PDF, avisos de WhatsApp, sorteios, escola de tênis e equipes continuam no app.
+- **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
+- **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
 
 ## 8. Placar na TV ou no monitor
 
@@ -4462,7 +6246,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4489,7 +6273,7 @@ enum class Role(val tabs: List<HomeTab>) {
  */
 enum class ClubFeature(val base: Boolean) {
     MEMBERS(true), PAYMENTS(true), PLANNING(true), TOURNAMENTS(true),
-    TEAMS(false), SCHOOL(false), LADDER(false), STATS(false), SERVER(false),
+    TEAMS(false), SCHOOL(false), LADDER(false), STATS(false), SERVER(false), DESK(false),
 }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
@@ -5052,6 +6836,7 @@ class MatchController(
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.BOOK_COURT -> Screen.HOME
+            Screen.DESK -> Screen.HOME
             Screen.COURT_STATS -> statsBack
             Screen.LADDERS -> Screen.HOME
             Screen.LADDER -> Screen.LADDERS
@@ -5449,6 +7234,17 @@ class MatchController(
         players.value = list.sortedBy { it.name.lowercase() }
         scope.launch(io) { storage.savePlayers(list) }
     }
+
+    /** Tanti giocatori in una volta (Segreteria da PC, import di un foglio): un solo salvataggio. */
+    fun savePlayers(changed: List<com.tennis.scoremanager.data.PlayerProfile>) {
+        val ids = changed.map { it.id }.toSet()
+        val list = players.value.filter { it.id !in ids } + changed
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch(io) { storage.savePlayers(list) }
+    }
+
+    /** La Segreteria da PC: spenta finché non la si accende dall'app. */
+    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this)) }
 
     fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
 
@@ -17580,6 +19376,1207 @@ object WorkoutReport {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/DeskApi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskApi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import com.tennis.scoremanager.data.BookingKind
+import com.tennis.scoremanager.data.Charge
+import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.CourtBooking
+import com.tennis.scoremanager.data.CourtPlan
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Fee
+import com.tennis.scoremanager.data.FeeKind
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.FitpCard
+import com.tennis.scoremanager.data.MedicalKind
+import com.tennis.scoremanager.data.Members
+import com.tennis.scoremanager.data.Membership
+import com.tennis.scoremanager.data.PayType
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.Players
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+
+/** Quello che la Segreteria da PC legge e cambia: i dati restano nell'app, sul telefono. */
+interface DeskData {
+    /** Esegue [f] da solo rispetto al resto dell'app, così telefono e PC non si pestano i piedi. */
+    fun <T> tx(f: () -> T): T
+    val club: String
+    val lang: String
+    fun now(): Long
+    fun players(): List<PlayerProfile>
+    fun savePlayers(list: List<PlayerProfile>)
+    fun book(): ClubBook
+    fun saveBook(b: ClubBook)
+    fun payTypes(): List<PayType>
+    fun courts(): List<String>
+    fun plan(): CourtPlan
+    fun tournaments(): List<ClubTournament>
+    /** Salva una prenotazione nuova; con [charge] divide il prezzo tra i giocatori e lo addebita. */
+    fun saveBooking(b: CourtBooking, charge: Boolean)
+    fun deleteBooking(b: CourtBooking)
+    fun paymentsCsv(year: Int): ByteArray?
+}
+
+@Serializable data class DeskError(val error: String)
+@Serializable data class DeskCodeIn(val code: String)
+@Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
+/** Il QR da disegnare: una stringa di 0 e 1 per riga. */
+@Serializable data class DeskQrOut(val id: String, val rows: List<String>)
+@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int)
+
+@Serializable data class DeskPerson(
+    val id: String = "", val name: String = "", val firstName: String = "", val lastName: String = "", val nickname: String = "",
+    val phone: String = "", val email: String = "", val birth: String? = null, val sex: String = "", val note: String = "",
+    val member: Boolean = false, val since: String? = null, val number: String = "", val fitpNumber: String = "", val fitpCard: FitpCard? = null, val fitpYear: Int? = null,
+    val ranking: String = "", val medical: MedicalKind? = null, val medicalUntil: String? = null, val privacy: String? = null, val photosOk: Boolean = false,
+    val guardian: String = "", val guardianPhone: String = "",
+    /** Solo in uscita: cosa manca e quanto deve. */
+    val issues: List<String> = emptyList(), val owedCents: Int = 0,
+)
+
+@Serializable data class DeskCsvIn(val text: String)
+@Serializable data class DeskCsvRow(val line: Int, val firstName: String, val lastName: String, val phone: String, val email: String, val birth: String?, val fitp: String, val update: Boolean, val error: String?)
+@Serializable data class DeskCsvOut(val rows: List<DeskCsvRow>, val added: Int = 0, val updated: Int = 0, val done: Boolean = false)
+
+@Serializable data class DeskCharge(
+    val id: String, val player: String, val name: String, val label: String, val cents: Int, val paidCents: Int, val leftCents: Int, val due: String?, val status: String,
+    val payments: List<DeskPayment>,
+)
+@Serializable data class DeskPayment(val id: String, val cents: Int, val date: String, val method: String, val ref: String, val receipt: String)
+@Serializable data class DeskFee(val id: String, val name: String, val cents: Int, val kind: FeeKind, val due: String?, val paid: Int, val total: Int)
+@Serializable data class DeskPayType(val id: String, val name: String)
+@Serializable data class DeskMoney(val year: Int, val incomeCents: Int, val openCents: Int, val openPeople: Int, val fees: List<DeskFee>, val charges: List<DeskCharge>, val payTypes: List<DeskPayType>)
+@Serializable data class DeskFeeIn(val name: String, val cents: Int, val kind: FeeKind = FeeKind.OTHER, val due: String? = null, val chargeMembers: Boolean = false)
+@Serializable data class DeskChargeIn(val player: String, val label: String, val cents: Int, val due: String? = null)
+@Serializable data class DeskPayIn(val cents: Int, val date: String, val type: String, val ref: String = "")
+@Serializable data class DeskCount(val count: Int)
+
+@Serializable data class DeskItem(
+    val id: String, val court: String, val startMin: Int, val endMin: Int, val type: String, val label: String, val note: String = "",
+    val kind: BookingKind? = null, val cents: Int = 0, val online: Boolean = false,
+)
+@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>)
+@Serializable data class DeskBookingIn(
+    val court: String, val date: String, val startMin: Int, val minutes: Int, val kind: BookingKind = BookingKind.PLAY,
+    val players: List<String> = emptyList(), val names: List<String> = emptyList(), val note: String = "", val charge: Boolean = false,
+)
+@Serializable data class DeskQuote(val cents: Int, val lights: Boolean)
+
+@Serializable data class DeskTournament(val id: String, val name: String, val category: String, val doubles: Boolean, val start: String?, val end: String?, val entries: List<String>, val matches: Int, val played: Int)
+
+/**
+ * Le chiamate della Segreteria da PC. Tutto tranne l'abbinamento chiede la chiave della sessione, in
+ * un'intestazione Authorization: i siti esterni non possono aggiungerla, e la pagina non usa cookie.
+ */
+class DeskApi(
+    private val data: DeskData, private val auth: DeskAuth, private val zone: () -> ZoneId = ZoneId::systemDefault,
+    /** Il testo come QR, riga per riga. */
+    private val qr: (String) -> List<String> = { listOf(it) },
+) {
+
+    data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
+    class Resp(val status: Int, val body: ByteArray, val type: String = JSON)
+    private class Fail(val status: Int, val code: String) : Exception(code)
+
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
+
+    private fun <T> ok(ser: KSerializer<T>, v: T) = Resp(200, json.encodeToString(ser, v).toByteArray())
+    private fun done() = Resp(200, "{}".toByteArray())
+    private fun <T> read(ser: KSerializer<T>, r: Req): T = try { json.decodeFromString(ser, r.body) } catch (_: Exception) { throw Fail(400, "BAD_REQUEST") }
+
+    fun handle(r: Req): Resp = try {
+        route(r)
+    } catch (e: Fail) {
+        Resp(e.status, json.encodeToString(DeskError.serializer(), DeskError(e.code)).toByteArray())
+    } catch (_: Exception) {
+        // Nessun dettaglio verso il browser: né dati, né percorsi.
+        Resp(500, json.encodeToString(DeskError.serializer(), DeskError("SERVER")).toByteArray())
+    }
+
+    private fun route(r: Req): Resp {
+        val p = r.path.trim('/').split('/').filter { it.isNotEmpty() }
+        val m = r.method
+        // Prima di entrare.
+        if (m == "POST" && p == listOf("pair", "qr")) return pairQr(r.ip)
+        if (m == "POST" && p == listOf("pair")) return pair(r)
+        if (m == "GET" && p.size == 2 && p[0] == "pair") return pairState(p[1], r.ip)
+        if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
+        if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
+        return data.tx {
+            when {
+                m == "GET" && p == listOf("info") -> info()
+                m == "GET" && p == listOf("people") -> people()
+                m == "POST" && p == listOf("people") -> savePerson(read(DeskPerson.serializer(), r), null)
+                m == "PUT" && p.size == 2 && p[0] == "people" -> savePerson(read(DeskPerson.serializer(), r), p[1])
+                m == "POST" && p == listOf("people", "import", "preview") -> importCsv(read(DeskCsvIn.serializer(), r), false)
+                m == "POST" && p == listOf("people", "import") -> importCsv(read(DeskCsvIn.serializer(), r), true)
+                m == "GET" && p == listOf("money") -> money(r.query["year"]?.toIntOrNull())
+                m == "GET" && p == listOf("payments.csv") -> paymentsCsv(r.query["year"]?.toIntOrNull())
+                m == "POST" && p == listOf("fees") -> addFee(read(DeskFeeIn.serializer(), r))
+                m == "POST" && p == listOf("charges") -> addCharge(read(DeskChargeIn.serializer(), r))
+                m == "POST" && p.size == 3 && p[0] == "charges" && p[2] == "pay" -> pay(p[1], read(DeskPayIn.serializer(), r))
+                m == "POST" && p.size == 3 && p[0] == "charges" && p[2] == "cancel" -> { data.saveBook(Fees.cancel(data.book(), charge(p[1]).id)); done() }
+                m == "DELETE" && p.size == 4 && p[0] == "charges" && p[2] == "payments" -> { data.saveBook(Fees.unpay(data.book(), charge(p[1]).id, p[3])); done() }
+                m == "GET" && p == listOf("day") -> day(r.query["date"])
+                m == "GET" && p == listOf("quote") -> quote(r.query)
+                m == "POST" && p == listOf("bookings") -> book(read(DeskBookingIn.serializer(), r))
+                m == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancelBooking(p[1])
+                m == "GET" && p == listOf("tournaments") -> tournaments()
+                else -> throw Fail(404, "NOT_FOUND")
+            }
+        }
+    }
+
+    // --- Abbinamento ---
+
+    private fun pair(r: Req): Resp = when (val x = auth.submit(read(DeskCodeIn.serializer(), r).code, r.ip)) {
+        is DeskAuth.Result.Waiting -> ok(DeskPairOut.serializer(), DeskPairOut("WAIT", id = x.id))
+        DeskAuth.Result.Wrong -> throw Fail(403, "BAD_CODE")
+        DeskAuth.Result.Blocked -> throw Fail(429, "TOO_MANY_TRIES")
+        DeskAuth.Result.Busy -> throw Fail(423, "BUSY")
+    }
+
+    private fun pairQr(ip: String): Resp {
+        val q = auth.qr(ip) ?: throw Fail(423, "BUSY")
+        return ok(DeskQrOut.serializer(), DeskQrOut(q.id, qr(q.text)))
+    }
+
+    private fun pairState(id: String, ip: String): Resp = when (val x = auth.poll(id, ip)) {
+        DeskAuth.Poll.Wait -> ok(DeskPairOut.serializer(), DeskPairOut("WAIT"))
+        DeskAuth.Poll.Confirm -> ok(DeskPairOut.serializer(), DeskPairOut("CONFIRM"))
+        DeskAuth.Poll.Refused -> throw Fail(403, "REFUSED")
+        is DeskAuth.Poll.Granted -> ok(DeskPairOut.serializer(), DeskPairOut("OK", token = x.token))
+    }
+
+    // --- Date ---
+
+    private fun day(t: Long?): String? = t?.let { Instant.ofEpochMilli(it).atZone(zone()).toLocalDate().toString() }
+
+    /** Una data del modulo, a mezzogiorno come quelle dell'app. */
+    private fun noon(s: String?): Long? {
+        if (s.isNullOrBlank()) return null
+        return runCatching { LocalDate.parse(s).atTime(12, 0).atZone(zone()).toInstant().toEpochMilli() }.getOrElse { throw Fail(400, "BAD_DATE") }
+    }
+
+    private fun cents(c: Int): Int = if (c in 1..MAX_CENTS) c else throw Fail(400, "BAD_AMOUNT")
+    private fun text(s: String, max: Int): String = s.trim().take(max)
+
+    private fun info(): Resp {
+        val now = data.now()
+        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year))
+    }
+
+    // --- Giocatori e soci ---
+
+    private fun person(p: PlayerProfile, book: ClubBook, now: Long): DeskPerson {
+        val m = p.member
+        return DeskPerson(
+            p.id, p.name, p.firstName, p.lastName, p.nickname, p.phone, p.email, day(p.birth), p.sex, p.note,
+            m != null, day(m?.since), m?.number.orEmpty(), m?.fitpNumber.orEmpty(), m?.fitpCard, m?.fitpYear, m?.ranking.orEmpty(), m?.medical, day(m?.medicalUntil), day(m?.privacyAt),
+            m?.photosOk == true, m?.guardian.orEmpty(), m?.guardianPhone.orEmpty(),
+            Members.issues(p, now).map { it.name }, Fees.owed(book, p),
+        )
+    }
+
+    private fun people(): Resp {
+        val now = data.now(); val book = data.book()
+        return ok(ListSerializer(DeskPerson.serializer()), data.players().sortedBy { it.name.lowercase() }.map { person(it, book, now) })
+    }
+
+    private fun savePerson(i: DeskPerson, id: String?): Resp {
+        val first = text(i.firstName, 80); val last = text(i.lastName, 80); val nick = text(i.nickname, 40)
+        if (first.isEmpty() || last.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val now = data.now()
+        val old = id?.let { x -> Players.byId(data.players(), x) ?: throw Fail(404, "NOT_FOUND") }
+        val oldM = old?.member
+        val m = if (!i.member) null else (oldM ?: Membership()).copy(
+            since = noon(i.since) ?: oldM?.since ?: now, number = text(i.number, 40), fitpNumber = text(i.fitpNumber, 40), fitpCard = i.fitpCard, fitpYear = i.fitpYear,
+            ranking = text(i.ranking, 12), medical = i.medical, medicalUntil = noon(i.medicalUntil), privacyAt = noon(i.privacy), photosOk = i.photosOk,
+            guardian = text(i.guardian, 120), guardianPhone = text(i.guardianPhone, 40),
+        )
+        // Quello che il PC non mostra (racchetta, foto, alias, statistiche) resta com'era.
+        val base = old ?: PlayerProfile(Players.newId(), "", createdAt = now)
+        val p = base.copy(
+            name = PlayerProfile.display(first, last, nick), firstName = first, lastName = last, nickname = nick,
+            phone = text(i.phone, 40), email = text(i.email, 120), birth = noon(i.birth), note = text(i.note, 2000), member = m,
+        )
+        data.savePlayers(listOf(p))
+        return ok(DeskPerson.serializer(), person(p, data.book(), now))
+    }
+
+    private fun importCsv(i: DeskCsvIn, commit: Boolean): Resp {
+        val players = data.players()
+        val rows = MembersCsv.parse(i.text, players) ?: throw Fail(400, "CSV_NO_COLUMNS")
+        val out = rows.map { DeskCsvRow(it.line, it.first, it.last, it.phone, it.email, day(it.birth), it.fitp, it.match != null, it.error) }
+        if (!commit) return ok(DeskCsvOut.serializer(), DeskCsvOut(out))
+        val saved = MembersCsv.apply(rows, players, data.now())
+        data.savePlayers(saved)
+        val known = players.map { it.id }.toSet()
+        return ok(DeskCsvOut.serializer(), DeskCsvOut(out, saved.count { it.id !in known }, saved.count { it.id in known }, true))
+    }
+
+    // --- Quote e pagamenti ---
+
+    private fun charge(id: String): Charge = data.book().charges.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    private fun money(year: Int?): Resp {
+        val now = data.now(); val book = data.book()
+        val y = year ?: Instant.ofEpochMilli(now).atZone(zone()).year
+        val (openC, openP) = Fees.open(book)
+        val fees = book.fees.map { f -> val (a, b) = Fees.feeProgress(book, f); DeskFee(f.id, f.name, f.cents, f.kind, day(f.due), a, b) }
+        val charges = book.charges.sortedWith(compareBy<Charge> { it.left == 0 }.thenByDescending { it.createdAt }).map { c ->
+            DeskCharge(
+                c.id, c.player, c.name, c.label, c.cents, c.paid, c.left, day(c.due), Fees.status(c, now).name,
+                c.payments.map { DeskPayment(it.id, it.cents, day(it.at)!!, it.methodName.ifEmpty { it.method.name }, it.ref, it.receipt) },
+            )
+        }
+        return ok(DeskMoney.serializer(), DeskMoney(y, Fees.income(book, y), openC, openP, fees, charges, data.payTypes().map { DeskPayType(it.id, it.name) }))
+    }
+
+    private fun paymentsCsv(year: Int?): Resp {
+        val y = year ?: throw Fail(400, "BAD_REQUEST")
+        return Resp(200, data.paymentsCsv(y) ?: throw Fail(404, "NOT_FOUND"), "text/csv; charset=utf-8")
+    }
+
+    private fun addFee(i: DeskFeeIn): Resp {
+        val name = text(i.name, 120)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val now = data.now()
+        val fee = Fee(Fees.newId("f"), name, cents(i.cents), i.kind, noon(i.due), now)
+        var book = data.book().let { it.copy(fees = it.fees + fee) }
+        var count = 0
+        if (i.chargeMembers) {
+            val (b, n) = Fees.chargeAll(book, fee, data.players().filter { it.member != null }, now)
+            book = b; count = n
+        }
+        data.saveBook(book)
+        return ok(DeskCount.serializer(), DeskCount(count))
+    }
+
+    private fun addCharge(i: DeskChargeIn): Resp {
+        val p = Players.byId(data.players(), i.player) ?: throw Fail(404, "NOT_FOUND")
+        val label = text(i.label, 120)
+        if (label.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val book = Fees.charge(data.book(), p, label, cents(i.cents), data.now())
+        val made = book.charges.last().copy(due = noon(i.due))
+        data.saveBook(book.copy(charges = book.charges.dropLast(1) + made))
+        return done()
+    }
+
+    private fun pay(id: String, i: DeskPayIn): Resp {
+        val c = charge(id)
+        if (cents(i.cents) > c.left) throw Fail(400, "BAD_AMOUNT")
+        val type = data.payTypes().firstOrNull { it.id == i.type } ?: throw Fail(400, "BAD_TYPE")
+        val at = noon(i.date) ?: throw Fail(400, "BAD_DATE")
+        val (book, _) = Fees.pay(data.book(), c.id, i.cents, at, type.method, text(i.ref, 120), type.name) ?: throw Fail(400, "BAD_AMOUNT")
+        data.saveBook(book)
+        return done()
+    }
+
+    // --- Planning ---
+
+    private fun dayStart(date: String?): Long = CourtPlans.dayStart(noon(date) ?: throw Fail(400, "BAD_DATE"))
+
+    private fun day(date: String?): Resp {
+        val start = dayStart(date)
+        val plan = data.plan()
+        val people = data.players()
+        val items = CourtPlans.occupied(plan, data.tournaments(), start + 12 * 3_600_000L).map { o ->
+            val from = ((o.start - start) / 60_000L).toInt().coerceAtLeast(0)
+            val to = ((o.end - start) / 60_000L).toInt()
+            val b = o.booking
+            when {
+                b != null -> DeskItem(
+                    b.id, b.court, from, to, "BOOKING",
+                    (b.players.mapNotNull { Players.byId(people, it)?.name } + b.names).joinToString(", "), b.note, b.kind, b.cents, b.online != null,
+                )
+                o.block != null -> DeskItem(o.block.id, if (o.court == CourtPlans.ALL) "" else o.court, from, to, "BLOCK", o.block.label)
+                else -> DeskItem(o.match?.id.orEmpty(), o.court, from, to, "TOURNAMENT", o.tournament?.name.orEmpty())
+            }
+        }
+        val s = plan.settings
+        return ok(DeskDay.serializer(), DeskDay(date!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items))
+    }
+
+    private fun quote(q: Map<String, String>): Resp {
+        val s = data.plan().settings
+        val start = dayStart(q["date"]) + (q["startMin"]?.toLongOrNull() ?: 0) * 60_000L
+        val minutes = q["minutes"]?.toIntOrNull()?.coerceIn(0, MAX_MINUTES) ?: 60
+        val kind = runCatching { BookingKind.valueOf(q["kind"].orEmpty()) }.getOrDefault(BookingKind.PLAY)
+        return ok(DeskQuote.serializer(), DeskQuote(CourtPlans.price(s, start, minutes, kind, q["court"].orEmpty()), CourtPlans.needsLights(s, start, minutes)))
+    }
+
+    private fun book(i: DeskBookingIn): Resp {
+        if (i.court !in data.courts()) throw Fail(404, "NOT_FOUND")
+        if (i.minutes !in 5..MAX_MINUTES || i.startMin !in 0 until 24 * 60) throw Fail(400, "BAD_TIME")
+        val plan = data.plan()
+        val start = CourtPlans.at(dayStart(i.date), 0) + i.startMin * 60_000L
+        val end = start + i.minutes * 60_000L
+        if (CourtPlans.blockedBy(plan, i.court, start, end, i.kind).isNotEmpty()) throw Fail(409, "BLOCKED")
+        if (CourtPlans.conflicts(plan, data.tournaments(), i.court, start, end).isNotEmpty()) throw Fail(409, "CONFLICT")
+        val people = data.players()
+        val ids = i.players.filter { Players.byId(people, it) != null }
+        data.saveBooking(
+            CourtBooking(
+                CourtPlans.newId("b"), i.court, start, i.minutes, i.kind, ids, i.names.map { text(it, 80) }.filter { it.isNotEmpty() }.take(8), text(i.note, 500),
+                CourtPlans.needsLights(plan.settings, start, i.minutes), CourtPlans.price(plan.settings, start, i.minutes, i.kind, i.court),
+            ),
+            i.charge,
+        )
+        return done()
+    }
+
+    private fun cancelBooking(id: String): Resp {
+        data.deleteBooking(data.plan().bookings.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND"))
+        return done()
+    }
+
+    // --- Tornei (solo da guardare) ---
+
+    private fun tournaments(): Resp = ok(ListSerializer(DeskTournament.serializer()), data.tournaments().map { t ->
+        val real = t.matches.filter { !it.bye }
+        DeskTournament(t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.winner != null })
+    })
+
+    companion object {
+        private const val JSON = "application/json; charset=utf-8"
+        private const val MAX_CENTS = 10_000_000
+        private const val MAX_MINUTES = 12 * 60
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/DeskAuth.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskAuth.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.Base64
+
+/**
+ * Chi può entrare nella Segreteria da PC. Due passi: il telefono inquadra il QR sullo schermo del PC (oppure sul PC si
+ * scrive il codice che si legge sul telefono, usa e getta) e poi si tocca "Consenti" sul telefono. Una sola sessione alla volta, legata all'indirizzo del PC; la chiave vive in
+ * memoria come impronta e sparisce spegnendo la Segreteria. Tutto sotto un solo lucchetto: i metodi sono brevi.
+ */
+class DeskAuth(private val clock: () -> Long = System::currentTimeMillis, private val onChange: () -> Unit = {}) {
+
+    /** Un PC che ha scritto il codice giusto e aspetta il "Consenti" sul telefono. */
+    data class Pending(val id: String, val ip: String, val at: Long, val approved: Boolean = false)
+
+    /** Il QR mostrato da un PC: [secret] sta solo dentro il QR, [id] serve al PC per chiedere com'è andata. */
+    data class Qr(val id: String, val secret: String, val ip: String, val at: Long) {
+        val text: String get() = QR_PREFIX + secret
+    }
+
+    private class Session(val hash: String, val ip: String, val since: Long, var last: Long)
+
+    private val rnd = SecureRandom()
+    private var code: String = ""
+    private var codeAt = 0L
+    private var wrong = 0
+    private var blockedUntil = 0L
+    private var strikes = 0
+    private var session: Session? = null
+    private var pendingPair: Pending? = null
+    /** I QR aperti, uno per indirizzo. */
+    private val qrs = LinkedHashMap<String, Qr>()
+
+    /** Il codice da mostrare sul telefono, sempre valido; "" se c'è già un PC collegato o in attesa. */
+    @get:Synchronized val shownCode: String get() {
+        if (session != null || pendingPair != null) return ""
+        if (code.isEmpty() || clock() - codeAt > CODE_MS) newCode()
+        return code
+    }
+
+    /** Il PC in attesa di "Consenti" (non ancora approvato). */
+    @get:Synchronized val pending: Pending? get() = expirePending()?.takeIf { !it.approved }
+
+    /** L'indirizzo del PC collegato (null = nessuno). */
+    @get:Synchronized val connected: String? get() = validSession()?.ip
+
+    /** Fine dell'ultima attività: serve a spegnere il server quando nessuno lo usa. */
+    @get:Synchronized val lastUse: Long get() = session?.last ?: 0
+
+    private fun newCode() {
+        code = buildString { repeat(CODE_LEN) { append(ALPHABET[rnd.nextInt(ALPHABET.length)]) } }
+        codeAt = clock()
+        wrong = 0
+    }
+
+    private fun expirePending(): Pending? {
+        val p = pendingPair ?: return null
+        if (clock() - p.at > PENDING_MS) { pendingPair = null; return null }
+        return p
+    }
+
+    /**
+     * Prova del codice. Riuscita: il PC aspetta il consenso e riceve l'id dell'attesa. Dopo [MAX_WRONG] errori il codice
+     * cambia, e ogni volta che succede si aspetta di più: da fuori non si può indovinarlo a tentativi.
+     */
+    @Synchronized
+    fun submit(typed: String, ip: String): Result {
+        val now = clock()
+        if (now < blockedUntil) return Result.Blocked
+        if (session != null || expirePending() != null) return Result.Busy
+        if (code.isEmpty() || now - codeAt > CODE_MS) newCode()
+        val clean = typed.uppercase().filter { it.isLetterOrDigit() }.toByteArray()
+        if (!MessageDigest.isEqual(clean, code.toByteArray())) {
+            if (++wrong >= MAX_WRONG) {
+                strikes++
+                blockedUntil = now + BLOCK_MS * (1L shl (strikes - 1).coerceAtMost(6))
+                newCode()
+            }
+            return Result.Wrong
+        }
+        code = ""
+        strikes = 0
+        val p = Pending(token(), ip, now)
+        pendingPair = p
+        onChange()
+        return Result.Waiting(p.id)
+    }
+
+    /**
+     * Il QR per il PC [ip]: lo stesso finché è giovane, poi uno nuovo. Pochi e a scadenza: chi è in rete può chiederne,
+     * ma non serve a niente senza un telefono che lo inquadri. null se c'è già un PC collegato o in attesa.
+     */
+    @Synchronized
+    fun qr(ip: String): Qr? {
+        val now = clock()
+        if (validSession() != null || expirePending() != null) return null
+        qrs.values.removeAll { now - it.at > QR_MS }
+        qrs[ip]?.takeIf { now - it.at < QR_MS / 2 }?.let { return it }
+        qrs.remove(ip)
+        if (qrs.size >= MAX_QRS) qrs.remove(qrs.keys.first())
+        return Qr(token(), token(), ip, now).also { qrs[ip] = it }
+    }
+
+    /** Il telefono ha inquadrato [text]: se è un QR aperto, quel PC aspetta il "Consenti". */
+    @Synchronized
+    fun scan(text: String): Boolean {
+        val now = clock()
+        if (validSession() != null || expirePending() != null) return false
+        val found = qrs.values.firstOrNull { now - it.at <= QR_MS && same(it.text, text.trim()) } ?: return false
+        qrs.clear()
+        code = ""
+        pendingPair = Pending(found.id, found.ip, now)
+        onChange()
+        return true
+    }
+
+    /** La risposta del telefono al PC in attesa. */
+    @Synchronized
+    fun answer(allow: Boolean) {
+        val p = expirePending() ?: return
+        pendingPair = if (allow) p.copy(approved = true) else null
+        onChange()
+    }
+
+    /** Il PC chiede com'è andata. Appena approvato riceve la chiave, una volta sola e solo dallo stesso indirizzo. */
+    @Synchronized
+    fun poll(id: String, ip: String): Poll {
+        val now0 = clock()
+        val p = expirePending()
+        if (p == null || !same(p.id, id)) {
+            val open = qrs.values.any { same(it.id, id) && it.ip == ip && now0 - it.at <= QR_MS }
+            return if (open) Poll.Wait else Poll.Refused
+        }
+        if (p.ip != ip) return Poll.Refused
+        if (!p.approved) return Poll.Confirm
+        pendingPair = null
+        val t = token()
+        val now = clock()
+        session = Session(hash(t), ip, now, now)
+        onChange()
+        return Poll.Granted(t)
+    }
+
+    private fun validSession(): Session? {
+        val s = session ?: return null
+        val now = clock()
+        if (now - s.last > IDLE_MS || now - s.since > MAX_MS) { session = null; onChange(); return null }
+        return s
+    }
+
+    /** La chiave è quella giusta, non scaduta e arriva dal PC abbinato. */
+    @Synchronized
+    fun check(token: String?, ip: String): Boolean {
+        val s = validSession() ?: return false
+        if (token == null || !same(s.hash, hash(token)) || s.ip != ip) return false
+        s.last = clock()
+        return true
+    }
+
+    /** Chiude la sessione (dal PC o dal telefono) e, con un nuovo abbinamento, si riparte da un codice nuovo. */
+    @Synchronized
+    fun logout() {
+        session = null
+        pendingPair = null
+        code = ""
+        qrs.clear()
+        onChange()
+    }
+
+    private fun token(): String = ByteArray(32).also { rnd.nextBytes(it) }.let { Base64.getUrlEncoder().withoutPadding().encodeToString(it) }
+    private fun hash(s: String): String = Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(s.toByteArray()))
+    private fun same(a: String, b: String) = MessageDigest.isEqual(a.toByteArray(), b.toByteArray())
+
+    sealed interface Result {
+        data class Waiting(val id: String) : Result
+        data object Wrong : Result
+        data object Blocked : Result
+        data object Busy : Result
+    }
+
+    sealed interface Poll {
+        /** Nessuno ha ancora inquadrato il QR. */
+        data object Wait : Poll
+        /** Si aspetta il "Consenti" sul telefono. */
+        data object Confirm : Poll
+        data object Refused : Poll
+        data class Granted(val token: String) : Poll
+    }
+
+    companion object {
+        /** Lettere e cifre che non si confondono (niente 0/O, 1/I/L). */
+        private const val ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+        const val CODE_LEN = 8
+        const val CODE_MS = 5 * 60_000L
+        const val PENDING_MS = 2 * 60_000L
+        const val QR_PREFIX = "tsm-desk:"
+        const val QR_MS = 2 * 60_000L
+        private const val MAX_QRS = 16
+        const val MAX_WRONG = 5
+        const val BLOCK_MS = 30_000L
+        /** Fermo da mezz'ora, o dopo 12 ore comunque: si riabbina. */
+        const val IDLE_MS = 30 * 60_000L
+        const val MAX_MS = 12 * 3_600_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/DeskCert.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskCert.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.math.BigInteger
+import java.security.KeyFactory
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.MessageDigest
+import java.security.PrivateKey
+import java.security.SecureRandom
+import java.security.Signature
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
+import java.security.spec.ECGenParameterSpec
+import java.security.spec.PKCS8EncodedKeySpec
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
+
+/**
+ * L'identità HTTPS del telefono per la Segreteria da PC: una chiave EC P-256 e un certificato autofirmato, creati la
+ * prima volta e tenuti fuori dai backup. Su una rete locale nessuna autorità firma un indirizzo come 192.168.1.20: il
+ * browser avvisa una volta, poi ricorda il certificato; se cambiasse, avviserebbe di nuovo. L'impronta si può
+ * confrontare con quella mostrata dal telefono.
+ */
+class DeskCert private constructor(val key: PrivateKey, val cert: X509Certificate) {
+
+    /** L'impronta SHA-256 del certificato, come la mostrano i browser: "AB:CD:…". */
+    val fingerprint: String get() = MessageDigest.getInstance("SHA-256").digest(cert.encoded).joinToString(":") { "%02X".format(it) }
+
+    fun sslContext(): SSLContext {
+        val ks = KeyStore.getInstance("PKCS12").apply { load(null, null) }
+        ks.setKeyEntry("tsm", key, PASS, arrayOf(cert))
+        val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()).apply { init(ks, PASS) }
+        return SSLContext.getInstance("TLS").apply { init(kmf.keyManagers, null, null) }
+    }
+
+    companion object {
+        private val PASS = "tsm".toCharArray()
+        private const val NAME = "Tennis Score Manager"
+        private const val YEARS = 10
+
+        /** Il certificato di [dir]; se manca o è rovinato se ne crea uno nuovo. */
+        fun loadOrCreate(dir: File, now: Long = System.currentTimeMillis()): DeskCert {
+            val keyFile = File(dir, "desk_tls.key")
+            val certFile = File(dir, "desk_tls.crt")
+            runCatching {
+                val key = KeyFactory.getInstance("EC").generatePrivate(PKCS8EncodedKeySpec(keyFile.readBytes()))
+                val cert = certFile.inputStream().use { CertificateFactory.getInstance("X.509").generateCertificate(it) } as X509Certificate
+                cert.checkValidity(Date(now))
+                return DeskCert(key, cert)
+            }
+            val made = create(now)
+            dir.mkdirs()
+            keyFile.delete()
+            keyFile.createNewFile()
+            keyFile.setReadable(false, false); keyFile.setReadable(true, true)
+            keyFile.writeBytes(made.key.encoded)
+            certFile.writeBytes(made.cert.encoded)
+            return made
+        }
+
+        fun create(now: Long = System.currentTimeMillis()): DeskCert {
+            val pair = KeyPairGenerator.getInstance("EC").apply { initialize(ECGenParameterSpec("secp256r1"), SecureRandom()) }.generateKeyPair()
+            val alg = seq(oid(1, 2, 840, 10045, 4, 3, 2))  // ecdsa-with-SHA256
+            val name = seq(set(seq(oid(2, 5, 4, 3), tlv(0x0C, NAME.toByteArray()))))  // CN
+            val serial = BigInteger(159, SecureRandom()).add(BigInteger.ONE)
+            val from = now - 86_400_000L
+            val to = now + YEARS * 365L * 86_400_000L
+            val ext = seq(
+                seq(oid(2, 5, 29, 19), tlv(0x01, byteArrayOf(-1)), tlv(0x04, seq())),  // basicConstraints critico: non è una CA
+                seq(oid(2, 5, 29, 15), tlv(0x01, byteArrayOf(-1)), tlv(0x04, tlv(0x03, byteArrayOf(7, 0x80.toByte())))),  // keyUsage: digitalSignature
+                seq(oid(2, 5, 29, 37), tlv(0x04, seq(oid(1, 3, 6, 1, 5, 5, 7, 3, 1)))),  // extKeyUsage: serverAuth
+            )
+            val tbs = seq(
+                tlv(0xA0, tlv(0x02, byteArrayOf(2))),  // versione 3
+                tlv(0x02, serial.toByteArray()),
+                alg, name, seq(time(from), time(to)), name,
+                pair.public.encoded,
+                tlv(0xA3, ext),
+            )
+            val sig = Signature.getInstance("SHA256withECDSA").apply { initSign(pair.private); update(tbs) }.sign()
+            val der = seq(tbs, alg, tlv(0x03, byteArrayOf(0) + sig))
+            val cert = CertificateFactory.getInstance("X.509").generateCertificate(der.inputStream()) as X509Certificate
+            return DeskCert(pair.private, cert)
+        }
+
+        // --- DER: quel poco che serve per scrivere un certificato ---
+
+        private fun tlv(tag: Int, body: ByteArray): ByteArray {
+            val out = ByteArrayOutputStream()
+            out.write(tag)
+            when {
+                body.size < 128 -> out.write(body.size)
+                body.size < 256 -> { out.write(0x81); out.write(body.size) }
+                else -> { out.write(0x82); out.write(body.size shr 8); out.write(body.size and 0xFF) }
+            }
+            out.write(body)
+            return out.toByteArray()
+        }
+
+        private fun seq(vararg parts: ByteArray) = tlv(0x30, parts.fold(ByteArray(0)) { a, b -> a + b })
+        private fun set(vararg parts: ByteArray) = tlv(0x31, parts.fold(ByteArray(0)) { a, b -> a + b })
+
+        private fun oid(vararg arcs: Long): ByteArray {
+            val out = ByteArrayOutputStream()
+            out.write((arcs[0] * 40 + arcs[1]).toInt())
+            for (a in arcs.drop(2)) {
+                var shift = 63 - java.lang.Long.numberOfLeadingZeros(a or 1)
+                shift -= shift % 7
+                while (shift > 0) { out.write((((a shr shift) and 0x7F) or 0x80).toInt()); shift -= 7 }
+                out.write((a and 0x7F).toInt())
+            }
+            return tlv(0x06, out.toByteArray())
+        }
+        private fun oid(vararg arcs: Int) = oid(*arcs.map { it.toLong() }.toLongArray())
+
+        private fun time(t: Long): ByteArray =
+            tlv(0x17, SimpleDateFormat("yyMMddHHmmss'Z'", Locale.ROOT).apply { timeZone = TimeZone.getTimeZone("UTC") }.format(Date(t)).toByteArray())
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/DeskManager.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskManager.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import android.content.Context
+import android.util.Log
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.CourtBooking
+import com.tennis.scoremanager.data.CourtPlan
+import com.tennis.scoremanager.data.PayType
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.service.DeskService
+import com.tennis.scoremanager.tv.TvServer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.util.concurrent.ConcurrentHashMap
+
+/** I dati veri dell'app per la Segreteria da PC: ogni richiesta gira sul filo principale, come i tocchi sul telefono. */
+class DeskBridge(private val c: MatchController) : DeskData {
+    override fun <T> tx(f: () -> T): T = runBlocking(Dispatchers.Main.immediate) { f() }
+    override val club: String get() = c.storage.clubName
+    override val lang: String get() = c.options.value.lang.code
+    override fun now(): Long = System.currentTimeMillis()
+    override fun players(): List<PlayerProfile> = c.players.value
+    override fun savePlayers(list: List<PlayerProfile>) = c.savePlayers(list)
+    override fun book(): ClubBook = c.clubBook.value
+    override fun saveBook(b: ClubBook) = c.saveClubBook(b)
+    override fun payTypes(): List<PayType> = c.payTypes()
+    override fun courts(): List<String> = c.clubCourts.value
+    override fun plan(): CourtPlan = c.courtPlan.value
+    override fun tournaments(): List<ClubTournament> = c.clubTournaments.value
+    override fun saveBooking(b: CourtBooking, charge: Boolean) { c.saveBooking(b, 1, charge) }
+    override fun deleteBooking(b: CourtBooking) = c.deleteBooking(b, wholeSeries = false)
+    override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
+}
+
+/**
+ * La Segreteria da PC sul telefono: acceso solo quando serve. Si spegne da solo dopo mezz'ora senza nessuno collegato.
+ * Il certificato sta nella cartella esclusa dai backup: la chiave privata non esce mai dal telefono.
+ */
+class DeskManager(context: Context, private val data: DeskData) {
+
+    data class Ui(
+        val running: Boolean = false, val urls: List<String> = emptyList(), val code: String = "", val waitingIp: String? = null,
+        val connectedIp: String? = null, val fingerprint: String = "", val failed: Boolean = false,
+    )
+
+    private val app = context.applicationContext
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val _ui = MutableStateFlow(Ui())
+    val ui: StateFlow<Ui> = _ui
+    private val auth = DeskAuth()
+    private var server: DeskServer? = null
+    private var ticker: Job? = null
+    private val files = ConcurrentHashMap<String, ByteArray>()
+
+    private fun asset(name: String): ByteArray? = files[name] ?: runCatching { app.assets.open("desk/$name").use { it.readBytes() } }.getOrNull()?.also { files[name] = it }
+
+    fun start() {
+        scope.launch {
+            synchronized(this@DeskManager) {
+                if (server != null) return@launch
+                try {
+                    val cert = DeskCert.loadOrCreate(app.noBackupFilesDir)
+                    val s = DeskServer(cert, DeskApi(data, auth, qr = ::qrRows), ::asset, { TvServer.isLocalPeer(it) })
+                    s.start()
+                    server = s
+                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Avvio non riuscito", e)
+                    _ui.value = Ui(failed = true)
+                    return@launch
+                }
+            }
+            DeskService.start(app)
+            tick()
+        }
+    }
+
+    /** Ogni secondo: codice, PC in attesa e indirizzi aggiornati; dopo mezz'ora vuota si spegne. */
+    private fun tick() {
+        ticker?.cancel()
+        ticker = scope.launch {
+            var active = System.currentTimeMillis()
+            while (isActive) {
+                val port = server?.port ?: break
+                val connected = auth.connected
+                if (connected != null || auth.pending != null) active = System.currentTimeMillis()
+                _ui.value = _ui.value.copy(
+                    urls = TvServer.localAddresses().map { "https://$it:$port" }, code = auth.shownCode, waitingIp = auth.pending?.ip, connectedIp = connected,
+                )
+                if (System.currentTimeMillis() - active > DeskAuth.IDLE_MS) { stop(); break }
+                delay(1_000)
+            }
+        }
+    }
+
+    private fun qrRows(text: String): List<String> {
+        val m = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 0, 0, mapOf(EncodeHintType.MARGIN to 0))
+        return (0 until m.height).map { y -> buildString { for (x in 0 until m.width) append(if (m[x, y]) '1' else '0') } }
+    }
+
+    /** Il telefono ha inquadrato un QR: false se non è quello di un PC in attesa. */
+    fun scan(text: String): Boolean = auth.scan(text)
+
+    /** La risposta del telefono al PC che chiede di entrare. */
+    fun answer(allow: Boolean) = auth.answer(allow)
+
+    /** Chiude il PC collegato; il server resta acceso con un codice nuovo. */
+    fun disconnect() = auth.logout()
+
+    @Synchronized
+    fun stop() {
+        ticker?.cancel()
+        ticker = null
+        auth.logout()
+        server?.stop()
+        server = null
+        files.clear()
+        _ui.value = Ui()
+        DeskService.stop(app)
+    }
+
+    companion object { private const val TAG = "DeskManager" }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/DeskServer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskServer.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import java.io.BufferedOutputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.InetAddress
+import java.net.Socket
+import java.net.URLDecoder
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import javax.net.ssl.SSLServerSocket
+import javax.net.ssl.SSLSocket
+
+/**
+ * Il server della Segreteria da PC: HTTPS sulla rete locale, solo TLS 1.2 e 1.3. Non contiene dati: serve la pagina
+ * ([asset]) e passa le richieste /api/ a [api]. Risponde solo a chi è in rete locale ([allowed]) e solo se la richiesta
+ * è rivolta a un indirizzo numerico o a localhost (niente "DNS rebinding": un sito esterno non può parlargli).
+ */
+class DeskServer(
+    private val cert: DeskCert,
+    private val api: DeskApi,
+    private val asset: (String) -> ByteArray?,
+    private val allowed: (InetAddress) -> Boolean,
+) {
+    @Volatile private var socket: SSLServerSocket? = null
+    private var pool: ExecutorService? = null
+
+    /** La porta in ascolto (null = spento). */
+    val port: Int? get() = socket?.localPort
+
+    @Synchronized
+    fun start(first: Int = PORT): Int {
+        socket?.let { return it.localPort }
+        val factory = cert.sslContext().serverSocketFactory
+        val s = (first until first + 10).firstNotNullOfOrNull { p ->
+            runCatching {
+                factory.createServerSocket(p, 32) as SSLServerSocket
+            }.getOrNull()
+        } ?: throw IOException("Nessuna porta libera")
+        s.enabledProtocols = s.supportedProtocols.filter { it == "TLSv1.3" || it == "TLSv1.2" }.toTypedArray()
+        val workers = Executors.newFixedThreadPool(WORKERS)
+        pool = workers
+        socket = s
+        Thread({ acceptLoop(s, workers) }, "desk-accept").apply { isDaemon = true }.start()
+        return s.localPort
+    }
+
+    @Synchronized
+    fun stop() {
+        runCatching { socket?.close() }
+        socket = null
+        pool?.shutdownNow()
+        pool = null
+    }
+
+    private fun acceptLoop(s: SSLServerSocket, workers: ExecutorService) {
+        while (!s.isClosed) {
+            val client = try { s.accept() } catch (_: IOException) {
+                if (s.isClosed) return
+                runCatching { Thread.sleep(300) }
+                continue
+            }
+            if (!allowed(client.inetAddress)) { runCatching { client.close() }; continue }
+            runCatching { workers.execute { runCatching { handle(client as SSLSocket) } } }.onFailure { runCatching { client.close() } }
+        }
+    }
+
+    private fun handle(sock: Socket) {
+        sock.use { s ->
+            s.soTimeout = TIMEOUT_MS
+            (s as SSLSocket).startHandshake()
+            val input = s.getInputStream()
+            val out = BufferedOutputStream(s.getOutputStream())
+            val first = readLine(input) ?: return
+            val parts = first.split(' ')
+            if (parts.size < 3) return respond(out, 400, TEXT, ByteArray(0))
+            val headers = HashMap<String, String>()
+            for (i in 0 until MAX_HEADERS) {
+                val h = readLine(input) ?: return
+                if (h.isEmpty()) break
+                val c = h.indexOf(':')
+                if (c > 0) headers[h.substring(0, c).trim().lowercase()] = h.substring(c + 1).trim()
+                if (i == MAX_HEADERS - 1) return respond(out, 431, TEXT, ByteArray(0))
+            }
+            if (!hostOk(headers["host"])) return respond(out, 421, TEXT, ByteArray(0))
+            val len = headers["content-length"]?.toIntOrNull() ?: 0
+            if (len < 0 || len > MAX_BODY) return respond(out, 413, TEXT, ByteArray(0))
+            val body = ByteArray(len)
+            var got = 0
+            while (got < len) {
+                val n = input.read(body, got, len - got)
+                if (n < 0) return
+                got += n
+            }
+            val target = parts[1]
+            val path = target.substringBefore('?')
+            val query = target.substringAfter('?', "").split('&').filter { '=' in it }.associate {
+                val (k, v) = it.split('=', limit = 2)
+                URLDecoder.decode(k, "UTF-8") to URLDecoder.decode(v, "UTF-8")
+            }
+            if (path.startsWith("/api/")) {
+                val token = headers["authorization"]?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
+                val r = api.handle(DeskApi.Req(parts[0], path.removePrefix("/api"), query, body.toString(Charsets.UTF_8), token, peer(s)))
+                respond(out, r.status, r.type, r.body)
+            } else serveAsset(out, parts[0], path)
+        }
+    }
+
+    private fun peer(s: Socket): String = s.inetAddress.hostAddress.orEmpty()
+
+    private fun serveAsset(out: OutputStream, method: String, path: String) {
+        if (method != "GET" && method != "HEAD") return respond(out, 405, TEXT, ByteArray(0))
+        val name = if (path == "/") "index.html" else path.removePrefix("/")
+        val type = TYPES[name.substringAfterLast('.')]
+        val data = if (type != null && SAFE_NAME.matches(name)) asset(name) else null
+        if (data == null) return respond(out, 404, TEXT, ByteArray(0))
+        respond(out, 200, type!!, if (method == "HEAD") ByteArray(0) else data, data.size)
+    }
+
+    private fun respond(out: OutputStream, status: Int, type: String, body: ByteArray, length: Int = body.size) {
+        val head = "HTTP/1.1 $status ${REASON[status] ?: "Error"}\r\n" +
+            "Content-Type: $type\r\n" +
+            "Content-Length: $length\r\n" +
+            "Cache-Control: no-store\r\n" +
+            "X-Content-Type-Options: nosniff\r\n" +
+            "X-Frame-Options: DENY\r\n" +
+            "Referrer-Policy: no-referrer\r\n" +
+            "Cross-Origin-Resource-Policy: same-origin\r\n" +
+            "Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'\r\n" +
+            "Connection: close\r\n\r\n"
+        out.write(head.toByteArray(Charsets.ISO_8859_1))
+        out.write(body)
+        out.flush()
+    }
+
+    /** Riga della richiesta (max 8 KB), senza \r\n; null = connessione chiusa o riga troppo lunga. */
+    private fun readLine(input: InputStream): String? {
+        val b = ByteArrayOutputStream()
+        while (b.size() < 8192) {
+            val c = input.read()
+            if (c < 0) return null
+            if (c == '\n'.code) return b.toString("ISO-8859-1").trimEnd('\r')
+            b.write(c)
+        }
+        return null
+    }
+
+    companion object {
+        const val PORT = 8443
+        private const val WORKERS = 6
+        private const val TIMEOUT_MS = 15_000
+        private const val MAX_HEADERS = 64
+        const val MAX_BODY = 1024 * 1024
+        private const val TEXT = "text/plain; charset=utf-8"
+        private val SAFE_NAME = Regex("^[a-z0-9-]+\\.[a-z]+$")
+        private val IPV4_HOST = Regex("^\\d{1,3}(\\.\\d{1,3}){3}(:\\d+)?$")
+        private val TYPES = mapOf(
+            "html" to "text/html; charset=utf-8", "js" to "text/javascript; charset=utf-8", "css" to "text/css; charset=utf-8",
+            "png" to "image/png", "svg" to "image/svg+xml",
+        )
+        private val REASON = mapOf(
+            200 to "OK", 400 to "Bad Request", 401 to "Unauthorized", 403 to "Forbidden", 404 to "Not Found", 405 to "Method Not Allowed",
+            409 to "Conflict", 413 to "Payload Too Large", 421 to "Misdirected Request", 423 to "Locked", 429 to "Too Many Requests", 431 to "Headers Too Large", 500 to "Server Error",
+        )
+
+        fun hostOk(host: String?): Boolean = host != null && (IPV4_HOST.matches(host) || host == "localhost" || host.startsWith("localhost:"))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/MembersCsv.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/MembersCsv.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import com.tennis.scoremanager.data.Membership
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.Players
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+/**
+ * L'elenco dei soci da un foglio di calcolo (CSV): il primo inserimento, che dal telefono sarebbe lungo. Le colonne si
+ * riconoscono dal titolo, in sei lingue e in qualsiasi ordine. I dati si leggono e si mostrano prima: entrano solo
+ * dopo la conferma. Un socio già presente si completa, senza cancellare niente di quello che ha.
+ */
+object MembersCsv {
+    const val MAX_ROWS = 5000
+
+    data class Row(
+        val line: Int, val first: String = "", val last: String = "", val phone: String = "", val email: String = "", val birth: Long? = null,
+        val number: String = "", val fitp: String = "", val ranking: String = "", val medicalUntil: Long? = null,
+        /** Il giocatore già presente, se c'è. */
+        val match: String? = null, val error: String? = null,
+    )
+
+    private val COLUMNS: Map<String, List<String>> = mapOf(
+        "first" to listOf("nome", "first name", "firstname", "given name", "prenom", "vorname", "nombre", "primeiro nome"),
+        "last" to listOf("cognome", "last name", "lastname", "surname", "family name", "nom de famille", "nachname", "familienname", "apellido", "apellidos", "apelido", "sobrenome"),
+        "full" to listOf("nome e cognome", "cognome e nome", "nominativo", "socio", "full name", "name", "nom", "nombre completo", "nome completo"),
+        "phone" to listOf("telefono", "cellulare", "tel", "phone", "mobile", "telephone", "portable", "telefon", "handy", "movil", "telemovel"),
+        "email" to listOf("email", "e mail", "mail", "posta elettronica", "courriel", "correo", "correo electronico"),
+        "birth" to listOf("data di nascita", "nascita", "nato il", "birth date", "date of birth", "birthday", "date de naissance", "geburtsdatum", "fecha de nacimiento", "data de nascimento"),
+        "number" to listOf("tessera", "tessera circolo", "numero tessera", "n tessera", "numero socio", "member number", "membership number", "numero de membre", "mitgliedsnummer", "numero de socio", "numero de socio"),
+        "fitp" to listOf("fitp", "tessera fitp", "numero fitp", "n fitp", "fit", "federation number", "licence", "lizenz", "licencia", "licenca"),
+        "ranking" to listOf("classifica", "ranking", "classement", "rangliste", "clasificacion", "classificacao"),
+        "medical" to listOf("scadenza certificato", "certificato medico", "certificato", "scadenza visita", "medical until", "medical certificate", "certificat medical", "arztliches attest", "certificado medico"),
+    )
+
+    private val DATES = listOf("d/M/uuuu", "uuuu-M-d", "d-M-uuuu", "d.M.uuuu", "d/M/uu").map { DateTimeFormatter.ofPattern(it) }
+
+    /** Una data di un foglio di calcolo, a mezzogiorno come le altre date dei soci; null se non si capisce. */
+    fun date(text: String, zone: java.time.ZoneId = java.time.ZoneId.systemDefault()): Long? {
+        val t = text.trim()
+        for (f in DATES) {
+            val d = runCatching { LocalDate.parse(t, f) }.getOrNull() ?: continue
+            return d.atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
+        }
+        return null
+    }
+
+    private fun plain(s: String): String = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
+        .replace(Regex("\\p{M}"), "").lowercase().replace(Regex("[^a-z0-9]+"), " ").trim()
+
+    /** Il separatore della riga dei titoli: Excel in italiano usa il punto e virgola. */
+    private fun delimiter(header: String): Char = listOf(';', '\t', ',').maxBy { d -> header.count { it == d } }
+
+    /** Le righe del testo, con i campi tra virgolette (che possono contenere separatori e a capo). */
+    fun table(text: String): List<Pair<Int, List<String>>> {
+        val t = text.removePrefix("﻿")
+        val d = delimiter(t.lineSequence().firstOrNull { it.isNotBlank() }.orEmpty())
+        val rows = mutableListOf<Pair<Int, List<String>>>()
+        var row = mutableListOf<String>()
+        val cell = StringBuilder()
+        var quoted = false
+        var line = 1
+        var start = 1
+        var i = 0
+        fun endRow() {
+            row.add(cell.toString().trim()); cell.setLength(0)
+            if (row.any { it.isNotEmpty() }) rows += start to row
+            row = mutableListOf()
+        }
+        while (i < t.length) {
+            val c = t[i]
+            when {
+                quoted && c == '"' && t.getOrNull(i + 1) == '"' -> { cell.append('"'); i++ }
+                c == '"' && (quoted || cell.isBlank()) -> { quoted = !quoted; if (quoted) cell.setLength(0) }
+                !quoted && c == d -> { row.add(cell.toString().trim()); cell.setLength(0) }
+                !quoted && c == '\r' -> {}
+                !quoted && c == '\n' -> { endRow(); line++; start = line }
+                else -> { if (c == '\n') line++; cell.append(c) }
+            }
+            i++
+        }
+        if (cell.isNotEmpty() || row.isNotEmpty()) endRow()
+        return rows
+    }
+
+    /** Legge il foglio. null = non si riconoscono le colonne del nome. */
+    fun parse(text: String, players: List<PlayerProfile>): List<Row>? {
+        val rows = table(text)
+        val head = rows.firstOrNull()?.second ?: return null
+        val cols = head.map { h -> plain(h).let { p -> COLUMNS.entries.firstOrNull { p in it.value }?.key } }
+        fun at(r: List<String>, key: String) = cols.indexOf(key).takeIf { it >= 0 }?.let { r.getOrNull(it) }.orEmpty().trim()
+        val hasNames = "full" in cols || ("first" in cols && "last" in cols)
+        if (!hasNames) return null
+        return rows.drop(1).take(MAX_ROWS).map { (line, r) ->
+            var first = at(r, "first"); var last = at(r, "last")
+            if (first.isEmpty() || last.isEmpty()) splitFull(at(r, "full"))?.let { (f, l) -> first = first.ifEmpty { f }; last = last.ifEmpty { l } }
+            val birthText = at(r, "birth"); val medText = at(r, "medical")
+            val birth = date(birthText); val med = date(medText)
+            val base = Row(line, first, last, at(r, "phone"), at(r, "email").lowercase(), birth, at(r, "number"), at(r, "fitp"), at(r, "ranking"), med)
+            val err = when {
+                first.isEmpty() || last.isEmpty() -> "NAME"
+                birthText.isNotEmpty() && birth == null -> "DATE"
+                medText.isNotEmpty() && med == null -> "DATE"
+                else -> null
+            }
+            base.copy(match = find(players, base)?.id, error = err)
+        }
+    }
+
+    /** "Rossi Mario" o "Rossi, Mario": il cognome è la prima parola solo con la virgola; se no l'ultima. */
+    private fun splitFull(full: String): Pair<String, String>? {
+        val t = full.trim()
+        if (',' in t) return t.substringAfter(',').trim().takeIf { it.isNotEmpty() }?.let { it to t.substringBefore(',').trim() }
+        val w = t.split(Regex("\\s+")).filter { it.isNotEmpty() }
+        return if (w.size < 2) null else w.dropLast(1).joinToString(" ") to w.last()
+    }
+
+    private fun same(a: String, b: String) = plain(a) == plain(b)
+
+    /** Lo stesso giocatore: tessera FITP uguale, o stesso nome con la stessa data di nascita (o senza date). */
+    private fun find(players: List<PlayerProfile>, r: Row): PlayerProfile? {
+        if (r.fitp.isNotEmpty()) players.firstOrNull { it.member?.fitpNumber?.trim()?.equals(r.fitp, ignoreCase = true) == true }?.let { return it }
+        val named = players.filter { same(it.firstName, r.first) && same(it.lastName, r.last) && r.first.isNotEmpty() }
+        return named.firstOrNull { p ->
+            p.birth == null || r.birth == null || LocalDate.ofEpochDay(p.birth / 86_400_000L) == LocalDate.ofEpochDay(r.birth / 86_400_000L)
+        }
+    }
+
+    /** I giocatori da salvare per le righe senza errori. Quelli presenti diventano soci e prendono solo i dati mancanti. */
+    fun apply(rows: List<Row>, players: List<PlayerProfile>, now: Long): List<PlayerProfile> {
+        val done = LinkedHashMap<String, PlayerProfile>()
+        for (r in rows.filter { it.error == null }) {
+            val old = r.match?.let { id -> done[id] ?: players.firstOrNull { it.id == id } }
+            val p = old ?: PlayerProfile(Players.newId(), PlayerProfile.display(r.first, r.last, ""), r.first, r.last, createdAt = now)
+            val m = p.member ?: Membership(since = now)
+            done[p.id] = p.copy(
+                phone = p.phone.ifBlank { r.phone }, email = p.email.ifBlank { r.email }, birth = p.birth ?: r.birth,
+                member = m.copy(
+                    number = m.number.ifBlank { r.number }, fitpNumber = m.fitpNumber.ifBlank { r.fitp }, ranking = m.ranking.ifBlank { r.ranking },
+                    medicalUntil = m.medicalUntil ?: r.medicalUntil,
+                ),
+            )
+        }
+        return done.values.toList()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/model/Rules.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/model/Rules.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -19673,6 +22670,83 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
 
     private fun connectedNow(): Set<String> =
         InputDevice.getDeviceIds().asList().mapNotNull { InputDevice.getDevice(it)?.descriptor }.toSet()
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/DeskService.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/DeskService.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.service
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
+import android.os.IBinder
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.MainActivity
+import com.tennis.scoremanager.R
+import com.tennis.scoremanager.TsmApp
+
+/** Tiene vivo il server della Segreteria da PC anche a schermo spento, con la notifica sempre visibile e il tasto per spegnerlo. */
+class DeskService : Service() {
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    /** App tolta dalle recenti: niente server che resta acceso a insaputa di chi l'ha chiusa. */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        (application as TsmApp).controller.desk.stop()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val c = (application as TsmApp).controller
+        if (intent?.action == ACTION_STOP) {
+            c.desk.stop()
+            return START_NOT_STICKY
+        }
+        val s = c.strings
+        val nm = getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.deskTitle, NotificationManager.IMPORTANCE_LOW))
+        val open = PendingIntent.getActivity(this, 2, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE)
+        val stop = PendingIntent.getService(this, 3, Intent(this, DeskService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE)
+        val notification = NotificationCompat.Builder(this, CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_tennis)
+            .setContentTitle(s.deskTitle)
+            .setContentText(s.deskNotif)
+            .setOngoing(true)
+            .setContentIntent(open)
+            .addAction(0, s.deskStop, stop)
+            .build()
+        try {
+            ServiceCompat.startForeground(this, 2, notification, if (Build.VERSION.SDK_INT >= 29) ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE else 0)
+        } catch (e: Exception) {
+            Log.w("DeskService", "Servizio in primo piano non avviato", e)
+            stopSelf()
+        }
+        return START_NOT_STICKY
+    }
+
+    companion object {
+        private const val CHANNEL = "desk"
+        private const val ACTION_STOP = "com.tennis.scoremanager.DESK_STOP"
+
+        fun start(ctx: Context) {
+            runCatching { ContextCompat.startForegroundService(ctx, Intent(ctx, DeskService::class.java)) }.onFailure { Log.w("DeskService", "start", it) }
+        }
+
+        fun stop(ctx: Context) {
+            ctx.stopService(Intent(ctx, DeskService::class.java))
+        }
+    }
 }
 TSM_EOF
 
@@ -22163,6 +25237,7 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Leaderboard
@@ -22198,6 +25273,7 @@ fun featureInfo(s: Strings, f: ClubFeature): Triple<String, String, ImageVector>
     ClubFeature.LADDER -> Triple(s.ldTitle, s.ldHint, Icons.Filled.Leaderboard)
     ClubFeature.STATS -> Triple(s.stTitle, s.cfStatsHint, Icons.Filled.BarChart)
     ClubFeature.SERVER -> Triple(s.srvTitle, s.srvButtonHint, Icons.Filled.Cloud)
+    ClubFeature.DESK -> Triple(s.deskTitle, s.deskHint, Icons.Filled.Computer)
 }
 
 /** Le funzioni del circolo: un interruttore per ognuna, quelle di base prima. I dati delle funzioni spente restano. */
@@ -22487,6 +25563,7 @@ fun AppRoot(c: MatchController) {
                 Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
                 Screen.BOOK_COURT -> com.tennis.scoremanager.ui.screens.BookCourtScreen(c)
                 Screen.COURT_STATS -> com.tennis.scoremanager.ui.screens.CourtStatsScreen(c)
+                Screen.DESK -> com.tennis.scoremanager.ui.screens.DeskScreen(c)
                 Screen.LADDERS -> com.tennis.scoremanager.ui.screens.LaddersScreen(c)
                 Screen.LADDER -> com.tennis.scoremanager.ui.screens.LadderScreen(c)
                 Screen.PAYMENTS -> com.tennis.scoremanager.ui.screens.PaymentsScreen(c)
@@ -26644,6 +29721,30 @@ interface Strings {
     val backhandOne: String
     val backhandTwo: String
     val playerAge: (Int) -> String
+    // Segreteria da PC.
+    val deskTitle: String
+    val deskHint: String
+    val deskIntro: String
+    val deskStart: String
+    val deskShare: String
+    val deskScan: String
+    val deskScanHint: String
+    val deskScanBad: String
+    val deskStop: String
+    val deskFailed: String
+    val deskAddress: String
+    val deskWarning: String
+    val deskCode: String
+    val deskCodeHint: String
+    val deskNoNetwork: String
+    val deskFingerprint: String
+    val deskDisconnect: String
+    val deskAskTitle: String
+    val deskAllow: String
+    val deskDeny: String
+    val deskNotif: String
+    val deskConnected: (String) -> String
+    val deskAsk: (String) -> String
     // Server del circolo (facoltativo).
     val srvTitle: String
     val srvButtonHint: String
@@ -28664,6 +31765,29 @@ object ItStrings : Strings {
     override val backhandTwo = "2 mani"
     override val playerAge: (Int) -> String = { "$it anni" }
     override val memberValidUntil: (String) -> String = { "fino al $it" }
+    override val deskTitle = "Segreteria da PC"
+    override val deskHint = "Soci, pagamenti e planning dal computer, sulla stessa rete"
+    override val deskIntro = "Il computer apre una pagina servita da questo telefono: i dati restano qui, cifrati durante il viaggio. Telefono e computer devono stare sulla stessa rete. Si spegne da solo dopo mezz'ora senza nessuno collegato."
+    override val deskStart = "Accendi"
+    override val deskShare = "Condividi l'indirizzo"
+    override val deskScan = "Inquadra il QR del computer"
+    override val deskScanHint = "La pagina sul computer mostra un QR: inquadralo, poi tocca Consenti."
+    override val deskScanBad = "QR non valido o scaduto: aggiorna la pagina sul computer."
+    override val deskStop = "Spegni"
+    override val deskFailed = "Non si è acceso: riprova."
+    override val deskAddress = "Scrivi questo indirizzo nel browser del computer"
+    override val deskWarning = "La prima volta il browser avvisa che la connessione non è privata: è normale con un certificato del telefono. Scegli Avanzate e Procedi; se l'avviso torna senza motivo, non proseguire."
+    override val deskCode = "Codice di accesso"
+    override val deskCodeHint = "Se non puoi usare la fotocamera, scrivilo sul computer. Vale una volta sola e cambia ogni 5 minuti. Non dirlo a nessuno."
+    override val deskNoNetwork = "Nessuna rete: collega il telefono al Wi-Fi o accendi l'hotspot."
+    override val deskFingerprint = "Impronta del certificato (SHA-256), da confrontare nel browser se vuoi controllare"
+    override val deskDisconnect = "Scollega il computer"
+    override val deskAskTitle = "Consenti l'accesso?"
+    override val deskAllow = "Consenti"
+    override val deskDeny = "Rifiuta"
+    override val deskNotif = "Acceso: il computer può gestire i dati del circolo"
+    override val deskConnected: (String) -> String = { x -> "Collegato: $x" }
+    override val deskAsk: (String) -> String = { x -> "Il computer $x ha scritto il codice giusto e potrà vedere e cambiare i dati del circolo. Sei tu?" }
     override val srvTitle = "Server del circolo"
     override val srvButtonHint = "Facoltativo: i giocatori prenotano da soli"
     override val srvIntro = "Facoltativo. Con un piccolo server al circolo (un Raspberry Pi o un vecchio PC) i giocatori invitati prenotano i campi da soli dal telefono, anche da iPhone, con le regole decise qui. Senza server tutto resta com'è: si prenota in segreteria."
@@ -30659,6 +33783,29 @@ object EnStrings : Strings {
     override val backhandTwo = "2 hands"
     override val playerAge: (Int) -> String = { "$it years old" }
     override val memberValidUntil: (String) -> String = { "until $it" }
+    override val deskTitle = "Office from PC"
+    override val deskHint = "Members, payments and planner from a computer on the same network"
+    override val deskIntro = "The computer opens a page served by this phone: the data stays here and is encrypted in transit. Phone and computer must be on the same network. It turns itself off after half an hour with nobody connected."
+    override val deskStart = "Turn on"
+    override val deskShare = "Share the address"
+    override val deskScan = "Scan the computer's QR"
+    override val deskScanHint = "The page on the computer shows a QR: scan it, then tap Allow."
+    override val deskScanBad = "Invalid or expired QR: reload the page on the computer."
+    override val deskStop = "Turn off"
+    override val deskFailed = "It did not start: try again."
+    override val deskAddress = "Type this address in the computer's browser"
+    override val deskWarning = "The first time, the browser warns that the connection is not private: this is normal with a certificate made by the phone. Choose Advanced and Proceed; if the warning comes back for no reason, do not continue."
+    override val deskCode = "Access code"
+    override val deskCodeHint = "If you cannot use the camera, type it on the computer. It works once and changes every 5 minutes. Keep it to yourself."
+    override val deskNoNetwork = "No network: connect the phone to Wi-Fi or turn on the hotspot."
+    override val deskFingerprint = "Certificate fingerprint (SHA-256), to compare in the browser if you want to check"
+    override val deskDisconnect = "Disconnect the computer"
+    override val deskAskTitle = "Allow access?"
+    override val deskAllow = "Allow"
+    override val deskDeny = "Deny"
+    override val deskNotif = "On: the computer can manage the club data"
+    override val deskConnected: (String) -> String = { x -> "Connected: $x" }
+    override val deskAsk: (String) -> String = { x -> "Computer $x entered the right code and will be able to view and change the club data. Is it you?" }
     override val srvTitle = "Club server"
     override val srvButtonHint = "Optional: players book by themselves"
     override val srvIntro = "Optional. With a small server at the club (a Raspberry Pi or an old PC) invited players book courts by themselves from their phone, iPhone too, with the rules set here. Without a server nothing changes: bookings go through the club office."
@@ -32677,6 +35824,29 @@ object DeStrings : Strings {
     override val backhandTwo = "2 Hände"
     override val playerAge: (Int) -> String = { "$it Jahre" }
     override val memberValidUntil: (String) -> String = { "bis $it" }
+    override val deskTitle = "Büro am PC"
+    override val deskHint = "Mitglieder, Zahlungen und Platzplan am Computer, im selben Netz"
+    override val deskIntro = "Der Computer öffnet eine Seite, die dieses Telefon bereitstellt: Die Daten bleiben hier und werden verschlüsselt übertragen. Telefon und Computer müssen im selben Netz sein. Nach einer halben Stunde ohne Verbindung schaltet es sich selbst aus."
+    override val deskStart = "Einschalten"
+    override val deskShare = "Adresse teilen"
+    override val deskScan = "QR des Computers scannen"
+    override val deskScanHint = "Die Seite am Computer zeigt einen QR: Scanne ihn und tippe dann auf Erlauben."
+    override val deskScanBad = "QR ungültig oder abgelaufen: Lade die Seite am Computer neu."
+    override val deskStop = "Ausschalten"
+    override val deskFailed = "Start fehlgeschlagen: Versuche es erneut."
+    override val deskAddress = "Gib diese Adresse im Browser des Computers ein"
+    override val deskWarning = "Beim ersten Mal warnt der Browser, die Verbindung sei nicht privat: Das ist bei einem Zertifikat des Telefons normal. Wähle Erweitert und Weiter; kommt die Warnung ohne Grund wieder, mach nicht weiter."
+    override val deskCode = "Zugangscode"
+    override val deskCodeHint = "Ohne Kamera gib ihn am Computer ein. Er gilt einmal und ändert sich alle 5 Minuten. Gib ihn nicht weiter."
+    override val deskNoNetwork = "Kein Netz: Verbinde das Telefon mit dem WLAN oder schalte den Hotspot ein."
+    override val deskFingerprint = "Zertifikat-Fingerabdruck (SHA-256), zum Vergleich im Browser"
+    override val deskDisconnect = "Computer trennen"
+    override val deskAskTitle = "Zugriff erlauben?"
+    override val deskAllow = "Erlauben"
+    override val deskDeny = "Ablehnen"
+    override val deskNotif = "An: Der Computer kann die Vereinsdaten verwalten"
+    override val deskConnected: (String) -> String = { x -> "Verbunden: $x" }
+    override val deskAsk: (String) -> String = { x -> "Computer $x hat den richtigen Code eingegeben und kann die Vereinsdaten sehen und ändern. Bist du das?" }
     override val srvTitle = "Vereinsserver"
     override val srvButtonHint = "Optional: Spieler buchen selbst"
     override val srvIntro = "Optional. Mit einem kleinen Server im Verein (ein Raspberry Pi oder ein alter PC) buchen eingeladene Spieler die Plätze selbst am Handy, auch am iPhone, nach den hier festgelegten Regeln. Ohne Server bleibt alles wie gehabt: gebucht wird im Vereinsbüro."
@@ -34688,6 +37858,29 @@ object EsStrings : Strings {
     override val backhandTwo = "2 manos"
     override val playerAge: (Int) -> String = { "$it años" }
     override val memberValidUntil: (String) -> String = { "hasta el $it" }
+    override val deskTitle = "Secretaría desde el PC"
+    override val deskHint = "Socios, pagos y planning desde el ordenador, en la misma red"
+    override val deskIntro = "El ordenador abre una página servida por este teléfono: los datos se quedan aquí y viajan cifrados. Teléfono y ordenador deben estar en la misma red. Se apaga solo tras media hora sin nadie conectado."
+    override val deskStart = "Encender"
+    override val deskShare = "Compartir la dirección"
+    override val deskScan = "Escanea el QR del ordenador"
+    override val deskScanHint = "La página del ordenador muestra un QR: escanéalo y toca Permitir."
+    override val deskScanBad = "QR no válido o caducado: recarga la página en el ordenador."
+    override val deskStop = "Apagar"
+    override val deskFailed = "No se ha encendido: inténtalo de nuevo."
+    override val deskAddress = "Escribe esta dirección en el navegador del ordenador"
+    override val deskWarning = "La primera vez el navegador avisa de que la conexión no es privada: es normal con un certificado del teléfono. Elige Avanzado y Continuar; si el aviso vuelve sin motivo, no sigas."
+    override val deskCode = "Código de acceso"
+    override val deskCodeHint = "Si no puedes usar la cámara, escríbelo en el ordenador. Vale una sola vez y cambia cada 5 minutos. No se lo digas a nadie."
+    override val deskNoNetwork = "Sin red: conecta el teléfono al Wi-Fi o enciende el punto de acceso."
+    override val deskFingerprint = "Huella del certificado (SHA-256), para comparar en el navegador si quieres comprobarlo"
+    override val deskDisconnect = "Desconectar el ordenador"
+    override val deskAskTitle = "¿Permitir el acceso?"
+    override val deskAllow = "Permitir"
+    override val deskDeny = "Rechazar"
+    override val deskNotif = "Encendido: el ordenador puede gestionar los datos del club"
+    override val deskConnected: (String) -> String = { x -> "Conectado: $x" }
+    override val deskAsk: (String) -> String = { x -> "El ordenador $x ha escrito el código correcto y podrá ver y cambiar los datos del club. ¿Eres tú?" }
     override val srvTitle = "Servidor del club"
     override val srvButtonHint = "Opcional: los jugadores reservan solos"
     override val srvIntro = "Opcional. Con un pequeño servidor en el club (una Raspberry Pi o un PC viejo) los jugadores invitados reservan las pistas solos desde el teléfono, también iPhone, con las reglas fijadas aquí. Sin servidor todo sigue igual: se reserva en secretaría."
@@ -36701,6 +39894,29 @@ object FrStrings : Strings {
     override val backhandTwo = "2 mains"
     override val playerAge: (Int) -> String = { "$it ans" }
     override val memberValidUntil: (String) -> String = { "jusqu'au $it" }
+    override val deskTitle = "Secrétariat sur PC"
+    override val deskHint = "Adhérents, paiements et planning depuis l'ordinateur, sur le même réseau"
+    override val deskIntro = "L'ordinateur ouvre une page servie par ce téléphone : les données restent ici et sont chiffrées pendant le transfert. Téléphone et ordinateur doivent être sur le même réseau. Il s'éteint seul après une demi-heure sans connexion."
+    override val deskStart = "Activer"
+    override val deskShare = "Partager l'adresse"
+    override val deskScan = "Scanner le QR de l'ordinateur"
+    override val deskScanHint = "La page sur l'ordinateur affiche un QR : scannez-le, puis touchez Autoriser."
+    override val deskScanBad = "QR non valide ou expiré : rechargez la page sur l'ordinateur."
+    override val deskStop = "Désactiver"
+    override val deskFailed = "Le démarrage a échoué : réessayez."
+    override val deskAddress = "Saisissez cette adresse dans le navigateur de l'ordinateur"
+    override val deskWarning = "La première fois, le navigateur signale que la connexion n'est pas privée : c'est normal avec un certificat créé par le téléphone. Choisissez Avancé puis Continuer ; si l'alerte revient sans raison, n'allez pas plus loin."
+    override val deskCode = "Code d'accès"
+    override val deskCodeHint = "Sans caméra, saisissez-le sur l'ordinateur. Il ne sert qu'une fois et change toutes les 5 minutes. Ne le communiquez à personne."
+    override val deskNoNetwork = "Aucun réseau : connectez le téléphone au Wi-Fi ou activez le point d'accès."
+    override val deskFingerprint = "Empreinte du certificat (SHA-256), à comparer dans le navigateur si vous voulez vérifier"
+    override val deskDisconnect = "Déconnecter l'ordinateur"
+    override val deskAskTitle = "Autoriser l'accès ?"
+    override val deskAllow = "Autoriser"
+    override val deskDeny = "Refuser"
+    override val deskNotif = "Activé : l'ordinateur peut gérer les données du club"
+    override val deskConnected: (String) -> String = { x -> "Connecté : $x" }
+    override val deskAsk: (String) -> String = { x -> "L'ordinateur $x a saisi le bon code et pourra voir et modifier les données du club. Est-ce vous ?" }
     override val srvTitle = "Serveur du club"
     override val srvButtonHint = "Facultatif : les joueurs réservent eux-mêmes"
     override val srvIntro = "Facultatif. Avec un petit serveur au club (un Raspberry Pi ou un vieux PC), les joueurs invités réservent eux-mêmes depuis leur téléphone, iPhone compris, avec les règles fixées ici. Sans serveur rien ne change : on réserve au secrétariat."
@@ -38715,6 +41931,29 @@ object PtStrings : Strings {
     override val backhandTwo = "2 mãos"
     override val playerAge: (Int) -> String = { "$it anos" }
     override val memberValidUntil: (String) -> String = { "até $it" }
+    override val deskTitle = "Secretaria no PC"
+    override val deskHint = "Sócios, pagamentos e agenda no computador, na mesma rede"
+    override val deskIntro = "O computador abre uma página servida por este telefone: os dados ficam aqui e viajam cifrados. Telefone e computador devem estar na mesma rede. Desliga-se sozinho após meia hora sem ninguém conectado."
+    override val deskStart = "Ativar"
+    override val deskShare = "Compartilhar o endereço"
+    override val deskScan = "Escaneie o QR do computador"
+    override val deskScanHint = "A página no computador mostra um QR: escaneie e toque em Permitir."
+    override val deskScanBad = "QR inválido ou expirado: recarregue a página no computador."
+    override val deskStop = "Desativar"
+    override val deskFailed = "Não ligou: tente de novo."
+    override val deskAddress = "Digite este endereço no navegador do computador"
+    override val deskWarning = "Da primeira vez o navegador avisa que a conexão não é privada: é normal com um certificado do telefone. Escolha Avançado e Continuar; se o aviso voltar sem motivo, não prossiga."
+    override val deskCode = "Código de acesso"
+    override val deskCodeHint = "Se não puder usar a câmera, digite-o no computador. Vale uma só vez e muda a cada 5 minutos. Não o diga a ninguém."
+    override val deskNoNetwork = "Sem rede: ligue o telefone ao Wi-Fi ou ative o hotspot."
+    override val deskFingerprint = "Impressão digital do certificado (SHA-256), para comparar no navegador se quiser verificar"
+    override val deskDisconnect = "Desconectar o computador"
+    override val deskAskTitle = "Permitir o acesso?"
+    override val deskAllow = "Permitir"
+    override val deskDeny = "Recusar"
+    override val deskNotif = "Conectado: o computador pode gerir os dados do clube"
+    override val deskConnected: (String) -> String = { x -> "Conectado: $x" }
+    override val deskAsk: (String) -> String = { x -> "O computador $x escreveu o código certo e poderá ver e alterar os dados do clube. É você?" }
     override val srvTitle = "Servidor do clube"
     override val srvButtonHint = "Opcional: os jogadores reservam sozinhos"
     override val srvIntro = "Opcional. Com um pequeno servidor no clube (um Raspberry Pi ou um PC antigo) os jogadores convidados reservam as quadras sozinhos no telemóvel, também iPhone, com as regras definidas aqui. Sem servidor tudo fica igual: reserva-se na secretaria."
@@ -41975,6 +45214,119 @@ fun DataScreen(c: MatchController) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/DeskScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/DeskScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Intent
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.TsmColors
+
+/** Accende la Segreteria da PC: indirizzo e codice da scrivere sul computer, chi è collegato, il consenso. */
+@Composable
+fun DeskScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val ui by c.desk.ui.collectAsState()
+    val context = LocalContext.current
+    var scanBad by remember { mutableStateOf(false) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { scanBad = !c.desk.scan(it) } }
+    ScreenScaffold(
+        onHelp = { c.openHelp("7.20") },
+        title = s.deskTitle,
+        subtitle = s.deskHint,
+        icon = Icons.Filled.Computer,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        if (!ui.running) {
+            Text(s.deskIntro, color = TsmColors.TextDim)
+            if (ui.failed) Text(s.deskFailed, color = TsmColors.Orange)
+            GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start() }, Modifier.fillMaxWidth())
+            return@ScreenScaffold
+        }
+        val ip = ui.connectedIp
+        if (ip != null) {
+            SectionCard(s.deskConnected(ip), Icons.Filled.Link) {
+                GhostButton(s.deskDisconnect, Icons.Filled.LinkOff, { c.desk.disconnect() }, Modifier.fillMaxWidth())
+            }
+        } else {
+            SectionCard(s.deskAddress, Icons.Filled.Computer) {
+                if (ui.urls.isEmpty()) Text(s.deskNoNetwork, color = TsmColors.Orange)
+                ui.urls.forEach { Text(it, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace) }
+                ui.urls.firstOrNull()?.let { url ->
+                    GhostButton(s.deskShare, Icons.Filled.Share, {
+                        // Solo l'indirizzo: per entrare servono comunque il codice e il consenso sul telefono.
+                        val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url)
+                        context.startActivity(Intent.createChooser(send, s.deskShare))
+                    }, Modifier.fillMaxWidth())
+                }
+                Text(s.deskWarning, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+            SectionCard(s.deskScan, Icons.Filled.QrCodeScanner) {
+                Text(s.deskScanHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (scanBad) Text(s.deskScanBad, color = TsmColors.Orange)
+                GhostButton(s.deskScan, Icons.Filled.QrCodeScanner, {
+                    scanBad = false
+                    scanner.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.deskScanHint).setBeepEnabled(false).setOrientationLocked(true))
+                }, Modifier.fillMaxWidth())
+            }
+            SectionCard(s.deskCode, Icons.Filled.VpnKey) {
+                Text(ui.code.chunked(4).joinToString(" "), fontSize = 30.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = TsmColors.Ball)
+                Text(s.deskCodeHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+        }
+        Text(s.deskFingerprint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(ui.fingerprint, color = TsmColors.TextDim, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+        GhostButton(s.deskStop, Icons.Filled.PowerSettingsNew, { c.desk.stop() }, Modifier.fillMaxWidth())
+    }
+    ui.waitingIp?.let { ip ->
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(s.deskAskTitle) },
+            text = { Text(s.deskAsk(ip)) },
+            confirmButton = { TextButton(onClick = { c.desk.answer(true) }) { Text(s.deskAllow) } },
+            dismissButton = { TextButton(onClick = { c.desk.answer(false) }) { Text(s.deskDeny) } },
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/DrillsScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/DrillsScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -42732,6 +46084,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -42949,6 +46302,7 @@ private fun CourtsTab(c: MatchController) {
         val srv by c.clubServer.collectAsState()
         Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
     }
+    if (ClubFeature.DESK in f) Entry(Icons.Filled.Computer, s.deskTitle, s.deskHint) { c.go(Screen.DESK) }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
     if (server) ClubServerDialog(c) { server = false }
@@ -71537,6 +74891,335 @@ class WorkoutStatsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/desk/DeskTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/desk/DeskTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.File
+import java.net.InetAddress
+import java.net.Socket
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLEngine
+import javax.net.ssl.SSLParameters
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509ExtendedTrustManager
+
+class DeskTest {
+    private var t = 1_000_000L
+    private val auth = DeskAuth({ t })
+    private val data = FakeDesk()
+    private val api = DeskApi(data, auth)
+    private val ip = "192.168.1.40"
+
+    private fun req(m: String, p: String, body: String = "", token: String? = null, from: String = ip, q: Map<String, String> = emptyMap()) =
+        api.handle(DeskApi.Req(m, p, q, body, token, from)).let { it.status to it.body.toString(Charsets.UTF_8) }
+
+    private fun field(json: String, k: String) = Regex("\"$k\":\"([^\"]+)\"").find(json)?.groupValues?.get(1)
+
+    /** Codice giusto e "Consenti": la chiave della sessione. */
+    private fun login(): String {
+        val id = field(req("POST", "/pair", """{"code":"${auth.shownCode}"}""").second, "id")!!
+        auth.answer(true)
+        return field(req("GET", "/pair/$id").second, "token")!!
+    }
+
+    @Test fun senzaChiaveNonSiVedeNiente() {
+        for ((m, p) in listOf("GET" to "/people", "GET" to "/money", "GET" to "/day", "POST" to "/fees", "GET" to "/info", "DELETE" to "/bookings/x")) {
+            assertEquals(p, 401, req(m, p).first)
+            assertEquals(p, 401, req(m, p, token = "sbagliata").first)
+        }
+    }
+
+    @Test fun ilCodiceDaSoloNonBasta() {
+        val id = field(req("POST", "/pair", """{"code":"${auth.shownCode}"}""").second, "id")!!
+        assertEquals("CONFIRM", field(req("GET", "/pair/$id").second, "state"))
+        assertEquals(ip, auth.pending?.ip)
+        auth.answer(false)
+        assertEquals(403, req("GET", "/pair/$id").first)
+        assertNull(auth.connected)
+    }
+
+    @Test fun laChiaveEUnaSolaEDalloStessoPc() {
+        val id = field(req("POST", "/pair", """{"code":"${auth.shownCode}"}""").second, "id")!!
+        auth.answer(true)
+        assertEquals(403, req("GET", "/pair/$id", from = "192.168.1.66").first)
+        val token = field(req("GET", "/pair/$id").second, "token")!!
+        assertEquals(403, req("GET", "/pair/$id").first)
+        assertEquals(200, req("GET", "/info", token = token).first)
+        assertEquals(401, req("GET", "/info", token = token, from = "192.168.1.66").first)
+    }
+
+    /** Il PC chiede il QR: col generatore di prova la riga è il testo stesso. */
+    private fun qr(from: String = ip): Pair<String, String> {
+        val out = req("POST", "/pair/qr", from = from).second
+        return field(out, "id")!! to Regex("tsm-desk:[^\"]+").find(out)!!.value
+    }
+
+    @Test fun conIlQrSiEntraSoloDopoIlConsenti() {
+        val (id, text) = qr()
+        assertEquals("WAIT", field(req("GET", "/pair/$id").second, "state"))
+        assertTrue(auth.scan(text))
+        assertEquals(ip, auth.pending?.ip)
+        assertEquals("CONFIRM", field(req("GET", "/pair/$id").second, "state"))
+        auth.answer(true)
+        val token = field(req("GET", "/pair/$id").second, "token")!!
+        assertEquals(200, req("GET", "/info", token = token).first)
+    }
+
+    @Test fun qrRifiutatoESbagliatoENonRiusabile() {
+        val (id, text) = qr()
+        assertFalse(auth.scan("tsm-desk:inventato"))
+        assertFalse(auth.scan("https://altro.example"))
+        assertNull(auth.pending)
+        assertTrue(auth.scan(text))
+        auth.answer(false)
+        assertEquals(403, req("GET", "/pair/$id").first)
+        assertFalse("un QR vale una volta", auth.scan(text))
+    }
+
+    @Test fun qrScadeEDaUnAltroPcNonSiEntra() {
+        val (id, text) = qr()
+        assertEquals(403, req("GET", "/pair/$id", from = "192.168.1.66").first)
+        val (other, otherText) = qr("192.168.1.66")
+        assertNotEquals(text, otherText)
+        assertTrue(auth.scan(otherText))
+        auth.answer(true)
+        assertEquals(403, req("GET", "/pair/$other").first)
+        val t2 = field(req("GET", "/pair/$other", from = "192.168.1.66").second, "token")!!
+        assertEquals(423, req("POST", "/pair/qr").first)
+        assertEquals(200, req("POST", "/logout", token = t2, from = "192.168.1.66").first)
+        val (_, old) = qr()
+        t += DeskAuth.QR_MS + 1
+        assertFalse(auth.scan(old))
+    }
+
+    @Test fun ilCodiceNonSiRiusaESiCambia() {
+        val c = auth.shownCode
+        assertEquals(DeskAuth.CODE_LEN, c.length)
+        t += DeskAuth.CODE_MS + 1
+        assertNotEquals(c, auth.shownCode)
+        assertEquals(403, req("POST", "/pair", """{"code":"$c"}""").first)
+    }
+
+    @Test fun iTentativiVengonoFermati() {
+        val c = auth.shownCode
+        repeat(DeskAuth.MAX_WRONG) { assertEquals(403, req("POST", "/pair", """{"code":"AAAAAAAA"}""").first) }
+        assertNotEquals("dopo troppi errori il codice cambia", c, auth.shownCode)
+        assertEquals(429, req("POST", "/pair", """{"code":"${auth.shownCode}"}""").first)
+        t += DeskAuth.BLOCK_MS + 1
+        assertEquals(200, req("POST", "/pair", """{"code":"${auth.shownCode}"}""").first)
+    }
+
+    @Test fun unaSolaSessioneEScadenza() {
+        val token = login()
+        assertEquals("", auth.shownCode)
+        assertEquals(423, req("POST", "/pair", """{"code":"X"}""", from = "192.168.1.66").first)
+        t += DeskAuth.IDLE_MS + 1
+        assertEquals(401, req("GET", "/info", token = token).first)
+        assertTrue(auth.shownCode.isNotEmpty())
+    }
+
+    @Test fun scadenzaMassimaAncheSeSiLavora() {
+        val token = login()
+        repeat(30) { t += DeskAuth.IDLE_MS - 1; req("GET", "/info", token = token) }
+        assertEquals(401, req("GET", "/info", token = token).first)
+    }
+
+    @Test fun logoutChiude() {
+        val token = login()
+        assertEquals(200, req("POST", "/logout", token = token).first)
+        assertEquals(401, req("GET", "/info", token = token).first)
+    }
+
+    @Test fun socioNuovoECambiato() {
+        val k = login()
+        assertEquals(400, req("POST", "/people", """{"firstName":"Mario"}""", k).first)
+        val (st, out) = req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true,"birth":"1980-03-01","medicalUntil":"2020-01-01"}""", k)
+        assertEquals(200, st)
+        val id = field(out, "id")!!
+        val p = data.list.single()
+        assertEquals("Mario Rossi", p.name)
+        assertNotNull(p.member)
+        assertTrue(out, "MEDICAL_EXPIRED" in out)
+        // Quello che il PC non vede non si perde.
+        data.list = listOf(p.copy(racket = "r1", aliases = setOf("vecchio")))
+        assertEquals(200, req("PUT", "/people/$id", """{"firstName":"Mario","lastName":"Rossi","nickname":"Mago","member":true}""", k).first)
+        assertEquals("r1", data.list.single().racket)
+        assertEquals(setOf("vecchio"), data.list.single().aliases)
+        assertEquals("Mago", data.list.single().name)
+        assertEquals(404, req("PUT", "/people/nessuno", """{"firstName":"A","lastName":"B"}""", k).first)
+    }
+
+    @Test fun quotaAddebitoEPagamento() {
+        val k = login()
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true}""", k)
+        req("POST", "/people", """{"firstName":"Luca","lastName":"Bianchi","member":false}""", k)
+        val (_, n) = req("POST", "/fees", """{"name":"Quota 2027","cents":15000,"kind":"MEMBERSHIP","chargeMembers":true}""", k)
+        assertTrue(n, "\"count\":1" in n)
+        val c = data.ledger.charges.single()
+        assertEquals(400, req("POST", "/charges/${c.id}/pay", """{"cents":20000,"date":"2026-11-04","type":"cash"}""", k).first)
+        assertEquals(400, req("POST", "/charges/${c.id}/pay", """{"cents":-5,"date":"2026-11-04","type":"cash"}""", k).first)
+        assertEquals(400, req("POST", "/charges/${c.id}/pay", """{"cents":100,"date":"2026-11-04","type":"boh"}""", k).first)
+        assertEquals(200, req("POST", "/charges/${c.id}/pay", """{"cents":15000,"date":"2026-11-04","type":"cash","ref":"x"}""", k).first)
+        val paid = data.ledger.charges.single()
+        assertEquals(0, paid.left)
+        assertEquals("1/2026", paid.payments.single().receipt)
+        assertEquals(200, req("DELETE", "/charges/${c.id}/payments/${paid.payments.single().id}", token = k).first)
+        assertEquals(15000, data.ledger.charges.single().left)
+    }
+
+    @Test fun prenotazioniSenzaSovrapposizioni() {
+        val k = login()
+        val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"]}"""
+        assertEquals(200, req("POST", "/bookings", b, k).first)
+        assertEquals(409, req("POST", "/bookings", b, k).first)
+        assertEquals(200, req("POST", "/bookings", b.replace("Campo 1", "Campo 2"), k).first)
+        assertEquals(404, req("POST", "/bookings", b.replace("Campo 1", "Campo 9"), k).first)
+        assertEquals(400, req("POST", "/bookings", b.replace("\"minutes\":60", "\"minutes\":0"), k).first)
+        val (st, day) = req("GET", "/day", token = k, q = mapOf("date" to "2026-11-10"))
+        assertEquals(200, st)
+        assertTrue(day, "\"startMin\":600" in day && "Rossi" in day)
+        assertEquals(1200, data.courtPlan.bookings.first().cents)
+        assertEquals(200, req("DELETE", "/bookings/${data.courtPlan.bookings.first().id}", token = k).first)
+        assertEquals(1, data.courtPlan.bookings.size)
+    }
+
+    @Test fun csvDaExcelItaliano() {
+        val k = login()
+        val csv = "﻿Cognome;Nome;Cellulare;Data di nascita;Tessera FITP;Scadenza certificato\r\n" +
+            "Rossi;Mario;333 1234567;01/03/1980;123;31/12/2026\r\n" +
+            "\"Dell'Orto; Jr\";Anna;;2/4/1990;;\r\n" +
+            "Verdi;;;;;\r\n" +
+            "Neri;Elsa;;31/31/1990;;\r\n"
+        val body = kotlinx.serialization.json.Json.encodeToString(DeskCsvIn.serializer(), DeskCsvIn(csv))
+        val (st, prev) = req("POST", "/people/import/preview", body, k)
+        assertEquals(prev, 200, st)
+        assertTrue("l'anteprima non salva niente", data.list.isEmpty())
+        assertTrue(prev, "\"error\":\"NAME\"" in prev && "\"error\":\"DATE\"" in prev)
+        val (_, out) = req("POST", "/people/import", body, k)
+        assertTrue(out, "\"added\":2" in out)
+        val mario = data.list.first { it.firstName == "Mario" }
+        assertEquals("123", mario.member!!.fitpNumber)
+        assertEquals("333 1234567", mario.phone)
+        assertEquals("Dell'Orto; Jr", data.list.first { it.firstName == "Anna" }.lastName)
+        // Rifatto: non si duplica e non si cancella niente di quello che c'è.
+        data.savePlayers(listOf(mario.copy(phone = "999")))
+        val (_, again) = req("POST", "/people/import", body, k)
+        assertTrue(again, "\"added\":0" in again && "\"updated\":2" in again)
+        assertEquals(2, data.list.size)
+        assertEquals("999", data.list.first { it.firstName == "Mario" }.phone)
+        assertEquals(400, req("POST", "/people/import/preview", """{"text":"a;b\n1;2"}""", k).first)
+    }
+
+    @Test fun certificatoValidoESalvato() {
+        val dir = File.createTempFile("desk", "").also { it.delete() }
+        val a = DeskCert.loadOrCreate(dir)
+        a.cert.verify(a.cert.publicKey)
+        a.cert.checkValidity()
+        assertEquals("non è una CA", -1, a.cert.basicConstraints)
+        assertEquals("il certificato resta lo stesso", a.fingerprint, DeskCert.loadOrCreate(dir).fingerprint)
+        dir.deleteRecursively()
+    }
+
+    @Test fun hostSoloNumericiOLocalhost() {
+        assertTrue(DeskServer.hostOk("192.168.1.20:8443"))
+        assertTrue(DeskServer.hostOk("localhost:8443"))
+        assertFalse(DeskServer.hostOk("sito-cattivo.example:8443"))
+        assertFalse(DeskServer.hostOk(null))
+    }
+
+    /** Prova vera: TLS, richiesta, risposta e intestazioni di sicurezza. */
+    @Test fun httpsDavvero() {
+        val cert = DeskCert.create()
+        val server = DeskServer(cert, api, { if (it == "index.html") "<html>".toByteArray() else null }, { a: InetAddress -> a.isLoopbackAddress })
+        val port = server.start(18443)
+        try {
+            // Come il browser dopo aver accettato il certificato: niente controllo del nome.
+            val trust = object : X509ExtendedTrustManager() {
+                override fun checkClientTrusted(c: Array<X509Certificate>, a: String) {}
+                override fun checkServerTrusted(c: Array<X509Certificate>, a: String) {}
+                override fun checkClientTrusted(c: Array<X509Certificate>, a: String, s: Socket) {}
+                override fun checkServerTrusted(c: Array<X509Certificate>, a: String, s: Socket) {}
+                override fun checkClientTrusted(c: Array<X509Certificate>, a: String, e: SSLEngine) {}
+                override fun checkServerTrusted(c: Array<X509Certificate>, a: String, e: SSLEngine) {}
+                override fun getAcceptedIssuers() = emptyArray<X509Certificate>()
+            }
+            val ctx = SSLContext.getInstance("TLS").apply { init(null, arrayOf<TrustManager>(trust), null) }
+            val http = HttpClient.newBuilder().sslContext(ctx).sslParameters(SSLParameters().apply { endpointIdentificationAlgorithm = "" }).version(HttpClient.Version.HTTP_1_1).build()
+            fun get(p: String) = http.send(HttpRequest.newBuilder(URI("https://127.0.0.1:$port$p")).build(), HttpResponse.BodyHandlers.ofString())
+            val page = get("/")
+            assertEquals(200, page.statusCode())
+            assertTrue(page.headers().firstValue("content-security-policy").get().startsWith("default-src 'none'"))
+            assertEquals("DENY", page.headers().firstValue("x-frame-options").get())
+            assertEquals(401, get("/api/people").statusCode())
+            assertEquals(404, get("/../../etc/passwd").statusCode())
+            assertEquals(404, get("/nascosto.kt").statusCode())
+            // Sulla stessa porta in chiaro non si parla.
+            val plain = runCatching { Socket("127.0.0.1", port).use { s -> s.getOutputStream().write("GET / HTTP/1.0\r\n\r\n".toByteArray()); s.soTimeout = 3000; s.getInputStream().readBytes() } }
+            assertFalse(plain.getOrDefault(ByteArray(0)).toString(Charsets.ISO_8859_1).contains("HTTP/1.1 200"))
+            val ssl = (ctx.socketFactory as SSLSocketFactory).createSocket("127.0.0.1", port) as javax.net.ssl.SSLSocket
+            ssl.use { it.enabledProtocols = arrayOf("TLSv1.1"); assertTrue(runCatching { it.startHandshake() }.isFailure) }
+        } finally { server.stop() }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/desk/FakeDesk.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/desk/FakeDesk.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.CourtBooking
+import com.tennis.scoremanager.data.CourtPlan
+import com.tennis.scoremanager.data.CourtSettings
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.PayType
+import com.tennis.scoremanager.data.PlayerProfile
+
+/** I dati del circolo in memoria, al posto dell'app. */
+class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
+    var list = emptyList<PlayerProfile>()
+    var ledger = ClubBook()
+    var courtPlan = CourtPlan(CourtSettings(centsPerHour = 1200, centsPerHourLights = 1600))
+    var cups = emptyList<ClubTournament>()
+    override fun <T> tx(f: () -> T): T = synchronized(this) { f() }
+    override val club = "TC Prova"
+    override var lang = "it"
+    override fun now() = time
+    override fun players() = list
+    override fun savePlayers(list: List<PlayerProfile>) { val ids = list.map { it.id }.toSet(); this.list = this.list.filter { it.id !in ids } + list }
+    override fun book() = ledger
+    override fun saveBook(b: ClubBook) { ledger = b }
+    override fun payTypes() = Fees.types(ledger) { it.name }
+    override fun courts() = listOf("Campo 1", "Campo 2")
+    override fun plan() = courtPlan
+    override fun tournaments() = cups
+    override fun saveBooking(b: CourtBooking, charge: Boolean) { courtPlan = courtPlan.copy(bookings = courtPlan.bookings + b) }
+    override fun deleteBooking(b: CourtBooking) { courtPlan = courtPlan.copy(bookings = courtPlan.bookings - b) }
+    override fun paymentsCsv(year: Int): ByteArray? = "anno;$year\n".toByteArray()
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -82506,6 +86189,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 281 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 295 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

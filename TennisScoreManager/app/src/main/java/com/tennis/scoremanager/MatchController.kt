@@ -128,7 +128,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -155,7 +155,7 @@ enum class Role(val tabs: List<HomeTab>) {
  */
 enum class ClubFeature(val base: Boolean) {
     MEMBERS(true), PAYMENTS(true), PLANNING(true), TOURNAMENTS(true),
-    TEAMS(false), SCHOOL(false), LADDER(false), STATS(false), SERVER(false),
+    TEAMS(false), SCHOOL(false), LADDER(false), STATS(false), SERVER(false), DESK(false),
 }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
@@ -718,6 +718,7 @@ class MatchController(
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.BOOK_COURT -> Screen.HOME
+            Screen.DESK -> Screen.HOME
             Screen.COURT_STATS -> statsBack
             Screen.LADDERS -> Screen.HOME
             Screen.LADDER -> Screen.LADDERS
@@ -1115,6 +1116,17 @@ class MatchController(
         players.value = list.sortedBy { it.name.lowercase() }
         scope.launch(io) { storage.savePlayers(list) }
     }
+
+    /** Tanti giocatori in una volta (Segreteria da PC, import di un foglio): un solo salvataggio. */
+    fun savePlayers(changed: List<com.tennis.scoremanager.data.PlayerProfile>) {
+        val ids = changed.map { it.id }.toSet()
+        val list = players.value.filter { it.id !in ids } + changed
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch(io) { storage.savePlayers(list) }
+    }
+
+    /** La Segreteria da PC: spenta finché non la si accende dall'app. */
+    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this)) }
 
     fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
 

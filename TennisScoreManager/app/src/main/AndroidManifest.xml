@@ -132,6 +132,12 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!-- Segreteria da PC: server HTTPS sulla rete locale, solo quando lo si accende -->
+        <service
+            android:name=".service.DeskService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
         <service
             android:name=".service.MatchService"
             android:exported="false"

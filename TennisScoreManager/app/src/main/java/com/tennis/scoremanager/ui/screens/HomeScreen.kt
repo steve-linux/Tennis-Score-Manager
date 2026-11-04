@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -240,6 +241,7 @@ private fun CourtsTab(c: MatchController) {
         val srv by c.clubServer.collectAsState()
         Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
     }
+    if (ClubFeature.DESK in f) Entry(Icons.Filled.Computer, s.deskTitle, s.deskHint) { c.go(Screen.DESK) }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
     if (server) ClubServerDialog(c) { server = false }

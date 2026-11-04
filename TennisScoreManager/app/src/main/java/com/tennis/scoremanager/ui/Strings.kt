@@ -1526,6 +1526,30 @@ interface Strings {
     val backhandOne: String
     val backhandTwo: String
     val playerAge: (Int) -> String
+    // Segreteria da PC.
+    val deskTitle: String
+    val deskHint: String
+    val deskIntro: String
+    val deskStart: String
+    val deskShare: String
+    val deskScan: String
+    val deskScanHint: String
+    val deskScanBad: String
+    val deskStop: String
+    val deskFailed: String
+    val deskAddress: String
+    val deskWarning: String
+    val deskCode: String
+    val deskCodeHint: String
+    val deskNoNetwork: String
+    val deskFingerprint: String
+    val deskDisconnect: String
+    val deskAskTitle: String
+    val deskAllow: String
+    val deskDeny: String
+    val deskNotif: String
+    val deskConnected: (String) -> String
+    val deskAsk: (String) -> String
     // Server del circolo (facoltativo).
     val srvTitle: String
     val srvButtonHint: String
@@ -3546,6 +3570,29 @@ object ItStrings : Strings {
     override val backhandTwo = "2 mani"
     override val playerAge: (Int) -> String = { "$it anni" }
     override val memberValidUntil: (String) -> String = { "fino al $it" }
+    override val deskTitle = "Segreteria da PC"
+    override val deskHint = "Soci, pagamenti e planning dal computer, sulla stessa rete"
+    override val deskIntro = "Il computer apre una pagina servita da questo telefono: i dati restano qui, cifrati durante il viaggio. Telefono e computer devono stare sulla stessa rete. Si spegne da solo dopo mezz'ora senza nessuno collegato."
+    override val deskStart = "Accendi"
+    override val deskShare = "Condividi l'indirizzo"
+    override val deskScan = "Inquadra il QR del computer"
+    override val deskScanHint = "La pagina sul computer mostra un QR: inquadralo, poi tocca Consenti."
+    override val deskScanBad = "QR non valido o scaduto: aggiorna la pagina sul computer."
+    override val deskStop = "Spegni"
+    override val deskFailed = "Non si è acceso: riprova."
+    override val deskAddress = "Scrivi questo indirizzo nel browser del computer"
+    override val deskWarning = "La prima volta il browser avvisa che la connessione non è privata: è normale con un certificato del telefono. Scegli Avanzate e Procedi; se l'avviso torna senza motivo, non proseguire."
+    override val deskCode = "Codice di accesso"
+    override val deskCodeHint = "Se non puoi usare la fotocamera, scrivilo sul computer. Vale una volta sola e cambia ogni 5 minuti. Non dirlo a nessuno."
+    override val deskNoNetwork = "Nessuna rete: collega il telefono al Wi-Fi o accendi l'hotspot."
+    override val deskFingerprint = "Impronta del certificato (SHA-256), da confrontare nel browser se vuoi controllare"
+    override val deskDisconnect = "Scollega il computer"
+    override val deskAskTitle = "Consenti l'accesso?"
+    override val deskAllow = "Consenti"
+    override val deskDeny = "Rifiuta"
+    override val deskNotif = "Acceso: il computer può gestire i dati del circolo"
+    override val deskConnected: (String) -> String = { x -> "Collegato: $x" }
+    override val deskAsk: (String) -> String = { x -> "Il computer $x ha scritto il codice giusto e potrà vedere e cambiare i dati del circolo. Sei tu?" }
     override val srvTitle = "Server del circolo"
     override val srvButtonHint = "Facoltativo: i giocatori prenotano da soli"
     override val srvIntro = "Facoltativo. Con un piccolo server al circolo (un Raspberry Pi o un vecchio PC) i giocatori invitati prenotano i campi da soli dal telefono, anche da iPhone, con le regole decise qui. Senza server tutto resta com'è: si prenota in segreteria."
@@ -5541,6 +5588,29 @@ object EnStrings : Strings {
     override val backhandTwo = "2 hands"
     override val playerAge: (Int) -> String = { "$it years old" }
     override val memberValidUntil: (String) -> String = { "until $it" }
+    override val deskTitle = "Office from PC"
+    override val deskHint = "Members, payments and planner from a computer on the same network"
+    override val deskIntro = "The computer opens a page served by this phone: the data stays here and is encrypted in transit. Phone and computer must be on the same network. It turns itself off after half an hour with nobody connected."
+    override val deskStart = "Turn on"
+    override val deskShare = "Share the address"
+    override val deskScan = "Scan the computer's QR"
+    override val deskScanHint = "The page on the computer shows a QR: scan it, then tap Allow."
+    override val deskScanBad = "Invalid or expired QR: reload the page on the computer."
+    override val deskStop = "Turn off"
+    override val deskFailed = "It did not start: try again."
+    override val deskAddress = "Type this address in the computer's browser"
+    override val deskWarning = "The first time, the browser warns that the connection is not private: this is normal with a certificate made by the phone. Choose Advanced and Proceed; if the warning comes back for no reason, do not continue."
+    override val deskCode = "Access code"
+    override val deskCodeHint = "If you cannot use the camera, type it on the computer. It works once and changes every 5 minutes. Keep it to yourself."
+    override val deskNoNetwork = "No network: connect the phone to Wi-Fi or turn on the hotspot."
+    override val deskFingerprint = "Certificate fingerprint (SHA-256), to compare in the browser if you want to check"
+    override val deskDisconnect = "Disconnect the computer"
+    override val deskAskTitle = "Allow access?"
+    override val deskAllow = "Allow"
+    override val deskDeny = "Deny"
+    override val deskNotif = "On: the computer can manage the club data"
+    override val deskConnected: (String) -> String = { x -> "Connected: $x" }
+    override val deskAsk: (String) -> String = { x -> "Computer $x entered the right code and will be able to view and change the club data. Is it you?" }
     override val srvTitle = "Club server"
     override val srvButtonHint = "Optional: players book by themselves"
     override val srvIntro = "Optional. With a small server at the club (a Raspberry Pi or an old PC) invited players book courts by themselves from their phone, iPhone too, with the rules set here. Without a server nothing changes: bookings go through the club office."

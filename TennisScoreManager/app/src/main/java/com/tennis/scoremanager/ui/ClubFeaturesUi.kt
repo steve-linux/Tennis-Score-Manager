@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Leaderboard
@@ -51,6 +52,7 @@ fun featureInfo(s: Strings, f: ClubFeature): Triple<String, String, ImageVector>
     ClubFeature.LADDER -> Triple(s.ldTitle, s.ldHint, Icons.Filled.Leaderboard)
     ClubFeature.STATS -> Triple(s.stTitle, s.cfStatsHint, Icons.Filled.BarChart)
     ClubFeature.SERVER -> Triple(s.srvTitle, s.srvButtonHint, Icons.Filled.Cloud)
+    ClubFeature.DESK -> Triple(s.deskTitle, s.deskHint, Icons.Filled.Computer)
 }
 
 /** Le funzioni del circolo: un interruttore per ognuna, quelle di base prima. I dati delle funzioni spente restano. */
