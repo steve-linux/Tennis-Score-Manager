@@ -472,6 +472,66 @@ const APP_I18N = {
     ctWalkoverLong: "Vinta a tavolino (w.o.)",
     ctWhere: "Dove e quando",
     ctWinner: "Chi ha vinto",
+    scAddSlot: "Aggiungi un orario",
+    scAddStudent: "Aggiungi allievo",
+    scAttendance: (p, t) => `presente ${p} su ${t}`,
+    scCancelLesson: "Lezione annullata",
+    scCancelled: "annullata",
+    scCancelledNotice: (it) => `La lezione del corso ${it} è annullata:`,
+    scCancelledTitle: "Lezione annullata",
+    scChargeStudents: "Addebita agli allievi",
+    scCharged: (it) => `${it} addebiti nuovi`,
+    scCoach: "Istruttore",
+    scCoachLine: (it) => `istruttore ${it}`,
+    scCoachPick: "Scegli l'istruttore dal database",
+    scDelete: "Elimina il corso",
+    scDeleteAsk: (it) => `Eliminare il corso ${it}? I campi tornano prenotabili; le quote già addebitate restano nel registro.`,
+    scFee: "Quota",
+    scHint: "Corsi, allievi, orari, presenze e quote; i campi dei corsi non si prenotano",
+    scLevel: "Livello (es. Principianti, Agonisti)",
+    scMax: (it) => `Al massimo ${it} allievi`,
+    scMonthly: "al mese",
+    scName: "Nome del corso (es. SAT Under 10 · Gruppo A)",
+    scNew: "Nuovo corso",
+    scNext: (it) => `prossima: ${it}`,
+    scNoFee: "Nessuna quota per questo corso: impostala in Modifica.",
+    scNoLessons: "Nessuna lezione: aggiungi gli orari al corso.",
+    scNoMax: "Nessun limite di posti",
+    scNone: "Nessun corso: crealo con Nuovo corso.",
+    scNotify: "Avvisa gli allievi",
+    scNotifyCancelled: "Annulla e avvisa gli allievi",
+    scPast: "Fatte",
+    scPresent: (p, t) => `${p} su ${t}`,
+    scRemoveStudent: "Togli dal corso",
+    scSchedule: "Orari",
+    scScheduleHint: "Negli orari con un campo, quel campo diventa non prenotabile nel planning per tutta la stagione.",
+    scSeason: "stagione",
+    scSeasonFee: "per la stagione",
+    scShowAll: (it) => `Mostra tutte (${it})`,
+    scSoon: "Da iniziare",
+    scTabFees: "Quote",
+    scTabLessons: "Lezioni",
+    scTabStudents: "Allievi",
+    scTitle: "Scuola tennis",
+    scToMark: "da segnare",
+    scUpcoming: "Prossime",
+    scWhoWasThere: "Chi c'era",
+    stBlocked: (it) => `non prenotabili ${it} h`,
+    stBookings: "Prenotazioni",
+    stByCourt: "Campo per campo",
+    stCount: (it) => it === 1 ? `1 prenotazione` : `${it} prenotazioni`,
+    stHeat: "Quando si gioca",
+    stHeatHint: "Occupazione per giorno e ora, tutti i campi insieme: più chiaro = più pieno.",
+    stHoursOf: (a, b) => `${a} h su ${b}`,
+    stLast4w: "4 settimane",
+    stNone: "Nessuna prenotazione in questo periodo.",
+    stOccupancy: "Occupazione",
+    stOnline: (it) => `Di cui online: ${it}`,
+    stRevenue: "Incassi",
+    stRevenueHint: "Incassi = prezzo delle prenotazioni di gioco e lezione, pagate o no.",
+    stTitle: "Statistiche dei campi",
+    stTop: "Chi prenota di più",
+    stTournaments: (it) => `Partite dei tornei: ${it} h`,
     tdBlocking: (it) => it === 1 ? `1 non può giocare (certificato o tessera)` : `${it} non possono giocare (certificato o tessera)`,
     tdChallenges: (it) => `Sfide da giocare: ${it}`,
     tdCourts: (it) => `Oggi in campo: ${it}`,
@@ -600,6 +660,66 @@ const APP_I18N = {
     ctWalkoverLong: "Won by walkover (w/o)",
     ctWhere: "Where and when",
     ctWinner: "Winner",
+    scAddSlot: "Add a time",
+    scAddStudent: "Add student",
+    scAttendance: (p, t) => `attended ${p} of ${t}`,
+    scCancelLesson: "Lesson cancelled",
+    scCancelled: "cancelled",
+    scCancelledNotice: (it) => `The ${it} lesson is cancelled:`,
+    scCancelledTitle: "Lesson cancelled",
+    scChargeStudents: "Charge the students",
+    scCharged: (it) => `${it} new charges`,
+    scCoach: "Coach",
+    scCoachLine: (it) => `coach ${it}`,
+    scCoachPick: "Pick the coach from the database",
+    scDelete: "Delete the course",
+    scDeleteAsk: (it) => `Delete the course ${it}? Courts become bookable again; fees already charged stay in the register.`,
+    scFee: "Fee",
+    scHint: "Courses, students, times, attendance and fees; course courts can't be booked",
+    scLevel: "Level (e.g. Beginners, Competitive)",
+    scMax: (it) => `At most ${it} students`,
+    scMonthly: "per month",
+    scName: "Course name (e.g. Juniors U10 · Group A)",
+    scNew: "New course",
+    scNext: (it) => `next: ${it}`,
+    scNoFee: "No fee for this course: set it in Edit.",
+    scNoLessons: "No lessons: add times to the course.",
+    scNoMax: "No limit on places",
+    scNone: "No courses: create one with New course.",
+    scNotify: "Notify the students",
+    scNotifyCancelled: "Cancel and notify the students",
+    scPast: "Held",
+    scPresent: (p, t) => `${p} of ${t}`,
+    scRemoveStudent: "Remove from the course",
+    scSchedule: "Times",
+    scScheduleHint: "For times with a court, that court becomes not bookable in the planner for the whole season.",
+    scSeason: "season",
+    scSeasonFee: "for the season",
+    scShowAll: (it) => `Show all (${it})`,
+    scSoon: "Starting soon",
+    scTabFees: "Fees",
+    scTabLessons: "Lessons",
+    scTabStudents: "Students",
+    scTitle: "Tennis school",
+    scToMark: "to mark",
+    scUpcoming: "Upcoming",
+    scWhoWasThere: "Who was there",
+    stBlocked: (it) => `not bookable ${it} h`,
+    stBookings: "Bookings",
+    stByCourt: "Court by court",
+    stCount: (it) => it === 1 ? `1 booking` : `${it} bookings`,
+    stHeat: "When people play",
+    stHeatHint: "Occupancy by day and hour, all courts together: brighter = fuller.",
+    stHoursOf: (a, b) => `${a} h of ${b}`,
+    stLast4w: "4 weeks",
+    stNone: "No bookings in this period.",
+    stOccupancy: "Occupancy",
+    stOnline: (it) => `Of which online: ${it}`,
+    stRevenue: "Revenue",
+    stRevenueHint: "Revenue = price of play and lesson bookings, paid or not.",
+    stTitle: "Court statistics",
+    stTop: "Who books most",
+    stTournaments: (it) => `Tournament matches: ${it} h`,
     tdBlocking: (it) => `${it} cannot play (certificate or card)`,
     tdChallenges: (it) => `Challenges to play: ${it}`,
     tdCourts: (it) => `On court today: ${it}`,
@@ -728,6 +848,66 @@ const APP_I18N = {
     ctWalkoverLong: "Gagné par forfait",
     ctWhere: "Où et quand",
     ctWinner: "Vainqueur",
+    scAddSlot: "Ajouter un horaire",
+    scAddStudent: "Ajouter un élève",
+    scAttendance: (p, t) => `présent ${p} sur ${t}`,
+    scCancelLesson: "Leçon annulée",
+    scCancelled: "annulée",
+    scCancelledNotice: (it) => `La leçon du cours ${it} est annulée :`,
+    scCancelledTitle: "Leçon annulée",
+    scChargeStudents: "Facturer aux élèves",
+    scCharged: (it) => `${it} nouvelles facturations`,
+    scCoach: "Moniteur",
+    scCoachLine: (it) => `moniteur ${it}`,
+    scCoachPick: "Choisir le moniteur dans la base",
+    scDelete: "Supprimer le cours",
+    scDeleteAsk: (it) => `Supprimer le cours ${it} ? Les terrains redeviennent réservables ; les cotisations déjà facturées restent dans le registre.`,
+    scFee: "Cotisation",
+    scHint: "Cours, élèves, horaires, présences et cotisations ; les terrains des cours ne se réservent pas",
+    scLevel: "Niveau (ex. Débutants, Compétition)",
+    scMax: (it) => `Au plus ${it} élèves`,
+    scMonthly: "par mois",
+    scName: "Nom du cours (ex. Mini-tennis · Groupe A)",
+    scNew: "Nouveau cours",
+    scNext: (it) => `prochaine : ${it}`,
+    scNoFee: "Pas de cotisation pour ce cours : réglez-la dans Modifier.",
+    scNoLessons: "Aucune leçon : ajoutez les horaires au cours.",
+    scNoMax: "Pas de limite de places",
+    scNone: "Aucun cours : créez-en un avec Nouveau cours.",
+    scNotify: "Prévenir les élèves",
+    scNotifyCancelled: "Annuler et prévenir les élèves",
+    scPast: "Faites",
+    scPresent: (p, t) => `${p} sur ${t}`,
+    scRemoveStudent: "Retirer du cours",
+    scSchedule: "Horaires",
+    scScheduleHint: "Pour les horaires avec un terrain, ce terrain devient non réservable dans le planning pour toute la saison.",
+    scSeason: "saison",
+    scSeasonFee: "pour la saison",
+    scShowAll: (it) => `Tout afficher (${it})`,
+    scSoon: "Bientôt",
+    scTabFees: "Cotisations",
+    scTabLessons: "Leçons",
+    scTabStudents: "Élèves",
+    scTitle: "École de tennis",
+    scToMark: "à pointer",
+    scUpcoming: "À venir",
+    scWhoWasThere: "Qui était là",
+    stBlocked: (it) => `non réservables ${it} h`,
+    stBookings: "Réservations",
+    stByCourt: "Terrain par terrain",
+    stCount: (it) => it === 1 ? `1 réservation` : `${it} réservations`,
+    stHeat: "Quand on joue",
+    stHeatHint: "Occupation par jour et heure, tous les terrains ensemble : plus clair = plus plein.",
+    stHoursOf: (a, b) => `${a} h sur ${b}`,
+    stLast4w: "4 semaines",
+    stNone: "Aucune réservation sur cette période.",
+    stOccupancy: "Occupation",
+    stOnline: (it) => `Dont en ligne : ${it}`,
+    stRevenue: "Recettes",
+    stRevenueHint: "Recettes = prix des réservations de jeu et de leçon, payées ou non.",
+    stTitle: "Statistiques des terrains",
+    stTop: "Qui réserve le plus",
+    stTournaments: (it) => `Matchs des tournois : ${it} h`,
     tdBlocking: (it) => it === 1 ? `1 ne peut pas jouer (certificat ou licence)` : `${it} ne peuvent pas jouer (certificat ou licence)`,
     tdChallenges: (it) => `Défis à jouer : ${it}`,
     tdCourts: (it) => `Sur les terrains aujourd'hui : ${it}`,
@@ -856,6 +1036,66 @@ const APP_I18N = {
     ctWalkoverLong: "Kampflos gewonnen",
     ctWhere: "Wo und wann",
     ctWinner: "Sieger",
+    scAddSlot: "Zeit hinzufügen",
+    scAddStudent: "Schüler hinzufügen",
+    scAttendance: (p, t) => `anwesend ${p} von ${t}`,
+    scCancelLesson: "Stunde abgesagt",
+    scCancelled: "abgesagt",
+    scCancelledNotice: (it) => `Die Stunde des Kurses ${it} ist abgesagt:`,
+    scCancelledTitle: "Stunde abgesagt",
+    scChargeStudents: "Den Schülern berechnen",
+    scCharged: (it) => `${it} neue Forderungen`,
+    scCoach: "Trainer",
+    scCoachLine: (it) => `Trainer ${it}`,
+    scCoachPick: "Trainer aus der Datenbank wählen",
+    scDelete: "Kurs löschen",
+    scDeleteAsk: (it) => `Kurs ${it} löschen? Die Plätze sind wieder buchbar; berechnete Beiträge bleiben im Register.`,
+    scFee: "Beitrag",
+    scHint: "Kurse, Schüler, Zeiten, Anwesenheit und Beiträge; Kursplätze sind nicht buchbar",
+    scLevel: "Niveau (z. B. Anfänger, Wettkampf)",
+    scMax: (it) => `Höchstens ${it} Schüler`,
+    scMonthly: "pro Monat",
+    scName: "Kursname (z. B. Kinder U10 · Gruppe A)",
+    scNew: "Neuer Kurs",
+    scNext: (it) => `nächste: ${it}`,
+    scNoFee: "Kein Beitrag für diesen Kurs: unter Bearbeiten einstellen.",
+    scNoLessons: "Keine Stunden: dem Kurs Zeiten hinzufügen.",
+    scNoMax: "Keine Platzbegrenzung",
+    scNone: "Keine Kurse: mit Neuer Kurs anlegen.",
+    scNotify: "Schüler benachrichtigen",
+    scNotifyCancelled: "Absagen und Schüler benachrichtigen",
+    scPast: "Gehalten",
+    scPresent: (p, t) => `${p} von ${t}`,
+    scRemoveStudent: "Aus dem Kurs nehmen",
+    scSchedule: "Zeiten",
+    scScheduleHint: "Bei Zeiten mit Platz wird dieser Platz in der Belegung die ganze Saison nicht buchbar.",
+    scSeason: "Saison",
+    scSeasonFee: "für die Saison",
+    scShowAll: (it) => `Alle zeigen (${it})`,
+    scSoon: "Demnächst",
+    scTabFees: "Beiträge",
+    scTabLessons: "Stunden",
+    scTabStudents: "Schüler",
+    scTitle: "Tennisschule",
+    scToMark: "einzutragen",
+    scUpcoming: "Kommende",
+    scWhoWasThere: "Wer da war",
+    stBlocked: (it) => `nicht buchbar ${it} Std.`,
+    stBookings: "Buchungen",
+    stByCourt: "Platz für Platz",
+    stCount: (it) => it === 1 ? `1 Buchung` : `${it} Buchungen`,
+    stHeat: "Wann gespielt wird",
+    stHeatHint: "Auslastung nach Tag und Stunde, alle Plätze zusammen: heller = voller.",
+    stHoursOf: (a, b) => `${a} Std. von ${b}`,
+    stLast4w: "4 Wochen",
+    stNone: "Keine Buchungen in diesem Zeitraum.",
+    stOccupancy: "Auslastung",
+    stOnline: (it) => `Davon online: ${it}`,
+    stRevenue: "Einnahmen",
+    stRevenueHint: "Einnahmen = Preis der Spiel- und Stundenbuchungen, bezahlt oder nicht.",
+    stTitle: "Platzstatistik",
+    stTop: "Wer am meisten bucht",
+    stTournaments: (it) => `Turnierspiele: ${it} Std.`,
     tdBlocking: (it) => it === 1 ? `1 darf nicht spielen (Attest oder Ausweis)` : `${it} dürfen nicht spielen (Attest oder Ausweis)`,
     tdChallenges: (it) => `Offene Forderungen: ${it}`,
     tdCourts: (it) => `Heute auf den Plätzen: ${it}`,
@@ -984,6 +1224,66 @@ const APP_I18N = {
     ctWalkoverLong: "Ganado por w.o.",
     ctWhere: "Dónde y cuándo",
     ctWinner: "Ganador",
+    scAddSlot: "Añadir un horario",
+    scAddStudent: "Añadir alumno",
+    scAttendance: (p, t) => `asistió a ${p} de ${t}`,
+    scCancelLesson: "Clase anulada",
+    scCancelled: "anulada",
+    scCancelledNotice: (it) => `La clase del curso ${it} está anulada:`,
+    scCancelledTitle: "Clase anulada",
+    scChargeStudents: "Cargar a los alumnos",
+    scCharged: (it) => `${it} cargos nuevos`,
+    scCoach: "Monitor",
+    scCoachLine: (it) => `monitor ${it}`,
+    scCoachPick: "Elegir el monitor de la base de datos",
+    scDelete: "Eliminar el curso",
+    scDeleteAsk: (it) => `¿Eliminar el curso ${it}? Las pistas vuelven a ser reservables; las cuotas ya cargadas quedan en el registro.`,
+    scFee: "Cuota",
+    scHint: "Cursos, alumnos, horarios, asistencia y cuotas; las pistas de los cursos no se reservan",
+    scLevel: "Nivel (p. ej. Iniciación, Competición)",
+    scMax: (it) => `Como máximo ${it} alumnos`,
+    scMonthly: "al mes",
+    scName: "Nombre del curso (p. ej. Escuela Sub-10 · Grupo A)",
+    scNew: "Nuevo curso",
+    scNext: (it) => `próxima: ${it}`,
+    scNoFee: "Sin cuota para este curso: ponla en Editar.",
+    scNoLessons: "Ninguna clase: añade los horarios al curso.",
+    scNoMax: "Sin límite de plazas",
+    scNone: "Ningún curso: crea uno con Nuevo curso.",
+    scNotify: "Avisar a los alumnos",
+    scNotifyCancelled: "Anular y avisar a los alumnos",
+    scPast: "Hechas",
+    scPresent: (p, t) => `${p} de ${t}`,
+    scRemoveStudent: "Quitar del curso",
+    scSchedule: "Horarios",
+    scScheduleHint: "En los horarios con pista, esa pista pasa a no reservable en el planning toda la temporada.",
+    scSeason: "temporada",
+    scSeasonFee: "por temporada",
+    scShowAll: (it) => `Mostrar todas (${it})`,
+    scSoon: "Por empezar",
+    scTabFees: "Cuotas",
+    scTabLessons: "Clases",
+    scTabStudents: "Alumnos",
+    scTitle: "Escuela de tenis",
+    scToMark: "por pasar lista",
+    scUpcoming: "Próximas",
+    scWhoWasThere: "Quién estuvo",
+    stBlocked: (it) => `no reservables ${it} h`,
+    stBookings: "Reservas",
+    stByCourt: "Pista por pista",
+    stCount: (it) => it === 1 ? `1 reserva` : `${it} reservas`,
+    stHeat: "Cuándo se juega",
+    stHeatHint: "Ocupación por día y hora, todas las pistas juntas: más claro = más lleno.",
+    stHoursOf: (a, b) => `${a} h de ${b}`,
+    stLast4w: "4 semanas",
+    stNone: "Ninguna reserva en este periodo.",
+    stOccupancy: "Ocupación",
+    stOnline: (it) => `De ellas en línea: ${it}`,
+    stRevenue: "Ingresos",
+    stRevenueHint: "Ingresos = precio de las reservas de juego y clase, pagadas o no.",
+    stTitle: "Estadísticas de las pistas",
+    stTop: "Quién reserva más",
+    stTournaments: (it) => `Partidos de torneo: ${it} h`,
     tdBlocking: (it) => it === 1 ? `1 no puede jugar (certificado o licencia)` : `${it} no pueden jugar (certificado o licencia)`,
     tdChallenges: (it) => `Desafíos por jugar: ${it}`,
     tdCourts: (it) => `Hoy en pista: ${it}`,
@@ -1112,6 +1412,66 @@ const APP_I18N = {
     ctWalkoverLong: "Vitória por W.O.",
     ctWhere: "Onde e quando",
     ctWinner: "Vencedor",
+    scAddSlot: "Adicionar um horário",
+    scAddStudent: "Adicionar aluno",
+    scAttendance: (p, t) => `presente em ${p} de ${t}`,
+    scCancelLesson: "Aula cancelada",
+    scCancelled: "cancelada",
+    scCancelledNotice: (it) => `A aula do curso ${it} está cancelada:`,
+    scCancelledTitle: "Aula cancelada",
+    scChargeStudents: "Cobrar dos alunos",
+    scCharged: (it) => `${it} novas cobranças`,
+    scCoach: "Professor",
+    scCoachLine: (it) => `professor ${it}`,
+    scCoachPick: "Escolher o professor no banco de dados",
+    scDelete: "Excluir o curso",
+    scDeleteAsk: (it) => `Excluir o curso ${it}? As quadras voltam a ser reserváveis; as mensalidades já cobradas ficam no registro.`,
+    scFee: "Mensalidade",
+    scHint: "Cursos, alunos, horários, presenças e mensalidades; as quadras dos cursos não se reservam",
+    scLevel: "Nível (ex. Iniciantes, Competição)",
+    scMax: (it) => `No máximo ${it} alunos`,
+    scMonthly: "por mês",
+    scName: "Nome do curso (ex. Escolinha Sub-10 · Turma A)",
+    scNew: "Novo curso",
+    scNext: (it) => `próxima: ${it}`,
+    scNoFee: "Sem mensalidade para este curso: defina em Editar.",
+    scNoLessons: "Nenhuma aula: adicione os horários ao curso.",
+    scNoMax: "Sem limite de vagas",
+    scNone: "Nenhum curso: crie um com Novo curso.",
+    scNotify: "Avisar os alunos",
+    scNotifyCancelled: "Cancelar e avisar os alunos",
+    scPast: "Feitas",
+    scPresent: (p, t) => `${p} de ${t}`,
+    scRemoveStudent: "Tirar do curso",
+    scSchedule: "Horários",
+    scScheduleHint: "Nos horários com quadra, essa quadra fica não reservável na agenda a temporada toda.",
+    scSeason: "temporada",
+    scSeasonFee: "pela temporada",
+    scShowAll: (it) => `Mostrar todas (${it})`,
+    scSoon: "A começar",
+    scTabFees: "Mensalidades",
+    scTabLessons: "Aulas",
+    scTabStudents: "Alunos",
+    scTitle: "Escola de tênis",
+    scToMark: "a marcar",
+    scUpcoming: "Próximas",
+    scWhoWasThere: "Quem estava",
+    stBlocked: (it) => `não reserváveis ${it} h`,
+    stBookings: "Reservas",
+    stByCourt: "Quadra a quadra",
+    stCount: (it) => it === 1 ? `1 reserva` : `${it} reservas`,
+    stHeat: "Quando se joga",
+    stHeatHint: "Ocupação por dia e hora, todas as quadras juntas: mais claro = mais cheio.",
+    stHoursOf: (a, b) => `${a} h de ${b}`,
+    stLast4w: "4 semanas",
+    stNone: "Nenhuma reserva neste período.",
+    stOccupancy: "Ocupação",
+    stOnline: (it) => `Das quais online: ${it}`,
+    stRevenue: "Receitas",
+    stRevenueHint: "Receitas = preço das reservas de jogo e aula, pagas ou não.",
+    stTitle: "Estatísticas das quadras",
+    stTop: "Quem reserva mais",
+    stTournaments: (it) => `Jogos de torneio: ${it} h`,
     tdBlocking: (it) => it === 1 ? `1 não pode jogar (atestado ou cartão)` : `${it} não podem jogar (atestado ou cartão)`,
     tdChallenges: (it) => `Desafios por jogar: ${it}`,
     tdCourts: (it) => `Hoje em quadra: ${it}`,
@@ -1338,7 +1698,8 @@ async function start() {
 /** Le pagine, solo per le funzioni del circolo accese (Oggi c'è sempre). */
 const VIEWS = () => {
   const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
-  return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')]]
+  return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')],
+    ['school', T.scTitle, on('SCHOOL')], ['stats', T.stTitle, on('STATS')]]
     .filter((v) => v[2]).map(([v, l]) => [v, l]);
 };
 const main = () => document.querySelector('main');
@@ -1348,12 +1709,12 @@ async function render() {
   put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; render(); } }, l)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups })[view](); }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, stats: showStats })[view](); }
   catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
@@ -1386,7 +1747,7 @@ async function showToday() {
     cards.push(card(T.tdMatches(d.matches.length), d.matches.slice(0, 3).map(at),
       () => go('cups', () => { cupId = cups.length === 1 ? cups[0] : null; cupTab = 'matches'; })));
   }
-  if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at)));
+  if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at), () => go('school', () => { courseId = null; })));
   if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text)));
   if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
   const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -1542,6 +1903,30 @@ let moneyFilter = { type: '', show: 'open', text: '' };
 const STATUS = { PAID: 'ok', PARTIAL: 'warn', UNPAID: 'warn', LATE: 'bad', CANCELLED: 'dim' };
 
 let lastMoney = null;
+let shownCharges = [];
+
+/**
+ * Sollecito a chi deve qualcosa, solo per gli addebiti che si vedono (coi filtri): il PC prepara i messaggi,
+ * il telefono li manda col suo WhatsApp, uno per uno.
+ */
+async function duesDialog(charges) {
+  const ids = charges.filter((c) => c.leftCents > 0 && c.status !== 'CANCELLED').map((c) => c.id);
+  let list = [];
+  try { if (ids.length) list = await api('POST', '/dues', { ids }); } catch (e) { toast(errText(e)); return; }
+  if (!list.length) { toast(T.duesNone); return; }
+  const picks = list.map((d) => [d, h('input', { type: 'checkbox', checked: true })]);
+  const dlg = dialog(T.duesButton + ' · ' + T.duesCount(list.length), h('div',
+    h('p.dim', T.duesHint),
+    h('div.dues', picks.map(([d, x]) => h('div.due',
+      h('label.check', x, h('b', d.name), ' ', d.phone || d.email ? h('span.dim', [d.phone, d.email].filter(Boolean).join(' · ')) : h('span.tag.warn', T.noContact)),
+      h('pre', d.text))))), async () => {
+    const keep = new Set(picks.filter(([, x]) => x.checked).map(([d]) => d.id));
+    const send = charges.filter((c) => keep.has(c.player) && ids.includes(c.id)).map((c) => c.id);
+    if (!send.length) throw new Error(T.duesNone);
+    await api('POST', '/dues/send', { ids: send });
+    alert(T.duesSent);
+  }, { saveText: T.duesSend, wide: true });
+}
 
 async function showMoney() {
   const m = await api('GET', '/money' + (moneyYear ? '?year=' + moneyYear : ''));
@@ -1569,6 +1954,7 @@ async function showMoney() {
       && ({ open: c.leftCents > 0 && c.status !== 'CANCELLED', late: c.status === 'LATE', paid: c.status === 'PAID', all: true })[moneyFilter.show]
       && (!q || [c.name, c.label].some((x) => (x || '').toLowerCase().includes(q))));
     const left = rows.reduce((a, c) => a + (c.status === 'CANCELLED' ? 0 : c.leftCents), 0);
+    shownCharges = rows;
     const filtered = t || q || moneyFilter.show !== 'open';
     put(body, 
       rows.length && filtered ? h('p.dim', T.shown(rows.length, eur(left))) : null,
@@ -1578,7 +1964,7 @@ async function showMoney() {
           h('td', c.name), h('td', c.label), h('td', dateText(c.due)), h('td', h('span.tag.' + STATUS[c.status], T.chargeStatus[c.status])), h('td.num', eur(c.cents)), h('td.num', eur(c.leftCents))))))) : h('div.panel', h('div.empty', filtered && m.charges.length ? T.noResults : T.noCharges)));
   }
   put(main(), 
-    h('div.head', h('h1', T.money), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
+    h('div.head', h('h1', T.money), h('button', { onclick: () => duesDialog(shownCharges) }, T.duesButton), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
     h('div.kpis',
       h('div.kpi', h('b', eur(m.incomeCents)), h('span', T.income(m.year))),
       h('div.kpi', h('b', eur(m.openCents)), h('span', T.open)),
@@ -2208,6 +2594,252 @@ function editCup(t) {
   }, { left: del });
 }
 
+// --- Statistiche dei campi ---
+
+let statsPeriod = 'w4';
+let statsFrom = null, statsTo = null;
+
+/** Il periodo scelto: le ultime 4 settimane, questo mese, il mese scorso, quest'anno, o dal–al. */
+function statsRange() {
+  const t = info.today, first = t.slice(0, 8) + '01';
+  if (statsPeriod === 'month') return [first, t];
+  if (statsPeriod === 'last') { const f = addMonth(t, -1); return [f, addDay(first, -1)]; }
+  if (statsPeriod === 'year') return [t.slice(0, 4) + '-01-01', t];
+  if (statsPeriod === 'custom') return [statsFrom || first, statsTo || t];
+  return [addDay(t, -27), t];
+}
+
+async function showStats() {
+  const [a, b] = statsRange();
+  const month = (d) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), { month: 'long' });
+  const period = select([['w4', T.stLast4w], ['month', month(info.today)], ['last', month(addMonth(info.today, -1))], ['year', T.thisYear], ['custom', T.otherPeriod]], statsPeriod);
+  period.setAttribute('aria-label', T.periodLabel);
+  period.addEventListener('change', () => { statsPeriod = period.value; if (statsPeriod === 'custom') { statsFrom = a; statsTo = b; } showStats(); });
+  // Le date si scrivono con calma e valgono con Mostra (o Invio): niente ricarica a metà, mentre si scrive l'anno.
+  const from = h('input', { type: 'date', value: a, 'aria-label': T.blkFrom });
+  const to = h('input', { type: 'date', value: b, 'aria-label': T.blkTo });
+  from.classList.add('year'); to.classList.add('year');
+  const apply = () => {
+    const f = from.value, t = to.value;
+    if (!f || !t || f > t || (new Date(t) - new Date(f)) / 86400000 > 366) { toast(T.badPeriod); return; }
+    statsFrom = f; statsTo = t; showStats();
+  };
+  [from, to].forEach((x) => x.addEventListener('keydown', (e) => { if (e.key === 'Enter') apply(); }));
+  const tools = h('div.tools', period, statsPeriod === 'custom'
+    ? [h('label', T.blkFrom + ' ', from), h('label', T.blkTo + ' ', to), h('button.primary', { type: 'button', onclick: apply }, T.showPeriod)] : null);
+  let st;
+  try { st = await api('GET', '/stats?from=' + a + '&to=' + b); }
+  catch (e) {
+    if (!(e instanceof ApiError) || e.message === 'UNAUTHORIZED') throw e;
+    // Il periodo non va: restano le scelte per cambiarlo.
+    put(main(), h('div.head', h('h1', T.stTitle)), tools, h('div.panel', h('div.empty', T.badPeriod)));
+    return;
+  }
+  const pct = (x) => Math.round(x * 100) + '%';
+  const hrs = (x) => (Math.round(x * 10) / 10).toLocaleString(locale());
+  const money0 = (c) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(c / 100);
+  const label = dateText(a) + ' – ' + dateText(b);
+  const heat = st.heat[0] ? h('div.panel', h('table.heat',
+    h('thead', h('tr', h('th'), st.heat[0].map((_, i) => h('th.num', String(st.firstHour + i))))),
+    h('tbody', st.heat.map((row, d) => h('tr', h('th', weekdayName(d + 1)), row.map((v, i) => h('td', {
+      title: weekdayName(d + 1) + ' ' + hhmm((st.firstHour + i) * 60) + ': ' + pct(v), style: 'background: rgba(127, 196, 143, ' + (0.08 + v * 0.85).toFixed(2) + ')',
+    }, v >= 0.5 ? pct(v) : ''))))))) : null;
+  put(main(),
+    h('div.head', h('h1', T.stTitle), h('span.dim', label), h('button', { onclick: () => window.print() }, T.print)),
+    printHead(T.stTitle + ' · ' + label),
+    tools,
+    h('div.kpis',
+      h('div.kpi', h('b', pct(st.occupancy)), h('span', T.stOccupancy)),
+      h('div.kpi', h('b', money0(st.cents)), h('span', T.stRevenue)),
+      h('div.kpi', h('b', st.bookings), h('span', T.stBookings + (st.online ? ' · ' + T.stOnline(st.online) : '')))),
+    st.tournamentHours ? h('p.dim', T.stTournaments(hrs(st.tournamentHours))) : null,
+    !st.bookings ? h('p.dim', T.stNone) : null,
+    h('div.section', h('h2', T.stByCourt), h('div.panel', h('table',
+      h('thead', h('tr', h('th', T.court), h('th', T.stOccupancy), h('th.num', T.hoursCol), h('th.num', T.stBookings), h('th.num', T.stRevenue))),
+      h('tbody', st.courts.map((c) => h('tr', h('td', c.court),
+        h('td', h('span.pbar', h('i', { style: 'width:' + pct(c.occupancy) })), ' ', pct(c.occupancy)),
+        h('td.num', T.stHoursOf(hrs(c.bookedHours), hrs(Math.max(0, c.openHours - c.blockedHours))), c.blockedHours ? h('div.dim', T.stBlocked(hrs(c.blockedHours))) : null),
+        h('td.num', c.bookings + (c.online ? ' (' + c.online + ' online)' : '')), h('td.num', money0(c.cents)))))))),
+    h('p.dim', T.stRevenueHint),
+    heat ? h('div.section', h('h2', T.stHeat), h('p.dim', T.stHeatHint), heat) : null,
+    st.top.length ? h('div.section', h('h2', T.stTop), h('div.panel', h('table', h('tbody', st.top.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td.num', T.stCount(x.count)))))))) : null);
+}
+
+// --- Scuola tennis ---
+
+let courseId = null;
+let courseTab = 'students';
+let lessonShow = 'next';
+
+const slotText = (x) => [weekdayName(x.weekday), hhmm(x.startMin), x.court].filter(Boolean).join(' ');
+const feeText = (c) => (c.feeCents ? eur(c.feeCents) + ' ' + (c.feeKind === 'SEASON' ? T.scSeasonFee : T.scMonthly) : '');
+const coachOf = (c) => (c.coach ? (people.find((p) => p.id === c.coach) || {}).name || '' : c.coachName);
+
+async function showSchool() {
+  people = await api('GET', '/people');
+  const list = await api('GET', '/courses');
+  const c = courseId && list.find((x) => x.id === courseId);
+  if (c) return showCourse(c);
+  courseId = null;
+  put(main(), h('div.head', h('h1', T.scTitle), h('button.primary', { onclick: () => editCourse(null) }, T.scNew)), h('p.dim', T.scHint),
+    list.length ? h('div.cards', list.map((x) => {
+      const next = x.lessons.find((l) => !l.cancelled && l.date >= info.today);
+      return h('button.card', { type: 'button', onclick: () => { courseId = x.id; courseTab = 'students'; showSchool(); } },
+        h('h2', x.name), h('p.dim', [x.level, coachOf(x) ? T.scCoachLine(coachOf(x)) : ''].filter(Boolean).join(' · ')),
+        h('p.dim', x.slots.map(slotText).join(' · ')),
+        h('p', T.scStudentsCount(x.students.length, x.maxStudents) + (feeText(x) ? ' · ' + feeText(x) : '')),
+        next ? h('p.dim', T.scNext(shortDay(next.date) + ' ' + hhmm(next.startMin))) : null);
+    })) : h('div.panel', h('div.empty', T.scNone)));
+}
+
+/** Una chiamata sul corso aperto, poi la scheda si ridisegna. */
+async function courseDo(method, path, body) {
+  let out = null;
+  try { out = await api(method, '/courses/' + encodeURIComponent(courseId) + path, body); toast(T.saved); }
+  catch (e) { toast(errText(e)); }
+  await showSchool();
+  return out;
+}
+
+function showCourse(c) {
+  const tabs = [['students', T.scTabStudents + ' (' + c.students.length + ')'], ['lessons', T.scTabLessons], ['fees', T.scTabFees]];
+  const body = h('div');
+  put(main(),
+    h('div.head', h('button', { onclick: () => { courseId = null; showSchool(); }, 'aria-label': T.scTitle, title: T.scTitle }, '←'), h('h1', c.name),
+      h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editCourse(c) }, T.edit)),
+    h('p.dim', [c.level, coachOf(c) ? T.scCoachLine(coachOf(c)) : '', dateText(c.from) + ' – ' + dateText(c.to), feeText(c)].filter(Boolean).join(' · '),
+      h('br'), c.slots.length ? c.slots.map(slotText).join(' · ') : T.scNoLessons),
+    printHead(T.scTitle + ' · ' + c.name + ' · ' + Object.fromEntries(tabs)[courseTab]),
+    h('div.tabs', { role: 'tablist' }, tabs.map(([v, l]) => h('button' + (v === courseTab ? '.on' : ''), {
+      type: 'button', role: 'tab', 'aria-selected': v === courseTab ? 'true' : 'false', onclick: () => { courseTab = v; showCourse(c); },
+    }, l))),
+    body);
+  ({ students: courseStudents, lessons: courseLessons, fees: courseFees })[courseTab](c, body);
+}
+
+function courseStudents(c, body) {
+  const inside = new Set(c.students.map((x) => x.id));
+  const full = c.maxStudents > 0 && c.students.length >= c.maxStudents;
+  const input = h('input', { type: 'search', placeholder: T.scAddStudent, 'aria-label': T.scAddStudent, autocomplete: 'off', disabled: full });
+  const hits = h('div.hits');
+  function refresh() {
+    const q = input.value.trim().toLowerCase();
+    const list = q ? people.filter((p) => !inside.has(p.id) && p.name.toLowerCase().includes(q)).slice(0, 8) : [];
+    put(hits, list.map((p) => h('button', { type: 'button', onclick: async () => {
+      input.disabled = true;
+      await courseDo('POST', '/students', { ids: [p.id] });
+      const again = document.querySelector('.picker input');
+      if (again && !again.disabled) again.focus();
+    } }, p.name, p.member ? null : h('span.dim', ' · ' + T.notMember))), q && !list.length ? h('div.dim.pad', T.noResults) : null);
+  }
+  input.addEventListener('input', refresh);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+  put(body,
+    h('div.picker.noprint', input, hits, c.maxStudents ? h('p.dim', T.scMax(c.maxStudents)) : null),
+    c.students.length ? h('div.panel', h('table',
+      h('thead', h('tr', h('th.num', '#'), h('th', T.name), h('th', T.scTabLessons), h('th.num', T.owed), h('th.noprint'))),
+      h('tbody', c.students.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td', x.marked ? T.scPresent(x.present, x.marked) : h('span.dim', '—')),
+        h('td.num', x.owedCents ? eur(x.owedCents) : ''),
+        h('td.num.noprint', h('button.danger', { type: 'button', onclick: async () => { if (confirm(T.scRemoveStudent + ': ' + x.name + '?')) await courseDo('DELETE', '/students/' + encodeURIComponent(x.id)); } }, T.scRemoveStudent))))))) 
+      : h('div.panel', h('div.empty', T.noResults)));
+}
+
+function courseLessons(c, body) {
+  const show = select([['next', T.scUpcoming], ['past', T.scPast], ['all', T.cupAll]], lessonShow);
+  show.setAttribute('aria-label', T.status);
+  show.addEventListener('change', () => { lessonShow = show.value; courseLessons(c, body); });
+  const rows = c.lessons.filter((l) => ({ next: l.date >= info.today, past: l.date < info.today, all: true })[lessonShow]);
+  if (lessonShow === 'past') rows.reverse();
+  const names = Object.fromEntries(c.students.map((x) => [x.id, x.name]));
+  put(body,
+    h('div.tools.noprint', show, h('span.dim', T.lessonHint)),
+    rows.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
+      h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
+        h('td', shortDay(l.date)), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
+          : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
+      : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
+}
+
+function openLesson(c, l) {
+  const boxes = c.students.map((x) => [x.id, h('input', { type: 'checkbox', checked: l.marked ? l.present.includes(x.id) : false })]);
+  const act = async (body) => {
+    try { await api('POST', '/courses/' + encodeURIComponent(c.id) + '/lesson', body); dlg.close(); toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
+  };
+  const left = h('button.danger.left', { type: 'button', onclick: () => act({ key: l.key, cancelled: !l.cancelled }) }, l.cancelled ? T.restoreLesson : T.cancelLessonBtn);
+  const all = h('button', { type: 'button', onclick: () => boxes.forEach(([, x]) => { x.checked = true; }) }, T.allPresent);
+  const dlg = dialog(c.name + ' · ' + shortDay(l.date) + ' ' + hhmm(l.startMin), h('div.form',
+    l.cancelled ? h('p.full', h('span.tag.bad', T.scCancelled)) : null,
+    h('h3', T.scWhoWasThere), c.students.length ? h('div.full.checks', boxes.map(([id, x]) => h('label.check', x, c.students.find((s) => s.id === id).name)), all) : h('p.full.dim', T.noResults),
+    h('p.full.dim', T.cancelLessonHint)), l.cancelled ? null : async () => {
+    await api('POST', '/courses/' + encodeURIComponent(c.id) + '/lesson', { key: l.key, present: boxes.filter(([, x]) => x.checked).map(([id]) => id) });
+    toast(T.saved);
+    await showSchool();
+  }, { left });
+}
+
+function courseFees(c, body) {
+  if (!c.feeCents) { put(body, h('div.panel', h('div.empty', T.scNoFee))); return; }
+  put(body,
+    h('p.dim', feeText(c) + ' · ' + T.feesCourseHint),
+    h('div.panel', h('table',
+      h('thead', h('tr', h('th', T.what), h('th.num', T.chargedCol), h('th.num', T.paidOnes), h('th.noprint'))),
+      h('tbody', c.fees.map((f) => h('tr', h('td', f.label), h('td.num', f.charged + ' / ' + c.students.length), h('td.num', f.paid),
+        h('td.num.noprint', f.charged < c.students.length ? h('button', { type: 'button', onclick: async () => {
+          const out = await courseDo('POST', '/charge', { month: f.month });
+          if (out) toast(T.scCharged(out.count));
+        } }, T.scChargeStudents) : null)))))));
+}
+
+function editCourse(c) {
+  const v = c || { name: '', level: '', coach: null, coachName: '', from: info.today, to: addMonth(info.today, 9), maxStudents: 0, feeCents: 0, feeKind: 'MONTHLY', note: '', slots: [] };
+  const name = h('input', { required: true, maxlength: 80, value: v.name });
+  const level = h('input', { maxlength: 60, value: v.level });
+  const coach = select([['', '—']].concat(people.map((p) => [p.id, p.name])), v.coach || '');
+  const coachName = h('input', { maxlength: 80, value: v.coachName, placeholder: T.scCoach });
+  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', required: true, value: v.to });
+  const fee = h('input', { inputmode: 'decimal', value: v.feeCents ? (v.feeCents / 100).toFixed(2).replace('.', ',') : '' });
+  const kind = select([['MONTHLY', T.scMonthly], ['SEASON', T.scSeasonFee]], v.feeKind);
+  const max = h('input', { type: 'number', min: 0, max: 200, value: v.maxStudents || '', placeholder: T.scNoMax });
+  const note = h('input', { maxlength: 500, value: v.note });
+  const slots = v.slots.map((x) => ({ ...x }));
+  const box = h('div.full.slots');
+  const minutes = [30, 45, 60, 75, 90, 120, 150, 180];
+  function draw() {
+    put(box, slots.map((x, i) => {
+      const wd = select([1, 2, 3, 4, 5, 6, 7].map((n) => [String(n), weekdayName(n)]), String(x.weekday));
+      wd.addEventListener('change', () => { x.weekday = Number(wd.value); });
+      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); } });
+      const len = select((minutes.includes(x.minutes) ? minutes : minutes.concat([x.minutes]).sort((a, b) => a - b)).map((m) => [String(m), m + ' min']), String(x.minutes));
+      len.addEventListener('change', () => { x.minutes = Number(len.value); });
+      const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), x.court);
+      ct.addEventListener('change', () => { x.court = ct.value; });
+      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); } }, '×'));
+    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); } }, T.scAddSlot));
+  }
+  draw();
+  const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.scDeleteAsk(c.name))) return;
+    try { await api('DELETE', '/courses/' + encodeURIComponent(c.id)); dlg.close(); courseId = null; toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
+  } }, T.scDelete);
+  const dlg = dialog(c ? c.name : T.scNew, h('div.form',
+    field(T.scName, name, 'full'), field(T.scLevel, level, 'full'),
+    field(T.scCoach, coach), field(T.scCoachFree, coachName),
+    field(T.blkFrom, from), field(T.blkTo, to),
+    field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
+    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint)), async () => {
+    const fc = fee.value.trim() ? cents(fee.value) : 0;
+    if (fc === null) throw new Error(T.err.BAD_AMOUNT);
+    const body = { name: name.value, level: level.value, coach: coach.value || null, coachName: coach.value ? '' : coachName.value, from: from.value, to: to.value,
+      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots };
+    if (c) await api('PUT', '/courses/' + encodeURIComponent(c.id), body);
+    else { const out = await api('POST', '/courses', body); courseId = out.id; courseTab = 'students'; }
+    toast(T.saved);
+    await showSchool();
+  }, { left: del, wide: true });
+}
+
 // --- Via ---
 
 (async () => {
@@ -2375,6 +3007,29 @@ const DESK_I18N = {
     next: "Avanti",
     monthHint: "La barretta dice quanto sono occupati i campi. Clicca un giorno per vederlo ore per campi.",
     nBookings: (n) => n === 1 ? '1 prenotazione' : n + ' prenotazioni',
+    duesButton: "Prepara sollecito",
+    duesHint: "Il messaggio di ciascuno con le sue voci da pagare, come nell'app. Il telefono li manda col suo WhatsApp o SMS, uno per uno: togli la spunta a chi non vuoi scrivere.",
+    noContact: "nessun telefono né email",
+    duesSend: "Apri sul telefono",
+    duesSent: "Sul telefono si è aperto il sollecito: mandalo da lì, uno per uno.",
+    duesNone: "Nessuno da sollecitare tra gli addebiti che vedi.",
+    thisYear: "Quest'anno",
+    otherPeriod: "Altro periodo",
+    periodLabel: "Periodo",
+    hoursCol: "Ore prenotate",
+    scCoachFree: "o scrivi il nome",
+    scMaxField: "Posti (vuoto = senza limite)",
+    lessonHint: "Clicca una lezione per l'appello o per annullarla.",
+    restoreLesson: "Ripristina la lezione",
+    cancelLessonBtn: "Segna annullata",
+    allPresent: "Tutti presenti",
+    cancelLessonHint: "Per avvisare gli allievi di una lezione annullata usa l'app: il messaggio parte dal telefono.",
+    feesCourseHint: "la quota si addebita agli allievi del corso che non l'hanno ancora",
+    chargedCol: "Addebitate",
+    duesCount: (n) => n === 1 ? '1 persona' : n + ' persone',
+    scStudentsCount: (n, max) => (n === 1 ? '1 allievo' : n + ' allievi') + (max > 0 ? ' su ' + max : ''),
+    showPeriod: "Mostra",
+    badPeriod: "Scegli un periodo valido: la prima data prima della seconda, al massimo un anno.",
     kindMembership: "Quota sociale",
     kindFitp: "Tessera FITP",
     kindCourse: "Corso",
@@ -2428,6 +3083,9 @@ const DESK_I18N = {
       OTHER: "Altro",
     },
     err: {
+      NOTHING_DUE: "Nessuno da sollecitare.",
+      COURSE_FULL: "Il corso è pieno: aumenta i posti in Modifica.",
+      NO_FEE: "Il corso non ha una quota: impostala in Modifica.",
       MANAGED: "Si cambia nell'app, dal corso o dalla squadra.",
       HAS_RESULTS: "Ci sono già risultati: il sorteggio non si rifà più.",
       TOO_FEW: "Servono almeno due iscritti in regola.",
@@ -2606,6 +3264,29 @@ const DESK_I18N = {
     next: "Forward",
     monthHint: "The bar shows how busy the courts are. Click a day to see it by hours and courts.",
     nBookings: (n) => n === 1 ? '1 booking' : n + ' bookings',
+    duesButton: "Prepare reminder",
+    duesHint: "Each person's message with their items to pay, as in the app. The phone sends them with its WhatsApp or SMS, one by one: untick anyone you don't want to write to.",
+    noContact: "no phone or email",
+    duesSend: "Open on the phone",
+    duesSent: "The reminder is open on the phone: send it from there, one by one.",
+    duesNone: "Nobody to remind among the charges you see.",
+    thisYear: "This year",
+    otherPeriod: "Other period",
+    periodLabel: "Period",
+    hoursCol: "Hours booked",
+    scCoachFree: "or type the name",
+    scMaxField: "Places (empty = no limit)",
+    lessonHint: "Click a lesson to take attendance or cancel it.",
+    restoreLesson: "Restore the lesson",
+    cancelLessonBtn: "Mark as cancelled",
+    allPresent: "All present",
+    cancelLessonHint: "To tell the students about a cancelled lesson use the app: the message goes from the phone.",
+    feesCourseHint: "the fee is charged to the course students who don't have it yet",
+    chargedCol: "Charged",
+    duesCount: (n) => n === 1 ? '1 person' : n + ' people',
+    scStudentsCount: (n, max) => (n === 1 ? '1 student' : n + ' students') + (max > 0 ? ' of ' + max : ''),
+    showPeriod: "Show",
+    badPeriod: "Choose a valid period: the first date before the second, at most one year.",
     kindMembership: "Membership",
     kindFitp: "Federation card",
     kindCourse: "Course",
@@ -2659,6 +3340,9 @@ const DESK_I18N = {
       OTHER: "Other",
     },
     err: {
+      NOTHING_DUE: "Nobody to remind.",
+      COURSE_FULL: "The course is full: raise the places in Edit.",
+      NO_FEE: "The course has no fee: set it in Edit.",
       MANAGED: "Change it in the app, from the course or the team.",
       HAS_RESULTS: "There are results already: the draw can't be redone.",
       TOO_FEW: "At least two entries in order are needed.",
@@ -2838,6 +3522,29 @@ const DESK_I18N = {
     next: "Suivant",
     monthHint: "La barre indique l'occupation des courts. Cliquez sur un jour pour le voir par heures et par courts.",
     nBookings: (n) => n === 1 ? '1 réservation' : n + ' réservations',
+    duesButton: "Préparer une relance",
+    duesHint: "Le message de chacun avec ce qu'il doit, comme dans l'app. Le téléphone les envoie avec son WhatsApp ou SMS, un par un : décochez ceux à qui vous ne voulez pas écrire.",
+    noContact: "ni téléphone ni e-mail",
+    duesSend: "Ouvrir sur le téléphone",
+    duesSent: "La relance est ouverte sur le téléphone : envoyez-la de là, un par un.",
+    duesNone: "Personne à relancer parmi les débits affichés.",
+    thisYear: "Cette année",
+    otherPeriod: "Autre période",
+    periodLabel: "Période",
+    hoursCol: "Heures réservées",
+    scCoachFree: "ou écrivez le nom",
+    scMaxField: "Places (vide = sans limite)",
+    lessonHint: "Cliquez sur un cours pour l'appel ou pour l'annuler.",
+    restoreLesson: "Rétablir le cours",
+    cancelLessonBtn: "Marquer annulé",
+    allPresent: "Tous présents",
+    cancelLessonHint: "Pour prévenir les élèves d'un cours annulé, utilisez l'app : le message part du téléphone.",
+    feesCourseHint: "les frais sont débités aux élèves du cours qui ne les ont pas encore",
+    chargedCol: "Débités",
+    duesCount: (n) => n === 1 ? '1 personne' : n + ' personnes',
+    scStudentsCount: (n, max) => (n === 1 ? '1 élève' : n + ' élèves') + (max > 0 ? ' sur ' + max : ''),
+    showPeriod: "Afficher",
+    badPeriod: "Choisissez une période valable : la première date avant la seconde, un an au maximum.",
     kindMembership: "Cotisation",
     kindFitp: "Licence fédérale",
     kindCourse: "Cours",
@@ -2891,6 +3598,9 @@ const DESK_I18N = {
       OTHER: "Autre",
     },
     err: {
+      NOTHING_DUE: "Personne à relancer.",
+      COURSE_FULL: "Le groupe est complet : augmentez les places dans Modifier.",
+      NO_FEE: "Le groupe n'a pas de frais : réglez-les dans Modifier.",
       MANAGED: "Elle se change dans l'app, depuis le cours ou l'équipe.",
       HAS_RESULTS: "Il y a déjà des résultats : le tirage ne se refait plus.",
       TOO_FEW: "Il faut au moins deux inscrits en règle.",
@@ -3069,6 +3779,29 @@ const DESK_I18N = {
     next: "Weiter",
     monthHint: "Der Balken zeigt, wie belegt die Plätze sind. Klicke auf einen Tag, um ihn nach Stunden und Plätzen zu sehen.",
     nBookings: (n) => n === 1 ? '1 Buchung' : n + ' Buchungen',
+    duesButton: "Mahnung vorbereiten",
+    duesHint: "Die Nachricht für jeden mit seinen offenen Posten, wie in der App. Das Handy schickt sie mit seinem WhatsApp oder per SMS, einzeln: entferne das Häkchen bei allen, denen du nicht schreiben willst.",
+    noContact: "weder Telefon noch E-Mail",
+    duesSend: "Auf dem Handy öffnen",
+    duesSent: "Die Mahnung ist auf dem Handy geöffnet: schicke sie von dort, eine nach der anderen.",
+    duesNone: "Niemand zu mahnen unter den angezeigten Forderungen.",
+    thisYear: "Dieses Jahr",
+    otherPeriod: "Anderer Zeitraum",
+    periodLabel: "Zeitraum",
+    hoursCol: "Gebuchte Stunden",
+    scCoachFree: "oder Namen schreiben",
+    scMaxField: "Plätze (leer = ohne Grenze)",
+    lessonHint: "Klicke auf eine Stunde für die Anwesenheit oder um sie abzusagen.",
+    restoreLesson: "Stunde wiederherstellen",
+    cancelLessonBtn: "Als abgesagt markieren",
+    allPresent: "Alle anwesend",
+    cancelLessonHint: "Um die Schüler über eine abgesagte Stunde zu informieren, nimm die App: die Nachricht geht vom Handy.",
+    feesCourseHint: "die Gebühr wird den Kursschülern belastet, die sie noch nicht haben",
+    chargedCol: "Belastet",
+    duesCount: (n) => n === 1 ? '1 Person' : n + ' Personen',
+    scStudentsCount: (n, max) => (n === 1 ? '1 Schüler' : n + ' Schüler') + (max > 0 ? ' von ' + max : ''),
+    showPeriod: "Anzeigen",
+    badPeriod: "Wähle einen gültigen Zeitraum: das erste Datum vor dem zweiten, höchstens ein Jahr.",
     kindMembership: "Mitgliedsbeitrag",
     kindFitp: "Verbandslizenz",
     kindCourse: "Kurs",
@@ -3122,6 +3855,9 @@ const DESK_I18N = {
       OTHER: "Andere",
     },
     err: {
+      NOTHING_DUE: "Niemand zu mahnen.",
+      COURSE_FULL: "Der Kurs ist voll: erhöhe die Plätze unter Bearbeiten.",
+      NO_FEE: "Der Kurs hat keine Gebühr: lege sie unter Bearbeiten fest.",
       MANAGED: "Wird in der App beim Kurs oder bei der Mannschaft geändert.",
       HAS_RESULTS: "Es gibt schon Ergebnisse: die Auslosung wird nicht wiederholt.",
       TOO_FEW: "Es braucht mindestens zwei Meldungen in Ordnung.",
@@ -3300,6 +4036,29 @@ const DESK_I18N = {
     next: "Adelante",
     monthHint: "La barra indica lo ocupadas que están las pistas. Pulsa un día para verlo por horas y pistas.",
     nBookings: (n) => n === 1 ? '1 reserva' : n + ' reservas',
+    duesButton: "Preparar recordatorio",
+    duesHint: "El mensaje de cada uno con lo que debe, como en la app. El teléfono los envía con su WhatsApp o SMS, uno a uno: quita la marca a quien no quieras escribir.",
+    noContact: "sin teléfono ni correo",
+    duesSend: "Abrir en el teléfono",
+    duesSent: "El recordatorio está abierto en el teléfono: envíalo desde allí, uno a uno.",
+    duesNone: "Nadie a quien recordar entre los cargos que ves.",
+    thisYear: "Este año",
+    otherPeriod: "Otro periodo",
+    periodLabel: "Periodo",
+    hoursCol: "Horas reservadas",
+    scCoachFree: "o escribe el nombre",
+    scMaxField: "Plazas (vacío = sin límite)",
+    lessonHint: "Pulsa una clase para pasar lista o anularla.",
+    restoreLesson: "Recuperar la clase",
+    cancelLessonBtn: "Marcar como anulada",
+    allPresent: "Todos presentes",
+    cancelLessonHint: "Para avisar a los alumnos de una clase anulada usa la app: el mensaje sale del teléfono.",
+    feesCourseHint: "la cuota se carga a los alumnos del curso que aún no la tienen",
+    chargedCol: "Cargadas",
+    duesCount: (n) => n === 1 ? '1 persona' : n + ' personas',
+    scStudentsCount: (n, max) => (n === 1 ? '1 alumno' : n + ' alumnos') + (max > 0 ? ' de ' + max : ''),
+    showPeriod: "Mostrar",
+    badPeriod: "Elige un periodo válido: la primera fecha antes de la segunda, como mucho un año.",
     kindMembership: "Cuota social",
     kindFitp: "Licencia federativa",
     kindCourse: "Curso",
@@ -3353,6 +4112,9 @@ const DESK_I18N = {
       OTHER: "Otro",
     },
     err: {
+      NOTHING_DUE: "Nadie a quien recordar.",
+      COURSE_FULL: "El curso está lleno: aumenta las plazas en Editar.",
+      NO_FEE: "El curso no tiene cuota: ponla en Editar.",
       MANAGED: "Se cambia en la app, desde el curso o el equipo.",
       HAS_RESULTS: "Ya hay resultados: el sorteo no se repite.",
       TOO_FEW: "Hacen falta al menos dos inscritos en regla.",
@@ -3531,6 +4293,29 @@ const DESK_I18N = {
     next: "Avançar",
     monthHint: "A barra mostra quanto as quadras estão ocupadas. Clique num dia para o ver por horas e quadras.",
     nBookings: (n) => n === 1 ? '1 reserva' : n + ' reservas',
+    duesButton: "Preparar lembrete",
+    duesHint: "A mensagem de cada um com o que deve, como no app. O telefone envia-as com o seu WhatsApp ou SMS, uma a uma: tire a marca a quem não quer escrever.",
+    noContact: "sem telefone nem e-mail",
+    duesSend: "Abrir no telefone",
+    duesSent: "O lembrete está aberto no telefone: envie-o de lá, um a um.",
+    duesNone: "Ninguém a lembrar entre os débitos que vê.",
+    thisYear: "Este ano",
+    otherPeriod: "Outro período",
+    periodLabel: "Período",
+    hoursCol: "Horas reservadas",
+    scCoachFree: "ou escreva o nome",
+    scMaxField: "Vagas (vazio = sem limite)",
+    lessonHint: "Clique numa aula para a chamada ou para a cancelar.",
+    restoreLesson: "Repor a aula",
+    cancelLessonBtn: "Marcar como cancelada",
+    allPresent: "Todos presentes",
+    cancelLessonHint: "Para avisar os alunos de uma aula cancelada use o app: a mensagem sai do telefone.",
+    feesCourseHint: "a mensalidade é debitada aos alunos do curso que ainda não a têm",
+    chargedCol: "Debitadas",
+    duesCount: (n) => n === 1 ? '1 pessoa' : n + ' pessoas',
+    scStudentsCount: (n, max) => (n === 1 ? '1 aluno' : n + ' alunos') + (max > 0 ? ' de ' + max : ''),
+    showPeriod: "Mostrar",
+    badPeriod: "Escolha um período válido: a primeira data antes da segunda, no máximo um ano.",
     kindMembership: "Mensalidade",
     kindFitp: "Carteira federativa",
     kindCourse: "Curso",
@@ -3584,6 +4369,9 @@ const DESK_I18N = {
       OTHER: "Outro",
     },
     err: {
+      NOTHING_DUE: "Ninguém a lembrar.",
+      COURSE_FULL: "O curso está cheio: aumente as vagas em Editar.",
+      NO_FEE: "O curso não tem mensalidade: defina-a em Editar.",
       MANAGED: "Muda-se no app, a partir do curso ou da equipe.",
       HAS_RESULTS: "Já há resultados: o sorteio não se refaz.",
       TOO_FEW: "São precisos pelo menos dois inscritos em ordem.",
@@ -3807,6 +4595,19 @@ tr.pass td:first-child { font-weight: 700; }
 @media print { .seg, .head select { display: none !important; } .month { min-width: 0; } .mday .bar i { background: #555; } }
 .head select { width: auto; }
 .gday { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Solleciti, statistiche, scuola */
+.dues { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow: auto; }
+.due { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.due pre { white-space: pre-wrap; font: 12px/1.4 inherit; margin: 6px 0 0 24px; color: var(--dim); }
+.heat th, .heat td { padding: 4px 3px; font-size: 11px; text-align: center; }
+.heat td { min-width: 26px; color: var(--text); }
+.pbar { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--hover); vertical-align: middle; overflow: hidden; }
+.pbar i { display: block; height: 100%; background: var(--accent); }
+.slots { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.slot { display: flex; gap: 6px; flex-wrap: wrap; }
+.slot select, .slot input { width: auto; }
+@media print { .heat td { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .pbar i { background: #555; } }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -4283,7 +5084,7 @@ Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **
 - **Einschalten**: *Vereinsfunktionen* › **Büro am PC**, dann der Eintrag im Plätze-Tab und **Einschalten**. Das Telefon zeigt die Adresse (z. B. `https://192.168.1.20:8443`) und einen Code.
 - **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
 - **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
-- **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). WhatsApp-Nachrichten, Live-Zählung, Tennisschule und Mannschaften bleiben in der App.
+- **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). **Tennisschule** (Kurse mit Zeiten und Plätzen, Schüler, Anwesenheit, abgesagte Stunden, Monats- oder Saisongebühren zum Belasten), **Platzstatistik** (Auslastung, Einnahmen, Platz für Platz, vollste Tage und Stunden, wer am meisten bucht, nach Zeitraum, druckbar). Mit **Mahnung vorbereiten** in Beiträge und Zahlungen wählst du unter den angezeigten Forderungen, wem du schreibst: die Nachricht öffnet sich auf dem Handy und du schickst sie von dort. WhatsApp-Nachrichten, Live-Zählung und Mannschaften bleiben in der App.
 - **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
 - **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
 
@@ -4838,7 +5639,7 @@ Entering members and payments is easier with a keyboard and mouse. **A computer 
 - **Turn on**: *Club features* › **Office from PC**, then the entry in the courts tab and **Turn on**. The phone shows the address (e.g. `https://192.168.1.20:8443`) and a code.
 - **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
 - **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
-- **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). WhatsApp notices, live scoring, tennis school and teams stay in the app.
+- **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). **Tennis school** (courses with times and courts, students, attendance, cancelled lessons, monthly or season fees to charge), **Court statistics** (occupancy, takings, court by court, busiest days and hours, who books most, by period, printable). With **Prepare reminder** in Fees and payments you pick whom to write to among the charges you see: the message opens on the phone and you send it from there. WhatsApp notices, live scoring and teams stay in the app.
 - **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
 - **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
 
@@ -5392,7 +6193,7 @@ Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (
 - **Encender**: *Funciones del club* › **Secretaría desde el PC**, luego la entrada de la pestaña de pistas y **Encender**. El teléfono muestra la dirección (p. ej. `https://192.168.1.20:8443`) y un código.
 - **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
 - **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
-- **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). Avisos de WhatsApp, marcador en directo, escuela de tenis y equipos siguen en la app.
+- **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). **Escuela de tenis** (cursos con horarios y pistas, alumnos, lista de las clases, clases anuladas, cuotas del mes o de la temporada por cargar), **Estadísticas de las pistas** (ocupación, ingresos, pista por pista, días y horas más llenos, quién reserva más, por periodo, para imprimir). Con **Preparar recordatorio** en Cuotas y pagos eliges a quién escribir entre los cargos que ves: el mensaje se abre en el teléfono y lo envías desde allí. Avisos de WhatsApp, marcador en directo y equipos siguen en la app.
 - **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
 - **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
 
@@ -5946,7 +6747,7 @@ Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un 
 - **Activer** : *Fonctions du club* › **Secrétariat sur PC**, puis l'entrée dans l'onglet des terrains et **Activer**. Le téléphone affiche l'adresse (par ex. `https://192.168.1.20:8443`) et un code.
 - **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
 - **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
-- **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). Avis WhatsApp, marquage en direct, école de tennis et équipes restent dans l'app.
+- **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). **École de tennis** (groupes avec horaires et courts, élèves, appel des cours, cours annulés, frais du mois ou de la saison à débiter), **Statistiques des terrains** (occupation, recettes, court par court, jours et heures les plus pleins, qui réserve le plus, par période, à imprimer). Avec **Préparer une relance** dans Cotisations et paiements, vous choisissez à qui écrire parmi les débits affichés : le message s'ouvre sur le téléphone et vous l'envoyez de là. Avis WhatsApp, marquage en direct et équipes restent dans l'app.
 - **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
 - **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
 
@@ -6500,7 +7301,7 @@ Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Wi
 - **Accendere**: *Funzioni del circolo* › **Segreteria da PC**, poi la voce nella scheda dei campi e **Accendi**. Il telefono mostra indirizzo (es. `https://192.168.1.20:8443`) e codice.
 - **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
 - **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
-- **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). Avvisi WhatsApp, segnapunti dal vivo, scuola tennis e squadre restano nell'app.
+- **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). **Scuola tennis** (corsi con orari e campi, allievi, appello delle lezioni, lezioni annullate, quote del mese o della stagione da addebitare), **Statistiche dei campi** (occupazione, incassi, campo per campo, giorni e ore più pieni, chi prenota di più, per periodo, da stampare). Con **Prepara sollecito** in Quote e pagamenti scegli a chi scrivere tra gli addebiti che vedi: il messaggio si apre sul telefono e lo mandi da lì. Avvisi WhatsApp, segnapunti dal vivo e squadre restano nell'app.
 - **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
 - **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
 
@@ -7054,7 +7855,7 @@ Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computado
 - **Ativar**: *Funções do clube* › **Secretaria no PC**, depois a entrada na aba das quadras e **Ativar**. O telefone mostra o endereço (ex. `https://192.168.1.20:8443`) e um código.
 - **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
 - **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
-- **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). Avisos de WhatsApp, marcador ao vivo, escola de tênis e equipes continuam no app.
+- **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). **Escola de tênis** (cursos com horários e quadras, alunos, chamada das aulas, aulas canceladas, mensalidades do mês ou da temporada a debitar), **Estatísticas das quadras** (ocupação, receitas, quadra a quadra, dias e horas mais cheios, quem reserva mais, por período, para imprimir). Com **Preparar lembrete** em Mensalidades e pagamentos escolhe a quem escrever entre os débitos que vê: a mensagem abre-se no telefone e envia-a de lá. Avisos de WhatsApp, marcador ao vivo e equipes continuam no app.
 - **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
 - **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
 
@@ -10206,15 +11007,19 @@ class MatchController(
         openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntKindFree, t.name, "${t.name}\n\n", rec, editable = true))
     }
 
-    /** Sollecito a chi deve qualcosa al circolo, voce per voce. */
-    fun noticeDues() {
+    /** Sollecito a chi deve qualcosa al circolo, voce per voce; con [only] solo quegli addebiti (dalla Segreteria da PC). */
+    fun noticeDues(only: Set<String>? = null) {
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntDuesButton, strings.paymentsTitle, "", duesRecipients(only)))
+    }
+
+    /** Chi deve qualcosa e il suo messaggio, voce per voce; con [only] solo quegli addebiti. */
+    fun duesRecipients(only: Set<String>? = null): List<com.tennis.scoremanager.data.NoticeRecipient> {
         val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
         val book = clubBook.value
-        val rec = players.value.mapNotNull { p ->
-            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 }
+        return players.value.mapNotNull { p ->
+            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 && (only == null || it.id in only) }
             if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now, com.tennis.scoremanager.data.Notices.payLines(s, book)), now)
         }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntDuesButton, s.paymentsTitle, "", rec))
     }
 
     /** Ai soci che hanno qualcosa da sistemare (certificato, tessera, consensi…), a ciascuno il suo. */
@@ -16682,7 +17487,9 @@ object Notices {
     /** "sabato 14 novembre" (in tedesco "Samstag, 14. November", in inglese "Saturday 14 November"). */
     fun day(t: Long, lang: Lang): String {
         val pattern = if (lang == Lang.DE) "EEEE, d. MMMM" else "EEEE d MMMM"
-        return java.text.SimpleDateFormat(pattern, Reports.locale(lang)).format(java.util.Date(t))
+        val text = java.text.SimpleDateFormat(pattern, Reports.locale(lang)).format(java.util.Date(t))
+        // In italiano, francese, spagnolo e portoghese giorni e mesi vanno in minuscolo, anche se il telefono li dà maiuscoli.
+        return if (lang == Lang.DE || lang == Lang.EN) text else text.lowercase(Reports.locale(lang))
     }
 
     /** "sabato 14 novembre, 9:00 · Campo 2" (o "orario da definire"). */
@@ -21178,6 +21985,9 @@ import com.tennis.scoremanager.data.BlockReason
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.CourseFee
+import com.tennis.scoremanager.data.CourseSlot
+import com.tennis.scoremanager.data.CourtStats
 import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
 import com.tennis.scoremanager.data.Team
@@ -21242,6 +22052,17 @@ interface DeskData {
     fun ladders(): List<Ladder>
     /** La ricevuta di un pagamento in PDF, come quella dell'app. */
     fun receiptPdf(chargeId: String, paymentId: String): ByteArray?
+    /** Salva il corso (e i suoi periodi non prenotabili nel planning) o lo toglie. */
+    fun saveCourse(c: Course)
+    fun deleteCourse(c: Course)
+    /** La voce della quota del corso nel registro: per il mese (anno, mese 0-11) o, con null, la stagione. */
+    fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String
+    /** Addebita la quota del mese (o della stagione) agli allievi che non l'hanno; quanti addebiti nuovi. */
+    fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int
+    /** Il sollecito per gli addebiti [charges]: a chi va e il suo messaggio, come nell'app. */
+    fun dues(charges: Set<String>): List<DeskDue>
+    /** Apre sul telefono gli avvisi del sollecito, da mandare da lì uno per uno. */
+    fun sendDues(charges: Set<String>)
     fun paymentsCsv(year: Int): ByteArray?
     /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
     fun saveTournament(t: ClubTournament)
@@ -21258,7 +22079,7 @@ interface DeskData {
 @Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
 /** Il QR da disegnare: una stringa di 0 e 1 per riga. */
 @Serializable data class DeskQrOut(val id: String, val rows: List<String>)
-@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList())
+@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
 @Serializable data class DeskTodayLine(val text: String, val startMin: Int? = null, val court: String = "", val date: String? = null, val cup: String? = null)
 @Serializable data class DeskToday(
@@ -21317,6 +22138,32 @@ interface DeskData {
     val weeks: Int = 1,
 )
 @Serializable data class DeskBooked(val skipped: List<String>)
+@Serializable data class DeskDue(val id: String, val name: String, val phone: String, val email: String, val text: String)
+@Serializable data class DeskIds(val ids: List<String> = emptyList())
+@Serializable data class DeskStatsCourt(
+    val court: String, val openHours: Double, val blockedHours: Double, val bookedHours: Double, val occupancy: Double, val cents: Long, val bookings: Int, val online: Int,
+)
+@Serializable data class DeskStats(
+    val from: String, val to: String, val courts: List<DeskStatsCourt>, val occupancy: Double, val cents: Long, val bookings: Int, val online: Int,
+    val tournamentHours: Double, val firstHour: Int, val heat: List<List<Double>>, val top: List<DeskTop>,
+)
+@Serializable data class DeskTop(val name: String, val count: Int)
+@Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
+@Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>)
+/** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
+@Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
+@Serializable data class DeskCourse(
+    val id: String, val name: String, val level: String, val coach: String?, val coachName: String, val from: String, val to: String,
+    val maxStudents: Int, val feeCents: Int, val feeKind: CourseFee, val note: String, val slots: List<DeskSlot>,
+    val students: List<DeskStudent>, val lessons: List<DeskLesson>, val fees: List<DeskCourseFee>,
+)
+@Serializable data class DeskCourseIn(
+    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String,
+    val maxStudents: Int = 0, val feeCents: Int = 0, val feeKind: CourseFee = CourseFee.MONTHLY, val note: String = "", val slots: List<DeskSlot> = emptyList(),
+)
+@Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
+@Serializable data class DeskChargeCourseIn(val month: String = "")
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
@@ -21418,6 +22265,17 @@ class DeskApi(
                 m == "PUT" && p.size == 2 && p[0] == "bookings" -> book(read(DeskBookingIn.serializer(), r), p[1])
                 m == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancelBooking(p[1], r.query["series"] == "1")
                 m == "GET" && p == listOf("blocks") -> blocks()
+                m == "GET" && p == listOf("stats") -> stats(r.query["from"], r.query["to"])
+                m == "POST" && p == listOf("dues") -> ok(ListSerializer(DeskDue.serializer()), data.dues(read(DeskIds.serializer(), r).ids.toSet()))
+                m == "POST" && p == listOf("dues", "send") -> {
+                    val ids = read(DeskIds.serializer(), r).ids.toSet()
+                    if (data.dues(ids).isEmpty()) throw Fail(400, "NOTHING_DUE")
+                    data.sendDues(ids)
+                    done()
+                }
+                m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
+                m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
+                p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
                 m == "POST" && p == listOf("blocks") -> saveBlock(read(DeskBlock.serializer(), r))
                 m == "DELETE" && p.size == 2 && p[0] == "blocks" -> {
                     data.saveBlock(block(p[1]), delete = true)
@@ -21467,7 +22325,7 @@ class DeskApi(
 
     private fun info(): Resp {
         val now = data.now()
-        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year, data.features().sortedBy { it.ordinal }))
+        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year, data.features().sortedBy { it.ordinal }, data.courts()))
     }
 
     // --- Giocatori e soci ---
@@ -21716,6 +22574,106 @@ class DeskApi(
         )
         data.saveBlock(b, delete = false)
         return done()
+    }
+
+    // --- Statistiche dei campi ---
+
+    /** Come in Statistiche dei campi nell'app, dal giorno [from] al giorno [to] compresi. */
+    private fun stats(from: String?, to: String?): Resp {
+        val a = dayStart(from); val b = CourtPlans.addDays(dayStart(to), 1)
+        if (b <= a || b - a > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
+        val people = data.players()
+        val rep = CourtStats.report(data.plan(), data.tournaments(), data.courts(), a, b)
+        return ok(DeskStats.serializer(), DeskStats(
+            from!!, to!!, rep.courts.map { DeskStatsCourt(it.court, it.openHours, it.blockedHours, it.bookedHours, it.occupancy, it.cents, it.bookings, it.online) },
+            rep.occupancy, rep.cents, rep.bookings, rep.online, rep.tournamentHours, rep.firstHour, rep.heat,
+            rep.top.map { (who, n) -> DeskTop(Players.byId(people, who)?.name ?: who, n) },
+        ))
+    }
+
+    // --- Scuola tennis ---
+
+    private fun course(id: String): Course = data.courses().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    /** I mesi della stagione ("2026-11"), o la stagione sola (""), con la voce della quota nel registro. */
+    private fun feeMonths(c: Course): List<Pair<String, Pair<Int, Int>?>> =
+        if (c.feeKind == CourseFee.SEASON) listOf("" to null) else Courses.months(c).map { (y, m) -> "%04d-%02d".format(y, m + 1) to (y to m) }
+
+    private fun courseOut(c: Course): DeskCourse {
+        val people = data.players(); val book = data.book(); val now = data.now()
+        val students = c.students.map { id ->
+            val p = Players.byId(people, id)
+            val (yes, all) = Courses.attendanceOf(c, id, now)
+            DeskStudent(id, p?.name ?: id, yes, all, p?.let { pp -> Fees.of(book, pp).filter { it.kind == FeeKind.COURSE && it.label.startsWith(c.name) }.sumOf { it.left } } ?: 0)
+        }
+        val lessons = Courses.lessons(c).map { l ->
+            val start = CourtPlans.dayStart(l.start)
+            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList())
+        }
+        val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
+        val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
+            val label = data.courseFeeLabel(c, month)
+            val mine = book.charges.filter { it.label == label && !it.cancelled && it.player in keys }
+            DeskCourseFee(key, label, mine.size, mine.count { it.settled })
+        }
+        return DeskCourse(
+            c.id, c.name, c.level, c.coach, c.coachName, day(c.from)!!, day(c.to)!!, c.maxStudents, c.feeCents, c.feeKind, c.note,
+            c.slots.map { DeskSlot(it.weekday, it.startMin, it.minutes, it.court) }, students, lessons, fees,
+        )
+    }
+
+    private fun courseRoute(m: String, p: List<String>, r: Req): Resp {
+        val c = course(p[0])
+        val rest = p.drop(1)
+        return when {
+            m == "PUT" && rest.isEmpty() -> saveCourse(c, read(DeskCourseIn.serializer(), r))
+            m == "DELETE" && rest.isEmpty() -> { data.deleteCourse(c); done() }
+            m == "POST" && rest == listOf("students") -> {
+                val people = data.players()
+                val add = read(DeskIds.serializer(), r).ids.map { Players.byId(people, it)?.id ?: throw Fail(404, "NOT_FOUND") }.filter { it !in c.students }.distinct()
+                if (c.maxStudents > 0 && c.students.size + add.size > c.maxStudents) throw Fail(409, "COURSE_FULL")
+                courseSaved(c.copy(students = c.students + add))
+            }
+            m == "DELETE" && rest.size == 2 && rest[0] == "students" -> courseSaved(c.copy(students = c.students - rest[1]))
+            m == "POST" && rest == listOf("lesson") -> {
+                val i = read(DeskMarkIn.serializer(), r)
+                if (Courses.lessons(c).none { it.key == i.key }) throw Fail(404, "NOT_FOUND")
+                var n = if (i.cancelled != null) Courses.setCancelled(c, i.key, i.cancelled) else c
+                if (i.cancelled == null) n = Courses.mark(n, i.key, i.present.filter { it in c.students }.toSet())
+                courseSaved(n)
+            }
+            m == "POST" && rest == listOf("charge") -> {
+                if (c.feeCents <= 0) throw Fail(409, "NO_FEE")
+                val key = read(DeskChargeCourseIn.serializer(), r).month
+                val month = feeMonths(c).firstOrNull { it.first == key } ?: throw Fail(404, "NOT_FOUND")
+                ok(DeskCount.serializer(), DeskCount(data.chargeCourse(c, month.second)))
+            }
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
+
+    private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
+        val name = text(i.name, 80)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE"); val to = noon(i.to) ?: throw Fail(400, "BAD_DATE")
+        if (to < from || to - from > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
+        if (i.feeCents != 0) cents(i.feeCents)
+        val courts = data.courts()
+        val slots = i.slots.map { s ->
+            if (s.weekday !in 1..7 || s.startMin !in 0 until 24 * 60 || s.minutes !in 15..8 * 60) throw Fail(400, "BAD_TIME")
+            if (s.court.isNotEmpty() && s.court !in courts) throw Fail(404, "NOT_FOUND")
+            CourseSlot(s.weekday, s.startMin, s.minutes, s.court)
+        }
+        val coach = i.coach?.let { id -> Players.byId(data.players(), id)?.id ?: throw Fail(404, "NOT_FOUND") }
+        val base = old ?: Course(Courses.newId("k"), name, from = from, to = to, createdAt = data.now())
+        val c = base.copy(
+            name = name, level = text(i.level, 60), coach = coach, coachName = if (coach != null) "" else text(i.coachName, 80), from = from, to = to,
+            maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
+        )
+        data.saveCourse(c)
+        return ok(DeskId.serializer(), DeskId(c.id))
     }
 
     // --- Oggi ---
@@ -22322,6 +23280,12 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun courses(): List<Course> = c.courses.value
     override fun teams(): List<Team> = c.teams.value
     override fun ladders(): List<Ladder> = c.ladders.value
+    override fun saveCourse(c: Course) = this.c.saveCourse(c)
+    override fun deleteCourse(c: Course) = this.c.deleteCourse(c.id)
+    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.courseFeeLabel(c, month)
+    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
+    override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
+    override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
@@ -50958,10 +51922,11 @@ fun NoticeScreen(c: MatchController) {
                             Text(if (open) r.text else short, color = TsmColors.TextMain, fontSize = 13.sp,
                                 modifier = Modifier.clickable { open = !open }, maxLines = if (open) 30 else 3)
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp") { mark(r); open(whatsApp(wa, textOf(r))) }
-                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS") { mark(r); open(sms(listOf(r.phone), textOf(r))) }
-                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail) { mark(r); open(email(listOf(r.email), emptyList(), p.subject, textOf(r))) }
+                        // Larghi uguali su una riga: con tre tasti "Email" non va più a capo a metà parola.
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp", Modifier.weight(1f)) { mark(r); open(whatsApp(wa, textOf(r))) }
+                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS", Modifier.weight(1f)) { mark(r); open(sms(listOf(r.phone), textOf(r))) }
+                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail, Modifier.weight(1f)) { mark(r); open(email(listOf(r.email), emptyList(), p.subject, textOf(r))) }
                         }
                     }
                 }
@@ -50971,11 +51936,12 @@ fun NoticeScreen(c: MatchController) {
 }
 
 @Composable
-private fun Chip(icon: ImageVector, label: String, onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.Surface) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun Chip(icon: ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(10.dp), color = TsmColors.Surface) {
+        Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = TsmColors.Ball)
-            Text(" $label", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(" $label", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, softWrap = false,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }
@@ -77353,6 +78319,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import com.tennis.scoremanager.data.FeeKind
+import com.tennis.scoremanager.data.Courses
 import java.io.File
 import java.net.InetAddress
 import java.net.Socket
@@ -77686,6 +78653,61 @@ class DeskTest {
         assertEquals(400, req("GET", "/week", token = k, q = mapOf("date" to "boh")).first)
     }
 
+    @Test fun scuolaTennisDalPc() {
+        val k = login()
+        data.time = java.time.LocalDateTime.of(2026, 11, 20, 9, 0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        for (n in listOf("Anna", "Bea", "Cora")) req("POST", "/people", """{"firstName":"$n","lastName":"X","member":true}""", k)
+        val ids = data.list.associate { it.firstName to it.id }
+        assertEquals(400, req("POST", "/courses", """{"name":" ","from":"2026-11-01","to":"2026-12-31"}""", k).first)
+        // Lunedì e mercoledì alle 17 sul Campo 1, novembre e dicembre, 40 euro al mese, al massimo 2 allievi.
+        val body = """{"name":"SAT","from":"2026-11-02","to":"2026-12-30","feeCents":4000,"maxStudents":2,"slots":[{"weekday":1,"startMin":1020,"court":"Campo 1"},{"weekday":3,"startMin":1020}]}"""
+        val (st, made) = req("POST", "/courses", body, k)
+        assertEquals(200, st)
+        val id = field(made, "id")!!
+        assertEquals(400, req("PUT", "/courses/$id", body.replace("\"weekday\":3", "\"weekday\":9"), k).first)
+        assertEquals(200, req("POST", "/courses/$id/students", """{"ids":["${ids["Anna"]}","${ids["Bea"]}"]}""", k).first)
+        assertEquals(409, req("POST", "/courses/$id/students", """{"ids":["${ids["Cora"]}"]}""", k).first)
+        val c = data.school.single()
+        val lessons = Courses.lessons(c)
+        assertEquals(18, lessons.size)
+        val first = lessons.first()
+        // Appello: Anna c'era, Cora no (non è allieva) e non conta.
+        assertEquals(200, req("POST", "/courses/$id/lesson", """{"key":"${first.key}","present":["${ids["Anna"]}","${ids["Cora"]}"]}""", k).first)
+        assertEquals(setOf(ids["Anna"]), data.school.single().attendance[first.key])
+        assertEquals(200, req("POST", "/courses/$id/lesson", """{"key":"${lessons[1].key}","cancelled":true}""", k).first)
+        assertTrue(lessons[1].key in data.school.single().cancelled)
+        assertEquals(404, req("POST", "/courses/$id/lesson", """{"key":"boh","cancelled":true}""", k).first)
+        val (_, list) = req("GET", "/courses", token = k)
+        assertTrue(list, "\"present\":1,\"marked\":1" in list && "\"month\":\"2026-11\"" in list && "\"month\":\"2026-12\"" in list)
+        // La quota di novembre: due addebiti, la seconda volta nessuno.
+        assertEquals("""{"count":2}""", req("POST", "/courses/$id/charge", """{"month":"2026-11"}""", k).second)
+        assertEquals("""{"count":0}""", req("POST", "/courses/$id/charge", """{"month":"2026-11"}""", k).second)
+        assertEquals(404, req("POST", "/courses/$id/charge", """{"month":"2027-05"}""", k).first)
+        assertTrue(req("GET", "/courses", token = k).second.contains("\"charged\":2,\"paid\":0"))
+        assertEquals(200, req("DELETE", "/courses/$id/students/${ids["Bea"]}", token = k).first)
+        assertEquals(listOf(ids["Anna"]), data.school.single().students)
+        assertEquals(200, req("DELETE", "/courses/$id", token = k).first)
+        assertTrue(data.school.isEmpty())
+    }
+
+    @Test fun sollecitiEStatistiche() {
+        val k = login()
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true,"phone":"333 1"}""", k)
+        req("POST", "/people", """{"firstName":"Luca","lastName":"Bianchi","member":true}""", k)
+        req("POST", "/fees", """{"name":"Quota","cents":5000,"chargeMembers":true}""", k)
+        val mario = data.ledger.charges.first { it.name == "Mario Rossi" }.id
+        val (_, prev) = req("POST", "/dues", """{"ids":["$mario"]}""", k)
+        assertTrue(prev, "Mario Rossi" in prev && "Luca" !in prev && "333 1" in prev)
+        assertEquals(400, req("POST", "/dues/send", """{"ids":[]}""", k).first)
+        assertEquals(200, req("POST", "/dues/send", """{"ids":["$mario"]}""", k).first)
+        assertEquals(setOf(mario), data.sent)
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Bianchi"]}""", k)
+        val (st, out) = req("GET", "/stats", token = k, q = mapOf("from" to "2026-11-01", "to" to "2026-11-30"))
+        assertEquals(200, st)
+        assertTrue(out, "\"bookings\":1" in out && "\"cents\":1200" in out && "Bianchi" in out && "\"heat\":[[" in out)
+        assertEquals(400, req("GET", "/stats", token = k, q = mapOf("from" to "2026-11-30", "to" to "2026-11-01")).first)
+    }
+
     @Test fun prenotazioniSenzaSovrapposizioni() {
         val k = login()
         val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"]}"""
@@ -77821,6 +78843,7 @@ import com.tennis.scoremanager.data.CTEntry
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.CourtPlans
 import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
 import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
@@ -77869,6 +78892,20 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun courses() = school
     override fun teams() = emptyList<Team>()
     override fun ladders() = emptyList<Ladder>()
+    override fun saveCourse(c: Course) { school = school.filter { it.id != c.id } + c }
+    override fun deleteCourse(c: Course) { school = school.filter { it.id != c.id } }
+    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = c.name + " · " + (month?.let { "%04d-%02d".format(it.first, it.second + 1) } ?: "stagione")
+    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int {
+        val (b, n) = Courses.charge(ledger, c, list, courseFeeLabel(c, month), time)
+        ledger = b
+        return n
+    }
+    var sent: Set<String>? = null
+    override fun dues(charges: Set<String>): List<DeskDue> = list.mapNotNull { p ->
+        val open = Fees.of(ledger, p).filter { it.left > 0 && it.id in charges }
+        if (open.isEmpty()) null else DeskDue(p.id, p.name, p.phone, p.email, open.joinToString("\n") { it.label })
+    }
+    override fun sendDues(charges: Set<String>) { sent = charges }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? =
         ledger.charges.firstOrNull { it.id == chargeId }?.payments?.firstOrNull { it.id == paymentId }?.let { "%PDF-${it.receipt}".toByteArray() }
     override fun paymentsCsv(year: Int): ByteArray? = "anno;$year\n".toByteArray()

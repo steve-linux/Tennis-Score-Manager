@@ -56,6 +56,12 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun courses(): List<Course> = c.courses.value
     override fun teams(): List<Team> = c.teams.value
     override fun ladders(): List<Ladder> = c.ladders.value
+    override fun saveCourse(c: Course) = this.c.saveCourse(c)
+    override fun deleteCourse(c: Course) = this.c.deleteCourse(c.id)
+    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.courseFeeLabel(c, month)
+    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
+    override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
+    override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)

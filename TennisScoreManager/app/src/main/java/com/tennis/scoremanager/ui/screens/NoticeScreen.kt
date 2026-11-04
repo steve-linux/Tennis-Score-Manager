@@ -134,10 +134,11 @@ fun NoticeScreen(c: MatchController) {
                             Text(if (open) r.text else short, color = TsmColors.TextMain, fontSize = 13.sp,
                                 modifier = Modifier.clickable { open = !open }, maxLines = if (open) 30 else 3)
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp") { mark(r); open(whatsApp(wa, textOf(r))) }
-                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS") { mark(r); open(sms(listOf(r.phone), textOf(r))) }
-                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail) { mark(r); open(email(listOf(r.email), emptyList(), p.subject, textOf(r))) }
+                        // Larghi uguali su una riga: con tre tasti "Email" non va più a capo a metà parola.
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp", Modifier.weight(1f)) { mark(r); open(whatsApp(wa, textOf(r))) }
+                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS", Modifier.weight(1f)) { mark(r); open(sms(listOf(r.phone), textOf(r))) }
+                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail, Modifier.weight(1f)) { mark(r); open(email(listOf(r.email), emptyList(), p.subject, textOf(r))) }
                         }
                     }
                 }
@@ -147,11 +148,12 @@ fun NoticeScreen(c: MatchController) {
 }
 
 @Composable
-private fun Chip(icon: ImageVector, label: String, onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.Surface) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun Chip(icon: ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(10.dp), color = TsmColors.Surface) {
+        Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = TsmColors.Ball)
-            Text(" $label", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(" $label", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, softWrap = false,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }

@@ -203,7 +203,8 @@ async function start() {
 /** Le pagine, solo per le funzioni del circolo accese (Oggi c'è sempre). */
 const VIEWS = () => {
   const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
-  return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')]]
+  return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')],
+    ['school', T.scTitle, on('SCHOOL')], ['stats', T.stTitle, on('STATS')]]
     .filter((v) => v[2]).map(([v, l]) => [v, l]);
 };
 const main = () => document.querySelector('main');
@@ -213,12 +214,12 @@ async function render() {
   put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; render(); } }, l)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups })[view](); }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, stats: showStats })[view](); }
   catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
@@ -251,7 +252,7 @@ async function showToday() {
     cards.push(card(T.tdMatches(d.matches.length), d.matches.slice(0, 3).map(at),
       () => go('cups', () => { cupId = cups.length === 1 ? cups[0] : null; cupTab = 'matches'; })));
   }
-  if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at)));
+  if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at), () => go('school', () => { courseId = null; })));
   if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text)));
   if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
   const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -407,6 +408,30 @@ let moneyFilter = { type: '', show: 'open', text: '' };
 const STATUS = { PAID: 'ok', PARTIAL: 'warn', UNPAID: 'warn', LATE: 'bad', CANCELLED: 'dim' };
 
 let lastMoney = null;
+let shownCharges = [];
+
+/**
+ * Sollecito a chi deve qualcosa, solo per gli addebiti che si vedono (coi filtri): il PC prepara i messaggi,
+ * il telefono li manda col suo WhatsApp, uno per uno.
+ */
+async function duesDialog(charges) {
+  const ids = charges.filter((c) => c.leftCents > 0 && c.status !== 'CANCELLED').map((c) => c.id);
+  let list = [];
+  try { if (ids.length) list = await api('POST', '/dues', { ids }); } catch (e) { toast(errText(e)); return; }
+  if (!list.length) { toast(T.duesNone); return; }
+  const picks = list.map((d) => [d, h('input', { type: 'checkbox', checked: true })]);
+  const dlg = dialog(T.duesButton + ' · ' + T.duesCount(list.length), h('div',
+    h('p.dim', T.duesHint),
+    h('div.dues', picks.map(([d, x]) => h('div.due',
+      h('label.check', x, h('b', d.name), ' ', d.phone || d.email ? h('span.dim', [d.phone, d.email].filter(Boolean).join(' · ')) : h('span.tag.warn', T.noContact)),
+      h('pre', d.text))))), async () => {
+    const keep = new Set(picks.filter(([, x]) => x.checked).map(([d]) => d.id));
+    const send = charges.filter((c) => keep.has(c.player) && ids.includes(c.id)).map((c) => c.id);
+    if (!send.length) throw new Error(T.duesNone);
+    await api('POST', '/dues/send', { ids: send });
+    alert(T.duesSent);
+  }, { saveText: T.duesSend, wide: true });
+}
 
 async function showMoney() {
   const m = await api('GET', '/money' + (moneyYear ? '?year=' + moneyYear : ''));
@@ -434,6 +459,7 @@ async function showMoney() {
       && ({ open: c.leftCents > 0 && c.status !== 'CANCELLED', late: c.status === 'LATE', paid: c.status === 'PAID', all: true })[moneyFilter.show]
       && (!q || [c.name, c.label].some((x) => (x || '').toLowerCase().includes(q))));
     const left = rows.reduce((a, c) => a + (c.status === 'CANCELLED' ? 0 : c.leftCents), 0);
+    shownCharges = rows;
     const filtered = t || q || moneyFilter.show !== 'open';
     put(body, 
       rows.length && filtered ? h('p.dim', T.shown(rows.length, eur(left))) : null,
@@ -443,7 +469,7 @@ async function showMoney() {
           h('td', c.name), h('td', c.label), h('td', dateText(c.due)), h('td', h('span.tag.' + STATUS[c.status], T.chargeStatus[c.status])), h('td.num', eur(c.cents)), h('td.num', eur(c.leftCents))))))) : h('div.panel', h('div.empty', filtered && m.charges.length ? T.noResults : T.noCharges)));
   }
   put(main(), 
-    h('div.head', h('h1', T.money), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
+    h('div.head', h('h1', T.money), h('button', { onclick: () => duesDialog(shownCharges) }, T.duesButton), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
     h('div.kpis',
       h('div.kpi', h('b', eur(m.incomeCents)), h('span', T.income(m.year))),
       h('div.kpi', h('b', eur(m.openCents)), h('span', T.open)),
@@ -1071,6 +1097,252 @@ function editCup(t) {
     toast(T.saved);
     await showCup(cupId);
   }, { left: del });
+}
+
+// --- Statistiche dei campi ---
+
+let statsPeriod = 'w4';
+let statsFrom = null, statsTo = null;
+
+/** Il periodo scelto: le ultime 4 settimane, questo mese, il mese scorso, quest'anno, o dal–al. */
+function statsRange() {
+  const t = info.today, first = t.slice(0, 8) + '01';
+  if (statsPeriod === 'month') return [first, t];
+  if (statsPeriod === 'last') { const f = addMonth(t, -1); return [f, addDay(first, -1)]; }
+  if (statsPeriod === 'year') return [t.slice(0, 4) + '-01-01', t];
+  if (statsPeriod === 'custom') return [statsFrom || first, statsTo || t];
+  return [addDay(t, -27), t];
+}
+
+async function showStats() {
+  const [a, b] = statsRange();
+  const month = (d) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), { month: 'long' });
+  const period = select([['w4', T.stLast4w], ['month', month(info.today)], ['last', month(addMonth(info.today, -1))], ['year', T.thisYear], ['custom', T.otherPeriod]], statsPeriod);
+  period.setAttribute('aria-label', T.periodLabel);
+  period.addEventListener('change', () => { statsPeriod = period.value; if (statsPeriod === 'custom') { statsFrom = a; statsTo = b; } showStats(); });
+  // Le date si scrivono con calma e valgono con Mostra (o Invio): niente ricarica a metà, mentre si scrive l'anno.
+  const from = h('input', { type: 'date', value: a, 'aria-label': T.blkFrom });
+  const to = h('input', { type: 'date', value: b, 'aria-label': T.blkTo });
+  from.classList.add('year'); to.classList.add('year');
+  const apply = () => {
+    const f = from.value, t = to.value;
+    if (!f || !t || f > t || (new Date(t) - new Date(f)) / 86400000 > 366) { toast(T.badPeriod); return; }
+    statsFrom = f; statsTo = t; showStats();
+  };
+  [from, to].forEach((x) => x.addEventListener('keydown', (e) => { if (e.key === 'Enter') apply(); }));
+  const tools = h('div.tools', period, statsPeriod === 'custom'
+    ? [h('label', T.blkFrom + ' ', from), h('label', T.blkTo + ' ', to), h('button.primary', { type: 'button', onclick: apply }, T.showPeriod)] : null);
+  let st;
+  try { st = await api('GET', '/stats?from=' + a + '&to=' + b); }
+  catch (e) {
+    if (!(e instanceof ApiError) || e.message === 'UNAUTHORIZED') throw e;
+    // Il periodo non va: restano le scelte per cambiarlo.
+    put(main(), h('div.head', h('h1', T.stTitle)), tools, h('div.panel', h('div.empty', T.badPeriod)));
+    return;
+  }
+  const pct = (x) => Math.round(x * 100) + '%';
+  const hrs = (x) => (Math.round(x * 10) / 10).toLocaleString(locale());
+  const money0 = (c) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(c / 100);
+  const label = dateText(a) + ' – ' + dateText(b);
+  const heat = st.heat[0] ? h('div.panel', h('table.heat',
+    h('thead', h('tr', h('th'), st.heat[0].map((_, i) => h('th.num', String(st.firstHour + i))))),
+    h('tbody', st.heat.map((row, d) => h('tr', h('th', weekdayName(d + 1)), row.map((v, i) => h('td', {
+      title: weekdayName(d + 1) + ' ' + hhmm((st.firstHour + i) * 60) + ': ' + pct(v), style: 'background: rgba(127, 196, 143, ' + (0.08 + v * 0.85).toFixed(2) + ')',
+    }, v >= 0.5 ? pct(v) : ''))))))) : null;
+  put(main(),
+    h('div.head', h('h1', T.stTitle), h('span.dim', label), h('button', { onclick: () => window.print() }, T.print)),
+    printHead(T.stTitle + ' · ' + label),
+    tools,
+    h('div.kpis',
+      h('div.kpi', h('b', pct(st.occupancy)), h('span', T.stOccupancy)),
+      h('div.kpi', h('b', money0(st.cents)), h('span', T.stRevenue)),
+      h('div.kpi', h('b', st.bookings), h('span', T.stBookings + (st.online ? ' · ' + T.stOnline(st.online) : '')))),
+    st.tournamentHours ? h('p.dim', T.stTournaments(hrs(st.tournamentHours))) : null,
+    !st.bookings ? h('p.dim', T.stNone) : null,
+    h('div.section', h('h2', T.stByCourt), h('div.panel', h('table',
+      h('thead', h('tr', h('th', T.court), h('th', T.stOccupancy), h('th.num', T.hoursCol), h('th.num', T.stBookings), h('th.num', T.stRevenue))),
+      h('tbody', st.courts.map((c) => h('tr', h('td', c.court),
+        h('td', h('span.pbar', h('i', { style: 'width:' + pct(c.occupancy) })), ' ', pct(c.occupancy)),
+        h('td.num', T.stHoursOf(hrs(c.bookedHours), hrs(Math.max(0, c.openHours - c.blockedHours))), c.blockedHours ? h('div.dim', T.stBlocked(hrs(c.blockedHours))) : null),
+        h('td.num', c.bookings + (c.online ? ' (' + c.online + ' online)' : '')), h('td.num', money0(c.cents)))))))),
+    h('p.dim', T.stRevenueHint),
+    heat ? h('div.section', h('h2', T.stHeat), h('p.dim', T.stHeatHint), heat) : null,
+    st.top.length ? h('div.section', h('h2', T.stTop), h('div.panel', h('table', h('tbody', st.top.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td.num', T.stCount(x.count)))))))) : null);
+}
+
+// --- Scuola tennis ---
+
+let courseId = null;
+let courseTab = 'students';
+let lessonShow = 'next';
+
+const slotText = (x) => [weekdayName(x.weekday), hhmm(x.startMin), x.court].filter(Boolean).join(' ');
+const feeText = (c) => (c.feeCents ? eur(c.feeCents) + ' ' + (c.feeKind === 'SEASON' ? T.scSeasonFee : T.scMonthly) : '');
+const coachOf = (c) => (c.coach ? (people.find((p) => p.id === c.coach) || {}).name || '' : c.coachName);
+
+async function showSchool() {
+  people = await api('GET', '/people');
+  const list = await api('GET', '/courses');
+  const c = courseId && list.find((x) => x.id === courseId);
+  if (c) return showCourse(c);
+  courseId = null;
+  put(main(), h('div.head', h('h1', T.scTitle), h('button.primary', { onclick: () => editCourse(null) }, T.scNew)), h('p.dim', T.scHint),
+    list.length ? h('div.cards', list.map((x) => {
+      const next = x.lessons.find((l) => !l.cancelled && l.date >= info.today);
+      return h('button.card', { type: 'button', onclick: () => { courseId = x.id; courseTab = 'students'; showSchool(); } },
+        h('h2', x.name), h('p.dim', [x.level, coachOf(x) ? T.scCoachLine(coachOf(x)) : ''].filter(Boolean).join(' · ')),
+        h('p.dim', x.slots.map(slotText).join(' · ')),
+        h('p', T.scStudentsCount(x.students.length, x.maxStudents) + (feeText(x) ? ' · ' + feeText(x) : '')),
+        next ? h('p.dim', T.scNext(shortDay(next.date) + ' ' + hhmm(next.startMin))) : null);
+    })) : h('div.panel', h('div.empty', T.scNone)));
+}
+
+/** Una chiamata sul corso aperto, poi la scheda si ridisegna. */
+async function courseDo(method, path, body) {
+  let out = null;
+  try { out = await api(method, '/courses/' + encodeURIComponent(courseId) + path, body); toast(T.saved); }
+  catch (e) { toast(errText(e)); }
+  await showSchool();
+  return out;
+}
+
+function showCourse(c) {
+  const tabs = [['students', T.scTabStudents + ' (' + c.students.length + ')'], ['lessons', T.scTabLessons], ['fees', T.scTabFees]];
+  const body = h('div');
+  put(main(),
+    h('div.head', h('button', { onclick: () => { courseId = null; showSchool(); }, 'aria-label': T.scTitle, title: T.scTitle }, '←'), h('h1', c.name),
+      h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editCourse(c) }, T.edit)),
+    h('p.dim', [c.level, coachOf(c) ? T.scCoachLine(coachOf(c)) : '', dateText(c.from) + ' – ' + dateText(c.to), feeText(c)].filter(Boolean).join(' · '),
+      h('br'), c.slots.length ? c.slots.map(slotText).join(' · ') : T.scNoLessons),
+    printHead(T.scTitle + ' · ' + c.name + ' · ' + Object.fromEntries(tabs)[courseTab]),
+    h('div.tabs', { role: 'tablist' }, tabs.map(([v, l]) => h('button' + (v === courseTab ? '.on' : ''), {
+      type: 'button', role: 'tab', 'aria-selected': v === courseTab ? 'true' : 'false', onclick: () => { courseTab = v; showCourse(c); },
+    }, l))),
+    body);
+  ({ students: courseStudents, lessons: courseLessons, fees: courseFees })[courseTab](c, body);
+}
+
+function courseStudents(c, body) {
+  const inside = new Set(c.students.map((x) => x.id));
+  const full = c.maxStudents > 0 && c.students.length >= c.maxStudents;
+  const input = h('input', { type: 'search', placeholder: T.scAddStudent, 'aria-label': T.scAddStudent, autocomplete: 'off', disabled: full });
+  const hits = h('div.hits');
+  function refresh() {
+    const q = input.value.trim().toLowerCase();
+    const list = q ? people.filter((p) => !inside.has(p.id) && p.name.toLowerCase().includes(q)).slice(0, 8) : [];
+    put(hits, list.map((p) => h('button', { type: 'button', onclick: async () => {
+      input.disabled = true;
+      await courseDo('POST', '/students', { ids: [p.id] });
+      const again = document.querySelector('.picker input');
+      if (again && !again.disabled) again.focus();
+    } }, p.name, p.member ? null : h('span.dim', ' · ' + T.notMember))), q && !list.length ? h('div.dim.pad', T.noResults) : null);
+  }
+  input.addEventListener('input', refresh);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+  put(body,
+    h('div.picker.noprint', input, hits, c.maxStudents ? h('p.dim', T.scMax(c.maxStudents)) : null),
+    c.students.length ? h('div.panel', h('table',
+      h('thead', h('tr', h('th.num', '#'), h('th', T.name), h('th', T.scTabLessons), h('th.num', T.owed), h('th.noprint'))),
+      h('tbody', c.students.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td', x.marked ? T.scPresent(x.present, x.marked) : h('span.dim', '—')),
+        h('td.num', x.owedCents ? eur(x.owedCents) : ''),
+        h('td.num.noprint', h('button.danger', { type: 'button', onclick: async () => { if (confirm(T.scRemoveStudent + ': ' + x.name + '?')) await courseDo('DELETE', '/students/' + encodeURIComponent(x.id)); } }, T.scRemoveStudent))))))) 
+      : h('div.panel', h('div.empty', T.noResults)));
+}
+
+function courseLessons(c, body) {
+  const show = select([['next', T.scUpcoming], ['past', T.scPast], ['all', T.cupAll]], lessonShow);
+  show.setAttribute('aria-label', T.status);
+  show.addEventListener('change', () => { lessonShow = show.value; courseLessons(c, body); });
+  const rows = c.lessons.filter((l) => ({ next: l.date >= info.today, past: l.date < info.today, all: true })[lessonShow]);
+  if (lessonShow === 'past') rows.reverse();
+  const names = Object.fromEntries(c.students.map((x) => [x.id, x.name]));
+  put(body,
+    h('div.tools.noprint', show, h('span.dim', T.lessonHint)),
+    rows.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
+      h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
+        h('td', shortDay(l.date)), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
+          : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
+      : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
+}
+
+function openLesson(c, l) {
+  const boxes = c.students.map((x) => [x.id, h('input', { type: 'checkbox', checked: l.marked ? l.present.includes(x.id) : false })]);
+  const act = async (body) => {
+    try { await api('POST', '/courses/' + encodeURIComponent(c.id) + '/lesson', body); dlg.close(); toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
+  };
+  const left = h('button.danger.left', { type: 'button', onclick: () => act({ key: l.key, cancelled: !l.cancelled }) }, l.cancelled ? T.restoreLesson : T.cancelLessonBtn);
+  const all = h('button', { type: 'button', onclick: () => boxes.forEach(([, x]) => { x.checked = true; }) }, T.allPresent);
+  const dlg = dialog(c.name + ' · ' + shortDay(l.date) + ' ' + hhmm(l.startMin), h('div.form',
+    l.cancelled ? h('p.full', h('span.tag.bad', T.scCancelled)) : null,
+    h('h3', T.scWhoWasThere), c.students.length ? h('div.full.checks', boxes.map(([id, x]) => h('label.check', x, c.students.find((s) => s.id === id).name)), all) : h('p.full.dim', T.noResults),
+    h('p.full.dim', T.cancelLessonHint)), l.cancelled ? null : async () => {
+    await api('POST', '/courses/' + encodeURIComponent(c.id) + '/lesson', { key: l.key, present: boxes.filter(([, x]) => x.checked).map(([id]) => id) });
+    toast(T.saved);
+    await showSchool();
+  }, { left });
+}
+
+function courseFees(c, body) {
+  if (!c.feeCents) { put(body, h('div.panel', h('div.empty', T.scNoFee))); return; }
+  put(body,
+    h('p.dim', feeText(c) + ' · ' + T.feesCourseHint),
+    h('div.panel', h('table',
+      h('thead', h('tr', h('th', T.what), h('th.num', T.chargedCol), h('th.num', T.paidOnes), h('th.noprint'))),
+      h('tbody', c.fees.map((f) => h('tr', h('td', f.label), h('td.num', f.charged + ' / ' + c.students.length), h('td.num', f.paid),
+        h('td.num.noprint', f.charged < c.students.length ? h('button', { type: 'button', onclick: async () => {
+          const out = await courseDo('POST', '/charge', { month: f.month });
+          if (out) toast(T.scCharged(out.count));
+        } }, T.scChargeStudents) : null)))))));
+}
+
+function editCourse(c) {
+  const v = c || { name: '', level: '', coach: null, coachName: '', from: info.today, to: addMonth(info.today, 9), maxStudents: 0, feeCents: 0, feeKind: 'MONTHLY', note: '', slots: [] };
+  const name = h('input', { required: true, maxlength: 80, value: v.name });
+  const level = h('input', { maxlength: 60, value: v.level });
+  const coach = select([['', '—']].concat(people.map((p) => [p.id, p.name])), v.coach || '');
+  const coachName = h('input', { maxlength: 80, value: v.coachName, placeholder: T.scCoach });
+  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', required: true, value: v.to });
+  const fee = h('input', { inputmode: 'decimal', value: v.feeCents ? (v.feeCents / 100).toFixed(2).replace('.', ',') : '' });
+  const kind = select([['MONTHLY', T.scMonthly], ['SEASON', T.scSeasonFee]], v.feeKind);
+  const max = h('input', { type: 'number', min: 0, max: 200, value: v.maxStudents || '', placeholder: T.scNoMax });
+  const note = h('input', { maxlength: 500, value: v.note });
+  const slots = v.slots.map((x) => ({ ...x }));
+  const box = h('div.full.slots');
+  const minutes = [30, 45, 60, 75, 90, 120, 150, 180];
+  function draw() {
+    put(box, slots.map((x, i) => {
+      const wd = select([1, 2, 3, 4, 5, 6, 7].map((n) => [String(n), weekdayName(n)]), String(x.weekday));
+      wd.addEventListener('change', () => { x.weekday = Number(wd.value); });
+      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); } });
+      const len = select((minutes.includes(x.minutes) ? minutes : minutes.concat([x.minutes]).sort((a, b) => a - b)).map((m) => [String(m), m + ' min']), String(x.minutes));
+      len.addEventListener('change', () => { x.minutes = Number(len.value); });
+      const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), x.court);
+      ct.addEventListener('change', () => { x.court = ct.value; });
+      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); } }, '×'));
+    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); } }, T.scAddSlot));
+  }
+  draw();
+  const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.scDeleteAsk(c.name))) return;
+    try { await api('DELETE', '/courses/' + encodeURIComponent(c.id)); dlg.close(); courseId = null; toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
+  } }, T.scDelete);
+  const dlg = dialog(c ? c.name : T.scNew, h('div.form',
+    field(T.scName, name, 'full'), field(T.scLevel, level, 'full'),
+    field(T.scCoach, coach), field(T.scCoachFree, coachName),
+    field(T.blkFrom, from), field(T.blkTo, to),
+    field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
+    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint)), async () => {
+    const fc = fee.value.trim() ? cents(fee.value) : 0;
+    if (fc === null) throw new Error(T.err.BAD_AMOUNT);
+    const body = { name: name.value, level: level.value, coach: coach.value || null, coachName: coach.value ? '' : coachName.value, from: from.value, to: to.value,
+      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots };
+    if (c) await api('PUT', '/courses/' + encodeURIComponent(c.id), body);
+    else { const out = await api('POST', '/courses', body); courseId = out.id; courseTab = 'students'; }
+    toast(T.saved);
+    await showSchool();
+  }, { left: del, wide: true });
 }
 
 // --- Via ---

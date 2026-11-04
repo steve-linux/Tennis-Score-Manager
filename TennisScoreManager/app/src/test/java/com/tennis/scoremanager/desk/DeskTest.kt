@@ -11,6 +11,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import com.tennis.scoremanager.data.FeeKind
+import com.tennis.scoremanager.data.Courses
 import java.io.File
 import java.net.InetAddress
 import java.net.Socket
@@ -342,6 +343,61 @@ class DeskTest {
         assertTrue(m, "{\"date\":\"2026-11-11\",\"bookings\":1,\"matches\":0,\"busy\":3,\"blocked\":0}" in m)
         assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100}" in m)
         assertEquals(400, req("GET", "/week", token = k, q = mapOf("date" to "boh")).first)
+    }
+
+    @Test fun scuolaTennisDalPc() {
+        val k = login()
+        data.time = java.time.LocalDateTime.of(2026, 11, 20, 9, 0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        for (n in listOf("Anna", "Bea", "Cora")) req("POST", "/people", """{"firstName":"$n","lastName":"X","member":true}""", k)
+        val ids = data.list.associate { it.firstName to it.id }
+        assertEquals(400, req("POST", "/courses", """{"name":" ","from":"2026-11-01","to":"2026-12-31"}""", k).first)
+        // Lunedì e mercoledì alle 17 sul Campo 1, novembre e dicembre, 40 euro al mese, al massimo 2 allievi.
+        val body = """{"name":"SAT","from":"2026-11-02","to":"2026-12-30","feeCents":4000,"maxStudents":2,"slots":[{"weekday":1,"startMin":1020,"court":"Campo 1"},{"weekday":3,"startMin":1020}]}"""
+        val (st, made) = req("POST", "/courses", body, k)
+        assertEquals(200, st)
+        val id = field(made, "id")!!
+        assertEquals(400, req("PUT", "/courses/$id", body.replace("\"weekday\":3", "\"weekday\":9"), k).first)
+        assertEquals(200, req("POST", "/courses/$id/students", """{"ids":["${ids["Anna"]}","${ids["Bea"]}"]}""", k).first)
+        assertEquals(409, req("POST", "/courses/$id/students", """{"ids":["${ids["Cora"]}"]}""", k).first)
+        val c = data.school.single()
+        val lessons = Courses.lessons(c)
+        assertEquals(18, lessons.size)
+        val first = lessons.first()
+        // Appello: Anna c'era, Cora no (non è allieva) e non conta.
+        assertEquals(200, req("POST", "/courses/$id/lesson", """{"key":"${first.key}","present":["${ids["Anna"]}","${ids["Cora"]}"]}""", k).first)
+        assertEquals(setOf(ids["Anna"]), data.school.single().attendance[first.key])
+        assertEquals(200, req("POST", "/courses/$id/lesson", """{"key":"${lessons[1].key}","cancelled":true}""", k).first)
+        assertTrue(lessons[1].key in data.school.single().cancelled)
+        assertEquals(404, req("POST", "/courses/$id/lesson", """{"key":"boh","cancelled":true}""", k).first)
+        val (_, list) = req("GET", "/courses", token = k)
+        assertTrue(list, "\"present\":1,\"marked\":1" in list && "\"month\":\"2026-11\"" in list && "\"month\":\"2026-12\"" in list)
+        // La quota di novembre: due addebiti, la seconda volta nessuno.
+        assertEquals("""{"count":2}""", req("POST", "/courses/$id/charge", """{"month":"2026-11"}""", k).second)
+        assertEquals("""{"count":0}""", req("POST", "/courses/$id/charge", """{"month":"2026-11"}""", k).second)
+        assertEquals(404, req("POST", "/courses/$id/charge", """{"month":"2027-05"}""", k).first)
+        assertTrue(req("GET", "/courses", token = k).second.contains("\"charged\":2,\"paid\":0"))
+        assertEquals(200, req("DELETE", "/courses/$id/students/${ids["Bea"]}", token = k).first)
+        assertEquals(listOf(ids["Anna"]), data.school.single().students)
+        assertEquals(200, req("DELETE", "/courses/$id", token = k).first)
+        assertTrue(data.school.isEmpty())
+    }
+
+    @Test fun sollecitiEStatistiche() {
+        val k = login()
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true,"phone":"333 1"}""", k)
+        req("POST", "/people", """{"firstName":"Luca","lastName":"Bianchi","member":true}""", k)
+        req("POST", "/fees", """{"name":"Quota","cents":5000,"chargeMembers":true}""", k)
+        val mario = data.ledger.charges.first { it.name == "Mario Rossi" }.id
+        val (_, prev) = req("POST", "/dues", """{"ids":["$mario"]}""", k)
+        assertTrue(prev, "Mario Rossi" in prev && "Luca" !in prev && "333 1" in prev)
+        assertEquals(400, req("POST", "/dues/send", """{"ids":[]}""", k).first)
+        assertEquals(200, req("POST", "/dues/send", """{"ids":["$mario"]}""", k).first)
+        assertEquals(setOf(mario), data.sent)
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Bianchi"]}""", k)
+        val (st, out) = req("GET", "/stats", token = k, q = mapOf("from" to "2026-11-01", "to" to "2026-11-30"))
+        assertEquals(200, st)
+        assertTrue(out, "\"bookings\":1" in out && "\"cents\":1200" in out && "Bianchi" in out && "\"heat\":[[" in out)
+        assertEquals(400, req("GET", "/stats", token = k, q = mapOf("from" to "2026-11-30", "to" to "2026-11-01")).first)
     }
 
     @Test fun prenotazioniSenzaSovrapposizioni() {

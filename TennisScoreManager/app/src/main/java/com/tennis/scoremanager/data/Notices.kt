@@ -61,7 +61,9 @@ object Notices {
     /** "sabato 14 novembre" (in tedesco "Samstag, 14. November", in inglese "Saturday 14 November"). */
     fun day(t: Long, lang: Lang): String {
         val pattern = if (lang == Lang.DE) "EEEE, d. MMMM" else "EEEE d MMMM"
-        return java.text.SimpleDateFormat(pattern, Reports.locale(lang)).format(java.util.Date(t))
+        val text = java.text.SimpleDateFormat(pattern, Reports.locale(lang)).format(java.util.Date(t))
+        // In italiano, francese, spagnolo e portoghese giorni e mesi vanno in minuscolo, anche se il telefono li dà maiuscoli.
+        return if (lang == Lang.DE || lang == Lang.EN) text else text.lowercase(Reports.locale(lang))
     }
 
     /** "sabato 14 novembre, 9:00 · Campo 2" (o "orario da definire"). */

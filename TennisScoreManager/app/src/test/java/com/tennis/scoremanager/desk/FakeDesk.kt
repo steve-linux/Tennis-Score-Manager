@@ -9,6 +9,7 @@ import com.tennis.scoremanager.data.CTEntry
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.CourtPlans
 import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
 import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
@@ -57,6 +58,20 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun courses() = school
     override fun teams() = emptyList<Team>()
     override fun ladders() = emptyList<Ladder>()
+    override fun saveCourse(c: Course) { school = school.filter { it.id != c.id } + c }
+    override fun deleteCourse(c: Course) { school = school.filter { it.id != c.id } }
+    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = c.name + " · " + (month?.let { "%04d-%02d".format(it.first, it.second + 1) } ?: "stagione")
+    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int {
+        val (b, n) = Courses.charge(ledger, c, list, courseFeeLabel(c, month), time)
+        ledger = b
+        return n
+    }
+    var sent: Set<String>? = null
+    override fun dues(charges: Set<String>): List<DeskDue> = list.mapNotNull { p ->
+        val open = Fees.of(ledger, p).filter { it.left > 0 && it.id in charges }
+        if (open.isEmpty()) null else DeskDue(p.id, p.name, p.phone, p.email, open.joinToString("\n") { it.label })
+    }
+    override fun sendDues(charges: Set<String>) { sent = charges }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? =
         ledger.charges.firstOrNull { it.id == chargeId }?.payments?.firstOrNull { it.id == paymentId }?.let { "%PDF-${it.receipt}".toByteArray() }
     override fun paymentsCsv(year: Int): ByteArray? = "anno;$year\n".toByteArray()

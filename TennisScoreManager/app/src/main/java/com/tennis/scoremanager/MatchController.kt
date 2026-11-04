@@ -2333,15 +2333,19 @@ class MatchController(
         openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntKindFree, t.name, "${t.name}\n\n", rec, editable = true))
     }
 
-    /** Sollecito a chi deve qualcosa al circolo, voce per voce. */
-    fun noticeDues() {
+    /** Sollecito a chi deve qualcosa al circolo, voce per voce; con [only] solo quegli addebiti (dalla Segreteria da PC). */
+    fun noticeDues(only: Set<String>? = null) {
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntDuesButton, strings.paymentsTitle, "", duesRecipients(only)))
+    }
+
+    /** Chi deve qualcosa e il suo messaggio, voce per voce; con [only] solo quegli addebiti. */
+    fun duesRecipients(only: Set<String>? = null): List<com.tennis.scoremanager.data.NoticeRecipient> {
         val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
         val book = clubBook.value
-        val rec = players.value.mapNotNull { p ->
-            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 }
+        return players.value.mapNotNull { p ->
+            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 && (only == null || it.id in only) }
             if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now, com.tennis.scoremanager.data.Notices.payLines(s, book)), now)
         }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntDuesButton, s.paymentsTitle, "", rec))
     }
 
     /** Ai soci che hanno qualcosa da sistemare (certificato, tessera, consensi…), a ciascuno il suo. */

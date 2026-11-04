@@ -167,3 +167,16 @@ tr.pass td:first-child { font-weight: 700; }
 @media print { .seg, .head select { display: none !important; } .month { min-width: 0; } .mday .bar i { background: #555; } }
 .head select { width: auto; }
 .gday { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Solleciti, statistiche, scuola */
+.dues { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow: auto; }
+.due { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.due pre { white-space: pre-wrap; font: 12px/1.4 inherit; margin: 6px 0 0 24px; color: var(--dim); }
+.heat th, .heat td { padding: 4px 3px; font-size: 11px; text-align: center; }
+.heat td { min-width: 26px; color: var(--text); }
+.pbar { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--hover); vertical-align: middle; overflow: hidden; }
+.pbar i { display: block; height: 100%; background: var(--accent); }
+.slots { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.slot { display: flex; gap: 6px; flex-wrap: wrap; }
+.slot select, .slot input { width: auto; }
+@media print { .heat td { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .pbar i { background: #555; } }

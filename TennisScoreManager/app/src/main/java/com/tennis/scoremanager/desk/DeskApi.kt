@@ -8,6 +8,9 @@ import com.tennis.scoremanager.data.BlockReason
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.CourseFee
+import com.tennis.scoremanager.data.CourseSlot
+import com.tennis.scoremanager.data.CourtStats
 import com.tennis.scoremanager.data.Courses
 import com.tennis.scoremanager.data.Ladder
 import com.tennis.scoremanager.data.Team
@@ -72,6 +75,17 @@ interface DeskData {
     fun ladders(): List<Ladder>
     /** La ricevuta di un pagamento in PDF, come quella dell'app. */
     fun receiptPdf(chargeId: String, paymentId: String): ByteArray?
+    /** Salva il corso (e i suoi periodi non prenotabili nel planning) o lo toglie. */
+    fun saveCourse(c: Course)
+    fun deleteCourse(c: Course)
+    /** La voce della quota del corso nel registro: per il mese (anno, mese 0-11) o, con null, la stagione. */
+    fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String
+    /** Addebita la quota del mese (o della stagione) agli allievi che non l'hanno; quanti addebiti nuovi. */
+    fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int
+    /** Il sollecito per gli addebiti [charges]: a chi va e il suo messaggio, come nell'app. */
+    fun dues(charges: Set<String>): List<DeskDue>
+    /** Apre sul telefono gli avvisi del sollecito, da mandare da lì uno per uno. */
+    fun sendDues(charges: Set<String>)
     fun paymentsCsv(year: Int): ByteArray?
     /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
     fun saveTournament(t: ClubTournament)
@@ -88,7 +102,7 @@ interface DeskData {
 @Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
 /** Il QR da disegnare: una stringa di 0 e 1 per riga. */
 @Serializable data class DeskQrOut(val id: String, val rows: List<String>)
-@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList())
+@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
 @Serializable data class DeskTodayLine(val text: String, val startMin: Int? = null, val court: String = "", val date: String? = null, val cup: String? = null)
 @Serializable data class DeskToday(
@@ -147,6 +161,32 @@ interface DeskData {
     val weeks: Int = 1,
 )
 @Serializable data class DeskBooked(val skipped: List<String>)
+@Serializable data class DeskDue(val id: String, val name: String, val phone: String, val email: String, val text: String)
+@Serializable data class DeskIds(val ids: List<String> = emptyList())
+@Serializable data class DeskStatsCourt(
+    val court: String, val openHours: Double, val blockedHours: Double, val bookedHours: Double, val occupancy: Double, val cents: Long, val bookings: Int, val online: Int,
+)
+@Serializable data class DeskStats(
+    val from: String, val to: String, val courts: List<DeskStatsCourt>, val occupancy: Double, val cents: Long, val bookings: Int, val online: Int,
+    val tournamentHours: Double, val firstHour: Int, val heat: List<List<Double>>, val top: List<DeskTop>,
+)
+@Serializable data class DeskTop(val name: String, val count: Int)
+@Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
+@Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>)
+/** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
+@Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
+@Serializable data class DeskCourse(
+    val id: String, val name: String, val level: String, val coach: String?, val coachName: String, val from: String, val to: String,
+    val maxStudents: Int, val feeCents: Int, val feeKind: CourseFee, val note: String, val slots: List<DeskSlot>,
+    val students: List<DeskStudent>, val lessons: List<DeskLesson>, val fees: List<DeskCourseFee>,
+)
+@Serializable data class DeskCourseIn(
+    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String,
+    val maxStudents: Int = 0, val feeCents: Int = 0, val feeKind: CourseFee = CourseFee.MONTHLY, val note: String = "", val slots: List<DeskSlot> = emptyList(),
+)
+@Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
+@Serializable data class DeskChargeCourseIn(val month: String = "")
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
@@ -248,6 +288,17 @@ class DeskApi(
                 m == "PUT" && p.size == 2 && p[0] == "bookings" -> book(read(DeskBookingIn.serializer(), r), p[1])
                 m == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancelBooking(p[1], r.query["series"] == "1")
                 m == "GET" && p == listOf("blocks") -> blocks()
+                m == "GET" && p == listOf("stats") -> stats(r.query["from"], r.query["to"])
+                m == "POST" && p == listOf("dues") -> ok(ListSerializer(DeskDue.serializer()), data.dues(read(DeskIds.serializer(), r).ids.toSet()))
+                m == "POST" && p == listOf("dues", "send") -> {
+                    val ids = read(DeskIds.serializer(), r).ids.toSet()
+                    if (data.dues(ids).isEmpty()) throw Fail(400, "NOTHING_DUE")
+                    data.sendDues(ids)
+                    done()
+                }
+                m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
+                m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
+                p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
                 m == "POST" && p == listOf("blocks") -> saveBlock(read(DeskBlock.serializer(), r))
                 m == "DELETE" && p.size == 2 && p[0] == "blocks" -> {
                     data.saveBlock(block(p[1]), delete = true)
@@ -297,7 +348,7 @@ class DeskApi(
 
     private fun info(): Resp {
         val now = data.now()
-        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year, data.features().sortedBy { it.ordinal }))
+        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year, data.features().sortedBy { it.ordinal }, data.courts()))
     }
 
     // --- Giocatori e soci ---
@@ -546,6 +597,106 @@ class DeskApi(
         )
         data.saveBlock(b, delete = false)
         return done()
+    }
+
+    // --- Statistiche dei campi ---
+
+    /** Come in Statistiche dei campi nell'app, dal giorno [from] al giorno [to] compresi. */
+    private fun stats(from: String?, to: String?): Resp {
+        val a = dayStart(from); val b = CourtPlans.addDays(dayStart(to), 1)
+        if (b <= a || b - a > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
+        val people = data.players()
+        val rep = CourtStats.report(data.plan(), data.tournaments(), data.courts(), a, b)
+        return ok(DeskStats.serializer(), DeskStats(
+            from!!, to!!, rep.courts.map { DeskStatsCourt(it.court, it.openHours, it.blockedHours, it.bookedHours, it.occupancy, it.cents, it.bookings, it.online) },
+            rep.occupancy, rep.cents, rep.bookings, rep.online, rep.tournamentHours, rep.firstHour, rep.heat,
+            rep.top.map { (who, n) -> DeskTop(Players.byId(people, who)?.name ?: who, n) },
+        ))
+    }
+
+    // --- Scuola tennis ---
+
+    private fun course(id: String): Course = data.courses().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    /** I mesi della stagione ("2026-11"), o la stagione sola (""), con la voce della quota nel registro. */
+    private fun feeMonths(c: Course): List<Pair<String, Pair<Int, Int>?>> =
+        if (c.feeKind == CourseFee.SEASON) listOf("" to null) else Courses.months(c).map { (y, m) -> "%04d-%02d".format(y, m + 1) to (y to m) }
+
+    private fun courseOut(c: Course): DeskCourse {
+        val people = data.players(); val book = data.book(); val now = data.now()
+        val students = c.students.map { id ->
+            val p = Players.byId(people, id)
+            val (yes, all) = Courses.attendanceOf(c, id, now)
+            DeskStudent(id, p?.name ?: id, yes, all, p?.let { pp -> Fees.of(book, pp).filter { it.kind == FeeKind.COURSE && it.label.startsWith(c.name) }.sumOf { it.left } } ?: 0)
+        }
+        val lessons = Courses.lessons(c).map { l ->
+            val start = CourtPlans.dayStart(l.start)
+            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList())
+        }
+        val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
+        val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
+            val label = data.courseFeeLabel(c, month)
+            val mine = book.charges.filter { it.label == label && !it.cancelled && it.player in keys }
+            DeskCourseFee(key, label, mine.size, mine.count { it.settled })
+        }
+        return DeskCourse(
+            c.id, c.name, c.level, c.coach, c.coachName, day(c.from)!!, day(c.to)!!, c.maxStudents, c.feeCents, c.feeKind, c.note,
+            c.slots.map { DeskSlot(it.weekday, it.startMin, it.minutes, it.court) }, students, lessons, fees,
+        )
+    }
+
+    private fun courseRoute(m: String, p: List<String>, r: Req): Resp {
+        val c = course(p[0])
+        val rest = p.drop(1)
+        return when {
+            m == "PUT" && rest.isEmpty() -> saveCourse(c, read(DeskCourseIn.serializer(), r))
+            m == "DELETE" && rest.isEmpty() -> { data.deleteCourse(c); done() }
+            m == "POST" && rest == listOf("students") -> {
+                val people = data.players()
+                val add = read(DeskIds.serializer(), r).ids.map { Players.byId(people, it)?.id ?: throw Fail(404, "NOT_FOUND") }.filter { it !in c.students }.distinct()
+                if (c.maxStudents > 0 && c.students.size + add.size > c.maxStudents) throw Fail(409, "COURSE_FULL")
+                courseSaved(c.copy(students = c.students + add))
+            }
+            m == "DELETE" && rest.size == 2 && rest[0] == "students" -> courseSaved(c.copy(students = c.students - rest[1]))
+            m == "POST" && rest == listOf("lesson") -> {
+                val i = read(DeskMarkIn.serializer(), r)
+                if (Courses.lessons(c).none { it.key == i.key }) throw Fail(404, "NOT_FOUND")
+                var n = if (i.cancelled != null) Courses.setCancelled(c, i.key, i.cancelled) else c
+                if (i.cancelled == null) n = Courses.mark(n, i.key, i.present.filter { it in c.students }.toSet())
+                courseSaved(n)
+            }
+            m == "POST" && rest == listOf("charge") -> {
+                if (c.feeCents <= 0) throw Fail(409, "NO_FEE")
+                val key = read(DeskChargeCourseIn.serializer(), r).month
+                val month = feeMonths(c).firstOrNull { it.first == key } ?: throw Fail(404, "NOT_FOUND")
+                ok(DeskCount.serializer(), DeskCount(data.chargeCourse(c, month.second)))
+            }
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
+
+    private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
+        val name = text(i.name, 80)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE"); val to = noon(i.to) ?: throw Fail(400, "BAD_DATE")
+        if (to < from || to - from > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
+        if (i.feeCents != 0) cents(i.feeCents)
+        val courts = data.courts()
+        val slots = i.slots.map { s ->
+            if (s.weekday !in 1..7 || s.startMin !in 0 until 24 * 60 || s.minutes !in 15..8 * 60) throw Fail(400, "BAD_TIME")
+            if (s.court.isNotEmpty() && s.court !in courts) throw Fail(404, "NOT_FOUND")
+            CourseSlot(s.weekday, s.startMin, s.minutes, s.court)
+        }
+        val coach = i.coach?.let { id -> Players.byId(data.players(), id)?.id ?: throw Fail(404, "NOT_FOUND") }
+        val base = old ?: Course(Courses.newId("k"), name, from = from, to = to, createdAt = data.now())
+        val c = base.copy(
+            name = name, level = text(i.level, 60), coach = coach, coachName = if (coach != null) "" else text(i.coachName, 80), from = from, to = to,
+            maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
+        )
+        data.saveCourse(c)
+        return ok(DeskId.serializer(), DeskId(c.id))
     }
 
     // --- Oggi ---
