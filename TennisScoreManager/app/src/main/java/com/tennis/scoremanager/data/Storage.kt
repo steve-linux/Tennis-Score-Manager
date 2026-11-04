@@ -595,6 +595,15 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Cosa usa chi gioca (PlayerFeature.name); null = mai scelto (tutto acceso, come prima). */
+    var playerFeatures: Set<String>?
+        get() = prefs.getStringSet("player_features", null)?.toSet()
+        set(v) = prefs.edit().putStringSet("player_features", v).apply()
+
+    var playerFeaturesSeen: Boolean
+        get() = prefs.getBoolean("player_features_seen", false)
+        set(v) = prefs.edit().putBoolean("player_features_seen", v).apply()
+
     /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
     var clubFeatures: Set<String>?
         get() = prefs.getStringSet("club_features", null)?.toSet()

@@ -112,7 +112,7 @@ object Courses {
         for (p in people.filter { it.id in c.students }) {
             val keys = setOf(p.id) + p.aliases
             if (b.charges.any { it.player in keys && it.label == label && !it.cancelled }) continue
-            b = b.copy(charges = b.charges + Charge(Fees.newId("c"), p.id, p.name, null, label, c.feeCents, now, due))
+            b = b.copy(charges = b.charges + Charge(Fees.newId("c"), p.id, p.name, null, label, c.feeCents, now, due, kind = FeeKind.COURSE))
             n++
         }
         return b to n

@@ -4,7 +4,15 @@
 package com.tennis.scoremanager.desk
 
 import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.ClubTournaments
 import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.CourtSettings
@@ -27,10 +35,34 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun book() = ledger
     override fun saveBook(b: ClubBook) { ledger = b }
     override fun payTypes() = Fees.types(ledger) { it.name }
-    override fun courts() = listOf("Campo 1", "Campo 2")
+    var pitches = listOf("Campo 1", "Campo 2")
+    override fun courts() = pitches
     override fun plan() = courtPlan
     override fun tournaments() = cups
-    override fun saveBooking(b: CourtBooking, charge: Boolean) { courtPlan = courtPlan.copy(bookings = courtPlan.bookings + b) }
-    override fun deleteBooking(b: CourtBooking) { courtPlan = courtPlan.copy(bookings = courtPlan.bookings - b) }
+    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> {
+        val (list, skipped) = if (weeks > 1) CourtPlans.weekly(courtPlan, cups, b, weeks) else listOf(b) to emptyList()
+        courtPlan = courtPlan.copy(bookings = courtPlan.bookings.filter { o -> list.none { it.id == o.id } } + list)
+        return skipped
+    }
+    override fun deleteBooking(b: CourtBooking, series: Boolean) {
+        val gone = if (series && b.series != null) courtPlan.bookings.filter { it.series == b.series && it.start >= b.start } else listOf(b)
+        courtPlan = courtPlan.copy(bookings = courtPlan.bookings - gone.toSet())
+    }
+    override fun saveBlock(b: CourtBlock, delete: Boolean) {
+        courtPlan = courtPlan.copy(blocks = courtPlan.blocks.filter { it.id != b.id } + listOfNotNull(b.takeIf { !delete }))
+    }
+    var on = ClubFeature.entries.filter { it.base }.toSet()
+    var school = emptyList<Course>()
+    override fun features() = on
+    override fun courses() = school
+    override fun teams() = emptyList<Team>()
+    override fun ladders() = emptyList<Ladder>()
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? =
+        ledger.charges.firstOrNull { it.id == chargeId }?.payments?.firstOrNull { it.id == paymentId }?.let { "%PDF-${it.receipt}".toByteArray() }
     override fun paymentsCsv(year: Int): ByteArray? = "anno;$year\n".toByteArray()
+    override fun saveTournament(t: ClubTournament) { cups = cups.filter { it.id != t.id } + t }
+    override fun deleteTournament(t: ClubTournament) { cups = cups - t }
+    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) =
+        saveTournament(t.copy(entries = t.entries + CTEntry(ClubTournaments.newId("e"), people.map { it.id }, people.map { it.name }, at = time)))
+    override fun removeEntry(t: ClubTournament, entry: CTEntry) = saveTournament(t.copy(entries = t.entries - entry))
 }

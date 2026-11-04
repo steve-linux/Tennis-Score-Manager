@@ -351,6 +351,786 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
 </manifest>
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/assets/desk/app-i18n.js
+cat > "$DEST/app/src/main/assets/desk/app-i18n.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Fatto da deliver/make_desk_texts.py coi testi dell'app (Strings*.kt): non cambiarlo a mano.
+'use strict';
+
+const APP_I18N = {
+  it: {
+    bkOther: "Altro",
+    blkAllCourts: "Tutti i campi",
+    blkAllDay: "Tutto il giorno",
+    blkBlocked: (it) => `Non prenotabile: ${it}`,
+    blkCell: (it) => `Non prenotabile\n${it}`,
+    blkCourse: "Corso",
+    blkDays: "Giorni",
+    blkDelete: "Elimina",
+    blkEnd: "Alle",
+    blkEveryDay: "tutti i giorni",
+    blkFrom: "Dal",
+    blkFromTournament: (it) => `Dal torneo: ${it}`,
+    blkHint: "Per corsi, tornei e manutenzione: in quegli orari non si prenota (le lezioni dei corsi sì, e le partite del torneo si vedono sopra).",
+    blkLabel: "Nome (es. Scuola tennis, Torneo sociale)",
+    blkMaintenance: "Manutenzione",
+    blkNew: "Nuovo periodo non prenotabile",
+    blkNone: "Nessun periodo non prenotabile.",
+    blkShort: "Non prenotabili",
+    blkStart: "Dalle",
+    blkTitle: "Campi non prenotabili",
+    blkTo: "Al",
+    blkTournament: "Torneo",
+    ctAddEntry: "Iscrivi",
+    ctBye: "bye",
+    ctCategory: "Categoria (es. Singolare maschile, Over 45)",
+    ctChampion: (it) => `Vince ${it}`,
+    ctClearResult: "Cancella il risultato",
+    ctColGames: "Game",
+    ctColSets: "Set",
+    ctColWon: "V",
+    ctCourt: "Campo",
+    ctDates: (a, b) => a === b ? a : `dal ${a} al ${b}`,
+    ctDelete: "Elimina il torneo",
+    ctDeleteAsk: (it) => `Eliminare il torneo ${it}? Le iscrizioni non pagate si cancellano, i pagamenti restano nel registro.`,
+    ctDone: "Conclusi",
+    ctDoubles: "Doppio",
+    ctDraw: "Sorteggio",
+    ctDrawAsk: (it) => `Entrano nel sorteggio ${it} iscritti in regola, in ordine di classifica per le teste di serie.`,
+    ctDrawExcluded: (it) => `${it} non ${it === 1 ? "entra" : "entrano"}: non in regola (vedi Iscritti).`,
+    ctDrawTooFew: "Servono almeno due iscritti in regola.",
+    ctEnd: "Fine",
+    ctEntriesCount: (it) => `${it} ${it === 1 ? "iscritto" : "iscritti"}`,
+    ctFee: "Quota d'iscrizione (per giocatore)",
+    ctFeeLine: (it) => `iscrizione ${it}`,
+    ctFeeName: (it) => `Iscrizione ${it}`,
+    ctFinal: "Finale",
+    ctFitpCode: "Codice del torneo FITP",
+    ctFitpCodeLine: (it) => `codice FITP ${it}`,
+    ctFitpHint: "FITP: tessera agonistica dell'anno, certificato agonistico valido all'inizio e classifica nel limite.",
+    ctFormatGroups: "Gironi + tabellone",
+    ctFormatKnockout: "Eliminazione diretta",
+    ctGroup: (it) => `Girone ${it}`,
+    ctGroupsCount: "Gironi",
+    ctGroupsFirst: "Il tabellone finale si fa a gironi finiti.",
+    ctHint: "Sociali e FITP: iscrizioni, quote, tabellone, gironi e risultati",
+    ctInOrder: "in regola",
+    ctLast16: "Ottavi di finale",
+    ctLast32: "Sedicesimi di finale",
+    ctLimit: "Classifica massima (es. 4.1; vuoto = open)",
+    ctLimitShort: (it) => `lim. ${it}`,
+    ctMakeKnockout: "Tabellone finale",
+    ctMedicalNotAgonistic: "certificato non agonistico",
+    ctName: "Nome del torneo",
+    ctNew: "Nuovo torneo",
+    ctNoEntries: "Nessun iscritto.",
+    ctNoFitpCard: "manca la tessera FITP dell'anno",
+    ctNoMedical: "certificato non valido",
+    ctNone: "Nessun torneo: crealo con Nuovo torneo.",
+    ctNotAgonistCard: "tessera non agonista",
+    ctNotDrawn: "Il tabellone si fa col sorteggio, dalla scheda Iscritti.",
+    ctNotMember: "non socio",
+    ctOpen: "Iscrizioni aperte",
+    ctPaidOnly: "Nel tabellone solo chi ha pagato",
+    ctPaidOnlyHint: "Chi non ha pagato resta tra gli iscritti ma non entra nel sorteggio.",
+    ctPaidOnlyShort: "solo chi ha pagato",
+    ctPickPartner: (it) => `Il compagno di ${it}`,
+    ctPlayLive: "Gioca col segnapunti",
+    ctPlayed: "Giocate",
+    ctQualify: "Passano da ogni girone",
+    ctQuarter: "Quarti di finale",
+    ctRankTooHigh: "classifica oltre il limite",
+    ctReferee: "Giudice arbitro",
+    ctRefereeLine: (it) => `giudice arbitro ${it}`,
+    ctRemoveEntry: "Ritira l'iscrizione",
+    ctRetired: "rit.",
+    ctRetiredLong: "Ritiro durante la partita",
+    ctRoundN: (it) => `${it}° turno`,
+    ctRunning: "In corso",
+    ctScore: "Punteggio (es. 6-4 3-6 10-8)",
+    ctSeedAuto: "dalla classifica",
+    ctSeedHint: "Testa di serie: di solito dalla classifica FITP; qui la si sceglie a mano.",
+    ctSeedN: (it) => `testa di serie n. ${it}`,
+    ctSemi: "Semifinali",
+    ctSingles: "Singolare",
+    ctSocial: "Sociale",
+    ctSocialHint: "Sociale: certificato medico valido; chi non è socio si segnala.",
+    ctStart: "Inizio",
+    ctTabDraw: "Tabellone",
+    ctTabEntries: "Iscritti",
+    ctTabMatches: "Partite",
+    ctTime: "Ora",
+    ctTitle: "Tornei del circolo",
+    ctToPlay: "Da giocare",
+    ctTvHide: "Togli dal tabellone TV",
+    ctTvOff: "Tabellone TV spento: accendilo in Dispositivi",
+    ctTvShow: "Mostra sul tabellone TV",
+    ctUndoDraw: "Rifai il sorteggio",
+    ctUnpaid: "iscrizione da pagare",
+    ctWalkover: "w.o.",
+    ctWalkoverLong: "Vinta a tavolino (w.o.)",
+    ctWhere: "Dove e quando",
+    ctWinner: "Chi ha vinto",
+    tdBlocking: (it) => it === 1 ? `1 non può giocare (certificato o tessera)` : `${it} non possono giocare (certificato o tessera)`,
+    tdChallenges: (it) => `Sfide da giocare: ${it}`,
+    tdCourts: (it) => `Oggi in campo: ${it}`,
+    tdCourtsNone: "Nessuna prenotazione oggi",
+    tdFixtures: (it) => `Incontri delle squadre in settimana: ${it}`,
+    tdLate: (it) => it === 1 ? `1 scaduta` : `${it} scadute`,
+    tdLessons: (it) => `Lezioni oggi: ${it}`,
+    tdMatches: (it) => `Partite dei tornei oggi: ${it}`,
+    tdMembers: (it) => `Soci da sistemare: ${it}`,
+    tdNothing: "Niente in programma oggi.",
+    tdOnline: (it) => `di cui online: ${it}`,
+    tdPeople: (it) => it === 1 ? `da 1 persona` : `da ${it} persone`,
+    tdTitle: "Oggi",
+    tdToCollect: (it) => `Da incassare: ${it}`,
+  },
+  en: {
+    bkOther: "Other",
+    blkAllCourts: "All courts",
+    blkAllDay: "All day",
+    blkBlocked: (it) => `Not bookable: ${it}`,
+    blkCell: (it) => `Not bookable\n${it}`,
+    blkCourse: "Course",
+    blkDays: "Days",
+    blkDelete: "Delete",
+    blkEnd: "Until",
+    blkEveryDay: "every day",
+    blkFrom: "From",
+    blkFromTournament: (it) => `From the tournament: ${it}`,
+    blkHint: "For courses, tournaments and maintenance: no booking at those times (course lessons yes, and tournament matches show on top).",
+    blkLabel: "Name (e.g. Tennis school, Social tournament)",
+    blkMaintenance: "Maintenance",
+    blkNew: "New non-bookable period",
+    blkNone: "No non-bookable periods.",
+    blkShort: "Not bookable",
+    blkStart: "From",
+    blkTitle: "Non-bookable courts",
+    blkTo: "To",
+    blkTournament: "Tournament",
+    ctAddEntry: "Enter",
+    ctBye: "bye",
+    ctCategory: "Category (e.g. Men's singles, Over 45)",
+    ctChampion: (it) => `Winner: ${it}`,
+    ctClearResult: "Clear the result",
+    ctColGames: "Games",
+    ctColSets: "Sets",
+    ctColWon: "W",
+    ctCourt: "Court",
+    ctDates: (a, b) => a === b ? a : `${a} to ${b}`,
+    ctDelete: "Delete the tournament",
+    ctDeleteAsk: (it) => `Delete the tournament ${it}? Unpaid entry fees are removed, payments stay in the register.`,
+    ctDone: "Finished",
+    ctDoubles: "Doubles",
+    ctDraw: "Draw",
+    ctDrawAsk: (it) => `${it} entries in order go into the draw, seeded by ranking.`,
+    ctDrawExcluded: (it) => `${it} ${it === 1 ? "is" : "are"} left out: not in order (see Entries).`,
+    ctDrawTooFew: "At least two entries in order are needed.",
+    ctEnd: "End",
+    ctEntriesCount: (it) => `${it} ${it === 1 ? "entry" : "entries"}`,
+    ctFee: "Entry fee (per player)",
+    ctFeeLine: (it) => `entry fee ${it}`,
+    ctFeeName: (it) => `Entry ${it}`,
+    ctFinal: "Final",
+    ctFitpCode: "FITP tournament code",
+    ctFitpCodeLine: (it) => `FITP code ${it}`,
+    ctFitpHint: "FITP: this year's competitive card, competitive certificate valid at the start and ranking within the limit.",
+    ctFormatGroups: "Groups + draw",
+    ctFormatKnockout: "Knockout",
+    ctGroup: (it) => `Group ${it}`,
+    ctGroupsCount: "Groups",
+    ctGroupsFirst: "The final draw is made once the groups are over.",
+    ctHint: "Social and FITP: entries, fees, draw, groups and results",
+    ctInOrder: "in order",
+    ctLast16: "Round of 16",
+    ctLast32: "Round of 32",
+    ctLimit: "Maximum ranking (e.g. 4.1; empty = open)",
+    ctLimitShort: (it) => `lim. ${it}`,
+    ctMakeKnockout: "Final draw",
+    ctMedicalNotAgonistic: "certificate not competitive",
+    ctName: "Tournament name",
+    ctNew: "New tournament",
+    ctNoEntries: "No entries.",
+    ctNoFitpCard: "no FITP card for this year",
+    ctNoMedical: "certificate not valid",
+    ctNone: "No tournaments: create one with New tournament.",
+    ctNotAgonistCard: "non-competitive card",
+    ctNotDrawn: "The draw sheet comes from the draw, on the Entries tab.",
+    ctNotMember: "not a member",
+    ctOpen: "Entries open",
+    ctPaidOnly: "Only paid entries in the draw",
+    ctPaidOnlyHint: "Who hasn't paid stays among the entries but is not drawn.",
+    ctPaidOnlyShort: "paid only",
+    ctPickPartner: (it) => `${it}'s partner`,
+    ctPlayLive: "Play with the scorer",
+    ctPlayed: "Played",
+    ctQualify: "Qualify from each group",
+    ctQuarter: "Quarter-finals",
+    ctRankTooHigh: "ranking above the limit",
+    ctReferee: "Referee",
+    ctRefereeLine: (it) => `referee ${it}`,
+    ctRemoveEntry: "Withdraw the entry",
+    ctRetired: "ret.",
+    ctRetiredLong: "Retired during the match",
+    ctRoundN: (it) => `Round ${it}`,
+    ctRunning: "In progress",
+    ctScore: "Score (e.g. 6-4 3-6 10-8)",
+    ctSeedAuto: "from the ranking",
+    ctSeedHint: "Seed: usually from the FITP ranking; here you choose it by hand.",
+    ctSeedN: (it) => `seed no. ${it}`,
+    ctSemi: "Semi-finals",
+    ctSingles: "Singles",
+    ctSocial: "Social",
+    ctSocialHint: "Social: valid medical certificate; non-members are flagged.",
+    ctStart: "Start",
+    ctTabDraw: "Draw sheet",
+    ctTabEntries: "Entries",
+    ctTabMatches: "Matches",
+    ctTime: "Time",
+    ctTitle: "Club tournaments",
+    ctToPlay: "To play",
+    ctTvHide: "Remove from the TV scoreboard",
+    ctTvOff: "TV scoreboard off: turn it on in Devices",
+    ctTvShow: "Show on the TV scoreboard",
+    ctUndoDraw: "Redo the draw",
+    ctUnpaid: "entry fee to pay",
+    ctWalkover: "w/o",
+    ctWalkoverLong: "Won by walkover (w/o)",
+    ctWhere: "Where and when",
+    ctWinner: "Winner",
+    tdBlocking: (it) => `${it} cannot play (certificate or card)`,
+    tdChallenges: (it) => `Challenges to play: ${it}`,
+    tdCourts: (it) => `On court today: ${it}`,
+    tdCourtsNone: "No bookings today",
+    tdFixtures: (it) => `Team fixtures this week: ${it}`,
+    tdLate: (it) => `${it} overdue`,
+    tdLessons: (it) => `Lessons today: ${it}`,
+    tdMatches: (it) => `Tournament matches today: ${it}`,
+    tdMembers: (it) => `Members to sort out: ${it}`,
+    tdNothing: "Nothing planned today.",
+    tdOnline: (it) => `of which online: ${it}`,
+    tdPeople: (it) => it === 1 ? `from 1 person` : `from ${it} people`,
+    tdTitle: "Today",
+    tdToCollect: (it) => `To collect: ${it}`,
+  },
+  fr: {
+    bkOther: "Autre",
+    blkAllCourts: "Tous les terrains",
+    blkAllDay: "Toute la journée",
+    blkBlocked: (it) => `Non réservable : ${it}`,
+    blkCell: (it) => `Non réservable\n${it}`,
+    blkCourse: "Cours",
+    blkDays: "Jours",
+    blkDelete: "Supprimer",
+    blkEnd: "À",
+    blkEveryDay: "tous les jours",
+    blkFrom: "Du",
+    blkFromTournament: (it) => `Depuis le tournoi : ${it}`,
+    blkHint: "Pour les cours, tournois et l'entretien : pas de réservation à ces heures-là (les leçons des cours si, et les matchs du tournoi s'affichent par-dessus).",
+    blkLabel: "Nom (ex. École de tennis, Tournoi interne)",
+    blkMaintenance: "Entretien",
+    blkNew: "Nouvelle période non réservable",
+    blkNone: "Aucune période non réservable.",
+    blkShort: "Non réservables",
+    blkStart: "De",
+    blkTitle: "Terrains non réservables",
+    blkTo: "Au",
+    blkTournament: "Tournoi",
+    ctAddEntry: "Inscrire",
+    ctBye: "exempt",
+    ctCategory: "Catégorie (ex. Simple messieurs, Plus de 45 ans)",
+    ctChampion: (it) => `Vainqueur : ${it}`,
+    ctClearResult: "Effacer le résultat",
+    ctColGames: "Jeux",
+    ctColSets: "Manches",
+    ctColWon: "V",
+    ctCourt: "Terrain",
+    ctDates: (a, b) => a === b ? a : `du ${a} au ${b}`,
+    ctDelete: "Supprimer le tournoi",
+    ctDeleteAsk: (it) => `Supprimer le tournoi ${it} ? Les inscriptions non payées sont effacées, les paiements restent dans le registre.`,
+    ctDone: "Terminés",
+    ctDoubles: "Double",
+    ctDraw: "Tirage au sort",
+    ctDrawAsk: (it) => `${it} inscrits en règle entrent au tirage, têtes de série d'après le classement.`,
+    ctDrawExcluded: (it) => `${it} ${it === 1 ? "reste" : "restent"} dehors : pas en règle (voir Inscrits).`,
+    ctDrawTooFew: "Il faut au moins deux inscrits en règle.",
+    ctEnd: "Fin",
+    ctEntriesCount: (it) => `${it} ${it === 1 ? "inscrit" : "inscrits"}`,
+    ctFee: "Droit d'inscription (par joueur)",
+    ctFeeLine: (it) => `inscription ${it}`,
+    ctFeeName: (it) => `Inscription ${it}`,
+    ctFinal: "Finale",
+    ctFitpCode: "Code du tournoi FITP",
+    ctFitpCodeLine: (it) => `code FITP ${it}`,
+    ctFitpHint: "FITP : licence compétition de l'année, certificat compétition valable au début et classement dans la limite.",
+    ctFormatGroups: "Poules + tableau",
+    ctFormatKnockout: "Élimination directe",
+    ctGroup: (it) => `Poule ${it}`,
+    ctGroupsCount: "Poules",
+    ctGroupsFirst: "Le tableau final se fait une fois les poules terminées.",
+    ctHint: "Internes et FITP : inscriptions, droits, tableau, poules et résultats",
+    ctInOrder: "en règle",
+    ctLast16: "Huitièmes de finale",
+    ctLast32: "Seizièmes de finale",
+    ctLimit: "Classement maximum (ex. 4.1 ; vide = open)",
+    ctLimitShort: (it) => `limité ${it}`,
+    ctMakeKnockout: "Tableau final",
+    ctMedicalNotAgonistic: "certificat non compétition",
+    ctName: "Nom du tournoi",
+    ctNew: "Nouveau tournoi",
+    ctNoEntries: "Aucun inscrit.",
+    ctNoFitpCard: "pas de licence FITP de l'année",
+    ctNoMedical: "certificat non valable",
+    ctNone: "Aucun tournoi : créez-en un avec Nouveau tournoi.",
+    ctNotAgonistCard: "licence loisir",
+    ctNotDrawn: "Le tableau se fait par tirage au sort, depuis l'onglet Inscrits.",
+    ctNotMember: "non adhérent",
+    ctOpen: "Inscriptions ouvertes",
+    ctPaidOnly: "Au tableau seulement ceux qui ont payé",
+    ctPaidOnlyHint: "Qui n'a pas payé reste inscrit mais n'est pas tiré au sort.",
+    ctPaidOnlyShort: "payés seulement",
+    ctPickPartner: (it) => `Partenaire de ${it}`,
+    ctPlayLive: "Jouer avec le marqueur",
+    ctPlayed: "Joués",
+    ctQualify: "Qualifiés par poule",
+    ctQuarter: "Quarts de finale",
+    ctRankTooHigh: "classement au-dessus de la limite",
+    ctReferee: "Juge-arbitre",
+    ctRefereeLine: (it) => `juge-arbitre ${it}`,
+    ctRemoveEntry: "Retirer l'inscription",
+    ctRetired: "abandon",
+    ctRetiredLong: "Abandon pendant le match",
+    ctRoundN: (it) => `${it}e tour`,
+    ctRunning: "En cours",
+    ctScore: "Score (ex. 6-4 3-6 10-8)",
+    ctSeedAuto: "d'après le classement",
+    ctSeedHint: "Tête de série : d'habitude d'après le classement FITP ; ici on la choisit à la main.",
+    ctSeedN: (it) => `tête de série n° ${it}`,
+    ctSemi: "Demi-finales",
+    ctSingles: "Simple",
+    ctSocial: "Interne",
+    ctSocialHint: "Interne : certificat médical valable ; les non-adhérents sont signalés.",
+    ctStart: "Début",
+    ctTabDraw: "Tableau",
+    ctTabEntries: "Inscrits",
+    ctTabMatches: "Matchs",
+    ctTime: "Heure",
+    ctTitle: "Tournois du club",
+    ctToPlay: "À jouer",
+    ctTvHide: "Retirer du tableau TV",
+    ctTvOff: "Tableau TV éteint : allumez-le dans Appareils",
+    ctTvShow: "Afficher sur le tableau TV",
+    ctUndoDraw: "Refaire le tirage",
+    ctUnpaid: "inscription à payer",
+    ctWalkover: "forfait",
+    ctWalkoverLong: "Gagné par forfait",
+    ctWhere: "Où et quand",
+    ctWinner: "Vainqueur",
+    tdBlocking: (it) => it === 1 ? `1 ne peut pas jouer (certificat ou licence)` : `${it} ne peuvent pas jouer (certificat ou licence)`,
+    tdChallenges: (it) => `Défis à jouer : ${it}`,
+    tdCourts: (it) => `Sur les terrains aujourd'hui : ${it}`,
+    tdCourtsNone: "Aucune réservation aujourd'hui",
+    tdFixtures: (it) => `Rencontres d'équipe cette semaine : ${it}`,
+    tdLate: (it) => `${it} en retard`,
+    tdLessons: (it) => `Leçons aujourd'hui : ${it}`,
+    tdMatches: (it) => `Matchs de tournoi aujourd'hui : ${it}`,
+    tdMembers: (it) => `Adhérents à régulariser : ${it}`,
+    tdNothing: "Rien de prévu aujourd'hui.",
+    tdOnline: (it) => `dont en ligne : ${it}`,
+    tdPeople: (it) => it === 1 ? `de 1 personne` : `de ${it} personnes`,
+    tdTitle: "Aujourd'hui",
+    tdToCollect: (it) => `À encaisser : ${it}`,
+  },
+  de: {
+    bkOther: "Sonstiges",
+    blkAllCourts: "Alle Plätze",
+    blkAllDay: "Ganzer Tag",
+    blkBlocked: (it) => `Nicht buchbar: ${it}`,
+    blkCell: (it) => `Nicht buchbar\n${it}`,
+    blkCourse: "Kurs",
+    blkDays: "Tage",
+    blkDelete: "Löschen",
+    blkEnd: "Bis",
+    blkEveryDay: "jeden Tag",
+    blkFrom: "Vom",
+    blkFromTournament: (it) => `Vom Turnier: ${it}`,
+    blkHint: "Für Kurse, Turniere und Pflege: zu diesen Zeiten keine Buchungen (Kursstunden schon, und Turniermatches erscheinen darüber).",
+    blkLabel: "Name (z. B. Tennisschule, Vereinsturnier)",
+    blkMaintenance: "Platzpflege",
+    blkNew: "Neuer nicht buchbarer Zeitraum",
+    blkNone: "Keine nicht buchbaren Zeiträume.",
+    blkShort: "Nicht buchbar",
+    blkStart: "Von",
+    blkTitle: "Nicht buchbare Plätze",
+    blkTo: "Bis",
+    blkTournament: "Turnier",
+    ctAddEntry: "Anmelden",
+    ctBye: "Freilos",
+    ctCategory: "Kategorie (z. B. Herreneinzel, Ü45)",
+    ctChampion: (it) => `Sieger: ${it}`,
+    ctClearResult: "Ergebnis löschen",
+    ctColGames: "Spiele",
+    ctColSets: "Sätze",
+    ctColWon: "S",
+    ctCourt: "Platz",
+    ctDates: (a, b) => a === b ? a : `${a} bis ${b}`,
+    ctDelete: "Turnier löschen",
+    ctDeleteAsk: (it) => `Turnier ${it} löschen? Unbezahlte Meldegebühren werden entfernt, Zahlungen bleiben im Register.`,
+    ctDone: "Beendet",
+    ctDoubles: "Doppel",
+    ctDraw: "Auslosung",
+    ctDrawAsk: (it) => `${it} gültige Meldungen kommen in die Auslosung, gesetzt nach Rangliste.`,
+    ctDrawExcluded: (it) => `${it} ${it === 1 ? "bleibt" : "bleiben"} draußen: nicht in Ordnung (siehe Gemeldet).`,
+    ctDrawTooFew: "Mindestens zwei gültige Meldungen nötig.",
+    ctEnd: "Ende",
+    ctEntriesCount: (it) => `${it} ${it === 1 ? "Meldung" : "Meldungen"}`,
+    ctFee: "Meldegebühr (pro Spieler)",
+    ctFeeLine: (it) => `Meldegebühr ${it}`,
+    ctFeeName: (it) => `Meldung ${it}`,
+    ctFinal: "Finale",
+    ctFitpCode: "FITP-Turniercode",
+    ctFitpCodeLine: (it) => `FITP-Code ${it}`,
+    ctFitpHint: "FITP: Wettkampfausweis des Jahres, Wettkampfattest gültig zum Beginn und Rangliste im Limit.",
+    ctFormatGroups: "Gruppen + Tableau",
+    ctFormatKnockout: "K.-o.-System",
+    ctGroup: (it) => `Gruppe ${it}`,
+    ctGroupsCount: "Gruppen",
+    ctGroupsFirst: "Das Finaltableau gibt es nach den Gruppen.",
+    ctHint: "Intern und FITP: Anmeldungen, Gebühren, Tableau, Gruppen und Ergebnisse",
+    ctInOrder: "in Ordnung",
+    ctLast16: "Achtelfinale",
+    ctLast32: "Sechzehntelfinale",
+    ctLimit: "Höchste Rangliste (z. B. 4.1; leer = offen)",
+    ctLimitShort: (it) => `lim. ${it}`,
+    ctMakeKnockout: "Finaltableau",
+    ctMedicalNotAgonistic: "Attest nicht für Wettkampf",
+    ctName: "Name des Turniers",
+    ctNew: "Neues Turnier",
+    ctNoEntries: "Keine Meldungen.",
+    ctNoFitpCard: "kein FITP-Ausweis für dieses Jahr",
+    ctNoMedical: "Attest ungültig",
+    ctNone: "Keine Turniere: mit Neues Turnier anlegen.",
+    ctNotAgonistCard: "Freizeitausweis",
+    ctNotDrawn: "Das Tableau entsteht durch die Auslosung, im Reiter Gemeldet.",
+    ctNotMember: "kein Mitglied",
+    ctOpen: "Anmeldung offen",
+    ctPaidOnly: "Ins Tableau nur, wer bezahlt hat",
+    ctPaidOnlyHint: "Wer nicht bezahlt hat, bleibt gemeldet, wird aber nicht ausgelost.",
+    ctPaidOnlyShort: "nur bezahlt",
+    ctPickPartner: (it) => `Partner von ${it}`,
+    ctPlayLive: "Mit dem Zähler spielen",
+    ctPlayed: "Gespielt",
+    ctQualify: "Weiter pro Gruppe",
+    ctQuarter: "Viertelfinale",
+    ctRankTooHigh: "Rangliste über dem Limit",
+    ctReferee: "Oberschiedsrichter",
+    ctRefereeLine: (it) => `Oberschiedsrichter ${it}`,
+    ctRemoveEntry: "Meldung zurückziehen",
+    ctRetired: "Aufgabe",
+    ctRetiredLong: "Aufgabe während des Matches",
+    ctRoundN: (it) => `${it}. Runde`,
+    ctRunning: "Laufend",
+    ctScore: "Ergebnis (z. B. 6-4 3-6 10-8)",
+    ctSeedAuto: "nach Rangliste",
+    ctSeedHint: "Setzung: meist nach FITP-Rangliste; hier wählt man sie von Hand.",
+    ctSeedN: (it) => `Setzplatz ${it}`,
+    ctSemi: "Halbfinale",
+    ctSingles: "Einzel",
+    ctSocial: "Intern",
+    ctSocialHint: "Intern: gültiges ärztliches Attest; Nichtmitglieder werden angezeigt.",
+    ctStart: "Beginn",
+    ctTabDraw: "Tableau",
+    ctTabEntries: "Gemeldet",
+    ctTabMatches: "Matches",
+    ctTime: "Uhrzeit",
+    ctTitle: "Vereinsturniere",
+    ctToPlay: "Zu spielen",
+    ctTvHide: "Von der TV-Anzeigetafel nehmen",
+    ctTvOff: "TV-Anzeigetafel aus: unter Geräte einschalten",
+    ctTvShow: "Auf der TV-Anzeigetafel zeigen",
+    ctUndoDraw: "Auslosung wiederholen",
+    ctUnpaid: "Meldegebühr offen",
+    ctWalkover: "kampflos",
+    ctWalkoverLong: "Kampflos gewonnen",
+    ctWhere: "Wo und wann",
+    ctWinner: "Sieger",
+    tdBlocking: (it) => it === 1 ? `1 darf nicht spielen (Attest oder Ausweis)` : `${it} dürfen nicht spielen (Attest oder Ausweis)`,
+    tdChallenges: (it) => `Offene Forderungen: ${it}`,
+    tdCourts: (it) => `Heute auf den Plätzen: ${it}`,
+    tdCourtsNone: "Heute keine Buchungen",
+    tdFixtures: (it) => `Mannschaftsspiele diese Woche: ${it}`,
+    tdLate: (it) => `${it} überfällig`,
+    tdLessons: (it) => `Trainingsstunden heute: ${it}`,
+    tdMatches: (it) => `Turnierspiele heute: ${it}`,
+    tdMembers: (it) => `Mitglieder zu klären: ${it}`,
+    tdNothing: "Heute nichts geplant.",
+    tdOnline: (it) => `davon online: ${it}`,
+    tdPeople: (it) => it === 1 ? `von 1 Person` : `von ${it} Personen`,
+    tdTitle: "Heute",
+    tdToCollect: (it) => `Offen: ${it}`,
+  },
+  es: {
+    bkOther: "Otro",
+    blkAllCourts: "Todas las pistas",
+    blkAllDay: "Todo el día",
+    blkBlocked: (it) => `No reservable: ${it}`,
+    blkCell: (it) => `No reservable\n${it}`,
+    blkCourse: "Curso",
+    blkDays: "Días",
+    blkDelete: "Eliminar",
+    blkEnd: "A",
+    blkEveryDay: "todos los días",
+    blkFrom: "Desde",
+    blkFromTournament: (it) => `Del torneo: ${it}`,
+    blkHint: "Para cursos, torneos y mantenimiento: en esas horas no se reserva (las clases de los cursos sí, y los partidos del torneo se ven encima).",
+    blkLabel: "Nombre (p. ej. Escuela de tenis, Torneo social)",
+    blkMaintenance: "Mantenimiento",
+    blkNew: "Nuevo periodo no reservable",
+    blkNone: "Ningún periodo no reservable.",
+    blkShort: "No reservables",
+    blkStart: "De",
+    blkTitle: "Pistas no reservables",
+    blkTo: "Hasta",
+    blkTournament: "Torneo",
+    ctAddEntry: "Inscribir",
+    ctBye: "bye",
+    ctCategory: "Categoría (p. ej. Individual masculino, +45)",
+    ctChampion: (it) => `Gana ${it}`,
+    ctClearResult: "Borrar el resultado",
+    ctColGames: "Juegos",
+    ctColSets: "Sets",
+    ctColWon: "V",
+    ctCourt: "Pista",
+    ctDates: (a, b) => a === b ? a : `del ${a} al ${b}`,
+    ctDelete: "Eliminar el torneo",
+    ctDeleteAsk: (it) => `¿Eliminar el torneo ${it}? Las inscripciones sin pagar se borran, los pagos quedan en el registro.`,
+    ctDone: "Terminados",
+    ctDoubles: "Dobles",
+    ctDraw: "Sorteo",
+    ctDrawAsk: (it) => `Entran en el sorteo ${it} inscritos en regla, con cabezas de serie por clasificación.`,
+    ctDrawExcluded: (it) => `${it} ${it === 1 ? "se queda" : "se quedan"} fuera: no en regla (ver Inscritos).`,
+    ctDrawTooFew: "Hacen falta al menos dos inscritos en regla.",
+    ctEnd: "Fin",
+    ctEntriesCount: (it) => `${it} ${it === 1 ? "inscrito" : "inscritos"}`,
+    ctFee: "Cuota de inscripción (por jugador)",
+    ctFeeLine: (it) => `inscripción ${it}`,
+    ctFeeName: (it) => `Inscripción ${it}`,
+    ctFinal: "Final",
+    ctFitpCode: "Código del torneo FITP",
+    ctFitpCodeLine: (it) => `código FITP ${it}`,
+    ctFitpHint: "FITP: licencia de competición del año, certificado de competición válido al inicio y clasificación dentro del límite.",
+    ctFormatGroups: "Grupos + cuadro",
+    ctFormatKnockout: "Eliminación directa",
+    ctGroup: (it) => `Grupo ${it}`,
+    ctGroupsCount: "Grupos",
+    ctGroupsFirst: "El cuadro final se hace al terminar los grupos.",
+    ctHint: "Sociales y FITP: inscripciones, cuotas, cuadro, grupos y resultados",
+    ctInOrder: "en regla",
+    ctLast16: "Octavos de final",
+    ctLast32: "Dieciseisavos de final",
+    ctLimit: "Clasificación máxima (p. ej. 4.1; vacío = open)",
+    ctLimitShort: (it) => `lím. ${it}`,
+    ctMakeKnockout: "Cuadro final",
+    ctMedicalNotAgonistic: "certificado no de competición",
+    ctName: "Nombre del torneo",
+    ctNew: "Nuevo torneo",
+    ctNoEntries: "Ningún inscrito.",
+    ctNoFitpCard: "falta la licencia FITP del año",
+    ctNoMedical: "certificado no válido",
+    ctNone: "Ningún torneo: crea uno con Nuevo torneo.",
+    ctNotAgonistCard: "licencia no de competición",
+    ctNotDrawn: "El cuadro sale del sorteo, desde la pestaña Inscritos.",
+    ctNotMember: "no es socio",
+    ctOpen: "Inscripciones abiertas",
+    ctPaidOnly: "En el cuadro solo quien ha pagado",
+    ctPaidOnlyHint: "Quien no ha pagado sigue inscrito pero no entra en el sorteo.",
+    ctPaidOnlyShort: "solo pagados",
+    ctPickPartner: (it) => `Pareja de ${it}`,
+    ctPlayLive: "Jugar con el marcador",
+    ctPlayed: "Jugados",
+    ctQualify: "Pasan de cada grupo",
+    ctQuarter: "Cuartos de final",
+    ctRankTooHigh: "clasificación por encima del límite",
+    ctReferee: "Juez árbitro",
+    ctRefereeLine: (it) => `juez árbitro ${it}`,
+    ctRemoveEntry: "Retirar la inscripción",
+    ctRetired: "ret.",
+    ctRetiredLong: "Retirada durante el partido",
+    ctRoundN: (it) => `${it}.ª ronda`,
+    ctRunning: "En curso",
+    ctScore: "Resultado (p. ej. 6-4 3-6 10-8)",
+    ctSeedAuto: "por clasificación",
+    ctSeedHint: "Cabeza de serie: normalmente por la clasificación FITP; aquí se elige a mano.",
+    ctSeedN: (it) => `cabeza de serie n.º ${it}`,
+    ctSemi: "Semifinales",
+    ctSingles: "Individual",
+    ctSocial: "Social",
+    ctSocialHint: "Social: certificado médico válido; quien no es socio se señala.",
+    ctStart: "Inicio",
+    ctTabDraw: "Cuadro",
+    ctTabEntries: "Inscritos",
+    ctTabMatches: "Partidos",
+    ctTime: "Hora",
+    ctTitle: "Torneos del club",
+    ctToPlay: "Por jugar",
+    ctTvHide: "Quitar del marcador de la TV",
+    ctTvOff: "Marcador de la TV apagado: enciéndelo en Dispositivos",
+    ctTvShow: "Mostrar en el marcador de la TV",
+    ctUndoDraw: "Repetir el sorteo",
+    ctUnpaid: "inscripción por pagar",
+    ctWalkover: "w.o.",
+    ctWalkoverLong: "Ganado por w.o.",
+    ctWhere: "Dónde y cuándo",
+    ctWinner: "Ganador",
+    tdBlocking: (it) => it === 1 ? `1 no puede jugar (certificado o licencia)` : `${it} no pueden jugar (certificado o licencia)`,
+    tdChallenges: (it) => `Desafíos por jugar: ${it}`,
+    tdCourts: (it) => `Hoy en pista: ${it}`,
+    tdCourtsNone: "Ninguna reserva hoy",
+    tdFixtures: (it) => `Encuentros de equipo esta semana: ${it}`,
+    tdLate: (it) => it === 1 ? `1 vencido` : `${it} vencidos`,
+    tdLessons: (it) => `Clases hoy: ${it}`,
+    tdMatches: (it) => `Partidos de torneo hoy: ${it}`,
+    tdMembers: (it) => `Socios por regularizar: ${it}`,
+    tdNothing: "Nada previsto hoy.",
+    tdOnline: (it) => `de ellas en línea: ${it}`,
+    tdPeople: (it) => it === 1 ? `de 1 persona` : `de ${it} personas`,
+    tdTitle: "Hoy",
+    tdToCollect: (it) => `Por cobrar: ${it}`,
+  },
+  pt: {
+    bkOther: "Outro",
+    blkAllCourts: "Todas as quadras",
+    blkAllDay: "O dia todo",
+    blkBlocked: (it) => `Não reservável: ${it}`,
+    blkCell: (it) => `Não reservável\n${it}`,
+    blkCourse: "Curso",
+    blkDays: "Dias",
+    blkDelete: "Excluir",
+    blkEnd: "Às",
+    blkEveryDay: "todos os dias",
+    blkFrom: "De",
+    blkFromTournament: (it) => `Do torneio: ${it}`,
+    blkHint: "Para cursos, torneios e manutenção: nesses horários não se reserva (as aulas dos cursos sim, e as partidas do torneio aparecem por cima).",
+    blkLabel: "Nome (ex. Escola de tênis, Torneio social)",
+    blkMaintenance: "Manutenção",
+    blkNew: "Novo período não reservável",
+    blkNone: "Nenhum período não reservável.",
+    blkShort: "Não reserváveis",
+    blkStart: "Das",
+    blkTitle: "Quadras não reserváveis",
+    blkTo: "Até",
+    blkTournament: "Torneio",
+    ctAddEntry: "Inscrever",
+    ctBye: "bye",
+    ctCategory: "Categoria (ex. Simples masculino, 45+)",
+    ctChampion: (it) => `Vence ${it}`,
+    ctClearResult: "Apagar o resultado",
+    ctColGames: "Games",
+    ctColSets: "Sets",
+    ctColWon: "V",
+    ctCourt: "Quadra",
+    ctDates: (a, b) => a === b ? a : `de ${a} a ${b}`,
+    ctDelete: "Excluir o torneio",
+    ctDeleteAsk: (it) => `Excluir o torneio ${it}? As inscrições não pagas são apagadas, os pagamentos ficam no registro.`,
+    ctDone: "Encerrados",
+    ctDoubles: "Duplas",
+    ctDraw: "Sorteio",
+    ctDrawAsk: (it) => `Entram no sorteio ${it} inscritos em ordem, com cabeças de chave pelo ranking.`,
+    ctDrawExcluded: (it) => `${it} ${it === 1 ? "fica" : "ficam"} de fora: não em ordem (ver Inscritos).`,
+    ctDrawTooFew: "São necessários pelo menos dois inscritos em ordem.",
+    ctEnd: "Fim",
+    ctEntriesCount: (it) => `${it} ${it === 1 ? "inscrito" : "inscritos"}`,
+    ctFee: "Taxa de inscrição (por jogador)",
+    ctFeeLine: (it) => `inscrição ${it}`,
+    ctFeeName: (it) => `Inscrição ${it}`,
+    ctFinal: "Final",
+    ctFitpCode: "Código do torneio FITP",
+    ctFitpCodeLine: (it) => `código FITP ${it}`,
+    ctFitpHint: "FITP: cartão de competição do ano, atestado de competição válido no início e ranking dentro do limite.",
+    ctFormatGroups: "Grupos + chave",
+    ctFormatKnockout: "Eliminação direta",
+    ctGroup: (it) => `Grupo ${it}`,
+    ctGroupsCount: "Grupos",
+    ctGroupsFirst: "A chave final é feita depois dos grupos.",
+    ctHint: "Sociais e FITP: inscrições, taxas, chave, grupos e resultados",
+    ctInOrder: "em ordem",
+    ctLast16: "Oitavas de final",
+    ctLast32: "Dezesseis-avos de final",
+    ctLimit: "Ranking máximo (ex. 4.1; vazio = open)",
+    ctLimitShort: (it) => `lim. ${it}`,
+    ctMakeKnockout: "Chave final",
+    ctMedicalNotAgonistic: "atestado não de competição",
+    ctName: "Nome do torneio",
+    ctNew: "Novo torneio",
+    ctNoEntries: "Nenhum inscrito.",
+    ctNoFitpCard: "falta o cartão FITP do ano",
+    ctNoMedical: "atestado não válido",
+    ctNone: "Nenhum torneio: crie um com Novo torneio.",
+    ctNotAgonistCard: "cartão não de competição",
+    ctNotDrawn: "A chave sai do sorteio, na aba Inscritos.",
+    ctNotMember: "não é sócio",
+    ctOpen: "Inscrições abertas",
+    ctPaidOnly: "Na chave só quem pagou",
+    ctPaidOnlyHint: "Quem não pagou continua inscrito mas não entra no sorteio.",
+    ctPaidOnlyShort: "só pagos",
+    ctPickPartner: (it) => `Parceiro de ${it}`,
+    ctPlayLive: "Jogar com o marcador",
+    ctPlayed: "Jogadas",
+    ctQualify: "Passam de cada grupo",
+    ctQuarter: "Quartas de final",
+    ctRankTooHigh: "ranking acima do limite",
+    ctReferee: "Árbitro geral",
+    ctRefereeLine: (it) => `árbitro geral ${it}`,
+    ctRemoveEntry: "Retirar a inscrição",
+    ctRetired: "desist.",
+    ctRetiredLong: "Desistência durante a partida",
+    ctRoundN: (it) => `${it}ª rodada`,
+    ctRunning: "Em andamento",
+    ctScore: "Placar (ex. 6-4 3-6 10-8)",
+    ctSeedAuto: "pelo ranking",
+    ctSeedHint: "Cabeça de chave: normalmente pelo ranking FITP; aqui se escolhe à mão.",
+    ctSeedN: (it) => `cabeça de chave n.º ${it}`,
+    ctSemi: "Semifinais",
+    ctSingles: "Simples",
+    ctSocial: "Social",
+    ctSocialHint: "Social: atestado médico válido; quem não é sócio é indicado.",
+    ctStart: "Início",
+    ctTabDraw: "Chave",
+    ctTabEntries: "Inscritos",
+    ctTabMatches: "Partidas",
+    ctTime: "Hora",
+    ctTitle: "Torneios do clube",
+    ctToPlay: "A jogar",
+    ctTvHide: "Tirar do placar da TV",
+    ctTvOff: "Placar da TV desligado: ligue em Dispositivos",
+    ctTvShow: "Mostrar no placar da TV",
+    ctUndoDraw: "Refazer o sorteio",
+    ctUnpaid: "inscrição a pagar",
+    ctWalkover: "W.O.",
+    ctWalkoverLong: "Vitória por W.O.",
+    ctWhere: "Onde e quando",
+    ctWinner: "Vencedor",
+    tdBlocking: (it) => it === 1 ? `1 não pode jogar (atestado ou cartão)` : `${it} não podem jogar (atestado ou cartão)`,
+    tdChallenges: (it) => `Desafios por jogar: ${it}`,
+    tdCourts: (it) => `Hoje em quadra: ${it}`,
+    tdCourtsNone: "Nenhuma reserva hoje",
+    tdFixtures: (it) => `Encontros das equipes esta semana: ${it}`,
+    tdLate: (it) => `${it} em atraso`,
+    tdLessons: (it) => `Aulas hoje: ${it}`,
+    tdMatches: (it) => `Jogos de torneio hoje: ${it}`,
+    tdMembers: (it) => `Sócios por regularizar: ${it}`,
+    tdNothing: "Nada previsto para hoje.",
+    tdOnline: (it) => `das quais online: ${it}`,
+    tdPeople: (it) => it === 1 ? `de 1 pessoa` : `de ${it} pessoas`,
+    tdTitle: "Hoje",
+    tdToCollect: (it) => `Por receber: ${it}`,
+  },
+};
+for (const l in APP_I18N) Object.assign(DESK_I18N[l], APP_I18N[l]);
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/assets/desk/app.js
 cat > "$DEST/app/src/main/assets/desk/app.js" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -364,7 +1144,7 @@ const KEY = 'tsm-desk';
 let token = read();
 let info = null;
 let T = pick((navigator.language || 'it').slice(0, 2));
-let view = 'people';
+let view = 'today';
 let people = [];
 
 function read() { try { return sessionStorage.getItem(KEY); } catch (_) { return null; } }
@@ -427,6 +1207,9 @@ function cents(text) {
   if (!/^\d{1,6}(\.\d{1,2})?$/.test(t)) return null;
   return Math.round(Number(t) * 100);
 }
+
+/** Sostituisce il contenuto di [el]; i pezzi vuoti (null, false) non si vedono. */
+function put(el, ...kids) { el.replaceChildren(...kids.flat(3).filter((k) => k !== null && k !== undefined && k !== false)); }
 
 function field(label, input, cls) { return h('label' + (cls ? '.' + cls : ''), label, input); }
 function select(options, value) { return h('select', {}, options.map(([v, l]) => h('option', { value: v, selected: v === value }, l))); }
@@ -527,7 +1310,7 @@ function showLogin(message) {
   const canvas = h('canvas.qr', { role: 'img', 'aria-label': T.qrAlt });
   canvas.hidden = true;
   const status = h('div.status', { role: 'status' }, message || '');
-  root.replaceChildren(h('div.login', h('div.box', h('h1', T.title), h('p', T.qrHint), canvas, status,
+  put(root, h('div.login', h('div.box', h('h1', T.title), h('p', T.qrHint), canvas, status,
     h('details', h('summary', T.useCode), h('p', T.loginHint), form, h('ol', h('li', T.step1))))));
   qrLoop(canvas, status);
 }
@@ -552,26 +1335,88 @@ async function start() {
 
 // --- Telaio ---
 
-const VIEWS = () => [['people', T.members], ['money', T.money], ['plan', T.plan], ['cups', T.cups]];
+/** Le pagine, solo per le funzioni del circolo accese (Oggi c'è sempre). */
+const VIEWS = () => {
+  const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
+  return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')]]
+    .filter((v) => v[2]).map(([v, l]) => [v, l]);
+};
 const main = () => document.querySelector('main');
 
 async function render() {
-  root.replaceChildren(h('div.shell',
+  if (!VIEWS().some(([v]) => v === view)) view = 'today';
+  put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; render(); } }, l)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ people: showPeople, money: showMoney, plan: showPlan, cups: showCups })[view](); }
-  catch (e) { if (e instanceof ApiError && token) main().replaceChildren(h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups })[view](); }
+  catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
 async function logout() {
   try { await api('POST', '/logout'); } catch (_) { /* si esce comunque */ }
   token = null; write(null); info = null;
   showLogin(T.loggedOut);
+}
+
+// --- Oggi ---
+
+/** Va a una pagina (con [prep] per sistemarla prima). */
+function go(v, prep) { view = v; if (prep) prep(); render(); }
+
+async function showToday() {
+  const d = await api('GET', '/today');
+  const on = (f) => !info.features || !info.features.length || info.features.includes(f);
+  const at = (l) => [l.startMin != null ? hhmm(l.startMin) : '', l.court, l.text].filter(Boolean).join(' · ');
+  const card = (title, lines, onclick, alert) => h(onclick ? 'button.card' : 'div.card', onclick ? { type: 'button', onclick } : {},
+    h('h2' + (alert ? '.alert' : ''), title), lines.filter(Boolean).map((l) => h('p.dim', l)));
+  const cards = [];
+  if (on('PLANNING')) cards.push(card(d.bookings ? T.tdCourts(d.bookings) : T.tdCourtsNone,
+    d.next.map(at).concat(d.online ? [T.tdOnline(d.online)] : []), () => go('plan', () => { planDate = info.today; })));
+  if (on('PAYMENTS') && d.collectCents > 0) cards.push(card(T.tdToCollect(eur(d.collectCents)), [T.tdPeople(d.collectPeople)],
+    () => go('money', () => { moneyFilter = { type: '', show: 'open', text: '' }; })));
+  if (on('MEMBERS') && d.members > 0) cards.push(card(T.tdMembers(d.members), [d.memberNames.join(', '), d.blocking ? T.tdBlocking(d.blocking) : ''],
+    () => go('people', () => { filter.kind = 'todo'; filter.text = ''; }), d.blocking > 0));
+  if (on('TOURNAMENTS') && d.matches.length) {
+    const cups = [...new Set(d.matches.map((m) => m.cup))];
+    cards.push(card(T.tdMatches(d.matches.length), d.matches.slice(0, 3).map(at),
+      () => go('cups', () => { cupId = cups.length === 1 ? cups[0] : null; cupTab = 'matches'; })));
+  }
+  if (on('SCHOOL') && d.lessons.length) cards.push(card(T.tdLessons(d.lessons.length), d.lessons.slice(0, 3).map(at)));
+  if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text)));
+  if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
+  const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)),
+    h('div.cards', cards), cards.length === 1 && !d.bookings ? h('p.dim', T.tdNothing) : null);
+}
+
+/** Scarica [text] come file CSV (col BOM: il foglio di calcolo riconosce le lettere accentate). */
+function saveCsv(name, rows) {
+  const cell = (v) => { const t = String(v ?? ''); return /[";\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+  const text = '\uFEFF' + rows.map((r) => r.map(cell).join(';')).join('\r\n') + '\r\n';
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+  const a = h('a', { href: url, download: name + '.csv' });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+/** L'intestazione che compare solo sulla carta: circolo, cosa e quando. */
+const printHead = (what) => h('div.printonly.phead', h('b', info.club), ' · ', h('span.what', what), ' · ', dateText(info.today));
+
+/** Apre un PDF del telefono in una scheda nuova (o lo scarica, se il browser blocca la scheda). */
+async function openPdf(path, name) {
+  const w = window.open('', '_blank');
+  try {
+    const blob = await api('GET', path, undefined, true);
+    const url = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+    if (w) w.location.href = url;
+    else { const a = h('a', { href: url, download: name + '.pdf' }); document.body.append(a); a.click(); a.remove(); }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { if (w) w.close(); toast(errText(e)); }
 }
 
 // --- Soci ---
@@ -583,25 +1428,42 @@ function issueTag(i) {
   return h('span.tag.' + (bad ? 'bad' : 'warn'), T.issue[i] || i);
 }
 
+const MEDICAL = ['NO_MEDICAL', 'MEDICAL_EXPIRED', 'MEDICAL_SOON'];
+let shownPeople = [];
+
+/** L'elenco che si vede, per il foglio di calcolo: le colonne si reimportano con Importa da CSV. */
+function exportPeople() {
+  const head = [T.csvLastName || T.lastName, T.firstName, T.nickname, T.phone, T.email, T.birth, T.isMember, T.since, T.number, T.fitp, T.fitpYear, T.ranking, T.medical, T.owed];
+  const money = (c) => (c ? (c / 100).toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '');
+  saveCsv(T.members + ' ' + info.today, [head].concat(shownPeople.map((p) => [p.lastName, p.firstName, p.nickname, p.phone, p.email, dateText(p.birth),
+    p.member ? T.yes : T.no, dateText(p.since), p.number, p.fitpNumber, p.fitpYear || '', p.ranking, dateText(p.medicalUntil), money(p.owedCents)])));
+}
+
 async function showPeople() {
   people = await api('GET', '/people');
   const body = h('div');
   const search = h('input', { type: 'search', placeholder: T.search, 'aria-label': T.search, value: filter.text, oninput: () => { filter.text = search.value; list(); } });
-  const kind = select([['members', T.onlyMembers], ['todo', T.todo], ['all', T.everyone]], filter.kind);
+  const kind = select([['members', T.onlyMembers], ['todo', T.todo], ['medical', T.medicalTodo], ['owing', T.owing], ['all', T.everyone]], filter.kind);
   kind.addEventListener('change', () => { filter.kind = kind.value; list(); });
+  const ph = printHead('');
   function list() {
     const q = filter.text.trim().toLowerCase();
-    const rows = people.filter((p) => (filter.kind === 'all' || (p.member && (filter.kind === 'members' || p.issues.length)))
+    const rows = people.filter((p) => (filter.kind === 'all' || (filter.kind === 'owing' ? p.owedCents > 0
+      : filter.kind === 'medical' ? p.member && p.issues.some((i) => MEDICAL.includes(i)) : p.member && (filter.kind === 'members' || p.issues.length)))
       && (!q || [p.name, p.firstName, p.lastName, p.phone, p.email, p.fitpNumber, p.number].some((x) => (x || '').toLowerCase().includes(q))));
-    body.replaceChildren(rows.length ? h('div.panel', h('table',
+    shownPeople = rows;
+    ph.querySelector('.what').textContent = T.members + ' · ' + kind.selectedOptions[0].textContent;
+    put(body, rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.name, T.phone, T.email, T.fitp, T.medical, T.status].map((x) => h('th', { scope: 'col' }, x)), h('th.num', { scope: 'col' }, T.owed))),
       h('tbody', rows.map((p) => h('tr.row', { tabindex: 0, onclick: () => editPerson(p), onkeydown: (e) => { if (e.key === 'Enter') editPerson(p); } },
         h('td', p.name), h('td.nowrap', p.phone), h('td', p.email), h('td', p.fitpNumber, p.ranking ? h('span.dim', ' · ' + p.ranking) : null), h('td', dateText(p.medicalUntil)),
         h('td', p.member ? (p.issues.length ? p.issues.map(issueTag) : h('span.tag.ok', T.inOrder)) : h('span.dim', T.notMember)),
         h('td.num', p.owedCents ? eur(p.owedCents) : '')))))) : h('div.panel', h('div.empty', people.length ? T.noResults : T.noPeople)));
   }
-  main().replaceChildren(
-    h('div.head', h('h1', T.members), h('button', { onclick: importDialog }, T.importCsv), h('button.primary', { onclick: () => editPerson(null) }, T.newMember)),
+  put(main(), 
+    h('div.head', h('h1', T.members), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: exportPeople }, T.exportCsv),
+      h('button', { onclick: importDialog }, T.importCsv), h('button.primary', { onclick: () => editPerson(null) }, T.newMember)),
+    ph,
     h('div.tools', search, kind), body);
   list();
 }
@@ -649,20 +1511,20 @@ function importDialog() {
   let text = null;
   input.addEventListener('change', async () => {
     text = null;
-    area.replaceChildren();
+    put(area, );
     if (!input.files[0]) return;
-    if (input.files[0].size > 900 * 1024) { area.replaceChildren(h('div.err', T.err.TOO_BIG)); return; }
+    if (input.files[0].size > 900 * 1024) { put(area, h('div.err', T.err.TOO_BIG)); return; }
     try {
       const body = { text: await readFile(input.files[0]) };
       const r = await api('POST', '/people/import/preview', body);
       text = body.text;
       const good = r.rows.filter((x) => !x.error);
-      area.replaceChildren(
+      put(area, 
         h('p', T.importSummary(good.filter((x) => !x.update).length, good.filter((x) => x.update).length, r.rows.length - good.length)),
         h('div.panel', h('table', h('thead', h('tr', [T.line, T.name, T.phone, T.email, T.birth, T.fitp, ''].map((x) => h('th', x)))),
           h('tbody', r.rows.slice(0, 200).map((x) => h('tr', h('td.dim', x.line), h('td', x.firstName + ' ' + x.lastName), h('td', x.phone), h('td', x.email), h('td', dateText(x.birth)), h('td', x.fitp),
             h('td', x.error ? h('span.tag.bad', T.rowErr[x.error]) : h('span.tag.' + (x.update ? 'warn' : 'ok'), x.update ? T.willUpdate : T.willAdd))))))));
-    } catch (e) { area.replaceChildren(h('div.err', e instanceof ApiError ? errText(e) : String(e))); }
+    } catch (e) { put(area, h('div.err', e instanceof ApiError ? errText(e) : String(e))); }
   });
   dialog(T.importCsv, h('div', h('p.dim', T.importHint), input, area), async (err) => {
     if (text === null) { err.textContent = T.chooseFile; return false; }
@@ -675,31 +1537,59 @@ function importDialog() {
 // --- Quote e pagamenti ---
 
 let moneyYear = null;
-let moneyFilter = 'open';
+let moneyFilter = { type: '', show: 'open', text: '' };
 
 const STATUS = { PAID: 'ok', PARTIAL: 'warn', UNPAID: 'warn', LATE: 'bad', CANCELLED: 'dim' };
 
+let lastMoney = null;
+
 async function showMoney() {
   const m = await api('GET', '/money' + (moneyYear ? '?year=' + moneyYear : ''));
+  lastMoney = m;
   moneyYear = m.year;
   const year = h('input', { type: 'number', min: 2000, max: 2100, value: m.year, 'aria-label': T.year, onchange: () => { moneyYear = Number(year.value) || m.year; showMoney(); } });
   year.classList.add('year');
-  const show = select([['open', T.toCollect], ['all', T.allCharges]], moneyFilter);
-  show.addEventListener('change', () => { moneyFilter = show.value; showMoney(); });
-  const rows = m.charges.filter((c) => moneyFilter === 'all' || c.leftCents > 0);
-  main().replaceChildren(
-    h('div.head', h('h1', T.money), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
+  // Tipologia: i tipi di quota presenti, gli addebiti singoli, poi le quote una per una.
+  const KINDS = [['COURT', T.kindCourt]].concat(FEE_KINDS());
+  const types = [['', T.allTypes]].concat(KINDS.filter(([k]) => m.charges.some((c) => c.type === k)).map(([k, l]) => ['k:' + k, l]));
+  m.fees.forEach((f) => types.push(['f:' + f.id, '› ' + f.name]));
+  if (!types.some(([v]) => v === moneyFilter.type)) moneyFilter.type = '';
+  const type = select(types, moneyFilter.type);
+  type.setAttribute('aria-label', T.type);
+  type.addEventListener('change', () => { moneyFilter.type = type.value; list(); });
+  const show = select([['open', T.toCollect], ['late', T.chargeStatus.LATE], ['paid', T.paidOnes], ['all', T.allCharges]], moneyFilter.show);
+  show.setAttribute('aria-label', T.status);
+  show.addEventListener('change', () => { moneyFilter.show = show.value; list(); });
+  const search = h('input', { type: 'search', placeholder: T.searchCharge, 'aria-label': T.searchCharge, value: moneyFilter.text, oninput: () => { moneyFilter.text = search.value; list(); } });
+  const body = h('div');
+  const pick = (f) => { moneyFilter.type = 'f:' + f.id; moneyFilter.show = 'all'; type.value = moneyFilter.type; show.value = 'all'; list(); window.scrollTo(0, 0); };
+  function list() {
+    const t = moneyFilter.type, q = moneyFilter.text.trim().toLowerCase();
+    const rows = m.charges.filter((c) => (!t || (t.startsWith('k:') ? c.type === t.slice(2) : c.fee === t.slice(2)))
+      && ({ open: c.leftCents > 0 && c.status !== 'CANCELLED', late: c.status === 'LATE', paid: c.status === 'PAID', all: true })[moneyFilter.show]
+      && (!q || [c.name, c.label].some((x) => (x || '').toLowerCase().includes(q))));
+    const left = rows.reduce((a, c) => a + (c.status === 'CANCELLED' ? 0 : c.leftCents), 0);
+    const filtered = t || q || moneyFilter.show !== 'open';
+    put(body, 
+      rows.length && filtered ? h('p.dim', T.shown(rows.length, eur(left))) : null,
+      rows.length ? h('div.panel', h('table',
+        h('thead', h('tr', [T.name, T.what, T.due, T.status].map((x) => h('th', { scope: 'col' }, x)), h('th.num', T.amount), h('th.num', T.left))),
+        h('tbody', rows.map((c) => h('tr.row', { tabindex: 0, onclick: () => openCharge(c, m), onkeydown: (e) => { if (e.key === 'Enter') openCharge(c, m); } },
+          h('td', c.name), h('td', c.label), h('td', dateText(c.due)), h('td', h('span.tag.' + STATUS[c.status], T.chargeStatus[c.status])), h('td.num', eur(c.cents)), h('td.num', eur(c.leftCents))))))) : h('div.panel', h('div.empty', filtered && m.charges.length ? T.noResults : T.noCharges)));
+  }
+  put(main(), 
+    h('div.head', h('h1', T.money), h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => exportCsv(m.year) }, T.exportCsv), h('button', { onclick: () => newCharge() }, T.newCharge), h('button.primary', { onclick: () => newFee() }, T.newFee)),
     h('div.kpis',
       h('div.kpi', h('b', eur(m.incomeCents)), h('span', T.income(m.year))),
       h('div.kpi', h('b', eur(m.openCents)), h('span', T.open)),
       h('div.kpi', h('b', m.openPeople), h('span', T.openPeople))),
-    h('div.tools', show, h('label', T.year + ' ', year)),
-    rows.length ? h('div.panel', h('table',
-      h('thead', h('tr', [T.name, T.what, T.due, T.status].map((x) => h('th', { scope: 'col' }, x)), h('th.num', T.amount), h('th.num', T.left))),
-      h('tbody', rows.map((c) => h('tr.row', { tabindex: 0, onclick: () => openCharge(c, m), onkeydown: (e) => { if (e.key === 'Enter') openCharge(c, m); } },
-        h('td', c.name), h('td', c.label), h('td', dateText(c.due)), h('td', h('span.tag.' + STATUS[c.status], T.chargeStatus[c.status])), h('td.num', eur(c.cents)), h('td.num', eur(c.leftCents))))))) : h('div.panel', h('div.empty', T.noCharges)),
-    m.fees.length ? h('div.section', h('h2', T.fees), h('div.panel', h('table', h('thead', h('tr', h('th', T.name), h('th', T.due), h('th.num', T.amount), h('th.num', T.paidOf))),
-      h('tbody', m.fees.map((f) => h('tr', h('td', f.name), h('td', dateText(f.due)), h('td.num', eur(f.cents)), h('td.num', f.paid + ' / ' + f.total))))))) : null);
+    printHead(T.money),
+    h('div.tools', search, type, show, h('label', T.year + ' ', year)),
+    body,
+    m.fees.length ? h('div.section', h('h2', T.fees), h('p.dim', T.feesHint), h('div.panel', h('table', h('thead', h('tr', h('th', T.name), h('th', T.due), h('th.num', T.amount), h('th.num', T.paidOf))),
+      h('tbody', m.fees.map((f) => h('tr.row', { tabindex: 0, onclick: () => pick(f), onkeydown: (e) => { if (e.key === 'Enter') pick(f); } },
+        h('td', f.name), h('td', dateText(f.due)), h('td.num', eur(f.cents)), h('td.num', f.paid + ' / ' + f.total))))))) : null);
+  list();
 }
 
 function openCharge(c, m) {
@@ -709,6 +1599,8 @@ function openCharge(c, m) {
   const ref = h('input', { maxlength: 120 });
   const history = c.payments.length ? h('div.full', h('h2', T.payments), h('div.panel', h('table', h('tbody', c.payments.map((p) => h('tr',
     h('td', dateText(p.date)), h('td', p.method), h('td.dim', p.receipt), h('td.dim', p.ref), h('td.num', eur(p.cents)),
+    h('td.num', h('button', { type: 'button', onclick: () => openPdf('/charges/' + encodeURIComponent(c.id) + '/payments/' + encodeURIComponent(p.id) + '/receipt',
+      T.receipt + ' ' + p.receipt.replace('/', '-') + ' ' + c.name) }, T.receipt)),
     h('td.num', h('button.danger', { type: 'button', onclick: async () => {
       if (!confirm(T.removePaymentAsk)) return;
       try { await api('DELETE', '/charges/' + encodeURIComponent(c.id) + '/payments/' + encodeURIComponent(p.id)); d.close(); toast(T.saved); await showMoney(); } catch (e) { toast(errText(e)); }
@@ -728,14 +1620,19 @@ function openCharge(c, m) {
     await api('POST', '/charges/' + encodeURIComponent(c.id) + '/pay', { cents: v, date: date.value, type: type.value, ref: ref.value });
     toast(T.saved);
     await showMoney();
+    // Riaperta subito: c'è il pagamento nuovo col tasto Ricevuta.
+    const again = lastMoney && lastMoney.charges.find((x) => x.id === c.id);
+    if (again) setTimeout(() => openCharge(again, lastMoney), 0);
   } : null, { saveText: T.register, left: cancel });
 }
+
+const FEE_KINDS = () => [['MEMBERSHIP', T.kindMembership], ['FITP', T.kindFitp], ['COURSE', T.kindCourse], ['TOURNAMENT', T.kindTournament], ['OTHER', T.kindOther]];
 
 function newFee() {
   const name = h('input', { required: true, maxlength: 120 });
   const amount = h('input', { required: true, inputmode: 'decimal' });
   const due = h('input', { type: 'date' });
-  const kind = select([['MEMBERSHIP', T.kindMembership], ['FITP', T.kindFitp], ['COURSE', T.kindCourse], ['TOURNAMENT', T.kindTournament], ['OTHER', T.kindOther]], 'MEMBERSHIP');
+  const kind = select(FEE_KINDS(), 'MEMBERSHIP');
   const all = h('input', { type: 'checkbox', checked: true });
   dialog(T.newFee, h('div.form', field(T.name, name, 'full'), field(T.amount, amount), field(T.due, due), field(T.kind, kind), h('label.check.full', all, T.chargeAll)), async () => {
     const v = cents(amount.value);
@@ -752,10 +1649,11 @@ async function newCharge() {
   const label = h('input', { required: true, maxlength: 120 });
   const amount = h('input', { required: true, inputmode: 'decimal' });
   const due = h('input', { type: 'date' });
-  dialog(T.newCharge, h('div.form', field(T.name, who, 'full'), field(T.what, label, 'full'), field(T.amount, amount), field(T.due, due)), async () => {
+  const kind = select(FEE_KINDS(), 'OTHER');
+  dialog(T.newCharge, h('div.form', field(T.name, who, 'full'), field(T.what, label, 'full'), field(T.amount, amount), field(T.due, due), field(T.kind, kind)), async () => {
     const v = cents(amount.value);
     if (v === null) throw new Error(T.err.BAD_AMOUNT);
-    await api('POST', '/charges', { player: who.value, label: label.value, cents: v, due: due.value || null });
+    await api('POST', '/charges', { player: who.value, label: label.value, cents: v, due: due.value || null, kind: kind.value });
     toast(T.saved);
     await showMoney();
   });
@@ -776,59 +1674,134 @@ async function exportCsv(year) {
 let planDate = null;
 const ROW = 22;
 
+let planView = 'day';
+let planCourt = null;
+
+/** Il lunedì della settimana di [d] e il primo del mese, come date "aaaa-mm-gg". */
+function monday(d) { const t = new Date(d + 'T12:00:00'); return addDay(d, -((t.getDay() + 6) % 7)); }
+function addMonth(d, n) { const t = new Date(d + 'T12:00:00'); t.setDate(1); t.setMonth(t.getMonth() + n); return addDay(t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-01', 0); }
+
 async function showPlan() {
-  const d = await api('GET', '/day?date=' + planDate);
   if (!people.length) people = await api('GET', '/people');
-  const label = new Date(planDate + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const step = { day: (n) => addDay(planDate, n), week: (n) => addDay(planDate, 7 * n), month: (n) => addMonth(planDate, n) }[planView];
   const date = h('input', { type: 'date', value: planDate, 'aria-label': T.date, onchange: () => { if (date.value) { planDate = date.value; showPlan(); } } });
   date.classList.add('year');
-  const head = h('div.head', h('h1', label),
-    h('button', { onclick: () => { planDate = addDay(planDate, -1); showPlan(); }, 'aria-label': T.prevDay }, '←'),
+  const views = h('div.seg', { role: 'group', 'aria-label': T.planView }, [['day', T.viewDay], ['week', T.viewWeek], ['month', T.viewMonth]].map(([v, l]) =>
+    h('button' + (v === planView ? '.on' : ''), { type: 'button', 'aria-pressed': v === planView ? 'true' : 'false', onclick: () => { planView = v; showPlan(); } }, l)));
+  const head = (title, d, extra) => h('div.head', h('h1', title),
+    h('button', { onclick: () => { planDate = step(-1); showPlan(); }, 'aria-label': T.prev, title: T.prev }, '←'),
     h('button', { onclick: () => { planDate = info.today; showPlan(); } }, T.today),
-    h('button', { onclick: () => { planDate = addDay(planDate, 1); showPlan(); }, 'aria-label': T.nextDay }, '→'), date);
-  if (!d.courts.length) { main().replaceChildren(head, h('div.panel', h('div.empty', T.noCourts))); return; }
+    h('button', { onclick: () => { planDate = step(1); showPlan(); }, 'aria-label': T.next, title: T.next }, '→'), date, views, extra,
+    h('button', { onclick: () => blocksDialog(d) }, T.blkShort), h('button', { onclick: () => window.print() }, T.print));
+  const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
+
+  if (planView === 'month') {
+    const m = await api('GET', '/month?date=' + planDate);
+    const title = long(m.first, { month: 'long', year: 'numeric' });
+    const lead = (new Date(m.first + 'T12:00:00').getDay() + 6) % 7;
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
+    for (const x of m.days) {
+      const n = Number(x.date.slice(8));
+      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : ''), {
+        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+      }, h('b', n),
+      x.bookings ? h('span', T.nBookings(x.bookings)) : null,
+      x.matches ? h('span', '🏆 ' + x.matches) : null,
+      x.blocked >= 100 ? h('span.dim', T.blkShort) : x.blocked ? h('span.dim', T.blkShort + ' ' + x.blocked + '%') : null,
+      h('i.bar', h('i', { style: 'width:' + x.busy + '%' }))));
+    }
+    const names = [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k)));
+    put(main(), head(title, { courts: m.courts }), printHead(T.plan + ' · ' + title),
+      h('div.panel', h('div.month', names, cells)), h('p.dim.noprint', T.monthHint));
+    return;
+  }
+
+  // Giorno e settimana: la stessa griglia, una colonna per campo (e per giorno).
+  let d, days, title;
+  if (planView === 'week') {
+    const w = await api('GET', '/week?date=' + planDate);
+    d = w; days = w.days;
+    title = long(w.from, { day: 'numeric', month: 'short' }) + ' – ' + long(addDay(w.from, 6), { day: 'numeric', month: 'short', year: 'numeric' });
+  } else {
+    d = await api('GET', '/day?date=' + planDate);
+    days = [d];
+    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  // In settimana con tanti campi se ne guarda uno alla volta, se no non si legge.
+  let courts = d.courts;
+  let pickCourt = null;
+  if (planView === 'week' && d.courts.length > 3) {
+    if (!d.courts.includes(planCourt)) planCourt = d.courts[0];
+    courts = [planCourt];
+    pickCourt = select(d.courts.map((c) => [c, c]), planCourt);
+    pickCourt.setAttribute('aria-label', T.court);
+    pickCourt.addEventListener('change', () => { planCourt = pickCourt.value; showPlan(); });
+  }
+  if (!d.courts.length) { put(main(), head(title, d), h('div.panel', h('div.empty', T.noCourts))); return; }
+  const cols = days.flatMap((x) => courts.map((c) => ({ date: x.date, court: c })));
+  const week = planView === 'week';
+  const two = week && courts.length > 1;
+  const heads = two ? 2 : 1;
   const slot = d.slotMinutes;
   const open = d.openHour * 60, close = d.closeHour * 60;
   const rows = Math.ceil((close - open) / slot);
-  const grid = h('div.grid');
-  grid.style.gridTemplateColumns = '56px repeat(' + d.courts.length + ', minmax(110px, 1fr))';
-  grid.style.gridTemplateRows = 'auto repeat(' + rows + ', ' + Math.max(ROW, Math.round(ROW * slot / 30)) + 'px)';
-  const put = (e, row, col, span, cols) => { e.style.gridRow = row + ' / span ' + span; e.style.gridColumn = col + ' / span ' + (cols || 1); grid.append(e); };
-  put(h('div'), 1, 1, 1);
-  d.courts.forEach((c, i) => put(h('div.gcourt', c), 1, i + 2, 1));
+  const grid = h('div.grid' + (week ? '.week' : ''));
+  grid.style.gridTemplateColumns = '56px repeat(' + cols.length + ', minmax(' + (week ? (courts.length > 1 ? 54 : 96) : 110) + 'px, 1fr))';
+  grid.style.gridTemplateRows = 'repeat(' + heads + ', auto) repeat(' + rows + ', ' + Math.max(ROW, Math.round(ROW * slot / 30)) + 'px)';
+  const place = (e, row, col, span, colSpan) => { e.style.gridRow = row + ' / span ' + span; e.style.gridColumn = col + ' / span ' + (colSpan || 1); grid.append(e); };
+  place(h('div'), 1, 1, heads);
+  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : ''), {
+    type: 'button', title: T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+  }, long(x.date, { weekday: 'short', day: 'numeric' })), 1, 2 + i * courts.length, 1, courts.length));
+  if (!week || two) cols.forEach((c, i) => place(h('div.gcourt' + (two ? '.small' : ''), c.court), heads, i + 2, 1));
   for (let r = 0; r < rows; r++) {
     const start = open + r * slot;
-    put(h('div.ghour', hhmm(start)), r + 2, 1, 1);
-    d.courts.forEach((c, i) => put(h('button.gcell', { type: 'button', 'aria-label': c + ' ' + hhmm(start), title: hhmm(start), onclick: () => newBooking(d, c, start) }), r + 2, i + 2, 1));
+    place(h('div.ghour', hhmm(start)), r + 1 + heads, 1, 1);
+    cols.forEach((c, i) => place(h('button.gcell' + (week && i % courts.length === 0 ? '.dayline' : ''), {
+      type: 'button', 'aria-label': c.date + ' ' + c.court + ' ' + hhmm(start), title: c.court + ' ' + hhmm(start),
+      onclick: () => { planDate = c.date; bookingDialog(d, c.court, start, null); },
+    }), r + 1 + heads, i + 2, 1));
   }
-  for (const it of d.items) {
-    const from = Math.max(0, Math.floor((it.startMin - open) / slot));
-    const span = Math.max(1, Math.ceil((Math.min(it.endMin, close) - open) / slot) - from);
-    if (from >= rows) continue;
-    const text = [hhmm(it.startMin) + '–' + hhmm(it.endMin), it.label || (it.kind ? T.bookingKind[it.kind] : '')].filter(Boolean).join(' ');
-    const all = it.court === '';
-    const col = all ? 2 : d.courts.indexOf(it.court) + 2;
-    if (col < 2) continue;
-    const cls = 'button.gitem.' + it.type + (it.online ? '.online' : '');
-    put(h(cls, { type: 'button', title: text, onclick: it.type === 'BOOKING' ? () => openBooking(it) : null }, text), from + 2, col, span, all ? d.courts.length : 1);
+  for (const x of days) {
+    const first = cols.findIndex((c) => c.date === x.date);
+    for (const it of x.items) {
+      const from = Math.max(0, Math.floor((it.startMin - open) / slot));
+      const span = Math.max(1, Math.ceil((Math.min(it.endMin, close) - open) / slot) - from);
+      if (from >= rows) continue;
+      const all = it.court === '';
+      const ci = all ? first : cols.findIndex((c) => c.date === x.date && c.court === it.court);
+      if (ci < 0) continue;
+      const what = it.type === 'BLOCK' ? it.label || blockReason(it.reason) : it.type === 'TOURNAMENT' ? it.label + ' · ' + it.note : it.label || (it.kind ? T.bookingKind[it.kind] : '');
+      const text = [hhmm(it.startMin) + '–' + hhmm(it.endMin), what, it.series ? '↻' : ''].filter(Boolean).join(' ');
+      const click = it.type === 'BOOKING' ? () => { planDate = x.date; bookingDialog(d, it.court, it.startMin, it); }
+        : it.type === 'TOURNAMENT' ? () => go('cups', () => { cupId = it.cup; cupTab = 'matches'; cupOpenMatch = it.id; })
+          : it.editable ? () => editBlock(d, it.id) : () => toast(T.blkManaged);
+      const cls = 'button.gitem.' + it.type + (it.online ? '.online' : '');
+      place(h(cls, { type: 'button', title: text, onclick: click }, week && courts.length > 1 ? (what || text) : text), from + 1 + heads, ci + 2, span, all ? courts.length : 1);
+    }
   }
-  main().replaceChildren(head, h('div.panel', grid));
+  put(main(), head(title, d, pickCourt), printHead(T.plan + ' · ' + title + (pickCourt ? ' · ' + planCourt : '')), h('div.panel', grid));
 }
 
-function newBooking(d, court, start) {
+/** Una prenotazione: nuova (anche ogni settimana) o, con [it], da cambiare o cancellare. */
+function bookingDialog(d, court, start, it) {
   const courtS = select(d.courts.map((c) => [c, c]), court);
   const times = [];
   for (let m = d.openHour * 60; m < d.closeHour * 60; m += d.slotMinutes) times.push([String(m), hhmm(m)]);
+  if (!times.some(([v]) => v === String(start))) times.push([String(start), hhmm(start)]), times.sort((a, b) => a[0] - b[0]);
   const startS = select(times, String(start));
   const lengths = [];
   for (let m = d.slotMinutes; m <= 240; m += d.slotMinutes) lengths.push([String(m), m + ' min']);
-  const dur = select(lengths, String(lengths.some(([v]) => v === '60') ? 60 : d.slotMinutes));
-  const kind = select(Object.entries(T.bookingKind));
+  const was = it ? it.endMin - it.startMin : 0;
+  if (was && !lengths.some(([v]) => v === String(was))) lengths.push([String(was), was + ' min']), lengths.sort((a, b) => a[0] - b[0]);
+  const dur = select(lengths, String(was || (lengths.some(([v]) => v === '60') ? 60 : d.slotMinutes)));
+  const kind = select(Object.entries(T.bookingKind), it ? it.kind : 'PLAY');
   const price = h('span');
   const who = h('input', { list: 'desk-people', placeholder: T.addPlayer });
   const list = h('datalist', { id: 'desk-people' }, people.map((p) => h('option', { value: p.name })));
   const chips = h('div.chips full');
-  const picked = [];
+  const picked = it ? it.players.map((id) => ({ id, name: (people.find((p) => p.id === id) || {}).name || id })).concat(it.names.map((n) => ({ name: n }))) : [];
   function add() {
     const n = who.value.trim();
     if (!n) return;
@@ -836,10 +1809,12 @@ function newBooking(d, court, start) {
     who.value = '';
     drawChips();
   }
-  function drawChips() { chips.replaceChildren(...picked.map((p, i) => h('button.chip', { type: 'button', title: T.remove, onclick: () => { picked.splice(i, 1); drawChips(); } }, p.name + ' ×'))); }
+  function drawChips() { put(chips, ...picked.map((p, i) => h('button.chip', { type: 'button', title: T.remove, onclick: () => { picked.splice(i, 1); drawChips(); } }, p.name + ' ×'))); }
+  drawChips();
   who.addEventListener('change', add);
-  const charge = h('input', { type: 'checkbox' });
-  const note = h('input', { maxlength: 500 });
+  const charge = h('input', { type: 'checkbox', checked: it && it.charged });
+  const note = h('input', { maxlength: 500, value: it ? it.note : '' });
+  const weeks = select([['1', T.onlyOnce]].concat([2, 4, 8, 12, 16, 26, 52].map((n) => [String(n), T.weeksN(n)])), '1');
   async function quote() {
     try {
       const q = await api('GET', '/quote?date=' + planDate + '&court=' + encodeURIComponent(courtS.value) + '&startMin=' + startS.value + '&minutes=' + dur.value + '&kind=' + kind.value);
@@ -848,34 +1823,389 @@ function newBooking(d, court, start) {
   }
   [courtS, startS, dur, kind].forEach((e) => e.addEventListener('change', quote));
   quote();
-  dialog(T.newBooking + ' · ' + dateText(planDate), h('div.form', list, field(T.court, courtS), field(T.start, startS), field(T.duration, dur), field(T.kind, kind),
-    h('label.full', T.players, who), chips, field(T.note, note, 'full'), h('label.check.full', charge, T.chargeSplit), h('div.full', T.price + ': ', price)), async () => {
+  const remove = it && h('button.danger.left', { type: 'button', onclick: () => deleteBooking(it, dlg) }, T.deleteBooking);
+  const dlg = dialog((it ? it.court + ' · ' + hhmm(it.startMin) + '–' + hhmm(it.endMin) : T.newBooking) + ' · ' + dateText(planDate), h('div.form', list,
+    field(T.court, courtS), field(T.start, startS), field(T.duration, dur), field(T.kind, kind),
+    h('label.full', T.players, who), chips, field(T.note, note, 'full'),
+    it ? (it.series ? h('p.full.dim', T.seriesEditHint) : null) : field(T.repeat, weeks, 'full'),
+    it && it.online ? h('p.full.dim', T.onlineEditHint) : null,
+    h('label.check.full', charge, T.chargeSplit), h('div.full', T.price + ': ', price)), async () => {
     add();
-    await api('POST', '/bookings', { court: courtS.value, date: planDate, startMin: Number(startS.value), minutes: Number(dur.value), kind: kind.value,
-      players: picked.filter((p) => p.id).map((p) => p.id), names: picked.filter((p) => !p.id).map((p) => p.name), note: note.value, charge: charge.checked });
+    const body = { court: courtS.value, date: planDate, startMin: Number(startS.value), minutes: Number(dur.value), kind: kind.value,
+      players: picked.filter((p) => p.id).map((p) => p.id), names: picked.filter((p) => !p.id).map((p) => p.name), note: note.value, charge: charge.checked,
+      weeks: Number(weeks.value) };
+    const out = it ? await api('PUT', '/bookings/' + encodeURIComponent(it.id), body) : await api('POST', '/bookings', body);
     toast(T.saved);
     await showPlan();
+    if (out.skipped && out.skipped.length) alert(T.skippedDays(out.skipped.map(dateText).join(', ')));
+  }, { left: remove });
+}
+
+/** Cancella: da sola o, se è ripetuta ogni settimana, anche con quelle dopo. */
+function deleteBooking(it, parent) {
+  const run = async (series) => {
+    try {
+      await api('DELETE', '/bookings/' + encodeURIComponent(it.id) + (series ? '?series=1' : ''));
+      ask.close(); parent.close(); toast(T.saved); await showPlan();
+    } catch (e) { toast(errText(e)); }
+  };
+  const ask = dialog(T.deleteBooking, h('p', it.series ? T.deleteSeriesAsk : T.deleteBookingAsk), null, {
+    left: it.series ? [h('button.danger.left', { type: 'button', onclick: () => run(false) }, T.onlyThis), h('button.danger', { type: 'button', onclick: () => run(true) }, T.thisAndNext)]
+      : h('button.danger.left', { type: 'button', onclick: () => run(false) }, T.deleteBooking),
   });
 }
 
-function openBooking(it) {
-  const remove = h('button.danger.left', { type: 'button', onclick: async () => {
-    if (!confirm(T.deleteBookingAsk)) return;
-    try { await api('DELETE', '/bookings/' + encodeURIComponent(it.id)); d.close(); toast(T.saved); await showPlan(); } catch (e) { toast(errText(e)); }
-  } }, T.deleteBooking);
-  const d = dialog(it.court + ' · ' + hhmm(it.startMin) + '–' + hhmm(it.endMin), h('div',
-    h('p', it.label || T.bookingKind[it.kind]), it.note ? h('p.dim', it.note) : null, h('p.dim', T.price + ': ' + eur(it.cents) + (it.online ? ' · online' : ''))), null, { left: remove });
+// --- Campi non prenotabili ---
+
+const blockReason = (r) => ({ COURSE: T.blkCourse, TOURNAMENT: T.blkTournament, MAINTENANCE: T.blkMaintenance, OTHER: T.bkOther })[r] || '';
+/** Lunedì = 1, come nell'app. */
+const weekdayName = (n) => new Date(2024, 0, n, 12).toLocaleDateString(locale(), { weekday: 'short' });
+const blockLine = (b) => [blockReason(b.reason), b.weekdays.length ? b.weekdays.map(weekdayName).join(' ') : T.blkEveryDay,
+  b.startMin === 0 && b.endMin === 1440 ? T.blkAllDay : hhmm(b.startMin) + '–' + hhmm(b.endMin), b.courts.length ? b.courts.join(', ') : T.blkAllCourts,
+  b.from === b.to ? dateText(b.from) : dateText(b.from) + ' – ' + dateText(b.to)].join(' · ');
+
+async function blocksDialog(d) {
+  let list;
+  try { list = await api('GET', '/blocks'); } catch (e) { toast(errText(e)); return; }
+  const dlg = dialog(T.blkTitle, h('div',
+    h('p.dim', T.blkHint),
+    list.length ? h('div.panel', h('table', h('tbody', list.map((b) => h('tr' + (b.editable ? '.row' : ''), b.editable ? { tabindex: 0, onclick: () => { dlg.close(); blockDialog(d, b); } } : {},
+      h('td', h('b', b.label || blockReason(b.reason)), h('div.dim', blockLine(b)), b.editable ? null : h('div.dim', T.blkManaged))))))) : h('p.dim', T.blkNone)),
+  null, { left: h('button.primary.left', { type: 'button', onclick: () => { dlg.close(); blockDialog(d, null); } }, T.blkNew), wide: true });
+}
+
+async function editBlock(d, id) {
+  try { const b = (await api('GET', '/blocks')).find((x) => x.id === id); if (b) blockDialog(d, b); } catch (e) { toast(errText(e)); }
+}
+
+function blockDialog(d, b) {
+  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440 };
+  const label = h('input', { maxlength: 40, value: v.label });
+  const reason = select([['MAINTENANCE', T.blkMaintenance], ['TOURNAMENT', T.blkTournament], ['OTHER', T.bkOther]], v.reason);
+  const all = h('input', { type: 'checkbox', checked: !v.courts.length });
+  const courts = d.courts.map((c) => [c, h('input', { type: 'checkbox', checked: v.courts.includes(c) })]);
+  const courtBox = h('div.full.checks', courts.map(([c, x]) => h('label.check', x, c)));
+  const from = h('input', { type: 'date', value: v.from, required: true }), to = h('input', { type: 'date', value: v.to, required: true });
+  const days = [1, 2, 3, 4, 5, 6, 7].map((n) => [n, h('input', { type: 'checkbox', checked: v.weekdays.includes(n) })]);
+  const allDay = h('input', { type: 'checkbox', checked: v.startMin === 0 && v.endMin === 1440 });
+  const t1 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 15 * 60 : v.startMin), step: 300 });
+  const t2 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 18 * 60 : Math.min(v.endMin, 1439)), step: 300 });
+  const f1 = field(T.blkStart, t1), f2 = field(T.blkEnd, t2);
+  function update() { courtBox.hidden = all.checked; f1.hidden = f2.hidden = allDay.checked; }
+  all.addEventListener('change', update); allDay.addEventListener('change', update); update();
+  const del = b && h('button.danger.left', { type: 'button', onclick: async () => {
+    try { await api('DELETE', '/blocks/' + encodeURIComponent(b.id)); dlg.close(); toast(T.saved); await showPlan(); } catch (e) { toast(errText(e)); }
+  } }, T.blkDelete);
+  const dlg = dialog(b ? b.label || T.blkTitle : T.blkNew, h('div.form',
+    field(T.blkLabel, label, 'full'), field(T.kind, reason), h('span'),
+    h('label.check.full', all, T.blkAllCourts), courtBox,
+    field(T.blkFrom, from), field(T.blkTo, to),
+    h('h3', T.blkDays), h('div.full.checks', days.map(([n, x]) => h('label.check', x, weekdayName(n)))), h('p.full.dim', T.blkDaysHint),
+    h('label.check.full', allDay, T.blkAllDay), f1, f2), async () => {
+    const pick = courts.filter(([, x]) => x.checked).map(([c]) => c);
+    const body = {
+      id: b ? b.id : '', label: label.value, reason: reason.value, courts: all.checked ? [] : pick, from: from.value, to: to.value,
+      weekdays: days.filter(([, x]) => x.checked).map(([n]) => n),
+      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'),
+    };
+    if (!all.checked && !pick.length) throw new Error(T.blkPickCourt);
+    await api('POST', '/blocks', body);
+    toast(T.saved);
+    await showPlan();
+  }, { left: del });
 }
 
 // --- Tornei ---
 
+// --- Tornei ---
+
+let cupId = null;
+let cupTab = 'entries';
+let cupShow = 'todo';
+let cupRun = 0;
+/** La partita da aprire appena si apre il torneo (dal Planning). */
+let cupOpenMatch = null;
+
+const PROBLEM = () => ({
+  NOT_MEMBER: T.ctNotMember, NO_MEDICAL: T.ctNoMedical, MEDICAL_NOT_AGONISTIC: T.ctMedicalNotAgonistic, NO_FITP_CARD: T.ctNoFitpCard,
+  NOT_AGONIST_CARD: T.ctNotAgonistCard, RANK_TOO_HIGH: T.ctRankTooHigh, UNPAID: T.ctUnpaid, NO_PLAYER: T.cupNoPlayer,
+});
+const groupLetter = (g) => String.fromCharCode(65 + g);
+const cupDates = (t) => (t.start ? T.ctDates(dateText(t.start), dateText(t.end || t.start)) : '');
+const cupLine = (t) => [t.category, t.kind === 'FITP' ? 'FITP' : T.ctSocial, t.doubles ? T.ctDoubles : T.ctSingles,
+  t.format === 'GROUPS' ? T.ctFormatGroups : T.ctFormatKnockout, cupDates(t)].filter(Boolean).join(' · ');
+const toMin = (v) => { const [a, b] = v.split(':').map(Number); return a * 60 + (b || 0); };
+const shortDay = (d) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+/** Il nome del turno, come nell'app: dal numero di giocatori rimasti. */
+function roundName(t, m) {
+  if (m.round === 0) return T.ctGroup(groupLetter(m.group || 0));
+  const n = t.matches.filter((x) => x.round === m.round).length * 2;
+  return ({ 2: T.ctFinal, 4: T.ctSemi, 8: T.ctQuarter, 16: T.ctLast16, 32: T.ctLast32 })[n] || T.ctRoundN(m.round);
+}
+
+/** Chi ha vinto secondo il punteggio, come nell'app: più set, a pari set più game. */
+function winnerOf(score) {
+  const sets = [...score.replace(/\(\d+\)/g, '').matchAll(/(\d{1,2})\s*[-/]\s*(\d{1,2})/g)].map((x) => [Number(x[1]), Number(x[2])]);
+  if (!sets.length) return null;
+  const a = sets.filter(([x, y]) => x > y).length, b = sets.filter(([x, y]) => y > x).length;
+  if (a !== b) return a > b ? 'a' : 'b';
+  const ga = sets.reduce((n, [x]) => n + x, 0), gb = sets.reduce((n, [, y]) => n + y, 0);
+  return ga === gb ? null : ga > gb ? 'a' : 'b';
+}
+
+const scoreText = (m) => [m.score, m.walkover ? T.ctWalkover : '', m.retired ? T.ctRetired : ''].filter(Boolean).join(' ');
+const whenText = (m) => (m.date ? [shortDay(m.date), m.startMin != null ? hhmm(m.startMin) : '', m.court].filter(Boolean).join(' · ') : '');
+
 async function showCups() {
+  if (cupId) return showCup(cupId);
   const list = await api('GET', '/tournaments');
-  main().replaceChildren(h('div.head', h('h1', T.cups)), h('p.dim', T.cupsNote),
-    list.length ? h('div.cards', list.map((t) => h('div.panel', h('div.pad',
-      h('h2', t.name), h('p.dim', [t.category, t.start ? dateText(t.start) + (t.end ? ' – ' + dateText(t.end) : '') : ''].filter(Boolean).join(' · ')),
-      h('p', T.cupEntries(t.entries.length) + (t.matches ? ' · ' + T.cupPlayed(t.played, t.matches) : '')),
-      t.entries.length ? h('details', h('summary', T.entriesList), h('ul', t.entries.map((e) => h('li', e)))) : null)))) : h('div.panel', h('div.empty', T.noCups)));
+  put(main(), h('div.head', h('h1', T.cups), h('button.primary', { onclick: () => editCup(null) }, T.ctNew)), h('p.dim', T.cupsNote),
+    list.length ? h('div.cards', list.map((t) => h('button.card', { type: 'button', onclick: () => { cupId = t.id; cupTab = t.drawn ? 'draw' : 'entries'; showCup(t.id); } },
+      h('h2', t.name), h('p.dim', cupLine(t)),
+      h('p', T.ctEntriesCount(t.entries.length) + (t.matches ? ' · ' + T.cupPlayed(t.played, t.matches) : '')),
+      h('span.tag.' + (t.champion ? 'ok' : t.drawn ? 'warn' : 'dim'), t.champion ? T.ctChampion(t.champion) : t.drawn ? T.ctRunning : T.ctOpen)))) : h('div.panel', h('div.empty', T.ctNone)));
+}
+
+/** Una chiamata sul torneo aperto, poi la scheda si ridisegna; [onOk] solo se è andata. */
+async function cupDo(method, path, body, onOk) {
+  let ok = true;
+  try { await api(method, '/tournaments/' + encodeURIComponent(cupId) + path, body); toast(T.saved); if (onOk) onOk(); }
+  catch (e) { ok = false; toast(e instanceof ApiError ? errText(e) : String(e.message || e)); }
+  await showCup(cupId);
+  return ok;
+}
+
+async function showCup(id) {
+  // Se nel frattempo è partito un altro aggiornamento, vince quello.
+  const run = ++cupRun;
+  let t;
+  try { t = await api('GET', '/tournaments/' + encodeURIComponent(id)); }
+  catch (e) { if (e instanceof ApiError && e.message === 'NOT_FOUND') { cupId = null; return showCups(); } throw e; }
+  if (cupTab === 'entries') people = await api('GET', '/people');
+  if (run !== cupRun || view !== 'cups') return;
+  cupId = t.id;
+  const names = Object.fromEntries(t.entries.map((e) => [e.id, e.names.join(' / ')]));
+  const who = (x) => (x ? names[x] || '?' : '');
+  const tabs = [['entries', T.ctTabEntries + ' (' + t.entries.length + ')'], ['draw', T.ctTabDraw], ['matches', T.ctTabMatches]];
+  const extra = [t.feeCents ? T.ctFeeLine(eur(t.feeCents)) + (t.requirePaid ? ' (' + T.ctPaidOnlyShort + ')' : '') : '', t.rankLimit ? T.ctLimitShort(t.rankLimit) : '',
+    t.fitpCode ? T.ctFitpCodeLine(t.fitpCode) : '', t.referee ? T.ctRefereeLine(t.referee) : ''].filter(Boolean).join(' · ');
+  const body = h('div');
+  put(main(), 
+    h('div.head', h('button', { onclick: () => { cupId = null; showCups(); }, 'aria-label': T.cupsBack, title: T.cupsBack }, '←'), h('h1', t.name),
+      h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editCup(t) }, T.edit)),
+    h('p.dim', cupLine(t), extra ? h('br') : null, extra),
+    t.champion ? h('p', h('span.tag.ok', T.ctChampion(who(t.champion)))) : null,
+    h('h2.printonly', Object.fromEntries(tabs)[cupTab]),
+    h('div.tabs', { role: 'tablist' }, tabs.map(([v, l]) => h('button' + (v === cupTab ? '.on' : ''), {
+      type: 'button', role: 'tab', 'aria-selected': v === cupTab ? 'true' : 'false', onclick: () => { cupTab = v; showCup(t.id); },
+    }, l))),
+    body);
+  ({ entries: cupEntries, draw: cupDraw, matches: cupMatches })[cupTab](t, body, who);
+  const m = cupOpenMatch && t.matches.find((x) => x.id === cupOpenMatch);
+  cupOpenMatch = null;
+  if (m && m.a && m.b) openMatch(t, m, who);
+}
+
+/** Iscritti: si cerca il giocatore e lo si iscrive; i problemi si vedono subito; poi il sorteggio. */
+function cupEntries(t, body) {
+  const need = t.doubles ? 2 : 1;
+  const picked = [];
+  const inside = new Set(t.entries.flatMap((e) => e.players));
+  const inDraw = new Set(t.matches.flatMap((m) => [m.a, m.b]));
+  const input = h('input', { type: 'search', placeholder: t.doubles ? T.cupPickPair : T.cupPick, 'aria-label': T.ctAddEntry, autocomplete: 'off' });
+  const hits = h('div.hits');
+  const chosen = h('div.chips');
+  function refresh() {
+    const q = input.value.trim().toLowerCase();
+    put(chosen, ...picked.map((p) => h('span.chip', p.name)));
+    const list = q ? people.filter((p) => !inside.has(p.id) && !picked.includes(p) && p.name.toLowerCase().includes(q)).slice(0, 8) : [];
+    put(hits, ...list.map((p) => h('button', { type: 'button', onclick: () => choose(p) },
+      p.name, p.ranking ? h('span.dim', ' · ' + p.ranking) : null, p.member ? null : h('span.dim', ' · ' + T.notMember))));
+    if (q && !list.length) hits.append(h('div.dim.pad', T.noResults));
+  }
+  async function choose(p) {
+    picked.push(p);
+    input.value = '';
+    if (picked.length < need) { input.placeholder = T.ctPickPartner(picked[0].name); refresh(); input.focus(); return; }
+    const players = picked.splice(0).map((x) => x.id);
+    input.disabled = true;
+    await cupDo('POST', '/entries', { players });
+    const again = document.querySelector('.picker input');
+    if (again) again.focus();
+  }
+  input.addEventListener('input', refresh);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+
+  const rows = t.entries.map((e, i) => {
+    const seed = h('input.seed', { type: 'number', min: 1, max: 64, value: e.seed || '', placeholder: T.ctSeedAuto, 'aria-label': T.cupSeed, disabled: t.drawn });
+    seed.addEventListener('change', () => cupDo('PUT', '/entries/' + encodeURIComponent(e.id) + '/seed', { seed: Number(seed.value) || null }));
+    const name = e.names.join(' / ');
+    return h('tr', h('td.num', i + 1), h('td', name), h('td', seed),
+      h('td', e.problems.length ? e.problems.map((p) => h('span.tag.' + (p.blocking ? 'bad' : 'warn'), (t.doubles ? p.name + ': ' : '') + (PROBLEM()[p.code] || p.code))) : h('span.tag.ok', T.ctInOrder)),
+      h('td.num.noprint', inDraw.has(e.id) ? null : h('button.danger', { type: 'button', onclick: async () => {
+        if (confirm(T.cupRemoveAsk(name))) await cupDo('DELETE', '/entries/' + encodeURIComponent(e.id));
+      } }, T.ctRemoveEntry)));
+  });
+
+  const excluded = t.entries.length - t.eligible;
+  const draw = !t.drawn
+    ? [h('p', T.ctDrawAsk(t.eligible)), excluded > 0 ? h('p.dim', T.ctDrawExcluded(excluded)) : null,
+      t.eligible < 2 ? h('p.dim', T.ctDrawTooFew) : h('button.primary', { type: 'button', onclick: () => cupDo('POST', '/draw', undefined, () => { cupTab = 'draw'; }) }, T.ctDraw)]
+    : t.hasResults ? h('p.dim', T.cupDrawnLocked)
+      : [h('p.dim', T.cupRedrawHint), h('button', { type: 'button', onclick: async () => { if (confirm(T.cupRedrawAsk)) await cupDo('POST', '/undraw'); } }, T.ctUndoDraw)];
+
+  put(body, 
+    h('div.picker.noprint', input, chosen, hits),
+    t.entries.length ? h('div.panel', h('table',
+      h('thead', h('tr', h('th.num', '#'), h('th', T.name), h('th', T.cupSeed), h('th', T.status), h('th.noprint'))),
+      h('tbody', rows))) : h('div.panel', h('div.empty', T.ctNoEntries)),
+    t.entries.length && !t.drawn ? h('p.dim.noprint', T.ctSeedHint) : null,
+    h('div.section.noprint', h('h2', T.ctDraw), h('div.panel', h('div.pad', draw))));
+  refresh();
+}
+
+/** Una partita del tabellone: chi gioca, chi ha vinto, punteggio, e dove e quando. */
+function matchBox(t, m, who) {
+  const pl = (x) => h('div.pl' + (m.winner && m.winner === x ? '.win' : ''), x ? who(x) : (m.round === 1 ? T.ctBye : '…'));
+  const meta = [scoreText(m), m.winner ? '' : whenText(m)].filter(Boolean).join(' · ');
+  const kids = [pl(m.a), pl(m.b), meta ? h('div.meta', meta) : null];
+  return m.a && m.b ? h('button.match', { type: 'button', onclick: () => openMatch(t, m, who) }, kids) : h('div.match', kids);
+}
+
+function cupDraw(t, body, who) {
+  if (!t.drawn) { put(body, h('div.panel', h('div.empty', T.ctNotDrawn))); return; }
+  const out = [];
+  const ko = t.matches.filter((m) => m.round > 0);
+  if (t.format === 'GROUPS') {
+    const groups = t.matches.filter((m) => m.round === 0);
+    const done = groups.length > 0 && groups.every((m) => m.winner);
+    out.push(h('div.cards', t.standings.map((st, g) => h('div.panel', h('div.pad',
+      h('h2', T.ctGroup(groupLetter(g))),
+      h('table', h('thead', h('tr', h('th', T.name), h('th.num', T.ctColWon), h('th.num', T.ctColSets), h('th.num', T.ctColGames))),
+        h('tbody', st.map((r, i) => h('tr' + (i < t.qualify ? '.pass' : ''), h('td', who(r.entry)), h('td.num', r.won + '/' + r.played),
+          h('td.num', r.setsWon + '-' + r.setsLost), h('td.num', r.gamesWon + '-' + r.gamesLost))))),
+      h('div.gmatches', groups.filter((m) => m.group === g).map((m) => matchBox(t, m, who))))))));
+    if (!ko.length) out.push(done
+      ? h('div.section.noprint', h('button.primary', { type: 'button', onclick: () => cupDo('POST', '/knockout') }, T.ctMakeKnockout))
+      : h('p.dim', T.ctGroupsFirst));
+  }
+  if (ko.length) {
+    const rounds = [...new Set(ko.map((m) => m.round))].sort((a, b) => a - b);
+    out.push(h('div.section.panel', h('div.bracket', rounds.map((r) => h('div.round',
+      h('div.rname', roundName(t, ko.find((m) => m.round === r))),
+      h('div.rmatches', ko.filter((m) => m.round === r).sort((a, b) => a.slot - b.slot).map((m) => matchBox(t, m, who))))))));
+  }
+  put(body, ...out);
+}
+
+/** Partite: il programma per giorno e ora, poi quelle ancora da programmare. */
+function cupMatches(t, body, who) {
+  const show = select([['todo', T.ctToPlay], ['played', T.ctPlayed], ['all', T.cupAll]], cupShow);
+  show.setAttribute('aria-label', T.status);
+  show.addEventListener('change', () => { cupShow = show.value; cupMatches(t, body, who); });
+  const real = t.matches.filter((m) => !m.bye && (m.a || m.b));
+  const rows = real.filter((m) => ({ todo: !m.winner, played: !!m.winner, all: true })[cupShow])
+    .sort((x, y) => (x.date ? 0 : 1) - (y.date ? 0 : 1) || (x.date || '').localeCompare(y.date || '') || (x.startMin ?? 0) - (y.startMin ?? 0) || x.round - y.round || x.slot - y.slot);
+  put(body, 
+    h('div.tools.noprint', show, h('span.dim', T.cupMatchHint)),
+    rows.length ? h('div.panel', h('table',
+      h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.cupRound, T.cupMatch, T.cupResult].map((x) => h('th', { scope: 'col' }, x)))),
+      h('tbody', rows.map((m) => {
+        const can = m.a && m.b;
+        return h('tr' + (can ? '.row' : ''), can ? { tabindex: 0, onclick: () => openMatch(t, m, who), onkeydown: (e) => { if (e.key === 'Enter') openMatch(t, m, who); } } : {},
+          h('td', m.date ? shortDay(m.date) : h('span.dim', T.cupUnscheduled)), h('td', m.startMin != null && m.date ? hhmm(m.startMin) : ''), h('td', m.court),
+          h('td', roundName(t, m)),
+          h('td', h('span' + (m.winner === m.a ? '.b' : ''), who(m.a) || '…'), ' – ', h('span' + (m.winner === m.b ? '.b' : ''), who(m.b) || '…')),
+          h('td', scoreText(m)));
+      })))) : h('div.panel', h('div.empty', real.length ? T.noResults : T.ctNotDrawn)));
+}
+
+function openMatch(t, m, who) {
+  const wa = h('input', { type: 'radio', name: 'winner', checked: m.winner === m.a });
+  const wb = h('input', { type: 'radio', name: 'winner', checked: m.winner === m.b });
+  const score = h('input', { value: m.score, placeholder: '6-4 3-6 10-8', autocomplete: 'off', maxlength: 60 });
+  score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) (w === 'a' ? wa : wb).checked = true; });
+  const wo = h('input', { type: 'checkbox', checked: m.walkover });
+  const rit = h('input', { type: 'checkbox', checked: m.retired });
+  const court = select([['', '—']].concat(t.courts.map((c) => [c, c])), m.court);
+  const date = h('input', { type: 'date', value: m.date || '' });
+  const time = h('input', { type: 'time', value: m.date && m.startMin != null ? hhmm(m.startMin) : '', step: 300 });
+  const base = '/tournaments/' + encodeURIComponent(t.id) + '/matches/' + encodeURIComponent(m.id);
+  const clear = m.winner && h('button.danger.left', { type: 'button', onclick: async () => {
+    try { await api('POST', base + '/result', {}); d.close(); toast(T.saved); await showCup(t.id); } catch (e) { toast(errText(e)); }
+  } }, T.ctClearResult);
+  const d = dialog(roundName(t, m) + ': ' + who(m.a) + ' – ' + who(m.b), h('div.form',
+    h('h3', T.ctWinner), h('label.check.full', wa, who(m.a)), h('label.check.full', wb, who(m.b)),
+    field(T.ctScore, score, 'full'), h('label.check', wo, T.ctWalkoverLong), h('label.check', rit, T.ctRetiredLong),
+    h('h3', T.ctWhere), field(T.date, date), field(T.ctTime, time), field(T.ctCourt, court),
+    h('p.full.dim', T.cupWhereHint(t.matchMinutes))), async () => {
+    const w = wa.checked ? m.a : wb.checked ? m.b : null;
+    const sched = { court: court.value, date: date.value || null, startMin: time.value ? toMin(time.value) : null };
+    if (sched.date && sched.startMin === null) throw new Error(T.err.BAD_TIME);
+    if (sched.court !== m.court || sched.date !== (m.date || null) || (sched.date && sched.startMin !== m.startMin)) {
+      try { await api('POST', base + '/schedule', sched); }
+      catch (e) {
+        if (!(e instanceof ApiError && e.message === 'CONFLICT') || !confirm(T.cupBusyAsk)) throw e;
+        await api('POST', base + '/schedule', { ...sched, force: true });
+      }
+    }
+    const changed = w !== (m.winner || null) || score.value.trim() !== m.score || wo.checked !== m.walkover || rit.checked !== m.retired;
+    if (changed && (w || score.value.trim())) await api('POST', base + '/result', { winner: w, score: score.value, walkover: wo.checked, retired: rit.checked });
+    toast(T.saved);
+    await showCup(t.id);
+  }, { left: clear });
+}
+
+function editCup(t) {
+  const v = t || { kind: 'SOCIAL', format: 'KNOCKOUT', doubles: false, groups: 2, qualify: 2, requirePaid: true, feeCents: 0 };
+  const locked = !!(t && t.drawn);
+  const inp = (k, extra) => h('input', { value: v[k] || '', ...extra });
+  const name = inp('name', { required: true, maxlength: 120 });
+  const category = inp('category', { maxlength: 80 });
+  const kind = select([['SOCIAL', T.ctSocial], ['FITP', 'FITP']], v.kind);
+  const format = select([['KNOCKOUT', T.ctFormatKnockout], ['GROUPS', T.ctFormatGroups]], v.format);
+  const doubles = select([['0', T.ctSingles], ['1', T.ctDoubles]], v.doubles ? '1' : '0');
+  format.disabled = locked; doubles.disabled = locked;
+  const start = inp('start', { type: 'date' }), end = inp('end', { type: 'date' });
+  const fee = h('input', { inputmode: 'decimal', value: v.feeCents ? (v.feeCents / 100).toFixed(2).replace('.', ',') : '' });
+  const paid = h('input', { type: 'checkbox', checked: v.requirePaid });
+  const limit = inp('rankLimit', { maxlength: 10 });
+  const code = inp('fitpCode', { maxlength: 40 }), referee = inp('referee', { maxlength: 80 });
+  const groups = h('input', { type: 'number', min: 1, max: 16, value: v.groups, disabled: locked });
+  const qualify = h('input', { type: 'number', min: 1, max: 8, value: v.qualify });
+  const hint = h('p.full.dim');
+  const fCode = field(T.ctFitpCode, code), fRef = field(T.ctReferee, referee), fGroups = field(T.ctGroupsCount, groups), fQualify = field(T.ctQualify, qualify);
+  const paidRow = h('label.check.full', paid, T.ctPaidOnly);
+  function update() {
+    hint.textContent = kind.value === 'FITP' ? T.ctFitpHint : T.ctSocialHint;
+    fCode.hidden = fRef.hidden = kind.value !== 'FITP';
+    fGroups.hidden = fQualify.hidden = format.value !== 'GROUPS';
+  }
+  kind.addEventListener('change', update);
+  format.addEventListener('change', update);
+  update();
+  const del = t && h('button.danger.left', { type: 'button', onclick: async () => {
+    if (!confirm(T.ctDeleteAsk(t.name))) return;
+    try { await api('DELETE', '/tournaments/' + encodeURIComponent(t.id)); d.close(); cupId = null; toast(T.saved); await showCups(); } catch (e) { toast(errText(e)); }
+  } }, T.ctDelete);
+  const d = dialog(t ? t.name : T.ctNew, h('div.form',
+    field(T.ctName, name, 'full'), field(T.ctCategory, category, 'full'),
+    field(T.kind, kind), field(T.cupFormat, format), hint, field(T.cupPlay, doubles), h('span'),
+    fGroups, fQualify, field(T.ctStart, start), field(T.ctEnd, end),
+    field(T.ctFee, fee), field(T.ctLimit, limit), paidRow, h('p.full.dim', T.ctPaidOnlyHint), fCode, fRef,
+    locked ? h('p.full.dim', T.cupLocked) : null), async () => {
+    const fc = fee.value.trim() ? cents(fee.value) : 0;
+    if (fc === null) throw new Error(T.err.BAD_AMOUNT);
+    const body = {
+      name: name.value, kind: kind.value, format: format.value, doubles: doubles.value === '1', category: category.value, start: start.value || null, end: end.value || null,
+      feeCents: fc, requirePaid: paid.checked, rankLimit: limit.value, fitpCode: code.value, referee: referee.value, groups: Number(groups.value) || 2, qualify: Number(qualify.value) || 2,
+    };
+    if (t) await api('PUT', '/tournaments/' + encodeURIComponent(t.id), body);
+    else { const r = await api('POST', '/tournaments', body); cupId = r.id; cupTab = 'entries'; }
+    toast(T.saved);
+    await showCup(cupId);
+  }, { left: del });
 }
 
 // --- Via ---
@@ -989,6 +2319,62 @@ const DESK_I18N = {
     cancelCharge: "Annulla addebito",
     cancelChargeAsk: "Annullare questo addebito?",
     kind: "Tipo",
+    allTypes: "Tutti i tipi",
+    paidOnes: "Pagati",
+    searchCharge: "Cerca nome o descrizione…",
+    type: "Tipo",
+    feesHint: "Tocca una quota per vedere solo i suoi addebiti.",
+    owing: "Devono pagare",
+    shown: (n, t) => n === 1 ? '1 addebito, resta ' + t : n + ' addebiti, resta ' + t,
+    kindCourt: "Campi",
+    edit: "Modifica",
+    print: "Stampa",
+    cupsBack: "Tutti i tornei",
+    cupNoPlayer: "giocatore cancellato",
+    cupPick: "Cerca il giocatore da iscrivere…",
+    cupPickPair: "Cerca il primo giocatore della coppia…",
+    cupSeed: "Testa di serie",
+    cupRedrawHint: "Finché non c'è un risultato puoi rifare il sorteggio, ad esempio dopo un'iscrizione arrivata tardi.",
+    cupRedrawAsk: "Rifare il sorteggio? Il tabellone di adesso si perde.",
+    cupDrawnLocked: "Ci sono già risultati: il sorteggio resta questo.",
+    cupBusyAsk: "Il campo è già occupato a quell'ora. Metterla lo stesso?",
+    cupUnscheduled: "Da programmare",
+    cupAll: "Tutte",
+    cupWhen: "Giorno",
+    cupRound: "Turno",
+    cupMatch: "Partita",
+    cupResult: "Risultato",
+    cupMatchHint: "Clicca una partita per il risultato o per giorno, ora e campo.",
+    cupFormat: "Formula",
+    cupPlay: "Singolare o doppio",
+    cupLocked: "Il sorteggio è fatto: formula, doppio e numero di gironi non si cambiano più.",
+    cupsNote: "Crea i tornei, iscrivi, sorteggia, programma e segna i risultati: tutto si ritrova subito anche nell'app.",
+    cupRemoveAsk: (n) => `Ritirare l'iscrizione di ${n}? Le quote non pagate si annullano.`,
+    cupWhereHint: (n) => `Ogni partita occupa il campo per ${n} minuti (si cambia nell'app, in Orari e prezzi). La partita compare nel Planning.`,
+    yes: "Sì",
+    no: "No",
+    medicalTodo: "Certificato da rinnovare",
+    receipt: "Ricevuta",
+    onlyOnce: "Solo questa volta",
+    repeat: "Ripeti",
+    seriesEditHint: "È ripetuta ogni settimana: si cambia solo questa.",
+    onlineEditHint: "Fatta online: se cambi campo, ora o durata diventa della segreteria e sul sito si toglie.",
+    deleteSeriesAsk: "È ripetuta ogni settimana. Cancellare solo questa o anche quelle dopo?",
+    onlyThis: "Solo questa",
+    thisAndNext: "Anche quelle dopo",
+    blkManaged: "Questo periodo viene da un corso o da una squadra: si cambia nell'app, dal corso o dalla squadra.",
+    blkDaysHint: "Nessun giorno scelto = tutti i giorni.",
+    blkPickCourt: "Scegli almeno un campo, o Tutti i campi.",
+    weeksN: (n) => `Ogni settimana per ${n} settimane`,
+    skippedDays: (d) => `Saltate perché il campo era già occupato: ${d}`,
+    planView: "Vista",
+    viewDay: "Giorno",
+    viewWeek: "Settimana",
+    viewMonth: "Mese",
+    prev: "Indietro",
+    next: "Avanti",
+    monthHint: "La barretta dice quanto sono occupati i campi. Clicca un giorno per vederlo ore per campi.",
+    nBookings: (n) => n === 1 ? '1 prenotazione' : n + ' prenotazioni',
     kindMembership: "Quota sociale",
     kindFitp: "Tessera FITP",
     kindCourse: "Corso",
@@ -996,8 +2382,6 @@ const DESK_I18N = {
     kindOther: "Altro",
     chargeAll: "Addebitala subito a tutti i soci",
     csvName: "Pagamenti",
-    prevDay: "Giorno prima",
-    nextDay: "Giorno dopo",
     today: "Oggi",
     noCourts: "Nessun campo: aggiungili nell'app.",
     court: "Campo",
@@ -1011,14 +2395,11 @@ const DESK_I18N = {
     newBooking: "Nuova prenotazione",
     deleteBooking: "Cancella prenotazione",
     deleteBookingAsk: "Cancellare questa prenotazione?",
-    cupsNote: "Qui si guardano soltanto: iscrizioni, sorteggio e risultati si gestiscono dall'app.",
-    entriesList: "Elenco iscritti",
     noCups: "Nessun torneo.",
     importSummary: (a, b, c) => `${a} nuovi, ${b} da completare, ${c} con errori`,
     imported: (a, b) => `Importati: ${a} nuovi, ${b} completati`,
     income: (a) => `Incassato nel ${a}`,
     charged: (a) => `Quota creata, addebiti: ${a}`,
-    cupEntries: (a) => `Iscritti: ${a}`,
     cupPlayed: (a, b) => `Partite giocate: ${a} su ${b}`,
     rowErr: {
       NAME: "Manca il nome",
@@ -1047,6 +2428,13 @@ const DESK_I18N = {
       OTHER: "Altro",
     },
     err: {
+      MANAGED: "Si cambia nell'app, dal corso o dalla squadra.",
+      HAS_RESULTS: "Ci sono già risultati: il sorteggio non si rifà più.",
+      TOO_FEW: "Servono almeno due iscritti in regola.",
+      ALREADY_IN: "È già iscritto a questo torneo.",
+      IN_DRAW: "È nel tabellone: non si può ritirare. Segna la partita persa a tavolino.",
+      NOT_READY: "Non ancora: manca un giocatore o i gironi non sono finiti.",
+      NO_WINNER: "Scegli chi ha vinto, o scrivi un punteggio con un vincitore.",
       NET: "Il telefono non risponde: controlla che sia acceso e sulla stessa rete.",
       BAD_CODE: "Codice sbagliato.",
       TOO_MANY_TRIES: "Troppi tentativi: aspetta e usa il nuovo codice.",
@@ -1162,6 +2550,62 @@ const DESK_I18N = {
     cancelCharge: "Cancel charge",
     cancelChargeAsk: "Cancel this charge?",
     kind: "Type",
+    allTypes: "All types",
+    paidOnes: "Paid",
+    searchCharge: "Search name or description…",
+    type: "Type",
+    feesHint: "Click a fee to see only its charges.",
+    owing: "Owing money",
+    shown: (n, t) => n === 1 ? '1 charge, ' + t + ' left' : n + ' charges, ' + t + ' left',
+    kindCourt: "Courts",
+    edit: "Edit",
+    print: "Print",
+    cupsBack: "All tournaments",
+    cupNoPlayer: "deleted player",
+    cupPick: "Search for the player to enter…",
+    cupPickPair: "Search for the first player of the pair…",
+    cupSeed: "Seed",
+    cupRedrawHint: "Until there is a result you can redo the draw, for example after a late entry.",
+    cupRedrawAsk: "Redo the draw? The current draw is lost.",
+    cupDrawnLocked: "There are results already: the draw stays as it is.",
+    cupBusyAsk: "The court is already taken at that time. Put it there anyway?",
+    cupUnscheduled: "Not scheduled",
+    cupAll: "All",
+    cupWhen: "Day",
+    cupRound: "Round",
+    cupMatch: "Match",
+    cupResult: "Result",
+    cupMatchHint: "Click a match for the result or for day, time and court.",
+    cupFormat: "Format",
+    cupPlay: "Singles or doubles",
+    cupLocked: "The draw is made: format, doubles and number of groups can no longer change.",
+    cupsNote: "Create tournaments, take entries, make the draw, schedule and record results: everything shows up in the app right away.",
+    cupRemoveAsk: (n) => `Withdraw ${n}'s entry? Unpaid fees are cancelled.`,
+    cupWhereHint: (n) => `Each match takes the court for ${n} minutes (change it in the app, under Hours and prices). The match shows up in the Planning.`,
+    yes: "Yes",
+    no: "No",
+    medicalTodo: "Certificate to renew",
+    receipt: "Receipt",
+    onlyOnce: "Just this once",
+    repeat: "Repeat",
+    seriesEditHint: "It repeats every week: only this one changes.",
+    onlineEditHint: "Booked online: if you change court, time or length it becomes an office booking and is removed from the website.",
+    deleteSeriesAsk: "It repeats every week. Delete only this one or the following ones too?",
+    onlyThis: "Only this one",
+    thisAndNext: "The following ones too",
+    blkManaged: "This period comes from a course or a team: change it in the app, from the course or the team.",
+    blkDaysHint: "No day chosen = every day.",
+    blkPickCourt: "Choose at least one court, or All courts.",
+    weeksN: (n) => `Every week for ${n} weeks`,
+    skippedDays: (d) => `Skipped because the court was already taken: ${d}`,
+    planView: "View",
+    viewDay: "Day",
+    viewWeek: "Week",
+    viewMonth: "Month",
+    prev: "Back",
+    next: "Forward",
+    monthHint: "The bar shows how busy the courts are. Click a day to see it by hours and courts.",
+    nBookings: (n) => n === 1 ? '1 booking' : n + ' bookings',
     kindMembership: "Membership",
     kindFitp: "Federation card",
     kindCourse: "Course",
@@ -1169,8 +2613,6 @@ const DESK_I18N = {
     kindOther: "Other",
     chargeAll: "Charge it to all members now",
     csvName: "Payments",
-    prevDay: "Previous day",
-    nextDay: "Next day",
     today: "Today",
     noCourts: "No courts: add them in the app.",
     court: "Court",
@@ -1184,14 +2626,11 @@ const DESK_I18N = {
     newBooking: "New booking",
     deleteBooking: "Delete booking",
     deleteBookingAsk: "Delete this booking?",
-    cupsNote: "View only here: entries, draw and results are handled in the app.",
-    entriesList: "Entry list",
     noCups: "No tournaments.",
     importSummary: (a, b, c) => `${a} new, ${b} to update, ${c} with errors`,
     imported: (a, b) => `Imported: ${a} new, ${b} updated`,
     income: (a) => `Collected in ${a}`,
     charged: (a) => `Fee created, charges: ${a}`,
-    cupEntries: (a) => `Entries: ${a}`,
     cupPlayed: (a, b) => `Matches played: ${a} of ${b}`,
     rowErr: {
       NAME: "Name missing",
@@ -1220,6 +2659,13 @@ const DESK_I18N = {
       OTHER: "Other",
     },
     err: {
+      MANAGED: "Change it in the app, from the course or the team.",
+      HAS_RESULTS: "There are results already: the draw can't be redone.",
+      TOO_FEW: "At least two entries in order are needed.",
+      ALREADY_IN: "Already entered in this tournament.",
+      IN_DRAW: "It's in the draw: it can't be withdrawn. Record the match as a walkover.",
+      NOT_READY: "Not yet: a player is missing or the groups aren't over.",
+      NO_WINNER: "Choose who won, or type a score with a winner.",
       NET: "The phone is not answering: check that it is on and on the same network.",
       BAD_CODE: "Wrong code.",
       TOO_MANY_TRIES: "Too many tries: wait and use the new code.",
@@ -1335,6 +2781,63 @@ const DESK_I18N = {
     cancelCharge: "Annuler le débit",
     cancelChargeAsk: "Annuler ce débit ?",
     kind: "Type",
+    allTypes: "Tous les types",
+    paidOnes: "Payés",
+    searchCharge: "Chercher nom ou libellé…",
+    type: "Type de débit",
+    feesHint: "Cliquez sur une cotisation pour ne voir que ses débits.",
+    owing: "Doivent payer",
+    shown: (n, t) => n === 1 ? '1 débit, reste ' + t : n + ' débits, reste ' + t,
+    kindCourt: "Terrains",
+    edit: "Modifier",
+    print: "Imprimer",
+    cupsBack: "Tous les tournois",
+    cupNoPlayer: "joueur supprimé",
+    cupPick: "Chercher le joueur à inscrire…",
+    cupPickPair: "Chercher le premier joueur de la paire…",
+    cupSeed: "Tête de série",
+    cupRedrawHint: "Tant qu'il n'y a pas de résultat, vous pouvez refaire le tirage, par exemple après une inscription tardive.",
+    cupRedrawAsk: "Refaire le tirage ? Le tableau actuel sera perdu.",
+    cupDrawnLocked: "Il y a déjà des résultats : le tirage reste celui-ci.",
+    cupBusyAsk: "Le court est déjà occupé à cette heure. La mettre quand même ?",
+    cupUnscheduled: "À programmer",
+    cupAll: "Toutes",
+    cupWhen: "Jour",
+    cupRound: "Tour",
+    cupMatch: "Match",
+    cupResult: "Résultat",
+    cupMatchHint: "Cliquez sur un match pour le résultat ou pour le jour, l'heure et le court.",
+    cupFormat: "Formule",
+    cupPlay: "Simple ou double",
+    cupLocked: "Le tirage est fait : formule, double et nombre de poules ne changent plus.",
+    cupsNote: "Créez les tournois, inscrivez, tirez au sort, programmez et notez les résultats : tout apparaît aussitôt dans l'app.",
+    cupRemoveAsk: (n) => `Retirer l'inscription de ${n} ? Les frais non payés sont annulés.`,
+    cupWhereHint: (n) => `Chaque match occupe le court ${n} minutes (à changer dans l'app, Horaires et tarifs). Le match apparaît dans le planning.`,
+    yes: "Oui",
+    no: "Non",
+    medicalTodo: "Certificat à renouveler",
+    receipt: "Reçu",
+    onlyOnce: "Seulement cette fois",
+    repeat: "Répéter",
+    seriesEditHint: "Elle se répète chaque semaine : seule celle-ci change.",
+    onlineEditHint: "Réservée en ligne : si vous changez de court, d'heure ou de durée, elle passe au secrétariat et disparaît du site.",
+    deleteSeriesAsk: "Elle se répète chaque semaine. Supprimer seulement celle-ci ou aussi les suivantes ?",
+    onlyThis: "Seulement celle-ci",
+    thisAndNext: "Aussi les suivantes",
+    blkManaged: "Cette période vient d'un cours ou d'une équipe : elle se change dans l'app, depuis le cours ou l'équipe.",
+    blkDaysHint: "Aucun jour choisi = tous les jours.",
+    blkPickCourt: "Choisissez au moins un court, ou Tous les courts.",
+    weeksN: (n) => `Chaque semaine pendant ${n} semaines`,
+    skippedDays: (d) => `Sautées car le court était déjà occupé : ${d}`,
+    csvLastName: "Nom de famille",
+    planView: "Affichage",
+    viewDay: "Jour",
+    viewWeek: "Semaine",
+    viewMonth: "Mois",
+    prev: "Précédent",
+    next: "Suivant",
+    monthHint: "La barre indique l'occupation des courts. Cliquez sur un jour pour le voir par heures et par courts.",
+    nBookings: (n) => n === 1 ? '1 réservation' : n + ' réservations',
     kindMembership: "Cotisation",
     kindFitp: "Licence fédérale",
     kindCourse: "Cours",
@@ -1342,8 +2845,6 @@ const DESK_I18N = {
     kindOther: "Autre",
     chargeAll: "La débiter à tous les adhérents",
     csvName: "Paiements",
-    prevDay: "Jour précédent",
-    nextDay: "Jour suivant",
     today: "Aujourd'hui",
     noCourts: "Aucun terrain : ajoutez-les dans l'app.",
     court: "Terrain",
@@ -1357,14 +2858,11 @@ const DESK_I18N = {
     newBooking: "Nouvelle réservation",
     deleteBooking: "Supprimer la réservation",
     deleteBookingAsk: "Supprimer cette réservation ?",
-    cupsNote: "Consultation seule : inscriptions, tirage et résultats se gèrent dans l'app.",
-    entriesList: "Liste des inscrits",
     noCups: "Aucun tournoi.",
     importSummary: (a, b, c) => `${a} nouveaux, ${b} à compléter, ${c} en erreur`,
     imported: (a, b) => `Importés : ${a} nouveaux, ${b} complétés`,
     income: (a) => `Encaissé en ${a}`,
     charged: (a) => `Cotisation créée, débits : ${a}`,
-    cupEntries: (a) => `Inscrits : ${a}`,
     cupPlayed: (a, b) => `Matchs joués : ${a} sur ${b}`,
     rowErr: {
       NAME: "Nom manquant",
@@ -1393,6 +2891,13 @@ const DESK_I18N = {
       OTHER: "Autre",
     },
     err: {
+      MANAGED: "Elle se change dans l'app, depuis le cours ou l'équipe.",
+      HAS_RESULTS: "Il y a déjà des résultats : le tirage ne se refait plus.",
+      TOO_FEW: "Il faut au moins deux inscrits en règle.",
+      ALREADY_IN: "Déjà inscrit à ce tournoi.",
+      IN_DRAW: "Il est dans le tableau : impossible de le retirer. Notez le match perdu par forfait.",
+      NOT_READY: "Pas encore : il manque un joueur ou les poules ne sont pas finies.",
+      NO_WINNER: "Choisissez le vainqueur, ou écrivez un score avec un vainqueur.",
       NET: "Le téléphone ne répond pas : vérifiez qu'il est allumé et sur le même réseau.",
       BAD_CODE: "Code incorrect.",
       TOO_MANY_TRIES: "Trop d'essais : attendez et utilisez le nouveau code.",
@@ -1508,6 +3013,62 @@ const DESK_I18N = {
     cancelCharge: "Forderung stornieren",
     cancelChargeAsk: "Diese Forderung stornieren?",
     kind: "Art",
+    allTypes: "Alle Arten",
+    paidOnes: "Bezahlt",
+    searchCharge: "Name oder Beschreibung suchen…",
+    type: "Art",
+    feesHint: "Klicken Sie auf einen Beitrag, um nur seine Belastungen zu sehen.",
+    owing: "Müssen zahlen",
+    shown: (n, t) => n === 1 ? '1 Belastung, offen ' + t : n + ' Belastungen, offen ' + t,
+    kindCourt: "Plätze",
+    edit: "Bearbeiten",
+    print: "Drucken",
+    cupsBack: "Alle Turniere",
+    cupNoPlayer: "gelöschter Spieler",
+    cupPick: "Spieler zum Melden suchen…",
+    cupPickPair: "Ersten Spieler des Doppels suchen…",
+    cupSeed: "Setzung",
+    cupRedrawHint: "Solange es kein Ergebnis gibt, kannst du neu auslosen, zum Beispiel nach einer späten Meldung.",
+    cupRedrawAsk: "Neu auslosen? Das jetzige Tableau geht verloren.",
+    cupDrawnLocked: "Es gibt schon Ergebnisse: die Auslosung bleibt so.",
+    cupBusyAsk: "Der Platz ist zu dieser Zeit schon belegt. Trotzdem eintragen?",
+    cupUnscheduled: "Noch nicht angesetzt",
+    cupAll: "Alle",
+    cupWhen: "Tag",
+    cupRound: "Runde",
+    cupMatch: "Spiel",
+    cupResult: "Ergebnis",
+    cupMatchHint: "Klicke auf ein Spiel für das Ergebnis oder für Tag, Uhrzeit und Platz.",
+    cupFormat: "Modus",
+    cupPlay: "Einzel oder Doppel",
+    cupLocked: "Die Auslosung ist gemacht: Modus, Doppel und Zahl der Gruppen ändern sich nicht mehr.",
+    cupsNote: "Turniere anlegen, Meldungen, Auslosung, Spielplan und Ergebnisse: alles erscheint sofort auch in der App.",
+    cupRemoveAsk: (n) => `Die Meldung von ${n} zurückziehen? Unbezahlte Gebühren werden storniert.`,
+    cupWhereHint: (n) => `Jedes Spiel belegt den Platz ${n} Minuten (in der App unter Zeiten und Preise änderbar). Das Spiel erscheint im Belegungsplan.`,
+    yes: "Ja",
+    no: "Nein",
+    medicalTodo: "Attest zu erneuern",
+    receipt: "Beleg",
+    onlyOnce: "Nur dieses Mal",
+    repeat: "Wiederholen",
+    seriesEditHint: "Sie wiederholt sich jede Woche: nur diese wird geändert.",
+    onlineEditHint: "Online gebucht: änderst du Platz, Uhrzeit oder Dauer, wird sie zur Büro-Buchung und verschwindet von der Website.",
+    deleteSeriesAsk: "Sie wiederholt sich jede Woche. Nur diese löschen oder auch die folgenden?",
+    onlyThis: "Nur diese",
+    thisAndNext: "Auch die folgenden",
+    blkManaged: "Dieser Zeitraum kommt von einem Kurs oder einer Mannschaft: er wird in der App beim Kurs oder bei der Mannschaft geändert.",
+    blkDaysHint: "Kein Tag gewählt = jeden Tag.",
+    blkPickCourt: "Wähle mindestens einen Platz oder Alle Plätze.",
+    weeksN: (n) => `Jede Woche für ${n} Wochen`,
+    skippedDays: (d) => `Übersprungen, weil der Platz schon belegt war: ${d}`,
+    planView: "Ansicht",
+    viewDay: "Tag",
+    viewWeek: "Woche",
+    viewMonth: "Monat",
+    prev: "Zurück",
+    next: "Weiter",
+    monthHint: "Der Balken zeigt, wie belegt die Plätze sind. Klicke auf einen Tag, um ihn nach Stunden und Plätzen zu sehen.",
+    nBookings: (n) => n === 1 ? '1 Buchung' : n + ' Buchungen',
     kindMembership: "Mitgliedsbeitrag",
     kindFitp: "Verbandslizenz",
     kindCourse: "Kurs",
@@ -1515,8 +3076,6 @@ const DESK_I18N = {
     kindOther: "Andere",
     chargeAll: "Sofort allen Mitgliedern berechnen",
     csvName: "Zahlungen",
-    prevDay: "Vortag",
-    nextDay: "Nächster Tag",
     today: "Heute",
     noCourts: "Keine Plätze: füge sie in der App hinzu.",
     court: "Platz",
@@ -1530,14 +3089,11 @@ const DESK_I18N = {
     newBooking: "Neue Buchung",
     deleteBooking: "Buchung löschen",
     deleteBookingAsk: "Diese Buchung löschen?",
-    cupsNote: "Hier nur zur Ansicht: Meldungen, Auslosung und Ergebnisse laufen über die App.",
-    entriesList: "Meldeliste",
     noCups: "Keine Turniere.",
     importSummary: (a, b, c) => `${a} neu, ${b} zu ergänzen, ${c} mit Fehlern`,
     imported: (a, b) => `Importiert: ${a} neu, ${b} ergänzt`,
     income: (a) => `Eingenommen ${a}`,
     charged: (a) => `Beitrag erstellt, Forderungen: ${a}`,
-    cupEntries: (a) => `Meldungen: ${a}`,
     cupPlayed: (a, b) => `Gespielte Partien: ${a} von ${b}`,
     rowErr: {
       NAME: "Name fehlt",
@@ -1566,6 +3122,13 @@ const DESK_I18N = {
       OTHER: "Andere",
     },
     err: {
+      MANAGED: "Wird in der App beim Kurs oder bei der Mannschaft geändert.",
+      HAS_RESULTS: "Es gibt schon Ergebnisse: die Auslosung wird nicht wiederholt.",
+      TOO_FEW: "Es braucht mindestens zwei Meldungen in Ordnung.",
+      ALREADY_IN: "Schon für dieses Turnier gemeldet.",
+      IN_DRAW: "Steht im Tableau: kann nicht zurückgezogen werden. Trage das Spiel als w.o. ein.",
+      NOT_READY: "Noch nicht: ein Spieler fehlt oder die Gruppen sind nicht fertig.",
+      NO_WINNER: "Wähle den Sieger oder gib ein Ergebnis mit Sieger ein.",
       NET: "Das Telefon antwortet nicht: Prüfe, ob es an und im selben Netz ist.",
       BAD_CODE: "Falscher Code.",
       TOO_MANY_TRIES: "Zu viele Versuche: warte und nutze den neuen Code.",
@@ -1681,6 +3244,62 @@ const DESK_I18N = {
     cancelCharge: "Anular cargo",
     cancelChargeAsk: "¿Anular este cargo?",
     kind: "Tipo",
+    allTypes: "Todos los tipos",
+    paidOnes: "Pagados",
+    searchCharge: "Buscar nombre o descripción…",
+    type: "Tipo",
+    feesHint: "Pulsa una cuota para ver solo sus cargos.",
+    owing: "Deben pagar",
+    shown: (n, t) => n === 1 ? '1 cargo, quedan ' + t : n + ' cargos, quedan ' + t,
+    kindCourt: "Pistas",
+    edit: "Editar",
+    print: "Imprimir",
+    cupsBack: "Todos los torneos",
+    cupNoPlayer: "jugador borrado",
+    cupPick: "Busca el jugador que inscribir…",
+    cupPickPair: "Busca el primer jugador de la pareja…",
+    cupSeed: "Cabeza de serie",
+    cupRedrawHint: "Mientras no haya un resultado puedes repetir el sorteo, por ejemplo tras una inscripción tardía.",
+    cupRedrawAsk: "¿Repetir el sorteo? El cuadro actual se pierde.",
+    cupDrawnLocked: "Ya hay resultados: el sorteo se queda así.",
+    cupBusyAsk: "La pista ya está ocupada a esa hora. ¿Ponerlo igualmente?",
+    cupUnscheduled: "Por programar",
+    cupAll: "Todos",
+    cupWhen: "Día",
+    cupRound: "Ronda",
+    cupMatch: "Partido",
+    cupResult: "Resultado",
+    cupMatchHint: "Pulsa un partido para el resultado o para día, hora y pista.",
+    cupFormat: "Formato",
+    cupPlay: "Individual o dobles",
+    cupLocked: "El sorteo está hecho: formato, dobles y número de grupos ya no cambian.",
+    cupsNote: "Crea torneos, inscribe, sortea, programa y anota resultados: todo aparece enseguida también en la app.",
+    cupRemoveAsk: (n) => `¿Retirar la inscripción de ${n}? Las cuotas sin pagar se anulan.`,
+    cupWhereHint: (n) => `Cada partido ocupa la pista ${n} minutos (se cambia en la app, en Horarios y precios). El partido aparece en el planning.`,
+    yes: "Sí",
+    no: "No",
+    medicalTodo: "Certificado por renovar",
+    receipt: "Recibo",
+    onlyOnce: "Solo esta vez",
+    repeat: "Repetir",
+    seriesEditHint: "Se repite cada semana: solo cambia esta.",
+    onlineEditHint: "Hecha online: si cambias pista, hora o duración pasa a la secretaría y se quita de la web.",
+    deleteSeriesAsk: "Se repite cada semana. ¿Borrar solo esta o también las siguientes?",
+    onlyThis: "Solo esta",
+    thisAndNext: "También las siguientes",
+    blkManaged: "Este periodo viene de un curso o de un equipo: se cambia en la app, desde el curso o el equipo.",
+    blkDaysHint: "Ningún día elegido = todos los días.",
+    blkPickCourt: "Elige al menos una pista, o Todas las pistas.",
+    weeksN: (n) => `Cada semana durante ${n} semanas`,
+    skippedDays: (d) => `Saltadas porque la pista ya estaba ocupada: ${d}`,
+    planView: "Vista",
+    viewDay: "Día",
+    viewWeek: "Semana",
+    viewMonth: "Mes",
+    prev: "Atrás",
+    next: "Adelante",
+    monthHint: "La barra indica lo ocupadas que están las pistas. Pulsa un día para verlo por horas y pistas.",
+    nBookings: (n) => n === 1 ? '1 reserva' : n + ' reservas',
     kindMembership: "Cuota social",
     kindFitp: "Licencia federativa",
     kindCourse: "Curso",
@@ -1688,8 +3307,6 @@ const DESK_I18N = {
     kindOther: "Otro",
     chargeAll: "Cargarla ya a todos los socios",
     csvName: "Pagos",
-    prevDay: "Día anterior",
-    nextDay: "Día siguiente",
     today: "Hoy",
     noCourts: "Sin pistas: añádelas en la app.",
     court: "Pista",
@@ -1703,14 +3320,11 @@ const DESK_I18N = {
     newBooking: "Nueva reserva",
     deleteBooking: "Borrar reserva",
     deleteBookingAsk: "¿Borrar esta reserva?",
-    cupsNote: "Aquí solo se consultan: inscripciones, sorteo y resultados se gestionan en la app.",
-    entriesList: "Lista de inscritos",
     noCups: "Ningún torneo.",
     importSummary: (a, b, c) => `${a} nuevos, ${b} por completar, ${c} con errores`,
     imported: (a, b) => `Importados: ${a} nuevos, ${b} completados`,
     income: (a) => `Cobrado en ${a}`,
     charged: (a) => `Cuota creada, cargos: ${a}`,
-    cupEntries: (a) => `Inscritos: ${a}`,
     cupPlayed: (a, b) => `Partidos jugados: ${a} de ${b}`,
     rowErr: {
       NAME: "Falta el nombre",
@@ -1739,6 +3353,13 @@ const DESK_I18N = {
       OTHER: "Otro",
     },
     err: {
+      MANAGED: "Se cambia en la app, desde el curso o el equipo.",
+      HAS_RESULTS: "Ya hay resultados: el sorteo no se repite.",
+      TOO_FEW: "Hacen falta al menos dos inscritos en regla.",
+      ALREADY_IN: "Ya está inscrito en este torneo.",
+      IN_DRAW: "Está en el cuadro: no se puede retirar. Anota el partido perdido por incomparecencia.",
+      NOT_READY: "Todavía no: falta un jugador o los grupos no han terminado.",
+      NO_WINNER: "Elige quién ganó, o escribe un resultado con ganador.",
       NET: "El teléfono no responde: comprueba que esté encendido y en la misma red.",
       BAD_CODE: "Código incorrecto.",
       TOO_MANY_TRIES: "Demasiados intentos: espera y usa el nuevo código.",
@@ -1854,6 +3475,62 @@ const DESK_I18N = {
     cancelCharge: "Anular débito",
     cancelChargeAsk: "Anular este débito?",
     kind: "Tipo",
+    allTypes: "Todos os tipos",
+    paidOnes: "Pagos",
+    searchCharge: "Procurar nome ou descrição…",
+    type: "Tipo",
+    feesHint: "Clique numa mensalidade para ver só os seus débitos.",
+    owing: "Devem pagar",
+    shown: (n, t) => n === 1 ? '1 débito, faltam ' + t : n + ' débitos, faltam ' + t,
+    kindCourt: "Quadras",
+    edit: "Editar",
+    print: "Imprimir",
+    cupsBack: "Todos os torneios",
+    cupNoPlayer: "jogador apagado",
+    cupPick: "Procure o jogador a inscrever…",
+    cupPickPair: "Procure o primeiro jogador da dupla…",
+    cupSeed: "Cabeça de chave",
+    cupRedrawHint: "Enquanto não houver resultado, pode refazer o sorteio, por exemplo depois de uma inscrição atrasada.",
+    cupRedrawAsk: "Refazer o sorteio? A chave atual perde-se.",
+    cupDrawnLocked: "Já há resultados: o sorteio fica como está.",
+    cupBusyAsk: "A quadra já está ocupada a essa hora. Pôr mesmo assim?",
+    cupUnscheduled: "Por marcar",
+    cupAll: "Todas",
+    cupWhen: "Dia",
+    cupRound: "Fase",
+    cupMatch: "Jogo",
+    cupResult: "Resultado",
+    cupMatchHint: "Clique num jogo para o resultado ou para dia, hora e quadra.",
+    cupFormat: "Formato",
+    cupPlay: "Simples ou duplas",
+    cupLocked: "O sorteio está feito: formato, duplas e número de grupos já não mudam.",
+    cupsNote: "Crie torneios, inscreva, sorteie, marque os jogos e registe resultados: tudo aparece logo também no app.",
+    cupRemoveAsk: (n) => `Retirar a inscrição de ${n}? As taxas não pagas são anuladas.`,
+    cupWhereHint: (n) => `Cada jogo ocupa a quadra ${n} minutos (muda-se no app, em Horários e preços). O jogo aparece no planning.`,
+    yes: "Sim",
+    no: "Não",
+    medicalTodo: "Atestado a renovar",
+    receipt: "Recibo",
+    onlyOnce: "Só desta vez",
+    repeat: "Repetir",
+    seriesEditHint: "Repete-se todas as semanas: só esta muda.",
+    onlineEditHint: "Feita online: se mudar a quadra, a hora ou a duração passa para a secretaria e sai do site.",
+    deleteSeriesAsk: "Repete-se todas as semanas. Apagar só esta ou também as seguintes?",
+    onlyThis: "Só esta",
+    thisAndNext: "Também as seguintes",
+    blkManaged: "Este período vem de um curso ou de uma equipe: muda-se no app, a partir do curso ou da equipe.",
+    blkDaysHint: "Nenhum dia escolhido = todos os dias.",
+    blkPickCourt: "Escolha pelo menos uma quadra, ou Todas as quadras.",
+    weeksN: (n) => `Todas as semanas durante ${n} semanas`,
+    skippedDays: (d) => `Saltadas porque a quadra já estava ocupada: ${d}`,
+    planView: "Vista",
+    viewDay: "Dia",
+    viewWeek: "Semana",
+    viewMonth: "Mês",
+    prev: "Voltar",
+    next: "Avançar",
+    monthHint: "A barra mostra quanto as quadras estão ocupadas. Clique num dia para o ver por horas e quadras.",
+    nBookings: (n) => n === 1 ? '1 reserva' : n + ' reservas',
     kindMembership: "Mensalidade",
     kindFitp: "Carteira federativa",
     kindCourse: "Curso",
@@ -1861,8 +3538,6 @@ const DESK_I18N = {
     kindOther: "Outro",
     chargeAll: "Cobrar agora de todos os sócios",
     csvName: "Pagamentos",
-    prevDay: "Dia anterior",
-    nextDay: "Dia seguinte",
     today: "Hoje",
     noCourts: "Sem quadras: adicione-as no app.",
     court: "Quadra",
@@ -1876,14 +3551,11 @@ const DESK_I18N = {
     newBooking: "Nova reserva",
     deleteBooking: "Apagar reserva",
     deleteBookingAsk: "Apagar esta reserva?",
-    cupsNote: "Aqui só se consultam: inscrições, sorteio e resultados gerem-se no app.",
-    entriesList: "Lista de inscritos",
     noCups: "Nenhum torneio.",
     importSummary: (a, b, c) => `${a} novos, ${b} a completar, ${c} com erros`,
     imported: (a, b) => `Importados: ${a} novos, ${b} completados`,
     income: (a) => `Recebido em ${a}`,
     charged: (a) => `Mensalidade criada, débitos: ${a}`,
-    cupEntries: (a) => `Inscritos: ${a}`,
     cupPlayed: (a, b) => `Jogos realizados: ${a} de ${b}`,
     rowErr: {
       NAME: "Falta o nome",
@@ -1912,6 +3584,13 @@ const DESK_I18N = {
       OTHER: "Outro",
     },
     err: {
+      MANAGED: "Muda-se no app, a partir do curso ou da equipe.",
+      HAS_RESULTS: "Já há resultados: o sorteio não se refaz.",
+      TOO_FEW: "São precisos pelo menos dois inscritos em ordem.",
+      ALREADY_IN: "Já está inscrito neste torneio.",
+      IN_DRAW: "Está na chave: não se pode retirar. Registe o jogo perdido por W.O.",
+      NOT_READY: "Ainda não: falta um jogador ou os grupos não terminaram.",
+      NO_WINNER: "Escolha quem ganhou, ou escreva um resultado com vencedor.",
       NET: "O telefone não responde: verifique se está ligado e na mesma rede.",
       BAD_CODE: "Código errado.",
       TOO_MANY_TRIES: "Demasiadas tentativas: aguarde e use o novo código.",
@@ -1951,6 +3630,7 @@ cat > "$DEST/app/src/main/assets/desk/index.html" << 'TSM_EOF'
 <body>
 <div id="app"></div>
 <script src="i18n.js"></script>
+<script src="app-i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
@@ -1979,7 +3659,7 @@ body { background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -ap
 h1 { font-size: 22px; margin: 0; } h2 { font-size: 16px; margin: 0 0 10px; }
 button, input, select, textarea { font: inherit; color: inherit; }
 input, select, textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0; }
-input[type=checkbox] { width: auto; }
+input[type=checkbox], input[type=radio] { width: auto; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 button { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
 button:hover { background: var(--hover); }
@@ -2058,6 +3738,75 @@ td:first-child, td.nowrap { white-space: nowrap; }
 .qr { display: block; margin: 0 auto; max-width: 100%; border-radius: 8px; image-rendering: pixelated; }
 .status { text-align: center; color: var(--dim); min-height: 1.4em; margin-top: 8px; }
 .login details { margin-top: 12px; } .login summary { cursor: pointer; color: var(--dim); }
+
+/* Tornei */
+[hidden] { display: none !important; }
+.card { display: block; width: 100%; text-align: left; white-space: normal; padding: 14px; background: var(--panel); border-radius: 8px; }
+.card h2 { margin-bottom: 4px; } .card p { margin: 4px 0; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 6px 0 14px; flex-wrap: wrap; }
+.tabs button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 8px 12px; }
+.tabs button.on { border-bottom-color: var(--accent); font-weight: 600; }
+.picker { max-width: 460px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+.hits { display: flex; flex-direction: column; background: var(--panel); border-radius: 6px; }
+.hits:not(:empty) { border: 1px solid var(--line); }
+.hits button { text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; }
+.hits button:last-child { border-bottom: 0; }
+input.seed { width: 140px; }
+.bracket { display: flex; gap: 18px; padding: 14px; min-width: max-content; }
+.round { display: flex; flex-direction: column; width: 210px; }
+.rname { font-size: 12px; font-weight: 600; color: var(--dim); margin-bottom: 8px; }
+.rmatches { display: flex; flex-direction: column; justify-content: space-around; flex: 1; gap: 10px; }
+.match { display: block; width: 100%; text-align: left; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; background: var(--panel); white-space: normal; break-inside: avoid; }
+.match .pl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .match .pl.win, span.b { font-weight: 700; }
+.match .meta { font-size: 11px; color: var(--dim); }
+.gmatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 10px; }
+tr.pass td:first-child { font-weight: 700; }
+.printonly { display: none; }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --text: #000; --dim: #444; --line: #bbb; --hover: #fff; }
+  body { background: #fff; color: #000; }
+  .side, .noprint, .tabs, .head button, .toast, dialog { display: none !important; }
+  .shell { display: block; } main { padding: 0; }
+  .printonly { display: block; margin: 8px 0; }
+  .panel { overflow: visible; } .bracket { min-width: 0; padding: 0; gap: 10px; } .round { width: auto; flex: 1; }
+  tr.row { cursor: default; }
+}
+.form p { margin: 0; font-size: 12px; }
+@media (max-width: 800px) { .shell { align-content: start; } }
+
+/* Oggi, stampe, planning */
+.card h2.alert { color: var(--warn); }
+.card p.dim { margin: 2px 0; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.gitem.TOURNAMENT, .gitem.BLOCK { cursor: pointer; }
+.phead { margin: 0 0 8px; }
+@media print {
+  .tools, .head input, .gcell { display: none !important; }
+  .grid { min-width: 0; }
+  .gitem { border-color: #999; }
+}
+
+/* Planning: giorno, settimana, mese */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button.on { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+.gday { background: none; border: 0; border-left: 2px solid var(--line); border-radius: 0; font-weight: 600; padding: 8px 4px; }
+.gday.now, .mday.now b { color: var(--accent); }
+.gcourt.small { font-size: 11px; font-weight: 400; padding: 3px 2px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gcell.dayline { border-left: 2px solid var(--line); }
+.grid.week .gitem { font-size: 11px; padding: 1px 4px; margin: 1px; }
+.month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--line); min-width: 560px; }
+.mhead { background: var(--panel); padding: 6px; font-size: 12px; font-weight: 600; color: var(--dim); text-align: center; }
+.mday { background: var(--panel); border: 0; border-radius: 0; min-height: 86px; padding: 6px 8px; text-align: left; display: flex; flex-direction: column; gap: 2px; white-space: normal; font-size: 12px; }
+.mday.out { background: var(--bg); }
+.mday.closed { background: var(--block); }
+.mday b { font-size: 14px; }
+.mday .bar { display: block; margin-top: auto; height: 5px; border-radius: 3px; background: var(--hover); overflow: hidden; }
+.mday .bar i { display: block; height: 100%; background: var(--accent); }
+@media print { .seg, .head select { display: none !important; } .month { min-width: 0; } .mday .bar i { background: #555; } }
+.head select { width: auto; }
+.gday { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -2401,6 +4150,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 
 - Unter **Mehr › Profil und Daten › Rollen** (und beim ersten Start) wählst du, wer die App nutzt; du kannst mehrere haben. Rollen ändern die Reiter des ersten Bildschirms, **die Daten bleiben dieselben**; bei mehreren Rollen steht oben die aktive: antippen, um zu wechseln.
   - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
+  - **Was du nutzt** (Mehr): Behalte nur, was du brauchst. Armbänder und Fernbedienungen, Herzfrequenzgurte, Schlagtraining und Schüler, Video und Kamera, Fortschritte und Rating, Schläger, Padel: Was du ausschaltest, erscheint nicht, und leere Reiter (Trainieren, Video) verschwinden; der Verlauf bleibt immer (ohne Fortschritt kommt er zu Spielen). Anfangs ist alles an; bei der ersten Einführung schlägt die App aus der Antwort auf „Wie wirst du sie nutzen“ vor, was bleiben soll. Mehr ist in Gruppen geteilt: Geräte und Stimme, Daten, Hilfe.
   - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
   - **Verein**: **Heute** (die Buchungen des Tages, was offen ist, Mitglieder zu klären, Turnierspiele, Trainingsstunden, Mannschaftsspiele und Forderungen: Antippen führt dorthin), **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
   - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik, Vereinsserver und Büro am PC. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
@@ -2533,7 +4283,7 @@ Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **
 - **Einschalten**: *Vereinsfunktionen* › **Büro am PC**, dann der Eintrag im Plätze-Tab und **Einschalten**. Das Telefon zeigt die Adresse (z. B. `https://192.168.1.20:8443`) und einen Code.
 - **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
 - **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
-- **Was geht**: **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen mit Beleg, CSV-Export), **Platzplan** (Tag ansehen, Buchungen hinzufügen und entfernen), **Turniere** nur zum Ansehen. PDF-Belege, WhatsApp-Nachrichten, Auslosungen, Tennisschule und Mannschaften bleiben in der App.
+- **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). WhatsApp-Nachrichten, Live-Zählung, Tennisschule und Mannschaften bleiben in der App.
 - **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
 - **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
 
@@ -2955,6 +4705,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 
 - In **More › Profile and data › Roles** (and at the first start) you choose who uses the app; you can have more than one. Roles change the tabs of the first screen, **the data is the same**; with several roles the active one is shown at the top: tap it to switch to another.
   - **You**: Play, Practice, Video, Progress, More (the app as always).
+  - **What you use** (More): keep only what you need. Wristbands and remotes, heart rate straps, stroke training and students, video and camera, progress and rating, rackets, padel: what you turn off does not appear, and tabs left empty (Practice, Video) disappear; the history always stays (without Progress it moves to Play). At first everything is on; on the first introduction the app suggests what to keep from the answer to "how will you use it". More is split into groups: Devices and voice, Data, Help.
   - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
   - **Club**: **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
   - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
@@ -3087,7 +4838,7 @@ Entering members and payments is easier with a keyboard and mouse. **A computer 
 - **Turn on**: *Club features* › **Office from PC**, then the entry in the courts tab and **Turn on**. The phone shows the address (e.g. `https://192.168.1.20:8443`) and a code.
 - **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
 - **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
-- **What you can do**: **Members** (search, add, edit, *To fix*), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments with receipt, CSV export), **Planner** (see the day, add and remove bookings), **Tournaments** read-only. PDF receipts, WhatsApp notices, draws, tennis school and teams stay in the app.
+- **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). WhatsApp notices, live scoring, tennis school and teams stay in the app.
 - **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
 - **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
 
@@ -3508,6 +5259,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 
 - En **Más › Perfil y datos › Roles** (y en el primer arranque) eliges quién usa la app; puedes tener más de uno. Los roles cambian las pestañas de la primera pantalla, **los datos son los mismos**; con varios roles, arriba está el activo: tócalo para pasar a otro.
   - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
+  - **Lo que usas** (Más): te quedas solo con lo que necesitas. Pulseras y mandos, bandas de pulso, entrenamiento de golpes y alumnos, vídeo y cámara, progresos y rating, raquetas, pádel: lo que apagas no aparece, y las pestañas que quedan vacías (Entrenar, Vídeo) desaparecen; el historial se queda siempre (sin Progresos pasa a Jugar). Al principio todo está encendido; en la primera presentación la app propone qué dejar según la respuesta a «cómo la usarás». Más se divide en grupos: Dispositivos y voz, Datos, Ayuda.
   - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
   - **Club**: **Hoy** (las reservas del día, lo que hay por cobrar, los socios por regularizar, los partidos de torneo, las clases, los encuentros y los desafíos: se toca un recuadro para ir), **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
   - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas, Servidor del club y Secretaría desde el PC. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
@@ -3640,7 +5392,7 @@ Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (
 - **Encender**: *Funciones del club* › **Secretaría desde el PC**, luego la entrada de la pestaña de pistas y **Encender**. El teléfono muestra la dirección (p. ej. `https://192.168.1.20:8443`) y un código.
 - **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
 - **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
-- **Qué se puede hacer**: **Socios** (buscar, añadir, cambiar, *Por arreglar*), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos con recibo, exportación CSV), **Planning** (ver el día, añadir y quitar reservas), **Torneos** solo de lectura. Recibos PDF, avisos de WhatsApp, sorteos, escuela de tenis y equipos siguen en la app.
+- **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). Avisos de WhatsApp, marcador en directo, escuela de tenis y equipos siguen en la app.
 - **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
 - **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
 
@@ -4061,6 +5813,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 
 - Dans **Plus › Profil et données › Rôles** (et au premier démarrage) vous choisissez qui utilise l'appli ; vous pouvez en avoir plusieurs. Les rôles changent les onglets du premier écran, **les données sont les mêmes** ; avec plusieurs rôles, le rôle actif est en haut : touchez-le pour passer à un autre.
   - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
+  - **Ce que vous utilisez** (Plus) : on garde seulement ce qui sert. Bracelets et télécommandes, ceintures cardio, entraînement des coups et élèves, vidéo et caméra, progrès et classement, raquettes, padel : ce qu'on désactive n'apparaît pas, et les onglets restés vides (S'entraîner, Vidéo) disparaissent ; l'historique reste toujours (sans Progrès il passe dans Jouer). Au début tout est activé ; à la première présentation, l'app propose quoi garder d'après la réponse à « comment l'utiliserez-vous ». Plus est divisé en groupes : Appareils et voix, Données, Aide.
   - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
   - **Club** : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs de tournoi, les leçons, les rencontres et les défis : on touche un encadré pour y aller), **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
   - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains, Serveur du club et Secrétariat sur PC. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
@@ -4193,7 +5946,7 @@ Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un 
 - **Activer** : *Fonctions du club* › **Secrétariat sur PC**, puis l'entrée dans l'onglet des terrains et **Activer**. Le téléphone affiche l'adresse (par ex. `https://192.168.1.20:8443`) et un code.
 - **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
 - **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
-- **Ce qu'on peut faire** : **Adhérents** (chercher, ajouter, modifier, *À régulariser*), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements avec reçu, export CSV), **Planning** (voir la journée, ajouter et retirer des réservations), **Tournois** en lecture seule. Reçus PDF, avis WhatsApp, tirages, école de tennis et équipes restent dans l'app.
+- **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). Avis WhatsApp, marquage en direct, école de tennis et équipes restent dans l'app.
 - **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
 - **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
 
@@ -4614,9 +6367,10 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 
 - In **Altro › Profilo e dati › Ruoli** (e alla prima apertura) scegli chi usa l'app; puoi averne più di uno. I ruoli cambiano le schede della prima schermata, **i dati sono gli stessi**; con più ruoli, in alto c'è il ruolo attivo: toccandolo passi a un altro.
   - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
+  - **Cosa usi** (Altro): si tiene solo quello che serve. Braccialetti e telecomandi, fasce cardio, allenamento dei colpi e allievi, video e telecamera, progressi e rating, racchette, padel: quello che si spegne non compare, e le schede rimaste vuote (Allenati, Video) spariscono; lo storico resta sempre (senza Progressi va in Gioca). All'inizio è tutto acceso; alla prima presentazione l'app propone cosa tenere dalla risposta a "come la userai". Altro è diviso in gruppi: Dispositivi e voce, Dati, Aiuto.
   - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
   - **Circolo**: **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
-  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi Server del circolo e Segreteria da PC. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
+  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi, Server del circolo e Segreteria da PC. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
   - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
 - Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
 - **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
@@ -4746,7 +6500,7 @@ Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Wi
 - **Accendere**: *Funzioni del circolo* › **Segreteria da PC**, poi la voce nella scheda dei campi e **Accendi**. Il telefono mostra indirizzo (es. `https://192.168.1.20:8443`) e codice.
 - **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
 - **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
-- **Cosa si fa**: **Soci** (cerca, aggiungi, modifica, *Da sistemare*), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti con ricevuta, esportazione CSV), **Planning** (vedi il giorno, aggiungi e togli prenotazioni), **Tornei** in sola lettura. Ricevute PDF, avvisi WhatsApp, sorteggi, scuola tennis e squadre restano nell'app.
+- **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). Avvisi WhatsApp, segnapunti dal vivo, scuola tennis e squadre restano nell'app.
 - **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
 - **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
 
@@ -5167,6 +6921,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 
 - Em **Mais › Perfil e dados › Papéis** (e na primeira abertura) você escolhe quem usa o app; pode ter mais de um. Os papéis mudam as abas da primeira tela, **os dados são os mesmos**; com vários papéis, no alto aparece o ativo: toque para passar a outro.
   - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
+  - **O que usas** (Mais): fica-se só com o que é preciso. Pulseiras e comandos, cintas cardíacas, treino de pancadas e alunos, vídeo e câmara, progressos e rating, raquetes, padel: o que se desliga não aparece, e os separadores que ficam vazios (Treinar, Vídeo) desaparecem; o histórico fica sempre (sem Progressos passa para Jogar). No início está tudo ligado; na primeira apresentação a app propõe o que manter a partir da resposta a «como vais usá-la». Mais está dividido em grupos: Dispositivos e voz, Dados, Ajuda.
   - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
   - **Clube**: **Hoje** (as reservas do dia, o que há por receber, os sócios por regularizar, os jogos de torneio, as aulas, os encontros e os desafios: toca-se num quadro para lá ir), **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
   - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras, Servidor do clube e Secretaria no PC. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
@@ -5299,7 +7054,7 @@ Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computado
 - **Ativar**: *Funções do clube* › **Secretaria no PC**, depois a entrada na aba das quadras e **Ativar**. O telefone mostra o endereço (ex. `https://192.168.1.20:8443`) e um código.
 - **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
 - **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
-- **O que se pode fazer**: **Sócios** (procurar, adicionar, alterar, *Por tratar*), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos com recibo, exportação CSV), **Agenda** (ver o dia, adicionar e remover reservas), **Torneios** só de leitura. Recibos PDF, avisos de WhatsApp, sorteios, escola de tênis e equipes continuam no app.
+- **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). Avisos de WhatsApp, marcador ao vivo, escola de tênis e equipes continuam no app.
 - **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
 - **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
 
@@ -6266,6 +8021,9 @@ enum class Role(val tabs: List<HomeTab>) {
     /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
     CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
 }
+
+/** Cosa usa chi gioca (ruoli Tu e Allenatore): quello che non usa non compare (i dati restano). */
+enum class PlayerFeature { BANDS, HEART, TRAINING, VIDEO, PROGRESS, RACKETS, PADEL }
 
 /**
  * Le funzioni del ruolo Circolo, da accendere o spegnere: quelle spente non compaiono nei menu (i dati restano).
@@ -8177,6 +9935,27 @@ class MatchController(
     fun openPlanAt(day: Long) {
         planDayRequest.value = day
         openCourtsPlan()
+    }
+
+    // ---- Cosa usi (Tu e Allenatore) ----
+
+    /** Finché non si sceglie, tutto acceso: a chi usa già l'app non sparisce niente. */
+    val playerFeatures = MutableStateFlow(
+        storage.playerFeatures?.mapNotNull { n -> PlayerFeature.entries.firstOrNull { it.name == n } }?.toSet() ?: PlayerFeature.entries.toSet(),
+    )
+
+    fun uses(f: PlayerFeature): Boolean = f in playerFeatures.value
+
+    fun setPlayerFeature(f: PlayerFeature, on: Boolean) = setPlayerFeatures(if (on) playerFeatures.value + f else playerFeatures.value - f)
+
+    fun setPlayerFeatures(set: Set<PlayerFeature>) {
+        playerFeatures.value = set
+        storage.playerFeatures = set.map { it.name }.toSet()
+    }
+
+    /** La prima presentazione propone cosa tenere dalla risposta a "come la userai" (solo se non si è mai scelto). */
+    fun suggestPlayerFeatures(base: Set<PlayerFeature>) {
+        if (storage.playerFeatures == null) setPlayerFeatures(base + PlayerFeature.PROGRESS + PlayerFeature.RACKETS)
     }
 
     // ---- Funzioni del circolo ----
@@ -12522,6 +14301,8 @@ data class Charge(
     val payments: List<Payment> = emptyList(),
     /** Annullato (storno): non si deve più, i pagamenti fatti restano. */
     val cancelled: Boolean = false,
+    /** Il tipo di un addebito senza quota (corso, tessera FITP…), per filtrarli; null se non si sa. */
+    val kind: FeeKind? = null,
 ) {
     val paid: Int get() = payments.sumOf { it.cents }
     val left: Int get() = if (cancelled) 0 else (cents - paid).coerceAtLeast(0)
@@ -12592,8 +14373,8 @@ object Fees {
     }
 
     /** Un addebito singolo. */
-    fun charge(book: ClubBook, p: PlayerProfile, label: String, cents: Int, now: Long, fee: Fee? = null): ClubBook =
-        book.copy(charges = book.charges + Charge(newId("c"), p.id, p.name, fee?.id, label, cents, now, fee?.due))
+    fun charge(book: ClubBook, p: PlayerProfile, label: String, cents: Int, now: Long, fee: Fee? = null, kind: FeeKind? = null): ClubBook =
+        book.copy(charges = book.charges + Charge(newId("c"), p.id, p.name, fee?.id, label, cents, now, fee?.due, kind = kind))
 
     /**
      * Registra un versamento di [cents] sull'addebito [chargeId] col numero di ricevuta dell'anno del pagamento
@@ -16685,7 +18466,7 @@ object Courses {
         for (p in people.filter { it.id in c.students }) {
             val keys = setOf(p.id) + p.aliases
             if (b.charges.any { it.player in keys && it.label == label && !it.cancelled }) continue
-            b = b.copy(charges = b.charges + Charge(Fees.newId("c"), p.id, p.name, null, label, c.feeCents, now, due))
+            b = b.copy(charges = b.charges + Charge(Fees.newId("c"), p.id, p.name, null, label, c.feeCents, now, due, kind = FeeKind.COURSE))
             n++
         }
         return b to n
@@ -17957,6 +19738,15 @@ class Storage(context: Context) {
     var myName: String
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
+
+    /** Cosa usa chi gioca (PlayerFeature.name); null = mai scelto (tutto acceso, come prima). */
+    var playerFeatures: Set<String>?
+        get() = prefs.getStringSet("player_features", null)?.toSet()
+        set(v) = prefs.edit().putStringSet("player_features", v).apply()
+
+    var playerFeaturesSeen: Boolean
+        get() = prefs.getBoolean("player_features_seen", false)
+        set(v) = prefs.edit().putBoolean("player_features_seen", v).apply()
 
     /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
     var clubFeatures: Set<String>?
@@ -19383,10 +21173,22 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskApi.kt" << 'TSM_
 
 package com.tennis.scoremanager.desk
 
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.BlockReason
 import com.tennis.scoremanager.data.BookingKind
+import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Courses
+import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.Charge
 import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CTFormat
+import com.tennis.scoremanager.data.CTKind
+import com.tennis.scoremanager.data.CTMatch
 import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.ClubTournaments
 import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.CourtPlans
@@ -19407,6 +21209,7 @@ import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.random.Random
 
 /** Quello che la Segreteria da PC legge e cambia: i dati restano nell'app, sul telefono. */
 interface DeskData {
@@ -19423,10 +21226,31 @@ interface DeskData {
     fun courts(): List<String>
     fun plan(): CourtPlan
     fun tournaments(): List<ClubTournament>
-    /** Salva una prenotazione nuova; con [charge] divide il prezzo tra i giocatori e lo addebita. */
-    fun saveBooking(b: CourtBooking, charge: Boolean)
-    fun deleteBooking(b: CourtBooking)
+    /**
+     * Salva una prenotazione (nuova o cambiata), ripetuta per [weeks] settimane; con [charge] divide il prezzo tra
+     * i giocatori e lo addebita. Restituisce le date saltate perché il campo era occupato.
+     */
+    fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long>
+    /** Toglie la prenotazione o, con [series], anche quelle dopo della stessa serie. */
+    fun deleteBooking(b: CourtBooking, series: Boolean)
+    /** Salva (o toglie, con [delete]) un periodo di campi non prenotabili. */
+    fun saveBlock(b: CourtBlock, delete: Boolean)
+    /** Le funzioni del circolo accese. */
+    fun features(): Set<ClubFeature>
+    fun courses(): List<Course>
+    fun teams(): List<Team>
+    fun ladders(): List<Ladder>
+    /** La ricevuta di un pagamento in PDF, come quella dell'app. */
+    fun receiptPdf(chargeId: String, paymentId: String): ByteArray?
     fun paymentsCsv(year: Int): ByteArray?
+    /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
+    fun saveTournament(t: ClubTournament)
+    /** Toglie il torneo: le iscrizioni non pagate si annullano, i pagamenti restano. */
+    fun deleteTournament(t: ClubTournament)
+    /** Iscrive un giocatore o una coppia; con la quota, l'iscrizione si addebita a ciascuno. */
+    fun addEntry(t: ClubTournament, people: List<PlayerProfile>)
+    /** Ritira un'iscrizione; le sue quote non pagate si annullano. */
+    fun removeEntry(t: ClubTournament, entry: CTEntry)
 }
 
 @Serializable data class DeskError(val error: String)
@@ -19434,7 +21258,14 @@ interface DeskData {
 @Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
 /** Il QR da disegnare: una stringa di 0 e 1 per riga. */
 @Serializable data class DeskQrOut(val id: String, val rows: List<String>)
-@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int)
+@Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList())
+/** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
+@Serializable data class DeskTodayLine(val text: String, val startMin: Int? = null, val court: String = "", val date: String? = null, val cup: String? = null)
+@Serializable data class DeskToday(
+    val bookings: Int, val online: Int, val next: List<DeskTodayLine>, val collectCents: Int, val collectPeople: Int,
+    val members: Int, val blocking: Int, val memberNames: List<String>, val matches: List<DeskTodayLine>, val lessons: List<DeskTodayLine>,
+    val fixtures: List<DeskTodayLine>, val challenges: Int, val late: Int,
+)
 
 @Serializable data class DeskPerson(
     val id: String = "", val name: String = "", val firstName: String = "", val lastName: String = "", val nickname: String = "",
@@ -19453,28 +21284,75 @@ interface DeskData {
 @Serializable data class DeskCharge(
     val id: String, val player: String, val name: String, val label: String, val cents: Int, val paidCents: Int, val leftCents: Int, val due: String?, val status: String,
     val payments: List<DeskPayment>,
+    /** La quota da cui viene (null per gli addebiti singoli) e il tipo per filtrare: un FeeKind o COURT per i campi. */
+    val fee: String? = null, val type: String = "OTHER",
 )
 @Serializable data class DeskPayment(val id: String, val cents: Int, val date: String, val method: String, val ref: String, val receipt: String)
 @Serializable data class DeskFee(val id: String, val name: String, val cents: Int, val kind: FeeKind, val due: String?, val paid: Int, val total: Int)
 @Serializable data class DeskPayType(val id: String, val name: String)
 @Serializable data class DeskMoney(val year: Int, val incomeCents: Int, val openCents: Int, val openPeople: Int, val fees: List<DeskFee>, val charges: List<DeskCharge>, val payTypes: List<DeskPayType>)
 @Serializable data class DeskFeeIn(val name: String, val cents: Int, val kind: FeeKind = FeeKind.OTHER, val due: String? = null, val chargeMembers: Boolean = false)
-@Serializable data class DeskChargeIn(val player: String, val label: String, val cents: Int, val due: String? = null)
+@Serializable data class DeskChargeIn(val player: String, val label: String, val cents: Int, val due: String? = null, val kind: FeeKind = FeeKind.OTHER)
 @Serializable data class DeskPayIn(val cents: Int, val date: String, val type: String, val ref: String = "")
 @Serializable data class DeskCount(val count: Int)
 
 @Serializable data class DeskItem(
     val id: String, val court: String, val startMin: Int, val endMin: Int, val type: String, val label: String, val note: String = "",
     val kind: BookingKind? = null, val cents: Int = 0, val online: Boolean = false,
+    /** Prenotazione: giocatori del database, nomi scritti, serie settimanale, prezzo addebitato. */
+    val players: List<String> = emptyList(), val names: List<String> = emptyList(), val series: Boolean = false, val charged: Boolean = false,
+    /** Partita di torneo: il torneo. Blocco: il motivo, e se si cambia da qui (non quelli di corsi e squadre). */
+    val cup: String? = null, val reason: BlockReason? = null, val editable: Boolean = false,
 )
 @Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>)
+/** La settimana da lunedì: i sette giorni come in [DeskDay]. */
+@Serializable data class DeskWeek(val from: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val days: List<DeskDay>)
+/** Un giorno del mese in breve: prenotazioni, partite, quanto sono occupati e chiusi i campi (in percentuale). */
+@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int)
+@Serializable data class DeskMonth(val first: String, val courts: List<String>, val days: List<DeskDaySum>)
 @Serializable data class DeskBookingIn(
     val court: String, val date: String, val startMin: Int, val minutes: Int, val kind: BookingKind = BookingKind.PLAY,
     val players: List<String> = emptyList(), val names: List<String> = emptyList(), val note: String = "", val charge: Boolean = false,
+    /** Ripetuta ogni settimana per tante settimane (1 = solo questa). */
+    val weeks: Int = 1,
+)
+@Serializable data class DeskBooked(val skipped: List<String>)
+@Serializable data class DeskBlock(
+    val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
+    val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
 )
 @Serializable data class DeskQuote(val cents: Int, val lights: Boolean)
 
-@Serializable data class DeskTournament(val id: String, val name: String, val category: String, val doubles: Boolean, val start: String?, val end: String?, val entries: List<String>, val matches: Int, val played: Int)
+@Serializable data class DeskTournament(
+    val id: String, val name: String, val category: String, val doubles: Boolean, val start: String?, val end: String?, val entries: List<String>, val matches: Int, val played: Int,
+    val kind: CTKind = CTKind.SOCIAL, val format: CTFormat = CTFormat.KNOCKOUT, val drawn: Boolean = false, val champion: String? = null,
+)
+@Serializable data class DeskCupIn(
+    val name: String, val kind: CTKind = CTKind.SOCIAL, val format: CTFormat = CTFormat.KNOCKOUT, val doubles: Boolean = false, val category: String = "",
+    val start: String? = null, val end: String? = null, val feeCents: Int = 0, val requirePaid: Boolean = true, val rankLimit: String = "",
+    val fitpCode: String = "", val referee: String = "", val groups: Int = 2, val qualify: Int = 2,
+)
+/** Un problema di un giocatore per il torneo; [blocking] = non entra nel sorteggio. */
+@Serializable data class DeskProblem(val name: String, val code: String, val blocking: Boolean)
+@Serializable data class DeskCupEntry(val id: String, val players: List<String>, val names: List<String>, val seed: Int?, val problems: List<DeskProblem>)
+@Serializable data class DeskCupMatch(
+    val id: String, val round: Int, val slot: Int, val group: Int?, val a: String?, val b: String?, val winner: String?, val score: String,
+    val walkover: Boolean, val retired: Boolean, val bye: Boolean, val court: String, val date: String?, val startMin: Int?,
+)
+@Serializable data class DeskStanding(val entry: String, val played: Int, val won: Int, val setsWon: Int, val setsLost: Int, val gamesWon: Int, val gamesLost: Int)
+@Serializable data class DeskCup(
+    val id: String, val name: String, val kind: CTKind, val format: CTFormat, val doubles: Boolean, val category: String, val start: String?, val end: String?,
+    val feeCents: Int, val requirePaid: Boolean, val rankLimit: String, val fitpCode: String, val referee: String, val groups: Int, val qualify: Int,
+    val drawn: Boolean, val hasResults: Boolean, val eligible: Int, val champion: String?, val matchMinutes: Int,
+    val entries: List<DeskCupEntry>, val matches: List<DeskCupMatch>, val standings: List<List<DeskStanding>>, val courts: List<String>,
+)
+@Serializable data class DeskId(val id: String)
+@Serializable data class DeskEntryIn(val players: List<String>)
+@Serializable data class DeskSeedIn(val seed: Int? = null)
+/** Il risultato: [winner] è l'iscritto (CTEntry.id); se manca, si ricava dal punteggio. Tutto vuoto = cancella. */
+@Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false)
+/** Dove e quando; [date] null = da programmare. Con [force] la si mette anche se il campo è occupato. */
+@Serializable data class DeskScheduleIn(val court: String = "", val date: String? = null, val startMin: Int? = null, val force: Boolean = false)
 
 /**
  * Le chiamate della Segreteria da PC. Tutto tranne l'abbinamento chiede la chiave della sessione, in
@@ -19529,11 +21407,25 @@ class DeskApi(
                 m == "POST" && p.size == 3 && p[0] == "charges" && p[2] == "pay" -> pay(p[1], read(DeskPayIn.serializer(), r))
                 m == "POST" && p.size == 3 && p[0] == "charges" && p[2] == "cancel" -> { data.saveBook(Fees.cancel(data.book(), charge(p[1]).id)); done() }
                 m == "DELETE" && p.size == 4 && p[0] == "charges" && p[2] == "payments" -> { data.saveBook(Fees.unpay(data.book(), charge(p[1]).id, p[3])); done() }
-                m == "GET" && p == listOf("day") -> day(r.query["date"])
+                m == "GET" && p == listOf("day") -> ok(DeskDay.serializer(), dayOut(dayStart(r.query["date"])))
+                m == "GET" && p == listOf("week") -> week(r.query["date"])
+                m == "GET" && p == listOf("month") -> month(r.query["date"])
                 m == "GET" && p == listOf("quote") -> quote(r.query)
-                m == "POST" && p == listOf("bookings") -> book(read(DeskBookingIn.serializer(), r))
-                m == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancelBooking(p[1])
+                m == "GET" && p == listOf("today") -> today()
+                m == "GET" && p.size == 5 && p[0] == "charges" && p[2] == "payments" && p[4] == "receipt" ->
+                    Resp(200, data.receiptPdf(charge(p[1]).id, p[3]) ?: throw Fail(404, "NOT_FOUND"), "application/pdf")
+                m == "POST" && p == listOf("bookings") -> book(read(DeskBookingIn.serializer(), r), null)
+                m == "PUT" && p.size == 2 && p[0] == "bookings" -> book(read(DeskBookingIn.serializer(), r), p[1])
+                m == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancelBooking(p[1], r.query["series"] == "1")
+                m == "GET" && p == listOf("blocks") -> blocks()
+                m == "POST" && p == listOf("blocks") -> saveBlock(read(DeskBlock.serializer(), r))
+                m == "DELETE" && p.size == 2 && p[0] == "blocks" -> {
+                    data.saveBlock(block(p[1]), delete = true)
+                    done()
+                }
                 m == "GET" && p == listOf("tournaments") -> tournaments()
+                m == "POST" && p == listOf("tournaments") -> createCup(read(DeskCupIn.serializer(), r))
+                p.size >= 2 && p[0] == "tournaments" -> cupRoute(m, p.drop(1), r)
                 else -> throw Fail(404, "NOT_FOUND")
             }
         }
@@ -19575,7 +21467,7 @@ class DeskApi(
 
     private fun info(): Resp {
         val now = data.now()
-        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year))
+        return ok(DeskInfo.serializer(), DeskInfo(data.club, data.lang, day(now)!!, Instant.ofEpochMilli(now).atZone(zone()).year, data.features().sortedBy { it.ordinal }))
     }
 
     // --- Giocatori e soci ---
@@ -19636,13 +21528,27 @@ class DeskApi(
         val y = year ?: Instant.ofEpochMilli(now).atZone(zone()).year
         val (openC, openP) = Fees.open(book)
         val fees = book.fees.map { f -> val (a, b) = Fees.feeProgress(book, f); DeskFee(f.id, f.name, f.cents, f.kind, day(f.due), a, b) }
+        val kinds = book.fees.associate { it.id to it.kind }
+        val courts = (data.courts() + data.plan().bookings.map { it.court }).distinct()
         val charges = book.charges.sortedWith(compareBy<Charge> { it.left == 0 }.thenByDescending { it.createdAt }).map { c ->
             DeskCharge(
                 c.id, c.player, c.name, c.label, c.cents, c.paid, c.left, day(c.due), Fees.status(c, now).name,
                 c.payments.map { DeskPayment(it.id, it.cents, day(it.at)!!, it.methodName.ifEmpty { it.method.name }, it.ref, it.receipt) },
+                c.fee, type(c, kinds, courts),
             )
         }
         return ok(DeskMoney.serializer(), DeskMoney(y, Fees.income(book, y), openC, openP, fees, charges, data.payTypes().map { DeskPayType(it.id, it.name) }))
+    }
+
+    /**
+     * Il tipo di un addebito: quello segnato, o quello della sua quota; gli addebiti dei campi cominciano col nome del
+     * campo; quelli vecchi fatti a mano con "FITP" o "tessera" nella descrizione sono tessere.
+     */
+    private fun type(c: Charge, kinds: Map<String, FeeKind>, courts: List<String>): String {
+        (c.kind ?: c.fee?.let { kinds[it] })?.let { return it.name }
+        if (courts.any { c.label.startsWith("$it · ") }) return "COURT"
+        val l = c.label.lowercase()
+        return if ("fitp" in l || "tessera" in l) FeeKind.FITP.name else FeeKind.OTHER.name
     }
 
     private fun paymentsCsv(year: Int?): Resp {
@@ -19669,7 +21575,7 @@ class DeskApi(
         val p = Players.byId(data.players(), i.player) ?: throw Fail(404, "NOT_FOUND")
         val label = text(i.label, 120)
         if (label.isEmpty()) throw Fail(400, "NAME_REQUIRED")
-        val book = Fees.charge(data.book(), p, label, cents(i.cents), data.now())
+        val book = Fees.charge(data.book(), p, label, cents(i.cents), data.now(), kind = i.kind)
         val made = book.charges.last().copy(due = noon(i.due))
         data.saveBook(book.copy(charges = book.charges.dropLast(1) + made))
         return done()
@@ -19689,8 +21595,7 @@ class DeskApi(
 
     private fun dayStart(date: String?): Long = CourtPlans.dayStart(noon(date) ?: throw Fail(400, "BAD_DATE"))
 
-    private fun day(date: String?): Resp {
-        val start = dayStart(date)
+    private fun dayOut(start: Long): DeskDay {
         val plan = data.plan()
         val people = data.players()
         val items = CourtPlans.occupied(plan, data.tournaments(), start + 12 * 3_600_000L).map { o ->
@@ -19701,13 +21606,50 @@ class DeskApi(
                 b != null -> DeskItem(
                     b.id, b.court, from, to, "BOOKING",
                     (b.players.mapNotNull { Players.byId(people, it)?.name } + b.names).joinToString(", "), b.note, b.kind, b.cents, b.online != null,
+                    b.players.filter { Players.byId(people, it) != null }, b.names, b.series != null, b.charges.isNotEmpty(),
                 )
-                o.block != null -> DeskItem(o.block.id, if (o.court == CourtPlans.ALL) "" else o.court, from, to, "BLOCK", o.block.label)
-                else -> DeskItem(o.match?.id.orEmpty(), o.court, from, to, "TOURNAMENT", o.tournament?.name.orEmpty())
+                o.block != null -> DeskItem(
+                    o.block.id, if (o.court == CourtPlans.ALL) "" else o.court, from, to, "BLOCK", o.block.label,
+                    reason = o.block.reason, editable = editable(o.block),
+                )
+                else -> {
+                    val t = o.tournament
+                    val who = listOf(o.match?.a, o.match?.b).map { id -> t?.entries?.firstOrNull { it.id == id }?.names?.joinToString(" / ") ?: "…" }.joinToString(" – ")
+                    DeskItem(o.match?.id.orEmpty(), o.court, from, to, "TOURNAMENT", t?.name.orEmpty(), who, cup = t?.id)
+                }
             }
         }
         val s = plan.settings
-        return ok(DeskDay.serializer(), DeskDay(date!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items))
+        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items)
+    }
+
+    private fun localDay(date: String?): LocalDate = runCatching { LocalDate.parse(date.orEmpty()) }.getOrElse { throw Fail(400, "BAD_DATE") }
+
+    private fun week(date: String?): Resp {
+        val monday = localDay(date).with(java.time.DayOfWeek.MONDAY)
+        val days = (0L until 7L).map { dayOut(dayStart(monday.plusDays(it).toString())) }
+        val s = data.plan().settings
+        return ok(DeskWeek.serializer(), DeskWeek(monday.toString(), s.openHour, s.closeHour, s.slotMinutes, data.courts(), days))
+    }
+
+    /** Il mese giorno per giorno, in breve: per vedere a colpo d'occhio i giorni pieni, vuoti e chiusi. */
+    private fun month(date: String?): Resp {
+        val first = localDay(date).withDayOfMonth(1)
+        val plan = data.plan(); val cups = data.tournaments(); val courts = data.courts()
+        val s = plan.settings
+        val open = (s.closeHour - s.openHour).coerceAtLeast(1) * 60
+        val days = (0 until first.lengthOfMonth()).map { i ->
+            val d = first.plusDays(i.toLong())
+            val start = dayStart(d.toString())
+            val from = start + s.openHour * 3_600_000L; val to = start + s.closeHour * 3_600_000L
+            val occ = CourtPlans.occupied(plan, cups, start + 12 * 3_600_000L)
+            fun minutes(o: com.tennis.scoremanager.data.Occupied) = ((minOf(o.end, to) - maxOf(o.start, from)).coerceAtLeast(0) / 60_000L).toInt()
+            val used = occ.filter { it.block == null }.sumOf(::minutes)
+            val closed = occ.filter { it.block != null }.sumOf { o -> minutes(o) * (if (o.court == CourtPlans.ALL) courts.size else 1) }
+            val cap = (open * courts.size).coerceAtLeast(1)
+            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100))
+        }
+        return ok(DeskMonth.serializer(), DeskMonth(first.toString(), courts, days))
     }
 
     private fun quote(q: Map<String, String>): Resp {
@@ -19718,37 +21660,254 @@ class DeskApi(
         return ok(DeskQuote.serializer(), DeskQuote(CourtPlans.price(s, start, minutes, kind, q["court"].orEmpty()), CourtPlans.needsLights(s, start, minutes)))
     }
 
-    private fun book(i: DeskBookingIn): Resp {
+    /** Una prenotazione nuova ([id] null, anche ripetuta ogni settimana) o cambiata (campo, ora, durata, giocatori). */
+    private fun book(i: DeskBookingIn, id: String?): Resp {
         if (i.court !in data.courts()) throw Fail(404, "NOT_FOUND")
         if (i.minutes !in 5..MAX_MINUTES || i.startMin !in 0 until 24 * 60) throw Fail(400, "BAD_TIME")
         val plan = data.plan()
+        val old = id?.let { x -> plan.bookings.firstOrNull { it.id == x } ?: throw Fail(404, "NOT_FOUND") }
         val start = CourtPlans.at(dayStart(i.date), 0) + i.startMin * 60_000L
         val end = start + i.minutes * 60_000L
         if (CourtPlans.blockedBy(plan, i.court, start, end, i.kind).isNotEmpty()) throw Fail(409, "BLOCKED")
-        if (CourtPlans.conflicts(plan, data.tournaments(), i.court, start, end).isNotEmpty()) throw Fail(409, "CONFLICT")
+        if (CourtPlans.conflicts(plan, data.tournaments(), i.court, start, end, except = old?.id).isNotEmpty()) throw Fail(409, "CONFLICT")
         val people = data.players()
         val ids = i.players.filter { Players.byId(people, it) != null }
-        data.saveBooking(
-            CourtBooking(
-                CourtPlans.newId("b"), i.court, start, i.minutes, i.kind, ids, i.names.map { text(it, 80) }.filter { it.isNotEmpty() }.take(8), text(i.note, 500),
-                CourtPlans.needsLights(plan.settings, start, i.minutes), CourtPlans.price(plan.settings, start, i.minutes, i.kind, i.court),
-            ),
-            i.charge,
-        )
+        val names = i.names.map { text(it, 80) }.filter { it.isNotEmpty() }.take(8)
+        val lights = CourtPlans.needsLights(plan.settings, start, i.minutes)
+        val price = CourtPlans.price(plan.settings, start, i.minutes, i.kind, i.court)
+        val b = old?.copy(court = i.court, start = start, minutes = i.minutes, kind = i.kind, players = ids, names = names, note = text(i.note, 500), lights = lights, cents = price)
+            ?: CourtBooking(CourtPlans.newId("b"), i.court, start, i.minutes, i.kind, ids, names, text(i.note, 500), lights, price)
+        val skipped = data.saveBooking(b, if (old == null) i.weeks.coerceIn(1, 52) else 1, i.charge)
+        return ok(DeskBooked.serializer(), DeskBooked(skipped.mapNotNull { day(it) }))
+    }
+
+    private fun cancelBooking(id: String, series: Boolean): Resp {
+        data.deleteBooking(data.plan().bookings.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND"), series)
         return done()
     }
 
-    private fun cancelBooking(id: String): Resp {
-        data.deleteBooking(data.plan().bookings.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND"))
-        return done()
+    // --- Campi non prenotabili ---
+
+    /** Quelli di corsi e squadre si cambiano col corso o con la squadra, nell'app. */
+    private fun editable(b: CourtBlock) = b.course == null && b.team == null
+
+    private fun block(id: String): CourtBlock {
+        val b = data.plan().blocks.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+        if (!editable(b)) throw Fail(409, "MANAGED")
+        return b
     }
 
-    // --- Tornei (solo da guardare) ---
-
-    private fun tournaments(): Resp = ok(ListSerializer(DeskTournament.serializer()), data.tournaments().map { t ->
-        val real = t.matches.filter { !it.bye }
-        DeskTournament(t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.winner != null })
+    private fun blocks(): Resp = ok(ListSerializer(DeskBlock.serializer()), data.plan().blocks.sortedBy { it.from }.map { b ->
+        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b))
     })
+
+    private fun saveBlock(i: DeskBlock): Resp {
+        val old = i.id.takeIf { it.isNotEmpty() }?.let(::block)
+        val from = CourtPlans.dayStart(noon(i.from) ?: throw Fail(400, "BAD_DATE"))
+        val to = CourtPlans.dayStart(noon(i.to) ?: throw Fail(400, "BAD_DATE"))
+        if (to < from) throw Fail(400, "BAD_DATE")
+        if (i.startMin !in 0 until 24 * 60 || i.endMin !in 1..24 * 60 || i.endMin <= i.startMin) throw Fail(400, "BAD_TIME")
+        val courts = data.courts()
+        if (i.courts.any { it !in courts }) throw Fail(404, "NOT_FOUND")
+        if (i.reason == BlockReason.COURSE) throw Fail(400, "BAD_REQUEST")
+        val b = (old ?: CourtBlock(CourtPlans.newId("k"), "", from = from, to = to)).copy(
+            label = text(i.label, 40), reason = i.reason, courts = i.courts.distinct(), from = from, to = to,
+            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin,
+        )
+        data.saveBlock(b, delete = false)
+        return done()
+    }
+
+    // --- Oggi ---
+
+    /** Quello che serve oggi, come nella scheda Oggi dell'app: solo per le funzioni accese. */
+    private fun today(): Resp {
+        val now = data.now(); val f = data.features()
+        val today = CourtPlans.dayStart(now); val tomorrow = CourtPlans.addDays(today, 1)
+        val people = data.players()
+        val tournaments = data.tournaments()
+        fun min(t: Long) = ((t - today) / 60_000L).toInt()
+        var bookings = 0; var online = 0; var next = emptyList<DeskTodayLine>()
+        if (ClubFeature.PLANNING in f) {
+            val occ = CourtPlans.occupied(data.plan(), tournaments, today).filter { it.block == null }
+            bookings = occ.size
+            online = occ.count { it.booking?.online != null }
+            next = occ.filter { it.end > now }.sortedBy { it.start }.take(4).map { o ->
+                val who = o.booking?.let { b -> (b.players.mapNotNull { Players.byId(people, it)?.name } + b.names).joinToString(", ") } ?: o.tournament?.name.orEmpty()
+                DeskTodayLine(who, min(o.start), o.court)
+            }
+        }
+        val (cents, owing) = if (ClubFeature.PAYMENTS in f) Fees.open(data.book()) else 0 to 0
+        val issues = if (ClubFeature.MEMBERS in f) people.filter { it.member != null }.map { it to Members.issues(it, now) }.filter { it.second.isNotEmpty() } else emptyList()
+        val matches = if (ClubFeature.TOURNAMENTS in f) tournaments.flatMap { t ->
+            t.matches.filter { m -> m.at != null && m.at in today until tomorrow && m.winner == null && !m.bye }.map { m -> Triple(t, m, m.at!!) }
+        }.sortedBy { it.third }.map { (t, m, at) -> DeskTodayLine(t.name, min(at), m.court, cup = t.id) } else emptyList()
+        val lessons = if (ClubFeature.SCHOOL in f) data.courses().flatMap { co ->
+            Courses.lessons(co).filter { it.start in today until tomorrow && it.key !in co.cancelled }.map { co to it }
+        }.sortedBy { it.second.start }.map { (co, l) -> DeskTodayLine(co.name, min(l.start), l.court) } else emptyList()
+        val fixtures = if (ClubFeature.TEAMS in f) data.teams().flatMap { t ->
+            t.fixtures.filter { it.at in today until CourtPlans.addDays(today, 7) }.map { t to it }
+        }.sortedBy { it.second.at }.map { (t, x) -> DeskTodayLine("${t.name} – ${x.opponent}", date = day(x.at)) } else emptyList()
+        val open = if (ClubFeature.LADDER in f) data.ladders().flatMap { l -> l.challenges.filter { it.open } } else emptyList()
+        return ok(DeskToday.serializer(), DeskToday(
+            bookings, online, next, cents, owing, issues.size, issues.count { (_, l) -> l.any(Members::blocking) }, issues.take(3).map { it.first.name },
+            matches, lessons, fixtures, open.size, open.count { it.deadline < now },
+        ))
+    }
+
+    // --- Tornei ---
+
+    private fun tournaments(): Resp = ok(ListSerializer(DeskTournament.serializer()), data.tournaments().sortedByDescending { it.start ?: it.createdAt }.map { t ->
+        val real = t.matches.filter { !it.bye }
+        DeskTournament(
+            t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.winner != null },
+            t.kind, t.format, t.drawn, t.champion?.let { c -> t.entries.firstOrNull { it.id == c }?.names?.joinToString(" / ") },
+        )
+    })
+
+    private fun cup(id: String): ClubTournament = data.tournaments().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    /** Un risultato vero (non un bye): dopo, il sorteggio non si rifà più. */
+    private fun hasResults(t: ClubTournament) = t.matches.any { it.winner != null && !it.bye }
+
+    private fun cupRoute(m: String, p: List<String>, r: Req): Resp {
+        val t = cup(p[0])
+        val rest = p.drop(1)
+        return when {
+            m == "GET" && rest.isEmpty() -> cupOut(t)
+            m == "PUT" && rest.isEmpty() -> editCup(t, read(DeskCupIn.serializer(), r))
+            m == "DELETE" && rest.isEmpty() -> { data.deleteTournament(t); done() }
+            m == "POST" && rest == listOf("entries") -> addEntry(t, read(DeskEntryIn.serializer(), r))
+            m == "DELETE" && rest.size == 2 && rest[0] == "entries" -> removeEntry(t, rest[1])
+            m == "PUT" && rest.size == 3 && rest[0] == "entries" && rest[2] == "seed" -> seed(t, rest[1], read(DeskSeedIn.serializer(), r))
+            m == "POST" && rest == listOf("draw") -> draw(t)
+            m == "POST" && rest == listOf("undraw") -> {
+                if (hasResults(t)) throw Fail(409, "HAS_RESULTS")
+                save(t.copy(matches = emptyList(), drawnAt = null))
+            }
+            m == "POST" && rest == listOf("knockout") -> {
+                if (t.format != CTFormat.GROUPS || !t.groupsDone || t.matches.any { it.round > 0 }) throw Fail(409, "NOT_READY")
+                val now = data.now()
+                save(t.copy(matches = t.matches.filter { it.round == 0 } + ClubTournaments.knockoutFromGroups(t, Random(now), now)))
+            }
+            m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "result" -> result(t, rest[1], read(DeskResultIn.serializer(), r))
+            m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "schedule" -> schedule(t, rest[1], read(DeskScheduleIn.serializer(), r))
+            else -> throw Fail(404, "NOT_FOUND")
+        }
+    }
+
+    private fun save(t: ClubTournament): Resp { data.saveTournament(t); return cupOut(cup(t.id)) }
+
+    private fun cupOut(t: ClubTournament): Resp {
+        val people = data.players(); val book = data.book(); val now = data.now()
+        val entries = t.entries.map { e ->
+            val problems = e.players.mapIndexed { i, id -> id to e.names.getOrElse(i) { "" } }.flatMap { (id, name) ->
+                val p = Players.byId(people, id) ?: return@flatMap listOf(DeskProblem(name, "NO_PLAYER", true))
+                ClubTournaments.problems(t, p, book, now).map { DeskProblem(p.name, it.name, ClubTournaments.blocking(it)) }
+            }
+            DeskCupEntry(e.id, e.players, e.players.mapIndexed { i, id -> Players.byId(people, id)?.name ?: e.names.getOrElse(i) { "" } }, e.seed, problems)
+        }
+        val matches = t.matches.sortedWith(compareBy({ it.round }, { it.group ?: 0 }, { it.slot })).map { x ->
+            val start = x.at?.let { CourtPlans.dayStart(it) }
+            DeskCupMatch(
+                x.id, x.round, x.slot, x.group, x.a, x.b, x.winner, x.score, x.walkover, x.retired, x.bye, x.court,
+                x.at?.let { at -> day(at) }, if (x.at != null && start != null) ((x.at - start) / 60_000L).toInt() else null,
+            )
+        }
+        val standings = ClubTournaments.groupMembers(t).indices.map { g ->
+            ClubTournaments.standings(t, g).map { DeskStanding(it.entry, it.played, it.won, it.setsWon, it.setsLost, it.gamesWon, it.gamesLost) }
+        }
+        return ok(DeskCup.serializer(), DeskCup(
+            t.id, t.name, t.kind, t.format, t.doubles, t.category, day(t.start), day(t.end), t.feeCents, t.requirePaid, t.rankLimit, t.fitpCode, t.referee,
+            t.groups, t.qualify, t.drawn, hasResults(t), ClubTournaments.eligible(t, people, book, now).size, t.champion, data.plan().settings.tournamentMinutes,
+            entries, matches, standings, data.courts(),
+        ))
+    }
+
+    /** I campi del modulo; formula, doppio e gironi solo prima del sorteggio. */
+    private fun fill(t: ClubTournament, i: DeskCupIn): ClubTournament {
+        val name = text(i.name, 120)
+        if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
+        val start = noon(i.start); val end = noon(i.end)
+        if (start != null && end != null && end < start) throw Fail(400, "BAD_DATE")
+        if (i.feeCents != 0) cents(i.feeCents)
+        val base = t.copy(
+            name = name, kind = i.kind, category = text(i.category, 80), start = start, end = end, feeCents = i.feeCents, requirePaid = i.requirePaid,
+            rankLimit = text(i.rankLimit, 10), fitpCode = text(i.fitpCode, 40), referee = text(i.referee, 80), qualify = i.qualify.coerceIn(1, 8),
+        )
+        return if (t.drawn) base else base.copy(format = i.format, doubles = i.doubles, groups = i.groups.coerceIn(1, 16))
+    }
+
+    private fun createCup(i: DeskCupIn): Resp {
+        val now = data.now()
+        val t = fill(ClubTournament(ClubTournaments.newId("t"), "", createdAt = now), i)
+        data.saveTournament(t)
+        return ok(DeskId.serializer(), DeskId(t.id))
+    }
+
+    private fun editCup(t: ClubTournament, i: DeskCupIn): Resp = save(fill(t, i))
+
+    private fun addEntry(t: ClubTournament, i: DeskEntryIn): Resp {
+        val people = data.players()
+        if (i.players.size != (if (t.doubles) 2 else 1) || i.players.toSet().size != i.players.size) throw Fail(400, "BAD_REQUEST")
+        val list = i.players.map { Players.byId(people, it) ?: throw Fail(404, "NOT_FOUND") }
+        val inside = t.entries.flatMap { it.players }.toSet()
+        if (list.any { p -> p.id in inside || p.aliases.any { it in inside } }) throw Fail(409, "ALREADY_IN")
+        data.addEntry(t, list)
+        return cupOut(cup(t.id))
+    }
+
+    private fun removeEntry(t: ClubTournament, id: String): Resp {
+        val e = t.entries.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+        if (t.matches.any { it.a == id || it.b == id }) throw Fail(409, "IN_DRAW")
+        data.removeEntry(t, e)
+        return cupOut(cup(t.id))
+    }
+
+    private fun seed(t: ClubTournament, id: String, i: DeskSeedIn): Resp {
+        if (t.entries.none { it.id == id }) throw Fail(404, "NOT_FOUND")
+        val n = i.seed?.takeIf { it > 0 }?.coerceAtMost(64)
+        return save(t.copy(entries = t.entries.map { if (it.id == id) it.copy(seed = n) else it }))
+    }
+
+    /** Il sorteggio come sul telefono: gli iscritti in regola, in ordine per le teste di serie. */
+    private fun draw(t: ClubTournament): Resp {
+        if (hasResults(t)) throw Fail(409, "HAS_RESULTS")
+        val now = data.now(); val people = data.players()
+        val ok = ClubTournaments.eligible(t, people, data.book(), now)
+        if (ok.size < 2) throw Fail(409, "TOO_FEW")
+        val ids = ClubTournaments.ordered(ok, people).map { it.id }
+        val ms = if (t.format == CTFormat.GROUPS) ClubTournaments.groupsDraw(ids, t.groups) else ClubTournaments.knockout(ids, Random(now), now)
+        return save(t.copy(matches = ms, drawnAt = now))
+    }
+
+    private fun match(t: ClubTournament, id: String): CTMatch = t.matches.firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
+
+    private fun result(t: ClubTournament, id: String, i: DeskResultIn): Resp {
+        val m = match(t, id)
+        if (m.a == null || m.b == null) throw Fail(409, "NOT_READY")
+        val score = text(i.score, 60)
+        if (i.winner == null && score.isEmpty() && !i.walkover && !i.retired) return save(ClubTournaments.setResult(t, id, null, ""))
+        val w = i.winner ?: when (ClubTournaments.winnerFromScore(score)) { "a" -> m.a; "b" -> m.b; else -> null }
+        if (w == null || (w != m.a && w != m.b)) throw Fail(400, "NO_WINNER")
+        return save(ClubTournaments.setResult(t, id, w, score, i.walkover, i.retired))
+    }
+
+    private fun schedule(t: ClubTournament, id: String, i: DeskScheduleIn): Resp {
+        match(t, id)
+        if (i.date == null) return save(t.copy(matches = t.matches.map { if (it.id == id) it.copy(court = "", at = null) else it }))
+        if (i.court.isNotEmpty() && i.court !in data.courts()) throw Fail(404, "NOT_FOUND")
+        val min = i.startMin ?: throw Fail(400, "BAD_TIME")
+        if (min !in 0 until 24 * 60) throw Fail(400, "BAD_TIME")
+        val at = dayStart(i.date) + min * 60_000L
+        if (i.court.isNotEmpty() && !i.force) {
+            val plan = data.plan()
+            val end = at + plan.settings.tournamentMinutes * 60_000L
+            val others = data.tournaments().map { x -> if (x.id != t.id) x else x.copy(matches = x.matches.map { if (it.id == id) it.copy(at = null) else it }) }
+            if (CourtPlans.conflicts(plan, others, i.court, at, end).isNotEmpty() || CourtPlans.blockedBy(plan, i.court, at, end, BookingKind.PLAY).isNotEmpty()) throw Fail(409, "CONFLICT")
+        }
+        return save(t.copy(matches = t.matches.map { if (it.id == id) it.copy(court = i.court, at = at) else it }))
+    }
 
     companion object {
         private const val JSON = "application/json; charset=utf-8"
@@ -20117,6 +22276,12 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
@@ -20150,9 +22315,19 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun courts(): List<String> = c.clubCourts.value
     override fun plan(): CourtPlan = c.courtPlan.value
     override fun tournaments(): List<ClubTournament> = c.clubTournaments.value
-    override fun saveBooking(b: CourtBooking, charge: Boolean) { c.saveBooking(b, 1, charge) }
-    override fun deleteBooking(b: CourtBooking) = c.deleteBooking(b, wholeSeries = false)
+    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.saveBooking(b, weeks, charge)
+    override fun deleteBooking(b: CourtBooking, series: Boolean) = c.deleteBooking(b, wholeSeries = series)
+    override fun saveBlock(b: CourtBlock, delete: Boolean) = c.saveCourtBlock(b, delete)
+    override fun features(): Set<ClubFeature> = c.clubFeatures.value
+    override fun courses(): List<Course> = c.courses.value
+    override fun teams(): List<Team> = c.teams.value
+    override fun ladders(): List<Ladder> = c.ladders.value
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
+    override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
+    override fun deleteTournament(t: ClubTournament) = c.deleteClubTournament(t.id)
+    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.addClubEntry(t, people)
+    override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
 }
 
 /**
@@ -20455,13 +22630,17 @@ object MembersCsv {
         "first" to listOf("nome", "first name", "firstname", "given name", "prenom", "vorname", "nombre", "primeiro nome"),
         "last" to listOf("cognome", "last name", "lastname", "surname", "family name", "nom de famille", "nachname", "familienname", "apellido", "apellidos", "apelido", "sobrenome"),
         "full" to listOf("nome e cognome", "cognome e nome", "nominativo", "socio", "full name", "name", "nom", "nombre completo", "nome completo"),
-        "phone" to listOf("telefono", "cellulare", "tel", "phone", "mobile", "telephone", "portable", "telefon", "handy", "movil", "telemovel"),
+        "phone" to listOf("telefono", "cellulare", "tel", "phone", "mobile", "telephone", "portable", "telefon", "handy", "movil", "telemovel", "telefone"),
         "email" to listOf("email", "e mail", "mail", "posta elettronica", "courriel", "correo", "correo electronico"),
         "birth" to listOf("data di nascita", "nascita", "nato il", "birth date", "date of birth", "birthday", "date de naissance", "geburtsdatum", "fecha de nacimiento", "data de nascimento"),
-        "number" to listOf("tessera", "tessera circolo", "numero tessera", "n tessera", "numero socio", "member number", "membership number", "numero de membre", "mitgliedsnummer", "numero de socio", "numero de socio"),
-        "fitp" to listOf("fitp", "tessera fitp", "numero fitp", "n fitp", "fit", "federation number", "licence", "lizenz", "licencia", "licenca"),
+        "number" to listOf("tessera", "tessera circolo", "numero tessera", "n tessera", "numero socio", "member number", "membership number", "numero de membre", "mitgliedsnummer", "numero de socio", "numero de socio",
+            // Le colonne dell'esportazione della Segreteria da PC, nelle sei lingue.
+            "tessera del circolo", "club card", "carte du club", "vereinsausweis", "carne del club", "cartao do clube"),
+        "fitp" to listOf("fitp", "tessera fitp", "numero fitp", "n fitp", "fit", "federation number", "licence", "lizenz", "licencia", "licenca",
+            "federation card", "licence federale", "verbandslizenz", "licencia federativa", "carteira federativa"),
         "ranking" to listOf("classifica", "ranking", "classement", "rangliste", "clasificacion", "classificacao"),
-        "medical" to listOf("scadenza certificato", "certificato medico", "certificato", "scadenza visita", "medical until", "medical certificate", "certificat medical", "arztliches attest", "certificado medico"),
+        "medical" to listOf("scadenza certificato", "certificato medico", "certificato", "scadenza visita", "medical until", "medical certificate", "certificat medical", "arztliches attest", "certificado medico",
+            "certificato fino al", "certificat jusqu au", "attest bis", "certificado hasta", "atestado ate"),
     )
 
     private val DATES = listOf("d/M/uuuu", "uuuu-M-d", "d-M-uuuu", "d.M.uuuu", "d/M/uu").map { DateTimeFormatter.ofPattern(it) }
@@ -26516,6 +28695,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var last by remember { mutableStateOf("") }
     var nick by remember { mutableStateOf("") }
     fun finish() {
+        // Solo alla prima presentazione si propone cosa tenere: rifatta da Altro, non spegne niente.
+        val firstTime = !c.storage.onboarded
         c.storage.onboarded = true
         c.setRoles(roles)
         if (com.tennis.scoremanager.Role.CLUB in roles) {
@@ -26538,10 +28719,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         val first = com.tennis.scoremanager.Role.entries.first { it in roles }
         c.setActiveRole(first)
         if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
-            Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
-            Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
-            Use.TRAIN -> c.home(HomeTab.TRAIN)
-            Use.VIDEO -> c.home(HomeTab.VIDEO)
+            Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
+            Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
+            Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
+            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.VIDEO) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()
@@ -26669,6 +28850,96 @@ fun ProfileDialog(c: MatchController, onDone: () -> Unit) {
         confirmButton = { TextButton(onClick = { create = true }) { Text(s.meNew) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/PlayerFeaturesUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/PlayerFeaturesUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.SportsBaseball
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.PlayerFeature
+
+/** Nome, spiegazione e icona di una cosa che si può usare. */
+fun playerFeatureInfo(s: Strings, f: PlayerFeature): Triple<String, String, ImageVector> = when (f) {
+    PlayerFeature.BANDS -> Triple(s.pfBands, s.pfBandsHint, Icons.Filled.Watch)
+    PlayerFeature.HEART -> Triple(s.pfHeart, s.pfHeartHint, Icons.Filled.MonitorHeart)
+    PlayerFeature.TRAINING -> Triple(s.pfTraining, s.pfTrainingHint, Icons.Filled.FitnessCenter)
+    PlayerFeature.VIDEO -> Triple(s.pfVideo, s.pfVideoHint, Icons.Filled.Videocam)
+    PlayerFeature.PROGRESS -> Triple(s.pfProgress, s.pfProgressHint, Icons.Filled.Timeline)
+    PlayerFeature.RACKETS -> Triple(s.pfRackets, s.pfRacketsHint, Icons.Filled.SportsTennis)
+    PlayerFeature.PADEL -> Triple(s.sportPadel, s.pfPadelHint, Icons.Filled.SportsBaseball)
+}
+
+/** Cosa usi: un interruttore per ognuna; quello che è spento non compare, i dati restano. */
+@Composable
+fun PlayerFeaturesDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val on by c.playerFeatures.collectAsState()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.pfTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(s.pfHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (f in PlayerFeature.entries) {
+                    val (name, hint, icon) = playerFeatureInfo(s, f)
+                    SwitchRow(icon, name, hint, f in on) { c.setPlayerFeature(f, it) }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+}
+
+/** In cima a Gioca, finché non si è guardato: l'invito a tenere solo quello che si usa. */
+@Composable
+fun PlayerFeaturesHint(c: MatchController) {
+    val s = LocalStrings.current
+    var seen by remember { mutableStateOf(c.storage.playerFeaturesSeen) }
+    var open by remember { mutableStateOf(false) }
+    if (!seen) Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.SurfaceHigh).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.pfAsk, color = TsmColors.TextMain, fontSize = 14.sp)
+        GhostButton(s.pfChoose, Icons.Filled.Tune, { open = true }, Modifier.fillMaxWidth())
+    }
+    if (open) PlayerFeaturesDialog(c) { open = false; seen = true; c.storage.playerFeaturesSeen = true }
 }
 TSM_EOF
 
@@ -29977,6 +32248,28 @@ interface Strings {
     val tdChallenges: (Int) -> String
     val tdLate: (Int) -> String
     val tdNothing: String
+    // Cosa usi (Tu e Allenatore) e Altro a gruppi.
+    val pfTitle: String
+    val pfEntryHint: String
+    val pfHint: String
+    val pfAsk: String
+    val pfChoose: String
+    val pfBands: String
+    val pfBandsHint: String
+    val pfHeart: String
+    val pfHeartHint: String
+    val pfTraining: String
+    val pfTrainingHint: String
+    val pfVideo: String
+    val pfVideoHint: String
+    val pfProgress: String
+    val pfProgressHint: String
+    val pfRackets: String
+    val pfRacketsHint: String
+    val pfPadelHint: String
+    val moreGroupDevices: String
+    val moreGroupData: String
+    val moreGroupHelp: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -32014,6 +34307,27 @@ object ItStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Sfide da giocare: $it" }
     override val tdLate: (Int) -> String = { if (it == 1) "1 scaduta" else "$it scadute" }
     override val tdNothing = "Niente in programma oggi."
+    override val pfTitle = "Cosa usi"
+    override val pfEntryHint = "Tieni solo quello che ti serve: il resto non compare"
+    override val pfHint = "Quello che spegni non compare nei menu e nelle schermate. Puoi cambiarlo quando vuoi, i dati restano."
+    override val pfAsk = "Usi solo una parte dell'app? Scegli cosa usi: il resto sparisce dai menu."
+    override val pfChoose = "Scegli cosa usi"
+    override val pfBands = "Braccialetti e telecomandi"
+    override val pfBandsHint = "I giocatori segnano il punto dal polso o da un telecomando; spento, si segna solo da arbitro"
+    override val pfHeart = "Fasce cardio"
+    override val pfHeartHint = "Battito nella partita e allenamento con la fascia"
+    override val pfTraining = "Allenamento dei colpi e allievi"
+    override val pfTrainingHint = "Servizio, dritto, rovescio e volée col braccialetto; gli allievi per chi allena"
+    override val pfVideo = "Video e telecamera"
+    override val pfVideoHint = "Il telefono che riprende la partita, gli highlights e la moviola"
+    override val pfProgress = "Progressi e rating"
+    override val pfProgressHint = "Il tuo andamento partita dopo partita; lo storico resta comunque"
+    override val pfRackets = "Racchette"
+    override val pfRacketsHint = "Le tue racchette, le corde e la racchetta virtuale"
+    override val pfPadelHint = "La scelta tennis o padel nella nuova partita"
+    override val moreGroupDevices = "Dispositivi e voce"
+    override val moreGroupData = "Dati"
+    override val moreGroupHelp = "Aiuto"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -34032,6 +36346,27 @@ object EnStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Challenges to play: $it" }
     override val tdLate: (Int) -> String = { "$it overdue" }
     override val tdNothing = "Nothing planned today."
+    override val pfTitle = "What you use"
+    override val pfEntryHint = "Keep only what you need: the rest does not appear"
+    override val pfHint = "What you turn off does not appear in menus and screens. You can change it any time, the data stays."
+    override val pfAsk = "Do you use only part of the app? Choose what you use: the rest disappears from the menus."
+    override val pfChoose = "Choose what you use"
+    override val pfBands = "Wristbands and remotes"
+    override val pfBandsHint = "Players score from the wrist or a remote; off, you score as umpire only"
+    override val pfHeart = "Heart rate straps"
+    override val pfHeartHint = "Heart rate in the match and training with the strap"
+    override val pfTraining = "Stroke training and students"
+    override val pfTrainingHint = "Serve, forehand, backhand and volley with the wristband; students for coaches"
+    override val pfVideo = "Video and camera"
+    override val pfVideoHint = "The phone filming the match, highlights and replay"
+    override val pfProgress = "Progress and rating"
+    override val pfProgressHint = "Your trend match after match; the history stays anyway"
+    override val pfRackets = "Rackets"
+    override val pfRacketsHint = "Your rackets, strings and the virtual racket"
+    override val pfPadelHint = "The tennis or padel choice in a new match"
+    override val moreGroupDevices = "Devices and voice"
+    override val moreGroupData = "Data"
+    override val moreGroupHelp = "Help"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -36073,6 +38408,27 @@ object DeStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Offene Forderungen: $it" }
     override val tdLate: (Int) -> String = { "$it überfällig" }
     override val tdNothing = "Heute nichts geplant."
+    override val pfTitle = "Was du nutzt"
+    override val pfEntryHint = "Behalte nur, was du brauchst: Der Rest erscheint nicht"
+    override val pfHint = "Was du ausschaltest, erscheint nicht in Menüs und Bildschirmen. Du kannst es jederzeit ändern, die Daten bleiben."
+    override val pfAsk = "Nutzt du nur einen Teil der App? Wähle, was du nutzt: Der Rest verschwindet aus den Menüs."
+    override val pfChoose = "Auswählen"
+    override val pfBands = "Armbänder und Fernbedienungen"
+    override val pfBandsHint = "Die Spieler zählen am Handgelenk oder mit einer Fernbedienung; aus, zählt man nur als Schiedsrichter"
+    override val pfHeart = "Herzfrequenzgurte"
+    override val pfHeartHint = "Puls im Match und Training mit dem Gurt"
+    override val pfTraining = "Schlagtraining und Schüler"
+    override val pfTrainingHint = "Aufschlag, Vorhand, Rückhand und Volley mit dem Armband; Schüler für Trainer"
+    override val pfVideo = "Video und Kamera"
+    override val pfVideoHint = "Das Handy, das das Match filmt, Highlights und Zeitlupe"
+    override val pfProgress = "Fortschritte und Rating"
+    override val pfProgressHint = "Dein Verlauf Match für Match; der Verlauf der Matches bleibt trotzdem"
+    override val pfRackets = "Schläger"
+    override val pfRacketsHint = "Deine Schläger, Saiten und der virtuelle Schläger"
+    override val pfPadelHint = "Die Wahl Tennis oder Padel im neuen Match"
+    override val moreGroupDevices = "Geräte und Stimme"
+    override val moreGroupData = "Daten"
+    override val moreGroupHelp = "Hilfe"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -38107,6 +40463,27 @@ object EsStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Desafíos por jugar: $it" }
     override val tdLate: (Int) -> String = { if (it == 1) "1 vencido" else "$it vencidos" }
     override val tdNothing = "Nada previsto hoy."
+    override val pfTitle = "Lo que usas"
+    override val pfEntryHint = "Quédate solo con lo que necesitas: el resto no aparece"
+    override val pfHint = "Lo que apagas no aparece en los menús ni en las pantallas. Puedes cambiarlo cuando quieras, los datos se quedan."
+    override val pfAsk = "¿Usas solo una parte de la app? Elige lo que usas: el resto desaparece de los menús."
+    override val pfChoose = "Elegir lo que usas"
+    override val pfBands = "Pulseras y mandos"
+    override val pfBandsHint = "Los jugadores marcan desde la muñeca o con un mando; apagado, solo se marca como árbitro"
+    override val pfHeart = "Bandas de pulso"
+    override val pfHeartHint = "Pulso en el partido y entrenamiento con la banda"
+    override val pfTraining = "Entrenamiento de golpes y alumnos"
+    override val pfTrainingHint = "Saque, derecha, revés y volea con la pulsera; los alumnos para quien entrena"
+    override val pfVideo = "Vídeo y cámara"
+    override val pfVideoHint = "El teléfono que graba el partido, los mejores momentos y la moviola"
+    override val pfProgress = "Progresos y rating"
+    override val pfProgressHint = "Tu evolución partido a partido; el historial se queda igualmente"
+    override val pfRackets = "Raquetas"
+    override val pfRacketsHint = "Tus raquetas, los cordajes y la raqueta virtual"
+    override val pfPadelHint = "La elección tenis o pádel en el nuevo partido"
+    override val moreGroupDevices = "Dispositivos y voz"
+    override val moreGroupData = "Datos"
+    override val moreGroupHelp = "Ayuda"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -40143,6 +42520,27 @@ object FrStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Défis à jouer : $it" }
     override val tdLate: (Int) -> String = { "$it en retard" }
     override val tdNothing = "Rien de prévu aujourd'hui."
+    override val pfTitle = "Ce que vous utilisez"
+    override val pfEntryHint = "Gardez seulement ce qui vous sert : le reste n'apparaît pas"
+    override val pfHint = "Ce que vous désactivez n'apparaît pas dans les menus et les écrans. Vous pouvez le changer quand vous voulez, les données restent."
+    override val pfAsk = "Vous n'utilisez qu'une partie de l'app ? Choisissez ce que vous utilisez : le reste disparaît des menus."
+    override val pfChoose = "Choisir"
+    override val pfBands = "Bracelets et télécommandes"
+    override val pfBandsHint = "Les joueurs marquent depuis le poignet ou une télécommande ; désactivé, on marque seulement en arbitre"
+    override val pfHeart = "Ceintures cardio"
+    override val pfHeartHint = "Fréquence cardiaque pendant le match et entraînement avec la ceinture"
+    override val pfTraining = "Entraînement des coups et élèves"
+    override val pfTrainingHint = "Service, coup droit, revers et volée avec le bracelet ; les élèves pour qui entraîne"
+    override val pfVideo = "Vidéo et caméra"
+    override val pfVideoHint = "Le téléphone qui filme le match, les meilleurs moments et le ralenti"
+    override val pfProgress = "Progrès et classement"
+    override val pfProgressHint = "Votre évolution match après match ; l'historique reste de toute façon"
+    override val pfRackets = "Raquettes"
+    override val pfRacketsHint = "Vos raquettes, les cordages et la raquette virtuelle"
+    override val pfPadelHint = "Le choix tennis ou padel dans un nouveau match"
+    override val moreGroupDevices = "Appareils et voix"
+    override val moreGroupData = "Données"
+    override val moreGroupHelp = "Aide"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -42180,6 +44578,27 @@ object PtStrings : Strings {
     override val tdChallenges: (Int) -> String = { "Desafios por jogar: $it" }
     override val tdLate: (Int) -> String = { "$it em atraso" }
     override val tdNothing = "Nada previsto para hoje."
+    override val pfTitle = "O que usas"
+    override val pfEntryHint = "Fica só com o que precisas: o resto não aparece"
+    override val pfHint = "O que desligas não aparece nos menus nem nos ecrãs. Podes mudar quando quiseres, os dados ficam."
+    override val pfAsk = "Usas só uma parte da app? Escolhe o que usas: o resto desaparece dos menus."
+    override val pfChoose = "Escolher o que usas"
+    override val pfBands = "Pulseiras e comandos"
+    override val pfBandsHint = "Os jogadores marcam pelo pulso ou por um comando; desligado, marca-se só como árbitro"
+    override val pfHeart = "Cintas cardíacas"
+    override val pfHeartHint = "Batimento no jogo e treino com a cinta"
+    override val pfTraining = "Treino de pancadas e alunos"
+    override val pfTrainingHint = "Serviço, direita, esquerda e vólei com a pulseira; os alunos para quem treina"
+    override val pfVideo = "Vídeo e câmara"
+    override val pfVideoHint = "O telemóvel que filma o jogo, os melhores momentos e a repetição"
+    override val pfProgress = "Progressos e rating"
+    override val pfProgressHint = "A tua evolução jogo a jogo; o histórico fica na mesma"
+    override val pfRackets = "Raquetes"
+    override val pfRacketsHint = "As tuas raquetes, as cordas e a raquete virtual"
+    override val pfPadelHint = "A escolha ténis ou padel no novo jogo"
+    override val moreGroupDevices = "Dispositivos e voz"
+    override val moreGroupData = "Dados"
+    override val moreGroupHelp = "Ajuda"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -46112,6 +48531,7 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Videocam
@@ -46138,6 +48558,7 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.PlayerFeature
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.ble.StrapState
@@ -46179,7 +48600,16 @@ fun HomeScreen(c: MatchController) {
     // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
     val role by c.activeRole.collectAsState()
     val roles by c.roles.collectAsState()
-    val tabs = role.tabs
+    // Le schede di Tu e Allenatore che restano vuote con quello che non si usa spariscono.
+    val pf by c.playerFeatures.collectAsState()
+    val tabs = role.tabs.filter { t ->
+        when (t) {
+            HomeTab.TRAIN -> PlayerFeature.HEART in pf || PlayerFeature.TRAINING in pf
+            HomeTab.VIDEO -> PlayerFeature.VIDEO in pf
+            HomeTab.PROGRESS -> PlayerFeature.PROGRESS in pf || PlayerFeature.RACKETS in pf || PlayerFeature.TRAINING in pf
+            else -> true
+        }
+    }
     LaunchedEffect(role, tab) { if (tab !in tabs) c.homeTab.value = tabs.first() }
     // Da un'altra scheda "Indietro" torna alla prima; dalla prima esce dall'app come sempre.
     BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
@@ -46412,6 +48842,9 @@ private fun PlayTab(c: MatchController) {
         c.refreshHistory()
     }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
+    val pf by c.playerFeatures.collectAsState()
+    // La prima volta: l'invito a tenere solo quello che si usa.
+    com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -46441,22 +48874,27 @@ private fun PlayTab(c: MatchController) {
         }
     }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
+    // Senza la scheda Progressi lo storico sta qui.
+    if (PlayerFeature.PROGRESS !in pf && PlayerFeature.RACKETS !in pf && PlayerFeature.TRAINING !in pf) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Il server del circolo (se il circolo ce l'ha): prenotare i campi da qui, con l'invito della segreteria.
     val booking by c.bookingAccount.collectAsState()
     Entry(Icons.Filled.CalendarMonth, s.pbTitle, if (booking.joined) s.pbEntryJoined(booking.club.ifBlank { booking.url }) else s.pbEntryHint) { c.go(Screen.BOOK_COURT) }
     SectionLabel(s.playUseAs)
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
-    Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
 }
 
 @Composable
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
-    // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
-    ServeTrainingCard(c)
-    // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
-    Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    val pf by c.playerFeatures.collectAsState()
+    if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
+    if (PlayerFeature.TRAINING in pf) {
+        // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
+        ServeTrainingCard(c)
+        // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
+        Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    }
 }
 
 @Composable
@@ -46477,19 +48915,20 @@ private fun ProgressTab(c: MatchController) {
     val mine = remember(history, me) {
         if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
     }
-    Entry(
+    val pf by c.playerFeatures.collectAsState()
+    if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
-    Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     val trainee by c.trainStudent.collectAsState()
     val ofTrainee = sessions.filter { it.student == trainee }
     val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> ofTrainee.any { it.stroke == t } }
-    if (done.isNotEmpty()) {
+    if (done.isNotEmpty() && PlayerFeature.TRAINING in pf) {
         com.tennis.scoremanager.ui.SectionCard(s.progressStrokes + (c.studentById(trainee)?.name?.let { " · $it" } ?: ""), Icons.Filled.SportsTennis) {
             Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
             for (t in done) {
@@ -46520,14 +48959,21 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
         if (mine != null) c.openStudent(mine.id) else profile = true
     }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    val pf by c.playerFeatures.collectAsState()
+    var uses by remember { mutableStateOf(false) }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
-    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    Entry(Icons.Filled.Tune, s.pfTitle, s.pfEntryHint) { uses = true }
+    SectionLabel(s.moreGroupDevices)
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
-    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
-    Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    SectionLabel(s.moreGroupData)
+    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
     Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
+    SectionLabel(s.moreGroupHelp)
+    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
+    if (uses) com.tennis.scoremanager.ui.PlayerFeaturesDialog(c) { uses = false; c.storage.playerFeaturesSeen = true }
     // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
     AboutFooter()
 }
@@ -48795,8 +51241,9 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
         // Modalità
         if (match) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
-            // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue.
-            Segmented(
+            // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
+            // telecomandi (Altro › Cosa usi) si segna solo da arbitro: niente scelta.
+            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
                 listOf(
                     SegOption(s.modeReferee, Icons.Filled.Gavel),
                     SegOption(s.modeBands, Icons.Filled.Watch),
@@ -48806,7 +51253,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 onSelect = { i -> c.updateOptions { it.copy(mode = PlayMode.entries[i]) } },
                 columns = 1,
             )
-            Text(
+            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Text(
                 when (o.mode) {
                     PlayMode.REFEREE -> s.modeRefereeHint
                     PlayMode.BANDS -> s.modeBandsHint
@@ -48828,7 +51275,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        if (match || devices) HeartSection(
+        if (devices || (match && c.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -51473,7 +53920,7 @@ fun SetupScreen(c: MatchController) {
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+        if (c.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
                 selected = su.sport.ordinal,
@@ -74905,17 +77352,14 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import com.tennis.scoremanager.data.FeeKind
 import java.io.File
 import java.net.InetAddress
 import java.net.Socket
 import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLEngine
-import javax.net.ssl.SSLParameters
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509ExtendedTrustManager
@@ -75073,6 +77517,9 @@ class DeskTest {
         val (_, n) = req("POST", "/fees", """{"name":"Quota 2027","cents":15000,"kind":"MEMBERSHIP","chargeMembers":true}""", k)
         assertTrue(n, "\"count\":1" in n)
         val c = data.ledger.charges.single()
+        // La pagina filtra per tipo: l'addebito porta la quota da cui viene e il suo tipo.
+        val (_, money) = req("GET", "/money", token = k)
+        assertTrue(money, "\"fee\":\"${c.fee}\"" in money && "\"type\":\"MEMBERSHIP\"" in money)
         assertEquals(400, req("POST", "/charges/${c.id}/pay", """{"cents":20000,"date":"2026-11-04","type":"cash"}""", k).first)
         assertEquals(400, req("POST", "/charges/${c.id}/pay", """{"cents":-5,"date":"2026-11-04","type":"cash"}""", k).first)
         assertEquals(400, req("POST", "/charges/${c.id}/pay", """{"cents":100,"date":"2026-11-04","type":"boh"}""", k).first)
@@ -75082,6 +77529,161 @@ class DeskTest {
         assertEquals("1/2026", paid.payments.single().receipt)
         assertEquals(200, req("DELETE", "/charges/${c.id}/payments/${paid.payments.single().id}", token = k).first)
         assertEquals(15000, data.ledger.charges.single().left)
+        val mario = data.list.first { it.lastName == "Rossi" }.id
+        assertEquals(200, req("POST", "/charges", """{"player":"$mario","label":"Rinnovo","cents":2000,"kind":"FITP"}""", k).first)
+        assertEquals(FeeKind.FITP, data.ledger.charges.last().kind)
+        data.ledger = data.ledger.copy(charges = data.ledger.charges + c.copy(id = "x1", fee = null, label = "Tessera 2027") + c.copy(id = "x2", fee = null, label = "${data.courts().first()} · Mer 4 Nov 12:00"))
+        val (_, more) = req("GET", "/money", token = k)
+        assertEquals(2, Regex("\"type\":\"FITP\"").findAll(more).count())
+        assertTrue(more, "\"type\":\"COURT\"" in more)
+    }
+
+    @Test fun torneoDaCapoAFine() {
+        val k = login()
+        for ((n, r) in listOf("Anna" to "4.1", "Bea" to "4.3", "Cora" to "", "Dina" to "4.2", "Ely" to "")) {
+            assertEquals(200, req("POST", "/people", """{"firstName":"$n","lastName":"X","member":true,"ranking":"$r","medicalUntil":"2030-01-01"}""", k).first)
+        }
+        req("POST", "/people", """{"firstName":"Zeno","lastName":"X","member":true}""", k)
+        val ids = data.list.associate { it.firstName to it.id }
+        assertEquals(400, req("POST", "/tournaments", """{"name":"  "}""", k).first)
+        val (st, made) = req("POST", "/tournaments", """{"name":"Sociale 2027","category":"Singolare","start":"2027-05-01","end":"2027-05-10"}""", k)
+        assertEquals(200, st)
+        val id = field(made, "id")!!
+        for (n in listOf("Anna", "Bea", "Cora", "Dina", "Ely", "Zeno")) assertEquals(200, req("POST", "/tournaments/$id/entries", """{"players":["${ids[n]}"]}""", k).first)
+        assertEquals(409, req("POST", "/tournaments/$id/entries", """{"players":["${ids["Anna"]}"]}""", k).first)
+        assertEquals(400, req("POST", "/tournaments/$id/entries", """{"players":["${ids["Anna"]}","${ids["Bea"]}"]}""", k).first)
+        // Zeno non ha il certificato: resta iscritto ma non entra nel sorteggio.
+        val (_, cup) = req("GET", "/tournaments/$id", token = k)
+        assertTrue(cup, "\"code\":\"NO_MEDICAL\"" in cup && "\"eligible\":5" in cup)
+        val cora = data.cups.single().entries.first { it.names == listOf("Cora X") }.id
+        assertEquals(200, req("PUT", "/tournaments/$id/entries/$cora/seed", """{"seed":1}""", k).first)
+        assertEquals(200, req("POST", "/tournaments/$id/draw", token = k).first)
+        var t = data.cups.single()
+        assertEquals(8, t.matches.count { it.round == 1 } * 2)
+        // La testa di serie scelta a mano va in cima, i bye contro le prime teste di serie.
+        assertEquals(cora, t.matches.first { it.round == 1 && it.slot == 0 }.a)
+        assertTrue(t.matches.first { it.round == 1 && it.slot == 0 }.bye)
+        assertFalse(t.entries.first { it.names == listOf("Zeno X") }.id in t.matches.flatMap { listOf(it.a, it.b) })
+        val m = t.matches.first { it.round == 1 && !it.bye }
+        assertEquals(400, req("POST", "/tournaments/$id/matches/${m.id}/result", """{"score":"6-6"}""", k).first)
+        assertEquals(200, req("POST", "/tournaments/$id/matches/${m.id}/result", """{"score":"4-6 2-6"}""", k).first)
+        t = data.cups.single()
+        assertEquals(m.b, t.matches.first { it.id == m.id }.winner)
+        assertEquals(m.b, t.matches.first { it.round == 2 && it.slot == m.slot / 2 }.let { if (m.slot % 2 == 0) it.a else it.b })
+        assertEquals(409, req("POST", "/tournaments/$id/draw", token = k).first)
+        assertEquals(409, req("POST", "/tournaments/$id/undraw", token = k).first)
+        assertEquals(409, req("DELETE", "/tournaments/$id/entries/$cora", token = k).first)
+        // Il programma: il campo occupato da una prenotazione si segnala, e con force si mette lo stesso.
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2027-05-02","startMin":600,"minutes":60,"names":["Rossi"]}""", k)
+        val next = t.matches.first { it.round == 2 }
+        val at = """{"court":"Campo 1","date":"2027-05-02","startMin":630}"""
+        assertEquals(409, req("POST", "/tournaments/$id/matches/${next.id}/schedule", at, k).first)
+        assertEquals(200, req("POST", "/tournaments/$id/matches/${next.id}/schedule", at.replace("}", ",\"force\":true}"), k).first)
+        assertEquals(200, req("POST", "/tournaments/$id/matches/${next.id}/schedule", at.replace("Campo 1", "Campo 2"), k).first)
+        assertEquals("Campo 2", data.cups.single().matches.first { it.id == next.id }.court)
+        val (_, plan) = req("GET", "/day", token = k, q = mapOf("date" to "2027-05-02"))
+        assertTrue(plan, "\"TOURNAMENT\"" in plan && "Sociale 2027" in plan)
+        // A sorteggio fatto la formula non cambia, il nome sì.
+        assertEquals(200, req("PUT", "/tournaments/$id", """{"name":"Sociale di primavera","format":"GROUPS","start":"2027-05-01"}""", k).first)
+        assertEquals("Sociale di primavera", data.cups.single().name)
+        assertEquals(com.tennis.scoremanager.data.CTFormat.KNOCKOUT, data.cups.single().format)
+        assertEquals(200, req("DELETE", "/tournaments/$id", token = k).first)
+        assertTrue(data.cups.isEmpty())
+    }
+
+    @Test fun torneoAGironi() {
+        val k = login()
+        for (n in listOf("A", "B", "C", "D")) req("POST", "/people", """{"firstName":"$n","lastName":"Y","member":true,"medicalUntil":"2030-01-01"}""", k)
+        val id = field(req("POST", "/tournaments", """{"name":"Gironi","format":"GROUPS","groups":2,"qualify":1}""", k).second, "id")!!
+        for (p in data.list) req("POST", "/tournaments/$id/entries", """{"players":["${p.id}"]}""", k)
+        assertEquals(409, req("POST", "/tournaments/$id/knockout", token = k).first)
+        assertEquals(200, req("POST", "/tournaments/$id/draw", token = k).first)
+        for (m in data.cups.single().matches) assertEquals(200, req("POST", "/tournaments/$id/matches/${m.id}/result", """{"score":"6-1 6-1"}""", k).first)
+        val (_, cup) = req("GET", "/tournaments/$id", token = k)
+        assertTrue(cup, "\"standings\":[[{" in cup)
+        assertEquals(200, req("POST", "/tournaments/$id/knockout", token = k).first)
+        val fin = data.cups.single().matches.single { it.round == 1 }
+        assertEquals(data.cups.single().matches.filter { it.round == 0 }.map { it.a }.toSet(), setOf(fin.a, fin.b))
+    }
+
+    @Test fun prenotazioneCambiataRipetutaEChiusure() {
+        val k = login()
+        val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"],"weeks":4}"""
+        // Ripetuta 4 settimane: la terza c'è già un'altra prenotazione e si salta.
+        assertEquals(200, req("POST", "/bookings", b.replace("2026-11-10", "2026-11-24").replace(",\"weeks\":4", ""), k).first)
+        val (st, out) = req("POST", "/bookings", b, k)
+        assertEquals(200, st)
+        assertTrue(out, "2026-11-24" in out)
+        val series = data.courtPlan.bookings.filter { it.series != null }
+        assertEquals(3, series.size)
+        // Spostata di un'ora e su un altro campo: resta lei (stesso id, stessa serie).
+        val first = series.minByOrNull { it.start }!!
+        assertEquals(200, req("PUT", "/bookings/${first.id}", b.replace("Campo 1", "Campo 2").replace("600", "660").replace(",\"weeks\":4", ""), k).first)
+        val moved = data.courtPlan.bookings.first { it.id == first.id }
+        assertEquals("Campo 2", moved.court)
+        assertEquals(first.series, moved.series)
+        assertEquals(first.start + 3_600_000L, moved.start)
+        // Su un campo occupato no.
+        val other = data.courtPlan.bookings.first { it.series == null }
+        assertEquals(409, req("PUT", "/bookings/${moved.id}", b.replace("2026-11-10", "2026-11-24").replace(",\"weeks\":4", ""), k).first)
+        assertEquals(other, data.courtPlan.bookings.first { it.id == other.id })
+        // Cancellata con quelle dopo della serie.
+        assertEquals(200, req("DELETE", "/bookings/${moved.id}", token = k, q = mapOf("series" to "1")).first)
+        assertEquals(listOf(other.id), data.courtPlan.bookings.map { it.id })
+        // Chiusura del Campo 1 il martedì mattina per un mese: lì non si prenota più.
+        assertEquals(400, req("POST", "/blocks", """{"label":"Manutenzione","from":"2026-12-01","to":"2026-11-01"}""", k).first)
+        assertEquals(200, req("POST", "/blocks", """{"label":"Terra nuova","courts":["Campo 1"],"from":"2026-11-01","to":"2026-11-30","weekdays":[2],"startMin":480,"endMin":720}""", k).first)
+        assertEquals(409, req("POST", "/bookings", b.replace(",\"weeks\":4", "").replace("2026-11-10", "2026-11-17"), k).first)
+        assertEquals(200, req("POST", "/bookings", b.replace(",\"weeks\":4", "").replace("2026-11-10", "2026-11-18"), k).first)
+        val (_, day) = req("GET", "/day", token = k, q = mapOf("date" to "2026-11-17"))
+        assertTrue(day, "\"type\":\"BLOCK\"" in day && "Terra nuova" in day && "\"editable\":true" in day)
+        val id = data.courtPlan.blocks.single().id
+        // I blocchi dei corsi si cambiano col corso, nell'app.
+        data.courtPlan = data.courtPlan.copy(blocks = data.courtPlan.blocks + data.courtPlan.blocks.single().copy(id = "corso", course = "c1"))
+        assertEquals(409, req("DELETE", "/blocks/corso", token = k).first)
+        assertEquals(200, req("DELETE", "/blocks/$id", token = k).first)
+        assertEquals(listOf("corso"), data.courtPlan.blocks.map { it.id })
+    }
+
+    @Test fun oggiERicevuta() {
+        val k = login()
+        data.time = java.time.LocalDateTime.of(2026, 11, 10, 9, 0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true}""", k)
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Bianchi"]}""", k)
+        req("POST", "/fees", """{"name":"Quota","cents":5000,"chargeMembers":true}""", k)
+        val (st, out) = req("GET", "/today", token = k)
+        assertEquals(200, st)
+        assertTrue(out, "\"bookings\":1" in out && "Bianchi" in out && "\"startMin\":600" in out)
+        assertTrue(out, "\"collectCents\":5000" in out && "\"members\":1" in out && "Mario Rossi" in out)
+        // Con Quote e pagamenti spento non si vede quanto c'è da incassare.
+        data.on = data.on - com.tennis.scoremanager.ClubFeature.PAYMENTS
+        assertTrue("\"collectCents\":0" in req("GET", "/today", token = k).second)
+        assertTrue(req("GET", "/info", token = k).second.let { "PLANNING" in it && "PAYMENTS" !in it })
+        val c = data.ledger.charges.single()
+        req("POST", "/charges/${c.id}/pay", """{"cents":5000,"date":"2026-11-10","type":"cash"}""", k)
+        val pay = data.ledger.charges.single().payments.single()
+        val r = api.handle(DeskApi.Req("GET", "/charges/${c.id}/payments/${pay.id}/receipt", token = k, ip = ip))
+        assertEquals(200, r.status)
+        assertEquals("application/pdf", r.type)
+        assertEquals(404, req("GET", "/charges/${c.id}/payments/nessuno/receipt", token = k).first)
+    }
+
+    @Test fun settimanaEMese() {
+        val k = login()
+        // 2026-11-11 è un mercoledì: la settimana parte da lunedì 9.
+        req("POST", "/bookings", """{"court":"Campo 1","date":"2026-11-11","startMin":600,"minutes":60,"names":["Rossi"]}""", k)
+        req("POST", "/blocks", """{"label":"Chiuso","from":"2026-11-15","to":"2026-11-15"}""", k)
+        val (st, w) = req("GET", "/week", token = k, q = mapOf("date" to "2026-11-11"))
+        assertEquals(200, st)
+        assertTrue(w, "\"from\":\"2026-11-09\"" in w && "\"date\":\"2026-11-15\"" in w && "Rossi" in w)
+        assertEquals(7, Regex("\"date\":").findAll(w).count())
+        val (_, m) = req("GET", "/month", token = k, q = mapOf("date" to "2026-11-20"))
+        assertTrue(m, "\"first\":\"2026-11-01\"" in m)
+        assertEquals(30, Regex("\"date\":").findAll(m).count())
+        // Un'ora su un campo, con due campi aperti 15 ore: 3%. La domenica chiusa tutta.
+        assertTrue(m, "{\"date\":\"2026-11-11\",\"bookings\":1,\"matches\":0,\"busy\":3,\"blocked\":0}" in m)
+        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100}" in m)
+        assertEquals(400, req("GET", "/week", token = k, q = mapOf("date" to "boh")).first)
     }
 
     @Test fun prenotazioniSenzaSovrapposizioni() {
@@ -75098,6 +77700,26 @@ class DeskTest {
         assertEquals(1200, data.courtPlan.bookings.first().cents)
         assertEquals(200, req("DELETE", "/bookings/${data.courtPlan.bookings.first().id}", token = k).first)
         assertEquals(1, data.courtPlan.bookings.size)
+    }
+
+    @Test fun csvEsportatoSiReimporta() {
+        val k = login()
+        // Le colonne che scrive Esporta CSV dei Soci (in portoghese e in francese).
+        for (csv in listOf(
+            "Sobrenome;Nome;Telefone;E-mail;Data de nascimento;Sócio do clube;Sócio desde;Cartão do clube;Carteira federativa;Ano do cartão;Classificação;Atestado até;Deve\r\n" +
+                "Rossi;Mario;333 1;m@x.it;01/03/1980;Sim;;77;123;;4.1;31/12/2026;\r\n",
+            "Nom de famille;Prénom;Téléphone;E-mail;Date de naissance;Carte du club;Licence fédérale;Classement;Certificat jusqu'au\r\n" +
+                "Verdi;Anna;333 2;;;78;456;4.2;30/06/2027\r\n",
+        )) {
+            val body = kotlinx.serialization.json.Json.encodeToString(DeskCsvIn.serializer(), DeskCsvIn(csv))
+            assertTrue(req("POST", "/people/import", body, k).second.contains("\"added\":1"))
+        }
+        val m = data.list.first { it.firstName == "Mario" }.member!!
+        assertEquals(listOf("77", "123", "4.1"), listOf(m.number, m.fitpNumber, m.ranking))
+        assertNotNull(m.medicalUntil)
+        val a = data.list.first { it.firstName == "Anna" }
+        assertEquals(listOf("Verdi", "333 2", "456"), listOf(a.lastName, a.phone, a.member!!.fitpNumber))
+        assertNotNull(a.member!!.medicalUntil)
     }
 
     @Test fun csvDaExcelItaliano() {
@@ -75161,15 +77783,21 @@ class DeskTest {
                 override fun getAcceptedIssuers() = emptyArray<X509Certificate>()
             }
             val ctx = SSLContext.getInstance("TLS").apply { init(null, arrayOf<TrustManager>(trust), null) }
-            val http = HttpClient.newBuilder().sslContext(ctx).sslParameters(SSLParameters().apply { endpointIdentificationAlgorithm = "" }).version(HttpClient.Version.HTTP_1_1).build()
-            fun get(p: String) = http.send(HttpRequest.newBuilder(URI("https://127.0.0.1:$port$p")).build(), HttpResponse.BodyHandlers.ofString())
+            // HttpsURLConnection (c'è anche nei test Android, java.net.http no); il percorso va scritto così com'è.
+            class Got(val code: Int, val headers: Map<String, List<String>>)
+            fun get(p: String): Got {
+                val c = URI("https://127.0.0.1:$port").toURL().let { java.net.URL(it, p) }.openConnection() as javax.net.ssl.HttpsURLConnection
+                c.sslSocketFactory = ctx.socketFactory
+                c.hostnameVerifier = javax.net.ssl.HostnameVerifier { _, _ -> true }
+                return try { Got(c.responseCode, c.headerFields.filterKeys { it != null }.mapKeys { it.key.lowercase() }) } finally { c.disconnect() }
+            }
             val page = get("/")
-            assertEquals(200, page.statusCode())
-            assertTrue(page.headers().firstValue("content-security-policy").get().startsWith("default-src 'none'"))
-            assertEquals("DENY", page.headers().firstValue("x-frame-options").get())
-            assertEquals(401, get("/api/people").statusCode())
-            assertEquals(404, get("/../../etc/passwd").statusCode())
-            assertEquals(404, get("/nascosto.kt").statusCode())
+            assertEquals(200, page.code)
+            assertTrue(page.headers.getValue("content-security-policy").first().startsWith("default-src 'none'"))
+            assertEquals("DENY", page.headers.getValue("x-frame-options").first())
+            assertEquals(401, get("/api/people").code)
+            assertEquals(404, get("/../../etc/passwd").code)
+            assertEquals(404, get("/nascosto.kt").code)
             // Sulla stessa porta in chiaro non si parla.
             val plain = runCatching { Socket("127.0.0.1", port).use { s -> s.getOutputStream().write("GET / HTTP/1.0\r\n\r\n".toByteArray()); s.soTimeout = 3000; s.getInputStream().readBytes() } }
             assertFalse(plain.getOrDefault(ByteArray(0)).toString(Charsets.ISO_8859_1).contains("HTTP/1.1 200"))
@@ -75188,7 +77816,15 @@ cat > "$DEST/app/src/test/java/com/tennis/scoremanager/desk/FakeDesk.kt" << 'TSM
 package com.tennis.scoremanager.desk
 
 import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.ClubTournaments
 import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.CourtSettings
@@ -75211,12 +77847,36 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun book() = ledger
     override fun saveBook(b: ClubBook) { ledger = b }
     override fun payTypes() = Fees.types(ledger) { it.name }
-    override fun courts() = listOf("Campo 1", "Campo 2")
+    var pitches = listOf("Campo 1", "Campo 2")
+    override fun courts() = pitches
     override fun plan() = courtPlan
     override fun tournaments() = cups
-    override fun saveBooking(b: CourtBooking, charge: Boolean) { courtPlan = courtPlan.copy(bookings = courtPlan.bookings + b) }
-    override fun deleteBooking(b: CourtBooking) { courtPlan = courtPlan.copy(bookings = courtPlan.bookings - b) }
+    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> {
+        val (list, skipped) = if (weeks > 1) CourtPlans.weekly(courtPlan, cups, b, weeks) else listOf(b) to emptyList()
+        courtPlan = courtPlan.copy(bookings = courtPlan.bookings.filter { o -> list.none { it.id == o.id } } + list)
+        return skipped
+    }
+    override fun deleteBooking(b: CourtBooking, series: Boolean) {
+        val gone = if (series && b.series != null) courtPlan.bookings.filter { it.series == b.series && it.start >= b.start } else listOf(b)
+        courtPlan = courtPlan.copy(bookings = courtPlan.bookings - gone.toSet())
+    }
+    override fun saveBlock(b: CourtBlock, delete: Boolean) {
+        courtPlan = courtPlan.copy(blocks = courtPlan.blocks.filter { it.id != b.id } + listOfNotNull(b.takeIf { !delete }))
+    }
+    var on = ClubFeature.entries.filter { it.base }.toSet()
+    var school = emptyList<Course>()
+    override fun features() = on
+    override fun courses() = school
+    override fun teams() = emptyList<Team>()
+    override fun ladders() = emptyList<Ladder>()
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? =
+        ledger.charges.firstOrNull { it.id == chargeId }?.payments?.firstOrNull { it.id == paymentId }?.let { "%PDF-${it.receipt}".toByteArray() }
     override fun paymentsCsv(year: Int): ByteArray? = "anno;$year\n".toByteArray()
+    override fun saveTournament(t: ClubTournament) { cups = cups.filter { it.id != t.id } + t }
+    override fun deleteTournament(t: ClubTournament) { cups = cups - t }
+    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) =
+        saveTournament(t.copy(entries = t.entries + CTEntry(ClubTournaments.newId("e"), people.map { it.id }, people.map { it.name }, at = time)))
+    override fun removeEntry(t: ClubTournament, entry: CTEntry) = saveTournament(t.copy(entries = t.entries - entry))
 }
 TSM_EOF
 
@@ -86189,6 +88849,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 295 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 297 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -28,13 +28,17 @@ object MembersCsv {
         "first" to listOf("nome", "first name", "firstname", "given name", "prenom", "vorname", "nombre", "primeiro nome"),
         "last" to listOf("cognome", "last name", "lastname", "surname", "family name", "nom de famille", "nachname", "familienname", "apellido", "apellidos", "apelido", "sobrenome"),
         "full" to listOf("nome e cognome", "cognome e nome", "nominativo", "socio", "full name", "name", "nom", "nombre completo", "nome completo"),
-        "phone" to listOf("telefono", "cellulare", "tel", "phone", "mobile", "telephone", "portable", "telefon", "handy", "movil", "telemovel"),
+        "phone" to listOf("telefono", "cellulare", "tel", "phone", "mobile", "telephone", "portable", "telefon", "handy", "movil", "telemovel", "telefone"),
         "email" to listOf("email", "e mail", "mail", "posta elettronica", "courriel", "correo", "correo electronico"),
         "birth" to listOf("data di nascita", "nascita", "nato il", "birth date", "date of birth", "birthday", "date de naissance", "geburtsdatum", "fecha de nacimiento", "data de nascimento"),
-        "number" to listOf("tessera", "tessera circolo", "numero tessera", "n tessera", "numero socio", "member number", "membership number", "numero de membre", "mitgliedsnummer", "numero de socio", "numero de socio"),
-        "fitp" to listOf("fitp", "tessera fitp", "numero fitp", "n fitp", "fit", "federation number", "licence", "lizenz", "licencia", "licenca"),
+        "number" to listOf("tessera", "tessera circolo", "numero tessera", "n tessera", "numero socio", "member number", "membership number", "numero de membre", "mitgliedsnummer", "numero de socio", "numero de socio",
+            // Le colonne dell'esportazione della Segreteria da PC, nelle sei lingue.
+            "tessera del circolo", "club card", "carte du club", "vereinsausweis", "carne del club", "cartao do clube"),
+        "fitp" to listOf("fitp", "tessera fitp", "numero fitp", "n fitp", "fit", "federation number", "licence", "lizenz", "licencia", "licenca",
+            "federation card", "licence federale", "verbandslizenz", "licencia federativa", "carteira federativa"),
         "ranking" to listOf("classifica", "ranking", "classement", "rangliste", "clasificacion", "classificacao"),
-        "medical" to listOf("scadenza certificato", "certificato medico", "certificato", "scadenza visita", "medical until", "medical certificate", "certificat medical", "arztliches attest", "certificado medico"),
+        "medical" to listOf("scadenza certificato", "certificato medico", "certificato", "scadenza visita", "medical until", "medical certificate", "certificat medical", "arztliches attest", "certificado medico",
+            "certificato fino al", "certificat jusqu au", "attest bis", "certificado hasta", "atestado ate"),
     )
 
     private val DATES = listOf("d/M/uuuu", "uuuu-M-d", "d-M-uuuu", "d.M.uuuu", "d/M/uu").map { DateTimeFormatter.ofPattern(it) }

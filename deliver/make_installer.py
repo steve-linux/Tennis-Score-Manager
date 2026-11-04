@@ -20,6 +20,10 @@ sys.path.insert(0, str(ROOT / "deliver"))
 import make_help  # noqa: E402
 
 help_files = [str(p.relative_to(ROOT)) for p in make_help.main()]
+# E i testi dell'app che usa la Segreteria da PC, presi da Strings*.kt.
+import make_desk_texts  # noqa: E402
+
+help_files += [str(p.relative_to(ROOT)) for p in make_desk_texts.main()]
 
 # File tracciati da git dentro il progetto Android (niente build/, .gradle/, local.properties), più la guida appena fatta
 files = subprocess.run(

@@ -51,6 +51,7 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Videocam
@@ -77,6 +78,7 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.PlayerFeature
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.ble.StrapState
@@ -118,7 +120,16 @@ fun HomeScreen(c: MatchController) {
     // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
     val role by c.activeRole.collectAsState()
     val roles by c.roles.collectAsState()
-    val tabs = role.tabs
+    // Le schede di Tu e Allenatore che restano vuote con quello che non si usa spariscono.
+    val pf by c.playerFeatures.collectAsState()
+    val tabs = role.tabs.filter { t ->
+        when (t) {
+            HomeTab.TRAIN -> PlayerFeature.HEART in pf || PlayerFeature.TRAINING in pf
+            HomeTab.VIDEO -> PlayerFeature.VIDEO in pf
+            HomeTab.PROGRESS -> PlayerFeature.PROGRESS in pf || PlayerFeature.RACKETS in pf || PlayerFeature.TRAINING in pf
+            else -> true
+        }
+    }
     LaunchedEffect(role, tab) { if (tab !in tabs) c.homeTab.value = tabs.first() }
     // Da un'altra scheda "Indietro" torna alla prima; dalla prima esce dall'app come sempre.
     BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
@@ -351,6 +362,9 @@ private fun PlayTab(c: MatchController) {
         c.refreshHistory()
     }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
+    val pf by c.playerFeatures.collectAsState()
+    // La prima volta: l'invito a tenere solo quello che si usa.
+    com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -380,22 +394,27 @@ private fun PlayTab(c: MatchController) {
         }
     }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
+    // Senza la scheda Progressi lo storico sta qui.
+    if (PlayerFeature.PROGRESS !in pf && PlayerFeature.RACKETS !in pf && PlayerFeature.TRAINING !in pf) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Il server del circolo (se il circolo ce l'ha): prenotare i campi da qui, con l'invito della segreteria.
     val booking by c.bookingAccount.collectAsState()
     Entry(Icons.Filled.CalendarMonth, s.pbTitle, if (booking.joined) s.pbEntryJoined(booking.club.ifBlank { booking.url }) else s.pbEntryHint) { c.go(Screen.BOOK_COURT) }
     SectionLabel(s.playUseAs)
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
-    Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
 }
 
 @Composable
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
-    // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
-    ServeTrainingCard(c)
-    // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
-    Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    val pf by c.playerFeatures.collectAsState()
+    if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
+    if (PlayerFeature.TRAINING in pf) {
+        // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
+        ServeTrainingCard(c)
+        // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
+        Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    }
 }
 
 @Composable
@@ -416,19 +435,20 @@ private fun ProgressTab(c: MatchController) {
     val mine = remember(history, me) {
         if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
     }
-    Entry(
+    val pf by c.playerFeatures.collectAsState()
+    if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
-    Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     val trainee by c.trainStudent.collectAsState()
     val ofTrainee = sessions.filter { it.student == trainee }
     val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> ofTrainee.any { it.stroke == t } }
-    if (done.isNotEmpty()) {
+    if (done.isNotEmpty() && PlayerFeature.TRAINING in pf) {
         com.tennis.scoremanager.ui.SectionCard(s.progressStrokes + (c.studentById(trainee)?.name?.let { " · $it" } ?: ""), Icons.Filled.SportsTennis) {
             Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
             for (t in done) {
@@ -459,14 +479,21 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
         if (mine != null) c.openStudent(mine.id) else profile = true
     }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    val pf by c.playerFeatures.collectAsState()
+    var uses by remember { mutableStateOf(false) }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
-    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    Entry(Icons.Filled.Tune, s.pfTitle, s.pfEntryHint) { uses = true }
+    SectionLabel(s.moreGroupDevices)
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
-    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
-    Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    SectionLabel(s.moreGroupData)
+    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
     Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
+    SectionLabel(s.moreGroupHelp)
+    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
+    if (uses) com.tennis.scoremanager.ui.PlayerFeaturesDialog(c) { uses = false; c.storage.playerFeaturesSeen = true }
     // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
     AboutFooter()
 }

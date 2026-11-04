@@ -68,6 +68,8 @@ data class Charge(
     val payments: List<Payment> = emptyList(),
     /** Annullato (storno): non si deve più, i pagamenti fatti restano. */
     val cancelled: Boolean = false,
+    /** Il tipo di un addebito senza quota (corso, tessera FITP…), per filtrarli; null se non si sa. */
+    val kind: FeeKind? = null,
 ) {
     val paid: Int get() = payments.sumOf { it.cents }
     val left: Int get() = if (cancelled) 0 else (cents - paid).coerceAtLeast(0)
@@ -138,8 +140,8 @@ object Fees {
     }
 
     /** Un addebito singolo. */
-    fun charge(book: ClubBook, p: PlayerProfile, label: String, cents: Int, now: Long, fee: Fee? = null): ClubBook =
-        book.copy(charges = book.charges + Charge(newId("c"), p.id, p.name, fee?.id, label, cents, now, fee?.due))
+    fun charge(book: ClubBook, p: PlayerProfile, label: String, cents: Int, now: Long, fee: Fee? = null, kind: FeeKind? = null): ClubBook =
+        book.copy(charges = book.charges + Charge(newId("c"), p.id, p.name, fee?.id, label, cents, now, fee?.due, kind = kind))
 
     /**
      * Registra un versamento di [cents] sull'addebito [chargeId] col numero di ricevuta dell'anno del pagamento

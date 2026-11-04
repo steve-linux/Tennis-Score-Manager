@@ -149,6 +149,9 @@ enum class Role(val tabs: List<HomeTab>) {
     CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
 }
 
+/** Cosa usa chi gioca (ruoli Tu e Allenatore): quello che non usa non compare (i dati restano). */
+enum class PlayerFeature { BANDS, HEART, TRAINING, VIDEO, PROGRESS, RACKETS, PADEL }
+
 /**
  * Le funzioni del ruolo Circolo, da accendere o spegnere: quelle spente non compaiono nei menu (i dati restano).
  * [base] = accese all'inizio per tutti.
@@ -2059,6 +2062,27 @@ class MatchController(
     fun openPlanAt(day: Long) {
         planDayRequest.value = day
         openCourtsPlan()
+    }
+
+    // ---- Cosa usi (Tu e Allenatore) ----
+
+    /** Finché non si sceglie, tutto acceso: a chi usa già l'app non sparisce niente. */
+    val playerFeatures = MutableStateFlow(
+        storage.playerFeatures?.mapNotNull { n -> PlayerFeature.entries.firstOrNull { it.name == n } }?.toSet() ?: PlayerFeature.entries.toSet(),
+    )
+
+    fun uses(f: PlayerFeature): Boolean = f in playerFeatures.value
+
+    fun setPlayerFeature(f: PlayerFeature, on: Boolean) = setPlayerFeatures(if (on) playerFeatures.value + f else playerFeatures.value - f)
+
+    fun setPlayerFeatures(set: Set<PlayerFeature>) {
+        playerFeatures.value = set
+        storage.playerFeatures = set.map { it.name }.toSet()
+    }
+
+    /** La prima presentazione propone cosa tenere dalla risposta a "come la userai" (solo se non si è mai scelto). */
+    fun suggestPlayerFeatures(base: Set<PlayerFeature>) {
+        if (storage.playerFeatures == null) setPlayerFeatures(base + PlayerFeature.PROGRESS + PlayerFeature.RACKETS)
     }
 
     // ---- Funzioni del circolo ----

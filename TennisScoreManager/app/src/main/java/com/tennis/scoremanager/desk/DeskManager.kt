@@ -10,6 +10,12 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CourtBlock
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.Ladder
+import com.tennis.scoremanager.data.Team
 import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
@@ -43,9 +49,19 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun courts(): List<String> = c.clubCourts.value
     override fun plan(): CourtPlan = c.courtPlan.value
     override fun tournaments(): List<ClubTournament> = c.clubTournaments.value
-    override fun saveBooking(b: CourtBooking, charge: Boolean) { c.saveBooking(b, 1, charge) }
-    override fun deleteBooking(b: CourtBooking) = c.deleteBooking(b, wholeSeries = false)
+    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.saveBooking(b, weeks, charge)
+    override fun deleteBooking(b: CourtBooking, series: Boolean) = c.deleteBooking(b, wholeSeries = series)
+    override fun saveBlock(b: CourtBlock, delete: Boolean) = c.saveCourtBlock(b, delete)
+    override fun features(): Set<ClubFeature> = c.clubFeatures.value
+    override fun courses(): List<Course> = c.courses.value
+    override fun teams(): List<Team> = c.teams.value
+    override fun ladders(): List<Ladder> = c.ladders.value
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
+    override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
+    override fun deleteTournament(t: ClubTournament) = c.deleteClubTournament(t.id)
+    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.addClubEntry(t, people)
+    override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
 }
 
 /**
