@@ -3544,17 +3544,21 @@ class MatchController(
         }
     }
 
-    fun openFromHistory(m: LiveMatch) {
+    /** Il riepilogo di una partita dello storico; Indietro torna a [back] (lo storico, o Progressi dal calendario). */
+    fun openFromHistory(m: LiveMatch, back: Screen = Screen.HISTORY) {
         summary.value = m
         summaryFromHistory.value = true
+        summaryBack = back
         screen.value = Screen.SUMMARY
     }
+
+    private var summaryBack = Screen.HISTORY
 
     /** "Indietro" dal riepilogo aperto dallo storico. */
     fun backToHistory() {
         summary.value = null
         summaryFromHistory.value = false
-        openHistory()
+        if (summaryBack == Screen.PROGRESS) { summaryBack = Screen.HISTORY; screen.value = Screen.PROGRESS } else openHistory()
     }
 
     fun deleteFromHistory(id: String) {

@@ -1819,6 +1819,15 @@ object DeStrings : Strings {
     override val yrAces: (Int) -> String = { "Asse: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 Training" else "$it Trainings" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a gewonnen, $b verloren" }
+    override val calTitle = "Kalender"
+    override val calHint = "Die Tage mit Matches und Trainings: tippe auf einen Tag, um zu sehen, was du gemacht hast."
+    override val calNoneDay = "An diesem Tag nichts."
+    override val calPrev = "Voriger Monat"
+    override val calNext = "Nächster Monat"
+    override val pbInviteSend = "Einladen"
+    override val pbBookedInvite = "Gebucht! Unten kannst du einladen, wer mit dir spielt."
+    override val calStreak: (Int) -> String = { if (it == 1) "Diese Woche hast du gespielt oder trainiert" else "Seit $it Wochen in Folge spielst oder trainierst du" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "Ich habe einen Platz bei $a gebucht: $b. Bist du dabei?" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

@@ -1822,6 +1822,15 @@ object FrStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces : $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entraînement" else "$it entraînements" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a gagnés, $b perdus" }
+    override val calTitle = "Calendrier"
+    override val calHint = "Les jours avec matchs et entraînements : touchez un jour pour voir ce que vous avez fait."
+    override val calNoneDay = "Rien ce jour-là."
+    override val calPrev = "Mois précédent"
+    override val calNext = "Mois suivant"
+    override val pbInviteSend = "Inviter"
+    override val pbBookedInvite = "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous."
+    override val calStreak: (Int) -> String = { if (it == 1) "Vous avez joué ou vous êtes entraîné cette semaine" else "$it semaines de suite à jouer ou vous entraîner" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "J'ai réservé un court à $a : $b. Tu viens ?" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

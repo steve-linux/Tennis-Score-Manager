@@ -103,6 +103,7 @@ fun ProgressScreen(c: MatchController) {
         var year by remember { mutableStateOf(false) }
         GhostButton(s.yrTitle, Icons.Filled.CalendarMonth, { year = true }, Modifier.fillMaxWidth())
         if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
+        com.tennis.scoremanager.ui.ActivityCalendarCard(c)
         Segmented(
             listOf(SegOption(s.progressWorkouts), SegOption(s.progressMatches)),
             selected = if (matches) 1 else 0,

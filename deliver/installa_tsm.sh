@@ -509,6 +509,7 @@ const APP_I18N = {
     pbBlocked: "Non prenotabile",
     pbBookNow: "Prenota",
     pbBooked: "Prenotato!",
+    pbBookedInvite: "Prenotato! Qui sotto puoi invitare chi gioca con te.",
     pbBusy: "Occupato",
     pbCallOffice: "Per disdirla ora chiama la segreteria.",
     pbCancel: "Disdici",
@@ -546,6 +547,8 @@ const APP_I18N = {
     pbFreePrice: "gratis",
     pbHeating: "Riscaldamento",
     pbInvite: "Link o codice d'invito",
+    pbInviteSend: "Invita",
+    pbInviteText: (a, b) => `Ho prenotato un campo a ${a}: ${b}. Ci sei?`,
     pbJoin: "Entra",
     pbJoinIntro: "Inquadra il QR d'invito che ti ha dato la segreteria del circolo, oppure incolla il link dell'invito (o scrivi il codice e l'indirizzo del circolo).",
     pbLeave: "Esci da questo circolo",
@@ -958,6 +961,7 @@ const APP_I18N = {
     pbBlocked: "Not bookable",
     pbBookNow: "Book",
     pbBooked: "Booked!",
+    pbBookedInvite: "Booked! Below you can invite whoever plays with you.",
     pbBusy: "Taken",
     pbCallOffice: "To cancel it now, call the club office.",
     pbCancel: "Cancel",
@@ -995,6 +999,8 @@ const APP_I18N = {
     pbFreePrice: "free",
     pbHeating: "Heating",
     pbInvite: "Invitation link or code",
+    pbInviteSend: "Invite",
+    pbInviteText: (a, b) => `I booked a court at ${a}: ${b}. Are you in?`,
     pbJoin: "Join",
     pbJoinIntro: "Scan the invitation QR the club office gave you, or paste the invitation link (or type the code and the club address).",
     pbLeave: "Leave this club",
@@ -1407,6 +1413,7 @@ const APP_I18N = {
     pbBlocked: "Non réservable",
     pbBookNow: "Réserver",
     pbBooked: "Réservé !",
+    pbBookedInvite: "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous.",
     pbBusy: "Occupé",
     pbCallOffice: "Pour l'annuler maintenant, appelez le secrétariat.",
     pbCancel: "Annuler",
@@ -1444,6 +1451,8 @@ const APP_I18N = {
     pbFreePrice: "gratuit",
     pbHeating: "Chauffage",
     pbInvite: "Lien ou code d'invitation",
+    pbInviteSend: "Inviter",
+    pbInviteText: (a, b) => `J'ai réservé un court à ${a} : ${b}. Tu viens ?`,
     pbJoin: "Entrer",
     pbJoinIntro: "Scannez le QR d'invitation donné par le secrétariat du club, ou collez le lien d'invitation (ou saisissez le code et l'adresse du club).",
     pbLeave: "Quitter ce club",
@@ -1856,6 +1865,7 @@ const APP_I18N = {
     pbBlocked: "Nicht buchbar",
     pbBookNow: "Buchen",
     pbBooked: "Gebucht!",
+    pbBookedInvite: "Gebucht! Unten kannst du einladen, wer mit dir spielt.",
     pbBusy: "Belegt",
     pbCallOffice: "Um sie jetzt zu stornieren, ruf das Vereinsbüro an.",
     pbCancel: "Stornieren",
@@ -1893,6 +1903,8 @@ const APP_I18N = {
     pbFreePrice: "kostenlos",
     pbHeating: "Heizung",
     pbInvite: "Einladungslink oder -code",
+    pbInviteSend: "Einladen",
+    pbInviteText: (a, b) => `Ich habe einen Platz bei ${a} gebucht: ${b}. Bist du dabei?`,
     pbJoin: "Beitreten",
     pbJoinIntro: "Scanne den Einladungs-QR-Code vom Vereinsbüro oder füge den Einladungslink ein (oder gib Code und Vereinsadresse ein).",
     pbLeave: "Diesen Verein verlassen",
@@ -2305,6 +2317,7 @@ const APP_I18N = {
     pbBlocked: "No reservable",
     pbBookNow: "Reservar",
     pbBooked: "¡Reservada!",
+    pbBookedInvite: "¡Reservado! Abajo puedes invitar a quien juega contigo.",
     pbBusy: "Ocupada",
     pbCallOffice: "Para anularla ahora llama a la secretaría.",
     pbCancel: "Anular",
@@ -2342,6 +2355,8 @@ const APP_I18N = {
     pbFreePrice: "gratis",
     pbHeating: "Calefacción",
     pbInvite: "Enlace o código de invitación",
+    pbInviteSend: "Invitar",
+    pbInviteText: (a, b) => `He reservado una pista en ${a}: ${b}. ¿Te apuntas?`,
     pbJoin: "Entrar",
     pbJoinIntro: "Escanea el QR de invitación que te dio la secretaría del club, o pega el enlace de la invitación (o escribe el código y la dirección del club).",
     pbLeave: "Salir de este club",
@@ -2754,6 +2769,7 @@ const APP_I18N = {
     pbBlocked: "Não reservável",
     pbBookNow: "Reservar",
     pbBooked: "Reservada!",
+    pbBookedInvite: "Reservado! Aqui em baixo pode convidar quem joga consigo.",
     pbBusy: "Ocupada",
     pbCallOffice: "Para a cancelar agora liga para a secretaria.",
     pbCancel: "Cancelar",
@@ -2791,6 +2807,8 @@ const APP_I18N = {
     pbFreePrice: "grátis",
     pbHeating: "Aquecimento",
     pbInvite: "Ligação ou código de convite",
+    pbInviteSend: "Convidar",
+    pbInviteText: (a, b) => `Reservei uma quadra em ${a}: ${b}. Vamos jogar?`,
     pbJoin: "Entrar",
     pbJoinIntro: "Lê o QR de convite que a secretaria do clube te deu, ou cola a ligação do convite (ou escreve o código e o endereço do clube).",
     pbLeave: "Sair deste clube",
@@ -7244,6 +7262,8 @@ Zum Trainieren mit dem Brustgurt ohne Match: **Trainieren** › **Training mit d
 
 **Ziele** (oben in Fortschritte): wähle einen Punkt (gewonnene Matches, gewonnene Punkte, erste Aufschläge, Asse, Doppelfehler, unerzwungene Fehler, Matches in 30 Tagen, Trainings in 7 Tagen) und einen Zielwert; der Balken füllt sich mit dem Schnitt deiner letzten 3, 5 oder 10 Matches. Erreichst du ihn, erscheint ein Hinweis in **Spielen**. **Mein Jahr** (auch im Tab Fortschritt): Matches, Siege, Stunden auf dem Platz, der Rivale mit Bilanz, die Matches Monat für Monat, die längste Serie und die Trainings, in einem Bild zum Teilen. Für beides muss die App wissen, wer du bist (Mehr › Du).
 
+**Kalender** (in Fortschritte, unter *Mein Jahr*): der Monat mit gelben Punkten für Matches und roten für Trainings, und seit wie vielen Wochen in Folge du spielst oder trainierst; tippe auf einen Tag, um zu sehen, was du gemacht hast, und das Match zu öffnen.
+
 ### 7.3 Videos: Kamera-Telefon, Highlights und Zeitlupe
 
 Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
@@ -7452,6 +7472,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code. Am iPhone führt ihn die **TSM**-Seite durch: *Teilen › Zum Home-Bildschirm*, dann TSM vom Home-Bildschirm öffnen und den Code einfügen (Safari und die App auf dem Home-Bildschirm teilen keine Daten, deshalb wird die Einladung in der installierten App benutzt). Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
 - **Mit der TSM-App auf Android** bucht der Spieler auch unter *Spielen › Platz buchen*: den Einladungs-QR-Code scannen (oder den Link einfügen), dann die eigenen Buchungen sehen, den Tag wählen und ein freies Feld antippen; Dauer, Heizung und Preis vor dem Bestätigen, **Stornieren**, solange es noch geht, **Diesen Verein verlassen**, um das Handy zu trennen. Es gelten dieselben Regeln wie auf der Webseite.
 - Seite und App haben **drei Reiter**: **Buchen** (Tage und Felder), **Meine** (Buchungen, Wartelisten, Erinnerungen) und **Partner** (Partner gesucht).
+- In der App schickt **Einladen** unter **Meine** dem, der mit dir spielt, Platz, Tag und Uhrzeit schon fertig geschrieben (per WhatsApp oder wohin du willst); nach einer Buchung bringt dich die App von selbst dorthin.
 - **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
 - **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
 - **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
@@ -7804,6 +7825,8 @@ To train with the heart rate strap without a match: **Train** › **Workout with
 
 **Goals** (at the top of Progress): pick an item (matches won, points won, first serves in, aces, double faults, unforced errors, matches in 30 days, workouts in 7 days) and a target; the bar fills with the average of your last 3, 5 or 10 matches. When you reach it a notice appears in **Play**. **My year** (also in the Progress tab): matches, wins, hours on court, the rival with the record, matches month by month, the longest streak and workouts, in a picture to share. Both need the app to know who you are (More › You).
 
+**Calendar** (in Progress, below *My year*): the month with yellow dots for matches and red ones for workouts, and how many weeks in a row you've played or trained; tap a day to see what you did and open the match.
+
 ### 7.3 Videos: camera phone, highlights and replay
 
 A second phone on a tripod films the match and puts the umpire's score on the video.
@@ -8012,6 +8035,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR. On iPhone the **TSM** page walks them through it: *Share › Add to Home Screen*, then open TSM from the Home Screen and paste the code (Safari and the Home Screen app do not share data, so the invitation is used in the installed app). The card shows who books online; **Remove online access** disconnects them.
 - **With the TSM app on Android** a player can also book from *Play › Book a court*: scan the invitation QR (or paste the link), then see your bookings, pick the day and tap a free slot; length, heating and price before confirming, **Cancel** while still in time, **Leave this club** to disconnect the phone. The rules are the same as on the web page.
 - The page and the app have **three tabs**: **Book** (days and slots), **Mine** (bookings, waiting lists, reminders) and **Partners** (Looking for a partner).
+- In the app, under **Mine**, **Invite** sends whoever plays with you the court, day and time already written (on WhatsApp or wherever you like); after booking the app takes you there by itself.
 - **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
@@ -8363,6 +8387,8 @@ Para entrenar con la banda de pecho sin partido: **Entrenar** › **Entrenamient
 
 **Objetivos** (arriba en Progresos): elige un dato (partidos ganados, puntos ganados, primeros servicios, aces, dobles faltas, errores no forzados, partidos en 30 días, entrenamientos en 7 días) y una meta; la barra se llena con la media de tus últimos 3, 5 o 10 partidos. Cuando la alcanzas aparece un aviso en **Jugar**. **Mi año** (también en la pestaña Progresos): partidos, victorias, horas en pista, el rival con el balance, los partidos mes a mes, la racha más larga y los entrenamientos, en una imagen para compartir. Los dos necesitan que la app sepa quién eres (Más › Tú).
 
+**Calendario** (en Progresos, debajo de *Mi año*): el mes con puntos amarillos de los partidos y rojos de los entrenamientos, y cuántas semanas seguidas llevas jugando o entrenando; toca un día para ver qué hiciste y abrir el partido.
+
 ### 7.3 Vídeos: teléfono-cámara, mejores jugadas y repetición
 
 Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marcador del árbitro.
@@ -8571,6 +8597,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR. En iPhone la página **TSM** le guía: *Compartir › Añadir a pantalla de inicio*, luego abre TSM desde la pantalla de inicio y pega el código (Safari y la app de la pantalla de inicio no comparten datos, así que la invitación se usa en la app instalada). En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
 - **Con la app TSM en Android** el jugador también reserva desde *Jugar › Reservar pista*: escanea el QR de la invitación (o pega el enlace), luego ve sus reservas, elige el día y toca una casilla libre; duración, calefacción y precio antes de confirmar, **Anular** mientras haya tiempo, **Salir de este club** para desconectar el teléfono. Las reglas son las mismas que en la página web.
 - La página y la app tienen **tres pestañas**: **Reservar** (días y casillas), **Mías** (reservas, listas de espera, recordatorios) y **Compañeros** (Busco compañero).
+- En la app, en **Mías**, **Invitar** envía a quien juega contigo la pista, el día y la hora ya escritos (por WhatsApp o donde quieras); tras una reserva la app te lleva ahí sola.
 - **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
 - **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
 - **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
@@ -8922,6 +8949,8 @@ Pour s'entraîner avec la ceinture cardio sans match : **S'entraîner** › **En
 
 **Objectifs** (en haut de Progrès) : choisissez un élément (matchs gagnés, points gagnés, premières balles, aces, doubles fautes, fautes directes, matchs en 30 jours, entraînements en 7 jours) et un seuil ; la barre se remplit avec la moyenne de vos 3, 5 ou 10 derniers matchs. Quand vous l'atteignez, un avis apparaît dans **Jouer**. **Mon année** (aussi dans l'onglet Progrès) : matchs, victoires, heures sur le court, le rival avec le bilan, les matchs mois par mois, la plus longue série et les entraînements, dans une image à partager. Les deux demandent que l'app sache qui vous êtes (Plus › Vous).
 
+**Calendrier** (dans Progrès, sous *Mon année*) : le mois avec les points jaunes des matchs et rouges des entraînements, et depuis combien de semaines de suite vous jouez ou vous entraînez ; touchez un jour pour voir ce que vous avez fait et ouvrir le match.
+
 ### 7.3 Vidéos : téléphone-caméra, temps forts et ralenti
 
 Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
@@ -9130,6 +9159,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR. Sur iPhone, la page **TSM** le guide : *Partager › Sur l'écran d'accueil*, puis il ouvre TSM depuis l'écran d'accueil et colle le code (Safari et l'app de l'écran d'accueil ne partagent pas leurs données, l'invitation s'utilise donc dans l'app installée). La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
 - **Avec l'app TSM sur Android**, le joueur réserve aussi depuis *Jouer › Réserver un terrain* : il scanne le QR de l'invitation (ou colle le lien), puis voit ses réservations, choisit le jour et touche un créneau libre ; durée, chauffage et prix avant de confirmer, **Annuler** tant qu'il est temps, **Quitter ce club** pour déconnecter le téléphone. Les règles sont les mêmes que sur la page web.
 - La page et l'app ont **trois onglets** : **Réserver** (jours et créneaux), **Les miennes** (réservations, listes d'attente, rappels) et **Partenaires** (Je cherche un partenaire).
+- Dans l'app, sous **Les miennes**, **Inviter** envoie à qui joue avec vous le court, le jour et l'heure déjà écrits (sur WhatsApp ou ailleurs) ; après une réservation, l'app vous y amène toute seule.
 - **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
@@ -9481,6 +9511,8 @@ Per allenarsi con la fascia cardio senza una partita: **Allenati** › **Allenam
 
 **Obiettivi** (in cima a Progressi): scegli una voce (partite vinte, punti vinti, prime di servizio, ace, doppi falli, errori gratuiti, partite in 30 giorni, allenamenti in 7 giorni) e un traguardo; la barra si riempie con la media delle tue ultime 3, 5 o 10 partite. Quando lo raggiungi compare l'avviso in **Gioca**. **Il mio anno** (anche nella scheda Progressi): partite, vittorie, ore in campo, il rivale col bilancio, le partite mese per mese, la serie più lunga e gli allenamenti, in un'immagine da condividere. Servono tutti e due che l'app sappia chi sei (Altro › Tu).
 
+**Calendario** (in Progressi, sotto *Il mio anno*): il mese coi pallini gialli delle partite e rossi degli allenamenti, e da quante settimane di fila giochi o ti alleni; tocca un giorno per vedere cosa hai fatto e aprire la partita.
+
 ### 7.3 Video: telefono-telecamera, highlights e moviola
 
 Un secondo telefono su un treppiede riprende la partita e mette sul video il punteggio dell'arbitro.
@@ -9689,6 +9721,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR. Su iPhone la pagina **TSM** lo guida: *Condividi › Aggiungi alla schermata Home*, poi apre TSM dalla Home e incolla il codice (Safari e l'app sulla Home non condividono i dati, quindi l'invito si usa nell'app installata). Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
 - **Con l'app TSM su Android** il giocatore prenota anche da *Gioca › Prenota un campo*: inquadra il QR dell'invito (o incolla il link), poi vede le sue prenotazioni, sceglie il giorno e tocca una casella libera; durata, riscaldamento e prezzo prima di confermare, **Disdici** finché si è in tempo, **Esci da questo circolo** per scollegare il telefono. Le regole sono le stesse della pagina web.
 - La pagina e l'app hanno **tre schede**: **Prenota** (giorni e caselle), **Le mie** (prenotazioni, liste d'attesa, promemoria) e **Compagni** (Cerco compagno).
+- Nell'app, in **Le mie**, **Invita** manda a chi gioca con te il campo, il giorno e l'ora già scritti (su WhatsApp o dove vuoi); dopo una prenotazione l'app ti porta lì da sola.
 - **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
@@ -10040,6 +10073,8 @@ Para treinar com a cinta cardíaca sem partida: **Treinar** › **Treino com a c
 
 **Objetivos** (no alto de Progressos): escolha um dado (partidas ganhas, pontos ganhos, primeiros serviços, aces, duplas faltas, erros não forçados, partidas em 30 dias, treinos em 7 dias) e uma meta; a barra enche-se com a média das suas últimas 3, 5 ou 10 partidas. Quando a alcança aparece um aviso em **Jogar**. **O meu ano** (também no separador Progresso): partidas, vitórias, horas em quadra, o rival com o balanço, as partidas mês a mês, a maior série e os treinos, numa imagem para partilhar. Os dois precisam que o app saiba quem é (Mais › Você).
 
+**Calendário** (em Progressos, abaixo de *O meu ano*): o mês com pontos amarelos das partidas e vermelhos dos treinos, e há quantas semanas seguidas joga ou treina; toque num dia para ver o que fez e abrir a partida.
+
 ### 7.3 Vídeos: telefone-câmera, melhores momentos e replay
 
 Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do árbitro.
@@ -10248,6 +10283,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR. No iPhone a página **TSM** guia-o: *Partilhar › Adicionar ao ecrã principal*, depois abre o TSM a partir do ecrã principal e cola o código (o Safari e a app do ecrã principal não partilham dados, por isso o convite usa-se na app instalada). Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
 - **Com a app TSM no Android** o jogador também reserva em *Jogar › Reservar quadra*: lê o QR do convite (ou cola a ligação), depois vê as suas reservas, escolhe o dia e toca numa casa livre; duração, aquecimento e preço antes de confirmar, **Cancelar** enquanto há tempo, **Sair deste clube** para desligar o telemóvel. As regras são as mesmas da página web.
 - A página e a app têm **três separadores**: **Reservar** (dias e casas), **Minhas** (reservas, listas de espera, lembretes) e **Parceiros** (Procuro parceiro).
+- No app, em **Minhas**, **Convidar** envia a quem joga consigo a quadra, o dia e a hora já escritos (pelo WhatsApp ou onde quiser); depois de uma reserva o app leva-o lá sozinho.
 - **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
@@ -14645,17 +14681,21 @@ class MatchController(
         }
     }
 
-    fun openFromHistory(m: LiveMatch) {
+    /** Il riepilogo di una partita dello storico; Indietro torna a [back] (lo storico, o Progressi dal calendario). */
+    fun openFromHistory(m: LiveMatch, back: Screen = Screen.HISTORY) {
         summary.value = m
         summaryFromHistory.value = true
+        summaryBack = back
         screen.value = Screen.SUMMARY
     }
+
+    private var summaryBack = Screen.HISTORY
 
     /** "Indietro" dal riepilogo aperto dallo storico. */
     fun backToHistory() {
         summary.value = null
         summaryFromHistory.value = false
-        openHistory()
+        if (summaryBack == Screen.PROGRESS) { summaryBack = Screen.HISTORY; screen.value = Screen.PROGRESS } else openHistory()
     }
 
     fun deleteFromHistory(id: String) {
@@ -17448,6 +17488,70 @@ class StrapGaps {
         const val GAP_MS = 3_000L
         /** Il secondo che ci si aspetta comunque tra una misura e l'altra non è perso. */
         private const val EXPECTED_MS = 1_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ActivityCalendar.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ActivityCalendar.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.util.Calendar
+
+/**
+ * Il calendario di Progressi: quali giorni hanno partite e allenamenti, e da quante settimane di fila si gioca o ci
+ * si allena. Le settimane cominciano il lunedì.
+ */
+object ActivityCalendar {
+    /** Cosa c'è in un giorno: gli id delle partite e degli allenamenti. */
+    data class Day(val matches: List<String> = emptyList(), val workouts: List<String> = emptyList())
+
+    private fun cal(t: Long) = Calendar.getInstance().apply { firstDayOfWeek = Calendar.MONDAY; minimalDaysInFirstWeek = 4; timeInMillis = t }
+
+    fun dayStart(t: Long): Long = cal(t).apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+
+    /** Il lunedì della settimana di [t], a mezzanotte. */
+    fun weekStart(t: Long): Long = cal(dayStart(t)).apply { while (get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) add(Calendar.DAY_OF_YEAR, -1) }.timeInMillis
+
+    /** I giorni (a mezzanotte) con quello che c'è: partite e allenamenti come (id, quando). */
+    fun byDay(matches: List<Pair<String, Long>>, workouts: List<Pair<String, Long>>): Map<Long, Day> {
+        val out = HashMap<Long, Day>()
+        for ((id, t) in matches) dayStart(t).let { d -> out[d] = (out[d] ?: Day()).let { it.copy(matches = it.matches + id) } }
+        for ((id, t) in workouts) dayStart(t).let { d -> out[d] = (out[d] ?: Day()).let { it.copy(workouts = it.workouts + id) } }
+        return out
+    }
+
+    /**
+     * Da quante settimane di fila si gioca o ci si allena: si conta all'indietro da questa settimana (o dalla scorsa,
+     * se questa è ancora vuota: la settimana non è finita).
+     */
+    fun weekStreak(times: List<Long>, now: Long): Int {
+        val weeks = times.map(::weekStart).toSet()
+        var w = weekStart(now)
+        if (w !in weeks) w = cal(w).apply { add(Calendar.DAY_OF_YEAR, -7) }.timeInMillis
+        var n = 0
+        while (w in weeks) {
+            n++
+            w = cal(w).apply { add(Calendar.DAY_OF_YEAR, -7) }.timeInMillis
+        }
+        return n
+    }
+
+    /**
+     * Le caselle del mese ([year], [month] 0-11), a righe di 7 dal lunedì: null prima del primo e dopo l'ultimo
+     * giorno, se no la mezzanotte del giorno.
+     */
+    fun monthGrid(year: Int, month: Int): List<Long?> {
+        val first = Calendar.getInstance().apply { clear(); set(year, month, 1) }
+        val lead = (first.get(Calendar.DAY_OF_WEEK) + 5) % 7
+        val days = first.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val cells = MutableList<Long?>(lead) { null }
+        for (d in 1..days) cells += Calendar.getInstance().apply { clear(); set(year, month, d) }.timeInMillis
+        while (cells.size % 7 != 0) cells += null
+        return cells
     }
 }
 TSM_EOF
@@ -32828,6 +32932,13 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/GoalsUi.kt" << 'TSM_EO
 package com.tennis.scoremanager.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32975,6 +33086,89 @@ fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
 }
+
+/** Progressi › Calendario: il mese coi giorni di partite (giallo) e allenamenti (rosso), e le settimane di fila. */
+@Composable
+fun ActivityCalendarCard(c: MatchController) {
+    val s = LocalStrings.current
+    val history by c.history.collectAsState()
+    val workouts by c.workouts.collectAsState()
+    val lang = c.options.value.lang
+    val now = remember { System.currentTimeMillis() }
+    val today = java.util.Calendar.getInstance()
+    var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
+    val days = remember(history, workouts) {
+        com.tennis.scoremanager.data.ActivityCalendar.byDay(
+            history.filter { it.record.finished }.map { it.record.id to (it.record.startedAt ?: it.record.updatedAt) },
+            workouts.map { it.id to it.startedAt },
+        )
+    }
+    val streak = remember(days) { com.tennis.scoremanager.data.ActivityCalendar.weekStreak(days.keys.toList(), now) }
+    var picked by remember { mutableStateOf<Long?>(null) }
+    SectionCard(s.calTitle, androidx.compose.material.icons.Icons.Filled.CalendarMonth) {
+        Text(s.calHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (streak >= 1) Text(s.calStreak(streak), color = TsmColors.Ball, fontSize = 14.sp)
+        val y = ym / 12; val m = ym % 12
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = { ym--; picked = null }) { Text("←", fontSize = 20.sp) }
+            val title = java.text.SimpleDateFormat("LLLL yyyy", lang.locale).format(java.util.Calendar.getInstance().apply { clear(); set(y, m, 1) }.time)
+            Text(title.replaceFirstChar { it.titlecase(lang.locale) }, color = TsmColors.TextMain, fontSize = 16.sp, modifier = Modifier.weight(1f),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            TextButton(onClick = { ym++; picked = null }) { Text("→", fontSize = 20.sp) }
+        }
+        val names = java.text.DateFormatSymbols(lang.locale).shortWeekdays
+        val order = listOf(java.util.Calendar.MONDAY, java.util.Calendar.TUESDAY, java.util.Calendar.WEDNESDAY, java.util.Calendar.THURSDAY,
+            java.util.Calendar.FRIDAY, java.util.Calendar.SATURDAY, java.util.Calendar.SUNDAY)
+        Row { for (d in order) Text(names[d].take(2).replaceFirstChar { it.titlecase(lang.locale) }, color = TsmColors.TextDim, fontSize = 11.sp,
+            modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
+        val todayStart = com.tennis.scoremanager.data.ActivityCalendar.dayStart(now)
+        for (week in com.tennis.scoremanager.data.ActivityCalendar.monthGrid(y, m).chunked(7)) Row {
+            for (d in week) {
+                val info = d?.let { days[it] }
+                Column(
+                    Modifier.weight(1f).height(44.dp).padding(1.dp)
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                        .background(if (d != null && d == picked) TsmColors.SurfaceHigh else androidx.compose.ui.graphics.Color.Transparent)
+                        .let { if (d != null) it.clickable { picked = d } else it },
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+                ) {
+                    if (d != null) {
+                        val n = java.util.Calendar.getInstance().apply { timeInMillis = d }.get(java.util.Calendar.DAY_OF_MONTH)
+                        Text("$n", color = if (d == todayStart) TsmColors.Ball else TsmColors.TextMain, fontSize = 13.sp)
+                        Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                            if (!info?.matches.isNullOrEmpty()) Dot(TsmColors.Ball)
+                            if (!info?.workouts.isNullOrEmpty()) Dot(TsmColors.Danger)
+                        }
+                    }
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Dot(TsmColors.Ball); Text(s.progressMatches, color = TsmColors.TextDim, fontSize = 12.sp)
+            Dot(TsmColors.Danger); Text(s.progressWorkouts, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        picked?.let { d ->
+            val info = days[d]
+            Text(com.tennis.scoremanager.data.Notices.day(d, lang), color = TsmColors.TextMain, fontSize = 14.sp)
+            if (info == null) Text(s.calNoneDay, color = TsmColors.TextDim, fontSize = 13.sp)
+            for (id in info?.matches.orEmpty()) history.firstOrNull { it.record.id == id }?.let { lm ->
+                val rec = lm.record
+                val names2 = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { com.tennis.scoremanager.data.PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+                TextButton(onClick = { c.openFromHistory(lm, com.tennis.scoremanager.Screen.PROGRESS) }, modifier = Modifier.fillMaxWidth()) {
+                    Text("${Reports.time(rec.startedAt ?: rec.updatedAt, lang)} · $names2", color = TsmColors.TextMain, modifier = Modifier.fillMaxWidth())
+                }
+            }
+            for (id in info?.workouts.orEmpty()) workouts.firstOrNull { it.id == id }?.let { w ->
+                Text("${Reports.time(w.startedAt, lang)} · ${s.trainCardio} · ${Reports.duration(w.durationS * 1000L)}", color = TsmColors.TextMain, fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun Dot(color: androidx.compose.ui.graphics.Color) =
+    androidx.compose.foundation.layout.Box(Modifier.size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(color))
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt
@@ -37134,6 +37328,16 @@ interface Strings {
     val yrAces: (Int) -> String
     val yrWorkouts: (Int) -> String
     val yrRecord: (Int, Int) -> String
+    /** Progressi › Calendario e Prenota › Invita. */
+    val calTitle: String
+    val calHint: String
+    val calNoneDay: String
+    val calPrev: String
+    val calNext: String
+    val pbInviteSend: String
+    val pbBookedInvite: String
+    val calStreak: (Int) -> String
+    val pbInviteText: (String, String) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -39252,6 +39456,15 @@ object ItStrings : Strings {
     override val yrAces: (Int) -> String = { "Ace: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 allenamento" else "$it allenamenti" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a vinte, $b perse" }
+    override val calTitle = "Calendario"
+    override val calHint = "I giorni con partite e allenamenti: tocca un giorno per vedere cosa hai fatto."
+    override val calNoneDay = "Niente in questo giorno."
+    override val calPrev = "Mese prima"
+    override val calNext = "Mese dopo"
+    override val pbInviteSend = "Invita"
+    override val pbBookedInvite = "Prenotato! Qui sotto puoi invitare chi gioca con te."
+    override val calStreak: (Int) -> String = { if (it == 1) "Hai giocato o ti sei allenato questa settimana" else "Da $it settimane di fila giochi o ti alleni" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "Ho prenotato un campo a $a: $b. Ci sei?" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -41351,6 +41564,15 @@ object EnStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 workout" else "$it workouts" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a won, $b lost" }
+    override val calTitle = "Calendar"
+    override val calHint = "Days with matches and workouts: tap a day to see what you did."
+    override val calNoneDay = "Nothing on this day."
+    override val calPrev = "Previous month"
+    override val calNext = "Next month"
+    override val pbInviteSend = "Invite"
+    override val pbBookedInvite = "Booked! Below you can invite whoever plays with you."
+    override val calStreak: (Int) -> String = { if (it == 1) "You played or trained this week" else "$it weeks in a row of playing or training" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "I booked a court at $a: $b. Are you in?" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -43473,6 +43695,15 @@ object DeStrings : Strings {
     override val yrAces: (Int) -> String = { "Asse: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 Training" else "$it Trainings" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a gewonnen, $b verloren" }
+    override val calTitle = "Kalender"
+    override val calHint = "Die Tage mit Matches und Trainings: tippe auf einen Tag, um zu sehen, was du gemacht hast."
+    override val calNoneDay = "An diesem Tag nichts."
+    override val calPrev = "Voriger Monat"
+    override val calNext = "Nächster Monat"
+    override val pbInviteSend = "Einladen"
+    override val pbBookedInvite = "Gebucht! Unten kannst du einladen, wer mit dir spielt."
+    override val calStreak: (Int) -> String = { if (it == 1) "Diese Woche hast du gespielt oder trainiert" else "Seit $it Wochen in Folge spielst oder trainierst du" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "Ich habe einen Platz bei $a gebucht: $b. Bist du dabei?" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -45588,6 +45819,15 @@ object EsStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entrenamiento" else "$it entrenamientos" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganados, $b perdidos" }
+    override val calTitle = "Calendario"
+    override val calHint = "Los días con partidos y entrenamientos: toca un día para ver qué hiciste."
+    override val calNoneDay = "Nada este día."
+    override val calPrev = "Mes anterior"
+    override val calNext = "Mes siguiente"
+    override val pbInviteSend = "Invitar"
+    override val pbBookedInvite = "¡Reservado! Abajo puedes invitar a quien juega contigo."
+    override val calStreak: (Int) -> String = { if (it == 1) "Esta semana has jugado o entrenado" else "Llevas $it semanas seguidas jugando o entrenando" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "He reservado una pista en $a: $b. ¿Te apuntas?" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -47705,6 +47945,15 @@ object FrStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces : $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entraînement" else "$it entraînements" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a gagnés, $b perdus" }
+    override val calTitle = "Calendrier"
+    override val calHint = "Les jours avec matchs et entraînements : touchez un jour pour voir ce que vous avez fait."
+    override val calNoneDay = "Rien ce jour-là."
+    override val calPrev = "Mois précédent"
+    override val calNext = "Mois suivant"
+    override val pbInviteSend = "Inviter"
+    override val pbBookedInvite = "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous."
+    override val calStreak: (Int) -> String = { if (it == 1) "Vous avez joué ou vous êtes entraîné cette semaine" else "$it semaines de suite à jouer ou vous entraîner" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "J'ai réservé un court à $a : $b. Tu viens ?" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -49823,6 +50072,15 @@ object PtStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 treino" else "$it treinos" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganhas, $b perdidas" }
+    override val calTitle = "Calendário"
+    override val calHint = "Os dias com partidas e treinos: toque num dia para ver o que fez."
+    override val calNoneDay = "Nada neste dia."
+    override val calPrev = "Mês anterior"
+    override val calNext = "Mês seguinte"
+    override val pbInviteSend = "Convidar"
+    override val pbBookedInvite = "Reservado! Aqui em baixo pode convidar quem joga consigo."
+    override val calStreak: (Int) -> String = { if (it == 1) "Esta semana jogou ou treinou" else "Há $it semanas seguidas que joga ou treina" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "Reservei uma quadra em $a: $b. Vamos jogar?" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -50662,6 +50920,12 @@ private fun BookingView(c: MatchController) {
                         Text(listOfNotNull(if (b.cents > 0) Fees.money(b.cents, locale) else s.pbFreePrice, s.pbLights.takeIf { b.lights }, s.pbHeating.takeIf { b.heating }).joinToString(" · "),
                             color = TsmColors.TextDim, fontSize = 13.sp)
                     }
+                    // L'invito a chi gioca: su WhatsApp (o dove si vuole) col campo, il giorno e l'ora già scritti.
+                    TextButton(onClick = {
+                        val text = s.pbInviteText(m.club, "${b.court} · ${ct.whenText(b.start)}–${ct.time(b.start + b.minutes * 60_000L)}")
+                        val send = android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text)
+                        context.startActivity(android.content.Intent.createChooser(send, s.pbInviteSend))
+                    }) { Text(s.pbInviteSend, color = TsmColors.Ball) }
                     TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
                 }
 
@@ -50723,7 +50987,8 @@ private fun BookingView(c: MatchController) {
         booking?.let { (court, start) ->
             BookDialog(c, m, day?.slotMinutes ?: 60, court, start, ct) { done ->
                 booking = null
-                if (done) { Toast.makeText(context, s.pbBooked, Toast.LENGTH_SHORT).show(); reload() }
+                // Prenotato: si va alle proprie prenotazioni, dove c'è Invita.
+                if (done) { Toast.makeText(context, s.pbBookedInvite, Toast.LENGTH_LONG).show(); tab = 1; reload() }
             }
         }
         if (newSeek) SeekDialog(c, m, day, date, ct) { done ->
@@ -57957,6 +58222,7 @@ fun ProgressScreen(c: MatchController) {
         var year by remember { mutableStateOf(false) }
         GhostButton(s.yrTitle, Icons.Filled.CalendarMonth, { year = true }, Modifier.fillMaxWidth())
         if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
+        com.tennis.scoremanager.ui.ActivityCalendarCard(c)
         Segmented(
             listOf(SegOption(s.progressWorkouts), SegOption(s.progressMatches)),
             selected = if (matches) 1 else 0,
@@ -80042,6 +80308,45 @@ class StrokeProtocolTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ActivityCalendarTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ActivityCalendarTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+import java.util.Calendar
+
+class ActivityCalendarTest {
+    private fun at(m: Int, d: Int, h: Int = 18) = Calendar.getInstance().apply { clear(); set(2026, m, d, h, 0) }.timeInMillis
+
+    @Test fun daysAndWeeksInARow() {
+        val days = ActivityCalendar.byDay(listOf("m1" to at(10, 2), "m2" to at(10, 2, 20)), listOf("w1" to at(10, 2, 9), "w2" to at(10, 4)))
+        assertEquals(listOf("m1", "m2"), days[ActivityCalendar.dayStart(at(10, 2))]!!.matches)
+        assertEquals(listOf("w1"), days[ActivityCalendar.dayStart(at(10, 2))]!!.workouts)
+        // Novembre 2026: lunedì 2, 9, 16, 23. Attività nelle settimane del 26 ottobre, del 2 e del 9 novembre.
+        val times = listOf(at(9, 28), at(10, 3), at(10, 12))
+        assertEquals(3, ActivityCalendar.weekStreak(times, at(10, 13)))
+        // Mercoledì 18 senza niente ancora: la settimana non è finita, si conta dalla scorsa.
+        assertEquals(3, ActivityCalendar.weekStreak(times, at(10, 18)))
+        // Una settimana intera saltata: la serie si azzera.
+        assertEquals(0, ActivityCalendar.weekStreak(times, at(10, 25)))
+    }
+
+    @Test fun monthStartsOnMonday() {
+        // Il 1° novembre 2026 è domenica: sei caselle vuote prima.
+        val g = ActivityCalendar.monthGrid(2026, 10)
+        assertEquals(0, g.size % 7)
+        assertNull(g[5])
+        assertEquals(ActivityCalendar.dayStart(at(10, 1)), g[6])
+        assertEquals(ActivityCalendar.dayStart(at(10, 2)), g[7])
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubBookTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubBookTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -94691,6 +94996,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 305 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 307 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

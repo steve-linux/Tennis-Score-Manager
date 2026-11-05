@@ -4,6 +4,13 @@
 package com.tennis.scoremanager.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -151,3 +158,86 @@ fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
 }
+
+/** Progressi › Calendario: il mese coi giorni di partite (giallo) e allenamenti (rosso), e le settimane di fila. */
+@Composable
+fun ActivityCalendarCard(c: MatchController) {
+    val s = LocalStrings.current
+    val history by c.history.collectAsState()
+    val workouts by c.workouts.collectAsState()
+    val lang = c.options.value.lang
+    val now = remember { System.currentTimeMillis() }
+    val today = java.util.Calendar.getInstance()
+    var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
+    val days = remember(history, workouts) {
+        com.tennis.scoremanager.data.ActivityCalendar.byDay(
+            history.filter { it.record.finished }.map { it.record.id to (it.record.startedAt ?: it.record.updatedAt) },
+            workouts.map { it.id to it.startedAt },
+        )
+    }
+    val streak = remember(days) { com.tennis.scoremanager.data.ActivityCalendar.weekStreak(days.keys.toList(), now) }
+    var picked by remember { mutableStateOf<Long?>(null) }
+    SectionCard(s.calTitle, androidx.compose.material.icons.Icons.Filled.CalendarMonth) {
+        Text(s.calHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (streak >= 1) Text(s.calStreak(streak), color = TsmColors.Ball, fontSize = 14.sp)
+        val y = ym / 12; val m = ym % 12
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = { ym--; picked = null }) { Text("←", fontSize = 20.sp) }
+            val title = java.text.SimpleDateFormat("LLLL yyyy", lang.locale).format(java.util.Calendar.getInstance().apply { clear(); set(y, m, 1) }.time)
+            Text(title.replaceFirstChar { it.titlecase(lang.locale) }, color = TsmColors.TextMain, fontSize = 16.sp, modifier = Modifier.weight(1f),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            TextButton(onClick = { ym++; picked = null }) { Text("→", fontSize = 20.sp) }
+        }
+        val names = java.text.DateFormatSymbols(lang.locale).shortWeekdays
+        val order = listOf(java.util.Calendar.MONDAY, java.util.Calendar.TUESDAY, java.util.Calendar.WEDNESDAY, java.util.Calendar.THURSDAY,
+            java.util.Calendar.FRIDAY, java.util.Calendar.SATURDAY, java.util.Calendar.SUNDAY)
+        Row { for (d in order) Text(names[d].take(2).replaceFirstChar { it.titlecase(lang.locale) }, color = TsmColors.TextDim, fontSize = 11.sp,
+            modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
+        val todayStart = com.tennis.scoremanager.data.ActivityCalendar.dayStart(now)
+        for (week in com.tennis.scoremanager.data.ActivityCalendar.monthGrid(y, m).chunked(7)) Row {
+            for (d in week) {
+                val info = d?.let { days[it] }
+                Column(
+                    Modifier.weight(1f).height(44.dp).padding(1.dp)
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                        .background(if (d != null && d == picked) TsmColors.SurfaceHigh else androidx.compose.ui.graphics.Color.Transparent)
+                        .let { if (d != null) it.clickable { picked = d } else it },
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+                ) {
+                    if (d != null) {
+                        val n = java.util.Calendar.getInstance().apply { timeInMillis = d }.get(java.util.Calendar.DAY_OF_MONTH)
+                        Text("$n", color = if (d == todayStart) TsmColors.Ball else TsmColors.TextMain, fontSize = 13.sp)
+                        Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                            if (!info?.matches.isNullOrEmpty()) Dot(TsmColors.Ball)
+                            if (!info?.workouts.isNullOrEmpty()) Dot(TsmColors.Danger)
+                        }
+                    }
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Dot(TsmColors.Ball); Text(s.progressMatches, color = TsmColors.TextDim, fontSize = 12.sp)
+            Dot(TsmColors.Danger); Text(s.progressWorkouts, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        picked?.let { d ->
+            val info = days[d]
+            Text(com.tennis.scoremanager.data.Notices.day(d, lang), color = TsmColors.TextMain, fontSize = 14.sp)
+            if (info == null) Text(s.calNoneDay, color = TsmColors.TextDim, fontSize = 13.sp)
+            for (id in info?.matches.orEmpty()) history.firstOrNull { it.record.id == id }?.let { lm ->
+                val rec = lm.record
+                val names2 = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { com.tennis.scoremanager.data.PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+                TextButton(onClick = { c.openFromHistory(lm, com.tennis.scoremanager.Screen.PROGRESS) }, modifier = Modifier.fillMaxWidth()) {
+                    Text("${Reports.time(rec.startedAt ?: rec.updatedAt, lang)} · $names2", color = TsmColors.TextMain, modifier = Modifier.fillMaxWidth())
+                }
+            }
+            for (id in info?.workouts.orEmpty()) workouts.firstOrNull { it.id == id }?.let { w ->
+                Text("${Reports.time(w.startedAt, lang)} · ${s.trainCardio} · ${Reports.duration(w.durationS * 1000L)}", color = TsmColors.TextMain, fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun Dot(color: androidx.compose.ui.graphics.Color) =
+    androidx.compose.foundation.layout.Box(Modifier.size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(color))

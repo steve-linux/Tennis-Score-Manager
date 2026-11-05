@@ -1820,6 +1820,15 @@ object EsStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entrenamiento" else "$it entrenamientos" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganados, $b perdidos" }
+    override val calTitle = "Calendario"
+    override val calHint = "Los días con partidos y entrenamientos: toca un día para ver qué hiciste."
+    override val calNoneDay = "Nada este día."
+    override val calPrev = "Mes anterior"
+    override val calNext = "Mes siguiente"
+    override val pbInviteSend = "Invitar"
+    override val pbBookedInvite = "¡Reservado! Abajo puedes invitar a quien juega contigo."
+    override val calStreak: (Int) -> String = { if (it == 1) "Esta semana has jugado o entrenado" else "Llevas $it semanas seguidas jugando o entrenando" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "He reservado una pista en $a: $b. ¿Te apuntas?" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

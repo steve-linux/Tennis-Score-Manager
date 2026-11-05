@@ -264,6 +264,12 @@ private fun BookingView(c: MatchController) {
                         Text(listOfNotNull(if (b.cents > 0) Fees.money(b.cents, locale) else s.pbFreePrice, s.pbLights.takeIf { b.lights }, s.pbHeating.takeIf { b.heating }).joinToString(" · "),
                             color = TsmColors.TextDim, fontSize = 13.sp)
                     }
+                    // L'invito a chi gioca: su WhatsApp (o dove si vuole) col campo, il giorno e l'ora già scritti.
+                    TextButton(onClick = {
+                        val text = s.pbInviteText(m.club, "${b.court} · ${ct.whenText(b.start)}–${ct.time(b.start + b.minutes * 60_000L)}")
+                        val send = android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text)
+                        context.startActivity(android.content.Intent.createChooser(send, s.pbInviteSend))
+                    }) { Text(s.pbInviteSend, color = TsmColors.Ball) }
                     TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
                 }
 
@@ -325,7 +331,8 @@ private fun BookingView(c: MatchController) {
         booking?.let { (court, start) ->
             BookDialog(c, m, day?.slotMinutes ?: 60, court, start, ct) { done ->
                 booking = null
-                if (done) { Toast.makeText(context, s.pbBooked, Toast.LENGTH_SHORT).show(); reload() }
+                // Prenotato: si va alle proprie prenotazioni, dove c'è Invita.
+                if (done) { Toast.makeText(context, s.pbBookedInvite, Toast.LENGTH_LONG).show(); tab = 1; reload() }
             }
         }
         if (newSeek) SeekDialog(c, m, day, date, ct) { done ->

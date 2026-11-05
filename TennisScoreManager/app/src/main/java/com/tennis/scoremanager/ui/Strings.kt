@@ -1870,6 +1870,16 @@ interface Strings {
     val yrAces: (Int) -> String
     val yrWorkouts: (Int) -> String
     val yrRecord: (Int, Int) -> String
+    /** Progressi › Calendario e Prenota › Invita. */
+    val calTitle: String
+    val calHint: String
+    val calNoneDay: String
+    val calPrev: String
+    val calNext: String
+    val pbInviteSend: String
+    val pbBookedInvite: String
+    val calStreak: (Int) -> String
+    val pbInviteText: (String, String) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3988,6 +3998,15 @@ object ItStrings : Strings {
     override val yrAces: (Int) -> String = { "Ace: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 allenamento" else "$it allenamenti" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a vinte, $b perse" }
+    override val calTitle = "Calendario"
+    override val calHint = "I giorni con partite e allenamenti: tocca un giorno per vedere cosa hai fatto."
+    override val calNoneDay = "Niente in questo giorno."
+    override val calPrev = "Mese prima"
+    override val calNext = "Mese dopo"
+    override val pbInviteSend = "Invita"
+    override val pbBookedInvite = "Prenotato! Qui sotto puoi invitare chi gioca con te."
+    override val calStreak: (Int) -> String = { if (it == 1) "Hai giocato o ti sei allenato questa settimana" else "Da $it settimane di fila giochi o ti alleni" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "Ho prenotato un campo a $a: $b. Ci sei?" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -6087,6 +6106,15 @@ object EnStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 workout" else "$it workouts" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a won, $b lost" }
+    override val calTitle = "Calendar"
+    override val calHint = "Days with matches and workouts: tap a day to see what you did."
+    override val calNoneDay = "Nothing on this day."
+    override val calPrev = "Previous month"
+    override val calNext = "Next month"
+    override val pbInviteSend = "Invite"
+    override val pbBookedInvite = "Booked! Below you can invite whoever plays with you."
+    override val calStreak: (Int) -> String = { if (it == 1) "You played or trained this week" else "$it weeks in a row of playing or training" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "I booked a court at $a: $b. Are you in?" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

@@ -1823,6 +1823,15 @@ object PtStrings : Strings {
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 treino" else "$it treinos" }
     override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganhas, $b perdidas" }
+    override val calTitle = "Calendário"
+    override val calHint = "Os dias com partidas e treinos: toque num dia para ver o que fez."
+    override val calNoneDay = "Nada neste dia."
+    override val calPrev = "Mês anterior"
+    override val calNext = "Mês seguinte"
+    override val pbInviteSend = "Convidar"
+    override val pbBookedInvite = "Reservado! Aqui em baixo pode convidar quem joga consigo."
+    override val calStreak: (Int) -> String = { if (it == 1) "Esta semana jogou ou treinou" else "Há $it semanas seguidas que joga ou treina" }
+    override val pbInviteText: (String, String) -> String = { a, b -> "Reservei uma quadra em $a: $b. Vamos jogar?" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
