@@ -70,6 +70,7 @@ fun DrillsScreen(c: MatchController) {
     var edit by remember { mutableStateOf<Drill?>(null) }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.10") },
         title = s.drillsTitle,
         subtitle = s.drillsHint,
         icon = Icons.Filled.FormatListNumbered,

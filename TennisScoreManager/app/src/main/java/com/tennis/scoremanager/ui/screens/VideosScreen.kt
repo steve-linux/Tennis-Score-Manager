@@ -70,6 +70,7 @@ fun VideosScreen(c: MatchController) {
         context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.3") },
         title = s.videoTitle,
         subtitle = s.videoHint,
         icon = Icons.Filled.VideoLibrary,

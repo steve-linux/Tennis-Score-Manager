@@ -98,7 +98,7 @@ bash installa_tsm.sh
 
 At the **first start** the app asks three questions: the language, how you'll use it (keep score, play with the wristbands, train, film matches) and your name; you can skip it and do it again from **More › App introduction**. At the bottom there are always **five tabs**:
 
-- **Play**: **New match**, the suspended match to resume, a **rematch** of the last one, the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Play**: **New match**, the suspended match to resume, **Like last time** (same players, court and rules: the rules fit in one line and you go straight to the coin toss; *Change mode or rules* opens them again), the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.

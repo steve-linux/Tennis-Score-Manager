@@ -7013,7 +7013,7 @@ cat > "$DEST/app/src/main/assets/help/de.md" << 'TSM_EOF'
 
 Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen wirst (Punkte zählen, mit Armbändern spielen, trainieren, Matches filmen) und deinen Namen; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Unten gibt es immer **fünf Reiter**:
 
-- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, die **Revanche** des letzten, das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, **Wie beim letzten Mal** (gleiche Spieler, Platz und Regeln: die Regeln stehen in einer Zeile und es geht direkt zum Münzwurf; *Modus oder Regeln ändern* öffnet sie wieder), das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
@@ -7569,7 +7569,7 @@ cat > "$DEST/app/src/main/assets/help/en.md" << 'TSM_EOF'
 
 At the **first start** the app asks three questions: the language, how you'll use it (keep score, play with the wristbands, train, film matches) and your name; you can skip it and do it again from **More › App introduction**. At the bottom there are always **five tabs**:
 
-- **Play**: **New match**, the suspended match to resume, a **rematch** of the last one, the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Play**: **New match**, the suspended match to resume, **Like last time** (same players, court and rules: the rules fit in one line and you go straight to the coin toss; *Change mode or rules* opens them again), the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
@@ -8124,7 +8124,7 @@ cat > "$DEST/app/src/main/assets/help/es.md" << 'TSM_EOF'
 
 En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a usar (llevar el marcador, jugar con las pulseras, entrenar, grabar partidos) y tu nombre; se puede saltar y repetir desde **Más › Presentación de la app**. Abajo hay siempre **cinco pestañas**:
 
-- **Jugar**: **Nuevo partido**, el partido suspendido para reanudar, la **revancha** del último, el **torneo entre amigos** (Americano, Mexicano) y **Usar este teléfono como** marcador o cámara. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
+- **Jugar**: **Nuevo partido**, el partido suspendido para reanudar, **Como la última vez** (mismos jugadores, pista y reglas: las reglas caben en una línea y se va directo al sorteo; *Cambiar modo o reglas* las vuelve a abrir), el **torneo entre amigos** (Americano, Mexicano) y **Usar este teléfono como** marcador o cámara. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
 - **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
 - **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.
@@ -8679,7 +8679,7 @@ cat > "$DEST/app/src/main/assets/help/fr.md" << 'TSM_EOF'
 
 Au **premier démarrage**, l'appli pose trois questions : la langue, comment vous l'utiliserez (compter les points, jouer avec les bracelets, vous entraîner, filmer les matchs) et votre nom ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. En bas, il y a toujours **cinq onglets** :
 
-- **Jouer** : **Nouveau match**, le match suspendu à reprendre, la **revanche** du dernier, le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **Jouer** : **Nouveau match**, le match suspendu à reprendre, **Comme la dernière fois** (mêmes joueurs, court et règles : les règles tiennent sur une ligne et on passe directement au tirage au sort ; *Changer de mode ou de règles* les rouvre), le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
@@ -9234,7 +9234,7 @@ cat > "$DEST/app/src/main/assets/help/it.md" << 'TSM_EOF'
 
 Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segnare il punteggio, giocare coi braccialetti, allenarti, riprendere le partite) e il tuo nome; si può saltare e rifare da **Altro › Presentazione dell'app**. In basso ci sono sempre **cinque schede**:
 
-- **Gioca**: **Nuova partita**, la partita sospesa da riprendere, la **rivincita** dell'ultima, il **torneo tra amici** (Americano, Mexicano) e **Usa questo telefono come** tabellone o telecamera. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
+- **Gioca**: **Nuova partita**, la partita sospesa da riprendere, **Come l'ultima volta** (stessi giocatori, campo e regole: le regole stanno in una riga e si va dritti al sorteggio; *Cambia modalità o regole* le riapre), il **torneo tra amici** (Americano, Mexicano) e **Usa questo telefono come** tabellone o telecamera. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
@@ -9789,7 +9789,7 @@ cat > "$DEST/app/src/main/assets/help/pt.md" << 'TSM_EOF'
 
 Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo (marcar o placar, jogar com as pulseiras, treinar, filmar partidas) e o seu nome; dá para pular e refazer em **Mais › Apresentação do app**. Embaixo há sempre **cinco abas**:
 
-- **Jogar**: **Nova partida**, a partida suspensa para retomar, a **revanche** da última, o **torneio entre amigos** (Americano, Mexicano) e **Usar este telefone como** placar ou câmera. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
+- **Jogar**: **Nova partida**, a partida suspensa para retomar, **Como da última vez** (mesmos jogadores, quadra e regras: as regras cabem numa linha e vai-se direto para o sorteio; *Mudar modo ou regras* reabre-as), o **torneio entre amigos** (Americano, Mexicano) e **Usar este telefone como** placar ou câmera. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
 - **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
 - **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
@@ -14198,6 +14198,7 @@ class MatchController(
         if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
+        quickStart.value = false
         screen.value = Screen.SETUP
     }
 
@@ -14858,6 +14859,16 @@ class MatchController(
             .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, text)
 
     /** La stessa partita in pagina 1: giocatori, circolo, campo e regole; il torneo no. */
+    /** Nuova partita più corta: le regole si vedono in una riga e si va dritti al sorteggio (finché non si tocca Cambia). */
+    val quickStart = MutableStateFlow(false)
+
+    /** Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio. Indietro porta ai giocatori. */
+    fun startLikeLast(rec: MatchRecord) {
+        prepareRematch(rec)
+        quickStart.value = true
+        screen.value = Screen.OPTIONS
+    }
+
     fun prepareRematch(rec: MatchRecord) {
         updateSetup { com.tennis.scoremanager.data.Rematch.setup(rec.setup) }
         updateOptions { com.tennis.scoremanager.data.Rematch.options(it, rec.options) }
@@ -36530,6 +36541,11 @@ interface Strings {
     val obRestore: String
     val obRestoreTitle: String
     val obLast: (String) -> String
+    /** Nuova partita più corta: si riparte come l'ultima volta, dritti al sorteggio. */
+    val playLikeLastHint: String
+    val likeLastTitle: String
+    val likeLastChange: String
+    val playLikeLast: (String) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -36581,7 +36597,6 @@ interface Strings {
     val tabProgress: String
     val tabMore: String
     val playNewMatchHint: String
-    val playRematch: (String) -> String
     val playResume: (String) -> String
     val playTournamentHint: String
     val playUseAs: String
@@ -38605,6 +38620,10 @@ object ItStrings : Strings {
     override val obRestore = "Ripristina"
     override val obRestoreTitle = "Ripristinare questo backup?"
     override val obLast: (String) -> String = { "Ultimo backup: $it" }
+    override val playLikeLastHint = "Stessi giocatori, campo e regole: si va dritti al sorteggio"
+    override val likeLastTitle = "Come l'ultima volta"
+    override val likeLastChange = "Cambia modalità o regole"
+    override val playLikeLast: (String) -> String = { "Come l'ultima volta: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -38652,7 +38671,6 @@ object ItStrings : Strings {
     override val tabProgress = "Progressi"
     override val tabMore = "Altro"
     override val playNewMatchHint = "Chi gioca, regole e come segni il punteggio"
-    override val playRematch: (String) -> String = { "Rivincita: $it" }
     override val playResume: (String) -> String = { "Riprendi: $it" }
     override val playTournamentHint = "Americano o Mexicano, a coppie che girano"
     override val playUseAs = "Usa questo telefono come"
@@ -40661,6 +40679,10 @@ object EnStrings : Strings {
     override val obRestore = "Restore"
     override val obRestoreTitle = "Restore this backup?"
     override val obLast: (String) -> String = { "Last backup: $it" }
+    override val playLikeLastHint = "Same players, court and rules: straight to the coin toss"
+    override val likeLastTitle = "Like last time"
+    override val likeLastChange = "Change mode or rules"
+    override val playLikeLast: (String) -> String = { "Like last time: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -40708,7 +40730,6 @@ object EnStrings : Strings {
     override val tabProgress = "Progress"
     override val tabMore = "More"
     override val playNewMatchHint = "Who plays, rules and how you keep score"
-    override val playRematch: (String) -> String = { "Rematch: $it" }
     override val playResume: (String) -> String = { "Resume: $it" }
     override val playTournamentHint = "Americano or Mexicano, with rotating pairs"
     override val playUseAs = "Use this phone as"
@@ -42740,6 +42761,10 @@ object DeStrings : Strings {
     override val obRestore = "Wiederherstellen"
     override val obRestoreTitle = "Diese Sicherung wiederherstellen?"
     override val obLast: (String) -> String = { "Letzte Sicherung: $it" }
+    override val playLikeLastHint = "Gleiche Spieler, Platz und Regeln: direkt zum Münzwurf"
+    override val likeLastTitle = "Wie beim letzten Mal"
+    override val likeLastChange = "Modus oder Regeln ändern"
+    override val playLikeLast: (String) -> String = { "Wie beim letzten Mal: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -42787,7 +42812,6 @@ object DeStrings : Strings {
     override val tabProgress = "Fortschritt"
     override val tabMore = "Mehr"
     override val playNewMatchHint = "Wer spielt, Regeln und wie gezählt wird"
-    override val playRematch: (String) -> String = { "Revanche: $it" }
     override val playResume: (String) -> String = { "Fortsetzen: $it" }
     override val playTournamentHint = "Americano oder Mexicano, mit wechselnden Paaren"
     override val playUseAs = "Dieses Telefon verwenden als"
@@ -44812,6 +44836,10 @@ object EsStrings : Strings {
     override val obRestore = "Restaurar"
     override val obRestoreTitle = "¿Restaurar esta copia?"
     override val obLast: (String) -> String = { "Última copia: $it" }
+    override val playLikeLastHint = "Mismos jugadores, pista y reglas: directo al sorteo"
+    override val likeLastTitle = "Como la última vez"
+    override val likeLastChange = "Cambiar modo o reglas"
+    override val playLikeLast: (String) -> String = { "Como la última vez: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -44859,7 +44887,6 @@ object EsStrings : Strings {
     override val tabProgress = "Progresos"
     override val tabMore = "Más"
     override val playNewMatchHint = "Quién juega, reglas y cómo llevas el marcador"
-    override val playRematch: (String) -> String = { "Revancha: $it" }
     override val playResume: (String) -> String = { "Reanudar: $it" }
     override val playTournamentHint = "Americano o Mexicano, con parejas que rotan"
     override val playUseAs = "Usar este teléfono como"
@@ -46886,6 +46913,10 @@ object FrStrings : Strings {
     override val obRestore = "Restaurer"
     override val obRestoreTitle = "Restaurer cette sauvegarde ?"
     override val obLast: (String) -> String = { "Dernière sauvegarde : $it" }
+    override val playLikeLastHint = "Mêmes joueurs, court et règles : directement au tirage au sort"
+    override val likeLastTitle = "Comme la dernière fois"
+    override val likeLastChange = "Changer de mode ou de règles"
+    override val playLikeLast: (String) -> String = { "Comme la dernière fois : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -46933,7 +46964,6 @@ object FrStrings : Strings {
     override val tabProgress = "Progrès"
     override val tabMore = "Plus"
     override val playNewMatchHint = "Qui joue, règles et façon de compter"
-    override val playRematch: (String) -> String = { "Revanche : $it" }
     override val playResume: (String) -> String = { "Reprendre : $it" }
     override val playTournamentHint = "Americano ou Mexicano, avec des paires qui tournent"
     override val playUseAs = "Utiliser ce téléphone comme"
@@ -48961,6 +48991,10 @@ object PtStrings : Strings {
     override val obRestore = "Restaurar"
     override val obRestoreTitle = "Restaurar esta cópia?"
     override val obLast: (String) -> String = { "Última cópia: $it" }
+    override val playLikeLastHint = "Mesmos jogadores, quadra e regras: direto para o sorteio"
+    override val likeLastTitle = "Como da última vez"
+    override val likeLastChange = "Mudar modo ou regras"
+    override val playLikeLast: (String) -> String = { "Como da última vez: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -49008,7 +49042,6 @@ object PtStrings : Strings {
     override val tabProgress = "Progresso"
     override val tabMore = "Mais"
     override val playNewMatchHint = "Quem joga, regras e como você marca o placar"
-    override val playRematch: (String) -> String = { "Revanche: $it" }
     override val playResume: (String) -> String = { "Retomar: $it" }
     override val playTournamentHint = "Americano ou Mexicano, com duplas que trocam"
     override val playUseAs = "Usar este telefone como"
@@ -51910,6 +51943,7 @@ fun DataScreen(c: MatchController) {
         }
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.8") },
         title = s.dataTitle,
         subtitle = s.dataHint,
         icon = Icons.Filled.Backup,
@@ -52190,6 +52224,7 @@ fun DrillsScreen(c: MatchController) {
     var edit by remember { mutableStateOf<Drill?>(null) }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.10") },
         title = s.drillsTitle,
         subtitle = s.drillsHint,
         icon = Icons.Filled.FormatListNumbered,
@@ -52569,6 +52604,8 @@ fun HistoryScreen(c: MatchController) {
     BackHandler { if (player != null) player = null else c.home() }
 
     ScreenScaffold(
+
+        onHelp = { c.openHelp("7") },
         title = s.historyTitle,
         subtitle = s.historySubtitle,
         icon = Icons.Filled.History,
@@ -52985,6 +53022,7 @@ fun HomeScreen(c: MatchController) {
     BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
     val (title, icon) = tabInfo(s, tab)
     ScreenScaffold(
+        onHelp = { c.openHelp("3.1") },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
         action = if (roles.size > 1) { { RoleSwitch(c) } } else null,
     ) {
@@ -53243,7 +53281,7 @@ private fun PlayTab(c: MatchController) {
         val su = last.record.setup
         if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
             val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
-            Entry(Icons.Filled.Replay, s.playRematch(names), null) { c.prepareRematch(last.record) }
+            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
         }
     }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
@@ -55428,6 +55466,7 @@ import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
@@ -55614,8 +55653,29 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             }
             SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
         }
-        // Modalità
-        if (match) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
+        // Come l'ultima volta: le regole in una riga, e si va dritti al sorteggio (Cambia le riapre tutte).
+        val quick by c.quickStart.collectAsState()
+        val short = match && quick
+        if (short) SectionCard(s.likeLastTitle, Icons.Filled.Replay) {
+            val mode = when (o.mode) { PlayMode.REFEREE -> s.modeReferee; PlayMode.BANDS -> s.modeBands; PlayMode.REMOTES -> s.modeRemotes }
+            val format = when (o.format) {
+                MatchFormat.BEST_OF_THREE -> s.formatBestOfThree
+                MatchFormat.BEST_OF_FIVE -> s.formatBestOfFive
+                MatchFormat.TWO_SETS_MATCH_TIEBREAK -> s.formatMatchTiebreak
+                MatchFormat.PRO_SET -> s.formatProSet
+                MatchFormat.MATCH_TIEBREAK_ONLY -> s.formatMatchTiebreakOnly
+            }
+            val extra = when {
+                o.format == MatchFormat.MATCH_TIEBREAK_ONLY -> null
+                o.noAd -> if (su.sport == Sport.PADEL) s.goldenPoint else s.noAd
+                o.starPoint -> s.starPoint
+                else -> null
+            }
+            Text(listOfNotNull(mode, format, extra).joinToString(" · "), color = TsmColors.TextMain)
+            GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false }, Modifier.fillMaxWidth())
+        }
+        // Modalità (come l'ultima volta si vede solo coi braccialetti o i telecomandi: vanno collegati)
+        if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
             // telecomandi (Altro › Cosa usi) si segna solo da arbitro: niente scelta.
             if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
@@ -55682,7 +55742,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         if (devices) TvSection(c)
 
         // Formato
-        if (match) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
+        if (match && !short) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
             // Il pro set ha 8 o 10 game, gli altri set 6 o 4: cambiando formato si torna a un valore valido.
             fun pick(f: MatchFormat) = c.updateOptions {
                 val pro = f == MatchFormat.PRO_SET
@@ -56875,6 +56935,7 @@ fun PlayersScreen(c: MatchController) {
     val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.7") },
         title = s.playersTitle,
         subtitle = s.playersHint,
         icon = Icons.Filled.Groups,
@@ -57005,6 +57066,7 @@ fun ProgressScreen(c: MatchController) {
     val selected = shown.map { it.id }.filter { it !in excluded }.toSet()
     val report = remember(history, workouts, matches, key, selected) { if (matches && key == null) null else c.progressReport(key, selected) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.2") },
         title = s.progressTitle,
         subtitle = s.progressHint,
         icon = Icons.AutoMirrored.Filled.TrendingUp,
@@ -57273,6 +57335,7 @@ fun RacketsScreen(c: MatchController) {
     }
     BackHandler { c.back() }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.4") },
         title = s.racketTitle,
         subtitle = s.racketHint,
         icon = Icons.Filled.SportsTennis,
@@ -57443,6 +57506,7 @@ fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () 
         checkHours = check.toIntOrNullTrim()?.coerceIn(1, 999) ?: Racket.DEFAULT_CHECK_HOURS, retired = retired,
     )
     ScreenScaffold(
+        onHelp = { c.openHelp("7.4") },
         title = if (isNew) s.racketNew else s.racketEdit,
         subtitle = start.label.takeIf { !isNew && it.isNotBlank() },
         icon = Icons.Filled.SportsTennis,
@@ -57518,6 +57582,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
     var notes by remember { mutableStateOf(start.notes) }
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.4") },
         title = if (isNew) s.stringNew else s.stringTitle,
         subtitle = racket?.label,
         icon = Icons.Filled.SportsTennis,
@@ -58266,6 +58331,7 @@ fun SetupScreen(c: MatchController) {
         }
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7") },
         title = s.setupTitle,
         subtitle = s.step1Hint,
         icon = Icons.Filled.SportsTennis,
@@ -58885,6 +58951,7 @@ fun StrokeSessionsScreen(c: MatchController) {
     val name = strokeLabel(s, stroke)
     fun mb(b: Long) = String.format(lang.locale, "%.0f MB", b / 1_048_576.0)
     ScreenScaffold(
+        onHelp = { c.openHelp("7.5") },
         title = s.strokeSessionsTitle(name + (who?.let { " · $it" } ?: "")),
         // Da Android 11 la cartella è Documenti; prima quella dell'app (come per i file salvati).
         subtitle = s.strokeSessionsWhere(
@@ -59052,6 +59119,7 @@ fun StudentsScreen(c: MatchController) {
     var create by remember { mutableStateOf(false) }
     val lang = c.options.value.lang
     ScreenScaffold(
+        onHelp = { c.openHelp("7.6") },
         title = s.studentsTitle,
         subtitle = s.studentsHint,
         icon = Icons.Filled.Groups,
@@ -59111,6 +59179,7 @@ fun StudentScreen(c: MatchController) {
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.6") },
         title = st.name,
         subtitle = listOfNotNull(
             st.fullName.takeIf { it.isNotBlank() && it != st.name }, st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size),
@@ -60723,6 +60792,7 @@ private fun TournamentList(c: MatchController) {
         return
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7") },
         title = s.tournamentTitle,
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
@@ -60774,6 +60844,7 @@ private fun NewTournament(c: MatchController, onCancel: () -> Unit) {
     val names = players.map { it.trim() }.filter { it.isNotEmpty() }
     val valid = names.size >= Tournaments.MIN_PLAYERS && names.map { PlayerStats.key(it) }.toSet().size == names.size
     ScreenScaffold(
+        onHelp = { c.openHelp("7") },
         title = s.tournamentNew,
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
@@ -60860,6 +60931,8 @@ private fun TournamentView(c: MatchController, t: Tournament) {
     BackHandler { c.closeTournament() }
 
     ScreenScaffold(
+
+        onHelp = { c.openHelp("7") },
         title = title(t, s),
         subtitle = if (t.scoring == TournamentScoring.POINTS) s.tournamentPointsN(t.pointsPerMatch) else s.tournamentMinutesN(t.minutes),
         icon = Icons.Filled.EmojiEvents,
@@ -61163,6 +61236,7 @@ fun VideosScreen(c: MatchController) {
         context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.3") },
         title = s.videoTitle,
         subtitle = s.videoHint,
         icon = Icons.Filled.VideoLibrary,
@@ -61294,6 +61368,7 @@ fun WorkoutScreen(c: MatchController) {
     val rackets by c.rackets.collectAsState()
     val workoutRacket by c.workoutRacket.collectAsState()
     ScreenScaffold(
+        onHelp = { c.openHelp("7.1") },
         title = s.workoutTitle,
         subtitle = s.workoutHint,
         icon = Icons.Filled.MonitorHeart,
@@ -61385,6 +61460,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
     val o by c.options.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.1") },
         title = s.workoutTitle,
         subtitle = "${Reports.date(w.startedAt, o.lang)} ${Reports.time(w.startedAt, o.lang)}",
         icon = Icons.Filled.MonitorHeart,

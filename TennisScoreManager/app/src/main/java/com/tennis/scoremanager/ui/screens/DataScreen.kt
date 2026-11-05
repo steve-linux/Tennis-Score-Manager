@@ -92,6 +92,7 @@ fun DataScreen(c: MatchController) {
         }
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.8") },
         title = s.dataTitle,
         subtitle = s.dataHint,
         icon = Icons.Filled.Backup,

@@ -3121,6 +3121,7 @@ class MatchController(
         if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
+        quickStart.value = false
         screen.value = Screen.SETUP
     }
 
@@ -3781,6 +3782,16 @@ class MatchController(
             .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, text)
 
     /** La stessa partita in pagina 1: giocatori, circolo, campo e regole; il torneo no. */
+    /** Nuova partita più corta: le regole si vedono in una riga e si va dritti al sorteggio (finché non si tocca Cambia). */
+    val quickStart = MutableStateFlow(false)
+
+    /** Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio. Indietro porta ai giocatori. */
+    fun startLikeLast(rec: MatchRecord) {
+        prepareRematch(rec)
+        quickStart.value = true
+        screen.value = Screen.OPTIONS
+    }
+
     fun prepareRematch(rec: MatchRecord) {
         updateSetup { com.tennis.scoremanager.data.Rematch.setup(rec.setup) }
         updateOptions { com.tennis.scoremanager.data.Rematch.options(it, rec.options) }

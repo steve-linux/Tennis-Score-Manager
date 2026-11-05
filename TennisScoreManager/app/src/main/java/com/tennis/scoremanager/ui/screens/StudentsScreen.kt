@@ -88,6 +88,7 @@ fun StudentsScreen(c: MatchController) {
     var create by remember { mutableStateOf(false) }
     val lang = c.options.value.lang
     ScreenScaffold(
+        onHelp = { c.openHelp("7.6") },
         title = s.studentsTitle,
         subtitle = s.studentsHint,
         icon = Icons.Filled.Groups,
@@ -147,6 +148,7 @@ fun StudentScreen(c: MatchController) {
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.6") },
         title = st.name,
         subtitle = listOfNotNull(
             st.fullName.takeIf { it.isNotBlank() && it != st.name }, st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size),

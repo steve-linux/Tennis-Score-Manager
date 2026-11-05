@@ -107,6 +107,7 @@ fun RacketsScreen(c: MatchController) {
     }
     BackHandler { c.back() }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.4") },
         title = s.racketTitle,
         subtitle = s.racketHint,
         icon = Icons.Filled.SportsTennis,
@@ -277,6 +278,7 @@ fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () 
         checkHours = check.toIntOrNullTrim()?.coerceIn(1, 999) ?: Racket.DEFAULT_CHECK_HOURS, retired = retired,
     )
     ScreenScaffold(
+        onHelp = { c.openHelp("7.4") },
         title = if (isNew) s.racketNew else s.racketEdit,
         subtitle = start.label.takeIf { !isNew && it.isNotBlank() },
         icon = Icons.Filled.SportsTennis,
@@ -352,6 +354,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
     var notes by remember { mutableStateOf(start.notes) }
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.4") },
         title = if (isNew) s.stringNew else s.stringTitle,
         subtitle = racket?.label,
         icon = Icons.Filled.SportsTennis,

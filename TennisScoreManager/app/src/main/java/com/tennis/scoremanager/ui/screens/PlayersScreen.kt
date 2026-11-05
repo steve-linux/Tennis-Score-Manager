@@ -57,6 +57,7 @@ fun PlayersScreen(c: MatchController) {
     val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.7") },
         title = s.playersTitle,
         subtitle = s.playersHint,
         icon = Icons.Filled.Groups,

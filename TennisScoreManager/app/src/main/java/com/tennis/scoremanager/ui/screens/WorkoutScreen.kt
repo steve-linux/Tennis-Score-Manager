@@ -75,6 +75,7 @@ fun WorkoutScreen(c: MatchController) {
     val rackets by c.rackets.collectAsState()
     val workoutRacket by c.workoutRacket.collectAsState()
     ScreenScaffold(
+        onHelp = { c.openHelp("7.1") },
         title = s.workoutTitle,
         subtitle = s.workoutHint,
         icon = Icons.Filled.MonitorHeart,
@@ -166,6 +167,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
     val o by c.options.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.1") },
         title = s.workoutTitle,
         subtitle = "${Reports.date(w.startedAt, o.lang)} ${Reports.time(w.startedAt, o.lang)}",
         icon = Icons.Filled.MonitorHeart,

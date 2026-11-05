@@ -68,6 +68,7 @@ import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
@@ -254,8 +255,29 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             }
             SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
         }
-        // Modalità
-        if (match) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
+        // Come l'ultima volta: le regole in una riga, e si va dritti al sorteggio (Cambia le riapre tutte).
+        val quick by c.quickStart.collectAsState()
+        val short = match && quick
+        if (short) SectionCard(s.likeLastTitle, Icons.Filled.Replay) {
+            val mode = when (o.mode) { PlayMode.REFEREE -> s.modeReferee; PlayMode.BANDS -> s.modeBands; PlayMode.REMOTES -> s.modeRemotes }
+            val format = when (o.format) {
+                MatchFormat.BEST_OF_THREE -> s.formatBestOfThree
+                MatchFormat.BEST_OF_FIVE -> s.formatBestOfFive
+                MatchFormat.TWO_SETS_MATCH_TIEBREAK -> s.formatMatchTiebreak
+                MatchFormat.PRO_SET -> s.formatProSet
+                MatchFormat.MATCH_TIEBREAK_ONLY -> s.formatMatchTiebreakOnly
+            }
+            val extra = when {
+                o.format == MatchFormat.MATCH_TIEBREAK_ONLY -> null
+                o.noAd -> if (su.sport == Sport.PADEL) s.goldenPoint else s.noAd
+                o.starPoint -> s.starPoint
+                else -> null
+            }
+            Text(listOfNotNull(mode, format, extra).joinToString(" · "), color = TsmColors.TextMain)
+            GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false }, Modifier.fillMaxWidth())
+        }
+        // Modalità (come l'ultima volta si vede solo coi braccialetti o i telecomandi: vanno collegati)
+        if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
             // telecomandi (Altro › Cosa usi) si segna solo da arbitro: niente scelta.
             if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
@@ -322,7 +344,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         if (devices) TvSection(c)
 
         // Formato
-        if (match) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
+        if (match && !short) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
             // Il pro set ha 8 o 10 game, gli altri set 6 o 4: cambiando formato si torna a un valore valido.
             fun pick(f: MatchFormat) = c.updateOptions {
                 val pro = f == MatchFormat.PRO_SET

@@ -2,7 +2,7 @@
 
 Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segnare il punteggio, giocare coi braccialetti, allenarti, riprendere le partite) e il tuo nome; si può saltare e rifare da **Altro › Presentazione dell'app**. In basso ci sono sempre **cinque schede**:
 
-- **Gioca**: **Nuova partita**, la partita sospesa da riprendere, la **rivincita** dell'ultima, il **torneo tra amici** (Americano, Mexicano) e **Usa questo telefono come** tabellone o telecamera. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
+- **Gioca**: **Nuova partita**, la partita sospesa da riprendere, **Come l'ultima volta** (stessi giocatori, campo e regole: le regole stanno in una riga e si va dritti al sorteggio; *Cambia modalità o regole* le riapre), il **torneo tra amici** (Americano, Mexicano) e **Usa questo telefono come** tabellone o telecamera. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.

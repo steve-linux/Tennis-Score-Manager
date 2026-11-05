@@ -98,7 +98,7 @@ bash installa_tsm.sh
 
 Au **premier démarrage**, l'appli pose trois questions : la langue, comment vous l'utiliserez (compter les points, jouer avec les bracelets, vous entraîner, filmer les matchs) et votre nom ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. En bas, il y a toujours **cinq onglets** :
 
-- **Jouer** : **Nouveau match**, le match suspendu à reprendre, la **revanche** du dernier, le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **Jouer** : **Nouveau match**, le match suspendu à reprendre, **Comme la dernière fois** (mêmes joueurs, court et règles : les règles tiennent sur une ligne et on passe directement au tirage au sort ; *Changer de mode ou de règles* les rouvre), le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.

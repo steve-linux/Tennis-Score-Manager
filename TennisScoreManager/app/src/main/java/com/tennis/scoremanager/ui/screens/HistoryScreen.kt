@@ -96,6 +96,8 @@ fun HistoryScreen(c: MatchController) {
     BackHandler { if (player != null) player = null else c.home() }
 
     ScreenScaffold(
+
+        onHelp = { c.openHelp("7") },
         title = s.historyTitle,
         subtitle = s.historySubtitle,
         icon = Icons.Filled.History,

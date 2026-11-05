@@ -113,6 +113,7 @@ fun SetupScreen(c: MatchController) {
         }
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7") },
         title = s.setupTitle,
         subtitle = s.step1Hint,
         icon = Icons.Filled.SportsTennis,

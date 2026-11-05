@@ -91,6 +91,7 @@ fun ProgressScreen(c: MatchController) {
     val selected = shown.map { it.id }.filter { it !in excluded }.toSet()
     val report = remember(history, workouts, matches, key, selected) { if (matches && key == null) null else c.progressReport(key, selected) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.2") },
         title = s.progressTitle,
         subtitle = s.progressHint,
         icon = Icons.AutoMirrored.Filled.TrendingUp,

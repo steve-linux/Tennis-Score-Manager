@@ -114,6 +114,7 @@ private fun TournamentList(c: MatchController) {
         return
     }
     ScreenScaffold(
+        onHelp = { c.openHelp("7") },
         title = s.tournamentTitle,
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
@@ -165,6 +166,7 @@ private fun NewTournament(c: MatchController, onCancel: () -> Unit) {
     val names = players.map { it.trim() }.filter { it.isNotEmpty() }
     val valid = names.size >= Tournaments.MIN_PLAYERS && names.map { PlayerStats.key(it) }.toSet().size == names.size
     ScreenScaffold(
+        onHelp = { c.openHelp("7") },
         title = s.tournamentNew,
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
@@ -251,6 +253,8 @@ private fun TournamentView(c: MatchController, t: Tournament) {
     BackHandler { c.closeTournament() }
 
     ScreenScaffold(
+
+        onHelp = { c.openHelp("7") },
         title = title(t, s),
         subtitle = if (t.scoring == TournamentScoring.POINTS) s.tournamentPointsN(t.pointsPerMatch) else s.tournamentMinutesN(t.minutes),
         icon = Icons.Filled.EmojiEvents,

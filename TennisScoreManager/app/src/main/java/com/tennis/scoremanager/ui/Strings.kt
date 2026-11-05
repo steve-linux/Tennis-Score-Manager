@@ -1823,6 +1823,11 @@ interface Strings {
     val obRestore: String
     val obRestoreTitle: String
     val obLast: (String) -> String
+    /** Nuova partita più corta: si riparte come l'ultima volta, dritti al sorteggio. */
+    val playLikeLastHint: String
+    val likeLastTitle: String
+    val likeLastChange: String
+    val playLikeLast: (String) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -1874,7 +1879,6 @@ interface Strings {
     val tabProgress: String
     val tabMore: String
     val playNewMatchHint: String
-    val playRematch: (String) -> String
     val playResume: (String) -> String
     val playTournamentHint: String
     val playUseAs: String
@@ -3898,6 +3902,10 @@ object ItStrings : Strings {
     override val obRestore = "Ripristina"
     override val obRestoreTitle = "Ripristinare questo backup?"
     override val obLast: (String) -> String = { "Ultimo backup: $it" }
+    override val playLikeLastHint = "Stessi giocatori, campo e regole: si va dritti al sorteggio"
+    override val likeLastTitle = "Come l'ultima volta"
+    override val likeLastChange = "Cambia modalità o regole"
+    override val playLikeLast: (String) -> String = { "Come l'ultima volta: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3945,7 +3953,6 @@ object ItStrings : Strings {
     override val tabProgress = "Progressi"
     override val tabMore = "Altro"
     override val playNewMatchHint = "Chi gioca, regole e come segni il punteggio"
-    override val playRematch: (String) -> String = { "Rivincita: $it" }
     override val playResume: (String) -> String = { "Riprendi: $it" }
     override val playTournamentHint = "Americano o Mexicano, a coppie che girano"
     override val playUseAs = "Usa questo telefono come"
@@ -5954,6 +5961,10 @@ object EnStrings : Strings {
     override val obRestore = "Restore"
     override val obRestoreTitle = "Restore this backup?"
     override val obLast: (String) -> String = { "Last backup: $it" }
+    override val playLikeLastHint = "Same players, court and rules: straight to the coin toss"
+    override val likeLastTitle = "Like last time"
+    override val likeLastChange = "Change mode or rules"
+    override val playLikeLast: (String) -> String = { "Like last time: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -6001,7 +6012,6 @@ object EnStrings : Strings {
     override val tabProgress = "Progress"
     override val tabMore = "More"
     override val playNewMatchHint = "Who plays, rules and how you keep score"
-    override val playRematch: (String) -> String = { "Rematch: $it" }
     override val playResume: (String) -> String = { "Resume: $it" }
     override val playTournamentHint = "Americano or Mexicano, with rotating pairs"
     override val playUseAs = "Use this phone as"

@@ -2,7 +2,7 @@
 
 Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen wirst (Punkte zählen, mit Armbändern spielen, trainieren, Matches filmen) und deinen Namen; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Unten gibt es immer **fünf Reiter**:
 
-- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, die **Revanche** des letzten, das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, **Wie beim letzten Mal** (gleiche Spieler, Platz und Regeln: die Regeln stehen in einer Zeile und es geht direkt zum Münzwurf; *Modus oder Regeln ändern* öffnet sie wieder), das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.

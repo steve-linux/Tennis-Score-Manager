@@ -135,6 +135,7 @@ fun HomeScreen(c: MatchController) {
     BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
     val (title, icon) = tabInfo(s, tab)
     ScreenScaffold(
+        onHelp = { c.openHelp("3.1") },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
         action = if (roles.size > 1) { { RoleSwitch(c) } } else null,
     ) {
@@ -393,7 +394,7 @@ private fun PlayTab(c: MatchController) {
         val su = last.record.setup
         if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
             val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
-            Entry(Icons.Filled.Replay, s.playRematch(names), null) { c.prepareRematch(last.record) }
+            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
         }
     }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }

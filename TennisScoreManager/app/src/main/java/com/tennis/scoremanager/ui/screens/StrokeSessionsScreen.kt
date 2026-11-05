@@ -84,6 +84,7 @@ fun StrokeSessionsScreen(c: MatchController) {
     val name = strokeLabel(s, stroke)
     fun mb(b: Long) = String.format(lang.locale, "%.0f MB", b / 1_048_576.0)
     ScreenScaffold(
+        onHelp = { c.openHelp("7.5") },
         title = s.strokeSessionsTitle(name + (who?.let { " · $it" } ?: "")),
         // Da Android 11 la cartella è Documenti; prima quella dell'app (come per i file salvati).
         subtitle = s.strokeSessionsWhere(

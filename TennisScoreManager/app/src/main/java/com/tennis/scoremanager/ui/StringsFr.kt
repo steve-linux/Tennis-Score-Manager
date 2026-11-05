@@ -1778,6 +1778,10 @@ object FrStrings : Strings {
     override val obRestore = "Restaurer"
     override val obRestoreTitle = "Restaurer cette sauvegarde ?"
     override val obLast: (String) -> String = { "Dernière sauvegarde : $it" }
+    override val playLikeLastHint = "Mêmes joueurs, court et règles : directement au tirage au sort"
+    override val likeLastTitle = "Comme la dernière fois"
+    override val likeLastChange = "Changer de mode ou de règles"
+    override val playLikeLast: (String) -> String = { "Comme la dernière fois : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -1825,7 +1829,6 @@ object FrStrings : Strings {
     override val tabProgress = "Progrès"
     override val tabMore = "Plus"
     override val playNewMatchHint = "Qui joue, règles et façon de compter"
-    override val playRematch: (String) -> String = { "Revanche : $it" }
     override val playResume: (String) -> String = { "Reprendre : $it" }
     override val playTournamentHint = "Americano ou Mexicano, avec des paires qui tournent"
     override val playUseAs = "Utiliser ce téléphone comme"

@@ -1779,6 +1779,10 @@ object PtStrings : Strings {
     override val obRestore = "Restaurar"
     override val obRestoreTitle = "Restaurar esta cópia?"
     override val obLast: (String) -> String = { "Última cópia: $it" }
+    override val playLikeLastHint = "Mesmos jogadores, quadra e regras: direto para o sorteio"
+    override val likeLastTitle = "Como da última vez"
+    override val likeLastChange = "Mudar modo ou regras"
+    override val playLikeLast: (String) -> String = { "Como da última vez: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -1826,7 +1830,6 @@ object PtStrings : Strings {
     override val tabProgress = "Progresso"
     override val tabMore = "Mais"
     override val playNewMatchHint = "Quem joga, regras e como você marca o placar"
-    override val playRematch: (String) -> String = { "Revanche: $it" }
     override val playResume: (String) -> String = { "Retomar: $it" }
     override val playTournamentHint = "Americano ou Mexicano, com duplas que trocam"
     override val playUseAs = "Usar este telefone como"

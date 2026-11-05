@@ -2,7 +2,7 @@
 
 En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a usar (llevar el marcador, jugar con las pulseras, entrenar, grabar partidos) y tu nombre; se puede saltar y repetir desde **Más › Presentación de la app**. Abajo hay siempre **cinco pestañas**:
 
-- **Jugar**: **Nuevo partido**, el partido suspendido para reanudar, la **revancha** del último, el **torneo entre amigos** (Americano, Mexicano) y **Usar este teléfono como** marcador o cámara. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
+- **Jugar**: **Nuevo partido**, el partido suspendido para reanudar, **Como la última vez** (mismos jugadores, pista y reglas: las reglas caben en una línea y se va directo al sorteo; *Cambiar modo o reglas* las vuelve a abrir), el **torneo entre amigos** (Americano, Mexicano) y **Usar este teléfono como** marcador o cámara. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
 - **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
 - **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.

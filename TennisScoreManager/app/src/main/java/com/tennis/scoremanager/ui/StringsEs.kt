@@ -1776,6 +1776,10 @@ object EsStrings : Strings {
     override val obRestore = "Restaurar"
     override val obRestoreTitle = "¿Restaurar esta copia?"
     override val obLast: (String) -> String = { "Última copia: $it" }
+    override val playLikeLastHint = "Mismos jugadores, pista y reglas: directo al sorteo"
+    override val likeLastTitle = "Como la última vez"
+    override val likeLastChange = "Cambiar modo o reglas"
+    override val playLikeLast: (String) -> String = { "Como la última vez: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -1823,7 +1827,6 @@ object EsStrings : Strings {
     override val tabProgress = "Progresos"
     override val tabMore = "Más"
     override val playNewMatchHint = "Quién juega, reglas y cómo llevas el marcador"
-    override val playRematch: (String) -> String = { "Revancha: $it" }
     override val playResume: (String) -> String = { "Reanudar: $it" }
     override val playTournamentHint = "Americano o Mexicano, con parejas que rotan"
     override val playUseAs = "Usar este teléfono como"

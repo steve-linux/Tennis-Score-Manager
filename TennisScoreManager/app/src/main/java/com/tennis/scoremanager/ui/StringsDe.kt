@@ -1775,6 +1775,10 @@ object DeStrings : Strings {
     override val obRestore = "Wiederherstellen"
     override val obRestoreTitle = "Diese Sicherung wiederherstellen?"
     override val obLast: (String) -> String = { "Letzte Sicherung: $it" }
+    override val playLikeLastHint = "Gleiche Spieler, Platz und Regeln: direkt zum Münzwurf"
+    override val likeLastTitle = "Wie beim letzten Mal"
+    override val likeLastChange = "Modus oder Regeln ändern"
+    override val playLikeLast: (String) -> String = { "Wie beim letzten Mal: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -1822,7 +1826,6 @@ object DeStrings : Strings {
     override val tabProgress = "Fortschritt"
     override val tabMore = "Mehr"
     override val playNewMatchHint = "Wer spielt, Regeln und wie gezählt wird"
-    override val playRematch: (String) -> String = { "Revanche: $it" }
     override val playResume: (String) -> String = { "Fortsetzen: $it" }
     override val playTournamentHint = "Americano oder Mexicano, mit wechselnden Paaren"
     override val playUseAs = "Dieses Telefon verwenden als"
