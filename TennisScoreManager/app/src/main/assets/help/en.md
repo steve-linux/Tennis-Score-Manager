@@ -231,6 +231,8 @@ To train with the heart rate strap without a match: **Train** › **Workout with
 - **TSM rating**: in *Matches*, above the filters, the player's rating (everyone starts at 1500) with the matches counted, the change in the last one and the trend, plus the **TSM ranking** of every player in the history. It is an Elo worked out on the phone: it goes up when you win, more against higher-rated players and with a clear score; in doubles the pair's average counts; tennis and padel have separate rankings. For the first 5 matches it is *provisional* and moves more. In each match summary the **TSM rating** card shows how much each player gained or lost; with **Friendly** the match stays in the history but doesn't count.
 - **PDF** (with the trend of each item and the full list, on several pages if needed) to share, or **Print** with the Android print service (also *Save as PDF*).
 
+**Goals** (at the top of Progress): pick an item (matches won, points won, first serves in, aces, double faults, unforced errors, matches in 30 days, workouts in 7 days) and a target; the bar fills with the average of your last 3, 5 or 10 matches. When you reach it a notice appears in **Play**. **My year** (also in the Progress tab): matches, wins, hours on court, the rival with the record, matches month by month, the longest streak and workouts, in a picture to share. Both need the app to know who you are (More › You).
+
 ### 7.3 Videos: camera phone, highlights and replay
 
 A second phone on a tripod films the match and puts the umpire's score on the video.
@@ -332,6 +334,8 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
   - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
+
+**Automatic backup every day**: without videos, only if something changed. The last 5 copies go to Documents › Tennis Score Manager › Backup, which stays even if you uninstall the app; from the *Automatic copies* list each one can be **sent** (Drive, email…) or **restored**. To be safe keep one off the phone too: on Drive, on the PC or by syncing that folder.
 
 ### 7.9 Roles: You, Coach, Club
 

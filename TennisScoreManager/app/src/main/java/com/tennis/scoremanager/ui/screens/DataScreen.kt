@@ -37,6 +37,9 @@ import com.tennis.scoremanager.data.Backup
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
@@ -64,7 +67,9 @@ fun DataScreen(c: MatchController) {
     var wipeVideos by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
-    var restoreAsk by remember { mutableStateOf<Pair<Uri, Backup.Manifest>?>(null) }
+    // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
+    var restoreAsk by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
+    var copies by remember { mutableStateOf(c.personalBackups()) }
     var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
     var closeAfter by remember { mutableStateOf(false) }
     val videoMb by produceState(0L) {
@@ -88,7 +93,7 @@ fun DataScreen(c: MatchController) {
         uri ?: return@rememberLauncherForActivityResult
         scope.launch {
             val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
-            if (m == null) message = s.dataNotBackup else restoreAsk = uri to m
+            if (m == null) message = s.dataNotBackup else restoreAsk = { context.contentResolver.openInputStream(uri) } to m
         }
     }
     ScreenScaffold(
@@ -108,10 +113,44 @@ fun DataScreen(c: MatchController) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }
             SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it; c.storage.backupReminder = it }
+            var auto by remember { mutableStateOf(c.storage.personalBackupAuto) }
+            SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.setPersonalBackupAuto(it) }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
                 create.launch("TennisScoreManager-backup-$stamp.zip")
+            }, Modifier.fillMaxWidth())
+        }
+        SectionCard(s.autoBackupCopies, Icons.Filled.Schedule) {
+            // Data corta (05/11/26 21:07): nell'elenco ci sta su una riga.
+            val short = remember(lang) { java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT, lang.locale) }
+            Text(copies.firstOrNull()?.let { s.autoBackupLast(short.format(Date(it.lastModified()))) } ?: s.autoBackupNone,
+                color = TsmColors.TextDim, fontSize = 13.sp)
+            for (f in copies) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("${short.format(Date(f.lastModified()))} · ${(f.length() + 524_287) / 1_048_576} MB",
+                    color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                TextButton(onClick = {
+                    // Si condivide una copia nella cartella "share": il FileProvider dà solo quella.
+                    scope.launch {
+                        val out = withContext(Dispatchers.IO) { java.io.File(java.io.File(context.cacheDir, "share").apply { mkdirs() }, f.name).also { f.copyTo(it, overwrite = true) } }
+                        context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(out, "application/zip"), s.autoBackupShare))
+                    }
+                }) { Text(s.autoBackupShare) }
+                TextButton(onClick = {
+                    scope.launch {
+                        val m = withContext(Dispatchers.IO) { runCatching { f.inputStream().use { Backup.peek(it) } }.getOrNull() }
+                        if (m == null) message = s.dataNotBackup else restoreAsk = { f.inputStream() } to m
+                    }
+                }) { Text(s.dataRestoreDo) }
+            }
+            GhostButton(s.autoBackupNow, Icons.Filled.Backup, {
+                busy = s.dataBusy
+                scope.launch {
+                    val f = c.personalBackupNow(onlyIfChanged = false)
+                    busy = null
+                    copies = c.personalBackups()
+                    message = if (f != null) s.dataBackupDone else s.dataBackupFailed
+                }
             }, Modifier.fillMaxWidth())
         }
         SectionCard(s.dataRestore, Icons.Filled.Restore) {
@@ -132,7 +171,7 @@ fun DataScreen(c: MatchController) {
             confirmButton = { TextButton(onClick = { message = null; if (closeAfter) c.closeAfterData() }) { Text(s.ok) } },
         )
     }
-    restoreAsk?.let { (uri, m) ->
+    restoreAsk?.let { (input, m) ->
         AlertDialog(
             onDismissRequest = { restoreAsk = null },
             title = { Text(s.dataRestore) },
@@ -143,7 +182,7 @@ fun DataScreen(c: MatchController) {
                     busy = s.dataBusy
                     scope.launch {
                         val ok = withContext(Dispatchers.IO) {
-                            runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
+                            runCatching { input()?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
                         }
                         busy = null
                         closeAfter = ok

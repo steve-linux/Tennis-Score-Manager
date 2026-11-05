@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.PictureAsPdf
@@ -97,6 +98,11 @@ fun ProgressScreen(c: MatchController) {
         icon = Icons.AutoMirrored.Filled.TrendingUp,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // In cima: gli obiettivi e il mio anno (di chi usa l'app).
+        com.tennis.scoremanager.ui.GoalsCard(c)
+        var year by remember { mutableStateOf(false) }
+        GhostButton(s.yrTitle, Icons.Filled.CalendarMonth, { year = true }, Modifier.fillMaxWidth())
+        if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
         Segmented(
             listOf(SegOption(s.progressWorkouts), SegOption(s.progressMatches)),
             selected = if (matches) 1 else 0,

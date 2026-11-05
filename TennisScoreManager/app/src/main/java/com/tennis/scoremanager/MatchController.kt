@@ -1171,7 +1171,30 @@ class MatchController(
     /** Il backup automatico, una volta al giorno (anche ad app chiusa). */
     fun setOfficeBackupAuto(on: Boolean) {
         storage.officeBackupAuto = on
-        com.tennis.scoremanager.service.OfficeBackupJob.schedule(app, on)
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(app, storage)
+    }
+
+    /** Il backup automatico di tutti i dati (senza video), una volta al giorno. */
+    fun setPersonalBackupAuto(on: Boolean) {
+        storage.personalBackupAuto = on
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(app, storage)
+    }
+
+    fun personalBackups(): List<File> = com.tennis.scoremanager.data.Backup.autoList(storage)
+
+    /**
+     * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
+     * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
+     */
+    suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
+        val folder = strings.strokeFolderName
+        val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
+        if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
+        val now = System.currentTimeMillis()
+        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now) }.getOrNull()?.also {
+            storage.personalBackupPrint = print
+            storage.lastBackupAt = now
+        }
     }
 
     /**
@@ -1347,6 +1370,42 @@ class MatchController(
     }
 
     private var studentBack = Screen.STUDENTS
+
+    // ---- Obiettivi (Progressi) ----
+
+    val goals = MutableStateFlow(storage.loadGoals())
+
+    /** Le partite finite di chi usa l'app (Altro › Tu), dalla più vecchia; vuoto se non si sa chi è. */
+    fun myLines(): List<com.tennis.scoremanager.data.PlayerStats.MatchLine> =
+        myKey().takeIf { it.isNotEmpty() }?.let { com.tennis.scoremanager.data.PlayerStats.lines(played(), it) }.orEmpty()
+
+    fun goalStatus(g: com.tennis.scoremanager.data.Goal): com.tennis.scoremanager.data.Goals.Status =
+        com.tennis.scoremanager.data.Goals.status(g, myLines(), workouts.value.map { it.startedAt }, System.currentTimeMillis())
+
+    private fun putGoals(list: List<com.tennis.scoremanager.data.Goal>) {
+        goals.value = list
+        scope.launch(io) { storage.saveGoals(list) }
+    }
+
+    /** Un obiettivo nuovo; se è già raggiunto, lo si sa subito senza avviso. */
+    fun addGoal(kind: com.tennis.scoremanager.data.GoalKind, target: Double, window: Int) {
+        val now = System.currentTimeMillis()
+        val g = com.tennis.scoremanager.data.Goal(com.tennis.scoremanager.data.Goals.newId(), kind, target, window, now)
+        val reached = goalStatus(g).reached
+        putGoals(goals.value + g.copy(reachedAt = if (reached) now else null, seen = reached))
+    }
+
+    fun deleteGoal(id: String) = putGoals(goals.value.filter { it.id != id })
+
+    fun goalSeen(id: String) = putGoals(goals.value.map { if (it.id == id) it.copy(seen = true) else it })
+
+    /** Dopo una partita o un allenamento: gli obiettivi raggiunti adesso prendono la data (e l'avviso in Gioca). */
+    private fun checkGoals() {
+        val list = goals.value
+        if (list.none { it.reachedAt == null }) return
+        val next = com.tennis.scoremanager.data.Goals.markReached(list, myLines(), workouts.value.map { it.startedAt }, System.currentTimeMillis())
+        if (next != list) putGoals(next)
+    }
 
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
@@ -2505,7 +2564,7 @@ class MatchController(
 
     /** Il backup va ricordato: promemoria acceso, ultimo backup da più di 30 giorni (o mai) e qualcosa da salvare. */
     fun backupDue(now: Long = System.currentTimeMillis()): Boolean =
-        storage.backupReminder && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
+        storage.backupReminder && !storage.personalBackupAuto && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
 
     /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
     fun myKey(): String = me()?.id ?: keyForName(storage.myName)
@@ -3416,7 +3475,7 @@ class MatchController(
     }
 
     private fun refreshWorkouts() {
-        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() } }
+        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() }; checkGoals() }
     }
 
     /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
@@ -3481,6 +3540,7 @@ class MatchController(
                 storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
                 storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
             }
+            checkGoals()
         }
     }
 

@@ -231,6 +231,8 @@ Zum Trainieren mit dem Brustgurt ohne Match: **Trainieren** › **Training mit d
 - **TSM-Wertung**: Unter *Matches*, über den Filtern, die Wertung des Spielers (alle starten bei 1500) mit den gezählten Matches, der Änderung im letzten und dem Verlauf, dazu die **TSM-Rangliste** aller Spieler der Historie. Es ist ein Elo, auf dem Telefon berechnet: Sie steigt, wenn du gewinnst, stärker gegen besser bewertete Spieler und bei klarem Ergebnis; im Doppel zählt der Durchschnitt des Paares; Tennis und Padel haben getrennte Ranglisten. In den ersten 5 Matches ist sie *vorläufig* und bewegt sich stärker. In der Zusammenfassung jedes Matches zeigt die Karte **TSM-Wertung**, wie viel jeder gewonnen oder verloren hat; mit **Freundschaftsspiel** bleibt das Match in der Historie, zählt aber nicht.
 - **PDF** (mit dem Verlauf jedes Punkts und der vollständigen Liste, bei Bedarf auf mehreren Seiten) zum Teilen, oder **Drucken** mit dem Android-Druckdienst (auch *Als PDF speichern*).
 
+**Ziele** (oben in Fortschritte): wähle einen Punkt (gewonnene Matches, gewonnene Punkte, erste Aufschläge, Asse, Doppelfehler, unerzwungene Fehler, Matches in 30 Tagen, Trainings in 7 Tagen) und einen Zielwert; der Balken füllt sich mit dem Schnitt deiner letzten 3, 5 oder 10 Matches. Erreichst du ihn, erscheint ein Hinweis in **Spielen**. **Mein Jahr** (auch im Tab Fortschritt): Matches, Siege, Stunden auf dem Platz, der Rivale mit Bilanz, die Matches Monat für Monat, die längste Serie und die Trainings, in einem Bild zum Teilen. Für beides muss die App wissen, wer du bist (Mehr › Du).
+
 ### 7.3 Videos: Kamera-Telefon, Highlights und Zeitlupe
 
 Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
@@ -332,6 +334,8 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
   - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
+
+**Automatische Sicherung jeden Tag**: ohne Videos, nur wenn sich etwas geändert hat. Die letzten 5 Kopien kommen nach Dokumente › Tennis Score Manager › Backup, das auch bleibt, wenn du die App deinstallierst; in der Liste *Automatische Kopien* lässt sich jede **senden** (Drive, E-Mail…) oder **wiederherstellen**. Zur Sicherheit behalte eine auch außerhalb des Handys: auf Drive, am PC oder indem du den Ordner synchronisieren lässt.
 
 ### 7.9 Rollen: Du, Trainer, Verein
 

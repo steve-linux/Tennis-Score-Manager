@@ -132,9 +132,9 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <!-- Una volta al giorno, se acceso: il backup della segreteria (solo se è cambiato qualcosa). -->
+        <!-- Una volta al giorno, se acceso: i backup automatici (segreteria e tutti i dati, solo se è cambiato qualcosa). -->
         <service
-            android:name=".service.OfficeBackupJob"
+            android:name=".service.DailyBackupJob"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 

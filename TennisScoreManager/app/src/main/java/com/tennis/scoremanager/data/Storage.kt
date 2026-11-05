@@ -259,6 +259,20 @@ class Storage(context: Context) {
 
     /** Le squadre del circolo, coi loro incontri, in un file solo. */
     /** Le classifiche a sfida del circolo. */
+    private val goalsFile: File get() = File(app.filesDir, "goals.json")
+
+    fun loadGoals(): List<Goal> =
+        runCatching { json.decodeFromString(ListSerializer(Goal.serializer()), goalsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveGoals(list: List<Goal>) {
+        runCatching {
+            val tmp = File(app.filesDir, "goals.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Goal.serializer()), list))
+            if (!tmp.renameTo(goalsFile)) { goalsFile.delete(); tmp.renameTo(goalsFile) }
+        }
+    }
+
     private val laddersFile: File get() = File(app.filesDir, "club_ladders.json")
 
     fun loadLadders(): List<Ladder> =
@@ -631,6 +645,14 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
+    /** Backup automatico di tutti i dati (senza video), ogni giorno solo se è cambiato qualcosa; l'impronta dell'ultimo. */
+    var personalBackupAuto: Boolean
+        get() = prefs.getBoolean("personal_backup_auto", false)
+        set(v) = prefs.edit().putBoolean("personal_backup_auto", v).apply()
+    var personalBackupPrint: String
+        get() = prefs.getString("personal_backup_print", null) ?: ""
+        set(v) = prefs.edit().putString("personal_backup_print", v).apply()
+
     /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa), l'impronta e l'ora dell'ultimo. */
     var officeBackupAuto: Boolean
         get() = prefs.getBoolean("office_backup_auto", false)

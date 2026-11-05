@@ -231,6 +231,8 @@ Para entrenar con la banda de pecho sin partido: **Entrenar** › **Entrenamient
 - **Rating TSM**: en *Partidos*, encima de los filtros, el rating del jugador (todos empiezan en 1500) con los partidos contados, la variación del último y la evolución, y la **Clasificación TSM** de todos los jugadores del historial. Es un Elo calculado en el teléfono: sube cuando ganas, más contra quien tiene un rating más alto y con un resultado claro; en dobles cuenta la media de la pareja; tenis y pádel tienen clasificaciones separadas. En los 5 primeros partidos es *provisional* y se mueve más. En el resumen de cada partido la tarjeta **Rating TSM** muestra cuánto ganó o perdió cada uno; con **Amistoso** el partido sigue en el historial pero no cuenta.
 - **PDF** (con la evolución de cada dato y la lista completa, en varias páginas si hace falta) para compartir, o **Imprimir** con el servicio de impresión de Android (también *Guardar como PDF*).
 
+**Objetivos** (arriba en Progresos): elige un dato (partidos ganados, puntos ganados, primeros servicios, aces, dobles faltas, errores no forzados, partidos en 30 días, entrenamientos en 7 días) y una meta; la barra se llena con la media de tus últimos 3, 5 o 10 partidos. Cuando la alcanzas aparece un aviso en **Jugar**. **Mi año** (también en la pestaña Progresos): partidos, victorias, horas en pista, el rival con el balance, los partidos mes a mes, la racha más larga y los entrenamientos, en una imagen para compartir. Los dos necesitan que la app sepa quién eres (Más › Tú).
+
 ### 7.3 Vídeos: teléfono-cámara, mejores jugadas y repetición
 
 Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marcador del árbitro.
@@ -332,6 +334,8 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
   - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
+
+**Copia automática cada día**: sin vídeos, solo si algo ha cambiado. Las últimas 5 copias van a Documentos › Tennis Score Manager › Backup, que se queda aunque desinstales la app; desde la lista *Copias automáticas* cada una se **envía** (Drive, correo…) o se **restaura**. Por seguridad guarda una también fuera del teléfono: en Drive, en el PC o sincronizando esa carpeta.
 
 ### 7.9 Roles: Tú, Entrenador, Club
 

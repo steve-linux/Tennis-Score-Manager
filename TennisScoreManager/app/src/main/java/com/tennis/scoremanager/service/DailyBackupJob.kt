@@ -10,22 +10,24 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.Storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
- * Il backup automatico della segreteria, una volta al giorno anche ad app chiusa: una copia sul telefono (le
- * ultime 14) e, se c'è, sul server del circolo; solo se qualcosa è cambiato dall'ultima.
+ * I backup automatici, una volta al giorno anche ad app chiusa e solo se qualcosa è cambiato: quello della
+ * segreteria (sul telefono e, se c'è, sul server del circolo) e quello di tutti i dati senza video (in Documenti).
  */
-class OfficeBackupJob : JobService() {
+class DailyBackupJob : JobService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onStartJob(params: JobParameters): Boolean {
         val c = (application as TsmApp).controller
         scope.launch {
             runCatching { if (c.storage.officeBackupAuto) c.officeBackupNow(onlyIfChanged = true) }
+            runCatching { if (c.storage.personalBackupAuto) c.personalBackupNow(onlyIfChanged = true) }
             jobFinished(params, false)
         }
         return true
@@ -36,12 +38,13 @@ class OfficeBackupJob : JobService() {
     companion object {
         private const val JOB = 7306
 
-        fun schedule(context: Context, on: Boolean) {
+        /** Acceso se almeno uno dei due backup automatici lo è. */
+        fun schedule(context: Context, storage: Storage) {
             val js = context.getSystemService(JobScheduler::class.java) ?: return
-            if (!on) { js.cancel(JOB); return }
+            if (!storage.officeBackupAuto && !storage.personalBackupAuto) { js.cancel(JOB); return }
             if (js.getPendingJob(JOB) != null) return
             js.schedule(
-                JobInfo.Builder(JOB, ComponentName(context, OfficeBackupJob::class.java))
+                JobInfo.Builder(JOB, ComponentName(context, DailyBackupJob::class.java))
                     .setPeriodic(24 * 3_600_000L).setPersisted(true).build(),
             )
         }

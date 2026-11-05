@@ -344,6 +344,8 @@ Pour s'entraîner avec la ceinture cardio sans match : **S'entraîner** › **En
 - **Classement TSM** : dans *Matchs*, au-dessus des filtres, le classement du joueur (tout le monde part de 1500) avec les matchs comptés, la variation du dernier et l'évolution, et le **Classement TSM des joueurs** de tout l'historique. C'est un Elo calculé sur le téléphone : il monte quand vous gagnez, davantage contre un joueur mieux classé et avec un score net ; en double c'est la moyenne de la paire qui compte ; tennis et padel ont des classements séparés. Pendant les 5 premiers matchs il est *provisoire* et bouge davantage. Dans le récapitulatif de chaque match, la carte **Classement TSM** montre ce que chacun a gagné ou perdu ; avec **Amical**, le match reste dans l'historique mais ne compte pas.
 - **PDF** (avec l'évolution de chaque élément et la liste complète, sur plusieurs pages si besoin) à partager, ou **Imprimer** avec le service d'impression d'Android (aussi *Enregistrer en PDF*).
 
+**Objectifs** (en haut de Progrès) : choisissez un élément (matchs gagnés, points gagnés, premières balles, aces, doubles fautes, fautes directes, matchs en 30 jours, entraînements en 7 jours) et un seuil ; la barre se remplit avec la moyenne de vos 3, 5 ou 10 derniers matchs. Quand vous l'atteignez, un avis apparaît dans **Jouer**. **Mon année** (aussi dans l'onglet Progrès) : matchs, victoires, heures sur le court, le rival avec le bilan, les matchs mois par mois, la plus longue série et les entraînements, dans une image à partager. Les deux demandent que l'app sache qui vous êtes (Plus › Vous).
+
 ### 7.3 Vidéos : téléphone-caméra, temps forts et ralenti (app 2.5)
 
 Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
@@ -445,6 +447,8 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
   - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
+
+**Sauvegarde automatique chaque jour** : sans vidéos, seulement si quelque chose a changé. Les 5 dernières copies vont dans Documents › Tennis Score Manager › Backup, qui reste même si vous désinstallez l'app ; depuis la liste *Copies automatiques*, chacune s'**envoie** (Drive, e-mail…) ou se **restaure**. Par sécurité, gardez-en une hors du téléphone : sur Drive, sur le PC ou en synchronisant ce dossier.
 
 ### 7.9 Rôles : Vous, Entraîneur, Club (app 2.6)
 

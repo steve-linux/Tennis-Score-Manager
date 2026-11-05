@@ -327,9 +327,9 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <!-- Una volta al giorno, se acceso: il backup della segreteria (solo se è cambiato qualcosa). -->
+        <!-- Una volta al giorno, se acceso: i backup automatici (segreteria e tutti i dati, solo se è cambiato qualcosa). -->
         <service
-            android:name=".service.OfficeBackupJob"
+            android:name=".service.DailyBackupJob"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
@@ -7242,6 +7242,8 @@ Zum Trainieren mit dem Brustgurt ohne Match: **Trainieren** › **Training mit d
 - **TSM-Wertung**: Unter *Matches*, über den Filtern, die Wertung des Spielers (alle starten bei 1500) mit den gezählten Matches, der Änderung im letzten und dem Verlauf, dazu die **TSM-Rangliste** aller Spieler der Historie. Es ist ein Elo, auf dem Telefon berechnet: Sie steigt, wenn du gewinnst, stärker gegen besser bewertete Spieler und bei klarem Ergebnis; im Doppel zählt der Durchschnitt des Paares; Tennis und Padel haben getrennte Ranglisten. In den ersten 5 Matches ist sie *vorläufig* und bewegt sich stärker. In der Zusammenfassung jedes Matches zeigt die Karte **TSM-Wertung**, wie viel jeder gewonnen oder verloren hat; mit **Freundschaftsspiel** bleibt das Match in der Historie, zählt aber nicht.
 - **PDF** (mit dem Verlauf jedes Punkts und der vollständigen Liste, bei Bedarf auf mehreren Seiten) zum Teilen, oder **Drucken** mit dem Android-Druckdienst (auch *Als PDF speichern*).
 
+**Ziele** (oben in Fortschritte): wähle einen Punkt (gewonnene Matches, gewonnene Punkte, erste Aufschläge, Asse, Doppelfehler, unerzwungene Fehler, Matches in 30 Tagen, Trainings in 7 Tagen) und einen Zielwert; der Balken füllt sich mit dem Schnitt deiner letzten 3, 5 oder 10 Matches. Erreichst du ihn, erscheint ein Hinweis in **Spielen**. **Mein Jahr** (auch im Tab Fortschritt): Matches, Siege, Stunden auf dem Platz, der Rivale mit Bilanz, die Matches Monat für Monat, die längste Serie und die Trainings, in einem Bild zum Teilen. Für beides muss die App wissen, wer du bist (Mehr › Du).
+
 ### 7.3 Videos: Kamera-Telefon, Highlights und Zeitlupe
 
 Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
@@ -7343,6 +7345,8 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
   - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
+
+**Automatische Sicherung jeden Tag**: ohne Videos, nur wenn sich etwas geändert hat. Die letzten 5 Kopien kommen nach Dokumente › Tennis Score Manager › Backup, das auch bleibt, wenn du die App deinstallierst; in der Liste *Automatische Kopien* lässt sich jede **senden** (Drive, E-Mail…) oder **wiederherstellen**. Zur Sicherheit behalte eine auch außerhalb des Handys: auf Drive, am PC oder indem du den Ordner synchronisieren lässt.
 
 ### 7.9 Rollen: Du, Trainer, Verein
 
@@ -7798,6 +7802,8 @@ To train with the heart rate strap without a match: **Train** › **Workout with
 - **TSM rating**: in *Matches*, above the filters, the player's rating (everyone starts at 1500) with the matches counted, the change in the last one and the trend, plus the **TSM ranking** of every player in the history. It is an Elo worked out on the phone: it goes up when you win, more against higher-rated players and with a clear score; in doubles the pair's average counts; tennis and padel have separate rankings. For the first 5 matches it is *provisional* and moves more. In each match summary the **TSM rating** card shows how much each player gained or lost; with **Friendly** the match stays in the history but doesn't count.
 - **PDF** (with the trend of each item and the full list, on several pages if needed) to share, or **Print** with the Android print service (also *Save as PDF*).
 
+**Goals** (at the top of Progress): pick an item (matches won, points won, first serves in, aces, double faults, unforced errors, matches in 30 days, workouts in 7 days) and a target; the bar fills with the average of your last 3, 5 or 10 matches. When you reach it a notice appears in **Play**. **My year** (also in the Progress tab): matches, wins, hours on court, the rival with the record, matches month by month, the longest streak and workouts, in a picture to share. Both need the app to know who you are (More › You).
+
 ### 7.3 Videos: camera phone, highlights and replay
 
 A second phone on a tripod films the match and puts the umpire's score on the video.
@@ -7899,6 +7905,8 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
   - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
+
+**Automatic backup every day**: without videos, only if something changed. The last 5 copies go to Documents › Tennis Score Manager › Backup, which stays even if you uninstall the app; from the *Automatic copies* list each one can be **sent** (Drive, email…) or **restored**. To be safe keep one off the phone too: on Drive, on the PC or by syncing that folder.
 
 ### 7.9 Roles: You, Coach, Club
 
@@ -8353,6 +8361,8 @@ Para entrenar con la banda de pecho sin partido: **Entrenar** › **Entrenamient
 - **Rating TSM**: en *Partidos*, encima de los filtros, el rating del jugador (todos empiezan en 1500) con los partidos contados, la variación del último y la evolución, y la **Clasificación TSM** de todos los jugadores del historial. Es un Elo calculado en el teléfono: sube cuando ganas, más contra quien tiene un rating más alto y con un resultado claro; en dobles cuenta la media de la pareja; tenis y pádel tienen clasificaciones separadas. En los 5 primeros partidos es *provisional* y se mueve más. En el resumen de cada partido la tarjeta **Rating TSM** muestra cuánto ganó o perdió cada uno; con **Amistoso** el partido sigue en el historial pero no cuenta.
 - **PDF** (con la evolución de cada dato y la lista completa, en varias páginas si hace falta) para compartir, o **Imprimir** con el servicio de impresión de Android (también *Guardar como PDF*).
 
+**Objetivos** (arriba en Progresos): elige un dato (partidos ganados, puntos ganados, primeros servicios, aces, dobles faltas, errores no forzados, partidos en 30 días, entrenamientos en 7 días) y una meta; la barra se llena con la media de tus últimos 3, 5 o 10 partidos. Cuando la alcanzas aparece un aviso en **Jugar**. **Mi año** (también en la pestaña Progresos): partidos, victorias, horas en pista, el rival con el balance, los partidos mes a mes, la racha más larga y los entrenamientos, en una imagen para compartir. Los dos necesitan que la app sepa quién eres (Más › Tú).
+
 ### 7.3 Vídeos: teléfono-cámara, mejores jugadas y repetición
 
 Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marcador del árbitro.
@@ -8454,6 +8464,8 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
   - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
+
+**Copia automática cada día**: sin vídeos, solo si algo ha cambiado. Las últimas 5 copias van a Documentos › Tennis Score Manager › Backup, que se queda aunque desinstales la app; desde la lista *Copias automáticas* cada una se **envía** (Drive, correo…) o se **restaura**. Por seguridad guarda una también fuera del teléfono: en Drive, en el PC o sincronizando esa carpeta.
 
 ### 7.9 Roles: Tú, Entrenador, Club
 
@@ -8908,6 +8920,8 @@ Pour s'entraîner avec la ceinture cardio sans match : **S'entraîner** › **En
 - **Classement TSM** : dans *Matchs*, au-dessus des filtres, le classement du joueur (tout le monde part de 1500) avec les matchs comptés, la variation du dernier et l'évolution, et le **Classement TSM des joueurs** de tout l'historique. C'est un Elo calculé sur le téléphone : il monte quand vous gagnez, davantage contre un joueur mieux classé et avec un score net ; en double c'est la moyenne de la paire qui compte ; tennis et padel ont des classements séparés. Pendant les 5 premiers matchs il est *provisoire* et bouge davantage. Dans le récapitulatif de chaque match, la carte **Classement TSM** montre ce que chacun a gagné ou perdu ; avec **Amical**, le match reste dans l'historique mais ne compte pas.
 - **PDF** (avec l'évolution de chaque élément et la liste complète, sur plusieurs pages si besoin) à partager, ou **Imprimer** avec le service d'impression d'Android (aussi *Enregistrer en PDF*).
 
+**Objectifs** (en haut de Progrès) : choisissez un élément (matchs gagnés, points gagnés, premières balles, aces, doubles fautes, fautes directes, matchs en 30 jours, entraînements en 7 jours) et un seuil ; la barre se remplit avec la moyenne de vos 3, 5 ou 10 derniers matchs. Quand vous l'atteignez, un avis apparaît dans **Jouer**. **Mon année** (aussi dans l'onglet Progrès) : matchs, victoires, heures sur le court, le rival avec le bilan, les matchs mois par mois, la plus longue série et les entraînements, dans une image à partager. Les deux demandent que l'app sache qui vous êtes (Plus › Vous).
+
 ### 7.3 Vidéos : téléphone-caméra, temps forts et ralenti
 
 Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
@@ -9009,6 +9023,8 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
   - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
+
+**Sauvegarde automatique chaque jour** : sans vidéos, seulement si quelque chose a changé. Les 5 dernières copies vont dans Documents › Tennis Score Manager › Backup, qui reste même si vous désinstallez l'app ; depuis la liste *Copies automatiques*, chacune s'**envoie** (Drive, e-mail…) ou se **restaure**. Par sécurité, gardez-en une hors du téléphone : sur Drive, sur le PC ou en synchronisant ce dossier.
 
 ### 7.9 Rôles : Vous, Entraîneur, Club
 
@@ -9463,6 +9479,8 @@ Per allenarsi con la fascia cardio senza una partita: **Allenati** › **Allenam
 - **Rating TSM**: in *Partite*, sopra i filtri, il rating del giocatore (si parte da 1500) con le partite contate, la variazione dell'ultima e l'andamento, e la **Classifica TSM** di tutti i giocatori dello storico. È un Elo calcolato sul telefono: sale quando vinci, di più contro chi ha un rating più alto e con un punteggio netto; nel doppio conta la media della coppia; tennis e padel hanno classifiche separate. Nelle prime 5 partite è *provvisorio* e si muove di più. Nel riepilogo di ogni partita la scheda **Rating TSM** mostra quanto ha guadagnato o perso ciascuno; con **Amichevole** la partita resta nello storico ma non conta.
 - **PDF** (con l'andamento di ogni voce e l'elenco completo, su più pagine se serve) da condividere, o **Stampa** con il servizio di stampa di Android (anche *Salva come PDF*).
 
+**Obiettivi** (in cima a Progressi): scegli una voce (partite vinte, punti vinti, prime di servizio, ace, doppi falli, errori gratuiti, partite in 30 giorni, allenamenti in 7 giorni) e un traguardo; la barra si riempie con la media delle tue ultime 3, 5 o 10 partite. Quando lo raggiungi compare l'avviso in **Gioca**. **Il mio anno** (anche nella scheda Progressi): partite, vittorie, ore in campo, il rivale col bilancio, le partite mese per mese, la serie più lunga e gli allenamenti, in un'immagine da condividere. Servono tutti e due che l'app sappia chi sei (Altro › Tu).
+
 ### 7.3 Video: telefono-telecamera, highlights e moviola
 
 Un secondo telefono su un treppiede riprende la partita e mette sul video il punteggio dell'arbitro.
@@ -9564,6 +9582,8 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Crea il backup**: un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce; con **Includi i video** anche clip dei colpi, moviola e highlights (il file diventa grande). Lo salvi dove vuoi (Download, un PC, una chiavetta): niente cloud. Non entrano il modello dell'analisi del movimento (si riscarica) e i file che hai salvato tu in Documenti.
   - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
   - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano.
+
+**Backup automatico ogni giorno**: senza video, solo se è cambiato qualcosa. Le ultime 5 copie vanno in Documenti › Tennis Score Manager › Backup, che resta anche se disinstalli l'app; dall'elenco *Copie automatiche* ognuna si **manda** (Drive, email…) o si **ripristina**. Per sicurezza tienine una anche fuori dal telefono: su Drive, sul PC o facendo sincronizzare quella cartella.
 
 ### 7.9 Ruoli: Tu, Allenatore, Circolo
 
@@ -10018,6 +10038,8 @@ Para treinar com a cinta cardíaca sem partida: **Treinar** › **Treino com a c
 - **Rating TSM**: em *Partidas*, acima dos filtros, o rating do jogador (todos começam em 1500) com as partidas contadas, a variação da última e a evolução, e a **Classificação TSM** de todos os jogadores do histórico. É um Elo calculado no telefone: sobe quando você vence, mais contra quem tem rating mais alto e com placar folgado; nas duplas conta a média da dupla; tênis e padel têm classificações separadas. Nas 5 primeiras partidas é *provisório* e se move mais. No resumo de cada partida o cartão **Rating TSM** mostra quanto cada um ganhou ou perdeu; com **Amistoso** a partida fica no histórico mas não conta.
 - **PDF** (com a evolução de cada item e a lista completa, em várias páginas se necessário) para compartilhar, ou **Imprimir** com o serviço de impressão do Android (também *Salvar como PDF*).
 
+**Objetivos** (no alto de Progressos): escolha um dado (partidas ganhas, pontos ganhos, primeiros serviços, aces, duplas faltas, erros não forçados, partidas em 30 dias, treinos em 7 dias) e uma meta; a barra enche-se com a média das suas últimas 3, 5 ou 10 partidas. Quando a alcança aparece um aviso em **Jogar**. **O meu ano** (também no separador Progresso): partidas, vitórias, horas em quadra, o rival com o balanço, as partidas mês a mês, a maior série e os treinos, numa imagem para partilhar. Os dois precisam que o app saiba quem é (Mais › Você).
+
 ### 7.3 Vídeos: telefone-câmera, melhores momentos e replay
 
 Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do árbitro.
@@ -10119,6 +10141,8 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
   - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
   - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
+
+**Cópia automática todos os dias**: sem vídeos, só se algo mudou. As últimas 5 cópias vão para Documentos › Tennis Score Manager › Backup, que fica mesmo que desinstale o app; na lista *Cópias automáticas* cada uma **envia-se** (Drive, e-mail…) ou **restaura-se**. Por segurança guarde uma também fora do telefone: no Drive, no PC ou sincronizando essa pasta.
 
 ### 7.9 Papéis: Você, Treinador, Clube
 
@@ -12248,7 +12272,30 @@ class MatchController(
     /** Il backup automatico, una volta al giorno (anche ad app chiusa). */
     fun setOfficeBackupAuto(on: Boolean) {
         storage.officeBackupAuto = on
-        com.tennis.scoremanager.service.OfficeBackupJob.schedule(app, on)
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(app, storage)
+    }
+
+    /** Il backup automatico di tutti i dati (senza video), una volta al giorno. */
+    fun setPersonalBackupAuto(on: Boolean) {
+        storage.personalBackupAuto = on
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(app, storage)
+    }
+
+    fun personalBackups(): List<File> = com.tennis.scoremanager.data.Backup.autoList(storage)
+
+    /**
+     * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
+     * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
+     */
+    suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
+        val folder = strings.strokeFolderName
+        val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
+        if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
+        val now = System.currentTimeMillis()
+        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now) }.getOrNull()?.also {
+            storage.personalBackupPrint = print
+            storage.lastBackupAt = now
+        }
     }
 
     /**
@@ -12424,6 +12471,42 @@ class MatchController(
     }
 
     private var studentBack = Screen.STUDENTS
+
+    // ---- Obiettivi (Progressi) ----
+
+    val goals = MutableStateFlow(storage.loadGoals())
+
+    /** Le partite finite di chi usa l'app (Altro › Tu), dalla più vecchia; vuoto se non si sa chi è. */
+    fun myLines(): List<com.tennis.scoremanager.data.PlayerStats.MatchLine> =
+        myKey().takeIf { it.isNotEmpty() }?.let { com.tennis.scoremanager.data.PlayerStats.lines(played(), it) }.orEmpty()
+
+    fun goalStatus(g: com.tennis.scoremanager.data.Goal): com.tennis.scoremanager.data.Goals.Status =
+        com.tennis.scoremanager.data.Goals.status(g, myLines(), workouts.value.map { it.startedAt }, System.currentTimeMillis())
+
+    private fun putGoals(list: List<com.tennis.scoremanager.data.Goal>) {
+        goals.value = list
+        scope.launch(io) { storage.saveGoals(list) }
+    }
+
+    /** Un obiettivo nuovo; se è già raggiunto, lo si sa subito senza avviso. */
+    fun addGoal(kind: com.tennis.scoremanager.data.GoalKind, target: Double, window: Int) {
+        val now = System.currentTimeMillis()
+        val g = com.tennis.scoremanager.data.Goal(com.tennis.scoremanager.data.Goals.newId(), kind, target, window, now)
+        val reached = goalStatus(g).reached
+        putGoals(goals.value + g.copy(reachedAt = if (reached) now else null, seen = reached))
+    }
+
+    fun deleteGoal(id: String) = putGoals(goals.value.filter { it.id != id })
+
+    fun goalSeen(id: String) = putGoals(goals.value.map { if (it.id == id) it.copy(seen = true) else it })
+
+    /** Dopo una partita o un allenamento: gli obiettivi raggiunti adesso prendono la data (e l'avviso in Gioca). */
+    private fun checkGoals() {
+        val list = goals.value
+        if (list.none { it.reachedAt == null }) return
+        val next = com.tennis.scoremanager.data.Goals.markReached(list, myLines(), workouts.value.map { it.startedAt }, System.currentTimeMillis())
+        if (next != list) putGoals(next)
+    }
 
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
@@ -13582,7 +13665,7 @@ class MatchController(
 
     /** Il backup va ricordato: promemoria acceso, ultimo backup da più di 30 giorni (o mai) e qualcosa da salvare. */
     fun backupDue(now: Long = System.currentTimeMillis()): Boolean =
-        storage.backupReminder && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
+        storage.backupReminder && !storage.personalBackupAuto && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
 
     /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
     fun myKey(): String = me()?.id ?: keyForName(storage.myName)
@@ -14493,7 +14576,7 @@ class MatchController(
     }
 
     private fun refreshWorkouts() {
-        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() } }
+        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() }; checkGoals() }
     }
 
     /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
@@ -14558,6 +14641,7 @@ class MatchController(
                 storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
                 storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
             }
+            checkGoals()
         }
     }
 
@@ -17449,6 +17533,51 @@ object Backup {
         }
     }
 
+    // --- Backup automatico ---
+
+    /** Dove vanno le copie automatiche: Documenti/Tennis Score Manager/Backup (si vede col gestore file, resta anche disinstallando l'app). */
+    const val AUTO_DIR = "Backup"
+    /** Le copie automatiche che restano: pesano qualche MB l'una. */
+    const val AUTO_KEEP = 5
+    private const val AUTO_PREFIX = "TSM backup "
+
+    fun autoDir(storage: Storage) = File(storage.documentsRoot, AUTO_DIR)
+
+    /** "TSM backup 2026-11-05 2130.zip". */
+    fun autoName(at: Long): String = AUTO_PREFIX + java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at)) + ".zip"
+
+    /** Le copie automatiche, dalla più nuova. */
+    fun autoList(storage: Storage): List<File> = autoDir(storage).listFiles { f -> f.isFile && f.name.startsWith(AUTO_PREFIX) && f.name.endsWith(".zip") }
+        .orEmpty().sortedByDescending { it.lastModified() }
+
+    /**
+     * L'impronta di quello che entrerebbe nel backup senza video (nome, grandezza e data di ogni file): se è uguale
+     * all'ultima, non è cambiato niente e la copia automatica si salta. Costa poco: non legge i file.
+     */
+    fun fingerprint(c: Context, storage: Storage, strokesFolder: String): String {
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        fun add(prefix: String, f: File) { md.update("$prefix${f.name}|${f.length()}|${f.lastModified()}\n".toByteArray()) }
+        fun tree(prefix: String, root: File, keep: (File) -> Boolean) {
+            if (root.exists()) root.walkTopDown().filter { it.isFile && keep(it) }.sortedBy { it.path }.forEach { add(prefix + it.relativeTo(root).invariantSeparatorsPath, it) }
+        }
+        // Le impostazioni cambiano a ogni apertura (finestre viste, ultima scheda): contano solo i dati.
+        c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.sortedBy { it.name }.forEach { f -> if (f.isDirectory) tree("files/${f.name}/", f) { true } else add("files/", f) }
+        extDir(c)?.let { tree("external/$EXT_VOICE/", File(it, EXT_VOICE)) { true } }
+        tree("documents/$strokesFolder/", strokes(storage, strokesFolder)) { !isVideo(it) }
+        return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    /** Scrive una copia automatica (senza video) e tiene le ultime [AUTO_KEEP]. */
+    fun writeAuto(c: Context, storage: Storage, version: String, strokesFolder: String, at: Long): File {
+        val dir = autoDir(storage).apply { mkdirs() }
+        val f = File(dir, autoName(at))
+        val tmp = File(dir, ".${f.name}.tmp")
+        tmp.outputStream().use { write(c, storage, it, videos = false, version = version, strokesFolder = strokesFolder) }
+        if (!tmp.renameTo(f)) { tmp.copyTo(f, overwrite = true); tmp.delete() }
+        autoList(storage).drop(AUTO_KEEP).forEach { it.delete() }
+        return f
+    }
+
     /** Legge solo il manifest (per chiedere conferma prima di ripristinare); null se non è un backup dell'app. */
     fun peek(input: InputStream): Manifest? = ZipInputStream(input.buffered()).use { zip ->
         val e = zip.nextEntry ?: return null
@@ -18741,6 +18870,107 @@ object Drills {
             DrillStep(15, wing = Wing.FOREHAND, direction = ShotDirection.CROSS), DrillStep(15, wing = Wing.BACKHAND, direction = ShotDirection.CROSS),
         ), now),
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Goals.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Goals.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+/** Cosa si vuole raggiungere: le stesse voci di Progressi, più quante partite e allenamenti. */
+@Serializable
+enum class GoalKind(val lowerIsBetter: Boolean = false, val perMatch: Boolean = true) {
+    WINS, POINTS_WON, FIRST_SERVE, ACES, DOUBLE_FAULTS(lowerIsBetter = true), UNFORCED_ERRORS(lowerIsBetter = true),
+    MATCHES_MONTH(perMatch = false), WORKOUTS_WEEK(perMatch = false),
+}
+
+/**
+ * Un obiettivo: arrivare a [target] (o restarci sotto, per doppi falli ed errori) in media nelle ultime [window]
+ * partite; per partite e allenamenti, quanti negli ultimi 30 o 7 giorni. [reachedAt]: la prima volta che ci si è
+ * arrivati; [seen]: l'avviso è già stato visto.
+ */
+@Serializable
+data class Goal(
+    val id: String,
+    val kind: GoalKind,
+    val target: Double,
+    val window: Int = 5,
+    val createdAt: Long = 0,
+    val reachedAt: Long? = null,
+    val seen: Boolean = false,
+)
+
+object Goals {
+    fun newId(): String = "g" + java.util.UUID.randomUUID().toString().take(12)
+
+    /** A che punto si è: il valore di adesso (null = non ci sono ancora dati), da 0 a 1, raggiunto o no, su quante partite. */
+    data class Status(val current: Double?, val progress: Float, val reached: Boolean, val count: Int)
+
+    /** Il valore di una partita per quella voce; null se la partita non l'ha (statistiche non dettagliate). */
+    fun value(kind: GoalKind, l: PlayerStats.MatchLine): Double? {
+        val d = l.detail
+        return when (kind) {
+            GoalKind.WINS -> if (l.won) 100.0 else 0.0
+            GoalKind.POINTS_WON -> l.pointsWonPct.toDouble()
+            GoalKind.FIRST_SERVE -> d?.takeIf { it.servePoints > 0 }?.let { it.firstServesIn * 100.0 / it.servePoints }
+            GoalKind.ACES -> d?.aces?.toDouble()
+            GoalKind.DOUBLE_FAULTS -> d?.doubleFaults?.toDouble()
+            GoalKind.UNFORCED_ERRORS -> d?.unforcedErrors?.toDouble()
+            GoalKind.MATCHES_MONTH, GoalKind.WORKOUTS_WEEK -> null
+        }
+    }
+
+    /**
+     * [lines]: le partite finite di chi usa l'app, dalla più vecchia. Per le voci delle partite conta la media delle
+     * ultime [Goal.window] che hanno quel dato, e si è arrivati solo con almeno [Goal.window] partite.
+     */
+    fun status(g: Goal, lines: List<PlayerStats.MatchLine>, workoutStarts: List<Long>, now: Long): Status {
+        val day = 86_400_000L
+        val (current, count, enough) = when (g.kind) {
+            GoalKind.MATCHES_MONTH -> lines.count { (it.rec.endedAt ?: it.rec.updatedAt) >= now - 30 * day }.let { Triple(it.toDouble(), it, true) }
+            GoalKind.WORKOUTS_WEEK -> workoutStarts.count { it >= now - 7 * day }.let { Triple(it.toDouble(), it, true) }
+            else -> {
+                val v = lines.mapNotNull { value(g.kind, it) }.takeLast(g.window.coerceAtLeast(1))
+                Triple(v.takeIf { it.isNotEmpty() }?.average(), v.size, v.size >= g.window)
+            }
+        }
+        if (current == null) return Status(null, 0f, false, 0)
+        val reached = enough && if (g.kind.lowerIsBetter) current <= g.target + 1e-9 else current >= g.target - 1e-9
+        val progress = when {
+            g.kind.lowerIsBetter -> if (current <= g.target) 1f else (g.target / current).toFloat()
+            g.target <= 0 -> 1f
+            else -> (current / g.target).toFloat()
+        }.coerceIn(0f, 1f).let { if (!enough && it >= 1f) 0.99f else it }
+        return Status(current, progress, reached, count)
+    }
+
+    /** Gli obiettivi appena raggiunti prendono la data (la prima volta): così arriva l'avviso. */
+    fun markReached(goals: List<Goal>, lines: List<PlayerStats.MatchLine>, workoutStarts: List<Long>, now: Long): List<Goal> =
+        goals.map { g -> if (g.reachedAt == null && status(g, lines, workoutStarts, now).reached) g.copy(reachedAt = now) else g }
+
+    /** Il valore come si legge: percentuali senza decimali, medie per partita con uno. */
+    fun format(kind: GoalKind, v: Double): String = when (kind) {
+        GoalKind.WINS, GoalKind.POINTS_WON, GoalKind.FIRST_SERVE -> "${Math.round(v)}%"
+        GoalKind.MATCHES_MONTH, GoalKind.WORKOUTS_WEEK -> "${Math.round(v)}"
+        else -> String.format(java.util.Locale.ROOT, "%.1f", v).removeSuffix(".0")
+    }
+
+    /** I traguardi che si propongono, per voce: da dove si parte nel menu. */
+    fun choices(kind: GoalKind): List<Double> = when (kind) {
+        GoalKind.WINS -> listOf(40.0, 50.0, 60.0, 70.0, 80.0)
+        GoalKind.POINTS_WON -> listOf(45.0, 50.0, 55.0, 60.0)
+        GoalKind.FIRST_SERVE -> listOf(50.0, 55.0, 60.0, 65.0, 70.0, 75.0)
+        GoalKind.ACES -> listOf(1.0, 2.0, 3.0, 5.0)
+        GoalKind.DOUBLE_FAULTS -> listOf(1.0, 2.0, 3.0, 4.0)
+        GoalKind.UNFORCED_ERRORS -> listOf(5.0, 10.0, 15.0, 20.0)
+        GoalKind.MATCHES_MONTH -> listOf(2.0, 4.0, 6.0, 8.0, 12.0)
+        GoalKind.WORKOUTS_WEEK -> listOf(1.0, 2.0, 3.0, 4.0, 5.0)
+    }
 }
 TSM_EOF
 
@@ -22818,6 +23048,20 @@ class Storage(context: Context) {
 
     /** Le squadre del circolo, coi loro incontri, in un file solo. */
     /** Le classifiche a sfida del circolo. */
+    private val goalsFile: File get() = File(app.filesDir, "goals.json")
+
+    fun loadGoals(): List<Goal> =
+        runCatching { json.decodeFromString(ListSerializer(Goal.serializer()), goalsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveGoals(list: List<Goal>) {
+        runCatching {
+            val tmp = File(app.filesDir, "goals.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Goal.serializer()), list))
+            if (!tmp.renameTo(goalsFile)) { goalsFile.delete(); tmp.renameTo(goalsFile) }
+        }
+    }
+
     private val laddersFile: File get() = File(app.filesDir, "club_ladders.json")
 
     fun loadLadders(): List<Ladder> =
@@ -23190,6 +23434,14 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
+    /** Backup automatico di tutti i dati (senza video), ogni giorno solo se è cambiato qualcosa; l'impronta dell'ultimo. */
+    var personalBackupAuto: Boolean
+        get() = prefs.getBoolean("personal_backup_auto", false)
+        set(v) = prefs.edit().putBoolean("personal_backup_auto", v).apply()
+    var personalBackupPrint: String
+        get() = prefs.getString("personal_backup_print", null) ?: ""
+        set(v) = prefs.edit().putString("personal_backup_print", v).apply()
+
     /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa), l'impronta e l'ora dell'ultimo. */
     var officeBackupAuto: Boolean
         get() = prefs.getBoolean("office_backup_auto", false)
@@ -24594,6 +24846,140 @@ object WorkoutReport {
             if (i == 0 || t.t[i] - t.t[i - 1] > 5) path.moveTo(x, y) else path.lineTo(x, y)
         }
         c.drawPath(path, line)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/YearReview.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/YearReview.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import java.util.Calendar
+
+/**
+ * Il mio anno: le partite finite di chi usa l'app in un anno, in breve. Quante, quante vinte, le ore in campo, il
+ * rivale (l'avversario incontrato più spesso) col bilancio, le partite mese per mese, la serie di vittorie più lunga,
+ * gli ace (dalle partite con le statistiche dettagliate) e gli allenamenti.
+ */
+object YearReview {
+    data class Year(
+        val year: Int, val played: Int, val won: Int, val minutes: Long, val rival: String?, val rivalWon: Int, val rivalLost: Int,
+        val months: List<Int>, val streak: Int, val aces: Int?, val workouts: Int,
+    ) {
+        val winPct: Int get() = if (played > 0) Math.round(won * 100.0 / played).toInt() else 0
+        /** Il mese (0-11) con più partite; null senza partite. */
+        val bestMonth: Int? get() = months.withIndex().filter { it.value > 0 }.maxByOrNull { it.value }?.index
+    }
+
+    private fun yearOf(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.YEAR)
+    private fun monthOf(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.MONTH)
+    private fun at(l: PlayerStats.MatchLine): Long = l.rec.startedAt ?: l.rec.endedAt ?: l.rec.updatedAt
+
+    /** Gli anni con almeno una partita, dal più recente. */
+    fun years(lines: List<PlayerStats.MatchLine>): List<Int> = lines.map { yearOf(at(it)) }.distinct().sortedDescending()
+
+    /** [lines]: le partite di [key] (chi usa l'app), dalla più vecchia; [workoutStarts]: quando sono iniziati gli allenamenti. */
+    fun of(year: Int, lines: List<PlayerStats.MatchLine>, key: String, workoutStarts: List<Long>): Year {
+        val mine = lines.filter { yearOf(at(it)) == year }
+        // Il rivale: chi si è incontrato più volte (nel doppio, la coppia).
+        val vs = mine.mapNotNull { l ->
+            val side = PlayerStats.sideOf(l.rec, key) ?: return@mapNotNull null
+            PlayerStats.names(l.rec.setup, side.other).joinToString(" / ").takeIf { it.isNotBlank() }?.let { it to l.won }
+        }
+        val rival = vs.groupBy { it.first }.maxWithOrNull(compareBy({ it.value.size }, { -it.value.count { w -> !w.second } }))
+        var best = 0; var run = 0
+        for (l in mine) { run = if (l.won) run + 1 else 0; best = maxOf(best, run) }
+        val months = MutableList(12) { 0 }
+        mine.forEach { months[monthOf(at(it))]++ }
+        val withDetail = mine.mapNotNull { it.detail }
+        return Year(
+            year, mine.size, mine.count { it.won }, mine.sumOf { it.rec.clockMs } / 60_000L,
+            rival?.key?.takeIf { rival.value.size >= 2 }, rival?.value?.count { it.second } ?: 0, rival?.value?.count { !it.second } ?: 0,
+            months, best, withDetail.takeIf { it.isNotEmpty() }?.sumOf { it.aces }, workoutStarts.count { yearOf(it) == year },
+        )
+    }
+}
+
+/** L'immagine del mio anno per WhatsApp e i social (1080×1350), coi colori dell'app. */
+object YearReviewImage {
+    private val bg = Color.rgb(13, 20, 33)
+    private val surface = Color.rgb(25, 35, 54)
+    private val ball = Color.rgb(198, 244, 50)
+    private val main = Color.WHITE
+    private val dim = Color.rgb(150, 162, 180)
+
+    fun render(y: YearReview.Year, name: String, s: Strings, lang: Lang): Bitmap {
+        val w = 1080; val h = 1350
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        c.drawColor(bg)
+        fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+            textSize = size; this.color = color; typeface = if (bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT; isAntiAlias = true; textAlign = align
+        }
+        fun box(r: RectF) = c.drawRoundRect(r, 32f, 32f, Paint().apply { color = surface; isAntiAlias = true })
+        c.drawText(s.yrOf(y.year), 70f, 130f, p(84f, main, true))
+        if (name.isNotBlank()) c.drawText(name, 70f, 195f, p(40f, dim))
+        if (y.played == 0) {
+            c.drawText(s.yrNone, 70f, 320f, p(40f, dim))
+            c.drawText(s.generatedWith, w / 2f, h - 50f, p(30f, dim, align = Paint.Align.CENTER))
+            return bmp
+        }
+        // Tre numeri grandi: partite, vinte, ore in campo.
+        val tiles = listOf(y.played.toString() to s.yrMatches, "${y.winPct}%" to s.yrWon, String.format(lang.locale, if (y.minutes < 600) "%.1f" else "%.0f", y.minutes / 60.0) to s.yrHours)
+        val tw = (w - 120f - 2 * 30f) / 3
+        tiles.forEachIndexed { i, (big, label) ->
+            val x = 60f + i * (tw + 30f)
+            box(RectF(x, 250f, x + tw, 470f))
+            c.drawText(big, x + tw / 2, 375f, p(96f, ball, true, Paint.Align.CENTER))
+            c.drawText(label, x + tw / 2, 435f, p(32f, dim, align = Paint.Align.CENTER))
+        }
+        var top = 510f
+        // Il rivale col bilancio.
+        y.rival?.let { r ->
+            box(RectF(60f, top, w - 60f, top + 170f))
+            c.drawText(s.yrRival, 100f, top + 60f, p(32f, dim))
+            c.drawText(r.take(28), 100f, top + 125f, p(52f, main, true))
+            c.drawText("${y.rivalWon}–${y.rivalLost}", w - 100f, top + 120f, p(80f, ball, true, Paint.Align.RIGHT))
+            top += 200f
+        }
+        // Le partite mese per mese.
+        box(RectF(60f, top, w - 60f, top + 330f))
+        val max = (y.months.maxOrNull() ?: 0).coerceAtLeast(1)
+        val bw = (w - 200f) / 12
+        val initials = java.text.DateFormatSymbols(lang.locale).shortMonths
+        for (m in 0 until 12) {
+            val x = 100f + m * bw
+            val bh = 200f * y.months[m] / max
+            c.drawRoundRect(RectF(x + 8f, top + 250f - bh, x + bw - 8f, top + 250f), 10f, 10f, Paint().apply { color = if (y.months[m] == max) ball else dim; isAntiAlias = true })
+            c.drawText(initials[m].take(1).uppercase(lang.locale), x + bw / 2, top + 300f, p(28f, dim, align = Paint.Align.CENTER))
+        }
+        top += 360f
+        // In fondo, in righe: il mese con più partite, la serie, gli ace, gli allenamenti.
+        val months = java.text.DateFormatSymbols(lang.locale).months
+        val lines = listOfNotNull(
+            y.bestMonth?.let { s.yrBestMonth(months[it].replaceFirstChar { ch -> ch.titlecase(lang.locale) }) },
+            y.streak.takeIf { it >= 2 }?.let { s.yrStreak(it) },
+            y.aces?.takeIf { it > 0 }?.let { s.yrAces(it) },
+            y.workouts.takeIf { it > 0 }?.let { s.yrWorkouts(it) },
+        )
+        for (l in lines) {
+            if (top > h - 130f) break
+            c.drawText(l, 70f, top + 40f, p(38f, main))
+            top += 62f
+        }
+        c.drawText(s.generatedWith, w / 2f, h - 50f, p(30f, dim, align = Paint.Align.CENTER))
+        return bmp
     }
 }
 TSM_EOF
@@ -28920,6 +29306,62 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/DailyBackupJob.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/DailyBackupJob.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.service
+
+import android.app.job.JobInfo
+import android.app.job.JobParameters
+import android.app.job.JobScheduler
+import android.app.job.JobService
+import android.content.ComponentName
+import android.content.Context
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.Storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
+/**
+ * I backup automatici, una volta al giorno anche ad app chiusa e solo se qualcosa è cambiato: quello della
+ * segreteria (sul telefono e, se c'è, sul server del circolo) e quello di tutti i dati senza video (in Documenti).
+ */
+class DailyBackupJob : JobService() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun onStartJob(params: JobParameters): Boolean {
+        val c = (application as TsmApp).controller
+        scope.launch {
+            runCatching { if (c.storage.officeBackupAuto) c.officeBackupNow(onlyIfChanged = true) }
+            runCatching { if (c.storage.personalBackupAuto) c.personalBackupNow(onlyIfChanged = true) }
+            jobFinished(params, false)
+        }
+        return true
+    }
+
+    override fun onStopJob(params: JobParameters): Boolean = true
+
+    companion object {
+        private const val JOB = 7306
+
+        /** Acceso se almeno uno dei due backup automatici lo è. */
+        fun schedule(context: Context, storage: Storage) {
+            val js = context.getSystemService(JobScheduler::class.java) ?: return
+            if (!storage.officeBackupAuto && !storage.personalBackupAuto) { js.cancel(JOB); return }
+            if (js.getPendingJob(JOB) != null) return
+            js.schedule(
+                JobInfo.Builder(JOB, ComponentName(context, DailyBackupJob::class.java))
+                    .setPeriodic(24 * 3_600_000L).setPersisted(true).build(),
+            )
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/DeskService.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/DeskService.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -29087,59 +29529,6 @@ class MatchService : Service() {
 
         fun stop(ctx: Context) {
             ctx.stopService(Intent(ctx, MatchService::class.java))
-        }
-    }
-}
-TSM_EOF
-
-# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/OfficeBackupJob.kt
-cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/OfficeBackupJob.kt" << 'TSM_EOF'
-// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
-// SPDX-License-Identifier: GPL-3.0-or-later
-
-package com.tennis.scoremanager.service
-
-import android.app.job.JobInfo
-import android.app.job.JobParameters
-import android.app.job.JobScheduler
-import android.app.job.JobService
-import android.content.ComponentName
-import android.content.Context
-import com.tennis.scoremanager.TsmApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-
-/**
- * Il backup automatico della segreteria, una volta al giorno anche ad app chiusa: una copia sul telefono (le
- * ultime 14) e, se c'è, sul server del circolo; solo se qualcosa è cambiato dall'ultima.
- */
-class OfficeBackupJob : JobService() {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
-    override fun onStartJob(params: JobParameters): Boolean {
-        val c = (application as TsmApp).controller
-        scope.launch {
-            runCatching { if (c.storage.officeBackupAuto) c.officeBackupNow(onlyIfChanged = true) }
-            jobFinished(params, false)
-        }
-        return true
-    }
-
-    override fun onStopJob(params: JobParameters): Boolean = true
-
-    companion object {
-        private const val JOB = 7306
-
-        fun schedule(context: Context, on: Boolean) {
-            val js = context.getSystemService(JobScheduler::class.java) ?: return
-            if (!on) { js.cancel(JOB); return }
-            if (js.getPendingJob(JOB) != null) return
-            js.schedule(
-                JobInfo.Builder(JOB, ComponentName(context, OfficeBackupJob::class.java))
-                    .setPeriodic(24 * 3_600_000L).setPersisted(true).build(),
-            )
         }
     }
 }
@@ -32428,6 +32817,163 @@ private fun CalibSlider(label: String, value: String, v: Float, range: ClosedFlo
             colors = SliderDefaults.colors(thumbColor = TsmColors.Ball, activeTrackColor = TsmColors.Ball),
         )
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/GoalsUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/GoalsUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Goal
+import com.tennis.scoremanager.data.GoalKind
+import com.tennis.scoremanager.data.Goals
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.YearReview
+import com.tennis.scoremanager.data.YearReviewImage
+import java.io.File
+
+/** Il nome della voce, come in Progressi. */
+fun goalName(s: Strings, k: GoalKind): String = when (k) {
+    GoalKind.WINS -> s.progressWins
+    GoalKind.POINTS_WON -> s.progressPointsWon
+    GoalKind.FIRST_SERVE -> s.statFirstServeIn
+    GoalKind.ACES -> s.statAces
+    GoalKind.DOUBLE_FAULTS -> s.statDoubleFaults
+    GoalKind.UNFORCED_ERRORS -> s.statUnforcedErrors
+    GoalKind.MATCHES_MONTH -> s.goalMatchesMonth
+    GoalKind.WORKOUTS_WEEK -> s.goalWorkoutsWeek
+}
+
+/** "Prime di servizio in campo almeno 60%". */
+fun goalLine(s: Strings, g: Goal): String =
+    "${goalName(s, g.kind)} " + (if (g.kind.lowerIsBetter) s.goalAtMost(Goals.format(g.kind, g.target)) else s.goalAtLeast(Goals.format(g.kind, g.target)))
+
+/** Progressi › Obiettivi: ognuno con la sua barra; si aggiungono e si tolgono. */
+@Composable
+fun GoalsCard(c: MatchController) {
+    val s = LocalStrings.current
+    val goals by c.goals.collectAsState()
+    val history by c.history.collectAsState()
+    val workouts by c.workouts.collectAsState()
+    var adding by remember { mutableStateOf(false) }
+    val lang = c.options.value.lang
+    SectionCard(s.goalsTitle, Icons.Filled.Flag) {
+        if (c.myKey().isEmpty()) { Text(s.goalNeedMe, color = TsmColors.TextDim, fontSize = 13.sp); return@SectionCard }
+        Text(s.goalsHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (goals.isEmpty()) Text(s.goalsNone, color = TsmColors.TextDim)
+        for (g in goals) {
+            val st = remember(g, history, workouts) { c.goalStatus(g) }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(goalLine(s, g), color = TsmColors.TextMain, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { c.deleteGoal(g.id) }) { Text(s.goalDelete, color = TsmColors.TextDim) }
+                }
+                LinearProgressIndicator(progress = { st.progress }, modifier = Modifier.fillMaxWidth(), color = if (st.reached) TsmColors.Ok else TsmColors.Ball)
+                val parts = listOfNotNull(
+                    st.current?.let { s.goalNow(Goals.format(g.kind, it)) },
+                    s.goalWindow(g.window).takeIf { g.kind.perMatch },
+                    (g.window - st.count).takeIf { g.kind.perMatch && !st.reached && it > 0 }?.let { s.goalMore(it) },
+                    g.reachedAt?.let { s.goalReached(Reports.date(it, lang)) },
+                )
+                Text(parts.joinToString(" · "), color = if (st.reached) TsmColors.Ok else TsmColors.TextDim, fontSize = 12.sp)
+            }
+        }
+        GhostButton(s.goalNew, Icons.Filled.Add, { adding = true }, Modifier.fillMaxWidth())
+    }
+    if (adding) GoalDialog(c) { adding = false }
+}
+
+@Composable
+private fun GoalDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val kinds = GoalKind.entries
+    var kind by remember { mutableStateOf(GoalKind.FIRST_SERVE) }
+    var target by remember(kind) { mutableStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
+    val windows = listOf(3, 5, 10)
+    var window by remember { mutableIntStateOf(5) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.goalNew) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.goalWhat, color = TsmColors.TextDim, fontSize = 13.sp)
+                Segmented(kinds.map { SegOption(goalName(s, it)) }, kinds.indexOf(kind), { kind = kinds[it] }, columns = 1)
+                Text(s.goalTarget + " · " + (if (kind.lowerIsBetter) s.goalAtMost("…") else s.goalAtLeast("…")), color = TsmColors.TextDim, fontSize = 13.sp)
+                val choices = Goals.choices(kind)
+                Segmented(choices.map { SegOption(Goals.format(kind, it)) }, choices.indexOf(target).coerceAtLeast(0), { target = choices[it] }, columns = 3)
+                if (kind.perMatch) {
+                    Text(s.goalWindowLabel, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Segmented(windows.map { SegOption(it.toString()) }, windows.indexOf(window), { window = windows[it] })
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.addGoal(kind, target, window); onDone() }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Il mio anno: l'anno da scegliere, l'immagine e il tasto per condividerla. */
+@Composable
+fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val history by c.history.collectAsState()
+    val workouts by c.workouts.collectAsState()
+    val lang = c.options.value.lang
+    val lines = remember(history) { c.myLines() }
+    val years = remember(lines) { YearReview.years(lines).ifEmpty { listOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) } }
+    var year by remember { mutableIntStateOf(years.first()) }
+    val name = c.me()?.name ?: c.storage.myName
+    val bmp = remember(year, lines, workouts) { YearReviewImage.render(YearReview.of(year, lines, c.myKey(), workouts.map { it.startedAt }), name, s, lang) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.yrTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (c.myKey().isEmpty()) { Text(s.goalNeedMe, color = TsmColors.TextDim, fontSize = 13.sp); return@Column }
+                if (years.size > 1) Segmented(years.map { SegOption(it.toString()) }, years.indexOf(year), { year = years[it] }, columns = minOf(years.size, 4))
+                Image(bmp.asImageBitmap(), contentDescription = s.yrOf(year), modifier = Modifier.fillMaxWidth())
+                GhostButton(s.yrShare, Icons.Filled.Share, {
+                    val f = File(File(context.cacheDir, "share").apply { mkdirs() }, "${s.yrOf(year)}.png")
+                    f.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+                    context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(f, "image/png"), s.yrShare))
+                }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
 }
 TSM_EOF
 
@@ -36546,6 +37092,48 @@ interface Strings {
     val likeLastTitle: String
     val likeLastChange: String
     val playLikeLast: (String) -> String
+    /** Profilo e dati: il backup automatico di tutti i dati. */
+    val autoBackup: String
+    val autoBackupHint: String
+    val autoBackupNone: String
+    val autoBackupNow: String
+    val autoBackupShare: String
+    val autoBackupCopies: String
+    val autoBackupLast: (String) -> String
+    /** Progressi: obiettivi e il mio anno. */
+    val goalsTitle: String
+    val goalsHint: String
+    val goalsNone: String
+    val goalNew: String
+    val goalWhat: String
+    val goalTarget: String
+    val goalWindowLabel: String
+    val goalNeedMe: String
+    val goalMatchesMonth: String
+    val goalWorkoutsWeek: String
+    val goalDelete: String
+    val yrTitle: String
+    val yrHint: String
+    val yrMatches: String
+    val yrWon: String
+    val yrHours: String
+    val yrRival: String
+    val yrNone: String
+    val yrShare: String
+    val yrYear: String
+    val goalAtLeast: (String) -> String
+    val goalAtMost: (String) -> String
+    val goalReached: (String) -> String
+    val goalReachedBanner: (String) -> String
+    val goalNow: (String) -> String
+    val yrBestMonth: (String) -> String
+    val goalWindow: (Int) -> String
+    val goalMore: (Int) -> String
+    val yrOf: (Int) -> String
+    val yrStreak: (Int) -> String
+    val yrAces: (Int) -> String
+    val yrWorkouts: (Int) -> String
+    val yrRecord: (Int, Int) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -38624,6 +39212,46 @@ object ItStrings : Strings {
     override val likeLastTitle = "Come l'ultima volta"
     override val likeLastChange = "Cambia modalità o regole"
     override val playLikeLast: (String) -> String = { "Come l'ultima volta: $it" }
+    override val autoBackup = "Backup automatico ogni giorno"
+    override val autoBackupHint = "Senza video, solo se è cambiato qualcosa. Le ultime 5 copie stanno in Documenti › Tennis Score Manager › Backup e restano anche se disinstalli l'app: da lì le mandi su Drive o le copi sul PC."
+    override val autoBackupNone = "Ancora nessuna copia automatica"
+    override val autoBackupNow = "Fai una copia adesso"
+    override val autoBackupShare = "Manda"
+    override val autoBackupCopies = "Copie automatiche"
+    override val autoBackupLast: (String) -> String = { "Ultima copia: $it" }
+    override val goalsTitle = "Obiettivi"
+    override val goalsHint = "Un traguardo e una barra che si riempie: le medie sono sulle tue ultime partite."
+    override val goalsNone = "Nessun obiettivo: scegline uno."
+    override val goalNew = "Nuovo obiettivo"
+    override val goalWhat = "Che cosa"
+    override val goalTarget = "Traguardo"
+    override val goalWindowLabel = "Sulle ultime"
+    override val goalNeedMe = "Per gli obiettivi e il tuo anno l'app deve sapere chi sei: Altro › Tu."
+    override val goalMatchesMonth = "Partite in 30 giorni"
+    override val goalWorkoutsWeek = "Allenamenti in 7 giorni"
+    override val goalDelete = "Togli"
+    override val yrTitle = "Il mio anno"
+    override val yrHint = "Partite, vittorie, rivale e mesi più attivi in un'immagine da condividere"
+    override val yrMatches = "partite"
+    override val yrWon = "vinte"
+    override val yrHours = "ore in campo"
+    override val yrRival = "Il rivale"
+    override val yrNone = "Nessuna partita in quest'anno."
+    override val yrShare = "Condividi"
+    override val yrYear = "Anno"
+    override val goalAtLeast: (String) -> String = { "almeno $it" }
+    override val goalAtMost: (String) -> String = { "al massimo $it" }
+    override val goalReached: (String) -> String = { "Raggiunto il $it" }
+    override val goalReachedBanner: (String) -> String = { "Obiettivo raggiunto: $it" }
+    override val goalNow: (String) -> String = { "adesso $it" }
+    override val yrBestMonth: (String) -> String = { "Il mese con più partite: $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "nell'ultima partita" else "sulle ultime $it partite" }
+    override val goalMore: (Int) -> String = { if (it == 1) "ancora 1 partita per dirlo" else "ancora $it partite per dirlo" }
+    override val yrOf: (Int) -> String = { "Il mio $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Serie più lunga: 1 vittoria" else "Serie più lunga: $it vittorie di fila" }
+    override val yrAces: (Int) -> String = { "Ace: $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 allenamento" else "$it allenamenti" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a vinte, $b perse" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -40683,6 +41311,46 @@ object EnStrings : Strings {
     override val likeLastTitle = "Like last time"
     override val likeLastChange = "Change mode or rules"
     override val playLikeLast: (String) -> String = { "Like last time: $it" }
+    override val autoBackup = "Automatic backup every day"
+    override val autoBackupHint = "Without videos, only if something changed. The last 5 copies are in Documents › Tennis Score Manager › Backup and stay even if you uninstall the app: from there send them to Drive or copy them to the PC."
+    override val autoBackupNone = "No automatic copy yet"
+    override val autoBackupNow = "Make a copy now"
+    override val autoBackupShare = "Send"
+    override val autoBackupCopies = "Automatic copies"
+    override val autoBackupLast: (String) -> String = { "Last copy: $it" }
+    override val goalsTitle = "Goals"
+    override val goalsHint = "A target and a bar that fills up: averages are over your latest matches."
+    override val goalsNone = "No goals: pick one."
+    override val goalNew = "New goal"
+    override val goalWhat = "What"
+    override val goalTarget = "Target"
+    override val goalWindowLabel = "Over the last"
+    override val goalNeedMe = "For goals and your year the app needs to know who you are: More › You."
+    override val goalMatchesMonth = "Matches in 30 days"
+    override val goalWorkoutsWeek = "Workouts in 7 days"
+    override val goalDelete = "Remove"
+    override val yrTitle = "My year"
+    override val yrHint = "Matches, wins, rival and busiest months in a picture to share"
+    override val yrMatches = "matches"
+    override val yrWon = "won"
+    override val yrHours = "hours on court"
+    override val yrRival = "The rival"
+    override val yrNone = "No matches this year."
+    override val yrShare = "Share"
+    override val yrYear = "Year"
+    override val goalAtLeast: (String) -> String = { "at least $it" }
+    override val goalAtMost: (String) -> String = { "at most $it" }
+    override val goalReached: (String) -> String = { "Reached on $it" }
+    override val goalReachedBanner: (String) -> String = { "Goal reached: $it" }
+    override val goalNow: (String) -> String = { "now $it" }
+    override val yrBestMonth: (String) -> String = { "Month with most matches: $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "in the last match" else "over the last $it matches" }
+    override val goalMore: (Int) -> String = { if (it == 1) "1 more match to tell" else "$it more matches to tell" }
+    override val yrOf: (Int) -> String = { "My $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Longest streak: 1 win" else "Longest streak: $it wins in a row" }
+    override val yrAces: (Int) -> String = { "Aces: $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 workout" else "$it workouts" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a won, $b lost" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -42765,6 +43433,46 @@ object DeStrings : Strings {
     override val likeLastTitle = "Wie beim letzten Mal"
     override val likeLastChange = "Modus oder Regeln ändern"
     override val playLikeLast: (String) -> String = { "Wie beim letzten Mal: $it" }
+    override val autoBackup = "Automatische Sicherung jeden Tag"
+    override val autoBackupHint = "Ohne Videos, nur wenn sich etwas geändert hat. Die letzten 5 Kopien liegen in Dokumente › Tennis Score Manager › Backup und bleiben, auch wenn du die App deinstallierst: von dort schickst du sie zu Drive oder kopierst sie auf den PC."
+    override val autoBackupNone = "Noch keine automatische Kopie"
+    override val autoBackupNow = "Jetzt eine Kopie machen"
+    override val autoBackupShare = "Senden"
+    override val autoBackupCopies = "Automatische Kopien"
+    override val autoBackupLast: (String) -> String = { "Letzte Kopie: $it" }
+    override val goalsTitle = "Ziele"
+    override val goalsHint = "Ein Ziel und ein Balken, der sich füllt: die Durchschnitte gelten für deine letzten Matches."
+    override val goalsNone = "Keine Ziele: wähle eins."
+    override val goalNew = "Neues Ziel"
+    override val goalWhat = "Was"
+    override val goalTarget = "Zielwert"
+    override val goalWindowLabel = "Über die letzten"
+    override val goalNeedMe = "Für Ziele und dein Jahr muss die App wissen, wer du bist: Mehr › Du."
+    override val goalMatchesMonth = "Matches in 30 Tagen"
+    override val goalWorkoutsWeek = "Trainings in 7 Tagen"
+    override val goalDelete = "Entfernen"
+    override val yrTitle = "Mein Jahr"
+    override val yrHint = "Matches, Siege, Rivale und aktivste Monate in einem Bild zum Teilen"
+    override val yrMatches = "Matches"
+    override val yrWon = "gewonnen"
+    override val yrHours = "Stunden auf dem Platz"
+    override val yrRival = "Der Rivale"
+    override val yrNone = "Keine Matches in diesem Jahr."
+    override val yrShare = "Teilen"
+    override val yrYear = "Jahr"
+    override val goalAtLeast: (String) -> String = { "mindestens $it" }
+    override val goalAtMost: (String) -> String = { "höchstens $it" }
+    override val goalReached: (String) -> String = { "Erreicht am $it" }
+    override val goalReachedBanner: (String) -> String = { "Ziel erreicht: $it" }
+    override val goalNow: (String) -> String = { "jetzt $it" }
+    override val yrBestMonth: (String) -> String = { "Monat mit den meisten Matches: $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "im letzten Match" else "über die letzten $it Matches" }
+    override val goalMore: (Int) -> String = { if (it == 1) "noch 1 Match, um es zu sagen" else "noch $it Matches, um es zu sagen" }
+    override val yrOf: (Int) -> String = { "Mein $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Längste Serie: 1 Sieg" else "Längste Serie: $it Siege in Folge" }
+    override val yrAces: (Int) -> String = { "Asse: $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 Training" else "$it Trainings" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a gewonnen, $b verloren" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -44840,6 +45548,46 @@ object EsStrings : Strings {
     override val likeLastTitle = "Como la última vez"
     override val likeLastChange = "Cambiar modo o reglas"
     override val playLikeLast: (String) -> String = { "Como la última vez: $it" }
+    override val autoBackup = "Copia automática cada día"
+    override val autoBackupHint = "Sin vídeos, solo si algo ha cambiado. Las últimas 5 copias están en Documentos › Tennis Score Manager › Backup y se quedan aunque desinstales la app: desde ahí las envías a Drive o las copias al PC."
+    override val autoBackupNone = "Todavía ninguna copia automática"
+    override val autoBackupNow = "Hacer una copia ahora"
+    override val autoBackupShare = "Enviar"
+    override val autoBackupCopies = "Copias automáticas"
+    override val autoBackupLast: (String) -> String = { "Última copia: $it" }
+    override val goalsTitle = "Objetivos"
+    override val goalsHint = "Una meta y una barra que se llena: las medias son de tus últimos partidos."
+    override val goalsNone = "Ningún objetivo: elige uno."
+    override val goalNew = "Nuevo objetivo"
+    override val goalWhat = "Qué"
+    override val goalTarget = "Meta"
+    override val goalWindowLabel = "En los últimos"
+    override val goalNeedMe = "Para los objetivos y tu año la app debe saber quién eres: Más › Tú."
+    override val goalMatchesMonth = "Partidos en 30 días"
+    override val goalWorkoutsWeek = "Entrenamientos en 7 días"
+    override val goalDelete = "Quitar"
+    override val yrTitle = "Mi año"
+    override val yrHint = "Partidos, victorias, rival y meses más activos en una imagen para compartir"
+    override val yrMatches = "partidos"
+    override val yrWon = "ganados"
+    override val yrHours = "horas en pista"
+    override val yrRival = "El rival"
+    override val yrNone = "Ningún partido este año."
+    override val yrShare = "Compartir"
+    override val yrYear = "Año"
+    override val goalAtLeast: (String) -> String = { "al menos $it" }
+    override val goalAtMost: (String) -> String = { "como mucho $it" }
+    override val goalReached: (String) -> String = { "Conseguido el $it" }
+    override val goalReachedBanner: (String) -> String = { "Objetivo conseguido: $it" }
+    override val goalNow: (String) -> String = { "ahora $it" }
+    override val yrBestMonth: (String) -> String = { "El mes con más partidos: $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "en el último partido" else "en los últimos $it partidos" }
+    override val goalMore: (Int) -> String = { if (it == 1) "falta 1 partido para saberlo" else "faltan $it partidos para saberlo" }
+    override val yrOf: (Int) -> String = { "Mi $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Racha más larga: 1 victoria" else "Racha más larga: $it victorias seguidas" }
+    override val yrAces: (Int) -> String = { "Aces: $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entrenamiento" else "$it entrenamientos" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganados, $b perdidos" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -46917,6 +47665,46 @@ object FrStrings : Strings {
     override val likeLastTitle = "Comme la dernière fois"
     override val likeLastChange = "Changer de mode ou de règles"
     override val playLikeLast: (String) -> String = { "Comme la dernière fois : $it" }
+    override val autoBackup = "Sauvegarde automatique chaque jour"
+    override val autoBackupHint = "Sans vidéos, seulement si quelque chose a changé. Les 5 dernières copies sont dans Documents › Tennis Score Manager › Backup et restent même si vous désinstallez l'app : de là, envoyez-les sur Drive ou copiez-les sur le PC."
+    override val autoBackupNone = "Pas encore de copie automatique"
+    override val autoBackupNow = "Faire une copie maintenant"
+    override val autoBackupShare = "Envoyer"
+    override val autoBackupCopies = "Copies automatiques"
+    override val autoBackupLast: (String) -> String = { "Dernière copie : $it" }
+    override val goalsTitle = "Objectifs"
+    override val goalsHint = "Un objectif et une barre qui se remplit : les moyennes portent sur vos derniers matchs."
+    override val goalsNone = "Aucun objectif : choisissez-en un."
+    override val goalNew = "Nouvel objectif"
+    override val goalWhat = "Quoi"
+    override val goalTarget = "Seuil"
+    override val goalWindowLabel = "Sur les derniers"
+    override val goalNeedMe = "Pour les objectifs et votre année, l'app doit savoir qui vous êtes : Plus › Vous."
+    override val goalMatchesMonth = "Matchs en 30 jours"
+    override val goalWorkoutsWeek = "Entraînements en 7 jours"
+    override val goalDelete = "Retirer"
+    override val yrTitle = "Mon année"
+    override val yrHint = "Matchs, victoires, rival et mois les plus actifs dans une image à partager"
+    override val yrMatches = "matchs"
+    override val yrWon = "gagnés"
+    override val yrHours = "heures sur le court"
+    override val yrRival = "Le rival"
+    override val yrNone = "Aucun match cette année."
+    override val yrShare = "Partager"
+    override val yrYear = "Année"
+    override val goalAtLeast: (String) -> String = { "au moins $it" }
+    override val goalAtMost: (String) -> String = { "au plus $it" }
+    override val goalReached: (String) -> String = { "Atteint le $it" }
+    override val goalReachedBanner: (String) -> String = { "Objectif atteint : $it" }
+    override val goalNow: (String) -> String = { "maintenant $it" }
+    override val yrBestMonth: (String) -> String = { "Le mois avec le plus de matchs : $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "au dernier match" else "sur les $it derniers matchs" }
+    override val goalMore: (Int) -> String = { if (it == 1) "encore 1 match pour le dire" else "encore $it matchs pour le dire" }
+    override val yrOf: (Int) -> String = { "Mon année $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Plus longue série : 1 victoire" else "Plus longue série : $it victoires de suite" }
+    override val yrAces: (Int) -> String = { "Aces : $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entraînement" else "$it entraînements" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a gagnés, $b perdus" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -48995,6 +49783,46 @@ object PtStrings : Strings {
     override val likeLastTitle = "Como da última vez"
     override val likeLastChange = "Mudar modo ou regras"
     override val playLikeLast: (String) -> String = { "Como da última vez: $it" }
+    override val autoBackup = "Cópia automática todos os dias"
+    override val autoBackupHint = "Sem vídeos, só se algo mudou. As últimas 5 cópias ficam em Documentos › Tennis Score Manager › Backup e continuam lá mesmo que desinstale o app: de lá envie-as para o Drive ou copie-as para o PC."
+    override val autoBackupNone = "Ainda nenhuma cópia automática"
+    override val autoBackupNow = "Fazer uma cópia agora"
+    override val autoBackupShare = "Enviar"
+    override val autoBackupCopies = "Cópias automáticas"
+    override val autoBackupLast: (String) -> String = { "Última cópia: $it" }
+    override val goalsTitle = "Objetivos"
+    override val goalsHint = "Uma meta e uma barra que se enche: as médias são das suas últimas partidas."
+    override val goalsNone = "Nenhum objetivo: escolha um."
+    override val goalNew = "Novo objetivo"
+    override val goalWhat = "O quê"
+    override val goalTarget = "Meta"
+    override val goalWindowLabel = "Nas últimas"
+    override val goalNeedMe = "Para os objetivos e o seu ano o app tem de saber quem é: Mais › Você."
+    override val goalMatchesMonth = "Partidas em 30 dias"
+    override val goalWorkoutsWeek = "Treinos em 7 dias"
+    override val goalDelete = "Tirar"
+    override val yrTitle = "O meu ano"
+    override val yrHint = "Partidas, vitórias, rival e meses mais ativos numa imagem para partilhar"
+    override val yrMatches = "partidas"
+    override val yrWon = "ganhas"
+    override val yrHours = "horas em quadra"
+    override val yrRival = "O rival"
+    override val yrNone = "Nenhuma partida neste ano."
+    override val yrShare = "Partilhar"
+    override val yrYear = "Ano"
+    override val goalAtLeast: (String) -> String = { "pelo menos $it" }
+    override val goalAtMost: (String) -> String = { "no máximo $it" }
+    override val goalReached: (String) -> String = { "Alcançado a $it" }
+    override val goalReachedBanner: (String) -> String = { "Objetivo alcançado: $it" }
+    override val goalNow: (String) -> String = { "agora $it" }
+    override val yrBestMonth: (String) -> String = { "O mês com mais partidas: $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "na última partida" else "nas últimas $it partidas" }
+    override val goalMore: (Int) -> String = { if (it == 1) "falta 1 partida para saber" else "faltam $it partidas para saber" }
+    override val yrOf: (Int) -> String = { "O meu $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Maior série: 1 vitória" else "Maior série: $it vitórias seguidas" }
+    override val yrAces: (Int) -> String = { "Aces: $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 treino" else "$it treinos" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganhas, $b perdidas" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -51888,6 +52716,9 @@ import com.tennis.scoremanager.data.Backup
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
@@ -51915,7 +52746,9 @@ fun DataScreen(c: MatchController) {
     var wipeVideos by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
-    var restoreAsk by remember { mutableStateOf<Pair<Uri, Backup.Manifest>?>(null) }
+    // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
+    var restoreAsk by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
+    var copies by remember { mutableStateOf(c.personalBackups()) }
     var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
     var closeAfter by remember { mutableStateOf(false) }
     val videoMb by produceState(0L) {
@@ -51939,7 +52772,7 @@ fun DataScreen(c: MatchController) {
         uri ?: return@rememberLauncherForActivityResult
         scope.launch {
             val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
-            if (m == null) message = s.dataNotBackup else restoreAsk = uri to m
+            if (m == null) message = s.dataNotBackup else restoreAsk = { context.contentResolver.openInputStream(uri) } to m
         }
     }
     ScreenScaffold(
@@ -51959,10 +52792,44 @@ fun DataScreen(c: MatchController) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }
             SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it; c.storage.backupReminder = it }
+            var auto by remember { mutableStateOf(c.storage.personalBackupAuto) }
+            SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.setPersonalBackupAuto(it) }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
                 create.launch("TennisScoreManager-backup-$stamp.zip")
+            }, Modifier.fillMaxWidth())
+        }
+        SectionCard(s.autoBackupCopies, Icons.Filled.Schedule) {
+            // Data corta (05/11/26 21:07): nell'elenco ci sta su una riga.
+            val short = remember(lang) { java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT, lang.locale) }
+            Text(copies.firstOrNull()?.let { s.autoBackupLast(short.format(Date(it.lastModified()))) } ?: s.autoBackupNone,
+                color = TsmColors.TextDim, fontSize = 13.sp)
+            for (f in copies) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("${short.format(Date(f.lastModified()))} · ${(f.length() + 524_287) / 1_048_576} MB",
+                    color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                TextButton(onClick = {
+                    // Si condivide una copia nella cartella "share": il FileProvider dà solo quella.
+                    scope.launch {
+                        val out = withContext(Dispatchers.IO) { java.io.File(java.io.File(context.cacheDir, "share").apply { mkdirs() }, f.name).also { f.copyTo(it, overwrite = true) } }
+                        context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(out, "application/zip"), s.autoBackupShare))
+                    }
+                }) { Text(s.autoBackupShare) }
+                TextButton(onClick = {
+                    scope.launch {
+                        val m = withContext(Dispatchers.IO) { runCatching { f.inputStream().use { Backup.peek(it) } }.getOrNull() }
+                        if (m == null) message = s.dataNotBackup else restoreAsk = { f.inputStream() } to m
+                    }
+                }) { Text(s.dataRestoreDo) }
+            }
+            GhostButton(s.autoBackupNow, Icons.Filled.Backup, {
+                busy = s.dataBusy
+                scope.launch {
+                    val f = c.personalBackupNow(onlyIfChanged = false)
+                    busy = null
+                    copies = c.personalBackups()
+                    message = if (f != null) s.dataBackupDone else s.dataBackupFailed
+                }
             }, Modifier.fillMaxWidth())
         }
         SectionCard(s.dataRestore, Icons.Filled.Restore) {
@@ -51983,7 +52850,7 @@ fun DataScreen(c: MatchController) {
             confirmButton = { TextButton(onClick = { message = null; if (closeAfter) c.closeAfterData() }) { Text(s.ok) } },
         )
     }
-    restoreAsk?.let { (uri, m) ->
+    restoreAsk?.let { (input, m) ->
         AlertDialog(
             onDismissRequest = { restoreAsk = null },
             title = { Text(s.dataRestore) },
@@ -51994,7 +52861,7 @@ fun DataScreen(c: MatchController) {
                     busy = s.dataBusy
                     scope.launch {
                         val ok = withContext(Dispatchers.IO) {
-                            runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
+                            runCatching { input()?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
                         }
                         busy = null
                         closeAfter = ok
@@ -53256,6 +54123,11 @@ private fun PlayTab(c: MatchController) {
     val pf by c.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
+    // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
+    val goals by c.goals.collectAsState()
+    for (g in goals.filter { it.reachedAt != null && !it.seen }) {
+        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
+    }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -53332,6 +54204,9 @@ private fun ProgressTab(c: MatchController) {
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
+    var year by remember { mutableStateOf(false) }
+    Entry(Icons.Filled.CalendarMonth, s.yrTitle, s.yrHint) { year = true }
+    if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
     if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()
@@ -57002,6 +57877,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.PictureAsPdf
@@ -57076,6 +57952,11 @@ fun ProgressScreen(c: MatchController) {
         icon = Icons.AutoMirrored.Filled.TrendingUp,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // In cima: gli obiettivi e il mio anno (di chi usa l'app).
+        com.tennis.scoremanager.ui.GoalsCard(c)
+        var year by remember { mutableStateOf(false) }
+        GhostButton(s.yrTitle, Icons.Filled.CalendarMonth, { year = true }, Modifier.fillMaxWidth())
+        if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
         Segmented(
             listOf(SegOption(s.progressWorkouts), SegOption(s.progressMatches)),
             selected = if (matches) 1 else 0,
@@ -79844,6 +80725,92 @@ class DrillsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/GoalsYearTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/GoalsYearTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.RulesConfig
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class GoalsYearTest {
+    private fun at(y: Int, m: Int, d: Int) = Calendar.getInstance().apply { set(y, m, d, 18, 0, 0) }.timeInMillis
+
+    private fun line(t: Long, won: Boolean, opponent: String = "Mario", dfs: Int? = null, firstIn: Int = 0, served: Int = 0, aces: Int = 0) = PlayerStats.MatchLine(
+        MatchRecord(id = "m$t", setup = SetupData(p1a = "Stefano", p1aId = "me", p2a = opponent), options = MatchOptions(), rules = RulesConfig(),
+            startedAt = t, endedAt = t + 3_600_000L, updatedAt = t, finished = true, clockMs = 90 * 60_000L),
+        won, if (won) 55 else 45,
+        dfs?.let { MatchStats.SideTotals(doubleFaults = it, firstServesIn = firstIn, servePoints = served, aces = aces) },
+    )
+
+    @Test fun firstServeOverTheLastMatches() {
+        val now = at(2026, 10, 30)
+        val g = Goal("g", GoalKind.FIRST_SERVE, target = 60.0, window = 3)
+        // Le prime due partite non contano: si guardano le ultime tre (50, 60, 70 = 60%).
+        val lines = listOf(30, 40, 50, 60, 70).mapIndexed { i, pct -> line(at(2026, 10, i + 1), true, dfs = 2, firstIn = pct, served = 100) }
+        val st = Goals.status(g, lines, emptyList(), now)
+        assertEquals(60.0, st.current!!, 1e-9)
+        assertTrue(st.reached)
+        // Con due partite sole no, anche se la media c'è: ne servono tre.
+        assertFalse(Goals.status(g, lines.take(2), emptyList(), now).reached)
+        assertEquals(0.99f, Goals.status(g.copy(target = 30.0), lines.take(2), emptyList(), now).progress)
+    }
+
+    @Test fun lowerIsBetterForDoubleFaults() {
+        val now = at(2026, 10, 30)
+        val g = Goal("g", GoalKind.DOUBLE_FAULTS, target = 2.0, window = 2)
+        val many = listOf(line(at(2026, 10, 1), true, dfs = 4), line(at(2026, 10, 2), true, dfs = 4))
+        assertEquals(0.5f, Goals.status(g, many, emptyList(), now).progress)
+        val few = many + listOf(line(at(2026, 10, 3), true, dfs = 1), line(at(2026, 10, 4), true, dfs = 2))
+        assertTrue(Goals.status(g, few, emptyList(), now).reached)
+        // Senza statistiche dettagliate non c'è il dato.
+        assertNull(Goals.status(g, listOf(line(at(2026, 10, 1), true)), emptyList(), now).current)
+    }
+
+    @Test fun matchesAndWorkoutsCountRecentOnes() {
+        val now = at(2026, 10, 30)
+        val lines = listOf(line(at(2026, 8, 1), true), line(at(2026, 10, 20), true), line(at(2026, 10, 25), false))
+        assertEquals(2.0, Goals.status(Goal("g", GoalKind.MATCHES_MONTH, 2.0), lines, emptyList(), now).current!!, 0.0)
+        val w = listOf(at(2026, 10, 26), at(2026, 10, 29), at(2026, 10, 10))
+        val st = Goals.status(Goal("g", GoalKind.WORKOUTS_WEEK, 3.0), emptyList(), w, now)
+        assertEquals(2.0, st.current!!, 0.0)
+        assertFalse(st.reached)
+        // Appena raggiunto prende la data, una volta sola.
+        val marked = Goals.markReached(listOf(Goal("a", GoalKind.MATCHES_MONTH, 2.0), Goal("b", GoalKind.MATCHES_MONTH, 5.0)), lines, w, now)
+        assertEquals(listOf(now, null), marked.map { it.reachedAt })
+        assertEquals(marked, Goals.markReached(marked, lines, w, now + 1000))
+    }
+
+    @Test fun myYear() {
+        val lines = listOf(
+            line(at(2025, 11, 20), true),
+            line(at(2026, 0, 10), true), line(at(2026, 0, 17), true), line(at(2026, 0, 24), false, "Luca"),
+            line(at(2026, 4, 2), true), line(at(2026, 4, 9), false), line(at(2026, 4, 16), true, dfs = 1, aces = 4),
+        )
+        assertEquals(listOf(2026, 2025), YearReview.years(lines))
+        val y = YearReview.of(2026, lines, "me", listOf(at(2026, 2, 1), at(2025, 1, 1)))
+        assertEquals(6, y.played)
+        assertEquals(4, y.won)
+        assertEquals(67, y.winPct)
+        assertEquals(9 * 60L, y.minutes)
+        assertEquals("Mario", y.rival)
+        assertEquals(4 to 1, y.rivalWon to y.rivalLost)
+        assertEquals(2, y.streak)
+        assertEquals(4, y.aces)
+        assertEquals(1, y.workouts)
+        // Gennaio e maggio pari (3 e 3): vince il primo.
+        assertEquals(0, y.bestMonth)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/GroundPoseRealTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/GroundPoseRealTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -93724,6 +94691,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 301 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 305 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

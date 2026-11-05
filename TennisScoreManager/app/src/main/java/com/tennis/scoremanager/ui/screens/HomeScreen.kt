@@ -369,6 +369,11 @@ private fun PlayTab(c: MatchController) {
     val pf by c.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
+    // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
+    val goals by c.goals.collectAsState()
+    for (g in goals.filter { it.reachedAt != null && !it.seen }) {
+        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
+    }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -445,6 +450,9 @@ private fun ProgressTab(c: MatchController) {
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
+    var year by remember { mutableStateOf(false) }
+    Entry(Icons.Filled.CalendarMonth, s.yrTitle, s.yrHint) { year = true }
+    if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
     if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()

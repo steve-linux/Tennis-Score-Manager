@@ -77,6 +77,51 @@ object Backup {
         }
     }
 
+    // --- Backup automatico ---
+
+    /** Dove vanno le copie automatiche: Documenti/Tennis Score Manager/Backup (si vede col gestore file, resta anche disinstallando l'app). */
+    const val AUTO_DIR = "Backup"
+    /** Le copie automatiche che restano: pesano qualche MB l'una. */
+    const val AUTO_KEEP = 5
+    private const val AUTO_PREFIX = "TSM backup "
+
+    fun autoDir(storage: Storage) = File(storage.documentsRoot, AUTO_DIR)
+
+    /** "TSM backup 2026-11-05 2130.zip". */
+    fun autoName(at: Long): String = AUTO_PREFIX + java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at)) + ".zip"
+
+    /** Le copie automatiche, dalla più nuova. */
+    fun autoList(storage: Storage): List<File> = autoDir(storage).listFiles { f -> f.isFile && f.name.startsWith(AUTO_PREFIX) && f.name.endsWith(".zip") }
+        .orEmpty().sortedByDescending { it.lastModified() }
+
+    /**
+     * L'impronta di quello che entrerebbe nel backup senza video (nome, grandezza e data di ogni file): se è uguale
+     * all'ultima, non è cambiato niente e la copia automatica si salta. Costa poco: non legge i file.
+     */
+    fun fingerprint(c: Context, storage: Storage, strokesFolder: String): String {
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        fun add(prefix: String, f: File) { md.update("$prefix${f.name}|${f.length()}|${f.lastModified()}\n".toByteArray()) }
+        fun tree(prefix: String, root: File, keep: (File) -> Boolean) {
+            if (root.exists()) root.walkTopDown().filter { it.isFile && keep(it) }.sortedBy { it.path }.forEach { add(prefix + it.relativeTo(root).invariantSeparatorsPath, it) }
+        }
+        // Le impostazioni cambiano a ogni apertura (finestre viste, ultima scheda): contano solo i dati.
+        c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.sortedBy { it.name }.forEach { f -> if (f.isDirectory) tree("files/${f.name}/", f) { true } else add("files/", f) }
+        extDir(c)?.let { tree("external/$EXT_VOICE/", File(it, EXT_VOICE)) { true } }
+        tree("documents/$strokesFolder/", strokes(storage, strokesFolder)) { !isVideo(it) }
+        return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    /** Scrive una copia automatica (senza video) e tiene le ultime [AUTO_KEEP]. */
+    fun writeAuto(c: Context, storage: Storage, version: String, strokesFolder: String, at: Long): File {
+        val dir = autoDir(storage).apply { mkdirs() }
+        val f = File(dir, autoName(at))
+        val tmp = File(dir, ".${f.name}.tmp")
+        tmp.outputStream().use { write(c, storage, it, videos = false, version = version, strokesFolder = strokesFolder) }
+        if (!tmp.renameTo(f)) { tmp.copyTo(f, overwrite = true); tmp.delete() }
+        autoList(storage).drop(AUTO_KEEP).forEach { it.delete() }
+        return f
+    }
+
     /** Legge solo il manifest (per chiedere conferma prima di ripristinare); null se non è un backup dell'app. */
     fun peek(input: InputStream): Manifest? = ZipInputStream(input.buffered()).use { zip ->
         val e = zip.nextEntry ?: return null

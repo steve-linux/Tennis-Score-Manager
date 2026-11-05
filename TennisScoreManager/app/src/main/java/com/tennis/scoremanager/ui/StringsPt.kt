@@ -1783,6 +1783,46 @@ object PtStrings : Strings {
     override val likeLastTitle = "Como da última vez"
     override val likeLastChange = "Mudar modo ou regras"
     override val playLikeLast: (String) -> String = { "Como da última vez: $it" }
+    override val autoBackup = "Cópia automática todos os dias"
+    override val autoBackupHint = "Sem vídeos, só se algo mudou. As últimas 5 cópias ficam em Documentos › Tennis Score Manager › Backup e continuam lá mesmo que desinstale o app: de lá envie-as para o Drive ou copie-as para o PC."
+    override val autoBackupNone = "Ainda nenhuma cópia automática"
+    override val autoBackupNow = "Fazer uma cópia agora"
+    override val autoBackupShare = "Enviar"
+    override val autoBackupCopies = "Cópias automáticas"
+    override val autoBackupLast: (String) -> String = { "Última cópia: $it" }
+    override val goalsTitle = "Objetivos"
+    override val goalsHint = "Uma meta e uma barra que se enche: as médias são das suas últimas partidas."
+    override val goalsNone = "Nenhum objetivo: escolha um."
+    override val goalNew = "Novo objetivo"
+    override val goalWhat = "O quê"
+    override val goalTarget = "Meta"
+    override val goalWindowLabel = "Nas últimas"
+    override val goalNeedMe = "Para os objetivos e o seu ano o app tem de saber quem é: Mais › Você."
+    override val goalMatchesMonth = "Partidas em 30 dias"
+    override val goalWorkoutsWeek = "Treinos em 7 dias"
+    override val goalDelete = "Tirar"
+    override val yrTitle = "O meu ano"
+    override val yrHint = "Partidas, vitórias, rival e meses mais ativos numa imagem para partilhar"
+    override val yrMatches = "partidas"
+    override val yrWon = "ganhas"
+    override val yrHours = "horas em quadra"
+    override val yrRival = "O rival"
+    override val yrNone = "Nenhuma partida neste ano."
+    override val yrShare = "Partilhar"
+    override val yrYear = "Ano"
+    override val goalAtLeast: (String) -> String = { "pelo menos $it" }
+    override val goalAtMost: (String) -> String = { "no máximo $it" }
+    override val goalReached: (String) -> String = { "Alcançado a $it" }
+    override val goalReachedBanner: (String) -> String = { "Objetivo alcançado: $it" }
+    override val goalNow: (String) -> String = { "agora $it" }
+    override val yrBestMonth: (String) -> String = { "O mês com mais partidas: $it" }
+    override val goalWindow: (Int) -> String = { if (it == 1) "na última partida" else "nas últimas $it partidas" }
+    override val goalMore: (Int) -> String = { if (it == 1) "falta 1 partida para saber" else "faltam $it partidas para saber" }
+    override val yrOf: (Int) -> String = { "O meu $it" }
+    override val yrStreak: (Int) -> String = { if (it == 1) "Maior série: 1 vitória" else "Maior série: $it vitórias seguidas" }
+    override val yrAces: (Int) -> String = { "Aces: $it" }
+    override val yrWorkouts: (Int) -> String = { if (it == 1) "1 treino" else "$it treinos" }
+    override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganhas, $b perdidas" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
