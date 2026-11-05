@@ -273,9 +273,13 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 o.starPoint -> s.starPoint
                 else -> null
             }
-            Text(listOfNotNull(mode, format, extra).joinToString(" · "), color = TsmColors.TextMain)
+            // Il pro set e i set brevi dicono a quanti game: "Pro set · 8 game".
+            val games = s.gamesN(o.gamesPerSet).takeIf { o.format == MatchFormat.PRO_SET || (o.format != MatchFormat.MATCH_TIEBREAK_ONLY && o.gamesPerSet != 6) }
+            Text(listOfNotNull(mode, format, games, extra).joinToString(" · "), color = TsmColors.TextMain)
             GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false }, Modifier.fillMaxWidth())
         }
+        // Come l'ultima volta il sorteggio viene subito: è l'unica cosa da fare.
+        if (short) CoinTossSection(c, o, names, su.doubles)
         // Modalità (come l'ultima volta si vede solo coi braccialetti o i telecomandi: vanno collegati)
         if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
@@ -392,7 +396,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Sorteggio
-        if (match) CoinTossSection(c, o, names, su.doubles)
+        if (match && !short) CoinTossSection(c, o, names, su.doubles)
     }
 
     if (locationDialog) {
