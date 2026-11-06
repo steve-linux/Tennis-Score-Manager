@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Schedule
@@ -231,7 +232,8 @@ private fun EntriesTab(
         t.referee.ifBlank { null }?.let { s.ctRefereeLine(it) },
     )
     for (l in info) Text(l, color = TsmColors.TextDim, fontSize = 13.sp)
-    if (!t.drawn) BigButton(s.ctAddEntry, Icons.Filled.PersonAdd, onAdd, Modifier.fillMaxWidth())
+    // Anche dopo il sorteggio: un ripescato si iscrive qui e prende posto con Modifica tabellone.
+    if (t.champion == null) BigButton(s.ctAddEntry, Icons.Filled.PersonAdd, onAdd, Modifier.fillMaxWidth())
     if (t.entries.isEmpty()) Text(s.ctNoEntries, color = TsmColors.TextDim)
     val ordered = ClubTournaments.ordered(t.entries, players)
     val okIds = ClubTournaments.eligible(t, players, book, now).map { it.id }.toSet()
@@ -256,6 +258,66 @@ private fun EntriesTab(
             }
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
         }
+    }
+}
+
+/** Il posto scelto in Modifica tabellone: nel primo turno ([seat]) o in un girone ([entry]). */
+private data class EditPick(val seat: ClubTournaments.Seat? = null, val entry: String? = null)
+
+/** Modifica a mano: si tocca un posto, poi quello con cui scambiarlo, o un iscritto rimasto fuori. */
+@Composable
+private fun EditDraw(c: MatchController, t: ClubTournament) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    val book by c.clubBook.collectAsState()
+    var picked by remember { mutableStateOf<EditPick?>(null) }
+    var failed by remember { mutableStateOf(false) }
+    val now = remember { System.currentTimeMillis() }
+    val inGroups = t.format == CTFormat.GROUPS && !ClubTournaments.groupsLocked(t)
+    val ok = ClubTournaments.eligible(t, players, book, now).map { it.id }.toSet()
+    val subs = ClubTournaments.outsideDraw(t).filter { it.id in ok }
+    fun change(f: (ClubTournament) -> ClubTournament?) { failed = !c.editClubDraw(t, f); picked = null }
+    fun tap(x: EditPick) {
+        val p = picked
+        when {
+            p == null -> picked = x
+            p == x -> picked = null
+            p.seat != null && x.seat != null -> change { ClubTournaments.swapSeats(it, p.seat, x.seat) }
+            p.entry != null && x.entry != null -> change { ClubTournaments.swapGroupEntries(it, p.entry, x.entry) }
+        }
+    }
+    @Composable fun place(name: String, x: EditPick, locked: Boolean) {
+        val on = picked == x
+        Text(
+            name, color = if (on) TsmColors.Background else if (locked) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh)
+                .clickable(enabled = !locked) { tap(x) }.padding(horizontal = 10.dp, vertical = 9.dp),
+        )
+    }
+    if (t.kind == CTKind.FITP) Text(s.ctEditFitp, color = TsmColors.Orange, fontSize = 13.sp)
+    Text(if (picked != null) s.ctEditPicked else if (inGroups) s.ctEditGroupsHint else s.ctEditHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    if (failed) Text(s.ctEditNo, color = TsmColors.Orange, fontSize = 13.sp)
+    if (inGroups) {
+        for ((g, members) in ClubTournaments.groupMembers(t).withIndex()) {
+            Text(s.ctGroup(groupLetter(g)), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            for (id in members) place(entryName(c, t.entries.firstOrNull { it.id == id }), EditPick(entry = id), ClubTournaments.groupEntryLocked(t, id))
+        }
+    } else {
+        for (m in t.matches.filter { it.round == 1 }.sortedBy { it.slot }) {
+            val locked = ClubTournaments.seatLocked(t, m)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                for ((side, id) in listOf(0 to m.a, 1 to m.b)) {
+                    place(id?.let { x -> entryName(c, t.entries.firstOrNull { it.id == x }) } ?: s.ctBye, EditPick(ClubTournaments.Seat(m.id, side)), locked)
+                }
+            }
+        }
+    }
+    val p = picked
+    if (p != null && subs.isNotEmpty()) {
+        Text(s.ctEditSubs, color = TsmColors.TextDim, fontSize = 13.sp)
+        for (e in subs) GhostButton(entryName(c, e), Icons.Filled.PersonAdd, {
+            change { if (p.seat != null) ClubTournaments.replaceSeat(it, p.seat, e.id) else ClubTournaments.replaceGroupEntry(it, p.entry.orEmpty(), e.id) }
+        }, Modifier.fillMaxWidth())
     }
 }
 
@@ -287,6 +349,10 @@ private fun MatchBox(c: MatchController, t: ClubTournament, m: CTMatch, onOpen: 
 private fun DrawTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
     val s = LocalStrings.current
     if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
+    var editing by remember { mutableStateOf(false) }
+    if (t.manualEdits > 0) Text(s.ctEdited(t.manualEdits), color = if (t.kind == CTKind.FITP) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+    if (t.champion == null) GhostButton(if (editing) s.ctEditDone else s.ctEditDraw, Icons.Filled.SwapHoriz, { editing = !editing }, Modifier.fillMaxWidth())
+    if (editing) { EditDraw(c, t); return }
     // Gironi: la classifica (in evidenza chi passa) e le partite.
     val groups = ClubTournaments.groupMembers(t)
     for (g in groups.indices) {
@@ -424,6 +490,8 @@ private fun EntryDialog(c: MatchController, t: ClubTournament, e: CTEntry, onDon
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (id in e.players) c.playerById(id)?.let { p -> GhostButton(p.name, Icons.AutoMirrored.Filled.ArrowForward, { onDone(); c.openStudent(p.id) }, Modifier.fillMaxWidth()) }
+                if (t.drawn && ClubTournaments.outsideDraw(t).any { it.id == e.id })
+                    TextButton(onClick = { c.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
                 if (!t.drawn) {
                     Text(s.ctSeedHint, color = TsmColors.TextDim, fontSize = 13.sp)
                     Row(verticalAlignment = Alignment.CenterVertically) {

@@ -330,10 +330,16 @@ interface DeskData {
     val feeCents: Int, val requirePaid: Boolean, val rankLimit: String, val fitpCode: String, val referee: String, val groups: Int, val qualify: Int,
     val drawn: Boolean, val hasResults: Boolean, val eligible: Int, val champion: String?, val matchMinutes: Int,
     val entries: List<DeskCupEntry>, val matches: List<DeskCupMatch>, val standings: List<List<DeskStanding>>, val courts: List<String>,
+    /** Per Modifica tabellone: quante modifiche, le partite e gli iscritti fermi, chi può entrare. */
+    val manualEdits: Int = 0, val lockedMatches: List<String> = emptyList(), val lockedEntries: List<String> = emptyList(), val groupsLocked: Boolean = false, val subs: List<String> = emptyList(),
 )
 @Serializable data class DeskId(val id: String)
 @Serializable data class DeskEntryIn(val players: List<String>)
 @Serializable data class DeskSeedIn(val seed: Int? = null)
+/** Un posto: nel primo turno ([match] e [side]) o in un girone ([entry]). */
+@Serializable data class DeskSeatIn(val match: String? = null, val side: Int = 0, val entry: String? = null)
+@Serializable data class DeskSwapIn(val a: DeskSeatIn, val b: DeskSeatIn)
+@Serializable data class DeskReplaceIn(val seat: DeskSeatIn, val entry: String)
 /** Il risultato: [winner] è l'iscritto (CTEntry.id); se manca, si ricava dal punteggio. Tutto vuoto = cancella. */
 @Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false)
 /** Dove e quando; [date] null = da programmare. Con [force] la si mette anche se il campo è occupato. */
@@ -1195,8 +1201,10 @@ class DeskApi(
             m == "POST" && rest == listOf("draw") -> draw(t)
             m == "POST" && rest == listOf("undraw") -> {
                 if (hasResults(t)) throw Fail(409, "HAS_RESULTS")
-                save(t.copy(matches = emptyList(), drawnAt = null))
+                save(t.copy(matches = emptyList(), drawnAt = null, manualEdits = 0))
             }
+            m == "POST" && rest == listOf("swap") -> swap(t, read(DeskSwapIn.serializer(), r))
+            m == "POST" && rest == listOf("replace") -> replace(t, read(DeskReplaceIn.serializer(), r))
             m == "POST" && rest == listOf("knockout") -> {
                 if (t.format != CTFormat.GROUPS || !t.groupsDone || t.matches.any { it.round > 0 }) throw Fail(409, "NOT_READY")
                 val now = data.now()
@@ -1232,7 +1240,10 @@ class DeskApi(
         return ok(DeskCup.serializer(), DeskCup(
             t.id, t.name, t.kind, t.format, t.doubles, t.category, day(t.start), day(t.end), t.feeCents, t.requirePaid, t.rankLimit, t.fitpCode, t.referee,
             t.groups, t.qualify, t.drawn, hasResults(t), ClubTournaments.eligible(t, people, book, now).size, t.champion, data.plan().settings.tournamentMinutes,
-            entries, matches, standings, data.courts(),
+            entries, matches, standings, data.courts(), t.manualEdits,
+            t.matches.filter { it.round == 1 && ClubTournaments.seatLocked(t, it) }.map { it.id },
+            ClubTournaments.groupMembers(t).flatten().filter { ClubTournaments.groupEntryLocked(t, it) },
+            ClubTournaments.groupsLocked(t), subs(t).map { it.id },
         ))
     }
 
@@ -1280,6 +1291,37 @@ class DeskApi(
         if (t.entries.none { it.id == id }) throw Fail(404, "NOT_FOUND")
         val n = i.seed?.takeIf { it > 0 }?.coerceAtMost(64)
         return save(t.copy(entries = t.entries.map { if (it.id == id) it.copy(seed = n) else it }))
+    }
+
+    /** Chi può prendere un posto: rimasto fuori e in regola. */
+    private fun subs(t: ClubTournament): List<CTEntry> {
+        val ok = ClubTournaments.eligible(t, data.players(), data.book(), data.now()).map { it.id }.toSet()
+        return ClubTournaments.outsideDraw(t).filter { it.id in ok }
+    }
+
+    private fun seat(s: DeskSeatIn): ClubTournaments.Seat? = s.match?.takeIf { s.side in 0..1 }?.let { ClubTournaments.Seat(it, s.side) }
+
+    /** Modifica tabellone: scambia due posti del primo turno o due iscritti di girone. */
+    private fun swap(t: ClubTournament, i: DeskSwapIn): Resp {
+        val x = seat(i.a); val y = seat(i.b)
+        val done = when {
+            x != null && y != null -> ClubTournaments.swapSeats(t, x, y)
+            i.a.entry != null && i.b.entry != null -> ClubTournaments.swapGroupEntries(t, i.a.entry, i.b.entry)
+            else -> throw Fail(400, "BAD_REQUEST")
+        }
+        return save(done ?: throw Fail(409, "DRAW_LOCKED"))
+    }
+
+    /** Modifica tabellone: un iscritto rimasto fuori prende un posto. */
+    private fun replace(t: ClubTournament, i: DeskReplaceIn): Resp {
+        if (subs(t).none { it.id == i.entry }) throw Fail(409, "NOT_ELIGIBLE")
+        val x = seat(i.seat)
+        val done = when {
+            x != null -> ClubTournaments.replaceSeat(t, x, i.entry)
+            i.seat.entry != null -> ClubTournaments.replaceGroupEntry(t, i.seat.entry, i.entry)
+            else -> throw Fail(400, "BAD_REQUEST")
+        }
+        return save(done ?: throw Fail(409, "DRAW_LOCKED"))
     }
 
     /** Il sorteggio come sul telefono: gli iscritti in regola, in ordine per le teste di serie. */

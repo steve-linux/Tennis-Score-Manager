@@ -80,6 +80,8 @@ data class ClubTournament(
     val matches: List<CTMatch> = emptyList(),
     /** Quando è stato fatto il sorteggio (null = iscrizioni aperte). */
     val drawnAt: Long? = null,
+    /** Quante modifiche a mano ha avuto il tabellone dopo il sorteggio: nei tornei FITP resta scritto. */
+    val manualEdits: Int = 0,
     val createdAt: Long = 0,
 ) {
     val drawn: Boolean get() = drawnAt != null
@@ -335,6 +337,78 @@ object ClubTournaments {
             }
         }
         return matches.map { if (it.round == 0) it else byKey[it.round to it.slot] ?: it }
+    }
+
+    // --- Modifica a mano dopo il sorteggio ---
+
+    /** Un posto del primo turno: [side] 0 = a, 1 = b. */
+    data class Seat(val match: String, val side: Int)
+
+    private fun nextMatch(t: ClubTournament, m: CTMatch) = t.matches.firstOrNull { it.round == m.round + 1 && it.slot == m.slot / 2 }
+
+    /** Si può cambiare chi gioca questa partita del primo turno? No se c'è un risultato che andrebbe perso. */
+    fun seatLocked(t: ClubTournament, m: CTMatch): Boolean =
+        m.round != 1 || if (m.bye) nextMatch(t, m)?.played == true else m.played
+
+    /** Da quando esiste il tabellone, i gironi non si toccano più: da lì sono usciti i qualificati. */
+    fun groupsLocked(t: ClubTournament): Boolean = t.matches.any { it.round > 0 }
+
+    /** Questo iscritto può cambiare girone? No se ha già un risultato. */
+    fun groupEntryLocked(t: ClubTournament, entry: String): Boolean =
+        groupsLocked(t) || t.matches.any { it.round == 0 && it.played && (it.a == entry || it.b == entry) }
+
+    /** Gli iscritti rimasti fuori: possono prendere il posto di qualcuno. */
+    fun outsideDraw(t: ClubTournament): List<CTEntry> {
+        val inside = t.matches.flatMap { listOf(it.a, it.b) }.toSet()
+        return t.entries.filter { it.id !in inside }
+    }
+
+    private fun CTMatch.at(side: Int) = if (side == 0) a else b
+    private fun CTMatch.with(side: Int, entry: String?) = (if (side == 0) copy(a = entry) else copy(b = entry)).copy(winner = null)
+
+    /** Applica i nuovi posti: i bye si rifanno da soli, e una partita senza nessuno non può esistere. */
+    private fun reseat(t: ClubTournament, changed: Map<String, CTMatch>): ClubTournament? {
+        val ms = t.matches.map { changed[it.id] ?: it }
+        if (ms.any { it.round == 1 && it.a == null && it.b == null }) return null
+        return t.copy(matches = propagate(ms), manualEdits = t.manualEdits + 1)
+    }
+
+    /** Scambia due posti del primo turno (anche un bye). null = non si può. */
+    fun swapSeats(t: ClubTournament, x: Seat, y: Seat): ClubTournament? {
+        val mx = t.matches.firstOrNull { it.id == x.match } ?: return null
+        val my = t.matches.firstOrNull { it.id == y.match } ?: return null
+        if (x == y || seatLocked(t, mx) || seatLocked(t, my)) return null
+        val ex = mx.at(x.side); val ey = my.at(y.side)
+        if (ex == null && ey == null) return null
+        if (mx.id == my.id) return reseat(t, mapOf(mx.id to mx.with(x.side, ey).with(y.side, ex)))
+        return reseat(t, mapOf(mx.id to mx.with(x.side, ey), my.id to my.with(y.side, ex)))
+    }
+
+    /** Mette al posto [x] (anche un bye) un iscritto rimasto fuori. null = non si può. */
+    fun replaceSeat(t: ClubTournament, x: Seat, entry: String): ClubTournament? {
+        val m = t.matches.firstOrNull { it.id == x.match } ?: return null
+        if (seatLocked(t, m) || outsideDraw(t).none { it.id == entry }) return null
+        return reseat(t, mapOf(m.id to m.with(x.side, entry)))
+    }
+
+    /** Sostituisce gli iscritti in tutte le partite dei gironi secondo [map]. */
+    private fun remapGroups(t: ClubTournament, map: Map<String, String>): ClubTournament = t.copy(
+        matches = t.matches.map { m -> if (m.round != 0) m else m.copy(a = m.a?.let { map[it] ?: it }, b = m.b?.let { map[it] ?: it }) },
+        manualEdits = t.manualEdits + 1,
+    )
+
+    private fun inGroups(t: ClubTournament, entry: String) = t.matches.any { it.round == 0 && (it.a == entry || it.b == entry) }
+
+    /** Scambia di girone due iscritti. null = non si può. */
+    fun swapGroupEntries(t: ClubTournament, x: String, y: String): ClubTournament? {
+        if (x == y || !inGroups(t, x) || !inGroups(t, y) || groupEntryLocked(t, x) || groupEntryLocked(t, y)) return null
+        return remapGroups(t, mapOf(x to y, y to x))
+    }
+
+    /** Nel girone, un iscritto rimasto fuori prende il posto di [old]. null = non si può. */
+    fun replaceGroupEntry(t: ClubTournament, old: String, entry: String): ClubTournament? {
+        if (!inGroups(t, old) || groupEntryLocked(t, old) || outsideDraw(t).none { it.id == entry }) return null
+        return remapGroups(t, mapOf(old to entry))
     }
 
     /** Il risultato di una partita (anche per correggerlo); il tabellone si aggiorna. */

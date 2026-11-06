@@ -1202,6 +1202,15 @@ interface Strings {
     val ctCourt: String
     val ctTime: String
     val ctClearResult: String
+    val ctEditDraw: String
+    val ctEditDone: String
+    val ctEditHint: String
+    val ctEditGroupsHint: String
+    val ctEditPicked: String
+    val ctEditSubs: String
+    val ctEditNo: String
+    val ctEditFitp: String
+    val ctEdited: (Int) -> String
     val ctSeedHint: String
     val ctSeedAuto: String
     val ctRemoveEntry: String
@@ -3354,6 +3363,15 @@ object ItStrings : Strings {
     override val ctCourt = "Campo"
     override val ctTime = "Ora"
     override val ctClearResult = "Cancella il risultato"
+    override val ctEditDraw = "Modifica tabellone"
+    override val ctEditDone = "Fine modifiche"
+    override val ctEditHint = "Tocca un giocatore o un bye, poi l'altro posto: i due si scambiano. Quello che ha già un risultato non si sposta."
+    override val ctEditGroupsHint = "Tocca due iscritti di gironi diversi: si scambiano. Chi ha già un risultato non si sposta."
+    override val ctEditPicked = "Ora tocca il posto con cui scambiare."
+    override val ctEditSubs = "Oppure metti al suo posto:"
+    override val ctEditNo = "Non si può: un incontro resterebbe senza giocatori o ha già un risultato."
+    override val ctEditFitp = "Torneo FITP: modifica solo se lo consente il giudice arbitro. Le modifiche restano segnate."
+    override val ctEdited: (Int) -> String = { "Modifiche a mano al tabellone: $it" }
     override val ctSeedHint = "Testa di serie: di solito dalla classifica FITP; qui la si sceglie a mano."
     override val ctSeedAuto = "dalla classifica"
     override val ctRemoveEntry = "Ritira l'iscrizione"
@@ -5474,6 +5492,15 @@ object EnStrings : Strings {
     override val ctCourt = "Court"
     override val ctTime = "Time"
     override val ctClearResult = "Clear the result"
+    override val ctEditDraw = "Edit draw sheet"
+    override val ctEditDone = "Done editing"
+    override val ctEditHint = "Tap a player or a bye, then the other place: the two swap. Anything that already has a result cannot move."
+    override val ctEditGroupsHint = "Tap two entries from different groups: they swap. Anyone with a result cannot move."
+    override val ctEditPicked = "Now tap the place to swap with."
+    override val ctEditSubs = "Or put in this place:"
+    override val ctEditNo = "Not possible: a match would have no players or already has a result."
+    override val ctEditFitp = "FITP tournament: edit only if the referee allows it. Edits stay recorded."
+    override val ctEdited: (Int) -> String = { "Manual edits to the draw sheet: $it" }
     override val ctSeedHint = "Seed: usually from the FITP ranking; here you choose it by hand."
     override val ctSeedAuto = "from the ranking"
     override val ctRemoveEntry = "Withdraw the entry"

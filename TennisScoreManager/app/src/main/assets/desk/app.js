@@ -964,9 +964,44 @@ function matchBox(t, m, who) {
   return m.a && m.b ? h('button.match', { type: 'button', onclick: () => openMatch(t, m, who) }, kids) : h('div.match', kids);
 }
 
+let cupEditing = null;
+let cupPick = null;
+
+/** Modifica tabellone: si tocca un posto, poi quello con cui scambiarlo, o un iscritto rimasto fuori. */
+function cupEdit(t, body, who) {
+  const inGroups = t.format === 'GROUPS' && !t.groupsLocked;
+  const same = (x, y) => x && y && x.match === y.match && x.side === y.side && x.entry === y.entry;
+  async function tap(x) {
+    if (!cupPick) { cupPick = x; return cupEdit(t, body, who); }
+    if (same(cupPick, x)) { cupPick = null; return cupEdit(t, body, who); }
+    const a = cupPick;
+    cupPick = null;
+    await cupDo('POST', '/swap', { a, b: x });
+  }
+  const place = (x, name, locked) => h('button.seat' + (same(cupPick, x) ? '.on' : ''), { type: 'button', disabled: locked, onclick: () => tap(x) }, name);
+  const seats = inGroups
+    ? h('div.cards', t.standings.map((st, g) => h('div.panel', h('div.pad', h('h2', T.ctGroup(groupLetter(g))),
+      h('div.seats', st.map((r) => place({ entry: r.entry }, who(r.entry), t.lockedEntries.includes(r.entry))))))))
+    : h('div.cards', t.matches.filter((m) => m.round === 1).sort((a, b) => a.slot - b.slot).map((m) => h('div.panel', h('div.pad', h('div.seats',
+      [m.a, m.b].map((id, side) => place({ match: m.id, side }, id ? who(id) : T.ctBye, t.lockedMatches.includes(m.id))))))));
+  const subs = cupPick && t.subs.length ? h('div.section', h('p.dim', T.ctEditSubs), h('div.tools', t.subs.map((id) => h('button', { type: 'button', onclick: async () => {
+    const seat = cupPick;
+    cupPick = null;
+    await cupDo('POST', '/replace', { seat, entry: id });
+  } }, who(id))))) : null;
+  put(body,
+    h('div.tools.noprint', h('button', { type: 'button', onclick: () => { cupEditing = null; cupPick = null; showCup(t.id); } }, T.ctEditDone)),
+    t.kind === 'FITP' ? h('p', h('span.tag.warn.wrap', T.ctEditFitp)) : null,
+    h('p.dim', cupPick ? T.ctEditPicked : inGroups ? T.ctEditGroupsHint : T.ctEditHint),
+    seats, subs);
+}
+
 function cupDraw(t, body, who) {
   if (!t.drawn) { put(body, h('div.panel', h('div.empty', T.ctNotDrawn))); return; }
+  if (cupEditing === t.id) { cupEdit(t, body, who); return; }
   const out = [];
+  if (!t.champion) out.push(h('div.tools.noprint', h('button', { type: 'button', onclick: () => { cupEditing = t.id; cupPick = null; showCup(t.id); } }, T.ctEditDraw)));
+  if (t.manualEdits) out.push(h('p', h('span.tag.' + (t.kind === 'FITP' ? 'warn' : 'dim'), T.ctEdited(t.manualEdits))));
   const ko = t.matches.filter((m) => m.round > 0);
   if (t.format === 'GROUPS') {
     const groups = t.matches.filter((m) => m.round === 0);

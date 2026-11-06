@@ -430,6 +430,15 @@ const APP_I18N = {
     ctDrawAsk: (it) => `Entrano nel sorteggio ${it} iscritti in regola, in ordine di classifica per le teste di serie.`,
     ctDrawExcluded: (it) => `${it} non ${it === 1 ? "entra" : "entrano"}: non in regola (vedi Iscritti).`,
     ctDrawTooFew: "Servono almeno due iscritti in regola.",
+    ctEditDone: "Fine modifiche",
+    ctEditDraw: "Modifica tabellone",
+    ctEditFitp: "Torneo FITP: modifica solo se lo consente il giudice arbitro. Le modifiche restano segnate.",
+    ctEditGroupsHint: "Tocca due iscritti di gironi diversi: si scambiano. Chi ha già un risultato non si sposta.",
+    ctEditHint: "Tocca un giocatore o un bye, poi l'altro posto: i due si scambiano. Quello che ha già un risultato non si sposta.",
+    ctEditNo: "Non si può: un incontro resterebbe senza giocatori o ha già un risultato.",
+    ctEditPicked: "Ora tocca il posto con cui scambiare.",
+    ctEditSubs: "Oppure metti al suo posto:",
+    ctEdited: (it) => `Modifiche a mano al tabellone: ${it}`,
     ctEnd: "Fine",
     ctEntriesCount: (it) => `${it} ${it === 1 ? "iscritto" : "iscritti"}`,
     ctFee: "Quota d'iscrizione (per giocatore)",
@@ -894,6 +903,15 @@ const APP_I18N = {
     ctDrawAsk: (it) => `${it} entries in order go into the draw, seeded by ranking.`,
     ctDrawExcluded: (it) => `${it} ${it === 1 ? "is" : "are"} left out: not in order (see Entries).`,
     ctDrawTooFew: "At least two entries in order are needed.",
+    ctEditDone: "Done editing",
+    ctEditDraw: "Edit draw sheet",
+    ctEditFitp: "FITP tournament: edit only if the referee allows it. Edits stay recorded.",
+    ctEditGroupsHint: "Tap two entries from different groups: they swap. Anyone with a result cannot move.",
+    ctEditHint: "Tap a player or a bye, then the other place: the two swap. Anything that already has a result cannot move.",
+    ctEditNo: "Not possible: a match would have no players or already has a result.",
+    ctEditPicked: "Now tap the place to swap with.",
+    ctEditSubs: "Or put in this place:",
+    ctEdited: (it) => `Manual edits to the draw sheet: ${it}`,
     ctEnd: "End",
     ctEntriesCount: (it) => `${it} ${it === 1 ? "entry" : "entries"}`,
     ctFee: "Entry fee (per player)",
@@ -1358,6 +1376,15 @@ const APP_I18N = {
     ctDrawAsk: (it) => `${it} inscrits en règle entrent au tirage, têtes de série d'après le classement.`,
     ctDrawExcluded: (it) => `${it} ${it === 1 ? "reste" : "restent"} dehors : pas en règle (voir Inscrits).`,
     ctDrawTooFew: "Il faut au moins deux inscrits en règle.",
+    ctEditDone: "Terminer les modifications",
+    ctEditDraw: "Modifier le tableau",
+    ctEditFitp: "Tournoi FITP : modifiez seulement si le juge-arbitre l'autorise. Les modifications restent notées.",
+    ctEditGroupsHint: "Touchez deux inscrits de poules différentes : ils s'échangent. Qui a déjà un résultat ne bouge pas.",
+    ctEditHint: "Touchez un joueur ou un exempt, puis l'autre place : ils s'échangent. Ce qui a déjà un résultat ne bouge pas.",
+    ctEditNo: "Impossible : un match resterait sans joueurs ou a déjà un résultat.",
+    ctEditPicked: "Touchez maintenant la place à échanger.",
+    ctEditSubs: "Ou mettre à cette place :",
+    ctEdited: (it) => `Modifications manuelles du tableau : ${it}`,
     ctEnd: "Fin",
     ctEntriesCount: (it) => `${it} ${it === 1 ? "inscrit" : "inscrits"}`,
     ctFee: "Droit d'inscription (par joueur)",
@@ -1822,6 +1849,15 @@ const APP_I18N = {
     ctDrawAsk: (it) => `${it} gültige Meldungen kommen in die Auslosung, gesetzt nach Rangliste.`,
     ctDrawExcluded: (it) => `${it} ${it === 1 ? "bleibt" : "bleiben"} draußen: nicht in Ordnung (siehe Gemeldet).`,
     ctDrawTooFew: "Mindestens zwei gültige Meldungen nötig.",
+    ctEditDone: "Bearbeitung beenden",
+    ctEditDraw: "Tableau bearbeiten",
+    ctEditFitp: "FITP-Turnier: Nur ändern, wenn der Oberschiedsrichter es erlaubt. Änderungen bleiben vermerkt.",
+    ctEditGroupsHint: "Tippe auf zwei Teilnehmer aus verschiedenen Gruppen: Sie tauschen. Wer schon ein Ergebnis hat, bleibt.",
+    ctEditHint: "Tippe auf einen Spieler oder ein Freilos, dann auf den anderen Platz: Beide tauschen. Was schon ein Ergebnis hat, bleibt.",
+    ctEditNo: "Nicht möglich: Eine Partie bliebe ohne Spieler oder hat schon ein Ergebnis.",
+    ctEditPicked: "Tippe jetzt auf den Platz zum Tauschen.",
+    ctEditSubs: "Oder auf diesen Platz setzen:",
+    ctEdited: (it) => `Manuelle Änderungen am Tableau: ${it}`,
     ctEnd: "Ende",
     ctEntriesCount: (it) => `${it} ${it === 1 ? "Meldung" : "Meldungen"}`,
     ctFee: "Meldegebühr (pro Spieler)",
@@ -2286,6 +2322,15 @@ const APP_I18N = {
     ctDrawAsk: (it) => `Entran en el sorteo ${it} inscritos en regla, con cabezas de serie por clasificación.`,
     ctDrawExcluded: (it) => `${it} ${it === 1 ? "se queda" : "se quedan"} fuera: no en regla (ver Inscritos).`,
     ctDrawTooFew: "Hacen falta al menos dos inscritos en regla.",
+    ctEditDone: "Terminar los cambios",
+    ctEditDraw: "Modificar el cuadro",
+    ctEditFitp: "Torneo FITP: modifica solo si lo permite el juez árbitro. Los cambios quedan anotados.",
+    ctEditGroupsHint: "Toca dos inscritos de grupos distintos: se intercambian. Quien ya tiene resultado no se mueve.",
+    ctEditHint: "Toca un jugador o un bye y luego el otro puesto: se intercambian. Lo que ya tiene resultado no se mueve.",
+    ctEditNo: "No es posible: un partido quedaría sin jugadores o ya tiene resultado.",
+    ctEditPicked: "Ahora toca el puesto con el que intercambiar.",
+    ctEditSubs: "O poner en este puesto:",
+    ctEdited: (it) => `Cambios manuales en el cuadro: ${it}`,
     ctEnd: "Fin",
     ctEntriesCount: (it) => `${it} ${it === 1 ? "inscrito" : "inscritos"}`,
     ctFee: "Cuota de inscripción (por jugador)",
@@ -2750,6 +2795,15 @@ const APP_I18N = {
     ctDrawAsk: (it) => `Entram no sorteio ${it} inscritos em ordem, com cabeças de chave pelo ranking.`,
     ctDrawExcluded: (it) => `${it} ${it === 1 ? "fica" : "ficam"} de fora: não em ordem (ver Inscritos).`,
     ctDrawTooFew: "São necessários pelo menos dois inscritos em ordem.",
+    ctEditDone: "Concluir edição",
+    ctEditDraw: "Editar a chave",
+    ctEditFitp: "Torneio FITP: edite só se o árbitro geral permitir. As alterações ficam registradas.",
+    ctEditGroupsHint: "Toque em dois inscritos de grupos diferentes: eles trocam. Quem já tem resultado não se move.",
+    ctEditHint: "Toque em um jogador ou bye e depois no outro lugar: os dois trocam. O que já tem resultado não se move.",
+    ctEditNo: "Não é possível: uma partida ficaria sem jogadores ou já tem resultado.",
+    ctEditPicked: "Agora toque no lugar para trocar.",
+    ctEditSubs: "Ou colocar neste lugar:",
+    ctEdited: (it) => `Alterações manuais na chave: ${it}`,
     ctEnd: "Fim",
     ctEntriesCount: (it) => `${it} ${it === 1 ? "inscrito" : "inscritos"}`,
     ctFee: "Taxa de inscrição (por jogador)",
@@ -4121,9 +4175,44 @@ function matchBox(t, m, who) {
   return m.a && m.b ? h('button.match', { type: 'button', onclick: () => openMatch(t, m, who) }, kids) : h('div.match', kids);
 }
 
+let cupEditing = null;
+let cupPick = null;
+
+/** Modifica tabellone: si tocca un posto, poi quello con cui scambiarlo, o un iscritto rimasto fuori. */
+function cupEdit(t, body, who) {
+  const inGroups = t.format === 'GROUPS' && !t.groupsLocked;
+  const same = (x, y) => x && y && x.match === y.match && x.side === y.side && x.entry === y.entry;
+  async function tap(x) {
+    if (!cupPick) { cupPick = x; return cupEdit(t, body, who); }
+    if (same(cupPick, x)) { cupPick = null; return cupEdit(t, body, who); }
+    const a = cupPick;
+    cupPick = null;
+    await cupDo('POST', '/swap', { a, b: x });
+  }
+  const place = (x, name, locked) => h('button.seat' + (same(cupPick, x) ? '.on' : ''), { type: 'button', disabled: locked, onclick: () => tap(x) }, name);
+  const seats = inGroups
+    ? h('div.cards', t.standings.map((st, g) => h('div.panel', h('div.pad', h('h2', T.ctGroup(groupLetter(g))),
+      h('div.seats', st.map((r) => place({ entry: r.entry }, who(r.entry), t.lockedEntries.includes(r.entry))))))))
+    : h('div.cards', t.matches.filter((m) => m.round === 1).sort((a, b) => a.slot - b.slot).map((m) => h('div.panel', h('div.pad', h('div.seats',
+      [m.a, m.b].map((id, side) => place({ match: m.id, side }, id ? who(id) : T.ctBye, t.lockedMatches.includes(m.id))))))));
+  const subs = cupPick && t.subs.length ? h('div.section', h('p.dim', T.ctEditSubs), h('div.tools', t.subs.map((id) => h('button', { type: 'button', onclick: async () => {
+    const seat = cupPick;
+    cupPick = null;
+    await cupDo('POST', '/replace', { seat, entry: id });
+  } }, who(id))))) : null;
+  put(body,
+    h('div.tools.noprint', h('button', { type: 'button', onclick: () => { cupEditing = null; cupPick = null; showCup(t.id); } }, T.ctEditDone)),
+    t.kind === 'FITP' ? h('p', h('span.tag.warn.wrap', T.ctEditFitp)) : null,
+    h('p.dim', cupPick ? T.ctEditPicked : inGroups ? T.ctEditGroupsHint : T.ctEditHint),
+    seats, subs);
+}
+
 function cupDraw(t, body, who) {
   if (!t.drawn) { put(body, h('div.panel', h('div.empty', T.ctNotDrawn))); return; }
+  if (cupEditing === t.id) { cupEdit(t, body, who); return; }
   const out = [];
+  if (!t.champion) out.push(h('div.tools.noprint', h('button', { type: 'button', onclick: () => { cupEditing = t.id; cupPick = null; showCup(t.id); } }, T.ctEditDraw)));
+  if (t.manualEdits) out.push(h('p', h('span.tag.' + (t.kind === 'FITP' ? 'warn' : 'dim'), T.ctEdited(t.manualEdits))));
   const ko = t.matches.filter((m) => m.round > 0);
   if (t.format === 'GROUPS') {
     const groups = t.matches.filter((m) => m.round === 0);
@@ -5285,6 +5374,8 @@ const DESK_I18N = {
       TOO_BIG: "File troppo grande (massimo 900 KB).",
       NOT_FOUND: "Non trovato: forse è stato cambiato dal telefono.",
       BAD_REQUEST: "Richiesta non valida.",
+      DRAW_LOCKED: "La modifica non è possibile: un incontro resterebbe senza giocatori o ha già un risultato.",
+      NOT_ELIGIBLE: "Non è in regola per entrare nel tabellone.",
       SERVER: "Qualcosa non ha funzionato sul telefono: riprova.",
     },
   },
@@ -5604,6 +5695,8 @@ const DESK_I18N = {
       TOO_BIG: "File too large (900 KB maximum).",
       NOT_FOUND: "Not found: it may have been changed on the phone.",
       BAD_REQUEST: "Invalid request.",
+      DRAW_LOCKED: "This change is not possible: a match would have no players or already has a result.",
+      NOT_ELIGIBLE: "This entry is not eligible for the draw sheet.",
       SERVER: "Something went wrong on the phone: try again.",
     },
   },
@@ -5924,6 +6017,8 @@ const DESK_I18N = {
       TOO_BIG: "Fichier trop volumineux (900 Ko maximum).",
       NOT_FOUND: "Introuvable : il a peut-être été modifié sur le téléphone.",
       BAD_REQUEST: "Requête non valide.",
+      DRAW_LOCKED: "Modification impossible : un match resterait sans joueurs ou a déjà un résultat.",
+      NOT_ELIGIBLE: "Cet inscrit n'est pas en règle pour entrer dans le tableau.",
       SERVER: "Un problème est survenu sur le téléphone : réessayez.",
     },
   },
@@ -6243,6 +6338,8 @@ const DESK_I18N = {
       TOO_BIG: "Datei zu groß (maximal 900 KB).",
       NOT_FOUND: "Nicht gefunden: Vielleicht wurde es am Telefon geändert.",
       BAD_REQUEST: "Ungültige Anfrage.",
+      DRAW_LOCKED: "Diese Änderung ist nicht möglich: Eine Partie bliebe ohne Spieler oder hat schon ein Ergebnis.",
+      NOT_ELIGIBLE: "Dieser Teilnehmer erfüllt die Bedingungen für das Tableau nicht.",
       SERVER: "Am Telefon ist etwas schiefgelaufen: Versuche es erneut.",
     },
   },
@@ -6562,6 +6659,8 @@ const DESK_I18N = {
       TOO_BIG: "Archivo demasiado grande (900 KB como máximo).",
       NOT_FOUND: "No encontrado: quizá se cambió en el teléfono.",
       BAD_REQUEST: "Solicitud no válida.",
+      DRAW_LOCKED: "El cambio no es posible: un partido quedaría sin jugadores o ya tiene resultado.",
+      NOT_ELIGIBLE: "Este inscrito no cumple los requisitos para entrar en el cuadro.",
       SERVER: "Algo ha fallado en el teléfono: inténtalo de nuevo.",
     },
   },
@@ -6881,6 +6980,8 @@ const DESK_I18N = {
       TOO_BIG: "Ficheiro demasiado grande (máximo 900 KB).",
       NOT_FOUND: "Não encontrado: talvez tenha sido alterado no telefone.",
       BAD_REQUEST: "Pedido inválido.",
+      DRAW_LOCKED: "A alteração não é possível: uma partida ficaria sem jogadores ou já tem resultado.",
+      NOT_ELIGIBLE: "Este inscrito não está em dia para entrar na chave.",
       SERVER: "Algo correu mal no telefone: tente de novo.",
     },
   },
@@ -7095,6 +7196,10 @@ tr.pass td:first-child { font-weight: 700; }
 @media print { .heat td { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .pbar i { background: #555; } }
 .rubber select, .rubber input { width: auto; max-width: 150px; margin: 2px; }
 .section > .head { margin-bottom: 8px; } .section > .head h2 { margin: 0 auto 0 0; }
+.seats { display: grid; gap: 4px; }
+.seat { text-align: left; white-space: normal; }
+.seat.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.tag.wrap { white-space: normal; border-radius: 8px; }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -7489,6 +7594,7 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
 - Unter jeder Meldung steht, ob sie **in Ordnung** ist. **FITP**: Wettkampfausweis des Jahres, Wettkampfattest gültig am ersten Turniertag, Rangliste im Limit. **Intern**: gültiges Attest (Nichtmitglieder werden angezeigt, dürfen aber spielen). Für alle: Meldegebühr bezahlt, wenn verlangt. Rot, wer nicht ausgelost wird.
 - **Setzliste**: nach FITP-Rangliste (die Stärksten zuerst); eine Meldung antippen, um von Hand zu setzen. Zwei Gesetzte bis 8 Plätze, danach einer je vier.
 - **Auslosung**: nur gültige Meldungen. Im Tableau steht die Nummer 1 oben, die 2 unten, 3 und 4 (dann 5-8) werden auf ihre Plätze gelost; **Freilose** gehen an die ersten Gesetzten, die von selbst weiterkommen. Mit Gruppen: Verteilung in Schlangenlinie nach Rangliste, jeder gegen jeden; danach **Finaltableau** mit den Gruppensiegern gesetzt und den Zweiten in der Hälfte gegenüber ihrem Gruppensieger. Solange es kein Ergebnis gibt: **Auslosung wiederholen**.
+  - **Tableau bearbeiten** (Reiter *Tableau*, auch am PC): Tippe nach der Auslosung auf einen Spieler oder ein *Freilos*, dann auf den anderen Platz, und beide tauschen; in Gruppen tauschen zwei Teilnehmer. Wer sich nach der Auslosung anmeldet, bleibt draußen, bis du ihn bei gewähltem Platz dort einsetzt: Wer ausscheidet, bleibt gemeldet, aber außerhalb des Tableaus. Ändern lässt sich nur, was kein Ergebnis hat, und die Gruppen stehen fest, sobald das Endtableau existiert. Bei FITP-Turnieren nur ändern, wenn der Oberschiedsrichter es erlaubt: Die Zahl der Änderungen bleibt vermerkt.
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
 
@@ -8056,6 +8162,7 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
 - Under each entry the app says whether it is **in order**. **FITP**: this year's competitive card, competitive certificate valid on the start date, ranking within the limit. **Social**: valid certificate (non-members are flagged, but may play). For all: entry paid, if required. In red whoever won't be drawn.
 - **Seeds**: from the FITP ranking (strongest first); tap an entry to set one by hand. Two seeds up to 8 places, then one every four.
 - **Draw**: only entries in order go in. In the draw sheet seed 1 goes at the top, seed 2 at the bottom, 3 and 4 (then 5-8) drawn among their places; **byes** go to the top seeds and move on by themselves. With groups: snake distribution by ranking and round robin; once the groups are over, **Final draw** with the group winners seeded and the runners-up in the half opposite their group winner. Until there's a result, **Redo the draw**.
+  - **Edit draw sheet** (*Draw sheet* tab, also from a PC): after the draw, tap a player or a *bye*, then the other place, and the two swap; in groups, two entries swap. Anyone entering after the draw stays out until, with a place selected, you put them in it: whoever leaves stays entered but out of the draw sheet. Only what has no results can change, and groups freeze once the final draw sheet exists. In FITP tournaments, edit only if the referee allows it: the number of edits stays recorded.
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
 
@@ -8622,6 +8729,7 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
 - Debajo de cada inscrito la app dice si está **en regla**. **FITP**: licencia de competición del año, certificado de competición válido el día del inicio, clasificación dentro del límite. **Social**: certificado válido (quien no es socio se señala, pero puede jugar). Para todos: la inscripción pagada, si se exige. En rojo quien no entra en el sorteo.
 - **Cabezas de serie**: por la clasificación FITP (el más fuerte primero); tocando un inscrito se elige también a mano. Dos cabezas de serie hasta 8 plazas, luego una cada cuatro.
 - **Sorteo**: entran solo los inscritos en regla. En el cuadro el cabeza de serie 1 va arriba, el 2 abajo, el 3 y el 4 (y luego 5-8) sorteados entre sus puestos; los **byes** van a los primeros cabezas de serie, que pasan solos. Con grupos: reparto en serpentina por clasificación y todos contra todos; terminados los grupos, **Cuadro final** con los primeros como cabezas de serie y los segundos en la mitad opuesta al primero de su grupo. Mientras no haya resultados, **Repetir el sorteo**.
+  - **Modificar el cuadro** (pestaña *Cuadro*, también desde el PC): tras el sorteo toca un jugador o un *bye*, luego el otro puesto, y se intercambian; en los grupos se intercambian dos inscritos. Quien se inscribe después del sorteo queda fuera hasta que, elegido un puesto, lo pones en él: quien sale sigue inscrito pero fuera del cuadro. Solo cambia lo que no tiene resultados, y los grupos se fijan cuando existe el cuadro final. En los torneos FITP, modifica solo si lo permite el juez árbitro: el número de cambios queda anotado.
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
 
@@ -9188,6 +9296,7 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
 - Sous chaque inscrit, l'appli dit s'il est **en règle**. **FITP** : licence compétition de l'année, certificat compétition valable le jour du début, classement dans la limite. **Interne** : certificat valable (les non-adhérents sont signalés, mais peuvent jouer). Pour tous : l'inscription payée, si on l'exige. En rouge ceux qui ne seront pas tirés.
 - **Têtes de série** : d'après le classement FITP (le plus fort d'abord) ; en touchant un inscrit on la choisit aussi à la main. Deux têtes de série jusqu'à 8 places, puis une toutes les quatre.
 - **Tirage au sort** : seuls les inscrits en règle entrent. Au tableau la tête de série 1 va en haut, la 2 en bas, la 3 et la 4 (puis 5-8) tirées entre leurs places ; les **exempts** vont aux premières têtes de série, qui passent toutes seules. Avec les poules : répartition en serpentin par classement et chacun contre tous ; poules terminées, **Tableau final** avec les premiers en têtes de série et les deuxièmes dans la moitié opposée au premier de leur poule. Tant qu'il n'y a pas de résultat, **Refaire le tirage**.
+  - **Modifier le tableau** (onglet *Tableau*, aussi depuis le PC) : après le tirage, touchez un joueur ou un *exempt*, puis l'autre place, et ils s'échangent ; dans les poules, deux inscrits s'échangent. Qui s'inscrit après le tirage reste dehors jusqu'à ce que, une place choisie, vous le mettiez à cette place : celui qui sort reste inscrit mais hors du tableau. Seul ce qui n'a pas de résultat peut changer, et les poules se figent dès que le tableau final existe. Dans les tournois FITP, modifiez seulement si le juge-arbitre l'autorise : le nombre de modifications reste noté.
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
 
@@ -9754,6 +9863,7 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
 - Sotto ogni iscritto l'app dice se è **in regola**. **FITP**: tessera agonistica dell'anno, certificato agonistico valido il giorno d'inizio, classifica nel limite. **Sociale**: certificato valido (chi non è socio si segnala, ma può giocare). Per tutti: l'iscrizione pagata, se la si chiede. In rosso chi non entra nel sorteggio.
 - **Teste di serie**: dalla classifica FITP (più forte = prima); toccando un iscritto la si sceglie anche a mano. Due teste di serie fino a 8 posti, poi una ogni quattro.
 - **Sorteggio**: entrano solo gli iscritti in regola. Nel tabellone la testa di serie 1 va in cima, la 2 in fondo, la 3 e la 4 (e poi le 5-8) sorteggiate tra i loro posti; i **bye** vanno alle prime teste di serie e passano da soli. Con i gironi: distribuzione a serpentina per classifica e tutti contro tutti; a gironi finiti, **Tabellone finale** con i primi come teste di serie e i secondi nella metà opposta al primo del loro girone. Finché non c'è un risultato, **Rifai il sorteggio**.
+  - **Modifica tabellone** (scheda *Tabellone*, anche dal PC): dopo il sorteggio tocchi un giocatore o un *bye*, poi l'altro posto, e i due si scambiano; nei gironi si scambiano due iscritti. Chi si iscrive dopo il sorteggio resta fuori finché, scelto un posto, non lo metti al posto di un altro: chi esce resta iscritto ma fuori dal tabellone. Si tocca solo ciò che non ha risultati, e i gironi si fermano quando esiste il tabellone finale. Nei tornei FITP modifica solo se lo consente il giudice arbitro: il numero di modifiche resta scritto.
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
 
@@ -10320,6 +10430,7 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
 - Embaixo de cada inscrito o app diz se está **em ordem**. **FITP**: cartão de competição do ano, atestado de competição válido no dia do início, ranking dentro do limite. **Social**: atestado válido (quem não é sócio é indicado, mas pode jogar). Para todos: a inscrição paga, se exigida. Em vermelho quem não entra no sorteio.
 - **Cabeças de chave**: pelo ranking FITP (o mais forte primeiro); tocando num inscrito dá para escolher à mão. Dois cabeças de chave até 8 posições, depois um a cada quatro.
 - **Sorteio**: entram só os inscritos em ordem. Na chave o cabeça 1 vai no topo, o 2 no fim, o 3 e o 4 (depois 5-8) sorteados entre as suas posições; os **byes** vão para os primeiros cabeças, que passam sozinhos. Com grupos: distribuição em serpentina pelo ranking e todos contra todos; terminados os grupos, **Chave final** com os primeiros como cabeças e os segundos na metade oposta ao primeiro do seu grupo. Enquanto não houver resultado, **Refazer o sorteio**.
+  - **Editar a chave** (aba *Chave*, também pelo PC): depois do sorteio, toque em um jogador ou *bye*, depois no outro lugar, e os dois trocam; nos grupos, trocam dois inscritos. Quem se inscreve depois do sorteio fica de fora até que, escolhido um lugar, você o coloque nele: quem sai continua inscrito, mas fora da chave. Só muda o que não tem resultado, e os grupos ficam fixos quando a chave final existe. Em torneios FITP, edite só se o árbitro geral permitir: o número de alterações fica registrado.
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
 
@@ -12793,7 +12904,14 @@ class MatchController(
     }
 
     /** Rifà il sorteggio da capo (si può finché non c'è un risultato). */
-    fun undoClubDraw(t: com.tennis.scoremanager.data.ClubTournament) = saveClubTournament(t.copy(matches = emptyList(), drawnAt = null))
+    fun undoClubDraw(t: com.tennis.scoremanager.data.ClubTournament) = saveClubTournament(t.copy(matches = emptyList(), drawnAt = null, manualEdits = 0))
+
+    /** Una modifica a mano del tabellone: sempre sul torneo aggiornato; false = non si può. */
+    fun editClubDraw(t: com.tennis.scoremanager.data.ClubTournament, change: (com.tennis.scoremanager.data.ClubTournament) -> com.tennis.scoremanager.data.ClubTournament?): Boolean {
+        val done = change(clubTournament(t.id) ?: t) ?: return false
+        saveClubTournament(done)
+        return true
+    }
 
     fun setClubResult(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean) =
         saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired))
@@ -18559,6 +18677,8 @@ data class ClubTournament(
     val matches: List<CTMatch> = emptyList(),
     /** Quando è stato fatto il sorteggio (null = iscrizioni aperte). */
     val drawnAt: Long? = null,
+    /** Quante modifiche a mano ha avuto il tabellone dopo il sorteggio: nei tornei FITP resta scritto. */
+    val manualEdits: Int = 0,
     val createdAt: Long = 0,
 ) {
     val drawn: Boolean get() = drawnAt != null
@@ -18814,6 +18934,78 @@ object ClubTournaments {
             }
         }
         return matches.map { if (it.round == 0) it else byKey[it.round to it.slot] ?: it }
+    }
+
+    // --- Modifica a mano dopo il sorteggio ---
+
+    /** Un posto del primo turno: [side] 0 = a, 1 = b. */
+    data class Seat(val match: String, val side: Int)
+
+    private fun nextMatch(t: ClubTournament, m: CTMatch) = t.matches.firstOrNull { it.round == m.round + 1 && it.slot == m.slot / 2 }
+
+    /** Si può cambiare chi gioca questa partita del primo turno? No se c'è un risultato che andrebbe perso. */
+    fun seatLocked(t: ClubTournament, m: CTMatch): Boolean =
+        m.round != 1 || if (m.bye) nextMatch(t, m)?.played == true else m.played
+
+    /** Da quando esiste il tabellone, i gironi non si toccano più: da lì sono usciti i qualificati. */
+    fun groupsLocked(t: ClubTournament): Boolean = t.matches.any { it.round > 0 }
+
+    /** Questo iscritto può cambiare girone? No se ha già un risultato. */
+    fun groupEntryLocked(t: ClubTournament, entry: String): Boolean =
+        groupsLocked(t) || t.matches.any { it.round == 0 && it.played && (it.a == entry || it.b == entry) }
+
+    /** Gli iscritti rimasti fuori: possono prendere il posto di qualcuno. */
+    fun outsideDraw(t: ClubTournament): List<CTEntry> {
+        val inside = t.matches.flatMap { listOf(it.a, it.b) }.toSet()
+        return t.entries.filter { it.id !in inside }
+    }
+
+    private fun CTMatch.at(side: Int) = if (side == 0) a else b
+    private fun CTMatch.with(side: Int, entry: String?) = (if (side == 0) copy(a = entry) else copy(b = entry)).copy(winner = null)
+
+    /** Applica i nuovi posti: i bye si rifanno da soli, e una partita senza nessuno non può esistere. */
+    private fun reseat(t: ClubTournament, changed: Map<String, CTMatch>): ClubTournament? {
+        val ms = t.matches.map { changed[it.id] ?: it }
+        if (ms.any { it.round == 1 && it.a == null && it.b == null }) return null
+        return t.copy(matches = propagate(ms), manualEdits = t.manualEdits + 1)
+    }
+
+    /** Scambia due posti del primo turno (anche un bye). null = non si può. */
+    fun swapSeats(t: ClubTournament, x: Seat, y: Seat): ClubTournament? {
+        val mx = t.matches.firstOrNull { it.id == x.match } ?: return null
+        val my = t.matches.firstOrNull { it.id == y.match } ?: return null
+        if (x == y || seatLocked(t, mx) || seatLocked(t, my)) return null
+        val ex = mx.at(x.side); val ey = my.at(y.side)
+        if (ex == null && ey == null) return null
+        if (mx.id == my.id) return reseat(t, mapOf(mx.id to mx.with(x.side, ey).with(y.side, ex)))
+        return reseat(t, mapOf(mx.id to mx.with(x.side, ey), my.id to my.with(y.side, ex)))
+    }
+
+    /** Mette al posto [x] (anche un bye) un iscritto rimasto fuori. null = non si può. */
+    fun replaceSeat(t: ClubTournament, x: Seat, entry: String): ClubTournament? {
+        val m = t.matches.firstOrNull { it.id == x.match } ?: return null
+        if (seatLocked(t, m) || outsideDraw(t).none { it.id == entry }) return null
+        return reseat(t, mapOf(m.id to m.with(x.side, entry)))
+    }
+
+    /** Sostituisce gli iscritti in tutte le partite dei gironi secondo [map]. */
+    private fun remapGroups(t: ClubTournament, map: Map<String, String>): ClubTournament = t.copy(
+        matches = t.matches.map { m -> if (m.round != 0) m else m.copy(a = m.a?.let { map[it] ?: it }, b = m.b?.let { map[it] ?: it }) },
+        manualEdits = t.manualEdits + 1,
+    )
+
+    private fun inGroups(t: ClubTournament, entry: String) = t.matches.any { it.round == 0 && (it.a == entry || it.b == entry) }
+
+    /** Scambia di girone due iscritti. null = non si può. */
+    fun swapGroupEntries(t: ClubTournament, x: String, y: String): ClubTournament? {
+        if (x == y || !inGroups(t, x) || !inGroups(t, y) || groupEntryLocked(t, x) || groupEntryLocked(t, y)) return null
+        return remapGroups(t, mapOf(x to y, y to x))
+    }
+
+    /** Nel girone, un iscritto rimasto fuori prende il posto di [old]. null = non si può. */
+    fun replaceGroupEntry(t: ClubTournament, old: String, entry: String): ClubTournament? {
+        if (!inGroups(t, old) || groupEntryLocked(t, old) || outsideDraw(t).none { it.id == entry }) return null
+        return remapGroups(t, mapOf(old to entry))
     }
 
     /** Il risultato di una partita (anche per correggerlo); il tabellone si aggiorna. */
@@ -25529,10 +25721,16 @@ interface DeskData {
     val feeCents: Int, val requirePaid: Boolean, val rankLimit: String, val fitpCode: String, val referee: String, val groups: Int, val qualify: Int,
     val drawn: Boolean, val hasResults: Boolean, val eligible: Int, val champion: String?, val matchMinutes: Int,
     val entries: List<DeskCupEntry>, val matches: List<DeskCupMatch>, val standings: List<List<DeskStanding>>, val courts: List<String>,
+    /** Per Modifica tabellone: quante modifiche, le partite e gli iscritti fermi, chi può entrare. */
+    val manualEdits: Int = 0, val lockedMatches: List<String> = emptyList(), val lockedEntries: List<String> = emptyList(), val groupsLocked: Boolean = false, val subs: List<String> = emptyList(),
 )
 @Serializable data class DeskId(val id: String)
 @Serializable data class DeskEntryIn(val players: List<String>)
 @Serializable data class DeskSeedIn(val seed: Int? = null)
+/** Un posto: nel primo turno ([match] e [side]) o in un girone ([entry]). */
+@Serializable data class DeskSeatIn(val match: String? = null, val side: Int = 0, val entry: String? = null)
+@Serializable data class DeskSwapIn(val a: DeskSeatIn, val b: DeskSeatIn)
+@Serializable data class DeskReplaceIn(val seat: DeskSeatIn, val entry: String)
 /** Il risultato: [winner] è l'iscritto (CTEntry.id); se manca, si ricava dal punteggio. Tutto vuoto = cancella. */
 @Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false)
 /** Dove e quando; [date] null = da programmare. Con [force] la si mette anche se il campo è occupato. */
@@ -26394,8 +26592,10 @@ class DeskApi(
             m == "POST" && rest == listOf("draw") -> draw(t)
             m == "POST" && rest == listOf("undraw") -> {
                 if (hasResults(t)) throw Fail(409, "HAS_RESULTS")
-                save(t.copy(matches = emptyList(), drawnAt = null))
+                save(t.copy(matches = emptyList(), drawnAt = null, manualEdits = 0))
             }
+            m == "POST" && rest == listOf("swap") -> swap(t, read(DeskSwapIn.serializer(), r))
+            m == "POST" && rest == listOf("replace") -> replace(t, read(DeskReplaceIn.serializer(), r))
             m == "POST" && rest == listOf("knockout") -> {
                 if (t.format != CTFormat.GROUPS || !t.groupsDone || t.matches.any { it.round > 0 }) throw Fail(409, "NOT_READY")
                 val now = data.now()
@@ -26431,7 +26631,10 @@ class DeskApi(
         return ok(DeskCup.serializer(), DeskCup(
             t.id, t.name, t.kind, t.format, t.doubles, t.category, day(t.start), day(t.end), t.feeCents, t.requirePaid, t.rankLimit, t.fitpCode, t.referee,
             t.groups, t.qualify, t.drawn, hasResults(t), ClubTournaments.eligible(t, people, book, now).size, t.champion, data.plan().settings.tournamentMinutes,
-            entries, matches, standings, data.courts(),
+            entries, matches, standings, data.courts(), t.manualEdits,
+            t.matches.filter { it.round == 1 && ClubTournaments.seatLocked(t, it) }.map { it.id },
+            ClubTournaments.groupMembers(t).flatten().filter { ClubTournaments.groupEntryLocked(t, it) },
+            ClubTournaments.groupsLocked(t), subs(t).map { it.id },
         ))
     }
 
@@ -26479,6 +26682,37 @@ class DeskApi(
         if (t.entries.none { it.id == id }) throw Fail(404, "NOT_FOUND")
         val n = i.seed?.takeIf { it > 0 }?.coerceAtMost(64)
         return save(t.copy(entries = t.entries.map { if (it.id == id) it.copy(seed = n) else it }))
+    }
+
+    /** Chi può prendere un posto: rimasto fuori e in regola. */
+    private fun subs(t: ClubTournament): List<CTEntry> {
+        val ok = ClubTournaments.eligible(t, data.players(), data.book(), data.now()).map { it.id }.toSet()
+        return ClubTournaments.outsideDraw(t).filter { it.id in ok }
+    }
+
+    private fun seat(s: DeskSeatIn): ClubTournaments.Seat? = s.match?.takeIf { s.side in 0..1 }?.let { ClubTournaments.Seat(it, s.side) }
+
+    /** Modifica tabellone: scambia due posti del primo turno o due iscritti di girone. */
+    private fun swap(t: ClubTournament, i: DeskSwapIn): Resp {
+        val x = seat(i.a); val y = seat(i.b)
+        val done = when {
+            x != null && y != null -> ClubTournaments.swapSeats(t, x, y)
+            i.a.entry != null && i.b.entry != null -> ClubTournaments.swapGroupEntries(t, i.a.entry, i.b.entry)
+            else -> throw Fail(400, "BAD_REQUEST")
+        }
+        return save(done ?: throw Fail(409, "DRAW_LOCKED"))
+    }
+
+    /** Modifica tabellone: un iscritto rimasto fuori prende un posto. */
+    private fun replace(t: ClubTournament, i: DeskReplaceIn): Resp {
+        if (subs(t).none { it.id == i.entry }) throw Fail(409, "NOT_ELIGIBLE")
+        val x = seat(i.seat)
+        val done = when {
+            x != null -> ClubTournaments.replaceSeat(t, x, i.entry)
+            i.seat.entry != null -> ClubTournaments.replaceGroupEntry(t, i.seat.entry, i.entry)
+            else -> throw Fail(400, "BAD_REQUEST")
+        }
+        return save(done ?: throw Fail(409, "DRAW_LOCKED"))
     }
 
     /** Il sorteggio come sul telefono: gli iscritti in regola, in ordine per le teste di serie. */
@@ -36767,6 +37001,15 @@ interface Strings {
     val ctCourt: String
     val ctTime: String
     val ctClearResult: String
+    val ctEditDraw: String
+    val ctEditDone: String
+    val ctEditHint: String
+    val ctEditGroupsHint: String
+    val ctEditPicked: String
+    val ctEditSubs: String
+    val ctEditNo: String
+    val ctEditFitp: String
+    val ctEdited: (Int) -> String
     val ctSeedHint: String
     val ctSeedAuto: String
     val ctRemoveEntry: String
@@ -38919,6 +39162,15 @@ object ItStrings : Strings {
     override val ctCourt = "Campo"
     override val ctTime = "Ora"
     override val ctClearResult = "Cancella il risultato"
+    override val ctEditDraw = "Modifica tabellone"
+    override val ctEditDone = "Fine modifiche"
+    override val ctEditHint = "Tocca un giocatore o un bye, poi l'altro posto: i due si scambiano. Quello che ha già un risultato non si sposta."
+    override val ctEditGroupsHint = "Tocca due iscritti di gironi diversi: si scambiano. Chi ha già un risultato non si sposta."
+    override val ctEditPicked = "Ora tocca il posto con cui scambiare."
+    override val ctEditSubs = "Oppure metti al suo posto:"
+    override val ctEditNo = "Non si può: un incontro resterebbe senza giocatori o ha già un risultato."
+    override val ctEditFitp = "Torneo FITP: modifica solo se lo consente il giudice arbitro. Le modifiche restano segnate."
+    override val ctEdited: (Int) -> String = { "Modifiche a mano al tabellone: $it" }
     override val ctSeedHint = "Testa di serie: di solito dalla classifica FITP; qui la si sceglie a mano."
     override val ctSeedAuto = "dalla classifica"
     override val ctRemoveEntry = "Ritira l'iscrizione"
@@ -41039,6 +41291,15 @@ object EnStrings : Strings {
     override val ctCourt = "Court"
     override val ctTime = "Time"
     override val ctClearResult = "Clear the result"
+    override val ctEditDraw = "Edit draw sheet"
+    override val ctEditDone = "Done editing"
+    override val ctEditHint = "Tap a player or a bye, then the other place: the two swap. Anything that already has a result cannot move."
+    override val ctEditGroupsHint = "Tap two entries from different groups: they swap. Anyone with a result cannot move."
+    override val ctEditPicked = "Now tap the place to swap with."
+    override val ctEditSubs = "Or put in this place:"
+    override val ctEditNo = "Not possible: a match would have no players or already has a result."
+    override val ctEditFitp = "FITP tournament: edit only if the referee allows it. Edits stay recorded."
+    override val ctEdited: (Int) -> String = { "Manual edits to the draw sheet: $it" }
     override val ctSeedHint = "Seed: usually from the FITP ranking; here you choose it by hand."
     override val ctSeedAuto = "from the ranking"
     override val ctRemoveEntry = "Withdraw the entry"
@@ -43182,6 +43443,15 @@ object DeStrings : Strings {
     override val ctCourt = "Platz"
     override val ctTime = "Uhrzeit"
     override val ctClearResult = "Ergebnis löschen"
+    override val ctEditDraw = "Tableau bearbeiten"
+    override val ctEditDone = "Bearbeitung beenden"
+    override val ctEditHint = "Tippe auf einen Spieler oder ein Freilos, dann auf den anderen Platz: Beide tauschen. Was schon ein Ergebnis hat, bleibt."
+    override val ctEditGroupsHint = "Tippe auf zwei Teilnehmer aus verschiedenen Gruppen: Sie tauschen. Wer schon ein Ergebnis hat, bleibt."
+    override val ctEditPicked = "Tippe jetzt auf den Platz zum Tauschen."
+    override val ctEditSubs = "Oder auf diesen Platz setzen:"
+    override val ctEditNo = "Nicht möglich: Eine Partie bliebe ohne Spieler oder hat schon ein Ergebnis."
+    override val ctEditFitp = "FITP-Turnier: Nur ändern, wenn der Oberschiedsrichter es erlaubt. Änderungen bleiben vermerkt."
+    override val ctEdited: (Int) -> String = { "Manuelle Änderungen am Tableau: $it" }
     override val ctSeedHint = "Setzung: meist nach FITP-Rangliste; hier wählt man sie von Hand."
     override val ctSeedAuto = "nach Rangliste"
     override val ctRemoveEntry = "Meldung zurückziehen"
@@ -45318,6 +45588,15 @@ object EsStrings : Strings {
     override val ctCourt = "Pista"
     override val ctTime = "Hora"
     override val ctClearResult = "Borrar el resultado"
+    override val ctEditDraw = "Modificar el cuadro"
+    override val ctEditDone = "Terminar los cambios"
+    override val ctEditHint = "Toca un jugador o un bye y luego el otro puesto: se intercambian. Lo que ya tiene resultado no se mueve."
+    override val ctEditGroupsHint = "Toca dos inscritos de grupos distintos: se intercambian. Quien ya tiene resultado no se mueve."
+    override val ctEditPicked = "Ahora toca el puesto con el que intercambiar."
+    override val ctEditSubs = "O poner en este puesto:"
+    override val ctEditNo = "No es posible: un partido quedaría sin jugadores o ya tiene resultado."
+    override val ctEditFitp = "Torneo FITP: modifica solo si lo permite el juez árbitro. Los cambios quedan anotados."
+    override val ctEdited: (Int) -> String = { "Cambios manuales en el cuadro: $it" }
     override val ctSeedHint = "Cabeza de serie: normalmente por la clasificación FITP; aquí se elige a mano."
     override val ctSeedAuto = "por clasificación"
     override val ctRemoveEntry = "Retirar la inscripción"
@@ -47456,6 +47735,15 @@ object FrStrings : Strings {
     override val ctCourt = "Terrain"
     override val ctTime = "Heure"
     override val ctClearResult = "Effacer le résultat"
+    override val ctEditDraw = "Modifier le tableau"
+    override val ctEditDone = "Terminer les modifications"
+    override val ctEditHint = "Touchez un joueur ou un exempt, puis l'autre place : ils s'échangent. Ce qui a déjà un résultat ne bouge pas."
+    override val ctEditGroupsHint = "Touchez deux inscrits de poules différentes : ils s'échangent. Qui a déjà un résultat ne bouge pas."
+    override val ctEditPicked = "Touchez maintenant la place à échanger."
+    override val ctEditSubs = "Ou mettre à cette place :"
+    override val ctEditNo = "Impossible : un match resterait sans joueurs ou a déjà un résultat."
+    override val ctEditFitp = "Tournoi FITP : modifiez seulement si le juge-arbitre l'autorise. Les modifications restent notées."
+    override val ctEdited: (Int) -> String = { "Modifications manuelles du tableau : $it" }
     override val ctSeedHint = "Tête de série : d'habitude d'après le classement FITP ; ici on la choisit à la main."
     override val ctSeedAuto = "d'après le classement"
     override val ctRemoveEntry = "Retirer l'inscription"
@@ -49595,6 +49883,15 @@ object PtStrings : Strings {
     override val ctCourt = "Quadra"
     override val ctTime = "Hora"
     override val ctClearResult = "Apagar o resultado"
+    override val ctEditDraw = "Editar a chave"
+    override val ctEditDone = "Concluir edição"
+    override val ctEditHint = "Toque em um jogador ou bye e depois no outro lugar: os dois trocam. O que já tem resultado não se move."
+    override val ctEditGroupsHint = "Toque em dois inscritos de grupos diferentes: eles trocam. Quem já tem resultado não se move."
+    override val ctEditPicked = "Agora toque no lugar para trocar."
+    override val ctEditSubs = "Ou colocar neste lugar:"
+    override val ctEditNo = "Não é possível: uma partida ficaria sem jogadores ou já tem resultado."
+    override val ctEditFitp = "Torneio FITP: edite só se o árbitro geral permitir. As alterações ficam registradas."
+    override val ctEdited: (Int) -> String = { "Alterações manuais na chave: $it" }
     override val ctSeedHint = "Cabeça de chave: normalmente pelo ranking FITP; aqui se escolhe à mão."
     override val ctSeedAuto = "pelo ranking"
     override val ctRemoveEntry = "Retirar a inscrição"
@@ -51755,6 +52052,7 @@ import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Schedule
@@ -51959,7 +52257,8 @@ private fun EntriesTab(
         t.referee.ifBlank { null }?.let { s.ctRefereeLine(it) },
     )
     for (l in info) Text(l, color = TsmColors.TextDim, fontSize = 13.sp)
-    if (!t.drawn) BigButton(s.ctAddEntry, Icons.Filled.PersonAdd, onAdd, Modifier.fillMaxWidth())
+    // Anche dopo il sorteggio: un ripescato si iscrive qui e prende posto con Modifica tabellone.
+    if (t.champion == null) BigButton(s.ctAddEntry, Icons.Filled.PersonAdd, onAdd, Modifier.fillMaxWidth())
     if (t.entries.isEmpty()) Text(s.ctNoEntries, color = TsmColors.TextDim)
     val ordered = ClubTournaments.ordered(t.entries, players)
     val okIds = ClubTournaments.eligible(t, players, book, now).map { it.id }.toSet()
@@ -51984,6 +52283,66 @@ private fun EntriesTab(
             }
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
         }
+    }
+}
+
+/** Il posto scelto in Modifica tabellone: nel primo turno ([seat]) o in un girone ([entry]). */
+private data class EditPick(val seat: ClubTournaments.Seat? = null, val entry: String? = null)
+
+/** Modifica a mano: si tocca un posto, poi quello con cui scambiarlo, o un iscritto rimasto fuori. */
+@Composable
+private fun EditDraw(c: MatchController, t: ClubTournament) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    val book by c.clubBook.collectAsState()
+    var picked by remember { mutableStateOf<EditPick?>(null) }
+    var failed by remember { mutableStateOf(false) }
+    val now = remember { System.currentTimeMillis() }
+    val inGroups = t.format == CTFormat.GROUPS && !ClubTournaments.groupsLocked(t)
+    val ok = ClubTournaments.eligible(t, players, book, now).map { it.id }.toSet()
+    val subs = ClubTournaments.outsideDraw(t).filter { it.id in ok }
+    fun change(f: (ClubTournament) -> ClubTournament?) { failed = !c.editClubDraw(t, f); picked = null }
+    fun tap(x: EditPick) {
+        val p = picked
+        when {
+            p == null -> picked = x
+            p == x -> picked = null
+            p.seat != null && x.seat != null -> change { ClubTournaments.swapSeats(it, p.seat, x.seat) }
+            p.entry != null && x.entry != null -> change { ClubTournaments.swapGroupEntries(it, p.entry, x.entry) }
+        }
+    }
+    @Composable fun place(name: String, x: EditPick, locked: Boolean) {
+        val on = picked == x
+        Text(
+            name, color = if (on) TsmColors.Background else if (locked) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh)
+                .clickable(enabled = !locked) { tap(x) }.padding(horizontal = 10.dp, vertical = 9.dp),
+        )
+    }
+    if (t.kind == CTKind.FITP) Text(s.ctEditFitp, color = TsmColors.Orange, fontSize = 13.sp)
+    Text(if (picked != null) s.ctEditPicked else if (inGroups) s.ctEditGroupsHint else s.ctEditHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    if (failed) Text(s.ctEditNo, color = TsmColors.Orange, fontSize = 13.sp)
+    if (inGroups) {
+        for ((g, members) in ClubTournaments.groupMembers(t).withIndex()) {
+            Text(s.ctGroup(groupLetter(g)), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            for (id in members) place(entryName(c, t.entries.firstOrNull { it.id == id }), EditPick(entry = id), ClubTournaments.groupEntryLocked(t, id))
+        }
+    } else {
+        for (m in t.matches.filter { it.round == 1 }.sortedBy { it.slot }) {
+            val locked = ClubTournaments.seatLocked(t, m)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                for ((side, id) in listOf(0 to m.a, 1 to m.b)) {
+                    place(id?.let { x -> entryName(c, t.entries.firstOrNull { it.id == x }) } ?: s.ctBye, EditPick(ClubTournaments.Seat(m.id, side)), locked)
+                }
+            }
+        }
+    }
+    val p = picked
+    if (p != null && subs.isNotEmpty()) {
+        Text(s.ctEditSubs, color = TsmColors.TextDim, fontSize = 13.sp)
+        for (e in subs) GhostButton(entryName(c, e), Icons.Filled.PersonAdd, {
+            change { if (p.seat != null) ClubTournaments.replaceSeat(it, p.seat, e.id) else ClubTournaments.replaceGroupEntry(it, p.entry.orEmpty(), e.id) }
+        }, Modifier.fillMaxWidth())
     }
 }
 
@@ -52015,6 +52374,10 @@ private fun MatchBox(c: MatchController, t: ClubTournament, m: CTMatch, onOpen: 
 private fun DrawTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
     val s = LocalStrings.current
     if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
+    var editing by remember { mutableStateOf(false) }
+    if (t.manualEdits > 0) Text(s.ctEdited(t.manualEdits), color = if (t.kind == CTKind.FITP) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+    if (t.champion == null) GhostButton(if (editing) s.ctEditDone else s.ctEditDraw, Icons.Filled.SwapHoriz, { editing = !editing }, Modifier.fillMaxWidth())
+    if (editing) { EditDraw(c, t); return }
     // Gironi: la classifica (in evidenza chi passa) e le partite.
     val groups = ClubTournaments.groupMembers(t)
     for (g in groups.indices) {
@@ -52152,6 +52515,8 @@ private fun EntryDialog(c: MatchController, t: ClubTournament, e: CTEntry, onDon
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (id in e.players) c.playerById(id)?.let { p -> GhostButton(p.name, Icons.AutoMirrored.Filled.ArrowForward, { onDone(); c.openStudent(p.id) }, Modifier.fillMaxWidth()) }
+                if (t.drawn && ClubTournaments.outsideDraw(t).any { it.id == e.id })
+                    TextButton(onClick = { c.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
                 if (!t.drawn) {
                     Text(s.ctSeedHint, color = TsmColors.TextDim, fontSize = 13.sp)
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -80862,6 +81227,159 @@ class ClubServersTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubTournamentEditTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubTournamentEditTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.data.ClubTournaments.Seat
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import kotlin.random.Random
+
+class ClubTournamentEditTest {
+    private fun entries(n: Int) = (1..n).map { CTEntry("e$it", listOf("p$it"), listOf("G$it")) }
+
+    private fun cup(n: Int, inDraw: Int = n): ClubTournament {
+        val ids = (1..inDraw).map { "e$it" }
+        return ClubTournament("t", "Prova", entries = entries(n), matches = ClubTournaments.knockout(ids, Random(1), 0), drawnAt = 1)
+    }
+
+    private fun groups(n: Int, inDraw: Int = n, count: Int = 2): ClubTournament {
+        val ids = (1..inDraw).map { "e$it" }
+        return ClubTournament("t", "Prova", format = CTFormat.GROUPS, groups = count, entries = entries(n), matches = ClubTournaments.groupsDraw(ids, count), drawnAt = 1)
+    }
+
+    private fun first(t: ClubTournament) = t.matches.filter { it.round == 1 }.sortedBy { it.slot }
+    private fun inDraw(t: ClubTournament) = first(t).flatMap { listOf(it.a, it.b) }.filterNotNull().sorted()
+    private fun play(t: ClubTournament, m: CTMatch) = ClubTournaments.setResult(t, m.id, m.a, "6-1 6-1")
+
+    @Test fun scambiaDueGiocatoriSenzaPerderneNessuno() {
+        val t = cup(8)
+        val (m0, m1) = first(t)
+        val done = ClubTournaments.swapSeats(t, Seat(m0.id, 0), Seat(m1.id, 1))!!
+        val (n0, n1) = first(done)
+        assertEquals(m1.b, n0.a)
+        assertEquals(m0.a, n1.b)
+        assertEquals(inDraw(t), inDraw(done))
+        assertEquals(1, done.manualEdits)
+    }
+
+    @Test fun scambioDentroLaStessaPartita() {
+        val t = cup(4)
+        val m = first(t)[0]
+        val n = first(ClubTournaments.swapSeats(t, Seat(m.id, 0), Seat(m.id, 1))!!)[0]
+        assertEquals(m.b, n.a)
+        assertEquals(m.a, n.b)
+    }
+
+    @Test fun ilByeSiPuoDareAUnAltro() {
+        val t = cup(6)  // 6 su 8: due bye
+        val bye = first(t).first { it.bye }
+        val real = first(t).first { !it.bye }
+        val moved = bye.a ?: bye.b
+        val empty = if (bye.a == null) 0 else 1
+        val done = ClubTournaments.swapSeats(t, Seat(bye.id, empty), Seat(real.id, 0))!!
+        val m = done.matches.first { it.id == bye.id }
+        val r = done.matches.first { it.id == real.id }
+        assertFalse("ora si gioca", m.bye)
+        assertNull(m.winner)
+        assertTrue("l'altra partita ora è un bye", r.bye)
+        assertEquals(r.b, r.winner)
+        val next = done.matches.first { it.round == 2 && it.slot == bye.slot / 2 }
+        assertFalse("chi aveva il bye non è più avanti", next.a == moved || next.b == moved)
+    }
+
+    @Test fun nonSiCreaUnaPartitaSenzaGiocatori() {
+        val t = cup(6)
+        val (b1, b2) = first(t).filter { it.bye }
+        val filled = if (b1.a != null) 0 else 1
+        val free = if (b2.a == null) 0 else 1
+        assertNull(ClubTournaments.swapSeats(t, Seat(b1.id, filled), Seat(b2.id, free)))
+        assertNull("due posti vuoti", ClubTournaments.swapSeats(t, Seat(b1.id, 1 - filled), Seat(b2.id, free)))
+    }
+
+    @Test fun cioCheEGiocatoNonSiTocca() {
+        val t0 = cup(8)
+        val (m0, m1, m2) = first(t0)
+        val t = play(t0, m0)
+        val snap = t
+        assertTrue(ClubTournaments.seatLocked(t, t.matches.first { it.id == m0.id }))
+        assertNull(ClubTournaments.swapSeats(t, Seat(m0.id, 0), Seat(m1.id, 0)))
+        assertNotNull(ClubTournaments.swapSeats(t, Seat(m1.id, 0), Seat(m2.id, 0)))
+        assertEquals("niente cambia nel torneo di partenza", m0.a, snap.matches.first { it.id == m0.id }.winner)
+    }
+
+    @Test fun lIncontroGiocatoDopoUnByeBloccaQuelBye() {
+        var t = cup(6)
+        val bye = first(t).first { it.bye }
+        val partner = first(t).first { it.slot == (bye.slot xor 1) }
+        if (!partner.bye) t = play(t, partner)
+        val next = t.matches.first { it.round == 2 && it.slot == bye.slot / 2 }
+        t = ClubTournaments.setResult(t, next.id, next.a, "6-0 6-0")
+        assertTrue(ClubTournaments.seatLocked(t, t.matches.first { it.id == bye.id }))
+    }
+
+    @Test fun ilRipescatoPrendeIlPostoEChiEsceRestaIscritto() {
+        val t = cup(9, 8)
+        val m = first(t)[0]
+        assertEquals(listOf("e9"), ClubTournaments.outsideDraw(t).map { it.id })
+        val done = ClubTournaments.replaceSeat(t, Seat(m.id, 0), "e9")!!
+        assertEquals("e9", first(done)[0].a)
+        assertEquals(listOf(m.a), ClubTournaments.outsideDraw(done).map { it.id })
+        assertEquals(9, done.entries.size)
+        assertNull("già in tabellone", ClubTournaments.replaceSeat(t, Seat(m.id, 0), "e2"))
+        assertNull("non iscritto", ClubTournaments.replaceSeat(t, Seat(m.id, 0), "e99"))
+    }
+
+    @Test fun ilRipescatoRiempieUnBye() {
+        val t = cup(7, 6)
+        val bye = first(t).first { it.bye }
+        val done = ClubTournaments.replaceSeat(t, Seat(bye.id, if (bye.a == null) 0 else 1), "e7")!!
+        val m = done.matches.first { it.id == bye.id }
+        assertFalse(m.bye)
+        assertNull(m.winner)
+    }
+
+    @Test fun gironiSiScambianoInTutteLePartite() {
+        val t = groups(6)
+        val before = ClubTournaments.groupMembers(t)
+        val x = before[0][0]; val y = before[1][0]
+        val done = ClubTournaments.swapGroupEntries(t, x, y)!!
+        val after = ClubTournaments.groupMembers(done)
+        assertTrue(y in after[0] && x in after[1])
+        assertFalse(x in after[0])
+        assertEquals(t.matches.size, done.matches.size)
+        assertTrue(done.matches.none { it.a == it.b })
+    }
+
+    @Test fun gironiBloccatiDaiRisultatiEDalTabellone() {
+        val t0 = groups(6)
+        val m = t0.matches.first { it.round == 0 }
+        val t = ClubTournaments.setResult(t0, m.id, m.a, "6-1 6-1")
+        val other = ClubTournaments.groupMembers(t)[1].first()
+        assertNull(ClubTournaments.swapGroupEntries(t, m.a!!, other))
+        val ko = t0.copy(matches = t0.matches + CTMatch("k", 1, 0, a = "e1", b = "e2"))
+        assertTrue(ClubTournaments.groupsLocked(ko))
+        assertNull(ClubTournaments.swapGroupEntries(ko, ClubTournaments.groupMembers(ko)[0][0], ClubTournaments.groupMembers(ko)[1][0]))
+    }
+
+    @Test fun ripescatoNelGirone() {
+        val t = groups(7, 6)
+        val old = ClubTournaments.groupMembers(t)[0][0]
+        val done = ClubTournaments.replaceGroupEntry(t, old, "e7")!!
+        assertTrue("e7" in ClubTournaments.groupMembers(done)[0])
+        assertEquals(listOf(old), ClubTournaments.outsideDraw(done).map { it.id })
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubTournamentTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubTournamentTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -95573,6 +96091,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 313 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 314 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -1560,7 +1560,14 @@ class MatchController(
     }
 
     /** Rifà il sorteggio da capo (si può finché non c'è un risultato). */
-    fun undoClubDraw(t: com.tennis.scoremanager.data.ClubTournament) = saveClubTournament(t.copy(matches = emptyList(), drawnAt = null))
+    fun undoClubDraw(t: com.tennis.scoremanager.data.ClubTournament) = saveClubTournament(t.copy(matches = emptyList(), drawnAt = null, manualEdits = 0))
+
+    /** Una modifica a mano del tabellone: sempre sul torneo aggiornato; false = non si può. */
+    fun editClubDraw(t: com.tennis.scoremanager.data.ClubTournament, change: (com.tennis.scoremanager.data.ClubTournament) -> com.tennis.scoremanager.data.ClubTournament?): Boolean {
+        val done = change(clubTournament(t.id) ?: t) ?: return false
+        saveClubTournament(done)
+        return true
+    }
 
     fun setClubResult(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean) =
         saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired))

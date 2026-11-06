@@ -182,3 +182,7 @@ tr.pass td:first-child { font-weight: 700; }
 @media print { .heat td { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .pbar i { background: #555; } }
 .rubber select, .rubber input { width: auto; max-width: 150px; margin: 2px; }
 .section > .head { margin-bottom: 8px; } .section > .head h2 { margin: 0 auto 0 0; }
+.seats { display: grid; gap: 4px; }
+.seat { text-align: left; white-space: normal; }
+.seat.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.tag.wrap { white-space: normal; border-radius: 8px; }
