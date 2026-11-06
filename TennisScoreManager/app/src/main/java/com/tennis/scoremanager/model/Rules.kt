@@ -121,6 +121,11 @@ sealed class MatchEvent {
     @Serializable
     @SerialName("serveOrder")
     data class ServeOrder(val setNumber: Int, val firstP1: Int, val firstP2: Int) : MatchEvent()
+
+    /** [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. */
+    @Serializable
+    @SerialName("retired")
+    data class Retired(val side: Side, val at: Long = 0L) : MatchEvent()
 }
 
 /** Punteggio di un set concluso. Per il match tie-break g1/g2 valgono 1-0 e i punti stanno in tb1/tb2. */
@@ -131,6 +136,8 @@ data class SetScore(
     val tb1: Int? = null,
     val tb2: Int? = null,
     val matchTiebreak: Boolean = false,
+    /** Set interrotto da un ritiro: non è vinto da nessuno, conta solo il punteggio. */
+    val partial: Boolean = false,
 ) {
     val winner: Side get() = if (g1 > g2) Side.P1 else Side.P2
     val hasTiebreak: Boolean get() = tb1 != null && tb2 != null

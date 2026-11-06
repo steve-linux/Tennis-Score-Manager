@@ -206,6 +206,8 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 **Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the **Play** tab.
 
+**Retirement**: the **Retire** button under the score asks who is retiring and ends the match at that score, without the points of the current game (e.g. `6-3 2-1 ret.`). The opponent wins, the voice announces it and, before **Match concluded**, **Undo retirement** restores everything. In tournaments the result goes in by itself with the retirement marked; the match counts as a win but does not affect the TSM rating.
+
 **Saving**: the match saves itself at every point. On the **Play** tab a suspended match is deleted by **long-pressing** its *Resume*; all suspended matches are in **Progress › History › Suspended**, to resume or delete (ticking several, also together). *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
 ### 7.1 Workout with the strap

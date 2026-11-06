@@ -654,6 +654,12 @@ interface Strings {
     val endDialogText: (String, String, Boolean) -> String
     val matchConcluded: String
     val undoLastPoint: String
+    val retireButton: String
+    val retireTitle: String
+    val retireHint: String
+    val retireUndo: String
+    val retireCall: (String) -> String
+    val retireBy: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -2820,6 +2826,12 @@ object ItStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Vincono" else "Vince"} $name\n$score" }
     override val matchConcluded = "Partita conclusa"
     override val undoLastPoint = "Annulla ultimo punto"
+    override val retireButton = "Ritiro"
+    override val retireTitle = "Chi si ritira?"
+    override val retireHint = "La partita finisce col punteggio attuale e vince l'avversario. Potrai annullare prima di confermare."
+    override val retireUndo = "Annulla il ritiro"
+    override val retireCall: (String) -> String = { "$it si ritira" }
+    override val retireBy: (String) -> String = { "Ritiro di $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -4949,6 +4961,12 @@ object EnStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "$name ${if (team) "win" else "wins"}\n$score" }
     override val matchConcluded = "Match concluded"
     override val undoLastPoint = "Undo last point"
+    override val retireButton = "Retire"
+    override val retireTitle = "Who is retiring?"
+    override val retireHint = "The match ends at the current score and the opponent wins. You can undo before confirming."
+    override val retireUndo = "Undo retirement"
+    override val retireCall: (String) -> String = { "$it retires" }
+    override val retireBy: (String) -> String = { "Retirement: $it" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

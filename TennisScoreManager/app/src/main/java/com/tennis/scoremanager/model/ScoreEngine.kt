@@ -31,6 +31,8 @@ data class MatchState(
     val p1Left: Boolean = rules.p1StartsLeft,
     val winner: Side? = null,
     val pointsPlayed: Int = 0,
+    /** Chi si è ritirato (null = partita finita sul campo o ancora in corso). */
+    val retired: Side? = null,
 ) {
     val isFinished: Boolean get() = winner != null
     val setNumber: Int get() = sets.size + 1
@@ -39,7 +41,7 @@ data class MatchState(
 
     fun games(side: Side): Int = if (side == Side.P1) g1 else g2
     fun points(side: Side): Int = if (side == Side.P1) pt1 else pt2
-    fun setsWon(side: Side): Int = sets.count { it.winner == side }
+    fun setsWon(side: Side): Int = sets.count { !it.partial && it.winner == side }
     fun order(side: Side): Int = if (side == Side.P1) order1 else order2
     fun leftSide(): Side = if (p1Left) Side.P1 else Side.P2
 
@@ -116,6 +118,23 @@ object ScoreEngine {
     fun apply(state: MatchState, event: MatchEvent): Step = when (event) {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)
+        is MatchEvent.Retired -> Step(retire(state, event.side), null)
+    }
+
+    /**
+     * Il ritiro: il set in corso resta scritto com'era (nel match tie-break, coi suoi punti), senza vincitore. I punti
+     * del game in corso non entrano nel risultato, come sul referto.
+     */
+    private fun retire(s: MatchState, side: Side): MatchState {
+        if (s.isFinished) return s
+        val inMatchTiebreak = s.tiebreak == TiebreakKind.MATCH
+        val started = if (inMatchTiebreak) s.pt1 + s.pt2 > 0 else s.g1 + s.g2 > 0
+        val open = when {
+            !started -> emptyList()
+            inMatchTiebreak -> listOf(SetScore(0, 0, s.pt1, s.pt2, matchTiebreak = true, partial = true))
+            else -> listOf(SetScore(s.g1, s.g2, partial = true))
+        }
+        return s.copy(sets = s.sets + open, g1 = 0, g2 = 0, pt1 = 0, pt2 = 0, tiebreak = TiebreakKind.NONE, winner = side.other, retired = side)
     }
 
     /** L'ordine di servizio del doppio si può cambiare solo prima del primo punto del set. */

@@ -59,6 +59,10 @@ object Reports {
 
     fun scoreLine(state: MatchState, from: Side): String = state.sets.joinToString("  ") { setText(it, from) }
 
+    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit.". */
+    fun resultLine(state: MatchState, from: Side, s: Strings): String =
+        scoreLine(state, from) + if (state.retired != null) " " + s.ctRetired else ""
+
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
@@ -169,7 +173,7 @@ object Reports {
         sb.appendLine(date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
         sb.appendLine()
         sb.appendLine("🏆 ${s.winner}: ${names.side(w)}")
-        sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${scoreLine(state, w)}")
+        sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${resultLine(state, w, s)}")
         sb.appendLine()
         sb.appendLine("⏱ ${s.duration}: ${duration(rec.clockMs)}")
         sb.appendLine("🕘 ${s.startTime}: ${time(rec.startedAt, lang)} · ${s.endTime}: ${time(rec.endedAt, lang)}")

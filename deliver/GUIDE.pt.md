@@ -319,6 +319,8 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
 
 **Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela aba **Jogar**.
 
+**Desistência**: o botão **Desistência** abaixo do placar pergunta quem desiste e termina a partida com esse placar, sem os pontos do game em andamento (ex. `6-3 2-1 desist.`). O adversário vence, a voz anuncia e, antes de concluir, **Desfazer a desistência** deixa tudo como estava. Nos torneios o resultado entra sozinho com a desistência marcada; a partida conta como vitória, mas não pesa no rating TSM.
+
 **Salvamento**: a partida é salva sozinha a cada ponto. Na aba **Jogar** uma partida suspensa se exclui **mantendo pressionado** o seu *Retomar*; todas as suspensas estão em **Progresso › Histórico › Suspensas**, para retomar ou excluir (marcando várias, também juntas). *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
 ### 7.1 Treino com a cinta (app 2.5)

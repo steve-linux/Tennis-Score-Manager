@@ -113,7 +113,8 @@ object Rating {
 
     /** Una partita dello storico come [Game], o null se non conta (non finita, amichevole, senza vincitore). */
     fun gameOf(rec: MatchRecord, sets: List<com.tennis.scoremanager.model.SetScore>, winner: Side?): Game? {
-        if (winner == null || !rec.finished || rec.friendly) return null
+        // Con un ritiro i game non dicono chi era più forte: la partita non pesa sul rating.
+        if (winner == null || !rec.finished || rec.friendly || rec.events.any { it is com.tennis.scoremanager.model.MatchEvent.Retired }) return null
         val games = Side.entries.associateWith { side ->
             // Il super tie-break vale come un game: i suoi punti falserebbero la quota.
             sets.sumOf { st -> if (st.matchTiebreak) (if (st.winner == side) 1 else 0) else st.games(side) }

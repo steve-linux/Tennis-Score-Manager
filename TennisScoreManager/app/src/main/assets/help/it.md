@@ -206,6 +206,8 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 
 **Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
 
+**Ritiro**: il tasto **Ritiro** sotto il punteggio chiede chi si ritira e chiude la partita col punteggio di quel momento, senza i punti del game in corso (es. `6-3 2-1 rit.`). Vince l'avversario, la voce lo annuncia e, prima di **Partita conclusa**, **Annulla il ritiro** rimette tutto com'era. Nei tornei il risultato entra da solo con il ritiro segnato; la partita conta come vittoria ma non pesa sul rating TSM.
+
 **Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
 ### 7.1 Allenamento con la fascia

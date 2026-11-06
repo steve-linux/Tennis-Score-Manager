@@ -382,4 +382,46 @@ class ScoreEngineTest {
         val t = play(ScoreEngine.initial(RulesConfig(firstServer = P1)), P1, P1, P1)
         assertFalse(ScoreEngine.isBreakPoint(t))
     }
+
+    @Test fun ritiroChiudeColPunteggioDelMomento() {
+        var s = ScoreEngine.initial(RulesConfig())
+        repeat(6) { s = game(s, P1) }
+        repeat(2) { s = game(s, P1) }
+        s = game(s, P2)
+        s = play(s, P1)
+        val after = ScoreEngine.apply(s, MatchEvent.Retired(P1)).state
+        assertEquals(P2, after.winner)
+        assertEquals(P1, after.retired)
+        assertTrue(after.isFinished)
+        assertEquals(2, after.sets.size)
+        assertEquals(6 to 0, after.sets[0].g1 to after.sets[0].g2)
+        assertEquals(2 to 1, after.sets[1].g1 to after.sets[1].g2)
+        assertTrue(after.sets[1].partial)
+        assertEquals("il set interrotto non è vinto da nessuno", 0, after.setsWon(P2))
+        assertEquals(1, after.setsWon(P1))
+        assertEquals("dopo il ritiro non si segna più", after, ScoreEngine.pointWonBy(after, P1).state)
+    }
+
+    @Test fun ritiroAInizioSetNonInventaUnSet() {
+        var s = ScoreEngine.initial(RulesConfig())
+        repeat(6) { s = game(s, P1) }
+        assertEquals(1, ScoreEngine.apply(s, MatchEvent.Retired(P2)).state.sets.size)
+        assertEquals(0, ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.Retired(P2)).state.sets.size)
+    }
+
+    @Test fun ritiroSiRigiocaESiAnnulla() {
+        val rules = RulesConfig()
+        val events = List(6) { MatchEvent.Point(P1) } + MatchEvent.Retired(P2)
+        assertEquals(P2, ScoreEngine.replay(rules, events).retired)
+        assertEquals(null, ScoreEngine.replay(rules, events.dropLast(1)).retired)
+        assertEquals(1, ScoreEngine.replay(rules, events.dropLast(1)).games(P1))
+    }
+
+    @Test fun ritiroNelMatchTiebreakTieneIPunti() {
+        val rules = RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY)
+        val s = play(ScoreEngine.initial(rules), P1, P1, P2)
+        val set = ScoreEngine.apply(s, MatchEvent.Retired(P2)).state.sets.single()
+        assertEquals(2 to 1, set.tb1 to set.tb2)
+        assertTrue(set.partial && set.matchTiebreak)
+    }
 }

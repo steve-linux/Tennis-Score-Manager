@@ -620,6 +620,12 @@ object DeStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Sieg für $name\n$score" }
     override val matchConcluded = "Match beendet"
     override val undoLastPoint = "Letzten Punkt zurücknehmen"
+    override val retireButton = "Aufgabe"
+    override val retireTitle = "Wer gibt auf?"
+    override val retireHint = "Die Partie endet beim aktuellen Stand und der Gegner gewinnt. Vor der Bestätigung kannst du es rückgängig machen."
+    override val retireUndo = "Aufgabe zurücknehmen"
+    override val retireCall: (String) -> String = { "$it gibt auf" }
+    override val retireBy: (String) -> String = { "Aufgabe von $it" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

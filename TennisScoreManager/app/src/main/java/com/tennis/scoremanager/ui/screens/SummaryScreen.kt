@@ -165,7 +165,8 @@ fun SummaryScreen(c: MatchController) {
                 Text(s.winner.uppercase(), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
-                Text(Reports.scoreLine(state, w), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text(Reports.resultLine(state, w, s), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                state.retired?.let { Text(s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
             }
 
             // Tabellone finale
@@ -197,9 +198,9 @@ fun SummaryScreen(c: MatchController) {
                                 Row(verticalAlignment = Alignment.Top) {
                                     Text(
                                         set.shown(side).toString(),
-                                        color = if (set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
+                                        color = if (!set.partial && set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
                                         fontSize = if (set.matchTiebreak) 18.sp else 24.sp,
-                                        fontWeight = if (set.winner == side) FontWeight.Black else FontWeight.Normal,
+                                        fontWeight = if (!set.partial && set.winner == side) FontWeight.Black else FontWeight.Normal,
                                     )
                                     if (set.hasTiebreak && !set.matchTiebreak && set.winner != side) {
                                         Text(set.tb(side).toString(), color = TsmColors.TextDim, fontSize = 12.sp)

@@ -41,6 +41,7 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -138,6 +139,7 @@ fun MatchScreen(c: MatchController) {
     val suspended = lm.record.suspended
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
+    var confirmRetire by remember { mutableStateOf(false) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
     /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
     var locked by rememberSaveable { mutableStateOf(false) }
@@ -191,6 +193,7 @@ fun MatchScreen(c: MatchController) {
                     Modifier.weight(1f),
                     highlight = suspended,
                 ) { c.toggleSuspend() }
+                ControlButton(Icons.Filled.Flag, s.retireButton, Modifier.weight(1f)) { confirmRetire = true }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
@@ -206,6 +209,24 @@ fun MatchScreen(c: MatchController) {
             }
         }
         if (locked) LockOverlay(s) { locked = false }
+    }
+
+    if (confirmRetire) {
+        AlertDialog(
+            onDismissRequest = { confirmRetire = false },
+            icon = { Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange) },
+            title = { Text(s.retireTitle, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.retireHint)
+                    for (side in Side.entries) OutlinedButton(onClick = { confirmRetire = false; c.retire(side) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { confirmRetire = false }) { Text(s.back) } },
+        )
     }
 
     if (confirmExit) {
@@ -251,7 +272,7 @@ fun MatchScreen(c: MatchController) {
             text = {
                 RemoteKeysInDialog(c)
                 Text(
-                    s.endDialogText(names.side(w), Reports.scoreLine(state, w), state.rules.doubles),
+                    (state.retired?.let { s.retireBy(names.side(it)) + "\n" } ?: "") + s.endDialogText(names.side(w), Reports.resultLine(state, w, s), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             },
@@ -269,7 +290,7 @@ fun MatchScreen(c: MatchController) {
                 OutlinedButton(onClick = { if (armed) c.undo() }) {
                     Icon(Icons.AutoMirrored.Filled.Undo, null, tint = TsmColors.TextMain)
                     Spacer(Modifier.width(6.dp))
-                    Text(s.undoLastPoint, color = TsmColors.TextMain)
+                    Text(if (state.retired != null) s.retireUndo else s.undoLastPoint, color = TsmColors.TextMain)
                 }
             },
         )

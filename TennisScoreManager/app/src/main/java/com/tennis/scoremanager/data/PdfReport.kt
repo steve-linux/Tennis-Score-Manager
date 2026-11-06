@@ -134,7 +134,7 @@ object PdfReport {
         wr.y += 6
         val body = paint(11f)
         val info = listOf(
-            "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.scoreLine(state, state.winner ?: Side.P1)}",
+            "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.resultLine(state, state.winner ?: Side.P1, s)}",
             "${s.duration}: ${Reports.duration(rec.clockMs)}",
             "${Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }} · ${s.startTime} ${Reports.time(rec.startedAt, lang)} · ${s.endTime} ${Reports.time(rec.endedAt, lang)}",
             Reports.eventLine(rec.setup)?.let { "${s.eventSection}: $it" } ?: "",

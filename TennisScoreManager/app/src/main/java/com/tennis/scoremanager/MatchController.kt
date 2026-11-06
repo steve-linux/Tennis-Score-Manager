@@ -1620,7 +1620,7 @@ class MatchController(
         for (t in clubTournaments.value) {
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
-            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), retired = state.retired != null, record = rec.id))
         }
     }
 
@@ -1762,7 +1762,7 @@ class MatchController(
             val i = f.rubbers.indexOfFirst { it.record == rec.id }
             if (i < 0) continue
             val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> null }
-            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, rec.id))
+            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, rec.id))
             return
         }
     }
@@ -1842,7 +1842,7 @@ class MatchController(
         for (l in ladders.value) {
             val ch = l.challenges.firstOrNull { it.open && it.record == rec.id } ?: continue
             val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> return }
-            saveLadder(com.tennis.scoremanager.data.Ladders.result(l, ch.id, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, System.currentTimeMillis(), rec.id))
+            saveLadder(com.tennis.scoremanager.data.Ladders.result(l, ch.id, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, System.currentTimeMillis(), rec.id))
             return
         }
     }
@@ -2673,7 +2673,7 @@ class MatchController(
             if (only != null && side != only) continue
             val o = side.other
             val payload = when {
-                state.isFinished -> BandProtocol.message(s.bandGameSetMatch, Reports.scoreLine(state, side), 15)
+                state.isFinished -> BandProtocol.message(s.bandGameSetMatch, Reports.resultLine(state, side, s), 15)
                 t?.setWinner != null -> {
                     val set = state.sets.last()
                     BandProtocol.games(set.games(side), set.games(o), state.setsWon(side), state.setsWon(o), "${s.bandSet} ${state.sets.size}")
@@ -3077,10 +3077,14 @@ class MatchController(
             return
         }
         val events = lm.record.events.toMutableList()
-        while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
-        if (events.isEmpty()) return
-        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
-        rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
+        // Dopo un ritiro si annulla il ritiro, non l'ultimo punto.
+        if (events.lastOrNull() is MatchEvent.Retired) events.removeAt(events.lastIndex)
+        else {
+            while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
+            if (events.isEmpty()) return
+            // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+            rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
+        }
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -3097,6 +3101,26 @@ class MatchController(
         pushScore(state, null)
         showMessage(strings.msgPointUndone)
         showTvMessage(null)
+    }
+
+    /** [side] si ritira: la partita si ferma col punteggio di ora e si chiude come le altre (annullabile fino alla conferma). */
+    fun retire(side: Side) {
+        val lm = live.value ?: return
+        if (closing || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        faultPending.value = false
+        val rec = lm.record.copy(events = lm.record.events + MatchEvent.Retired(side, System.currentTimeMillis()), endedAt = System.currentTimeMillis())
+        val state = ScoreEngine.replay(rec.rules, rec.events)
+        commit(rec, state)
+        stopClock()
+        stopCountdown()
+        persist()
+        val text = strings.retireCall(names(rec.setup).side(side))
+        announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
+        pushScore(state, null)
+        showTvMessage(text)
+        message.value = null
+        endDialog.value = true
     }
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {

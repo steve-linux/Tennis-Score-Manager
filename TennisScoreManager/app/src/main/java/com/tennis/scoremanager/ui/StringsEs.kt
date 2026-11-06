@@ -621,6 +621,12 @@ object EsStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Ganan" else "Gana"} $name\n$score" }
     override val matchConcluded = "Partido terminado"
     override val undoLastPoint = "Anular el último punto"
+    override val retireButton = "Retirada"
+    override val retireTitle = "¿Quién se retira?"
+    override val retireHint = "El partido termina con el marcador actual y gana el rival. Podrás deshacerlo antes de confirmar."
+    override val retireUndo = "Deshacer la retirada"
+    override val retireCall: (String) -> String = { "$it se retira" }
+    override val retireBy: (String) -> String = { "Retirada de $it" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

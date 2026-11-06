@@ -7412,6 +7412,8 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
 
 **App verlassen**: **Beenden** (im Match mit Rückfrage, auch in der Zusammenfassung vorhanden) schließt die App wirklich; ebenso, wenn du sie aus den zuletzt verwendeten Apps entfernst. Beim nächsten Öffnen startet sie im Reiter **Spielen**.
 
+**Aufgabe**: Die Taste **Aufgabe** unter dem Spielstand fragt, wer aufgibt, und beendet die Partie bei diesem Stand, ohne die Punkte des laufenden Spiels (z. B. `6-3 2-1 Aufgabe`). Der Gegner gewinnt, die Stimme sagt es an, und vor dem Abschluss stellt **Aufgabe zurücknehmen** alles wieder her. Bei Turnieren geht das Ergebnis mit vermerkter Aufgabe von selbst ein; die Partie zählt als Sieg, wirkt sich aber nicht auf das TSM-Rating aus.
+
 **Speichern**: Das Match speichert sich bei jedem Punkt von selbst. Im Reiter **Spielen** löscht man ein unterbrochenes Match, indem man sein *Fortsetzen* **gedrückt hält**; alle unterbrochenen Matches stehen unter **Fortschritt › Verlauf › Unterbrochen**, zum Fortsetzen oder Löschen (mehrere angehakt auch zusammen). *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
 
 ### 7.1 Training mit dem Gurt
@@ -7980,6 +7982,8 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 **Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the **Play** tab.
 
+**Retirement**: the **Retire** button under the score asks who is retiring and ends the match at that score, without the points of the current game (e.g. `6-3 2-1 ret.`). The opponent wins, the voice announces it and, before **Match concluded**, **Undo retirement** restores everything. In tournaments the result goes in by itself with the retirement marked; the match counts as a win but does not affect the TSM rating.
+
 **Saving**: the match saves itself at every point. On the **Play** tab a suspended match is deleted by **long-pressing** its *Resume*; all suspended matches are in **Progress › History › Suspended**, to resume or delete (ticking several, also together). *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
 ### 7.1 Workout with the strap
@@ -8546,6 +8550,8 @@ Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos
    **Revancha** (al final del resumen): propone el mismo día de la semana y la misma hora, la semana siguiente, y el club del partido; se cambian fecha, hora y lugar y se añade una nota. **Mandar la invitación** abre el menú de compartir (WhatsApp, SMS, correo…) con el mensaje listo: quién contra quién, cuándo, dónde y cómo acabó la última vez. **Añadir al calendario** crea el evento en la app del calendario, **Preparar el partido** devuelve a *Nuevo partido* jugadores, club, pista y reglas (el torneo no). Sin cuentas: la invitación pasa por los canales que ya usas.
 
 **Para salir**: **Salir** (durante el partido pide confirmación, y también está en el resumen) cierra la app de verdad; lo mismo ocurre si la quitas de las aplicaciones recientes. Al volver a abrirla empieza desde la pestaña **Jugar**.
+
+**Retirada**: el botón **Retirada** bajo el marcador pregunta quién se retira y termina el partido con ese marcador, sin los puntos del juego en curso (p. ej. `6-3 2-1 ret.`). Gana el rival, la voz lo anuncia y, antes de concluir, **Deshacer la retirada** lo deja todo como estaba. En los torneos el resultado entra solo con la retirada anotada; el partido cuenta como victoria pero no pesa en el rating TSM.
 
 **Guardado**: el partido se guarda solo en cada punto. En la pestaña **Jugar** un partido suspendido se elimina **manteniendo pulsado** su *Reanudar*; todos los suspendidos están en **Progresos › Historial › Suspendidos**, para reanudar o eliminar (marcando varios, también a la vez). *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
 
@@ -9114,6 +9120,8 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 **Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de l'onglet **Jouer**.
 
+**Abandon** : le bouton **Abandon** sous le score demande qui abandonne et termine le match à ce score, sans les points du jeu en cours (par ex. `6-3 2-1 abandon`). L'adversaire gagne, la voix l'annonce et, avant de conclure, **Annuler l'abandon** remet tout comme avant. Dans les tournois, le résultat entre tout seul avec l'abandon noté ; le match compte comme une victoire mais ne pèse pas sur le rating TSM.
+
 **Sauvegardes** : le match s'enregistre tout seul à chaque point. Dans l'onglet **Jouer**, un match suspendu se supprime en **appuyant longuement** sur son *Reprendre* ; tous les matchs suspendus sont dans **Progrès › Historique › Suspendus**, à reprendre ou supprimer (en en cochant plusieurs, aussi ensemble). *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
 ### 7.1 Entraînement avec la ceinture
@@ -9681,6 +9689,8 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 
 **Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
 
+**Ritiro**: il tasto **Ritiro** sotto il punteggio chiede chi si ritira e chiude la partita col punteggio di quel momento, senza i punti del game in corso (es. `6-3 2-1 rit.`). Vince l'avversario, la voce lo annuncia e, prima di **Partita conclusa**, **Annulla il ritiro** rimette tutto com'era. Nei tornei il risultato entra da solo con il ritiro segnato; la partita conta come vittoria ma non pesa sul rating TSM.
+
 **Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
 ### 7.1 Allenamento con la fascia
@@ -10247,6 +10257,8 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
    **Revanche** (no fim do resumo): propõe o mesmo dia da semana e a mesma hora, na semana seguinte, e o clube da partida; dá para mudar data, hora e local e acrescentar uma nota. **Mandar o convite** abre o compartilhamento (WhatsApp, SMS, e-mail…) com a mensagem pronta: quem contra quem, quando, onde e como terminou da última vez. **Pôr na agenda** cria o evento no app de agenda, **Preparar a partida** traz de volta para *Nova partida* jogadores, clube, quadra e regras (o torneio não). Sem conta: o convite passa pelos canais que você já usa.
 
 **Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela aba **Jogar**.
+
+**Desistência**: o botão **Desistência** abaixo do placar pergunta quem desiste e termina a partida com esse placar, sem os pontos do game em andamento (ex. `6-3 2-1 desist.`). O adversário vence, a voz anuncia e, antes de concluir, **Desfazer a desistência** deixa tudo como estava. Nos torneios o resultado entra sozinho com a desistência marcada; a partida conta como vitória, mas não pesa no rating TSM.
 
 **Salvamento**: a partida é salva sozinha a cada ponto. Na aba **Jogar** uma partida suspensa se exclui **mantendo pressionado** o seu *Retomar*; todas as suspensas estão em **Progresso › Histórico › Suspensas**, para retomar ou excluir (marcando várias, também juntas). *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
@@ -12964,7 +12976,7 @@ class MatchController(
         for (t in clubTournaments.value) {
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
-            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), retired = state.retired != null, record = rec.id))
         }
     }
 
@@ -13106,7 +13118,7 @@ class MatchController(
             val i = f.rubbers.indexOfFirst { it.record == rec.id }
             if (i < 0) continue
             val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> null }
-            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, rec.id))
+            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, rec.id))
             return
         }
     }
@@ -13186,7 +13198,7 @@ class MatchController(
         for (l in ladders.value) {
             val ch = l.challenges.firstOrNull { it.open && it.record == rec.id } ?: continue
             val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> return }
-            saveLadder(com.tennis.scoremanager.data.Ladders.result(l, ch.id, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, System.currentTimeMillis(), rec.id))
+            saveLadder(com.tennis.scoremanager.data.Ladders.result(l, ch.id, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, System.currentTimeMillis(), rec.id))
             return
         }
     }
@@ -14017,7 +14029,7 @@ class MatchController(
             if (only != null && side != only) continue
             val o = side.other
             val payload = when {
-                state.isFinished -> BandProtocol.message(s.bandGameSetMatch, Reports.scoreLine(state, side), 15)
+                state.isFinished -> BandProtocol.message(s.bandGameSetMatch, Reports.resultLine(state, side, s), 15)
                 t?.setWinner != null -> {
                     val set = state.sets.last()
                     BandProtocol.games(set.games(side), set.games(o), state.setsWon(side), state.setsWon(o), "${s.bandSet} ${state.sets.size}")
@@ -14421,10 +14433,14 @@ class MatchController(
             return
         }
         val events = lm.record.events.toMutableList()
-        while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
-        if (events.isEmpty()) return
-        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
-        rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
+        // Dopo un ritiro si annulla il ritiro, non l'ultimo punto.
+        if (events.lastOrNull() is MatchEvent.Retired) events.removeAt(events.lastIndex)
+        else {
+            while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
+            if (events.isEmpty()) return
+            // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+            rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
+        }
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -14441,6 +14457,26 @@ class MatchController(
         pushScore(state, null)
         showMessage(strings.msgPointUndone)
         showTvMessage(null)
+    }
+
+    /** [side] si ritira: la partita si ferma col punteggio di ora e si chiude come le altre (annullabile fino alla conferma). */
+    fun retire(side: Side) {
+        val lm = live.value ?: return
+        if (closing || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        faultPending.value = false
+        val rec = lm.record.copy(events = lm.record.events + MatchEvent.Retired(side, System.currentTimeMillis()), endedAt = System.currentTimeMillis())
+        val state = ScoreEngine.replay(rec.rules, rec.events)
+        commit(rec, state)
+        stopClock()
+        stopCountdown()
+        persist()
+        val text = strings.retireCall(names(rec.setup).side(side))
+        announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
+        pushScore(state, null)
+        showTvMessage(text)
+        message.value = null
+        endDialog.value = true
     }
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {
@@ -20927,7 +20963,7 @@ object PdfReport {
         wr.y += 6
         val body = paint(11f)
         val info = listOf(
-            "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.scoreLine(state, state.winner ?: Side.P1)}",
+            "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.resultLine(state, state.winner ?: Side.P1, s)}",
             "${s.duration}: ${Reports.duration(rec.clockMs)}",
             "${Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }} · ${s.startTime} ${Reports.time(rec.startedAt, lang)} · ${s.endTime} ${Reports.time(rec.endedAt, lang)}",
             Reports.eventLine(rec.setup)?.let { "${s.eventSection}: $it" } ?: "",
@@ -21941,7 +21977,8 @@ object Rating {
 
     /** Una partita dello storico come [Game], o null se non conta (non finita, amichevole, senza vincitore). */
     fun gameOf(rec: MatchRecord, sets: List<com.tennis.scoremanager.model.SetScore>, winner: Side?): Game? {
-        if (winner == null || !rec.finished || rec.friendly) return null
+        // Con un ritiro i game non dicono chi era più forte: la partita non pesa sul rating.
+        if (winner == null || !rec.finished || rec.friendly || rec.events.any { it is com.tennis.scoremanager.model.MatchEvent.Retired }) return null
         val games = Side.entries.associateWith { side ->
             // Il super tie-break vale come un game: i suoi punti falserebbero la quota.
             sets.sumOf { st -> if (st.matchTiebreak) (if (st.winner == side) 1 else 0) else st.games(side) }
@@ -22159,6 +22196,10 @@ object Reports {
 
     fun scoreLine(state: MatchState, from: Side): String = state.sets.joinToString("  ") { setText(it, from) }
 
+    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit.". */
+    fun resultLine(state: MatchState, from: Side, s: Strings): String =
+        scoreLine(state, from) + if (state.retired != null) " " + s.ctRetired else ""
+
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
@@ -22269,7 +22310,7 @@ object Reports {
         sb.appendLine(date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
         sb.appendLine()
         sb.appendLine("🏆 ${s.winner}: ${names.side(w)}")
-        sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${scoreLine(state, w)}")
+        sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${resultLine(state, w, s)}")
         sb.appendLine()
         sb.appendLine("⏱ ${s.duration}: ${duration(rec.clockMs)}")
         sb.appendLine("🕘 ${s.startTime}: ${time(rec.startedAt, lang)} · ${s.endTime}: ${time(rec.endedAt, lang)}")
@@ -27780,6 +27821,11 @@ sealed class MatchEvent {
     @Serializable
     @SerialName("serveOrder")
     data class ServeOrder(val setNumber: Int, val firstP1: Int, val firstP2: Int) : MatchEvent()
+
+    /** [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. */
+    @Serializable
+    @SerialName("retired")
+    data class Retired(val side: Side, val at: Long = 0L) : MatchEvent()
 }
 
 /** Punteggio di un set concluso. Per il match tie-break g1/g2 valgono 1-0 e i punti stanno in tb1/tb2. */
@@ -27790,6 +27836,8 @@ data class SetScore(
     val tb1: Int? = null,
     val tb2: Int? = null,
     val matchTiebreak: Boolean = false,
+    /** Set interrotto da un ritiro: non è vinto da nessuno, conta solo il punteggio. */
+    val partial: Boolean = false,
 ) {
     val winner: Side get() = if (g1 > g2) Side.P1 else Side.P2
     val hasTiebreak: Boolean get() = tb1 != null && tb2 != null
@@ -27839,6 +27887,8 @@ data class MatchState(
     val p1Left: Boolean = rules.p1StartsLeft,
     val winner: Side? = null,
     val pointsPlayed: Int = 0,
+    /** Chi si è ritirato (null = partita finita sul campo o ancora in corso). */
+    val retired: Side? = null,
 ) {
     val isFinished: Boolean get() = winner != null
     val setNumber: Int get() = sets.size + 1
@@ -27847,7 +27897,7 @@ data class MatchState(
 
     fun games(side: Side): Int = if (side == Side.P1) g1 else g2
     fun points(side: Side): Int = if (side == Side.P1) pt1 else pt2
-    fun setsWon(side: Side): Int = sets.count { it.winner == side }
+    fun setsWon(side: Side): Int = sets.count { !it.partial && it.winner == side }
     fun order(side: Side): Int = if (side == Side.P1) order1 else order2
     fun leftSide(): Side = if (p1Left) Side.P1 else Side.P2
 
@@ -27924,6 +27974,23 @@ object ScoreEngine {
     fun apply(state: MatchState, event: MatchEvent): Step = when (event) {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)
+        is MatchEvent.Retired -> Step(retire(state, event.side), null)
+    }
+
+    /**
+     * Il ritiro: il set in corso resta scritto com'era (nel match tie-break, coi suoi punti), senza vincitore. I punti
+     * del game in corso non entrano nel risultato, come sul referto.
+     */
+    private fun retire(s: MatchState, side: Side): MatchState {
+        if (s.isFinished) return s
+        val inMatchTiebreak = s.tiebreak == TiebreakKind.MATCH
+        val started = if (inMatchTiebreak) s.pt1 + s.pt2 > 0 else s.g1 + s.g2 > 0
+        val open = when {
+            !started -> emptyList()
+            inMatchTiebreak -> listOf(SetScore(0, 0, s.pt1, s.pt2, matchTiebreak = true, partial = true))
+            else -> listOf(SetScore(s.g1, s.g2, partial = true))
+        }
+        return s.copy(sets = s.sets + open, g1 = 0, g2 = 0, pt1 = 0, pt2 = 0, tiebreak = TiebreakKind.NONE, winner = side.other, retired = side)
     }
 
     /** L'ordine di servizio del doppio si può cambiare solo prima del primo punto del set. */
@@ -36453,6 +36520,12 @@ interface Strings {
     val endDialogText: (String, String, Boolean) -> String
     val matchConcluded: String
     val undoLastPoint: String
+    val retireButton: String
+    val retireTitle: String
+    val retireHint: String
+    val retireUndo: String
+    val retireCall: (String) -> String
+    val retireBy: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -38619,6 +38692,12 @@ object ItStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Vincono" else "Vince"} $name\n$score" }
     override val matchConcluded = "Partita conclusa"
     override val undoLastPoint = "Annulla ultimo punto"
+    override val retireButton = "Ritiro"
+    override val retireTitle = "Chi si ritira?"
+    override val retireHint = "La partita finisce col punteggio attuale e vince l'avversario. Potrai annullare prima di confermare."
+    override val retireUndo = "Annulla il ritiro"
+    override val retireCall: (String) -> String = { "$it si ritira" }
+    override val retireBy: (String) -> String = { "Ritiro di $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -40748,6 +40827,12 @@ object EnStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "$name ${if (team) "win" else "wins"}\n$score" }
     override val matchConcluded = "Match concluded"
     override val undoLastPoint = "Undo last point"
+    override val retireButton = "Retire"
+    override val retireTitle = "Who is retiring?"
+    override val retireHint = "The match ends at the current score and the opponent wins. You can undo before confirming."
+    override val retireUndo = "Undo retirement"
+    override val retireCall: (String) -> String = { "$it retires" }
+    override val retireBy: (String) -> String = { "Retirement: $it" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -42900,6 +42985,12 @@ object DeStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Sieg für $name\n$score" }
     override val matchConcluded = "Match beendet"
     override val undoLastPoint = "Letzten Punkt zurücknehmen"
+    override val retireButton = "Aufgabe"
+    override val retireTitle = "Wer gibt auf?"
+    override val retireHint = "Die Partie endet beim aktuellen Stand und der Gegner gewinnt. Vor der Bestätigung kannst du es rückgängig machen."
+    override val retireUndo = "Aufgabe zurücknehmen"
+    override val retireCall: (String) -> String = { "$it gibt auf" }
+    override val retireBy: (String) -> String = { "Aufgabe von $it" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -45045,6 +45136,12 @@ object EsStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Ganan" else "Gana"} $name\n$score" }
     override val matchConcluded = "Partido terminado"
     override val undoLastPoint = "Anular el último punto"
+    override val retireButton = "Retirada"
+    override val retireTitle = "¿Quién se retira?"
+    override val retireHint = "El partido termina con el marcador actual y gana el rival. Podrás deshacerlo antes de confirmar."
+    override val retireUndo = "Deshacer la retirada"
+    override val retireCall: (String) -> String = { "$it se retira" }
+    override val retireBy: (String) -> String = { "Retirada de $it" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -47192,6 +47289,12 @@ object FrStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Victoire de $name\n$score" }
     override val matchConcluded = "Match terminé"
     override val undoLastPoint = "Annuler le dernier point"
+    override val retireButton = "Abandon"
+    override val retireTitle = "Qui abandonne ?"
+    override val retireHint = "Le match s'arrête au score actuel et l'adversaire gagne. Vous pourrez annuler avant de confirmer."
+    override val retireUndo = "Annuler l'abandon"
+    override val retireCall: (String) -> String = { "$it abandonne" }
+    override val retireBy: (String) -> String = { "Abandon de $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -49340,6 +49443,12 @@ object PtStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Vitória de $name\n$score" }
     override val matchConcluded = "Partida encerrada"
     override val undoLastPoint = "Anular o último ponto"
+    override val retireButton = "Desistência"
+    override val retireTitle = "Quem desiste?"
+    override val retireHint = "A partida termina com o placar atual e o adversário vence. Você poderá desfazer antes de confirmar."
+    override val retireUndo = "Desfazer a desistência"
+    override val retireCall: (String) -> String = { "$it desiste" }
+    override val retireBy: (String) -> String = { "Desistência de $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -54568,7 +54677,7 @@ private fun MatchRow(m: LiveMatch, onClick: () -> Unit) {
                     }
                 }
             }
-            if (w != null) Text(Reports.scoreLine(m.state, w), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            if (w != null) Text(Reports.resultLine(m.state, w, s), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
         }
         Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
     }
@@ -55485,6 +55594,7 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -55582,6 +55692,7 @@ fun MatchScreen(c: MatchController) {
     val suspended = lm.record.suspended
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
+    var confirmRetire by remember { mutableStateOf(false) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
     /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
     var locked by rememberSaveable { mutableStateOf(false) }
@@ -55635,6 +55746,7 @@ fun MatchScreen(c: MatchController) {
                     Modifier.weight(1f),
                     highlight = suspended,
                 ) { c.toggleSuspend() }
+                ControlButton(Icons.Filled.Flag, s.retireButton, Modifier.weight(1f)) { confirmRetire = true }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
@@ -55650,6 +55762,24 @@ fun MatchScreen(c: MatchController) {
             }
         }
         if (locked) LockOverlay(s) { locked = false }
+    }
+
+    if (confirmRetire) {
+        AlertDialog(
+            onDismissRequest = { confirmRetire = false },
+            icon = { Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange) },
+            title = { Text(s.retireTitle, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.retireHint)
+                    for (side in Side.entries) OutlinedButton(onClick = { confirmRetire = false; c.retire(side) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { confirmRetire = false }) { Text(s.back) } },
+        )
     }
 
     if (confirmExit) {
@@ -55695,7 +55825,7 @@ fun MatchScreen(c: MatchController) {
             text = {
                 RemoteKeysInDialog(c)
                 Text(
-                    s.endDialogText(names.side(w), Reports.scoreLine(state, w), state.rules.doubles),
+                    (state.retired?.let { s.retireBy(names.side(it)) + "\n" } ?: "") + s.endDialogText(names.side(w), Reports.resultLine(state, w, s), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             },
@@ -55713,7 +55843,7 @@ fun MatchScreen(c: MatchController) {
                 OutlinedButton(onClick = { if (armed) c.undo() }) {
                     Icon(Icons.AutoMirrored.Filled.Undo, null, tint = TsmColors.TextMain)
                     Spacer(Modifier.width(6.dp))
-                    Text(s.undoLastPoint, color = TsmColors.TextMain)
+                    Text(if (state.retired != null) s.retireUndo else s.undoLastPoint, color = TsmColors.TextMain)
                 }
             },
         )
@@ -61416,7 +61546,8 @@ fun SummaryScreen(c: MatchController) {
                 Text(s.winner.uppercase(), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
-                Text(Reports.scoreLine(state, w), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text(Reports.resultLine(state, w, s), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                state.retired?.let { Text(s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
             }
 
             // Tabellone finale
@@ -61448,9 +61579,9 @@ fun SummaryScreen(c: MatchController) {
                                 Row(verticalAlignment = Alignment.Top) {
                                     Text(
                                         set.shown(side).toString(),
-                                        color = if (set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
+                                        color = if (!set.partial && set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
                                         fontSize = if (set.matchTiebreak) 18.sp else 24.sp,
-                                        fontWeight = if (set.winner == side) FontWeight.Black else FontWeight.Normal,
+                                        fontWeight = if (!set.partial && set.winner == side) FontWeight.Black else FontWeight.Normal,
                                     )
                                     if (set.hasTiebreak && !set.matchTiebreak && set.winner != side) {
                                         Text(set.tb(side).toString(), color = TsmColors.TextDim, fontSize = 12.sp)
@@ -85091,6 +85222,48 @@ class ScoreEngineTest {
         assertTrue(ScoreEngine.isBreakPoint(s))
         val t = play(ScoreEngine.initial(RulesConfig(firstServer = P1)), P1, P1, P1)
         assertFalse(ScoreEngine.isBreakPoint(t))
+    }
+
+    @Test fun ritiroChiudeColPunteggioDelMomento() {
+        var s = ScoreEngine.initial(RulesConfig())
+        repeat(6) { s = game(s, P1) }
+        repeat(2) { s = game(s, P1) }
+        s = game(s, P2)
+        s = play(s, P1)
+        val after = ScoreEngine.apply(s, MatchEvent.Retired(P1)).state
+        assertEquals(P2, after.winner)
+        assertEquals(P1, after.retired)
+        assertTrue(after.isFinished)
+        assertEquals(2, after.sets.size)
+        assertEquals(6 to 0, after.sets[0].g1 to after.sets[0].g2)
+        assertEquals(2 to 1, after.sets[1].g1 to after.sets[1].g2)
+        assertTrue(after.sets[1].partial)
+        assertEquals("il set interrotto non è vinto da nessuno", 0, after.setsWon(P2))
+        assertEquals(1, after.setsWon(P1))
+        assertEquals("dopo il ritiro non si segna più", after, ScoreEngine.pointWonBy(after, P1).state)
+    }
+
+    @Test fun ritiroAInizioSetNonInventaUnSet() {
+        var s = ScoreEngine.initial(RulesConfig())
+        repeat(6) { s = game(s, P1) }
+        assertEquals(1, ScoreEngine.apply(s, MatchEvent.Retired(P2)).state.sets.size)
+        assertEquals(0, ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.Retired(P2)).state.sets.size)
+    }
+
+    @Test fun ritiroSiRigiocaESiAnnulla() {
+        val rules = RulesConfig()
+        val events = List(6) { MatchEvent.Point(P1) } + MatchEvent.Retired(P2)
+        assertEquals(P2, ScoreEngine.replay(rules, events).retired)
+        assertEquals(null, ScoreEngine.replay(rules, events.dropLast(1)).retired)
+        assertEquals(1, ScoreEngine.replay(rules, events.dropLast(1)).games(P1))
+    }
+
+    @Test fun ritiroNelMatchTiebreakTieneIPunti() {
+        val rules = RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY)
+        val s = play(ScoreEngine.initial(rules), P1, P1, P2)
+        val set = ScoreEngine.apply(s, MatchEvent.Retired(P2)).state.sets.single()
+        assertEquals(2 to 1, set.tb1 to set.tb2)
+        assertTrue(set.partial && set.matchTiebreak)
     }
 }
 TSM_EOF

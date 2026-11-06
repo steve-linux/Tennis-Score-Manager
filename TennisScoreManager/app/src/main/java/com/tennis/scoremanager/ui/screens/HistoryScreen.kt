@@ -307,7 +307,7 @@ private fun MatchRow(m: LiveMatch, onClick: () -> Unit) {
                     }
                 }
             }
-            if (w != null) Text(Reports.scoreLine(m.state, w), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            if (w != null) Text(Reports.resultLine(m.state, w, s), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
         }
         Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
     }

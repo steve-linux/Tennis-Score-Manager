@@ -623,6 +623,12 @@ object FrStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Victoire de $name\n$score" }
     override val matchConcluded = "Match terminé"
     override val undoLastPoint = "Annuler le dernier point"
+    override val retireButton = "Abandon"
+    override val retireTitle = "Qui abandonne ?"
+    override val retireHint = "Le match s'arrête au score actuel et l'adversaire gagne. Vous pourrez annuler avant de confirmer."
+    override val retireUndo = "Annuler l'abandon"
+    override val retireCall: (String) -> String = { "$it abandonne" }
+    override val retireBy: (String) -> String = { "Abandon de $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"

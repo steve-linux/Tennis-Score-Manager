@@ -319,6 +319,8 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 **Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de l'onglet **Jouer**.
 
+**Abandon** : le bouton **Abandon** sous le score demande qui abandonne et termine le match à ce score, sans les points du jeu en cours (par ex. `6-3 2-1 abandon`). L'adversaire gagne, la voix l'annonce et, avant de conclure, **Annuler l'abandon** remet tout comme avant. Dans les tournois, le résultat entre tout seul avec l'abandon noté ; le match compte comme une victoire mais ne pèse pas sur le rating TSM.
+
 **Sauvegardes** : le match s'enregistre tout seul à chaque point. Dans l'onglet **Jouer**, un match suspendu se supprime en **appuyant longuement** sur son *Reprendre* ; tous les matchs suspendus sont dans **Progrès › Historique › Suspendus**, à reprendre ou supprimer (en en cochant plusieurs, aussi ensemble). *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
 ### 7.1 Entraînement avec la ceinture (app 2.5)

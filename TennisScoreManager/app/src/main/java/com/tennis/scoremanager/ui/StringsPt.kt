@@ -624,6 +624,12 @@ object PtStrings : Strings {
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Vitória de $name\n$score" }
     override val matchConcluded = "Partida encerrada"
     override val undoLastPoint = "Anular o último ponto"
+    override val retireButton = "Desistência"
+    override val retireTitle = "Quem desiste?"
+    override val retireHint = "A partida termina com o placar atual e o adversário vence. Você poderá desfazer antes de confirmar."
+    override val retireUndo = "Desfazer a desistência"
+    override val retireCall: (String) -> String = { "$it desiste" }
+    override val retireBy: (String) -> String = { "Desistência de $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
