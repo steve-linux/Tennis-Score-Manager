@@ -152,6 +152,22 @@ sealed class MatchEvent {
     @Serializable
     @SerialName("endsFix")
     data class EndsFix(val at: Long = 0L) : MatchEvent()
+
+    /**
+     * Il punteggio messo a mano (partita iniziata senza l'app, o da rimettere in pari col campo): i set finiti, i game
+     * del set in corso, i punti del game (o del tie-break) e chi serve adesso. Si continua da qui.
+     */
+    @Serializable
+    @SerialName("scoreSet")
+    data class ScoreSet(
+        val sets: List<SetScore>, val g1: Int, val g2: Int, val pt1: Int, val pt2: Int,
+        val server: Side, val serverPlayer: Int = 0, val at: Long = 0L,
+    ) : MatchEvent()
+
+    /** Doppio: chi risponde da destra (lato parità) in ciascuna squadra, per il set [setNumber]. */
+    @Serializable
+    @SerialName("receiveOrder")
+    data class ReceiveOrder(val setNumber: Int, val deuceP1: Int, val deuceP2: Int) : MatchEvent()
 }
 
 /** Le pause con il loro tempo: medical timeout 3 minuti, bagno o cambio d'abiti fino a 5. */

@@ -35,6 +35,9 @@ data class MatchState(
     val retired: Side? = null,
     /** Il ritiro è una squalifica. */
     val disqualified: Boolean = false,
+    /** Doppio: chi risponde da destra in ciascuna squadra nel set in corso (null = non detto). */
+    val recv1: Int? = null,
+    val recv2: Int? = null,
     /** I richiami fatti finora, per tipo: [Penalty] li conta per sapere cosa comporta il prossimo. */
     val codes1: Int = 0,
     val codes2: Int = 0,
@@ -50,6 +53,10 @@ data class MatchState(
     fun points(side: Side): Int = if (side == Side.P1) pt1 else pt2
     fun setsWon(side: Side): Int = sets.count { !it.partial && it.winner == side }
     fun order(side: Side): Int = if (side == Side.P1) order1 else order2
+
+    /** Doppio: chi risponde adesso nella squadra che riceve (da destra sui punti pari del game); null = non detto. */
+    val receiverPlayer: Int?
+        get() = (if (receiver == Side.P1) recv1 else recv2)?.let { if ((pt1 + pt2) % 2 == 0) it else 1 - it }
     fun penalties(side: Side, kind: PenaltyKind): Int = when (kind) {
         PenaltyKind.CODE -> if (side == Side.P1) codes1 else codes2
         PenaltyKind.TIME -> if (side == Side.P1) times1 else times2
@@ -134,6 +141,66 @@ object ScoreEngine {
         is MatchEvent.Break -> Step(state, null)
         is MatchEvent.ServerFix -> Step(fixServer(state, event.side, event.player), null)
         is MatchEvent.EndsFix -> Step(if (state.isFinished) state else state.copy(p1Left = !state.p1Left), null)
+        is MatchEvent.ScoreSet -> Step(setScore(state, event), null)
+        is MatchEvent.ReceiveOrder ->
+            Step(if (state.isFinished || event.setNumber != state.setNumber) state else state.copy(recv1 = event.deuceP1.coerceIn(0, 1), recv2 = event.deuceP2.coerceIn(0, 1)), null)
+    }
+
+    /** Nel set numero [setsDone] + 1 si gioca solo il match tie-break? */
+    fun matchTiebreakSet(rules: RulesConfig, setsDone: Int): Boolean =
+        rules.format == MatchFormat.MATCH_TIEBREAK_ONLY || (rules.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK && setsDone == 2)
+
+    /** Con questi game del set in corso si gioca il tie-break di set? */
+    fun tiebreakAt(rules: RulesConfig, g1: Int, g2: Int): Boolean = rules.setTiebreak && g1 == rules.gamesPerSet && g2 == rules.gamesPerSet
+
+    /** Un set finito, giocato fino in fondo con queste regole (6-4, 7-5, 7-6; senza tie-break, due game di scarto). */
+    fun validSet(rules: RulesConfig, set: SetScore): Boolean {
+        val n = rules.gamesPerSet
+        val hi = maxOf(set.g1, set.g2); val lo = minOf(set.g1, set.g2)
+        return when {
+            hi == n && lo <= n - 2 -> true
+            hi > n && hi - lo == 2 && (lo >= n - 1) && (!rules.setTiebreak || hi == n + 1) -> true
+            rules.setTiebreak && hi == n + 1 && lo == n -> true
+            else -> false
+        }
+    }
+
+    /**
+     * Il punteggio messo a mano si può giocare: i set sono finiti e nessuno ha già vinto la partita, il set in corso
+     * non è chiuso e il game (o il tie-break) nemmeno.
+     */
+    fun validScore(rules: RulesConfig, sets: List<SetScore>, g1: Int, g2: Int, pt1: Int, pt2: Int): Boolean {
+        if (listOf(g1, g2, pt1, pt2).any { it < 0 }) return false
+        if (sets.any { !validSet(rules, it) }) return false
+        if (Side.entries.any { side -> sets.count { it.winner == side } >= rules.setsToWin }) return false
+        val matchTb = matchTiebreakSet(rules, sets.size)
+        val n = rules.gamesPerSet
+        val hi = maxOf(g1, g2); val lo = minOf(g1, g2)
+        if (!matchTb) {
+            if (hi >= n && hi - lo >= 2) return false
+            if (rules.setTiebreak && hi > n) return false
+        }
+        val tb = matchTb || tiebreakAt(rules, g1, g2)
+        val ph = maxOf(pt1, pt2); val pl = minOf(pt1, pt2)
+        return if (tb) !(ph >= (if (matchTb) 10 else 7) && ph - pl >= 2)
+        else if (rules.noAd) ph <= 3 else ph <= 3 || (ph == 4 && pl == 3)
+    }
+
+    /** Il punteggio messo a mano: si continua da lì, con chi serve deciso adesso. */
+    private fun setScore(s: MatchState, e: MatchEvent.ScoreSet): MatchState {
+        if (s.isFinished || !validScore(s.rules, e.sets, e.g1, e.g2, e.pt1, e.pt2)) return s
+        val matchTb = matchTiebreakSet(s.rules, e.sets.size)
+        val tb = when {
+            matchTb -> TiebreakKind.MATCH
+            tiebreakAt(s.rules, e.g1, e.g2) -> TiebreakKind.SET
+            else -> TiebreakKind.NONE
+        }
+        val set = s.copy(
+            sets = e.sets.map { it.copy(partial = false, matchTiebreak = false) },
+            g1 = if (matchTb) 0 else e.g1, g2 = if (matchTb) 0 else e.g2, pt1 = e.pt1, pt2 = e.pt2, tiebreak = tb,
+            recv1 = null, recv2 = null,
+        )
+        return fixServer(set, e.server, e.serverPlayer)
     }
 
     /**
@@ -301,6 +368,8 @@ object ScoreEngine {
             sets = sets, g1 = 0, g2 = 0, pt1 = 0, pt2 = 0,
             tiebreak = nextTiebreak,
             setStartServer = nextStart,
+            // Nel set nuovo l'ordine di risposta si sceglie di nuovo.
+            recv1 = null, recv2 = null,
             order1 = naturalNextServer(s, Side.P1),
             order2 = naturalNextServer(s, Side.P2),
             p1Left = if (change) !s.p1Left else s.p1Left,

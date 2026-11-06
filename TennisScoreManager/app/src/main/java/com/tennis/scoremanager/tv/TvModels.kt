@@ -77,6 +77,8 @@ data class TvSnapshot(
     val replay: TvReplay? = null,
     /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
     val club: TvClub? = null,
+    /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
+    val balls: Long? = null,
 )
 
 /**
@@ -167,6 +169,8 @@ data class TvLabels(
     val fullscreen: String,
     /** Titolo della pagina (document.title). */
     val page: String,
+    /** La scritta dell'animazione del cambio palle. */
+    val newBalls: String = "",
 )
 
 /** Stato dell'app da cui si ricava il tabellone. */
@@ -189,6 +193,7 @@ data class TvInput(
     val photos: Map<Side, List<String>> = emptyMap(),
     val replay: TvReplay? = null,
     val club: TvClub? = null,
+    val balls: Long? = null,
 )
 
 object TvSnapshots {
@@ -266,6 +271,7 @@ object TvSnapshots {
             labels = labels(s),
             replay = i.replay,
             club = i.club,
+            balls = i.balls,
         )
     }
 
@@ -274,7 +280,7 @@ object TvSnapshots {
         vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
         waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
         tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
-        page = s.tvPageTitle,
+        page = s.tvPageTitle, newBalls = s.newBallsCall,
     )
 
     /** "Circolo Tennis · Campo 3" dai dati della pagina 1 (un numero da solo diventa "Campo 3"). */

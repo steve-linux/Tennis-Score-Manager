@@ -90,6 +90,11 @@ data class MatchOptions(
     val addressLookup: Boolean = false,
     /** Fasce cardio Bluetooth: battito e calorie, in qualsiasi modalità. */
     val heartRate: Boolean = false,
+    /** Cambio palle: la prima volta dopo [newBallsFirst] game, poi ogni [newBallsEvery] (0 = niente). */
+    val newBallsFirst: Int = 0,
+    val newBallsEvery: Int = 0,
+    /** Al cambio palle, l'animazione sul telefono e sul tabellone TV. */
+    val newBallsAnimation: Boolean = false,
 )
 
 @Serializable

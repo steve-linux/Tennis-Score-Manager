@@ -201,6 +201,7 @@ class MatchController(
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
         const val SET_BREAK_S = 120          // ITF: 120" a fine set
+        const val BALLS_ANIMATION_MS = 5_500L
         const val WARMUP_S = 300             // ITF: 5' di riscaldamento
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
@@ -298,6 +299,13 @@ class MatchController(
     val tv = MutableStateFlow(storage.tv)
     val tvServer = TvServer(app)
     private val tvMessage = MutableStateFlow<String?>(null)
+    /** L'animazione del cambio palle: quando è partita (sul telefono e sul tabellone), null = niente. */
+    val ballsAnimation = MutableStateFlow<Long?>(null)
+    private var ballsJob: Job? = null
+    /** Un cambio palle rimandato dall'inizio di un tie-break al secondo game del set dopo. */
+    private var ballsPending = false
+    /** Lo shot clock è arrivato a zero senza che si giocasse: si propone la violazione di tempo. */
+    val shotClockOut = MutableStateFlow(false)
     private var tvMessageJob: Job? = null
     private var tvSeq = 0L
     /** Fine del cronometro in corso (null = nessuno): a ogni nuovo cronometro il tabellone riceve subito il tempo giusto. */
@@ -487,7 +495,7 @@ class MatchController(
         scope.launch {
             // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
             merge(
-                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd, tvReplay,
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd, tvReplay, ballsAnimation,
             ).collect { publishTv() }
         }
         scope.launch {
@@ -547,6 +555,7 @@ class MatchController(
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
+                balls = ballsAnimation.value,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -2914,6 +2923,7 @@ class MatchController(
         persist()
         if (needsService()) MatchService.start(app)
         batteryWarned.clear()
+        ballsPending = false
         warnLowBandsAtStart()
         fetchLocation()
         // "Primo set" · "[nome] al servizio" · "gioco": il tempo partita parte su "gioco".
@@ -2977,7 +2987,14 @@ class MatchController(
     /** [note]: detto prima del punteggio e scritto davanti al messaggio (il richiamo che ha dato il punto). */
     private fun afterTransition(state: MatchState, t: Transition, note: String? = null) {
         val n = names()
-        announcer.announce(listOfNotNull(note?.let { com.tennis.scoremanager.voice.Seg.Say(it) }) + calls().afterPoint(state, t, n))
+        val o = live.value?.record?.options ?: options.value
+        val (balls, pending) = com.tennis.scoremanager.model.NewBalls.check(state, t, o.newBallsFirst, o.newBallsEvery, ballsPending)
+        ballsPending = pending
+        announcer.announce(
+            listOfNotNull(note?.let { com.tennis.scoremanager.voice.Seg.Say(it) }) + calls().afterPoint(state, t, n) +
+                listOfNotNull(strings.newBallsCall.takeIf { balls }?.let { com.tennis.scoremanager.voice.Seg.Say(it) }),
+        )
+        if (balls && o.newBallsAnimation) playBallsAnimation()
         pushScore(state, t)
         when {
             t.matchWinner != null -> {
@@ -3008,6 +3025,7 @@ class MatchController(
             t.changeEnds -> s.msgChangeEnds
             else -> pressureMessage(state)
         }.let { m -> if (note == null) m else listOfNotNull(note, m).joinToString(" · ") }
+            .let { m -> if (!balls) m else listOfNotNull(m, strings.newBallsCall).joinToString(" · ") }
         if (msg != null) showMessage(msg)
         showTvMessage(msg)
         if (t.setWinner != null && state.rules.doubles) serveOrderPrompt.value = true
@@ -3176,7 +3194,9 @@ class MatchController(
             // Sulla seconda è un doppio fallo: il punto va a chi risponde.
             if (faultPending.value) { awardPoint(step.state.receiver, kind = PointKind.DOUBLE_FAULT, note = text); return }
             fault()
-        }
+        } else startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
+        // Il richiamo è dato: la proposta dello shot clock sparisce e i 25" ripartono.
+        shotClockOut.value = false
         announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
         showTvMessage(text)
         showMessage(text)
@@ -3214,6 +3234,65 @@ class MatchController(
         val text = if (ends) strings.endsFixed else strings.serverFixed(n.players(state.server).getOrNull(state.serverPlayer) ?: n.side(state.server))
         showMessage(text)
         showTvMessage(text)
+    }
+
+    /** L'animazione del cambio palle sul telefono e sul tabellone TV, per qualche secondo (anche per provarla). */
+    fun playBallsAnimation() {
+        ballsJob?.cancel()
+        ballsAnimation.value = System.currentTimeMillis()
+        ballsJob = scope.launch {
+            delay(BALLS_ANIMATION_MS)
+            ballsAnimation.value = null
+        }
+    }
+
+    fun stopBallsAnimation() {
+        ballsJob?.cancel()
+        ballsAnimation.value = null
+    }
+
+    /**
+     * Il punteggio messo a mano: i set finiti, i game e i punti di adesso e chi serve. Si continua da qui; Annulla lo
+     * toglie. false = non si può giocare con queste regole.
+     */
+    fun setScore(sets: List<com.tennis.scoremanager.model.SetScore>, g1: Int, g2: Int, pt1: Int, pt2: Int, server: Side, serverPlayer: Int): Boolean {
+        val lm = live.value ?: return false
+        if (closing || lm.state.isFinished || endDialog.value) return false
+        if (!ScoreEngine.validScore(lm.state.rules, sets, g1, g2, pt1, pt2)) return false
+        askDetail(null)
+        faultPending.value = false
+        val event = MatchEvent.ScoreSet(sets, g1, g2, pt1, pt2, server, serverPlayer, System.currentTimeMillis())
+        val state = ScoreEngine.apply(lm.state, event).state
+        commit(lm.record.copy(events = lm.record.events + event), state)
+        ballsPending = false
+        pushScore(state, null)
+        announcer.announce(calls().correction(state, names()))
+        showMessage(strings.scoreSetApplied)
+        showTvMessage(strings.scoreSetApplied)
+        if (!lm.record.suspended && lm.record.startedAt != null) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
+        return true
+    }
+
+    /** Doppio: chi risponde da destra in ciascuna squadra, per il set in corso (si può correggere quando serve). */
+    fun setReceiveOrder(deuceP1: Int, deuceP2: Int) {
+        val lm = live.value ?: return
+        if (closing || lm.state.isFinished || !lm.state.rules.doubles) return
+        val event = MatchEvent.ReceiveOrder(lm.state.setNumber, deuceP1, deuceP2)
+        val state = ScoreEngine.apply(lm.state, event).state
+        commit(lm.record.copy(events = lm.record.events + event), state)
+    }
+
+    /** Una nota dell'arbitro durante la partita: va nelle note della partita (riepilogo, PDF, testo condiviso) con l'ora e il punteggio. */
+    fun addMatchNote(text: String) {
+        val lm = live.value ?: return
+        val t = text.trim().take(300)
+        if (t.isEmpty()) return
+        // I set finiti e i game del set in corso: "6-3 2-1".
+        val score = listOfNotNull(Reports.scoreLine(lm.state, Side.P1).ifBlank { null }, "${lm.state.g1}-${lm.state.g2}").joinToString(" ")
+        val line = "${Reports.time(System.currentTimeMillis(), lm.record.options.lang)} ($score) $t"
+        setRecord(lm.record.copy(notes = listOf(lm.record.notes.trim(), line).filter { it.isNotEmpty() }.joinToString("\n")))
+        persist()
+        showMessage(strings.noteAdded)
     }
 
     /** I 5 minuti di riscaldamento, prima del primo punto: il tempo partita parte solo col primo punto. */
@@ -4202,6 +4281,7 @@ class MatchController(
     }
 
     private fun startCountdown(kind: CountdownKind, seconds: Int) {
+        shotClockOut.value = false
         cdKind = kind
         cdEnd = SystemClock.elapsedRealtime() + seconds * 1000L
         countdown.value = CountdownUi(kind, seconds)
@@ -4209,6 +4289,7 @@ class MatchController(
     }
 
     private fun stopCountdown() {
+        shotClockOut.value = false
         cdKind = null
         countdown.value = null
         tvCountdownEnd.value = null
@@ -4219,6 +4300,11 @@ class MatchController(
         if (live.value != null) clockMs.value = currentClock(now)
         cdKind?.let { k ->
             val rem = ((cdEnd - now + 999) / 1000).coerceAtLeast(0).toInt()
+            // Shot clock a zero a partita in corso: si propone la violazione di tempo (sparisce col punto dopo).
+            if (rem == 0 && k == CountdownKind.SHOT_CLOCK && !shotClockOut.value) {
+                val lm = live.value
+                if (lm != null && runningSince != null && !lm.state.isFinished && !lm.record.suspended && !endDialog.value) shotClockOut.value = true
+            }
             if (rem == 0 && k != CountdownKind.SHOT_CLOCK) {
                 // Finita la pausa parte lo shot clock di 25".
                 startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)

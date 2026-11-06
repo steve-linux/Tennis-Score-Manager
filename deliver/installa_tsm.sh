@@ -7473,6 +7473,10 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
 
 **Korrekturen**: Hat der Falsche aufgeschlagen (im Doppel auch der falsche Partner), lässt **Schiri › Aufschläger korrigieren** ab jetzt den aufschlagen, den du antippst; **Seiten korrigieren** tauscht die Seiten. Der Spielstand bleibt, wie es die Regeln wollen: Die gespielten Punkte zählen. **Zurück** nimmt die Korrektur zurück.
 
+**Mehr unter Schiri**: **Spielstand setzen** setzt Sätze, Spiele, Punkte und wer aufschlägt (für eine Partie, die ohne die App begonnen hat, oder um wieder mit dem Platz übereinzustimmen), und es geht von dort weiter; diese Punkte zählen nicht in der Statistik. Im Doppel sagt **Rückschlagfolge**, wer in jeder Mannschaft rechts (Einstand) returniert: Sie wird auch zu Satzbeginn mit der Aufschlagfolge gewählt, und unter der Taste der rückschlagenden Mannschaft steht, wer returniert. **Notiz hinzufügen** schreibt eine Zeile mit Uhrzeit und Spielstand in die Notizen der Partie (Zusammenfassung, PDF und geteilter Text). Wenn die Shot Clock null erreicht, erscheint **25 Sekunden vorbei: Zeitverstoß?** mit beiden Spielern: ein Tippen, und die Strafe ist notiert.
+
+**Ballwechsel**: In den Regeln der Partie wählt man, wann (7 / 9, 9 / 11, 11 / 13: das erste Mal nach so vielen Spielen, dann alle so viele; der Tiebreak zählt als ein Spiel). Im richtigen Moment sagen Stimme und TV **Neue Bälle**; fällt er auf den Beginn eines Tiebreaks, kommt er zum zweiten Spiel des nächsten Satzes. Mit **Animation beim Ballwechsel** läuft auf dem Telefon und auf der TV-Anzeige eine Animation von einigen Sekunden (antippen schließt sie); **Animation ausprobieren** zeigt sie sofort.
+
 **Speichern**: Das Match speichert sich bei jedem Punkt von selbst. Im Reiter **Spielen** löscht man ein unterbrochenes Match, indem man sein *Fortsetzen* **gedrückt hält**; alle unterbrochenen Matches stehen unter **Fortschritt › Verlauf › Unterbrochen**, zum Fortsetzen oder Löschen (mehrere angehakt auch zusammen). *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
 
 ### 7.1 Training mit dem Gurt
@@ -8049,6 +8053,10 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 **Corrections**: if the wrong player served (in doubles, also the wrong partner), **Umpire › Fix who serves** makes the player you tap serve from now on; **Fix the ends** swaps the ends. The score stays as it is, as the rules say: the points played count. **Undo** removes the correction.
 
+**More in Umpire**: **Set the score** sets sets, games, points and who serves (for a match started without the app, or to get back in line with the court) and play goes on from there; those points are not in the statistics. In doubles **Receiving order** says who receives on the right (deuce) side in each team: it is also chosen at the start of a set, together with the serving order, and under the receiving team's button you see who receives. **Add a note** writes a line with the time and the score in the match notes (summary, PDF and shared text). When the shot clock reaches zero, **25 seconds gone: time violation?** appears with the two players: one tap and the penalty is recorded.
+
+**Ball change**: in the match rules you choose when (7 / 9, 9 / 11, 11 / 13: the first time after so many games, then every so many; the tie-break counts as one game). At the right moment the voice and the TV say **New balls**; if it falls at the start of a tie-break it moves to the second game of the next set. With **Ball change animation** on, a few-second animation plays on the phone and on the TV scoreboard (tap to close it); **Try the animation** shows it straight away.
+
 **Saving**: the match saves itself at every point. On the **Play** tab a suspended match is deleted by **long-pressing** its *Resume*; all suspended matches are in **Progress › History › Suspended**, to resume or delete (ticking several, also together). *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
 ### 7.1 Workout with the strap
@@ -8623,6 +8631,10 @@ Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos
 **Pausas, calentamiento y descalificación**: también en **Árbitro**, antes del primer punto está **Calentamiento** (5 minutos; el tiempo del partido empieza con el primer punto). **Tiempo médico** (3 minutos) y **Baño o cambio de ropa** (5 minutos) preguntan para quién es la pausa y ponen en marcha el tiempo, que se ve arriba y en la TV; el resumen dice cuántas pausas pidió cada uno y **Anular** quita la última. **Descalificación** termina el partido como la retirada, con la marca `desc.`; en los torneos el resultado entra así. En los torneos, en la ficha del partido, también está el **Doble w.o.** (no se presenta ninguno): no pasa nadie y el rival de la ronda siguiente pasa solo. En los grupos un w.o. cuenta 6-0 6-0 y, con retirada o descalificación, el set interrumpido y los que faltan van para quien gana. En los equipos, en un partido de la eliminatoria, **W.o. a nuestro favor** y **W.o. a su favor** escriben 6-0 6-0 o 0-6 0-6.
 
 **Correcciones**: si sacó quien no debía (en dobles, también el compañero equivocado), **Árbitro › Corregir quién saca** hace sacar desde ahora a quien toques; **Corregir los lados** cambia los lados. El marcador no cambia, como dice el reglamento: los puntos jugados valen. **Anular** quita la corrección.
+
+**Más en Árbitro**: **Poner el marcador** fija sets, juegos, puntos y quién saca (para un partido empezado sin la app, o para cuadrar con la pista) y se sigue desde ahí; esos puntos no entran en las estadísticas. En dobles, **Orden de resto** dice quién resta a la derecha (iguales) en cada equipo: también se elige al empezar el set, junto con el orden de saque, y bajo el botón del equipo que recibe se ve quién resta. **Añadir una nota** escribe una línea con la hora y el marcador en las notas del partido (resumen, PDF y texto compartido). Cuando el shot clock llega a cero aparece **25 segundos pasados: ¿infracción de tiempo?** con los dos jugadores: un toque y la penalización queda anotada.
+
+**Cambio de bolas**: en las reglas del partido se elige cuándo (7 / 9, 9 / 11, 11 / 13: la primera vez tras tantos juegos, luego cada tantos; el tie-break cuenta como un juego). En el momento justo la voz y la TV dicen **Bolas nuevas**; si cae al inicio de un tie-break, pasa al segundo juego del set siguiente. Con **Animación del cambio de bolas** activada, en el teléfono y en el marcador de la TV sale una animación de unos segundos (toca para cerrarla); **Probar la animación** la muestra enseguida.
 
 **Guardado**: el partido se guarda solo en cada punto. En la pestaña **Jugar** un partido suspendido se elimina **manteniendo pulsado** su *Reanudar*; todos los suspendidos están en **Progresos › Historial › Suspendidos**, para reanudar o eliminar (marcando varios, también a la vez). *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
 
@@ -9199,6 +9211,10 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 **Corrections** : si le mauvais joueur a servi (en double, aussi le mauvais partenaire), **Arbitre › Corriger qui sert** fait servir dès maintenant le joueur que vous touchez ; **Corriger les côtés** échange les côtés. Le score ne change pas, comme le veut le règlement : les points joués comptent. **Annuler** retire la correction.
 
+**Autres options dans Arbitre** : **Régler le score** fixe sets, jeux, points et qui sert (pour un match commencé sans l'appli, ou pour se recaler sur le court) et on continue de là ; ces points n'entrent pas dans les statistiques. En double, **Ordre de retour** dit qui retourne à droite (égalité) dans chaque équipe : on le choisit aussi en début de set, avec l'ordre de service, et sous le bouton de l'équipe qui reçoit on voit qui retourne. **Ajouter une note** écrit une ligne avec l'heure et le score dans les notes du match (résumé, PDF et texte partagé). Quand le chrono des 25 secondes arrive à zéro, **25 secondes passées : infraction de temps ?** apparaît avec les deux joueurs : un toucher et la pénalité est notée.
+
+**Changement de balles** : dans les règles du match on choisit quand (7 / 9, 9 / 11, 11 / 13 : la première fois après tant de jeux, puis tous les tant ; le tie-break compte comme un jeu). Au bon moment la voix et la TV disent **Balles neuves** ; s'il tombe au début d'un tie-break, il passe au deuxième jeu du set suivant. Avec **Animation du changement de balles** activée, une animation de quelques secondes passe sur le téléphone et sur le tableau TV (touchez pour la fermer) ; **Essayer l'animation** la montre tout de suite.
+
 **Sauvegardes** : le match s'enregistre tout seul à chaque point. Dans l'onglet **Jouer**, un match suspendu se supprime en **appuyant longuement** sur son *Reprendre* ; tous les matchs suspendus sont dans **Progrès › Historique › Suspendus**, à reprendre ou supprimer (en en cochant plusieurs, aussi ensemble). *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
 ### 7.1 Entraînement avec la ceinture
@@ -9773,6 +9789,10 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 **Pause, riscaldamento e squalifica**: sempre in **Arbitro**, prima del primo punto c'è **Riscaldamento** (5 minuti, il tempo partita parte col primo punto). **Medical timeout** (3 minuti) e **Bagno o cambio d'abiti** (5 minuti) chiedono per chi è la pausa e fanno partire il tempo, che si vede in alto e sulla TV; il riepilogo dice quante pause ha chiesto ciascuno e **Annulla** toglie l'ultima. **Squalifica** chiude la partita come il ritiro, col segno `squal.`; nei tornei il risultato entra così. Nei tornei, nella scheda della partita, c'è anche il **Doppio w.o.** (non si presenta nessuno dei due): non passa nessuno e l'avversario del turno dopo passa da solo. Nei gironi un w.o. conta 6-0 6-0 e, col ritiro o la squalifica, il set interrotto e quelli che mancano vanno a chi vince. Nelle squadre, in una partita dell'incontro, **W.o. a nostro favore** e **W.o. a loro favore** scrivono 6-0 6-0 o 0-6 0-6.
 
 **Correzioni**: se ha servito chi non doveva (nel doppio anche il compagno sbagliato), **Arbitro › Correggi chi serve** fa servire da adesso chi tocchi tu; con **Correggi i lati del campo** si scambiano i lati. Il punteggio resta com'è, come vuole il regolamento: i punti giocati valgono. **Annulla** toglie la correzione.
+
+**Altro in Arbitro**: **Imposta punteggio** mette set, game, punti e chi serve (per una partita iniziata senza l'app o da rimettere in pari col campo) e si continua da lì; quei punti non entrano nelle statistiche. Nel doppio **Ordine di risposta** dice chi risponde da destra (parità) in ogni squadra: si sceglie anche a inizio set, insieme all'ordine di servizio, e sotto il tasto di chi riceve compare chi risponde. **Aggiungi una nota** scrive una riga con l'ora e il punteggio nelle note della partita (riepilogo, PDF e testo condiviso). Quando lo shot clock arriva a zero compare **25 secondi passati: violazione di tempo?** con i due giocatori: un tocco e il richiamo è segnato.
+
+**Cambio palle**: nelle regole della partita si sceglie quando (7 / 9, 9 / 11, 11 / 13: la prima volta dopo tanti game, poi ogni tanti; il tie-break conta come un game). Al momento giusto la voce e la TV dicono **Palle nuove**; se cade all'inizio di un tie-break si rimanda al secondo game del set dopo. Con **Animazione del cambio palle** acceso, sul telefono e sul tabellone TV parte un'animazione di qualche secondo (tocca per chiuderla); **Prova l'animazione** la fa vedere subito.
 
 **Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
@@ -10349,6 +10369,10 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
 
 **Correções**: se serviu quem não devia (em pares, também o parceiro errado), **Árbitro › Corrigir quem serve** faz servir a partir de agora quem tocares; **Corrigir os lados** troca os lados. O placar fica como está, como diz o regulamento: os pontos jogados valem. **Anular** retira a correção.
 
+**Mais em Árbitro**: **Definir o placar** fixa sets, jogos, pontos e quem serve (para uma partida começada sem a app, ou para acertar com o court) e continua-se daí; esses pontos não entram nas estatísticas. Em pares, **Ordem de receção** diz quem recebe à direita (iguais) em cada equipa: também se escolhe no início do set, junto com a ordem de serviço, e por baixo do botão da equipa que recebe aparece quem recebe. **Adicionar uma nota** escreve uma linha com a hora e o placar nas notas da partida (resumo, PDF e texto partilhado). Quando o shot clock chega a zero aparece **25 segundos passados: violação de tempo?** com os dois jogadores: um toque e a penalização fica registada.
+
+**Troca de bolas**: nas regras da partida escolhe-se quando (7 / 9, 9 / 11, 11 / 13: a primeira vez depois de tantos jogos, depois a cada tantos; o tie-break conta como um jogo). No momento certo a voz e a TV dizem **Bolas novas**; se calhar no início de um tie-break, passa para o segundo jogo do set seguinte. Com **Animação da troca de bolas** ligada, aparece no telefone e no placar da TV uma animação de alguns segundos (toca para a fechar); **Experimentar a animação** mostra-a logo.
+
 **Salvamento**: a partida é salva sozinha a cada ponto. Na aba **Jogar** uma partida suspensa se exclui **mantendo pressionado** o seu *Retomar*; todas as suspensas estão em **Progresso › Histórico › Suspensas**, para retomar ou excluir (marcando várias, também juntas). *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
 ### 7.1 Treino com a cinta
@@ -10814,6 +10838,42 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   #replay video { width: 100%; height: 100%; object-fit: contain; }
   #rl { position: absolute; top: calc(3 * var(--vh)); left: calc(3 * var(--vw)); padding: .3em .7em; border-radius: .3em;
         background: var(--orange); color: #111; font: 900 calc(4 * var(--vh)) sans-serif; letter-spacing: .08em; }
+  /* Cambio palle: il tubo sale, salta il tappo, escono tre palle che rimbalzano e arriva la scritta. */
+  #balls { display: none; position: fixed; inset: 0; z-index: 45; overflow: hidden;
+           background: radial-gradient(ellipse at 50% 60%, rgba(30,46,70,.96), rgba(5,7,11,.98)); }
+  #balls.on { display: block; animation: bfade 5.5s ease forwards; }
+  @keyframes bfade { 0% { opacity: 0; } 6% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; } }
+  #bt { position: absolute; left: 50%; bottom: 8vh; width: 18vh; height: 46vh; margin-left: -9vh; border-radius: 4vh 4vh 3vh 3vh;
+        background: linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.28) 35%, rgba(255,255,255,.08) 70%, rgba(255,255,255,.2));
+        border: .5vh solid rgba(255,255,255,.45); box-shadow: 0 0 6vh rgba(198,244,50,.25); transform: translateY(70vh); }
+  #balls.on #bt { animation: btube 5.5s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes btube { 0% { transform: translateY(70vh); } 12% { transform: translateY(0); } 70% { transform: translateY(0); opacity: 1; } 85% { transform: translateY(60vh); opacity: 0; } 100% { transform: translateY(60vh); opacity: 0; } }
+  #lid { position: absolute; left: -1.5vh; right: -1.5vh; top: -3.2vh; height: 4.5vh; border-radius: 1.6vh; background: #C6F432; box-shadow: inset 0 -.8vh 0 rgba(0,0,0,.25); }
+  #balls.on #lid { animation: blid 5.5s ease forwards; }
+  @keyframes blid { 0%, 16% { transform: none; opacity: 1; } 26% { transform: translate(-22vw, -52vh) rotate(-260deg); opacity: 1; } 34%, 100% { transform: translate(-34vw, -20vh) rotate(-420deg); opacity: 0; } }
+  .nb { position: absolute; left: 50%; bottom: 40vh; width: 16vh; height: 16vh; margin-left: -8vh; border-radius: 50%; overflow: hidden; opacity: 0;
+          background: radial-gradient(circle at 34% 30%, #F6FFB0, #C6F432 42%, #8DB21A 100%); box-shadow: 0 2vh 4vh rgba(0,0,0,.5); }
+  .nb::before, .nb::after { content: ""; position: absolute; width: 100%; height: 100%; border: .9vh solid rgba(255,255,255,.92); border-radius: 50%; }
+  .nb::before { left: -62%; top: 0; }
+  .nb::after { left: 62%; top: 0; }
+  #balls.on .nb { animation: bfly 5.5s cubic-bezier(.3,.7,.4,1) forwards; }
+  #balls.on .b1 { --x: -32vw; --d: 0s; }
+  #balls.on .b2 { --x: 0vw; --d: .18s; }
+  #balls.on .b3 { --x: 32vw; --d: .36s; }
+  #balls.on .nb { animation-delay: var(--d); }
+  @keyframes bfly {
+    0%, 18% { opacity: 0; transform: translate(0, 10vh) scale(.6) rotate(0); }
+    20% { opacity: 1; }
+    30% { transform: translate(calc(var(--x) * .6), -40vh) scale(1) rotate(200deg); }
+    40% { transform: translate(var(--x), -6vh) scale(1, .86) rotate(330deg); }
+    46% { transform: translate(var(--x), -16vh) scale(1) rotate(380deg); }
+    52%, 86% { opacity: 1; transform: translate(var(--x), -8vh) scale(1) rotate(420deg); }
+    100% { opacity: 0; transform: translate(var(--x), -8vh) scale(1.2) rotate(460deg); }
+  }
+  #bw { position: absolute; left: 0; right: 0; top: 14vh; text-align: center; color: #F1F5FB; opacity: 0;
+        font: 900 min(14vh, 9vw) sans-serif; letter-spacing: .12em; text-shadow: 0 0 4vh rgba(198,244,50,.55); }
+  #balls.on #bw { animation: bword 5.5s ease forwards; }
+  @keyframes bword { 0%, 38% { opacity: 0; transform: scale(.4); letter-spacing: .6em; } 48% { opacity: 1; transform: scale(1.08); } 54%, 88% { opacity: 1; transform: scale(1); letter-spacing: .12em; } 100% { opacity: 0; transform: scale(1.1); } }
   /* Torneo del circolo: sopra il punteggio (sotto la moviola), pagine che si alternano. */
   #club { display: none; position: fixed; inset: 0; z-index: 40; background: #05070B; color: #F1F5FB; font-family: sans-serif;
           padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
@@ -10875,6 +10935,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
 </div>
 <div id="banner"></div>
 <div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
+<div id="balls"><div id="bw"></div><div class="nb b1"></div><div class="nb b2"></div><div class="nb b3"></div><div id="bt"><div id="lid"></div></div></div>
 <div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
 
@@ -10882,12 +10943,12 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
      Copia di quelli dell'app: TvSnapshotTest controlla che siano uguali e, se no, stampa il blocco giusto. -->
 <script type="application/json" id="texts">
 {
-"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
-"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
-"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
-"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
-"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
-"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
+"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM","newBalls":"Palle nuove"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
+"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard","newBalls":"New balls"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
+"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM","newBalls":"Balles neuves"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
+"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel","newBalls":"Neue Bälle"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
+"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM","newBalls":"Bolas nuevas"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
+"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM","newBalls":"Bolas novas"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
 }
 </script>
 <script>
@@ -11116,6 +11177,23 @@ function onState(json) {
   render();
   replayUpdate(S.replay);
   clubUpdate(S.club);
+  ballsUpdate(S.balls);
+}
+
+// ------------------------------------------------------------------ cambio palle
+// Un numero nuovo in balls fa partire l'animazione (dura 5,5 s); null la ferma.
+let ballsSeen = null, ballsTimer = 0;
+function ballsUpdate(b) {
+  const box = $("balls");
+  if (!b) { if (ballsSeen) { box.classList.remove("on"); ballsSeen = null; } return; }
+  if (b === ballsSeen) return;
+  ballsSeen = b;
+  $("bw").textContent = ((S.labels && S.labels.newBalls) || "").toUpperCase();
+  box.classList.remove("on");
+  void box.offsetWidth;
+  box.classList.add("on");
+  clearTimeout(ballsTimer);
+  ballsTimer = setTimeout(() => box.classList.remove("on"), 5600);
 }
 // ------------------------------------------------------------------ torneo del circolo
 // Le pagine (tabellone, gironi, ordine di gioco) si alternano ogni club.seconds secondi; un torneo nuovo riparte
@@ -11646,6 +11724,7 @@ class MatchController(
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
         const val SET_BREAK_S = 120          // ITF: 120" a fine set
+        const val BALLS_ANIMATION_MS = 5_500L
         const val WARMUP_S = 300             // ITF: 5' di riscaldamento
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
@@ -11743,6 +11822,13 @@ class MatchController(
     val tv = MutableStateFlow(storage.tv)
     val tvServer = TvServer(app)
     private val tvMessage = MutableStateFlow<String?>(null)
+    /** L'animazione del cambio palle: quando è partita (sul telefono e sul tabellone), null = niente. */
+    val ballsAnimation = MutableStateFlow<Long?>(null)
+    private var ballsJob: Job? = null
+    /** Un cambio palle rimandato dall'inizio di un tie-break al secondo game del set dopo. */
+    private var ballsPending = false
+    /** Lo shot clock è arrivato a zero senza che si giocasse: si propone la violazione di tempo. */
+    val shotClockOut = MutableStateFlow(false)
     private var tvMessageJob: Job? = null
     private var tvSeq = 0L
     /** Fine del cronometro in corso (null = nessuno): a ogni nuovo cronometro il tabellone riceve subito il tempo giusto. */
@@ -11932,7 +12018,7 @@ class MatchController(
         scope.launch {
             // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
             merge(
-                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd, tvReplay,
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd, tvReplay, ballsAnimation,
             ).collect { publishTv() }
         }
         scope.launch {
@@ -11992,6 +12078,7 @@ class MatchController(
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
+                balls = ballsAnimation.value,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -14359,6 +14446,7 @@ class MatchController(
         persist()
         if (needsService()) MatchService.start(app)
         batteryWarned.clear()
+        ballsPending = false
         warnLowBandsAtStart()
         fetchLocation()
         // "Primo set" · "[nome] al servizio" · "gioco": il tempo partita parte su "gioco".
@@ -14422,7 +14510,14 @@ class MatchController(
     /** [note]: detto prima del punteggio e scritto davanti al messaggio (il richiamo che ha dato il punto). */
     private fun afterTransition(state: MatchState, t: Transition, note: String? = null) {
         val n = names()
-        announcer.announce(listOfNotNull(note?.let { com.tennis.scoremanager.voice.Seg.Say(it) }) + calls().afterPoint(state, t, n))
+        val o = live.value?.record?.options ?: options.value
+        val (balls, pending) = com.tennis.scoremanager.model.NewBalls.check(state, t, o.newBallsFirst, o.newBallsEvery, ballsPending)
+        ballsPending = pending
+        announcer.announce(
+            listOfNotNull(note?.let { com.tennis.scoremanager.voice.Seg.Say(it) }) + calls().afterPoint(state, t, n) +
+                listOfNotNull(strings.newBallsCall.takeIf { balls }?.let { com.tennis.scoremanager.voice.Seg.Say(it) }),
+        )
+        if (balls && o.newBallsAnimation) playBallsAnimation()
         pushScore(state, t)
         when {
             t.matchWinner != null -> {
@@ -14453,6 +14548,7 @@ class MatchController(
             t.changeEnds -> s.msgChangeEnds
             else -> pressureMessage(state)
         }.let { m -> if (note == null) m else listOfNotNull(note, m).joinToString(" · ") }
+            .let { m -> if (!balls) m else listOfNotNull(m, strings.newBallsCall).joinToString(" · ") }
         if (msg != null) showMessage(msg)
         showTvMessage(msg)
         if (t.setWinner != null && state.rules.doubles) serveOrderPrompt.value = true
@@ -14621,7 +14717,9 @@ class MatchController(
             // Sulla seconda è un doppio fallo: il punto va a chi risponde.
             if (faultPending.value) { awardPoint(step.state.receiver, kind = PointKind.DOUBLE_FAULT, note = text); return }
             fault()
-        }
+        } else startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
+        // Il richiamo è dato: la proposta dello shot clock sparisce e i 25" ripartono.
+        shotClockOut.value = false
         announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
         showTvMessage(text)
         showMessage(text)
@@ -14659,6 +14757,65 @@ class MatchController(
         val text = if (ends) strings.endsFixed else strings.serverFixed(n.players(state.server).getOrNull(state.serverPlayer) ?: n.side(state.server))
         showMessage(text)
         showTvMessage(text)
+    }
+
+    /** L'animazione del cambio palle sul telefono e sul tabellone TV, per qualche secondo (anche per provarla). */
+    fun playBallsAnimation() {
+        ballsJob?.cancel()
+        ballsAnimation.value = System.currentTimeMillis()
+        ballsJob = scope.launch {
+            delay(BALLS_ANIMATION_MS)
+            ballsAnimation.value = null
+        }
+    }
+
+    fun stopBallsAnimation() {
+        ballsJob?.cancel()
+        ballsAnimation.value = null
+    }
+
+    /**
+     * Il punteggio messo a mano: i set finiti, i game e i punti di adesso e chi serve. Si continua da qui; Annulla lo
+     * toglie. false = non si può giocare con queste regole.
+     */
+    fun setScore(sets: List<com.tennis.scoremanager.model.SetScore>, g1: Int, g2: Int, pt1: Int, pt2: Int, server: Side, serverPlayer: Int): Boolean {
+        val lm = live.value ?: return false
+        if (closing || lm.state.isFinished || endDialog.value) return false
+        if (!ScoreEngine.validScore(lm.state.rules, sets, g1, g2, pt1, pt2)) return false
+        askDetail(null)
+        faultPending.value = false
+        val event = MatchEvent.ScoreSet(sets, g1, g2, pt1, pt2, server, serverPlayer, System.currentTimeMillis())
+        val state = ScoreEngine.apply(lm.state, event).state
+        commit(lm.record.copy(events = lm.record.events + event), state)
+        ballsPending = false
+        pushScore(state, null)
+        announcer.announce(calls().correction(state, names()))
+        showMessage(strings.scoreSetApplied)
+        showTvMessage(strings.scoreSetApplied)
+        if (!lm.record.suspended && lm.record.startedAt != null) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
+        return true
+    }
+
+    /** Doppio: chi risponde da destra in ciascuna squadra, per il set in corso (si può correggere quando serve). */
+    fun setReceiveOrder(deuceP1: Int, deuceP2: Int) {
+        val lm = live.value ?: return
+        if (closing || lm.state.isFinished || !lm.state.rules.doubles) return
+        val event = MatchEvent.ReceiveOrder(lm.state.setNumber, deuceP1, deuceP2)
+        val state = ScoreEngine.apply(lm.state, event).state
+        commit(lm.record.copy(events = lm.record.events + event), state)
+    }
+
+    /** Una nota dell'arbitro durante la partita: va nelle note della partita (riepilogo, PDF, testo condiviso) con l'ora e il punteggio. */
+    fun addMatchNote(text: String) {
+        val lm = live.value ?: return
+        val t = text.trim().take(300)
+        if (t.isEmpty()) return
+        // I set finiti e i game del set in corso: "6-3 2-1".
+        val score = listOfNotNull(Reports.scoreLine(lm.state, Side.P1).ifBlank { null }, "${lm.state.g1}-${lm.state.g2}").joinToString(" ")
+        val line = "${Reports.time(System.currentTimeMillis(), lm.record.options.lang)} ($score) $t"
+        setRecord(lm.record.copy(notes = listOf(lm.record.notes.trim(), line).filter { it.isNotEmpty() }.joinToString("\n")))
+        persist()
+        showMessage(strings.noteAdded)
     }
 
     /** I 5 minuti di riscaldamento, prima del primo punto: il tempo partita parte solo col primo punto. */
@@ -15647,6 +15804,7 @@ class MatchController(
     }
 
     private fun startCountdown(kind: CountdownKind, seconds: Int) {
+        shotClockOut.value = false
         cdKind = kind
         cdEnd = SystemClock.elapsedRealtime() + seconds * 1000L
         countdown.value = CountdownUi(kind, seconds)
@@ -15654,6 +15812,7 @@ class MatchController(
     }
 
     private fun stopCountdown() {
+        shotClockOut.value = false
         cdKind = null
         countdown.value = null
         tvCountdownEnd.value = null
@@ -15664,6 +15823,11 @@ class MatchController(
         if (live.value != null) clockMs.value = currentClock(now)
         cdKind?.let { k ->
             val rem = ((cdEnd - now + 999) / 1000).coerceAtLeast(0).toInt()
+            // Shot clock a zero a partita in corso: si propone la violazione di tempo (sparisce col punto dopo).
+            if (rem == 0 && k == CountdownKind.SHOT_CLOCK && !shotClockOut.value) {
+                val lm = live.value
+                if (lm != null && runningSince != null && !lm.state.isFinished && !lm.record.suspended && !endDialog.value) shotClockOut.value = true
+            }
             if (rem == 0 && k != CountdownKind.SHOT_CLOCK) {
                 // Finita la pausa parte lo shot clock di 25".
                 startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
@@ -20689,6 +20853,11 @@ data class MatchOptions(
     val addressLookup: Boolean = false,
     /** Fasce cardio Bluetooth: battito e calorie, in qualsiasi modalità. */
     val heartRate: Boolean = false,
+    /** Cambio palle: la prima volta dopo [newBallsFirst] game, poi ogni [newBallsEvery] (0 = niente). */
+    val newBallsFirst: Int = 0,
+    val newBallsEvery: Int = 0,
+    /** Al cambio palle, l'animazione sul telefono e sul tabellone TV. */
+    val newBallsAnimation: Boolean = false,
 )
 
 @Serializable
@@ -27961,6 +28130,47 @@ object MembersCsv {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/model/NewBalls.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/model/NewBalls.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.model
+
+/**
+ * Il cambio palle dei tornei: la prima volta dopo [first] game, poi ogni [every] (es. 7 e 9). Il tie-break conta come
+ * un game, il match tie-break pure. Se il cambio tocca all'inizio di un tie-break si rimanda all'inizio del secondo
+ * game del set dopo, come dice il regolamento.
+ */
+object NewBalls {
+    /** Le sequenze che si propongono: (dopo quanti game la prima volta, poi ogni quanti). */
+    val choices: List<Pair<Int, Int>> = listOf(7 to 9, 9 to 11, 11 to 13)
+
+    /** I game giocati finora nella partita. */
+    fun gamesPlayed(s: MatchState): Int = s.sets.sumOf { if (it.matchTiebreak) 1 else it.g1 + it.g2 } + s.g1 + s.g2
+
+    /** Dopo [games] game si cambiano le palle? */
+    fun dueAt(games: Int, first: Int, every: Int): Boolean =
+        first > 0 && (games == first || (every > 0 && games > first && (games - first) % every == 0))
+
+    /**
+     * Dopo il punto che ha portato a [after] con [t]: (si cambiano adesso, resta un cambio rimandato). [pending] dice se
+     * ce n'era uno rimandato dal tie-break.
+     */
+    fun check(after: MatchState, t: Transition, first: Int, every: Int, pending: Boolean): Pair<Boolean, Boolean> {
+        if (first <= 0 || after.isFinished || t.gameWinner == null) return false to pending
+        val due = dueAt(gamesPlayed(after), first, every)
+        return when {
+            // Si comincia il tie-break: il cambio aspetta il secondo game del set dopo.
+            t.tiebreakStarted && due -> false to true
+            // Il primo game del set è finito: tocca a quello rimandato (o a uno che cade proprio qui).
+            pending && after.g1 + after.g2 == 1 && !after.inTiebreak -> true to false
+            else -> due to pending
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/model/Rules.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/model/Rules.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -28117,6 +28327,22 @@ sealed class MatchEvent {
     @Serializable
     @SerialName("endsFix")
     data class EndsFix(val at: Long = 0L) : MatchEvent()
+
+    /**
+     * Il punteggio messo a mano (partita iniziata senza l'app, o da rimettere in pari col campo): i set finiti, i game
+     * del set in corso, i punti del game (o del tie-break) e chi serve adesso. Si continua da qui.
+     */
+    @Serializable
+    @SerialName("scoreSet")
+    data class ScoreSet(
+        val sets: List<SetScore>, val g1: Int, val g2: Int, val pt1: Int, val pt2: Int,
+        val server: Side, val serverPlayer: Int = 0, val at: Long = 0L,
+    ) : MatchEvent()
+
+    /** Doppio: chi risponde da destra (lato parità) in ciascuna squadra, per il set [setNumber]. */
+    @Serializable
+    @SerialName("receiveOrder")
+    data class ReceiveOrder(val setNumber: Int, val deuceP1: Int, val deuceP2: Int) : MatchEvent()
 }
 
 /** Le pause con il loro tempo: medical timeout 3 minuti, bagno o cambio d'abiti fino a 5. */
@@ -28197,6 +28423,9 @@ data class MatchState(
     val retired: Side? = null,
     /** Il ritiro è una squalifica. */
     val disqualified: Boolean = false,
+    /** Doppio: chi risponde da destra in ciascuna squadra nel set in corso (null = non detto). */
+    val recv1: Int? = null,
+    val recv2: Int? = null,
     /** I richiami fatti finora, per tipo: [Penalty] li conta per sapere cosa comporta il prossimo. */
     val codes1: Int = 0,
     val codes2: Int = 0,
@@ -28212,6 +28441,10 @@ data class MatchState(
     fun points(side: Side): Int = if (side == Side.P1) pt1 else pt2
     fun setsWon(side: Side): Int = sets.count { !it.partial && it.winner == side }
     fun order(side: Side): Int = if (side == Side.P1) order1 else order2
+
+    /** Doppio: chi risponde adesso nella squadra che riceve (da destra sui punti pari del game); null = non detto. */
+    val receiverPlayer: Int?
+        get() = (if (receiver == Side.P1) recv1 else recv2)?.let { if ((pt1 + pt2) % 2 == 0) it else 1 - it }
     fun penalties(side: Side, kind: PenaltyKind): Int = when (kind) {
         PenaltyKind.CODE -> if (side == Side.P1) codes1 else codes2
         PenaltyKind.TIME -> if (side == Side.P1) times1 else times2
@@ -28296,6 +28529,66 @@ object ScoreEngine {
         is MatchEvent.Break -> Step(state, null)
         is MatchEvent.ServerFix -> Step(fixServer(state, event.side, event.player), null)
         is MatchEvent.EndsFix -> Step(if (state.isFinished) state else state.copy(p1Left = !state.p1Left), null)
+        is MatchEvent.ScoreSet -> Step(setScore(state, event), null)
+        is MatchEvent.ReceiveOrder ->
+            Step(if (state.isFinished || event.setNumber != state.setNumber) state else state.copy(recv1 = event.deuceP1.coerceIn(0, 1), recv2 = event.deuceP2.coerceIn(0, 1)), null)
+    }
+
+    /** Nel set numero [setsDone] + 1 si gioca solo il match tie-break? */
+    fun matchTiebreakSet(rules: RulesConfig, setsDone: Int): Boolean =
+        rules.format == MatchFormat.MATCH_TIEBREAK_ONLY || (rules.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK && setsDone == 2)
+
+    /** Con questi game del set in corso si gioca il tie-break di set? */
+    fun tiebreakAt(rules: RulesConfig, g1: Int, g2: Int): Boolean = rules.setTiebreak && g1 == rules.gamesPerSet && g2 == rules.gamesPerSet
+
+    /** Un set finito, giocato fino in fondo con queste regole (6-4, 7-5, 7-6; senza tie-break, due game di scarto). */
+    fun validSet(rules: RulesConfig, set: SetScore): Boolean {
+        val n = rules.gamesPerSet
+        val hi = maxOf(set.g1, set.g2); val lo = minOf(set.g1, set.g2)
+        return when {
+            hi == n && lo <= n - 2 -> true
+            hi > n && hi - lo == 2 && (lo >= n - 1) && (!rules.setTiebreak || hi == n + 1) -> true
+            rules.setTiebreak && hi == n + 1 && lo == n -> true
+            else -> false
+        }
+    }
+
+    /**
+     * Il punteggio messo a mano si può giocare: i set sono finiti e nessuno ha già vinto la partita, il set in corso
+     * non è chiuso e il game (o il tie-break) nemmeno.
+     */
+    fun validScore(rules: RulesConfig, sets: List<SetScore>, g1: Int, g2: Int, pt1: Int, pt2: Int): Boolean {
+        if (listOf(g1, g2, pt1, pt2).any { it < 0 }) return false
+        if (sets.any { !validSet(rules, it) }) return false
+        if (Side.entries.any { side -> sets.count { it.winner == side } >= rules.setsToWin }) return false
+        val matchTb = matchTiebreakSet(rules, sets.size)
+        val n = rules.gamesPerSet
+        val hi = maxOf(g1, g2); val lo = minOf(g1, g2)
+        if (!matchTb) {
+            if (hi >= n && hi - lo >= 2) return false
+            if (rules.setTiebreak && hi > n) return false
+        }
+        val tb = matchTb || tiebreakAt(rules, g1, g2)
+        val ph = maxOf(pt1, pt2); val pl = minOf(pt1, pt2)
+        return if (tb) !(ph >= (if (matchTb) 10 else 7) && ph - pl >= 2)
+        else if (rules.noAd) ph <= 3 else ph <= 3 || (ph == 4 && pl == 3)
+    }
+
+    /** Il punteggio messo a mano: si continua da lì, con chi serve deciso adesso. */
+    private fun setScore(s: MatchState, e: MatchEvent.ScoreSet): MatchState {
+        if (s.isFinished || !validScore(s.rules, e.sets, e.g1, e.g2, e.pt1, e.pt2)) return s
+        val matchTb = matchTiebreakSet(s.rules, e.sets.size)
+        val tb = when {
+            matchTb -> TiebreakKind.MATCH
+            tiebreakAt(s.rules, e.g1, e.g2) -> TiebreakKind.SET
+            else -> TiebreakKind.NONE
+        }
+        val set = s.copy(
+            sets = e.sets.map { it.copy(partial = false, matchTiebreak = false) },
+            g1 = if (matchTb) 0 else e.g1, g2 = if (matchTb) 0 else e.g2, pt1 = e.pt1, pt2 = e.pt2, tiebreak = tb,
+            recv1 = null, recv2 = null,
+        )
+        return fixServer(set, e.server, e.serverPlayer)
     }
 
     /**
@@ -28463,6 +28756,8 @@ object ScoreEngine {
             sets = sets, g1 = 0, g2 = 0, pt1 = 0, pt2 = 0,
             tiebreak = nextTiebreak,
             setStartServer = nextStart,
+            // Nel set nuovo l'ordine di risposta si sceglie di nuovo.
+            recv1 = null, recv2 = null,
             order1 = naturalNextServer(s, Side.P1),
             order2 = naturalNextServer(s, Side.P2),
             p1Left = if (change) !s.p1Left else s.p1Left,
@@ -31488,6 +31783,8 @@ data class TvSnapshot(
     val replay: TvReplay? = null,
     /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
     val club: TvClub? = null,
+    /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
+    val balls: Long? = null,
 )
 
 /**
@@ -31578,6 +31875,8 @@ data class TvLabels(
     val fullscreen: String,
     /** Titolo della pagina (document.title). */
     val page: String,
+    /** La scritta dell'animazione del cambio palle. */
+    val newBalls: String = "",
 )
 
 /** Stato dell'app da cui si ricava il tabellone. */
@@ -31600,6 +31899,7 @@ data class TvInput(
     val photos: Map<Side, List<String>> = emptyMap(),
     val replay: TvReplay? = null,
     val club: TvClub? = null,
+    val balls: Long? = null,
 )
 
 object TvSnapshots {
@@ -31677,6 +31977,7 @@ object TvSnapshots {
             labels = labels(s),
             replay = i.replay,
             club = i.club,
+            balls = i.balls,
         )
     }
 
@@ -31685,7 +31986,7 @@ object TvSnapshots {
         vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
         waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
         tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
-        page = s.tvPageTitle,
+        page = s.tvPageTitle, newBalls = s.newBallsCall,
     )
 
     /** "Circolo Tennis · Campo 3" dai dati della pagina 1 (un numero da solo diventa "Campo 3"). */
@@ -33151,6 +33452,9 @@ fun AppRoot(c: MatchController) {
                 Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
             }
         }
+        // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
+        val balls by c.ballsAnimation.collectAsState()
+        if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
     }
 }
 
@@ -34238,6 +34542,149 @@ fun WorkoutStrapCard(c: MatchController) {
         StrapPicker(c, Side.P1, s.playerTag(1), straps[Side.P1], found, straps)
         straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/NewBallsUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/NewBallsUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+/** Durata dell'animazione del cambio palle, come sul tabellone TV. */
+private const val BALLS_MS = 5_500
+
+/** Da 0 a 1 tra [a] e [b] del tempo (fuori, fermo ai capi). */
+private fun phase(t: Float, a: Float, b: Float): Float = ((t - a) / (b - a)).coerceIn(0f, 1f)
+
+private fun lerp(a: Float, b: Float, f: Float) = a + (b - a) * f
+
+/** Rallenta alla fine: come un lancio che arriva. */
+private fun easeOut(f: Float) = 1f - (1f - f) * (1f - f)
+
+/**
+ * Il cambio palle sul telefono: il tubo sale, salta il tappo, escono tre palle che rimbalzano e arriva la scritta.
+ * Tocca per chiudere; [onDone] arriva anche da sola, a fine animazione.
+ */
+@Composable
+fun NewBallsOverlay(text: String, onDone: () -> Unit) {
+    val anim = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        anim.animateTo(1f, tween(BALLS_MS, easing = LinearEasing))
+        onDone()
+    }
+    val t = anim.value
+    val fade = when {
+        t < 0.06f -> t / 0.06f
+        t > 0.88f -> (1f - t) / 0.12f
+        else -> 1f
+    }.coerceIn(0f, 1f)
+    Box(
+        Modifier.fillMaxSize().alpha(fade).background(Brush.radialGradient(listOf(Color(0xF51E2E46), Color(0xFA05070B))))
+            .clickable(remember { MutableInteractionSource() }, null) { onDone() },
+    ) {
+        Canvas(Modifier.fillMaxSize()) { drawBalls(t) }
+        val w = phase(t, 0.38f, 0.48f)
+        Text(
+            text.uppercase(), color = Color(0xFFF1F5FB), fontSize = 40.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center,
+            letterSpacing = (lerp(10f, 3f, phase(t, 0.38f, 0.54f))).sp, maxLines = 1, softWrap = false,
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 110.dp).fillMaxWidth()
+                .alpha(if (t > 0.88f) fade else w).scale(lerp(0.4f, 1f, easeOut(w))),
+        )
+    }
+}
+
+private val ballFill = Brush.radialGradient(listOf(Color(0xFFF6FFB0), Color(0xFFC6F432), Color(0xFF8DB21A)))
+
+private fun DrawScope.drawBalls(t: Float) {
+    val h = size.height
+    val cx = size.width / 2
+    val unit = h / 100f
+    // Il tubo: sale nei primi istanti, se ne va verso la fine.
+    val tubeW = 18 * unit; val tubeH = 46 * unit
+    val rise = 1f - easeOut(phase(t, 0f, 0.12f))
+    val leave = phase(t, 0.70f, 0.85f)
+    val tubeTop = h - 8 * unit - tubeH + (rise * 70 + leave * 60) * unit
+    drawRoundRect(
+        Brush.horizontalGradient(listOf(Color(0x1AFFFFFF), Color(0x47FFFFFF), Color(0x14FFFFFF), Color(0x33FFFFFF)), cx - tubeW / 2, cx + tubeW / 2),
+        Offset(cx - tubeW / 2, tubeTop), Size(tubeW, tubeH), CornerRadius(4 * unit), alpha = 1f - leave,
+    )
+    drawRoundRect(Color(0x73FFFFFF), Offset(cx - tubeW / 2, tubeTop), Size(tubeW, tubeH), CornerRadius(4 * unit), style = Stroke(0.5f * unit), alpha = 1f - leave)
+    // Il tappo: salta e vola via girando.
+    val lid = phase(t, 0.16f, 0.34f)
+    if (lid < 1f) {
+        val lx = cx + lerp(0f, -34f, lid) * size.width / 100f
+        val ly = tubeTop - 3.2f * unit + (if (lid < 0.55f) lerp(0f, -52f, easeOut(lid / 0.55f)) else lerp(-52f, -20f, (lid - 0.55f) / 0.45f)) * unit
+        rotate(-420f * lid, Offset(lx, ly + 2 * unit)) {
+            drawRoundRect(Color(0xFFC6F432), Offset(lx - tubeW / 2 - 1.5f * unit, ly), Size(tubeW + 3 * unit, 4.5f * unit), CornerRadius(1.6f * unit), alpha = 1f - phase(lid, 0.7f, 1f))
+        }
+    }
+    // Le tre palle: escono dal tubo una dopo l'altra, volano, rimbalzano e si fermano in fila (staccate anche in verticale).
+    val r = minOf(8 * unit, size.width * 0.12f)
+    for ((k, x) in listOf(-32f, 0f, 32f).withIndex()) {
+        val start = 0.18f + k * 0.033f
+        val f = phase(t, start, start + 0.34f)
+        if (f <= 0f) continue
+        val dx = x * size.width / 100f
+        val restY = h - 40 * unit - r - (-8 * unit)
+        val (px, py) = when {
+            f < 0.35f -> { val g = easeOut(f / 0.35f); lerp(0f, dx * 0.6f, g) to lerp(h - 40 * unit, h * 0.25f, g) }
+            f < 0.65f -> { val g = (f - 0.35f) / 0.30f; lerp(dx * 0.6f, dx, g) to lerp(h * 0.25f, restY + 2 * unit, g * g) }
+            f < 0.82f -> { val g = (f - 0.65f) / 0.17f; dx to restY + 2 * unit - kotlin.math.sin(g * Math.PI).toFloat() * 10 * unit }
+            else -> dx to restY
+        }
+        val out = phase(t, 0.88f, 1f)
+        drawBall(Offset(cx + px, py), r * (1f + 0.2f * out), 460f * f, 1f - out)
+    }
+}
+
+private fun DrawScope.drawBall(c: Offset, r: Float, angle: Float, alpha: Float) {
+    drawCircle(Color(0x80000000), r, c + Offset(0f, r * 0.25f), alpha = alpha * 0.5f)
+    drawCircle(ballFill, r, c, alpha = alpha)
+    // Le due cuciture bianche, come due archi dai lati.
+    val clip = Path().apply { addOval(androidx.compose.ui.geometry.Rect(c, r)) }
+    clipPath(clip) {
+        rotate(angle, c) {
+            val seam = Stroke(r * 0.11f)
+            drawCircle(Color(0xEBFFFFFF), r, c + Offset(-r * 1.24f, 0f), style = seam, alpha = alpha)
+            drawCircle(Color(0xEBFFFFFF), r, c + Offset(r * 1.24f, 0f), style = seam, alpha = alpha)
+        }
     }
 }
 TSM_EOF
@@ -35618,6 +36065,138 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ScoreSetUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ScoreSetUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.SetScore
+import com.tennis.scoremanager.model.Side
+
+/** Un numero con − e +, da 0 a [max]. */
+@Composable
+private fun Counter(value: Int, max: Int, color: androidx.compose.ui.graphics.Color, onChange: (Int) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { onChange((value - 1).coerceAtLeast(0)) }, enabled = value > 0) { Icon(Icons.Filled.Remove, null) }
+        Text(value.toString(), color = color, fontSize = 22.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center, modifier = Modifier.width(36.dp))
+        IconButton(onClick = { onChange((value + 1).coerceAtMost(max)) }, enabled = value < max) { Icon(Icons.Filled.Add, null) }
+    }
+}
+
+/** I punti del game come si dicono: 0 15 30 40 AD (AD solo contro 40). */
+private val pointLabels = listOf("0", "15", "30", "40", "AD")
+
+/**
+ * Imposta punteggio: i set finiti, i game del set in corso, i punti e chi serve. Parte dal punteggio di adesso; il tasto
+ * di conferma si accende solo con un punteggio che si può giocare con le regole della partita.
+ */
+@Composable
+fun ScoreSetDialog(state: MatchState, names: Names, onSet: (List<SetScore>, Int, Int, Int, Int, Side, Int) -> Unit, onDismiss: () -> Unit) {
+    val s = LocalStrings.current
+    val rules = state.rules
+    var sets by remember { mutableStateOf(state.sets.filter { !it.partial }) }
+    var g1 by remember { mutableIntStateOf(state.g1) }
+    var g2 by remember { mutableIntStateOf(state.g2) }
+    // Ai vantaggi i punti veri (es. 5-4) diventano come si dicono: 40 pari o AD.
+    val deuce = !state.inTiebreak && state.pt1 >= 3 && state.pt2 >= 3
+    var pt1 by remember { mutableIntStateOf(if (deuce) (if (state.pt1 > state.pt2) 4 else 3) else state.pt1) }
+    var pt2 by remember { mutableIntStateOf(if (deuce) (if (state.pt2 > state.pt1) 4 else 3) else state.pt2) }
+    var server by remember { mutableStateOf(state.server) }
+    var serverPlayer by remember { mutableIntStateOf(state.serverPlayer) }
+    val matchTb = ScoreEngine.matchTiebreakSet(rules, sets.size)
+    val tb = matchTb || ScoreEngine.tiebreakAt(rules, g1, g2)
+    val maxGames = rules.gamesPerSet + if (rules.setTiebreak) 1 else 30
+    val ok = ScoreEngine.validScore(rules, sets, g1, g2, pt1, pt2)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(s.scoreSetButton, fontWeight = FontWeight.Black) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.scoreSetHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                Text(names.short(Side.P1) + " – " + names.short(Side.P2), fontWeight = FontWeight.Bold)
+                // I set finiti, uno per riga.
+                Text(s.scoreSetDone, color = TsmColors.TextDim, fontSize = 13.sp)
+                for ((i, set) in sets.withIndex()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Counter(set.g1, maxGames, TsmColors.player(Side.P1)) { v -> sets = sets.mapIndexed { k, x -> if (k == i) x.copy(g1 = v) else x } }
+                        Counter(set.g2, maxGames, TsmColors.player(Side.P2)) { v -> sets = sets.mapIndexed { k, x -> if (k == i) x.copy(g2 = v) else x } }
+                        IconButton(onClick = { sets = sets.filterIndexed { k, _ -> k != i } }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+                    }
+                }
+                if (sets.size < rules.setsToWin * 2 - 2) TextButton(onClick = { sets = sets + SetScore(rules.gamesPerSet, 0) }) { Text(s.scoreSetAdd) }
+                if (!matchTb) {
+                    Text(s.scoreSetGames, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Row {
+                        Counter(g1, maxGames, TsmColors.player(Side.P1)) { g1 = it }
+                        Counter(g2, maxGames, TsmColors.player(Side.P2)) { g2 = it }
+                    }
+                }
+                Text(if (tb) s.scoreSetTbPoints else s.scoreSetPoints, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (tb) {
+                    Row {
+                        Counter(pt1, 99, TsmColors.player(Side.P1)) { pt1 = it }
+                        Counter(pt2, 99, TsmColors.player(Side.P2)) { pt2 = it }
+                    }
+                } else {
+                    // 0 15 30 40 AD per ciascuno: AD vale solo contro 40.
+                    val labels = if (rules.noAd) pointLabels.take(4) else pointLabels
+                    for ((side, value) in listOf(Side.P1 to pt1, Side.P2 to pt2)) {
+                        Segmented(labels.map { SegOption(it, null, TsmColors.player(side), TsmColors.onPlayer(side)) }, value.coerceAtMost(labels.lastIndex), { v ->
+                            if (side == Side.P1) { pt1 = v; if (v == 4) pt2 = 3 else if (pt2 == 4 && v < 3) pt2 = 3 } else { pt2 = v; if (v == 4) pt1 = 3 else if (pt1 == 4 && v < 3) pt1 = 3 }
+                        })
+                    }
+                }
+                Text(s.scoreSetServer, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (side in Side.entries) for ((i, name) in names.players(side).withIndex()) {
+                    val on = server == side && (!rules.doubles || serverPlayer == i)
+                    OutlinedButton(onClick = { server = side; serverPlayer = i }, modifier = Modifier.fillMaxWidth()) {
+                        Text(name + if (on) "  ✓" else "", color = TsmColors.player(side), fontWeight = if (on) FontWeight.Black else FontWeight.Normal)
+                    }
+                }
+                if (!ok) Text(s.scoreSetBad, color = TsmColors.Orange, fontSize = 13.sp)
+            }
+        },
+        confirmButton = { Button(onClick = { onSet(sets, g1, g2, pt1, pt2, server, serverPlayer) }, enabled = ok) { Text(s.confirm) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(s.back) } },
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ServeUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ServeUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -36954,6 +37533,31 @@ interface Strings {
     val endsFixed: String
     val fixUndone: String
     val serverFixed: (String) -> String
+    val scoreSetButton: String
+    val scoreSetHint: String
+    val scoreSetDone: String
+    val scoreSetAdd: String
+    val scoreSetGames: String
+    val scoreSetPoints: String
+    val scoreSetTbPoints: String
+    val scoreSetServer: String
+    val scoreSetBad: String
+    val scoreSetApplied: String
+    val receiveOrderButton: String
+    val receiveSet: String
+    val shotOutAsk: String
+    val newBalls: String
+    val newBallsHint: String
+    val newBallsOff: String
+    val newBallsAnim: String
+    val newBallsAnimHint: String
+    val newBallsCall: String
+    val newBallsPreview: String
+    val noteButton: String
+    val noteHint: String
+    val noteAdded: String
+    val receiveWho: (String) -> String
+    val receiving: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -39177,6 +39781,31 @@ object ItStrings : Strings {
     override val endsFixed = "Lati del campo scambiati"
     override val fixUndone = "Correzione annullata"
     override val serverFixed: (String) -> String = { "Ora serve $it" }
+    override val scoreSetButton = "Imposta punteggio"
+    override val scoreSetHint = "Per una partita iniziata senza l'app, o da rimettere in pari col campo: si continua da qui. Quei punti non entrano nelle statistiche."
+    override val scoreSetDone = "Set finiti"
+    override val scoreSetAdd = "Aggiungi un set"
+    override val scoreSetGames = "Game del set in corso"
+    override val scoreSetPoints = "Punti del game"
+    override val scoreSetTbPoints = "Punti del tie-break"
+    override val scoreSetServer = "Chi serve adesso"
+    override val scoreSetBad = "Questo punteggio non si può giocare con le regole della partita."
+    override val scoreSetApplied = "Punteggio impostato"
+    override val receiveOrderButton = "Ordine di risposta"
+    override val receiveSet = "Ordine di risposta impostato"
+    override val shotOutAsk = "25 secondi passati: violazione di tempo?"
+    override val newBalls = "Cambio palle"
+    override val newBallsHint = "Dopo i primi game e poi ogni tot, come stabilito dal torneo: l'app lo ricorda all'arbitro. Se tocca all'inizio di un tie-break, si rimanda al secondo game del set dopo."
+    override val newBallsOff = "No"
+    override val newBallsAnim = "Animazione del cambio palle"
+    override val newBallsAnimHint = "Sul telefono e sul tabellone TV, a ogni cambio palle."
+    override val newBallsCall = "Palle nuove"
+    override val newBallsPreview = "Prova l'animazione"
+    override val noteButton = "Aggiungi una nota"
+    override val noteHint = "es. pioggia, partita interrotta per 20 minuti"
+    override val noteAdded = "Nota aggiunta: la trovi nel riepilogo"
+    override val receiveWho: (String) -> String = { "Chi risponde da destra (parità) in $it?" }
+    override val receiving: (String) -> String = { "Risponde $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -41363,6 +41992,31 @@ object EnStrings : Strings {
     override val endsFixed = "Ends swapped"
     override val fixUndone = "Correction undone"
     override val serverFixed: (String) -> String = { "Now serving: $it" }
+    override val scoreSetButton = "Set the score"
+    override val scoreSetHint = "For a match started without the app, or to get back in line with the court: play goes on from here. Those points are not in the statistics."
+    override val scoreSetDone = "Finished sets"
+    override val scoreSetAdd = "Add a set"
+    override val scoreSetGames = "Games in the current set"
+    override val scoreSetPoints = "Points in the game"
+    override val scoreSetTbPoints = "Tie-break points"
+    override val scoreSetServer = "Who serves now"
+    override val scoreSetBad = "This score cannot be played with the rules of the match."
+    override val scoreSetApplied = "Score set"
+    override val receiveOrderButton = "Receiving order"
+    override val receiveSet = "Receiving order set"
+    override val shotOutAsk = "25 seconds gone: time violation?"
+    override val newBalls = "Ball change"
+    override val newBallsHint = "After the first games and then every few, as the tournament decides: the app reminds the umpire. If it falls at the start of a tie-break, it moves to the second game of the next set."
+    override val newBallsOff = "No"
+    override val newBallsAnim = "Ball change animation"
+    override val newBallsAnimHint = "On the phone and on the TV scoreboard, at every ball change."
+    override val newBallsCall = "New balls"
+    override val newBallsPreview = "Try the animation"
+    override val noteButton = "Add a note"
+    override val noteHint = "e.g. rain, match stopped for 20 minutes"
+    override val noteAdded = "Note added: you will find it in the summary"
+    override val receiveWho: (String) -> String = { "Who receives on the right (deuce) side in $it?" }
+    override val receiving: (String) -> String = { "Receiving: $it" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -43572,6 +44226,31 @@ object DeStrings : Strings {
     override val endsFixed = "Seiten getauscht"
     override val fixUndone = "Korrektur zurückgenommen"
     override val serverFixed: (String) -> String = { "Jetzt schlägt auf: $it" }
+    override val scoreSetButton = "Spielstand setzen"
+    override val scoreSetHint = "Für eine Partie, die ohne die App begonnen hat, oder um wieder mit dem Platz übereinzustimmen: Es geht von hier weiter. Diese Punkte zählen nicht in der Statistik."
+    override val scoreSetDone = "Beendete Sätze"
+    override val scoreSetAdd = "Satz hinzufügen"
+    override val scoreSetGames = "Spiele im laufenden Satz"
+    override val scoreSetPoints = "Punkte im Spiel"
+    override val scoreSetTbPoints = "Tiebreak-Punkte"
+    override val scoreSetServer = "Wer jetzt aufschlägt"
+    override val scoreSetBad = "Dieser Spielstand ist mit den Regeln der Partie nicht möglich."
+    override val scoreSetApplied = "Spielstand gesetzt"
+    override val receiveOrderButton = "Rückschlagfolge"
+    override val receiveSet = "Rückschlagfolge gesetzt"
+    override val shotOutAsk = "25 Sekunden vorbei: Zeitverstoß?"
+    override val newBalls = "Ballwechsel"
+    override val newBallsHint = "Nach den ersten Spielen und dann alle paar, wie das Turnier es festlegt: Die App erinnert den Schiedsrichter. Fällt er auf den Beginn eines Tiebreaks, kommt er zum zweiten Spiel des nächsten Satzes."
+    override val newBallsOff = "Nein"
+    override val newBallsAnim = "Animation beim Ballwechsel"
+    override val newBallsAnimHint = "Auf dem Telefon und auf der TV-Anzeige, bei jedem Ballwechsel."
+    override val newBallsCall = "Neue Bälle"
+    override val newBallsPreview = "Animation ausprobieren"
+    override val noteButton = "Notiz hinzufügen"
+    override val noteHint = "z. B. Regen, Partie 20 Minuten unterbrochen"
+    override val noteAdded = "Notiz hinzugefügt: Sie steht in der Zusammenfassung"
+    override val receiveWho: (String) -> String = { "Wer returniert rechts (Einstand) bei $it?" }
+    override val receiving: (String) -> String = { "Return: $it" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -45774,6 +46453,31 @@ object EsStrings : Strings {
     override val endsFixed = "Lados cambiados"
     override val fixUndone = "Corrección anulada"
     override val serverFixed: (String) -> String = { "Ahora saca $it" }
+    override val scoreSetButton = "Poner el marcador"
+    override val scoreSetHint = "Para un partido empezado sin la app, o para cuadrar con la pista: se sigue desde aquí. Esos puntos no entran en las estadísticas."
+    override val scoreSetDone = "Sets terminados"
+    override val scoreSetAdd = "Añadir un set"
+    override val scoreSetGames = "Juegos del set en curso"
+    override val scoreSetPoints = "Puntos del juego"
+    override val scoreSetTbPoints = "Puntos del tie-break"
+    override val scoreSetServer = "Quién saca ahora"
+    override val scoreSetBad = "Este marcador no se puede jugar con las reglas del partido."
+    override val scoreSetApplied = "Marcador puesto"
+    override val receiveOrderButton = "Orden de resto"
+    override val receiveSet = "Orden de resto puesto"
+    override val shotOutAsk = "25 segundos pasados: ¿infracción de tiempo?"
+    override val newBalls = "Cambio de bolas"
+    override val newBallsHint = "Tras los primeros juegos y luego cada tantos, como decide el torneo: la app se lo recuerda al árbitro. Si cae al inicio de un tie-break, pasa al segundo juego del set siguiente."
+    override val newBallsOff = "No"
+    override val newBallsAnim = "Animación del cambio de bolas"
+    override val newBallsAnimHint = "En el teléfono y en el marcador de la TV, en cada cambio de bolas."
+    override val newBallsCall = "Bolas nuevas"
+    override val newBallsPreview = "Probar la animación"
+    override val noteButton = "Añadir una nota"
+    override val noteHint = "p. ej. lluvia, partido parado 20 minutos"
+    override val noteAdded = "Nota añadida: está en el resumen"
+    override val receiveWho: (String) -> String = { "¿Quién resta a la derecha (iguales) en $it?" }
+    override val receiving: (String) -> String = { "Resta $it" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -47978,6 +48682,31 @@ object FrStrings : Strings {
     override val endsFixed = "Côtés échangés"
     override val fixUndone = "Correction annulée"
     override val serverFixed: (String) -> String = { "Au service : $it" }
+    override val scoreSetButton = "Régler le score"
+    override val scoreSetHint = "Pour un match commencé sans l'appli, ou pour se recaler sur le court : on continue d'ici. Ces points n'entrent pas dans les statistiques."
+    override val scoreSetDone = "Sets terminés"
+    override val scoreSetAdd = "Ajouter un set"
+    override val scoreSetGames = "Jeux du set en cours"
+    override val scoreSetPoints = "Points du jeu"
+    override val scoreSetTbPoints = "Points du tie-break"
+    override val scoreSetServer = "Qui sert maintenant"
+    override val scoreSetBad = "Ce score ne peut pas se jouer avec les règles du match."
+    override val scoreSetApplied = "Score réglé"
+    override val receiveOrderButton = "Ordre de retour"
+    override val receiveSet = "Ordre de retour réglé"
+    override val shotOutAsk = "25 secondes passées : infraction de temps ?"
+    override val newBalls = "Changement de balles"
+    override val newBallsHint = "Après les premiers jeux puis tous les tant, comme décidé par le tournoi : l'appli le rappelle à l'arbitre. S'il tombe au début d'un tie-break, il passe au deuxième jeu du set suivant."
+    override val newBallsOff = "Non"
+    override val newBallsAnim = "Animation du changement de balles"
+    override val newBallsAnimHint = "Sur le téléphone et sur le tableau TV, à chaque changement de balles."
+    override val newBallsCall = "Balles neuves"
+    override val newBallsPreview = "Essayer l'animation"
+    override val noteButton = "Ajouter une note"
+    override val noteHint = "par ex. pluie, match arrêté 20 minutes"
+    override val noteAdded = "Note ajoutée : elle est dans le résumé"
+    override val receiveWho: (String) -> String = { "Qui retourne à droite (égalité) dans $it ?" }
+    override val receiving: (String) -> String = { "Au retour : $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -50183,6 +50912,31 @@ object PtStrings : Strings {
     override val endsFixed = "Lados trocados"
     override val fixUndone = "Correção anulada"
     override val serverFixed: (String) -> String = { "Agora serve $it" }
+    override val scoreSetButton = "Definir o placar"
+    override val scoreSetHint = "Para uma partida começada sem a app, ou para acertar com o court: continua-se daqui. Esses pontos não entram nas estatísticas."
+    override val scoreSetDone = "Sets terminados"
+    override val scoreSetAdd = "Adicionar um set"
+    override val scoreSetGames = "Jogos do set em curso"
+    override val scoreSetPoints = "Pontos do jogo"
+    override val scoreSetTbPoints = "Pontos do tie-break"
+    override val scoreSetServer = "Quem serve agora"
+    override val scoreSetBad = "Este placar não se pode jogar com as regras da partida."
+    override val scoreSetApplied = "Placar definido"
+    override val receiveOrderButton = "Ordem de receção"
+    override val receiveSet = "Ordem de receção definida"
+    override val shotOutAsk = "25 segundos passados: violação de tempo?"
+    override val newBalls = "Troca de bolas"
+    override val newBallsHint = "Depois dos primeiros jogos e depois a cada tantos, como o torneio decide: a app lembra o árbitro. Se calhar no início de um tie-break, passa para o segundo jogo do set seguinte."
+    override val newBallsOff = "Não"
+    override val newBallsAnim = "Animação da troca de bolas"
+    override val newBallsAnimHint = "No telefone e no placar da TV, a cada troca de bolas."
+    override val newBallsCall = "Bolas novas"
+    override val newBallsPreview = "Experimentar a animação"
+    override val noteButton = "Adicionar uma nota"
+    override val noteHint = "ex. chuva, partida parada 20 minutos"
+    override val noteAdded = "Nota adicionada: está no resumo"
+    override val receiveWho: (String) -> String = { "Quem recebe à direita (iguais) em $it?" }
+    override val receiving: (String) -> String = { "Recebe $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -56381,6 +57135,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.runtime.key
+import androidx.compose.material3.OutlinedTextField
 import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
 import com.tennis.scoremanager.DetailAsk
@@ -56441,6 +57197,9 @@ fun MatchScreen(c: MatchController) {
     var confirmRetire by remember { mutableStateOf<Boolean?>(null) }
     var breakKind by remember { mutableStateOf<BreakKind?>(null) }
     var fixServe by remember { mutableStateOf(false) }
+    var scoreSet by remember { mutableStateOf(false) }
+    var receiveOrder by remember { mutableStateOf(false) }
+    var noteText by remember { mutableStateOf<String?>(null) }
     var umpireMenu by remember { mutableStateOf(false) }
     var penaltyKind by remember { mutableStateOf<PenaltyKind?>(null) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
@@ -56465,6 +57224,16 @@ fun MatchScreen(c: MatchController) {
             if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
             if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
             MessageBox(msg)
+            // Shot clock a zero: la violazione di tempo a portata di dito (di solito di chi serve).
+            val shotOut by c.shotClockOut.collectAsState()
+            if (shotOut && !state.isFinished && !suspended) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.shotOutAsk, color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    for (side in listOf(state.server, state.receiver)) {
+                        Pill(names.short(side), TsmColors.player(side), TsmColors.onPlayer(side), Icons.Filled.Gavel) { c.penalty(side, PenaltyKind.TIME) }
+                    }
+                }
+            }
             Scoreboard(state, names, s)
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 val playing = !suspended && !state.isFinished
@@ -56532,7 +57301,10 @@ fun MatchScreen(c: MatchController) {
                     item(s.breakMedical) { breakKind = BreakKind.MEDICAL }
                     item(s.breakToilet) { breakKind = BreakKind.TOILET }
                     item(s.serverFixButton) { fixServe = true }
+                    if (state.rules.doubles) item(s.receiveOrderButton) { receiveOrder = true }
                     item(s.endsFixButton) { c.fixServe(ends = true) }
+                    item(s.scoreSetButton) { scoreSet = true }
+                    item(s.noteButton) { noteText = "" }
                     OutlinedButton(onClick = { umpireMenu = false; confirmRetire = false }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange)
                         Spacer(Modifier.width(6.dp))
@@ -56591,6 +57363,42 @@ fun MatchScreen(c: MatchController) {
             },
             confirmButton = {},
             dismissButton = { TextButton(onClick = { confirmRetire = null }) { Text(s.back) } },
+        )
+    }
+
+    if (scoreSet) com.tennis.scoremanager.ui.ScoreSetDialog(state, names, { sets, g1, g2, pt1, pt2, server, player ->
+        if (c.setScore(sets, g1, g2, pt1, pt2, server, player)) scoreSet = false
+    }) { scoreSet = false }
+
+    if (receiveOrder) {
+        var r1 by remember { mutableIntStateOf(state.recv1 ?: 0) }
+        var r2 by remember { mutableIntStateOf(state.recv2 ?: 0) }
+        AlertDialog(
+            onDismissRequest = { receiveOrder = false },
+            title = { Text(s.receiveOrderButton, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    for (side in Side.entries) {
+                        Text(s.receiveWho(names.short(side)), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                        Segmented(
+                            names.players(side).map { SegOption(it, null, TsmColors.player(side), TsmColors.onPlayer(side)) },
+                            selected = if (side == Side.P1) r1 else r2, onSelect = { i -> if (side == Side.P1) r1 = i else r2 = i },
+                        )
+                    }
+                }
+            },
+            confirmButton = { Button(onClick = { receiveOrder = false; c.setReceiveOrder(r1, r2); c.showMessage(s.receiveSet) }) { Text(s.confirm) } },
+            dismissButton = { TextButton(onClick = { receiveOrder = false }) { Text(s.back) } },
+        )
+    }
+
+    noteText?.let { text ->
+        AlertDialog(
+            onDismissRequest = { noteText = null },
+            title = { Text(s.noteButton, fontWeight = FontWeight.Black) },
+            text = { OutlinedTextField(text, { noteText = it.take(300) }, Modifier.fillMaxWidth(), placeholder = { Text(s.noteHint) }, minLines = 2) },
+            confirmButton = { Button(onClick = { c.addMatchNote(text); noteText = null }, enabled = text.isNotBlank()) { Text(s.confirm) } },
+            dismissButton = { TextButton(onClick = { noteText = null }) { Text(s.back) } },
         )
     }
 
@@ -56717,8 +57525,10 @@ fun MatchScreen(c: MatchController) {
     if (serveOrder && state.rules.doubles && !end) {
         var p1 by remember(state.setNumber) { mutableIntStateOf(state.order1) }
         var p2 by remember(state.setNumber) { mutableIntStateOf(state.order2) }
+        var r1 by remember(state.setNumber) { mutableIntStateOf(state.recv1 ?: 0) }
+        var r2 by remember(state.setNumber) { mutableIntStateOf(state.recv2 ?: 0) }
         AlertDialog(
-            onDismissRequest = { c.setServeOrder(p1, p2) },
+            onDismissRequest = { c.setServeOrder(p1, p2); c.setReceiveOrder(r1, r2) },
             icon = { Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball) },
             title = { Text(s.serveOrderTitle(state.setNumber)) },
             text = {
@@ -56732,9 +57542,17 @@ fun MatchScreen(c: MatchController) {
                             onSelect = { i -> if (side == Side.P1) p1 = i else p2 = i },
                         )
                     }
+                    // E chi risponde da destra (parità), squadra per squadra.
+                    for (side in Side.entries) {
+                        Text(s.receiveWho(names.short(side)), color = TsmColors.player(side), fontSize = 13.sp)
+                        Segmented(
+                            names.players(side).map { SegOption(it, null, TsmColors.player(side), TsmColors.onPlayer(side)) },
+                            selected = if (side == Side.P1) r1 else r2, onSelect = { i -> if (side == Side.P1) r1 = i else r2 = i },
+                        )
+                    }
                 }
             },
-            confirmButton = { Button(onClick = { c.setServeOrder(p1, p2) }) { Text(s.confirm) } },
+            confirmButton = { Button(onClick = { c.setServeOrder(p1, p2); c.setReceiveOrder(r1, r2) }) { Text(s.confirm) } },
         )
     }
 }
@@ -56986,6 +57804,9 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
                         if (!state.isFinished && state.server == side) {
                             val who = if (state.rules.doubles) " · " + names.player(side, state.serverPlayer) else ""
                             Pill(s.onServe + who, TsmColors.Ball, TsmColors.OnBall, Icons.Filled.SportsTennis)
+                        } else if (!state.isFinished && state.rules.doubles) {
+                            // Doppio con l'ordine di risposta detto: chi risponde a questo punto.
+                            state.receiverPlayer?.let { rp -> Pill(s.receiving(names.player(side, rp)), TsmColors.SurfaceHigh, TsmColors.TextMain) }
                         }
                     }
                 }
@@ -58205,6 +59026,7 @@ import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsScore
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StopCircle
@@ -58534,6 +59356,21 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             if (padel && !onlyTiebreak) {
                 SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
                     c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
+                }
+            }
+            // Cambio palle dei tornei: niente, 7/9, 9/11, 11/13; con l'animazione facoltativa.
+            if (!padel && !short) {
+                Text(s.newBalls, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                Text(s.newBallsHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                val choices = listOf(0 to 0) + com.tennis.scoremanager.model.NewBalls.choices
+                Segmented(
+                    choices.map { (a, b) -> SegOption(if (a == 0) s.newBallsOff else "$a / $b") },
+                    choices.indexOf(o.newBallsFirst to o.newBallsEvery).coerceAtLeast(0),
+                    { i -> c.updateOptions { it.copy(newBallsFirst = choices[i].first, newBallsEvery = choices[i].second) } },
+                )
+                if (o.newBallsFirst > 0) {
+                    SwitchRow(Icons.Filled.SportsTennis, s.newBallsAnim, s.newBallsAnimHint, o.newBallsAnimation) { v -> c.updateOptions { it.copy(newBallsAnimation = v) } }
+                    if (o.newBallsAnimation) GhostButton(s.newBallsPreview, Icons.Filled.PlayArrow, { c.playBallsAnimation() }, Modifier.fillMaxWidth())
                 }
             }
         }
@@ -85768,6 +86605,76 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/model/NewBallsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/model/NewBallsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.model
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class NewBallsTest {
+    private val P1 = Side.P1
+    private val P2 = Side.P2
+
+    private fun game(s: MatchState, w: Side): Pair<MatchState, Transition> {
+        var st = s
+        var t: Transition? = null
+        do { val step = ScoreEngine.pointWonBy(st, w); st = step.state; t = step.transition } while (t?.gameWinner == null && !st.isFinished)
+        return st to t!!
+    }
+
+    @Test fun primaDopoSettePoiOgniNove() {
+        assertTrue(NewBalls.dueAt(7, 7, 9))
+        assertFalse(NewBalls.dueAt(8, 7, 9))
+        assertTrue(NewBalls.dueAt(16, 7, 9))
+        assertTrue(NewBalls.dueAt(25, 7, 9))
+        assertFalse(NewBalls.dueAt(7, 0, 0))
+    }
+
+    @Test fun dopoIlSettimoGameSiCambiano() {
+        var s = ScoreEngine.initial(RulesConfig())
+        var calls = mutableListOf<Int>()
+        var pending = false
+        repeat(16) { i ->
+            val (st, t) = game(s, if (i % 2 == 0) P1 else P2)
+            s = st
+            val (now, p) = NewBalls.check(s, t, 7, 9, pending)
+            pending = p
+            if (now) calls += NewBalls.gamesPlayed(s)
+        }
+        assertEquals(listOf(7, 16), calls)
+    }
+
+    @Test fun sulTiebreakSiRimandaAlSecondoGameDelSetDopo() {
+        // 6-6 al 12° game: con 3/9 il cambio cadrebbe sul 12° (3, 12...), cioè all'inizio del tie-break.
+        var s = ScoreEngine.initial(RulesConfig())
+        var pending = false
+        val calls = mutableListOf<Int>()
+        repeat(12) { i ->
+            val (st, t) = game(s, if (i % 2 == 0) P1 else P2)
+            s = st
+            val (now, p) = NewBalls.check(s, t, 3, 9, pending); pending = p
+            if (now) calls += NewBalls.gamesPlayed(s)
+        }
+        assertTrue(s.inTiebreak)
+        assertEquals("solo il terzo game; il dodicesimo aspetta", listOf(3), calls)
+        assertTrue(pending)
+        // Il tie-break e il primo game del set dopo: lì arriva il cambio rimandato.
+        val (afterTb, tTb) = game(s, P1)
+        val (n1, p1) = NewBalls.check(afterTb, tTb, 3, 9, pending)
+        assertFalse(n1); assertTrue(p1)
+        val (g1, t1) = game(afterTb, P2)
+        val (n2, p2) = NewBalls.check(g1, t1, 3, 9, p1)
+        assertTrue(n2); assertFalse(p2)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -86292,6 +87199,47 @@ class ScoreEngineTest {
     @Test fun correggereILati() {
         val s = ScoreEngine.initial(RulesConfig())
         assertEquals(!s.p1Left, ScoreEngine.apply(s, MatchEvent.EndsFix()).state.p1Left)
+    }
+
+    @Test fun punteggioImpostatoSiContinuaDaLi() {
+        val s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        val e = MatchEvent.ScoreSet(listOf(SetScore(6, 3)), 4, 3, 2, 1, P2)
+        val set = ScoreEngine.apply(s, e).state
+        assertEquals(1, set.sets.size)
+        assertEquals(4 to 3, set.g1 to set.g2)
+        assertEquals(2 to 1, set.pt1 to set.pt2)
+        assertEquals(P2, set.server)
+        assertEquals(1, set.setsWon(P1))
+        // Due punti a P1: il game è suo (5-3).
+        assertEquals(5 to 3, play(set, P1, P1).let { it.g1 to it.g2 })
+    }
+
+    @Test fun punteggioImpossibileNonSiApplica() {
+        val r = RulesConfig()
+        assertFalse("set non finito", ScoreEngine.validScore(r, listOf(SetScore(5, 3)), 0, 0, 0, 0))
+        assertFalse("partita già vinta", ScoreEngine.validScore(r, listOf(SetScore(6, 3), SetScore(6, 2)), 0, 0, 0, 0))
+        assertFalse("set in corso già chiuso", ScoreEngine.validScore(r, emptyList(), 6, 3, 0, 0))
+        assertFalse("game già vinto", ScoreEngine.validScore(r, emptyList(), 2, 2, 4, 1))
+        assertTrue("vantaggio", ScoreEngine.validScore(r, emptyList(), 2, 2, 4, 3))
+        assertTrue("7-6 col tie-break", ScoreEngine.validScore(r, listOf(SetScore(7, 6)), 6, 6, 5, 4))
+        val s = ScoreEngine.initial(r)
+        assertEquals(s, ScoreEngine.apply(s, MatchEvent.ScoreSet(emptyList(), 6, 0, 0, 0, P1)).state)
+    }
+
+    @Test fun punteggioImpostatoSul66EIlTiebreak() {
+        val st = ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.ScoreSet(emptyList(), 6, 6, 3, 2, P1)).state
+        assertTrue(st.inTiebreak)
+        assertEquals("3", st.pointLabel(P1))
+    }
+
+    @Test fun ordineDiRispostaNelDoppio() {
+        var s = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = P1))
+        assertEquals(null, s.receiverPlayer)
+        s = ScoreEngine.apply(s, MatchEvent.ReceiveOrder(1, 0, 1)).state
+        // Risponde P2: da destra il giocatore 1, poi l'altro.
+        assertEquals(1, s.receiverPlayer)
+        assertEquals(0, play(s, P1).receiverPlayer)
+        assertEquals("nel set dopo si sceglie di nuovo", null, ScoreEngine.apply(s, MatchEvent.ReceiveOrder(2, 0, 0)).state.let { if (it == s) null else it.recv1 })
     }
 }
 TSM_EOF
@@ -97296,6 +98244,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 314 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 318 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

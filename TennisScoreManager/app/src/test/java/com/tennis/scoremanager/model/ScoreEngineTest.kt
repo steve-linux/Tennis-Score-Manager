@@ -521,4 +521,45 @@ class ScoreEngineTest {
         val s = ScoreEngine.initial(RulesConfig())
         assertEquals(!s.p1Left, ScoreEngine.apply(s, MatchEvent.EndsFix()).state.p1Left)
     }
+
+    @Test fun punteggioImpostatoSiContinuaDaLi() {
+        val s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        val e = MatchEvent.ScoreSet(listOf(SetScore(6, 3)), 4, 3, 2, 1, P2)
+        val set = ScoreEngine.apply(s, e).state
+        assertEquals(1, set.sets.size)
+        assertEquals(4 to 3, set.g1 to set.g2)
+        assertEquals(2 to 1, set.pt1 to set.pt2)
+        assertEquals(P2, set.server)
+        assertEquals(1, set.setsWon(P1))
+        // Due punti a P1: il game è suo (5-3).
+        assertEquals(5 to 3, play(set, P1, P1).let { it.g1 to it.g2 })
+    }
+
+    @Test fun punteggioImpossibileNonSiApplica() {
+        val r = RulesConfig()
+        assertFalse("set non finito", ScoreEngine.validScore(r, listOf(SetScore(5, 3)), 0, 0, 0, 0))
+        assertFalse("partita già vinta", ScoreEngine.validScore(r, listOf(SetScore(6, 3), SetScore(6, 2)), 0, 0, 0, 0))
+        assertFalse("set in corso già chiuso", ScoreEngine.validScore(r, emptyList(), 6, 3, 0, 0))
+        assertFalse("game già vinto", ScoreEngine.validScore(r, emptyList(), 2, 2, 4, 1))
+        assertTrue("vantaggio", ScoreEngine.validScore(r, emptyList(), 2, 2, 4, 3))
+        assertTrue("7-6 col tie-break", ScoreEngine.validScore(r, listOf(SetScore(7, 6)), 6, 6, 5, 4))
+        val s = ScoreEngine.initial(r)
+        assertEquals(s, ScoreEngine.apply(s, MatchEvent.ScoreSet(emptyList(), 6, 0, 0, 0, P1)).state)
+    }
+
+    @Test fun punteggioImpostatoSul66EIlTiebreak() {
+        val st = ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.ScoreSet(emptyList(), 6, 6, 3, 2, P1)).state
+        assertTrue(st.inTiebreak)
+        assertEquals("3", st.pointLabel(P1))
+    }
+
+    @Test fun ordineDiRispostaNelDoppio() {
+        var s = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = P1))
+        assertEquals(null, s.receiverPlayer)
+        s = ScoreEngine.apply(s, MatchEvent.ReceiveOrder(1, 0, 1)).state
+        // Risponde P2: da destra il giocatore 1, poi l'altro.
+        assertEquals(1, s.receiverPlayer)
+        assertEquals(0, play(s, P1).receiverPlayer)
+        assertEquals("nel set dopo si sceglie di nuovo", null, ScoreEngine.apply(s, MatchEvent.ReceiveOrder(2, 0, 0)).state.let { if (it == s) null else it.recv1 })
+    }
 }

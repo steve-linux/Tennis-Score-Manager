@@ -716,6 +716,31 @@ interface Strings {
     val endsFixed: String
     val fixUndone: String
     val serverFixed: (String) -> String
+    val scoreSetButton: String
+    val scoreSetHint: String
+    val scoreSetDone: String
+    val scoreSetAdd: String
+    val scoreSetGames: String
+    val scoreSetPoints: String
+    val scoreSetTbPoints: String
+    val scoreSetServer: String
+    val scoreSetBad: String
+    val scoreSetApplied: String
+    val receiveOrderButton: String
+    val receiveSet: String
+    val shotOutAsk: String
+    val newBalls: String
+    val newBallsHint: String
+    val newBallsOff: String
+    val newBallsAnim: String
+    val newBallsAnimHint: String
+    val newBallsCall: String
+    val newBallsPreview: String
+    val noteButton: String
+    val noteHint: String
+    val noteAdded: String
+    val receiveWho: (String) -> String
+    val receiving: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -2939,6 +2964,31 @@ object ItStrings : Strings {
     override val endsFixed = "Lati del campo scambiati"
     override val fixUndone = "Correzione annullata"
     override val serverFixed: (String) -> String = { "Ora serve $it" }
+    override val scoreSetButton = "Imposta punteggio"
+    override val scoreSetHint = "Per una partita iniziata senza l'app, o da rimettere in pari col campo: si continua da qui. Quei punti non entrano nelle statistiche."
+    override val scoreSetDone = "Set finiti"
+    override val scoreSetAdd = "Aggiungi un set"
+    override val scoreSetGames = "Game del set in corso"
+    override val scoreSetPoints = "Punti del game"
+    override val scoreSetTbPoints = "Punti del tie-break"
+    override val scoreSetServer = "Chi serve adesso"
+    override val scoreSetBad = "Questo punteggio non si può giocare con le regole della partita."
+    override val scoreSetApplied = "Punteggio impostato"
+    override val receiveOrderButton = "Ordine di risposta"
+    override val receiveSet = "Ordine di risposta impostato"
+    override val shotOutAsk = "25 secondi passati: violazione di tempo?"
+    override val newBalls = "Cambio palle"
+    override val newBallsHint = "Dopo i primi game e poi ogni tot, come stabilito dal torneo: l'app lo ricorda all'arbitro. Se tocca all'inizio di un tie-break, si rimanda al secondo game del set dopo."
+    override val newBallsOff = "No"
+    override val newBallsAnim = "Animazione del cambio palle"
+    override val newBallsAnimHint = "Sul telefono e sul tabellone TV, a ogni cambio palle."
+    override val newBallsCall = "Palle nuove"
+    override val newBallsPreview = "Prova l'animazione"
+    override val noteButton = "Aggiungi una nota"
+    override val noteHint = "es. pioggia, partita interrotta per 20 minuti"
+    override val noteAdded = "Nota aggiunta: la trovi nel riepilogo"
+    override val receiveWho: (String) -> String = { "Chi risponde da destra (parità) in $it?" }
+    override val receiving: (String) -> String = { "Risponde $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5125,6 +5175,31 @@ object EnStrings : Strings {
     override val endsFixed = "Ends swapped"
     override val fixUndone = "Correction undone"
     override val serverFixed: (String) -> String = { "Now serving: $it" }
+    override val scoreSetButton = "Set the score"
+    override val scoreSetHint = "For a match started without the app, or to get back in line with the court: play goes on from here. Those points are not in the statistics."
+    override val scoreSetDone = "Finished sets"
+    override val scoreSetAdd = "Add a set"
+    override val scoreSetGames = "Games in the current set"
+    override val scoreSetPoints = "Points in the game"
+    override val scoreSetTbPoints = "Tie-break points"
+    override val scoreSetServer = "Who serves now"
+    override val scoreSetBad = "This score cannot be played with the rules of the match."
+    override val scoreSetApplied = "Score set"
+    override val receiveOrderButton = "Receiving order"
+    override val receiveSet = "Receiving order set"
+    override val shotOutAsk = "25 seconds gone: time violation?"
+    override val newBalls = "Ball change"
+    override val newBallsHint = "After the first games and then every few, as the tournament decides: the app reminds the umpire. If it falls at the start of a tie-break, it moves to the second game of the next set."
+    override val newBallsOff = "No"
+    override val newBallsAnim = "Ball change animation"
+    override val newBallsAnimHint = "On the phone and on the TV scoreboard, at every ball change."
+    override val newBallsCall = "New balls"
+    override val newBallsPreview = "Try the animation"
+    override val noteButton = "Add a note"
+    override val noteHint = "e.g. rain, match stopped for 20 minutes"
+    override val noteAdded = "Note added: you will find it in the summary"
+    override val receiveWho: (String) -> String = { "Who receives on the right (deuce) side in $it?" }
+    override val receiving: (String) -> String = { "Receiving: $it" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

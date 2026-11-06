@@ -88,6 +88,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.runtime.key
+import androidx.compose.material3.OutlinedTextField
 import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
 import com.tennis.scoremanager.DetailAsk
@@ -148,6 +150,9 @@ fun MatchScreen(c: MatchController) {
     var confirmRetire by remember { mutableStateOf<Boolean?>(null) }
     var breakKind by remember { mutableStateOf<BreakKind?>(null) }
     var fixServe by remember { mutableStateOf(false) }
+    var scoreSet by remember { mutableStateOf(false) }
+    var receiveOrder by remember { mutableStateOf(false) }
+    var noteText by remember { mutableStateOf<String?>(null) }
     var umpireMenu by remember { mutableStateOf(false) }
     var penaltyKind by remember { mutableStateOf<PenaltyKind?>(null) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
@@ -172,6 +177,16 @@ fun MatchScreen(c: MatchController) {
             if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
             if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
             MessageBox(msg)
+            // Shot clock a zero: la violazione di tempo a portata di dito (di solito di chi serve).
+            val shotOut by c.shotClockOut.collectAsState()
+            if (shotOut && !state.isFinished && !suspended) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.shotOutAsk, color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    for (side in listOf(state.server, state.receiver)) {
+                        Pill(names.short(side), TsmColors.player(side), TsmColors.onPlayer(side), Icons.Filled.Gavel) { c.penalty(side, PenaltyKind.TIME) }
+                    }
+                }
+            }
             Scoreboard(state, names, s)
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 val playing = !suspended && !state.isFinished
@@ -239,7 +254,10 @@ fun MatchScreen(c: MatchController) {
                     item(s.breakMedical) { breakKind = BreakKind.MEDICAL }
                     item(s.breakToilet) { breakKind = BreakKind.TOILET }
                     item(s.serverFixButton) { fixServe = true }
+                    if (state.rules.doubles) item(s.receiveOrderButton) { receiveOrder = true }
                     item(s.endsFixButton) { c.fixServe(ends = true) }
+                    item(s.scoreSetButton) { scoreSet = true }
+                    item(s.noteButton) { noteText = "" }
                     OutlinedButton(onClick = { umpireMenu = false; confirmRetire = false }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange)
                         Spacer(Modifier.width(6.dp))
@@ -298,6 +316,42 @@ fun MatchScreen(c: MatchController) {
             },
             confirmButton = {},
             dismissButton = { TextButton(onClick = { confirmRetire = null }) { Text(s.back) } },
+        )
+    }
+
+    if (scoreSet) com.tennis.scoremanager.ui.ScoreSetDialog(state, names, { sets, g1, g2, pt1, pt2, server, player ->
+        if (c.setScore(sets, g1, g2, pt1, pt2, server, player)) scoreSet = false
+    }) { scoreSet = false }
+
+    if (receiveOrder) {
+        var r1 by remember { mutableIntStateOf(state.recv1 ?: 0) }
+        var r2 by remember { mutableIntStateOf(state.recv2 ?: 0) }
+        AlertDialog(
+            onDismissRequest = { receiveOrder = false },
+            title = { Text(s.receiveOrderButton, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    for (side in Side.entries) {
+                        Text(s.receiveWho(names.short(side)), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                        Segmented(
+                            names.players(side).map { SegOption(it, null, TsmColors.player(side), TsmColors.onPlayer(side)) },
+                            selected = if (side == Side.P1) r1 else r2, onSelect = { i -> if (side == Side.P1) r1 = i else r2 = i },
+                        )
+                    }
+                }
+            },
+            confirmButton = { Button(onClick = { receiveOrder = false; c.setReceiveOrder(r1, r2); c.showMessage(s.receiveSet) }) { Text(s.confirm) } },
+            dismissButton = { TextButton(onClick = { receiveOrder = false }) { Text(s.back) } },
+        )
+    }
+
+    noteText?.let { text ->
+        AlertDialog(
+            onDismissRequest = { noteText = null },
+            title = { Text(s.noteButton, fontWeight = FontWeight.Black) },
+            text = { OutlinedTextField(text, { noteText = it.take(300) }, Modifier.fillMaxWidth(), placeholder = { Text(s.noteHint) }, minLines = 2) },
+            confirmButton = { Button(onClick = { c.addMatchNote(text); noteText = null }, enabled = text.isNotBlank()) { Text(s.confirm) } },
+            dismissButton = { TextButton(onClick = { noteText = null }) { Text(s.back) } },
         )
     }
 
@@ -424,8 +478,10 @@ fun MatchScreen(c: MatchController) {
     if (serveOrder && state.rules.doubles && !end) {
         var p1 by remember(state.setNumber) { mutableIntStateOf(state.order1) }
         var p2 by remember(state.setNumber) { mutableIntStateOf(state.order2) }
+        var r1 by remember(state.setNumber) { mutableIntStateOf(state.recv1 ?: 0) }
+        var r2 by remember(state.setNumber) { mutableIntStateOf(state.recv2 ?: 0) }
         AlertDialog(
-            onDismissRequest = { c.setServeOrder(p1, p2) },
+            onDismissRequest = { c.setServeOrder(p1, p2); c.setReceiveOrder(r1, r2) },
             icon = { Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball) },
             title = { Text(s.serveOrderTitle(state.setNumber)) },
             text = {
@@ -439,9 +495,17 @@ fun MatchScreen(c: MatchController) {
                             onSelect = { i -> if (side == Side.P1) p1 = i else p2 = i },
                         )
                     }
+                    // E chi risponde da destra (parità), squadra per squadra.
+                    for (side in Side.entries) {
+                        Text(s.receiveWho(names.short(side)), color = TsmColors.player(side), fontSize = 13.sp)
+                        Segmented(
+                            names.players(side).map { SegOption(it, null, TsmColors.player(side), TsmColors.onPlayer(side)) },
+                            selected = if (side == Side.P1) r1 else r2, onSelect = { i -> if (side == Side.P1) r1 = i else r2 = i },
+                        )
+                    }
                 }
             },
-            confirmButton = { Button(onClick = { c.setServeOrder(p1, p2) }) { Text(s.confirm) } },
+            confirmButton = { Button(onClick = { c.setServeOrder(p1, p2); c.setReceiveOrder(r1, r2) }) { Text(s.confirm) } },
         )
     }
 }
@@ -693,6 +757,9 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
                         if (!state.isFinished && state.server == side) {
                             val who = if (state.rules.doubles) " · " + names.player(side, state.serverPlayer) else ""
                             Pill(s.onServe + who, TsmColors.Ball, TsmColors.OnBall, Icons.Filled.SportsTennis)
+                        } else if (!state.isFinished && state.rules.doubles) {
+                            // Doppio con l'ordine di risposta detto: chi risponde a questo punto.
+                            state.receiverPlayer?.let { rp -> Pill(s.receiving(names.player(side, rp)), TsmColors.SurfaceHigh, TsmColors.TextMain) }
                         }
                     }
                 }

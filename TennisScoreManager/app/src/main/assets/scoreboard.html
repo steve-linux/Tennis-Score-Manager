@@ -104,6 +104,42 @@
   #replay video { width: 100%; height: 100%; object-fit: contain; }
   #rl { position: absolute; top: calc(3 * var(--vh)); left: calc(3 * var(--vw)); padding: .3em .7em; border-radius: .3em;
         background: var(--orange); color: #111; font: 900 calc(4 * var(--vh)) sans-serif; letter-spacing: .08em; }
+  /* Cambio palle: il tubo sale, salta il tappo, escono tre palle che rimbalzano e arriva la scritta. */
+  #balls { display: none; position: fixed; inset: 0; z-index: 45; overflow: hidden;
+           background: radial-gradient(ellipse at 50% 60%, rgba(30,46,70,.96), rgba(5,7,11,.98)); }
+  #balls.on { display: block; animation: bfade 5.5s ease forwards; }
+  @keyframes bfade { 0% { opacity: 0; } 6% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; } }
+  #bt { position: absolute; left: 50%; bottom: 8vh; width: 18vh; height: 46vh; margin-left: -9vh; border-radius: 4vh 4vh 3vh 3vh;
+        background: linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.28) 35%, rgba(255,255,255,.08) 70%, rgba(255,255,255,.2));
+        border: .5vh solid rgba(255,255,255,.45); box-shadow: 0 0 6vh rgba(198,244,50,.25); transform: translateY(70vh); }
+  #balls.on #bt { animation: btube 5.5s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes btube { 0% { transform: translateY(70vh); } 12% { transform: translateY(0); } 70% { transform: translateY(0); opacity: 1; } 85% { transform: translateY(60vh); opacity: 0; } 100% { transform: translateY(60vh); opacity: 0; } }
+  #lid { position: absolute; left: -1.5vh; right: -1.5vh; top: -3.2vh; height: 4.5vh; border-radius: 1.6vh; background: #C6F432; box-shadow: inset 0 -.8vh 0 rgba(0,0,0,.25); }
+  #balls.on #lid { animation: blid 5.5s ease forwards; }
+  @keyframes blid { 0%, 16% { transform: none; opacity: 1; } 26% { transform: translate(-22vw, -52vh) rotate(-260deg); opacity: 1; } 34%, 100% { transform: translate(-34vw, -20vh) rotate(-420deg); opacity: 0; } }
+  .nb { position: absolute; left: 50%; bottom: 40vh; width: 16vh; height: 16vh; margin-left: -8vh; border-radius: 50%; overflow: hidden; opacity: 0;
+          background: radial-gradient(circle at 34% 30%, #F6FFB0, #C6F432 42%, #8DB21A 100%); box-shadow: 0 2vh 4vh rgba(0,0,0,.5); }
+  .nb::before, .nb::after { content: ""; position: absolute; width: 100%; height: 100%; border: .9vh solid rgba(255,255,255,.92); border-radius: 50%; }
+  .nb::before { left: -62%; top: 0; }
+  .nb::after { left: 62%; top: 0; }
+  #balls.on .nb { animation: bfly 5.5s cubic-bezier(.3,.7,.4,1) forwards; }
+  #balls.on .b1 { --x: -32vw; --d: 0s; }
+  #balls.on .b2 { --x: 0vw; --d: .18s; }
+  #balls.on .b3 { --x: 32vw; --d: .36s; }
+  #balls.on .nb { animation-delay: var(--d); }
+  @keyframes bfly {
+    0%, 18% { opacity: 0; transform: translate(0, 10vh) scale(.6) rotate(0); }
+    20% { opacity: 1; }
+    30% { transform: translate(calc(var(--x) * .6), -40vh) scale(1) rotate(200deg); }
+    40% { transform: translate(var(--x), -6vh) scale(1, .86) rotate(330deg); }
+    46% { transform: translate(var(--x), -16vh) scale(1) rotate(380deg); }
+    52%, 86% { opacity: 1; transform: translate(var(--x), -8vh) scale(1) rotate(420deg); }
+    100% { opacity: 0; transform: translate(var(--x), -8vh) scale(1.2) rotate(460deg); }
+  }
+  #bw { position: absolute; left: 0; right: 0; top: 14vh; text-align: center; color: #F1F5FB; opacity: 0;
+        font: 900 min(14vh, 9vw) sans-serif; letter-spacing: .12em; text-shadow: 0 0 4vh rgba(198,244,50,.55); }
+  #balls.on #bw { animation: bword 5.5s ease forwards; }
+  @keyframes bword { 0%, 38% { opacity: 0; transform: scale(.4); letter-spacing: .6em; } 48% { opacity: 1; transform: scale(1.08); } 54%, 88% { opacity: 1; transform: scale(1); letter-spacing: .12em; } 100% { opacity: 0; transform: scale(1.1); } }
   /* Torneo del circolo: sopra il punteggio (sotto la moviola), pagine che si alternano. */
   #club { display: none; position: fixed; inset: 0; z-index: 40; background: #05070B; color: #F1F5FB; font-family: sans-serif;
           padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
@@ -165,6 +201,7 @@
 </div>
 <div id="banner"></div>
 <div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
+<div id="balls"><div id="bw"></div><div class="nb b1"></div><div class="nb b2"></div><div class="nb b3"></div><div id="bt"><div id="lid"></div></div></div>
 <div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
 
@@ -172,12 +209,12 @@
      Copia di quelli dell'app: TvSnapshotTest controlla che siano uguali e, se no, stampa il blocco giusto. -->
 <script type="application/json" id="texts">
 {
-"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
-"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
-"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
-"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
-"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
-"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
+"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM","newBalls":"Palle nuove"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
+"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard","newBalls":"New balls"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
+"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM","newBalls":"Balles neuves"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
+"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel","newBalls":"Neue Bälle"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
+"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM","newBalls":"Bolas nuevas"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
+"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM","newBalls":"Bolas novas"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
 }
 </script>
 <script>
@@ -406,6 +443,23 @@ function onState(json) {
   render();
   replayUpdate(S.replay);
   clubUpdate(S.club);
+  ballsUpdate(S.balls);
+}
+
+// ------------------------------------------------------------------ cambio palle
+// Un numero nuovo in balls fa partire l'animazione (dura 5,5 s); null la ferma.
+let ballsSeen = null, ballsTimer = 0;
+function ballsUpdate(b) {
+  const box = $("balls");
+  if (!b) { if (ballsSeen) { box.classList.remove("on"); ballsSeen = null; } return; }
+  if (b === ballsSeen) return;
+  ballsSeen = b;
+  $("bw").textContent = ((S.labels && S.labels.newBalls) || "").toUpperCase();
+  box.classList.remove("on");
+  void box.offsetWidth;
+  box.classList.add("on");
+  clearTimeout(ballsTimer);
+  ballsTimer = setTimeout(() => box.classList.remove("on"), 5600);
 }
 // ------------------------------------------------------------------ torneo del circolo
 // Le pagine (tabellone, gironi, ordine di gioco) si alternano ogni club.seconds secondi; un torneo nuovo riparte

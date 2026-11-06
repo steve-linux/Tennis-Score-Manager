@@ -62,6 +62,7 @@ import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsScore
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StopCircle
@@ -391,6 +392,21 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             if (padel && !onlyTiebreak) {
                 SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
                     c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
+                }
+            }
+            // Cambio palle dei tornei: niente, 7/9, 9/11, 11/13; con l'animazione facoltativa.
+            if (!padel && !short) {
+                Text(s.newBalls, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                Text(s.newBallsHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                val choices = listOf(0 to 0) + com.tennis.scoremanager.model.NewBalls.choices
+                Segmented(
+                    choices.map { (a, b) -> SegOption(if (a == 0) s.newBallsOff else "$a / $b") },
+                    choices.indexOf(o.newBallsFirst to o.newBallsEvery).coerceAtLeast(0),
+                    { i -> c.updateOptions { it.copy(newBallsFirst = choices[i].first, newBallsEvery = choices[i].second) } },
+                )
+                if (o.newBallsFirst > 0) {
+                    SwitchRow(Icons.Filled.SportsTennis, s.newBallsAnim, s.newBallsAnimHint, o.newBallsAnimation) { v -> c.updateOptions { it.copy(newBallsAnimation = v) } }
+                    if (o.newBallsAnimation) GhostButton(s.newBallsPreview, Icons.Filled.PlayArrow, { c.playBallsAnimation() }, Modifier.fillMaxWidth())
                 }
             }
         }
