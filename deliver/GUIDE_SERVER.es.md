@@ -20,7 +20,7 @@ El consejo: empezad por la manera **A**. Si queréis reservas desde casa, pasad 
 
 Hace falta un PC viejo (o una Raspberry Pi preparada por un técnico) y el **pendrive TSM-SERVER**.
 
-1. Conectad el PC a la red del club, mejor con cable.
+1. Conectad el PC a la red del club, mejor con cable. En un portátil sin cable también vale el Wi-Fi: la primera vez, cuando la pantalla diga **No network**, escribid `user`, Intro, `live`, Intro, y luego `sudo nmtui` (tras entrar, la pantalla recuerda todos los comandos); elegid **Activate a connection**, la red del club y escribid su contraseña. Queda guardada en el pendrive: las veces siguientes se conecta solo. Para salir: **Quit**, y luego `exit`.
 2. Meted el pendrive y encended el PC. Si arranca Windows, reiniciad, pulsad la tecla del menú de arranque (normalmente F12, F9 o Esc: la pantalla lo dice al encender) y elegid el pendrive USB.
 3. Al cabo de un minuto la pantalla muestra:
 

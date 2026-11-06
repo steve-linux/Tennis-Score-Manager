@@ -1,0 +1,28 @@
+
+  TSM - Server del circolo / Club server
+  Il server lavora da solo: qui serve solo per il Wi-Fi o la manutenzione.
+  The server runs by itself: you only need this for Wi-Fi or maintenance.
+
+  Wi-Fi (una volta sola: resta salvato sulla chiavetta / once: it stays saved on the stick)
+
+    sudo nmtui
+        Attiva una connessione (Activate a connection) > la rete del circolo / the club network
+        > la password > OK; poi / then: Indietro (Back) > Esci (Quit).
+
+    Oppure con un comando / Or with one command:
+        nmcli device wifi list                       le reti vicine / nearby networks
+        sudo nmcli device wifi connect "NOME RETE" password "PASSWORD"
+        (NOME RETE e PASSWORD come sono scritti, maiuscole comprese)
+        (network name and password exactly as written, capitals included)
+
+    Controllo / Check:
+        nmcli device status                          wifi = connesso / connected
+        hostname -I                                  l'indirizzo del server / the server address
+
+  Altri comandi / Other commands
+    sudo tsm-reset-admin       nuovo codice di abbinamento / new pairing code
+    passwd                     cambia la password (live) / change the password
+    sudo reboot                riavvia / restart
+    sudo poweroff              spegne / shut down
+    exit                       esci (il server resta acceso) / log out (the server keeps running)
+

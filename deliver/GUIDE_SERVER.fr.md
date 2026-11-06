@@ -20,7 +20,7 @@ Notre conseil : commencez par la façon **A**. Si vous voulez les réservations 
 
 Il faut un vieux PC (ou un Raspberry Pi préparé par un technicien) et la **clé USB TSM-SERVER**.
 
-1. Branchez le PC au réseau du club, de préférence par câble.
+1. Branchez le PC au réseau du club, de préférence par câble. Sur un portable sans câble le Wi-Fi convient aussi : la première fois, quand l'écran affiche **No network**, tapez `user`, Entrée, `live`, Entrée, puis `sudo nmtui` (après la connexion, l'écran rappelle toutes les commandes) ; choisissez **Activate a connection**, le réseau du club et tapez son mot de passe. Il reste enregistré sur la clé : les fois suivantes il se connecte tout seul. Pour sortir : **Quit**, puis `exit`.
 2. Insérez la clé et allumez le PC. Si Windows démarre, redémarrez et appuyez sur la touche du menu de démarrage (souvent F12, F9 ou Échap : l'écran l'indique à l'allumage) puis choisissez la clé USB.
 3. Après environ une minute l'écran affiche :
 

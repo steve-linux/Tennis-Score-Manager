@@ -20,7 +20,7 @@ Our advice: start with way **A**. If you want bookings from home, move to **B**:
 
 You need an old PC (or a Raspberry Pi prepared by a technician) and the **TSM-SERVER USB stick**.
 
-1. Connect the PC to the club network, preferably with a cable.
+1. Connect the PC to the club network, preferably with a cable. On a laptop without a cable Wi-Fi is fine too: the first time, when the screen says **No network**, type `user`, Enter, `live`, Enter, then `sudo nmtui` (after logging in, the screen lists all the commands); choose **Activate a connection**, the club network and type its password. It stays saved on the stick: from then on it connects by itself. To leave: **Quit**, then `exit`.
 2. Plug in the stick and switch the PC on. If Windows starts, restart and press the boot-menu key (usually F12, F9 or Esc: the screen says which one at power-on) and choose the USB stick.
 3. After about a minute the screen shows:
 

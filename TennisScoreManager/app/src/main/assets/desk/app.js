@@ -1854,3 +1854,26 @@ function editCourse(c) {
   if (!token) { showLogin(); return; }
   try { await start(); } catch (_) { if (!info) showLogin(); }
 })();
+
+// --- Aggiornamento da solo ---
+// Ogni minuto, e quando si torna sulla pagina, si chiedono al server del circolo le prenotazioni e le disdette dei
+// giocatori e si ridisegna la pagina. Mai mentre si scrive o con una finestra aperta: niente lavoro perso.
+const LIVE_VIEWS = { today: () => showToday(), plan: () => showPlan(), money: () => showMoney(), online: () => showOnline() };
+let liveBusy = false;
+async function liveRefresh() {
+  if (liveBusy || !token || !info || document.hidden || !LIVE_VIEWS[view]) return;
+  const busy = () => document.querySelector('dialog[open]') || (document.activeElement && document.activeElement.matches('input, select, textarea'));
+  if (busy()) return;
+  liveBusy = true;
+  try {
+    const server = !info.features || !info.features.length || info.features.includes('SERVER');
+    // Senza server abbinato (o se non risponde) si ridisegna lo stesso: i dati del telefono possono essere cambiati.
+    if (server) { try { await api('POST', '/online/sync'); } catch (_) { /* al prossimo giro */ } }
+    if (busy() || !LIVE_VIEWS[view]) return;
+    const y = window.scrollY;
+    await LIVE_VIEWS[view]();
+    window.scrollTo(0, y);
+  } catch (_) { /* al prossimo giro */ } finally { liveBusy = false; }
+}
+setInterval(liveRefresh, 60_000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) liveRefresh(); });

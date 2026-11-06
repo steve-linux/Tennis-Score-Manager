@@ -25,7 +25,8 @@ mkdir -p "$W/root/opt/tsm-server/kit"
 cp -a /kit/. "$W/root/opt/tsm-server/kit/"
 cp /iso/config/hooks/normal/9000-tsm.hook.chroot "$W/hook.sh"
 
-mmdebstrap --mode=unshare --variant=apt --components=main \
+# non-free-firmware: i firmware dei chip Wi-Fi dei portatili (Debian li mette anche nelle sue immagini ufficiali).
+mmdebstrap --mode=unshare --variant=apt --components=main,non-free-firmware \
     --include="linux-image-amd64,live-boot,live-config,live-config-systemd,systemd-sysv,locales,keyboard-configuration,console-setup,sudo,user-setup,$PKGS" \
     --customize-hook="sync-in $W/root /" \
     --customize-hook="upload $W/hook.sh /tmp/hook.sh" \

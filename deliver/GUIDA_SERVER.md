@@ -20,7 +20,7 @@ Il consiglio: partite dal modo **A**. Se volete le prenotazioni da casa, passate
 
 Vi serve un vecchio PC (o un Raspberry Pi preparato da un tecnico) e la **chiavetta TSM-SERVER**.
 
-1. Collegate il PC alla rete del circolo, meglio col cavo.
+1. Collegate il PC alla rete del circolo, meglio col cavo. Su un portatile senza cavo va bene anche il Wi-Fi: la prima volta, quando lo schermo dice **Nessuna rete**, scrivete `user`, Invio, `live`, Invio, poi `sudo nmtui` (dopo l'accesso lo schermo ricorda tutti i comandi); scegliete **Attiva una connessione** (o *Activate a connection*), la rete del circolo e scrivete la sua password. Resta salvata sulla chiavetta: dalle volte dopo si collega da solo. Per uscire: **Esci**, poi `exit`.
 2. Inserite la chiavetta e accendete il PC. Se parte Windows, al riavvio premete il tasto del menu di avvio (di solito F12, F9 o Esc: lo dice lo schermo all'accensione) e scegliete la chiavetta USB.
 3. Dopo circa un minuto sullo schermo compare:
 

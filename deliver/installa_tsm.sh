@@ -70,6 +70,7 @@ mkdir -p "$DEST/server"
 mkdir -p "$DEST/server/deploy"
 mkdir -p "$DEST/server/deploy/iso"
 mkdir -p "$DEST/server/deploy/iso/config/hooks/normal"
+mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/etc"
 mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/system"
 mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/usr/local/sbin"
 mkdir -p "$DEST/server/deploy/iso/config/package-lists"
@@ -5101,6 +5102,29 @@ function editCourse(c) {
   if (!token) { showLogin(); return; }
   try { await start(); } catch (_) { if (!info) showLogin(); }
 })();
+
+// --- Aggiornamento da solo ---
+// Ogni minuto, e quando si torna sulla pagina, si chiedono al server del circolo le prenotazioni e le disdette dei
+// giocatori e si ridisegna la pagina. Mai mentre si scrive o con una finestra aperta: niente lavoro perso.
+const LIVE_VIEWS = { today: () => showToday(), plan: () => showPlan(), money: () => showMoney(), online: () => showOnline() };
+let liveBusy = false;
+async function liveRefresh() {
+  if (liveBusy || !token || !info || document.hidden || !LIVE_VIEWS[view]) return;
+  const busy = () => document.querySelector('dialog[open]') || (document.activeElement && document.activeElement.matches('input, select, textarea'));
+  if (busy()) return;
+  liveBusy = true;
+  try {
+    const server = !info.features || !info.features.length || info.features.includes('SERVER');
+    // Senza server abbinato (o se non risponde) si ridisegna lo stesso: i dati del telefono possono essere cambiati.
+    if (server) { try { await api('POST', '/online/sync'); } catch (_) { /* al prossimo giro */ } }
+    if (busy() || !LIVE_VIEWS[view]) return;
+    const y = window.scrollY;
+    await LIVE_VIEWS[view]();
+    window.scrollTo(0, y);
+  } catch (_) { /* al prossimo giro */ } finally { liveBusy = false; }
+}
+setInterval(liveRefresh, 60_000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) liveRefresh(); });
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/desk/i18n.js
@@ -91395,6 +91419,37 @@ systemctl disable caddy.service || true
 echo tsm-circolo > /etc/hostname
 TSM_EOF
 
+# ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/etc/motd
+cat > "$DEST/server/deploy/iso/config/includes.chroot/etc/motd" << 'TSM_EOF'
+
+  TSM - Server del circolo / Club server
+  Il server lavora da solo: qui serve solo per il Wi-Fi o la manutenzione.
+  The server runs by itself: you only need this for Wi-Fi or maintenance.
+
+  Wi-Fi (una volta sola: resta salvato sulla chiavetta / once: it stays saved on the stick)
+
+    sudo nmtui
+        Attiva una connessione (Activate a connection) > la rete del circolo / the club network
+        > la password > OK; poi / then: Indietro (Back) > Esci (Quit).
+
+    Oppure con un comando / Or with one command:
+        nmcli device wifi list                       le reti vicine / nearby networks
+        sudo nmcli device wifi connect "NOME RETE" password "PASSWORD"
+        (NOME RETE e PASSWORD come sono scritti, maiuscole comprese)
+        (network name and password exactly as written, capitals included)
+
+    Controllo / Check:
+        nmcli device status                          wifi = connesso / connected
+        hostname -I                                  l'indirizzo del server / the server address
+
+  Altri comandi / Other commands
+    sudo tsm-reset-admin       nuovo codice di abbinamento / new pairing code
+    passwd                     cambia la password (live) / change the password
+    sudo reboot                riavvia / restart
+    sudo poweroff              spegne / shut down
+    exit                       esci (il server resta acceso) / log out (the server keeps running)
+TSM_EOF
+
 # ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.service
 cat > "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.service" << 'TSM_EOF'
 # SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -91445,9 +91500,14 @@ mkdir -p /etc/issue.d
 NEW=$(
     echo
     echo "  TSM – Server del circolo / Club server"
+    IPS=""
     for a in $(hostname -I 2>/dev/null); do
-        case "$a" in *:*) ;; *) echo "  http://$a:$PORT" ;; esac
+        case "$a" in *:*) ;; *) echo "  http://$a:$PORT"; IPS=1 ;; esac
     done
+    # Senza rete: col cavo, oppure il Wi-Fi una volta sola (resta salvato sulla chiavetta).
+    if [ -z "$IPS" ]; then
+        echo "  Nessuna rete: collega il cavo o il Wi-Fi. / No network: plug in the cable or set up Wi-Fi."
+    fi
     echo "  http://$(hostname).local:$PORT"
     if [ -f "$DATA/setup-code.txt" ]; then
         echo "  Codice di abbinamento / Pairing code: $(cat "$DATA/setup-code.txt")"
@@ -91462,6 +91522,8 @@ NEW=$(
         echo "  ATTENZIONE: nessuna partizione persistence, i dati si perdono allo spegnimento!"
         echo "  WARNING: no persistence partition, data is lost at shutdown!"
     fi
+    # Il Wi-Fi si imposta dopo il login: lì /etc/motd spiega i comandi.
+    echo "  Wi-Fi: login user, password live, poi / then: sudo nmtui"
     echo "  (Invio per aggiornare / press Enter to refresh)"
 )
 # Si riscrive (e si rinfresca lo schermo) solo se è cambiato qualcosa.
@@ -91479,6 +91541,14 @@ default-jre-headless
 avahi-daemon
 libnss-mdns
 network-manager
+# Wi-Fi: le password WPA e i firmware dei chip più comuni (Intel, Realtek, Atheros, Broadcom, MediaTek e altri).
+wpasupplicant
+wireless-regdb
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-misc-nonfree
 curl
 ca-certificates
 caddy
@@ -91513,7 +91583,8 @@ mkdir -p "$W/root/opt/tsm-server/kit"
 cp -a /kit/. "$W/root/opt/tsm-server/kit/"
 cp /iso/config/hooks/normal/9000-tsm.hook.chroot "$W/hook.sh"
 
-mmdebstrap --mode=unshare --variant=apt --components=main \
+# non-free-firmware: i firmware dei chip Wi-Fi dei portatili (Debian li mette anche nelle sue immagini ufficiali).
+mmdebstrap --mode=unshare --variant=apt --components=main,non-free-firmware \
     --include="linux-image-amd64,live-boot,live-config,live-config-systemd,systemd-sysv,locales,keyboard-configuration,console-setup,sudo,user-setup,$PKGS" \
     --customize-hook="sync-in $W/root /" \
     --customize-hook="upload $W/hook.sh /tmp/hook.sh" \
@@ -98256,6 +98327,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 318 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 319 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

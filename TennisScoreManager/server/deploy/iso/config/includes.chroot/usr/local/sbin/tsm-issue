@@ -10,9 +10,14 @@ mkdir -p /etc/issue.d
 NEW=$(
     echo
     echo "  TSM – Server del circolo / Club server"
+    IPS=""
     for a in $(hostname -I 2>/dev/null); do
-        case "$a" in *:*) ;; *) echo "  http://$a:$PORT" ;; esac
+        case "$a" in *:*) ;; *) echo "  http://$a:$PORT"; IPS=1 ;; esac
     done
+    # Senza rete: col cavo, oppure il Wi-Fi una volta sola (resta salvato sulla chiavetta).
+    if [ -z "$IPS" ]; then
+        echo "  Nessuna rete: collega il cavo o il Wi-Fi. / No network: plug in the cable or set up Wi-Fi."
+    fi
     echo "  http://$(hostname).local:$PORT"
     if [ -f "$DATA/setup-code.txt" ]; then
         echo "  Codice di abbinamento / Pairing code: $(cat "$DATA/setup-code.txt")"
@@ -27,6 +32,8 @@ NEW=$(
         echo "  ATTENZIONE: nessuna partizione persistence, i dati si perdono allo spegnimento!"
         echo "  WARNING: no persistence partition, data is lost at shutdown!"
     fi
+    # Il Wi-Fi si imposta dopo il login: lì /etc/motd spiega i comandi.
+    echo "  Wi-Fi: login user, password live, poi / then: sudo nmtui"
     echo "  (Invio per aggiornare / press Enter to refresh)"
 )
 # Si riscrive (e si rinfresca lo schermo) solo se è cambiato qualcosa.

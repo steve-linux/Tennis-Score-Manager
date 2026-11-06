@@ -20,7 +20,7 @@ Unser Rat: Beginnt mit Art **A**. Wenn ihr Buchungen von zu Hause wollt, wechsel
 
 Ihr braucht einen alten PC (oder einen von einem Techniker vorbereiteten Raspberry Pi) und den **USB-Stick TSM-SERVER**.
 
-1. Verbindet den PC mit dem Vereinsnetz, am besten per Kabel.
+1. Verbindet den PC mit dem Vereinsnetz, am besten per Kabel. Bei einem Laptop ohne Kabel geht auch WLAN: Beim ersten Mal, wenn der Bildschirm **No network** zeigt, `user`, Enter, `live`, Enter eingeben, dann `sudo nmtui` (nach der Anmeldung zeigt der Bildschirm alle Befehle); **Activate a connection** wählen, das Vereinsnetz auswählen und sein Passwort eingeben. Es bleibt auf dem Stick gespeichert: Danach verbindet er sich von selbst. Zum Verlassen: **Quit**, dann `exit`.
 2. Steckt den Stick ein und schaltet den PC ein. Startet Windows, dann neu starten, die Taste für das Startmenü drücken (meist F12, F9 oder Esc: Der Bildschirm zeigt sie beim Einschalten an) und den USB-Stick wählen.
 3. Nach etwa einer Minute erscheint auf dem Bildschirm:
 
