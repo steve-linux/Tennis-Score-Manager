@@ -2254,6 +2254,15 @@ class MatchController(
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 
+    /** Il tunnel da internet del server: com'è messo e, con [on], accendilo o spegnilo. */
+    suspend fun serverTunnel(on: Boolean? = null): Result<com.tennis.scoremanager.data.SrvTunnel> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { if (on == null) it.tunnel() else it.setTunnel(on) } })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+
     /** Il giocatore non prenota più online (le sue prenotazioni restano nel planning). */
     suspend fun serverRemovePlayer(id: String): String? {
         val conf = clubServer.value

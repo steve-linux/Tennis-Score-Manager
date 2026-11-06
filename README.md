@@ -53,6 +53,7 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Protocollo Bluetooth (condiviso col firmware) | `app/.../ble/BandProtocol.kt` e in cima a `TSM_Band.ino` |
 | Impostazioni dei braccialetti, stima autonomia | `app/.../ble/BandProtocol.kt` (`BandSettings`), `ble/BatteryModel.kt`, `ui/BandSettingsPanel.kt` |
 | Testi nelle sei lingue, grafica | `app/.../ui/Strings.kt` (+ `StringsFr/De/Es/Pt.kt`), `ui/screens/`, `ui/Theme.kt` |
+| Tunnel del server (Tailscale Funnel, porta riservata) | `server/deploy/tsm-tunnel*`, `server/.../Tunnel.kt`, `ui/screens/ClubServerScreen.kt` (`TunnelSection`) |
 | Segreteria da PC (server HTTPS sul telefono, abbinamento, API, import CSV, pagina) | `app/.../desk/`, `app/src/main/assets/desk/`, `ui/screens/DeskScreen.kt`, `service/DeskService.kt` |
 | Tabellone TV (pagina, server, telefono-tabellone) | `app/src/main/assets/scoreboard.html`, `app/.../tv/`, `ui/TvSection.kt` — anteprima: `scoreboard.html?demo=1` |
 | Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |

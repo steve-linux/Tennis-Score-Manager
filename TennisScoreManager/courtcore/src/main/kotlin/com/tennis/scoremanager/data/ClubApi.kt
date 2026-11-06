@@ -20,6 +20,13 @@ import kotlinx.serialization.Serializable
     val waits: List<Wait> = emptyList(), val seeks: List<Seek> = emptyList(),
 )
 @Serializable data class SrvOk(val ok: Boolean = true)
+
+/**
+ * Il tunnel da internet del server. [state]: OFF, WORKING, LOGIN e ENABLE (la segreteria apre [link]), ON (con [url]),
+ * ERROR (con [code]). [available] è falso se sul server manca l'aiutante del tunnel: va aggiornato il kit.
+ */
+@Serializable data class SrvTunnel(val available: Boolean = false, val state: String = "OFF", val url: String = "", val link: String = "", val code: String = "")
+@Serializable data class SrvTunnelIn(val on: Boolean)
 /** I backup della segreteria tenuti dal server (gli ultimi 14): il file compresso in base64. */
 @Serializable data class SrvBackup(val name: String, val at: Long, val size: Long)
 @Serializable data class SrvBackupData(val name: String, val data: String)

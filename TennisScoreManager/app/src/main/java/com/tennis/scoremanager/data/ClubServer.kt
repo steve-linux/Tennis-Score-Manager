@@ -247,6 +247,8 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun pair(code: String): SrvToken = call("POST", "/admin/pair", SrvCode.serializer(), SrvCode(code), SrvToken.serializer())
     fun sync(s: ClubSync): SrvAdmin = call("PUT", "/admin/sync", ClubSync.serializer(), s, SrvAdmin.serializer())
     fun state(): SrvAdmin = call<Unit, SrvAdmin>("GET", "/admin/state", null, null, SrvAdmin.serializer())
+    fun tunnel(): SrvTunnel = call<Unit, SrvTunnel>("GET", "/admin/tunnel", null, null, SrvTunnel.serializer())
+    fun setTunnel(on: Boolean): SrvTunnel = call("POST", "/admin/tunnel", SrvTunnelIn.serializer(), SrvTunnelIn(on), SrvTunnel.serializer())
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())

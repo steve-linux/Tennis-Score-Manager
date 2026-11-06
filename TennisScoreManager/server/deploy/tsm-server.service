@@ -11,9 +11,9 @@ Wants=network-online.target
 Type=simple
 User=tsm
 Group=tsm
-Environment=TSM_HOST=0.0.0.0 TSM_PORT=8080 "JAVA_OPTS=-Xmx64m"
+Environment=TSM_HOST=0.0.0.0 TSM_PORT=8080 TSM_TUNNEL_PORT=8088 "JAVA_OPTS=-Xmx64m"
 EnvironmentFile=-/etc/default/tsm-server
-ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/tsm-server/tsm-server.jar --host ${TSM_HOST} --port ${TSM_PORT} --data /var/lib/tsm-server
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/tsm-server/tsm-server.jar --host ${TSM_HOST} --port ${TSM_PORT} --tunnel-port ${TSM_TUNNEL_PORT} --data /var/lib/tsm-server
 StateDirectory=tsm-server
 StateDirectoryMode=0700
 Restart=on-failure

@@ -5,7 +5,9 @@
 # Dentro l'immagine: l'utente del server, i servizi accesi all'avvio, Caddy spento (si accende per l'HTTPS).
 set -e
 id tsm >/dev/null 2>&1 || useradd --system --home-dir /var/lib/tsm-server --no-create-home --shell /usr/sbin/nologin tsm
-chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin
-systemctl enable tsm-server.service tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
+chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin /opt/tsm-server/tsm-tunnel
+mkdir -p /var/lib/tsm-tunnel
+echo '{"state":"OFF"}' > /var/lib/tsm-tunnel/status.json
+systemctl enable tsm-server.service tsm-tunnel.path tsm-tunnel.timer tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
 systemctl disable caddy.service || true
 echo tsm-circolo > /etc/hostname

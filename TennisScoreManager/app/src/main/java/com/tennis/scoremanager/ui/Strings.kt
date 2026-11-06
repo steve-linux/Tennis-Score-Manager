@@ -1591,6 +1591,18 @@ interface Strings {
     val srvErrAuth: String
     val srvErrNotTsm: String
     val srvErrOther: (String) -> String
+    val srvTunnelTitle: String
+    val srvTunnelHint: String
+    val srvTunnelOn: String
+    val srvTunnelOff: String
+    val srvTunnelOpen: String
+    val srvTunnelWorking: String
+    val srvTunnelLogin: String
+    val srvTunnelEnable: String
+    val srvTunnelKey: String
+    val srvTunnelFail: String
+    val srvTunnelUpdate: String
+    val srvTunnelReady: (String) -> String
     val srvPublicUrl: String
     val srvPublicUrlHint: String
     val srvErrPairLocal: String
@@ -3730,6 +3742,18 @@ object ItStrings : Strings {
     override val srvErrAuth = "Il server non riconosce più questo telefono: scollega e abbina di nuovo."
     override val srvErrNotTsm = "A quell'indirizzo non c'è un server del circolo TSM."
     override val srvErrOther: (String) -> String = { "Errore del server: $it" }
+    override val srvTunnelTitle = "Accesso da internet senza toccare il router"
+    override val srvTunnelHint = "I giocatori prenotano anche da casa: basta un account gratuito Tailscale, senza aprire porte."
+    override val srvTunnelOn = "Attiva"
+    override val srvTunnelOff = "Disattiva"
+    override val srvTunnelOpen = "Apri Tailscale"
+    override val srvTunnelWorking = "Il server sta preparando il collegamento: può volerci qualche minuto."
+    override val srvTunnelLogin = "Apri Tailscale ed entra col tuo account (o creane uno gratuito). Poi torna qui."
+    override val srvTunnelEnable = "Ultimo passo: apri Tailscale e conferma l'attivazione di Funnel. Poi torna qui."
+    override val srvTunnelKey = "Per non dover rientrare ogni sei mesi: su login.tailscale.com, in Machines, scegli Disable key expiry per questo server."
+    override val srvTunnelFail = "Non è andata: controlla che il server abbia internet e riprova."
+    override val srvTunnelUpdate = "Per usarlo aggiorna il server: rilancia install.sh con il kit nuovo."
+    override val srvTunnelReady: (String) -> String = { "Attivo: $it. Gli inviti usano questo indirizzo." }
     override val srvPublicUrl = "Indirizzo da internet (facoltativo)"
     override val srvPublicUrlHint = "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo"
     override val srvErrPairLocal = "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080)."
@@ -5838,6 +5862,18 @@ object EnStrings : Strings {
     override val srvErrAuth = "The server no longer knows this phone: disconnect and pair again."
     override val srvErrNotTsm = "There is no TSM club server at that address."
     override val srvErrOther: (String) -> String = { "Server error: $it" }
+    override val srvTunnelTitle = "Internet access without touching the router"
+    override val srvTunnelHint = "Players can book from home too: a free Tailscale account is all you need, with no ports to open."
+    override val srvTunnelOn = "Turn on"
+    override val srvTunnelOff = "Turn off"
+    override val srvTunnelOpen = "Open Tailscale"
+    override val srvTunnelWorking = "The server is preparing the connection: this may take a few minutes."
+    override val srvTunnelLogin = "Open Tailscale and sign in with your account (or create a free one). Then come back here."
+    override val srvTunnelEnable = "Last step: open Tailscale and confirm turning on Funnel. Then come back here."
+    override val srvTunnelKey = "To avoid signing in again every six months: on login.tailscale.com, under Machines, choose Disable key expiry for this server."
+    override val srvTunnelFail = "It did not work: check that the server has internet access and try again."
+    override val srvTunnelUpdate = "To use this, update the server: run install.sh again with the new kit."
+    override val srvTunnelReady: (String) -> String = { "On: $it. Invitations use this address." }
     override val srvPublicUrl = "Address from the internet (optional)"
     override val srvPublicUrlHint = "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club"
     override val srvErrPairLocal = "Pairing works only from the club network: use the local address (http://…:8080)."

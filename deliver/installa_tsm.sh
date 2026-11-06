@@ -720,6 +720,18 @@ const APP_I18N = {
     srvSyncNow: "Invia ora",
     srvSynced: "Planning inviato",
     srvTitle: "Server del circolo",
+    srvTunnelEnable: "Ultimo passo: apri Tailscale e conferma l'attivazione di Funnel. Poi torna qui.",
+    srvTunnelFail: "Non è andata: controlla che il server abbia internet e riprova.",
+    srvTunnelHint: "I giocatori prenotano anche da casa: basta un account gratuito Tailscale, senza aprire porte.",
+    srvTunnelKey: "Per non dover rientrare ogni sei mesi: su login.tailscale.com, in Machines, scegli Disable key expiry per questo server.",
+    srvTunnelLogin: "Apri Tailscale ed entra col tuo account (o creane uno gratuito). Poi torna qui.",
+    srvTunnelOff: "Disattiva",
+    srvTunnelOn: "Attiva",
+    srvTunnelOpen: "Apri Tailscale",
+    srvTunnelReady: (it) => `Attivo: ${it}. Gli inviti usano questo indirizzo.`,
+    srvTunnelTitle: "Accesso da internet senza toccare il router",
+    srvTunnelUpdate: "Per usarlo aggiorna il server: rilancia install.sh con il kit nuovo.",
+    srvTunnelWorking: "Il server sta preparando il collegamento: può volerci qualche minuto.",
     srvUnpair: "Scollega il server",
     srvUnpairAsk: "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano.",
     stBlocked: (it) => `non prenotabili ${it} h`,
@@ -1172,6 +1184,18 @@ const APP_I18N = {
     srvSyncNow: "Send now",
     srvSynced: "Schedule sent",
     srvTitle: "Club server",
+    srvTunnelEnable: "Last step: open Tailscale and confirm turning on Funnel. Then come back here.",
+    srvTunnelFail: "It did not work: check that the server has internet access and try again.",
+    srvTunnelHint: "Players can book from home too: a free Tailscale account is all you need, with no ports to open.",
+    srvTunnelKey: "To avoid signing in again every six months: on login.tailscale.com, under Machines, choose Disable key expiry for this server.",
+    srvTunnelLogin: "Open Tailscale and sign in with your account (or create a free one). Then come back here.",
+    srvTunnelOff: "Turn off",
+    srvTunnelOn: "Turn on",
+    srvTunnelOpen: "Open Tailscale",
+    srvTunnelReady: (it) => `On: ${it}. Invitations use this address.`,
+    srvTunnelTitle: "Internet access without touching the router",
+    srvTunnelUpdate: "To use this, update the server: run install.sh again with the new kit.",
+    srvTunnelWorking: "The server is preparing the connection: this may take a few minutes.",
     srvUnpair: "Disconnect the server",
     srvUnpairAsk: "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay.",
     stBlocked: (it) => `not bookable ${it} h`,
@@ -1624,6 +1648,18 @@ const APP_I18N = {
     srvSyncNow: "Envoyer maintenant",
     srvSynced: "Planning envoyé",
     srvTitle: "Serveur du club",
+    srvTunnelEnable: "Dernière étape : ouvrez Tailscale et confirmez l'activation de Funnel. Revenez ensuite ici.",
+    srvTunnelFail: "Cela n'a pas fonctionné : vérifiez que le serveur a accès à internet et réessayez.",
+    srvTunnelHint: "Les joueurs réservent aussi de chez eux : un compte Tailscale gratuit suffit, sans ouvrir de ports.",
+    srvTunnelKey: "Pour ne pas vous reconnecter tous les six mois : sur login.tailscale.com, dans Machines, choisissez Disable key expiry pour ce serveur.",
+    srvTunnelLogin: "Ouvrez Tailscale et connectez-vous avec votre compte (ou créez-en un gratuit). Revenez ensuite ici.",
+    srvTunnelOff: "Désactiver",
+    srvTunnelOn: "Activer",
+    srvTunnelOpen: "Ouvrir Tailscale",
+    srvTunnelReady: (it) => `Activé : ${it}. Les invitations utilisent cette adresse.`,
+    srvTunnelTitle: "Accès internet sans toucher à la box",
+    srvTunnelUpdate: "Pour l'utiliser, mettez à jour le serveur : relancez install.sh avec le nouveau kit.",
+    srvTunnelWorking: "Le serveur prépare la connexion : cela peut prendre quelques minutes.",
     srvUnpair: "Déconnecter le serveur",
     srvUnpairAsk: "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : java -jar tsm-server.jar --reset-admin). Les réservations déjà au planning restent.",
     stBlocked: (it) => `non réservables ${it} h`,
@@ -2076,6 +2112,18 @@ const APP_I18N = {
     srvSyncNow: "Jetzt senden",
     srvSynced: "Plan gesendet",
     srvTitle: "Vereinsserver",
+    srvTunnelEnable: "Letzter Schritt: Öffne Tailscale und bestätige die Aktivierung von Funnel. Komm dann hierher zurück.",
+    srvTunnelFail: "Das hat nicht geklappt: Prüfe, ob der Server Internet hat, und versuche es erneut.",
+    srvTunnelHint: "Die Spieler buchen auch von zu Hause: Ein kostenloses Tailscale-Konto genügt, ohne Ports zu öffnen.",
+    srvTunnelKey: "Damit du dich nicht alle sechs Monate neu anmelden musst: Wähle auf login.tailscale.com unter Machines für diesen Server Disable key expiry.",
+    srvTunnelLogin: "Öffne Tailscale und melde dich mit deinem Konto an (oder erstelle ein kostenloses). Komm dann hierher zurück.",
+    srvTunnelOff: "Ausschalten",
+    srvTunnelOn: "Einschalten",
+    srvTunnelOpen: "Tailscale öffnen",
+    srvTunnelReady: (it) => `Aktiv: ${it}. Einladungen nutzen diese Adresse.`,
+    srvTunnelTitle: "Internetzugang ohne Router-Einstellungen",
+    srvTunnelUpdate: "Aktualisiere dafür den Server: Starte install.sh mit dem neuen Kit erneut.",
+    srvTunnelWorking: "Der Server bereitet die Verbindung vor: Das kann einige Minuten dauern.",
     srvUnpair: "Server trennen",
     srvUnpairAsk: "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: java -jar tsm-server.jar --reset-admin). Buchungen im Plan bleiben.",
     stBlocked: (it) => `nicht buchbar ${it} Std.`,
@@ -2528,6 +2576,18 @@ const APP_I18N = {
     srvSyncNow: "Enviar ahora",
     srvSynced: "Planning enviado",
     srvTitle: "Servidor del club",
+    srvTunnelEnable: "Último paso: abre Tailscale y confirma la activación de Funnel. Luego vuelve aquí.",
+    srvTunnelFail: "No ha funcionado: comprueba que el servidor tenga internet e inténtalo de nuevo.",
+    srvTunnelHint: "Los jugadores reservan también desde casa: basta una cuenta gratuita de Tailscale, sin abrir puertos.",
+    srvTunnelKey: "Para no tener que entrar de nuevo cada seis meses: en login.tailscale.com, en Machines, elige Disable key expiry para este servidor.",
+    srvTunnelLogin: "Abre Tailscale y entra con tu cuenta (o crea una gratuita). Luego vuelve aquí.",
+    srvTunnelOff: "Desactivar",
+    srvTunnelOn: "Activar",
+    srvTunnelOpen: "Abrir Tailscale",
+    srvTunnelReady: (it) => `Activo: ${it}. Las invitaciones usan esta dirección.`,
+    srvTunnelTitle: "Acceso desde internet sin tocar el router",
+    srvTunnelUpdate: "Para usarlo, actualiza el servidor: vuelve a lanzar install.sh con el kit nuevo.",
+    srvTunnelWorking: "El servidor está preparando la conexión: puede tardar unos minutos.",
     srvUnpair: "Desconectar el servidor",
     srvUnpairAsk: "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: java -jar tsm-server.jar --reset-admin). Las reservas ya en el planning se quedan.",
     stBlocked: (it) => `no reservables ${it} h`,
@@ -2980,6 +3040,18 @@ const APP_I18N = {
     srvSyncNow: "Enviar agora",
     srvSynced: "Agenda enviada",
     srvTitle: "Servidor do clube",
+    srvTunnelEnable: "Último passo: abra o Tailscale e confirme a ativação do Funnel. Depois volte aqui.",
+    srvTunnelFail: "Não funcionou: verifique se o servidor tem internet e tente de novo.",
+    srvTunnelHint: "Os jogadores reservam também de casa: basta uma conta gratuita do Tailscale, sem abrir portas.",
+    srvTunnelKey: "Para não precisar entrar de novo a cada seis meses: em login.tailscale.com, em Machines, escolha Disable key expiry para este servidor.",
+    srvTunnelLogin: "Abra o Tailscale e entre com sua conta (ou crie uma gratuita). Depois volte aqui.",
+    srvTunnelOff: "Desativar",
+    srvTunnelOn: "Ativar",
+    srvTunnelOpen: "Abrir o Tailscale",
+    srvTunnelReady: (it) => `Ativo: ${it}. Os convites usam este endereço.`,
+    srvTunnelTitle: "Acesso pela internet sem mexer no roteador",
+    srvTunnelUpdate: "Para usar isso, atualize o servidor: execute install.sh de novo com o kit novo.",
+    srvTunnelWorking: "O servidor está preparando a conexão: pode levar alguns minutos.",
     srvUnpair: "Desligar o servidor",
     srvUnpairAsk: "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: java -jar tsm-server.jar --reset-admin). As reservas já na agenda ficam.",
     stBlocked: (it) => `não reserváveis ${it} h`,
@@ -7481,6 +7553,10 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Warteliste**: Tippt der Spieler auf ein **Belegt**-Feld (auf der TSM-Seite oder unter *Platz buchen* in der App), wählt er **Benachrichtigen, wenn frei**, für diesen Platz oder einen beliebigen Platz zur selben Zeit (höchstens 3 Wartende). Wird die Buchung storniert oder verschoben, bekommt er sofort einen Hinweis und auf der Seite erscheint **Buchen**: Wer zuerst bucht, bekommt es; ist ein anderer schneller, wartet er weiter. Wartende verschwinden von selbst, wenn die Zeit vorbei ist.
 - **Partner gesucht**: Auf der TSM-Seite und unter *Platz buchen* gibt der Spieler eine Anzeige auf (Tag, Zeitfenster, Einzel oder Doppel, Niveau, Notiz; höchstens 3 offen). Die anderen sehen sie und tippen auf **Bin dabei**; wer sie aufgegeben hat, bekommt einen Hinweis. Vollständig (2 Spieler im Einzel, 4 im Doppel) **bucht der Server selbst** den ersten freien Platz im Zeitfenster, mit den Regeln der Online-Buchung, und sagt es allen; ist kein Platz frei, sagt er auch das, und sie buchen selbst. Vergangene Anzeigen verschwinden von selbst.
 - **Hinweise für das Büro**: Mit *Bei Online-Buchungen benachrichtigen* (normalerweise an) bekommt das Büro-Handy eine Benachrichtigung, wenn ein Spieler bucht oder storniert, auch bei geschlossener App: etwa alle 15 Minuten, wenn Netz da ist. Antippen öffnet die Platzbelegung am Tag der Buchung. Was das Büro selbst entfernt, löst keine Benachrichtigung aus.
+- **Von zu Hause, ohne Router-Einstellungen** (empfohlen). Tippe in *Vereinsserver* bei gekoppeltem Telefon unter *Internetzugang ohne Router-Einstellungen* auf **Einschalten**. Der Server installiert Tailscale, dann bittet dich die App, Tailscale zu öffnen, um dich anzumelden (oder ein kostenloses Konto zu erstellen), und beim ersten Mal, Funnel zu bestätigen. Danach füllt sich die **Adresse aus dem Internet** von selbst aus (`https://tsm-circolo….ts.net`): HTTPS inklusive, ohne DuckDNS, und es funktioniert auch hinter CGNAT.
+  - Die Verbindung geht vom Server nach außen, der Router bleibt also unberührt und die Spieler installieren nichts. Der Verkehr läuft über die Systeme von Tailscale, einen externen Dienst; Funnel ist noch in der Beta und hat Datenlimits, die für die Buchungen eines Vereins kaum ins Gewicht fallen dürften. Der erste Aufruf der Adresse kann einige Minuten dauern.
+  - Die Tailscale-Anmeldung läuft normalerweise nach 180 Tagen ab: Um das zu vermeiden, wähle auf login.tailscale.com unter *Machines* für den Server *Disable key expiry*. Läuft sie ab, zeigt die App wieder **Tailscale öffnen**.
+  - Das **Koppeln** des Büros geht weiterhin nur aus dem Vereinsnetz. **Ausschalten** trennt die Verbindung. Auf bereits installierten Servern starte zuerst `install.sh` mit dem neuen Kit.
 - **Von zu Hause** (Internet, per HTTPS: das braucht es auch, um die Seite auf den Home-Bildschirm des iPhones zu legen). Alles kostenlos:
   1. Auf **duckdns.org** (Anmeldung mit einem GitHub-, Google-… Konto) einen Namen anlegen, z. B. `tcprova.duckdns.org`, und den **Token** kopieren.
   2. Am **Vereinsrouter** dem Pi eine feste Adresse geben und die **TCP-Ports 80 und 443** an ihn weiterleiten.
@@ -8044,6 +8120,10 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Waiting list**: tapping a **Taken** slot (on the TSM page or in *Book a court* in the app) the player chooses **Tell me if it frees up**, for that court or any court at the same time (3 waits at most). If the booking is cancelled or moved they get an alert right away and **Book** appears on the page: whoever books first gets it; if someone else is faster, they go back to waiting. Waits disappear by themselves once the time has passed.
 - **Looking for a partner**: on the TSM page and in *Book a court* a player posts a request (day, time window, singles or doubles, level, note; at most 3 open). Others see it and tap **I'm in**; the poster gets an alert. When complete (2 players in singles, 4 in doubles) the server **books by itself** the first free court in the window, with the online booking rules, and tells everyone; if no court is free it says so, and they book one themselves. Past requests disappear by themselves.
 - **Alerts for the office**: with *Notify me of online bookings* (on by default) the office phone gets a notification when a player books or cancels, even with the app closed: about every 15 minutes, when there is a network. Tapping it opens the planner on the booking day. Bookings the office removes itself give no notification.
+- **From home, without touching the router** (recommended). In *Club server*, with the phone paired, tap **Turn on** under *Internet access without touching the router*. The server installs Tailscale, then the app asks you to open Tailscale to sign in (or create a free account) and, the first time, to confirm Funnel. When it is ready, **Address from the internet** fills itself in (`https://tsm-circolo….ts.net`): HTTPS included, no DuckDNS, and it also works behind CGNAT.
+  - The connection goes from the server outwards, so the router stays untouched and players install nothing. Traffic passes through Tailscale's systems, an external service; Funnel is still in beta and has traffic limits, which should not matter for a club's bookings. The first visit to the address may take a few minutes.
+  - The Tailscale sign-in normally expires after 180 days: to avoid this, on login.tailscale.com, under *Machines*, choose *Disable key expiry* for the server. If it expires, the app shows **Open Tailscale** again.
+  - **Pairing** the office is still possible only from the club network. **Turn off** closes the connection. On servers already installed, first run `install.sh` again with the new kit.
 - **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
   1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
   2. On the **club router** give the Pi a fixed address and forward **TCP ports 80 and 443** to it.
@@ -8606,6 +8686,10 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Lista de espera**: tocando una casilla **Ocupada** (en la página TSM o en *Reservar pista* en la app) el jugador elige **Avísame si se libera**, para esa pista o cualquier pista a la misma hora (como mucho 3 esperas). Si la reserva se anula o se mueve, recibe el aviso enseguida y en la página aparece **Reservar**: la consigue quien reserve primero; si otro es más rápido, vuelve a esperar. Las esperas desaparecen solas cuando pasa la hora.
 - **Busco compañero**: en la página TSM y en *Reservar pista* el jugador publica un anuncio (día, franja horaria, individual o dobles, nivel, nota; como mucho 3 abiertos). Los demás lo ven y tocan **Me apunto**; quien lo puso recibe un aviso. Completos (2 jugadores en individual, 4 en dobles) el servidor **reserva solo** la primera pista libre en la franja, con las reglas de las reservas en línea, y avisa a todos; si no hay pista libre lo dice, y la reservan ellos. Los anuncios pasados desaparecen solos.
 - **Avisos para la secretaría**: con *Avisarme de las reservas en línea* (encendido por defecto) el teléfono de la secretaría recibe una notificación cuando un jugador reserva o anula, también con la app cerrada: cada 15 minutos más o menos, cuando hay red. Al tocarla se abre el planning en el día de la reserva. Las que quita la propia secretaría no avisan.
+- **Desde casa, sin tocar el router** (recomendado). En *Servidor del club*, con el teléfono emparejado, toca **Activar** en *Acceso desde internet sin tocar el router*. El servidor instala Tailscale y la app te pide abrir Tailscale para entrar (o crear una cuenta gratuita) y, la primera vez, para confirmar Funnel. Cuando está listo, **Dirección desde internet** se rellena sola (`https://tsm-circolo….ts.net`): HTTPS incluido, sin DuckDNS, y también funciona con CGNAT.
+  - La conexión sale del servidor hacia fuera, así que el router no se toca y los jugadores no instalan nada. El tráfico pasa por los sistemas de Tailscale, un servicio externo; Funnel sigue en beta y tiene límites de tráfico, que no deberían afectar a las reservas de un club. El primer acceso a la dirección puede tardar unos minutos.
+  - El acceso a Tailscale caduca normalmente a los 180 días: para evitarlo, en login.tailscale.com, en *Machines*, elige *Disable key expiry* para el servidor. Si caduca, la app vuelve a mostrar **Abrir Tailscale**.
+  - **Emparejar** la secretaría sigue siendo posible solo desde la red del club. **Desactivar** cierra la conexión. En servidores ya instalados, vuelve a lanzar antes `install.sh` con el kit nuevo.
 - **Desde casa** (internet, en HTTPS: también hace falta para poner la página en la pantalla de inicio del iPhone). Todo gratis:
   1. En **duckdns.org** (se entra con una cuenta de GitHub, Google…) se crea un nombre, p. ej. `tcprova.duckdns.org`, y se copia el **token**.
   2. En el **router del club** se da a la Pi una dirección fija y se redirigen a ella los puertos **TCP 80 y 443**.
@@ -9168,6 +9252,10 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Liste d'attente** : en touchant un créneau **Occupé** (sur la page TSM ou dans *Réserver un terrain* dans l'app), le joueur choisit **Me prévenir s'il se libère**, pour ce terrain ou n'importe quel terrain à la même heure (3 attentes au maximum). Si la réservation est annulée ou déplacée, il est prévenu tout de suite et **Réserver** apparaît sur la page : le premier qui réserve l'obtient ; si un autre est plus rapide, il reprend l'attente. Les attentes disparaissent seules une fois l'heure passée.
 - **Je cherche un partenaire** : sur la page TSM et dans *Réserver un terrain*, le joueur publie une annonce (jour, créneau, simple ou double, niveau, note ; 3 ouvertes au maximum). Les autres la voient et touchent **Je viens** ; l'auteur est prévenu. Au complet (2 joueurs en simple, 4 en double), le serveur **réserve tout seul** le premier terrain libre dans le créneau, avec les règles des réservations en ligne, et prévient tout le monde ; s'il n'y a pas de terrain libre il le dit, et ils en réservent un eux-mêmes. Les annonces passées disparaissent seules.
 - **Alertes pour le secrétariat** : avec *Me prévenir des réservations en ligne* (activé par défaut), le téléphone du secrétariat reçoit une notification quand un joueur réserve ou annule, même app fermée : environ toutes les 15 minutes, quand il y a du réseau. En la touchant, le planning s'ouvre sur le jour de la réservation. Celles que le secrétariat retire lui-même ne donnent pas de notification.
+- **Depuis la maison, sans toucher à la box** (conseillé). Dans *Serveur du club*, téléphone appairé, touchez **Activer** sous *Accès internet sans toucher à la box*. Le serveur installe Tailscale, puis l'app vous demande d'ouvrir Tailscale pour vous connecter (ou créer un compte gratuit) et, la première fois, pour confirmer Funnel. Une fois prêt, **Adresse depuis internet** se remplit seule (`https://tsm-circolo….ts.net`) : HTTPS inclus, sans DuckDNS, et cela fonctionne aussi derrière un CGNAT.
+  - La connexion part du serveur vers l'extérieur : la box reste intacte et les joueurs n'installent rien. Le trafic passe par les systèmes de Tailscale, un service externe ; Funnel est encore en bêta et a des limites de trafic, qui ne devraient pas gêner les réservations d'un club. Le premier accès à l'adresse peut prendre quelques minutes.
+  - La connexion à Tailscale expire normalement après 180 jours : pour l'éviter, sur login.tailscale.com, dans *Machines*, choisissez *Disable key expiry* pour le serveur. Si elle expire, l'app affiche de nouveau **Ouvrir Tailscale**.
+  - **Appairer** le secrétariat reste possible uniquement depuis le réseau du club. **Désactiver** ferme la connexion. Sur les serveurs déjà installés, relancez d'abord `install.sh` avec le nouveau kit.
 - **Depuis chez soi** (internet, en HTTPS : il le faut aussi pour mettre la page sur l'écran d'accueil de l'iPhone). Tout est gratuit :
   1. Sur **duckdns.org** (connexion avec un compte GitHub, Google…), créez un nom, ex. `tcprova.duckdns.org`, et copiez le **jeton**.
   2. Sur la **box du club**, donnez au Pi une adresse fixe et redirigez vers elle les ports **TCP 80 et 443**.
@@ -9730,6 +9818,10 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Lista d'attesa**: toccando una casella **Occupato** (nella pagina TSM o in *Prenota un campo* nell'app) il giocatore sceglie **Avvisami se si libera**, per quel campo o per un campo qualsiasi alla stessa ora (al massimo 3 attese). Se la prenotazione viene disdetta o spostata gli arriva subito l'avviso e nella pagina compare **Prenota**: vince chi prenota per primo; se un altro arriva prima, si torna ad aspettare. Le attese spariscono da sole quando l'ora passa.
 - **Cerco compagno**: nella pagina TSM e in *Prenota un campo* il giocatore pubblica un annuncio (giorno, fascia oraria, singolo o doppio, livello, nota; al massimo 3 aperti). Gli altri lo vedono e toccano **Ci sto**; chi l'ha messo riceve un avviso. Al completo (2 giocatori nel singolo, 4 nel doppio) il server **prenota da solo** il primo campo libero nella fascia, con le regole delle prenotazioni online, e avvisa tutti; se non c'è un campo libero lo dice, e lo prenotano loro. Gli annunci passati spariscono da soli.
 - **Avvisi alla segreteria**: con *Avvisami delle prenotazioni online* (acceso di solito) il telefono della segreteria riceve una notifica quando un giocatore prenota o disdice, anche ad app chiusa: ogni 15 minuti circa, quando c'è rete. Toccandola si apre il planning sul giorno della prenotazione. Quelle tolte dalla segreteria stessa non danno notifica.
+- **Da casa, senza toccare il router** (consigliato). In *Server del circolo*, con il telefono abbinato, tocca **Attiva** in *Accesso da internet senza toccare il router*. Il server installa Tailscale, poi l'app chiede di aprire Tailscale per entrare (o creare un account gratuito) e, la prima volta, per confermare Funnel. Quando è pronto, **Indirizzo da internet** si compila da solo (`https://tsm-circolo….ts.net`): HTTPS incluso, niente DuckDNS, funziona anche con CGNAT.
+  - Il collegamento parte dal server verso fuori, quindi il router non si tocca e i giocatori non installano niente. Il traffico passa dai sistemi di Tailscale, un servizio esterno; Funnel è ancora in beta e ha limiti di traffico, che per le prenotazioni di un circolo non dovrebbero pesare. Il primo accesso all'indirizzo può richiedere qualche minuto.
+  - L'accesso a Tailscale scade di norma dopo 180 giorni: per evitarlo, su login.tailscale.com, in *Machines*, scegli *Disable key expiry* per il server. Se scade, l'app mostra di nuovo **Apri Tailscale**.
+  - **Abbinare** la segreteria resta possibile solo dalla rete del circolo. **Disattiva** chiude il collegamento. Sui server già installati, prima rilancia `install.sh` con il kit nuovo.
 - **Da casa** (internet, in HTTPS: serve anche per mettere la pagina sulla schermata Home dell'iPhone). Tutto gratuito:
   1. Su **duckdns.org** (si entra con un account GitHub, Google…) si crea un nome, es. `tcprova.duckdns.org`, e si copia il **token**.
   2. Sul **router del circolo** si dà al Pi un indirizzo fisso e si inoltrano a quell'indirizzo le porte **TCP 80 e 443**.
@@ -10292,6 +10384,10 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Lista de espera**: ao tocar numa casa **Ocupada** (na página TSM ou em *Reservar quadra* na app) o jogador escolhe **Avisa-me se ficar livre**, para essa quadra ou qualquer quadra à mesma hora (no máximo 3 esperas). Se a reserva for cancelada ou mudada, recebe logo o aviso e na página aparece **Reservar**: fica com ela quem reservar primeiro; se outro for mais rápido, volta a esperar. As esperas desaparecem sozinhas quando a hora passa.
 - **Procuro parceiro**: na página TSM e em *Reservar quadra* o jogador publica um anúncio (dia, faixa horária, singulares ou pares, nível, nota; no máximo 3 abertos). Os outros veem-no e tocam em **Conta comigo**; quem o publicou recebe um aviso. Completos (2 jogadores em singulares, 4 em pares) o servidor **reserva sozinho** a primeira quadra livre na faixa, com as regras das reservas online, e avisa todos; se não houver quadra livre diz-o, e reservam eles. Os anúncios passados desaparecem sozinhos.
 - **Avisos para a secretaria**: com *Avisar-me das reservas online* (ligado por omissão) o telemóvel da secretaria recebe uma notificação quando um jogador reserva ou cancela, mesmo com a app fechada: mais ou menos a cada 15 minutos, quando há rede. Ao tocá-la abre-se a agenda no dia da reserva. As que a própria secretaria tira não dão notificação.
+- **De casa, sem mexer no roteador** (recomendado). Em *Servidor do clube*, com o telefone emparelhado, toque em **Ativar** em *Acesso pela internet sem mexer no roteador*. O servidor instala o Tailscale, e o app pede para abrir o Tailscale para entrar (ou criar uma conta gratuita) e, na primeira vez, para confirmar o Funnel. Quando estiver pronto, **Endereço pela internet** se preenche sozinho (`https://tsm-circolo….ts.net`): HTTPS incluído, sem DuckDNS, e funciona também com CGNAT.
+  - A conexão sai do servidor para fora, então o roteador não é tocado e os jogadores não instalam nada. O tráfego passa pelos sistemas do Tailscale, um serviço externo; o Funnel ainda está em beta e tem limites de tráfego, que não devem pesar nas reservas de um clube. O primeiro acesso ao endereço pode levar alguns minutos.
+  - O acesso ao Tailscale normalmente expira após 180 dias: para evitar isso, em login.tailscale.com, em *Machines*, escolha *Disable key expiry* para o servidor. Se expirar, o app mostra de novo **Abrir o Tailscale**.
+  - **Emparelhar** a secretaria continua possível só pela rede do clube. **Desativar** fecha a conexão. Em servidores já instalados, execute antes `install.sh` de novo com o kit novo.
 - **De casa** (internet, em HTTPS: também é preciso para pôr a página no ecrã principal do iPhone). Tudo grátis:
   1. Em **duckdns.org** (entra-se com uma conta GitHub, Google…) cria-se um nome, ex. `tcprova.duckdns.org`, e copia-se o **token**.
   2. No **router do clube** dá-se ao Pi um endereço fixo e reencaminham-se para ele as portas **TCP 80 e 443**.
@@ -13388,6 +13484,15 @@ class MatchController(
         if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
         return try {
             Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.invite(p.id, p.name) } })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+
+    /** Il tunnel da internet del server: com'è messo e, con [on], accendilo o spegnilo. */
+    suspend fun serverTunnel(on: Boolean? = null): Result<com.tennis.scoremanager.data.SrvTunnel> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { if (on == null) it.tunnel() else it.setTunnel(on) } })
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 
@@ -18336,6 +18441,8 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun pair(code: String): SrvToken = call("POST", "/admin/pair", SrvCode.serializer(), SrvCode(code), SrvToken.serializer())
     fun sync(s: ClubSync): SrvAdmin = call("PUT", "/admin/sync", ClubSync.serializer(), s, SrvAdmin.serializer())
     fun state(): SrvAdmin = call<Unit, SrvAdmin>("GET", "/admin/state", null, null, SrvAdmin.serializer())
+    fun tunnel(): SrvTunnel = call<Unit, SrvTunnel>("GET", "/admin/tunnel", null, null, SrvTunnel.serializer())
+    fun setTunnel(on: Boolean): SrvTunnel = call("POST", "/admin/tunnel", SrvTunnelIn.serializer(), SrvTunnelIn(on), SrvTunnel.serializer())
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
@@ -37049,6 +37156,18 @@ interface Strings {
     val srvErrAuth: String
     val srvErrNotTsm: String
     val srvErrOther: (String) -> String
+    val srvTunnelTitle: String
+    val srvTunnelHint: String
+    val srvTunnelOn: String
+    val srvTunnelOff: String
+    val srvTunnelOpen: String
+    val srvTunnelWorking: String
+    val srvTunnelLogin: String
+    val srvTunnelEnable: String
+    val srvTunnelKey: String
+    val srvTunnelFail: String
+    val srvTunnelUpdate: String
+    val srvTunnelReady: (String) -> String
     val srvPublicUrl: String
     val srvPublicUrlHint: String
     val srvErrPairLocal: String
@@ -39188,6 +39307,18 @@ object ItStrings : Strings {
     override val srvErrAuth = "Il server non riconosce più questo telefono: scollega e abbina di nuovo."
     override val srvErrNotTsm = "A quell'indirizzo non c'è un server del circolo TSM."
     override val srvErrOther: (String) -> String = { "Errore del server: $it" }
+    override val srvTunnelTitle = "Accesso da internet senza toccare il router"
+    override val srvTunnelHint = "I giocatori prenotano anche da casa: basta un account gratuito Tailscale, senza aprire porte."
+    override val srvTunnelOn = "Attiva"
+    override val srvTunnelOff = "Disattiva"
+    override val srvTunnelOpen = "Apri Tailscale"
+    override val srvTunnelWorking = "Il server sta preparando il collegamento: può volerci qualche minuto."
+    override val srvTunnelLogin = "Apri Tailscale ed entra col tuo account (o creane uno gratuito). Poi torna qui."
+    override val srvTunnelEnable = "Ultimo passo: apri Tailscale e conferma l'attivazione di Funnel. Poi torna qui."
+    override val srvTunnelKey = "Per non dover rientrare ogni sei mesi: su login.tailscale.com, in Machines, scegli Disable key expiry per questo server."
+    override val srvTunnelFail = "Non è andata: controlla che il server abbia internet e riprova."
+    override val srvTunnelUpdate = "Per usarlo aggiorna il server: rilancia install.sh con il kit nuovo."
+    override val srvTunnelReady: (String) -> String = { "Attivo: $it. Gli inviti usano questo indirizzo." }
     override val srvPublicUrl = "Indirizzo da internet (facoltativo)"
     override val srvPublicUrlHint = "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo"
     override val srvErrPairLocal = "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080)."
@@ -41296,6 +41427,18 @@ object EnStrings : Strings {
     override val srvErrAuth = "The server no longer knows this phone: disconnect and pair again."
     override val srvErrNotTsm = "There is no TSM club server at that address."
     override val srvErrOther: (String) -> String = { "Server error: $it" }
+    override val srvTunnelTitle = "Internet access without touching the router"
+    override val srvTunnelHint = "Players can book from home too: a free Tailscale account is all you need, with no ports to open."
+    override val srvTunnelOn = "Turn on"
+    override val srvTunnelOff = "Turn off"
+    override val srvTunnelOpen = "Open Tailscale"
+    override val srvTunnelWorking = "The server is preparing the connection: this may take a few minutes."
+    override val srvTunnelLogin = "Open Tailscale and sign in with your account (or create a free one). Then come back here."
+    override val srvTunnelEnable = "Last step: open Tailscale and confirm turning on Funnel. Then come back here."
+    override val srvTunnelKey = "To avoid signing in again every six months: on login.tailscale.com, under Machines, choose Disable key expiry for this server."
+    override val srvTunnelFail = "It did not work: check that the server has internet access and try again."
+    override val srvTunnelUpdate = "To use this, update the server: run install.sh again with the new kit."
+    override val srvTunnelReady: (String) -> String = { "On: $it. Invitations use this address." }
     override val srvPublicUrl = "Address from the internet (optional)"
     override val srvPublicUrlHint = "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club"
     override val srvErrPairLocal = "Pairing works only from the club network: use the local address (http://…:8080)."
@@ -43427,6 +43570,18 @@ object DeStrings : Strings {
     override val srvErrAuth = "Der Server kennt dieses Handy nicht mehr: Trennen und neu koppeln."
     override val srvErrNotTsm = "Unter dieser Adresse ist kein TSM-Vereinsserver."
     override val srvErrOther: (String) -> String = { "Serverfehler: $it" }
+    override val srvTunnelTitle = "Internetzugang ohne Router-Einstellungen"
+    override val srvTunnelHint = "Die Spieler buchen auch von zu Hause: Ein kostenloses Tailscale-Konto genügt, ohne Ports zu öffnen."
+    override val srvTunnelOn = "Einschalten"
+    override val srvTunnelOff = "Ausschalten"
+    override val srvTunnelOpen = "Tailscale öffnen"
+    override val srvTunnelWorking = "Der Server bereitet die Verbindung vor: Das kann einige Minuten dauern."
+    override val srvTunnelLogin = "Öffne Tailscale und melde dich mit deinem Konto an (oder erstelle ein kostenloses). Komm dann hierher zurück."
+    override val srvTunnelEnable = "Letzter Schritt: Öffne Tailscale und bestätige die Aktivierung von Funnel. Komm dann hierher zurück."
+    override val srvTunnelKey = "Damit du dich nicht alle sechs Monate neu anmelden musst: Wähle auf login.tailscale.com unter Machines für diesen Server Disable key expiry."
+    override val srvTunnelFail = "Das hat nicht geklappt: Prüfe, ob der Server Internet hat, und versuche es erneut."
+    override val srvTunnelUpdate = "Aktualisiere dafür den Server: Starte install.sh mit dem neuen Kit erneut."
+    override val srvTunnelReady: (String) -> String = { "Aktiv: $it. Einladungen nutzen diese Adresse." }
     override val srvPublicUrl = "Adresse aus dem Internet (optional)"
     override val srvPublicUrlHint = "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins"
     override val srvErrPairLocal = "Koppeln geht nur aus dem Vereinsnetz: Nutze die lokale Adresse (http://…:8080)."
@@ -45551,6 +45706,18 @@ object EsStrings : Strings {
     override val srvErrAuth = "El servidor ya no reconoce este teléfono: desconecta y empareja de nuevo."
     override val srvErrNotTsm = "En esa dirección no hay un servidor de club TSM."
     override val srvErrOther: (String) -> String = { "Error del servidor: $it" }
+    override val srvTunnelTitle = "Acceso desde internet sin tocar el router"
+    override val srvTunnelHint = "Los jugadores reservan también desde casa: basta una cuenta gratuita de Tailscale, sin abrir puertos."
+    override val srvTunnelOn = "Activar"
+    override val srvTunnelOff = "Desactivar"
+    override val srvTunnelOpen = "Abrir Tailscale"
+    override val srvTunnelWorking = "El servidor está preparando la conexión: puede tardar unos minutos."
+    override val srvTunnelLogin = "Abre Tailscale y entra con tu cuenta (o crea una gratuita). Luego vuelve aquí."
+    override val srvTunnelEnable = "Último paso: abre Tailscale y confirma la activación de Funnel. Luego vuelve aquí."
+    override val srvTunnelKey = "Para no tener que entrar de nuevo cada seis meses: en login.tailscale.com, en Machines, elige Disable key expiry para este servidor."
+    override val srvTunnelFail = "No ha funcionado: comprueba que el servidor tenga internet e inténtalo de nuevo."
+    override val srvTunnelUpdate = "Para usarlo, actualiza el servidor: vuelve a lanzar install.sh con el kit nuevo."
+    override val srvTunnelReady: (String) -> String = { "Activo: $it. Las invitaciones usan esta dirección." }
     override val srvPublicUrl = "Dirección desde internet (opcional)"
     override val srvPublicUrlHint = "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club"
     override val srvErrPairLocal = "El emparejamiento solo se hace desde la red del club: usa la dirección local (http://…:8080)."
@@ -47677,6 +47844,18 @@ object FrStrings : Strings {
     override val srvErrAuth = "Le serveur ne reconnaît plus ce téléphone : déconnectez et appairez à nouveau."
     override val srvErrNotTsm = "Il n'y a pas de serveur de club TSM à cette adresse."
     override val srvErrOther: (String) -> String = { "Erreur du serveur : $it" }
+    override val srvTunnelTitle = "Accès internet sans toucher à la box"
+    override val srvTunnelHint = "Les joueurs réservent aussi de chez eux : un compte Tailscale gratuit suffit, sans ouvrir de ports."
+    override val srvTunnelOn = "Activer"
+    override val srvTunnelOff = "Désactiver"
+    override val srvTunnelOpen = "Ouvrir Tailscale"
+    override val srvTunnelWorking = "Le serveur prépare la connexion : cela peut prendre quelques minutes."
+    override val srvTunnelLogin = "Ouvrez Tailscale et connectez-vous avec votre compte (ou créez-en un gratuit). Revenez ensuite ici."
+    override val srvTunnelEnable = "Dernière étape : ouvrez Tailscale et confirmez l'activation de Funnel. Revenez ensuite ici."
+    override val srvTunnelKey = "Pour ne pas vous reconnecter tous les six mois : sur login.tailscale.com, dans Machines, choisissez Disable key expiry pour ce serveur."
+    override val srvTunnelFail = "Cela n'a pas fonctionné : vérifiez que le serveur a accès à internet et réessayez."
+    override val srvTunnelUpdate = "Pour l'utiliser, mettez à jour le serveur : relancez install.sh avec le nouveau kit."
+    override val srvTunnelReady: (String) -> String = { "Activé : $it. Les invitations utilisent cette adresse." }
     override val srvPublicUrl = "Adresse depuis internet (facultatif)"
     override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club"
     override val srvErrPairLocal = "L'appairage se fait seulement depuis le réseau du club : utilisez l'adresse locale (http://…:8080)."
@@ -49804,6 +49983,18 @@ object PtStrings : Strings {
     override val srvErrAuth = "O servidor já não reconhece este telemóvel: desliga e emparelha de novo."
     override val srvErrNotTsm = "Nesse endereço não há um servidor de clube TSM."
     override val srvErrOther: (String) -> String = { "Erro do servidor: $it" }
+    override val srvTunnelTitle = "Acesso pela internet sem mexer no roteador"
+    override val srvTunnelHint = "Os jogadores reservam também de casa: basta uma conta gratuita do Tailscale, sem abrir portas."
+    override val srvTunnelOn = "Ativar"
+    override val srvTunnelOff = "Desativar"
+    override val srvTunnelOpen = "Abrir o Tailscale"
+    override val srvTunnelWorking = "O servidor está preparando a conexão: pode levar alguns minutos."
+    override val srvTunnelLogin = "Abra o Tailscale e entre com sua conta (ou crie uma gratuita). Depois volte aqui."
+    override val srvTunnelEnable = "Último passo: abra o Tailscale e confirme a ativação do Funnel. Depois volte aqui."
+    override val srvTunnelKey = "Para não precisar entrar de novo a cada seis meses: em login.tailscale.com, em Machines, escolha Disable key expiry para este servidor."
+    override val srvTunnelFail = "Não funcionou: verifique se o servidor tem internet e tente de novo."
+    override val srvTunnelUpdate = "Para usar isso, atualize o servidor: execute install.sh de novo com o kit novo."
+    override val srvTunnelReady: (String) -> String = { "Ativo: $it. Os convites usam este endereço." }
     override val srvPublicUrl = "Endereço pela internet (opcional)"
     override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube"
     override val srvErrPairLocal = "O emparelhamento só se faz a partir da rede do clube: usa o endereço local (http://…:8080)."
@@ -51236,8 +51427,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
@@ -51260,16 +51452,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.ClubServerError
 import com.tennis.scoremanager.data.ClubServers
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.data.SrvTunnel
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.QrCode
@@ -51277,7 +51472,67 @@ import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+/**
+ * L'accesso da internet senza toccare il router: la segreteria lo accende da qui e, le prime volte, apre i link di
+ * Tailscale. Quando è pronto l'indirizzo da internet si compila da solo.
+ */
+@Composable
+private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (String) -> Unit) {
+    val s = LocalStrings.current
+    val uri = LocalUriHandler.current
+    val scope = rememberCoroutineScope()
+    var t by remember { mutableStateOf<SrvTunnel?>(null) }
+    var err by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var kick by remember { mutableStateOf(0) }
+    LaunchedEffect(kick) {
+        while (true) {
+            c.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            val state = t?.state
+            delay(if (state == "WORKING" || state == "LOGIN" || state == "ENABLE") 3_000 else 30_000)
+        }
+    }
+    val done = t?.takeIf { it.state == "ON" }?.url.orEmpty()
+    LaunchedEffect(done) { if (done.isNotEmpty() && done != publicUrl) onPublicUrl(done) }
+    fun set(on: Boolean) {
+        busy = true
+        scope.launch {
+            c.serverTunnel(on).onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            if (!on && publicUrl.endsWith(".ts.net")) onPublicUrl("")
+            busy = false
+            kick++
+        }
+    }
+    Text(s.srvTunnelTitle, fontWeight = FontWeight.Bold)
+    val now = t
+    when {
+        err == "NOT_FOUND" || now?.available == false -> Text(s.srvTunnelUpdate, color = TsmColors.TextDim, fontSize = 13.sp)
+        err != null -> Text(srvErrorText(s, err!!), color = TsmColors.Orange, fontSize = 13.sp)
+        now == null -> Text(s.srvTunnelHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        now.state == "ON" -> {
+            Text(s.srvTunnelReady(now.url), fontSize = 13.sp)
+            Text(s.srvTunnelKey, color = TsmColors.TextDim, fontSize = 12.sp)
+            GhostButton(s.srvTunnelOff, Icons.Filled.Public, { set(false) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+        now.state == "LOGIN" || now.state == "ENABLE" -> {
+            Text(if (now.state == "LOGIN") s.srvTunnelLogin else s.srvTunnelEnable, fontSize = 13.sp)
+            GhostButton(s.srvTunnelOpen, Icons.Filled.Public, { uri.openUri(now.link) }, Modifier.fillMaxWidth(), enabled = now.link.isNotEmpty())
+            GhostButton(s.srvTunnelOff, Icons.Filled.Public, { set(false) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+        now.state == "WORKING" -> {
+            Text(s.srvTunnelWorking, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.srvTunnelOff, Icons.Filled.Public, { set(false) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+        else -> {
+            Text(s.srvTunnelHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            if (now.state == "ERROR") Text(s.srvTunnelFail, color = TsmColors.Orange, fontSize = 13.sp)
+            GhostButton(s.srvTunnelOn, Icons.Filled.Public, { set(true) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+    }
+}
 
 /** L'errore del server detto in parole. */
 fun srvErrorText(s: Strings, code: String): String = when (code) {
@@ -51373,6 +51628,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     }, Modifier.fillMaxWidth(), enabled = !busy)
                     OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
+                    TunnelSection(c, publicUrl) { publicUrl = it; c.saveServerRules(rules, pay, it) }
                     SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
                         c.setServerAlerts(on)
                         if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)
@@ -86382,6 +86638,13 @@ import kotlinx.serialization.Serializable
     val waits: List<Wait> = emptyList(), val seeks: List<Seek> = emptyList(),
 )
 @Serializable data class SrvOk(val ok: Boolean = true)
+
+/**
+ * Il tunnel da internet del server. [state]: OFF, WORKING, LOGIN e ENABLE (la segreteria apre [link]), ON (con [url]),
+ * ERROR (con [code]). [available] è falso se sul server manca l'aiutante del tunnel: va aggiornato il kit.
+ */
+@Serializable data class SrvTunnel(val available: Boolean = false, val state: String = "OFF", val url: String = "", val link: String = "", val code: String = "")
+@Serializable data class SrvTunnelIn(val on: Boolean)
 /** I backup della segreteria tenuti dal server (gli ultimi 14): il file compresso in base64. */
 @Serializable data class SrvBackup(val name: String, val at: Long, val size: Long)
 @Serializable data class SrvBackupData(val name: String, val data: String)
@@ -88242,10 +88505,10 @@ val serverKit by tasks.registering(Tar::class) {
     into("tsm-server") {
         from(fatJar)
         from("deploy") {
-            include("install.sh", "reset-admin.sh", "setup-https.sh", "tsm-duckdns")
+            include("install.sh", "reset-admin.sh", "setup-https.sh", "tsm-duckdns", "tsm-tunnel")
             filePermissions { unix("rwxr-xr-x") }
         }
-        from("deploy") { include("tsm-server.service", "tsm-server.default", "tsm-duckdns.service", "tsm-duckdns.timer") }
+        from("deploy") { include("tsm-server.service", "tsm-server.default", "tsm-duckdns.service", "tsm-duckdns.timer", "tsm-tunnel.service", "tsm-tunnel.path", "tsm-tunnel.timer") }
     }
 }
 tasks.named("assemble") { dependsOn(serverKit) }
@@ -88346,8 +88609,10 @@ msg() {
 [ "$(id -u)" -eq 0 ] || { msg root; exit 1; }
 
 if [ "$REMOVE" -eq 1 ]; then
-    systemctl disable --now tsm-server 2>/dev/null || true
-    rm -f /etc/systemd/system/tsm-server.service
+    systemctl disable --now tsm-server tsm-tunnel.path tsm-tunnel.timer 2>/dev/null || true
+    command -v tailscale >/dev/null 2>&1 && tailscale funnel reset >/dev/null 2>&1 || true
+    rm -f /etc/systemd/system/tsm-server.service /etc/systemd/system/tsm-tunnel.service /etc/systemd/system/tsm-tunnel.path /etc/systemd/system/tsm-tunnel.timer
+    rm -rf /var/lib/tsm-tunnel
     rm -rf /opt/tsm-server
     systemctl daemon-reload
     msg removed
@@ -88368,6 +88633,11 @@ install -d -m 755 /opt/tsm-server
 install -m 644 "$DIR/tsm-server.jar" /opt/tsm-server/tsm-server.jar
 install -m 644 "$DIR/tsm-server.service" /etc/systemd/system/tsm-server.service
 [ -f /etc/default/tsm-server ] || install -m 644 "$DIR/tsm-server.default" /etc/default/tsm-server
+# Il tunnel da internet: spento finché la segreteria non lo accende dall'app.
+install -m 755 "$DIR/tsm-tunnel" /opt/tsm-server/tsm-tunnel
+install -m 644 "$DIR/tsm-tunnel.service" "$DIR/tsm-tunnel.path" "$DIR/tsm-tunnel.timer" /etc/systemd/system/
+install -d -m 755 /var/lib/tsm-tunnel
+[ -f /var/lib/tsm-tunnel/status.json ] || echo '{"state":"OFF"}' > /var/lib/tsm-tunnel/status.json
 if [ -n "$PORT" ]; then sed -i "s/^TSM_PORT=.*/TSM_PORT=$PORT/" /etc/default/tsm-server; fi
 PORT=$(sed -n 's/^TSM_PORT=//p' /etc/default/tsm-server)
 
@@ -88375,6 +88645,7 @@ msg start
 systemctl daemon-reload
 systemctl enable tsm-server >/dev/null 2>&1
 systemctl restart tsm-server
+systemctl enable --now tsm-tunnel.path tsm-tunnel.timer >/dev/null 2>&1
 
 # Sul Pi Zero Java parte in una ventina di secondi: si aspetta che il server risponda.
 i=0
@@ -88436,8 +88707,10 @@ cat > "$DEST/server/deploy/iso/config/hooks/normal/9000-tsm.hook.chroot" << 'TSM
 # Dentro l'immagine: l'utente del server, i servizi accesi all'avvio, Caddy spento (si accende per l'HTTPS).
 set -e
 id tsm >/dev/null 2>&1 || useradd --system --home-dir /var/lib/tsm-server --no-create-home --shell /usr/sbin/nologin tsm
-chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin
-systemctl enable tsm-server.service tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
+chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin /opt/tsm-server/tsm-tunnel
+mkdir -p /var/lib/tsm-tunnel
+echo '{"state":"OFF"}' > /var/lib/tsm-tunnel/status.json
+systemctl enable tsm-server.service tsm-tunnel.path tsm-tunnel.timer tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
 systemctl disable caddy.service || true
 echo tsm-circolo > /etc/hostname
 TSM_EOF
@@ -88548,7 +88821,8 @@ PKGS=$(grep -v '^#' /iso/config/package-lists/tsm.list.chroot | tr '\n' ',' | se
 mkdir -p "$W/root/opt/tsm-server" "$W/root/etc/default" "$W/root/etc/systemd/system" "$W/root/usr/local/sbin"
 cp -a /iso/config/includes.chroot/. "$W/root/"
 cp /kit/tsm-server.jar "$W/root/opt/tsm-server/"
-cp /kit/tsm-server.service "$W/root/etc/systemd/system/"
+cp /kit/tsm-server.service /kit/tsm-tunnel.service /kit/tsm-tunnel.path /kit/tsm-tunnel.timer "$W/root/etc/systemd/system/"
+cp /kit/tsm-tunnel "$W/root/opt/tsm-server/"
 cp /kit/tsm-server.default "$W/root/etc/default/tsm-server"
 sed 's#^cat /var/lib/tsm-server/setup-code.txt$#cat /var/lib/tsm-server/setup-code.txt; /usr/local/sbin/tsm-issue#' /kit/reset-admin.sh > "$W/root/usr/local/sbin/tsm-reset-admin"
 # Tutto il kit, per l'HTTPS da internet: sudo /opt/tsm-server/kit/setup-https.sh nome.duckdns.org --duckdns TOKEN
@@ -88872,6 +89146,8 @@ cat > "$DEST/server/deploy/tsm-server.default" << 'TSM_EOF'
 # Dove ascolta: 0.0.0.0 = tutta la rete del circolo; 127.0.0.1 se davanti c'è Caddy per l'HTTPS.
 TSM_HOST=0.0.0.0
 TSM_PORT=8080
+# La porta interna del tunnel (solo 127.0.0.1): chi arriva da qui conta sempre come arrivato da internet.
+TSM_TUNNEL_PORT=8088
 # Memoria di Java: basta poco anche su un Raspberry Pi Zero 2 W (512 MB).
 JAVA_OPTS="-Xmx64m -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -XX:MaxMetaspaceSize=48m -XX:ReservedCodeCacheSize=24m"
 TSM_EOF
@@ -88891,9 +89167,9 @@ Wants=network-online.target
 Type=simple
 User=tsm
 Group=tsm
-Environment=TSM_HOST=0.0.0.0 TSM_PORT=8080 "JAVA_OPTS=-Xmx64m"
+Environment=TSM_HOST=0.0.0.0 TSM_PORT=8080 TSM_TUNNEL_PORT=8088 "JAVA_OPTS=-Xmx64m"
 EnvironmentFile=-/etc/default/tsm-server
-ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/tsm-server/tsm-server.jar --host ${TSM_HOST} --port ${TSM_PORT} --data /var/lib/tsm-server
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/tsm-server/tsm-server.jar --host ${TSM_HOST} --port ${TSM_PORT} --tunnel-port ${TSM_TUNNEL_PORT} --data /var/lib/tsm-server
 StateDirectory=tsm-server
 StateDirectoryMode=0700
 Restart=on-failure
@@ -88914,6 +89190,177 @@ LockPersonality=yes
 
 [Install]
 WantedBy=multi-user.target
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-tunnel
+cat > "$DEST/server/deploy/tsm-tunnel" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Il server del circolo da internet senza toccare il router: un tunnel Tailscale Funnel, che parte dal server verso
+# fuori. Lo lancia systemd come root quando la segreteria lo chiede dall'app (tsm-tunnel.path) e ogni ora (tsm-tunnel.timer).
+# Il server scrive solo "on" o "off" in REQUEST; lo stato per l'app sta in DIR/status.json, che il server può solo leggere.
+# Il tunnel porta alla porta riservata del server (TSM_TUNNEL_PORT): lì ogni richiesta conta come arrivata da internet.
+set -u
+
+REQUEST=${TSM_TUNNEL_REQUEST:-/var/lib/tsm-server/tunnel-request}
+DIR=${TSM_TUNNEL_DIR:-/var/lib/tsm-tunnel}
+PORT=${TSM_TUNNEL_PORT:-8088}
+TS=${TSM_TAILSCALE:-tailscale}
+STEP=${TSM_TUNNEL_STEP:-2}
+ROUNDS=${TSM_TUNNEL_ROUNDS:-450}
+NAME=tsm-circolo
+UP=""
+FUNNEL=""
+
+put() {  # stato, indirizzo, link da aprire, codice d'errore
+    printf '{"state":"%s","url":"%s","link":"%s","code":"%s"}\n' "$1" "${2:-}" "${3:-}" "${4:-}" > "$DIR/status.tmp"
+    chmod 644 "$DIR/status.tmp"
+    mv -f "$DIR/status.tmp" "$DIR/status.json"
+}
+
+# Solo due parole valide; un collegamento simbolico al posto del file non si segue.
+want() {
+    [ -f "$REQUEST" ] && [ ! -L "$REQUEST" ] || return 0
+    case "$(head -c 4 "$REQUEST" | head -n 1)" in
+        on) echo on ;;
+        off) echo off ;;
+    esac
+}
+
+stop_jobs() {
+    for p in $UP $FUNNEL; do kill "$p" 2>/dev/null || true; done
+    UP=""; FUNNEL=""
+}
+
+turn_off() {
+    stop_jobs
+    command -v "$TS" >/dev/null 2>&1 && "$TS" funnel reset >/dev/null 2>&1
+    put OFF
+    exit 0
+}
+
+fail() { stop_jobs; put ERROR "" "" "$1"; exit 1; }
+
+# Solo link di Tailscale: è quello che la segreteria aprirà sul telefono.
+link_in() { grep -o 'https://login\.tailscale\.com/[A-Za-z0-9./?=_&%-]*' "$1" 2>/dev/null | tail -n 1; }
+
+field() { sed -n "s/.*\"$1\": *\"\\([^\"]*\\)\".*/\\1/p" "$DIR/status.ts" | head -n 1; }
+
+install_tailscale() {
+    command -v "$TS" >/dev/null 2>&1 && return 0
+    put WORKING
+    curl -fsSL -o "$DIR/install.sh" https://tailscale.com/install.sh || fail INSTALL
+    sh "$DIR/install.sh" > "$DIR/install.log" 2>&1 || fail INSTALL
+    rm -f "$DIR/install.sh"
+    command -v "$TS" >/dev/null 2>&1 || fail INSTALL
+}
+
+# L'accesso a Tailscale; serve anche quando la chiave scade (di norma dopo 180 giorni).
+log_in() {
+    command -v systemctl >/dev/null 2>&1 && systemctl enable --now tailscaled >/dev/null 2>&1
+    "$TS" up --hostname="$NAME" > "$DIR/up.log" 2>&1 &
+    UP=$!
+    i=0
+    while [ "$i" -lt "$ROUNDS" ]; do
+        [ "$(want)" = on ] || turn_off
+        "$TS" status --json --peers=false > "$DIR/status.ts" 2>/dev/null
+        [ "$(field BackendState)" = Running ] && return 0
+        l=$(field AuthURL)
+        case "$l" in https://login.tailscale.com/*) ;; *) l=$(link_in "$DIR/up.log") ;; esac
+        if [ -n "$l" ]; then put LOGIN "" "$l"; elif [ "$i" -eq 3 ]; then put WORKING; fi
+        i=$((i + 1))
+        sleep "$STEP"
+    done
+    fail LOGIN_TIMEOUT
+}
+
+# La prima volta Tailscale chiede di abilitare Funnel: il comando stampa un link e aspetta.
+open_funnel() {
+    "$TS" funnel --bg --yes "http://127.0.0.1:$PORT" > "$DIR/funnel.log" 2>&1 &
+    FUNNEL=$!
+    i=0
+    while [ "$i" -lt "$ROUNDS" ]; do
+        [ "$(want)" = on ] || turn_off
+        if ! kill -0 "$FUNNEL" 2>/dev/null; then
+            wait "$FUNNEL" || fail FUNNEL
+            FUNNEL=""
+            return 0
+        fi
+        l=$(link_in "$DIR/funnel.log")
+        [ -z "$l" ] || put ENABLE "" "$l"
+        i=$((i + 1))
+        sleep "$STEP"
+    done
+    fail ENABLE_TIMEOUT
+}
+
+mkdir -p "$DIR"
+case "$(want)" in
+    on) ;;
+    off) turn_off ;;
+    *) exit 0 ;;
+esac
+install_tailscale
+log_in
+open_funnel
+dns=$(field DNSName)
+dns=${dns%.}
+[ -n "$dns" ] || fail NO_NAME
+stop_jobs
+put ON "https://$dns"
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-tunnel.path
+cat > "$DEST/server/deploy/tsm-tunnel.path" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description=TSM club server tunnel: request from the app
+
+[Path]
+PathChanged=/var/lib/tsm-server/tunnel-request
+
+[Install]
+WantedBy=multi-user.target
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-tunnel.service
+cat > "$DEST/server/deploy/tsm-tunnel.service" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Accende o spegne il tunnel del server del circolo (lo chiede la segreteria dall'app).
+[Unit]
+Description=TSM club server tunnel (Tailscale Funnel)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=TSM_TUNNEL_PORT=8088
+EnvironmentFile=-/etc/default/tsm-server
+ExecStart=/opt/tsm-server/tsm-tunnel
+TimeoutStartSec=1200
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-tunnel.timer
+cat > "$DEST/server/deploy/tsm-tunnel.timer" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# All'avvio e ogni ora: se il tunnel è acceso si ricontrolla, così un accesso scaduto compare nell'app.
+[Unit]
+Description=TSM club server tunnel: periodic check
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target
 TSM_EOF
 
 # ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Api.kt
@@ -88957,6 +89404,8 @@ import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
+import com.tennis.scoremanager.data.SrvTunnel
+import com.tennis.scoremanager.data.SrvTunnelIn
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -88996,6 +89445,8 @@ class Api(
     private val pusher: Pusher = Pusher { v, sub, payload, ttl -> WebPush.send(v, PUSH_SUBJECT, sub, payload, ttl) },
     /** Le notifiche partono in un filo a parte, per non far aspettare chi prenota (nei test, subito). */
     private val async: Boolean = true,
+    /** Il tunnel da internet (nei test, file temporanei). */
+    private val tunnel: Tunnel? = null,
 ) {
     private val sender = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "push").apply { isDaemon = true } }
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
@@ -89017,6 +89468,8 @@ class Api(
             r.method == "POST" && p == listOf("admin", "pair") -> pair(r)
             r.method == "PUT" && p == listOf("admin", "sync") -> { admin(r); sync(r) }
             r.method == "GET" && p == listOf("admin", "state") -> { admin(r); adminState() }
+            r.method == "GET" && p == listOf("admin", "tunnel") -> { admin(r); ok(SrvTunnel.serializer(), tunnel?.read() ?: SrvTunnel()) }
+            r.method == "POST" && p == listOf("admin", "tunnel") -> { admin(r); setTunnel(r) }
             r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
@@ -89044,6 +89497,12 @@ class Api(
             r.method == "POST" && p == listOf("push", "unsubscribe") -> unsubscribe(player(r), r)
             else -> throw ApiError(404, "NOT_FOUND")
         }
+    }
+
+    private fun setTunnel(r: Req): Resp {
+        val t = tunnel?.takeIf { it.read().available } ?: throw ApiError(409, "TUNNEL_UNAVAILABLE")
+        t.set(read(SrvTunnelIn.serializer(), r).on)
+        return ok(SrvTunnel.serializer(), t.read())
     }
 
     // --- Chiavi ---
@@ -89517,6 +89976,7 @@ fun main(args: Array<String>) {
     if ("--help" in opts || "-h" in opts) { println(USAGE); return }
     val host = opt("--host", "0.0.0.0")
     val port = opt("--port", "8080").toInt()
+    val tunnelPort = opt("--tunnel-port", "0").toInt()
     val data = File(opt("--data", System.getenv("TSM_DATA") ?: "tsm-data"))
 
     val store = Store(data)
@@ -89527,7 +89987,8 @@ fun main(args: Array<String>) {
     }
     // Solo il codice nuovo (reset-admin.sh), senza avviare il server.
     if ("--no-serve" in opts) return
-    val server = start(store, host, port)
+    val tunnel = Tunnel(File(data, "tunnel-request"), File(System.getenv("TSM_TUNNEL_STATUS") ?: "/var/lib/tsm-tunnel/status.json"))
+    val server = start(store, host, port, tunnelPort, tunnel)
     println(t.listening("$host:$port", data.absolutePath))
     for (a in addresses(host)) println("  http://$a:$port")
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(1) })
@@ -89543,16 +90004,22 @@ fun addresses(host: String): List<String> {
 }
 
 /** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
-fun start(store: Store, host: String, port: Int): HttpServer {
-    val api = Api(store)
+fun start(store: Store, host: String, port: Int, tunnelPort: Int = 0, tunnel: Tunnel? = null): HttpServer {
+    val api = Api(store, tunnel = tunnel)
     // Ogni minuto i promemoria delle partite.
     java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "promemoria").apply { isDaemon = true } }
         .scheduleAtFixedRate({ runCatching { api.tick() }.onFailure { System.err.println("Promemoria: $it") } }, 30, 60, java.util.concurrent.TimeUnit.SECONDS)
-    val server = HttpServer.create(InetSocketAddress(host, port), 0)
+    // La porta del tunnel, solo in locale: chi entra da qui viene da internet, qualunque intestazione abbia.
+    if (tunnelPort > 0) listen(api, InetSocketAddress("127.0.0.1", tunnelPort), fromTunnel = true)
+    return listen(api, InetSocketAddress(host, port), fromTunnel = false)
+}
+
+private fun listen(api: Api, address: InetSocketAddress, fromTunnel: Boolean): HttpServer {
+    val server = HttpServer.create(address, 0)
     server.executor = Executors.newFixedThreadPool(4)
     server.createContext("/") { ex ->
         try {
-            if (ex.requestURI.path.startsWith("/api/")) serveApi(api, ex) else serveStatic(ex)
+            if (ex.requestURI.path.startsWith("/api/")) serveApi(api, ex, fromTunnel) else serveStatic(ex)
         } catch (e: Exception) {
             System.err.println("Errore su ${ex.requestURI}: $e")
             runCatching { send(ex, 500, "{\"error\":\"SERVER\"}".toByteArray(), "application/json") }
@@ -89571,7 +90038,7 @@ private fun forwardedFor(ex: HttpExchange): String? =
 /** L'indirizzo di chi chiama. */
 private fun clientIp(ex: HttpExchange): String = forwardedFor(ex) ?: ex.remoteAddress.address.hostAddress
 
-private fun serveApi(api: Api, ex: HttpExchange) {
+private fun serveApi(api: Api, ex: HttpExchange, fromTunnel: Boolean) {
     val max = if (ex.requestURI.path.endsWith("/admin/backups")) MAX_BACKUP else MAX_BODY
     val body = ex.requestBody.use { it.readNBytes(max + 1) }
     if (body.size > max) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
@@ -89579,7 +90046,7 @@ private fun serveApi(api: Api, ex: HttpExchange) {
         val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
     }
     val token = ex.requestHeaders.getFirst("Authorization")?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
-    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex), viaProxy = forwardedFor(ex) != null))
+    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex), viaProxy = fromTunnel || forwardedFor(ex) != null))
     ex.responseHeaders.add("Cache-Control", "no-store")
     send(ex, r.status, r.body.toByteArray(), "application/json; charset=utf-8")
 }
@@ -89823,6 +90290,34 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
             if (id in TimeZone.getAvailableIDs()) TimeZone.setDefault(TimeZone.getTimeZone(id))
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Tunnel.kt
+cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/Tunnel.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.SrvTunnel
+import kotlinx.serialization.json.Json
+import java.io.File
+
+/**
+ * Il dialogo con l'aiutante tsm-tunnel, che gira come root: il server non può toccare il sistema. Scrive solo "on" o
+ * "off" in [request] e legge lo stato da [status]; se quel file manca, sul computer l'aiutante non è installato.
+ */
+class Tunnel(private val request: File, private val status: File) {
+    private val json = Json { ignoreUnknownKeys = true }
+
+    fun read(): SrvTunnel {
+        if (!status.isFile) return SrvTunnel()
+        val s = runCatching { json.decodeFromString(SrvTunnel.serializer(), status.readText()) }.getOrDefault(SrvTunnel(state = "WORKING"))
+        return s.copy(available = true)
+    }
+
+    fun set(on: Boolean) = request.writeText(if (on) "on\n" else "off\n")
 }
 TSM_EOF
 
@@ -91930,6 +92425,88 @@ class SeekApiTest {
         // Passato il giorno, gli annunci spariscono.
         now = at(11, 9); api.tick()
         assertTrue(seeks(mario).none { it.date == "2026-11-10" })
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/TunnelTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/TunnelTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.File
+import java.net.HttpURLConnection
+import java.net.ServerSocket
+import java.net.URI
+import java.nio.file.Files
+
+class TunnelTest {
+    private val dir = Files.createTempDirectory("tsm-tunnel").toFile()
+    private val request = File(dir, "tunnel-request")
+    private val status = File(dir, "status.json")
+    private val store = Store(dir)
+    private val api = Api(store, async = false, tunnel = Tunnel(request, status))
+    private val code = store.ensureSetupCode()!!
+
+    private fun call(method: String, path: String, body: String = "", token: String? = null) = api.handle(Req(method, "/api/v1$path", body = body, token = token))
+    private fun admin() = Regex("\"token\":\"([^\"]+)\"").find(call("POST", "/admin/pair", """{"code":"$code"}""").body)!!.groupValues[1]
+
+    @Test fun soloLaSegreteriaToccaIlTunnel() {
+        assertEquals(401, call("GET", "/admin/tunnel").status)
+        assertEquals(401, call("POST", "/admin/tunnel", """{"on":true}""").status)
+        assertFalse(request.exists())
+    }
+
+    @Test fun senzaAiutanteLoDice() {
+        val k = admin()
+        assertTrue(call("GET", "/admin/tunnel", token = k).body.contains("\"available\":false"))
+        assertEquals(409, call("POST", "/admin/tunnel", """{"on":true}""", k).status)
+        assertFalse(request.exists())
+    }
+
+    @Test fun accendeSpegneELeggeLoStato() {
+        val k = admin()
+        status.writeText("""{"state":"OFF"}""")
+        assertEquals(200, call("POST", "/admin/tunnel", """{"on":true}""", k).status)
+        assertEquals("on\n", request.readText())
+        status.writeText("""{"state":"ON","url":"https://tsm-circolo.tail1.ts.net","link":"","code":""}""")
+        val on = call("GET", "/admin/tunnel", token = k).body
+        assertTrue(on, "\"available\":true" in on && "tail1.ts.net" in on)
+        call("POST", "/admin/tunnel", """{"on":false}""", k)
+        assertEquals("off\n", request.readText())
+        assertEquals(400, call("POST", "/admin/tunnel", "storia", k).status)
+    }
+
+    private fun freePort() = ServerSocket(0).use { it.localPort }
+
+    private fun post(port: Int, path: String, body: String, header: Pair<String, String>? = null): Pair<Int, String> {
+        val c = URI("http://127.0.0.1:$port/api/v1$path").toURL().openConnection() as HttpURLConnection
+        c.requestMethod = "POST"
+        c.doOutput = true
+        header?.let { c.setRequestProperty(it.first, it.second) }
+        c.outputStream.use { it.write(body.toByteArray()) }
+        val code = c.responseCode
+        return code to ((if (code < 400) c.inputStream else c.errorStream)?.bufferedReader()?.readText().orEmpty())
+    }
+
+    /** Il punto delicato: dal tunnel non si abbina, anche se Tailscale non scrivesse nessuna intestazione. */
+    @Test fun dalTunnelNonSiAbbinaMai() {
+        val lan = freePort(); val tun = freePort()
+        val server = start(store, "127.0.0.1", lan, tun)
+        try {
+            val body = """{"code":"$code"}"""
+            val far = post(tun, "/admin/pair", body)
+            assertEquals(far.second, 403, far.first)
+            assertTrue(far.second, "PAIR_LOCAL_ONLY" in far.second)
+            assertEquals(403, post(tun, "/admin/pair", body, "X-Forwarded-For" to "127.0.0.1").first)
+            assertEquals(200, post(lan, "/admin/pair", body).first)
+        } finally { server.stop(0) }
     }
 }
 TSM_EOF
@@ -94996,6 +95573,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 307 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 313 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

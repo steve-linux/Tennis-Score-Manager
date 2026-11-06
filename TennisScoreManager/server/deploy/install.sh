@@ -91,8 +91,10 @@ msg() {
 [ "$(id -u)" -eq 0 ] || { msg root; exit 1; }
 
 if [ "$REMOVE" -eq 1 ]; then
-    systemctl disable --now tsm-server 2>/dev/null || true
-    rm -f /etc/systemd/system/tsm-server.service
+    systemctl disable --now tsm-server tsm-tunnel.path tsm-tunnel.timer 2>/dev/null || true
+    command -v tailscale >/dev/null 2>&1 && tailscale funnel reset >/dev/null 2>&1 || true
+    rm -f /etc/systemd/system/tsm-server.service /etc/systemd/system/tsm-tunnel.service /etc/systemd/system/tsm-tunnel.path /etc/systemd/system/tsm-tunnel.timer
+    rm -rf /var/lib/tsm-tunnel
     rm -rf /opt/tsm-server
     systemctl daemon-reload
     msg removed
@@ -113,6 +115,11 @@ install -d -m 755 /opt/tsm-server
 install -m 644 "$DIR/tsm-server.jar" /opt/tsm-server/tsm-server.jar
 install -m 644 "$DIR/tsm-server.service" /etc/systemd/system/tsm-server.service
 [ -f /etc/default/tsm-server ] || install -m 644 "$DIR/tsm-server.default" /etc/default/tsm-server
+# Il tunnel da internet: spento finché la segreteria non lo accende dall'app.
+install -m 755 "$DIR/tsm-tunnel" /opt/tsm-server/tsm-tunnel
+install -m 644 "$DIR/tsm-tunnel.service" "$DIR/tsm-tunnel.path" "$DIR/tsm-tunnel.timer" /etc/systemd/system/
+install -d -m 755 /var/lib/tsm-tunnel
+[ -f /var/lib/tsm-tunnel/status.json ] || echo '{"state":"OFF"}' > /var/lib/tsm-tunnel/status.json
 if [ -n "$PORT" ]; then sed -i "s/^TSM_PORT=.*/TSM_PORT=$PORT/" /etc/default/tsm-server; fi
 PORT=$(sed -n 's/^TSM_PORT=//p' /etc/default/tsm-server)
 
@@ -120,6 +127,7 @@ msg start
 systemctl daemon-reload
 systemctl enable tsm-server >/dev/null 2>&1
 systemctl restart tsm-server
+systemctl enable --now tsm-tunnel.path tsm-tunnel.timer >/dev/null 2>&1
 
 # Sul Pi Zero Java parte in una ventina di secondi: si aspetta che il server risponda.
 i=0

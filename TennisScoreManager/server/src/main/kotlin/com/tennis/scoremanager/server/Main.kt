@@ -32,6 +32,7 @@ fun main(args: Array<String>) {
     if ("--help" in opts || "-h" in opts) { println(USAGE); return }
     val host = opt("--host", "0.0.0.0")
     val port = opt("--port", "8080").toInt()
+    val tunnelPort = opt("--tunnel-port", "0").toInt()
     val data = File(opt("--data", System.getenv("TSM_DATA") ?: "tsm-data"))
 
     val store = Store(data)
@@ -42,7 +43,8 @@ fun main(args: Array<String>) {
     }
     // Solo il codice nuovo (reset-admin.sh), senza avviare il server.
     if ("--no-serve" in opts) return
-    val server = start(store, host, port)
+    val tunnel = Tunnel(File(data, "tunnel-request"), File(System.getenv("TSM_TUNNEL_STATUS") ?: "/var/lib/tsm-tunnel/status.json"))
+    val server = start(store, host, port, tunnelPort, tunnel)
     println(t.listening("$host:$port", data.absolutePath))
     for (a in addresses(host)) println("  http://$a:$port")
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(1) })
@@ -58,16 +60,22 @@ fun addresses(host: String): List<String> {
 }
 
 /** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
-fun start(store: Store, host: String, port: Int): HttpServer {
-    val api = Api(store)
+fun start(store: Store, host: String, port: Int, tunnelPort: Int = 0, tunnel: Tunnel? = null): HttpServer {
+    val api = Api(store, tunnel = tunnel)
     // Ogni minuto i promemoria delle partite.
     java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "promemoria").apply { isDaemon = true } }
         .scheduleAtFixedRate({ runCatching { api.tick() }.onFailure { System.err.println("Promemoria: $it") } }, 30, 60, java.util.concurrent.TimeUnit.SECONDS)
-    val server = HttpServer.create(InetSocketAddress(host, port), 0)
+    // La porta del tunnel, solo in locale: chi entra da qui viene da internet, qualunque intestazione abbia.
+    if (tunnelPort > 0) listen(api, InetSocketAddress("127.0.0.1", tunnelPort), fromTunnel = true)
+    return listen(api, InetSocketAddress(host, port), fromTunnel = false)
+}
+
+private fun listen(api: Api, address: InetSocketAddress, fromTunnel: Boolean): HttpServer {
+    val server = HttpServer.create(address, 0)
     server.executor = Executors.newFixedThreadPool(4)
     server.createContext("/") { ex ->
         try {
-            if (ex.requestURI.path.startsWith("/api/")) serveApi(api, ex) else serveStatic(ex)
+            if (ex.requestURI.path.startsWith("/api/")) serveApi(api, ex, fromTunnel) else serveStatic(ex)
         } catch (e: Exception) {
             System.err.println("Errore su ${ex.requestURI}: $e")
             runCatching { send(ex, 500, "{\"error\":\"SERVER\"}".toByteArray(), "application/json") }
@@ -86,7 +94,7 @@ private fun forwardedFor(ex: HttpExchange): String? =
 /** L'indirizzo di chi chiama. */
 private fun clientIp(ex: HttpExchange): String = forwardedFor(ex) ?: ex.remoteAddress.address.hostAddress
 
-private fun serveApi(api: Api, ex: HttpExchange) {
+private fun serveApi(api: Api, ex: HttpExchange, fromTunnel: Boolean) {
     val max = if (ex.requestURI.path.endsWith("/admin/backups")) MAX_BACKUP else MAX_BODY
     val body = ex.requestBody.use { it.readNBytes(max + 1) }
     if (body.size > max) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
@@ -94,7 +102,7 @@ private fun serveApi(api: Api, ex: HttpExchange) {
         val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
     }
     val token = ex.requestHeaders.getFirst("Authorization")?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
-    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex), viaProxy = forwardedFor(ex) != null))
+    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex), viaProxy = fromTunnel || forwardedFor(ex) != null))
     ex.responseHeaders.add("Cache-Control", "no-store")
     send(ex, r.status, r.body.toByteArray(), "application/json; charset=utf-8")
 }

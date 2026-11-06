@@ -16,7 +16,8 @@ PKGS=$(grep -v '^#' /iso/config/package-lists/tsm.list.chroot | tr '\n' ',' | se
 mkdir -p "$W/root/opt/tsm-server" "$W/root/etc/default" "$W/root/etc/systemd/system" "$W/root/usr/local/sbin"
 cp -a /iso/config/includes.chroot/. "$W/root/"
 cp /kit/tsm-server.jar "$W/root/opt/tsm-server/"
-cp /kit/tsm-server.service "$W/root/etc/systemd/system/"
+cp /kit/tsm-server.service /kit/tsm-tunnel.service /kit/tsm-tunnel.path /kit/tsm-tunnel.timer "$W/root/etc/systemd/system/"
+cp /kit/tsm-tunnel "$W/root/opt/tsm-server/"
 cp /kit/tsm-server.default "$W/root/etc/default/tsm-server"
 sed 's#^cat /var/lib/tsm-server/setup-code.txt$#cat /var/lib/tsm-server/setup-code.txt; /usr/local/sbin/tsm-issue#' /kit/reset-admin.sh > "$W/root/usr/local/sbin/tsm-reset-admin"
 # Tutto il kit, per l'HTTPS da internet: sudo /opt/tsm-server/kit/setup-https.sh nome.duckdns.org --duckdns TOKEN

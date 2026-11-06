@@ -37,6 +37,8 @@ import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
+import com.tennis.scoremanager.data.SrvTunnel
+import com.tennis.scoremanager.data.SrvTunnelIn
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -76,6 +78,8 @@ class Api(
     private val pusher: Pusher = Pusher { v, sub, payload, ttl -> WebPush.send(v, PUSH_SUBJECT, sub, payload, ttl) },
     /** Le notifiche partono in un filo a parte, per non far aspettare chi prenota (nei test, subito). */
     private val async: Boolean = true,
+    /** Il tunnel da internet (nei test, file temporanei). */
+    private val tunnel: Tunnel? = null,
 ) {
     private val sender = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "push").apply { isDaemon = true } }
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
@@ -97,6 +101,8 @@ class Api(
             r.method == "POST" && p == listOf("admin", "pair") -> pair(r)
             r.method == "PUT" && p == listOf("admin", "sync") -> { admin(r); sync(r) }
             r.method == "GET" && p == listOf("admin", "state") -> { admin(r); adminState() }
+            r.method == "GET" && p == listOf("admin", "tunnel") -> { admin(r); ok(SrvTunnel.serializer(), tunnel?.read() ?: SrvTunnel()) }
+            r.method == "POST" && p == listOf("admin", "tunnel") -> { admin(r); setTunnel(r) }
             r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
@@ -124,6 +130,12 @@ class Api(
             r.method == "POST" && p == listOf("push", "unsubscribe") -> unsubscribe(player(r), r)
             else -> throw ApiError(404, "NOT_FOUND")
         }
+    }
+
+    private fun setTunnel(r: Req): Resp {
+        val t = tunnel?.takeIf { it.read().available } ?: throw ApiError(409, "TUNNEL_UNAVAILABLE")
+        t.set(read(SrvTunnelIn.serializer(), r).on)
+        return ok(SrvTunnel.serializer(), t.read())
     }
 
     // --- Chiavi ---

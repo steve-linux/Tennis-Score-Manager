@@ -17,8 +17,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
@@ -41,16 +42,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.ClubServerError
 import com.tennis.scoremanager.data.ClubServers
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.data.SrvTunnel
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.QrCode
@@ -58,7 +62,67 @@ import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+/**
+ * L'accesso da internet senza toccare il router: la segreteria lo accende da qui e, le prime volte, apre i link di
+ * Tailscale. Quando è pronto l'indirizzo da internet si compila da solo.
+ */
+@Composable
+private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (String) -> Unit) {
+    val s = LocalStrings.current
+    val uri = LocalUriHandler.current
+    val scope = rememberCoroutineScope()
+    var t by remember { mutableStateOf<SrvTunnel?>(null) }
+    var err by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var kick by remember { mutableStateOf(0) }
+    LaunchedEffect(kick) {
+        while (true) {
+            c.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            val state = t?.state
+            delay(if (state == "WORKING" || state == "LOGIN" || state == "ENABLE") 3_000 else 30_000)
+        }
+    }
+    val done = t?.takeIf { it.state == "ON" }?.url.orEmpty()
+    LaunchedEffect(done) { if (done.isNotEmpty() && done != publicUrl) onPublicUrl(done) }
+    fun set(on: Boolean) {
+        busy = true
+        scope.launch {
+            c.serverTunnel(on).onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            if (!on && publicUrl.endsWith(".ts.net")) onPublicUrl("")
+            busy = false
+            kick++
+        }
+    }
+    Text(s.srvTunnelTitle, fontWeight = FontWeight.Bold)
+    val now = t
+    when {
+        err == "NOT_FOUND" || now?.available == false -> Text(s.srvTunnelUpdate, color = TsmColors.TextDim, fontSize = 13.sp)
+        err != null -> Text(srvErrorText(s, err!!), color = TsmColors.Orange, fontSize = 13.sp)
+        now == null -> Text(s.srvTunnelHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        now.state == "ON" -> {
+            Text(s.srvTunnelReady(now.url), fontSize = 13.sp)
+            Text(s.srvTunnelKey, color = TsmColors.TextDim, fontSize = 12.sp)
+            GhostButton(s.srvTunnelOff, Icons.Filled.Public, { set(false) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+        now.state == "LOGIN" || now.state == "ENABLE" -> {
+            Text(if (now.state == "LOGIN") s.srvTunnelLogin else s.srvTunnelEnable, fontSize = 13.sp)
+            GhostButton(s.srvTunnelOpen, Icons.Filled.Public, { uri.openUri(now.link) }, Modifier.fillMaxWidth(), enabled = now.link.isNotEmpty())
+            GhostButton(s.srvTunnelOff, Icons.Filled.Public, { set(false) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+        now.state == "WORKING" -> {
+            Text(s.srvTunnelWorking, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.srvTunnelOff, Icons.Filled.Public, { set(false) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+        else -> {
+            Text(s.srvTunnelHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            if (now.state == "ERROR") Text(s.srvTunnelFail, color = TsmColors.Orange, fontSize = 13.sp)
+            GhostButton(s.srvTunnelOn, Icons.Filled.Public, { set(true) }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
+    }
+}
 
 /** L'errore del server detto in parole. */
 fun srvErrorText(s: Strings, code: String): String = when (code) {
@@ -154,6 +218,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     }, Modifier.fillMaxWidth(), enabled = !busy)
                     OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
+                    TunnelSection(c, publicUrl) { publicUrl = it; c.saveServerRules(rules, pay, it) }
                     SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
                         c.setServerAlerts(on)
                         if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)

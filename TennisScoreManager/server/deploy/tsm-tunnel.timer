@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# All'avvio e ogni ora: se il tunnel è acceso si ricontrolla, così un accesso scaduto compare nell'app.
+[Unit]
+Description=TSM club server tunnel: periodic check
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target
