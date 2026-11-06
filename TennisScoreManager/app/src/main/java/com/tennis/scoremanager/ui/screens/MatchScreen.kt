@@ -42,6 +42,7 @@ import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -103,6 +104,9 @@ import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.PenaltyOutcome
+import com.tennis.scoremanager.model.PenaltyKind
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
@@ -140,6 +144,8 @@ fun MatchScreen(c: MatchController) {
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var confirmRetire by remember { mutableStateOf(false) }
+    var umpireMenu by remember { mutableStateOf(false) }
+    var penaltyKind by remember { mutableStateOf<PenaltyKind?>(null) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
     /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
     var locked by rememberSaveable { mutableStateOf(false) }
@@ -186,14 +192,15 @@ fun MatchScreen(c: MatchController) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
+                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoShort, Modifier.weight(1f), contentDescription = s.undoPoint) { c.undo() }
                 ControlButton(
                     if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
                     if (suspended) s.resume else s.suspend,
                     Modifier.weight(1f),
                     highlight = suspended,
                 ) { c.toggleSuspend() }
-                ControlButton(Icons.Filled.Flag, s.retireButton, Modifier.weight(1f)) { confirmRetire = true }
+                // Solo icona, come audio e blocco: "Annulla punto" e "Sospendi" restano leggibili.
+                ControlButton(Icons.Filled.Gavel, null, Modifier.width(64.dp), contentDescription = s.umpireButton) { if (!state.isFinished) umpireMenu = true }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
@@ -204,11 +211,63 @@ fun MatchScreen(c: MatchController) {
                     contentDescription = if (o.audio) s.audioOn else s.audioOff,
                 ) { c.toggleAudio() }
                 ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
-                ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+                ControlButton(Icons.Filled.AddCircle, s.newMatchShort, Modifier.weight(1.3f), contentDescription = s.newMatch) { confirmNew = true }
                 ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
             }
         }
         if (locked) LockOverlay(s) { locked = false }
+    }
+
+    if (umpireMenu) {
+        AlertDialog(
+            onDismissRequest = { umpireMenu = false },
+            icon = { Icon(Icons.Filled.Gavel, null, tint = TsmColors.Orange) },
+            title = { Text(s.umpireButton, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.penaltyHint, fontSize = 13.sp, color = TsmColors.TextDim)
+                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.CODE }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyCode, color = TsmColors.TextMain) }
+                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.TIME }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyTime, color = TsmColors.TextMain) }
+                    OutlinedButton(onClick = { umpireMenu = false; confirmRetire = true }, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange)
+                        Spacer(Modifier.width(6.dp))
+                        Text(s.retireButton, color = TsmColors.TextMain)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { umpireMenu = false }) { Text(s.back) } },
+        )
+    }
+
+    penaltyKind?.let { kind ->
+        AlertDialog(
+            onDismissRequest = { penaltyKind = null },
+            icon = { Icon(Icons.Filled.Gavel, null, tint = TsmColors.Orange) },
+            title = { Text(if (kind == PenaltyKind.CODE) s.penaltyCode else s.penaltyTime, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.penaltyWho)
+                    for (side in Side.entries) {
+                        // Sotto il nome, cosa comporta: si vede prima di toccare.
+                        val out = when (ScoreEngine.penaltyOutcome(state, side, kind)) {
+                            PenaltyOutcome.WARNING -> s.penaltyOutWarning
+                            PenaltyOutcome.POINT -> s.penaltyOutPoint
+                            PenaltyOutcome.GAME -> s.penaltyOutGame
+                            PenaltyOutcome.SERVE -> s.penaltyOutServe
+                        }
+                        OutlinedButton(onClick = { penaltyKind = null; c.penalty(side, kind) }, modifier = Modifier.fillMaxWidth()) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Text(out, color = TsmColors.TextDim, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { penaltyKind = null }) { Text(s.back) } },
+        )
     }
 
     if (confirmRetire) {
@@ -498,9 +557,9 @@ private fun Scoreboard(state: MatchState, names: Names, s: Strings) {
                         Row(verticalAlignment = Alignment.Top) {
                             Text(
                                 set.shown(side).toString(),
-                                color = if (set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
+                                color = if (!set.partial && set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
                                 fontSize = if (set.matchTiebreak) 15.sp else 18.sp,
-                                fontWeight = if (set.winner == side) FontWeight.Bold else FontWeight.Normal,
+                                fontWeight = if (!set.partial && set.winner == side) FontWeight.Bold else FontWeight.Normal,
                             )
                             if (set.hasTiebreak && !set.matchTiebreak && set.winner != side) {
                                 Text(set.tb(side).toString(), color = TsmColors.TextDim, fontSize = 10.sp)

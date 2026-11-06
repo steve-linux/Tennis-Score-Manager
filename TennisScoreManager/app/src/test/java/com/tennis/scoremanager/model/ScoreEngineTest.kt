@@ -424,4 +424,64 @@ class ScoreEngineTest {
         assertEquals(2 to 1, set.tb1 to set.tb2)
         assertTrue(set.partial && set.matchTiebreak)
     }
+
+    private fun pen(s: MatchState, side: Side, kind: PenaltyKind) = ScoreEngine.apply(s, MatchEvent.Penalty(side, kind)).state
+
+    @Test fun condottaAvvertimentoPoiPuntoPoiGame() {
+        var s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        assertEquals(PenaltyOutcome.WARNING, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.CODE))
+        s = pen(s, P1, PenaltyKind.CODE)
+        assertEquals(0 to 0, s.pt1 to s.pt2)
+        assertEquals(PenaltyOutcome.POINT, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.CODE))
+        s = pen(s, P1, PenaltyKind.CODE)
+        assertEquals(0 to 1, s.pt1 to s.pt2)
+        assertEquals(PenaltyOutcome.GAME, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.CODE))
+        s = pen(s, P1, PenaltyKind.CODE)
+        assertEquals("il game va all'avversario", 0 to 1, s.g1 to s.g2)
+        assertEquals(0 to 0, s.pt1 to s.pt2)
+        assertEquals(3, s.penalties(P1, PenaltyKind.CODE))
+        assertEquals("i richiami dell'altro sono a parte", PenaltyOutcome.WARNING, ScoreEngine.penaltyOutcome(s, P2, PenaltyKind.CODE))
+    }
+
+    @Test fun tempoChiServePerdeIlServizioChiRispondeIlPunto() {
+        var s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        s = pen(s, P1, PenaltyKind.TIME)
+        s = pen(s, P2, PenaltyKind.TIME)
+        assertEquals(PenaltyOutcome.SERVE, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.TIME))
+        val served = pen(s, P1, PenaltyKind.TIME)
+        assertEquals("la perdita del servizio non tocca il punteggio", 0 to 0, served.pt1 to served.pt2)
+        assertEquals(PenaltyOutcome.POINT, ScoreEngine.penaltyOutcome(s, P2, PenaltyKind.TIME))
+        val received = pen(s, P2, PenaltyKind.TIME)
+        assertEquals(1 to 0, received.pt1 to received.pt2)
+    }
+
+    @Test fun gameDiPenalitaNelTiebreakChiudeIlSet() {
+        var s = ScoreEngine.initial(RulesConfig())
+        repeat(6) { s = game(s, P1); s = game(s, P2) }
+        assertTrue(s.inTiebreak)
+        s = pen(pen(pen(s, P2, PenaltyKind.CODE), P2, PenaltyKind.CODE), P2, PenaltyKind.CODE)
+        assertEquals(1, s.sets.size)
+        assertEquals(P1, s.sets[0].winner)
+    }
+
+    @Test fun richiamiSiRigiocanoESiAnnullano() {
+        val rules = RulesConfig()
+        val events = listOf(MatchEvent.Point(P1), MatchEvent.Penalty(P1, PenaltyKind.CODE), MatchEvent.Penalty(P1, PenaltyKind.CODE))
+        val s = ScoreEngine.replay(rules, events)
+        assertEquals(1 to 1, s.pt1 to s.pt2)
+        assertEquals(2, s.penalties(P1, PenaltyKind.CODE))
+        assertEquals(1 to 0, ScoreEngine.replay(rules, events.dropLast(1)).let { it.pt1 to it.pt2 })
+    }
+
+    @Test fun richiamoDopoLaFineNonCambiaNiente() {
+        val s = ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.Retired(P2)).state
+        assertEquals(s, pen(s, P1, PenaltyKind.CODE))
+    }
+
+    @Test fun ritiroNelPrimoGameSegnaZeroAZero() {
+        val s = play(ScoreEngine.initial(RulesConfig()), P2)
+        val set = ScoreEngine.apply(s, MatchEvent.Retired(P1)).state.sets.single()
+        assertEquals(0 to 0, set.g1 to set.g2)
+        assertTrue(set.partial)
+    }
 }

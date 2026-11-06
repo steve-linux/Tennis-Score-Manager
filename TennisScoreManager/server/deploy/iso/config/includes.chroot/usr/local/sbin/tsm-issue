@@ -19,6 +19,9 @@ NEW=$(
     elif [ -f "$DATA/state.json" ]; then
         echo "  Segreteria abbinata / Office paired"
     fi
+    # L'indirizzo da internet, se la segreteria ha acceso il tunnel dall'app.
+    NET=$(sed -n 's/.*"state":"ON","url":"\(https:[^"]*\)".*/\1/p' /var/lib/tsm-tunnel/status.json 2>/dev/null)
+    [ -z "$NET" ] || echo "  Da internet / From the internet: $NET"
     # Senza la partizione "persistence" sulla chiavetta, al prossimo avvio il server dimentica tutto.
     if ! grep -qs " /run/live/persistence/" /proc/mounts; then
         echo "  ATTENZIONE: nessuna partizione persistence, i dati si perdono allo spegnimento!"

@@ -33,6 +33,11 @@ data class MatchState(
     val pointsPlayed: Int = 0,
     /** Chi si è ritirato (null = partita finita sul campo o ancora in corso). */
     val retired: Side? = null,
+    /** I richiami fatti finora, per tipo: [Penalty] li conta per sapere cosa comporta il prossimo. */
+    val codes1: Int = 0,
+    val codes2: Int = 0,
+    val times1: Int = 0,
+    val times2: Int = 0,
 ) {
     val isFinished: Boolean get() = winner != null
     val setNumber: Int get() = sets.size + 1
@@ -43,6 +48,10 @@ data class MatchState(
     fun points(side: Side): Int = if (side == Side.P1) pt1 else pt2
     fun setsWon(side: Side): Int = sets.count { !it.partial && it.winner == side }
     fun order(side: Side): Int = if (side == Side.P1) order1 else order2
+    fun penalties(side: Side, kind: PenaltyKind): Int = when (kind) {
+        PenaltyKind.CODE -> if (side == Side.P1) codes1 else codes2
+        PenaltyKind.TIME -> if (side == Side.P1) times1 else times2
+    }
     fun leftSide(): Side = if (p1Left) Side.P1 else Side.P2
 
     /** Turno di servizio corrente all'interno del set. */
@@ -119,6 +128,41 @@ object ScoreEngine {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)
         is MatchEvent.Retired -> Step(retire(state, event.side), null)
+        is MatchEvent.Penalty -> penalty(state, event.side, event.kind)
+    }
+
+    /** Cosa comporterebbe adesso un richiamo [kind] a [side] (per mostrarlo prima di confermare). */
+    fun penaltyOutcome(s: MatchState, side: Side, kind: PenaltyKind): PenaltyOutcome {
+        val n = s.penalties(side, kind) + 1
+        return when {
+            n == 1 -> PenaltyOutcome.WARNING
+            kind == PenaltyKind.CODE -> if (n == 2) PenaltyOutcome.POINT else PenaltyOutcome.GAME
+            side == s.server -> PenaltyOutcome.SERVE
+            else -> PenaltyOutcome.POINT
+        }
+    }
+
+    /**
+     * Il richiamo: si conta e, se tocca, il punto o il game va all'avversario. La perdita del servizio non cambia il
+     * punteggio da sola: la segna chi tiene il punteggio come una prima fuori (o il doppio fallo).
+     */
+    private fun penalty(s: MatchState, side: Side, kind: PenaltyKind): Step {
+        if (s.isFinished) return Step(s, null)
+        val outcome = penaltyOutcome(s, side, kind)
+        val counted = when (kind) {
+            PenaltyKind.CODE -> if (side == Side.P1) s.copy(codes1 = s.codes1 + 1) else s.copy(codes2 = s.codes2 + 1)
+            PenaltyKind.TIME -> if (side == Side.P1) s.copy(times1 = s.times1 + 1) else s.copy(times2 = s.times2 + 1)
+        }
+        return when (outcome) {
+            PenaltyOutcome.WARNING, PenaltyOutcome.SERVE -> Step(counted, null)
+            PenaltyOutcome.POINT -> pointWonBy(counted, side.other)
+            PenaltyOutcome.GAME -> {
+                // Punti all'avversario finché il game (o il tie-break) non è suo.
+                var step = pointWonBy(counted, side.other)
+                while (step.transition != null && step.transition!!.gameWinner == null) step = pointWonBy(step.state, side.other)
+                step
+            }
+        }
     }
 
     /**
@@ -128,7 +172,8 @@ object ScoreEngine {
     private fun retire(s: MatchState, side: Side): MatchState {
         if (s.isFinished) return s
         val inMatchTiebreak = s.tiebreak == TiebreakKind.MATCH
-        val started = if (inMatchTiebreak) s.pt1 + s.pt2 > 0 else s.g1 + s.g2 > 0
+        // Ritiro nel primo game della partita, a punti già giocati: si scrive "0-0 rit." (senza nessun punto è un w.o.).
+        val started = if (inMatchTiebreak) s.pt1 + s.pt2 > 0 else s.g1 + s.g2 > 0 || (s.sets.isEmpty() && s.pointsPlayed > 0)
         val open = when {
             !started -> emptyList()
             inMatchTiebreak -> listOf(SetScore(0, 0, s.pt1, s.pt2, matchTiebreak = true, partial = true))

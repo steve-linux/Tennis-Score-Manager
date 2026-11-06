@@ -126,7 +126,23 @@ sealed class MatchEvent {
     @Serializable
     @SerialName("retired")
     data class Retired(val side: Side, val at: Long = 0L) : MatchEvent()
+
+    /** Un richiamo dell'arbitro a [side]: cosa comporta lo decide il numero di richiami dello stesso tipo ([PenaltyKind]). */
+    @Serializable
+    @SerialName("penalty")
+    data class Penalty(val side: Side, val kind: PenaltyKind, val at: Long = 0L) : MatchEvent()
 }
+
+/** I due tipi di richiamo, con le scale del regolamento: condotta e tempo (i 25 secondi tra un punto e l'altro). */
+@Serializable
+enum class PenaltyKind { CODE, TIME }
+
+/**
+ * Cosa comporta un richiamo. Condotta: 1° avvertimento, 2° punto all'avversario, poi un game all'avversario. Tempo:
+ * 1° avvertimento, poi chi serve perde il servizio (una prima fuori, o il doppio fallo sulla seconda) e chi risponde
+ * perde il punto.
+ */
+enum class PenaltyOutcome { WARNING, POINT, GAME, SERVE }
 
 /** Punteggio di un set concluso. Per il match tie-break g1/g2 valgono 1-0 e i punti stanno in tb1/tb2. */
 @Serializable

@@ -167,6 +167,12 @@ fun SummaryScreen(c: MatchController) {
                 Spacer(Modifier.height(6.dp))
                 Text(Reports.resultLine(state, w, s), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 state.retired?.let { Text(s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
+                // I richiami dell'arbitro, se ce ne sono stati.
+                for (side in Side.entries) {
+                    val code = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.CODE)
+                    val time = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.TIME)
+                    if (code + time > 0) Text("${s.penaltyList} · ${names.short(side)}: ${s.penaltyCount(code, time)}", color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+                }
             }
 
             // Tabellone finale

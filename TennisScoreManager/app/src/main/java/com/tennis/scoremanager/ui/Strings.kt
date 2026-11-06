@@ -660,6 +660,28 @@ interface Strings {
     val retireUndo: String
     val retireCall: (String) -> String
     val retireBy: (String) -> String
+    val umpireButton: String
+    val penaltyCode: String
+    val penaltyTime: String
+    val penaltyHint: String
+    val penaltyWho: String
+    val penaltyOutWarning: String
+    val penaltyOutPoint: String
+    val penaltyOutGame: String
+    val penaltyOutServe: String
+    val penaltyUndone: String
+    val penaltyList: String
+    val penaltyWarnCode: (String) -> String
+    val penaltyWarnTime: (String) -> String
+    val penaltyPoint: (String) -> String
+    val penaltyGame: (String) -> String
+    val penaltyServe: (String) -> String
+    val penaltyCount: (Int, Int) -> String
+    val retireUndone: String
+    /** "Annulla punto" corto, per il tasto accanto a Sospendi e Arbitro. */
+    val undoShort: String
+    /** "Nuova partita" corto, per il tasto in fondo alla partita. */
+    val newMatchShort: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -2832,6 +2854,26 @@ object ItStrings : Strings {
     override val retireUndo = "Annulla il ritiro"
     override val retireCall: (String) -> String = { "$it si ritira" }
     override val retireBy: (String) -> String = { "Ritiro di $it" }
+    override val umpireButton = "Arbitro"
+    override val penaltyCode = "Violazione di condotta"
+    override val penaltyTime = "Violazione di tempo"
+    override val penaltyHint = "Condotta: 1° avvertimento, 2° punto all'avversario, poi un game. Tempo: 1° avvertimento, poi chi serve perde il servizio e chi risponde il punto. Annulla lo toglie."
+    override val penaltyWho = "A chi va il richiamo?"
+    override val penaltyOutWarning = "Avvertimento"
+    override val penaltyOutPoint = "Punto all'avversario"
+    override val penaltyOutGame = "Game all'avversario"
+    override val penaltyOutServe = "Perde il servizio"
+    override val penaltyUndone = "Richiamo annullato"
+    override val penaltyList = "Richiami"
+    override val penaltyWarnCode: (String) -> String = { "Violazione di condotta, avvertimento a $it" }
+    override val penaltyWarnTime: (String) -> String = { "Violazione di tempo, avvertimento a $it" }
+    override val penaltyPoint: (String) -> String = { "Penalità di un punto a $it" }
+    override val penaltyGame: (String) -> String = { "Penalità di un game a $it" }
+    override val penaltyServe: (String) -> String = { "Violazione di tempo, $it perde il servizio" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "condotta $c · tempo $t" }
+    override val retireUndone = "Ritiro annullato"
+    override val undoShort = "Annulla"
+    override val newMatchShort = "Nuova"
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -3746,7 +3788,7 @@ object ItStrings : Strings {
     override val srvSyncNow = "Invia ora"
     override val srvSynced = "Planning inviato"
     override val srvUnpair = "Scollega il server"
-    override val srvUnpairAsk = "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano."
+    override val srvUnpairAsk = "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: sudo tsm-reset-admin sulla chiavetta, sudo ./reset-admin.sh nel kit). Le prenotazioni già nel planning restano."
     override val srvOpen = "Prenotazioni online aperte"
     override val srvOpenHint = "Spente: i giocatori vedono il planning ma non prenotano"
     override val srvDaysAhead = "Fin quanti giorni avanti"
@@ -4967,6 +5009,26 @@ object EnStrings : Strings {
     override val retireUndo = "Undo retirement"
     override val retireCall: (String) -> String = { "$it retires" }
     override val retireBy: (String) -> String = { "Retirement: $it" }
+    override val umpireButton = "Umpire"
+    override val penaltyCode = "Code violation"
+    override val penaltyTime = "Time violation"
+    override val penaltyHint = "Code: 1st warning, 2nd point to the opponent, then a game. Time: 1st warning, then the server loses a serve and the receiver a point. Undo removes it."
+    override val penaltyWho = "Who gets it?"
+    override val penaltyOutWarning = "Warning"
+    override val penaltyOutPoint = "Point to the opponent"
+    override val penaltyOutGame = "Game to the opponent"
+    override val penaltyOutServe = "Loses a serve"
+    override val penaltyUndone = "Penalty undone"
+    override val penaltyList = "Penalties"
+    override val penaltyWarnCode: (String) -> String = { "Code violation, warning, $it" }
+    override val penaltyWarnTime: (String) -> String = { "Time violation, warning, $it" }
+    override val penaltyPoint: (String) -> String = { "Point penalty, $it" }
+    override val penaltyGame: (String) -> String = { "Game penalty, $it" }
+    override val penaltyServe: (String) -> String = { "Time violation, loss of serve, $it" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "code $c · time $t" }
+    override val retireUndone = "Retirement undone"
+    override val undoShort = "Undo"
+    override val newMatchShort = "New"
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -5881,7 +5943,7 @@ object EnStrings : Strings {
     override val srvSyncNow = "Send now"
     override val srvSynced = "Schedule sent"
     override val srvUnpair = "Disconnect the server"
-    override val srvUnpairAsk = "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay."
+    override val srvUnpairAsk = "Disconnect the server? Players cannot book until you pair it again (it will need a new code: sudo tsm-reset-admin on the USB stick, sudo ./reset-admin.sh in the kit). Bookings already in the schedule stay."
     override val srvOpen = "Online booking open"
     override val srvOpenHint = "Off: players see the schedule but cannot book"
     override val srvDaysAhead = "How many days ahead"

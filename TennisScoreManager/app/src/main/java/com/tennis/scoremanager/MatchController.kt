@@ -71,6 +71,8 @@ import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PenaltyKind
+import com.tennis.scoremanager.model.PenaltyOutcome
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
@@ -1620,7 +1622,7 @@ class MatchController(
         for (t in clubTournaments.value) {
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
-            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), retired = state.retired != null, record = rec.id))
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), walkover = com.tennis.scoremanager.data.Reports.isWalkover(state), retired = state.retired != null && !com.tennis.scoremanager.data.Reports.isWalkover(state), record = rec.id))
         }
     }
 
@@ -2930,7 +2932,7 @@ class MatchController(
      * Statistiche dettagliate: [kind] dice come è finito il punto (null = non detto). La seconda di servizio
      * viene da [fault]: vale per il punto in corso, anche se poi lo dà un braccialetto o un telecomando.
      */
-    fun awardPoint(side: Side, fromBand: Boolean = false, kind: PointKind? = null) {
+    fun awardPoint(side: Side, fromBand: Boolean = false, kind: PointKind? = null, note: String? = null) {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
         val now = SystemClock.elapsedRealtime()
@@ -2963,12 +2965,13 @@ class MatchController(
                 else -> null
             },
         )
-        afterTransition(step.state, t)
+        afterTransition(step.state, t, note)
     }
 
-    private fun afterTransition(state: MatchState, t: Transition) {
+    /** [note]: detto prima del punteggio e scritto davanti al messaggio (il richiamo che ha dato il punto). */
+    private fun afterTransition(state: MatchState, t: Transition, note: String? = null) {
         val n = names()
-        announcer.announce(calls().afterPoint(state, t, n))
+        announcer.announce(listOfNotNull(note?.let { com.tennis.scoremanager.voice.Seg.Say(it) }) + calls().afterPoint(state, t, n))
         pushScore(state, t)
         when {
             t.matchWinner != null -> {
@@ -2998,7 +3001,7 @@ class MatchController(
             t.tiebreakStarted -> s.msgTiebreak
             t.changeEnds -> s.msgChangeEnds
             else -> pressureMessage(state)
-        }
+        }.let { m -> if (note == null) m else listOfNotNull(note, m).joinToString(" · ") }
         if (msg != null) showMessage(msg)
         showTvMessage(msg)
         if (t.setWinner != null && state.rules.doubles) serveOrderPrompt.value = true
@@ -3077,8 +3080,9 @@ class MatchController(
             return
         }
         val events = lm.record.events.toMutableList()
-        // Dopo un ritiro si annulla il ritiro, non l'ultimo punto.
-        if (events.lastOrNull() is MatchEvent.Retired) events.removeAt(events.lastIndex)
+        // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
+        val last = events.lastOrNull()
+        if (last is MatchEvent.Retired || last is MatchEvent.Penalty) events.removeAt(events.lastIndex)
         else {
             while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
             if (events.isEmpty()) return
@@ -3099,7 +3103,7 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(strings.msgPointUndone)
+        showMessage(when (last) { is MatchEvent.Penalty -> strings.penaltyUndone; is MatchEvent.Retired -> strings.retireUndone; else -> strings.msgPointUndone })
         showTvMessage(null)
     }
 
@@ -3121,6 +3125,46 @@ class MatchController(
         showTvMessage(text)
         message.value = null
         endDialog.value = true
+    }
+
+    /**
+     * Un richiamo dell'arbitro a [side]: si segna, si annuncia e, se tocca, il punto o il game va all'avversario (si
+     * annulla con Annulla punto). La perdita del servizio, con le statistiche dettagliate, è una prima fuori.
+     */
+    fun penalty(side: Side, kind: PenaltyKind) {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        if (lm.record.startedAt == null) onPlay()
+        val current = live.value ?: return
+        val outcome = ScoreEngine.penaltyOutcome(current.state, side, kind)
+        val event = MatchEvent.Penalty(side, kind, System.currentTimeMillis())
+        val step = ScoreEngine.apply(current.state, event)
+        val who = names(current.record.setup).side(side)
+        val text = when (outcome) {
+            PenaltyOutcome.WARNING -> if (kind == PenaltyKind.CODE) strings.penaltyWarnCode(who) else strings.penaltyWarnTime(who)
+            PenaltyOutcome.POINT -> strings.penaltyPoint(who)
+            PenaltyOutcome.GAME -> strings.penaltyGame(who)
+            PenaltyOutcome.SERVE -> strings.penaltyServe(who)
+        }
+        // Il punto o il game di penalità chiude lo scambio in corso.
+        if (step.transition != null) { faultPending.value = false; rallyStrokes = 0 }
+        commit(current.record.copy(events = current.record.events + event), step.state)
+        val t = step.transition
+        if (t != null) {
+            serveOrderPrompt.value = false
+            afterTransition(step.state, t, text)
+            return
+        }
+        if (outcome == PenaltyOutcome.SERVE && current.record.options.detailedStats) {
+            lastPointAt = 0L
+            // Sulla seconda è un doppio fallo: il punto va a chi risponde.
+            if (faultPending.value) { awardPoint(step.state.receiver, kind = PointKind.DOUBLE_FAULT, note = text); return }
+            fault()
+        }
+        announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
+        showTvMessage(text)
+        showMessage(text)
     }
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {

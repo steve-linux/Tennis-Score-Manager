@@ -59,9 +59,15 @@ object Reports {
 
     fun scoreLine(state: MatchState, from: Side): String = state.sets.joinToString("  ") { setText(it, from) }
 
-    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit.". */
-    fun resultLine(state: MatchState, from: Side, s: Strings): String =
-        scoreLine(state, from) + if (state.retired != null) " " + s.ctRetired else ""
+    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit."; ritiro prima di giocare, "w.o.". */
+    fun resultLine(state: MatchState, from: Side, s: Strings): String = when {
+        isWalkover(state) -> s.ctWalkover
+        state.retired != null -> scoreLine(state, from) + " " + s.ctRetired
+        else -> scoreLine(state, from)
+    }
+
+    /** Ritiro prima del primo punto: la partita non si è giocata (w.o.). */
+    fun isWalkover(state: MatchState): Boolean = state.retired != null && state.pointsPlayed == 0
 
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
@@ -253,7 +259,7 @@ object Reports {
             }
             for ((j, set) in state.sets.withIndex()) {
                 val x = firstCol + j * colW + colW / 2
-                val won = set.winner == side
+                val won = !set.partial && set.winner == side
                 c.drawText(set.shown(side).toString(), x, y + rowH / 2 + 34f, paint(if (set.matchTiebreak) 64f else 92f, if (won) white else grey, won, Paint.Align.CENTER))
                 if (set.hasTiebreak && !set.matchTiebreak && !won) {
                     c.drawText(set.tb(side).toString(), x + 42f, y + rowH / 2 - 22f, paint(38f, grey, false, Paint.Align.LEFT))

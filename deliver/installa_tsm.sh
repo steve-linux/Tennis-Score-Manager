@@ -742,7 +742,7 @@ const APP_I18N = {
     srvTunnelUpdate: "Per usarlo aggiorna il server: rilancia install.sh con il kit nuovo.",
     srvTunnelWorking: "Il server sta preparando il collegamento: può volerci qualche minuto.",
     srvUnpair: "Scollega il server",
-    srvUnpairAsk: "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano.",
+    srvUnpairAsk: "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: sudo tsm-reset-admin sulla chiavetta, sudo ./reset-admin.sh nel kit). Le prenotazioni già nel planning restano.",
     stBlocked: (it) => `non prenotabili ${it} h`,
     stBookings: "Prenotazioni",
     stByCourt: "Campo per campo",
@@ -1215,7 +1215,7 @@ const APP_I18N = {
     srvTunnelUpdate: "To use this, update the server: run install.sh again with the new kit.",
     srvTunnelWorking: "The server is preparing the connection: this may take a few minutes.",
     srvUnpair: "Disconnect the server",
-    srvUnpairAsk: "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay.",
+    srvUnpairAsk: "Disconnect the server? Players cannot book until you pair it again (it will need a new code: sudo tsm-reset-admin on the USB stick, sudo ./reset-admin.sh in the kit). Bookings already in the schedule stay.",
     stBlocked: (it) => `not bookable ${it} h`,
     stBookings: "Bookings",
     stByCourt: "Court by court",
@@ -1688,7 +1688,7 @@ const APP_I18N = {
     srvTunnelUpdate: "Pour l'utiliser, mettez à jour le serveur : relancez install.sh avec le nouveau kit.",
     srvTunnelWorking: "Le serveur prépare la connexion : cela peut prendre quelques minutes.",
     srvUnpair: "Déconnecter le serveur",
-    srvUnpairAsk: "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : java -jar tsm-server.jar --reset-admin). Les réservations déjà au planning restent.",
+    srvUnpairAsk: "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : sudo tsm-reset-admin sur la clé USB, sudo ./reset-admin.sh dans le kit). Les réservations déjà au planning restent.",
     stBlocked: (it) => `non réservables ${it} h`,
     stBookings: "Réservations",
     stByCourt: "Terrain par terrain",
@@ -2161,7 +2161,7 @@ const APP_I18N = {
     srvTunnelUpdate: "Aktualisiere dafür den Server: Starte install.sh mit dem neuen Kit erneut.",
     srvTunnelWorking: "Der Server bereitet die Verbindung vor: Das kann einige Minuten dauern.",
     srvUnpair: "Server trennen",
-    srvUnpairAsk: "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: java -jar tsm-server.jar --reset-admin). Buchungen im Plan bleiben.",
+    srvUnpairAsk: "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: sudo tsm-reset-admin auf dem USB-Stick, sudo ./reset-admin.sh im Kit). Buchungen im Plan bleiben.",
     stBlocked: (it) => `nicht buchbar ${it} Std.`,
     stBookings: "Buchungen",
     stByCourt: "Platz für Platz",
@@ -2634,7 +2634,7 @@ const APP_I18N = {
     srvTunnelUpdate: "Para usarlo, actualiza el servidor: vuelve a lanzar install.sh con el kit nuevo.",
     srvTunnelWorking: "El servidor está preparando la conexión: puede tardar unos minutos.",
     srvUnpair: "Desconectar el servidor",
-    srvUnpairAsk: "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: java -jar tsm-server.jar --reset-admin). Las reservas ya en el planning se quedan.",
+    srvUnpairAsk: "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: sudo tsm-reset-admin en el pendrive, sudo ./reset-admin.sh en el kit). Las reservas ya en el planning se quedan.",
     stBlocked: (it) => `no reservables ${it} h`,
     stBookings: "Reservas",
     stByCourt: "Pista por pista",
@@ -3107,7 +3107,7 @@ const APP_I18N = {
     srvTunnelUpdate: "Para usar isso, atualize o servidor: execute install.sh de novo com o kit novo.",
     srvTunnelWorking: "O servidor está preparando a conexão: pode levar alguns minutos.",
     srvUnpair: "Desligar o servidor",
-    srvUnpairAsk: "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: java -jar tsm-server.jar --reset-admin). As reservas já na agenda ficam.",
+    srvUnpairAsk: "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: sudo tsm-reset-admin na pen USB, sudo ./reset-admin.sh no kit). As reservas já na agenda ficam.",
     stBlocked: (it) => `não reserváveis ${it} h`,
     stBookings: "Reservas",
     stByCourt: "Quadra a quadra",
@@ -7412,7 +7412,9 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
 
 **App verlassen**: **Beenden** (im Match mit Rückfrage, auch in der Zusammenfassung vorhanden) schließt die App wirklich; ebenso, wenn du sie aus den zuletzt verwendeten Apps entfernst. Beim nächsten Öffnen startet sie im Reiter **Spielen**.
 
-**Aufgabe**: Die Taste **Aufgabe** unter dem Spielstand fragt, wer aufgibt, und beendet die Partie bei diesem Stand, ohne die Punkte des laufenden Spiels (z. B. `6-3 2-1 Aufgabe`). Der Gegner gewinnt, die Stimme sagt es an, und vor dem Abschluss stellt **Aufgabe zurücknehmen** alles wieder her. Bei Turnieren geht das Ergebnis mit vermerkter Aufgabe von selbst ein; die Partie zählt als Sieg, wirkt sich aber nicht auf das TSM-Rating aus.
+**Aufgabe**: Die Taste **Schiri** (der Hammer) unter dem Spielstand fragt unter **Aufgabe**, wer aufgibt, und beendet die Partie bei diesem Stand, ohne die Punkte des laufenden Spiels (z. B. `6-3 2-1 Aufgabe`). Der Gegner gewinnt, die Stimme sagt es an, und vor dem Abschluss stellt **Aufgabe zurücknehmen** alles wieder her. Bei Turnieren geht das Ergebnis mit vermerkter Aufgabe von selbst ein; die Partie zählt als Sieg, wirkt sich aber nicht auf das TSM-Rating aus.
+
+**Strafen des Schiedsrichters**: Ebenfalls unter **Schiri** fragen **Verhaltensverstoß** und **Zeitverstoß**, wen es trifft, und zeigen unter jedem Namen schon die Folge. Verhalten: Die 1. ist eine Verwarnung, die 2. gibt dem Gegner einen Punkt, ab der 3. ein Spiel (im Tiebreak den Tiebreak). Zeit: Die 1. ist eine Verwarnung, danach verliert der Rückschläger den Punkt und der Aufschläger einen Aufschlag (mit detaillierter Statistik wird daraus ein erster Fehler, beim zweiten der Doppelfehler). Stimme und TV sagen es an, **Zurück** nimmt die letzte Strafe zurück, und die Zusammenfassung zeigt, wie viele es gab. Eine Aufgabe vor dem ersten Punkt erscheint als `w.o.`.
 
 **Speichern**: Das Match speichert sich bei jedem Punkt von selbst. Im Reiter **Spielen** löscht man ein unterbrochenes Match, indem man sein *Fortsetzen* **gedrückt hält**; alle unterbrochenen Matches stehen unter **Fortschritt › Verlauf › Unterbrochen**, zum Fortsetzen oder Löschen (mehrere angehakt auch zusammen). *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
 
@@ -7982,7 +7984,9 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 **Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the **Play** tab.
 
-**Retirement**: the **Retire** button under the score asks who is retiring and ends the match at that score, without the points of the current game (e.g. `6-3 2-1 ret.`). The opponent wins, the voice announces it and, before **Match concluded**, **Undo retirement** restores everything. In tournaments the result goes in by itself with the retirement marked; the match counts as a win but does not affect the TSM rating.
+**Retirement**: the **Umpire** button (the gavel) under the score, under **Retire**, asks who is retiring and ends the match at that score, without the points of the current game (e.g. `6-3 2-1 ret.`). The opponent wins, the voice announces it and, before **Match concluded**, **Undo retirement** restores everything. In tournaments the result goes in by itself with the retirement marked; the match counts as a win but does not affect the TSM rating.
+
+**Umpire penalties**: also in **Umpire**, **Code violation** and **Time violation** ask who gets it and, under each name, already say what it means. Code: the 1st is a warning, the 2nd gives a point to the opponent, from the 3rd a game (in a tie-break, the tie-break). Time: the 1st is a warning, then the receiver loses the point and the server loses a serve (with detailed statistics it becomes a first-serve fault, or the double fault on the second). The voice and the TV announce it, **Undo** removes the last penalty and the summary says how many there were. A retirement before the first point shows as `w.o.`.
 
 **Saving**: the match saves itself at every point. On the **Play** tab a suspended match is deleted by **long-pressing** its *Resume*; all suspended matches are in **Progress › History › Suspended**, to resume or delete (ticking several, also together). *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
@@ -8551,7 +8555,9 @@ Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos
 
 **Para salir**: **Salir** (durante el partido pide confirmación, y también está en el resumen) cierra la app de verdad; lo mismo ocurre si la quitas de las aplicaciones recientes. Al volver a abrirla empieza desde la pestaña **Jugar**.
 
-**Retirada**: el botón **Retirada** bajo el marcador pregunta quién se retira y termina el partido con ese marcador, sin los puntos del juego en curso (p. ej. `6-3 2-1 ret.`). Gana el rival, la voz lo anuncia y, antes de concluir, **Deshacer la retirada** lo deja todo como estaba. En los torneos el resultado entra solo con la retirada anotada; el partido cuenta como victoria pero no pesa en el rating TSM.
+**Retirada**: el botón **Árbitro** (el mazo) bajo el marcador, en **Retirada**, pregunta quién se retira y termina el partido con ese marcador, sin los puntos del juego en curso (p. ej. `6-3 2-1 ret.`). Gana el rival, la voz lo anuncia y, antes de concluir, **Deshacer la retirada** lo deja todo como estaba. En los torneos el resultado entra solo con la retirada anotada; el partido cuenta como victoria pero no pesa en el rating TSM.
+
+**Penalizaciones del árbitro**: también en **Árbitro**, **Infracción de conducta** e **Infracción de tiempo** preguntan a quién va y, bajo cada nombre, ya dicen qué supone. Conducta: la 1.ª es una advertencia, la 2.ª da un punto al rival, desde la 3.ª un juego (en el tie-break, el tie-break). Tiempo: la 1.ª es una advertencia, luego quien resta pierde el punto y quien saca pierde un servicio (con estadísticas detalladas es una primera falta, o la doble falta en el segundo). La voz y la TV lo anuncian, **Anular** quita la última penalización y el resumen dice cuántas hubo. Una retirada antes del primer punto aparece como `w.o.`.
 
 **Guardado**: el partido se guarda solo en cada punto. En la pestaña **Jugar** un partido suspendido se elimina **manteniendo pulsado** su *Reanudar*; todos los suspendidos están en **Progresos › Historial › Suspendidos**, para reanudar o eliminar (marcando varios, también a la vez). *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
 
@@ -9120,7 +9126,9 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 **Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de l'onglet **Jouer**.
 
-**Abandon** : le bouton **Abandon** sous le score demande qui abandonne et termine le match à ce score, sans les points du jeu en cours (par ex. `6-3 2-1 abandon`). L'adversaire gagne, la voix l'annonce et, avant de conclure, **Annuler l'abandon** remet tout comme avant. Dans les tournois, le résultat entre tout seul avec l'abandon noté ; le match compte comme une victoire mais ne pèse pas sur le rating TSM.
+**Abandon** : le bouton **Arbitre** (le marteau) sous le score, à la ligne **Abandon**, demande qui abandonne et termine le match à ce score, sans les points du jeu en cours (par ex. `6-3 2-1 abandon`). L'adversaire gagne, la voix l'annonce et, avant de conclure, **Annuler l'abandon** remet tout comme avant. Dans les tournois, le résultat entre tout seul avec l'abandon noté ; le match compte comme une victoire mais ne pèse pas sur le rating TSM.
+
+**Pénalités de l'arbitre** : toujours dans **Arbitre**, **Code de conduite** et **Infraction de temps** demandent à qui va la pénalité et indiquent déjà, sous chaque nom, ce qu'elle entraîne. Conduite : la 1re est un avertissement, la 2e donne un point à l'adversaire, dès la 3e un jeu (dans un tie-break, le tie-break). Temps : la 1re est un avertissement, puis le relanceur perd le point et le serveur perd un service (avec les statistiques détaillées, c'est une première faute, ou la double faute sur la seconde). La voix et la TV l'annoncent, **Annuler** retire la dernière pénalité et le résumé dit combien il y en a eu. Un abandon avant le premier point s'affiche `forfait`.
 
 **Sauvegardes** : le match s'enregistre tout seul à chaque point. Dans l'onglet **Jouer**, un match suspendu se supprime en **appuyant longuement** sur son *Reprendre* ; tous les matchs suspendus sont dans **Progrès › Historique › Suspendus**, à reprendre ou supprimer (en en cochant plusieurs, aussi ensemble). *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
@@ -9689,7 +9697,9 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 
 **Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
 
-**Ritiro**: il tasto **Ritiro** sotto il punteggio chiede chi si ritira e chiude la partita col punteggio di quel momento, senza i punti del game in corso (es. `6-3 2-1 rit.`). Vince l'avversario, la voce lo annuncia e, prima di **Partita conclusa**, **Annulla il ritiro** rimette tutto com'era. Nei tornei il risultato entra da solo con il ritiro segnato; la partita conta come vittoria ma non pesa sul rating TSM.
+**Ritiro**: il tasto **Arbitro** (il martelletto) sotto il punteggio, alla voce **Ritiro**, chiede chi si ritira e chiude la partita col punteggio di quel momento, senza i punti del game in corso (es. `6-3 2-1 rit.`). Vince l'avversario, la voce lo annuncia e, prima di **Partita conclusa**, **Annulla il ritiro** rimette tutto com'era. Nei tornei il risultato entra da solo con il ritiro segnato; la partita conta come vittoria ma non pesa sul rating TSM.
+
+**Richiami dell'arbitro**: sempre in **Arbitro**, **Violazione di condotta** e **Violazione di tempo** chiedono a chi va il richiamo e, sotto ogni nome, dicono già cosa comporta. Condotta: il 1° è un avvertimento, il 2° dà un punto all'avversario, dal 3° un game (nel tie-break, il tie-break). Tempo: il 1° è un avvertimento, poi chi risponde perde il punto e chi serve perde il servizio (con le statistiche dettagliate diventa una prima fuori, o il doppio fallo sulla seconda). La voce e la TV lo annunciano, **Annulla** toglie l'ultimo richiamo e il riepilogo dice quanti ce ne sono stati. Un ritiro prima del primo punto risulta `w.o.`.
 
 **Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
@@ -10258,7 +10268,9 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
 
 **Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela aba **Jogar**.
 
-**Desistência**: o botão **Desistência** abaixo do placar pergunta quem desiste e termina a partida com esse placar, sem os pontos do game em andamento (ex. `6-3 2-1 desist.`). O adversário vence, a voz anuncia e, antes de concluir, **Desfazer a desistência** deixa tudo como estava. Nos torneios o resultado entra sozinho com a desistência marcada; a partida conta como vitória, mas não pesa no rating TSM.
+**Desistência**: o botão **Árbitro** (o martelo) abaixo do placar, em **Desistência**, pergunta quem desiste e termina a partida com esse placar, sem os pontos do game em andamento (ex. `6-3 2-1 desist.`). O adversário vence, a voz anuncia e, antes de concluir, **Desfazer a desistência** deixa tudo como estava. Nos torneios o resultado entra sozinho com a desistência marcada; a partida conta como vitória, mas não pesa no rating TSM.
+
+**Penalizações do árbitro**: também em **Árbitro**, **Violação de conduta** e **Violação de tempo** perguntam a quem vai e, sob cada nome, já dizem o que implica. Conduta: a 1.ª é uma advertência, a 2.ª dá um ponto ao adversário, a partir da 3.ª um jogo (no tie-break, o tie-break). Tempo: a 1.ª é uma advertência, depois quem recebe perde o ponto e quem serve perde um serviço (com as estatísticas detalhadas vira uma primeira falta, ou a dupla falta no segundo). A voz e a TV anunciam, **Anular** retira a última penalização e o resumo diz quantas houve. Uma desistência antes do primeiro ponto aparece como `w.o.`.
 
 **Salvamento**: a partida é salva sozinha a cada ponto. Na aba **Jogar** uma partida suspensa se exclui **mantendo pressionado** o seu *Retomar*; todas as suspensas estão em **Progresso › Histórico › Suspensas**, para retomar ou excluir (marcando várias, também juntas). *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
@@ -11427,6 +11439,8 @@ import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PenaltyKind
+import com.tennis.scoremanager.model.PenaltyOutcome
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
@@ -12976,7 +12990,7 @@ class MatchController(
         for (t in clubTournaments.value) {
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
-            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), retired = state.retired != null, record = rec.id))
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), walkover = com.tennis.scoremanager.data.Reports.isWalkover(state), retired = state.retired != null && !com.tennis.scoremanager.data.Reports.isWalkover(state), record = rec.id))
         }
     }
 
@@ -14286,7 +14300,7 @@ class MatchController(
      * Statistiche dettagliate: [kind] dice come è finito il punto (null = non detto). La seconda di servizio
      * viene da [fault]: vale per il punto in corso, anche se poi lo dà un braccialetto o un telecomando.
      */
-    fun awardPoint(side: Side, fromBand: Boolean = false, kind: PointKind? = null) {
+    fun awardPoint(side: Side, fromBand: Boolean = false, kind: PointKind? = null, note: String? = null) {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
         val now = SystemClock.elapsedRealtime()
@@ -14319,12 +14333,13 @@ class MatchController(
                 else -> null
             },
         )
-        afterTransition(step.state, t)
+        afterTransition(step.state, t, note)
     }
 
-    private fun afterTransition(state: MatchState, t: Transition) {
+    /** [note]: detto prima del punteggio e scritto davanti al messaggio (il richiamo che ha dato il punto). */
+    private fun afterTransition(state: MatchState, t: Transition, note: String? = null) {
         val n = names()
-        announcer.announce(calls().afterPoint(state, t, n))
+        announcer.announce(listOfNotNull(note?.let { com.tennis.scoremanager.voice.Seg.Say(it) }) + calls().afterPoint(state, t, n))
         pushScore(state, t)
         when {
             t.matchWinner != null -> {
@@ -14354,7 +14369,7 @@ class MatchController(
             t.tiebreakStarted -> s.msgTiebreak
             t.changeEnds -> s.msgChangeEnds
             else -> pressureMessage(state)
-        }
+        }.let { m -> if (note == null) m else listOfNotNull(note, m).joinToString(" · ") }
         if (msg != null) showMessage(msg)
         showTvMessage(msg)
         if (t.setWinner != null && state.rules.doubles) serveOrderPrompt.value = true
@@ -14433,8 +14448,9 @@ class MatchController(
             return
         }
         val events = lm.record.events.toMutableList()
-        // Dopo un ritiro si annulla il ritiro, non l'ultimo punto.
-        if (events.lastOrNull() is MatchEvent.Retired) events.removeAt(events.lastIndex)
+        // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
+        val last = events.lastOrNull()
+        if (last is MatchEvent.Retired || last is MatchEvent.Penalty) events.removeAt(events.lastIndex)
         else {
             while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
             if (events.isEmpty()) return
@@ -14455,7 +14471,7 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(strings.msgPointUndone)
+        showMessage(when (last) { is MatchEvent.Penalty -> strings.penaltyUndone; is MatchEvent.Retired -> strings.retireUndone; else -> strings.msgPointUndone })
         showTvMessage(null)
     }
 
@@ -14477,6 +14493,46 @@ class MatchController(
         showTvMessage(text)
         message.value = null
         endDialog.value = true
+    }
+
+    /**
+     * Un richiamo dell'arbitro a [side]: si segna, si annuncia e, se tocca, il punto o il game va all'avversario (si
+     * annulla con Annulla punto). La perdita del servizio, con le statistiche dettagliate, è una prima fuori.
+     */
+    fun penalty(side: Side, kind: PenaltyKind) {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        if (lm.record.startedAt == null) onPlay()
+        val current = live.value ?: return
+        val outcome = ScoreEngine.penaltyOutcome(current.state, side, kind)
+        val event = MatchEvent.Penalty(side, kind, System.currentTimeMillis())
+        val step = ScoreEngine.apply(current.state, event)
+        val who = names(current.record.setup).side(side)
+        val text = when (outcome) {
+            PenaltyOutcome.WARNING -> if (kind == PenaltyKind.CODE) strings.penaltyWarnCode(who) else strings.penaltyWarnTime(who)
+            PenaltyOutcome.POINT -> strings.penaltyPoint(who)
+            PenaltyOutcome.GAME -> strings.penaltyGame(who)
+            PenaltyOutcome.SERVE -> strings.penaltyServe(who)
+        }
+        // Il punto o il game di penalità chiude lo scambio in corso.
+        if (step.transition != null) { faultPending.value = false; rallyStrokes = 0 }
+        commit(current.record.copy(events = current.record.events + event), step.state)
+        val t = step.transition
+        if (t != null) {
+            serveOrderPrompt.value = false
+            afterTransition(step.state, t, text)
+            return
+        }
+        if (outcome == PenaltyOutcome.SERVE && current.record.options.detailedStats) {
+            lastPointAt = 0L
+            // Sulla seconda è un doppio fallo: il punto va a chi risponde.
+            if (faultPending.value) { awardPoint(step.state.receiver, kind = PointKind.DOUBLE_FAULT, note = text); return }
+            fault()
+        }
+        announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
+        showTvMessage(text)
+        showMessage(text)
     }
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {
@@ -22196,9 +22252,15 @@ object Reports {
 
     fun scoreLine(state: MatchState, from: Side): String = state.sets.joinToString("  ") { setText(it, from) }
 
-    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit.". */
-    fun resultLine(state: MatchState, from: Side, s: Strings): String =
-        scoreLine(state, from) + if (state.retired != null) " " + s.ctRetired else ""
+    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit."; ritiro prima di giocare, "w.o.". */
+    fun resultLine(state: MatchState, from: Side, s: Strings): String = when {
+        isWalkover(state) -> s.ctWalkover
+        state.retired != null -> scoreLine(state, from) + " " + s.ctRetired
+        else -> scoreLine(state, from)
+    }
+
+    /** Ritiro prima del primo punto: la partita non si è giocata (w.o.). */
+    fun isWalkover(state: MatchState): Boolean = state.retired != null && state.pointsPlayed == 0
 
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
@@ -22390,7 +22452,7 @@ object Reports {
             }
             for ((j, set) in state.sets.withIndex()) {
                 val x = firstCol + j * colW + colW / 2
-                val won = set.winner == side
+                val won = !set.partial && set.winner == side
                 c.drawText(set.shown(side).toString(), x, y + rowH / 2 + 34f, paint(if (set.matchTiebreak) 64f else 92f, if (won) white else grey, won, Paint.Align.CENTER))
                 if (set.hasTiebreak && !set.matchTiebreak && !won) {
                     c.drawText(set.tb(side).toString(), x + 42f, y + rowH / 2 - 22f, paint(38f, grey, false, Paint.Align.LEFT))
@@ -27826,7 +27888,23 @@ sealed class MatchEvent {
     @Serializable
     @SerialName("retired")
     data class Retired(val side: Side, val at: Long = 0L) : MatchEvent()
+
+    /** Un richiamo dell'arbitro a [side]: cosa comporta lo decide il numero di richiami dello stesso tipo ([PenaltyKind]). */
+    @Serializable
+    @SerialName("penalty")
+    data class Penalty(val side: Side, val kind: PenaltyKind, val at: Long = 0L) : MatchEvent()
 }
+
+/** I due tipi di richiamo, con le scale del regolamento: condotta e tempo (i 25 secondi tra un punto e l'altro). */
+@Serializable
+enum class PenaltyKind { CODE, TIME }
+
+/**
+ * Cosa comporta un richiamo. Condotta: 1° avvertimento, 2° punto all'avversario, poi un game all'avversario. Tempo:
+ * 1° avvertimento, poi chi serve perde il servizio (una prima fuori, o il doppio fallo sulla seconda) e chi risponde
+ * perde il punto.
+ */
+enum class PenaltyOutcome { WARNING, POINT, GAME, SERVE }
 
 /** Punteggio di un set concluso. Per il match tie-break g1/g2 valgono 1-0 e i punti stanno in tb1/tb2. */
 @Serializable
@@ -27889,6 +27967,11 @@ data class MatchState(
     val pointsPlayed: Int = 0,
     /** Chi si è ritirato (null = partita finita sul campo o ancora in corso). */
     val retired: Side? = null,
+    /** I richiami fatti finora, per tipo: [Penalty] li conta per sapere cosa comporta il prossimo. */
+    val codes1: Int = 0,
+    val codes2: Int = 0,
+    val times1: Int = 0,
+    val times2: Int = 0,
 ) {
     val isFinished: Boolean get() = winner != null
     val setNumber: Int get() = sets.size + 1
@@ -27899,6 +27982,10 @@ data class MatchState(
     fun points(side: Side): Int = if (side == Side.P1) pt1 else pt2
     fun setsWon(side: Side): Int = sets.count { !it.partial && it.winner == side }
     fun order(side: Side): Int = if (side == Side.P1) order1 else order2
+    fun penalties(side: Side, kind: PenaltyKind): Int = when (kind) {
+        PenaltyKind.CODE -> if (side == Side.P1) codes1 else codes2
+        PenaltyKind.TIME -> if (side == Side.P1) times1 else times2
+    }
     fun leftSide(): Side = if (p1Left) Side.P1 else Side.P2
 
     /** Turno di servizio corrente all'interno del set. */
@@ -27975,6 +28062,41 @@ object ScoreEngine {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)
         is MatchEvent.Retired -> Step(retire(state, event.side), null)
+        is MatchEvent.Penalty -> penalty(state, event.side, event.kind)
+    }
+
+    /** Cosa comporterebbe adesso un richiamo [kind] a [side] (per mostrarlo prima di confermare). */
+    fun penaltyOutcome(s: MatchState, side: Side, kind: PenaltyKind): PenaltyOutcome {
+        val n = s.penalties(side, kind) + 1
+        return when {
+            n == 1 -> PenaltyOutcome.WARNING
+            kind == PenaltyKind.CODE -> if (n == 2) PenaltyOutcome.POINT else PenaltyOutcome.GAME
+            side == s.server -> PenaltyOutcome.SERVE
+            else -> PenaltyOutcome.POINT
+        }
+    }
+
+    /**
+     * Il richiamo: si conta e, se tocca, il punto o il game va all'avversario. La perdita del servizio non cambia il
+     * punteggio da sola: la segna chi tiene il punteggio come una prima fuori (o il doppio fallo).
+     */
+    private fun penalty(s: MatchState, side: Side, kind: PenaltyKind): Step {
+        if (s.isFinished) return Step(s, null)
+        val outcome = penaltyOutcome(s, side, kind)
+        val counted = when (kind) {
+            PenaltyKind.CODE -> if (side == Side.P1) s.copy(codes1 = s.codes1 + 1) else s.copy(codes2 = s.codes2 + 1)
+            PenaltyKind.TIME -> if (side == Side.P1) s.copy(times1 = s.times1 + 1) else s.copy(times2 = s.times2 + 1)
+        }
+        return when (outcome) {
+            PenaltyOutcome.WARNING, PenaltyOutcome.SERVE -> Step(counted, null)
+            PenaltyOutcome.POINT -> pointWonBy(counted, side.other)
+            PenaltyOutcome.GAME -> {
+                // Punti all'avversario finché il game (o il tie-break) non è suo.
+                var step = pointWonBy(counted, side.other)
+                while (step.transition != null && step.transition!!.gameWinner == null) step = pointWonBy(step.state, side.other)
+                step
+            }
+        }
     }
 
     /**
@@ -27984,7 +28106,8 @@ object ScoreEngine {
     private fun retire(s: MatchState, side: Side): MatchState {
         if (s.isFinished) return s
         val inMatchTiebreak = s.tiebreak == TiebreakKind.MATCH
-        val started = if (inMatchTiebreak) s.pt1 + s.pt2 > 0 else s.g1 + s.g2 > 0
+        // Ritiro nel primo game della partita, a punti già giocati: si scrive "0-0 rit." (senza nessun punto è un w.o.).
+        val started = if (inMatchTiebreak) s.pt1 + s.pt2 > 0 else s.g1 + s.g2 > 0 || (s.sets.isEmpty() && s.pointsPlayed > 0)
         val open = when {
             !started -> emptyList()
             inMatchTiebreak -> listOf(SetScore(0, 0, s.pt1, s.pt2, matchTiebreak = true, partial = true))
@@ -36526,6 +36649,28 @@ interface Strings {
     val retireUndo: String
     val retireCall: (String) -> String
     val retireBy: (String) -> String
+    val umpireButton: String
+    val penaltyCode: String
+    val penaltyTime: String
+    val penaltyHint: String
+    val penaltyWho: String
+    val penaltyOutWarning: String
+    val penaltyOutPoint: String
+    val penaltyOutGame: String
+    val penaltyOutServe: String
+    val penaltyUndone: String
+    val penaltyList: String
+    val penaltyWarnCode: (String) -> String
+    val penaltyWarnTime: (String) -> String
+    val penaltyPoint: (String) -> String
+    val penaltyGame: (String) -> String
+    val penaltyServe: (String) -> String
+    val penaltyCount: (Int, Int) -> String
+    val retireUndone: String
+    /** "Annulla punto" corto, per il tasto accanto a Sospendi e Arbitro. */
+    val undoShort: String
+    /** "Nuova partita" corto, per il tasto in fondo alla partita. */
+    val newMatchShort: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -38698,6 +38843,26 @@ object ItStrings : Strings {
     override val retireUndo = "Annulla il ritiro"
     override val retireCall: (String) -> String = { "$it si ritira" }
     override val retireBy: (String) -> String = { "Ritiro di $it" }
+    override val umpireButton = "Arbitro"
+    override val penaltyCode = "Violazione di condotta"
+    override val penaltyTime = "Violazione di tempo"
+    override val penaltyHint = "Condotta: 1° avvertimento, 2° punto all'avversario, poi un game. Tempo: 1° avvertimento, poi chi serve perde il servizio e chi risponde il punto. Annulla lo toglie."
+    override val penaltyWho = "A chi va il richiamo?"
+    override val penaltyOutWarning = "Avvertimento"
+    override val penaltyOutPoint = "Punto all'avversario"
+    override val penaltyOutGame = "Game all'avversario"
+    override val penaltyOutServe = "Perde il servizio"
+    override val penaltyUndone = "Richiamo annullato"
+    override val penaltyList = "Richiami"
+    override val penaltyWarnCode: (String) -> String = { "Violazione di condotta, avvertimento a $it" }
+    override val penaltyWarnTime: (String) -> String = { "Violazione di tempo, avvertimento a $it" }
+    override val penaltyPoint: (String) -> String = { "Penalità di un punto a $it" }
+    override val penaltyGame: (String) -> String = { "Penalità di un game a $it" }
+    override val penaltyServe: (String) -> String = { "Violazione di tempo, $it perde il servizio" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "condotta $c · tempo $t" }
+    override val retireUndone = "Ritiro annullato"
+    override val undoShort = "Annulla"
+    override val newMatchShort = "Nuova"
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -39612,7 +39777,7 @@ object ItStrings : Strings {
     override val srvSyncNow = "Invia ora"
     override val srvSynced = "Planning inviato"
     override val srvUnpair = "Scollega il server"
-    override val srvUnpairAsk = "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano."
+    override val srvUnpairAsk = "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: sudo tsm-reset-admin sulla chiavetta, sudo ./reset-admin.sh nel kit). Le prenotazioni già nel planning restano."
     override val srvOpen = "Prenotazioni online aperte"
     override val srvOpenHint = "Spente: i giocatori vedono il planning ma non prenotano"
     override val srvDaysAhead = "Fin quanti giorni avanti"
@@ -40833,6 +40998,26 @@ object EnStrings : Strings {
     override val retireUndo = "Undo retirement"
     override val retireCall: (String) -> String = { "$it retires" }
     override val retireBy: (String) -> String = { "Retirement: $it" }
+    override val umpireButton = "Umpire"
+    override val penaltyCode = "Code violation"
+    override val penaltyTime = "Time violation"
+    override val penaltyHint = "Code: 1st warning, 2nd point to the opponent, then a game. Time: 1st warning, then the server loses a serve and the receiver a point. Undo removes it."
+    override val penaltyWho = "Who gets it?"
+    override val penaltyOutWarning = "Warning"
+    override val penaltyOutPoint = "Point to the opponent"
+    override val penaltyOutGame = "Game to the opponent"
+    override val penaltyOutServe = "Loses a serve"
+    override val penaltyUndone = "Penalty undone"
+    override val penaltyList = "Penalties"
+    override val penaltyWarnCode: (String) -> String = { "Code violation, warning, $it" }
+    override val penaltyWarnTime: (String) -> String = { "Time violation, warning, $it" }
+    override val penaltyPoint: (String) -> String = { "Point penalty, $it" }
+    override val penaltyGame: (String) -> String = { "Game penalty, $it" }
+    override val penaltyServe: (String) -> String = { "Time violation, loss of serve, $it" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "code $c · time $t" }
+    override val retireUndone = "Retirement undone"
+    override val undoShort = "Undo"
+    override val newMatchShort = "New"
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -41747,7 +41932,7 @@ object EnStrings : Strings {
     override val srvSyncNow = "Send now"
     override val srvSynced = "Schedule sent"
     override val srvUnpair = "Disconnect the server"
-    override val srvUnpairAsk = "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay."
+    override val srvUnpairAsk = "Disconnect the server? Players cannot book until you pair it again (it will need a new code: sudo tsm-reset-admin on the USB stick, sudo ./reset-admin.sh in the kit). Bookings already in the schedule stay."
     override val srvOpen = "Online booking open"
     override val srvOpenHint = "Off: players see the schedule but cannot book"
     override val srvDaysAhead = "How many days ahead"
@@ -42991,6 +43176,26 @@ object DeStrings : Strings {
     override val retireUndo = "Aufgabe zurücknehmen"
     override val retireCall: (String) -> String = { "$it gibt auf" }
     override val retireBy: (String) -> String = { "Aufgabe von $it" }
+    override val umpireButton = "Schiri"
+    override val penaltyCode = "Verhaltensverstoß"
+    override val penaltyTime = "Zeitverstoß"
+    override val penaltyHint = "Verhalten: 1. Verwarnung, 2. Punkt für den Gegner, dann ein Spiel. Zeit: 1. Verwarnung, dann verliert der Aufschläger einen Aufschlag und der Rückschläger den Punkt. „Zurück“ nimmt es zurück."
+    override val penaltyWho = "Wen trifft es?"
+    override val penaltyOutWarning = "Verwarnung"
+    override val penaltyOutPoint = "Punkt für den Gegner"
+    override val penaltyOutGame = "Spiel für den Gegner"
+    override val penaltyOutServe = "Verliert einen Aufschlag"
+    override val penaltyUndone = "Strafe zurückgenommen"
+    override val penaltyList = "Strafen"
+    override val penaltyWarnCode: (String) -> String = { "Verhaltensverstoß, Verwarnung, $it" }
+    override val penaltyWarnTime: (String) -> String = { "Zeitverstoß, Verwarnung, $it" }
+    override val penaltyPoint: (String) -> String = { "Punktstrafe, $it" }
+    override val penaltyGame: (String) -> String = { "Spielstrafe, $it" }
+    override val penaltyServe: (String) -> String = { "Zeitverstoß, Aufschlagverlust, $it" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "Verhalten $c · Zeit $t" }
+    override val retireUndone = "Aufgabe zurückgenommen"
+    override val undoShort = "Zurück"
+    override val newMatchShort = "Neu"
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -43905,7 +44110,7 @@ object DeStrings : Strings {
     override val srvSyncNow = "Jetzt senden"
     override val srvSynced = "Plan gesendet"
     override val srvUnpair = "Server trennen"
-    override val srvUnpairAsk = "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: java -jar tsm-server.jar --reset-admin). Buchungen im Plan bleiben."
+    override val srvUnpairAsk = "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: sudo tsm-reset-admin auf dem USB-Stick, sudo ./reset-admin.sh im Kit). Buchungen im Plan bleiben."
     override val srvOpen = "Online-Buchung offen"
     override val srvOpenHint = "Aus: Spieler sehen den Plan, buchen aber nicht"
     override val srvDaysAhead = "Wie viele Tage im Voraus"
@@ -45142,6 +45347,26 @@ object EsStrings : Strings {
     override val retireUndo = "Deshacer la retirada"
     override val retireCall: (String) -> String = { "$it se retira" }
     override val retireBy: (String) -> String = { "Retirada de $it" }
+    override val umpireButton = "Árbitro"
+    override val penaltyCode = "Infracción de conducta"
+    override val penaltyTime = "Infracción de tiempo"
+    override val penaltyHint = "Conducta: 1.ª advertencia, 2.ª punto para el rival, luego un juego. Tiempo: 1.ª advertencia, luego quien saca pierde un servicio y quien resta el punto. Anular la quita."
+    override val penaltyWho = "¿A quién?"
+    override val penaltyOutWarning = "Advertencia"
+    override val penaltyOutPoint = "Punto para el rival"
+    override val penaltyOutGame = "Juego para el rival"
+    override val penaltyOutServe = "Pierde un servicio"
+    override val penaltyUndone = "Penalización anulada"
+    override val penaltyList = "Penalizaciones"
+    override val penaltyWarnCode: (String) -> String = { "Infracción de conducta, advertencia, $it" }
+    override val penaltyWarnTime: (String) -> String = { "Infracción de tiempo, advertencia, $it" }
+    override val penaltyPoint: (String) -> String = { "Punto de penalización, $it" }
+    override val penaltyGame: (String) -> String = { "Juego de penalización, $it" }
+    override val penaltyServe: (String) -> String = { "Infracción de tiempo, pierde un servicio, $it" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "conducta $c · tiempo $t" }
+    override val retireUndone = "Retirada anulada"
+    override val undoShort = "Anular"
+    override val newMatchShort = "Nueva"
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -46056,7 +46281,7 @@ object EsStrings : Strings {
     override val srvSyncNow = "Enviar ahora"
     override val srvSynced = "Planning enviado"
     override val srvUnpair = "Desconectar el servidor"
-    override val srvUnpairAsk = "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: java -jar tsm-server.jar --reset-admin). Las reservas ya en el planning se quedan."
+    override val srvUnpairAsk = "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: sudo tsm-reset-admin en el pendrive, sudo ./reset-admin.sh en el kit). Las reservas ya en el planning se quedan."
     override val srvOpen = "Reservas en línea abiertas"
     override val srvOpenHint = "Apagadas: los jugadores ven el planning pero no reservan"
     override val srvDaysAhead = "Cuántos días antes"
@@ -47295,6 +47520,26 @@ object FrStrings : Strings {
     override val retireUndo = "Annuler l'abandon"
     override val retireCall: (String) -> String = { "$it abandonne" }
     override val retireBy: (String) -> String = { "Abandon de $it" }
+    override val umpireButton = "Arbitre"
+    override val penaltyCode = "Code de conduite"
+    override val penaltyTime = "Infraction de temps"
+    override val penaltyHint = "Conduite : 1er avertissement, 2e point à l'adversaire, puis un jeu. Temps : 1er avertissement, puis le serveur perd un service et le relanceur le point. Annuler l'efface."
+    override val penaltyWho = "À qui ?"
+    override val penaltyOutWarning = "Avertissement"
+    override val penaltyOutPoint = "Point à l'adversaire"
+    override val penaltyOutGame = "Jeu à l'adversaire"
+    override val penaltyOutServe = "Perd un service"
+    override val penaltyUndone = "Pénalité annulée"
+    override val penaltyList = "Pénalités"
+    override val penaltyWarnCode: (String) -> String = { "Code de conduite, avertissement, $it" }
+    override val penaltyWarnTime: (String) -> String = { "Infraction de temps, avertissement, $it" }
+    override val penaltyPoint: (String) -> String = { "Pénalité d'un point, $it" }
+    override val penaltyGame: (String) -> String = { "Pénalité d'un jeu, $it" }
+    override val penaltyServe: (String) -> String = { "Infraction de temps, perte d'un service, $it" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "conduite $c · temps $t" }
+    override val retireUndone = "Abandon annulé"
+    override val undoShort = "Annuler"
+    override val newMatchShort = "Nouvelle"
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -48209,7 +48454,7 @@ object FrStrings : Strings {
     override val srvSyncNow = "Envoyer maintenant"
     override val srvSynced = "Planning envoyé"
     override val srvUnpair = "Déconnecter le serveur"
-    override val srvUnpairAsk = "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : java -jar tsm-server.jar --reset-admin). Les réservations déjà au planning restent."
+    override val srvUnpairAsk = "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : sudo tsm-reset-admin sur la clé USB, sudo ./reset-admin.sh dans le kit). Les réservations déjà au planning restent."
     override val srvOpen = "Réservations en ligne ouvertes"
     override val srvOpenHint = "Désactivées : les joueurs voient le planning sans réserver"
     override val srvDaysAhead = "Combien de jours à l'avance"
@@ -49449,6 +49694,26 @@ object PtStrings : Strings {
     override val retireUndo = "Desfazer a desistência"
     override val retireCall: (String) -> String = { "$it desiste" }
     override val retireBy: (String) -> String = { "Desistência de $it" }
+    override val umpireButton = "Árbitro"
+    override val penaltyCode = "Violação de conduta"
+    override val penaltyTime = "Violação de tempo"
+    override val penaltyHint = "Conduta: 1.ª advertência, 2.ª ponto para o adversário, depois um jogo. Tempo: 1.ª advertência, depois quem serve perde um serviço e quem recebe o ponto. Anular retira-a."
+    override val penaltyWho = "A quem?"
+    override val penaltyOutWarning = "Advertência"
+    override val penaltyOutPoint = "Ponto para o adversário"
+    override val penaltyOutGame = "Jogo para o adversário"
+    override val penaltyOutServe = "Perde um serviço"
+    override val penaltyUndone = "Penalização anulada"
+    override val penaltyList = "Penalizações"
+    override val penaltyWarnCode: (String) -> String = { "Violação de conduta, advertência, $it" }
+    override val penaltyWarnTime: (String) -> String = { "Violação de tempo, advertência, $it" }
+    override val penaltyPoint: (String) -> String = { "Penalização de ponto, $it" }
+    override val penaltyGame: (String) -> String = { "Penalização de jogo, $it" }
+    override val penaltyServe: (String) -> String = { "Violação de tempo, perde um serviço, $it" }
+    override val penaltyCount: (Int, Int) -> String = { c, t -> "conduta $c · tempo $t" }
+    override val retireUndone = "Desistência anulada"
+    override val undoShort = "Anular"
+    override val newMatchShort = "Nova"
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -50363,7 +50628,7 @@ object PtStrings : Strings {
     override val srvSyncNow = "Enviar agora"
     override val srvSynced = "Agenda enviada"
     override val srvUnpair = "Desligar o servidor"
-    override val srvUnpairAsk = "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: java -jar tsm-server.jar --reset-admin). As reservas já na agenda ficam."
+    override val srvUnpairAsk = "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: sudo tsm-reset-admin na pen USB, sudo ./reset-admin.sh no kit). As reservas já na agenda ficam."
     override val srvOpen = "Reservas online abertas"
     override val srvOpenHint = "Desligadas: os jogadores veem a agenda mas não reservam"
     override val srvDaysAhead = "Quantos dias antes"
@@ -55595,6 +55860,7 @@ import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -55656,6 +55922,9 @@ import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.PenaltyOutcome
+import com.tennis.scoremanager.model.PenaltyKind
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
@@ -55693,6 +55962,8 @@ fun MatchScreen(c: MatchController) {
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var confirmRetire by remember { mutableStateOf(false) }
+    var umpireMenu by remember { mutableStateOf(false) }
+    var penaltyKind by remember { mutableStateOf<PenaltyKind?>(null) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
     /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
     var locked by rememberSaveable { mutableStateOf(false) }
@@ -55739,14 +56010,15 @@ fun MatchScreen(c: MatchController) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
+                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoShort, Modifier.weight(1f), contentDescription = s.undoPoint) { c.undo() }
                 ControlButton(
                     if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
                     if (suspended) s.resume else s.suspend,
                     Modifier.weight(1f),
                     highlight = suspended,
                 ) { c.toggleSuspend() }
-                ControlButton(Icons.Filled.Flag, s.retireButton, Modifier.weight(1f)) { confirmRetire = true }
+                // Solo icona, come audio e blocco: "Annulla punto" e "Sospendi" restano leggibili.
+                ControlButton(Icons.Filled.Gavel, null, Modifier.width(64.dp), contentDescription = s.umpireButton) { if (!state.isFinished) umpireMenu = true }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
@@ -55757,11 +56029,63 @@ fun MatchScreen(c: MatchController) {
                     contentDescription = if (o.audio) s.audioOn else s.audioOff,
                 ) { c.toggleAudio() }
                 ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
-                ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+                ControlButton(Icons.Filled.AddCircle, s.newMatchShort, Modifier.weight(1.3f), contentDescription = s.newMatch) { confirmNew = true }
                 ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
             }
         }
         if (locked) LockOverlay(s) { locked = false }
+    }
+
+    if (umpireMenu) {
+        AlertDialog(
+            onDismissRequest = { umpireMenu = false },
+            icon = { Icon(Icons.Filled.Gavel, null, tint = TsmColors.Orange) },
+            title = { Text(s.umpireButton, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.penaltyHint, fontSize = 13.sp, color = TsmColors.TextDim)
+                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.CODE }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyCode, color = TsmColors.TextMain) }
+                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.TIME }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyTime, color = TsmColors.TextMain) }
+                    OutlinedButton(onClick = { umpireMenu = false; confirmRetire = true }, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange)
+                        Spacer(Modifier.width(6.dp))
+                        Text(s.retireButton, color = TsmColors.TextMain)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { umpireMenu = false }) { Text(s.back) } },
+        )
+    }
+
+    penaltyKind?.let { kind ->
+        AlertDialog(
+            onDismissRequest = { penaltyKind = null },
+            icon = { Icon(Icons.Filled.Gavel, null, tint = TsmColors.Orange) },
+            title = { Text(if (kind == PenaltyKind.CODE) s.penaltyCode else s.penaltyTime, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.penaltyWho)
+                    for (side in Side.entries) {
+                        // Sotto il nome, cosa comporta: si vede prima di toccare.
+                        val out = when (ScoreEngine.penaltyOutcome(state, side, kind)) {
+                            PenaltyOutcome.WARNING -> s.penaltyOutWarning
+                            PenaltyOutcome.POINT -> s.penaltyOutPoint
+                            PenaltyOutcome.GAME -> s.penaltyOutGame
+                            PenaltyOutcome.SERVE -> s.penaltyOutServe
+                        }
+                        OutlinedButton(onClick = { penaltyKind = null; c.penalty(side, kind) }, modifier = Modifier.fillMaxWidth()) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Text(out, color = TsmColors.TextDim, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { penaltyKind = null }) { Text(s.back) } },
+        )
     }
 
     if (confirmRetire) {
@@ -56051,9 +56375,9 @@ private fun Scoreboard(state: MatchState, names: Names, s: Strings) {
                         Row(verticalAlignment = Alignment.Top) {
                             Text(
                                 set.shown(side).toString(),
-                                color = if (set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
+                                color = if (!set.partial && set.winner == side) TsmColors.TextMain else TsmColors.TextDim,
                                 fontSize = if (set.matchTiebreak) 15.sp else 18.sp,
-                                fontWeight = if (set.winner == side) FontWeight.Bold else FontWeight.Normal,
+                                fontWeight = if (!set.partial && set.winner == side) FontWeight.Bold else FontWeight.Normal,
                             )
                             if (set.hasTiebreak && !set.matchTiebreak && set.winner != side) {
                                 Text(set.tb(side).toString(), color = TsmColors.TextDim, fontSize = 10.sp)
@@ -61548,6 +61872,12 @@ fun SummaryScreen(c: MatchController) {
                 Spacer(Modifier.height(6.dp))
                 Text(Reports.resultLine(state, w, s), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 state.retired?.let { Text(s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
+                // I richiami dell'arbitro, se ce ne sono stati.
+                for (side in Side.entries) {
+                    val code = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.CODE)
+                    val time = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.TIME)
+                    if (code + time > 0) Text("${s.penaltyList} · ${names.short(side)}: ${s.penaltyCount(code, time)}", color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+                }
             }
 
             // Tabellone finale
@@ -85265,6 +85595,66 @@ class ScoreEngineTest {
         assertEquals(2 to 1, set.tb1 to set.tb2)
         assertTrue(set.partial && set.matchTiebreak)
     }
+
+    private fun pen(s: MatchState, side: Side, kind: PenaltyKind) = ScoreEngine.apply(s, MatchEvent.Penalty(side, kind)).state
+
+    @Test fun condottaAvvertimentoPoiPuntoPoiGame() {
+        var s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        assertEquals(PenaltyOutcome.WARNING, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.CODE))
+        s = pen(s, P1, PenaltyKind.CODE)
+        assertEquals(0 to 0, s.pt1 to s.pt2)
+        assertEquals(PenaltyOutcome.POINT, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.CODE))
+        s = pen(s, P1, PenaltyKind.CODE)
+        assertEquals(0 to 1, s.pt1 to s.pt2)
+        assertEquals(PenaltyOutcome.GAME, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.CODE))
+        s = pen(s, P1, PenaltyKind.CODE)
+        assertEquals("il game va all'avversario", 0 to 1, s.g1 to s.g2)
+        assertEquals(0 to 0, s.pt1 to s.pt2)
+        assertEquals(3, s.penalties(P1, PenaltyKind.CODE))
+        assertEquals("i richiami dell'altro sono a parte", PenaltyOutcome.WARNING, ScoreEngine.penaltyOutcome(s, P2, PenaltyKind.CODE))
+    }
+
+    @Test fun tempoChiServePerdeIlServizioChiRispondeIlPunto() {
+        var s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        s = pen(s, P1, PenaltyKind.TIME)
+        s = pen(s, P2, PenaltyKind.TIME)
+        assertEquals(PenaltyOutcome.SERVE, ScoreEngine.penaltyOutcome(s, P1, PenaltyKind.TIME))
+        val served = pen(s, P1, PenaltyKind.TIME)
+        assertEquals("la perdita del servizio non tocca il punteggio", 0 to 0, served.pt1 to served.pt2)
+        assertEquals(PenaltyOutcome.POINT, ScoreEngine.penaltyOutcome(s, P2, PenaltyKind.TIME))
+        val received = pen(s, P2, PenaltyKind.TIME)
+        assertEquals(1 to 0, received.pt1 to received.pt2)
+    }
+
+    @Test fun gameDiPenalitaNelTiebreakChiudeIlSet() {
+        var s = ScoreEngine.initial(RulesConfig())
+        repeat(6) { s = game(s, P1); s = game(s, P2) }
+        assertTrue(s.inTiebreak)
+        s = pen(pen(pen(s, P2, PenaltyKind.CODE), P2, PenaltyKind.CODE), P2, PenaltyKind.CODE)
+        assertEquals(1, s.sets.size)
+        assertEquals(P1, s.sets[0].winner)
+    }
+
+    @Test fun richiamiSiRigiocanoESiAnnullano() {
+        val rules = RulesConfig()
+        val events = listOf(MatchEvent.Point(P1), MatchEvent.Penalty(P1, PenaltyKind.CODE), MatchEvent.Penalty(P1, PenaltyKind.CODE))
+        val s = ScoreEngine.replay(rules, events)
+        assertEquals(1 to 1, s.pt1 to s.pt2)
+        assertEquals(2, s.penalties(P1, PenaltyKind.CODE))
+        assertEquals(1 to 0, ScoreEngine.replay(rules, events.dropLast(1)).let { it.pt1 to it.pt2 })
+    }
+
+    @Test fun richiamoDopoLaFineNonCambiaNiente() {
+        val s = ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.Retired(P2)).state
+        assertEquals(s, pen(s, P1, PenaltyKind.CODE))
+    }
+
+    @Test fun ritiroNelPrimoGameSegnaZeroAZero() {
+        val s = play(ScoreEngine.initial(RulesConfig()), P2)
+        val set = ScoreEngine.apply(s, MatchEvent.Retired(P1)).state.sets.single()
+        assertEquals(0 to 0, set.g1 to set.g2)
+        assertTrue(set.partial)
+    }
 }
 TSM_EOF
 
@@ -89465,6 +89855,9 @@ NEW=$(
     elif [ -f "$DATA/state.json" ]; then
         echo "  Segreteria abbinata / Office paired"
     fi
+    # L'indirizzo da internet, se la segreteria ha acceso il tunnel dall'app.
+    NET=$(sed -n 's/.*"state":"ON","url":"\(https:[^"]*\)".*/\1/p' /var/lib/tsm-tunnel/status.json 2>/dev/null)
+    [ -z "$NET" ] || echo "  Da internet / From the internet: $NET"
     # Senza la partizione "persistence" sulla chiavetta, al prossimo avvio il server dimentica tutto.
     if ! grep -qs " /run/live/persistence/" /proc/mounts; then
         echo "  ATTENZIONE: nessuna partizione persistence, i dati si perdono allo spegnimento!"
