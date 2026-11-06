@@ -450,6 +450,8 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 
 **Optional**: without a server nothing changes, bookings go through the club office as always. With a small server at the club (a Raspberry Pi Zero 2 W or an old PC), invited players **book courts by themselves** from their phone, **iPhone too**, on a club web page they can add to the Home screen like an app.
 
+**Simple guide for the club office** (starting from the USB stick, pairing, Tailscale account, the three ways): [GUIDE_SERVER.en.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.en.md).
+
 - **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
 - **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).

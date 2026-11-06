@@ -450,6 +450,8 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 
 **Opcional**: sem servidor nada muda, reserva-se na secretaria como sempre. Com um pequeno servidor no clube (um Raspberry Pi Zero 2 W ou um PC antigo) os jogadores convidados **reservam as quadras sozinhos** no telemóvel, **também iPhone**, numa página web do clube que se adiciona ao ecrã principal como uma app.
 
+**Guia simples para a secretaria** (início pelo pen drive, emparelhamento, conta do Tailscale, os três modos): [GUIDE_SERVER.pt.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.pt.md).
+
 - **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
 - **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
 - **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).

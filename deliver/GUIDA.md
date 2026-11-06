@@ -563,6 +563,8 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 
 **Facoltativo**: senza server non cambia niente, si prenota in segreteria come sempre. Con un piccolo server al circolo (un Raspberry Pi Zero 2 W o un vecchio PC) i giocatori invitati **prenotano i campi da soli**, dal telefono, **anche da iPhone**, da una pagina web del circolo che si aggiunge alla schermata Home come un'app.
 
+**Guida semplice per la segreteria** (avvio dalla chiavetta, abbinamento, account Tailscale, i tre modi): [GUIDA_SERVER.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDA_SERVER.md).
+
 - **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
 - **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).

@@ -450,6 +450,8 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 
 **Facultatif** : sans serveur rien ne change, on réserve au secrétariat comme toujours. Avec un petit serveur au club (un Raspberry Pi Zero 2 W ou un vieux PC), les joueurs invités **réservent eux-mêmes les terrains** depuis leur téléphone, **iPhone compris**, sur une page web du club qu'on ajoute à l'écran d'accueil comme une app.
 
+**Guide simple pour le secrétariat** (démarrage depuis la clé, appairage, compte Tailscale, les trois façons) : [GUIDE_SERVER.fr.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.fr.md).
+
 - **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
 - **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).

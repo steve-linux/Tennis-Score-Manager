@@ -450,6 +450,8 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 
 **Optional**: Ohne Server ändert sich nichts, gebucht wird wie immer im Vereinsbüro. Mit einem kleinen Server im Verein (ein Raspberry Pi Zero 2 W oder ein alter PC) **buchen eingeladene Spieler die Plätze selbst** am Handy, **auch am iPhone**, auf einer Webseite des Vereins, die man wie eine App zum Home-Bildschirm hinzufügt.
 
+**Einfache Anleitung für das Büro** (Start vom USB-Stick, Kopplung, Tailscale-Konto, die drei Arten): [GUIDE_SERVER.de.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.de.md).
+
 - **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
 - **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).

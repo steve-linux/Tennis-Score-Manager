@@ -563,6 +563,8 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 
 **Opcional**: sin servidor no cambia nada, se reserva en secretaría como siempre. Con un pequeño servidor en el club (una Raspberry Pi Zero 2 W o un PC viejo) los jugadores invitados **reservan las pistas solos** desde el teléfono, **también iPhone**, en una página web del club que se añade a la pantalla de inicio como una app.
 
+**Guía sencilla para la secretaría** (arranque desde el pendrive, emparejamiento, cuenta de Tailscale, las tres maneras): [GUIDE_SERVER.es.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.es.md).
+
 - **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
 - **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
 - **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).

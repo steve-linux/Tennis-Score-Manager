@@ -7709,6 +7709,8 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 
 **Optional**: Ohne Server ändert sich nichts, gebucht wird wie immer im Vereinsbüro. Mit einem kleinen Server im Verein (ein Raspberry Pi Zero 2 W oder ein alter PC) **buchen eingeladene Spieler die Plätze selbst** am Handy, **auch am iPhone**, auf einer Webseite des Vereins, die man wie eine App zum Home-Bildschirm hinzufügt.
 
+**Einfache Anleitung für das Büro** (Start vom USB-Stick, Kopplung, Tailscale-Konto, die drei Arten): [GUIDE_SERVER.de.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.de.md).
+
 - **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
 - **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
@@ -8289,6 +8291,8 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 
 **Optional**: without a server nothing changes, bookings go through the club office as always. With a small server at the club (a Raspberry Pi Zero 2 W or an old PC), invited players **book courts by themselves** from their phone, **iPhone too**, on a club web page they can add to the Home screen like an app.
 
+**Simple guide for the club office** (starting from the USB stick, pairing, Tailscale account, the three ways): [GUIDE_SERVER.en.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.en.md).
+
 - **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
 - **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
@@ -8867,6 +8871,8 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 ### 7.18 Servidor del club para las reservas (opcional, app 2.6)
 
 **Opcional**: sin servidor no cambia nada, se reserva en secretaría como siempre. Con un pequeño servidor en el club (una Raspberry Pi Zero 2 W o un PC viejo) los jugadores invitados **reservan las pistas solos** desde el teléfono, **también iPhone**, en una página web del club que se añade a la pantalla de inicio como una app.
+
+**Guía sencilla para la secretaría** (arranque desde el pendrive, emparejamiento, cuenta de Tailscale, las tres maneras): [GUIDE_SERVER.es.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.es.md).
 
 - **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
 - **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
@@ -9447,6 +9453,8 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 
 **Facultatif** : sans serveur rien ne change, on réserve au secrétariat comme toujours. Avec un petit serveur au club (un Raspberry Pi Zero 2 W ou un vieux PC), les joueurs invités **réservent eux-mêmes les terrains** depuis leur téléphone, **iPhone compris**, sur une page web du club qu'on ajoute à l'écran d'accueil comme une app.
 
+**Guide simple pour le secrétariat** (démarrage depuis la clé, appairage, compte Tailscale, les trois façons) : [GUIDE_SERVER.fr.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.fr.md).
+
 - **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
 - **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
@@ -10026,6 +10034,8 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 
 **Facoltativo**: senza server non cambia niente, si prenota in segreteria come sempre. Con un piccolo server al circolo (un Raspberry Pi Zero 2 W o un vecchio PC) i giocatori invitati **prenotano i campi da soli**, dal telefono, **anche da iPhone**, da una pagina web del circolo che si aggiunge alla schermata Home come un'app.
 
+**Guida semplice per la segreteria** (avvio dalla chiavetta, abbinamento, account Tailscale, i tre modi): [GUIDA_SERVER.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDA_SERVER.md).
+
 - **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
 - **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
@@ -10604,6 +10614,8 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 ### 7.18 Servidor do clube para as reservas (opcional, app 2.6)
 
 **Opcional**: sem servidor nada muda, reserva-se na secretaria como sempre. Com um pequeno servidor no clube (um Raspberry Pi Zero 2 W ou um PC antigo) os jogadores convidados **reservam as quadras sozinhos** no telemóvel, **também iPhone**, numa página web do clube que se adiciona ao ecrã principal como uma app.
+
+**Guia simples para a secretaria** (início pelo pen drive, emparelhamento, conta do Tailscale, os três modos): [GUIDE_SERVER.pt.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.pt.md).
 
 - **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
 - **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
