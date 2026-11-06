@@ -484,4 +484,41 @@ class ScoreEngineTest {
         assertEquals(0 to 0, set.g1 to set.g2)
         assertTrue(set.partial)
     }
+
+    @Test fun squalificaChiudeComeIlRitiro() {
+        val s = play(ScoreEngine.initial(RulesConfig()), P1)
+        val after = ScoreEngine.apply(s, MatchEvent.Retired(P1, disqualified = true)).state
+        assertEquals(P2, after.winner)
+        assertTrue(after.disqualified)
+        assertFalse(ScoreEngine.apply(s, MatchEvent.Retired(P1)).state.disqualified)
+    }
+
+    @Test fun lePauseNonToccanoIlPunteggio() {
+        val s = play(ScoreEngine.initial(RulesConfig()), P1, P2)
+        assertEquals(s, ScoreEngine.apply(s, MatchEvent.Break(P1, BreakKind.MEDICAL)).state)
+    }
+
+    @Test fun correggereChiServeTieneIlPunteggio() {
+        var s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        s = game(s, P1)
+        s = play(s, P1, P1)
+        assertEquals(P2, s.server)
+        val fixed = ScoreEngine.apply(s, MatchEvent.ServerFix(P1)).state
+        assertEquals(P1, fixed.server)
+        assertEquals(s.g1 to s.pt1, fixed.g1 to fixed.pt1)
+        assertEquals("poi si alterna da qui", P2, game(fixed, P1).server)
+    }
+
+    @Test fun nelDoppioSiCorreggeAncheIlGiocatore() {
+        val s = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = P1, firstServerP1 = 0))
+        val fixed = ScoreEngine.apply(s, MatchEvent.ServerFix(P1, 1)).state
+        assertEquals(P1 to 1, fixed.server to fixed.serverPlayer)
+        val two = game(game(fixed, P1), P2)
+        assertEquals("al prossimo turno della squadra tocca al compagno", P1 to 0, two.server to two.serverPlayer)
+    }
+
+    @Test fun correggereILati() {
+        val s = ScoreEngine.initial(RulesConfig())
+        assertEquals(!s.p1Left, ScoreEngine.apply(s, MatchEvent.EndsFix()).state.p1Left)
+    }
 }

@@ -51,6 +51,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.text.style.TextAlign
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Availability
 import com.tennis.scoremanager.data.ClubTournaments
@@ -252,7 +254,7 @@ fun FixtureScreen(c: MatchController) {
                         Text(c.rubberName(t, i), color = TsmColors.TextDim, fontSize = 12.sp)
                         Text("${r.ours.map(::name).joinToString(" / ").ifBlank { "—" }} – ${r.theirs.joinToString(" / ").ifBlank { "—" }}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
-                    Text(r.score.ifBlank { when (r.won) { true -> s.tmWon; false -> s.tmLost; null -> "" } }, color = when (r.won) { true -> TsmColors.Ok; false -> TsmColors.Danger; null -> TsmColors.TextDim }, fontSize = 13.sp)
+                    Text(r.score.ifBlank { when (r.won) { true -> s.tmWon; false -> s.tmLost; null -> "" } } + if (r.walkover) " " + s.ctWalkover else "", color = when (r.won) { true -> TsmColors.Ok; false -> TsmColors.Danger; null -> TsmColors.TextDim }, fontSize = 13.sp)
                 }
             }
             if (f.rubbers.any { it.won != null }) GhostButton(s.tmSendResult, Icons.Filled.Campaign, { c.noticeResult(t, f) }, Modifier.fillMaxWidth())
@@ -293,9 +295,15 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                     onDone()
                     c.playTeamRubber(c.team(t.id) ?: t, (c.team(t.id) ?: t).fixtures.first { it.id == f.id }, index)
                 }, Modifier.fillMaxWidth())
-                OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40)); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
+                OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
-                Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it]) })
+                Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it], walkover = false) })
+                // Non giocata: vinta a tavolino col punteggio del regolamento.
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (us in listOf(true, false)) OutlinedButton(onClick = { r = r.copy(won = us, score = Teams.walkoverScore(us), walkover = true) }, modifier = Modifier.weight(1f)) {
+                        Text(if (us) s.tmWalkoverUs else s.tmWalkoverThem, fontSize = 12.sp, textAlign = TextAlign.Center, color = if (r.walkover && r.won == us) TsmColors.Ball else TsmColors.TextMain)
+                    }
+                }
             }
         },
         confirmButton = {

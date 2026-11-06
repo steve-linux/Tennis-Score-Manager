@@ -129,4 +129,54 @@ class ClubTournamentTest {
         // Senza obbligo di pagamento entra lo stesso.
         assertTrue(ClubTournaments.problems(t.copy(requirePaid = false), p, ClubBook(), 0).isEmpty())
     }
+
+    private fun eight(): ClubTournament {
+        val ids = (1..8).map { "e$it" }
+        return ClubTournament("t", "Sociale", entries = ids.map { CTEntry(it, listOf(it), listOf(it)) }, matches = ClubTournaments.knockout(ids, Random(1), 0), drawnAt = 1)
+    }
+
+    @Test
+    fun doppioWoFaPassareLAvversarioDelTurnoDopo() {
+        var t = eight()
+        val r1 = t.matches.filter { it.round == 1 }.sortedBy { it.slot }
+        t = ClubTournaments.setResult(t, r1[0].id, null, "", noShow = true)
+        val semi = { t.matches.single { it.round == 2 && it.slot == 0 } }
+        assertTrue(t.matches.single { it.id == r1[0].id }.played)
+        assertNull("aspetta l'altra partita", semi().winner)
+        t = ClubTournaments.setResult(t, r1[1].id, r1[1].a, "6-2 6-2")
+        assertEquals(r1[1].a, semi().winner)
+        assertTrue(semi().walkover && semi().autoAdvance)
+        // Corretto il doppio w.o.: la semifinale torna da giocare.
+        t = ClubTournaments.setResult(t, r1[0].id, r1[0].a, "6-0 6-0")
+        assertNull(semi().winner)
+        assertFalse(semi().walkover)
+        assertEquals(r1[0].a, semi().a)
+    }
+
+    @Test
+    fun dueDoppiWoNonFannoPassareNessuno() {
+        var t = eight()
+        val r1 = t.matches.filter { it.round == 1 }.sortedBy { it.slot }
+        t = ClubTournaments.setResult(t, r1[0].id, null, "", noShow = true)
+        t = ClubTournaments.setResult(t, r1[1].id, null, "", noShow = true)
+        val semi = t.matches.single { it.round == 2 && it.slot == 0 }
+        assertTrue(semi.noShow && semi.played)
+        assertNull(semi.winner)
+        t = ClubTournaments.setResult(t, r1[2].id, r1[2].b, "6-1 6-1")
+        t = ClubTournaments.setResult(t, r1[3].id, r1[3].a, "6-1 6-1")
+        val s2 = t.matches.single { it.round == 2 && it.slot == 1 }
+        t = ClubTournaments.setResult(t, s2.id, s2.a, "6-3 6-3")
+        assertEquals("in finale passa da solo", s2.a, t.champion)
+    }
+
+    @Test
+    fun nelGironeIlWoContaSeiZeroEIlRitiroCompletaISet() {
+        val m = CTMatch("m", 0, 0, group = 0, a = "x", b = "y", winner = "y", walkover = true)
+        assertEquals(listOf(0 to 6, 0 to 6), ClubTournaments.countedSets(m))
+        val rit = m.copy(winner = "x", walkover = false, retired = true, score = "6-3 2-1")
+        assertEquals(listOf(6 to 3, 6 to 1), ClubTournaments.countedSets(rit))
+        val dq = m.copy(winner = "y", walkover = false, disqualified = true, score = "6-3 5-5")
+        assertEquals(listOf(6 to 3, 5 to 7, 0 to 6), ClubTournaments.countedSets(dq))
+        assertEquals("partita normale com'è", listOf(6 to 4), ClubTournaments.countedSets(m.copy(walkover = false, score = "6-4")))
+    }
 }

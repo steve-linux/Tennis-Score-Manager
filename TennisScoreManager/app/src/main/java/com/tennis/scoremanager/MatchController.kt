@@ -69,6 +69,7 @@ import com.tennis.scoremanager.data.Tournaments
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
+import com.tennis.scoremanager.model.BreakKind
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PenaltyKind
@@ -169,7 +170,7 @@ enum class DetailAsk { OUTCOME, ERROR_TYPE }
 /** [winner] ha vinto il punto, [server] serviva. */
 data class DetailPrompt(val ask: DetailAsk, val winner: Side, val server: Side)
 
-enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
+enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK, MEDICAL, TOILET, WARMUP }
 
 data class CountdownUi(val kind: CountdownKind, val seconds: Int)
 
@@ -200,6 +201,7 @@ class MatchController(
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
         const val SET_BREAK_S = 120          // ITF: 120" a fine set
+        const val WARMUP_S = 300             // ITF: 5' di riscaldamento
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
@@ -581,7 +583,7 @@ class MatchController(
             val ms = t.matches.filter { it.round == r }.sortedBy { it.slot }
             com.tennis.scoremanager.tv.TvRound(clubRoundName(t, ms.first()), ms.map { m ->
                 val a = if (m.a == null && m.bye) s.ctBye else n(m.a); val b = if (m.b == null && m.bye) s.ctBye else n(m.b)
-                val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }, s.ctDisqualified.takeIf { m.disqualified }, s.ctNoShow.takeIf { m.noShow }).joinToString(" ")
                 com.tennis.scoremanager.tv.TvDrawMatch(a, b, if (m.bye) "" else extra, when (m.winner) { null -> null; m.a -> 0; else -> 1 })
             })
         })
@@ -1571,8 +1573,10 @@ class MatchController(
         return true
     }
 
-    fun setClubResult(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean) =
-        saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired))
+    fun setClubResult(
+        t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean,
+        disqualified: Boolean = false, noShow: Boolean = false,
+    ) = saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired, disqualified = disqualified, noShow = noShow))
 
     fun setClubSchedule(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, court: String, at: Long?) =
         saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(court = court, at = at) else it }))
@@ -1622,7 +1626,7 @@ class MatchController(
         for (t in clubTournaments.value) {
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
-            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), walkover = com.tennis.scoremanager.data.Reports.isWalkover(state), retired = state.retired != null && !com.tennis.scoremanager.data.Reports.isWalkover(state), record = rec.id))
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), walkover = com.tennis.scoremanager.data.Reports.isWalkover(state), retired = state.retired != null && !state.disqualified && !com.tennis.scoremanager.data.Reports.isWalkover(state), record = rec.id, disqualified = state.disqualified && !com.tennis.scoremanager.data.Reports.isWalkover(state)))
         }
     }
 
@@ -1720,7 +1724,7 @@ class MatchController(
         val (w, l) = com.tennis.scoremanager.data.Teams.result(f)
         val text = (listOf("${t.name} – ${f.opponent} $w-$l") + f.rubbers.mapIndexed { i, r ->
             val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ").ifBlank { "—" }
-            "${rubberName(t, i)}: $ours – ${r.theirs.joinToString(" / ").ifBlank { "—" }} ${r.score}".trim()
+            "${rubberName(t, i)}: $ours – ${r.theirs.joinToString(" / ").ifBlank { "—" }} ${r.score}${if (r.walkover) " " + strings.ctWalkover else ""}".trim()
         } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
         val now = System.currentTimeMillis()
         openNotice(com.tennis.scoremanager.data.NoticePlan(strings.tmResultTitle, "${t.name} – ${f.opponent}", text, t.roster.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }))
@@ -1764,7 +1768,9 @@ class MatchController(
             val i = f.rubbers.indexOfFirst { it.record == rec.id }
             if (i < 0) continue
             val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> null }
-            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, rec.id))
+            // Ritiro prima del primo punto: è un w.o., col punteggio del regolamento.
+            val wo = com.tennis.scoremanager.data.Reports.isWalkover(state)
+            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, rec.id, walkover = wo))
             return
         }
     }
@@ -3082,7 +3088,7 @@ class MatchController(
         val events = lm.record.events.toMutableList()
         // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
         val last = events.lastOrNull()
-        if (last is MatchEvent.Retired || last is MatchEvent.Penalty) events.removeAt(events.lastIndex)
+        if (last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break || last is MatchEvent.ServerFix || last is MatchEvent.EndsFix) events.removeAt(events.lastIndex)
         else {
             while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
             if (events.isEmpty()) return
@@ -3103,23 +3109,32 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(when (last) { is MatchEvent.Penalty -> strings.penaltyUndone; is MatchEvent.Retired -> strings.retireUndone; else -> strings.msgPointUndone })
+        showMessage(when (last) {
+            is MatchEvent.Penalty -> strings.penaltyUndone
+            is MatchEvent.Retired -> if (last.disqualified) strings.disqualifyUndone else strings.retireUndone
+            is MatchEvent.Break -> strings.breakUndone
+            is MatchEvent.ServerFix, is MatchEvent.EndsFix -> strings.fixUndone
+            else -> strings.msgPointUndone
+        })
         showTvMessage(null)
     }
 
-    /** [side] si ritira: la partita si ferma col punteggio di ora e si chiude come le altre (annullabile fino alla conferma). */
-    fun retire(side: Side) {
+    /**
+     * [side] si ritira (o, con [disqualified], è squalificato): la partita si ferma col punteggio di ora e si chiude
+     * come le altre (annullabile fino alla conferma).
+     */
+    fun retire(side: Side, disqualified: Boolean = false) {
         val lm = live.value ?: return
         if (closing || lm.state.isFinished || endDialog.value) return
         askDetail(null)
         faultPending.value = false
-        val rec = lm.record.copy(events = lm.record.events + MatchEvent.Retired(side, System.currentTimeMillis()), endedAt = System.currentTimeMillis())
+        val rec = lm.record.copy(events = lm.record.events + MatchEvent.Retired(side, System.currentTimeMillis(), disqualified), endedAt = System.currentTimeMillis())
         val state = ScoreEngine.replay(rec.rules, rec.events)
         commit(rec, state)
         stopClock()
         stopCountdown()
         persist()
-        val text = strings.retireCall(names(rec.setup).side(side))
+        val text = names(rec.setup).side(side).let { if (disqualified) strings.disqualifyCall(it) else strings.retireCall(it) }
         announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
         pushScore(state, null)
         showTvMessage(text)
@@ -3166,6 +3181,55 @@ class MatchController(
         showTvMessage(text)
         showMessage(text)
     }
+
+    /** Una pausa chiesta da [side]: si segna (si conta nel riepilogo, si annulla con Annulla) e parte il suo tempo. */
+    fun takeBreak(side: Side, kind: BreakKind) {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        faultPending.value = false
+        commit(lm.record.copy(events = lm.record.events + MatchEvent.Break(side, kind, System.currentTimeMillis())), lm.state)
+        startCountdown(if (kind == BreakKind.MEDICAL) CountdownKind.MEDICAL else CountdownKind.TOILET, kind.seconds)
+        val who = names(lm.record.setup).side(side)
+        val text = if (kind == BreakKind.MEDICAL) strings.breakMedicalCall(who) else strings.breakToiletCall(who)
+        announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
+        showMessage(text)
+        showTvMessage(text)
+    }
+
+    /**
+     * Correzione dell'arbitro: da adesso serve [side] ([player] nel doppio), o con [ends] si scambiano i lati del
+     * campo. Il punteggio resta (si annulla con Annulla).
+     */
+    fun fixServe(side: Side? = null, player: Int = 0, ends: Boolean = false) {
+        val lm = live.value ?: return
+        if (closing || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        faultPending.value = false
+        val event = if (ends) MatchEvent.EndsFix(System.currentTimeMillis()) else MatchEvent.ServerFix(side ?: return, player, System.currentTimeMillis())
+        val state = ScoreEngine.apply(lm.state, event).state
+        commit(lm.record.copy(events = lm.record.events + event), state)
+        pushScore(state, null)
+        val n = names(lm.record.setup)
+        val text = if (ends) strings.endsFixed else strings.serverFixed(n.players(state.server).getOrNull(state.serverPlayer) ?: n.side(state.server))
+        showMessage(text)
+        showTvMessage(text)
+    }
+
+    /** I 5 minuti di riscaldamento, prima del primo punto: il tempo partita parte solo col primo punto. */
+    fun warmUp() {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || lm.state.pointsPlayed > 0) return
+        // Il tempo partita, partito con "gioco", torna a zero: ripartirà col primo punto (awardPoint → onPlay).
+        runningSince = null
+        setRecord(lm.record.copy(startedAt = null, clockMs = 0L))
+        clockMs.value = 0L
+        startCountdown(CountdownKind.WARMUP, WARMUP_S)
+        showMessage(strings.warmupTime)
+    }
+
+    /** Il riscaldamento si può fare solo prima del primo punto. */
+    fun canWarmUp(): Boolean = live.value?.let { !it.state.isFinished && it.state.pointsPlayed == 0 && !it.record.suspended } == true
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {
         serveOrderPrompt.value = false

@@ -424,6 +424,8 @@ const APP_I18N = {
     ctDates: (a, b) => a === b ? a : `dal ${a} al ${b}`,
     ctDelete: "Elimina il torneo",
     ctDeleteAsk: (it) => `Eliminare il torneo ${it}? Le iscrizioni non pagate si cancellano, i pagamenti restano nel registro.`,
+    ctDisqualified: "squal.",
+    ctDisqualifiedLong: "Vinta per squalifica",
     ctDone: "Conclusi",
     ctDoubles: "Doppio",
     ctDraw: "Sorteggio",
@@ -466,6 +468,8 @@ const APP_I18N = {
     ctNoEntries: "Nessun iscritto.",
     ctNoFitpCard: "manca la tessera FITP dell'anno",
     ctNoMedical: "certificato non valido",
+    ctNoShow: "doppio w.o.",
+    ctNoShowLong: "Doppio w.o.: non si presenta nessuno dei due",
     ctNone: "Nessun torneo: crealo con Nuovo torneo.",
     ctNotAgonistCard: "tessera non agonista",
     ctNotDrawn: "Il tabellone si fa col sorteggio, dalla scheda Iscritti.",
@@ -834,6 +838,8 @@ const APP_I18N = {
     tmTheirs2: "Secondo avversario",
     tmTheyWon: "Persa",
     tmTitle: "Squadre e campionati",
+    tmWalkoverThem: "W.o. a loro favore",
+    tmWalkoverUs: "W.o. a nostro favore",
     tmWeWon: "Vinta",
     tmWon: "vinto",
     tmYes: "Sì",
@@ -897,6 +903,8 @@ const APP_I18N = {
     ctDates: (a, b) => a === b ? a : `${a} to ${b}`,
     ctDelete: "Delete the tournament",
     ctDeleteAsk: (it) => `Delete the tournament ${it}? Unpaid entry fees are removed, payments stay in the register.`,
+    ctDisqualified: "def.",
+    ctDisqualifiedLong: "Won by disqualification",
     ctDone: "Finished",
     ctDoubles: "Doubles",
     ctDraw: "Draw",
@@ -939,6 +947,8 @@ const APP_I18N = {
     ctNoEntries: "No entries.",
     ctNoFitpCard: "no FITP card for this year",
     ctNoMedical: "certificate not valid",
+    ctNoShow: "double w.o.",
+    ctNoShowLong: "Double w.o.: neither one shows up",
     ctNone: "No tournaments: create one with New tournament.",
     ctNotAgonistCard: "non-competitive card",
     ctNotDrawn: "The draw sheet comes from the draw, on the Entries tab.",
@@ -1307,6 +1317,8 @@ const APP_I18N = {
     tmTheirs2: "Second opponent",
     tmTheyWon: "Lost",
     tmTitle: "Teams and leagues",
+    tmWalkoverThem: "W.o. in their favour",
+    tmWalkoverUs: "W.o. in our favour",
     tmWeWon: "Won",
     tmWon: "won",
     tmYes: "Yes",
@@ -1370,6 +1382,8 @@ const APP_I18N = {
     ctDates: (a, b) => a === b ? a : `du ${a} au ${b}`,
     ctDelete: "Supprimer le tournoi",
     ctDeleteAsk: (it) => `Supprimer le tournoi ${it} ? Les inscriptions non payées sont effacées, les paiements restent dans le registre.`,
+    ctDisqualified: "disq.",
+    ctDisqualifiedLong: "Gagné par disqualification",
     ctDone: "Terminés",
     ctDoubles: "Double",
     ctDraw: "Tirage au sort",
@@ -1412,6 +1426,8 @@ const APP_I18N = {
     ctNoEntries: "Aucun inscrit.",
     ctNoFitpCard: "pas de licence FITP de l'année",
     ctNoMedical: "certificat non valable",
+    ctNoShow: "double forfait",
+    ctNoShowLong: "Double forfait : aucun des deux ne se présente",
     ctNone: "Aucun tournoi : créez-en un avec Nouveau tournoi.",
     ctNotAgonistCard: "licence loisir",
     ctNotDrawn: "Le tableau se fait par tirage au sort, depuis l'onglet Inscrits.",
@@ -1780,6 +1796,8 @@ const APP_I18N = {
     tmTheirs2: "Second adversaire",
     tmTheyWon: "Perdu",
     tmTitle: "Équipes et championnats",
+    tmWalkoverThem: "Forfait en leur faveur",
+    tmWalkoverUs: "Forfait en notre faveur",
     tmWeWon: "Gagné",
     tmWon: "gagnée",
     tmYes: "Oui",
@@ -1843,6 +1861,8 @@ const APP_I18N = {
     ctDates: (a, b) => a === b ? a : `${a} bis ${b}`,
     ctDelete: "Turnier löschen",
     ctDeleteAsk: (it) => `Turnier ${it} löschen? Unbezahlte Meldegebühren werden entfernt, Zahlungen bleiben im Register.`,
+    ctDisqualified: "disq.",
+    ctDisqualifiedLong: "Sieg durch Disqualifikation",
     ctDone: "Beendet",
     ctDoubles: "Doppel",
     ctDraw: "Auslosung",
@@ -1885,6 +1905,8 @@ const APP_I18N = {
     ctNoEntries: "Keine Meldungen.",
     ctNoFitpCard: "kein FITP-Ausweis für dieses Jahr",
     ctNoMedical: "Attest ungültig",
+    ctNoShow: "doppeltes w.o.",
+    ctNoShowLong: "Doppeltes w.o.: Keiner der beiden erscheint",
     ctNone: "Keine Turniere: mit Neues Turnier anlegen.",
     ctNotAgonistCard: "Freizeitausweis",
     ctNotDrawn: "Das Tableau entsteht durch die Auslosung, im Reiter Gemeldet.",
@@ -2253,6 +2275,8 @@ const APP_I18N = {
     tmTheirs2: "Zweiter Gegner",
     tmTheyWon: "Verloren",
     tmTitle: "Mannschaften und Ligen",
+    tmWalkoverThem: "W.o. für sie",
+    tmWalkoverUs: "W.o. für uns",
     tmWeWon: "Gewonnen",
     tmWon: "gewonnen",
     tmYes: "Ja",
@@ -2316,6 +2340,8 @@ const APP_I18N = {
     ctDates: (a, b) => a === b ? a : `del ${a} al ${b}`,
     ctDelete: "Eliminar el torneo",
     ctDeleteAsk: (it) => `¿Eliminar el torneo ${it}? Las inscripciones sin pagar se borran, los pagos quedan en el registro.`,
+    ctDisqualified: "desc.",
+    ctDisqualifiedLong: "Ganado por descalificación",
     ctDone: "Terminados",
     ctDoubles: "Dobles",
     ctDraw: "Sorteo",
@@ -2358,6 +2384,8 @@ const APP_I18N = {
     ctNoEntries: "Ningún inscrito.",
     ctNoFitpCard: "falta la licencia FITP del año",
     ctNoMedical: "certificado no válido",
+    ctNoShow: "doble w.o.",
+    ctNoShowLong: "Doble w.o.: no se presenta ninguno",
     ctNone: "Ningún torneo: crea uno con Nuevo torneo.",
     ctNotAgonistCard: "licencia no de competición",
     ctNotDrawn: "El cuadro sale del sorteo, desde la pestaña Inscritos.",
@@ -2726,6 +2754,8 @@ const APP_I18N = {
     tmTheirs2: "Segundo rival",
     tmTheyWon: "Perdido",
     tmTitle: "Equipos y ligas",
+    tmWalkoverThem: "W.o. a su favor",
+    tmWalkoverUs: "W.o. a nuestro favor",
     tmWeWon: "Ganado",
     tmWon: "ganado",
     tmYes: "Sí",
@@ -2789,6 +2819,8 @@ const APP_I18N = {
     ctDates: (a, b) => a === b ? a : `de ${a} a ${b}`,
     ctDelete: "Excluir o torneio",
     ctDeleteAsk: (it) => `Excluir o torneio ${it}? As inscrições não pagas são apagadas, os pagamentos ficam no registro.`,
+    ctDisqualified: "desq.",
+    ctDisqualifiedLong: "Vitória por desqualificação",
     ctDone: "Encerrados",
     ctDoubles: "Duplas",
     ctDraw: "Sorteio",
@@ -2831,6 +2863,8 @@ const APP_I18N = {
     ctNoEntries: "Nenhum inscrito.",
     ctNoFitpCard: "falta o cartão FITP do ano",
     ctNoMedical: "atestado não válido",
+    ctNoShow: "duplo w.o.",
+    ctNoShowLong: "Duplo w.o.: nenhum dos dois comparece",
     ctNone: "Nenhum torneio: crie um com Novo torneio.",
     ctNotAgonistCard: "cartão não de competição",
     ctNotDrawn: "A chave sai do sorteio, na aba Inscritos.",
@@ -3199,6 +3233,8 @@ const APP_I18N = {
     tmTheirs2: "Segundo adversário",
     tmTheyWon: "Perdida",
     tmTitle: "Equipes e campeonatos",
+    tmWalkoverThem: "W.o. a favor deles",
+    tmWalkoverUs: "W.o. a nosso favor",
     tmWeWon: "Vencida",
     tmWon: "vencido",
     tmYes: "Sim",
@@ -4056,7 +4092,7 @@ function winnerOf(score) {
   return ga === gb ? null : ga > gb ? 'a' : 'b';
 }
 
-const scoreText = (m) => [m.score, m.walkover ? T.ctWalkover : '', m.retired ? T.ctRetired : ''].filter(Boolean).join(' ');
+const scoreText = (m) => [m.score, m.walkover ? T.ctWalkover : '', m.retired ? T.ctRetired : '', m.disqualified ? T.ctDisqualified : '', m.noShow ? T.ctNoShow : ''].filter(Boolean).join(' ');
 const whenText = (m) => (m.date ? [shortDay(m.date), m.startMin != null ? hhmm(m.startMin) : '', m.court].filter(Boolean).join(' · ') : '');
 
 async function showCups() {
@@ -4170,7 +4206,7 @@ function cupEntries(t, body) {
 /** Una partita del tabellone: chi gioca, chi ha vinto, punteggio, e dove e quando. */
 function matchBox(t, m, who) {
   const pl = (x) => h('div.pl' + (m.winner && m.winner === x ? '.win' : ''), x ? who(x) : (m.round === 1 ? T.ctBye : '…'));
-  const meta = [scoreText(m), m.winner ? '' : whenText(m)].filter(Boolean).join(' · ');
+  const meta = [scoreText(m), m.winner || m.noShow ? '' : whenText(m)].filter(Boolean).join(' · ');
   const kids = [pl(m.a), pl(m.b), meta ? h('div.meta', meta) : null];
   return m.a && m.b ? h('button.match', { type: 'button', onclick: () => openMatch(t, m, who) }, kids) : h('div.match', kids);
 }
@@ -4216,7 +4252,7 @@ function cupDraw(t, body, who) {
   const ko = t.matches.filter((m) => m.round > 0);
   if (t.format === 'GROUPS') {
     const groups = t.matches.filter((m) => m.round === 0);
-    const done = groups.length > 0 && groups.every((m) => m.winner);
+    const done = groups.length > 0 && groups.every((m) => m.winner || m.noShow);
     out.push(h('div.cards', t.standings.map((st, g) => h('div.panel', h('div.pad',
       h('h2', T.ctGroup(groupLetter(g))),
       h('table', h('thead', h('tr', h('th', T.name), h('th.num', T.ctColWon), h('th.num', T.ctColSets), h('th.num', T.ctColGames))),
@@ -4242,7 +4278,7 @@ function cupMatches(t, body, who) {
   show.setAttribute('aria-label', T.status);
   show.addEventListener('change', () => { cupShow = show.value; cupMatches(t, body, who); });
   const real = t.matches.filter((m) => !m.bye && (m.a || m.b));
-  const rows = real.filter((m) => ({ todo: !m.winner, played: !!m.winner, all: true })[cupShow])
+  const rows = real.filter((m) => ({ todo: !m.winner && !m.noShow, played: !!m.winner || m.noShow, all: true })[cupShow])
     .sort((x, y) => (x.date ? 0 : 1) - (y.date ? 0 : 1) || (x.date || '').localeCompare(y.date || '') || (x.startMin ?? 0) - (y.startMin ?? 0) || x.round - y.round || x.slot - y.slot);
   put(body, 
     h('div.tools.noprint', show, h('span.dim', T.cupMatchHint)),
@@ -4265,16 +4301,25 @@ function openMatch(t, m, who) {
   score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) (w === 'a' ? wa : wb).checked = true; });
   const wo = h('input', { type: 'checkbox', checked: m.walkover });
   const rit = h('input', { type: 'checkbox', checked: m.retired });
+  const dq = h('input', { type: 'checkbox', checked: m.disqualified });
+  const none = h('input', { type: 'checkbox', checked: m.noShow });
+  // Al più uno: w.o., ritiro, squalifica o doppio w.o. (che non dà un vincitore).
+  const flags = [wo, rit, dq, none];
+  flags.forEach((x) => x.addEventListener('change', () => {
+    if (x.checked) flags.forEach((y) => { if (y !== x) y.checked = false; });
+    if (none.checked) { wa.checked = false; wb.checked = false; score.value = ''; }
+  }));
   const court = select([['', '—']].concat(t.courts.map((c) => [c, c])), m.court);
   const date = h('input', { type: 'date', value: m.date || '' });
   const time = h('input', { type: 'time', value: m.date && m.startMin != null ? hhmm(m.startMin) : '', step: 300 });
   const base = '/tournaments/' + encodeURIComponent(t.id) + '/matches/' + encodeURIComponent(m.id);
-  const clear = m.winner && h('button.danger.left', { type: 'button', onclick: async () => {
+  const clear = (m.winner || m.noShow) && h('button.danger.left', { type: 'button', onclick: async () => {
     try { await api('POST', base + '/result', {}); d.close(); toast(T.saved); await showCup(t.id); } catch (e) { toast(errText(e)); }
   } }, T.ctClearResult);
   const d = dialog(roundName(t, m) + ': ' + who(m.a) + ' – ' + who(m.b), h('div.form',
     h('h3', T.ctWinner), h('label.check.full', wa, who(m.a)), h('label.check.full', wb, who(m.b)),
     field(T.ctScore, score, 'full'), h('label.check', wo, T.ctWalkoverLong), h('label.check', rit, T.ctRetiredLong),
+    h('label.check', dq, T.ctDisqualifiedLong), h('label.check', none, T.ctNoShowLong),
     h('h3', T.ctWhere), field(T.date, date), field(T.ctTime, time), field(T.ctCourt, court),
     h('p.full.dim', T.cupWhereHint(t.matchMinutes))), async () => {
     const w = wa.checked ? m.a : wb.checked ? m.b : null;
@@ -4287,8 +4332,11 @@ function openMatch(t, m, who) {
         await api('POST', base + '/schedule', { ...sched, force: true });
       }
     }
-    const changed = w !== (m.winner || null) || score.value.trim() !== m.score || wo.checked !== m.walkover || rit.checked !== m.retired;
-    if (changed && (w || score.value.trim())) await api('POST', base + '/result', { winner: w, score: score.value, walkover: wo.checked, retired: rit.checked });
+    const changed = w !== (m.winner || null) || score.value.trim() !== m.score || wo.checked !== m.walkover || rit.checked !== m.retired
+      || dq.checked !== !!m.disqualified || none.checked !== !!m.noShow;
+    if (changed && (w || score.value.trim() || none.checked)) {
+      await api('POST', base + '/result', { winner: w, score: score.value, walkover: wo.checked, retired: rit.checked, disqualified: dq.checked, noShow: none.checked });
+    }
     toast(T.saved);
     await showCup(t.id);
   }, { left: clear });
@@ -4787,9 +4835,14 @@ function showFixture(t, f) {
     const theirs = [...Array(n)].map((_, k) => h('input', { value: ru.theirs[k] || '', placeholder: k ? T.tmTheirs2 : T.tmTheirs, maxlength: 80 }));
     const score = h('input', { value: ru.score, placeholder: '6-4 3-6 10-8', maxlength: 60, 'aria-label': T.tmScoreOurs });
     const won = select([['', '—'], ['true', T.tmWeWon], ['false', T.tmTheyWon]], ru.won === null ? '' : String(ru.won));
-    score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
-    const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true' });
-    return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won),
+    // W.o.: non giocata, vinta a tavolino col punteggio del regolamento (6-0 6-0 dal lato di chi vince).
+    const wo = h('input', { type: 'checkbox', checked: ru.walkover, 'aria-label': T.ctWalkover });
+    const woScore = () => { if (!wo.checked) return; if (won.value === '') won.value = 'true'; score.value = won.value === 'true' ? '6-0 6-0' : '0-6 0-6'; };
+    wo.addEventListener('change', woScore);
+    won.addEventListener('change', woScore);
+    score.addEventListener('input', () => { wo.checked = false; const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
+    const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true', walkover: wo.checked });
+    return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won), h('td', h('label.check', wo, T.ctWalkover)),
       h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
   }))));
 
@@ -7416,6 +7469,10 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
 
 **Strafen des Schiedsrichters**: Ebenfalls unter **Schiri** fragen **Verhaltensverstoß** und **Zeitverstoß**, wen es trifft, und zeigen unter jedem Namen schon die Folge. Verhalten: Die 1. ist eine Verwarnung, die 2. gibt dem Gegner einen Punkt, ab der 3. ein Spiel (im Tiebreak den Tiebreak). Zeit: Die 1. ist eine Verwarnung, danach verliert der Rückschläger den Punkt und der Aufschläger einen Aufschlag (mit detaillierter Statistik wird daraus ein erster Fehler, beim zweiten der Doppelfehler). Stimme und TV sagen es an, **Zurück** nimmt die letzte Strafe zurück, und die Zusammenfassung zeigt, wie viele es gab. Eine Aufgabe vor dem ersten Punkt erscheint als `w.o.`.
 
+**Pausen, Einspielen und Disqualifikation**: Ebenfalls unter **Schiri** gibt es vor dem ersten Punkt **Einspielen** (5 Minuten; die Spielzeit läuft ab dem ersten Punkt). **Medical Timeout** (3 Minuten) und **Toilette oder Kleiderwechsel** (5 Minuten) fragen, für wen die Pause ist, und starten die Zeit, oben und auf dem TV zu sehen; die Zusammenfassung zeigt, wie viele Pausen jeder hatte, und **Zurück** nimmt die letzte zurück. **Disqualifikation** beendet die Partie wie eine Aufgabe, vermerkt mit `disq.`; bei Turnieren geht das Ergebnis so ein. Bei Turnieren gibt es in der Partie auch das **doppelte w.o.** (keiner der beiden erscheint): Niemand kommt weiter, und der Gegner der nächsten Runde kommt von selbst weiter. In Gruppen zählt ein w.o. 6-0 6-0, und bei Aufgabe oder Disqualifikation gehen der abgebrochene Satz und die fehlenden an den Sieger. Bei Mannschaften schreiben in einer Partie der Begegnung **W.o. für uns** und **W.o. für sie** 6-0 6-0 oder 0-6 0-6.
+
+**Korrekturen**: Hat der Falsche aufgeschlagen (im Doppel auch der falsche Partner), lässt **Schiri › Aufschläger korrigieren** ab jetzt den aufschlagen, den du antippst; **Seiten korrigieren** tauscht die Seiten. Der Spielstand bleibt, wie es die Regeln wollen: Die gespielten Punkte zählen. **Zurück** nimmt die Korrektur zurück.
+
 **Speichern**: Das Match speichert sich bei jedem Punkt von selbst. Im Reiter **Spielen** löscht man ein unterbrochenes Match, indem man sein *Fortsetzen* **gedrückt hält**; alle unterbrochenen Matches stehen unter **Fortschritt › Verlauf › Unterbrochen**, zum Fortsetzen oder Löschen (mehrere angehakt auch zusammen). *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
 
 ### 7.1 Training mit dem Gurt
@@ -7988,6 +8045,10 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 **Umpire penalties**: also in **Umpire**, **Code violation** and **Time violation** ask who gets it and, under each name, already say what it means. Code: the 1st is a warning, the 2nd gives a point to the opponent, from the 3rd a game (in a tie-break, the tie-break). Time: the 1st is a warning, then the receiver loses the point and the server loses a serve (with detailed statistics it becomes a first-serve fault, or the double fault on the second). The voice and the TV announce it, **Undo** removes the last penalty and the summary says how many there were. A retirement before the first point shows as `w.o.`.
 
+**Breaks, warm-up and disqualification**: also in **Umpire**, before the first point there is **Warm-up** (5 minutes; the match time starts with the first point). **Medical timeout** (3 minutes) and **Toilet or change of attire** (5 minutes) ask who the break is for and start the timer, shown at the top and on the TV; the summary says how many breaks each one asked for and **Undo** removes the last one. **Disqualification** ends the match like a retirement, marked `def.`; in tournaments the result goes in that way. In tournaments, in the match card, there is also **Double w.o.** (neither one shows up): nobody goes through and the next-round opponent goes through automatically. In groups a w.o. counts 6-0 6-0 and, with a retirement or a disqualification, the interrupted set and the missing ones go to the winner. In teams, in a rubber, **W.o. in our favour** and **W.o. in their favour** write 6-0 6-0 or 0-6 0-6.
+
+**Corrections**: if the wrong player served (in doubles, also the wrong partner), **Umpire › Fix who serves** makes the player you tap serve from now on; **Fix the ends** swaps the ends. The score stays as it is, as the rules say: the points played count. **Undo** removes the correction.
+
 **Saving**: the match saves itself at every point. On the **Play** tab a suspended match is deleted by **long-pressing** its *Resume*; all suspended matches are in **Progress › History › Suspended**, to resume or delete (ticking several, also together). *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
 ### 7.1 Workout with the strap
@@ -8558,6 +8619,10 @@ Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos
 **Retirada**: el botón **Árbitro** (el mazo) bajo el marcador, en **Retirada**, pregunta quién se retira y termina el partido con ese marcador, sin los puntos del juego en curso (p. ej. `6-3 2-1 ret.`). Gana el rival, la voz lo anuncia y, antes de concluir, **Deshacer la retirada** lo deja todo como estaba. En los torneos el resultado entra solo con la retirada anotada; el partido cuenta como victoria pero no pesa en el rating TSM.
 
 **Penalizaciones del árbitro**: también en **Árbitro**, **Infracción de conducta** e **Infracción de tiempo** preguntan a quién va y, bajo cada nombre, ya dicen qué supone. Conducta: la 1.ª es una advertencia, la 2.ª da un punto al rival, desde la 3.ª un juego (en el tie-break, el tie-break). Tiempo: la 1.ª es una advertencia, luego quien resta pierde el punto y quien saca pierde un servicio (con estadísticas detalladas es una primera falta, o la doble falta en el segundo). La voz y la TV lo anuncian, **Anular** quita la última penalización y el resumen dice cuántas hubo. Una retirada antes del primer punto aparece como `w.o.`.
+
+**Pausas, calentamiento y descalificación**: también en **Árbitro**, antes del primer punto está **Calentamiento** (5 minutos; el tiempo del partido empieza con el primer punto). **Tiempo médico** (3 minutos) y **Baño o cambio de ropa** (5 minutos) preguntan para quién es la pausa y ponen en marcha el tiempo, que se ve arriba y en la TV; el resumen dice cuántas pausas pidió cada uno y **Anular** quita la última. **Descalificación** termina el partido como la retirada, con la marca `desc.`; en los torneos el resultado entra así. En los torneos, en la ficha del partido, también está el **Doble w.o.** (no se presenta ninguno): no pasa nadie y el rival de la ronda siguiente pasa solo. En los grupos un w.o. cuenta 6-0 6-0 y, con retirada o descalificación, el set interrumpido y los que faltan van para quien gana. En los equipos, en un partido de la eliminatoria, **W.o. a nuestro favor** y **W.o. a su favor** escriben 6-0 6-0 o 0-6 0-6.
+
+**Correcciones**: si sacó quien no debía (en dobles, también el compañero equivocado), **Árbitro › Corregir quién saca** hace sacar desde ahora a quien toques; **Corregir los lados** cambia los lados. El marcador no cambia, como dice el reglamento: los puntos jugados valen. **Anular** quita la corrección.
 
 **Guardado**: el partido se guarda solo en cada punto. En la pestaña **Jugar** un partido suspendido se elimina **manteniendo pulsado** su *Reanudar*; todos los suspendidos están en **Progresos › Historial › Suspendidos**, para reanudar o eliminar (marcando varios, también a la vez). *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
 
@@ -9130,6 +9195,10 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 **Pénalités de l'arbitre** : toujours dans **Arbitre**, **Code de conduite** et **Infraction de temps** demandent à qui va la pénalité et indiquent déjà, sous chaque nom, ce qu'elle entraîne. Conduite : la 1re est un avertissement, la 2e donne un point à l'adversaire, dès la 3e un jeu (dans un tie-break, le tie-break). Temps : la 1re est un avertissement, puis le relanceur perd le point et le serveur perd un service (avec les statistiques détaillées, c'est une première faute, ou la double faute sur la seconde). La voix et la TV l'annoncent, **Annuler** retire la dernière pénalité et le résumé dit combien il y en a eu. Un abandon avant le premier point s'affiche `forfait`.
 
+**Pauses, échauffement et disqualification** : toujours dans **Arbitre**, avant le premier point il y a **Échauffement** (5 minutes ; le temps du match part au premier point). **Temps mort médical** (3 minutes) et **Toilettes ou changement de tenue** (5 minutes) demandent pour qui est la pause et lancent le chrono, visible en haut et sur la TV ; le résumé dit combien de pauses chacun a demandé et **Annuler** retire la dernière. **Disqualification** termine le match comme un abandon, noté `disq.` ; dans les tournois le résultat entre ainsi. Dans les tournois, dans la fiche du match, il y a aussi le **Double forfait** (aucun des deux ne se présente) : personne ne passe et l'adversaire du tour suivant passe tout seul. Dans les poules un forfait compte 6-0 6-0 et, avec un abandon ou une disqualification, le set interrompu et ceux qui manquent vont au gagnant. Dans les équipes, dans un match de la rencontre, **Forfait en notre faveur** et **Forfait en leur faveur** écrivent 6-0 6-0 ou 0-6 0-6.
+
+**Corrections** : si le mauvais joueur a servi (en double, aussi le mauvais partenaire), **Arbitre › Corriger qui sert** fait servir dès maintenant le joueur que vous touchez ; **Corriger les côtés** échange les côtés. Le score ne change pas, comme le veut le règlement : les points joués comptent. **Annuler** retire la correction.
+
 **Sauvegardes** : le match s'enregistre tout seul à chaque point. Dans l'onglet **Jouer**, un match suspendu se supprime en **appuyant longuement** sur son *Reprendre* ; tous les matchs suspendus sont dans **Progrès › Historique › Suspendus**, à reprendre ou supprimer (en en cochant plusieurs, aussi ensemble). *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
 ### 7.1 Entraînement avec la ceinture
@@ -9701,6 +9770,10 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 
 **Richiami dell'arbitro**: sempre in **Arbitro**, **Violazione di condotta** e **Violazione di tempo** chiedono a chi va il richiamo e, sotto ogni nome, dicono già cosa comporta. Condotta: il 1° è un avvertimento, il 2° dà un punto all'avversario, dal 3° un game (nel tie-break, il tie-break). Tempo: il 1° è un avvertimento, poi chi risponde perde il punto e chi serve perde il servizio (con le statistiche dettagliate diventa una prima fuori, o il doppio fallo sulla seconda). La voce e la TV lo annunciano, **Annulla** toglie l'ultimo richiamo e il riepilogo dice quanti ce ne sono stati. Un ritiro prima del primo punto risulta `w.o.`.
 
+**Pause, riscaldamento e squalifica**: sempre in **Arbitro**, prima del primo punto c'è **Riscaldamento** (5 minuti, il tempo partita parte col primo punto). **Medical timeout** (3 minuti) e **Bagno o cambio d'abiti** (5 minuti) chiedono per chi è la pausa e fanno partire il tempo, che si vede in alto e sulla TV; il riepilogo dice quante pause ha chiesto ciascuno e **Annulla** toglie l'ultima. **Squalifica** chiude la partita come il ritiro, col segno `squal.`; nei tornei il risultato entra così. Nei tornei, nella scheda della partita, c'è anche il **Doppio w.o.** (non si presenta nessuno dei due): non passa nessuno e l'avversario del turno dopo passa da solo. Nei gironi un w.o. conta 6-0 6-0 e, col ritiro o la squalifica, il set interrotto e quelli che mancano vanno a chi vince. Nelle squadre, in una partita dell'incontro, **W.o. a nostro favore** e **W.o. a loro favore** scrivono 6-0 6-0 o 0-6 0-6.
+
+**Correzioni**: se ha servito chi non doveva (nel doppio anche il compagno sbagliato), **Arbitro › Correggi chi serve** fa servire da adesso chi tocchi tu; con **Correggi i lati del campo** si scambiano i lati. Il punteggio resta com'è, come vuole il regolamento: i punti giocati valgono. **Annulla** toglie la correzione.
+
 **Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
 ### 7.1 Allenamento con la fascia
@@ -10271,6 +10344,10 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
 **Desistência**: o botão **Árbitro** (o martelo) abaixo do placar, em **Desistência**, pergunta quem desiste e termina a partida com esse placar, sem os pontos do game em andamento (ex. `6-3 2-1 desist.`). O adversário vence, a voz anuncia e, antes de concluir, **Desfazer a desistência** deixa tudo como estava. Nos torneios o resultado entra sozinho com a desistência marcada; a partida conta como vitória, mas não pesa no rating TSM.
 
 **Penalizações do árbitro**: também em **Árbitro**, **Violação de conduta** e **Violação de tempo** perguntam a quem vai e, sob cada nome, já dizem o que implica. Conduta: a 1.ª é uma advertência, a 2.ª dá um ponto ao adversário, a partir da 3.ª um jogo (no tie-break, o tie-break). Tempo: a 1.ª é uma advertência, depois quem recebe perde o ponto e quem serve perde um serviço (com as estatísticas detalhadas vira uma primeira falta, ou a dupla falta no segundo). A voz e a TV anunciam, **Anular** retira a última penalização e o resumo diz quantas houve. Uma desistência antes do primeiro ponto aparece como `w.o.`.
+
+**Pausas, aquecimento e desqualificação**: também em **Árbitro**, antes do primeiro ponto há **Aquecimento** (5 minutos; o tempo da partida começa com o primeiro ponto). **Tempo médico** (3 minutos) e **Casa de banho ou troca de roupa** (5 minutos) perguntam para quem é a pausa e iniciam o tempo, que aparece em cima e na TV; o resumo diz quantas pausas cada um pediu e **Anular** retira a última. **Desqualificação** termina a partida como a desistência, com a marca `desq.`; nos torneios o resultado entra assim. Nos torneios, na ficha da partida, há também o **Duplo w.o.** (nenhum dos dois comparece): ninguém passa e o adversário da ronda seguinte passa sozinho. Nos grupos um w.o. conta 6-0 6-0 e, com desistência ou desqualificação, o set interrompido e os que faltam vão para quem vence. Nas equipas, numa partida do confronto, **W.o. a nosso favor** e **W.o. a favor deles** escrevem 6-0 6-0 ou 0-6 0-6.
+
+**Correções**: se serviu quem não devia (em pares, também o parceiro errado), **Árbitro › Corrigir quem serve** faz servir a partir de agora quem tocares; **Corrigir os lados** troca os lados. O placar fica como está, como diz o regulamento: os pontos jogados valem. **Anular** retira a correção.
 
 **Salvamento**: a partida é salva sozinha a cada ponto. Na aba **Jogar** uma partida suspensa se exclui **mantendo pressionado** o seu *Retomar*; todas as suspensas estão em **Progresso › Histórico › Suspensas**, para retomar ou excluir (marcando várias, também juntas). *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
@@ -11437,6 +11514,7 @@ import com.tennis.scoremanager.data.Tournaments
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
+import com.tennis.scoremanager.model.BreakKind
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PenaltyKind
@@ -11537,7 +11615,7 @@ enum class DetailAsk { OUTCOME, ERROR_TYPE }
 /** [winner] ha vinto il punto, [server] serviva. */
 data class DetailPrompt(val ask: DetailAsk, val winner: Side, val server: Side)
 
-enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
+enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK, MEDICAL, TOILET, WARMUP }
 
 data class CountdownUi(val kind: CountdownKind, val seconds: Int)
 
@@ -11568,6 +11646,7 @@ class MatchController(
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
         const val SET_BREAK_S = 120          // ITF: 120" a fine set
+        const val WARMUP_S = 300             // ITF: 5' di riscaldamento
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
@@ -11949,7 +12028,7 @@ class MatchController(
             val ms = t.matches.filter { it.round == r }.sortedBy { it.slot }
             com.tennis.scoremanager.tv.TvRound(clubRoundName(t, ms.first()), ms.map { m ->
                 val a = if (m.a == null && m.bye) s.ctBye else n(m.a); val b = if (m.b == null && m.bye) s.ctBye else n(m.b)
-                val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }, s.ctDisqualified.takeIf { m.disqualified }, s.ctNoShow.takeIf { m.noShow }).joinToString(" ")
                 com.tennis.scoremanager.tv.TvDrawMatch(a, b, if (m.bye) "" else extra, when (m.winner) { null -> null; m.a -> 0; else -> 1 })
             })
         })
@@ -12939,8 +13018,10 @@ class MatchController(
         return true
     }
 
-    fun setClubResult(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean) =
-        saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired))
+    fun setClubResult(
+        t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean,
+        disqualified: Boolean = false, noShow: Boolean = false,
+    ) = saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired, disqualified = disqualified, noShow = noShow))
 
     fun setClubSchedule(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, court: String, at: Long?) =
         saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(court = court, at = at) else it }))
@@ -12990,7 +13071,7 @@ class MatchController(
         for (t in clubTournaments.value) {
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
-            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), walkover = com.tennis.scoremanager.data.Reports.isWalkover(state), retired = state.retired != null && !com.tennis.scoremanager.data.Reports.isWalkover(state), record = rec.id))
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), walkover = com.tennis.scoremanager.data.Reports.isWalkover(state), retired = state.retired != null && !state.disqualified && !com.tennis.scoremanager.data.Reports.isWalkover(state), record = rec.id, disqualified = state.disqualified && !com.tennis.scoremanager.data.Reports.isWalkover(state)))
         }
     }
 
@@ -13088,7 +13169,7 @@ class MatchController(
         val (w, l) = com.tennis.scoremanager.data.Teams.result(f)
         val text = (listOf("${t.name} – ${f.opponent} $w-$l") + f.rubbers.mapIndexed { i, r ->
             val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ").ifBlank { "—" }
-            "${rubberName(t, i)}: $ours – ${r.theirs.joinToString(" / ").ifBlank { "—" }} ${r.score}".trim()
+            "${rubberName(t, i)}: $ours – ${r.theirs.joinToString(" / ").ifBlank { "—" }} ${r.score}${if (r.walkover) " " + strings.ctWalkover else ""}".trim()
         } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
         val now = System.currentTimeMillis()
         openNotice(com.tennis.scoremanager.data.NoticePlan(strings.tmResultTitle, "${t.name} – ${f.opponent}", text, t.roster.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }))
@@ -13132,7 +13213,9 @@ class MatchController(
             val i = f.rubbers.indexOfFirst { it.record == rec.id }
             if (i < 0) continue
             val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> null }
-            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, rec.id))
+            // Ritiro prima del primo punto: è un w.o., col punteggio del regolamento.
+            val wo = com.tennis.scoremanager.data.Reports.isWalkover(state)
+            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.resultLine(state, Side.P1, strings), won, rec.id, walkover = wo))
             return
         }
     }
@@ -14450,7 +14533,7 @@ class MatchController(
         val events = lm.record.events.toMutableList()
         // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
         val last = events.lastOrNull()
-        if (last is MatchEvent.Retired || last is MatchEvent.Penalty) events.removeAt(events.lastIndex)
+        if (last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break || last is MatchEvent.ServerFix || last is MatchEvent.EndsFix) events.removeAt(events.lastIndex)
         else {
             while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
             if (events.isEmpty()) return
@@ -14471,23 +14554,32 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(when (last) { is MatchEvent.Penalty -> strings.penaltyUndone; is MatchEvent.Retired -> strings.retireUndone; else -> strings.msgPointUndone })
+        showMessage(when (last) {
+            is MatchEvent.Penalty -> strings.penaltyUndone
+            is MatchEvent.Retired -> if (last.disqualified) strings.disqualifyUndone else strings.retireUndone
+            is MatchEvent.Break -> strings.breakUndone
+            is MatchEvent.ServerFix, is MatchEvent.EndsFix -> strings.fixUndone
+            else -> strings.msgPointUndone
+        })
         showTvMessage(null)
     }
 
-    /** [side] si ritira: la partita si ferma col punteggio di ora e si chiude come le altre (annullabile fino alla conferma). */
-    fun retire(side: Side) {
+    /**
+     * [side] si ritira (o, con [disqualified], è squalificato): la partita si ferma col punteggio di ora e si chiude
+     * come le altre (annullabile fino alla conferma).
+     */
+    fun retire(side: Side, disqualified: Boolean = false) {
         val lm = live.value ?: return
         if (closing || lm.state.isFinished || endDialog.value) return
         askDetail(null)
         faultPending.value = false
-        val rec = lm.record.copy(events = lm.record.events + MatchEvent.Retired(side, System.currentTimeMillis()), endedAt = System.currentTimeMillis())
+        val rec = lm.record.copy(events = lm.record.events + MatchEvent.Retired(side, System.currentTimeMillis(), disqualified), endedAt = System.currentTimeMillis())
         val state = ScoreEngine.replay(rec.rules, rec.events)
         commit(rec, state)
         stopClock()
         stopCountdown()
         persist()
-        val text = strings.retireCall(names(rec.setup).side(side))
+        val text = names(rec.setup).side(side).let { if (disqualified) strings.disqualifyCall(it) else strings.retireCall(it) }
         announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
         pushScore(state, null)
         showTvMessage(text)
@@ -14534,6 +14626,55 @@ class MatchController(
         showTvMessage(text)
         showMessage(text)
     }
+
+    /** Una pausa chiesta da [side]: si segna (si conta nel riepilogo, si annulla con Annulla) e parte il suo tempo. */
+    fun takeBreak(side: Side, kind: BreakKind) {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        faultPending.value = false
+        commit(lm.record.copy(events = lm.record.events + MatchEvent.Break(side, kind, System.currentTimeMillis())), lm.state)
+        startCountdown(if (kind == BreakKind.MEDICAL) CountdownKind.MEDICAL else CountdownKind.TOILET, kind.seconds)
+        val who = names(lm.record.setup).side(side)
+        val text = if (kind == BreakKind.MEDICAL) strings.breakMedicalCall(who) else strings.breakToiletCall(who)
+        announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)))
+        showMessage(text)
+        showTvMessage(text)
+    }
+
+    /**
+     * Correzione dell'arbitro: da adesso serve [side] ([player] nel doppio), o con [ends] si scambiano i lati del
+     * campo. Il punteggio resta (si annulla con Annulla).
+     */
+    fun fixServe(side: Side? = null, player: Int = 0, ends: Boolean = false) {
+        val lm = live.value ?: return
+        if (closing || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
+        faultPending.value = false
+        val event = if (ends) MatchEvent.EndsFix(System.currentTimeMillis()) else MatchEvent.ServerFix(side ?: return, player, System.currentTimeMillis())
+        val state = ScoreEngine.apply(lm.state, event).state
+        commit(lm.record.copy(events = lm.record.events + event), state)
+        pushScore(state, null)
+        val n = names(lm.record.setup)
+        val text = if (ends) strings.endsFixed else strings.serverFixed(n.players(state.server).getOrNull(state.serverPlayer) ?: n.side(state.server))
+        showMessage(text)
+        showTvMessage(text)
+    }
+
+    /** I 5 minuti di riscaldamento, prima del primo punto: il tempo partita parte solo col primo punto. */
+    fun warmUp() {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || lm.state.pointsPlayed > 0) return
+        // Il tempo partita, partito con "gioco", torna a zero: ripartirà col primo punto (awardPoint → onPlay).
+        runningSince = null
+        setRecord(lm.record.copy(startedAt = null, clockMs = 0L))
+        clockMs.value = 0L
+        startCountdown(CountdownKind.WARMUP, WARMUP_S)
+        showMessage(strings.warmupTime)
+    }
+
+    /** Il riscaldamento si può fare solo prima del primo punto. */
+    fun canWarmUp(): Boolean = live.value?.let { !it.state.isFinished && it.state.pointsPlayed == 0 && !it.record.suspended } == true
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {
         serveOrderPrompt.value = false
@@ -18389,7 +18530,7 @@ object ClubDrawImage {
                         val label = e?.let(name) ?: if (m.bye) s.ctBye else "—"
                         c.drawText(fit(label, p(28f, if (win) ball else main, win), BOX_W - 30f), x + 16f, by + 40f + k * 36f, p(28f, if (win) ball else main, win))
                     }
-                    val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                    val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }, s.ctDisqualified.takeIf { m.disqualified }, s.ctNoShow.takeIf { m.noShow }).joinToString(" ")
                     if (extra.isNotBlank()) c.drawText(fit(extra, p(22f, dim), BOX_W - 30f), x + 16f, by + BOX_H - 10f, p(22f, dim))
                 }
             }
@@ -18732,12 +18873,18 @@ data class CTMatch(
     /** Vinta a tavolino (l'altro non si è presentato) o per ritiro durante la partita. */
     val walkover: Boolean = false,
     val retired: Boolean = false,
+    /** Vinta perché l'altro è stato squalificato dall'arbitro. */
+    val disqualified: Boolean = false,
+    /** Doppio w.o.: non si è presentato nessuno dei due, non passa nessuno. */
+    val noShow: Boolean = false,
+    /** Risultato messo dal tabellone (l'avversario veniva da un doppio w.o.): si toglie da solo se quello cambia. */
+    val autoAdvance: Boolean = false,
     val court: String = "",
     val at: Long? = null,
     /** La partita segnata col segnapunti (MatchRecord.id), se è stata giocata dal vivo. */
     val record: String? = null,
 ) {
-    val played: Boolean get() = winner != null
+    val played: Boolean get() = winner != null || noShow
     val bye: Boolean get() = round == 1 && (a == null) != (b == null)
 }
 
@@ -18950,6 +19097,33 @@ object ClubTournaments {
         return if (ga == gb) null else if (ga > gb) "a" else "b"
     }
 
+    /** Un set è finito (6-4, 7-5, 7-6, o il match tie-break a 10 con due di scarto). */
+    private fun complete(p: Pair<Int, Int>): Boolean {
+        val hi = maxOf(p.first, p.second); val lo = minOf(p.first, p.second)
+        return (hi == 6 && lo <= 4) || (hi == 7 && lo in 5..6) || (hi >= 10 && hi - lo >= 2) || (hi > 7 && hi - lo == 2)
+    }
+
+    /**
+     * I set che contano nella classifica del girone, dal lato di a. Col w.o. senza punteggio: 6-0 6-0 a chi vince.
+     * Col ritiro o la squalifica: il set interrotto e quelli che mancano (al meglio dei tre) vanno a chi vince.
+     */
+    fun countedSets(m: CTMatch): List<Pair<Int, Int>> {
+        val raw = sets(m.score)
+        val w = m.winner ?: return raw
+        val aWon = w == m.a
+        val won = if (aWon) 6 to 0 else 0 to 6
+        if (m.walkover && raw.isEmpty()) return listOf(won, won)
+        if (!m.retired && !m.disqualified) return raw
+        val out = raw.toMutableList()
+        out.lastOrNull()?.takeIf { !complete(it) }?.let { (x, y) ->
+            val lost = if (aWon) y else x
+            val need = if (lost <= 4) 6 else 7
+            out[out.lastIndex] = if (aWon) need to y else x to need
+        }
+        while (out.count { if (aWon) it.first > it.second else it.second > it.first } < 2) out += won
+        return out
+    }
+
     data class Standing(val entry: String, val played: Int, val won: Int, val setsWon: Int, val setsLost: Int, val gamesWon: Int, val gamesLost: Int)
 
     /** La classifica di un girone: vittorie, poi differenza set, poi differenza game, poi lo scontro diretto. */
@@ -18962,7 +19136,7 @@ object ClubTournaments {
                 val mine = when (e) { m.a -> true; m.b -> false; else -> continue }
                 played++
                 if (m.winner == e) won++
-                for ((x, y) in sets(m.score)) {
+                for ((x, y) in countedSets(m)) {
                     val (f, a) = if (mine) x to y else y to x
                     gw += f; gl += a
                     if (f > a) sw++ else if (a > f) sl++
@@ -19021,8 +19195,21 @@ object ClubTournaments {
                 val key = r + 1 to m.slot / 2
                 val next = byKey[key] ?: continue
                 var n = if (m.slot % 2 == 0) next.copy(a = m.winner) else next.copy(b = m.winner)
-                if (n.winner != null && n.winner != n.a && n.winner != n.b) n = n.copy(winner = null, score = "", walkover = false, retired = false, record = null)
+                if (n.winner != null && n.winner != n.a && n.winner != n.b) n = n.copy(winner = null, score = "", walkover = false, retired = false, disqualified = false, autoAdvance = false, record = null)
                 byKey[key] = n
+            }
+            // Doppio w.o. nel turno prima: l'avversario passa da solo (e se erano due, non passa nessuno).
+            for (n in byKey.values.filter { it.round == r + 1 }) {
+                val gone0 = byKey[r to n.slot * 2]?.noShow == true
+                val gone1 = byKey[r to n.slot * 2 + 1]?.noShow == true
+                val present = if (gone0) n.b else if (gone1) n.a else null
+                val x = when {
+                    gone0 && gone1 -> if (n.noShow || n.winner == null || n.autoAdvance) n.copy(winner = null, walkover = false, noShow = true, autoAdvance = true) else n
+                    present != null -> if (n.winner == null || n.autoAdvance) n.copy(winner = present, walkover = true, noShow = false, autoAdvance = true, score = "") else n
+                    n.autoAdvance -> n.copy(winner = null, walkover = false, noShow = false, autoAdvance = false)
+                    else -> n
+                }
+                byKey[r + 1 to n.slot] = x
             }
         }
         return matches.map { if (it.round == 0) it else byKey[it.round to it.slot] ?: it }
@@ -19101,10 +19288,17 @@ object ClubTournaments {
     }
 
     /** Il risultato di una partita (anche per correggerlo); il tabellone si aggiorna. */
-    fun setResult(t: ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean = false, retired: Boolean = false, record: String? = null): ClubTournament {
+    fun setResult(
+        t: ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean = false, retired: Boolean = false, record: String? = null,
+        disqualified: Boolean = false, noShow: Boolean = false,
+    ): ClubTournament {
         val ms = t.matches.map { m ->
             if (m.id != matchId) m
-            else m.copy(winner = winner?.takeIf { it == m.a || it == m.b }, score = score.trim(), walkover = walkover, retired = retired, record = record ?: m.record)
+            else if (noShow) m.copy(winner = null, score = "", walkover = false, retired = false, disqualified = false, noShow = true, autoAdvance = false, record = record ?: m.record)
+            else m.copy(
+                winner = winner?.takeIf { it == m.a || it == m.b }, score = score.trim(), walkover = walkover, retired = retired, disqualified = disqualified,
+                noShow = false, autoAdvance = false, record = record ?: m.record,
+            )
         }
         return t.copy(matches = propagate(ms))
     }
@@ -22255,7 +22449,7 @@ object Reports {
     /** Il risultato da leggere: col ritiro, "6-3  2-1 rit."; ritiro prima di giocare, "w.o.". */
     fun resultLine(state: MatchState, from: Side, s: Strings): String = when {
         isWalkover(state) -> s.ctWalkover
-        state.retired != null -> scoreLine(state, from) + " " + s.ctRetired
+        state.retired != null -> scoreLine(state, from) + " " + if (state.disqualified) s.ctDisqualified else s.ctRetired
         else -> scoreLine(state, from)
     }
 
@@ -24808,6 +25002,8 @@ data class Rubber(
     val won: Boolean? = null,
     /** La partita segnata col segnapunti (MatchRecord.id). */
     val record: String? = null,
+    /** Non giocata, vinta a tavolino: il punteggio è quello del regolamento (6-0 6-0). */
+    val walkover: Boolean = false,
 )
 
 /**
@@ -24900,10 +25096,14 @@ object Teams {
     fun noAnswer(t: Team, f: Fixture): List<String> = t.roster.filter { it !in f.availability }
 
     /** Il risultato di una partita, dal punteggio se non lo si dice (dal nostro lato). */
-    fun setRubber(f: Fixture, index: Int, score: String, won: Boolean?, record: String? = null): Fixture {
+    fun setRubber(f: Fixture, index: Int, score: String, won: Boolean?, record: String? = null, walkover: Boolean = false): Fixture {
         val w = won ?: ClubTournaments.winnerFromScore(score)?.let { it == "a" }
-        return f.copy(rubbers = f.rubbers.mapIndexed { i, r -> if (i == index) r.copy(score = score.trim(), won = w, record = record ?: r.record) else r })
+        val sc = if (walkover && w != null) walkoverScore(w) else score.trim()
+        return f.copy(rubbers = f.rubbers.mapIndexed { i, r -> if (i == index) r.copy(score = sc, won = w, record = record ?: r.record, walkover = walkover && w != null) else r })
     }
+
+    /** Il punteggio di una partita vinta a tavolino, dal nostro lato: 6-0 6-0 o 0-6 0-6. */
+    fun walkoverScore(won: Boolean): String = if (won) "6-0 6-0" else "0-6 0-6"
 
     /** I periodi non prenotabili degli incontri in casa con dei campi tenuti. */
     fun blocks(t: Team): List<CourtBlock> = t.fixtures.filter { it.home && it.courts.isNotEmpty() }.map { f ->
@@ -25736,7 +25936,7 @@ interface DeskData {
 )
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
-@Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?)
+@Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?, val walkover: Boolean = false)
 @Serializable data class DeskFixture(
     val id: String, val opponent: String, val date: String, val startMin: Int, val home: Boolean, val place: String, val meeting: String,
     val courts: List<String>, val hours: Int, val note: String, val availability: Map<String, Availability>, val callUp: List<String>,
@@ -25757,7 +25957,7 @@ interface DeskData {
     val courts: List<String> = emptyList(), val hours: Int = 6, val note: String = "",
 )
 @Serializable data class DeskAnswerIn(val player: String, val answer: Availability? = null)
-@Serializable data class DeskRubberIn(val index: Int, val ours: List<String> = emptyList(), val theirs: List<String> = emptyList(), val score: String = "", val won: Boolean? = null)
+@Serializable data class DeskRubberIn(val index: Int, val ours: List<String> = emptyList(), val theirs: List<String> = emptyList(), val score: String = "", val won: Boolean? = null, val walkover: Boolean = false)
 @Serializable data class DeskNoticeIn(val kind: String)
 @Serializable data class DeskCourtInfo(
     val name: String, val surface: Surface? = null, val covered: Boolean = false, val lights: Boolean = true, val heating: Boolean = false,
@@ -25817,6 +26017,7 @@ interface DeskData {
 @Serializable data class DeskCupMatch(
     val id: String, val round: Int, val slot: Int, val group: Int?, val a: String?, val b: String?, val winner: String?, val score: String,
     val walkover: Boolean, val retired: Boolean, val bye: Boolean, val court: String, val date: String?, val startMin: Int?,
+    val disqualified: Boolean = false, val noShow: Boolean = false,
 )
 @Serializable data class DeskStanding(val entry: String, val played: Int, val won: Int, val setsWon: Int, val setsLost: Int, val gamesWon: Int, val gamesLost: Int)
 @Serializable data class DeskCup(
@@ -25835,7 +26036,7 @@ interface DeskData {
 @Serializable data class DeskSwapIn(val a: DeskSeatIn, val b: DeskSeatIn)
 @Serializable data class DeskReplaceIn(val seat: DeskSeatIn, val entry: String)
 /** Il risultato: [winner] è l'iscritto (CTEntry.id); se manca, si ricava dal punteggio. Tutto vuoto = cancella. */
-@Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false)
+@Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false, val disqualified: Boolean = false, val noShow: Boolean = false)
 /** Dove e quando; [date] null = da programmare. Con [force] la si mette anche se il campo è occupato. */
 @Serializable data class DeskScheduleIn(val court: String = "", val date: String? = null, val startMin: Int? = null, val force: Boolean = false)
 
@@ -26447,7 +26648,7 @@ class DeskApi(
                 }.filterValues { it.isNotEmpty() }
                 DeskFixture(
                     f.id, f.opponent, day(f.at)!!, ((f.at - start) / 60_000L).toInt(), f.home, f.place, f.meeting, f.courts, f.hours, f.note, f.availability, f.callUp,
-                    f.rubbers.map { DeskRubber(it.doubles, it.ours, it.theirs, it.score, it.won) }, w, l, Teams.decided(f), Teams.outcome(f), problems,
+                    f.rubbers.map { DeskRubber(it.doubles, it.ours, it.theirs, it.score, it.won, it.walkover) }, w, l, Teams.decided(f), Teams.outcome(f), problems,
                 )
             },
         )
@@ -26532,7 +26733,7 @@ class DeskApi(
             })
             val score = text(i.score, 60)
             withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
-                else Teams.setRubber(withPlayers, i.index, score, i.won))
+                else Teams.setRubber(withPlayers, i.index, score, i.won, walkover = i.walkover))
         }
         m == "POST" && rest == listOf("notice") -> {
             val kind = read(DeskNoticeIn.serializer(), r).kind
@@ -26672,7 +26873,7 @@ class DeskApi(
     private fun tournaments(): Resp = ok(ListSerializer(DeskTournament.serializer()), data.tournaments().sortedByDescending { it.start ?: it.createdAt }.map { t ->
         val real = t.matches.filter { !it.bye }
         DeskTournament(
-            t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.winner != null },
+            t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.played },
             t.kind, t.format, t.drawn, t.champion?.let { c -> t.entries.firstOrNull { it.id == c }?.names?.joinToString(" / ") },
         )
     })
@@ -26680,7 +26881,7 @@ class DeskApi(
     private fun cup(id: String): ClubTournament = data.tournaments().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
 
     /** Un risultato vero (non un bye): dopo, il sorteggio non si rifà più. */
-    private fun hasResults(t: ClubTournament) = t.matches.any { it.winner != null && !it.bye }
+    private fun hasResults(t: ClubTournament) = t.matches.any { it.played && !it.bye }
 
     private fun cupRoute(m: String, p: List<String>, r: Req): Resp {
         val t = cup(p[0])
@@ -26725,7 +26926,7 @@ class DeskApi(
             val start = x.at?.let { CourtPlans.dayStart(it) }
             DeskCupMatch(
                 x.id, x.round, x.slot, x.group, x.a, x.b, x.winner, x.score, x.walkover, x.retired, x.bye, x.court,
-                x.at?.let { at -> day(at) }, if (x.at != null && start != null) ((x.at - start) / 60_000L).toInt() else null,
+                x.at?.let { at -> day(at) }, if (x.at != null && start != null) ((x.at - start) / 60_000L).toInt() else null, x.disqualified, x.noShow,
             )
         }
         val standings = ClubTournaments.groupMembers(t).indices.map { g ->
@@ -26835,10 +27036,12 @@ class DeskApi(
         val m = match(t, id)
         if (m.a == null || m.b == null) throw Fail(409, "NOT_READY")
         val score = text(i.score, 60)
-        if (i.winner == null && score.isEmpty() && !i.walkover && !i.retired) return save(ClubTournaments.setResult(t, id, null, ""))
+        // Doppio w.o.: nessun vincitore, non passa nessuno.
+        if (i.noShow) return save(ClubTournaments.setResult(t, id, null, "", noShow = true))
+        if (i.winner == null && score.isEmpty() && !i.walkover && !i.retired && !i.disqualified) return save(ClubTournaments.setResult(t, id, null, ""))
         val w = i.winner ?: when (ClubTournaments.winnerFromScore(score)) { "a" -> m.a; "b" -> m.b; else -> null }
         if (w == null || (w != m.a && w != m.b)) throw Fail(400, "NO_WINNER")
-        return save(ClubTournaments.setResult(t, id, w, score, i.walkover, i.retired))
+        return save(ClubTournaments.setResult(t, id, w, score, i.walkover, i.retired, disqualified = i.disqualified))
     }
 
     private fun schedule(t: ClubTournament, id: String, i: DeskScheduleIn): Resp {
@@ -27884,16 +28087,41 @@ sealed class MatchEvent {
     @SerialName("serveOrder")
     data class ServeOrder(val setNumber: Int, val firstP1: Int, val firstP2: Int) : MatchEvent()
 
-    /** [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. */
+    /**
+     * [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. Con [disqualified] è la
+     * squalifica decisa dall'arbitro (dopo i game di penalità o per un fatto grave): finisce allo stesso modo.
+     */
     @Serializable
     @SerialName("retired")
-    data class Retired(val side: Side, val at: Long = 0L) : MatchEvent()
+    data class Retired(val side: Side, val at: Long = 0L, val disqualified: Boolean = false) : MatchEvent()
 
     /** Un richiamo dell'arbitro a [side]: cosa comporta lo decide il numero di richiami dello stesso tipo ([PenaltyKind]). */
     @Serializable
     @SerialName("penalty")
     data class Penalty(val side: Side, val kind: PenaltyKind, val at: Long = 0L) : MatchEvent()
+
+    /** Una pausa chiesta da [side] (medical timeout o bagno): non cambia il punteggio, si conta nel riepilogo. */
+    @Serializable
+    @SerialName("break")
+    data class Break(val side: Side, val kind: BreakKind, val at: Long = 0L) : MatchEvent()
+
+    /**
+     * Correzione dell'arbitro: da adesso serve [side] (nel doppio il giocatore [player]) senza toccare il punteggio, come
+     * dice il regolamento quando ha servito chi non doveva: i punti giocati restano.
+     */
+    @Serializable
+    @SerialName("serverFix")
+    data class ServerFix(val side: Side, val player: Int = 0, val at: Long = 0L) : MatchEvent()
+
+    /** Correzione dell'arbitro: i giocatori erano dal lato sbagliato del campo; il punteggio resta. */
+    @Serializable
+    @SerialName("endsFix")
+    data class EndsFix(val at: Long = 0L) : MatchEvent()
 }
+
+/** Le pause con il loro tempo: medical timeout 3 minuti, bagno o cambio d'abiti fino a 5. */
+@Serializable
+enum class BreakKind(val seconds: Int) { MEDICAL(180), TOILET(300) }
 
 /** I due tipi di richiamo, con le scale del regolamento: condotta e tempo (i 25 secondi tra un punto e l'altro). */
 @Serializable
@@ -27967,6 +28195,8 @@ data class MatchState(
     val pointsPlayed: Int = 0,
     /** Chi si è ritirato (null = partita finita sul campo o ancora in corso). */
     val retired: Side? = null,
+    /** Il ritiro è una squalifica. */
+    val disqualified: Boolean = false,
     /** I richiami fatti finora, per tipo: [Penalty] li conta per sapere cosa comporta il prossimo. */
     val codes1: Int = 0,
     val codes2: Int = 0,
@@ -28061,8 +28291,24 @@ object ScoreEngine {
     fun apply(state: MatchState, event: MatchEvent): Step = when (event) {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)
-        is MatchEvent.Retired -> Step(retire(state, event.side), null)
+        is MatchEvent.Retired -> Step(retire(state, event.side).let { if (it.retired == event.side && !state.isFinished) it.copy(disqualified = event.disqualified) else it }, null)
         is MatchEvent.Penalty -> penalty(state, event.side, event.kind)
+        is MatchEvent.Break -> Step(state, null)
+        is MatchEvent.ServerFix -> Step(fixServer(state, event.side, event.player), null)
+        is MatchEvent.EndsFix -> Step(if (state.isFinished) state else state.copy(p1Left = !state.p1Left), null)
+    }
+
+    /**
+     * Da adesso serve [side] (nel doppio [player]): si sposta chi ha iniziato il set (e l'ordine della squadra), così
+     * il turno di ora tocca a lui e i successivi seguono da qui.
+     */
+    private fun fixServer(s: MatchState, side: Side, player: Int): MatchState {
+        if (s.isFinished) return s
+        val turn = s.serviceTurn
+        val fixed = s.copy(setStartServer = if (turn % 2 == 0) side else side.other)
+        if (!s.rules.doubles) return fixed
+        val order = Math.floorMod(player.coerceIn(0, 1) - turn / 2, 2)
+        return if (side == Side.P1) fixed.copy(order1 = order) else fixed.copy(order2 = order)
     }
 
     /** Cosa comporterebbe adesso un richiamo [kind] a [side] (per mostrarlo prima di confermare). */
@@ -31395,6 +31641,9 @@ object TvSnapshots {
                     CountdownKind.CHANGEOVER -> s.tvChangeover
                     CountdownKind.SET_BREAK -> s.tvSetBreak
                     CountdownKind.TIEBREAK_BREAK -> s.tvTiebreakBreak
+                    CountdownKind.MEDICAL -> s.tvMedical
+                    CountdownKind.TOILET -> s.tvToilet
+                    CountdownKind.WARMUP -> s.tvWarmup
                 },
                 leftMs = i.countdownLeftMs.coerceAtLeast(0),
                 shot = k == CountdownKind.SHOT_CLOCK,
@@ -36621,6 +36870,9 @@ interface Strings {
     val matchTime: String
     val shotClock: String get() = "Shot Clock"
     val changeoverTime: String get() = "Changeover Time"
+    val medicalTime: String get() = "Medical Timeout"
+    val toiletTime: String get() = "Toilet Break"
+    val warmupTime: String get() = "Warm-up"
     val setBreakTime: String get() = "Set Break Time"
     val tiebreakTime: String get() = "Tie-Break Time"
     val setsHeader: String
@@ -36671,6 +36923,37 @@ interface Strings {
     val undoShort: String
     /** "Nuova partita" corto, per il tasto in fondo alla partita. */
     val newMatchShort: String
+    val disqualifyButton: String
+    val disqualifyTitle: String
+    val disqualifyHint: String
+    val disqualifyUndo: String
+    val disqualifyUndone: String
+    val ctDisqualified: String
+    val ctDisqualifiedLong: String
+    val breakMedical: String
+    val breakToilet: String
+    val breakWho: String
+    val breakUndone: String
+    val breakList: String
+    val warmupButton: String
+    val ctNoShow: String
+    val ctNoShowLong: String
+    val tmWalkoverUs: String
+    val tmWalkoverThem: String
+    val tvMedical: String
+    val tvToilet: String
+    val tvWarmup: String
+    val disqualifyCall: (String) -> String
+    val disqualifyBy: (String) -> String
+    val breakMedicalCall: (String) -> String
+    val breakToiletCall: (String) -> String
+    val breakCount: (Int, Int) -> String
+    val serverFixButton: String
+    val serverFixWho: String
+    val endsFixButton: String
+    val endsFixed: String
+    val fixUndone: String
+    val serverFixed: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -38863,6 +39146,37 @@ object ItStrings : Strings {
     override val retireUndone = "Ritiro annullato"
     override val undoShort = "Annulla"
     override val newMatchShort = "Nuova"
+    override val disqualifyButton = "Squalifica"
+    override val disqualifyTitle = "Chi viene squalificato?"
+    override val disqualifyHint = "Dopo i game di penalità, o per un fatto grave, l'arbitro può squalificare: la partita finisce col punteggio attuale e vince l'avversario."
+    override val disqualifyUndo = "Annulla la squalifica"
+    override val disqualifyUndone = "Squalifica annullata"
+    override val ctDisqualified = "squal."
+    override val ctDisqualifiedLong = "Vinta per squalifica"
+    override val breakMedical = "Medical timeout (3 minuti)"
+    override val breakToilet = "Bagno o cambio d'abiti (5 minuti)"
+    override val breakWho = "Chi chiede la pausa?"
+    override val breakUndone = "Pausa annullata"
+    override val breakList = "Pause"
+    override val warmupButton = "Riscaldamento (5 minuti)"
+    override val ctNoShow = "doppio w.o."
+    override val ctNoShowLong = "Doppio w.o.: non si presenta nessuno dei due"
+    override val tmWalkoverUs = "W.o. a nostro favore"
+    override val tmWalkoverThem = "W.o. a loro favore"
+    override val tvMedical = "MEDICAL TIMEOUT"
+    override val tvToilet = "PAUSA"
+    override val tvWarmup = "RISCALDAMENTO"
+    override val disqualifyCall: (String) -> String = { "Squalifica: $it" }
+    override val disqualifyBy: (String) -> String = { "Squalifica di $it" }
+    override val breakMedicalCall: (String) -> String = { "Medical timeout per $it" }
+    override val breakToiletCall: (String) -> String = { "Pausa per $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "medical $m · bagno $t" }
+    override val serverFixButton = "Correggi chi serve"
+    override val serverFixWho = "Chi deve servire adesso? Il punteggio resta com'è: i punti giocati valgono."
+    override val endsFixButton = "Correggi i lati del campo"
+    override val endsFixed = "Lati del campo scambiati"
+    override val fixUndone = "Correzione annullata"
+    override val serverFixed: (String) -> String = { "Ora serve $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -41018,6 +41332,37 @@ object EnStrings : Strings {
     override val retireUndone = "Retirement undone"
     override val undoShort = "Undo"
     override val newMatchShort = "New"
+    override val disqualifyButton = "Disqualification"
+    override val disqualifyTitle = "Who is disqualified?"
+    override val disqualifyHint = "After the penalty games, or for a serious offence, the umpire can disqualify: the match ends at the current score and the opponent wins."
+    override val disqualifyUndo = "Undo disqualification"
+    override val disqualifyUndone = "Disqualification undone"
+    override val ctDisqualified = "def."
+    override val ctDisqualifiedLong = "Won by disqualification"
+    override val breakMedical = "Medical timeout (3 minutes)"
+    override val breakToilet = "Toilet or change of attire (5 minutes)"
+    override val breakWho = "Who asks for the break?"
+    override val breakUndone = "Break undone"
+    override val breakList = "Breaks"
+    override val warmupButton = "Warm-up (5 minutes)"
+    override val ctNoShow = "double w.o."
+    override val ctNoShowLong = "Double w.o.: neither one shows up"
+    override val tmWalkoverUs = "W.o. in our favour"
+    override val tmWalkoverThem = "W.o. in their favour"
+    override val tvMedical = "MEDICAL TIMEOUT"
+    override val tvToilet = "BREAK"
+    override val tvWarmup = "WARM-UP"
+    override val disqualifyCall: (String) -> String = { "Disqualification: $it" }
+    override val disqualifyBy: (String) -> String = { "Disqualification: $it" }
+    override val breakMedicalCall: (String) -> String = { "Medical timeout for $it" }
+    override val breakToiletCall: (String) -> String = { "Break for $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "medical $m · toilet $t" }
+    override val serverFixButton = "Fix who serves"
+    override val serverFixWho = "Who should serve now? The score stays as it is: the points played count."
+    override val endsFixButton = "Fix the ends"
+    override val endsFixed = "Ends swapped"
+    override val fixUndone = "Correction undone"
+    override val serverFixed: (String) -> String = { "Now serving: $it" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -43196,6 +43541,37 @@ object DeStrings : Strings {
     override val retireUndone = "Aufgabe zurückgenommen"
     override val undoShort = "Zurück"
     override val newMatchShort = "Neu"
+    override val disqualifyButton = "Disqualifikation"
+    override val disqualifyTitle = "Wer wird disqualifiziert?"
+    override val disqualifyHint = "Nach den Spielstrafen oder bei einem schweren Verstoß kann der Schiedsrichter disqualifizieren: Die Partie endet beim aktuellen Stand, der Gegner gewinnt."
+    override val disqualifyUndo = "Disqualifikation zurücknehmen"
+    override val disqualifyUndone = "Disqualifikation zurückgenommen"
+    override val ctDisqualified = "disq."
+    override val ctDisqualifiedLong = "Sieg durch Disqualifikation"
+    override val breakMedical = "Medical Timeout (3 Minuten)"
+    override val breakToilet = "Toilette oder Kleiderwechsel (5 Minuten)"
+    override val breakWho = "Wer bittet um die Pause?"
+    override val breakUndone = "Pause zurückgenommen"
+    override val breakList = "Pausen"
+    override val warmupButton = "Einspielen (5 Minuten)"
+    override val ctNoShow = "doppeltes w.o."
+    override val ctNoShowLong = "Doppeltes w.o.: Keiner der beiden erscheint"
+    override val tmWalkoverUs = "W.o. für uns"
+    override val tmWalkoverThem = "W.o. für sie"
+    override val tvMedical = "MEDICAL TIMEOUT"
+    override val tvToilet = "PAUSE"
+    override val tvWarmup = "EINSPIELEN"
+    override val disqualifyCall: (String) -> String = { "Disqualifikation: $it" }
+    override val disqualifyBy: (String) -> String = { "Disqualifikation von $it" }
+    override val breakMedicalCall: (String) -> String = { "Medical Timeout für $it" }
+    override val breakToiletCall: (String) -> String = { "Pause für $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "Medical $m · Toilette $t" }
+    override val serverFixButton = "Aufschläger korrigieren"
+    override val serverFixWho = "Wer muss jetzt aufschlagen? Der Spielstand bleibt: Die gespielten Punkte zählen."
+    override val endsFixButton = "Seiten korrigieren"
+    override val endsFixed = "Seiten getauscht"
+    override val fixUndone = "Korrektur zurückgenommen"
+    override val serverFixed: (String) -> String = { "Jetzt schlägt auf: $it" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -45367,6 +45743,37 @@ object EsStrings : Strings {
     override val retireUndone = "Retirada anulada"
     override val undoShort = "Anular"
     override val newMatchShort = "Nueva"
+    override val disqualifyButton = "Descalificación"
+    override val disqualifyTitle = "¿Quién queda descalificado?"
+    override val disqualifyHint = "Tras los juegos de penalización, o por una falta grave, el árbitro puede descalificar: el partido termina con el marcador actual y gana el rival."
+    override val disqualifyUndo = "Deshacer la descalificación"
+    override val disqualifyUndone = "Descalificación anulada"
+    override val ctDisqualified = "desc."
+    override val ctDisqualifiedLong = "Ganado por descalificación"
+    override val breakMedical = "Tiempo médico (3 minutos)"
+    override val breakToilet = "Baño o cambio de ropa (5 minutos)"
+    override val breakWho = "¿Quién pide la pausa?"
+    override val breakUndone = "Pausa anulada"
+    override val breakList = "Pausas"
+    override val warmupButton = "Calentamiento (5 minutos)"
+    override val ctNoShow = "doble w.o."
+    override val ctNoShowLong = "Doble w.o.: no se presenta ninguno"
+    override val tmWalkoverUs = "W.o. a nuestro favor"
+    override val tmWalkoverThem = "W.o. a su favor"
+    override val tvMedical = "TIEMPO MÉDICO"
+    override val tvToilet = "PAUSA"
+    override val tvWarmup = "CALENTAMIENTO"
+    override val disqualifyCall: (String) -> String = { "Descalificación: $it" }
+    override val disqualifyBy: (String) -> String = { "Descalificación de $it" }
+    override val breakMedicalCall: (String) -> String = { "Tiempo médico para $it" }
+    override val breakToiletCall: (String) -> String = { "Pausa para $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "médico $m · baño $t" }
+    override val serverFixButton = "Corregir quién saca"
+    override val serverFixWho = "¿Quién debe sacar ahora? El marcador no cambia: los puntos jugados valen."
+    override val endsFixButton = "Corregir los lados"
+    override val endsFixed = "Lados cambiados"
+    override val fixUndone = "Corrección anulada"
+    override val serverFixed: (String) -> String = { "Ahora saca $it" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -47540,6 +47947,37 @@ object FrStrings : Strings {
     override val retireUndone = "Abandon annulé"
     override val undoShort = "Annuler"
     override val newMatchShort = "Nouvelle"
+    override val disqualifyButton = "Disqualification"
+    override val disqualifyTitle = "Qui est disqualifié ?"
+    override val disqualifyHint = "Après les jeux de pénalité, ou pour un fait grave, l'arbitre peut disqualifier : le match s'arrête au score actuel et l'adversaire gagne."
+    override val disqualifyUndo = "Annuler la disqualification"
+    override val disqualifyUndone = "Disqualification annulée"
+    override val ctDisqualified = "disq."
+    override val ctDisqualifiedLong = "Gagné par disqualification"
+    override val breakMedical = "Temps mort médical (3 minutes)"
+    override val breakToilet = "Toilettes ou changement de tenue (5 minutes)"
+    override val breakWho = "Qui demande la pause ?"
+    override val breakUndone = "Pause annulée"
+    override val breakList = "Pauses"
+    override val warmupButton = "Échauffement (5 minutes)"
+    override val ctNoShow = "double forfait"
+    override val ctNoShowLong = "Double forfait : aucun des deux ne se présente"
+    override val tmWalkoverUs = "Forfait en notre faveur"
+    override val tmWalkoverThem = "Forfait en leur faveur"
+    override val tvMedical = "TEMPS MORT MÉDICAL"
+    override val tvToilet = "PAUSE"
+    override val tvWarmup = "ÉCHAUFFEMENT"
+    override val disqualifyCall: (String) -> String = { "Disqualification : $it" }
+    override val disqualifyBy: (String) -> String = { "Disqualification de $it" }
+    override val breakMedicalCall: (String) -> String = { "Temps mort médical pour $it" }
+    override val breakToiletCall: (String) -> String = { "Pause pour $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "médical $m · toilettes $t" }
+    override val serverFixButton = "Corriger qui sert"
+    override val serverFixWho = "Qui doit servir maintenant ? Le score ne change pas : les points joués comptent."
+    override val endsFixButton = "Corriger les côtés"
+    override val endsFixed = "Côtés échangés"
+    override val fixUndone = "Correction annulée"
+    override val serverFixed: (String) -> String = { "Au service : $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -49714,6 +50152,37 @@ object PtStrings : Strings {
     override val retireUndone = "Desistência anulada"
     override val undoShort = "Anular"
     override val newMatchShort = "Nova"
+    override val disqualifyButton = "Desqualificação"
+    override val disqualifyTitle = "Quem é desqualificado?"
+    override val disqualifyHint = "Depois dos jogos de penalização, ou por uma falta grave, o árbitro pode desqualificar: a partida termina com o placar atual e vence o adversário."
+    override val disqualifyUndo = "Desfazer a desqualificação"
+    override val disqualifyUndone = "Desqualificação anulada"
+    override val ctDisqualified = "desq."
+    override val ctDisqualifiedLong = "Vitória por desqualificação"
+    override val breakMedical = "Tempo médico (3 minutos)"
+    override val breakToilet = "Casa de banho ou troca de roupa (5 minutos)"
+    override val breakWho = "Quem pede a pausa?"
+    override val breakUndone = "Pausa anulada"
+    override val breakList = "Pausas"
+    override val warmupButton = "Aquecimento (5 minutos)"
+    override val ctNoShow = "duplo w.o."
+    override val ctNoShowLong = "Duplo w.o.: nenhum dos dois comparece"
+    override val tmWalkoverUs = "W.o. a nosso favor"
+    override val tmWalkoverThem = "W.o. a favor deles"
+    override val tvMedical = "TEMPO MÉDICO"
+    override val tvToilet = "PAUSA"
+    override val tvWarmup = "AQUECIMENTO"
+    override val disqualifyCall: (String) -> String = { "Desqualificação: $it" }
+    override val disqualifyBy: (String) -> String = { "Desqualificação de $it" }
+    override val breakMedicalCall: (String) -> String = { "Tempo médico para $it" }
+    override val breakToiletCall: (String) -> String = { "Pausa para $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "médico $m · casa de banho $t" }
+    override val serverFixButton = "Corrigir quem serve"
+    override val serverFixWho = "Quem deve servir agora? O placar fica como está: os pontos jogados valem."
+    override val endsFixButton = "Corrigir os lados"
+    override val endsFixed = "Lados trocados"
+    override val fixUndone = "Correção anulada"
+    override val serverFixed: (String) -> String = { "Agora serve $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -52739,7 +53208,7 @@ private fun MatchBox(c: MatchController, t: ClubTournament, m: CTMatch, onOpen: 
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
         }
-        val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+        val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }, s.ctDisqualified.takeIf { m.disqualified }, s.ctNoShow.takeIf { m.noShow }).joinToString(" ")
         if (extra.isNotBlank()) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 }
@@ -52812,7 +53281,7 @@ private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -
                     val when_ = listOfNotNull(m.at?.let { shortDate(it, lang) + " " + com.tennis.scoremanager.data.Reports.time(it, lang) }, m.court.ifBlank { null }).joinToString(" · ")
                     if (when_.isNotBlank()) Text(when_, color = TsmColors.TextDim, fontSize = 12.sp)
                 }
-                if (m.played) Text(m.score.ifBlank { if (m.walkover) s.ctWalkover else "✓" }, color = TsmColors.Ball, fontSize = 13.sp)
+                if (m.played) Text(m.score.ifBlank { if (m.noShow) s.ctNoShow else if (m.walkover) s.ctWalkover else "✓" }, color = TsmColors.Ball, fontSize = 13.sp)
             }
         }
     }
@@ -52830,6 +53299,8 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
     var score by remember { mutableStateOf(m.score) }
     var walkover by remember { mutableStateOf(m.walkover) }
     var retired by remember { mutableStateOf(m.retired) }
+    var disqualified by remember { mutableStateOf(m.disqualified) }
+    var noShow by remember { mutableStateOf(m.noShow) }
     var court by remember { mutableStateOf(m.court) }
     var at by remember { mutableStateOf(m.at) }
     val courts = c.storage.clubCourts
@@ -52848,8 +53319,11 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
                     // Dal punteggio si capisce chi ha vinto.
                     ClubTournaments.winnerFromScore(it)?.let { w -> winner = if (w == "a") m.a else m.b }
                 }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ctScore) })
-                SwitchRow(Icons.Filled.EmojiEvents, s.ctWalkoverLong, null, walkover) { walkover = it; if (it) retired = false }
-                SwitchRow(Icons.Filled.EmojiEvents, s.ctRetiredLong, null, retired) { retired = it; if (it) walkover = false }
+                // Al più uno: w.o., ritiro, squalifica o doppio w.o. (che non dà un vincitore).
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctWalkoverLong, null, walkover) { walkover = it; if (it) { retired = false; disqualified = false; noShow = false } }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctRetiredLong, null, retired) { retired = it; if (it) { walkover = false; disqualified = false; noShow = false } }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctDisqualifiedLong, null, disqualified) { disqualified = it; if (it) { walkover = false; retired = false; noShow = false } }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctNoShowLong, null, noShow) { noShow = it; if (it) { walkover = false; retired = false; disqualified = false; winner = null; score = "" } }
                 Text(s.ctWhere, color = TsmColors.TextDim, fontSize = 13.sp)
                 if (courts.isNotEmpty()) Segmented(courts.map { SegOption(it) }, courts.indexOf(court), { court = courts[it] }, columns = minOf(3, courts.size))
                 else OutlinedTextField(court, { court = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ctCourt) })
@@ -52870,7 +53344,8 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
             TextButton(onClick = {
                 var cur = c.clubTournament(t.id) ?: t
                 if (court != m.court || at != m.at) { c.setClubSchedule(cur, m.id, court, at); cur = c.clubTournament(t.id) ?: cur }
-                if (winner != m.winner || score != m.score || walkover != m.walkover || retired != m.retired) c.setClubResult(cur, m.id, winner, score, walkover, retired)
+                if (winner != m.winner || score != m.score || walkover != m.walkover || retired != m.retired || disqualified != m.disqualified || noShow != m.noShow)
+                    c.setClubResult(cur, m.id, winner, score, walkover, retired, disqualified, noShow)
                 onDone()
             }) { Text(s.ok) }
         },
@@ -55919,6 +56394,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.StrokeStats
+import com.tennis.scoremanager.model.BreakKind
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
@@ -55961,7 +56437,10 @@ fun MatchScreen(c: MatchController) {
     val suspended = lm.record.suspended
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
-    var confirmRetire by remember { mutableStateOf(false) }
+    /** Ritiro (false) o squalifica (true) da confermare scegliendo il giocatore. */
+    var confirmRetire by remember { mutableStateOf<Boolean?>(null) }
+    var breakKind by remember { mutableStateOf<BreakKind?>(null) }
+    var fixServe by remember { mutableStateOf(false) }
     var umpireMenu by remember { mutableStateOf(false) }
     var penaltyKind by remember { mutableStateOf<PenaltyKind?>(null) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
@@ -56042,15 +56521,24 @@ fun MatchScreen(c: MatchController) {
             icon = { Icon(Icons.Filled.Gavel, null, tint = TsmColors.Orange) },
             title = { Text(s.umpireButton, fontWeight = FontWeight.Black) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    @Composable fun item(text: String, onClick: () -> Unit) =
+                        OutlinedButton(onClick = { umpireMenu = false; onClick() }, modifier = Modifier.fillMaxWidth()) { Text(text, color = TsmColors.TextMain, textAlign = TextAlign.Center) }
+                    // Prima del primo punto c'è anche il riscaldamento.
+                    if (c.canWarmUp()) item(s.warmupButton) { c.warmUp() }
                     Text(s.penaltyHint, fontSize = 13.sp, color = TsmColors.TextDim)
-                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.CODE }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyCode, color = TsmColors.TextMain) }
-                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.TIME }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyTime, color = TsmColors.TextMain) }
-                    OutlinedButton(onClick = { umpireMenu = false; confirmRetire = true }, modifier = Modifier.fillMaxWidth()) {
+                    item(s.penaltyCode) { penaltyKind = PenaltyKind.CODE }
+                    item(s.penaltyTime) { penaltyKind = PenaltyKind.TIME }
+                    item(s.breakMedical) { breakKind = BreakKind.MEDICAL }
+                    item(s.breakToilet) { breakKind = BreakKind.TOILET }
+                    item(s.serverFixButton) { fixServe = true }
+                    item(s.endsFixButton) { c.fixServe(ends = true) }
+                    OutlinedButton(onClick = { umpireMenu = false; confirmRetire = false }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange)
                         Spacer(Modifier.width(6.dp))
                         Text(s.retireButton, color = TsmColors.TextMain)
                     }
+                    item(s.disqualifyButton) { confirmRetire = true }
                 }
             },
             confirmButton = {},
@@ -56088,21 +56576,60 @@ fun MatchScreen(c: MatchController) {
         )
     }
 
-    if (confirmRetire) {
+    confirmRetire?.let { dq ->
         AlertDialog(
-            onDismissRequest = { confirmRetire = false },
-            icon = { Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange) },
-            title = { Text(s.retireTitle, fontWeight = FontWeight.Black) },
+            onDismissRequest = { confirmRetire = null },
+            icon = { Icon(if (dq) Icons.Filled.Gavel else Icons.Filled.Flag, null, tint = TsmColors.Orange) },
+            title = { Text(if (dq) s.disqualifyTitle else s.retireTitle, fontWeight = FontWeight.Black) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(s.retireHint)
-                    for (side in Side.entries) OutlinedButton(onClick = { confirmRetire = false; c.retire(side) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(if (dq) s.disqualifyHint else s.retireHint)
+                    for (side in Side.entries) OutlinedButton(onClick = { confirmRetire = null; c.retire(side, dq) }, modifier = Modifier.fillMaxWidth()) {
                         Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
                     }
                 }
             },
             confirmButton = {},
-            dismissButton = { TextButton(onClick = { confirmRetire = false }) { Text(s.back) } },
+            dismissButton = { TextButton(onClick = { confirmRetire = null }) { Text(s.back) } },
+        )
+    }
+
+    if (fixServe) {
+        AlertDialog(
+            onDismissRequest = { fixServe = false },
+            title = { Text(s.serverFixButton, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.serverFixWho)
+                    // Nel doppio i quattro giocatori; chi serve adesso è già evidenziato.
+                    for (side in Side.entries) for ((i, name) in names.players(side).withIndex()) {
+                        val now = state.server == side && state.serverPlayer == i
+                        OutlinedButton(onClick = { fixServe = false; if (!now) c.fixServe(side, i) }, modifier = Modifier.fillMaxWidth()) {
+                            Text(name, color = TsmColors.player(side), fontWeight = if (now) FontWeight.Black else FontWeight.Bold)
+                            if (now) Text("  ✓", color = TsmColors.Ball)
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { fixServe = false }) { Text(s.back) } },
+        )
+    }
+
+    breakKind?.let { kind ->
+        AlertDialog(
+            onDismissRequest = { breakKind = null },
+            title = { Text(if (kind == BreakKind.MEDICAL) s.breakMedical else s.breakToilet, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.breakWho)
+                    for (side in Side.entries) OutlinedButton(onClick = { breakKind = null; c.takeBreak(side, kind) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { breakKind = null }) { Text(s.back) } },
         )
     }
 
@@ -56149,7 +56676,7 @@ fun MatchScreen(c: MatchController) {
             text = {
                 RemoteKeysInDialog(c)
                 Text(
-                    (state.retired?.let { s.retireBy(names.side(it)) + "\n" } ?: "") + s.endDialogText(names.side(w), Reports.resultLine(state, w, s), state.rules.doubles),
+                    (state.retired?.let { (if (state.disqualified) s.disqualifyBy(names.side(it)) else s.retireBy(names.side(it))) + "\n" } ?: "") + s.endDialogText(names.side(w), Reports.resultLine(state, w, s), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             },
@@ -56167,7 +56694,7 @@ fun MatchScreen(c: MatchController) {
                 OutlinedButton(onClick = { if (armed) c.undo() }) {
                     Icon(Icons.AutoMirrored.Filled.Undo, null, tint = TsmColors.TextMain)
                     Spacer(Modifier.width(6.dp))
-                    Text(if (state.retired != null) s.retireUndo else s.undoLastPoint, color = TsmColors.TextMain)
+                    Text(if (state.retired != null) (if (state.disqualified) s.disqualifyUndo else s.retireUndo) else s.undoLastPoint, color = TsmColors.TextMain)
                 }
             },
         )
@@ -56234,6 +56761,9 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings, middle: @Compos
                 CountdownKind.CHANGEOVER -> s.changeoverTime
                 CountdownKind.SET_BREAK -> s.setBreakTime
                 CountdownKind.TIEBREAK_BREAK -> s.tiebreakTime
+                CountdownKind.MEDICAL -> s.medicalTime
+                CountdownKind.TOILET -> s.toiletTime
+                CountdownKind.WARMUP -> s.warmupTime
                 else -> s.shotClock
             }
             val red = cd != null && cd.seconds <= 5
@@ -61871,12 +62401,14 @@ fun SummaryScreen(c: MatchController) {
                 Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
                 Text(Reports.resultLine(state, w, s), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                state.retired?.let { Text(s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
+                state.retired?.let { Text(if (state.disqualified) s.disqualifyBy(names.side(it)) else s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
                 // I richiami dell'arbitro, se ce ne sono stati.
                 for (side in Side.entries) {
                     val code = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.CODE)
                     val time = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.TIME)
                     if (code + time > 0) Text("${s.penaltyList} · ${names.short(side)}: ${s.penaltyCount(code, time)}", color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+                    val breaks = rec.events.filterIsInstance<com.tennis.scoremanager.model.MatchEvent.Break>().filter { it.side == side }
+                    if (breaks.isNotEmpty()) Text("${s.breakList} · ${names.short(side)}: ${s.breakCount(breaks.count { it.kind == com.tennis.scoremanager.model.BreakKind.MEDICAL }, breaks.count { it.kind == com.tennis.scoremanager.model.BreakKind.TOILET })}", color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
                 }
             }
 
@@ -62386,6 +62918,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.text.style.TextAlign
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Availability
 import com.tennis.scoremanager.data.ClubTournaments
@@ -62587,7 +63121,7 @@ fun FixtureScreen(c: MatchController) {
                         Text(c.rubberName(t, i), color = TsmColors.TextDim, fontSize = 12.sp)
                         Text("${r.ours.map(::name).joinToString(" / ").ifBlank { "—" }} – ${r.theirs.joinToString(" / ").ifBlank { "—" }}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
-                    Text(r.score.ifBlank { when (r.won) { true -> s.tmWon; false -> s.tmLost; null -> "" } }, color = when (r.won) { true -> TsmColors.Ok; false -> TsmColors.Danger; null -> TsmColors.TextDim }, fontSize = 13.sp)
+                    Text(r.score.ifBlank { when (r.won) { true -> s.tmWon; false -> s.tmLost; null -> "" } } + if (r.walkover) " " + s.ctWalkover else "", color = when (r.won) { true -> TsmColors.Ok; false -> TsmColors.Danger; null -> TsmColors.TextDim }, fontSize = 13.sp)
                 }
             }
             if (f.rubbers.any { it.won != null }) GhostButton(s.tmSendResult, Icons.Filled.Campaign, { c.noticeResult(t, f) }, Modifier.fillMaxWidth())
@@ -62628,9 +63162,15 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                     onDone()
                     c.playTeamRubber(c.team(t.id) ?: t, (c.team(t.id) ?: t).fixtures.first { it.id == f.id }, index)
                 }, Modifier.fillMaxWidth())
-                OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40)); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
+                OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
-                Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it]) })
+                Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it], walkover = false) })
+                // Non giocata: vinta a tavolino col punteggio del regolamento.
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (us in listOf(true, false)) OutlinedButton(onClick = { r = r.copy(won = us, score = Teams.walkoverScore(us), walkover = true) }, modifier = Modifier.weight(1f)) {
+                        Text(if (us) s.tmWalkoverUs else s.tmWalkoverThem, fontSize = 12.sp, textAlign = TextAlign.Center, color = if (r.walkover && r.won == us) TsmColors.Ball else TsmColors.TextMain)
+                    }
+                }
             }
         },
         confirmButton = {
@@ -81974,6 +82514,56 @@ class ClubTournamentTest {
         // Senza obbligo di pagamento entra lo stesso.
         assertTrue(ClubTournaments.problems(t.copy(requirePaid = false), p, ClubBook(), 0).isEmpty())
     }
+
+    private fun eight(): ClubTournament {
+        val ids = (1..8).map { "e$it" }
+        return ClubTournament("t", "Sociale", entries = ids.map { CTEntry(it, listOf(it), listOf(it)) }, matches = ClubTournaments.knockout(ids, Random(1), 0), drawnAt = 1)
+    }
+
+    @Test
+    fun doppioWoFaPassareLAvversarioDelTurnoDopo() {
+        var t = eight()
+        val r1 = t.matches.filter { it.round == 1 }.sortedBy { it.slot }
+        t = ClubTournaments.setResult(t, r1[0].id, null, "", noShow = true)
+        val semi = { t.matches.single { it.round == 2 && it.slot == 0 } }
+        assertTrue(t.matches.single { it.id == r1[0].id }.played)
+        assertNull("aspetta l'altra partita", semi().winner)
+        t = ClubTournaments.setResult(t, r1[1].id, r1[1].a, "6-2 6-2")
+        assertEquals(r1[1].a, semi().winner)
+        assertTrue(semi().walkover && semi().autoAdvance)
+        // Corretto il doppio w.o.: la semifinale torna da giocare.
+        t = ClubTournaments.setResult(t, r1[0].id, r1[0].a, "6-0 6-0")
+        assertNull(semi().winner)
+        assertFalse(semi().walkover)
+        assertEquals(r1[0].a, semi().a)
+    }
+
+    @Test
+    fun dueDoppiWoNonFannoPassareNessuno() {
+        var t = eight()
+        val r1 = t.matches.filter { it.round == 1 }.sortedBy { it.slot }
+        t = ClubTournaments.setResult(t, r1[0].id, null, "", noShow = true)
+        t = ClubTournaments.setResult(t, r1[1].id, null, "", noShow = true)
+        val semi = t.matches.single { it.round == 2 && it.slot == 0 }
+        assertTrue(semi.noShow && semi.played)
+        assertNull(semi.winner)
+        t = ClubTournaments.setResult(t, r1[2].id, r1[2].b, "6-1 6-1")
+        t = ClubTournaments.setResult(t, r1[3].id, r1[3].a, "6-1 6-1")
+        val s2 = t.matches.single { it.round == 2 && it.slot == 1 }
+        t = ClubTournaments.setResult(t, s2.id, s2.a, "6-3 6-3")
+        assertEquals("in finale passa da solo", s2.a, t.champion)
+    }
+
+    @Test
+    fun nelGironeIlWoContaSeiZeroEIlRitiroCompletaISet() {
+        val m = CTMatch("m", 0, 0, group = 0, a = "x", b = "y", winner = "y", walkover = true)
+        assertEquals(listOf(0 to 6, 0 to 6), ClubTournaments.countedSets(m))
+        val rit = m.copy(winner = "x", walkover = false, retired = true, score = "6-3 2-1")
+        assertEquals(listOf(6 to 3, 6 to 1), ClubTournaments.countedSets(rit))
+        val dq = m.copy(winner = "y", walkover = false, disqualified = true, score = "6-3 5-5")
+        assertEquals(listOf(6 to 3, 5 to 7, 0 to 6), ClubTournaments.countedSets(dq))
+        assertEquals("partita normale com'è", listOf(6 to 4), ClubTournaments.countedSets(m.copy(walkover = false, score = "6-4")))
+    }
 }
 TSM_EOF
 
@@ -84181,6 +84771,17 @@ class TeamsTest {
         assertTrue(CourtPlans.blockedBy(plan, "Campo 2", at(2027, 4, 11, 14), at(2027, 4, 11, 15), BookingKind.PLAY).isEmpty())
         assertTrue(CourtPlans.blockedBy(plan, "Campo 3", at(2027, 4, 11, 10), at(2027, 4, 11, 11), BookingKind.PLAY).isEmpty())
     }
+
+    @Test
+    fun woColPunteggioDelRegolamento() {
+        val f = Fixture("f", "TC Rivale", 0, rubbers = listOf(Rubber(), Rubber()))
+        val won = Teams.setRubber(f, 0, "", true, walkover = true).rubbers[0]
+        assertEquals("6-0 6-0", won.score)
+        assertTrue(won.walkover)
+        val lost = Teams.setRubber(f, 1, "qualcosa", false, walkover = true).rubbers[1]
+        assertEquals("0-6 0-6", lost.score)
+        assertFalse("senza vincitore non è un w.o.", Teams.setRubber(f, 0, "", null, walkover = true).rubbers[0].walkover)
+    }
 }
 TSM_EOF
 
@@ -85655,6 +86256,43 @@ class ScoreEngineTest {
         assertEquals(0 to 0, set.g1 to set.g2)
         assertTrue(set.partial)
     }
+
+    @Test fun squalificaChiudeComeIlRitiro() {
+        val s = play(ScoreEngine.initial(RulesConfig()), P1)
+        val after = ScoreEngine.apply(s, MatchEvent.Retired(P1, disqualified = true)).state
+        assertEquals(P2, after.winner)
+        assertTrue(after.disqualified)
+        assertFalse(ScoreEngine.apply(s, MatchEvent.Retired(P1)).state.disqualified)
+    }
+
+    @Test fun lePauseNonToccanoIlPunteggio() {
+        val s = play(ScoreEngine.initial(RulesConfig()), P1, P2)
+        assertEquals(s, ScoreEngine.apply(s, MatchEvent.Break(P1, BreakKind.MEDICAL)).state)
+    }
+
+    @Test fun correggereChiServeTieneIlPunteggio() {
+        var s = ScoreEngine.initial(RulesConfig(firstServer = P1))
+        s = game(s, P1)
+        s = play(s, P1, P1)
+        assertEquals(P2, s.server)
+        val fixed = ScoreEngine.apply(s, MatchEvent.ServerFix(P1)).state
+        assertEquals(P1, fixed.server)
+        assertEquals(s.g1 to s.pt1, fixed.g1 to fixed.pt1)
+        assertEquals("poi si alterna da qui", P2, game(fixed, P1).server)
+    }
+
+    @Test fun nelDoppioSiCorreggeAncheIlGiocatore() {
+        val s = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = P1, firstServerP1 = 0))
+        val fixed = ScoreEngine.apply(s, MatchEvent.ServerFix(P1, 1)).state
+        assertEquals(P1 to 1, fixed.server to fixed.serverPlayer)
+        val two = game(game(fixed, P1), P2)
+        assertEquals("al prossimo turno della squadra tocca al compagno", P1 to 0, two.server to two.serverPlayer)
+    }
+
+    @Test fun correggereILati() {
+        val s = ScoreEngine.initial(RulesConfig())
+        assertEquals(!s.p1Left, ScoreEngine.apply(s, MatchEvent.EndsFix()).state.p1Left)
+    }
 }
 TSM_EOF
 
@@ -86399,7 +87037,8 @@ class StringsTest {
             // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
             // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", e con la sagoma "Distance", "Direction", "Padel", uguali in francese.
             // Coi ruoli anche "Club" (il ruolo del circolo), uguale in francese.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 54)
+            // Con l'arbitro i cronometri Medical Timeout, Toilet Break e Warm-up (in inglese come Shot Clock) e "Disqualification", uguale in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 58)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }

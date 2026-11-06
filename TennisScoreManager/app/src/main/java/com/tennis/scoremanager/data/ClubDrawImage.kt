@@ -79,7 +79,7 @@ object ClubDrawImage {
                         val label = e?.let(name) ?: if (m.bye) s.ctBye else "—"
                         c.drawText(fit(label, p(28f, if (win) ball else main, win), BOX_W - 30f), x + 16f, by + 40f + k * 36f, p(28f, if (win) ball else main, win))
                     }
-                    val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                    val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }, s.ctDisqualified.takeIf { m.disqualified }, s.ctNoShow.takeIf { m.noShow }).joinToString(" ")
                     if (extra.isNotBlank()) c.drawText(fit(extra, p(22f, dim), BOX_W - 30f), x + 16f, by + BOX_H - 10f, p(22f, dim))
                 }
             }

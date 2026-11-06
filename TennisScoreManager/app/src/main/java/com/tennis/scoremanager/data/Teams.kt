@@ -22,6 +22,8 @@ data class Rubber(
     val won: Boolean? = null,
     /** La partita segnata col segnapunti (MatchRecord.id). */
     val record: String? = null,
+    /** Non giocata, vinta a tavolino: il punteggio è quello del regolamento (6-0 6-0). */
+    val walkover: Boolean = false,
 )
 
 /**
@@ -114,10 +116,14 @@ object Teams {
     fun noAnswer(t: Team, f: Fixture): List<String> = t.roster.filter { it !in f.availability }
 
     /** Il risultato di una partita, dal punteggio se non lo si dice (dal nostro lato). */
-    fun setRubber(f: Fixture, index: Int, score: String, won: Boolean?, record: String? = null): Fixture {
+    fun setRubber(f: Fixture, index: Int, score: String, won: Boolean?, record: String? = null, walkover: Boolean = false): Fixture {
         val w = won ?: ClubTournaments.winnerFromScore(score)?.let { it == "a" }
-        return f.copy(rubbers = f.rubbers.mapIndexed { i, r -> if (i == index) r.copy(score = score.trim(), won = w, record = record ?: r.record) else r })
+        val sc = if (walkover && w != null) walkoverScore(w) else score.trim()
+        return f.copy(rubbers = f.rubbers.mapIndexed { i, r -> if (i == index) r.copy(score = sc, won = w, record = record ?: r.record, walkover = walkover && w != null) else r })
     }
+
+    /** Il punteggio di una partita vinta a tavolino, dal nostro lato: 6-0 6-0 o 0-6 0-6. */
+    fun walkoverScore(won: Boolean): String = if (won) "6-0 6-0" else "0-6 0-6"
 
     /** I periodi non prenotabili degli incontri in casa con dei campi tenuti. */
     fun blocks(t: Team): List<CourtBlock> = t.fixtures.filter { it.home && it.courts.isNotEmpty() }.map { f ->

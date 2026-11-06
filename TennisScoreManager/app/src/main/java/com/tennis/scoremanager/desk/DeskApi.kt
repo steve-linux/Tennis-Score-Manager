@@ -242,7 +242,7 @@ interface DeskData {
 )
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
-@Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?)
+@Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?, val walkover: Boolean = false)
 @Serializable data class DeskFixture(
     val id: String, val opponent: String, val date: String, val startMin: Int, val home: Boolean, val place: String, val meeting: String,
     val courts: List<String>, val hours: Int, val note: String, val availability: Map<String, Availability>, val callUp: List<String>,
@@ -263,7 +263,7 @@ interface DeskData {
     val courts: List<String> = emptyList(), val hours: Int = 6, val note: String = "",
 )
 @Serializable data class DeskAnswerIn(val player: String, val answer: Availability? = null)
-@Serializable data class DeskRubberIn(val index: Int, val ours: List<String> = emptyList(), val theirs: List<String> = emptyList(), val score: String = "", val won: Boolean? = null)
+@Serializable data class DeskRubberIn(val index: Int, val ours: List<String> = emptyList(), val theirs: List<String> = emptyList(), val score: String = "", val won: Boolean? = null, val walkover: Boolean = false)
 @Serializable data class DeskNoticeIn(val kind: String)
 @Serializable data class DeskCourtInfo(
     val name: String, val surface: Surface? = null, val covered: Boolean = false, val lights: Boolean = true, val heating: Boolean = false,
@@ -323,6 +323,7 @@ interface DeskData {
 @Serializable data class DeskCupMatch(
     val id: String, val round: Int, val slot: Int, val group: Int?, val a: String?, val b: String?, val winner: String?, val score: String,
     val walkover: Boolean, val retired: Boolean, val bye: Boolean, val court: String, val date: String?, val startMin: Int?,
+    val disqualified: Boolean = false, val noShow: Boolean = false,
 )
 @Serializable data class DeskStanding(val entry: String, val played: Int, val won: Int, val setsWon: Int, val setsLost: Int, val gamesWon: Int, val gamesLost: Int)
 @Serializable data class DeskCup(
@@ -341,7 +342,7 @@ interface DeskData {
 @Serializable data class DeskSwapIn(val a: DeskSeatIn, val b: DeskSeatIn)
 @Serializable data class DeskReplaceIn(val seat: DeskSeatIn, val entry: String)
 /** Il risultato: [winner] è l'iscritto (CTEntry.id); se manca, si ricava dal punteggio. Tutto vuoto = cancella. */
-@Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false)
+@Serializable data class DeskResultIn(val winner: String? = null, val score: String = "", val walkover: Boolean = false, val retired: Boolean = false, val disqualified: Boolean = false, val noShow: Boolean = false)
 /** Dove e quando; [date] null = da programmare. Con [force] la si mette anche se il campo è occupato. */
 @Serializable data class DeskScheduleIn(val court: String = "", val date: String? = null, val startMin: Int? = null, val force: Boolean = false)
 
@@ -953,7 +954,7 @@ class DeskApi(
                 }.filterValues { it.isNotEmpty() }
                 DeskFixture(
                     f.id, f.opponent, day(f.at)!!, ((f.at - start) / 60_000L).toInt(), f.home, f.place, f.meeting, f.courts, f.hours, f.note, f.availability, f.callUp,
-                    f.rubbers.map { DeskRubber(it.doubles, it.ours, it.theirs, it.score, it.won) }, w, l, Teams.decided(f), Teams.outcome(f), problems,
+                    f.rubbers.map { DeskRubber(it.doubles, it.ours, it.theirs, it.score, it.won, it.walkover) }, w, l, Teams.decided(f), Teams.outcome(f), problems,
                 )
             },
         )
@@ -1038,7 +1039,7 @@ class DeskApi(
             })
             val score = text(i.score, 60)
             withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
-                else Teams.setRubber(withPlayers, i.index, score, i.won))
+                else Teams.setRubber(withPlayers, i.index, score, i.won, walkover = i.walkover))
         }
         m == "POST" && rest == listOf("notice") -> {
             val kind = read(DeskNoticeIn.serializer(), r).kind
@@ -1178,7 +1179,7 @@ class DeskApi(
     private fun tournaments(): Resp = ok(ListSerializer(DeskTournament.serializer()), data.tournaments().sortedByDescending { it.start ?: it.createdAt }.map { t ->
         val real = t.matches.filter { !it.bye }
         DeskTournament(
-            t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.winner != null },
+            t.id, t.name, t.category, t.doubles, day(t.start), day(t.end), t.entries.map { it.names.joinToString(" / ") }, real.size, real.count { it.played },
             t.kind, t.format, t.drawn, t.champion?.let { c -> t.entries.firstOrNull { it.id == c }?.names?.joinToString(" / ") },
         )
     })
@@ -1186,7 +1187,7 @@ class DeskApi(
     private fun cup(id: String): ClubTournament = data.tournaments().firstOrNull { it.id == id } ?: throw Fail(404, "NOT_FOUND")
 
     /** Un risultato vero (non un bye): dopo, il sorteggio non si rifà più. */
-    private fun hasResults(t: ClubTournament) = t.matches.any { it.winner != null && !it.bye }
+    private fun hasResults(t: ClubTournament) = t.matches.any { it.played && !it.bye }
 
     private fun cupRoute(m: String, p: List<String>, r: Req): Resp {
         val t = cup(p[0])
@@ -1231,7 +1232,7 @@ class DeskApi(
             val start = x.at?.let { CourtPlans.dayStart(it) }
             DeskCupMatch(
                 x.id, x.round, x.slot, x.group, x.a, x.b, x.winner, x.score, x.walkover, x.retired, x.bye, x.court,
-                x.at?.let { at -> day(at) }, if (x.at != null && start != null) ((x.at - start) / 60_000L).toInt() else null,
+                x.at?.let { at -> day(at) }, if (x.at != null && start != null) ((x.at - start) / 60_000L).toInt() else null, x.disqualified, x.noShow,
             )
         }
         val standings = ClubTournaments.groupMembers(t).indices.map { g ->
@@ -1341,10 +1342,12 @@ class DeskApi(
         val m = match(t, id)
         if (m.a == null || m.b == null) throw Fail(409, "NOT_READY")
         val score = text(i.score, 60)
-        if (i.winner == null && score.isEmpty() && !i.walkover && !i.retired) return save(ClubTournaments.setResult(t, id, null, ""))
+        // Doppio w.o.: nessun vincitore, non passa nessuno.
+        if (i.noShow) return save(ClubTournaments.setResult(t, id, null, "", noShow = true))
+        if (i.winner == null && score.isEmpty() && !i.walkover && !i.retired && !i.disqualified) return save(ClubTournaments.setResult(t, id, null, ""))
         val w = i.winner ?: when (ClubTournaments.winnerFromScore(score)) { "a" -> m.a; "b" -> m.b; else -> null }
         if (w == null || (w != m.a && w != m.b)) throw Fail(400, "NO_WINNER")
-        return save(ClubTournaments.setResult(t, id, w, score, i.walkover, i.retired))
+        return save(ClubTournaments.setResult(t, id, w, score, i.walkover, i.retired, disqualified = i.disqualified))
     }
 
     private fun schedule(t: ClubTournament, id: String, i: DeskScheduleIn): Resp {

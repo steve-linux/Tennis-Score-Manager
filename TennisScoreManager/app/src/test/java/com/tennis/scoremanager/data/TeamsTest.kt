@@ -70,4 +70,15 @@ class TeamsTest {
         assertTrue(CourtPlans.blockedBy(plan, "Campo 2", at(2027, 4, 11, 14), at(2027, 4, 11, 15), BookingKind.PLAY).isEmpty())
         assertTrue(CourtPlans.blockedBy(plan, "Campo 3", at(2027, 4, 11, 10), at(2027, 4, 11, 11), BookingKind.PLAY).isEmpty())
     }
+
+    @Test
+    fun woColPunteggioDelRegolamento() {
+        val f = Fixture("f", "TC Rivale", 0, rubbers = listOf(Rubber(), Rubber()))
+        val won = Teams.setRubber(f, 0, "", true, walkover = true).rubbers[0]
+        assertEquals("6-0 6-0", won.score)
+        assertTrue(won.walkover)
+        val lost = Teams.setRubber(f, 1, "qualcosa", false, walkover = true).rubbers[1]
+        assertEquals("0-6 0-6", lost.score)
+        assertFalse("senza vincitore non è un w.o.", Teams.setRubber(f, 0, "", null, walkover = true).rubbers[0].walkover)
+    }
 }

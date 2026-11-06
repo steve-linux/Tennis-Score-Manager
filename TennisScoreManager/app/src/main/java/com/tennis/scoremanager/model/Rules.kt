@@ -122,16 +122,41 @@ sealed class MatchEvent {
     @SerialName("serveOrder")
     data class ServeOrder(val setNumber: Int, val firstP1: Int, val firstP2: Int) : MatchEvent()
 
-    /** [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. */
+    /**
+     * [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. Con [disqualified] è la
+     * squalifica decisa dall'arbitro (dopo i game di penalità o per un fatto grave): finisce allo stesso modo.
+     */
     @Serializable
     @SerialName("retired")
-    data class Retired(val side: Side, val at: Long = 0L) : MatchEvent()
+    data class Retired(val side: Side, val at: Long = 0L, val disqualified: Boolean = false) : MatchEvent()
 
     /** Un richiamo dell'arbitro a [side]: cosa comporta lo decide il numero di richiami dello stesso tipo ([PenaltyKind]). */
     @Serializable
     @SerialName("penalty")
     data class Penalty(val side: Side, val kind: PenaltyKind, val at: Long = 0L) : MatchEvent()
+
+    /** Una pausa chiesta da [side] (medical timeout o bagno): non cambia il punteggio, si conta nel riepilogo. */
+    @Serializable
+    @SerialName("break")
+    data class Break(val side: Side, val kind: BreakKind, val at: Long = 0L) : MatchEvent()
+
+    /**
+     * Correzione dell'arbitro: da adesso serve [side] (nel doppio il giocatore [player]) senza toccare il punteggio, come
+     * dice il regolamento quando ha servito chi non doveva: i punti giocati restano.
+     */
+    @Serializable
+    @SerialName("serverFix")
+    data class ServerFix(val side: Side, val player: Int = 0, val at: Long = 0L) : MatchEvent()
+
+    /** Correzione dell'arbitro: i giocatori erano dal lato sbagliato del campo; il punteggio resta. */
+    @Serializable
+    @SerialName("endsFix")
+    data class EndsFix(val at: Long = 0L) : MatchEvent()
 }
+
+/** Le pause con il loro tempo: medical timeout 3 minuti, bagno o cambio d'abiti fino a 5. */
+@Serializable
+enum class BreakKind(val seconds: Int) { MEDICAL(180), TOILET(300) }
 
 /** I due tipi di richiamo, con le scale del regolamento: condotta e tempo (i 25 secondi tra un punto e l'altro). */
 @Serializable

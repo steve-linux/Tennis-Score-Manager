@@ -340,7 +340,7 @@ private fun MatchBox(c: MatchController, t: ClubTournament, m: CTMatch, onOpen: 
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
         }
-        val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+        val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }, s.ctDisqualified.takeIf { m.disqualified }, s.ctNoShow.takeIf { m.noShow }).joinToString(" ")
         if (extra.isNotBlank()) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 }
@@ -413,7 +413,7 @@ private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -
                     val when_ = listOfNotNull(m.at?.let { shortDate(it, lang) + " " + com.tennis.scoremanager.data.Reports.time(it, lang) }, m.court.ifBlank { null }).joinToString(" · ")
                     if (when_.isNotBlank()) Text(when_, color = TsmColors.TextDim, fontSize = 12.sp)
                 }
-                if (m.played) Text(m.score.ifBlank { if (m.walkover) s.ctWalkover else "✓" }, color = TsmColors.Ball, fontSize = 13.sp)
+                if (m.played) Text(m.score.ifBlank { if (m.noShow) s.ctNoShow else if (m.walkover) s.ctWalkover else "✓" }, color = TsmColors.Ball, fontSize = 13.sp)
             }
         }
     }
@@ -431,6 +431,8 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
     var score by remember { mutableStateOf(m.score) }
     var walkover by remember { mutableStateOf(m.walkover) }
     var retired by remember { mutableStateOf(m.retired) }
+    var disqualified by remember { mutableStateOf(m.disqualified) }
+    var noShow by remember { mutableStateOf(m.noShow) }
     var court by remember { mutableStateOf(m.court) }
     var at by remember { mutableStateOf(m.at) }
     val courts = c.storage.clubCourts
@@ -449,8 +451,11 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
                     // Dal punteggio si capisce chi ha vinto.
                     ClubTournaments.winnerFromScore(it)?.let { w -> winner = if (w == "a") m.a else m.b }
                 }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ctScore) })
-                SwitchRow(Icons.Filled.EmojiEvents, s.ctWalkoverLong, null, walkover) { walkover = it; if (it) retired = false }
-                SwitchRow(Icons.Filled.EmojiEvents, s.ctRetiredLong, null, retired) { retired = it; if (it) walkover = false }
+                // Al più uno: w.o., ritiro, squalifica o doppio w.o. (che non dà un vincitore).
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctWalkoverLong, null, walkover) { walkover = it; if (it) { retired = false; disqualified = false; noShow = false } }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctRetiredLong, null, retired) { retired = it; if (it) { walkover = false; disqualified = false; noShow = false } }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctDisqualifiedLong, null, disqualified) { disqualified = it; if (it) { walkover = false; retired = false; noShow = false } }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctNoShowLong, null, noShow) { noShow = it; if (it) { walkover = false; retired = false; disqualified = false; winner = null; score = "" } }
                 Text(s.ctWhere, color = TsmColors.TextDim, fontSize = 13.sp)
                 if (courts.isNotEmpty()) Segmented(courts.map { SegOption(it) }, courts.indexOf(court), { court = courts[it] }, columns = minOf(3, courts.size))
                 else OutlinedTextField(court, { court = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ctCourt) })
@@ -471,7 +476,8 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
             TextButton(onClick = {
                 var cur = c.clubTournament(t.id) ?: t
                 if (court != m.court || at != m.at) { c.setClubSchedule(cur, m.id, court, at); cur = c.clubTournament(t.id) ?: cur }
-                if (winner != m.winner || score != m.score || walkover != m.walkover || retired != m.retired) c.setClubResult(cur, m.id, winner, score, walkover, retired)
+                if (winner != m.winner || score != m.score || walkover != m.walkover || retired != m.retired || disqualified != m.disqualified || noShow != m.noShow)
+                    c.setClubResult(cur, m.id, winner, score, walkover, retired, disqualified, noShow)
                 onDone()
             }) { Text(s.ok) }
         },

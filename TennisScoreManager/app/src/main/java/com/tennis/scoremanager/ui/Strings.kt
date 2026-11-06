@@ -632,6 +632,9 @@ interface Strings {
     val matchTime: String
     val shotClock: String get() = "Shot Clock"
     val changeoverTime: String get() = "Changeover Time"
+    val medicalTime: String get() = "Medical Timeout"
+    val toiletTime: String get() = "Toilet Break"
+    val warmupTime: String get() = "Warm-up"
     val setBreakTime: String get() = "Set Break Time"
     val tiebreakTime: String get() = "Tie-Break Time"
     val setsHeader: String
@@ -682,6 +685,37 @@ interface Strings {
     val undoShort: String
     /** "Nuova partita" corto, per il tasto in fondo alla partita. */
     val newMatchShort: String
+    val disqualifyButton: String
+    val disqualifyTitle: String
+    val disqualifyHint: String
+    val disqualifyUndo: String
+    val disqualifyUndone: String
+    val ctDisqualified: String
+    val ctDisqualifiedLong: String
+    val breakMedical: String
+    val breakToilet: String
+    val breakWho: String
+    val breakUndone: String
+    val breakList: String
+    val warmupButton: String
+    val ctNoShow: String
+    val ctNoShowLong: String
+    val tmWalkoverUs: String
+    val tmWalkoverThem: String
+    val tvMedical: String
+    val tvToilet: String
+    val tvWarmup: String
+    val disqualifyCall: (String) -> String
+    val disqualifyBy: (String) -> String
+    val breakMedicalCall: (String) -> String
+    val breakToiletCall: (String) -> String
+    val breakCount: (Int, Int) -> String
+    val serverFixButton: String
+    val serverFixWho: String
+    val endsFixButton: String
+    val endsFixed: String
+    val fixUndone: String
+    val serverFixed: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -2874,6 +2908,37 @@ object ItStrings : Strings {
     override val retireUndone = "Ritiro annullato"
     override val undoShort = "Annulla"
     override val newMatchShort = "Nuova"
+    override val disqualifyButton = "Squalifica"
+    override val disqualifyTitle = "Chi viene squalificato?"
+    override val disqualifyHint = "Dopo i game di penalità, o per un fatto grave, l'arbitro può squalificare: la partita finisce col punteggio attuale e vince l'avversario."
+    override val disqualifyUndo = "Annulla la squalifica"
+    override val disqualifyUndone = "Squalifica annullata"
+    override val ctDisqualified = "squal."
+    override val ctDisqualifiedLong = "Vinta per squalifica"
+    override val breakMedical = "Medical timeout (3 minuti)"
+    override val breakToilet = "Bagno o cambio d'abiti (5 minuti)"
+    override val breakWho = "Chi chiede la pausa?"
+    override val breakUndone = "Pausa annullata"
+    override val breakList = "Pause"
+    override val warmupButton = "Riscaldamento (5 minuti)"
+    override val ctNoShow = "doppio w.o."
+    override val ctNoShowLong = "Doppio w.o.: non si presenta nessuno dei due"
+    override val tmWalkoverUs = "W.o. a nostro favore"
+    override val tmWalkoverThem = "W.o. a loro favore"
+    override val tvMedical = "MEDICAL TIMEOUT"
+    override val tvToilet = "PAUSA"
+    override val tvWarmup = "RISCALDAMENTO"
+    override val disqualifyCall: (String) -> String = { "Squalifica: $it" }
+    override val disqualifyBy: (String) -> String = { "Squalifica di $it" }
+    override val breakMedicalCall: (String) -> String = { "Medical timeout per $it" }
+    override val breakToiletCall: (String) -> String = { "Pausa per $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "medical $m · bagno $t" }
+    override val serverFixButton = "Correggi chi serve"
+    override val serverFixWho = "Chi deve servire adesso? Il punteggio resta com'è: i punti giocati valgono."
+    override val endsFixButton = "Correggi i lati del campo"
+    override val endsFixed = "Lati del campo scambiati"
+    override val fixUndone = "Correzione annullata"
+    override val serverFixed: (String) -> String = { "Ora serve $it" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5029,6 +5094,37 @@ object EnStrings : Strings {
     override val retireUndone = "Retirement undone"
     override val undoShort = "Undo"
     override val newMatchShort = "New"
+    override val disqualifyButton = "Disqualification"
+    override val disqualifyTitle = "Who is disqualified?"
+    override val disqualifyHint = "After the penalty games, or for a serious offence, the umpire can disqualify: the match ends at the current score and the opponent wins."
+    override val disqualifyUndo = "Undo disqualification"
+    override val disqualifyUndone = "Disqualification undone"
+    override val ctDisqualified = "def."
+    override val ctDisqualifiedLong = "Won by disqualification"
+    override val breakMedical = "Medical timeout (3 minutes)"
+    override val breakToilet = "Toilet or change of attire (5 minutes)"
+    override val breakWho = "Who asks for the break?"
+    override val breakUndone = "Break undone"
+    override val breakList = "Breaks"
+    override val warmupButton = "Warm-up (5 minutes)"
+    override val ctNoShow = "double w.o."
+    override val ctNoShowLong = "Double w.o.: neither one shows up"
+    override val tmWalkoverUs = "W.o. in our favour"
+    override val tmWalkoverThem = "W.o. in their favour"
+    override val tvMedical = "MEDICAL TIMEOUT"
+    override val tvToilet = "BREAK"
+    override val tvWarmup = "WARM-UP"
+    override val disqualifyCall: (String) -> String = { "Disqualification: $it" }
+    override val disqualifyBy: (String) -> String = { "Disqualification: $it" }
+    override val breakMedicalCall: (String) -> String = { "Medical timeout for $it" }
+    override val breakToiletCall: (String) -> String = { "Break for $it" }
+    override val breakCount: (Int, Int) -> String = { m, t -> "medical $m · toilet $t" }
+    override val serverFixButton = "Fix who serves"
+    override val serverFixWho = "Who should serve now? The score stays as it is: the points played count."
+    override val endsFixButton = "Fix the ends"
+    override val endsFixed = "Ends swapped"
+    override val fixUndone = "Correction undone"
+    override val serverFixed: (String) -> String = { "Now serving: $it" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

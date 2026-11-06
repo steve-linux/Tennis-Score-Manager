@@ -101,6 +101,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.StrokeStats
+import com.tennis.scoremanager.model.BreakKind
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
@@ -143,7 +144,10 @@ fun MatchScreen(c: MatchController) {
     val suspended = lm.record.suspended
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
-    var confirmRetire by remember { mutableStateOf(false) }
+    /** Ritiro (false) o squalifica (true) da confermare scegliendo il giocatore. */
+    var confirmRetire by remember { mutableStateOf<Boolean?>(null) }
+    var breakKind by remember { mutableStateOf<BreakKind?>(null) }
+    var fixServe by remember { mutableStateOf(false) }
     var umpireMenu by remember { mutableStateOf(false) }
     var penaltyKind by remember { mutableStateOf<PenaltyKind?>(null) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
@@ -224,15 +228,24 @@ fun MatchScreen(c: MatchController) {
             icon = { Icon(Icons.Filled.Gavel, null, tint = TsmColors.Orange) },
             title = { Text(s.umpireButton, fontWeight = FontWeight.Black) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    @Composable fun item(text: String, onClick: () -> Unit) =
+                        OutlinedButton(onClick = { umpireMenu = false; onClick() }, modifier = Modifier.fillMaxWidth()) { Text(text, color = TsmColors.TextMain, textAlign = TextAlign.Center) }
+                    // Prima del primo punto c'è anche il riscaldamento.
+                    if (c.canWarmUp()) item(s.warmupButton) { c.warmUp() }
                     Text(s.penaltyHint, fontSize = 13.sp, color = TsmColors.TextDim)
-                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.CODE }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyCode, color = TsmColors.TextMain) }
-                    OutlinedButton(onClick = { umpireMenu = false; penaltyKind = PenaltyKind.TIME }, modifier = Modifier.fillMaxWidth()) { Text(s.penaltyTime, color = TsmColors.TextMain) }
-                    OutlinedButton(onClick = { umpireMenu = false; confirmRetire = true }, modifier = Modifier.fillMaxWidth()) {
+                    item(s.penaltyCode) { penaltyKind = PenaltyKind.CODE }
+                    item(s.penaltyTime) { penaltyKind = PenaltyKind.TIME }
+                    item(s.breakMedical) { breakKind = BreakKind.MEDICAL }
+                    item(s.breakToilet) { breakKind = BreakKind.TOILET }
+                    item(s.serverFixButton) { fixServe = true }
+                    item(s.endsFixButton) { c.fixServe(ends = true) }
+                    OutlinedButton(onClick = { umpireMenu = false; confirmRetire = false }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange)
                         Spacer(Modifier.width(6.dp))
                         Text(s.retireButton, color = TsmColors.TextMain)
                     }
+                    item(s.disqualifyButton) { confirmRetire = true }
                 }
             },
             confirmButton = {},
@@ -270,21 +283,60 @@ fun MatchScreen(c: MatchController) {
         )
     }
 
-    if (confirmRetire) {
+    confirmRetire?.let { dq ->
         AlertDialog(
-            onDismissRequest = { confirmRetire = false },
-            icon = { Icon(Icons.Filled.Flag, null, tint = TsmColors.Orange) },
-            title = { Text(s.retireTitle, fontWeight = FontWeight.Black) },
+            onDismissRequest = { confirmRetire = null },
+            icon = { Icon(if (dq) Icons.Filled.Gavel else Icons.Filled.Flag, null, tint = TsmColors.Orange) },
+            title = { Text(if (dq) s.disqualifyTitle else s.retireTitle, fontWeight = FontWeight.Black) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(s.retireHint)
-                    for (side in Side.entries) OutlinedButton(onClick = { confirmRetire = false; c.retire(side) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(if (dq) s.disqualifyHint else s.retireHint)
+                    for (side in Side.entries) OutlinedButton(onClick = { confirmRetire = null; c.retire(side, dq) }, modifier = Modifier.fillMaxWidth()) {
                         Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
                     }
                 }
             },
             confirmButton = {},
-            dismissButton = { TextButton(onClick = { confirmRetire = false }) { Text(s.back) } },
+            dismissButton = { TextButton(onClick = { confirmRetire = null }) { Text(s.back) } },
+        )
+    }
+
+    if (fixServe) {
+        AlertDialog(
+            onDismissRequest = { fixServe = false },
+            title = { Text(s.serverFixButton, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.serverFixWho)
+                    // Nel doppio i quattro giocatori; chi serve adesso è già evidenziato.
+                    for (side in Side.entries) for ((i, name) in names.players(side).withIndex()) {
+                        val now = state.server == side && state.serverPlayer == i
+                        OutlinedButton(onClick = { fixServe = false; if (!now) c.fixServe(side, i) }, modifier = Modifier.fillMaxWidth()) {
+                            Text(name, color = TsmColors.player(side), fontWeight = if (now) FontWeight.Black else FontWeight.Bold)
+                            if (now) Text("  ✓", color = TsmColors.Ball)
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { fixServe = false }) { Text(s.back) } },
+        )
+    }
+
+    breakKind?.let { kind ->
+        AlertDialog(
+            onDismissRequest = { breakKind = null },
+            title = { Text(if (kind == BreakKind.MEDICAL) s.breakMedical else s.breakToilet, fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.breakWho)
+                    for (side in Side.entries) OutlinedButton(onClick = { breakKind = null; c.takeBreak(side, kind) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(names.side(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { breakKind = null }) { Text(s.back) } },
         )
     }
 
@@ -331,7 +383,7 @@ fun MatchScreen(c: MatchController) {
             text = {
                 RemoteKeysInDialog(c)
                 Text(
-                    (state.retired?.let { s.retireBy(names.side(it)) + "\n" } ?: "") + s.endDialogText(names.side(w), Reports.resultLine(state, w, s), state.rules.doubles),
+                    (state.retired?.let { (if (state.disqualified) s.disqualifyBy(names.side(it)) else s.retireBy(names.side(it))) + "\n" } ?: "") + s.endDialogText(names.side(w), Reports.resultLine(state, w, s), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             },
@@ -349,7 +401,7 @@ fun MatchScreen(c: MatchController) {
                 OutlinedButton(onClick = { if (armed) c.undo() }) {
                     Icon(Icons.AutoMirrored.Filled.Undo, null, tint = TsmColors.TextMain)
                     Spacer(Modifier.width(6.dp))
-                    Text(if (state.retired != null) s.retireUndo else s.undoLastPoint, color = TsmColors.TextMain)
+                    Text(if (state.retired != null) (if (state.disqualified) s.disqualifyUndo else s.retireUndo) else s.undoLastPoint, color = TsmColors.TextMain)
                 }
             },
         )
@@ -416,6 +468,9 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings, middle: @Compos
                 CountdownKind.CHANGEOVER -> s.changeoverTime
                 CountdownKind.SET_BREAK -> s.setBreakTime
                 CountdownKind.TIEBREAK_BREAK -> s.tiebreakTime
+                CountdownKind.MEDICAL -> s.medicalTime
+                CountdownKind.TOILET -> s.toiletTime
+                CountdownKind.WARMUP -> s.warmupTime
                 else -> s.shotClock
             }
             val red = cd != null && cd.seconds <= 5

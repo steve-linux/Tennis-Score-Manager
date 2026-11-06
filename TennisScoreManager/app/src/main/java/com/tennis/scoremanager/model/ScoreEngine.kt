@@ -33,6 +33,8 @@ data class MatchState(
     val pointsPlayed: Int = 0,
     /** Chi si è ritirato (null = partita finita sul campo o ancora in corso). */
     val retired: Side? = null,
+    /** Il ritiro è una squalifica. */
+    val disqualified: Boolean = false,
     /** I richiami fatti finora, per tipo: [Penalty] li conta per sapere cosa comporta il prossimo. */
     val codes1: Int = 0,
     val codes2: Int = 0,
@@ -127,8 +129,24 @@ object ScoreEngine {
     fun apply(state: MatchState, event: MatchEvent): Step = when (event) {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)
-        is MatchEvent.Retired -> Step(retire(state, event.side), null)
+        is MatchEvent.Retired -> Step(retire(state, event.side).let { if (it.retired == event.side && !state.isFinished) it.copy(disqualified = event.disqualified) else it }, null)
         is MatchEvent.Penalty -> penalty(state, event.side, event.kind)
+        is MatchEvent.Break -> Step(state, null)
+        is MatchEvent.ServerFix -> Step(fixServer(state, event.side, event.player), null)
+        is MatchEvent.EndsFix -> Step(if (state.isFinished) state else state.copy(p1Left = !state.p1Left), null)
+    }
+
+    /**
+     * Da adesso serve [side] (nel doppio [player]): si sposta chi ha iniziato il set (e l'ordine della squadra), così
+     * il turno di ora tocca a lui e i successivi seguono da qui.
+     */
+    private fun fixServer(s: MatchState, side: Side, player: Int): MatchState {
+        if (s.isFinished) return s
+        val turn = s.serviceTurn
+        val fixed = s.copy(setStartServer = if (turn % 2 == 0) side else side.other)
+        if (!s.rules.doubles) return fixed
+        val order = Math.floorMod(player.coerceIn(0, 1) - turn / 2, 2)
+        return if (side == Side.P1) fixed.copy(order1 = order) else fixed.copy(order2 = order)
     }
 
     /** Cosa comporterebbe adesso un richiamo [kind] a [side] (per mostrarlo prima di confermare). */

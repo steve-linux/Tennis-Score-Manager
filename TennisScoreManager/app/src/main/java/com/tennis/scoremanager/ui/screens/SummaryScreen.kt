@@ -166,12 +166,14 @@ fun SummaryScreen(c: MatchController) {
                 Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
                 Text(Reports.resultLine(state, w, s), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                state.retired?.let { Text(s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
+                state.retired?.let { Text(if (state.disqualified) s.disqualifyBy(names.side(it)) else s.retireBy(names.side(it)), color = TsmColors.Orange, fontSize = 14.sp) }
                 // I richiami dell'arbitro, se ce ne sono stati.
                 for (side in Side.entries) {
                     val code = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.CODE)
                     val time = state.penalties(side, com.tennis.scoremanager.model.PenaltyKind.TIME)
                     if (code + time > 0) Text("${s.penaltyList} · ${names.short(side)}: ${s.penaltyCount(code, time)}", color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+                    val breaks = rec.events.filterIsInstance<com.tennis.scoremanager.model.MatchEvent.Break>().filter { it.side == side }
+                    if (breaks.isNotEmpty()) Text("${s.breakList} · ${names.short(side)}: ${s.breakCount(breaks.count { it.kind == com.tennis.scoremanager.model.BreakKind.MEDICAL }, breaks.count { it.kind == com.tennis.scoremanager.model.BreakKind.TOILET })}", color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
                 }
             }
 

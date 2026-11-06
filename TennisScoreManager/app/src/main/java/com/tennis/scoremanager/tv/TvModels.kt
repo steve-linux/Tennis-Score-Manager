@@ -230,6 +230,9 @@ object TvSnapshots {
                     CountdownKind.CHANGEOVER -> s.tvChangeover
                     CountdownKind.SET_BREAK -> s.tvSetBreak
                     CountdownKind.TIEBREAK_BREAK -> s.tvTiebreakBreak
+                    CountdownKind.MEDICAL -> s.tvMedical
+                    CountdownKind.TOILET -> s.tvToilet
+                    CountdownKind.WARMUP -> s.tvWarmup
                 },
                 leftMs = i.countdownLeftMs.coerceAtLeast(0),
                 shot = k == CountdownKind.SHOT_CLOCK,

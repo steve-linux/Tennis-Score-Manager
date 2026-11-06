@@ -43,12 +43,18 @@ data class CTMatch(
     /** Vinta a tavolino (l'altro non si è presentato) o per ritiro durante la partita. */
     val walkover: Boolean = false,
     val retired: Boolean = false,
+    /** Vinta perché l'altro è stato squalificato dall'arbitro. */
+    val disqualified: Boolean = false,
+    /** Doppio w.o.: non si è presentato nessuno dei due, non passa nessuno. */
+    val noShow: Boolean = false,
+    /** Risultato messo dal tabellone (l'avversario veniva da un doppio w.o.): si toglie da solo se quello cambia. */
+    val autoAdvance: Boolean = false,
     val court: String = "",
     val at: Long? = null,
     /** La partita segnata col segnapunti (MatchRecord.id), se è stata giocata dal vivo. */
     val record: String? = null,
 ) {
-    val played: Boolean get() = winner != null
+    val played: Boolean get() = winner != null || noShow
     val bye: Boolean get() = round == 1 && (a == null) != (b == null)
 }
 
@@ -261,6 +267,33 @@ object ClubTournaments {
         return if (ga == gb) null else if (ga > gb) "a" else "b"
     }
 
+    /** Un set è finito (6-4, 7-5, 7-6, o il match tie-break a 10 con due di scarto). */
+    private fun complete(p: Pair<Int, Int>): Boolean {
+        val hi = maxOf(p.first, p.second); val lo = minOf(p.first, p.second)
+        return (hi == 6 && lo <= 4) || (hi == 7 && lo in 5..6) || (hi >= 10 && hi - lo >= 2) || (hi > 7 && hi - lo == 2)
+    }
+
+    /**
+     * I set che contano nella classifica del girone, dal lato di a. Col w.o. senza punteggio: 6-0 6-0 a chi vince.
+     * Col ritiro o la squalifica: il set interrotto e quelli che mancano (al meglio dei tre) vanno a chi vince.
+     */
+    fun countedSets(m: CTMatch): List<Pair<Int, Int>> {
+        val raw = sets(m.score)
+        val w = m.winner ?: return raw
+        val aWon = w == m.a
+        val won = if (aWon) 6 to 0 else 0 to 6
+        if (m.walkover && raw.isEmpty()) return listOf(won, won)
+        if (!m.retired && !m.disqualified) return raw
+        val out = raw.toMutableList()
+        out.lastOrNull()?.takeIf { !complete(it) }?.let { (x, y) ->
+            val lost = if (aWon) y else x
+            val need = if (lost <= 4) 6 else 7
+            out[out.lastIndex] = if (aWon) need to y else x to need
+        }
+        while (out.count { if (aWon) it.first > it.second else it.second > it.first } < 2) out += won
+        return out
+    }
+
     data class Standing(val entry: String, val played: Int, val won: Int, val setsWon: Int, val setsLost: Int, val gamesWon: Int, val gamesLost: Int)
 
     /** La classifica di un girone: vittorie, poi differenza set, poi differenza game, poi lo scontro diretto. */
@@ -273,7 +306,7 @@ object ClubTournaments {
                 val mine = when (e) { m.a -> true; m.b -> false; else -> continue }
                 played++
                 if (m.winner == e) won++
-                for ((x, y) in sets(m.score)) {
+                for ((x, y) in countedSets(m)) {
                     val (f, a) = if (mine) x to y else y to x
                     gw += f; gl += a
                     if (f > a) sw++ else if (a > f) sl++
@@ -332,8 +365,21 @@ object ClubTournaments {
                 val key = r + 1 to m.slot / 2
                 val next = byKey[key] ?: continue
                 var n = if (m.slot % 2 == 0) next.copy(a = m.winner) else next.copy(b = m.winner)
-                if (n.winner != null && n.winner != n.a && n.winner != n.b) n = n.copy(winner = null, score = "", walkover = false, retired = false, record = null)
+                if (n.winner != null && n.winner != n.a && n.winner != n.b) n = n.copy(winner = null, score = "", walkover = false, retired = false, disqualified = false, autoAdvance = false, record = null)
                 byKey[key] = n
+            }
+            // Doppio w.o. nel turno prima: l'avversario passa da solo (e se erano due, non passa nessuno).
+            for (n in byKey.values.filter { it.round == r + 1 }) {
+                val gone0 = byKey[r to n.slot * 2]?.noShow == true
+                val gone1 = byKey[r to n.slot * 2 + 1]?.noShow == true
+                val present = if (gone0) n.b else if (gone1) n.a else null
+                val x = when {
+                    gone0 && gone1 -> if (n.noShow || n.winner == null || n.autoAdvance) n.copy(winner = null, walkover = false, noShow = true, autoAdvance = true) else n
+                    present != null -> if (n.winner == null || n.autoAdvance) n.copy(winner = present, walkover = true, noShow = false, autoAdvance = true, score = "") else n
+                    n.autoAdvance -> n.copy(winner = null, walkover = false, noShow = false, autoAdvance = false)
+                    else -> n
+                }
+                byKey[r + 1 to n.slot] = x
             }
         }
         return matches.map { if (it.round == 0) it else byKey[it.round to it.slot] ?: it }
@@ -412,10 +458,17 @@ object ClubTournaments {
     }
 
     /** Il risultato di una partita (anche per correggerlo); il tabellone si aggiorna. */
-    fun setResult(t: ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean = false, retired: Boolean = false, record: String? = null): ClubTournament {
+    fun setResult(
+        t: ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean = false, retired: Boolean = false, record: String? = null,
+        disqualified: Boolean = false, noShow: Boolean = false,
+    ): ClubTournament {
         val ms = t.matches.map { m ->
             if (m.id != matchId) m
-            else m.copy(winner = winner?.takeIf { it == m.a || it == m.b }, score = score.trim(), walkover = walkover, retired = retired, record = record ?: m.record)
+            else if (noShow) m.copy(winner = null, score = "", walkover = false, retired = false, disqualified = false, noShow = true, autoAdvance = false, record = record ?: m.record)
+            else m.copy(
+                winner = winner?.takeIf { it == m.a || it == m.b }, score = score.trim(), walkover = walkover, retired = retired, disqualified = disqualified,
+                noShow = false, autoAdvance = false, record = record ?: m.record,
+            )
         }
         return t.copy(matches = propagate(ms))
     }

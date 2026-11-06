@@ -845,7 +845,7 @@ function winnerOf(score) {
   return ga === gb ? null : ga > gb ? 'a' : 'b';
 }
 
-const scoreText = (m) => [m.score, m.walkover ? T.ctWalkover : '', m.retired ? T.ctRetired : ''].filter(Boolean).join(' ');
+const scoreText = (m) => [m.score, m.walkover ? T.ctWalkover : '', m.retired ? T.ctRetired : '', m.disqualified ? T.ctDisqualified : '', m.noShow ? T.ctNoShow : ''].filter(Boolean).join(' ');
 const whenText = (m) => (m.date ? [shortDay(m.date), m.startMin != null ? hhmm(m.startMin) : '', m.court].filter(Boolean).join(' · ') : '');
 
 async function showCups() {
@@ -959,7 +959,7 @@ function cupEntries(t, body) {
 /** Una partita del tabellone: chi gioca, chi ha vinto, punteggio, e dove e quando. */
 function matchBox(t, m, who) {
   const pl = (x) => h('div.pl' + (m.winner && m.winner === x ? '.win' : ''), x ? who(x) : (m.round === 1 ? T.ctBye : '…'));
-  const meta = [scoreText(m), m.winner ? '' : whenText(m)].filter(Boolean).join(' · ');
+  const meta = [scoreText(m), m.winner || m.noShow ? '' : whenText(m)].filter(Boolean).join(' · ');
   const kids = [pl(m.a), pl(m.b), meta ? h('div.meta', meta) : null];
   return m.a && m.b ? h('button.match', { type: 'button', onclick: () => openMatch(t, m, who) }, kids) : h('div.match', kids);
 }
@@ -1005,7 +1005,7 @@ function cupDraw(t, body, who) {
   const ko = t.matches.filter((m) => m.round > 0);
   if (t.format === 'GROUPS') {
     const groups = t.matches.filter((m) => m.round === 0);
-    const done = groups.length > 0 && groups.every((m) => m.winner);
+    const done = groups.length > 0 && groups.every((m) => m.winner || m.noShow);
     out.push(h('div.cards', t.standings.map((st, g) => h('div.panel', h('div.pad',
       h('h2', T.ctGroup(groupLetter(g))),
       h('table', h('thead', h('tr', h('th', T.name), h('th.num', T.ctColWon), h('th.num', T.ctColSets), h('th.num', T.ctColGames))),
@@ -1031,7 +1031,7 @@ function cupMatches(t, body, who) {
   show.setAttribute('aria-label', T.status);
   show.addEventListener('change', () => { cupShow = show.value; cupMatches(t, body, who); });
   const real = t.matches.filter((m) => !m.bye && (m.a || m.b));
-  const rows = real.filter((m) => ({ todo: !m.winner, played: !!m.winner, all: true })[cupShow])
+  const rows = real.filter((m) => ({ todo: !m.winner && !m.noShow, played: !!m.winner || m.noShow, all: true })[cupShow])
     .sort((x, y) => (x.date ? 0 : 1) - (y.date ? 0 : 1) || (x.date || '').localeCompare(y.date || '') || (x.startMin ?? 0) - (y.startMin ?? 0) || x.round - y.round || x.slot - y.slot);
   put(body, 
     h('div.tools.noprint', show, h('span.dim', T.cupMatchHint)),
@@ -1054,16 +1054,25 @@ function openMatch(t, m, who) {
   score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) (w === 'a' ? wa : wb).checked = true; });
   const wo = h('input', { type: 'checkbox', checked: m.walkover });
   const rit = h('input', { type: 'checkbox', checked: m.retired });
+  const dq = h('input', { type: 'checkbox', checked: m.disqualified });
+  const none = h('input', { type: 'checkbox', checked: m.noShow });
+  // Al più uno: w.o., ritiro, squalifica o doppio w.o. (che non dà un vincitore).
+  const flags = [wo, rit, dq, none];
+  flags.forEach((x) => x.addEventListener('change', () => {
+    if (x.checked) flags.forEach((y) => { if (y !== x) y.checked = false; });
+    if (none.checked) { wa.checked = false; wb.checked = false; score.value = ''; }
+  }));
   const court = select([['', '—']].concat(t.courts.map((c) => [c, c])), m.court);
   const date = h('input', { type: 'date', value: m.date || '' });
   const time = h('input', { type: 'time', value: m.date && m.startMin != null ? hhmm(m.startMin) : '', step: 300 });
   const base = '/tournaments/' + encodeURIComponent(t.id) + '/matches/' + encodeURIComponent(m.id);
-  const clear = m.winner && h('button.danger.left', { type: 'button', onclick: async () => {
+  const clear = (m.winner || m.noShow) && h('button.danger.left', { type: 'button', onclick: async () => {
     try { await api('POST', base + '/result', {}); d.close(); toast(T.saved); await showCup(t.id); } catch (e) { toast(errText(e)); }
   } }, T.ctClearResult);
   const d = dialog(roundName(t, m) + ': ' + who(m.a) + ' – ' + who(m.b), h('div.form',
     h('h3', T.ctWinner), h('label.check.full', wa, who(m.a)), h('label.check.full', wb, who(m.b)),
     field(T.ctScore, score, 'full'), h('label.check', wo, T.ctWalkoverLong), h('label.check', rit, T.ctRetiredLong),
+    h('label.check', dq, T.ctDisqualifiedLong), h('label.check', none, T.ctNoShowLong),
     h('h3', T.ctWhere), field(T.date, date), field(T.ctTime, time), field(T.ctCourt, court),
     h('p.full.dim', T.cupWhereHint(t.matchMinutes))), async () => {
     const w = wa.checked ? m.a : wb.checked ? m.b : null;
@@ -1076,8 +1085,11 @@ function openMatch(t, m, who) {
         await api('POST', base + '/schedule', { ...sched, force: true });
       }
     }
-    const changed = w !== (m.winner || null) || score.value.trim() !== m.score || wo.checked !== m.walkover || rit.checked !== m.retired;
-    if (changed && (w || score.value.trim())) await api('POST', base + '/result', { winner: w, score: score.value, walkover: wo.checked, retired: rit.checked });
+    const changed = w !== (m.winner || null) || score.value.trim() !== m.score || wo.checked !== m.walkover || rit.checked !== m.retired
+      || dq.checked !== !!m.disqualified || none.checked !== !!m.noShow;
+    if (changed && (w || score.value.trim() || none.checked)) {
+      await api('POST', base + '/result', { winner: w, score: score.value, walkover: wo.checked, retired: rit.checked, disqualified: dq.checked, noShow: none.checked });
+    }
     toast(T.saved);
     await showCup(t.id);
   }, { left: clear });
@@ -1576,9 +1588,14 @@ function showFixture(t, f) {
     const theirs = [...Array(n)].map((_, k) => h('input', { value: ru.theirs[k] || '', placeholder: k ? T.tmTheirs2 : T.tmTheirs, maxlength: 80 }));
     const score = h('input', { value: ru.score, placeholder: '6-4 3-6 10-8', maxlength: 60, 'aria-label': T.tmScoreOurs });
     const won = select([['', '—'], ['true', T.tmWeWon], ['false', T.tmTheyWon]], ru.won === null ? '' : String(ru.won));
-    score.addEventListener('input', () => { const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
-    const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true' });
-    return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won),
+    // W.o.: non giocata, vinta a tavolino col punteggio del regolamento (6-0 6-0 dal lato di chi vince).
+    const wo = h('input', { type: 'checkbox', checked: ru.walkover, 'aria-label': T.ctWalkover });
+    const woScore = () => { if (!wo.checked) return; if (won.value === '') won.value = 'true'; score.value = won.value === 'true' ? '6-0 6-0' : '0-6 0-6'; };
+    wo.addEventListener('change', woScore);
+    won.addEventListener('change', woScore);
+    score.addEventListener('input', () => { wo.checked = false; const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
+    const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true', walkover: wo.checked });
+    return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won), h('td', h('label.check', wo, T.ctWalkover)),
       h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
   }))));
 

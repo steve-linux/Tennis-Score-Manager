@@ -62,7 +62,7 @@ object Reports {
     /** Il risultato da leggere: col ritiro, "6-3  2-1 rit."; ritiro prima di giocare, "w.o.". */
     fun resultLine(state: MatchState, from: Side, s: Strings): String = when {
         isWalkover(state) -> s.ctWalkover
-        state.retired != null -> scoreLine(state, from) + " " + s.ctRetired
+        state.retired != null -> scoreLine(state, from) + " " + if (state.disqualified) s.ctDisqualified else s.ctRetired
         else -> scoreLine(state, from)
     }
 
