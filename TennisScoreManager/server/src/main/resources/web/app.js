@@ -660,7 +660,8 @@ async function openChat(room, title, canWrite, opts = {}) {
       const more = m.mine && !m.deleted && canWrite ? el('button', { class: 'flag', 'aria-label': T.msgEdit, onclick: () => ownMenu(m) }, '⋯') : null;
       nodes.push(el('div', { class: 'bubble' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') + (m.deleted ? ' deleted' : '') },
         !m.mine && (group || m.office) ? el('div', { class: 'name', style: m.office ? null : 'color:' + nameColor(m.name) }, m.name) : null,
-        el('div', { class: 'text' }, m.deleted ? '🚫 ' + T.msgDeleted : m.text),
+        // Eliminato: "Hai eliminato…" o "Mario ha eliminato…".
+        el('div', { class: 'text' }, m.deleted ? '🚫 ' + (m.mine ? T.msgDeletedMine : T.msgDeletedBy(m.name)) : m.text),
         el('div', { class: 'meta' }, flag, more, (m.edited && !m.deleted ? T.msgEdited + ' · ' : '') + fmtTime(m.at))));
     }
     list.replaceChildren(...head.filter(n => n !== none || !msgs.length), ...nodes);

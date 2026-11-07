@@ -819,11 +819,12 @@ object EsStrings : Strings {
     override val pbYesterday = "Ayer"
     override val pbMsgEdit = "Editar"
     override val pbMsgDelete = "Eliminar"
-    override val pbMsgDeleted = "Mensaje eliminado"
     override val pbMsgEdited = "editado"
     override val pbMsgEditing = "Editando el mensaje"
     override val pbMsgDeleteAsk = "¿Eliminar el mensaje? Todos verán «Mensaje eliminado»."
     override val pbErrEditLate = "Un mensaje solo se puede editar en los primeros 15 minutos."
+    override val pbMsgDeletedMine = "Eliminaste este mensaje"
+    override val pbMsgDeletedBy: (String) -> String = { "$it eliminó este mensaje" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

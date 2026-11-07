@@ -57,6 +57,8 @@ import java.time.ZoneId
 const val API_VERSION = 1
 /** PIN sbagliati di fila prima di aspettare un quarto d'ora, e in tutto prima che il PIN non valga più. */
 /** Quanti giorni restano i messaggi, quanto è lungo un messaggio, quanti se ne scrivono in dieci minuti. */
+/** Il testo di un messaggio eliminato, per chi legge. */
+const val DELETED_MARK = "🚫"
 const val CHAT_DAYS = 30
 const val CHAT_MAX = 500
 const val CHAT_BURST = 30
@@ -416,8 +418,9 @@ class Api(
         val list = store.state.chats.filter { it.room == room && it.at > since && it.from !in hidden && (!onlyReported || it.reported) }
             .sortedBy { it.at }.takeLast(200)
             .map {
-                // Un messaggio eliminato: ai giocatori resta il posto; la segreteria ne vede il testo se era segnalato.
-                val text = if (it.deleted && (pl != null || !it.reported)) "" else it.text
+                // Un messaggio eliminato: ai giocatori resta il posto (con 🚫, anche per le app di prima, che non sanno
+                // di [SrvChatMsg.deleted]); la segreteria ne vede il testo se era segnalato.
+                val text = if (it.deleted && (pl != null || !it.reported)) DELETED_MARK else it.text
                 SrvChatMsg(it.id, it.name, text, it.at, mine = pl != null && it.from == pl.id, office = it.from.isEmpty(), edited = it.edited > 0, deleted = it.deleted)
             }
         return ok(ListSerializer(SrvChatMsg.serializer()), list)

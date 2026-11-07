@@ -857,11 +857,12 @@ interface Strings {
     val pbYesterday: String
     val pbMsgEdit: String
     val pbMsgDelete: String
-    val pbMsgDeleted: String
     val pbMsgEdited: String
     val pbMsgEditing: String
     val pbMsgDeleteAsk: String
     val pbErrEditLate: String
+    val pbMsgDeletedMine: String
+    val pbMsgDeletedBy: (String) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3226,11 +3227,12 @@ object ItStrings : Strings {
     override val pbYesterday = "Ieri"
     override val pbMsgEdit = "Modifica"
     override val pbMsgDelete = "Elimina"
-    override val pbMsgDeleted = "Messaggio eliminato"
     override val pbMsgEdited = "modificato"
     override val pbMsgEditing = "Modifica del messaggio"
     override val pbMsgDeleteAsk = "Eliminare il messaggio? Per tutti resterà «Messaggio eliminato»."
     override val pbErrEditLate = "Un messaggio si può modificare solo nei primi 15 minuti."
+    override val pbMsgDeletedMine = "Hai eliminato il messaggio"
+    override val pbMsgDeletedBy: (String) -> String = { "$it ha eliminato il messaggio" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5558,11 +5560,12 @@ object EnStrings : Strings {
     override val pbYesterday = "Yesterday"
     override val pbMsgEdit = "Edit"
     override val pbMsgDelete = "Delete"
-    override val pbMsgDeleted = "Message deleted"
     override val pbMsgEdited = "edited"
     override val pbMsgEditing = "Editing message"
     override val pbMsgDeleteAsk = "Delete the message? Everyone will see “Message deleted”."
     override val pbErrEditLate = "A message can only be edited in the first 15 minutes."
+    override val pbMsgDeletedMine = "You deleted this message"
+    override val pbMsgDeletedBy: (String) -> String = { "$it deleted this message" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

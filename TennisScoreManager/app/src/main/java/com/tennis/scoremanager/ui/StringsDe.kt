@@ -818,11 +818,12 @@ object DeStrings : Strings {
     override val pbYesterday = "Gestern"
     override val pbMsgEdit = "Bearbeiten"
     override val pbMsgDelete = "Löschen"
-    override val pbMsgDeleted = "Nachricht gelöscht"
     override val pbMsgEdited = "bearbeitet"
     override val pbMsgEditing = "Nachricht bearbeiten"
     override val pbMsgDeleteAsk = "Nachricht löschen? Alle sehen dann „Nachricht gelöscht“."
     override val pbErrEditLate = "Eine Nachricht lässt sich nur in den ersten 15 Minuten bearbeiten."
+    override val pbMsgDeletedMine = "Du hast diese Nachricht gelöscht"
+    override val pbMsgDeletedBy: (String) -> String = { "$it hat diese Nachricht gelöscht" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

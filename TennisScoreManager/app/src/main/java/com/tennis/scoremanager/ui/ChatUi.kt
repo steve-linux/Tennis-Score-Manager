@@ -239,7 +239,9 @@ fun ChatDialog(
                             ) {
                                 if (!m.mine && (group || m.office)) Text(m.name, color = if (m.office) TsmColors.Ball else nameColor(m.name), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                 val fg = if (m.mine) TsmColors.OnBall else TsmColors.TextMain
-                                if (m.deleted) Text("🚫 " + s.pbMsgDeleted + if (m.text.isNotEmpty()) " — ${m.text}" else "", color = fg.copy(alpha = 0.6f), fontSize = 14.sp,
+                                // Eliminato: "Hai eliminato…" o "Mario ha eliminato…"; la segreteria vede ancora il testo di quelli segnalati.
+                                if (m.deleted) Text("🚫 " + (if (m.mine) s.pbMsgDeletedMine else s.pbMsgDeletedBy(m.name)) +
+                                    (m.text.takeIf { it.isNotBlank() && it != "🚫" }?.let { " — $it" } ?: ""), color = fg.copy(alpha = 0.6f), fontSize = 14.sp,
                                     fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
                                 else Text(m.text, color = fg, fontSize = 15.sp)
                                 Text((if (m.edited && !m.deleted) s.pbMsgEdited + " · " else "") + time.format(java.util.Date(m.at)),

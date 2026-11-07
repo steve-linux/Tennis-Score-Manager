@@ -190,7 +190,7 @@ class ChatApiTest {
         assertEquals(200, call("DELETE", "/chat/msg/$m", token = mario).status)
         val gone = msgs("club", luca).single()
         assertTrue(gone.deleted)
-        assertEquals("", gone.text)
+        assertEquals(DELETED_MARK, gone.text)
         assertTrue("Ci vediamo" !in store.dir.walkTopDown().filter { it.isFile }.joinToString { it.readText() })
     }
 
@@ -199,7 +199,7 @@ class ChatApiTest {
         val m = field(call("POST", "/chat/club", """{"text":"insulto"}""", mario).body, "id")
         call("POST", "/chat/msg/$m/report", token = luca)
         call("DELETE", "/chat/msg/$m", token = mario)
-        assertEquals("", msgs("club", luca).single().text)
+        assertEquals(DELETED_MARK, msgs("club", luca).single().text)
         // La segreteria lo vede ancora.
         assertTrue(call("GET", "/admin/chat/club", token = admin).body.contains("insulto"))
     }
