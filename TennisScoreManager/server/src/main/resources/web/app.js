@@ -604,45 +604,85 @@ async function openChat(room, title, canWrite, opts = {}) {
   const list = el('div', { class: 'chatlist' });
   const input = canWrite ? el('textarea', { id: 'chatin', rows: '1', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
   const err = el('p', { class: 'error' });
-  let last = 0, timer = 0, lastDay = '';
+  let last = 0, timer = 0;
   const today = dayKey(Date.now()), yesterday = dayKey(Date.now() - 86400000);
   // Com'è questa chat (chi la legge, come si segnala): un riquadro in cima.
   const hint = opts.hint || (canWrite ? null : T.boardHint);
   if (hint) list.append(el('div', { class: 'notice' }, hint));
   const none = el('p', { class: 'dim center' }, T.chatNone);
   list.append(none);
+  const head = [...list.children];
+  // Il proprio messaggio che si sta correggendo: il testo va nella barra, sopra c'è una riga con la X.
+  let editing = null;
+  const editBar = el('div', { class: 'editbar', hidden: true });
+  const stopEdit = () => { editing = null; editBar.hidden = true; if (input) { input.value = ''; input.style.height = ''; } };
+  const startEdit = (m) => {
+    editing = m;
+    editBar.replaceChildren(el('span', null, el('b', null, '✎ ' + T.msgEditing), el('small', null, m.text)), el('button', { class: 'x', 'aria-label': T.close, onclick: stopEdit }, '✕'));
+    editBar.hidden = false;
+    input.value = m.text; input.focus();
+  };
+  const ownMenu = (m) => {
+    const canEdit = Date.now() - m.at <= 15 * 60000;
+    sheet(el('p', null, m.text),
+      el('div', { class: 'actions' },
+        canEdit ? el('button', { onclick: () => { closeSheet(); startEdit(m); } }, T.msgEdit) : null,
+        el('button', { class: 'danger', onclick: async () => {
+          if (!confirm(T.msgDeleteAsk)) return;
+          closeSheet();
+          try { await api('DELETE', '/chat/msg/' + m.id); if (editing && editing.id === m.id) stopEdit(); await load(); } catch (e) { err.textContent = errText(e); }
+        } }, T.msgDelete),
+        el('button', { class: 'ghost', onclick: closeSheet }, T.close)));
+  };
+  let shown = '';
+  // Ogni volta tutti i messaggi (al massimo 200): così si vedono anche quelli corretti o eliminati.
   const draw = (msgs) => {
+    const sig = JSON.stringify(msgs.map(m => [m.id, m.text, m.edited, m.deleted]));
+    if (sig === shown) return;
+    const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+    const grew = msgs.length && msgs[msgs.length - 1].at > last;
+    shown = sig;
+    let lastDay = '';
+    const nodes = [];
     for (const m of msgs) {
       last = Math.max(last, m.at);
       const d = dayKey(m.at);
       if (d !== lastDay) {
         lastDay = d;
-        list.append(el('div', { class: 'day' }, el('span', null, d === today ? T.today : d === yesterday ? T.yesterday
+        nodes.push(el('div', { class: 'day' }, el('span', null, d === today ? T.today : d === yesterday ? T.yesterday
           : new Intl.DateTimeFormat(LANG, { weekday: 'long', day: 'numeric', month: 'long', timeZone: tz() }).format(new Date(m.at)))));
       }
-      // Con la bandierina si segnala alla segreteria un messaggio ricevuto.
-      const flag = opts.report && !m.mine && !m.office ? el('button', { class: 'flag', title: T.report, 'aria-label': T.report, onclick: async () => {
+      // Con la bandierina si segnala alla segreteria un messaggio ricevuto; coi puntini si corregge o si elimina il proprio.
+      const flag = opts.report && !m.mine && !m.office && !m.deleted ? el('button', { class: 'flag', title: T.report, 'aria-label': T.report, onclick: async () => {
         if (!confirm(T.report + '?')) return;
         try { await api('POST', '/chat/msg/' + m.id + '/report'); toast(T.reported); } catch (e) { err.textContent = errText(e); }
       } }, '⚑') : null;
-      list.append(el('div', { class: 'bubble' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') },
+      const more = m.mine && !m.deleted && canWrite ? el('button', { class: 'flag', 'aria-label': T.msgEdit, onclick: () => ownMenu(m) }, '⋯') : null;
+      nodes.push(el('div', { class: 'bubble' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') + (m.deleted ? ' deleted' : '') },
         !m.mine && (group || m.office) ? el('div', { class: 'name', style: m.office ? null : 'color:' + nameColor(m.name) }, m.name) : null,
-        el('div', { class: 'text' }, m.text),
-        el('div', { class: 'meta' }, flag, fmtTime(m.at))));
+        el('div', { class: 'text' }, m.deleted ? '🚫 ' + T.msgDeleted : m.text),
+        el('div', { class: 'meta' }, flag, more, (m.edited && !m.deleted ? T.msgEdited + ' · ' : '') + fmtTime(m.at))));
     }
-    if (last) none.remove();
-    if (msgs.length) { list.scrollTop = list.scrollHeight; markChatRead(room, last); }
+    list.replaceChildren(...head.filter(n => n !== none || !msgs.length), ...nodes);
+    if (grew || atBottom) list.scrollTop = list.scrollHeight;
+    if (msgs.length) markChatRead(room, last);
   };
   const load = async () => {
-    try { draw(await api('GET', '/chat/' + room + '?after=' + last)); err.textContent = ''; } catch (e) { err.textContent = errText(e); }
+    try { draw(await api('GET', '/chat/' + room)); err.textContent = ''; } catch (e) { err.textContent = errText(e); }
   };
   const send = async () => {
     const text = input.value.trim();
     if (!text) return;
-    try { await api('POST', '/chat/' + room, { text }); input.value = ''; input.style.height = ''; await load(); } catch (e) { err.textContent = errText(e); }
+    try {
+      if (editing) await api('PUT', '/chat/msg/' + editing.id, { text }); else await api('POST', '/chat/' + room, { text });
+      stopEdit(); await load();
+    } catch (e) { err.textContent = errText(e); }
   };
   if (input) {
-    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+      if (e.key === 'Escape' && editing) stopEdit();
+    });
     // Il campo cresce col testo, fino a qualche riga.
     input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; });
   }
@@ -660,7 +700,7 @@ async function openChat(room, title, canWrite, opts = {}) {
   view.append(
     el('div', { class: 'chathead' }, el('button', { class: 'back', 'aria-label': T.close, onclick: close }, '←'),
       avatar(title, group ? '💬' : canWrite ? null : '📣'), el('b', null, title), block),
-    list, err,
+    list, err, input ? editBar : null,
     input ? el('div', { class: 'chatbar' }, input, el('button', { class: 'send', 'aria-label': T.chatSend, onclick: send }, '➤')) : null);
   document.body.append(view);
   document.body.classList.add('nochrome');

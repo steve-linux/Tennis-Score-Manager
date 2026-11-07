@@ -30,7 +30,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.MoreVert
@@ -132,6 +134,9 @@ fun ChatDialog(
     send: (suspend (String) -> String?)? = null,
     delete: (suspend (String) -> String?)? = null,
     report: (suspend (String) -> String?)? = null,
+    /** I propri messaggi: correggerli (nei primi [CHAT_EDIT_MINUTES] minuti) ed eliminarli. */
+    editMine: (suspend (String, String) -> String?)? = null,
+    deleteMine: (suspend (String) -> String?)? = null,
     hint: String? = null,
     extra: Pair<String, () -> Unit>? = null,
     group: Boolean = false,
@@ -150,6 +155,9 @@ fun ChatDialog(
     var tick by remember { mutableStateOf(0) }
     var menu by remember { mutableStateOf(false) }
     var picked by remember { mutableStateOf<SrvChatMsg?>(null) }
+    /** Il proprio messaggio che si sta correggendo: il testo va nella barra in basso. */
+    var editing by remember { mutableStateOf<SrvChatMsg?>(null) }
+    var deleteAsk by remember { mutableStateOf<SrvChatMsg?>(null) }
     val listState = rememberLazyListState()
     LaunchedEffect(tick) {
         while (true) {
@@ -220,7 +228,7 @@ fun ChatDialog(
                         }
                     } else {
                         val m = r as SrvChatMsg
-                        val canAct = (report != null && !m.mine && !m.office) || delete != null
+                        val canAct = !m.deleted && ((report != null && !m.mine && !m.office) || delete != null || (m.mine && deleteMine != null))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {
                             Column(
                                 Modifier.widthIn(max = 300.dp)
@@ -230,9 +238,12 @@ fun ChatDialog(
                                     .padding(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 4.dp),
                             ) {
                                 if (!m.mine && (group || m.office)) Text(m.name, color = if (m.office) TsmColors.Ball else nameColor(m.name), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                Text(m.text, color = if (m.mine) TsmColors.OnBall else TsmColors.TextMain, fontSize = 15.sp)
-                                Text(time.format(java.util.Date(m.at)), color = if (m.mine) TsmColors.OnBall.copy(alpha = 0.6f) else TsmColors.TextDim, fontSize = 11.sp,
-                                    modifier = Modifier.align(Alignment.End))
+                                val fg = if (m.mine) TsmColors.OnBall else TsmColors.TextMain
+                                if (m.deleted) Text("🚫 " + s.pbMsgDeleted + if (m.text.isNotEmpty()) " — ${m.text}" else "", color = fg.copy(alpha = 0.6f), fontSize = 14.sp,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                                else Text(m.text, color = fg, fontSize = 15.sp)
+                                Text((if (m.edited && !m.deleted) s.pbMsgEdited + " · " else "") + time.format(java.util.Date(m.at)),
+                                    color = if (m.mine) TsmColors.OnBall.copy(alpha = 0.6f) else TsmColors.TextDim, fontSize = 11.sp, modifier = Modifier.align(Alignment.End))
                             }
                         }
                     }
@@ -241,6 +252,17 @@ fun ChatDialog(
             }
             err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) }
             // In basso la barra per scrivere (non c'è dove si legge soltanto).
+            // Mentre si corregge un messaggio: una riga sopra la barra, con la X per lasciar perdere.
+            editing?.let { e ->
+                Row(Modifier.fillMaxWidth().background(TsmColors.Surface).padding(start = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Edit, null, tint = TsmColors.Ball, modifier = Modifier.size(18.dp))
+                    Column(Modifier.weight(1f).padding(start = 10.dp, top = 6.dp, bottom = 6.dp)) {
+                        Text(s.pbMsgEditing, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(e.text, color = TsmColors.TextDim, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    IconButton(onClick = { editing = null; text = "" }) { Icon(Icons.Filled.Close, s.back, tint = TsmColors.TextDim) }
+                }
+            }
             if (send != null) Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextField(
                     text, { text = it.take(500) }, Modifier.weight(1f), placeholder = { Text(s.pbChatPlaceholder) }, maxLines = 5,
@@ -256,14 +278,47 @@ fun ChatDialog(
                     Modifier.size(52.dp).clip(CircleShape).background(if (ready) TsmColors.Ball else TsmColors.SurfaceHigh).clickable(enabled = ready) {
                         val t = text.trim()
                         busy = true
-                        scope.launch { err = send(t)?.let(errText); if (err == null) text = ""; busy = false; tick++ }
+                        val e = editing
+                        scope.launch {
+                            err = (if (e != null && editMine != null) editMine(e.id, t) else send(t))?.let(errText)
+                            if (err == null) { text = ""; editing = null }
+                            busy = false; tick++
+                        }
                     },
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.AutoMirrored.Filled.Send, s.pbChatSend, tint = if (ready) TsmColors.OnBall else TsmColors.TextDim) }
             } else Spacer(Modifier.size(8.dp))
         }
+        // Tenendo premuto un proprio messaggio: correggerlo (nei primi minuti) o eliminarlo.
+        picked?.takeIf { it.mine && delete == null }?.let { m ->
+            val canEdit = editMine != null && System.currentTimeMillis() - m.at <= com.tennis.scoremanager.data.CHAT_EDIT_MINUTES * 60_000L
+            AlertDialog(
+                onDismissRequest = { picked = null },
+                text = { Text(m.text, color = TsmColors.TextMain, maxLines = 6, overflow = TextOverflow.Ellipsis) },
+                confirmButton = {
+                    Row {
+                        if (canEdit) TextButton(onClick = { picked = null; editing = m; text = m.text }) {
+                            Icon(Icons.Filled.Edit, null, tint = TsmColors.Ball); Text(" " + s.pbMsgEdit, color = TsmColors.Ball)
+                        }
+                        TextButton(onClick = { picked = null; deleteAsk = m }) { Icon(Icons.Filled.Delete, null, tint = TsmColors.Danger); Text(" " + s.pbMsgDelete, color = TsmColors.Danger) }
+                    }
+                },
+                dismissButton = { TextButton(onClick = { picked = null }) { Text(s.back) } },
+            )
+        }
+        deleteAsk?.let { m ->
+            AlertDialog(
+                onDismissRequest = { deleteAsk = null },
+                text = { Text(s.pbMsgDeleteAsk) },
+                confirmButton = { TextButton(onClick = {
+                    deleteAsk = null
+                    scope.launch { err = deleteMine?.invoke(m.id)?.let(errText); if (editing?.id == m.id) { editing = null; text = "" }; tick++ }
+                }) { Text(s.pbMsgDelete, color = TsmColors.Danger) } },
+                dismissButton = { TextButton(onClick = { deleteAsk = null }) { Text(s.back) } },
+            )
+        }
         // Tenendo premuto un messaggio: toglierlo (la segreteria) o segnalarlo.
-        picked?.let { m ->
+        picked?.takeIf { !it.mine || delete != null }?.let { m ->
             AlertDialog(
                 onDismissRequest = { picked = null },
                 text = { Text("${m.name}: ${m.text}", color = TsmColors.TextMain, maxLines = 6, overflow = TextOverflow.Ellipsis) },

@@ -817,6 +817,13 @@ object EsStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Mensaje de $it" }
     override val pbClubEntryHint = "Escribe a todos los socios del club"
     override val pbYesterday = "Ayer"
+    override val pbMsgEdit = "Editar"
+    override val pbMsgDelete = "Eliminar"
+    override val pbMsgDeleted = "Mensaje eliminado"
+    override val pbMsgEdited = "editado"
+    override val pbMsgEditing = "Editando el mensaje"
+    override val pbMsgDeleteAsk = "¿Eliminar el mensaje? Todos verán «Mensaje eliminado»."
+    override val pbErrEditLate = "Un mensaje solo se puede editar en los primeros 15 minutos."
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

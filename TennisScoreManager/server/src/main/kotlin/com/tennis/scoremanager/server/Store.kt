@@ -42,7 +42,11 @@ data class PushSub(val player: String, val endpoint: String, val p256dh: String,
  * [reported]: segnalato da chi l'ha ricevuto, e solo allora la segreteria lo vede in una chat privata.
  */
 @Serializable
-data class ChatMsg(val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long, val reported: Boolean = false)
+data class ChatMsg(
+    val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long, val reported: Boolean = false,
+    /** Quando l'autore l'ha modificato (0 = mai); eliminato dall'autore: il testo resta solo per la segreteria, se era segnalato. */
+    val edited: Long = 0, val deleted: Boolean = false,
+)
 
 /** Un invito non ancora usato: si salva solo l'impronta del codice. */
 @Serializable

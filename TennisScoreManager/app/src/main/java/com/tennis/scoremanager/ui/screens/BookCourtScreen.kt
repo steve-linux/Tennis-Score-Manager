@@ -140,6 +140,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "TOO_MANY_MESSAGES" -> s.pbErrChatMany
     "USER_BLOCKED" -> s.pbErrUserBlocked
     "DM_CLOSED" -> s.pbErrDmClosed
+    "EDIT_TOO_LATE" -> s.pbErrEditLate
+    "NOT_YOURS" -> s.pbErrChat
     else -> s.srvErrOther(code)
 }
 
@@ -367,7 +369,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""),
                 SegOption(s.pbTabSeek + acct.unreadSeeks.size.takeIf { it > 0 }?.let { " ($it)" }.orEmpty()),
                 SegOption(s.pbTabChat + if (rooms.any { it.last > (acct.chatRead[it.room] ?: 0) }) " •" else "")),
-            tab, { tab = it },
+            // Quattro schede su due righe: in una sola le scritte non ci stanno.
+            tab, { tab = it }, columns = 2,
         )
         when (tab) {
             0 -> {
@@ -549,6 +552,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 load = { c.booking { it.chat(room, 0) } },
                 send = if (board) null else { text -> c.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
                 report = if (board) null else { id -> c.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
+                editMine = if (board) null else { id, t -> c.booking { it.editChat(id, t) }.exceptionOrNull()?.let(::errCode) },
+                deleteMine = if (board) null else { id -> c.booking { it.deleteMine(id) }.exceptionOrNull()?.let(::errCode) },
                 hint = when { board -> s.pbBoardHint; room == "club" -> s.pbClubChatHint; other != null -> s.pbDmHint; else -> null },
                 extra = other?.let { id -> s.pbBlock to { blockAsk = id to name } },
                 group = room == "club" || room.startsWith("s-"),

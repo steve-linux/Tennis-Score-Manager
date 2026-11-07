@@ -38,6 +38,7 @@ import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvChatIn
 import com.tennis.scoremanager.data.SrvChatMsg
 import com.tennis.scoremanager.data.SrvChatRoom
+import com.tennis.scoremanager.data.CHAT_EDIT_MINUTES
 import com.tennis.scoremanager.data.SrvPerson
 import com.tennis.scoremanager.data.SrvBlockIn
 import com.tennis.scoremanager.data.SrvPinIn
@@ -134,6 +135,8 @@ class Api(
             r.method == "GET" && p == listOf("chats") -> myChats(player(r))
             r.method == "POST" && p == listOf("block") -> block(player(r), r)
             r.method == "POST" && p.size == 4 && p[0] == "chat" && p[1] == "msg" && p[3] == "report" -> report(player(r), p[2])
+            r.method == "PUT" && p.size == 3 && p[0] == "chat" && p[1] == "msg" -> editMine(player(r), p[2], r)
+            r.method == "DELETE" && p.size == 3 && p[0] == "chat" && p[1] == "msg" -> deleteMine(player(r), p[2])
             r.method == "GET" && p.size == 2 && p[0] == "chat" -> chatRead(player(r), p[1], r.query["after"])
             r.method == "POST" && p.size == 2 && p[0] == "chat" -> chatWrite(player(r), p[1], r)
             r.method == "GET" && p == listOf("admin", "chats") -> { admin(r); ok(ListSerializer(SrvChatRoom.serializer()), chatRooms()) }
@@ -412,8 +415,33 @@ class Api(
         val hidden = pl?.blocked.orEmpty().toSet()
         val list = store.state.chats.filter { it.room == room && it.at > since && it.from !in hidden && (!onlyReported || it.reported) }
             .sortedBy { it.at }.takeLast(200)
-            .map { SrvChatMsg(it.id, it.name, it.text, it.at, mine = pl != null && it.from == pl.id, office = it.from.isEmpty()) }
+            .map {
+                // Un messaggio eliminato: ai giocatori resta il posto; la segreteria ne vede il testo se era segnalato.
+                val text = if (it.deleted && (pl != null || !it.reported)) "" else it.text
+                SrvChatMsg(it.id, it.name, text, it.at, mine = pl != null && it.from == pl.id, office = it.from.isEmpty(), edited = it.edited > 0, deleted = it.deleted)
+            }
         return ok(ListSerializer(SrvChatMsg.serializer()), list)
+    }
+
+    /** Correggere un proprio messaggio, nei primi [CHAT_EDIT_MINUTES] minuti. */
+    private fun editMine(pl: Player, id: String, r: Req): Resp {
+        val text = read(SrvChatIn.serializer(), r).text.trim().take(CHAT_MAX)
+        if (text.isEmpty()) throw ApiError(400, "EMPTY")
+        val m = store.state.chats.firstOrNull { it.id == id } ?: throw ApiError(404, "NOT_FOUND")
+        if (m.from != pl.id || m.deleted) throw ApiError(403, "NOT_YOURS")
+        val now = store.now()
+        if (now - m.at > CHAT_EDIT_MINUTES * 60_000L) throw ApiError(409, "EDIT_TOO_LATE")
+        store.update { s -> s.copy(chats = s.chats.map { if (it.id == id) it.copy(text = text, edited = now) else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /** Eliminare un proprio messaggio: per tutti resta "Messaggio eliminato". */
+    private fun deleteMine(pl: Player, id: String): Resp {
+        val m = store.state.chats.firstOrNull { it.id == id } ?: throw ApiError(404, "NOT_FOUND")
+        if (m.from != pl.id) throw ApiError(403, "NOT_YOURS")
+        // Il testo resta solo se era stato segnalato (la segreteria deve poterlo vedere); se no se ne va davvero.
+        store.update { s -> s.copy(chats = s.chats.map { if (it.id == id) it.copy(deleted = true, text = if (it.reported) it.text else "") else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     /** I soci a cui si può scrivere: chi ha acceso "Possono scrivermi i soci", senza chi si è bloccato da una parte o dall'altra. */
@@ -430,8 +458,8 @@ class Api(
         val hidden = pl.blocked.toSet()
         val mine = s.chats.filter { it.from !in hidden && (it.room == "club" || dmOther(pl.id, it.room) != null) }.groupBy { it.room }
         val rooms = mine.map { (room, msgs) ->
-            val lastMsg = msgs.maxBy { it.at }
-            SrvChatRoom(room, if (room == "club") "club" else names[dmOther(pl.id, room)] ?: "?", msgs.size, lastMsg.at,
+            val lastMsg = msgs.filter { !it.deleted }.maxByOrNull { it.at } ?: msgs.maxBy { it.at }
+            SrvChatRoom(room, if (room == "club") "club" else names[dmOther(pl.id, room)] ?: "?", msgs.size, msgs.maxOf { it.at },
                 (if (room == "club" && lastMsg.from != pl.id) "${lastMsg.name}: " else "") + lastMsg.text.take(120), lastMsg.from == pl.id)
         }.let { l -> if (l.none { it.room == "club" }) l + SrvChatRoom("club", "club", 0, 0) else l }
         return ok(ListSerializer(SrvChatRoom.serializer()), rooms.sortedByDescending { it.last })
@@ -450,7 +478,7 @@ class Api(
     /** Segnalare alla segreteria un messaggio ricevuto: solo allora lo vede, anche in una chat privata. */
     private fun report(pl: Player, id: String): Resp {
         val m = store.state.chats.firstOrNull { it.id == id } ?: throw ApiError(404, "NOT_FOUND")
-        if (m.from == pl.id || !canRead(pl, m.room)) throw ApiError(403, "NOT_IN_CHAT")
+        if (m.from == pl.id || m.deleted || !canRead(pl, m.room)) throw ApiError(403, "NOT_IN_CHAT")
         store.update { s -> s.copy(chats = s.chats.map { if (it.id == id) it.copy(reported = true) else it }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }

@@ -173,4 +173,34 @@ class ChatApiTest {
         call("POST", "/block", """{"player":"p1","on":false}""", luca)
         assertEquals(201, call("POST", "/chat/$room", """{"text":"scusa"}""", mario).status)
     }
+
+    @Test fun modificareEdEliminareIPropri() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        val m = field(call("POST", "/chat/club", """{"text":"Ci vediamo alle 10"}""", mario).body, "id")
+        // Solo il proprio, e nei primi minuti.
+        assertEquals(403, call("PUT", "/chat/msg/$m", """{"text":"no"}""", luca).status)
+        assertEquals(200, call("PUT", "/chat/msg/$m", """{"text":"Ci vediamo alle 11"}""", mario).status)
+        val got = msgs("club", luca).single()
+        assertEquals("Ci vediamo alle 11", got.text)
+        assertTrue(got.edited)
+        now += (com.tennis.scoremanager.data.CHAT_EDIT_MINUTES + 1) * 60_000L
+        assertEquals(409, call("PUT", "/chat/msg/$m", """{"text":"troppo tardi"}""", mario).status)
+        // Eliminare si può sempre: resta il posto, senza testo.
+        assertEquals(403, call("DELETE", "/chat/msg/$m", token = luca).status)
+        assertEquals(200, call("DELETE", "/chat/msg/$m", token = mario).status)
+        val gone = msgs("club", luca).single()
+        assertTrue(gone.deleted)
+        assertEquals("", gone.text)
+        assertTrue("Ci vediamo" !in store.dir.walkTopDown().filter { it.isFile }.joinToString { it.readText() })
+    }
+
+    @Test fun unMessaggioSegnalatoResta() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        val m = field(call("POST", "/chat/club", """{"text":"insulto"}""", mario).body, "id")
+        call("POST", "/chat/msg/$m/report", token = luca)
+        call("DELETE", "/chat/msg/$m", token = mario)
+        assertEquals("", msgs("club", luca).single().text)
+        // La segreteria lo vede ancora.
+        assertTrue(call("GET", "/admin/chat/club", token = admin).body.contains("insulto"))
+    }
 }

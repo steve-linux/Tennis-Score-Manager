@@ -820,6 +820,13 @@ object PtStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Mensagem de $it" }
     override val pbClubEntryHint = "Escreve a todos os sócios do clube"
     override val pbYesterday = "Ontem"
+    override val pbMsgEdit = "Editar"
+    override val pbMsgDelete = "Eliminar"
+    override val pbMsgDeleted = "Mensagem eliminada"
+    override val pbMsgEdited = "editada"
+    override val pbMsgEditing = "A editar a mensagem"
+    override val pbMsgDeleteAsk = "Eliminar a mensagem? Todos verão «Mensagem eliminada»."
+    override val pbErrEditLate = "Uma mensagem só se pode editar nos primeiros 15 minutos."
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"

@@ -27,7 +27,13 @@ import kotlinx.serialization.Serializable
  * Un messaggio di una chat del circolo. Le stanze sono "board" (la bacheca: scrive solo la segreteria, leggono
  * tutti) e "s-ID" (la chat di un annuncio di Cerco compagno: chi l'ha messo e chi ha detto ci sto).
  */
-@Serializable data class SrvChatMsg(val id: String, val name: String, val text: String, val at: Long, val mine: Boolean = false, val office: Boolean = false)
+@Serializable data class SrvChatMsg(
+    val id: String, val name: String, val text: String, val at: Long, val mine: Boolean = false, val office: Boolean = false,
+    /** Corretto da chi l'ha scritto (si può nei primi [CHAT_EDIT_MINUTES] minuti); eliminato da chi l'ha scritto (resta il posto). */
+    val edited: Boolean = false, val deleted: Boolean = false,
+)
+/** Per quanti minuti dopo l'invio si può modificare un proprio messaggio. */
+const val CHAT_EDIT_MINUTES = 15
 @Serializable data class SrvChatIn(val text: String)
 /** Una stanza vista dalla segreteria: per la moderazione. */
 /** Una chat nell'elenco: [preview] l'ultimo messaggio ("Mario: ciao"), [previewMine] se l'ho scritto io. */

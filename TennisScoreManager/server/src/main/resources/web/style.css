@@ -50,7 +50,7 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .legend .FREE::before { background: rgba(198, 244, 50, .5); } .legend .MINE::before { background: var(--mine); }
 .legend .BUSY::before { background: var(--high); border: 1px solid var(--outline); } .legend .BLOCKED::before { background: var(--surface); border: 1px dashed var(--dim); }
-.sheet { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+.sheet { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); display: flex; align-items: flex-end; justify-content: center; z-index: 30; }
 .sheet[hidden] { display: none; }
 .sheet-box { background: var(--surface); border-radius: 18px 18px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); width: 100%; max-width: 520px; max-height: 90vh; overflow: auto; }
 @media (min-width: 600px) { .sheet { align-items: center; } .sheet-box { border-radius: 18px; } }
@@ -117,3 +117,10 @@ body.nochrome { overflow: hidden; }
 .chatrow .top small.new { color: var(--ball); }
 .chatrow .preview { flex: 1; color: var(--dim); font-size: 14px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chatrow .count { background: var(--ball); color: #0B1220; border-radius: 999px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
+.bubble.deleted .text { font-style: italic; opacity: .6; }
+.editbar { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 6px 10px 6px 16px; }
+.editbar[hidden] { display: none; }
+.editbar span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.editbar b { color: var(--ball); font-size: 13px; }
+.editbar small { color: var(--dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editbar .x { background: transparent; border: 0; color: var(--dim); min-height: 36px; padding: 0 8px; font-size: 16px; }

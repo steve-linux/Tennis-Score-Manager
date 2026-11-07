@@ -575,6 +575,7 @@ const APP_I18N = {
     pbErrClosed: "Le prenotazioni online sono chiuse.",
     pbErrCourt: "Questo campo non si prenota online.",
     pbErrDmClosed: "Questo socio non riceve messaggi privati.",
+    pbErrEditLate: "Un messaggio si può modificare solo nei primi 15 minuti.",
     pbErrFar: "Non si può ancora prenotare questo giorno.",
     pbErrFreeNow: "Si è appena liberata: prenotala subito!",
     pbErrFull: "L'annuncio è già al completo.",
@@ -617,6 +618,12 @@ const APP_I18N = {
     pbLoginTitle: "Hai già un PIN?",
     pbMine: "Le tue prenotazioni",
     pbMineCell: "Tuo",
+    pbMsgDelete: "Elimina",
+    pbMsgDeleteAsk: "Eliminare il messaggio? Per tutti resterà «Messaggio eliminato».",
+    pbMsgDeleted: "Messaggio eliminato",
+    pbMsgEdit: "Modifica",
+    pbMsgEdited: "modificato",
+    pbMsgEditing: "Modifica del messaggio",
     pbNewsHint: "Tocca un annuncio per aprirlo in Compagni e rispondere.",
     pbNewsTitle: (it) => it === 1 ? `1 novità dal circolo` : `${it} novità dal circolo`,
     pbNone: "Nessuna prenotazione",
@@ -1168,6 +1175,7 @@ const APP_I18N = {
     pbErrClosed: "Online booking is closed.",
     pbErrCourt: "This court cannot be booked online.",
     pbErrDmClosed: "This member does not receive private messages.",
+    pbErrEditLate: "A message can only be edited in the first 15 minutes.",
     pbErrFar: "This day cannot be booked yet.",
     pbErrFreeNow: "It has just become free: book it now!",
     pbErrFull: "This request is already complete.",
@@ -1210,6 +1218,12 @@ const APP_I18N = {
     pbLoginTitle: "Already have a PIN?",
     pbMine: "Your bookings",
     pbMineCell: "Yours",
+    pbMsgDelete: "Delete",
+    pbMsgDeleteAsk: "Delete the message? Everyone will see “Message deleted”.",
+    pbMsgDeleted: "Message deleted",
+    pbMsgEdit: "Edit",
+    pbMsgEdited: "edited",
+    pbMsgEditing: "Editing message",
     pbNewsHint: "Tap a post to open it in Partners and answer.",
     pbNewsTitle: (it) => it === 1 ? `1 update from the club` : `${it} updates from the club`,
     pbNone: "No bookings",
@@ -1761,6 +1775,7 @@ const APP_I18N = {
     pbErrClosed: "Les réservations en ligne sont fermées.",
     pbErrCourt: "Ce terrain ne se réserve pas en ligne.",
     pbErrDmClosed: "Ce membre ne reçoit pas de messages privés.",
+    pbErrEditLate: "Un message ne peut être modifié que dans les 15 premières minutes.",
     pbErrFar: "Ce jour n'est pas encore réservable.",
     pbErrFreeNow: "Il vient de se libérer : réservez-le vite !",
     pbErrFull: "Cette annonce est déjà complète.",
@@ -1803,6 +1818,12 @@ const APP_I18N = {
     pbLoginTitle: "Vous avez déjà un PIN ?",
     pbMine: "Vos réservations",
     pbMineCell: "À vous",
+    pbMsgDelete: "Supprimer",
+    pbMsgDeleteAsk: "Supprimer le message ? Tout le monde verra « Message supprimé ».",
+    pbMsgDeleted: "Message supprimé",
+    pbMsgEdit: "Modifier",
+    pbMsgEdited: "modifié",
+    pbMsgEditing: "Modification du message",
     pbNewsHint: "Touchez une annonce pour l'ouvrir dans Partenaires et répondre.",
     pbNewsTitle: (it) => it === 1 ? `1 nouveauté du club` : `${it} nouveautés du club`,
     pbNone: "Aucune réservation",
@@ -2354,6 +2375,7 @@ const APP_I18N = {
     pbErrClosed: "Online-Buchungen sind geschlossen.",
     pbErrCourt: "Dieser Platz ist online nicht buchbar.",
     pbErrDmClosed: "Dieses Mitglied empfängt keine privaten Nachrichten.",
+    pbErrEditLate: "Eine Nachricht lässt sich nur in den ersten 15 Minuten bearbeiten.",
     pbErrFar: "Dieser Tag ist noch nicht buchbar.",
     pbErrFreeNow: "Gerade frei geworden: Buch es jetzt!",
     pbErrFull: "Diese Anzeige ist schon vollständig.",
@@ -2396,6 +2418,12 @@ const APP_I18N = {
     pbLoginTitle: "Schon eine PIN?",
     pbMine: "Deine Buchungen",
     pbMineCell: "Deine",
+    pbMsgDelete: "Löschen",
+    pbMsgDeleteAsk: "Nachricht löschen? Alle sehen dann „Nachricht gelöscht“.",
+    pbMsgDeleted: "Nachricht gelöscht",
+    pbMsgEdit: "Bearbeiten",
+    pbMsgEdited: "bearbeitet",
+    pbMsgEditing: "Nachricht bearbeiten",
     pbNewsHint: "Tippe auf eine Anzeige, um sie unter Partner zu öffnen und zu antworten.",
     pbNewsTitle: (it) => it === 1 ? `1 Neuigkeit aus dem Verein` : `${it} Neuigkeiten aus dem Verein`,
     pbNone: "Keine Buchungen",
@@ -2947,6 +2975,7 @@ const APP_I18N = {
     pbErrClosed: "Las reservas en línea están cerradas.",
     pbErrCourt: "Esta pista no se reserva en línea.",
     pbErrDmClosed: "Este socio no recibe mensajes privados.",
+    pbErrEditLate: "Un mensaje solo se puede editar en los primeros 15 minutos.",
     pbErrFar: "Este día aún no se puede reservar.",
     pbErrFreeNow: "Se acaba de liberar: ¡resérvala ya!",
     pbErrFull: "El anuncio ya está completo.",
@@ -2989,6 +3018,12 @@ const APP_I18N = {
     pbLoginTitle: "¿Ya tienes un PIN?",
     pbMine: "Tus reservas",
     pbMineCell: "Tuya",
+    pbMsgDelete: "Eliminar",
+    pbMsgDeleteAsk: "¿Eliminar el mensaje? Todos verán «Mensaje eliminado».",
+    pbMsgDeleted: "Mensaje eliminado",
+    pbMsgEdit: "Editar",
+    pbMsgEdited: "editado",
+    pbMsgEditing: "Editando el mensaje",
     pbNewsHint: "Toca un anuncio para abrirlo en Compañeros y responder.",
     pbNewsTitle: (it) => it === 1 ? `1 novedad del club` : `${it} novedades del club`,
     pbNone: "Ninguna reserva",
@@ -3540,6 +3575,7 @@ const APP_I18N = {
     pbErrClosed: "As reservas online estão fechadas.",
     pbErrCourt: "Esta quadra não se reserva online.",
     pbErrDmClosed: "Este sócio não recebe mensagens privadas.",
+    pbErrEditLate: "Uma mensagem só se pode editar nos primeiros 15 minutos.",
     pbErrFar: "Este dia ainda não se pode reservar.",
     pbErrFreeNow: "Acabou de ficar livre: reserva-a já!",
     pbErrFull: "O anúncio já está completo.",
@@ -3582,6 +3618,12 @@ const APP_I18N = {
     pbLoginTitle: "Já tem um PIN?",
     pbMine: "As tuas reservas",
     pbMineCell: "Tua",
+    pbMsgDelete: "Eliminar",
+    pbMsgDeleteAsk: "Eliminar a mensagem? Todos verão «Mensagem eliminada».",
+    pbMsgDeleted: "Mensagem eliminada",
+    pbMsgEdit: "Editar",
+    pbMsgEdited: "editada",
+    pbMsgEditing: "A editar a mensagem",
     pbNewsHint: "Toque num anúncio para o abrir em Parceiros e responder.",
     pbNewsTitle: (it) => it === 1 ? `1 novidade do clube` : `${it} novidades do clube`,
     pbNone: "Nenhuma reserva",
@@ -8601,7 +8643,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Warteliste**: Tippt der Spieler auf ein **Belegt**-Feld (auf der TSM-Seite oder unter *Platz buchen* in der App), wählt er **Benachrichtigen, wenn frei**, für diesen Platz oder einen beliebigen Platz zur selben Zeit (höchstens 3 Wartende). Wird die Buchung storniert oder verschoben, bekommt er sofort einen Hinweis und auf der Seite erscheint **Buchen**: Wer zuerst bucht, bekommt es; ist ein anderer schneller, wartet er weiter. Wartende verschwinden von selbst, wenn die Zeit vorbei ist.
 - **Partner gesucht**: Auf der TSM-Seite und unter *Platz buchen* gibt der Spieler eine Anzeige auf (Tag, Zeitfenster, Einzel oder Doppel, Niveau, Notiz; höchstens 3 offen). Die anderen sehen sie und tippen auf **Bin dabei**; wer sie aufgegeben hat, bekommt einen Hinweis. Vollständig (2 Spieler im Einzel, 4 im Doppel) **bucht der Server selbst** den ersten freien Platz im Zeitfenster, mit den Regeln der Online-Buchung, und sagt es allen; ist kein Platz frei, sagt er auch das, und sie buchen selbst. Vergangene Anzeigen verschwinden von selbst.
 - **Chat der Anzeige**: Wer die Anzeige aufgegeben und wer **Bin dabei** getippt hat, hat einen **Chat** (auf der Anzeige, mit Punkt bei Neuem), um sich abzusprechen; die anderen sehen ihn nicht. Jede Nachricht kommt mit einer Benachrichtigung. Nur Text; Nachrichten bleiben 30 Tage.
-- **Chat zwischen Mitgliedern** (Reiter **Chat** unter *Platz buchen* und auf der Vereinsseite): der **Vereinschat**, in dem alle verbundenen Mitglieder lesen und schreiben (Benachrichtigungen abschaltbar), und **Private Nachrichten**. Privat schreibt man nur denen, die **Mitglieder dürfen mir schreiben** eingeschaltet haben (anfangs aus); wer etwas bekommt, kann immer antworten. **Blockieren** hindert ein Mitglied am Schreiben und blendet seine Nachrichten aus; mit der Fahne **meldet** man eine Nachricht dem Büro, das von privaten Chats nur gemeldete Nachrichten sieht. Unter **Spielen** gibt es den Eintrag **Vereinschat** (unter *Platz buchen*, mit der letzten Nachricht) und, bei neuen Nachrichten, oben einen Streifen, der den Chat öffnet; ebenso oben auf der Vereinsseite.
+- **Chat zwischen Mitgliedern** (Reiter **Chat** unter *Platz buchen* und auf der Vereinsseite): der **Vereinschat**, in dem alle verbundenen Mitglieder lesen und schreiben (Benachrichtigungen abschaltbar), und **Private Nachrichten**. Privat schreibt man nur denen, die **Mitglieder dürfen mir schreiben** eingeschaltet haben (anfangs aus); wer etwas bekommt, kann immer antworten. **Blockieren** hindert ein Mitglied am Schreiben und blendet seine Nachrichten aus; mit der Fahne **meldet** man eine Nachricht dem Büro, das von privaten Chats nur gemeldete Nachrichten sieht. Unter **Spielen** gibt es den Eintrag **Vereinschat** (unter *Platz buchen*, mit der letzten Nachricht) und, bei neuen Nachrichten, oben einen Streifen, der den Chat öffnet; ebenso oben auf der Vereinsseite. Hält man eine eigene Nachricht gedrückt (auf der Seite: die Punkte ⋯), kann man sie in den ersten 15 Minuten **bearbeiten** oder **löschen**: Die anderen sehen „Nachricht gelöscht“ (war sie gemeldet, sieht das Büro den Text weiterhin).
 - **Vereinsbrett**: Das Büro schreibt eine Mitteilung (*Vereinsserver › Vereinsbrett* oder **Online-Buchungen** am PC), und sie erreicht alle Spieler mit einer Benachrichtigung; sie lesen sie oben unter **Buchen**, ohne zu antworten. Unter *Chats und Meldungen* liest das Büro die Chats und entfernt unpassende Nachrichten. Neues erscheint auch in den Neuigkeiten unter **Spielen**.
 - **Wenn der Server nicht antwortet**: Die App merkt es selbst (alle paar Minuten), und *Platz buchen* sagt, dass der Verein nicht antwortet, mit den eigenen Buchungen der letzten Prüfung; ist er zurück, schaltet sich alles von selbst wieder ein. Der Rest der App ändert sich nicht. Wer nie beigetreten ist, sieht *Platz buchen* nicht: unter **Mehr** gibt es **Ich habe eine Einladung vom Verein**.
 - **Hinweise für das Büro**: Mit *Bei Online-Buchungen benachrichtigen* (normalerweise an) bekommt das Büro-Handy eine Benachrichtigung, wenn ein Spieler bucht oder storniert, auch bei geschlossener App: etwa alle 15 Minuten, wenn Netz da ist. Antippen öffnet die Platzbelegung am Tag der Buchung. Was das Büro selbst entfernt, löst keine Benachrichtigung aus.
@@ -9189,7 +9231,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Waiting list**: tapping a **Taken** slot (on the TSM page or in *Book a court* in the app) the player chooses **Tell me if it frees up**, for that court or any court at the same time (3 waits at most). If the booking is cancelled or moved they get an alert right away and **Book** appears on the page: whoever books first gets it; if someone else is faster, they go back to waiting. Waits disappear by themselves once the time has passed.
 - **Looking for a partner**: on the TSM page and in *Book a court* a player posts a request (day, time window, singles or doubles, level, note; at most 3 open). Others see it and tap **I'm in**; the poster gets an alert. When complete (2 players in singles, 4 in doubles) the server **books by itself** the first free court in the window, with the online booking rules, and tells everyone; if no court is free it says so, and they book one themselves. Past requests disappear by themselves.
 - **Request chat**: the poster and whoever tapped **I'm in** have a **Chat** (on the request card, with a dot when there is something new) to arrange things; nobody else sees it. Each message brings a notification. Text only; messages are kept 30 days.
-- **Member chat** (**Chat** tab in *Book a court* and on the club page): the **Club chat**, where every connected member reads and writes (notifications can be turned off), and **Private messages**. You can write privately only to those who turned on **Members can write to me** (off by default); whoever receives can always reply. **Block** stops a member writing to you and hides their messages; the flag **reports** a message to the office, which sees only reported messages of private chats. **Play** has a **Club chat** entry (under *Book a court*, with the latest message) and, when there are new messages, a strip at the top that opens the chat; the same at the top of the club page.
+- **Member chat** (**Chat** tab in *Book a court* and on the club page): the **Club chat**, where every connected member reads and writes (notifications can be turned off), and **Private messages**. You can write privately only to those who turned on **Members can write to me** (off by default); whoever receives can always reply. **Block** stops a member writing to you and hides their messages; the flag **reports** a message to the office, which sees only reported messages of private chats. **Play** has a **Club chat** entry (under *Book a court*, with the latest message) and, when there are new messages, a strip at the top that opens the chat; the same at the top of the club page. Long-press one of your messages (on the page: the ⋯ dots) to **edit** it, in the first 15 minutes, or **delete** it: others see “Message deleted” (if it had been reported, the office still sees its text).
 - **Club notice board**: the office writes a notice (*Club server › Club notice board*, or **Online bookings** from the PC) and it reaches every player with a notification; they read it at the top of **Book**, without replying. From *Chats and reports* the office reads the chats and removes out-of-place messages. New ones also show in the news on **Play**.
 - **If the server does not answer**: the app notices by itself (every few minutes) and *Book a court* says the club is not answering, showing your own bookings as of the last check; when it is back, everything switches on again by itself. The rest of the app does not change. Anyone who never joined does not see *Book a court*: under **More** there is **I have a club invitation**.
 - **Alerts for the office**: with *Notify me of online bookings* (on by default) the office phone gets a notification when a player books or cancels, even with the app closed: about every 15 minutes, when there is a network. Tapping it opens the planner on the booking day. Bookings the office removes itself give no notification.
@@ -9776,7 +9818,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Lista de espera**: tocando una casilla **Ocupada** (en la página TSM o en *Reservar pista* en la app) el jugador elige **Avísame si se libera**, para esa pista o cualquier pista a la misma hora (como mucho 3 esperas). Si la reserva se anula o se mueve, recibe el aviso enseguida y en la página aparece **Reservar**: la consigue quien reserve primero; si otro es más rápido, vuelve a esperar. Las esperas desaparecen solas cuando pasa la hora.
 - **Busco compañero**: en la página TSM y en *Reservar pista* el jugador publica un anuncio (día, franja horaria, individual o dobles, nivel, nota; como mucho 3 abiertos). Los demás lo ven y tocan **Me apunto**; quien lo puso recibe un aviso. Completos (2 jugadores en individual, 4 en dobles) el servidor **reserva solo** la primera pista libre en la franja, con las reglas de las reservas en línea, y avisa a todos; si no hay pista libre lo dice, y la reservan ellos. Los anuncios pasados desaparecen solos.
 - **Chat del anuncio**: quien puso el anuncio y quienes tocaron **Me apunto** tienen un **Chat** (en la ficha del anuncio, con un punto si hay algo nuevo) para ponerse de acuerdo; los demás no lo ven. Cada mensaje llega con una notificación. Solo texto; los mensajes se guardan 30 días.
-- **Chat entre socios** (pestaña **Chat** en *Reservar pista* y en la página del club): el **Chat del club**, donde leen y escriben todos los socios conectados (las notificaciones se pueden apagar), y los **Mensajes privados**. En privado solo se escribe a quien encendió **Los socios pueden escribirme** (apagado al principio); quien recibe siempre puede responder. **Bloquear** impide que un socio te escriba y oculta sus mensajes; con la banderita se **señala** un mensaje a la secretaría, que de los chats privados solo ve los mensajes señalados. En **Jugar** está la entrada **Chat del club** (bajo *Reservar pista*, con el último mensaje) y, cuando hay mensajes nuevos, una franja arriba que abre el chat; lo mismo arriba en la página del club.
+- **Chat entre socios** (pestaña **Chat** en *Reservar pista* y en la página del club): el **Chat del club**, donde leen y escriben todos los socios conectados (las notificaciones se pueden apagar), y los **Mensajes privados**. En privado solo se escribe a quien encendió **Los socios pueden escribirme** (apagado al principio); quien recibe siempre puede responder. **Bloquear** impide que un socio te escriba y oculta sus mensajes; con la banderita se **señala** un mensaje a la secretaría, que de los chats privados solo ve los mensajes señalados. En **Jugar** está la entrada **Chat del club** (bajo *Reservar pista*, con el último mensaje) y, cuando hay mensajes nuevos, una franja arriba que abre el chat; lo mismo arriba en la página del club. Manteniendo pulsado un mensaje propio (en la página: los puntos ⋯) se **edita**, en los primeros 15 minutos, o se **elimina**: los demás ven «Mensaje eliminado» (si había sido señalado, la secretaría sigue viendo el texto).
 - **Tablón del club**: la secretaría escribe un aviso (*Servidor del club › Tablón del club*, o **Reservas online** desde el PC) y llega a todos los jugadores con una notificación; lo leen arriba en **Reservar**, sin poder responder. Desde *Chats y avisos* la secretaría lee los chats y quita los mensajes fuera de lugar. Las novedades llegan también a las noticias de **Jugar**.
 - **Si el servidor no responde**: la app se da cuenta sola (cada pocos minutos) y en *Reservar pista* dice que el club no responde, mostrando las propias reservas del último control; cuando vuelve, todo se enciende solo. El resto de la app no cambia. Quien nunca entró no ve *Reservar pista*: en **Más** está **Tengo una invitación del club**.
 - **Avisos para la secretaría**: con *Avisarme de las reservas en línea* (encendido por defecto) el teléfono de la secretaría recibe una notificación cuando un jugador reserva o anula, también con la app cerrada: cada 15 minutos más o menos, cuando hay red. Al tocarla se abre el planning en el día de la reserva. Las que quita la propia secretaría no avisan.
@@ -10363,7 +10405,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Liste d'attente** : en touchant un créneau **Occupé** (sur la page TSM ou dans *Réserver un terrain* dans l'app), le joueur choisit **Me prévenir s'il se libère**, pour ce terrain ou n'importe quel terrain à la même heure (3 attentes au maximum). Si la réservation est annulée ou déplacée, il est prévenu tout de suite et **Réserver** apparaît sur la page : le premier qui réserve l'obtient ; si un autre est plus rapide, il reprend l'attente. Les attentes disparaissent seules une fois l'heure passée.
 - **Je cherche un partenaire** : sur la page TSM et dans *Réserver un terrain*, le joueur publie une annonce (jour, créneau, simple ou double, niveau, note ; 3 ouvertes au maximum). Les autres la voient et touchent **Je viens** ; l'auteur est prévenu. Au complet (2 joueurs en simple, 4 en double), le serveur **réserve tout seul** le premier terrain libre dans le créneau, avec les règles des réservations en ligne, et prévient tout le monde ; s'il n'y a pas de terrain libre il le dit, et ils en réservent un eux-mêmes. Les annonces passées disparaissent seules.
 - **Discussion de l'annonce** : l'auteur de l'annonce et ceux qui ont touché **Je viens** ont une **Discussion** (sur la fiche de l'annonce, avec un point s'il y a du nouveau) pour s'organiser ; les autres ne la voient pas. Chaque message arrive avec une notification. Texte seulement ; les messages restent 30 jours.
-- **Discussion entre membres** (onglet **Discussion** dans *Réserver un terrain* et sur la page du club) : la **Discussion du club**, où tous les membres connectés lisent et écrivent (les notifications se désactivent), et les **Messages privés**. On n'écrit en privé qu'à ceux qui ont activé **Les membres peuvent m'écrire** (désactivé au départ) ; qui reçoit peut toujours répondre. **Bloquer** empêche un membre de vous écrire et masque ses messages ; le drapeau **signale** un message au secrétariat, qui ne voit des discussions privées que les messages signalés. **Jouer** a une entrée **Discussion du club** (sous *Réserver un terrain*, avec le dernier message) et, quand il y a des messages nouveaux, une bande en haut qui ouvre la discussion ; de même en haut de la page du club.
+- **Discussion entre membres** (onglet **Discussion** dans *Réserver un terrain* et sur la page du club) : la **Discussion du club**, où tous les membres connectés lisent et écrivent (les notifications se désactivent), et les **Messages privés**. On n'écrit en privé qu'à ceux qui ont activé **Les membres peuvent m'écrire** (désactivé au départ) ; qui reçoit peut toujours répondre. **Bloquer** empêche un membre de vous écrire et masque ses messages ; le drapeau **signale** un message au secrétariat, qui ne voit des discussions privées que les messages signalés. **Jouer** a une entrée **Discussion du club** (sous *Réserver un terrain*, avec le dernier message) et, quand il y a des messages nouveaux, une bande en haut qui ouvre la discussion ; de même en haut de la page du club. Un appui long sur un de vos messages (sur la page : les points ⋯) permet de le **modifier**, dans les 15 premières minutes, ou de le **supprimer** : les autres voient « Message supprimé » (s'il avait été signalé, le secrétariat en voit encore le texte).
 - **Tableau du club** : le secrétariat écrit un avis (*Serveur du club › Tableau du club*, ou **Réservations en ligne** depuis le PC) et il arrive à tous les joueurs avec une notification ; ils le lisent en haut de **Réserver**, sans pouvoir répondre. Depuis *Discussions et signalements* le secrétariat lit les discussions et retire les messages déplacés. Les nouveautés arrivent aussi dans les nouvelles de **Jouer**.
 - **Si le serveur ne répond pas** : l'appli s'en aperçoit toute seule (toutes les quelques minutes) et *Réserver un terrain* indique que le club ne répond pas, en montrant ses réservations du dernier contrôle ; quand il revient, tout se rallume tout seul. Le reste de l'appli ne change pas. Qui n'est jamais entré ne voit pas *Réserver un terrain* : dans **Plus** il y a **J'ai une invitation du club**.
 - **Alertes pour le secrétariat** : avec *Me prévenir des réservations en ligne* (activé par défaut), le téléphone du secrétariat reçoit une notification quand un joueur réserve ou annule, même app fermée : environ toutes les 15 minutes, quand il y a du réseau. En la touchant, le planning s'ouvre sur le jour de la réservation. Celles que le secrétariat retire lui-même ne donnent pas de notification.
@@ -10950,7 +10992,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Lista d'attesa**: toccando una casella **Occupato** (nella pagina TSM o in *Prenota un campo* nell'app) il giocatore sceglie **Avvisami se si libera**, per quel campo o per un campo qualsiasi alla stessa ora (al massimo 3 attese). Se la prenotazione viene disdetta o spostata gli arriva subito l'avviso e nella pagina compare **Prenota**: vince chi prenota per primo; se un altro arriva prima, si torna ad aspettare. Le attese spariscono da sole quando l'ora passa.
 - **Cerco compagno**: nella pagina TSM e in *Prenota un campo* il giocatore pubblica un annuncio (giorno, fascia oraria, singolo o doppio, livello, nota; al massimo 3 aperti). Gli altri lo vedono e toccano **Ci sto**; chi l'ha messo riceve un avviso. Al completo (2 giocatori nel singolo, 4 nel doppio) il server **prenota da solo** il primo campo libero nella fascia, con le regole delle prenotazioni online, e avvisa tutti; se non c'è un campo libero lo dice, e lo prenotano loro. Gli annunci passati spariscono da soli.
 - **Chat dell'annuncio**: chi ha messo l'annuncio e chi ha toccato **Ci sto** hanno una **Chat** (sulla scheda dell'annuncio, col pallino se c'è del nuovo) per mettersi d'accordo; gli altri non la vedono. Arriva una notifica a ogni messaggio. Solo testo; i messaggi restano 30 giorni.
-- **Chat tra soci** (scheda **Chat** in *Prenota un campo* e nella pagina del circolo): la **Chat del circolo**, dove leggono e scrivono tutti i soci collegati (le notifiche si possono spegnere), e i **Messaggi privati**. Si scrive in privato solo a chi ha acceso **Possono scrivermi i soci** (spento di partenza); chi riceve può sempre rispondere. Con **Blocca** un socio non ti scrive più e non leggi più i suoi messaggi; con la bandierina un messaggio si **segnala** alla segreteria, che delle chat private vede solo i messaggi segnalati. In **Gioca** c'è la voce **Chat del circolo** (sotto *Prenota un campo*, con l'ultimo messaggio) e, quando ci sono messaggi nuovi, una striscia in cima che apre la chat; lo stesso in cima alla pagina del circolo.
+- **Chat tra soci** (scheda **Chat** in *Prenota un campo* e nella pagina del circolo): la **Chat del circolo**, dove leggono e scrivono tutti i soci collegati (le notifiche si possono spegnere), e i **Messaggi privati**. Si scrive in privato solo a chi ha acceso **Possono scrivermi i soci** (spento di partenza); chi riceve può sempre rispondere. Con **Blocca** un socio non ti scrive più e non leggi più i suoi messaggi; con la bandierina un messaggio si **segnala** alla segreteria, che delle chat private vede solo i messaggi segnalati. In **Gioca** c'è la voce **Chat del circolo** (sotto *Prenota un campo*, con l'ultimo messaggio) e, quando ci sono messaggi nuovi, una striscia in cima che apre la chat; lo stesso in cima alla pagina del circolo. Tenendo premuto un proprio messaggio (nella pagina: i puntini ⋯) lo si **modifica**, nei primi 15 minuti, o lo si **elimina**: agli altri resta «Messaggio eliminato» (se era stato segnalato, la segreteria ne vede ancora il testo).
 - **Bacheca del circolo**: la segreteria scrive un avviso (*Server del circolo › Bacheca del circolo*, o **Prenotazioni online** dal PC) e arriva a tutti i giocatori con una notifica; loro lo leggono in cima a **Prenota**, senza poter rispondere. Da *Chat e segnalazioni* la segreteria legge le chat e toglie i messaggi fuori luogo. Le nuove arrivano anche nelle novità di **Gioca**.
 - **Se il server non risponde**: l'app se ne accorge da sola (ogni pochi minuti) e in *Prenota un campo* scrive che il circolo non risponde, mostrando le proprie prenotazioni dell'ultimo controllo; quando torna, tutto si riaccende da solo. Il resto dell'app non cambia. Chi non è mai entrato non vede *Prenota un campo*: in **Altro** c'è **Ho un invito del circolo**.
 - **Avvisi alla segreteria**: con *Avvisami delle prenotazioni online* (acceso di solito) il telefono della segreteria riceve una notifica quando un giocatore prenota o disdice, anche ad app chiusa: ogni 15 minuti circa, quando c'è rete. Toccandola si apre il planning sul giorno della prenotazione. Quelle tolte dalla segreteria stessa non danno notifica.
@@ -11537,7 +11579,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Lista de espera**: ao tocar numa casa **Ocupada** (na página TSM ou em *Reservar quadra* na app) o jogador escolhe **Avisa-me se ficar livre**, para essa quadra ou qualquer quadra à mesma hora (no máximo 3 esperas). Se a reserva for cancelada ou mudada, recebe logo o aviso e na página aparece **Reservar**: fica com ela quem reservar primeiro; se outro for mais rápido, volta a esperar. As esperas desaparecem sozinhas quando a hora passa.
 - **Procuro parceiro**: na página TSM e em *Reservar quadra* o jogador publica um anúncio (dia, faixa horária, singulares ou pares, nível, nota; no máximo 3 abertos). Os outros veem-no e tocam em **Conta comigo**; quem o publicou recebe um aviso. Completos (2 jogadores em singulares, 4 em pares) o servidor **reserva sozinho** a primeira quadra livre na faixa, com as regras das reservas online, e avisa todos; se não houver quadra livre diz-o, e reservam eles. Os anúncios passados desaparecem sozinhos.
 - **Chat do anúncio**: quem pôs o anúncio e quem tocou em **Conta comigo** têm um **Chat** (na ficha do anúncio, com um ponto quando há novidades) para combinar; os outros não o veem. Cada mensagem chega com uma notificação. Só texto; as mensagens ficam 30 dias.
-- **Chat entre sócios** (separador **Chat** em *Reservar quadra* e na página do clube): o **Chat do clube**, onde leem e escrevem todos os sócios ligados (as notificações podem desligar-se), e as **Mensagens privadas**. Em privado só se escreve a quem ligou **Os sócios podem escrever-me** (desligado ao início); quem recebe pode sempre responder. **Bloquear** impede um sócio de te escrever e esconde as mensagens dele; com a bandeirinha **assinala-se** uma mensagem à secretaria, que dos chats privados só vê as mensagens assinaladas. Em **Jogar** há a entrada **Chat do clube** (por baixo de *Reservar quadra*, com a última mensagem) e, quando há mensagens novas, uma faixa no topo que abre o chat; o mesmo no topo da página do clube.
+- **Chat entre sócios** (separador **Chat** em *Reservar quadra* e na página do clube): o **Chat do clube**, onde leem e escrevem todos os sócios ligados (as notificações podem desligar-se), e as **Mensagens privadas**. Em privado só se escreve a quem ligou **Os sócios podem escrever-me** (desligado ao início); quem recebe pode sempre responder. **Bloquear** impede um sócio de te escrever e esconde as mensagens dele; com a bandeirinha **assinala-se** uma mensagem à secretaria, que dos chats privados só vê as mensagens assinaladas. Em **Jogar** há a entrada **Chat do clube** (por baixo de *Reservar quadra*, com a última mensagem) e, quando há mensagens novas, uma faixa no topo que abre o chat; o mesmo no topo da página do clube. Mantendo premida uma mensagem própria (na página: os pontos ⋯) pode-se **editar**, nos primeiros 15 minutos, ou **eliminar**: os outros veem «Mensagem eliminada» (se tinha sido assinalada, a secretaria continua a ver o texto).
 - **Mural do clube**: a secretaria escreve um aviso (*Servidor do clube › Mural do clube*, ou **Reservas online** no PC) e chega a todos os jogadores com uma notificação; eles leem-no no topo de **Reservar**, sem poder responder. Em *Chats e alertas* a secretaria lê os chats e tira as mensagens despropositadas. As novidades aparecem também nas notícias de **Jogar**.
 - **Se o servidor não responde**: a app dá por isso sozinha (a cada poucos minutos) e em *Reservar quadra* diz que o clube não responde, mostrando as próprias reservas do último controlo; quando volta, tudo se liga sozinho. O resto da app não muda. Quem nunca entrou não vê *Reservar quadra*: em **Mais** há **Tenho um convite do clube**.
 - **Avisos para a secretaria**: com *Avisar-me das reservas online* (ligado por omissão) o telemóvel da secretaria recebe uma notificação quando um jogador reserva ou cancela, mesmo com a app fechada: mais ou menos a cada 15 minutos, quando há rede. Ao tocá-la abre-se a agenda no dia da reserva. As que a própria secretaria tira não dão notificação.
@@ -20229,6 +20271,9 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun myChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
     fun setPrefs(p: SrvPrefsIn): SrvOk = call("POST", "/prefs", SrvPrefsIn.serializer(), p, SrvOk.serializer())
     fun block(player: String, on: Boolean): SrvOk = call("POST", "/block", SrvBlockIn.serializer(), SrvBlockIn(player, on), SrvOk.serializer())
+    /** Correggere (nei primi minuti) o eliminare un proprio messaggio. */
+    fun editChat(id: String, text: String): SrvOk = call("PUT", "/chat/msg/$id", SrvChatIn.serializer(), SrvChatIn(text), SrvOk.serializer())
+    fun deleteMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/chat/msg/$id", null, null, SrvOk.serializer())
     fun report(id: String): SrvOk = call<Unit, SrvOk>("POST", "/chat/msg/$id/report", null, null, SrvOk.serializer())
     fun adminChat(room: String): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/admin/chat/$room", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
     fun adminChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/admin/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
@@ -34529,7 +34574,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.MoreVert
@@ -34631,6 +34678,9 @@ fun ChatDialog(
     send: (suspend (String) -> String?)? = null,
     delete: (suspend (String) -> String?)? = null,
     report: (suspend (String) -> String?)? = null,
+    /** I propri messaggi: correggerli (nei primi [CHAT_EDIT_MINUTES] minuti) ed eliminarli. */
+    editMine: (suspend (String, String) -> String?)? = null,
+    deleteMine: (suspend (String) -> String?)? = null,
     hint: String? = null,
     extra: Pair<String, () -> Unit>? = null,
     group: Boolean = false,
@@ -34649,6 +34699,9 @@ fun ChatDialog(
     var tick by remember { mutableStateOf(0) }
     var menu by remember { mutableStateOf(false) }
     var picked by remember { mutableStateOf<SrvChatMsg?>(null) }
+    /** Il proprio messaggio che si sta correggendo: il testo va nella barra in basso. */
+    var editing by remember { mutableStateOf<SrvChatMsg?>(null) }
+    var deleteAsk by remember { mutableStateOf<SrvChatMsg?>(null) }
     val listState = rememberLazyListState()
     LaunchedEffect(tick) {
         while (true) {
@@ -34719,7 +34772,7 @@ fun ChatDialog(
                         }
                     } else {
                         val m = r as SrvChatMsg
-                        val canAct = (report != null && !m.mine && !m.office) || delete != null
+                        val canAct = !m.deleted && ((report != null && !m.mine && !m.office) || delete != null || (m.mine && deleteMine != null))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {
                             Column(
                                 Modifier.widthIn(max = 300.dp)
@@ -34729,9 +34782,12 @@ fun ChatDialog(
                                     .padding(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 4.dp),
                             ) {
                                 if (!m.mine && (group || m.office)) Text(m.name, color = if (m.office) TsmColors.Ball else nameColor(m.name), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                Text(m.text, color = if (m.mine) TsmColors.OnBall else TsmColors.TextMain, fontSize = 15.sp)
-                                Text(time.format(java.util.Date(m.at)), color = if (m.mine) TsmColors.OnBall.copy(alpha = 0.6f) else TsmColors.TextDim, fontSize = 11.sp,
-                                    modifier = Modifier.align(Alignment.End))
+                                val fg = if (m.mine) TsmColors.OnBall else TsmColors.TextMain
+                                if (m.deleted) Text("🚫 " + s.pbMsgDeleted + if (m.text.isNotEmpty()) " — ${m.text}" else "", color = fg.copy(alpha = 0.6f), fontSize = 14.sp,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                                else Text(m.text, color = fg, fontSize = 15.sp)
+                                Text((if (m.edited && !m.deleted) s.pbMsgEdited + " · " else "") + time.format(java.util.Date(m.at)),
+                                    color = if (m.mine) TsmColors.OnBall.copy(alpha = 0.6f) else TsmColors.TextDim, fontSize = 11.sp, modifier = Modifier.align(Alignment.End))
                             }
                         }
                     }
@@ -34740,6 +34796,17 @@ fun ChatDialog(
             }
             err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) }
             // In basso la barra per scrivere (non c'è dove si legge soltanto).
+            // Mentre si corregge un messaggio: una riga sopra la barra, con la X per lasciar perdere.
+            editing?.let { e ->
+                Row(Modifier.fillMaxWidth().background(TsmColors.Surface).padding(start = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Edit, null, tint = TsmColors.Ball, modifier = Modifier.size(18.dp))
+                    Column(Modifier.weight(1f).padding(start = 10.dp, top = 6.dp, bottom = 6.dp)) {
+                        Text(s.pbMsgEditing, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(e.text, color = TsmColors.TextDim, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    IconButton(onClick = { editing = null; text = "" }) { Icon(Icons.Filled.Close, s.back, tint = TsmColors.TextDim) }
+                }
+            }
             if (send != null) Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextField(
                     text, { text = it.take(500) }, Modifier.weight(1f), placeholder = { Text(s.pbChatPlaceholder) }, maxLines = 5,
@@ -34755,14 +34822,47 @@ fun ChatDialog(
                     Modifier.size(52.dp).clip(CircleShape).background(if (ready) TsmColors.Ball else TsmColors.SurfaceHigh).clickable(enabled = ready) {
                         val t = text.trim()
                         busy = true
-                        scope.launch { err = send(t)?.let(errText); if (err == null) text = ""; busy = false; tick++ }
+                        val e = editing
+                        scope.launch {
+                            err = (if (e != null && editMine != null) editMine(e.id, t) else send(t))?.let(errText)
+                            if (err == null) { text = ""; editing = null }
+                            busy = false; tick++
+                        }
                     },
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.AutoMirrored.Filled.Send, s.pbChatSend, tint = if (ready) TsmColors.OnBall else TsmColors.TextDim) }
             } else Spacer(Modifier.size(8.dp))
         }
+        // Tenendo premuto un proprio messaggio: correggerlo (nei primi minuti) o eliminarlo.
+        picked?.takeIf { it.mine && delete == null }?.let { m ->
+            val canEdit = editMine != null && System.currentTimeMillis() - m.at <= com.tennis.scoremanager.data.CHAT_EDIT_MINUTES * 60_000L
+            AlertDialog(
+                onDismissRequest = { picked = null },
+                text = { Text(m.text, color = TsmColors.TextMain, maxLines = 6, overflow = TextOverflow.Ellipsis) },
+                confirmButton = {
+                    Row {
+                        if (canEdit) TextButton(onClick = { picked = null; editing = m; text = m.text }) {
+                            Icon(Icons.Filled.Edit, null, tint = TsmColors.Ball); Text(" " + s.pbMsgEdit, color = TsmColors.Ball)
+                        }
+                        TextButton(onClick = { picked = null; deleteAsk = m }) { Icon(Icons.Filled.Delete, null, tint = TsmColors.Danger); Text(" " + s.pbMsgDelete, color = TsmColors.Danger) }
+                    }
+                },
+                dismissButton = { TextButton(onClick = { picked = null }) { Text(s.back) } },
+            )
+        }
+        deleteAsk?.let { m ->
+            AlertDialog(
+                onDismissRequest = { deleteAsk = null },
+                text = { Text(s.pbMsgDeleteAsk) },
+                confirmButton = { TextButton(onClick = {
+                    deleteAsk = null
+                    scope.launch { err = deleteMine?.invoke(m.id)?.let(errText); if (editing?.id == m.id) { editing = null; text = "" }; tick++ }
+                }) { Text(s.pbMsgDelete, color = TsmColors.Danger) } },
+                dismissButton = { TextButton(onClick = { deleteAsk = null }) { Text(s.back) } },
+            )
+        }
         // Tenendo premuto un messaggio: toglierlo (la segreteria) o segnalarlo.
-        picked?.let { m ->
+        picked?.takeIf { !it.mine || delete != null }?.let { m ->
             AlertDialog(
                 onDismissRequest = { picked = null },
                 text = { Text("${m.name}: ${m.text}", color = TsmColors.TextMain, maxLines = 6, overflow = TextOverflow.Ellipsis) },
@@ -39362,6 +39462,13 @@ interface Strings {
     val pbDmFrom: (String) -> String
     val pbClubEntryHint: String
     val pbYesterday: String
+    val pbMsgEdit: String
+    val pbMsgDelete: String
+    val pbMsgDeleted: String
+    val pbMsgEdited: String
+    val pbMsgEditing: String
+    val pbMsgDeleteAsk: String
+    val pbErrEditLate: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -41724,6 +41831,13 @@ object ItStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Messaggio da $it" }
     override val pbClubEntryHint = "Scrivi a tutti i soci del circolo"
     override val pbYesterday = "Ieri"
+    override val pbMsgEdit = "Modifica"
+    override val pbMsgDelete = "Elimina"
+    override val pbMsgDeleted = "Messaggio eliminato"
+    override val pbMsgEdited = "modificato"
+    override val pbMsgEditing = "Modifica del messaggio"
+    override val pbMsgDeleteAsk = "Eliminare il messaggio? Per tutti resterà «Messaggio eliminato»."
+    override val pbErrEditLate = "Un messaggio si può modificare solo nei primi 15 minuti."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -44049,6 +44163,13 @@ object EnStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Message from $it" }
     override val pbClubEntryHint = "Write to every member of the club"
     override val pbYesterday = "Yesterday"
+    override val pbMsgEdit = "Edit"
+    override val pbMsgDelete = "Delete"
+    override val pbMsgDeleted = "Message deleted"
+    override val pbMsgEdited = "edited"
+    override val pbMsgEditing = "Editing message"
+    override val pbMsgDeleteAsk = "Delete the message? Everyone will see “Message deleted”."
+    override val pbErrEditLate = "A message can only be edited in the first 15 minutes."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -46397,6 +46518,13 @@ object DeStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Nachricht von $it" }
     override val pbClubEntryHint = "Schreib allen Mitgliedern des Vereins"
     override val pbYesterday = "Gestern"
+    override val pbMsgEdit = "Bearbeiten"
+    override val pbMsgDelete = "Löschen"
+    override val pbMsgDeleted = "Nachricht gelöscht"
+    override val pbMsgEdited = "bearbeitet"
+    override val pbMsgEditing = "Nachricht bearbeiten"
+    override val pbMsgDeleteAsk = "Nachricht löschen? Alle sehen dann „Nachricht gelöscht“."
+    override val pbErrEditLate = "Eine Nachricht lässt sich nur in den ersten 15 Minuten bearbeiten."
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -48738,6 +48866,13 @@ object EsStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Mensaje de $it" }
     override val pbClubEntryHint = "Escribe a todos los socios del club"
     override val pbYesterday = "Ayer"
+    override val pbMsgEdit = "Editar"
+    override val pbMsgDelete = "Eliminar"
+    override val pbMsgDeleted = "Mensaje eliminado"
+    override val pbMsgEdited = "editado"
+    override val pbMsgEditing = "Editando el mensaje"
+    override val pbMsgDeleteAsk = "¿Eliminar el mensaje? Todos verán «Mensaje eliminado»."
+    override val pbErrEditLate = "Un mensaje solo se puede editar en los primeros 15 minutos."
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -51081,6 +51216,13 @@ object FrStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Message de $it" }
     override val pbClubEntryHint = "Écrivez à tous les membres du club"
     override val pbYesterday = "Hier"
+    override val pbMsgEdit = "Modifier"
+    override val pbMsgDelete = "Supprimer"
+    override val pbMsgDeleted = "Message supprimé"
+    override val pbMsgEdited = "modifié"
+    override val pbMsgEditing = "Modification du message"
+    override val pbMsgDeleteAsk = "Supprimer le message ? Tout le monde verra « Message supprimé »."
+    override val pbErrEditLate = "Un message ne peut être modifié que dans les 15 premières minutes."
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -53425,6 +53567,13 @@ object PtStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Mensagem de $it" }
     override val pbClubEntryHint = "Escreve a todos os sócios do clube"
     override val pbYesterday = "Ontem"
+    override val pbMsgEdit = "Editar"
+    override val pbMsgDelete = "Eliminar"
+    override val pbMsgDeleted = "Mensagem eliminada"
+    override val pbMsgEdited = "editada"
+    override val pbMsgEditing = "A editar a mensagem"
+    override val pbMsgDeleteAsk = "Eliminar a mensagem? Todos verão «Mensagem eliminada»."
+    override val pbErrEditLate = "Uma mensagem só se pode editar nos primeiros 15 minutos."
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -55369,6 +55518,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "TOO_MANY_MESSAGES" -> s.pbErrChatMany
     "USER_BLOCKED" -> s.pbErrUserBlocked
     "DM_CLOSED" -> s.pbErrDmClosed
+    "EDIT_TOO_LATE" -> s.pbErrEditLate
+    "NOT_YOURS" -> s.pbErrChat
     else -> s.srvErrOther(code)
 }
 
@@ -55596,7 +55747,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""),
                 SegOption(s.pbTabSeek + acct.unreadSeeks.size.takeIf { it > 0 }?.let { " ($it)" }.orEmpty()),
                 SegOption(s.pbTabChat + if (rooms.any { it.last > (acct.chatRead[it.room] ?: 0) }) " •" else "")),
-            tab, { tab = it },
+            // Quattro schede su due righe: in una sola le scritte non ci stanno.
+            tab, { tab = it }, columns = 2,
         )
         when (tab) {
             0 -> {
@@ -55778,6 +55930,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 load = { c.booking { it.chat(room, 0) } },
                 send = if (board) null else { text -> c.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
                 report = if (board) null else { id -> c.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
+                editMine = if (board) null else { id, t -> c.booking { it.editChat(id, t) }.exceptionOrNull()?.let(::errCode) },
+                deleteMine = if (board) null else { id -> c.booking { it.deleteMine(id) }.exceptionOrNull()?.let(::errCode) },
                 hint = when { board -> s.pbBoardHint; room == "club" -> s.pbClubChatHint; other != null -> s.pbDmHint; else -> null },
                 extra = other?.let { id -> s.pbBlock to { blockAsk = id to name } },
                 group = room == "club" || room.startsWith("s-"),
@@ -92359,7 +92513,13 @@ import kotlinx.serialization.Serializable
  * Un messaggio di una chat del circolo. Le stanze sono "board" (la bacheca: scrive solo la segreteria, leggono
  * tutti) e "s-ID" (la chat di un annuncio di Cerco compagno: chi l'ha messo e chi ha detto ci sto).
  */
-@Serializable data class SrvChatMsg(val id: String, val name: String, val text: String, val at: Long, val mine: Boolean = false, val office: Boolean = false)
+@Serializable data class SrvChatMsg(
+    val id: String, val name: String, val text: String, val at: Long, val mine: Boolean = false, val office: Boolean = false,
+    /** Corretto da chi l'ha scritto (si può nei primi [CHAT_EDIT_MINUTES] minuti); eliminato da chi l'ha scritto (resta il posto). */
+    val edited: Boolean = false, val deleted: Boolean = false,
+)
+/** Per quanti minuti dopo l'invio si può modificare un proprio messaggio. */
+const val CHAT_EDIT_MINUTES = 15
 @Serializable data class SrvChatIn(val text: String)
 /** Una stanza vista dalla segreteria: per la moderazione. */
 /** Una chat nell'elenco: [preview] l'ultimo messaggio ("Mario: ciao"), [previewMine] se l'ho scritto io. */
@@ -95230,6 +95390,7 @@ import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvChatIn
 import com.tennis.scoremanager.data.SrvChatMsg
 import com.tennis.scoremanager.data.SrvChatRoom
+import com.tennis.scoremanager.data.CHAT_EDIT_MINUTES
 import com.tennis.scoremanager.data.SrvPerson
 import com.tennis.scoremanager.data.SrvBlockIn
 import com.tennis.scoremanager.data.SrvPinIn
@@ -95326,6 +95487,8 @@ class Api(
             r.method == "GET" && p == listOf("chats") -> myChats(player(r))
             r.method == "POST" && p == listOf("block") -> block(player(r), r)
             r.method == "POST" && p.size == 4 && p[0] == "chat" && p[1] == "msg" && p[3] == "report" -> report(player(r), p[2])
+            r.method == "PUT" && p.size == 3 && p[0] == "chat" && p[1] == "msg" -> editMine(player(r), p[2], r)
+            r.method == "DELETE" && p.size == 3 && p[0] == "chat" && p[1] == "msg" -> deleteMine(player(r), p[2])
             r.method == "GET" && p.size == 2 && p[0] == "chat" -> chatRead(player(r), p[1], r.query["after"])
             r.method == "POST" && p.size == 2 && p[0] == "chat" -> chatWrite(player(r), p[1], r)
             r.method == "GET" && p == listOf("admin", "chats") -> { admin(r); ok(ListSerializer(SrvChatRoom.serializer()), chatRooms()) }
@@ -95604,8 +95767,33 @@ class Api(
         val hidden = pl?.blocked.orEmpty().toSet()
         val list = store.state.chats.filter { it.room == room && it.at > since && it.from !in hidden && (!onlyReported || it.reported) }
             .sortedBy { it.at }.takeLast(200)
-            .map { SrvChatMsg(it.id, it.name, it.text, it.at, mine = pl != null && it.from == pl.id, office = it.from.isEmpty()) }
+            .map {
+                // Un messaggio eliminato: ai giocatori resta il posto; la segreteria ne vede il testo se era segnalato.
+                val text = if (it.deleted && (pl != null || !it.reported)) "" else it.text
+                SrvChatMsg(it.id, it.name, text, it.at, mine = pl != null && it.from == pl.id, office = it.from.isEmpty(), edited = it.edited > 0, deleted = it.deleted)
+            }
         return ok(ListSerializer(SrvChatMsg.serializer()), list)
+    }
+
+    /** Correggere un proprio messaggio, nei primi [CHAT_EDIT_MINUTES] minuti. */
+    private fun editMine(pl: Player, id: String, r: Req): Resp {
+        val text = read(SrvChatIn.serializer(), r).text.trim().take(CHAT_MAX)
+        if (text.isEmpty()) throw ApiError(400, "EMPTY")
+        val m = store.state.chats.firstOrNull { it.id == id } ?: throw ApiError(404, "NOT_FOUND")
+        if (m.from != pl.id || m.deleted) throw ApiError(403, "NOT_YOURS")
+        val now = store.now()
+        if (now - m.at > CHAT_EDIT_MINUTES * 60_000L) throw ApiError(409, "EDIT_TOO_LATE")
+        store.update { s -> s.copy(chats = s.chats.map { if (it.id == id) it.copy(text = text, edited = now) else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /** Eliminare un proprio messaggio: per tutti resta "Messaggio eliminato". */
+    private fun deleteMine(pl: Player, id: String): Resp {
+        val m = store.state.chats.firstOrNull { it.id == id } ?: throw ApiError(404, "NOT_FOUND")
+        if (m.from != pl.id) throw ApiError(403, "NOT_YOURS")
+        // Il testo resta solo se era stato segnalato (la segreteria deve poterlo vedere); se no se ne va davvero.
+        store.update { s -> s.copy(chats = s.chats.map { if (it.id == id) it.copy(deleted = true, text = if (it.reported) it.text else "") else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     /** I soci a cui si può scrivere: chi ha acceso "Possono scrivermi i soci", senza chi si è bloccato da una parte o dall'altra. */
@@ -95622,8 +95810,8 @@ class Api(
         val hidden = pl.blocked.toSet()
         val mine = s.chats.filter { it.from !in hidden && (it.room == "club" || dmOther(pl.id, it.room) != null) }.groupBy { it.room }
         val rooms = mine.map { (room, msgs) ->
-            val lastMsg = msgs.maxBy { it.at }
-            SrvChatRoom(room, if (room == "club") "club" else names[dmOther(pl.id, room)] ?: "?", msgs.size, lastMsg.at,
+            val lastMsg = msgs.filter { !it.deleted }.maxByOrNull { it.at } ?: msgs.maxBy { it.at }
+            SrvChatRoom(room, if (room == "club") "club" else names[dmOther(pl.id, room)] ?: "?", msgs.size, msgs.maxOf { it.at },
                 (if (room == "club" && lastMsg.from != pl.id) "${lastMsg.name}: " else "") + lastMsg.text.take(120), lastMsg.from == pl.id)
         }.let { l -> if (l.none { it.room == "club" }) l + SrvChatRoom("club", "club", 0, 0) else l }
         return ok(ListSerializer(SrvChatRoom.serializer()), rooms.sortedByDescending { it.last })
@@ -95642,7 +95830,7 @@ class Api(
     /** Segnalare alla segreteria un messaggio ricevuto: solo allora lo vede, anche in una chat privata. */
     private fun report(pl: Player, id: String): Resp {
         val m = store.state.chats.firstOrNull { it.id == id } ?: throw ApiError(404, "NOT_FOUND")
-        if (m.from == pl.id || !canRead(pl, m.room)) throw ApiError(403, "NOT_IN_CHAT")
+        if (m.from == pl.id || m.deleted || !canRead(pl, m.room)) throw ApiError(403, "NOT_IN_CHAT")
         store.update { s -> s.copy(chats = s.chats.map { if (it.id == id) it.copy(reported = true) else it }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
@@ -96284,7 +96472,11 @@ data class PushSub(val player: String, val endpoint: String, val p256dh: String,
  * [reported]: segnalato da chi l'ha ricevuto, e solo allora la segreteria lo vede in una chat privata.
  */
 @Serializable
-data class ChatMsg(val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long, val reported: Boolean = false)
+data class ChatMsg(
+    val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long, val reported: Boolean = false,
+    /** Quando l'autore l'ha modificato (0 = mai); eliminato dall'autore: il testo resta solo per la segreteria, se era segnalato. */
+    val edited: Long = 0, val deleted: Boolean = false,
+)
 
 /** Un invito non ancora usato: si salva solo l'impronta del codice. */
 @Serializable
@@ -97195,45 +97387,85 @@ async function openChat(room, title, canWrite, opts = {}) {
   const list = el('div', { class: 'chatlist' });
   const input = canWrite ? el('textarea', { id: 'chatin', rows: '1', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
   const err = el('p', { class: 'error' });
-  let last = 0, timer = 0, lastDay = '';
+  let last = 0, timer = 0;
   const today = dayKey(Date.now()), yesterday = dayKey(Date.now() - 86400000);
   // Com'è questa chat (chi la legge, come si segnala): un riquadro in cima.
   const hint = opts.hint || (canWrite ? null : T.boardHint);
   if (hint) list.append(el('div', { class: 'notice' }, hint));
   const none = el('p', { class: 'dim center' }, T.chatNone);
   list.append(none);
+  const head = [...list.children];
+  // Il proprio messaggio che si sta correggendo: il testo va nella barra, sopra c'è una riga con la X.
+  let editing = null;
+  const editBar = el('div', { class: 'editbar', hidden: true });
+  const stopEdit = () => { editing = null; editBar.hidden = true; if (input) { input.value = ''; input.style.height = ''; } };
+  const startEdit = (m) => {
+    editing = m;
+    editBar.replaceChildren(el('span', null, el('b', null, '✎ ' + T.msgEditing), el('small', null, m.text)), el('button', { class: 'x', 'aria-label': T.close, onclick: stopEdit }, '✕'));
+    editBar.hidden = false;
+    input.value = m.text; input.focus();
+  };
+  const ownMenu = (m) => {
+    const canEdit = Date.now() - m.at <= 15 * 60000;
+    sheet(el('p', null, m.text),
+      el('div', { class: 'actions' },
+        canEdit ? el('button', { onclick: () => { closeSheet(); startEdit(m); } }, T.msgEdit) : null,
+        el('button', { class: 'danger', onclick: async () => {
+          if (!confirm(T.msgDeleteAsk)) return;
+          closeSheet();
+          try { await api('DELETE', '/chat/msg/' + m.id); if (editing && editing.id === m.id) stopEdit(); await load(); } catch (e) { err.textContent = errText(e); }
+        } }, T.msgDelete),
+        el('button', { class: 'ghost', onclick: closeSheet }, T.close)));
+  };
+  let shown = '';
+  // Ogni volta tutti i messaggi (al massimo 200): così si vedono anche quelli corretti o eliminati.
   const draw = (msgs) => {
+    const sig = JSON.stringify(msgs.map(m => [m.id, m.text, m.edited, m.deleted]));
+    if (sig === shown) return;
+    const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+    const grew = msgs.length && msgs[msgs.length - 1].at > last;
+    shown = sig;
+    let lastDay = '';
+    const nodes = [];
     for (const m of msgs) {
       last = Math.max(last, m.at);
       const d = dayKey(m.at);
       if (d !== lastDay) {
         lastDay = d;
-        list.append(el('div', { class: 'day' }, el('span', null, d === today ? T.today : d === yesterday ? T.yesterday
+        nodes.push(el('div', { class: 'day' }, el('span', null, d === today ? T.today : d === yesterday ? T.yesterday
           : new Intl.DateTimeFormat(LANG, { weekday: 'long', day: 'numeric', month: 'long', timeZone: tz() }).format(new Date(m.at)))));
       }
-      // Con la bandierina si segnala alla segreteria un messaggio ricevuto.
-      const flag = opts.report && !m.mine && !m.office ? el('button', { class: 'flag', title: T.report, 'aria-label': T.report, onclick: async () => {
+      // Con la bandierina si segnala alla segreteria un messaggio ricevuto; coi puntini si corregge o si elimina il proprio.
+      const flag = opts.report && !m.mine && !m.office && !m.deleted ? el('button', { class: 'flag', title: T.report, 'aria-label': T.report, onclick: async () => {
         if (!confirm(T.report + '?')) return;
         try { await api('POST', '/chat/msg/' + m.id + '/report'); toast(T.reported); } catch (e) { err.textContent = errText(e); }
       } }, '⚑') : null;
-      list.append(el('div', { class: 'bubble' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') },
+      const more = m.mine && !m.deleted && canWrite ? el('button', { class: 'flag', 'aria-label': T.msgEdit, onclick: () => ownMenu(m) }, '⋯') : null;
+      nodes.push(el('div', { class: 'bubble' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') + (m.deleted ? ' deleted' : '') },
         !m.mine && (group || m.office) ? el('div', { class: 'name', style: m.office ? null : 'color:' + nameColor(m.name) }, m.name) : null,
-        el('div', { class: 'text' }, m.text),
-        el('div', { class: 'meta' }, flag, fmtTime(m.at))));
+        el('div', { class: 'text' }, m.deleted ? '🚫 ' + T.msgDeleted : m.text),
+        el('div', { class: 'meta' }, flag, more, (m.edited && !m.deleted ? T.msgEdited + ' · ' : '') + fmtTime(m.at))));
     }
-    if (last) none.remove();
-    if (msgs.length) { list.scrollTop = list.scrollHeight; markChatRead(room, last); }
+    list.replaceChildren(...head.filter(n => n !== none || !msgs.length), ...nodes);
+    if (grew || atBottom) list.scrollTop = list.scrollHeight;
+    if (msgs.length) markChatRead(room, last);
   };
   const load = async () => {
-    try { draw(await api('GET', '/chat/' + room + '?after=' + last)); err.textContent = ''; } catch (e) { err.textContent = errText(e); }
+    try { draw(await api('GET', '/chat/' + room)); err.textContent = ''; } catch (e) { err.textContent = errText(e); }
   };
   const send = async () => {
     const text = input.value.trim();
     if (!text) return;
-    try { await api('POST', '/chat/' + room, { text }); input.value = ''; input.style.height = ''; await load(); } catch (e) { err.textContent = errText(e); }
+    try {
+      if (editing) await api('PUT', '/chat/msg/' + editing.id, { text }); else await api('POST', '/chat/' + room, { text });
+      stopEdit(); await load();
+    } catch (e) { err.textContent = errText(e); }
   };
   if (input) {
-    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+      if (e.key === 'Escape' && editing) stopEdit();
+    });
     // Il campo cresce col testo, fino a qualche riga.
     input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; });
   }
@@ -97251,7 +97483,7 @@ async function openChat(room, title, canWrite, opts = {}) {
   view.append(
     el('div', { class: 'chathead' }, el('button', { class: 'back', 'aria-label': T.close, onclick: close }, '←'),
       avatar(title, group ? '💬' : canWrite ? null : '📣'), el('b', null, title), block),
-    list, err,
+    list, err, input ? editBar : null,
     input ? el('div', { class: 'chatbar' }, input, el('button', { class: 'send', 'aria-label': T.chatSend, onclick: send }, '➤')) : null);
   document.body.append(view);
   document.body.classList.add('nochrome');
@@ -97445,7 +97677,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Prenotato!', closedNow: 'Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.',
     notSynced: 'Il circolo non ha ancora pubblicato il planning.', offline: 'Il server del circolo non risponde. Riprova tra poco.',
     install: 'Su iPhone: Condividi › Aggiungi alla schermata Home, e la trovi come un\'app.',
-    tabBook: 'Prenota', tabMine: n => `Le mie (${n})`, tabSeek: 'Compagni', tabChat: "Chat", yesterday: "Ieri", clubEntryHint: "Scrivi a tutti i soci del circolo", clubUnread: n => n === 1 ? "1 messaggio nuovo nella chat del circolo" : `${n} messaggi nuovi nella chat del circolo`, dmFrom: n => `Messaggio da ${n}`, clubChat: "Chat del circolo", clubChatHint: "Qui leggono e scrivono tutti i soci collegati. Siate gentili: la segreteria può togliere i messaggi, e con la bandierina segnali quelli fuori luogo.", clubChatAlerts: "Notifiche della chat del circolo", clubChatAlertsHint: "Spente: i messaggi li leggi qui quando vuoi.", dmTitle: "Messaggi privati", dmOpen: "Possono scrivermi i soci", dmOpenHint: "Acceso: compari nell'elenco e gli altri soci possono scriverti. Spento: non compari, ma puoi scrivere tu a chi l'ha acceso.", dmHint: "Lo leggete solo voi due. Se un messaggio non va, segnalalo con la bandierina: solo allora lo vede la segreteria.", dmWrite: "Scrivi a un socio", dmNobody: "Ancora nessun socio ha acceso «Possono scrivermi i soci».", dmNone: "Nessuna conversazione.", block: "Blocca", blockedList: "Bloccati", report: "Segnala", reported: "Segnalato alla segreteria", unblock: n => `Sblocca ${n}`, blockAsk: n => `Bloccare ${n}? Non potrà più scriverti e non leggerai più i suoi messaggi, neanche nella chat del circolo.`,
+    tabBook: 'Prenota', tabMine: n => `Le mie (${n})`, tabSeek: 'Compagni', tabChat: "Chat", msgEdit: "Modifica", msgDelete: "Elimina", msgDeleted: "Messaggio eliminato", msgEdited: "modificato", msgEditing: "Modifica del messaggio", msgDeleteAsk: "Eliminare il messaggio? Per tutti resterà «Messaggio eliminato».", yesterday: "Ieri", clubEntryHint: "Scrivi a tutti i soci del circolo", clubUnread: n => n === 1 ? "1 messaggio nuovo nella chat del circolo" : `${n} messaggi nuovi nella chat del circolo`, dmFrom: n => `Messaggio da ${n}`, clubChat: "Chat del circolo", clubChatHint: "Qui leggono e scrivono tutti i soci collegati. Siate gentili: la segreteria può togliere i messaggi, e con la bandierina segnali quelli fuori luogo.", clubChatAlerts: "Notifiche della chat del circolo", clubChatAlertsHint: "Spente: i messaggi li leggi qui quando vuoi.", dmTitle: "Messaggi privati", dmOpen: "Possono scrivermi i soci", dmOpenHint: "Acceso: compari nell'elenco e gli altri soci possono scriverti. Spento: non compari, ma puoi scrivere tu a chi l'ha acceso.", dmHint: "Lo leggete solo voi due. Se un messaggio non va, segnalalo con la bandierina: solo allora lo vede la segreteria.", dmWrite: "Scrivi a un socio", dmNobody: "Ancora nessun socio ha acceso «Possono scrivermi i soci».", dmNone: "Nessuna conversazione.", block: "Blocca", blockedList: "Bloccati", report: "Segnala", reported: "Segnalato alla segreteria", unblock: n => `Sblocca ${n}`, blockAsk: n => `Bloccare ${n}? Non potrà più scriverti e non leggerai più i suoi messaggi, neanche nella chat del circolo.`,
     seekTitle: 'Cerco compagno', seekNew: 'Pubblica un annuncio', seekDay: 'Giorno', seekFrom: 'Dalle', seekTo: 'Alle', seekKind: 'Partita', seekSingles: 'Singolo', seekDoubles: 'Doppio', seekLevel: 'Livello', seekNote: 'Nota (facoltativa)', seekPublish: 'Pubblica', seekPublished: 'Annuncio pubblicato', seekJoin: 'Ci sto', seekJoined: 'Ci sei! Quando siete al completo il campo si prenota da solo.', seekLeave: 'Mi tolgo', seekRemove: 'Togli l\'annuncio', seekYours: 'Il tuo annuncio', seekNoCourt: 'Al completo, ma nessun campo libero: prenotatelo voi.', seekNone: 'Nessun annuncio: pubblicane uno, gli altri giocatori del circolo lo vedranno.', seekHint: 'Gli altri giocatori lo vedono e toccano Ci sto; quando siete al completo il server prenota il primo campo libero nella fascia scelta.',
     seekWho: s => `Ci sono: ${s}`, seekNeed: n => n === 1 ? 'ne manca 1' : `ne mancano ${n}`, seekBooked: s => `Campo prenotato: ${s}`,
     WAITING: 'In attesa', waitText: 'Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo.', waitAny: 'Va bene un campo qualsiasi a quest\'ora', waitAsk: 'Avvisami se si libera', waitAdded: 'Sei in lista d\'attesa', waitList: 'In lista d\'attesa', waitFreed: 'Si è liberato!', waitAnyCourt: 'Un campo qualsiasi', waitRemove: 'Togli', bookNow: 'Prenota', waitNoPush: 'Per l\'avviso sul telefono attiva i promemoria; intanto lo vedi qui quando apri la pagina.',
@@ -97470,7 +97702,7 @@ const I18N = {
       UNAUTHORIZED: 'Questo telefono non è più collegato: chiedi un nuovo invito alla segreteria.', TOO_LATE: 'È tardi per disdire da solo: chiama la segreteria.',
       NOT_YOURS: 'Questa prenotazione non è tua.', NOT_FOUND: 'Prenotazione non trovata.', NOT_SYNCED: 'Il circolo non ha ancora pubblicato il planning.',
       BAD_PIN: 'Il PIN deve avere da 4 a 8 cifre.', BAD_PHONE: 'Scrivi il numero di telefono completo.', PHONE_TAKEN: 'Questo numero è già usato da un altro giocatore: chiedi alla segreteria.', BAD_LOGIN: 'Numero o PIN sbagliati.', PIN_RESET: 'Troppi tentativi: il PIN non vale più. Chiedi alla segreteria un nuovo invito.',
-      NOT_IN_CHAT: 'Questa chat è solo per chi partecipa all\'annuncio.', TOO_MANY_MESSAGES: 'Stai scrivendo troppo: aspetta qualche minuto.', USER_BLOCKED: "Non puoi scrivere a questo socio.", DM_CLOSED: "Questo socio non riceve messaggi privati.",
+      NOT_IN_CHAT: 'Questa chat è solo per chi partecipa all\'annuncio.', TOO_MANY_MESSAGES: 'Stai scrivendo troppo: aspetta qualche minuto.', USER_BLOCKED: "Non puoi scrivere a questo socio.", DM_CLOSED: "Questo socio non riceve messaggi privati.", EDIT_TOO_LATE: "Un messaggio si può modificare solo nei primi 15 minuti.", NOT_YOURS: "Puoi modificare o eliminare solo i tuoi messaggi.",
       generic: 'Qualcosa non ha funzionato. Riprova.',
     },
   },
@@ -97484,7 +97716,7 @@ const I18N = {
     pay: 'Payment', booked: 'Booked!', closedNow: 'Online booking is closed right now: you can see the schedule but not book.',
     notSynced: 'The club has not published the schedule yet.', offline: 'The club server is not answering. Try again shortly.',
     install: 'On iPhone: Share › Add to Home Screen, and it works like an app.',
-    tabBook: 'Book', tabMine: n => `Mine (${n})`, tabSeek: 'Partners', tabChat: "Chat", yesterday: "Yesterday", clubEntryHint: "Write to every member of the club", clubUnread: n => n === 1 ? "1 new message in the club chat" : `${n} new messages in the club chat`, dmFrom: n => `Message from ${n}`, clubChat: "Club chat", clubChatHint: "Every connected member reads and writes here. Be kind: the office can remove messages, and the flag reports out-of-place ones.", clubChatAlerts: "Club chat notifications", clubChatAlertsHint: "Off: read the messages here whenever you like.", dmTitle: "Private messages", dmOpen: "Members can write to me", dmOpenHint: "On: you are in the list and other members can write to you. Off: you are not, but you can write to those who turned it on.", dmHint: "Only the two of you read this. If a message is not OK, report it with the flag: only then does the office see it.", dmWrite: "Write to a member", dmNobody: "No member has turned on “Members can write to me” yet.", dmNone: "No conversations.", block: "Block", blockedList: "Blocked", report: "Report", reported: "Reported to the office", unblock: n => `Unblock ${n}`, blockAsk: n => `Block ${n}? They will no longer be able to write to you and you will no longer see their messages, not even in the club chat.`,
+    tabBook: 'Book', tabMine: n => `Mine (${n})`, tabSeek: 'Partners', tabChat: "Chat", msgEdit: "Edit", msgDelete: "Delete", msgDeleted: "Message deleted", msgEdited: "edited", msgEditing: "Editing message", msgDeleteAsk: "Delete the message? Everyone will see “Message deleted”.", yesterday: "Yesterday", clubEntryHint: "Write to every member of the club", clubUnread: n => n === 1 ? "1 new message in the club chat" : `${n} new messages in the club chat`, dmFrom: n => `Message from ${n}`, clubChat: "Club chat", clubChatHint: "Every connected member reads and writes here. Be kind: the office can remove messages, and the flag reports out-of-place ones.", clubChatAlerts: "Club chat notifications", clubChatAlertsHint: "Off: read the messages here whenever you like.", dmTitle: "Private messages", dmOpen: "Members can write to me", dmOpenHint: "On: you are in the list and other members can write to you. Off: you are not, but you can write to those who turned it on.", dmHint: "Only the two of you read this. If a message is not OK, report it with the flag: only then does the office see it.", dmWrite: "Write to a member", dmNobody: "No member has turned on “Members can write to me” yet.", dmNone: "No conversations.", block: "Block", blockedList: "Blocked", report: "Report", reported: "Reported to the office", unblock: n => `Unblock ${n}`, blockAsk: n => `Block ${n}? They will no longer be able to write to you and you will no longer see their messages, not even in the club chat.`,
     seekTitle: 'Looking for a partner', seekNew: 'Post a request', seekDay: 'Day', seekFrom: 'From', seekTo: 'To', seekKind: 'Match', seekSingles: 'Singles', seekDoubles: 'Doubles', seekLevel: 'Level', seekNote: 'Note (optional)', seekPublish: 'Post', seekPublished: 'Request posted', seekJoin: 'I\'m in', seekJoined: 'You\'re in! When you are complete the court is booked by itself.', seekLeave: 'I\'m out', seekRemove: 'Remove the request', seekYours: 'Your request', seekNoCourt: 'Complete, but no free court: book one yourselves.', seekNone: 'No requests: post one, the other club players will see it.', seekHint: 'Other players see it and tap I\'m in; when you are complete the server books the first free court in the chosen time.',
     seekWho: s => `In: ${s}`, seekNeed: n => n === 1 ? '1 missing' : `${n} missing`, seekBooked: s => `Court booked: ${s}`,
     WAITING: 'Waiting', waitText: 'This slot is taken. If it becomes free we tell you right away: whoever books first gets it.', waitAny: 'Any court at this time is fine', waitAsk: 'Tell me if it frees up', waitAdded: 'You are on the waiting list', waitList: 'On the waiting list', waitFreed: 'It\'s free now!', waitAnyCourt: 'Any court', waitRemove: 'Remove', bookNow: 'Book', waitNoPush: 'For an alert on your phone turn reminders on; meanwhile you see it here when you open the page.',
@@ -97509,7 +97741,7 @@ const I18N = {
       UNAUTHORIZED: 'This phone is no longer connected: ask the club office for a new invitation.', TOO_LATE: 'It is too late to cancel yourself: call the club office.',
       NOT_YOURS: 'This booking is not yours.', NOT_FOUND: 'Booking not found.', NOT_SYNCED: 'The club has not published the schedule yet.',
       BAD_PIN: 'The PIN must have 4 to 8 digits.', BAD_PHONE: 'Type the full phone number.', PHONE_TAKEN: 'This number is already used by another player: ask the club office.', BAD_LOGIN: 'Wrong number or PIN.', PIN_RESET: 'Too many attempts: the PIN no longer works. Ask the club office for a new invitation.',
-      NOT_IN_CHAT: 'This chat is only for the players in the post.', TOO_MANY_MESSAGES: 'You are writing too much: wait a few minutes.', USER_BLOCKED: "You cannot write to this member.", DM_CLOSED: "This member does not receive private messages.",
+      NOT_IN_CHAT: 'This chat is only for the players in the post.', TOO_MANY_MESSAGES: 'You are writing too much: wait a few minutes.', USER_BLOCKED: "You cannot write to this member.", DM_CLOSED: "This member does not receive private messages.", EDIT_TOO_LATE: "A message can only be edited in the first 15 minutes.", NOT_YOURS: "You can only edit or delete your own messages.",
       generic: 'Something went wrong. Try again.',
     },
   },
@@ -97523,7 +97755,7 @@ const I18N = {
     pay: 'Paiement', booked: 'Réservé !', closedNow: 'Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.',
     notSynced: 'Le club n\'a pas encore publié le planning.', offline: 'Le serveur du club ne répond pas. Réessayez dans un instant.',
     install: 'Sur iPhone : Partager › Sur l\'écran d\'accueil, et elle fonctionne comme une app.',
-    tabBook: 'Réserver', tabMine: n => `Les miennes (${n})`, tabSeek: 'Partenaires', tabChat: "Discussion", yesterday: "Hier", clubEntryHint: "Écrivez à tous les membres du club", clubUnread: n => n === 1 ? "1 nouveau message dans la discussion du club" : `${n} nouveaux messages dans la discussion du club`, dmFrom: n => `Message de ${n}`, clubChat: "Discussion du club", clubChatHint: "Tous les membres connectés lisent et écrivent ici. Soyez aimables : le secrétariat peut retirer les messages, et le drapeau signale ceux qui sont déplacés.", clubChatAlerts: "Notifications de la discussion du club", clubChatAlertsHint: "Désactivées : vous lisez les messages ici quand vous voulez.", dmTitle: "Messages privés", dmOpen: "Les membres peuvent m'écrire", dmOpenHint: "Activé : vous êtes dans la liste et les autres membres peuvent vous écrire. Désactivé : vous n'y êtes pas, mais vous pouvez écrire à ceux qui l'ont activé.", dmHint: "Vous seuls le lisez. Si un message ne va pas, signalez-le avec le drapeau : alors seulement le secrétariat le voit.", dmWrite: "Écrire à un membre", dmNobody: "Aucun membre n'a encore activé « Les membres peuvent m'écrire ».", dmNone: "Aucune conversation.", block: "Bloquer", blockedList: "Bloqués", report: "Signaler", reported: "Signalé au secrétariat", unblock: n => `Débloquer ${n}`, blockAsk: n => `Bloquer ${n} ? Il ne pourra plus vous écrire et vous ne verrez plus ses messages, même dans la discussion du club.`,
+    tabBook: 'Réserver', tabMine: n => `Les miennes (${n})`, tabSeek: 'Partenaires', tabChat: "Discussion", msgEdit: "Modifier", msgDelete: "Supprimer", msgDeleted: "Message supprimé", msgEdited: "modifié", msgEditing: "Modification du message", msgDeleteAsk: "Supprimer le message ? Tout le monde verra « Message supprimé ».", yesterday: "Hier", clubEntryHint: "Écrivez à tous les membres du club", clubUnread: n => n === 1 ? "1 nouveau message dans la discussion du club" : `${n} nouveaux messages dans la discussion du club`, dmFrom: n => `Message de ${n}`, clubChat: "Discussion du club", clubChatHint: "Tous les membres connectés lisent et écrivent ici. Soyez aimables : le secrétariat peut retirer les messages, et le drapeau signale ceux qui sont déplacés.", clubChatAlerts: "Notifications de la discussion du club", clubChatAlertsHint: "Désactivées : vous lisez les messages ici quand vous voulez.", dmTitle: "Messages privés", dmOpen: "Les membres peuvent m'écrire", dmOpenHint: "Activé : vous êtes dans la liste et les autres membres peuvent vous écrire. Désactivé : vous n'y êtes pas, mais vous pouvez écrire à ceux qui l'ont activé.", dmHint: "Vous seuls le lisez. Si un message ne va pas, signalez-le avec le drapeau : alors seulement le secrétariat le voit.", dmWrite: "Écrire à un membre", dmNobody: "Aucun membre n'a encore activé « Les membres peuvent m'écrire ».", dmNone: "Aucune conversation.", block: "Bloquer", blockedList: "Bloqués", report: "Signaler", reported: "Signalé au secrétariat", unblock: n => `Débloquer ${n}`, blockAsk: n => `Bloquer ${n} ? Il ne pourra plus vous écrire et vous ne verrez plus ses messages, même dans la discussion du club.`,
     seekTitle: 'Je cherche un partenaire', seekNew: 'Publier une annonce', seekDay: 'Jour', seekFrom: 'De', seekTo: 'À', seekKind: 'Match', seekSingles: 'Simple', seekDoubles: 'Double', seekLevel: 'Niveau', seekNote: 'Note (facultative)', seekPublish: 'Publier', seekPublished: 'Annonce publiée', seekJoin: 'Je viens', seekJoined: 'C\'est noté ! Quand vous êtes au complet, le terrain se réserve tout seul.', seekLeave: 'Je me retire', seekRemove: 'Retirer l\'annonce', seekYours: 'Votre annonce', seekNoCourt: 'Au complet, mais aucun terrain libre : réservez-en un vous-mêmes.', seekNone: 'Aucune annonce : publiez-en une, les autres joueurs du club la verront.', seekHint: 'Les autres joueurs la voient et touchent Je viens ; quand vous êtes au complet, le serveur réserve le premier terrain libre dans le créneau choisi.',
     seekWho: s => `Inscrits : ${s}`, seekNeed: n => n === 1 ? 'il en manque 1' : `il en manque ${n}`, seekBooked: s => `Terrain réservé : ${s}`,
     WAITING: 'En attente', waitText: 'Ce créneau est occupé. S\'il se libère, nous vous prévenons tout de suite : le premier qui réserve l\'obtient.', waitAny: 'N\'importe quel terrain à cette heure', waitAsk: 'Me prévenir s\'il se libère', waitAdded: 'Vous êtes sur liste d\'attente', waitList: 'Sur liste d\'attente', waitFreed: 'Il s\'est libéré !', waitAnyCourt: 'N\'importe quel terrain', waitRemove: 'Retirer', bookNow: 'Réserver', waitNoPush: 'Pour une alerte sur le téléphone, activez les rappels ; en attendant vous le voyez ici en ouvrant la page.',
@@ -97548,7 +97780,7 @@ const I18N = {
       UNAUTHORIZED: 'Ce téléphone n\'est plus connecté : demandez une nouvelle invitation au secrétariat.', TOO_LATE: 'Il est trop tard pour annuler vous-même : appelez le secrétariat.',
       NOT_YOURS: 'Cette réservation n\'est pas la vôtre.', NOT_FOUND: 'Réservation introuvable.', NOT_SYNCED: 'Le club n\'a pas encore publié le planning.',
       BAD_PIN: 'Le PIN doit avoir de 4 à 8 chiffres.', BAD_PHONE: 'Tapez le numéro de téléphone complet.', PHONE_TAKEN: 'Ce numéro est déjà utilisé par un autre joueur : demandez au secrétariat.', BAD_LOGIN: 'Numéro ou PIN incorrect.', PIN_RESET: 'Trop de tentatives : le PIN ne vaut plus. Demandez une nouvelle invitation au secrétariat.',
-      NOT_IN_CHAT: 'Cette discussion est réservée aux joueurs de l\'annonce.', TOO_MANY_MESSAGES: 'Vous écrivez trop : attendez quelques minutes.', USER_BLOCKED: "Vous ne pouvez pas écrire à ce membre.", DM_CLOSED: "Ce membre ne reçoit pas de messages privés.",
+      NOT_IN_CHAT: 'Cette discussion est réservée aux joueurs de l\'annonce.', TOO_MANY_MESSAGES: 'Vous écrivez trop : attendez quelques minutes.', USER_BLOCKED: "Vous ne pouvez pas écrire à ce membre.", DM_CLOSED: "Ce membre ne reçoit pas de messages privés.", EDIT_TOO_LATE: "Un message ne peut être modifié que dans les 15 premières minutes.", NOT_YOURS: "Vous ne pouvez modifier ou supprimer que vos messages.",
       generic: 'Un problème est survenu. Réessayez.',
     },
   },
@@ -97562,7 +97794,7 @@ const I18N = {
     pay: 'Bezahlung', booked: 'Gebucht!', closedNow: 'Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.',
     notSynced: 'Der Verein hat den Plan noch nicht veröffentlicht.', offline: 'Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.',
     install: 'Auf dem iPhone: Teilen › Zum Home-Bildschirm, dann funktioniert sie wie eine App.',
-    tabBook: 'Buchen', tabMine: n => `Meine (${n})`, tabSeek: 'Partner', tabChat: "Chat", yesterday: "Gestern", clubEntryHint: "Schreib allen Mitgliedern des Vereins", clubUnread: n => n === 1 ? "1 neue Nachricht im Vereinschat" : `${n} neue Nachrichten im Vereinschat`, dmFrom: n => `Nachricht von ${n}`, clubChat: "Vereinschat", clubChatHint: "Hier lesen und schreiben alle verbundenen Mitglieder. Seid freundlich: Das Büro kann Nachrichten entfernen, und mit der Fahne meldest du unpassende.", clubChatAlerts: "Benachrichtigungen des Vereinschats", clubChatAlertsHint: "Aus: Du liest die Nachrichten hier, wann du willst.", dmTitle: "Private Nachrichten", dmOpen: "Mitglieder dürfen mir schreiben", dmOpenHint: "An: Du stehst in der Liste und andere Mitglieder können dir schreiben. Aus: Du stehst nicht drin, kannst aber denen schreiben, die es eingeschaltet haben.", dmHint: "Nur ihr beide lest das. Ist eine Nachricht nicht in Ordnung, melde sie mit der Fahne: Erst dann sieht sie das Büro.", dmWrite: "Einem Mitglied schreiben", dmNobody: "Noch kein Mitglied hat „Mitglieder dürfen mir schreiben“ eingeschaltet.", dmNone: "Keine Unterhaltungen.", block: "Blockieren", blockedList: "Blockiert", report: "Melden", reported: "Dem Büro gemeldet", unblock: n => `${n} freigeben`, blockAsk: n => `${n} blockieren? Er kann dir nicht mehr schreiben und du siehst seine Nachrichten nicht mehr, auch nicht im Vereinschat.`,
+    tabBook: 'Buchen', tabMine: n => `Meine (${n})`, tabSeek: 'Partner', tabChat: "Chat", msgEdit: "Bearbeiten", msgDelete: "Löschen", msgDeleted: "Nachricht gelöscht", msgEdited: "bearbeitet", msgEditing: "Nachricht bearbeiten", msgDeleteAsk: "Nachricht löschen? Alle sehen dann „Nachricht gelöscht“.", yesterday: "Gestern", clubEntryHint: "Schreib allen Mitgliedern des Vereins", clubUnread: n => n === 1 ? "1 neue Nachricht im Vereinschat" : `${n} neue Nachrichten im Vereinschat`, dmFrom: n => `Nachricht von ${n}`, clubChat: "Vereinschat", clubChatHint: "Hier lesen und schreiben alle verbundenen Mitglieder. Seid freundlich: Das Büro kann Nachrichten entfernen, und mit der Fahne meldest du unpassende.", clubChatAlerts: "Benachrichtigungen des Vereinschats", clubChatAlertsHint: "Aus: Du liest die Nachrichten hier, wann du willst.", dmTitle: "Private Nachrichten", dmOpen: "Mitglieder dürfen mir schreiben", dmOpenHint: "An: Du stehst in der Liste und andere Mitglieder können dir schreiben. Aus: Du stehst nicht drin, kannst aber denen schreiben, die es eingeschaltet haben.", dmHint: "Nur ihr beide lest das. Ist eine Nachricht nicht in Ordnung, melde sie mit der Fahne: Erst dann sieht sie das Büro.", dmWrite: "Einem Mitglied schreiben", dmNobody: "Noch kein Mitglied hat „Mitglieder dürfen mir schreiben“ eingeschaltet.", dmNone: "Keine Unterhaltungen.", block: "Blockieren", blockedList: "Blockiert", report: "Melden", reported: "Dem Büro gemeldet", unblock: n => `${n} freigeben`, blockAsk: n => `${n} blockieren? Er kann dir nicht mehr schreiben und du siehst seine Nachrichten nicht mehr, auch nicht im Vereinschat.`,
     seekTitle: 'Partner gesucht', seekNew: 'Anzeige aufgeben', seekDay: 'Tag', seekFrom: 'Von', seekTo: 'Bis', seekKind: 'Spiel', seekSingles: 'Einzel', seekDoubles: 'Doppel', seekLevel: 'Niveau', seekNote: 'Notiz (optional)', seekPublish: 'Veröffentlichen', seekPublished: 'Anzeige veröffentlicht', seekJoin: 'Bin dabei', seekJoined: 'Du bist dabei! Seid ihr vollständig, wird der Platz von selbst gebucht.', seekLeave: 'Doch nicht', seekRemove: 'Anzeige entfernen', seekYours: 'Deine Anzeige', seekNoCourt: 'Vollständig, aber kein Platz frei: Bucht selbst einen.', seekNone: 'Keine Anzeigen: Gib eine auf, die anderen Spieler des Vereins sehen sie.', seekHint: 'Die anderen Spieler sehen sie und tippen auf Bin dabei; seid ihr vollständig, bucht der Server den ersten freien Platz in der gewählten Zeit.',
     seekWho: s => `Dabei: ${s}`, seekNeed: n => n === 1 ? '1 fehlt' : `${n} fehlen`, seekBooked: s => `Platz gebucht: ${s}`,
     WAITING: 'Wartend', waitText: 'Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es.', waitAny: 'Jeder Platz zu dieser Zeit ist recht', waitAsk: 'Benachrichtigen, wenn frei', waitAdded: 'Du stehst auf der Warteliste', waitList: 'Auf der Warteliste', waitFreed: 'Jetzt frei!', waitAnyCourt: 'Beliebiger Platz', waitRemove: 'Entfernen', bookNow: 'Buchen', waitNoPush: 'Für einen Hinweis aufs Handy schalte die Erinnerungen ein; bis dahin siehst du es hier, wenn du die Seite öffnest.',
@@ -97587,7 +97819,7 @@ const I18N = {
       UNAUTHORIZED: 'Dieses Handy ist nicht mehr verbunden: Frag im Vereinsbüro nach einer neuen Einladung.', TOO_LATE: 'Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an.',
       NOT_YOURS: 'Diese Buchung gehört nicht dir.', NOT_FOUND: 'Buchung nicht gefunden.', NOT_SYNCED: 'Der Verein hat den Plan noch nicht veröffentlicht.',
       BAD_PIN: 'Die PIN muss 4 bis 8 Ziffern haben.', BAD_PHONE: 'Gib die vollständige Telefonnummer ein.', PHONE_TAKEN: 'Diese Nummer nutzt schon ein anderer Spieler: Frag das Büro.', BAD_LOGIN: 'Nummer oder PIN falsch.', PIN_RESET: 'Zu viele Versuche: Die PIN gilt nicht mehr. Bitte das Büro um eine neue Einladung.',
-      NOT_IN_CHAT: 'Dieser Chat ist nur für die Spieler der Anzeige.', TOO_MANY_MESSAGES: 'Du schreibst zu viel: Warte ein paar Minuten.', USER_BLOCKED: "Du kannst diesem Mitglied nicht schreiben.", DM_CLOSED: "Dieses Mitglied empfängt keine privaten Nachrichten.",
+      NOT_IN_CHAT: 'Dieser Chat ist nur für die Spieler der Anzeige.', TOO_MANY_MESSAGES: 'Du schreibst zu viel: Warte ein paar Minuten.', USER_BLOCKED: "Du kannst diesem Mitglied nicht schreiben.", DM_CLOSED: "Dieses Mitglied empfängt keine privaten Nachrichten.", EDIT_TOO_LATE: "Eine Nachricht lässt sich nur in den ersten 15 Minuten bearbeiten.", NOT_YOURS: "Du kannst nur deine eigenen Nachrichten bearbeiten oder löschen.",
       generic: 'Etwas hat nicht geklappt. Versuch es noch einmal.',
     },
   },
@@ -97601,7 +97833,7 @@ const I18N = {
     pay: 'Pago', booked: '¡Reservada!', closedNow: 'Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.',
     notSynced: 'El club aún no ha publicado el planning.', offline: 'El servidor del club no responde. Inténtalo en un momento.',
     install: 'En iPhone: Compartir › Añadir a pantalla de inicio, y funciona como una app.',
-    tabBook: 'Reservar', tabMine: n => `Mías (${n})`, tabSeek: 'Compañeros', tabChat: "Chat", yesterday: "Ayer", clubEntryHint: "Escribe a todos los socios del club", clubUnread: n => n === 1 ? "1 mensaje nuevo en el chat del club" : `${n} mensajes nuevos en el chat del club`, dmFrom: n => `Mensaje de ${n}`, clubChat: "Chat del club", clubChatHint: "Aquí leen y escriben todos los socios conectados. Sed amables: la secretaría puede quitar mensajes, y con la banderita se señalan los que están fuera de lugar.", clubChatAlerts: "Notificaciones del chat del club", clubChatAlertsHint: "Apagadas: lees los mensajes aquí cuando quieras.", dmTitle: "Mensajes privados", dmOpen: "Los socios pueden escribirme", dmOpenHint: "Encendido: apareces en la lista y otros socios pueden escribirte. Apagado: no apareces, pero puedes escribir a quien lo tenga encendido.", dmHint: "Solo lo leéis vosotros dos. Si un mensaje no está bien, señálalo con la banderita: solo entonces lo ve la secretaría.", dmWrite: "Escribir a un socio", dmNobody: "Ningún socio ha encendido aún «Los socios pueden escribirme».", dmNone: "Ninguna conversación.", block: "Bloquear", blockedList: "Bloqueados", report: "Señalar", reported: "Señalado a la secretaría", unblock: n => `Desbloquear a ${n}`, blockAsk: n => `¿Bloquear a ${n}? Ya no podrá escribirte y no verás sus mensajes, ni siquiera en el chat del club.`,
+    tabBook: 'Reservar', tabMine: n => `Mías (${n})`, tabSeek: 'Compañeros', tabChat: "Chat", msgEdit: "Editar", msgDelete: "Eliminar", msgDeleted: "Mensaje eliminado", msgEdited: "editado", msgEditing: "Editando el mensaje", msgDeleteAsk: "¿Eliminar el mensaje? Todos verán «Mensaje eliminado».", yesterday: "Ayer", clubEntryHint: "Escribe a todos los socios del club", clubUnread: n => n === 1 ? "1 mensaje nuevo en el chat del club" : `${n} mensajes nuevos en el chat del club`, dmFrom: n => `Mensaje de ${n}`, clubChat: "Chat del club", clubChatHint: "Aquí leen y escriben todos los socios conectados. Sed amables: la secretaría puede quitar mensajes, y con la banderita se señalan los que están fuera de lugar.", clubChatAlerts: "Notificaciones del chat del club", clubChatAlertsHint: "Apagadas: lees los mensajes aquí cuando quieras.", dmTitle: "Mensajes privados", dmOpen: "Los socios pueden escribirme", dmOpenHint: "Encendido: apareces en la lista y otros socios pueden escribirte. Apagado: no apareces, pero puedes escribir a quien lo tenga encendido.", dmHint: "Solo lo leéis vosotros dos. Si un mensaje no está bien, señálalo con la banderita: solo entonces lo ve la secretaría.", dmWrite: "Escribir a un socio", dmNobody: "Ningún socio ha encendido aún «Los socios pueden escribirme».", dmNone: "Ninguna conversación.", block: "Bloquear", blockedList: "Bloqueados", report: "Señalar", reported: "Señalado a la secretaría", unblock: n => `Desbloquear a ${n}`, blockAsk: n => `¿Bloquear a ${n}? Ya no podrá escribirte y no verás sus mensajes, ni siquiera en el chat del club.`,
     seekTitle: 'Busco compañero', seekNew: 'Publicar un anuncio', seekDay: 'Día', seekFrom: 'Desde', seekTo: 'Hasta', seekKind: 'Partido', seekSingles: 'Individual', seekDoubles: 'Dobles', seekLevel: 'Nivel', seekNote: 'Nota (opcional)', seekPublish: 'Publicar', seekPublished: 'Anuncio publicado', seekJoin: 'Me apunto', seekJoined: '¡Estás dentro! Cuando estéis completos la pista se reserva sola.', seekLeave: 'Me borro', seekRemove: 'Quitar el anuncio', seekYours: 'Tu anuncio', seekNoCourt: 'Completos, pero ninguna pista libre: reservadla vosotros.', seekNone: 'Ningún anuncio: publica uno, los demás jugadores del club lo verán.', seekHint: 'Los demás jugadores lo ven y tocan Me apunto; cuando estéis completos el servidor reserva la primera pista libre en la franja elegida.',
     seekWho: s => `Apuntados: ${s}`, seekNeed: n => n === 1 ? 'falta 1' : `faltan ${n}`, seekBooked: s => `Pista reservada: ${s}`,
     WAITING: 'En espera', waitText: 'Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero.', waitAny: 'Me vale cualquier pista a esta hora', waitAsk: 'Avísame si se libera', waitAdded: 'Estás en la lista de espera', waitList: 'En lista de espera', waitFreed: '¡Se ha liberado!', waitAnyCourt: 'Cualquier pista', waitRemove: 'Quitar', bookNow: 'Reservar', waitNoPush: 'Para un aviso en el teléfono activa los recordatorios; mientras tanto lo ves aquí al abrir la página.',
@@ -97626,7 +97858,7 @@ const I18N = {
       UNAUTHORIZED: 'Este teléfono ya no está conectado: pide una nueva invitación a la secretaría.', TOO_LATE: 'Es tarde para anular tú mismo: llama a la secretaría.',
       NOT_YOURS: 'Esta reserva no es tuya.', NOT_FOUND: 'Reserva no encontrada.', NOT_SYNCED: 'El club aún no ha publicado el planning.',
       BAD_PIN: 'El PIN debe tener de 4 a 8 cifras.', BAD_PHONE: 'Escribe el número de teléfono completo.', PHONE_TAKEN: 'Este número ya lo usa otro jugador: pregunta a la secretaría.', BAD_LOGIN: 'Número o PIN incorrectos.', PIN_RESET: 'Demasiados intentos: el PIN ya no vale. Pide una nueva invitación a la secretaría.',
-      NOT_IN_CHAT: 'Este chat es solo para los jugadores del anuncio.', TOO_MANY_MESSAGES: 'Estás escribiendo demasiado: espera unos minutos.', USER_BLOCKED: "No puedes escribir a este socio.", DM_CLOSED: "Este socio no recibe mensajes privados.",
+      NOT_IN_CHAT: 'Este chat es solo para los jugadores del anuncio.', TOO_MANY_MESSAGES: 'Estás escribiendo demasiado: espera unos minutos.', USER_BLOCKED: "No puedes escribir a este socio.", DM_CLOSED: "Este socio no recibe mensajes privados.", EDIT_TOO_LATE: "Un mensaje solo se puede editar en los primeros 15 minutos.", NOT_YOURS: "Solo puedes editar o eliminar tus mensajes.",
       generic: 'Algo no ha funcionado. Inténtalo de nuevo.',
     },
   },
@@ -97640,7 +97872,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.',
     notSynced: 'O clube ainda não publicou a agenda.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
     install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
-    tabBook: 'Reservar', tabMine: n => `Minhas (${n})`, tabSeek: 'Parceiros', tabChat: "Chat", yesterday: "Ontem", clubEntryHint: "Escreve a todos os sócios do clube", clubUnread: n => n === 1 ? "1 mensagem nova no chat do clube" : `${n} mensagens novas no chat do clube`, dmFrom: n => `Mensagem de ${n}`, clubChat: "Chat do clube", clubChatHint: "Aqui leem e escrevem todos os sócios ligados. Sejam simpáticos: a secretaria pode tirar mensagens, e com a bandeirinha assinala as despropositadas.", clubChatAlerts: "Notificações do chat do clube", clubChatAlertsHint: "Desligadas: lês as mensagens aqui quando quiseres.", dmTitle: "Mensagens privadas", dmOpen: "Os sócios podem escrever-me", dmOpenHint: "Ligado: apareces na lista e os outros sócios podem escrever-te. Desligado: não apareces, mas podes escrever a quem o ligou.", dmHint: "Só vocês dois leem isto. Se uma mensagem não está bem, assinala-a com a bandeirinha: só então a secretaria a vê.", dmWrite: "Escrever a um sócio", dmNobody: "Ainda nenhum sócio ligou «Os sócios podem escrever-me».", dmNone: "Nenhuma conversa.", block: "Bloquear", blockedList: "Bloqueados", report: "Assinalar", reported: "Assinalado à secretaria", unblock: n => `Desbloquear ${n}`, blockAsk: n => `Bloquear ${n}? Deixa de te poder escrever e deixas de ver as mensagens dele, nem no chat do clube.`,
+    tabBook: 'Reservar', tabMine: n => `Minhas (${n})`, tabSeek: 'Parceiros', tabChat: "Chat", msgEdit: "Editar", msgDelete: "Eliminar", msgDeleted: "Mensagem eliminada", msgEdited: "editada", msgEditing: "A editar a mensagem", msgDeleteAsk: "Eliminar a mensagem? Todos verão «Mensagem eliminada».", yesterday: "Ontem", clubEntryHint: "Escreve a todos os sócios do clube", clubUnread: n => n === 1 ? "1 mensagem nova no chat do clube" : `${n} mensagens novas no chat do clube`, dmFrom: n => `Mensagem de ${n}`, clubChat: "Chat do clube", clubChatHint: "Aqui leem e escrevem todos os sócios ligados. Sejam simpáticos: a secretaria pode tirar mensagens, e com a bandeirinha assinala as despropositadas.", clubChatAlerts: "Notificações do chat do clube", clubChatAlertsHint: "Desligadas: lês as mensagens aqui quando quiseres.", dmTitle: "Mensagens privadas", dmOpen: "Os sócios podem escrever-me", dmOpenHint: "Ligado: apareces na lista e os outros sócios podem escrever-te. Desligado: não apareces, mas podes escrever a quem o ligou.", dmHint: "Só vocês dois leem isto. Se uma mensagem não está bem, assinala-a com a bandeirinha: só então a secretaria a vê.", dmWrite: "Escrever a um sócio", dmNobody: "Ainda nenhum sócio ligou «Os sócios podem escrever-me».", dmNone: "Nenhuma conversa.", block: "Bloquear", blockedList: "Bloqueados", report: "Assinalar", reported: "Assinalado à secretaria", unblock: n => `Desbloquear ${n}`, blockAsk: n => `Bloquear ${n}? Deixa de te poder escrever e deixas de ver as mensagens dele, nem no chat do clube.`,
     seekTitle: 'Procuro parceiro', seekNew: 'Publicar um anúncio', seekDay: 'Dia', seekFrom: 'Das', seekTo: 'Às', seekKind: 'Jogo', seekSingles: 'Singulares', seekDoubles: 'Pares', seekLevel: 'Nível', seekNote: 'Nota (opcional)', seekPublish: 'Publicar', seekPublished: 'Anúncio publicado', seekJoin: 'Conta comigo', seekJoined: 'Estás dentro! Quando estiverem completos a quadra reserva-se sozinha.', seekLeave: 'Saio', seekRemove: 'Tirar o anúncio', seekYours: 'O teu anúncio', seekNoCourt: 'Completos, mas nenhuma quadra livre: reservem vocês.', seekNone: 'Nenhum anúncio: publica um, os outros jogadores do clube vão vê-lo.', seekHint: 'Os outros jogadores veem-no e tocam em Conta comigo; quando estiverem completos o servidor reserva a primeira quadra livre na faixa escolhida.',
     seekWho: s => `Já estão: ${s}`, seekNeed: n => n === 1 ? 'falta 1' : `faltam ${n}`, seekBooked: s => `Quadra reservada: ${s}`,
     WAITING: 'Em espera', waitText: 'Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro.', waitAny: 'Serve qualquer quadra a esta hora', waitAsk: 'Avisa-me se ficar livre', waitAdded: 'Estás na lista de espera', waitList: 'Na lista de espera', waitFreed: 'Ficou livre!', waitAnyCourt: 'Qualquer quadra', waitRemove: 'Tirar', bookNow: 'Reservar', waitNoPush: 'Para um aviso no telemóvel ativa os lembretes; entretanto vês aqui ao abrir a página.',
@@ -97665,7 +97897,7 @@ const I18N = {
       UNAUTHORIZED: 'Este telemóvel já não está ligado: pede um novo convite à secretaria.', TOO_LATE: 'É tarde para cancelares sozinho: liga para a secretaria.',
       NOT_YOURS: 'Esta reserva não é tua.', NOT_FOUND: 'Reserva não encontrada.', NOT_SYNCED: 'O clube ainda não publicou a agenda.',
       BAD_PIN: 'O PIN deve ter de 4 a 8 dígitos.', BAD_PHONE: 'Escreva o número de telefone completo.', PHONE_TAKEN: 'Este número já é usado por outro jogador: pergunte à secretaria.', BAD_LOGIN: 'Número ou PIN errados.', PIN_RESET: 'Demasiadas tentativas: o PIN já não vale. Peça um novo convite à secretaria.',
-      NOT_IN_CHAT: 'Este chat é só para os jogadores do anúncio.', TOO_MANY_MESSAGES: 'Está a escrever demasiado: espere alguns minutos.', USER_BLOCKED: "Não podes escrever a este sócio.", DM_CLOSED: "Este sócio não recebe mensagens privadas.",
+      NOT_IN_CHAT: 'Este chat é só para os jogadores do anúncio.', TOO_MANY_MESSAGES: 'Está a escrever demasiado: espere alguns minutos.', USER_BLOCKED: "Não podes escrever a este sócio.", DM_CLOSED: "Este sócio não recebe mensagens privadas.", EDIT_TOO_LATE: "Uma mensagem só se pode editar nos primeiros 15 minutos.", NOT_YOURS: "Só podes editar ou eliminar as tuas mensagens.",
       generic: 'Algo correu mal. Tenta de novo.',
     },
   },
@@ -98413,7 +98645,7 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .legend .FREE::before { background: rgba(198, 244, 50, .5); } .legend .MINE::before { background: var(--mine); }
 .legend .BUSY::before { background: var(--high); border: 1px solid var(--outline); } .legend .BLOCKED::before { background: var(--surface); border: 1px dashed var(--dim); }
-.sheet { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+.sheet { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); display: flex; align-items: flex-end; justify-content: center; z-index: 30; }
 .sheet[hidden] { display: none; }
 .sheet-box { background: var(--surface); border-radius: 18px 18px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); width: 100%; max-width: 520px; max-height: 90vh; overflow: auto; }
 @media (min-width: 600px) { .sheet { align-items: center; } .sheet-box { border-radius: 18px; } }
@@ -98480,6 +98712,13 @@ body.nochrome { overflow: hidden; }
 .chatrow .top small.new { color: var(--ball); }
 .chatrow .preview { flex: 1; color: var(--dim); font-size: 14px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chatrow .count { background: var(--ball); color: #0B1220; border-radius: 999px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
+.bubble.deleted .text { font-style: italic; opacity: .6; }
+.editbar { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 6px 10px 6px 16px; }
+.editbar[hidden] { display: none; }
+.editbar span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.editbar b { color: var(--ball); font-size: 13px; }
+.editbar small { color: var(--dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editbar .x { background: transparent; border: 0; color: var(--dim); min-height: 36px; padding: 0 8px; font-size: 16px; }
 TSM_EOF
 
 # ---------------------------------------------------------------- server/src/main/resources/web/sw.js
@@ -98488,7 +98727,7 @@ cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-11';
+const CACHE = 'tsm-campi-12';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
@@ -98889,6 +99128,36 @@ class ChatApiTest {
         assertEquals("Mario", json.decodeFromString(SrvMe.serializer(), call("GET", "/me", token = luca).body).blocked.single().name)
         call("POST", "/block", """{"player":"p1","on":false}""", luca)
         assertEquals(201, call("POST", "/chat/$room", """{"text":"scusa"}""", mario).status)
+    }
+
+    @Test fun modificareEdEliminareIPropri() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        val m = field(call("POST", "/chat/club", """{"text":"Ci vediamo alle 10"}""", mario).body, "id")
+        // Solo il proprio, e nei primi minuti.
+        assertEquals(403, call("PUT", "/chat/msg/$m", """{"text":"no"}""", luca).status)
+        assertEquals(200, call("PUT", "/chat/msg/$m", """{"text":"Ci vediamo alle 11"}""", mario).status)
+        val got = msgs("club", luca).single()
+        assertEquals("Ci vediamo alle 11", got.text)
+        assertTrue(got.edited)
+        now += (com.tennis.scoremanager.data.CHAT_EDIT_MINUTES + 1) * 60_000L
+        assertEquals(409, call("PUT", "/chat/msg/$m", """{"text":"troppo tardi"}""", mario).status)
+        // Eliminare si può sempre: resta il posto, senza testo.
+        assertEquals(403, call("DELETE", "/chat/msg/$m", token = luca).status)
+        assertEquals(200, call("DELETE", "/chat/msg/$m", token = mario).status)
+        val gone = msgs("club", luca).single()
+        assertTrue(gone.deleted)
+        assertEquals("", gone.text)
+        assertTrue("Ci vediamo" !in store.dir.walkTopDown().filter { it.isFile }.joinToString { it.readText() })
+    }
+
+    @Test fun unMessaggioSegnalatoResta() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        val m = field(call("POST", "/chat/club", """{"text":"insulto"}""", mario).body, "id")
+        call("POST", "/chat/msg/$m/report", token = luca)
+        call("DELETE", "/chat/msg/$m", token = mario)
+        assertEquals("", msgs("club", luca).single().text)
+        // La segreteria lo vede ancora.
+        assertTrue(call("GET", "/admin/chat/club", token = admin).body.contains("insulto"))
     }
 }
 TSM_EOF

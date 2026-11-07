@@ -819,6 +819,13 @@ object FrStrings : Strings {
     override val pbDmFrom: (String) -> String = { "Message de $it" }
     override val pbClubEntryHint = "Écrivez à tous les membres du club"
     override val pbYesterday = "Hier"
+    override val pbMsgEdit = "Modifier"
+    override val pbMsgDelete = "Supprimer"
+    override val pbMsgDeleted = "Message supprimé"
+    override val pbMsgEdited = "modifié"
+    override val pbMsgEditing = "Modification du message"
+    override val pbMsgDeleteAsk = "Supprimer le message ? Tout le monde verra « Message supprimé »."
+    override val pbErrEditLate = "Un message ne peut être modifié que dans les 15 premières minutes."
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
