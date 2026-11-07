@@ -13,7 +13,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvToken(val token: String, val name: String = "", val player: String = "")
 @Serializable data class SrvInviteIn(val player: String, val name: String, val days: Int = 14)
 @Serializable data class SrvInvite(val code: String, val expires: Long)
-@Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
+@Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int, val hasPin: Boolean = false)
+/** Il giocatore sceglie numero di telefono e PIN, per rientrare da solo su un altro telefono. */
+@Serializable data class SrvPinIn(val phone: String, val pin: String)
 @Serializable data class SrvAdmin(
     val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>,
     /** Per la segreteria: chi è in lista d'attesa e gli annunci di Cerco compagno ancora da giocare (vuoti dai server vecchi). */
@@ -39,6 +41,9 @@ import kotlinx.serialization.Serializable
     val days: List<String>, val bookings: List<SrvMyBooking>,
     /** Le liste d'attesa del giocatore: aperte, o già liberate (si prenota). */
     val waits: List<SrvWait> = emptyList(),
+    /** Ha scelto numero e PIN: rientra da solo; [phone] sono le ultime cifre del numero, per riconoscerlo. */
+    val hasPin: Boolean = false,
+    val phone: String = "",
 )
 /** Una lista d'attesa vista dal giocatore: [freedCourt] non null = si è liberato quel campo. */
 @Serializable data class SrvWait(val id: String, val court: String? = null, val start: Long, val minutes: Int, val freedCourt: String? = null)

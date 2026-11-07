@@ -105,6 +105,7 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     var invited = mutableListOf<String>()
     override fun serverInvite(player: PlayerProfile): SrvInvite { if (remoteDown) throw ClubServerError("NET"); invited += player.id; return SrvInvite("ABCDEFGHJK", time + 7 * 86_400_000L) }
     override fun serverRevoke(playerId: String): String? = if (remoteDown) "NET" else { server = server.copy(players = server.players.filter { it.id != playerId }); null }
+    override fun serverResetPin(playerId: String): String? = if (remoteDown) "NET" else { server = server.copy(players = server.players.map { if (it.id == playerId) it.copy(hasPin = false) else it }); null }
     override fun readOnlineNotice(id: String?) { server = server.copy(inbox = if (id == null) emptyList() else server.inbox.filter { it.id != id }) }
     var auto = false
     val copies = linkedMapOf<String, ByteArray>()

@@ -377,6 +377,9 @@ function editPerson(p) {
   const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
   const online = server ? [
     h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+    p.pin ? h('button', { type: 'button', onclick: async () => {
+      try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id) + '/pin'); toast(T.srvPinResetDone); await showPeople(); } catch (e) { toast(errText(e)); }
+    } }, T.srvPinReset) : null,
     p.online ? h('button.danger', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvRevoke) : null,
@@ -412,6 +415,7 @@ async function inviteDialog(p) {
     canvas,
     h('p', h('b', T.srvInviteCode(inv.code))), h('p.dim', T.srvInviteUntil(dateText(inv.until))),
     h('p.dim', T.srvInviteHint),
+    inv.localOnly ? h('p', h('span.tag.warn.wrap', T.srvInviteLocalOnly)) : null,
     link,
     h('div.tools', copy, wa, mail),
     h('p.dim', T.srvSendHint)), null);

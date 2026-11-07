@@ -142,8 +142,60 @@ function showInvite(error) {
       el('p', { class: 'dim' }, T.inviteText),
       el('label', { for: 'code' }, T.code), input, msg,
       el('div', { class: 'actions' }, el('button', { onclick: go }, T.enter))),
+    loginCard(),
     installTip());
   input.focus();
+}
+
+/** Chi ha già scelto un PIN rientra da solo, con il numero di telefono: senza un nuovo invito. */
+function loginCard() {
+  const phone = el('input', { type: 'tel', id: 'lphone', autocomplete: 'tel', inputmode: 'tel' });
+  const pin = el('input', { type: 'password', id: 'lpin', inputmode: 'numeric', autocomplete: 'current-password', maxlength: '8' });
+  const msg = el('p', { class: 'error' }, '');
+  const go = async () => {
+    if (!phone.value.trim() || !pin.value.trim()) return;
+    try {
+      const r = await api('POST', '/login', { phone: phone.value, pin: pin.value });
+      state.token = r.token; save(KEY, r.token);
+      await refresh();
+    } catch (e) { msg.textContent = errText(e); pin.value = ''; }
+  };
+  pin.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  return el('div', { class: 'card' },
+    el('h3', null, T.loginTitle),
+    el('p', { class: 'dim' }, T.loginText),
+    el('label', { for: 'lphone' }, T.pinPhone), phone,
+    el('label', { for: 'lpin' }, T.pinPin), pin, msg,
+    el('div', { class: 'actions' }, el('button', { onclick: go }, T.loginGo)));
+}
+
+/** In Le mie: scegliere (o cambiare) numero e PIN, per rientrare da solo su un altro telefono. */
+function pinCard() {
+  const me = state.me;
+  const box = el('div', { class: 'card' });
+  const form = () => {
+    const phone = el('input', { type: 'tel', id: 'pphone', autocomplete: 'tel', inputmode: 'tel' });
+    const pin = el('input', { type: 'password', id: 'ppin', inputmode: 'numeric', autocomplete: 'new-password', maxlength: '8' });
+    const pin2 = el('input', { type: 'password', id: 'ppin2', inputmode: 'numeric', autocomplete: 'new-password', maxlength: '8' });
+    const msg = el('p', { class: 'error' }, '');
+    const save = async () => {
+      if (pin.value !== pin2.value) { msg.textContent = T.pinMismatch; return; }
+      try {
+        await api('POST', '/pin', { phone: phone.value, pin: pin.value });
+        me.hasPin = true; me.phone = phone.value.replace(/\D/g, '').slice(-3);
+        box.replaceChildren(el('b', null, T.pinTitle), el('p', null, T.pinSaved));
+      } catch (e) { msg.textContent = errText(e); }
+    };
+    box.replaceChildren(el('b', null, T.pinTitle), el('p', { class: 'dim' }, T.pinHint),
+      el('label', { for: 'pphone' }, T.pinPhone), phone,
+      el('label', { for: 'ppin' }, T.pinPin), pin,
+      el('label', { for: 'ppin2' }, T.pinPin2), pin2, msg,
+      el('div', { class: 'actions' }, el('button', { onclick: save }, T.pinSave)));
+  };
+  if (me.hasPin) box.replaceChildren(el('b', null, T.pinTitle), el('p', { class: 'dim' }, T.pinActive(me.phone)),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost small', onclick: form }, T.pinChange)));
+  else form();
+  return box;
 }
 
 async function claim(code) {
@@ -208,10 +260,12 @@ function render(dayError) {
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
   const parts = [bar];
   if (state.tab === 1) {
-    parts.push(...mine, ...waits, el('div', { id: 'push' }));
+    parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
     parts.push(...seekSection());
   } else {
+    // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
+    if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
     parts.push(el('h2', null, T.day), days);
     if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
     if (dayError) parts.push(el('p', { class: 'error' }, dayError));

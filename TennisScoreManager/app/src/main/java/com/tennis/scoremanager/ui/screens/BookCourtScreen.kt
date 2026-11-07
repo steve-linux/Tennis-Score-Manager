@@ -84,6 +84,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material.icons.filled.Password
+import com.tennis.scoremanager.ui.SectionCard
 
 private const val B_TIME_W = 52
 private const val B_CELL_W = 104
@@ -112,6 +114,11 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "TOO_MANY_WAITS" -> s.pbErrManyWaits
     "FULL" -> s.pbErrFull
     "TOO_MANY_SEEKS" -> s.pbErrManySeeks
+    "BAD_LOGIN" -> s.pbErrLogin
+    "PIN_RESET" -> s.pbErrPinReset
+    "PHONE_TAKEN" -> s.pbErrPhoneTaken
+    "BAD_PIN" -> s.pbErrPinFormat
+    "BAD_PHONE" -> s.pbErrPhone
     else -> s.srvErrOther(code)
 }
 
@@ -142,6 +149,8 @@ fun BookCourtScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val account by c.bookingAccount.collectAsState()
+    val accounts by c.bookingAccounts.collectAsState()
+    var adding by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.18") },
         title = s.pbTitle,
@@ -149,12 +158,22 @@ fun BookCourtScreen(c: MatchController) {
         icon = Icons.Filled.CalendarMonth,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
-        if (!account.joined) JoinClub(c) else BookingView(c)
+        if (!account.joined || adding) {
+            JoinClub(c) { adding = false }
+            if (adding) GhostButton(s.pbAddCancel, Icons.AutoMirrored.Filled.ArrowBack, { adding = false }, Modifier.fillMaxWidth())
+        } else {
+            // Più circoli: si sceglie quale guardare; ogni circolo ha la sua schermata (si ricarica cambiando).
+            if (accounts.size > 1) Segmented(
+                accounts.map { SegOption(it.club.ifBlank { it.url.substringAfter("//") }) }, accounts.indexOfFirst { it.url == account.url },
+                { c.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
+            )
+            androidx.compose.runtime.key(account.url) { BookingView(c) { adding = true } }
+        }
     }
 }
 
 @Composable
-private fun JoinClub(c: MatchController) {
+private fun JoinClub(c: MatchController, onJoined: () -> Unit = {}) {
     val s = LocalStrings.current
     val scope = rememberCoroutineScope()
     var invite by remember { mutableStateOf("") }
@@ -163,7 +182,7 @@ private fun JoinClub(c: MatchController) {
     var msg by remember { mutableStateOf<String?>(null) }
     fun join(text: String) {
         busy = true; msg = null
-        scope.launch { msg = c.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false }
+        scope.launch { msg = c.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false; if (msg == null) onJoined() }
     }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { invite = it; join(it) } }
     Text(s.pbJoinIntro, color = TsmColors.TextDim, fontSize = 14.sp)
@@ -177,10 +196,66 @@ private fun JoinClub(c: MatchController) {
         modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
     GhostButton(s.pbJoin, Icons.Filled.Login, { join(invite) }, Modifier.fillMaxWidth(), enabled = !busy && invite.isNotBlank())
     msg?.let { Text(it, color = TsmColors.Orange, fontSize = 14.sp) }
+
+    // Chi ha già scelto un PIN rientra da solo: indirizzo del circolo (o il vecchio link), numero e PIN.
+    var club by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var pin by remember { mutableStateOf("") }
+    var loginMsg by remember { mutableStateOf<String?>(null) }
+    SectionCard(s.pbLoginTitle, Icons.Filled.Password) {
+        Text(s.pbLoginText, color = TsmColors.TextDim, fontSize = 13.sp)
+        OutlinedTextField(club, { club = it }, label = { Text(s.pbLoginClub) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
+        OutlinedTextField(phone, { phone = it }, label = { Text(s.pbPinPhone) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+        OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(8) }, label = { Text(s.pbPinPin) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+        GhostButton(s.pbLoginGo, Icons.Filled.Login, {
+            busy = true; loginMsg = null
+            scope.launch { loginMsg = c.loginBooking(club, phone, pin)?.let { bookErrorText(s, it) }; busy = false; pin = ""; if (loginMsg == null) onJoined() }
+        }, Modifier.fillMaxWidth(), enabled = !busy && club.isNotBlank() && phone.isNotBlank() && pin.length >= 4)
+        loginMsg?.let { Text(it, color = TsmColors.Orange, fontSize = 14.sp) }
+    }
+}
+
+/** In Le mie: numero e PIN per rientrare da soli in questo circolo (scelti o da cambiare). */
+@Composable
+private fun PinSection(c: MatchController, me: SrvMe, onSaved: () -> Unit) {
+    val s = LocalStrings.current
+    val scope = rememberCoroutineScope()
+    var editing by remember { mutableStateOf(!me.hasPin) }
+    var phone by remember { mutableStateOf("") }
+    var pin by remember { mutableStateOf("") }
+    var pin2 by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var msg by remember { mutableStateOf<String?>(null) }
+    SectionCard(s.pbPinTitle, Icons.Filled.Password) {
+        if (!editing) {
+            Text(s.pbPinActive(me.phone), color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.pbPinChange, Icons.Filled.Password, { editing = true; msg = null }, Modifier.fillMaxWidth())
+        } else {
+            Text(s.pbPinHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            OutlinedTextField(phone, { phone = it }, label = { Text(s.pbPinPhone) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+            for ((v, label) in listOf(pin to s.pbPinPin, pin2 to s.pbPinPin2)) OutlinedTextField(v, { n -> if (label == s.pbPinPin) pin = n.filter(Char::isDigit).take(8) else pin2 = n.filter(Char::isDigit).take(8) },
+                label = { Text(label) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+            GhostButton(s.pbPinSave, Icons.Filled.Password, {
+                if (pin != pin2) { msg = s.pbPinMismatch; return@GhostButton }
+                busy = true; msg = null
+                scope.launch {
+                    val err = c.setBookingPin(phone, pin)
+                    busy = false
+                    if (err == null) { msg = s.pbPinSaved; editing = false; pin = ""; pin2 = ""; onSaved() } else msg = bookErrorText(s, err)
+                }
+            }, Modifier.fillMaxWidth(), enabled = !busy && phone.isNotBlank() && pin.length >= 4)
+        }
+        msg?.let { Text(it, color = if (it == s.pbPinSaved) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp) }
+    }
 }
 
 @Composable
-private fun BookingView(c: MatchController) {
+private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val locale = c.options.value.lang.locale
@@ -294,6 +369,8 @@ private fun BookingView(c: MatchController) {
                     c.setBookingReminders(on)
                     if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 }
+                PinSection(c, m) { reload() }
+                GhostButton(s.pbAddClub, Icons.Filled.Add, onAddClub, Modifier.fillMaxWidth())
                 GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
             }
             else -> {

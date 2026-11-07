@@ -136,6 +136,8 @@ interface DeskData {
     fun serverInvite(player: PlayerProfile): SrvInvite
     /** Il giocatore non prenota più online, fuori da [tx]; null = fatto, se no il codice dell'errore. */
     fun serverRevoke(playerId: String): String?
+    /** Azzera il PIN del giocatore, fuori da [tx]; null = fatto, se no il codice dell'errore. */
+    fun serverResetPin(playerId: String): String?
     fun paymentsCsv(year: Int): ByteArray?
     /** Backup della segreteria: il file di adesso, col suo nome. */
     fun officeBackup(): Pair<String, ByteArray>
@@ -187,14 +189,19 @@ interface DeskData {
     val guardian: String = "", val guardianPhone: String = "",
     /** Solo in uscita: cosa manca e quanto deve. */
     val issues: List<String> = emptyList(), val owedCents: Int = 0,
-    /** Solo in uscita: prenota già online (ha accettato un invito). */
+    /** Solo in uscita: prenota già online (ha accettato un invito) e ha scelto un PIN. */
     val online: Boolean = false,
+    val pin: Boolean = false,
 )
 /**
  * L'invito per prenotare online, per mostrarlo sul PC: il link e il suo QR ([rows]), il codice, fino a quando vale
  * ([until]) e, per mandarlo, il numero per WhatsApp ([wa], solo cifre col prefisso) e l'email del giocatore.
  */
-@Serializable data class DeskInvite(val link: String, val code: String, val until: String, val rows: List<String>, val club: String, val wa: String?, val email: String)
+@Serializable data class DeskInvite(
+    val link: String, val code: String, val until: String, val rows: List<String>, val club: String, val wa: String?, val email: String,
+    /** Senza indirizzo da internet: l'invito funziona solo nella rete del circolo. */
+    val localOnly: Boolean = false,
+)
 
 @Serializable data class DeskCsvIn(val text: String)
 @Serializable data class DeskCsvRow(val line: Int, val firstName: String, val lastName: String, val phone: String, val email: String, val birth: String?, val fitp: String, val update: Boolean, val error: String?)
@@ -530,6 +537,7 @@ class DeskApi(
             m?.photosOk == true, m?.guardian.orEmpty(), m?.guardianPhone.orEmpty(),
             Members.issues(p, now).map { it.name }, Fees.owed(book, p),
             data.serverConf().players.any { it.id == p.id },
+            data.serverConf().players.any { it.id == p.id && it.hasPin },
         )
     }
 
@@ -857,8 +865,12 @@ class DeskApi(
                 val link = ClubServers.inviteLink(conf, inv.code)
                 ok(DeskInvite.serializer(), DeskInvite(
                     link, inv.code.chunked(5).joinToString("-"), day(inv.expires).orEmpty(), qr(link), conf.club,
-                    com.tennis.scoremanager.data.Notices.waNumber(who.phone), who.email,
+                    com.tennis.scoremanager.data.Notices.waNumber(who.phone), who.email, conf.publicUrl.isBlank(),
                 ))
+            }
+            m == "DELETE" && p.size == 4 && p[1] == "players" && p[3] == "pin" -> {
+                data.serverResetPin(p[2])?.let { throw Fail(502, it) }
+                onlineOut()
             }
             m == "DELETE" && p.size == 3 && p[1] == "players" -> {
                 data.serverRevoke(p[2])?.let { throw Fail(502, it) }

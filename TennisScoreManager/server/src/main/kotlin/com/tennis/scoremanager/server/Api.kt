@@ -35,6 +35,7 @@ import com.tennis.scoremanager.data.SrvWait
 import com.tennis.scoremanager.data.SrvWaitIn
 import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
+import com.tennis.scoremanager.data.SrvPinIn
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import com.tennis.scoremanager.data.SrvTunnel
@@ -47,6 +48,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 const val API_VERSION = 1
+/** PIN sbagliati di fila prima di aspettare un quarto d'ora, e in tutto prima che il PIN non valga più. */
+const val PIN_TRIES = 5
+const val PIN_MAX = 20
 
 /** Una risposta: codice HTTP e corpo JSON. */
 data class Resp(val status: Int, val body: String)
@@ -111,7 +115,10 @@ class Api(
             r.method == "GET" && p == listOf("admin", "backup") -> { admin(r); getBackup(r.query["name"].orEmpty()) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "waits" -> { admin(r); adminRemove { s -> s.copy(waits = s.waits.filter { it.id != p[2] }) } }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "seeks" -> { admin(r); adminRemove { s -> s.copy(seeks = s.seeks.filter { it.id != p[2] }) } }
+            r.method == "DELETE" && p.size == 4 && p[0] == "admin" && p[1] == "players" && p[3] == "pin" -> { admin(r); resetPin(p[2]) }
             r.method == "POST" && p == listOf("claim") -> claim(r)
+            r.method == "POST" && p == listOf("login") -> login(r)
+            r.method == "POST" && p == listOf("pin") -> setPin(player(r), r)
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
@@ -204,7 +211,7 @@ class Api(
         val now = store.now()
         val today = java.time.Instant.ofEpochMilli(now).atZone(java.time.ZoneId.of(s.sync.timeZone)).toLocalDate().toString()
         return ok(SrvAdmin.serializer(), SrvAdmin(
-            s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) },
+            s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size, it.pin != null) },
             s.waits.filter { it.start > now }.sortedBy { it.start }, s.seeks.filter { it.date >= today }.sortedWith(compareBy({ it.date }, { it.fromMin })),
         ))
     }
@@ -328,7 +335,68 @@ class Api(
         return ok(SrvOk.serializer(), SrvOk())
     }
 
+    /** La segreteria azzera il PIN di un giocatore (l'ha dimenticato): rientra con un invito e se ne sceglie un altro. */
+    private fun resetPin(id: String): Resp {
+        store.update { s -> s.copy(players = s.players.map { if (it.id == id) it.copy(pin = null, pinFails = 0, pinLockUntil = 0) else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
     // --- Giocatori ---
+
+    /**
+     * Numero e PIN scelti dal giocatore già entrato: dopo, su un telefono nuovo o dopo un errore, rientra da solo.
+     * Il PIN ha da 4 a 8 cifre; lo stesso numero non può servire a due giocatori.
+     */
+    private fun setPin(pl: Player, r: Req): Resp {
+        val i = read(SrvPinIn.serializer(), r)
+        val pin = i.pin.trim()
+        if (pin.length !in 4..8 || !pin.all(Char::isDigit)) throw ApiError(400, "BAD_PIN")
+        val phone = Secrets.phoneKey(i.phone)
+        if (phone.length < 9) throw ApiError(400, "BAD_PHONE")
+        val hash = Secrets.pinHash(pin)
+        val taken = store.update { s ->
+            if (s.players.any { it.id != pl.id && it.phone == phone && it.pin != null }) return@update s to true
+            s.copy(players = s.players.map { if (it.id == pl.id) it.copy(phone = phone, pin = hash, pinFails = 0, pinLockUntil = 0) else it }) to false
+        }
+        if (taken) throw ApiError(409, "PHONE_TAKEN")
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /**
+     * Entrare con numero e PIN. Dopo [PIN_TRIES] PIN sbagliati di fila si aspetta un quarto d'ora; dopo [PIN_MAX]
+     * il PIN non vale più e lo azzera la segreteria. Il messaggio non dice se è sbagliato il numero o il PIN.
+     */
+    private fun login(r: Req): Resp {
+        guard(r)
+        val i = read(SrvPinIn.serializer(), r)
+        val phone = Secrets.phoneKey(i.phone)
+        val now = store.now()
+        val pl = store.state.players.firstOrNull { it.phone == phone && phone.length == 9 && it.pin != null }
+        if (pl == null) { limiter.fail(r.ip); throw ApiError(403, "BAD_LOGIN") }
+        if (pl.pinLockUntil > now) throw ApiError(429, "TOO_MANY_TRIES")
+        if (!Secrets.pinOk(i.pin.trim(), pl.pin!!)) {
+            limiter.fail(r.ip)
+            val gone = store.update { s ->
+                val p = s.players.first { it.id == pl.id }
+                val fails = p.pinFails + 1
+                val next = when {
+                    fails >= PIN_MAX -> p.copy(pin = null, pinFails = 0, pinLockUntil = 0)
+                    fails % PIN_TRIES == 0 -> p.copy(pinFails = fails, pinLockUntil = now + 15 * 60_000L)
+                    else -> p.copy(pinFails = fails)
+                }
+                s.copy(players = s.players.map { if (it.id == pl.id) next else it }) to (next.pin == null)
+            }
+            throw ApiError(403, if (gone) "PIN_RESET" else "BAD_LOGIN")
+        }
+        val token = Secrets.token()
+        store.update { s ->
+            s.copy(players = s.players.map {
+                // Come con l'invito: fino a tre telefoni, il quarto manda fuori il più vecchio.
+                if (it.id == pl.id) it.copy(tokens = (it.tokens + Secrets.hash(token)).takeLast(3), pinFails = 0, pinLockUntil = 0, lastSeen = now) else it
+            }) to Unit
+        }
+        return ok(SrvToken.serializer(), SrvToken(token, pl.name, pl.id))
+    }
 
     private fun claim(r: Req): Resp {
         guard(r)
@@ -359,7 +427,10 @@ class Api(
         val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
         val days = (0..s.sync.rules.daysAhead.coerceIn(0, 60)).map { today.plusDays(it.toLong()).toString() }
         val waits = s.waits.filter { it.player == pl.id && it.start > now }.sortedBy { it.start }.map { SrvWait(it.id, it.court, it.start, it.minutes, it.freedCourt) }
-        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits))
+        return ok(SrvMe.serializer(), SrvMe(
+            pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits,
+            pl.pin != null, pl.phone.takeLast(3),
+        ))
     }
 
     private fun day(pl: Player, date: String?): Resp {

@@ -275,6 +275,7 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun resetPin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id/pin", null, null, SrvOk.serializer())
     fun putBackup(name: String, bytes: ByteArray): SrvOk =
         call("POST", "/admin/backups", SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(bytes)), SrvOk.serializer())
     fun backups(): List<SrvBackup> = call<Unit, List<SrvBackup>>("GET", "/admin/backups", null, null, kotlinx.serialization.builtins.ListSerializer(SrvBackup.serializer()))
@@ -294,6 +295,9 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun book(b: SrvBookIn): SrvMyBooking = call("POST", "/bookings", SrvBookIn.serializer(), b, SrvMyBooking.serializer())
     fun cancelMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/bookings/${enc(id)}", null, null, SrvOk.serializer())
     fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
+    /** Entra con numero e PIN (scelti dal giocatore dopo l'invito). */
+    fun login(phone: String, pin: String): SrvToken = call("POST", "/login", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvToken.serializer())
+    fun setPin(phone: String, pin: String): SrvOk = call("POST", "/pin", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvOk.serializer())
     fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
     fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
     fun seeks(): List<SrvSeek> = call<Unit, List<SrvSeek>>("GET", "/seeks", null, null, kotlinx.serialization.builtins.ListSerializer(SrvSeek.serializer()))

@@ -12,5 +12,8 @@ firmware-atheros
 firmware-brcm80211
 firmware-misc-nonfree
 curl
+# Tailscale già dentro: Attiva parte subito, senza scaricarlo alla prima accensione. ps & co. per la manutenzione.
+tailscale
+procps
 ca-certificates
 caddy

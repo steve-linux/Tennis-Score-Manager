@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
@@ -48,6 +49,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Refresh
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ClubServerError
 import com.tennis.scoremanager.data.ClubServers
@@ -159,6 +166,57 @@ fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
     }
 }
 
+/** Una riga dei controlli: ✓ verde se va, ✗ arancione con cosa fare, grigio se è facoltativo o si sta controllando. */
+@Composable
+private fun CheckRow(ok: Boolean?, label: String, hint: String?, optional: Boolean = false) {
+    Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            when (ok) { true -> Icons.Filled.CheckCircle; false -> if (optional) Icons.Filled.RemoveCircleOutline else Icons.Filled.Cancel; null -> Icons.Filled.HourglassEmpty },
+            null, tint = when (ok) { true -> TsmColors.Ok; false -> if (optional) TsmColors.TextDim else TsmColors.Orange; null -> TsmColors.TextDim },
+        )
+        Column(Modifier.weight(1f)) {
+            Text(label, color = TsmColors.TextMain, fontSize = 14.sp)
+            if (hint != null) Text(hint, color = if (ok == false && !optional) TsmColors.Orange else TsmColors.TextDim, fontSize = 12.sp)
+        }
+    }
+}
+
+/**
+ * I controlli del server, uno per riga: abbinato, risponde in rete e da internet, planning inviato, prenotazioni
+ * aperte, campi, indirizzo da internet, avvisi. Si ricontrollano da soli ogni 30 secondi (e col tasto).
+ */
+@Composable
+private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data.BookingRules, publicUrl: String, notifOk: Boolean) {
+    val s = LocalStrings.current
+    val conf by c.clubServer.collectAsState()
+    var local by remember { mutableStateOf<Boolean?>(null) }
+    var remote by remember { mutableStateOf<Boolean?>(null) }
+    var round by remember { mutableStateOf(0) }
+    LaunchedEffect(round, publicUrl) {
+        while (true) {
+            local = null; remote = null
+            local = c.serverAnswers(conf.url)
+            remote = if (publicUrl.isBlank()) false else c.serverAnswers(publicUrl)
+            delay(30_000)
+        }
+    }
+    SectionCard(s.srvChkTitle, Icons.Filled.Checklist) {
+        // Abbinato sì, ma il server non riconosce più il telefono (es. chiavetta rifatta): va abbinato di nuovo.
+        val known = conf.paired && conf.error != "UNAUTHORIZED"
+        CheckRow(known, s.srvChkPaired, if (!known) s.srvErrAuth else null)
+        CheckRow(local, s.srvChkLocal, if (local == false) s.srvChkLocalNo else if (local == null) s.srvChkChecking else null)
+        val synced = conf.lastSync > 0 && conf.error == null
+        CheckRow(synced, s.srvChkSync, if (!synced) (conf.error?.let { srvErrorText(s, it) } ?: s.srvChkSyncNo) else null)
+        CheckRow(rules.open, s.srvChkOpen, if (!rules.open) s.srvChkOpenNo else null)
+        CheckRow(true, s.srvChkCourts, rules.courts.ifEmpty { null }?.joinToString(", ") ?: s.srvChkCourtsAll)
+        CheckRow(publicUrl.isNotBlank(), s.srvChkPublic, if (publicUrl.isBlank()) s.srvChkPublicNo else publicUrl)
+        if (publicUrl.isNotBlank()) CheckRow(remote, s.srvChkRemote, if (remote == false) s.srvChkRemoteNo else if (remote == null) s.srvChkChecking else null)
+        val alerts = conf.alerts && notifOk
+        CheckRow(alerts, s.srvChkAlerts, if (!alerts) s.srvChkAlertsNo else null, optional = true)
+        GhostButton(s.srvChkAgain, Icons.Filled.Refresh, { round++ }, Modifier.fillMaxWidth())
+    }
+}
+
 /** Abbinare il server, oppure (abbinato) lo stato, le regole per i giocatori e lo scollegamento. */
 @Composable
 fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
@@ -206,6 +264,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     }, Modifier.fillMaxWidth(), enabled = !busy && url.isNotBlank() && code.isNotBlank())
                 } else {
                     Text(s.srvConnected(conf.club.ifBlank { conf.url }), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                    ServerChecks(c, rules, publicUrl, notifOk)
                     Text(conf.url, color = TsmColors.TextDim, fontSize = 12.sp)
                     val err = conf.error
                     Text(
@@ -278,6 +337,13 @@ fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
             busy = true; msg = null
             scope.launch { c.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
         }, Modifier.fillMaxWidth(), enabled = !busy)
+        if (linked?.hasPin == true) {
+            Text(s.srvPinSet, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.srvPinReset, Icons.Filled.Password, {
+                busy = true; msg = null
+                scope.launch { msg = c.serverResetPin(p.id)?.let { srvErrorText(s, it) } ?: s.srvPinResetDone; busy = false }
+            }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
         if (linked != null) GhostButton(s.srvRevoke, Icons.Filled.LinkOff, {
             busy = true; msg = null
             scope.launch { msg = c.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
@@ -303,6 +369,7 @@ private fun InviteDialog(c: MatchController, inv: SrvInvite, onDone: () -> Unit)
                 Text(s.srvInviteCode(inv.code.chunked(5).joinToString("-")), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text(s.srvInviteUntil(shortDate(inv.expires, lang)), color = TsmColors.TextDim, fontSize = 13.sp)
                 Text(s.srvInviteHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (conf.publicUrl.isBlank()) Text(s.srvInviteLocalOnly, color = TsmColors.Orange, fontSize = 13.sp)
                 GhostButton(s.srvShare, Icons.Filled.Share, {
                     val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, s.srvShareText(conf.club.ifBlank { s.srvTitle }, link))
                     context.startActivity(Intent.createChooser(send, s.srvShare))

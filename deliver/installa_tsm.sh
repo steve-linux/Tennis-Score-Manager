@@ -71,6 +71,7 @@ mkdir -p "$DEST/server/deploy"
 mkdir -p "$DEST/server/deploy/iso"
 mkdir -p "$DEST/server/deploy/iso/config/hooks/normal"
 mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/etc"
+mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/journald.conf.d"
 mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/system"
 mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/usr/local/sbin"
 mkdir -p "$DEST/server/deploy/iso/config/package-lists"
@@ -516,6 +517,8 @@ const APP_I18N = {
     ctWalkoverLong: "Vinta a tavolino (w.o.)",
     ctWhere: "Dove e quando",
     ctWinner: "Chi ha vinto",
+    pbAddCancel: "Annulla",
+    pbAddClub: "Aggiungi un circolo",
     pbAlertChannel: "Le tue prenotazioni",
     pbAlertFreed: "Si è liberato un campo: prenotalo!",
     pbAlertReminder: "Promemoria della partita",
@@ -545,12 +548,17 @@ const APP_I18N = {
     pbErrFull: "L'annuncio è già al completo.",
     pbErrInvite: "Invito sbagliato o scaduto: chiedine uno nuovo alla segreteria.",
     pbErrLate: "È tardi per disdire da solo: chiama la segreteria.",
+    pbErrLogin: "Numero o PIN sbagliati.",
     pbErrLong: "La prenotazione è troppo lunga.",
     pbErrMany: "Hai già il massimo di prenotazioni: aspetta di giocarne una o disdicine una.",
     pbErrManySeeks: "Hai già 3 annunci aperti: togline uno prima.",
     pbErrManyWaits: "Sei già in attesa per 3 caselle: togline una prima.",
     pbErrNet: "Il server del circolo non risponde. Riprova tra poco.",
     pbErrPast: "Quest'ora è già passata.",
+    pbErrPhone: "Scrivi il numero di telefono completo.",
+    pbErrPhoneTaken: "Questo numero è già usato da un altro giocatore: chiedi alla segreteria.",
+    pbErrPinFormat: "Il PIN deve avere da 4 a 8 cifre.",
+    pbErrPinReset: "Troppi tentativi: il PIN non vale più. Chiedi alla segreteria un nuovo invito.",
     pbErrSlot: "Scegli un orario del planning.",
     pbErrSoon: "È troppo tardi per prenotare quest'ora: chiama la segreteria.",
     pbErrSynced: "Il circolo non ha ancora pubblicato il planning.",
@@ -568,10 +576,24 @@ const APP_I18N = {
     pbLeave: "Esci da questo circolo",
     pbLeaveAsk: "Uscire su questo telefono? Per rientrare serve un nuovo invito della segreteria.",
     pbLights: "Con le luci",
+    pbLoginClub: "Indirizzo del circolo o vecchio link d'invito",
+    pbLoginGo: "Entra con il PIN",
+    pbLoginText: "Entra con il tuo numero di telefono e il PIN.",
+    pbLoginTitle: "Hai già un PIN?",
     pbMine: "Le tue prenotazioni",
     pbMineCell: "Tuo",
     pbNone: "Nessuna prenotazione",
     pbPay: (it) => `Pagamento: ${it}`,
+    pbPinActive: (it) => `Rientri con il numero che finisce per ${it} e il tuo PIN.`,
+    pbPinChange: "Cambia PIN",
+    pbPinHint: "Scegli un PIN: se cambi telefono o esci, rientri da solo, senza chiedere un nuovo invito.",
+    pbPinMismatch: "I due PIN sono diversi.",
+    pbPinPhone: "Il tuo numero di telefono",
+    pbPinPin: "PIN (da 4 a 8 cifre)",
+    pbPinPin2: "Ripeti il PIN",
+    pbPinSave: "Salva il PIN",
+    pbPinSaved: "PIN salvato: d'ora in poi rientri con numero e PIN.",
+    pbPinTitle: "Rientra da solo con numero e PIN",
     pbPrice: "Prezzo",
     pbReminders: "Promemoria sul telefono",
     pbRemindersHint: (it) => `Una notifica ${it} ore prima della partita e se la segreteria toglie una tua prenotazione`,
@@ -696,6 +718,24 @@ const APP_I18N = {
     srvAlertsOff: "Le notifiche di TSM sono spente nelle impostazioni del telefono: accendile per ricevere gli avvisi.",
     srvButtonHint: "Facoltativo: i giocatori prenotano da soli",
     srvCancelHours: "Disdetta da soli fino a (ore prima)",
+    srvChkAgain: "Ricontrolla",
+    srvChkAlerts: "Avvisi delle prenotazioni sul telefono",
+    srvChkAlertsNo: "Spenti (facoltativo).",
+    srvChkChecking: "Controllo…",
+    srvChkCourts: "Campi prenotabili online",
+    srvChkCourtsAll: "tutti",
+    srvChkLocal: "Il server risponde nella rete del circolo",
+    srvChkLocalNo: "Non risponde: il telefono è sullo stesso Wi-Fi del server, e il server è acceso? Fuori dal circolo è normale.",
+    srvChkOpen: "Prenotazioni online aperte",
+    srvChkOpenNo: "Spente: i giocatori vedono il planning ma non prenotano.",
+    srvChkPaired: "Telefono abbinato al server",
+    srvChkPublic: "Indirizzo da internet",
+    srvChkPublicNo: "Manca: gli inviti funzionano solo nella rete del circolo. Accendi l'accesso da internet qui sotto.",
+    srvChkRemote: "Il server risponde da internet",
+    srvChkRemoteNo: "Non risponde: l'accesso da internet è spento, o il server non ha internet.",
+    srvChkSync: "Planning inviato al server",
+    srvChkSyncNo: "Non ancora: tocca Invia ora.",
+    srvChkTitle: "Controlli",
     srvConnected: (it) => `Collegato a ${it}`,
     srvCopyLink: "Copia il link",
     srvCourts: "Campi prenotabili online",
@@ -711,6 +751,7 @@ const APP_I18N = {
     srvInviteCode: (it) => `Codice: ${it}`,
     srvInviteHint: "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Gioca › Prenota un campo › Inquadra il QR.",
     srvInviteHow: "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online.",
+    srvInviteLocalOnly: "Senza indirizzo da internet questo invito funziona solo con il Wi-Fi del circolo.",
     srvInviteUntil: (it) => `Vale una volta, fino al ${it}`,
     srvLastSync: (it) => `Planning inviato: ${it}`,
     srvLinkCopied: "Link copiato",
@@ -724,6 +765,9 @@ const APP_I18N = {
     srvOpenHint: "Spente: i giocatori vedono il planning ma non prenotano",
     srvPair: "Abbina",
     srvPayInfo: "Come si paga (lo leggono i giocatori)",
+    srvPinReset: "Azzera il PIN",
+    srvPinResetDone: "PIN azzerato: il socio rientra con un nuovo invito e se ne sceglie un altro.",
+    srvPinSet: "Ha scelto un PIN: rientra da solo con numero e PIN.",
     srvPlayers: (it) => `Giocatori collegati: ${it}`,
     srvPublicUrl: "Indirizzo da internet (facoltativo)",
     srvPublicUrlHint: "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo",
@@ -1010,6 +1054,8 @@ const APP_I18N = {
     ctWalkoverLong: "Won by walkover (w/o)",
     ctWhere: "Where and when",
     ctWinner: "Winner",
+    pbAddCancel: "Cancel",
+    pbAddClub: "Add a club",
     pbAlertChannel: "Your bookings",
     pbAlertFreed: "A court is free: book it!",
     pbAlertReminder: "Match reminder",
@@ -1039,12 +1085,17 @@ const APP_I18N = {
     pbErrFull: "This request is already complete.",
     pbErrInvite: "Wrong or expired invitation: ask the club office for a new one.",
     pbErrLate: "It is too late to cancel yourself: call the club office.",
+    pbErrLogin: "Wrong number or PIN.",
     pbErrLong: "The booking is too long.",
     pbErrMany: "You already have the most bookings allowed: play one or cancel one first.",
     pbErrManySeeks: "You already have 3 open requests: remove one first.",
     pbErrManyWaits: "You are already waiting for 3 slots: remove one first.",
     pbErrNet: "The club server is not answering. Try again shortly.",
     pbErrPast: "This time has already passed.",
+    pbErrPhone: "Type the full phone number.",
+    pbErrPhoneTaken: "This number is already used by another player: ask the club office.",
+    pbErrPinFormat: "The PIN must have 4 to 8 digits.",
+    pbErrPinReset: "Too many attempts: the PIN no longer works. Ask the club office for a new invitation.",
     pbErrSlot: "Pick a time from the schedule.",
     pbErrSoon: "It is too late to book this time: call the club office.",
     pbErrSynced: "The club has not published the schedule yet.",
@@ -1062,10 +1113,24 @@ const APP_I18N = {
     pbLeave: "Leave this club",
     pbLeaveAsk: "Sign out on this phone? You will need a new invitation from the office to come back.",
     pbLights: "With lights",
+    pbLoginClub: "Club address or old invitation link",
+    pbLoginGo: "Sign in with PIN",
+    pbLoginText: "Sign in with your phone number and PIN.",
+    pbLoginTitle: "Already have a PIN?",
     pbMine: "Your bookings",
     pbMineCell: "Yours",
     pbNone: "No bookings",
     pbPay: (it) => `Payment: ${it}`,
+    pbPinActive: (it) => `You sign in with the number ending in ${it} and your PIN.`,
+    pbPinChange: "Change PIN",
+    pbPinHint: "Choose a PIN: if you change phone or sign out, you get back in yourself, without asking for a new invitation.",
+    pbPinMismatch: "The two PINs are different.",
+    pbPinPhone: "Your phone number",
+    pbPinPin: "PIN (4 to 8 digits)",
+    pbPinPin2: "Repeat the PIN",
+    pbPinSave: "Save the PIN",
+    pbPinSaved: "PIN saved: from now on you sign in with number and PIN.",
+    pbPinTitle: "Sign back in yourself with number and PIN",
     pbPrice: "Price",
     pbReminders: "Reminders on the phone",
     pbRemindersHint: (it) => `A notification ${it} hours before the match and if the office removes one of your bookings`,
@@ -1190,6 +1255,24 @@ const APP_I18N = {
     srvAlertsOff: "TSM notifications are off in the phone settings: turn them on to get the alerts.",
     srvButtonHint: "Optional: players book by themselves",
     srvCancelHours: "Self-cancel up to (hours before)",
+    srvChkAgain: "Check again",
+    srvChkAlerts: "Booking alerts on the phone",
+    srvChkAlertsNo: "Off (optional).",
+    srvChkChecking: "Checking…",
+    srvChkCourts: "Courts bookable online",
+    srvChkCourtsAll: "all",
+    srvChkLocal: "The server answers on the club network",
+    srvChkLocalNo: "No answer: is the phone on the same Wi-Fi as the server, and is the server on? Away from the club this is normal.",
+    srvChkOpen: "Online booking open",
+    srvChkOpenNo: "Off: players see the schedule but cannot book.",
+    srvChkPaired: "Phone paired with the server",
+    srvChkPublic: "Address from the internet",
+    srvChkPublicNo: "Missing: invitations work only on the club network. Turn on internet access below.",
+    srvChkRemote: "The server answers from the internet",
+    srvChkRemoteNo: "No answer: internet access is off, or the server has no internet.",
+    srvChkSync: "Schedule sent to the server",
+    srvChkSyncNo: "Not yet: tap Send now.",
+    srvChkTitle: "Checks",
     srvConnected: (it) => `Connected to ${it}`,
     srvCopyLink: "Copy the link",
     srvCourts: "Courts bookable online",
@@ -1205,6 +1288,7 @@ const APP_I18N = {
     srvInviteCode: (it) => `Code: ${it}`,
     srvInviteHint: "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: Play › Book a court › Scan the QR.",
     srvInviteHow: "To invite a player: open their card and tap Invite to book online.",
+    srvInviteLocalOnly: "Without an address from the internet, this invitation works only on the club Wi-Fi.",
     srvInviteUntil: (it) => `Works once, until ${it}`,
     srvLastSync: (it) => `Schedule sent: ${it}`,
     srvLinkCopied: "Link copied",
@@ -1218,6 +1302,9 @@ const APP_I18N = {
     srvOpenHint: "Off: players see the schedule but cannot book",
     srvPair: "Pair",
     srvPayInfo: "How to pay (players read this)",
+    srvPinReset: "Reset the PIN",
+    srvPinResetDone: "PIN reset: the member signs back in with a new invitation and chooses another one.",
+    srvPinSet: "Has chosen a PIN: signs back in with number and PIN.",
     srvPlayers: (it) => `Connected players: ${it}`,
     srvPublicUrl: "Address from the internet (optional)",
     srvPublicUrlHint: "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club",
@@ -1504,6 +1591,8 @@ const APP_I18N = {
     ctWalkoverLong: "Gagné par forfait",
     ctWhere: "Où et quand",
     ctWinner: "Vainqueur",
+    pbAddCancel: "Annuler",
+    pbAddClub: "Ajouter un club",
     pbAlertChannel: "Vos réservations",
     pbAlertFreed: "Un terrain s'est libéré : réservez-le !",
     pbAlertReminder: "Rappel du match",
@@ -1533,12 +1622,17 @@ const APP_I18N = {
     pbErrFull: "Cette annonce est déjà complète.",
     pbErrInvite: "Invitation erronée ou expirée : demandez-en une nouvelle au secrétariat.",
     pbErrLate: "Il est trop tard pour annuler vous-même : appelez le secrétariat.",
+    pbErrLogin: "Numéro ou PIN incorrect.",
     pbErrLong: "La réservation est trop longue.",
     pbErrMany: "Vous avez déjà le maximum de réservations : jouez-en ou annulez-en une d'abord.",
     pbErrManySeeks: "Vous avez déjà 3 annonces ouvertes : retirez-en une d'abord.",
     pbErrManyWaits: "Vous attendez déjà 3 créneaux : retirez-en un d'abord.",
     pbErrNet: "Le serveur du club ne répond pas. Réessayez dans un instant.",
     pbErrPast: "Cette heure est déjà passée.",
+    pbErrPhone: "Tapez le numéro de téléphone complet.",
+    pbErrPhoneTaken: "Ce numéro est déjà utilisé par un autre joueur : demandez au secrétariat.",
+    pbErrPinFormat: "Le PIN doit avoir de 4 à 8 chiffres.",
+    pbErrPinReset: "Trop de tentatives : le PIN ne vaut plus. Demandez une nouvelle invitation au secrétariat.",
     pbErrSlot: "Choisissez un horaire du planning.",
     pbErrSoon: "Il est trop tard pour réserver cette heure : appelez le secrétariat.",
     pbErrSynced: "Le club n'a pas encore publié le planning.",
@@ -1556,10 +1650,24 @@ const APP_I18N = {
     pbLeave: "Quitter ce club",
     pbLeaveAsk: "Se déconnecter sur ce téléphone ? Il faudra une nouvelle invitation du secrétariat pour revenir.",
     pbLights: "Avec éclairage",
+    pbLoginClub: "Adresse du club ou ancien lien d'invitation",
+    pbLoginGo: "Entrer avec le PIN",
+    pbLoginText: "Entrez avec votre numéro de téléphone et votre PIN.",
+    pbLoginTitle: "Vous avez déjà un PIN ?",
     pbMine: "Vos réservations",
     pbMineCell: "À vous",
     pbNone: "Aucune réservation",
     pbPay: (it) => `Paiement : ${it}`,
+    pbPinActive: (it) => `Vous entrez avec le numéro qui finit par ${it} et votre PIN.`,
+    pbPinChange: "Changer le PIN",
+    pbPinHint: "Choisissez un PIN : si vous changez de téléphone ou vous déconnectez, vous revenez seul, sans demander une nouvelle invitation.",
+    pbPinMismatch: "Les deux PIN sont différents.",
+    pbPinPhone: "Votre numéro de téléphone",
+    pbPinPin: "PIN (de 4 à 8 chiffres)",
+    pbPinPin2: "Répétez le PIN",
+    pbPinSave: "Enregistrer le PIN",
+    pbPinSaved: "PIN enregistré : désormais vous entrez avec numéro et PIN.",
+    pbPinTitle: "Revenir seul avec numéro et PIN",
     pbPrice: "Prix",
     pbReminders: "Rappels sur le téléphone",
     pbRemindersHint: (it) => `Une notification ${it} heures avant le match et si le secrétariat retire une de vos réservations`,
@@ -1684,6 +1792,24 @@ const APP_I18N = {
     srvAlertsOff: "Les notifications de TSM sont désactivées dans les réglages du téléphone : activez-les pour recevoir les alertes.",
     srvButtonHint: "Facultatif : les joueurs réservent eux-mêmes",
     srvCancelHours: "Annulation seul jusqu'à (heures avant)",
+    srvChkAgain: "Revérifier",
+    srvChkAlerts: "Alertes de réservation sur le téléphone",
+    srvChkAlertsNo: "Désactivées (facultatif).",
+    srvChkChecking: "Vérification…",
+    srvChkCourts: "Terrains réservables en ligne",
+    srvChkCourtsAll: "tous",
+    srvChkLocal: "Le serveur répond sur le réseau du club",
+    srvChkLocalNo: "Pas de réponse : le téléphone est-il sur le même Wi-Fi que le serveur, et le serveur est-il allumé ? Hors du club, c'est normal.",
+    srvChkOpen: "Réservations en ligne ouvertes",
+    srvChkOpenNo: "Désactivées : les joueurs voient le planning mais ne réservent pas.",
+    srvChkPaired: "Téléphone appairé au serveur",
+    srvChkPublic: "Adresse depuis internet",
+    srvChkPublicNo: "Manquante : les invitations ne marchent que sur le réseau du club. Activez l'accès internet ci-dessous.",
+    srvChkRemote: "Le serveur répond depuis internet",
+    srvChkRemoteNo: "Pas de réponse : l'accès internet est coupé, ou le serveur n'a pas internet.",
+    srvChkSync: "Planning envoyé au serveur",
+    srvChkSyncNo: "Pas encore : touchez Envoyer maintenant.",
+    srvChkTitle: "Vérifications",
     srvConnected: (it) => `Connecté à ${it}`,
     srvCopyLink: "Copier le lien",
     srvCourts: "Terrains réservables en ligne",
@@ -1699,6 +1825,7 @@ const APP_I18N = {
     srvInviteCode: (it) => `Code : ${it}`,
     srvInviteHint: "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Jouer › Réserver un terrain › Scanner le QR.",
     srvInviteHow: "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne.",
+    srvInviteLocalOnly: "Sans adresse depuis internet, cette invitation ne marche qu'avec le Wi-Fi du club.",
     srvInviteUntil: (it) => `Valable une fois, jusqu'au ${it}`,
     srvLastSync: (it) => `Planning envoyé : ${it}`,
     srvLinkCopied: "Lien copié",
@@ -1712,6 +1839,9 @@ const APP_I18N = {
     srvOpenHint: "Désactivées : les joueurs voient le planning sans réserver",
     srvPair: "Appairer",
     srvPayInfo: "Comment payer (les joueurs le lisent)",
+    srvPinReset: "Réinitialiser le PIN",
+    srvPinResetDone: "PIN réinitialisé : le membre revient avec une nouvelle invitation et en choisit un autre.",
+    srvPinSet: "A choisi un PIN : revient seul avec numéro et PIN.",
     srvPlayers: (it) => `Joueurs connectés : ${it}`,
     srvPublicUrl: "Adresse depuis internet (facultatif)",
     srvPublicUrlHint: "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club",
@@ -1998,6 +2128,8 @@ const APP_I18N = {
     ctWalkoverLong: "Kampflos gewonnen",
     ctWhere: "Wo und wann",
     ctWinner: "Sieger",
+    pbAddCancel: "Abbrechen",
+    pbAddClub: "Verein hinzufügen",
     pbAlertChannel: "Deine Buchungen",
     pbAlertFreed: "Ein Platz ist frei geworden: Buch ihn!",
     pbAlertReminder: "Erinnerung an dein Spiel",
@@ -2027,12 +2159,17 @@ const APP_I18N = {
     pbErrFull: "Diese Anzeige ist schon vollständig.",
     pbErrInvite: "Falsche oder abgelaufene Einladung: Frag im Vereinsbüro nach einer neuen.",
     pbErrLate: "Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an.",
+    pbErrLogin: "Nummer oder PIN falsch.",
     pbErrLong: "Die Buchung ist zu lang.",
     pbErrMany: "Du hast schon die meisten erlaubten Buchungen: Spiel oder storniere zuerst eine.",
     pbErrManySeeks: "Du hast schon 3 offene Anzeigen: Entferne zuerst eine.",
     pbErrManyWaits: "Du wartest schon auf 3 Felder: Entferne zuerst eins.",
     pbErrNet: "Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.",
     pbErrPast: "Diese Uhrzeit ist schon vorbei.",
+    pbErrPhone: "Gib die vollständige Telefonnummer ein.",
+    pbErrPhoneTaken: "Diese Nummer nutzt schon ein anderer Spieler: Frag das Büro.",
+    pbErrPinFormat: "Die PIN muss 4 bis 8 Ziffern haben.",
+    pbErrPinReset: "Zu viele Versuche: Die PIN gilt nicht mehr. Bitte das Büro um eine neue Einladung.",
     pbErrSlot: "Wähle eine Uhrzeit aus dem Plan.",
     pbErrSoon: "Für diese Uhrzeit ist es zu spät: Ruf das Vereinsbüro an.",
     pbErrSynced: "Der Verein hat den Plan noch nicht veröffentlicht.",
@@ -2050,10 +2187,24 @@ const APP_I18N = {
     pbLeave: "Diesen Verein verlassen",
     pbLeaveAsk: "Auf diesem Handy abmelden? Zum Zurückkommen brauchst du eine neue Einladung vom Büro.",
     pbLights: "Mit Licht",
+    pbLoginClub: "Adresse des Vereins oder alter Einladungslink",
+    pbLoginGo: "Mit PIN anmelden",
+    pbLoginText: "Melde dich mit deiner Telefonnummer und der PIN an.",
+    pbLoginTitle: "Schon eine PIN?",
     pbMine: "Deine Buchungen",
     pbMineCell: "Deine",
     pbNone: "Keine Buchungen",
     pbPay: (it) => `Bezahlung: ${it}`,
+    pbPinActive: (it) => `Du meldest dich mit der Nummer auf ${it} und deiner PIN an.`,
+    pbPinChange: "PIN ändern",
+    pbPinHint: "Wähle eine PIN: Wenn du das Telefon wechselst oder dich abmeldest, kommst du selbst wieder hinein, ohne neue Einladung.",
+    pbPinMismatch: "Die beiden PINs sind verschieden.",
+    pbPinPhone: "Deine Telefonnummer",
+    pbPinPin: "PIN (4 bis 8 Ziffern)",
+    pbPinPin2: "PIN wiederholen",
+    pbPinSave: "PIN speichern",
+    pbPinSaved: "PIN gespeichert: Ab jetzt meldest du dich mit Nummer und PIN an.",
+    pbPinTitle: "Selbst wieder anmelden mit Nummer und PIN",
     pbPrice: "Preis",
     pbReminders: "Erinnerungen auf dem Handy",
     pbRemindersHint: (it) => `Eine Benachrichtigung ${it} Stunden vor dem Spiel und wenn das Büro eine deiner Buchungen entfernt`,
@@ -2178,6 +2329,24 @@ const APP_I18N = {
     srvAlertsOff: "TSM-Benachrichtigungen sind in den Handy-Einstellungen aus: Schalte sie ein, um die Hinweise zu bekommen.",
     srvButtonHint: "Optional: Spieler buchen selbst",
     srvCancelHours: "Selbst stornieren bis (Stunden vorher)",
+    srvChkAgain: "Erneut prüfen",
+    srvChkAlerts: "Buchungsbenachrichtigungen auf dem Telefon",
+    srvChkAlertsNo: "Aus (optional).",
+    srvChkChecking: "Prüfe…",
+    srvChkCourts: "Online buchbare Plätze",
+    srvChkCourtsAll: "alle",
+    srvChkLocal: "Der Server antwortet im Vereinsnetz",
+    srvChkLocalNo: "Keine Antwort: Ist das Telefon im selben WLAN wie der Server, und ist der Server an? Außerhalb des Vereins ist das normal.",
+    srvChkOpen: "Online-Buchung offen",
+    srvChkOpenNo: "Aus: Die Spieler sehen den Plan, buchen aber nicht.",
+    srvChkPaired: "Telefon mit dem Server gekoppelt",
+    srvChkPublic: "Adresse aus dem Internet",
+    srvChkPublicNo: "Fehlt: Einladungen funktionieren nur im Vereinsnetz. Schalte unten den Internetzugang ein.",
+    srvChkRemote: "Der Server antwortet aus dem Internet",
+    srvChkRemoteNo: "Keine Antwort: Der Internetzugang ist aus, oder der Server hat kein Internet.",
+    srvChkSync: "Plan an den Server gesendet",
+    srvChkSyncNo: "Noch nicht: Tippe auf Jetzt senden.",
+    srvChkTitle: "Prüfungen",
     srvConnected: (it) => `Verbunden mit ${it}`,
     srvCopyLink: "Link kopieren",
     srvCourts: "Online buchbare Plätze",
@@ -2193,6 +2362,7 @@ const APP_I18N = {
     srvInviteCode: (it) => `Code: ${it}`,
     srvInviteHint: "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm. Mit der TSM-App: Spielen › Platz buchen › QR-Code scannen.",
     srvInviteHow: "Um einen Spieler einzuladen: Öffne seine Karte und tippe auf Einladung zum Online-Buchen.",
+    srvInviteLocalOnly: "Ohne Adresse aus dem Internet funktioniert diese Einladung nur im Vereins-WLAN.",
     srvInviteUntil: (it) => `Gilt einmal, bis ${it}`,
     srvLastSync: (it) => `Plan gesendet: ${it}`,
     srvLinkCopied: "Link kopiert",
@@ -2206,6 +2376,9 @@ const APP_I18N = {
     srvOpenHint: "Aus: Spieler sehen den Plan, buchen aber nicht",
     srvPair: "Koppeln",
     srvPayInfo: "Wie bezahlt wird (lesen die Spieler)",
+    srvPinReset: "PIN zurücksetzen",
+    srvPinResetDone: "PIN zurückgesetzt: Das Mitglied kommt mit einer neuen Einladung hinein und wählt eine neue.",
+    srvPinSet: "Hat eine PIN gewählt: meldet sich selbst mit Nummer und PIN an.",
     srvPlayers: (it) => `Verbundene Spieler: ${it}`,
     srvPublicUrl: "Adresse aus dem Internet (optional)",
     srvPublicUrlHint: "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins",
@@ -2492,6 +2665,8 @@ const APP_I18N = {
     ctWalkoverLong: "Ganado por w.o.",
     ctWhere: "Dónde y cuándo",
     ctWinner: "Ganador",
+    pbAddCancel: "Cancelar",
+    pbAddClub: "Añadir un club",
     pbAlertChannel: "Tus reservas",
     pbAlertFreed: "Se ha liberado una pista: ¡resérvala!",
     pbAlertReminder: "Recordatorio del partido",
@@ -2521,12 +2696,17 @@ const APP_I18N = {
     pbErrFull: "El anuncio ya está completo.",
     pbErrInvite: "Invitación errónea o caducada: pide una nueva a la secretaría.",
     pbErrLate: "Es tarde para anular tú mismo: llama a la secretaría.",
+    pbErrLogin: "Número o PIN incorrectos.",
     pbErrLong: "La reserva es demasiado larga.",
     pbErrMany: "Ya tienes el máximo de reservas: juega o anula una primero.",
     pbErrManySeeks: "Ya tienes 3 anuncios abiertos: quita uno primero.",
     pbErrManyWaits: "Ya esperas 3 casillas: quita una primero.",
     pbErrNet: "El servidor del club no responde. Inténtalo en un momento.",
     pbErrPast: "Esta hora ya ha pasado.",
+    pbErrPhone: "Escribe el número de teléfono completo.",
+    pbErrPhoneTaken: "Este número ya lo usa otro jugador: pregunta a la secretaría.",
+    pbErrPinFormat: "El PIN debe tener de 4 a 8 cifras.",
+    pbErrPinReset: "Demasiados intentos: el PIN ya no vale. Pide una nueva invitación a la secretaría.",
     pbErrSlot: "Elige un horario del planning.",
     pbErrSoon: "Es demasiado tarde para reservar esta hora: llama a la secretaría.",
     pbErrSynced: "El club aún no ha publicado el planning.",
@@ -2544,10 +2724,24 @@ const APP_I18N = {
     pbLeave: "Salir de este club",
     pbLeaveAsk: "¿Salir en este teléfono? Para volver hará falta una nueva invitación de secretaría.",
     pbLights: "Con luz",
+    pbLoginClub: "Dirección del club o enlace de invitación antiguo",
+    pbLoginGo: "Entrar con el PIN",
+    pbLoginText: "Entra con tu número de teléfono y el PIN.",
+    pbLoginTitle: "¿Ya tienes un PIN?",
     pbMine: "Tus reservas",
     pbMineCell: "Tuya",
     pbNone: "Ninguna reserva",
     pbPay: (it) => `Pago: ${it}`,
+    pbPinActive: (it) => `Entras con el número que acaba en ${it} y tu PIN.`,
+    pbPinChange: "Cambiar PIN",
+    pbPinHint: "Elige un PIN: si cambias de teléfono o sales, vuelves a entrar solo, sin pedir una nueva invitación.",
+    pbPinMismatch: "Los dos PIN son distintos.",
+    pbPinPhone: "Tu número de teléfono",
+    pbPinPin: "PIN (de 4 a 8 cifras)",
+    pbPinPin2: "Repite el PIN",
+    pbPinSave: "Guardar el PIN",
+    pbPinSaved: "PIN guardado: desde ahora entras con número y PIN.",
+    pbPinTitle: "Vuelve a entrar solo con número y PIN",
     pbPrice: "Precio",
     pbReminders: "Recordatorios en el teléfono",
     pbRemindersHint: (it) => `Una notificación ${it} horas antes del partido y si la secretaría quita una de tus reservas`,
@@ -2672,6 +2866,24 @@ const APP_I18N = {
     srvAlertsOff: "Las notificaciones de TSM están apagadas en los ajustes del teléfono: enciéndelas para recibir los avisos.",
     srvButtonHint: "Opcional: los jugadores reservan solos",
     srvCancelHours: "Anular solo hasta (horas antes)",
+    srvChkAgain: "Volver a comprobar",
+    srvChkAlerts: "Avisos de reservas en el teléfono",
+    srvChkAlertsNo: "Apagados (opcional).",
+    srvChkChecking: "Comprobando…",
+    srvChkCourts: "Pistas reservables en línea",
+    srvChkCourtsAll: "todas",
+    srvChkLocal: "El servidor responde en la red del club",
+    srvChkLocalNo: "No responde: ¿el teléfono está en el mismo Wi-Fi que el servidor, y el servidor está encendido? Fuera del club es normal.",
+    srvChkOpen: "Reservas en línea abiertas",
+    srvChkOpenNo: "Desactivadas: los jugadores ven el planning pero no reservan.",
+    srvChkPaired: "Teléfono emparejado con el servidor",
+    srvChkPublic: "Dirección desde internet",
+    srvChkPublicNo: "Falta: las invitaciones solo funcionan en la red del club. Activa el acceso desde internet aquí abajo.",
+    srvChkRemote: "El servidor responde desde internet",
+    srvChkRemoteNo: "No responde: el acceso desde internet está apagado, o el servidor no tiene internet.",
+    srvChkSync: "Planning enviado al servidor",
+    srvChkSyncNo: "Todavía no: toca Enviar ahora.",
+    srvChkTitle: "Comprobaciones",
     srvConnected: (it) => `Conectado a ${it}`,
     srvCopyLink: "Copiar el enlace",
     srvCourts: "Pistas reservables en línea",
@@ -2687,6 +2899,7 @@ const APP_I18N = {
     srvInviteCode: (it) => `Código: ${it}`,
     srvInviteHint: "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio. Con la app TSM: Jugar › Reservar pista › Escanear el QR.",
     srvInviteHow: "Para invitar a un jugador: abre su ficha y toca Invitación para reservar en línea.",
+    srvInviteLocalOnly: "Sin dirección desde internet, esta invitación solo funciona con el Wi-Fi del club.",
     srvInviteUntil: (it) => `Vale una vez, hasta el ${it}`,
     srvLastSync: (it) => `Planning enviado: ${it}`,
     srvLinkCopied: "Enlace copiado",
@@ -2700,6 +2913,9 @@ const APP_I18N = {
     srvOpenHint: "Apagadas: los jugadores ven el planning pero no reservan",
     srvPair: "Emparejar",
     srvPayInfo: "Cómo se paga (lo leen los jugadores)",
+    srvPinReset: "Restablecer el PIN",
+    srvPinResetDone: "PIN restablecido: el socio vuelve a entrar con una nueva invitación y elige otro.",
+    srvPinSet: "Ha elegido un PIN: vuelve a entrar solo con número y PIN.",
     srvPlayers: (it) => `Jugadores conectados: ${it}`,
     srvPublicUrl: "Dirección desde internet (opcional)",
     srvPublicUrlHint: "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club",
@@ -2986,6 +3202,8 @@ const APP_I18N = {
     ctWalkoverLong: "Vitória por W.O.",
     ctWhere: "Onde e quando",
     ctWinner: "Vencedor",
+    pbAddCancel: "Cancelar",
+    pbAddClub: "Adicionar um clube",
     pbAlertChannel: "As tuas reservas",
     pbAlertFreed: "Ficou livre uma quadra: reserva-a!",
     pbAlertReminder: "Lembrete do jogo",
@@ -3015,12 +3233,17 @@ const APP_I18N = {
     pbErrFull: "O anúncio já está completo.",
     pbErrInvite: "Convite errado ou expirado: pede um novo à secretaria.",
     pbErrLate: "É tarde para cancelares sozinho: liga para a secretaria.",
+    pbErrLogin: "Número ou PIN errados.",
     pbErrLong: "A reserva é demasiado longa.",
     pbErrMany: "Já tens o máximo de reservas: joga ou cancela uma primeiro.",
     pbErrManySeeks: "Já tens 3 anúncios abertos: tira um primeiro.",
     pbErrManyWaits: "Já esperas por 3 casas: tira uma primeiro.",
     pbErrNet: "O servidor do clube não responde. Tenta daqui a pouco.",
     pbErrPast: "Esta hora já passou.",
+    pbErrPhone: "Escreva o número de telefone completo.",
+    pbErrPhoneTaken: "Este número já é usado por outro jogador: pergunte à secretaria.",
+    pbErrPinFormat: "O PIN deve ter de 4 a 8 dígitos.",
+    pbErrPinReset: "Demasiadas tentativas: o PIN já não vale. Peça um novo convite à secretaria.",
     pbErrSlot: "Escolhe um horário da agenda.",
     pbErrSoon: "É tarde demais para reservar esta hora: liga para a secretaria.",
     pbErrSynced: "O clube ainda não publicou a agenda.",
@@ -3038,10 +3261,24 @@ const APP_I18N = {
     pbLeave: "Sair deste clube",
     pbLeaveAsk: "Sair neste telemóvel? Para voltar é preciso um novo convite da secretaria.",
     pbLights: "Com luz",
+    pbLoginClub: "Endereço do clube ou link de convite antigo",
+    pbLoginGo: "Entrar com o PIN",
+    pbLoginText: "Entre com o seu número de telefone e o PIN.",
+    pbLoginTitle: "Já tem um PIN?",
     pbMine: "As tuas reservas",
     pbMineCell: "Tua",
     pbNone: "Nenhuma reserva",
     pbPay: (it) => `Pagamento: ${it}`,
+    pbPinActive: (it) => `Entra com o número que termina em ${it} e o seu PIN.`,
+    pbPinChange: "Mudar o PIN",
+    pbPinHint: "Escolha um PIN: se trocar de telefone ou sair, volta a entrar sozinho, sem pedir um novo convite.",
+    pbPinMismatch: "Os dois PIN são diferentes.",
+    pbPinPhone: "O seu número de telefone",
+    pbPinPin: "PIN (de 4 a 8 dígitos)",
+    pbPinPin2: "Repita o PIN",
+    pbPinSave: "Guardar o PIN",
+    pbPinSaved: "PIN guardado: a partir de agora entra com número e PIN.",
+    pbPinTitle: "Volte a entrar sozinho com número e PIN",
     pbPrice: "Preço",
     pbReminders: "Lembretes no telemóvel",
     pbRemindersHint: (it) => `Uma notificação ${it} horas antes do jogo e se a secretaria retirar uma das tuas reservas`,
@@ -3166,6 +3403,24 @@ const APP_I18N = {
     srvAlertsOff: "As notificações do TSM estão desligadas nas definições do telemóvel: liga-as para receber os avisos.",
     srvButtonHint: "Opcional: os jogadores reservam sozinhos",
     srvCancelHours: "Cancelar sozinho até (horas antes)",
+    srvChkAgain: "Verificar de novo",
+    srvChkAlerts: "Avisos de reservas no telefone",
+    srvChkAlertsNo: "Desligados (opcional).",
+    srvChkChecking: "Verificando…",
+    srvChkCourts: "Quadras reserváveis online",
+    srvChkCourtsAll: "todas",
+    srvChkLocal: "O servidor responde na rede do clube",
+    srvChkLocalNo: "Não responde: o telefone está no mesmo Wi-Fi do servidor, e o servidor está ligado? Fora do clube é normal.",
+    srvChkOpen: "Reservas online abertas",
+    srvChkOpenNo: "Desligadas: os jogadores veem a agenda mas não reservam.",
+    srvChkPaired: "Telefone emparelhado com o servidor",
+    srvChkPublic: "Endereço pela internet",
+    srvChkPublicNo: "Falta: os convites só funcionam na rede do clube. Ligue o acesso pela internet aqui embaixo.",
+    srvChkRemote: "O servidor responde pela internet",
+    srvChkRemoteNo: "Não responde: o acesso pela internet está desligado, ou o servidor não tem internet.",
+    srvChkSync: "Agenda enviada ao servidor",
+    srvChkSyncNo: "Ainda não: toque em Enviar agora.",
+    srvChkTitle: "Verificações",
     srvConnected: (it) => `Ligado a ${it}`,
     srvCopyLink: "Copiar o link",
     srvCourts: "Quadras reserváveis online",
@@ -3181,6 +3436,7 @@ const APP_I18N = {
     srvInviteCode: (it) => `Código: ${it}`,
     srvInviteHint: "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal. Com a app TSM: Jogar › Reservar quadra › Ler o QR.",
     srvInviteHow: "Para convidar um jogador: abre a sua ficha e toca em Convite para reservar online.",
+    srvInviteLocalOnly: "Sem endereço pela internet, este convite só funciona no Wi-Fi do clube.",
     srvInviteUntil: (it) => `Vale uma vez, até ${it}`,
     srvLastSync: (it) => `Agenda enviada: ${it}`,
     srvLinkCopied: "Link copiado",
@@ -3194,6 +3450,9 @@ const APP_I18N = {
     srvOpenHint: "Desligadas: os jogadores veem a agenda mas não reservam",
     srvPair: "Emparelhar",
     srvPayInfo: "Como se paga (os jogadores leem)",
+    srvPinReset: "Repor o PIN",
+    srvPinResetDone: "PIN reposto: o sócio volta a entrar com um novo convite e escolhe outro.",
+    srvPinSet: "Escolheu um PIN: volta a entrar sozinho com número e PIN.",
     srvPlayers: (it) => `Jogadores ligados: ${it}`,
     srvPublicUrl: "Endereço pela internet (opcional)",
     srvPublicUrlHint: "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube",
@@ -3715,6 +3974,9 @@ function editPerson(p) {
   const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
   const online = server ? [
     h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+    p.pin ? h('button', { type: 'button', onclick: async () => {
+      try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id) + '/pin'); toast(T.srvPinResetDone); await showPeople(); } catch (e) { toast(errText(e)); }
+    } }, T.srvPinReset) : null,
     p.online ? h('button.danger', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvRevoke) : null,
@@ -3750,6 +4012,7 @@ async function inviteDialog(p) {
     canvas,
     h('p', h('b', T.srvInviteCode(inv.code))), h('p.dim', T.srvInviteUntil(dateText(inv.until))),
     h('p.dim', T.srvInviteHint),
+    inv.localOnly ? h('p', h('span.tag.warn.wrap', T.srvInviteLocalOnly)) : null,
     link,
     h('div.tools', copy, wa, mail),
     h('p.dim', T.srvSendHint)), null);
@@ -7946,6 +8209,8 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 
 **Einfache Anleitung für das Büro** (Start vom USB-Stick, Kopplung, Tailscale-Konto, die drei Arten): [GUIDE_SERVER.de.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.de.md).
 
+**Nummer und PIN, mehrere Vereine**: Nach der ersten Einladung kann der Spieler **Telefonnummer und PIN** wählen (auf der Vereinsseite und in der App unter **Meine**). Wechselt er das Telefon oder meldet sich ab, kommt er mit **Schon eine PIN?** selbst wieder hinein, ohne neue Einladung. Nach 5 falschen PINs wartet man eine Viertelstunde; nach 20 gilt die PIN nicht mehr und das Büro setzt sie in der Mitgliederkarte zurück (**PIN zurücksetzen**). In der App kann man **mehreren Vereinen** beitreten: **Verein hinzufügen** unter **Meine**, dann oben den Verein wählen; Erinnerungen und Hinweise kommen von allen, mit dem Vereinsnamen.
+
 - **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
 - **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
@@ -8528,6 +8793,8 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 
 **Simple guide for the club office** (starting from the USB stick, pairing, Tailscale account, the three ways): [GUIDE_SERVER.en.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.en.md).
 
+**Number and PIN, several clubs**: after the first invitation the player can choose a **phone number and PIN** (on the club page and in the app, under **Mine**). Then, after changing phone or signing out, they get back in with **Already have a PIN?**, without a new invitation. After 5 wrong PINs there is a fifteen-minute wait; after 20 the PIN stops working and the office resets it from the member card (**Reset the PIN**). In the app you can join **several clubs**: **Add a club** under **Mine**, then pick the club at the top; reminders and alerts come from all of them, with the club name.
+
 - **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
 - **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
@@ -9108,6 +9375,8 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 **Opcional**: sin servidor no cambia nada, se reserva en secretaría como siempre. Con un pequeño servidor en el club (una Raspberry Pi Zero 2 W o un PC viejo) los jugadores invitados **reservan las pistas solos** desde el teléfono, **también iPhone**, en una página web del club que se añade a la pantalla de inicio como una app.
 
 **Guía sencilla para la secretaría** (arranque desde el pendrive, emparejamiento, cuenta de Tailscale, las tres maneras): [GUIDE_SERVER.es.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.es.md).
+
+**Número y PIN, varios clubes**: tras la primera invitación el jugador puede elegir **número de teléfono y PIN** (en la página del club y en la app, en **Mías**). Así, si cambia de teléfono o sale, vuelve a entrar solo con **¿Ya tienes un PIN?**, sin nueva invitación. Tras 5 PIN erróneos se espera un cuarto de hora; tras 20 el PIN ya no vale y la secretaría lo restablece desde la ficha del socio (**Restablecer el PIN**). En la app se puede entrar en **varios clubes**: **Añadir un club** en **Mías**, y luego se elige el club arriba; recordatorios y avisos llegan de todos, con el nombre del club.
 
 - **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
 - **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
@@ -9690,6 +9959,8 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 
 **Guide simple pour le secrétariat** (démarrage depuis la clé, appairage, compte Tailscale, les trois façons) : [GUIDE_SERVER.fr.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.fr.md).
 
+**Numéro et PIN, plusieurs clubs** : après la première invitation le joueur peut choisir un **numéro de téléphone et un PIN** (sur la page du club et dans l'appli, dans **Les miennes**). Ainsi, s'il change de téléphone ou se déconnecte, il revient seul avec **Vous avez déjà un PIN ?**, sans nouvelle invitation. Après 5 PIN erronés on attend un quart d'heure ; après 20 le PIN ne vaut plus et le secrétariat le réinitialise depuis la fiche du membre (**Réinitialiser le PIN**). Dans l'appli on peut entrer dans **plusieurs clubs** : **Ajouter un club** dans **Les miennes**, puis on choisit le club en haut ; rappels et alertes arrivent de tous, avec le nom du club.
+
 - **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
 - **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
@@ -10271,6 +10542,8 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 
 **Guida semplice per la segreteria** (avvio dalla chiavetta, abbinamento, account Tailscale, i tre modi): [GUIDA_SERVER.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDA_SERVER.md).
 
+**Numero e PIN, più circoli**: dopo il primo invito il giocatore può scegliersi **numero di telefono e PIN** (nella pagina del circolo e nell'app, in **Le mie**). Così, se cambia telefono o esce, rientra da solo con **Hai già un PIN?**, senza un nuovo invito. Dopo 5 PIN sbagliati si aspetta un quarto d'ora; dopo 20 il PIN non vale più e la segreteria lo azzera dalla scheda del socio (**Azzera il PIN**). Nell'app si può entrare in **più circoli**: **Aggiungi un circolo** in **Le mie**, poi si sceglie il circolo in alto; promemoria e avvisi arrivano da tutti, col nome del circolo.
+
 - **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
 - **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
@@ -10851,6 +11124,8 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 **Opcional**: sem servidor nada muda, reserva-se na secretaria como sempre. Com um pequeno servidor no clube (um Raspberry Pi Zero 2 W ou um PC antigo) os jogadores convidados **reservam as quadras sozinhos** no telemóvel, **também iPhone**, numa página web do clube que se adiciona ao ecrã principal como uma app.
 
 **Guia simples para a secretaria** (início pelo pen drive, emparelhamento, conta do Tailscale, os três modos): [GUIDE_SERVER.pt.md](https://github.com/steve-linux/Tennis-Score-Manager/blob/main/deliver/GUIDE_SERVER.pt.md).
+
+**Número e PIN, vários clubes**: depois do primeiro convite o jogador pode escolher **número de telefone e PIN** (na página do clube e na app, em **Minhas**). Assim, se trocar de telefone ou sair, volta a entrar sozinho com **Já tem um PIN?**, sem novo convite. Depois de 5 PIN errados espera-se um quarto de hora; depois de 20 o PIN já não vale e a secretaria repõe-no a partir da ficha do sócio (**Repor o PIN**). Na app pode-se entrar em **vários clubes**: **Adicionar um clube** em **Minhas**, depois escolhe-se o clube em cima; lembretes e avisos chegam de todos, com o nome do clube.
 
 - **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
 - **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
@@ -14062,6 +14337,11 @@ class MatchController(
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 
+    /** Il server risponde a [url] (la rete del circolo o l'indirizzo da internet)? Per la lista dei controlli. */
+    suspend fun serverAnswers(url: String): Boolean = url.isNotBlank() && withContext(Dispatchers.IO) {
+        runCatching { com.tennis.scoremanager.data.ClubServerClient(com.tennis.scoremanager.data.ClubServers.cleanUrl(url), null).info() }.isSuccess
+    }
+
     /** Il tunnel da internet del server: com'è messo e, con [on], accendilo o spegnilo. */
     suspend fun serverTunnel(on: Boolean? = null): Result<com.tennis.scoremanager.data.SrvTunnel> {
         val conf = clubServer.value
@@ -14081,6 +14361,16 @@ class MatchController(
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
     }
 
+    /** Il socio ha dimenticato il PIN: lo si azzera (rientra con un invito e se ne sceglie un altro). null = fatto. */
+    suspend fun serverResetPin(id: String): String? {
+        val conf = clubServer.value
+        return try {
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.resetPin(id) } }
+            saveServer { it.copy(players = it.players.map { p -> if (p.id == id) p.copy(hasPin = false) else p }) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
     /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
     fun unpairServer() {
         saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl, alerts = it.alerts) }
@@ -14094,9 +14384,35 @@ class MatchController(
 
     // ---- Prenota un campo (il giocatore, col server del suo circolo) ----
 
-    val bookingAccount = MutableStateFlow(storage.loadBookingAccount())
+    /** I circoli in cui il giocatore è entrato (anche più d'uno); [bookingAccount] è quello che si sta guardando. */
+    val bookingAccounts = MutableStateFlow(storage.loadBookingAccounts())
+    val bookingAccount = MutableStateFlow(storage.loadBookingAccount().takeIf { it.joined } ?: bookingAccounts.value.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount())
 
-    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
+    /**
+     * Salva il circolo [a] (riconosciuto dall'indirizzo [url]): aggiornato al suo posto, o in fondo se è nuovo.
+     * Non più collegato (uscito, accesso tolto) = tolto dall'elenco; se era quello guardato, si passa al primo che resta.
+     */
+    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount, url: String = bookingAccount.value.url) {
+        val list = bookingAccounts.value
+        val next = when {
+            !a.joined -> list.filter { it.url != url }
+            list.any { it.url == url } -> list.map { if (it.url == url) a else it }
+            else -> list + a
+        }
+        bookingAccounts.value = next
+        val cur = bookingAccount.value
+        bookingAccount.value = when {
+            cur.url == url -> if (a.joined) a else next.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount()
+            !cur.joined -> a.takeIf { it.joined } ?: cur
+            else -> cur
+        }
+        val shown = bookingAccount.value
+        scope.launch(io) { storage.saveBookingAccounts(next); storage.saveBookingAccount(shown) }
+    }
+
+    /** Si guarda un altro dei propri circoli. */
+    fun selectBooking(url: String) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
         bookingAccount.value = a
         scope.launch(io) { storage.saveBookingAccount(a) }
     }
@@ -14113,22 +14429,51 @@ class MatchController(
                 val t = com.tennis.scoremanager.data.ClubServerClient(u, null).claim(code)
                 t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
             }
-            saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
     }
+
+    /** Un circolo nuovo (o lo stesso, rientrando): si aggiunge all'elenco e si guarda subito. */
+    private fun addBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
+        val old = bookingAccounts.value.firstOrNull { it.url == a.url }
+        // Rientrando nello stesso circolo restano le impostazioni (promemoria) e le notizie già viste.
+        saveBookingAccount(old?.copy(token = a.token, name = a.name, player = a.player, club = a.club) ?: a, a.url)
+        selectBooking(a.url)
+    }
+
+    /**
+     * Rientra con numero e PIN: [club] è l'indirizzo del circolo o il vecchio link d'invito (da lì si prende
+     * l'indirizzo). null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun loginBooking(club: String, phone: String, pin: String): String? {
+        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(club.substringBefore("#").substringBefore("?").trimEnd('/')).ifEmpty { return "NEED_URL" }
+        return try {
+            val (t, me) = withContext(Dispatchers.IO) {
+                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).login(phone, pin)
+                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
+            }
+            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Numero e PIN per rientrare da soli in questo circolo. null = fatto, altrimenti il codice dell'errore. */
+    suspend fun setBookingPin(phone: String, pin: String): String? = booking { it.setPin(phone, pin) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" }
 
     /**
      * Una chiamata del giocatore al server del suo circolo. Se il server non riconosce più la chiave (accesso
      * tolto dalla segreteria) si esce dal circolo: serve un nuovo invito.
      */
-    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
-        val a = bookingAccount.value
+    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> = bookingWith(bookingAccount.value, f)
+
+    /** Come [booking], per un circolo qualsiasi dei propri (il controllo in background li guarda tutti). */
+    private suspend fun <T> bookingWith(a: com.tennis.scoremanager.data.BookingAccount, f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
         if (!a.joined) return Result.failure(com.tennis.scoremanager.data.ClubServerError("UNAUTHORIZED"))
         return try {
             Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) })
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
-            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
+            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(), a.url)
             Result.failure(e)
         }
     }
@@ -14136,7 +14481,7 @@ class MatchController(
     init {
         // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
         scope.launch {
-            bookingAccount.map { it.joined && it.reminders }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
+            bookingAccounts.map { l -> l.any { it.joined && it.reminders } }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
         }
     }
 
@@ -14145,28 +14490,33 @@ class MatchController(
     /** Disdetta da qui: non è una notizia da dare al giocatore. */
     fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
 
-    /** Il controllo del giocatore (in background): promemoria della partita e prenotazioni tolte dalla segreteria. */
+    /** Il controllo del giocatore (in background), circolo per circolo: promemoria della partita e prenotazioni tolte dalla segreteria. */
     suspend fun checkMyBookings() {
-        val a = bookingAccount.value
+        val many = bookingAccounts.value.size > 1
+        for (a0 in bookingAccounts.value) checkMyBookings(a0, many)
+    }
+
+    /** [many]: si è in più circoli, e negli avvisi si dice di quale. */
+    private suspend fun checkMyBookings(a: com.tennis.scoremanager.data.BookingAccount, many: Boolean) {
         if (!a.joined) return
-        val me = booking { it.me() }.getOrNull() ?: return
+        val me = bookingWith(a) { it.me() }.getOrNull() ?: return
         val now = System.currentTimeMillis()
-        val news = com.tennis.scoremanager.data.ClubServers.myNews(bookingAccount.value, me.bookings, me.rules.remindHours, now) { b ->
-            bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
-        }
+        val club = if (many) me.club.ifBlank { a.club }.ifBlank { null } else null
+        fun label(court: String, start: Long) = listOfNotNull(club, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", court, start))).joinToString(" · ")
+        val news = com.tennis.scoremanager.data.ClubServers.myNews(a, me.bookings, me.rules.remindHours, now) { b -> label(b.court, b.start) }
         val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
-        val seeks = booking { it.seeks() }.getOrNull()
+        val seeks = bookingWith(a) { it.seeks() }.getOrNull()
         val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
-        saveBookingAccount(sk?.account ?: acc)
+        saveBookingAccount(sk?.account ?: acc, a.url)
         if (a.reminders) {
             com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
                 app, strings, news.remind.map { it.label }, news.removed.map { it.label },
-                freed.map { w -> bookingLabel(com.tennis.scoremanager.data.CourtBooking("", w.freedCourt!!, w.start)) },
+                freed.map { w -> label(w.freedCourt!!, w.start) },
             )
             if (sk != null) com.tennis.scoremanager.service.OnlineAlerts.postSeeks(
                 app, strings,
                 sk.joined.map { it.players.last() + " · " + it.date },
-                sk.booked.map { bookingLabel(com.tennis.scoremanager.data.CourtBooking("", it.bookedCourt!!, it.bookedStart!!)) + " · " + it.players.joinToString(", ") },
+                sk.booked.map { label(it.bookedCourt!!, it.bookedStart!!) + " · " + it.players.joinToString(", ") },
                 sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
             )
         }
@@ -19245,6 +19595,7 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun resetPin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id/pin", null, null, SrvOk.serializer())
     fun putBackup(name: String, bytes: ByteArray): SrvOk =
         call("POST", "/admin/backups", SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(bytes)), SrvOk.serializer())
     fun backups(): List<SrvBackup> = call<Unit, List<SrvBackup>>("GET", "/admin/backups", null, null, kotlinx.serialization.builtins.ListSerializer(SrvBackup.serializer()))
@@ -19264,6 +19615,9 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun book(b: SrvBookIn): SrvMyBooking = call("POST", "/bookings", SrvBookIn.serializer(), b, SrvMyBooking.serializer())
     fun cancelMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/bookings/${enc(id)}", null, null, SrvOk.serializer())
     fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
+    /** Entra con numero e PIN (scelti dal giocatore dopo l'invito). */
+    fun login(phone: String, pin: String): SrvToken = call("POST", "/login", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvToken.serializer())
+    fun setPin(phone: String, pin: String): SrvOk = call("POST", "/pin", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvOk.serializer())
     fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
     fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
     fun seeks(): List<SrvSeek> = call<Unit, List<SrvSeek>>("GET", "/seeks", null, null, kotlinx.serialization.builtins.ListSerializer(SrvSeek.serializer()))
@@ -24288,6 +24642,25 @@ class Storage(context: Context) {
     /** Il giocatore che prenota dall'app: il server del suo circolo e la sua chiave. */
     private val bookingFile: File get() = File(app.filesDir, "club_booking.json")
 
+    private val bookingsFile: File get() = File(app.filesDir, "club_bookings.json")
+
+    /** Tutti i circoli in cui il giocatore è entrato; la prima volta, quello di prima (un circolo solo). */
+    fun loadBookingAccounts(): List<BookingAccount> =
+        runCatching { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), bookingsFile.readText()) }
+            .getOrElse { listOf(loadBookingAccount()).filter { it.joined } }
+
+    @Synchronized
+    fun saveBookingAccounts(list: List<BookingAccount>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_bookings.tmp")
+            tmp.writeText(json.encodeToString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), list.filter { it.joined }))
+            if (!tmp.renameTo(bookingsFile)) {
+                bookingsFile.delete()
+                tmp.renameTo(bookingsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio dei circoli fallito", it) }
+    }
+
     fun loadBookingAccount(): BookingAccount =
         runCatching { json.decodeFromString(BookingAccount.serializer(), bookingFile.readText()) }.getOrDefault(BookingAccount())
 
@@ -26283,6 +26656,8 @@ interface DeskData {
     fun serverInvite(player: PlayerProfile): SrvInvite
     /** Il giocatore non prenota più online, fuori da [tx]; null = fatto, se no il codice dell'errore. */
     fun serverRevoke(playerId: String): String?
+    /** Azzera il PIN del giocatore, fuori da [tx]; null = fatto, se no il codice dell'errore. */
+    fun serverResetPin(playerId: String): String?
     fun paymentsCsv(year: Int): ByteArray?
     /** Backup della segreteria: il file di adesso, col suo nome. */
     fun officeBackup(): Pair<String, ByteArray>
@@ -26334,14 +26709,19 @@ interface DeskData {
     val guardian: String = "", val guardianPhone: String = "",
     /** Solo in uscita: cosa manca e quanto deve. */
     val issues: List<String> = emptyList(), val owedCents: Int = 0,
-    /** Solo in uscita: prenota già online (ha accettato un invito). */
+    /** Solo in uscita: prenota già online (ha accettato un invito) e ha scelto un PIN. */
     val online: Boolean = false,
+    val pin: Boolean = false,
 )
 /**
  * L'invito per prenotare online, per mostrarlo sul PC: il link e il suo QR ([rows]), il codice, fino a quando vale
  * ([until]) e, per mandarlo, il numero per WhatsApp ([wa], solo cifre col prefisso) e l'email del giocatore.
  */
-@Serializable data class DeskInvite(val link: String, val code: String, val until: String, val rows: List<String>, val club: String, val wa: String?, val email: String)
+@Serializable data class DeskInvite(
+    val link: String, val code: String, val until: String, val rows: List<String>, val club: String, val wa: String?, val email: String,
+    /** Senza indirizzo da internet: l'invito funziona solo nella rete del circolo. */
+    val localOnly: Boolean = false,
+)
 
 @Serializable data class DeskCsvIn(val text: String)
 @Serializable data class DeskCsvRow(val line: Int, val firstName: String, val lastName: String, val phone: String, val email: String, val birth: String?, val fitp: String, val update: Boolean, val error: String?)
@@ -26677,6 +27057,7 @@ class DeskApi(
             m?.photosOk == true, m?.guardian.orEmpty(), m?.guardianPhone.orEmpty(),
             Members.issues(p, now).map { it.name }, Fees.owed(book, p),
             data.serverConf().players.any { it.id == p.id },
+            data.serverConf().players.any { it.id == p.id && it.hasPin },
         )
     }
 
@@ -27004,8 +27385,12 @@ class DeskApi(
                 val link = ClubServers.inviteLink(conf, inv.code)
                 ok(DeskInvite.serializer(), DeskInvite(
                     link, inv.code.chunked(5).joinToString("-"), day(inv.expires).orEmpty(), qr(link), conf.club,
-                    com.tennis.scoremanager.data.Notices.waNumber(who.phone), who.email,
+                    com.tennis.scoremanager.data.Notices.waNumber(who.phone), who.email, conf.publicUrl.isBlank(),
                 ))
+            }
+            m == "DELETE" && p.size == 4 && p[1] == "players" && p[3] == "pin" -> {
+                data.serverResetPin(p[2])?.let { throw Fail(502, it) }
+                onlineOut()
             }
             m == "DELETE" && p.size == 3 && p[1] == "players" -> {
                 data.serverRevoke(p[2])?.let { throw Fail(502, it) }
@@ -28009,6 +28394,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
     override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
     override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
+    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverResetPin(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
@@ -37900,6 +38286,49 @@ interface Strings {
     val srvSendEmail: String
     val srvSendHint: String
     val srvRevoked: String
+    val srvChkTitle: String
+    val srvChkPaired: String
+    val srvChkLocal: String
+    val srvChkLocalNo: String
+    val srvChkSync: String
+    val srvChkSyncNo: String
+    val srvChkOpen: String
+    val srvChkOpenNo: String
+    val srvChkCourts: String
+    val srvChkCourtsAll: String
+    val srvChkPublic: String
+    val srvChkPublicNo: String
+    val srvChkRemote: String
+    val srvChkRemoteNo: String
+    val srvChkAlerts: String
+    val srvChkAlertsNo: String
+    val srvChkAgain: String
+    val srvChkChecking: String
+    val srvInviteLocalOnly: String
+    val srvPinSet: String
+    val srvPinReset: String
+    val srvPinResetDone: String
+    val pbAddClub: String
+    val pbAddCancel: String
+    val pbPinTitle: String
+    val pbPinHint: String
+    val pbPinPhone: String
+    val pbPinPin: String
+    val pbPinPin2: String
+    val pbPinSave: String
+    val pbPinSaved: String
+    val pbPinChange: String
+    val pbPinMismatch: String
+    val pbLoginTitle: String
+    val pbLoginText: String
+    val pbLoginClub: String
+    val pbLoginGo: String
+    val pbPinActive: (String) -> String
+    val pbErrLogin: String
+    val pbErrPinReset: String
+    val pbErrPhoneTaken: String
+    val pbErrPinFormat: String
+    val pbErrPhone: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -40163,6 +40592,49 @@ object ItStrings : Strings {
     override val srvSendEmail = "Manda per email"
     override val srvSendHint = "Si apre il messaggio già scritto: lo mandi tu."
     override val srvRevoked = "Non prenota più online"
+    override val srvChkTitle = "Controlli"
+    override val srvChkPaired = "Telefono abbinato al server"
+    override val srvChkLocal = "Il server risponde nella rete del circolo"
+    override val srvChkLocalNo = "Non risponde: il telefono è sullo stesso Wi-Fi del server, e il server è acceso? Fuori dal circolo è normale."
+    override val srvChkSync = "Planning inviato al server"
+    override val srvChkSyncNo = "Non ancora: tocca Invia ora."
+    override val srvChkOpen = "Prenotazioni online aperte"
+    override val srvChkOpenNo = "Spente: i giocatori vedono il planning ma non prenotano."
+    override val srvChkCourts = "Campi prenotabili online"
+    override val srvChkCourtsAll = "tutti"
+    override val srvChkPublic = "Indirizzo da internet"
+    override val srvChkPublicNo = "Manca: gli inviti funzionano solo nella rete del circolo. Accendi l'accesso da internet qui sotto."
+    override val srvChkRemote = "Il server risponde da internet"
+    override val srvChkRemoteNo = "Non risponde: l'accesso da internet è spento, o il server non ha internet."
+    override val srvChkAlerts = "Avvisi delle prenotazioni sul telefono"
+    override val srvChkAlertsNo = "Spenti (facoltativo)."
+    override val srvChkAgain = "Ricontrolla"
+    override val srvChkChecking = "Controllo…"
+    override val srvInviteLocalOnly = "Senza indirizzo da internet questo invito funziona solo con il Wi-Fi del circolo."
+    override val srvPinSet = "Ha scelto un PIN: rientra da solo con numero e PIN."
+    override val srvPinReset = "Azzera il PIN"
+    override val srvPinResetDone = "PIN azzerato: il socio rientra con un nuovo invito e se ne sceglie un altro."
+    override val pbAddClub = "Aggiungi un circolo"
+    override val pbAddCancel = "Annulla"
+    override val pbPinTitle = "Rientra da solo con numero e PIN"
+    override val pbPinHint = "Scegli un PIN: se cambi telefono o esci, rientri da solo, senza chiedere un nuovo invito."
+    override val pbPinPhone = "Il tuo numero di telefono"
+    override val pbPinPin = "PIN (da 4 a 8 cifre)"
+    override val pbPinPin2 = "Ripeti il PIN"
+    override val pbPinSave = "Salva il PIN"
+    override val pbPinSaved = "PIN salvato: d'ora in poi rientri con numero e PIN."
+    override val pbPinChange = "Cambia PIN"
+    override val pbPinMismatch = "I due PIN sono diversi."
+    override val pbLoginTitle = "Hai già un PIN?"
+    override val pbLoginText = "Entra con il tuo numero di telefono e il PIN."
+    override val pbLoginClub = "Indirizzo del circolo o vecchio link d'invito"
+    override val pbLoginGo = "Entra con il PIN"
+    override val pbPinActive: (String) -> String = { "Rientri con il numero che finisce per $it e il tuo PIN." }
+    override val pbErrLogin = "Numero o PIN sbagliati."
+    override val pbErrPinReset = "Troppi tentativi: il PIN non vale più. Chiedi alla segreteria un nuovo invito."
+    override val pbErrPhoneTaken = "Questo numero è già usato da un altro giocatore: chiedi alla segreteria."
+    override val pbErrPinFormat = "Il PIN deve avere da 4 a 8 cifre."
+    override val pbErrPhone = "Scrivi il numero di telefono completo."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -42389,6 +42861,49 @@ object EnStrings : Strings {
     override val srvSendEmail = "Send by email"
     override val srvSendHint = "The message opens already written: you send it."
     override val srvRevoked = "No longer books online"
+    override val srvChkTitle = "Checks"
+    override val srvChkPaired = "Phone paired with the server"
+    override val srvChkLocal = "The server answers on the club network"
+    override val srvChkLocalNo = "No answer: is the phone on the same Wi-Fi as the server, and is the server on? Away from the club this is normal."
+    override val srvChkSync = "Schedule sent to the server"
+    override val srvChkSyncNo = "Not yet: tap Send now."
+    override val srvChkOpen = "Online booking open"
+    override val srvChkOpenNo = "Off: players see the schedule but cannot book."
+    override val srvChkCourts = "Courts bookable online"
+    override val srvChkCourtsAll = "all"
+    override val srvChkPublic = "Address from the internet"
+    override val srvChkPublicNo = "Missing: invitations work only on the club network. Turn on internet access below."
+    override val srvChkRemote = "The server answers from the internet"
+    override val srvChkRemoteNo = "No answer: internet access is off, or the server has no internet."
+    override val srvChkAlerts = "Booking alerts on the phone"
+    override val srvChkAlertsNo = "Off (optional)."
+    override val srvChkAgain = "Check again"
+    override val srvChkChecking = "Checking…"
+    override val srvInviteLocalOnly = "Without an address from the internet, this invitation works only on the club Wi-Fi."
+    override val srvPinSet = "Has chosen a PIN: signs back in with number and PIN."
+    override val srvPinReset = "Reset the PIN"
+    override val srvPinResetDone = "PIN reset: the member signs back in with a new invitation and chooses another one."
+    override val pbAddClub = "Add a club"
+    override val pbAddCancel = "Cancel"
+    override val pbPinTitle = "Sign back in yourself with number and PIN"
+    override val pbPinHint = "Choose a PIN: if you change phone or sign out, you get back in yourself, without asking for a new invitation."
+    override val pbPinPhone = "Your phone number"
+    override val pbPinPin = "PIN (4 to 8 digits)"
+    override val pbPinPin2 = "Repeat the PIN"
+    override val pbPinSave = "Save the PIN"
+    override val pbPinSaved = "PIN saved: from now on you sign in with number and PIN."
+    override val pbPinChange = "Change PIN"
+    override val pbPinMismatch = "The two PINs are different."
+    override val pbLoginTitle = "Already have a PIN?"
+    override val pbLoginText = "Sign in with your phone number and PIN."
+    override val pbLoginClub = "Club address or old invitation link"
+    override val pbLoginGo = "Sign in with PIN"
+    override val pbPinActive: (String) -> String = { "You sign in with the number ending in $it and your PIN." }
+    override val pbErrLogin = "Wrong number or PIN."
+    override val pbErrPinReset = "Too many attempts: the PIN no longer works. Ask the club office for a new invitation."
+    override val pbErrPhoneTaken = "This number is already used by another player: ask the club office."
+    override val pbErrPinFormat = "The PIN must have 4 to 8 digits."
+    override val pbErrPhone = "Type the full phone number."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -44638,6 +45153,49 @@ object DeStrings : Strings {
     override val srvSendEmail = "Per E-Mail senden"
     override val srvSendHint = "Die Nachricht öffnet sich fertig geschrieben: Du schickst sie ab."
     override val srvRevoked = "Bucht nicht mehr online"
+    override val srvChkTitle = "Prüfungen"
+    override val srvChkPaired = "Telefon mit dem Server gekoppelt"
+    override val srvChkLocal = "Der Server antwortet im Vereinsnetz"
+    override val srvChkLocalNo = "Keine Antwort: Ist das Telefon im selben WLAN wie der Server, und ist der Server an? Außerhalb des Vereins ist das normal."
+    override val srvChkSync = "Plan an den Server gesendet"
+    override val srvChkSyncNo = "Noch nicht: Tippe auf Jetzt senden."
+    override val srvChkOpen = "Online-Buchung offen"
+    override val srvChkOpenNo = "Aus: Die Spieler sehen den Plan, buchen aber nicht."
+    override val srvChkCourts = "Online buchbare Plätze"
+    override val srvChkCourtsAll = "alle"
+    override val srvChkPublic = "Adresse aus dem Internet"
+    override val srvChkPublicNo = "Fehlt: Einladungen funktionieren nur im Vereinsnetz. Schalte unten den Internetzugang ein."
+    override val srvChkRemote = "Der Server antwortet aus dem Internet"
+    override val srvChkRemoteNo = "Keine Antwort: Der Internetzugang ist aus, oder der Server hat kein Internet."
+    override val srvChkAlerts = "Buchungsbenachrichtigungen auf dem Telefon"
+    override val srvChkAlertsNo = "Aus (optional)."
+    override val srvChkAgain = "Erneut prüfen"
+    override val srvChkChecking = "Prüfe…"
+    override val srvInviteLocalOnly = "Ohne Adresse aus dem Internet funktioniert diese Einladung nur im Vereins-WLAN."
+    override val srvPinSet = "Hat eine PIN gewählt: meldet sich selbst mit Nummer und PIN an."
+    override val srvPinReset = "PIN zurücksetzen"
+    override val srvPinResetDone = "PIN zurückgesetzt: Das Mitglied kommt mit einer neuen Einladung hinein und wählt eine neue."
+    override val pbAddClub = "Verein hinzufügen"
+    override val pbAddCancel = "Abbrechen"
+    override val pbPinTitle = "Selbst wieder anmelden mit Nummer und PIN"
+    override val pbPinHint = "Wähle eine PIN: Wenn du das Telefon wechselst oder dich abmeldest, kommst du selbst wieder hinein, ohne neue Einladung."
+    override val pbPinPhone = "Deine Telefonnummer"
+    override val pbPinPin = "PIN (4 bis 8 Ziffern)"
+    override val pbPinPin2 = "PIN wiederholen"
+    override val pbPinSave = "PIN speichern"
+    override val pbPinSaved = "PIN gespeichert: Ab jetzt meldest du dich mit Nummer und PIN an."
+    override val pbPinChange = "PIN ändern"
+    override val pbPinMismatch = "Die beiden PINs sind verschieden."
+    override val pbLoginTitle = "Schon eine PIN?"
+    override val pbLoginText = "Melde dich mit deiner Telefonnummer und der PIN an."
+    override val pbLoginClub = "Adresse des Vereins oder alter Einladungslink"
+    override val pbLoginGo = "Mit PIN anmelden"
+    override val pbPinActive: (String) -> String = { "Du meldest dich mit der Nummer auf $it und deiner PIN an." }
+    override val pbErrLogin = "Nummer oder PIN falsch."
+    override val pbErrPinReset = "Zu viele Versuche: Die PIN gilt nicht mehr. Bitte das Büro um eine neue Einladung."
+    override val pbErrPhoneTaken = "Diese Nummer nutzt schon ein anderer Spieler: Frag das Büro."
+    override val pbErrPinFormat = "Die PIN muss 4 bis 8 Ziffern haben."
+    override val pbErrPhone = "Gib die vollständige Telefonnummer ein."
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -46880,6 +47438,49 @@ object EsStrings : Strings {
     override val srvSendEmail = "Enviar por correo"
     override val srvSendHint = "El mensaje se abre ya escrito: lo envías tú."
     override val srvRevoked = "Ya no reserva en línea"
+    override val srvChkTitle = "Comprobaciones"
+    override val srvChkPaired = "Teléfono emparejado con el servidor"
+    override val srvChkLocal = "El servidor responde en la red del club"
+    override val srvChkLocalNo = "No responde: ¿el teléfono está en el mismo Wi-Fi que el servidor, y el servidor está encendido? Fuera del club es normal."
+    override val srvChkSync = "Planning enviado al servidor"
+    override val srvChkSyncNo = "Todavía no: toca Enviar ahora."
+    override val srvChkOpen = "Reservas en línea abiertas"
+    override val srvChkOpenNo = "Desactivadas: los jugadores ven el planning pero no reservan."
+    override val srvChkCourts = "Pistas reservables en línea"
+    override val srvChkCourtsAll = "todas"
+    override val srvChkPublic = "Dirección desde internet"
+    override val srvChkPublicNo = "Falta: las invitaciones solo funcionan en la red del club. Activa el acceso desde internet aquí abajo."
+    override val srvChkRemote = "El servidor responde desde internet"
+    override val srvChkRemoteNo = "No responde: el acceso desde internet está apagado, o el servidor no tiene internet."
+    override val srvChkAlerts = "Avisos de reservas en el teléfono"
+    override val srvChkAlertsNo = "Apagados (opcional)."
+    override val srvChkAgain = "Volver a comprobar"
+    override val srvChkChecking = "Comprobando…"
+    override val srvInviteLocalOnly = "Sin dirección desde internet, esta invitación solo funciona con el Wi-Fi del club."
+    override val srvPinSet = "Ha elegido un PIN: vuelve a entrar solo con número y PIN."
+    override val srvPinReset = "Restablecer el PIN"
+    override val srvPinResetDone = "PIN restablecido: el socio vuelve a entrar con una nueva invitación y elige otro."
+    override val pbAddClub = "Añadir un club"
+    override val pbAddCancel = "Cancelar"
+    override val pbPinTitle = "Vuelve a entrar solo con número y PIN"
+    override val pbPinHint = "Elige un PIN: si cambias de teléfono o sales, vuelves a entrar solo, sin pedir una nueva invitación."
+    override val pbPinPhone = "Tu número de teléfono"
+    override val pbPinPin = "PIN (de 4 a 8 cifras)"
+    override val pbPinPin2 = "Repite el PIN"
+    override val pbPinSave = "Guardar el PIN"
+    override val pbPinSaved = "PIN guardado: desde ahora entras con número y PIN."
+    override val pbPinChange = "Cambiar PIN"
+    override val pbPinMismatch = "Los dos PIN son distintos."
+    override val pbLoginTitle = "¿Ya tienes un PIN?"
+    override val pbLoginText = "Entra con tu número de teléfono y el PIN."
+    override val pbLoginClub = "Dirección del club o enlace de invitación antiguo"
+    override val pbLoginGo = "Entrar con el PIN"
+    override val pbPinActive: (String) -> String = { "Entras con el número que acaba en $it y tu PIN." }
+    override val pbErrLogin = "Número o PIN incorrectos."
+    override val pbErrPinReset = "Demasiados intentos: el PIN ya no vale. Pide una nueva invitación a la secretaría."
+    override val pbErrPhoneTaken = "Este número ya lo usa otro jugador: pregunta a la secretaría."
+    override val pbErrPinFormat = "El PIN debe tener de 4 a 8 cifras."
+    override val pbErrPhone = "Escribe el número de teléfono completo."
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -49124,6 +49725,49 @@ object FrStrings : Strings {
     override val srvSendEmail = "Envoyer par e-mail"
     override val srvSendHint = "Le message s'ouvre déjà écrit : c'est vous qui l'envoyez."
     override val srvRevoked = "Ne réserve plus en ligne"
+    override val srvChkTitle = "Vérifications"
+    override val srvChkPaired = "Téléphone appairé au serveur"
+    override val srvChkLocal = "Le serveur répond sur le réseau du club"
+    override val srvChkLocalNo = "Pas de réponse : le téléphone est-il sur le même Wi-Fi que le serveur, et le serveur est-il allumé ? Hors du club, c'est normal."
+    override val srvChkSync = "Planning envoyé au serveur"
+    override val srvChkSyncNo = "Pas encore : touchez Envoyer maintenant."
+    override val srvChkOpen = "Réservations en ligne ouvertes"
+    override val srvChkOpenNo = "Désactivées : les joueurs voient le planning mais ne réservent pas."
+    override val srvChkCourts = "Terrains réservables en ligne"
+    override val srvChkCourtsAll = "tous"
+    override val srvChkPublic = "Adresse depuis internet"
+    override val srvChkPublicNo = "Manquante : les invitations ne marchent que sur le réseau du club. Activez l'accès internet ci-dessous."
+    override val srvChkRemote = "Le serveur répond depuis internet"
+    override val srvChkRemoteNo = "Pas de réponse : l'accès internet est coupé, ou le serveur n'a pas internet."
+    override val srvChkAlerts = "Alertes de réservation sur le téléphone"
+    override val srvChkAlertsNo = "Désactivées (facultatif)."
+    override val srvChkAgain = "Revérifier"
+    override val srvChkChecking = "Vérification…"
+    override val srvInviteLocalOnly = "Sans adresse depuis internet, cette invitation ne marche qu'avec le Wi-Fi du club."
+    override val srvPinSet = "A choisi un PIN : revient seul avec numéro et PIN."
+    override val srvPinReset = "Réinitialiser le PIN"
+    override val srvPinResetDone = "PIN réinitialisé : le membre revient avec une nouvelle invitation et en choisit un autre."
+    override val pbAddClub = "Ajouter un club"
+    override val pbAddCancel = "Annuler"
+    override val pbPinTitle = "Revenir seul avec numéro et PIN"
+    override val pbPinHint = "Choisissez un PIN : si vous changez de téléphone ou vous déconnectez, vous revenez seul, sans demander une nouvelle invitation."
+    override val pbPinPhone = "Votre numéro de téléphone"
+    override val pbPinPin = "PIN (de 4 à 8 chiffres)"
+    override val pbPinPin2 = "Répétez le PIN"
+    override val pbPinSave = "Enregistrer le PIN"
+    override val pbPinSaved = "PIN enregistré : désormais vous entrez avec numéro et PIN."
+    override val pbPinChange = "Changer le PIN"
+    override val pbPinMismatch = "Les deux PIN sont différents."
+    override val pbLoginTitle = "Vous avez déjà un PIN ?"
+    override val pbLoginText = "Entrez avec votre numéro de téléphone et votre PIN."
+    override val pbLoginClub = "Adresse du club ou ancien lien d'invitation"
+    override val pbLoginGo = "Entrer avec le PIN"
+    override val pbPinActive: (String) -> String = { "Vous entrez avec le numéro qui finit par $it et votre PIN." }
+    override val pbErrLogin = "Numéro ou PIN incorrect."
+    override val pbErrPinReset = "Trop de tentatives : le PIN ne vaut plus. Demandez une nouvelle invitation au secrétariat."
+    override val pbErrPhoneTaken = "Ce numéro est déjà utilisé par un autre joueur : demandez au secrétariat."
+    override val pbErrPinFormat = "Le PIN doit avoir de 4 à 8 chiffres."
+    override val pbErrPhone = "Tapez le numéro de téléphone complet."
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -51369,6 +52013,49 @@ object PtStrings : Strings {
     override val srvSendEmail = "Enviar por e-mail"
     override val srvSendHint = "A mensagem abre já escrita: quem envia é você."
     override val srvRevoked = "Já não reserva online"
+    override val srvChkTitle = "Verificações"
+    override val srvChkPaired = "Telefone emparelhado com o servidor"
+    override val srvChkLocal = "O servidor responde na rede do clube"
+    override val srvChkLocalNo = "Não responde: o telefone está no mesmo Wi-Fi do servidor, e o servidor está ligado? Fora do clube é normal."
+    override val srvChkSync = "Agenda enviada ao servidor"
+    override val srvChkSyncNo = "Ainda não: toque em Enviar agora."
+    override val srvChkOpen = "Reservas online abertas"
+    override val srvChkOpenNo = "Desligadas: os jogadores veem a agenda mas não reservam."
+    override val srvChkCourts = "Quadras reserváveis online"
+    override val srvChkCourtsAll = "todas"
+    override val srvChkPublic = "Endereço pela internet"
+    override val srvChkPublicNo = "Falta: os convites só funcionam na rede do clube. Ligue o acesso pela internet aqui embaixo."
+    override val srvChkRemote = "O servidor responde pela internet"
+    override val srvChkRemoteNo = "Não responde: o acesso pela internet está desligado, ou o servidor não tem internet."
+    override val srvChkAlerts = "Avisos de reservas no telefone"
+    override val srvChkAlertsNo = "Desligados (opcional)."
+    override val srvChkAgain = "Verificar de novo"
+    override val srvChkChecking = "Verificando…"
+    override val srvInviteLocalOnly = "Sem endereço pela internet, este convite só funciona no Wi-Fi do clube."
+    override val srvPinSet = "Escolheu um PIN: volta a entrar sozinho com número e PIN."
+    override val srvPinReset = "Repor o PIN"
+    override val srvPinResetDone = "PIN reposto: o sócio volta a entrar com um novo convite e escolhe outro."
+    override val pbAddClub = "Adicionar um clube"
+    override val pbAddCancel = "Cancelar"
+    override val pbPinTitle = "Volte a entrar sozinho com número e PIN"
+    override val pbPinHint = "Escolha um PIN: se trocar de telefone ou sair, volta a entrar sozinho, sem pedir um novo convite."
+    override val pbPinPhone = "O seu número de telefone"
+    override val pbPinPin = "PIN (de 4 a 8 dígitos)"
+    override val pbPinPin2 = "Repita o PIN"
+    override val pbPinSave = "Guardar o PIN"
+    override val pbPinSaved = "PIN guardado: a partir de agora entra com número e PIN."
+    override val pbPinChange = "Mudar o PIN"
+    override val pbPinMismatch = "Os dois PIN são diferentes."
+    override val pbLoginTitle = "Já tem um PIN?"
+    override val pbLoginText = "Entre com o seu número de telefone e o PIN."
+    override val pbLoginClub = "Endereço do clube ou link de convite antigo"
+    override val pbLoginGo = "Entrar com o PIN"
+    override val pbPinActive: (String) -> String = { "Entra com o número que termina em $it e o seu PIN." }
+    override val pbErrLogin = "Número ou PIN errados."
+    override val pbErrPinReset = "Demasiadas tentativas: o PIN já não vale. Peça um novo convite à secretaria."
+    override val pbErrPhoneTaken = "Este número já é usado por outro jogador: pergunte à secretaria."
+    override val pbErrPinFormat = "O PIN deve ter de 4 a 8 dígitos."
+    override val pbErrPhone = "Escreva o número de telefone completo."
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -53257,6 +53944,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material.icons.filled.Password
+import com.tennis.scoremanager.ui.SectionCard
 
 private const val B_TIME_W = 52
 private const val B_CELL_W = 104
@@ -53285,6 +53974,11 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "TOO_MANY_WAITS" -> s.pbErrManyWaits
     "FULL" -> s.pbErrFull
     "TOO_MANY_SEEKS" -> s.pbErrManySeeks
+    "BAD_LOGIN" -> s.pbErrLogin
+    "PIN_RESET" -> s.pbErrPinReset
+    "PHONE_TAKEN" -> s.pbErrPhoneTaken
+    "BAD_PIN" -> s.pbErrPinFormat
+    "BAD_PHONE" -> s.pbErrPhone
     else -> s.srvErrOther(code)
 }
 
@@ -53315,6 +54009,8 @@ fun BookCourtScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val account by c.bookingAccount.collectAsState()
+    val accounts by c.bookingAccounts.collectAsState()
+    var adding by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.18") },
         title = s.pbTitle,
@@ -53322,12 +54018,22 @@ fun BookCourtScreen(c: MatchController) {
         icon = Icons.Filled.CalendarMonth,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
-        if (!account.joined) JoinClub(c) else BookingView(c)
+        if (!account.joined || adding) {
+            JoinClub(c) { adding = false }
+            if (adding) GhostButton(s.pbAddCancel, Icons.AutoMirrored.Filled.ArrowBack, { adding = false }, Modifier.fillMaxWidth())
+        } else {
+            // Più circoli: si sceglie quale guardare; ogni circolo ha la sua schermata (si ricarica cambiando).
+            if (accounts.size > 1) Segmented(
+                accounts.map { SegOption(it.club.ifBlank { it.url.substringAfter("//") }) }, accounts.indexOfFirst { it.url == account.url },
+                { c.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
+            )
+            androidx.compose.runtime.key(account.url) { BookingView(c) { adding = true } }
+        }
     }
 }
 
 @Composable
-private fun JoinClub(c: MatchController) {
+private fun JoinClub(c: MatchController, onJoined: () -> Unit = {}) {
     val s = LocalStrings.current
     val scope = rememberCoroutineScope()
     var invite by remember { mutableStateOf("") }
@@ -53336,7 +54042,7 @@ private fun JoinClub(c: MatchController) {
     var msg by remember { mutableStateOf<String?>(null) }
     fun join(text: String) {
         busy = true; msg = null
-        scope.launch { msg = c.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false }
+        scope.launch { msg = c.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false; if (msg == null) onJoined() }
     }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { invite = it; join(it) } }
     Text(s.pbJoinIntro, color = TsmColors.TextDim, fontSize = 14.sp)
@@ -53350,10 +54056,66 @@ private fun JoinClub(c: MatchController) {
         modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
     GhostButton(s.pbJoin, Icons.Filled.Login, { join(invite) }, Modifier.fillMaxWidth(), enabled = !busy && invite.isNotBlank())
     msg?.let { Text(it, color = TsmColors.Orange, fontSize = 14.sp) }
+
+    // Chi ha già scelto un PIN rientra da solo: indirizzo del circolo (o il vecchio link), numero e PIN.
+    var club by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var pin by remember { mutableStateOf("") }
+    var loginMsg by remember { mutableStateOf<String?>(null) }
+    SectionCard(s.pbLoginTitle, Icons.Filled.Password) {
+        Text(s.pbLoginText, color = TsmColors.TextDim, fontSize = 13.sp)
+        OutlinedTextField(club, { club = it }, label = { Text(s.pbLoginClub) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
+        OutlinedTextField(phone, { phone = it }, label = { Text(s.pbPinPhone) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+        OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(8) }, label = { Text(s.pbPinPin) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+        GhostButton(s.pbLoginGo, Icons.Filled.Login, {
+            busy = true; loginMsg = null
+            scope.launch { loginMsg = c.loginBooking(club, phone, pin)?.let { bookErrorText(s, it) }; busy = false; pin = ""; if (loginMsg == null) onJoined() }
+        }, Modifier.fillMaxWidth(), enabled = !busy && club.isNotBlank() && phone.isNotBlank() && pin.length >= 4)
+        loginMsg?.let { Text(it, color = TsmColors.Orange, fontSize = 14.sp) }
+    }
+}
+
+/** In Le mie: numero e PIN per rientrare da soli in questo circolo (scelti o da cambiare). */
+@Composable
+private fun PinSection(c: MatchController, me: SrvMe, onSaved: () -> Unit) {
+    val s = LocalStrings.current
+    val scope = rememberCoroutineScope()
+    var editing by remember { mutableStateOf(!me.hasPin) }
+    var phone by remember { mutableStateOf("") }
+    var pin by remember { mutableStateOf("") }
+    var pin2 by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var msg by remember { mutableStateOf<String?>(null) }
+    SectionCard(s.pbPinTitle, Icons.Filled.Password) {
+        if (!editing) {
+            Text(s.pbPinActive(me.phone), color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.pbPinChange, Icons.Filled.Password, { editing = true; msg = null }, Modifier.fillMaxWidth())
+        } else {
+            Text(s.pbPinHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            OutlinedTextField(phone, { phone = it }, label = { Text(s.pbPinPhone) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+            for ((v, label) in listOf(pin to s.pbPinPin, pin2 to s.pbPinPin2)) OutlinedTextField(v, { n -> if (label == s.pbPinPin) pin = n.filter(Char::isDigit).take(8) else pin2 = n.filter(Char::isDigit).take(8) },
+                label = { Text(label) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+            GhostButton(s.pbPinSave, Icons.Filled.Password, {
+                if (pin != pin2) { msg = s.pbPinMismatch; return@GhostButton }
+                busy = true; msg = null
+                scope.launch {
+                    val err = c.setBookingPin(phone, pin)
+                    busy = false
+                    if (err == null) { msg = s.pbPinSaved; editing = false; pin = ""; pin2 = ""; onSaved() } else msg = bookErrorText(s, err)
+                }
+            }, Modifier.fillMaxWidth(), enabled = !busy && phone.isNotBlank() && pin.length >= 4)
+        }
+        msg?.let { Text(it, color = if (it == s.pbPinSaved) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp) }
+    }
 }
 
 @Composable
-private fun BookingView(c: MatchController) {
+private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val locale = c.options.value.lang.locale
@@ -53467,6 +54229,8 @@ private fun BookingView(c: MatchController) {
                     c.setBookingReminders(on)
                     if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 }
+                PinSection(c, m) { reload() }
+                GhostButton(s.pbAddClub, Icons.Filled.Add, onAddClub, Modifier.fillMaxWidth())
                 GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
             }
             else -> {
@@ -53756,6 +54520,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
@@ -53784,6 +54549,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Refresh
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ClubServerError
 import com.tennis.scoremanager.data.ClubServers
@@ -53895,6 +54666,57 @@ fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
     }
 }
 
+/** Una riga dei controlli: ✓ verde se va, ✗ arancione con cosa fare, grigio se è facoltativo o si sta controllando. */
+@Composable
+private fun CheckRow(ok: Boolean?, label: String, hint: String?, optional: Boolean = false) {
+    Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            when (ok) { true -> Icons.Filled.CheckCircle; false -> if (optional) Icons.Filled.RemoveCircleOutline else Icons.Filled.Cancel; null -> Icons.Filled.HourglassEmpty },
+            null, tint = when (ok) { true -> TsmColors.Ok; false -> if (optional) TsmColors.TextDim else TsmColors.Orange; null -> TsmColors.TextDim },
+        )
+        Column(Modifier.weight(1f)) {
+            Text(label, color = TsmColors.TextMain, fontSize = 14.sp)
+            if (hint != null) Text(hint, color = if (ok == false && !optional) TsmColors.Orange else TsmColors.TextDim, fontSize = 12.sp)
+        }
+    }
+}
+
+/**
+ * I controlli del server, uno per riga: abbinato, risponde in rete e da internet, planning inviato, prenotazioni
+ * aperte, campi, indirizzo da internet, avvisi. Si ricontrollano da soli ogni 30 secondi (e col tasto).
+ */
+@Composable
+private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data.BookingRules, publicUrl: String, notifOk: Boolean) {
+    val s = LocalStrings.current
+    val conf by c.clubServer.collectAsState()
+    var local by remember { mutableStateOf<Boolean?>(null) }
+    var remote by remember { mutableStateOf<Boolean?>(null) }
+    var round by remember { mutableStateOf(0) }
+    LaunchedEffect(round, publicUrl) {
+        while (true) {
+            local = null; remote = null
+            local = c.serverAnswers(conf.url)
+            remote = if (publicUrl.isBlank()) false else c.serverAnswers(publicUrl)
+            delay(30_000)
+        }
+    }
+    SectionCard(s.srvChkTitle, Icons.Filled.Checklist) {
+        // Abbinato sì, ma il server non riconosce più il telefono (es. chiavetta rifatta): va abbinato di nuovo.
+        val known = conf.paired && conf.error != "UNAUTHORIZED"
+        CheckRow(known, s.srvChkPaired, if (!known) s.srvErrAuth else null)
+        CheckRow(local, s.srvChkLocal, if (local == false) s.srvChkLocalNo else if (local == null) s.srvChkChecking else null)
+        val synced = conf.lastSync > 0 && conf.error == null
+        CheckRow(synced, s.srvChkSync, if (!synced) (conf.error?.let { srvErrorText(s, it) } ?: s.srvChkSyncNo) else null)
+        CheckRow(rules.open, s.srvChkOpen, if (!rules.open) s.srvChkOpenNo else null)
+        CheckRow(true, s.srvChkCourts, rules.courts.ifEmpty { null }?.joinToString(", ") ?: s.srvChkCourtsAll)
+        CheckRow(publicUrl.isNotBlank(), s.srvChkPublic, if (publicUrl.isBlank()) s.srvChkPublicNo else publicUrl)
+        if (publicUrl.isNotBlank()) CheckRow(remote, s.srvChkRemote, if (remote == false) s.srvChkRemoteNo else if (remote == null) s.srvChkChecking else null)
+        val alerts = conf.alerts && notifOk
+        CheckRow(alerts, s.srvChkAlerts, if (!alerts) s.srvChkAlertsNo else null, optional = true)
+        GhostButton(s.srvChkAgain, Icons.Filled.Refresh, { round++ }, Modifier.fillMaxWidth())
+    }
+}
+
 /** Abbinare il server, oppure (abbinato) lo stato, le regole per i giocatori e lo scollegamento. */
 @Composable
 fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
@@ -53942,6 +54764,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     }, Modifier.fillMaxWidth(), enabled = !busy && url.isNotBlank() && code.isNotBlank())
                 } else {
                     Text(s.srvConnected(conf.club.ifBlank { conf.url }), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                    ServerChecks(c, rules, publicUrl, notifOk)
                     Text(conf.url, color = TsmColors.TextDim, fontSize = 12.sp)
                     val err = conf.error
                     Text(
@@ -54014,6 +54837,13 @@ fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
             busy = true; msg = null
             scope.launch { c.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
         }, Modifier.fillMaxWidth(), enabled = !busy)
+        if (linked?.hasPin == true) {
+            Text(s.srvPinSet, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.srvPinReset, Icons.Filled.Password, {
+                busy = true; msg = null
+                scope.launch { msg = c.serverResetPin(p.id)?.let { srvErrorText(s, it) } ?: s.srvPinResetDone; busy = false }
+            }, Modifier.fillMaxWidth(), enabled = !busy)
+        }
         if (linked != null) GhostButton(s.srvRevoke, Icons.Filled.LinkOff, {
             busy = true; msg = null
             scope.launch { msg = c.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
@@ -54039,6 +54869,7 @@ private fun InviteDialog(c: MatchController, inv: SrvInvite, onDone: () -> Unit)
                 Text(s.srvInviteCode(inv.code.chunked(5).joinToString("-")), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text(s.srvInviteUntil(shortDate(inv.expires, lang)), color = TsmColors.TextDim, fontSize = 13.sp)
                 Text(s.srvInviteHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (conf.publicUrl.isBlank()) Text(s.srvInviteLocalOnly, color = TsmColors.Orange, fontSize = 13.sp)
                 GhostButton(s.srvShare, Icons.Filled.Share, {
                     val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, s.srvShareText(conf.club.ifBlank { s.srvTitle }, link))
                     context.startActivity(Intent.createChooser(send, s.srvShare))
@@ -87094,6 +87925,7 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     var invited = mutableListOf<String>()
     override fun serverInvite(player: PlayerProfile): SrvInvite { if (remoteDown) throw ClubServerError("NET"); invited += player.id; return SrvInvite("ABCDEFGHJK", time + 7 * 86_400_000L) }
     override fun serverRevoke(playerId: String): String? = if (remoteDown) "NET" else { server = server.copy(players = server.players.filter { it.id != playerId }); null }
+    override fun serverResetPin(playerId: String): String? = if (remoteDown) "NET" else { server = server.copy(players = server.players.map { if (it.id == playerId) it.copy(hasPin = false) else it }); null }
     override fun readOnlineNotice(id: String?) { server = server.copy(inbox = if (id == null) emptyList() else server.inbox.filter { it.id != id }) }
     var auto = false
     val copies = linkedMapOf<String, ByteArray>()
@@ -89833,7 +90665,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvToken(val token: String, val name: String = "", val player: String = "")
 @Serializable data class SrvInviteIn(val player: String, val name: String, val days: Int = 14)
 @Serializable data class SrvInvite(val code: String, val expires: Long)
-@Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
+@Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int, val hasPin: Boolean = false)
+/** Il giocatore sceglie numero di telefono e PIN, per rientrare da solo su un altro telefono. */
+@Serializable data class SrvPinIn(val phone: String, val pin: String)
 @Serializable data class SrvAdmin(
     val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>,
     /** Per la segreteria: chi è in lista d'attesa e gli annunci di Cerco compagno ancora da giocare (vuoti dai server vecchi). */
@@ -89859,6 +90693,9 @@ import kotlinx.serialization.Serializable
     val days: List<String>, val bookings: List<SrvMyBooking>,
     /** Le liste d'attesa del giocatore: aperte, o già liberate (si prenota). */
     val waits: List<SrvWait> = emptyList(),
+    /** Ha scelto numero e PIN: rientra da solo; [phone] sono le ultime cifre del numero, per riconoscerlo. */
+    val hasPin: Boolean = false,
+    val phone: String = "",
 )
 /** Una lista d'attesa vista dal giocatore: [freedCourt] non null = si è liberato quel campo. */
 @Serializable data class SrvWait(val id: String, val court: String? = null, val start: Long, val minutes: Int, val freedCourt: String? = null)
@@ -91912,7 +92749,7 @@ id tsm >/dev/null 2>&1 || useradd --system --home-dir /var/lib/tsm-server --no-c
 chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin /opt/tsm-server/tsm-tunnel
 mkdir -p /var/lib/tsm-tunnel
 echo '{"state":"OFF"}' > /var/lib/tsm-tunnel/status.json
-systemctl enable tsm-server.service tsm-tunnel.path tsm-tunnel.timer tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
+systemctl enable tsm-server.service tsm-tunnel.path tsm-tunnel.timer tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service tailscaled.service
 systemctl disable caddy.service || true
 echo tsm-circolo > /etc/hostname
 TSM_EOF
@@ -91946,6 +92783,14 @@ cat > "$DEST/server/deploy/iso/config/includes.chroot/etc/motd" << 'TSM_EOF'
     sudo reboot                riavvia / restart
     sudo poweroff              spegne / shut down
     exit                       esci (il server resta acceso) / log out (the server keeps running)
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/etc/systemd/journald.conf.d/tsm.conf
+cat > "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/journald.conf.d/tsm.conf" << 'TSM_EOF'
+# I log di sistema in memoria, non sulla chiavetta: su una chiavetta lenta scriverli bloccava l'avvio, e così si consuma meno.
+[Journal]
+Storage=volatile
+RuntimeMaxUse=32M
 TSM_EOF
 
 # ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.service
@@ -92048,6 +92893,9 @@ firmware-atheros
 firmware-brcm80211
 firmware-misc-nonfree
 curl
+# Tailscale già dentro: Attiva parte subito, senza scaricarlo alla prima accensione. ps & co. per la manutenzione.
+tailscale
+procps
 ca-certificates
 caddy
 TSM_EOF
@@ -92065,6 +92913,12 @@ apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     mmdebstrap squashfs-tools-ng uidmap xorriso mtools grub-common grub-pc-bin grub-efi-amd64-bin ca-certificates
 W=/work
+# Tailscale (per l'accesso da internet senza router) dal suo repository ufficiale: la chiave sta allo stesso posto qui
+# e nell'immagine, così apt la trova sia durante la costruzione sia dopo, sulla chiavetta.
+TSKEY=/usr/share/keyrings/tailscale-archive-keyring.gpg
+mkdir -p /usr/share/keyrings
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl
+curl -fsSL -o "$TSKEY" https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg
 rm -rf "$W" && mkdir -p "$W/iso/live" "$W/iso/boot/grub"
 PKGS=$(grep -v '^#' /iso/config/package-lists/tsm.list.chroot | tr '\n' ',' | sed 's/,*$//')
 
@@ -92083,25 +92937,31 @@ cp /iso/config/hooks/normal/9000-tsm.hook.chroot "$W/hook.sh"
 
 # non-free-firmware: i firmware dei chip Wi-Fi dei portatili (Debian li mette anche nelle sue immagini ufficiali).
 mmdebstrap --mode=unshare --variant=apt --components=main,non-free-firmware \
+    --setup-hook='mkdir -p "$1/usr/share/keyrings" && cp '"$TSKEY"' "$1/usr/share/keyrings/"' \
     --include="linux-image-amd64,live-boot,live-config,live-config-systemd,systemd-sysv,locales,keyboard-configuration,console-setup,sudo,user-setup,$PKGS" \
     --customize-hook="sync-in $W/root /" \
     --customize-hook="upload $W/hook.sh /tmp/hook.sh" \
     --customize-hook='chroot "$1" sh /tmp/hook.sh' \
     --customize-hook='rm -f "$1/tmp/hook.sh"' \
     --customize-hook="sync-out /boot $W/boot" \
-    bookworm "$W/iso/live/filesystem.squashfs"
+    bookworm "$W/iso/live/filesystem.squashfs" \
+    "deb http://deb.debian.org/debian bookworm main non-free-firmware" \
+    "deb http://deb.debian.org/debian bookworm-updates main non-free-firmware" \
+    "deb http://security.debian.org/debian-security bookworm-security main non-free-firmware" \
+    "deb [signed-by=$TSKEY] https://pkgs.tailscale.com/stable/debian bookworm main"
 
 cp "$(ls $W/boot/vmlinuz-* | tail -1)" "$W/iso/live/vmlinuz"
 cp "$(ls $W/boot/initrd.img-* | tail -1)" "$W/iso/live/initrd.img"
+# nomodeset: senza driver grafici, che su certi portatili (due schede video) bloccano l'avvio; il server non li usa.
 cat > "$W/iso/boot/grub/grub.cfg" <<'GRUB'
 set timeout=3
 set default=0
 menuentry "TSM - Server del circolo / Club server" {
-    linux /live/vmlinuz boot=live components persistence quiet hostname=tsm-circolo locales=it_IT.UTF-8 keyboard-layouts=it timezone=Europe/Rome live-config.noautologin
+    linux /live/vmlinuz boot=live components persistence quiet hostname=tsm-circolo locales=it_IT.UTF-8 keyboard-layouts=it timezone=Europe/Rome live-config.noautologin nomodeset
     initrd /live/initrd.img
 }
 menuentry "TSM - English keyboard" {
-    linux /live/vmlinuz boot=live components persistence quiet hostname=tsm-circolo locales=en_US.UTF-8 keyboard-layouts=us timezone=Europe/Rome live-config.noautologin
+    linux /live/vmlinuz boot=live components persistence quiet hostname=tsm-circolo locales=en_US.UTF-8 keyboard-layouts=us timezone=Europe/Rome live-config.noautologin nomodeset
     initrd /live/initrd.img
 }
 GRUB
@@ -92654,6 +93514,7 @@ import com.tennis.scoremanager.data.SrvWait
 import com.tennis.scoremanager.data.SrvWaitIn
 import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
+import com.tennis.scoremanager.data.SrvPinIn
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import com.tennis.scoremanager.data.SrvTunnel
@@ -92666,6 +93527,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 const val API_VERSION = 1
+/** PIN sbagliati di fila prima di aspettare un quarto d'ora, e in tutto prima che il PIN non valga più. */
+const val PIN_TRIES = 5
+const val PIN_MAX = 20
 
 /** Una risposta: codice HTTP e corpo JSON. */
 data class Resp(val status: Int, val body: String)
@@ -92730,7 +93594,10 @@ class Api(
             r.method == "GET" && p == listOf("admin", "backup") -> { admin(r); getBackup(r.query["name"].orEmpty()) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "waits" -> { admin(r); adminRemove { s -> s.copy(waits = s.waits.filter { it.id != p[2] }) } }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "seeks" -> { admin(r); adminRemove { s -> s.copy(seeks = s.seeks.filter { it.id != p[2] }) } }
+            r.method == "DELETE" && p.size == 4 && p[0] == "admin" && p[1] == "players" && p[3] == "pin" -> { admin(r); resetPin(p[2]) }
             r.method == "POST" && p == listOf("claim") -> claim(r)
+            r.method == "POST" && p == listOf("login") -> login(r)
+            r.method == "POST" && p == listOf("pin") -> setPin(player(r), r)
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
@@ -92823,7 +93690,7 @@ class Api(
         val now = store.now()
         val today = java.time.Instant.ofEpochMilli(now).atZone(java.time.ZoneId.of(s.sync.timeZone)).toLocalDate().toString()
         return ok(SrvAdmin.serializer(), SrvAdmin(
-            s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) },
+            s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size, it.pin != null) },
             s.waits.filter { it.start > now }.sortedBy { it.start }, s.seeks.filter { it.date >= today }.sortedWith(compareBy({ it.date }, { it.fromMin })),
         ))
     }
@@ -92947,7 +93814,68 @@ class Api(
         return ok(SrvOk.serializer(), SrvOk())
     }
 
+    /** La segreteria azzera il PIN di un giocatore (l'ha dimenticato): rientra con un invito e se ne sceglie un altro. */
+    private fun resetPin(id: String): Resp {
+        store.update { s -> s.copy(players = s.players.map { if (it.id == id) it.copy(pin = null, pinFails = 0, pinLockUntil = 0) else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
     // --- Giocatori ---
+
+    /**
+     * Numero e PIN scelti dal giocatore già entrato: dopo, su un telefono nuovo o dopo un errore, rientra da solo.
+     * Il PIN ha da 4 a 8 cifre; lo stesso numero non può servire a due giocatori.
+     */
+    private fun setPin(pl: Player, r: Req): Resp {
+        val i = read(SrvPinIn.serializer(), r)
+        val pin = i.pin.trim()
+        if (pin.length !in 4..8 || !pin.all(Char::isDigit)) throw ApiError(400, "BAD_PIN")
+        val phone = Secrets.phoneKey(i.phone)
+        if (phone.length < 9) throw ApiError(400, "BAD_PHONE")
+        val hash = Secrets.pinHash(pin)
+        val taken = store.update { s ->
+            if (s.players.any { it.id != pl.id && it.phone == phone && it.pin != null }) return@update s to true
+            s.copy(players = s.players.map { if (it.id == pl.id) it.copy(phone = phone, pin = hash, pinFails = 0, pinLockUntil = 0) else it }) to false
+        }
+        if (taken) throw ApiError(409, "PHONE_TAKEN")
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /**
+     * Entrare con numero e PIN. Dopo [PIN_TRIES] PIN sbagliati di fila si aspetta un quarto d'ora; dopo [PIN_MAX]
+     * il PIN non vale più e lo azzera la segreteria. Il messaggio non dice se è sbagliato il numero o il PIN.
+     */
+    private fun login(r: Req): Resp {
+        guard(r)
+        val i = read(SrvPinIn.serializer(), r)
+        val phone = Secrets.phoneKey(i.phone)
+        val now = store.now()
+        val pl = store.state.players.firstOrNull { it.phone == phone && phone.length == 9 && it.pin != null }
+        if (pl == null) { limiter.fail(r.ip); throw ApiError(403, "BAD_LOGIN") }
+        if (pl.pinLockUntil > now) throw ApiError(429, "TOO_MANY_TRIES")
+        if (!Secrets.pinOk(i.pin.trim(), pl.pin!!)) {
+            limiter.fail(r.ip)
+            val gone = store.update { s ->
+                val p = s.players.first { it.id == pl.id }
+                val fails = p.pinFails + 1
+                val next = when {
+                    fails >= PIN_MAX -> p.copy(pin = null, pinFails = 0, pinLockUntil = 0)
+                    fails % PIN_TRIES == 0 -> p.copy(pinFails = fails, pinLockUntil = now + 15 * 60_000L)
+                    else -> p.copy(pinFails = fails)
+                }
+                s.copy(players = s.players.map { if (it.id == pl.id) next else it }) to (next.pin == null)
+            }
+            throw ApiError(403, if (gone) "PIN_RESET" else "BAD_LOGIN")
+        }
+        val token = Secrets.token()
+        store.update { s ->
+            s.copy(players = s.players.map {
+                // Come con l'invito: fino a tre telefoni, il quarto manda fuori il più vecchio.
+                if (it.id == pl.id) it.copy(tokens = (it.tokens + Secrets.hash(token)).takeLast(3), pinFails = 0, pinLockUntil = 0, lastSeen = now) else it
+            }) to Unit
+        }
+        return ok(SrvToken.serializer(), SrvToken(token, pl.name, pl.id))
+    }
 
     private fun claim(r: Req): Resp {
         guard(r)
@@ -92978,7 +93906,10 @@ class Api(
         val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
         val days = (0..s.sync.rules.daysAhead.coerceIn(0, 60)).map { today.plusDays(it.toLong()).toString() }
         val waits = s.waits.filter { it.player == pl.id && it.start > now }.sortedBy { it.start }.map { SrvWait(it.id, it.court, it.start, it.minutes, it.freedCourt) }
-        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits))
+        return ok(SrvMe.serializer(), SrvMe(
+            pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits,
+            pl.pin != null, pl.phone.takeLast(3),
+        ))
     }
 
     private fun day(pl: Player, date: String?): Resp {
@@ -93428,7 +94359,16 @@ import java.util.TimeZone
 
 /** Un giocatore invitato: [id] è il suo id nel database dell'app; [tokens] le impronte delle chiavi dei suoi telefoni. */
 @Serializable
-data class Player(val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0)
+data class Player(
+    val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0,
+    /** Le ultime 9 cifre del numero di telefono, per entrare con numero e PIN (vuoto = niente PIN). */
+    val phone: String = "",
+    /** Il PIN, mai in chiaro: "sale:impronta" (PBKDF2). */
+    val pin: String? = null,
+    /** PIN sbagliati di fila e fino a quando si aspetta prima di riprovare. */
+    val pinFails: Int = 0,
+    val pinLockUntil: Long = 0,
+)
 
 /** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
 @Serializable
@@ -93479,6 +94419,21 @@ object Secrets {
     fun hash(s: String): String = MessageDigest.getInstance("SHA-256").digest(s.toByteArray()).joinToString("") { "%02x".format(it) }
 
     fun id(prefix: String): String = prefix + token().take(12)
+
+    /** Le ultime 9 cifre del numero: "+39 333 1234567", "0039…" e "3331234567" sono lo stesso numero. */
+    fun phoneKey(raw: String): String = raw.filter(Char::isDigit).takeLast(9)
+
+    /** Il PIN salvato: sale casuale e PBKDF2 (lento apposta, contro chi prova tutti i PIN avendo il file). */
+    fun pinHash(pin: String, salt: String = token().take(16)): String {
+        val spec = javax.crypto.spec.PBEKeySpec(pin.toCharArray(), salt.toByteArray(), 60_000, 256)
+        val key = javax.crypto.SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+        return salt + ":" + key.joinToString("") { "%02x".format(it) }
+    }
+
+    fun pinOk(pin: String, saved: String): Boolean {
+        val salt = saved.substringBefore(':')
+        return MessageDigest.isEqual(pinHash(pin, salt).toByteArray(), saved.toByteArray())
+    }
 }
 
 /** Lo stato su disco, cambiato un passo alla volta e riscritto con file temporaneo e rinomina. */
@@ -93864,8 +94819,60 @@ function showInvite(error) {
       el('p', { class: 'dim' }, T.inviteText),
       el('label', { for: 'code' }, T.code), input, msg,
       el('div', { class: 'actions' }, el('button', { onclick: go }, T.enter))),
+    loginCard(),
     installTip());
   input.focus();
+}
+
+/** Chi ha già scelto un PIN rientra da solo, con il numero di telefono: senza un nuovo invito. */
+function loginCard() {
+  const phone = el('input', { type: 'tel', id: 'lphone', autocomplete: 'tel', inputmode: 'tel' });
+  const pin = el('input', { type: 'password', id: 'lpin', inputmode: 'numeric', autocomplete: 'current-password', maxlength: '8' });
+  const msg = el('p', { class: 'error' }, '');
+  const go = async () => {
+    if (!phone.value.trim() || !pin.value.trim()) return;
+    try {
+      const r = await api('POST', '/login', { phone: phone.value, pin: pin.value });
+      state.token = r.token; save(KEY, r.token);
+      await refresh();
+    } catch (e) { msg.textContent = errText(e); pin.value = ''; }
+  };
+  pin.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  return el('div', { class: 'card' },
+    el('h3', null, T.loginTitle),
+    el('p', { class: 'dim' }, T.loginText),
+    el('label', { for: 'lphone' }, T.pinPhone), phone,
+    el('label', { for: 'lpin' }, T.pinPin), pin, msg,
+    el('div', { class: 'actions' }, el('button', { onclick: go }, T.loginGo)));
+}
+
+/** In Le mie: scegliere (o cambiare) numero e PIN, per rientrare da solo su un altro telefono. */
+function pinCard() {
+  const me = state.me;
+  const box = el('div', { class: 'card' });
+  const form = () => {
+    const phone = el('input', { type: 'tel', id: 'pphone', autocomplete: 'tel', inputmode: 'tel' });
+    const pin = el('input', { type: 'password', id: 'ppin', inputmode: 'numeric', autocomplete: 'new-password', maxlength: '8' });
+    const pin2 = el('input', { type: 'password', id: 'ppin2', inputmode: 'numeric', autocomplete: 'new-password', maxlength: '8' });
+    const msg = el('p', { class: 'error' }, '');
+    const save = async () => {
+      if (pin.value !== pin2.value) { msg.textContent = T.pinMismatch; return; }
+      try {
+        await api('POST', '/pin', { phone: phone.value, pin: pin.value });
+        me.hasPin = true; me.phone = phone.value.replace(/\D/g, '').slice(-3);
+        box.replaceChildren(el('b', null, T.pinTitle), el('p', null, T.pinSaved));
+      } catch (e) { msg.textContent = errText(e); }
+    };
+    box.replaceChildren(el('b', null, T.pinTitle), el('p', { class: 'dim' }, T.pinHint),
+      el('label', { for: 'pphone' }, T.pinPhone), phone,
+      el('label', { for: 'ppin' }, T.pinPin), pin,
+      el('label', { for: 'ppin2' }, T.pinPin2), pin2, msg,
+      el('div', { class: 'actions' }, el('button', { onclick: save }, T.pinSave)));
+  };
+  if (me.hasPin) box.replaceChildren(el('b', null, T.pinTitle), el('p', { class: 'dim' }, T.pinActive(me.phone)),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost small', onclick: form }, T.pinChange)));
+  else form();
+  return box;
 }
 
 async function claim(code) {
@@ -93930,10 +94937,12 @@ function render(dayError) {
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
   const parts = [bar];
   if (state.tab === 1) {
-    parts.push(...mine, ...waits, el('div', { id: 'push' }));
+    parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
     parts.push(...seekSection());
   } else {
+    // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
+    if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
     parts.push(el('h2', null, T.day), days);
     if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
     if (dayError) parts.push(el('p', { class: 'error' }, dayError));
@@ -94238,6 +95247,7 @@ const I18N = {
     rules: (d, n) => `Prenoti fino a ${d} giorni avanti, al massimo ${n} prenotazioni per volta.`,
     cancelRule: h => `Disdici da solo fino a ${h} ore prima.`,
     covered: 'coperto', outdoor: 'scoperto', CLAY: 'terra', GRASS: 'erba', HARD: 'cemento', OTHER: '', free: 'gratis', today: 'Oggi',
+    pinTitle: 'Rientra da solo con numero e PIN', pinHint: 'Scegli un PIN: se cambi telefono o il browser ti fa uscire, rientri da solo, senza chiedere un nuovo invito.', pinPhone: 'Il tuo numero di telefono', pinPin: 'PIN (da 4 a 8 cifre)', pinPin2: 'Ripeti il PIN', pinSave: 'Salva il PIN', pinSaved: 'PIN salvato: d\'ora in poi rientri con numero e PIN.', pinChange: 'Cambia PIN', pinMismatch: 'I due PIN sono diversi.', loginTitle: 'Hai già un PIN?', loginText: 'Entra con il tuo numero di telefono e il PIN.', loginGo: 'Entra con il PIN', pinRemind: 'Scegli un PIN in Le mie: così, se serve, rientri da solo.', pinActive: n => `Rientri con il numero che finisce per ${n} e il tuo PIN.`,
     err: {
       FULL: 'L\'annuncio è già al completo.', TOO_MANY_SEEKS: 'Hai già 3 annunci aperti: togline uno prima.',
       FREE_NOW: 'Si è appena liberata: prenotala subito!', TOO_MANY_WAITS: 'Sei già in attesa per 3 caselle: togline una prima.',
@@ -94248,6 +95258,7 @@ const I18N = {
       BAD_CODE: 'Codice sbagliato o scaduto: chiedine uno nuovo alla segreteria.', TOO_MANY_TRIES: 'Troppi tentativi: riprova tra un quarto d\'ora.',
       UNAUTHORIZED: 'Questo telefono non è più collegato: chiedi un nuovo invito alla segreteria.', TOO_LATE: 'È tardi per disdire da solo: chiama la segreteria.',
       NOT_YOURS: 'Questa prenotazione non è tua.', NOT_FOUND: 'Prenotazione non trovata.', NOT_SYNCED: 'Il circolo non ha ancora pubblicato il planning.',
+      BAD_PIN: 'Il PIN deve avere da 4 a 8 cifre.', BAD_PHONE: 'Scrivi il numero di telefono completo.', PHONE_TAKEN: 'Questo numero è già usato da un altro giocatore: chiedi alla segreteria.', BAD_LOGIN: 'Numero o PIN sbagliati.', PIN_RESET: 'Troppi tentativi: il PIN non vale più. Chiedi alla segreteria un nuovo invito.',
       generic: 'Qualcosa non ha funzionato. Riprova.',
     },
   },
@@ -94270,6 +95281,7 @@ const I18N = {
     rules: (d, n) => `You can book up to ${d} days ahead, at most ${n} bookings at a time.`,
     cancelRule: h => `You can cancel yourself up to ${h} hours before.`,
     covered: 'indoor', outdoor: 'outdoor', CLAY: 'clay', GRASS: 'grass', HARD: 'hard', OTHER: '', free: 'free', today: 'Today',
+    pinTitle: 'Sign back in yourself with number and PIN', pinHint: 'Choose a PIN: if you change phone or the browser signs you out, you get back in yourself, without asking for a new invitation.', pinPhone: 'Your phone number', pinPin: 'PIN (4 to 8 digits)', pinPin2: 'Repeat the PIN', pinSave: 'Save the PIN', pinSaved: 'PIN saved: from now on you sign in with number and PIN.', pinChange: 'Change PIN', pinMismatch: 'The two PINs are different.', loginTitle: 'Already have a PIN?', loginText: 'Sign in with your phone number and PIN.', loginGo: 'Sign in with PIN', pinRemind: 'Choose a PIN in Mine: then, if needed, you can sign back in yourself.', pinActive: n => `You sign in with the number ending in ${n} and your PIN.`,
     err: {
       FULL: 'This request is already complete.', TOO_MANY_SEEKS: 'You already have 3 open requests: remove one first.',
       FREE_NOW: 'It has just become free: book it now!', TOO_MANY_WAITS: 'You are already waiting for 3 slots: remove one first.',
@@ -94280,6 +95292,7 @@ const I18N = {
       BAD_CODE: 'Wrong or expired code: ask the club office for a new one.', TOO_MANY_TRIES: 'Too many attempts: try again in fifteen minutes.',
       UNAUTHORIZED: 'This phone is no longer connected: ask the club office for a new invitation.', TOO_LATE: 'It is too late to cancel yourself: call the club office.',
       NOT_YOURS: 'This booking is not yours.', NOT_FOUND: 'Booking not found.', NOT_SYNCED: 'The club has not published the schedule yet.',
+      BAD_PIN: 'The PIN must have 4 to 8 digits.', BAD_PHONE: 'Type the full phone number.', PHONE_TAKEN: 'This number is already used by another player: ask the club office.', BAD_LOGIN: 'Wrong number or PIN.', PIN_RESET: 'Too many attempts: the PIN no longer works. Ask the club office for a new invitation.',
       generic: 'Something went wrong. Try again.',
     },
   },
@@ -94302,6 +95315,7 @@ const I18N = {
     rules: (d, n) => `Réservation jusqu'à ${d} jours à l'avance, ${n} réservations au maximum à la fois.`,
     cancelRule: h => `Annulation par vous-même jusqu'à ${h} heures avant.`,
     covered: 'couvert', outdoor: 'extérieur', CLAY: 'terre battue', GRASS: 'gazon', HARD: 'dur', OTHER: '', free: 'gratuit', today: 'Aujourd\'hui',
+    pinTitle: 'Revenir seul avec numéro et PIN', pinHint: 'Choisissez un PIN : si vous changez de téléphone ou si le navigateur vous déconnecte, vous revenez seul, sans demander une nouvelle invitation.', pinPhone: 'Votre numéro de téléphone', pinPin: 'PIN (de 4 à 8 chiffres)', pinPin2: 'Répétez le PIN', pinSave: 'Enregistrer le PIN', pinSaved: 'PIN enregistré : désormais vous entrez avec numéro et PIN.', pinChange: 'Changer le PIN', pinMismatch: 'Les deux PIN sont différents.', loginTitle: 'Vous avez déjà un PIN ?', loginText: 'Entrez avec votre numéro de téléphone et votre PIN.', loginGo: 'Entrer avec le PIN', pinRemind: 'Choisissez un PIN dans Les miennes : ainsi, si besoin, vous revenez seul.', pinActive: n => `Vous entrez avec le numéro qui finit par ${n} et votre PIN.`,
     err: {
       FULL: 'Cette annonce est déjà complète.', TOO_MANY_SEEKS: 'Vous avez déjà 3 annonces ouvertes : retirez-en une d\'abord.',
       FREE_NOW: 'Il vient de se libérer : réservez-le vite !', TOO_MANY_WAITS: 'Vous attendez déjà 3 créneaux : retirez-en un d\'abord.',
@@ -94312,6 +95326,7 @@ const I18N = {
       BAD_CODE: 'Code erroné ou expiré : demandez-en un nouveau au secrétariat.', TOO_MANY_TRIES: 'Trop de tentatives : réessayez dans un quart d\'heure.',
       UNAUTHORIZED: 'Ce téléphone n\'est plus connecté : demandez une nouvelle invitation au secrétariat.', TOO_LATE: 'Il est trop tard pour annuler vous-même : appelez le secrétariat.',
       NOT_YOURS: 'Cette réservation n\'est pas la vôtre.', NOT_FOUND: 'Réservation introuvable.', NOT_SYNCED: 'Le club n\'a pas encore publié le planning.',
+      BAD_PIN: 'Le PIN doit avoir de 4 à 8 chiffres.', BAD_PHONE: 'Tapez le numéro de téléphone complet.', PHONE_TAKEN: 'Ce numéro est déjà utilisé par un autre joueur : demandez au secrétariat.', BAD_LOGIN: 'Numéro ou PIN incorrect.', PIN_RESET: 'Trop de tentatives : le PIN ne vaut plus. Demandez une nouvelle invitation au secrétariat.',
       generic: 'Un problème est survenu. Réessayez.',
     },
   },
@@ -94334,6 +95349,7 @@ const I18N = {
     rules: (d, n) => `Buchbar bis ${d} Tage im Voraus, höchstens ${n} Buchungen gleichzeitig.`,
     cancelRule: h => `Selbst stornieren bis ${h} Stunden vorher.`,
     covered: 'Halle', outdoor: 'Freiplatz', CLAY: 'Sand', GRASS: 'Rasen', HARD: 'Hartplatz', OTHER: '', free: 'kostenlos', today: 'Heute',
+    pinTitle: 'Selbst wieder anmelden mit Nummer und PIN', pinHint: 'Wähle eine PIN: Wenn du das Telefon wechselst oder der Browser dich abmeldet, kommst du selbst wieder hinein, ohne neue Einladung.', pinPhone: 'Deine Telefonnummer', pinPin: 'PIN (4 bis 8 Ziffern)', pinPin2: 'PIN wiederholen', pinSave: 'PIN speichern', pinSaved: 'PIN gespeichert: Ab jetzt meldest du dich mit Nummer und PIN an.', pinChange: 'PIN ändern', pinMismatch: 'Die beiden PINs sind verschieden.', loginTitle: 'Schon eine PIN?', loginText: 'Melde dich mit deiner Telefonnummer und der PIN an.', loginGo: 'Mit PIN anmelden', pinRemind: 'Wähle unter Meine eine PIN: Dann kommst du bei Bedarf selbst wieder hinein.', pinActive: n => `Du meldest dich mit der Nummer auf ${n} und deiner PIN an.`,
     err: {
       FULL: 'Diese Anzeige ist schon vollständig.', TOO_MANY_SEEKS: 'Du hast schon 3 offene Anzeigen: Entferne zuerst eine.',
       FREE_NOW: 'Gerade frei geworden: Buch es jetzt!', TOO_MANY_WAITS: 'Du wartest schon auf 3 Felder: Entferne zuerst eins.',
@@ -94344,6 +95360,7 @@ const I18N = {
       BAD_CODE: 'Falscher oder abgelaufener Code: Frag im Vereinsbüro nach einem neuen.', TOO_MANY_TRIES: 'Zu viele Versuche: Versuch es in einer Viertelstunde wieder.',
       UNAUTHORIZED: 'Dieses Handy ist nicht mehr verbunden: Frag im Vereinsbüro nach einer neuen Einladung.', TOO_LATE: 'Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an.',
       NOT_YOURS: 'Diese Buchung gehört nicht dir.', NOT_FOUND: 'Buchung nicht gefunden.', NOT_SYNCED: 'Der Verein hat den Plan noch nicht veröffentlicht.',
+      BAD_PIN: 'Die PIN muss 4 bis 8 Ziffern haben.', BAD_PHONE: 'Gib die vollständige Telefonnummer ein.', PHONE_TAKEN: 'Diese Nummer nutzt schon ein anderer Spieler: Frag das Büro.', BAD_LOGIN: 'Nummer oder PIN falsch.', PIN_RESET: 'Zu viele Versuche: Die PIN gilt nicht mehr. Bitte das Büro um eine neue Einladung.',
       generic: 'Etwas hat nicht geklappt. Versuch es noch einmal.',
     },
   },
@@ -94366,6 +95383,7 @@ const I18N = {
     rules: (d, n) => `Reservas hasta ${d} días antes, como mucho ${n} reservas a la vez.`,
     cancelRule: h => `Anulas tú mismo hasta ${h} horas antes.`,
     covered: 'cubierta', outdoor: 'descubierta', CLAY: 'tierra batida', GRASS: 'hierba', HARD: 'dura', OTHER: '', free: 'gratis', today: 'Hoy',
+    pinTitle: 'Vuelve a entrar solo con número y PIN', pinHint: 'Elige un PIN: si cambias de teléfono o el navegador te saca, vuelves a entrar solo, sin pedir una nueva invitación.', pinPhone: 'Tu número de teléfono', pinPin: 'PIN (de 4 a 8 cifras)', pinPin2: 'Repite el PIN', pinSave: 'Guardar el PIN', pinSaved: 'PIN guardado: desde ahora entras con número y PIN.', pinChange: 'Cambiar PIN', pinMismatch: 'Los dos PIN son distintos.', loginTitle: '¿Ya tienes un PIN?', loginText: 'Entra con tu número de teléfono y el PIN.', loginGo: 'Entrar con el PIN', pinRemind: 'Elige un PIN en Mías: así, si hace falta, vuelves a entrar solo.', pinActive: n => `Entras con el número que acaba en ${n} y tu PIN.`,
     err: {
       FULL: 'El anuncio ya está completo.', TOO_MANY_SEEKS: 'Ya tienes 3 anuncios abiertos: quita uno primero.',
       FREE_NOW: 'Se acaba de liberar: ¡resérvala ya!', TOO_MANY_WAITS: 'Ya esperas 3 casillas: quita una primero.',
@@ -94376,6 +95394,7 @@ const I18N = {
       BAD_CODE: 'Código erróneo o caducado: pide uno nuevo a la secretaría.', TOO_MANY_TRIES: 'Demasiados intentos: vuelve a probar en un cuarto de hora.',
       UNAUTHORIZED: 'Este teléfono ya no está conectado: pide una nueva invitación a la secretaría.', TOO_LATE: 'Es tarde para anular tú mismo: llama a la secretaría.',
       NOT_YOURS: 'Esta reserva no es tuya.', NOT_FOUND: 'Reserva no encontrada.', NOT_SYNCED: 'El club aún no ha publicado el planning.',
+      BAD_PIN: 'El PIN debe tener de 4 a 8 cifras.', BAD_PHONE: 'Escribe el número de teléfono completo.', PHONE_TAKEN: 'Este número ya lo usa otro jugador: pregunta a la secretaría.', BAD_LOGIN: 'Número o PIN incorrectos.', PIN_RESET: 'Demasiados intentos: el PIN ya no vale. Pide una nueva invitación a la secretaría.',
       generic: 'Algo no ha funcionado. Inténtalo de nuevo.',
     },
   },
@@ -94398,6 +95417,7 @@ const I18N = {
     rules: (d, n) => `Reservas até ${d} dias antes, no máximo ${n} reservas de cada vez.`,
     cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
     covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
+    pinTitle: 'Volte a entrar sozinho com número e PIN', pinHint: 'Escolha um PIN: se trocar de telefone ou o navegador o desconectar, volta a entrar sozinho, sem pedir um novo convite.', pinPhone: 'O seu número de telefone', pinPin: 'PIN (de 4 a 8 dígitos)', pinPin2: 'Repita o PIN', pinSave: 'Guardar o PIN', pinSaved: 'PIN guardado: a partir de agora entra com número e PIN.', pinChange: 'Mudar o PIN', pinMismatch: 'Os dois PIN são diferentes.', loginTitle: 'Já tem um PIN?', loginText: 'Entre com o seu número de telefone e o PIN.', loginGo: 'Entrar com o PIN', pinRemind: 'Escolha um PIN em Minhas: assim, se precisar, volta a entrar sozinho.', pinActive: n => `Entra com o número que termina em ${n} e o seu PIN.`,
     err: {
       FULL: 'O anúncio já está completo.', TOO_MANY_SEEKS: 'Já tens 3 anúncios abertos: tira um primeiro.',
       FREE_NOW: 'Acabou de ficar livre: reserva-a já!', TOO_MANY_WAITS: 'Já esperas por 3 casas: tira uma primeiro.',
@@ -94408,6 +95428,7 @@ const I18N = {
       BAD_CODE: 'Código errado ou expirado: pede um novo à secretaria.', TOO_MANY_TRIES: 'Demasiadas tentativas: tenta de novo daqui a um quarto de hora.',
       UNAUTHORIZED: 'Este telemóvel já não está ligado: pede um novo convite à secretaria.', TOO_LATE: 'É tarde para cancelares sozinho: liga para a secretaria.',
       NOT_YOURS: 'Esta reserva não é tua.', NOT_FOUND: 'Reserva não encontrada.', NOT_SYNCED: 'O clube ainda não publicou a agenda.',
+      BAD_PIN: 'O PIN deve ter de 4 a 8 dígitos.', BAD_PHONE: 'Escreva o número de telefone completo.', PHONE_TAKEN: 'Este número já é usado por outro jogador: pergunte à secretaria.', BAD_LOGIN: 'Número ou PIN errados.', PIN_RESET: 'Demasiadas tentativas: o PIN já não vale. Peça um novo convite à secretaria.',
       generic: 'Algo correu mal. Tenta de novo.',
     },
   },
@@ -95192,7 +96213,7 @@ cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-2';
+const CACHE = 'tsm-campi-3';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
@@ -95407,6 +96428,113 @@ class ApiTest {
         val code = store.ensureSetupCode()!!
         val open = Api(store, Limiter { now }, pairRemote = true)
         assertEquals(200, open.handle(Req("POST", "/api/v1/admin/pair", body = """{"code":"$code"}""", viaProxy = true)).status)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/PinApiTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/PinApiTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.SrvMe
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import java.nio.file.Files
+
+/** Numero e PIN: il giocatore se li sceglie dopo l'invito e poi rientra da solo, anche da un altro telefono. */
+class PinApiTest {
+    private var now = 1_800_000_000_000L
+    private lateinit var store: Store
+    private lateinit var api: Api
+    private lateinit var admin: String
+    private val json = Json { ignoreUnknownKeys = true }
+
+    @Before fun setUp() {
+        store = Store(Files.createTempDirectory("tsm-pin").toFile()) { now }
+        api = Api(store, Limiter(max = 1000) { now }, async = false)
+        admin = field(call("POST", "/admin/pair", """{"code":"${store.ensureSetupCode()}"}""").body, "token")
+    }
+
+    private fun call(method: String, path: String, body: String = "", token: String? = null, ip: String = "1.1.1.1") =
+        api.handle(Req(method, "/api/v1$path", body = body, token = token, ip = ip))
+    private fun field(j: String, k: String) = Json.parseToJsonElement(j).jsonObject[k]!!.jsonPrimitive.content
+    private fun me(t: String) = json.decodeFromString(SrvMe.serializer(), call("GET", "/me", token = t).body)
+
+    private fun player(id: String, name: String): String {
+        val code = field(call("POST", "/admin/invites", """{"player":"$id","name":"$name"}""", admin).body, "code")
+        return field(call("POST", "/claim", """{"code":"$code"}""").body, "token")
+    }
+
+    private fun login(phone: String, pin: String) = call("POST", "/login", """{"phone":"$phone","pin":"$pin"}""")
+
+    @Test fun conNumeroEPinSiRientraDaUnAltroTelefono() {
+        val t = player("p1", "Mario Rossi")
+        assertFalse(me(t).hasPin)
+        assertEquals(200, call("POST", "/pin", """{"phone":"+39 333 123 4567","pin":"2468"}""", t).status)
+        assertTrue(me(t).hasPin)
+        assertEquals("567", me(t).phone)
+        // Il numero si riconosce scritto in un altro modo.
+        val r = login("3331234567", "2468")
+        assertEquals(r.body, 200, r.status)
+        val t2 = field(r.body, "token")
+        assertEquals("Mario Rossi", me(t2).name)
+        assertEquals("il primo telefono resta dentro", 200, call("GET", "/me", token = t).status)
+        // Il PIN non è mai nel file in chiaro.
+        assertFalse(store.dir.walkTopDown().filter { it.isFile }.any { "2468" in it.readText() })
+    }
+
+    @Test fun pinENumeroControllati() {
+        val t = player("p1", "Mario Rossi")
+        assertEquals(400, call("POST", "/pin", """{"phone":"3331234567","pin":"12"}""", t).status)
+        assertEquals(400, call("POST", "/pin", """{"phone":"3331234567","pin":"12ab"}""", t).status)
+        assertEquals(400, call("POST", "/pin", """{"phone":"123","pin":"1234"}""", t).status)
+        assertEquals(401, call("POST", "/pin", """{"phone":"3331234567","pin":"1234"}""").status)
+        // Lo stesso numero non serve a due giocatori.
+        call("POST", "/pin", """{"phone":"3331234567","pin":"1234"}""", t)
+        val other = player("p2", "Luca Bianchi")
+        val taken = call("POST", "/pin", """{"phone":"0039 333 1234567","pin":"9999"}""", other)
+        assertEquals(409, taken.status)
+        assertTrue("PHONE_TAKEN" in taken.body)
+    }
+
+    @Test fun troppiPinSbagliatiBloccanoPoiLoAnnullano() {
+        val t = player("p1", "Mario Rossi")
+        call("POST", "/pin", """{"phone":"3331234567","pin":"2468"}""", t)
+        assertEquals(403, login("3339999999", "2468").status)
+        repeat(PIN_TRIES) { assertEquals(403, login("3331234567", "0000").status) }
+        // Bloccato un quarto d'ora, anche col PIN giusto.
+        assertEquals(429, login("3331234567", "2468").status)
+        now += 16 * 60_000L
+        assertEquals(200, login("3331234567", "2468").status)
+        // Dopo il giusto si riparte da zero; fino a PIN_MAX sbagliati il PIN non vale più.
+        var last = ""
+        repeat(PIN_MAX) { i ->
+            if (i > 0 && i % PIN_TRIES == 0) now += 16 * 60_000L
+            last = login("3331234567", "0000").body
+        }
+        assertTrue(last, "PIN_RESET" in last)
+        assertEquals(403, login("3331234567", "2468").status)
+        assertFalse(me(t).hasPin)
+    }
+
+    @Test fun laSegreteriaVedeEAzzeraIlPin() {
+        val t = player("p1", "Mario Rossi")
+        call("POST", "/pin", """{"phone":"3331234567","pin":"2468"}""", t)
+        assertTrue(call("GET", "/admin/state", token = admin).body.contains("\"hasPin\":true"))
+        assertEquals(401, call("DELETE", "/admin/players/p1/pin").status)
+        assertEquals(200, call("DELETE", "/admin/players/p1/pin", token = admin).status)
+        assertEquals(403, login("3331234567", "2468").status)
+        assertFalse(me(t).hasPin)
+        assertEquals("il telefono già dentro resta dentro", 200, call("GET", "/me", token = t).status)
     }
 }
 TSM_EOF
@@ -98825,6 +99953,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 319 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 321 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

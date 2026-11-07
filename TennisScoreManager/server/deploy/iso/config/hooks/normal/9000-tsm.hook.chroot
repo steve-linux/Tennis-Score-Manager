@@ -8,6 +8,6 @@ id tsm >/dev/null 2>&1 || useradd --system --home-dir /var/lib/tsm-server --no-c
 chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin /opt/tsm-server/tsm-tunnel
 mkdir -p /var/lib/tsm-tunnel
 echo '{"state":"OFF"}' > /var/lib/tsm-tunnel/status.json
-systemctl enable tsm-server.service tsm-tunnel.path tsm-tunnel.timer tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
+systemctl enable tsm-server.service tsm-tunnel.path tsm-tunnel.timer tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service tailscaled.service
 systemctl disable caddy.service || true
 echo tsm-circolo > /etc/hostname

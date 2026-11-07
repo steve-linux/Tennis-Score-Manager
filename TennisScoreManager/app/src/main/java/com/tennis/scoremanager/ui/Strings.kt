@@ -756,6 +756,49 @@ interface Strings {
     val srvSendEmail: String
     val srvSendHint: String
     val srvRevoked: String
+    val srvChkTitle: String
+    val srvChkPaired: String
+    val srvChkLocal: String
+    val srvChkLocalNo: String
+    val srvChkSync: String
+    val srvChkSyncNo: String
+    val srvChkOpen: String
+    val srvChkOpenNo: String
+    val srvChkCourts: String
+    val srvChkCourtsAll: String
+    val srvChkPublic: String
+    val srvChkPublicNo: String
+    val srvChkRemote: String
+    val srvChkRemoteNo: String
+    val srvChkAlerts: String
+    val srvChkAlertsNo: String
+    val srvChkAgain: String
+    val srvChkChecking: String
+    val srvInviteLocalOnly: String
+    val srvPinSet: String
+    val srvPinReset: String
+    val srvPinResetDone: String
+    val pbAddClub: String
+    val pbAddCancel: String
+    val pbPinTitle: String
+    val pbPinHint: String
+    val pbPinPhone: String
+    val pbPinPin: String
+    val pbPinPin2: String
+    val pbPinSave: String
+    val pbPinSaved: String
+    val pbPinChange: String
+    val pbPinMismatch: String
+    val pbLoginTitle: String
+    val pbLoginText: String
+    val pbLoginClub: String
+    val pbLoginGo: String
+    val pbPinActive: (String) -> String
+    val pbErrLogin: String
+    val pbErrPinReset: String
+    val pbErrPhoneTaken: String
+    val pbErrPinFormat: String
+    val pbErrPhone: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3019,6 +3062,49 @@ object ItStrings : Strings {
     override val srvSendEmail = "Manda per email"
     override val srvSendHint = "Si apre il messaggio già scritto: lo mandi tu."
     override val srvRevoked = "Non prenota più online"
+    override val srvChkTitle = "Controlli"
+    override val srvChkPaired = "Telefono abbinato al server"
+    override val srvChkLocal = "Il server risponde nella rete del circolo"
+    override val srvChkLocalNo = "Non risponde: il telefono è sullo stesso Wi-Fi del server, e il server è acceso? Fuori dal circolo è normale."
+    override val srvChkSync = "Planning inviato al server"
+    override val srvChkSyncNo = "Non ancora: tocca Invia ora."
+    override val srvChkOpen = "Prenotazioni online aperte"
+    override val srvChkOpenNo = "Spente: i giocatori vedono il planning ma non prenotano."
+    override val srvChkCourts = "Campi prenotabili online"
+    override val srvChkCourtsAll = "tutti"
+    override val srvChkPublic = "Indirizzo da internet"
+    override val srvChkPublicNo = "Manca: gli inviti funzionano solo nella rete del circolo. Accendi l'accesso da internet qui sotto."
+    override val srvChkRemote = "Il server risponde da internet"
+    override val srvChkRemoteNo = "Non risponde: l'accesso da internet è spento, o il server non ha internet."
+    override val srvChkAlerts = "Avvisi delle prenotazioni sul telefono"
+    override val srvChkAlertsNo = "Spenti (facoltativo)."
+    override val srvChkAgain = "Ricontrolla"
+    override val srvChkChecking = "Controllo…"
+    override val srvInviteLocalOnly = "Senza indirizzo da internet questo invito funziona solo con il Wi-Fi del circolo."
+    override val srvPinSet = "Ha scelto un PIN: rientra da solo con numero e PIN."
+    override val srvPinReset = "Azzera il PIN"
+    override val srvPinResetDone = "PIN azzerato: il socio rientra con un nuovo invito e se ne sceglie un altro."
+    override val pbAddClub = "Aggiungi un circolo"
+    override val pbAddCancel = "Annulla"
+    override val pbPinTitle = "Rientra da solo con numero e PIN"
+    override val pbPinHint = "Scegli un PIN: se cambi telefono o esci, rientri da solo, senza chiedere un nuovo invito."
+    override val pbPinPhone = "Il tuo numero di telefono"
+    override val pbPinPin = "PIN (da 4 a 8 cifre)"
+    override val pbPinPin2 = "Ripeti il PIN"
+    override val pbPinSave = "Salva il PIN"
+    override val pbPinSaved = "PIN salvato: d'ora in poi rientri con numero e PIN."
+    override val pbPinChange = "Cambia PIN"
+    override val pbPinMismatch = "I due PIN sono diversi."
+    override val pbLoginTitle = "Hai già un PIN?"
+    override val pbLoginText = "Entra con il tuo numero di telefono e il PIN."
+    override val pbLoginClub = "Indirizzo del circolo o vecchio link d'invito"
+    override val pbLoginGo = "Entra con il PIN"
+    override val pbPinActive: (String) -> String = { "Rientri con il numero che finisce per $it e il tuo PIN." }
+    override val pbErrLogin = "Numero o PIN sbagliati."
+    override val pbErrPinReset = "Troppi tentativi: il PIN non vale più. Chiedi alla segreteria un nuovo invito."
+    override val pbErrPhoneTaken = "Questo numero è già usato da un altro giocatore: chiedi alla segreteria."
+    override val pbErrPinFormat = "Il PIN deve avere da 4 a 8 cifre."
+    override val pbErrPhone = "Scrivi il numero di telefono completo."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5245,6 +5331,49 @@ object EnStrings : Strings {
     override val srvSendEmail = "Send by email"
     override val srvSendHint = "The message opens already written: you send it."
     override val srvRevoked = "No longer books online"
+    override val srvChkTitle = "Checks"
+    override val srvChkPaired = "Phone paired with the server"
+    override val srvChkLocal = "The server answers on the club network"
+    override val srvChkLocalNo = "No answer: is the phone on the same Wi-Fi as the server, and is the server on? Away from the club this is normal."
+    override val srvChkSync = "Schedule sent to the server"
+    override val srvChkSyncNo = "Not yet: tap Send now."
+    override val srvChkOpen = "Online booking open"
+    override val srvChkOpenNo = "Off: players see the schedule but cannot book."
+    override val srvChkCourts = "Courts bookable online"
+    override val srvChkCourtsAll = "all"
+    override val srvChkPublic = "Address from the internet"
+    override val srvChkPublicNo = "Missing: invitations work only on the club network. Turn on internet access below."
+    override val srvChkRemote = "The server answers from the internet"
+    override val srvChkRemoteNo = "No answer: internet access is off, or the server has no internet."
+    override val srvChkAlerts = "Booking alerts on the phone"
+    override val srvChkAlertsNo = "Off (optional)."
+    override val srvChkAgain = "Check again"
+    override val srvChkChecking = "Checking…"
+    override val srvInviteLocalOnly = "Without an address from the internet, this invitation works only on the club Wi-Fi."
+    override val srvPinSet = "Has chosen a PIN: signs back in with number and PIN."
+    override val srvPinReset = "Reset the PIN"
+    override val srvPinResetDone = "PIN reset: the member signs back in with a new invitation and chooses another one."
+    override val pbAddClub = "Add a club"
+    override val pbAddCancel = "Cancel"
+    override val pbPinTitle = "Sign back in yourself with number and PIN"
+    override val pbPinHint = "Choose a PIN: if you change phone or sign out, you get back in yourself, without asking for a new invitation."
+    override val pbPinPhone = "Your phone number"
+    override val pbPinPin = "PIN (4 to 8 digits)"
+    override val pbPinPin2 = "Repeat the PIN"
+    override val pbPinSave = "Save the PIN"
+    override val pbPinSaved = "PIN saved: from now on you sign in with number and PIN."
+    override val pbPinChange = "Change PIN"
+    override val pbPinMismatch = "The two PINs are different."
+    override val pbLoginTitle = "Already have a PIN?"
+    override val pbLoginText = "Sign in with your phone number and PIN."
+    override val pbLoginClub = "Club address or old invitation link"
+    override val pbLoginGo = "Sign in with PIN"
+    override val pbPinActive: (String) -> String = { "You sign in with the number ending in $it and your PIN." }
+    override val pbErrLogin = "Wrong number or PIN."
+    override val pbErrPinReset = "Too many attempts: the PIN no longer works. Ask the club office for a new invitation."
+    override val pbErrPhoneTaken = "This number is already used by another player: ask the club office."
+    override val pbErrPinFormat = "The PIN must have 4 to 8 digits."
+    override val pbErrPhone = "Type the full phone number."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

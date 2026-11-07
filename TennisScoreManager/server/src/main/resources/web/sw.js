@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-2';
+const CACHE = 'tsm-campi-3';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));

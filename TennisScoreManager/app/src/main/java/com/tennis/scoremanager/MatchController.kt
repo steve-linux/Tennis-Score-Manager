@@ -2292,6 +2292,11 @@ class MatchController(
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 
+    /** Il server risponde a [url] (la rete del circolo o l'indirizzo da internet)? Per la lista dei controlli. */
+    suspend fun serverAnswers(url: String): Boolean = url.isNotBlank() && withContext(Dispatchers.IO) {
+        runCatching { com.tennis.scoremanager.data.ClubServerClient(com.tennis.scoremanager.data.ClubServers.cleanUrl(url), null).info() }.isSuccess
+    }
+
     /** Il tunnel da internet del server: com'è messo e, con [on], accendilo o spegnilo. */
     suspend fun serverTunnel(on: Boolean? = null): Result<com.tennis.scoremanager.data.SrvTunnel> {
         val conf = clubServer.value
@@ -2311,6 +2316,16 @@ class MatchController(
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
     }
 
+    /** Il socio ha dimenticato il PIN: lo si azzera (rientra con un invito e se ne sceglie un altro). null = fatto. */
+    suspend fun serverResetPin(id: String): String? {
+        val conf = clubServer.value
+        return try {
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.resetPin(id) } }
+            saveServer { it.copy(players = it.players.map { p -> if (p.id == id) p.copy(hasPin = false) else p }) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
     /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
     fun unpairServer() {
         saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl, alerts = it.alerts) }
@@ -2324,9 +2339,35 @@ class MatchController(
 
     // ---- Prenota un campo (il giocatore, col server del suo circolo) ----
 
-    val bookingAccount = MutableStateFlow(storage.loadBookingAccount())
+    /** I circoli in cui il giocatore è entrato (anche più d'uno); [bookingAccount] è quello che si sta guardando. */
+    val bookingAccounts = MutableStateFlow(storage.loadBookingAccounts())
+    val bookingAccount = MutableStateFlow(storage.loadBookingAccount().takeIf { it.joined } ?: bookingAccounts.value.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount())
 
-    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
+    /**
+     * Salva il circolo [a] (riconosciuto dall'indirizzo [url]): aggiornato al suo posto, o in fondo se è nuovo.
+     * Non più collegato (uscito, accesso tolto) = tolto dall'elenco; se era quello guardato, si passa al primo che resta.
+     */
+    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount, url: String = bookingAccount.value.url) {
+        val list = bookingAccounts.value
+        val next = when {
+            !a.joined -> list.filter { it.url != url }
+            list.any { it.url == url } -> list.map { if (it.url == url) a else it }
+            else -> list + a
+        }
+        bookingAccounts.value = next
+        val cur = bookingAccount.value
+        bookingAccount.value = when {
+            cur.url == url -> if (a.joined) a else next.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount()
+            !cur.joined -> a.takeIf { it.joined } ?: cur
+            else -> cur
+        }
+        val shown = bookingAccount.value
+        scope.launch(io) { storage.saveBookingAccounts(next); storage.saveBookingAccount(shown) }
+    }
+
+    /** Si guarda un altro dei propri circoli. */
+    fun selectBooking(url: String) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
         bookingAccount.value = a
         scope.launch(io) { storage.saveBookingAccount(a) }
     }
@@ -2343,22 +2384,51 @@ class MatchController(
                 val t = com.tennis.scoremanager.data.ClubServerClient(u, null).claim(code)
                 t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
             }
-            saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
     }
+
+    /** Un circolo nuovo (o lo stesso, rientrando): si aggiunge all'elenco e si guarda subito. */
+    private fun addBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
+        val old = bookingAccounts.value.firstOrNull { it.url == a.url }
+        // Rientrando nello stesso circolo restano le impostazioni (promemoria) e le notizie già viste.
+        saveBookingAccount(old?.copy(token = a.token, name = a.name, player = a.player, club = a.club) ?: a, a.url)
+        selectBooking(a.url)
+    }
+
+    /**
+     * Rientra con numero e PIN: [club] è l'indirizzo del circolo o il vecchio link d'invito (da lì si prende
+     * l'indirizzo). null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun loginBooking(club: String, phone: String, pin: String): String? {
+        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(club.substringBefore("#").substringBefore("?").trimEnd('/')).ifEmpty { return "NEED_URL" }
+        return try {
+            val (t, me) = withContext(Dispatchers.IO) {
+                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).login(phone, pin)
+                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
+            }
+            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Numero e PIN per rientrare da soli in questo circolo. null = fatto, altrimenti il codice dell'errore. */
+    suspend fun setBookingPin(phone: String, pin: String): String? = booking { it.setPin(phone, pin) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" }
 
     /**
      * Una chiamata del giocatore al server del suo circolo. Se il server non riconosce più la chiave (accesso
      * tolto dalla segreteria) si esce dal circolo: serve un nuovo invito.
      */
-    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
-        val a = bookingAccount.value
+    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> = bookingWith(bookingAccount.value, f)
+
+    /** Come [booking], per un circolo qualsiasi dei propri (il controllo in background li guarda tutti). */
+    private suspend fun <T> bookingWith(a: com.tennis.scoremanager.data.BookingAccount, f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
         if (!a.joined) return Result.failure(com.tennis.scoremanager.data.ClubServerError("UNAUTHORIZED"))
         return try {
             Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) })
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
-            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
+            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(), a.url)
             Result.failure(e)
         }
     }
@@ -2366,7 +2436,7 @@ class MatchController(
     init {
         // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
         scope.launch {
-            bookingAccount.map { it.joined && it.reminders }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
+            bookingAccounts.map { l -> l.any { it.joined && it.reminders } }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
         }
     }
 
@@ -2375,28 +2445,33 @@ class MatchController(
     /** Disdetta da qui: non è una notizia da dare al giocatore. */
     fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
 
-    /** Il controllo del giocatore (in background): promemoria della partita e prenotazioni tolte dalla segreteria. */
+    /** Il controllo del giocatore (in background), circolo per circolo: promemoria della partita e prenotazioni tolte dalla segreteria. */
     suspend fun checkMyBookings() {
-        val a = bookingAccount.value
+        val many = bookingAccounts.value.size > 1
+        for (a0 in bookingAccounts.value) checkMyBookings(a0, many)
+    }
+
+    /** [many]: si è in più circoli, e negli avvisi si dice di quale. */
+    private suspend fun checkMyBookings(a: com.tennis.scoremanager.data.BookingAccount, many: Boolean) {
         if (!a.joined) return
-        val me = booking { it.me() }.getOrNull() ?: return
+        val me = bookingWith(a) { it.me() }.getOrNull() ?: return
         val now = System.currentTimeMillis()
-        val news = com.tennis.scoremanager.data.ClubServers.myNews(bookingAccount.value, me.bookings, me.rules.remindHours, now) { b ->
-            bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
-        }
+        val club = if (many) me.club.ifBlank { a.club }.ifBlank { null } else null
+        fun label(court: String, start: Long) = listOfNotNull(club, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", court, start))).joinToString(" · ")
+        val news = com.tennis.scoremanager.data.ClubServers.myNews(a, me.bookings, me.rules.remindHours, now) { b -> label(b.court, b.start) }
         val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
-        val seeks = booking { it.seeks() }.getOrNull()
+        val seeks = bookingWith(a) { it.seeks() }.getOrNull()
         val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
-        saveBookingAccount(sk?.account ?: acc)
+        saveBookingAccount(sk?.account ?: acc, a.url)
         if (a.reminders) {
             com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
                 app, strings, news.remind.map { it.label }, news.removed.map { it.label },
-                freed.map { w -> bookingLabel(com.tennis.scoremanager.data.CourtBooking("", w.freedCourt!!, w.start)) },
+                freed.map { w -> label(w.freedCourt!!, w.start) },
             )
             if (sk != null) com.tennis.scoremanager.service.OnlineAlerts.postSeeks(
                 app, strings,
                 sk.joined.map { it.players.last() + " · " + it.date },
-                sk.booked.map { bookingLabel(com.tennis.scoremanager.data.CourtBooking("", it.bookedCourt!!, it.bookedStart!!)) + " · " + it.players.joinToString(", ") },
+                sk.booked.map { label(it.bookedCourt!!, it.bookedStart!!) + " · " + it.players.joinToString(", ") },
                 sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
             )
         }

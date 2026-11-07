@@ -100,6 +100,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
     override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
     override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
+    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverResetPin(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }

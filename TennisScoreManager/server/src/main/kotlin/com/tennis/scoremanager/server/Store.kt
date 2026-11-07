@@ -15,7 +15,16 @@ import java.util.TimeZone
 
 /** Un giocatore invitato: [id] è il suo id nel database dell'app; [tokens] le impronte delle chiavi dei suoi telefoni. */
 @Serializable
-data class Player(val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0)
+data class Player(
+    val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0,
+    /** Le ultime 9 cifre del numero di telefono, per entrare con numero e PIN (vuoto = niente PIN). */
+    val phone: String = "",
+    /** Il PIN, mai in chiaro: "sale:impronta" (PBKDF2). */
+    val pin: String? = null,
+    /** PIN sbagliati di fila e fino a quando si aspetta prima di riprovare. */
+    val pinFails: Int = 0,
+    val pinLockUntil: Long = 0,
+)
 
 /** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
 @Serializable
@@ -66,6 +75,21 @@ object Secrets {
     fun hash(s: String): String = MessageDigest.getInstance("SHA-256").digest(s.toByteArray()).joinToString("") { "%02x".format(it) }
 
     fun id(prefix: String): String = prefix + token().take(12)
+
+    /** Le ultime 9 cifre del numero: "+39 333 1234567", "0039…" e "3331234567" sono lo stesso numero. */
+    fun phoneKey(raw: String): String = raw.filter(Char::isDigit).takeLast(9)
+
+    /** Il PIN salvato: sale casuale e PBKDF2 (lento apposta, contro chi prova tutti i PIN avendo il file). */
+    fun pinHash(pin: String, salt: String = token().take(16)): String {
+        val spec = javax.crypto.spec.PBEKeySpec(pin.toCharArray(), salt.toByteArray(), 60_000, 256)
+        val key = javax.crypto.SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+        return salt + ":" + key.joinToString("") { "%02x".format(it) }
+    }
+
+    fun pinOk(pin: String, saved: String): Boolean {
+        val salt = saved.substringBefore(':')
+        return MessageDigest.isEqual(pinHash(pin, salt).toByteArray(), saved.toByteArray())
+    }
 }
 
 /** Lo stato su disco, cambiato un passo alla volta e riscritto con file temporaneo e rinomina. */

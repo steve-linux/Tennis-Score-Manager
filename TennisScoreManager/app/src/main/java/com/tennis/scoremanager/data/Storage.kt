@@ -346,6 +346,25 @@ class Storage(context: Context) {
     /** Il giocatore che prenota dall'app: il server del suo circolo e la sua chiave. */
     private val bookingFile: File get() = File(app.filesDir, "club_booking.json")
 
+    private val bookingsFile: File get() = File(app.filesDir, "club_bookings.json")
+
+    /** Tutti i circoli in cui il giocatore è entrato; la prima volta, quello di prima (un circolo solo). */
+    fun loadBookingAccounts(): List<BookingAccount> =
+        runCatching { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), bookingsFile.readText()) }
+            .getOrElse { listOf(loadBookingAccount()).filter { it.joined } }
+
+    @Synchronized
+    fun saveBookingAccounts(list: List<BookingAccount>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_bookings.tmp")
+            tmp.writeText(json.encodeToString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), list.filter { it.joined }))
+            if (!tmp.renameTo(bookingsFile)) {
+                bookingsFile.delete()
+                tmp.renameTo(bookingsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio dei circoli fallito", it) }
+    }
+
     fun loadBookingAccount(): BookingAccount =
         runCatching { json.decodeFromString(BookingAccount.serializer(), bookingFile.readText()) }.getOrDefault(BookingAccount())
 
