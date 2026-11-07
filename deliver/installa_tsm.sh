@@ -34302,6 +34302,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34409,7 +34410,9 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                     val f = frame
                     when {
                         relay.cameras == 0 -> Text(s.camRemoteGone, color = TsmColors.Orange)
-                        f != null -> Image(f.asImageBitmap(), null, Modifier.fillMaxWidth(), contentScale = ContentScale.Fit)
+                        // Tutto il riquadro (16:9 come il fotogramma): col solo fillMaxWidth l'immagine piccola (640×360)
+                        // restava alla sua altezza, rimpicciolita al centro, e la sagoma non ci cadeva sopra.
+                        f != null -> Image(f.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
                         else -> Row(verticalAlignment = Alignment.CenterVertically) {
                             CircularProgressIndicator(color = TsmColors.Ball)
                             Text("  " + s.camRemoteWaiting, color = TsmColors.TextDim, fontSize = 13.sp)
