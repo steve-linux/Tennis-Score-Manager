@@ -292,16 +292,23 @@ function render(dayError) {
 
   // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
   const freed = (me.waits || []).some(w => w.freedCourt);
-  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek];
+  if (state.tab === 2) markSeeksSeen();
+  const fresh = state.tab === 2 ? [] : unreadSeeks();
+  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : '')];
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
   const parts = [bar];
   if (state.tab === 1) {
     parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
-    parts.push(...seekSection());
+    parts.push(...seekSection().filter(Boolean));
   } else {
     // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
     if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
+    // Gli annunci nuovi degli altri, finché non si apre Compagni: altrimenti nessuno li vede.
+    if (fresh.length) parts.push(el('div', { class: 'card freed' },
+      el('b', null, T.seekNewTitle(fresh.length)),
+      ...fresh.slice(0, 5).map(k => el('div', null, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 2; save(TAB, '2'); render(dayError); } }, seekLine(k)))),
+      el('div', { class: 'actions' }, el('button', { class: 'small', onclick: () => { state.tab = 2; save(TAB, '2'); render(dayError); } }, T.seekOpen))));
     parts.push(el('h2', null, T.day), days);
     if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
     if (dayError) parts.push(el('p', { class: 'error' }, dayError));
@@ -446,6 +453,21 @@ function clubMinutes(ms) {
 }
 function hhmm(min) { return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
 
+// --- Annunci nuovi degli altri ---
+// Quelli a cui si può rispondere e non ancora visti in questo browser: in cima a Prenota e col numero su Compagni.
+const SEEN = 'tsm-seek-seen';
+function seekSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN) || '[]')); } catch (_) { return new Set(); } }
+function othersOpen() { return (state.seeks || []).filter(k => !k.mine && !k.joined && k.need > 0 && !k.bookedCourt && !k.noCourt); }
+function unreadSeeks() { const seen = seekSeen(); return othersOpen().filter(k => !seen.has(k.id)); }
+function markSeeksSeen() {
+  // Si tengono solo quelli ancora aperti: la lista non cresce.
+  try { localStorage.setItem(SEEN, JSON.stringify(othersOpen().map(k => k.id))); } catch (_) { /* resta da vedere */ }
+}
+function seekLine(k) {
+  const [wd, dm] = fmtDate(k.date);
+  return [k.owner, wd + ' ' + dm + ' ' + hhmm(k.fromMin) + '–' + hhmm(k.toMin), k.doubles ? T.seekDoubles : T.seekSingles, k.level, T.seekNeed(k.need)].filter(Boolean).join(' · ');
+}
+
 function seekSection() {
   const cards = (state.seeks || []).map(k => {
     const [wd, dm] = fmtDate(k.date);
@@ -463,7 +485,23 @@ function seekSection() {
     if (k.mine) buttons.push(el('button', { class: 'ghost small', onclick: () => seekAction('DELETE', '/seeks/' + k.id) }, T.seekRemove));
     return el('div', { class: 'card' + (k.mine ? ' freed' : '') }, ...lines, buttons.length ? el('div', { class: 'actions' }, ...buttons) : null);
   });
+  // Le notifiche dei nuovi annunci si possono spegnere: gli annunci restano qui e in cima a Prenota.
+  const box = el('input', { type: 'checkbox', checked: state.me.seekAlerts !== false ? 'checked' : null });
+  box.checked = state.me.seekAlerts !== false;
+  box.addEventListener('change', async () => {
+    try { await api('POST', '/prefs', { seekAlerts: box.checked }); state.me.seekAlerts = box.checked; toast(T.saved || '✓'); }
+    catch (e) { box.checked = !box.checked; toast(errText(e)); }
+  });
+  // Arrivati da una notifica: se quell'annuncio non è più aperto lo si dice (ha già trovato il compagno o è stato tolto).
+  let gone = null;
+  if (state.lookFor) {
+    const k = (state.seeks || []).find(x => x.id === state.lookFor);
+    if (!k || (!k.mine && !k.joined && (k.need === 0 || k.bookedCourt || k.noCourt))) gone = el('div', { class: 'card' }, el('p', null, T.seekGone));
+    state.lookFor = null;
+  }
   return [
+    gone,
+    el('label', { class: 'check' }, box, ' ', T.seekAlerts), el('p', { class: 'dim small' }, T.seekAlertsHint),
     ...(cards.length ? cards : [el('p', { class: 'dim' }, T.seekNone)]),
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: openSeek, disabled: !state.me.rules.open }, T.seekNew)),
   ];
@@ -563,13 +601,25 @@ $('logout').addEventListener('click', async () => {
   state.token = null; save(KEY, null); showInvite();
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.me) refresh(); });
-setInterval(() => { if (!document.hidden && state.me && $('sheet').hidden) loadDay(); }, 60000);
+// Ogni minuto il giorno e gli annunci (che si chiudono quando qualcuno accetta).
+setInterval(async () => {
+  if (document.hidden || !state.me || !$('sheet').hidden) return;
+  try { state.seeks = await api('GET', '/seeks'); } catch (_) { /* restano quelli di prima */ }
+  loadDay();
+}, 60000);
+// Dalla notifica di un annuncio, con la pagina già aperta: si va in Compagni.
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => {
+  if (e.data && e.data.seek && state.me) { state.lookFor = e.data.seek; state.tab = 2; save(TAB, '2'); refresh(); }
+});
 if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 (async () => {
   setHeader();
   state.token = load(KEY);
   // Il link del QR: https://circolo/#i=CODICE (dopo il # non arriva al server né nei log).
+  // Dalla notifica di un annuncio: si apre Compagni (e si dice se nel frattempo si è chiuso).
+  const sk = location.hash.match(/[#&]s=([A-Za-z0-9_-]+)/);
+  if (sk) { state.lookFor = sk[1]; state.tab = 2; save(TAB, '2'); history.replaceState(null, '', location.pathname); }
   const m = location.hash.match(/[#&]i=([A-Za-z0-9-]+)/);
   if (m) {
     history.replaceState(null, '', location.pathname);

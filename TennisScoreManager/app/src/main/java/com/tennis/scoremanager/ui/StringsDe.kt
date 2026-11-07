@@ -763,6 +763,11 @@ object DeStrings : Strings {
     override val pbPinRequiredTitle = "Letzter Schritt: Wähle deine PIN"
     override val pbPinRequiredText = "Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder dich abmeldest, ohne neue Einladung. Das machst du nur einmal."
     override val pbPinSaveTip = "Wenn das Telefon anbietet, sie im Passwortmanager zu speichern, nimm an. Sonst schreib sie an einem sicheren Ort auf."
+    override val pbSeekAlertNew = "Neue Anzeige: Partner gesucht"
+    override val pbNewsHint = "Tippe auf eine Anzeige, um sie unter Partner zu öffnen und zu antworten."
+    override val pbSeekAlerts = "Über neue Anzeigen benachrichtigen"
+    override val pbSeekAlertsHint = "Eine Benachrichtigung, wenn jemand im Verein einen Partner sucht. Aus: Die Anzeigen siehst du trotzdem hier und unter Spielen."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 Neuigkeit aus dem Verein" else "$it Neuigkeiten aus dem Verein" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

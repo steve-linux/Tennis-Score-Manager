@@ -766,6 +766,11 @@ object FrStrings : Strings {
     override val pbPinRequiredTitle = "Dernière étape : choisissez votre PIN"
     override val pbPinRequiredText = "Il vous sert à revenir seul si vous changez de téléphone ou vous déconnectez, sans demander une nouvelle invitation. On le fait une seule fois."
     override val pbPinSaveTip = "Si le téléphone propose de l'enregistrer dans le gestionnaire de mots de passe, acceptez. Sinon, notez-le dans un endroit sûr."
+    override val pbSeekAlertNew = "Nouvelle annonce : je cherche un partenaire"
+    override val pbNewsHint = "Touchez une annonce pour l'ouvrir dans Partenaires et répondre."
+    override val pbSeekAlerts = "Me prévenir des nouvelles annonces"
+    override val pbSeekAlertsHint = "Une notification quand quelqu'un du club cherche un partenaire. Désactivée, les annonces se voient quand même ici et dans Jouer."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 nouveauté du club" else "$it nouveautés du club" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"

@@ -36,6 +36,7 @@ import com.tennis.scoremanager.data.SrvWaitIn
 import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvPinIn
+import com.tennis.scoremanager.data.SrvPrefsIn
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import com.tennis.scoremanager.data.SrvTunnel
@@ -119,6 +120,7 @@ class Api(
             r.method == "POST" && p == listOf("claim") -> claim(r)
             r.method == "POST" && p == listOf("login") -> login(r)
             r.method == "POST" && p == listOf("pin") -> setPin(player(r), r)
+            r.method == "POST" && p == listOf("prefs") -> setPrefs(player(r), r)
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
@@ -362,6 +364,13 @@ class Api(
         return ok(SrvOk.serializer(), SrvOk())
     }
 
+    /** Le scelte del giocatore: per ora, se vuole le notifiche dei nuovi annunci. */
+    private fun setPrefs(pl: Player, r: Req): Resp {
+        val i = read(SrvPrefsIn.serializer(), r)
+        store.update { s -> s.copy(players = s.players.map { if (it.id == pl.id) it.copy(seekAlerts = i.seekAlerts) else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
     /**
      * Entrare con numero e PIN. Dopo [PIN_TRIES] PIN sbagliati di fila si aspetta un quarto d'ora; dopo [PIN_MAX]
      * il PIN non vale più e lo azzera la segreteria. Il messaggio non dice se è sbagliato il numero o il PIN.
@@ -429,7 +438,7 @@ class Api(
         val waits = s.waits.filter { it.player == pl.id && it.start > now }.sortedBy { it.start }.map { SrvWait(it.id, it.court, it.start, it.minutes, it.freedCourt) }
         return ok(SrvMe.serializer(), SrvMe(
             pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits,
-            pl.pin != null, pl.phone.takeLast(3),
+            pl.pin != null, pl.phone.takeLast(3), pl.seekAlerts,
         ))
     }
 
@@ -522,6 +531,8 @@ class Api(
             if (s.seeks.count { it.owner.id == pl.id && !it.full && it.date >= t.toString() } >= 3) s to Result.failure<Unit>(ApiError(409, "TOO_MANY_SEEKS"))
             else s.copy(seeks = s.seeks + seek) to Result.success(Unit)
         }.getOrElse { throw it }
+        // Lo vedono tutti gli altri: una notifica a chi le ha accese (sulla pagina), così l'annuncio non passa inosservato.
+        for (other in store.state.players.filter { it.id != pl.id && it.seekAlerts }) push(other.id, ttl = 12 * 3600) { PushTexts.seekNew(it.lang, seek) }
         return ok(SrvSeek.serializer(), seekOut(pl, seek, store.state), 201)
     }
 

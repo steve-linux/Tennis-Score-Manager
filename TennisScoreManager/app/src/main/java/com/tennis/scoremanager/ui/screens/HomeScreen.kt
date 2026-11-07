@@ -75,6 +75,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Check
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
@@ -374,6 +376,8 @@ private fun PlayTab(c: MatchController) {
     for (g in goals.filter { it.reachedAt != null && !it.seen }) {
         Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
     }
+    // Novità dai circoli: gli annunci di Cerco compagno ancora da leggere (toccandone uno si apre Compagni).
+    ClubNews(c)
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -535,3 +539,41 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
         confirmButton = { androidx.compose.material3.TextButton(onClick = { c.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
     )
 }
+
+/**
+ * Le novità dai circoli in cui si è entrati: gli annunci di Cerco compagno degli altri non ancora letti, i più
+ * vicini prima. Con più circoli, ogni riga dice di quale. Restano finché non si leggono (✓) o si aprono.
+ */
+@Composable
+private fun ClubNews(c: MatchController) {
+    val s = LocalStrings.current
+    val accounts by c.bookingAccounts.collectAsState()
+    val many = accounts.size > 1
+    val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
+    if (news.isEmpty()) return
+    androidx.compose.foundation.layout.Column(
+        Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
+    ) {
+        androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.NotificationsActive, null, tint = TsmColors.Ball)
+            Text(s.pbNewsTitle(news.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+        }
+        Text(s.pbNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        for ((a, k) in news.take(6)) {
+            androidx.compose.foundation.layout.Row(
+                Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
+                    .clickable { c.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                    Text(s.pbSeekTitle, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(c.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+                androidx.compose.material3.IconButton(onClick = { c.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+            }
+        }
+        if (news.size > 1) androidx.compose.material3.TextButton(onClick = { accounts.forEach { c.readSeeks(it.url) } }) { Text(s.tdNewsReadAll) }
+    }
+}
+

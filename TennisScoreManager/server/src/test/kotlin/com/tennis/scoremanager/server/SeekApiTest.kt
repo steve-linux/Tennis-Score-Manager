@@ -104,6 +104,7 @@ class SeekApiTest {
         assertTrue(seeks(mario).single().mine)
         // Il campo è occupato dalle 9 alle 10: si prende il primo libero, alle 10.
         sync(listOf(Busy("Campo 1", at(14, 9), at(14, 10))))
+        sent.clear()  // l'avviso del nuovo annuncio a Luca
         assertEquals(200, call("POST", "/seeks/$id/join", token = luca).status)
         val k = seeks(mario).single()
         assertEquals("Campo 1", k.bookedCourt)
@@ -123,6 +124,7 @@ class SeekApiTest {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); sent.clear()
         sync(listOf(Busy("Campo 1", at(14, 8), at(14, 22))))
         val id = field(call("POST", "/seeks", """{"date":"2026-11-14","fromMin":540,"toMin":720}""", mario).body, "id")
+        sent.clear()  // l'avviso del nuovo annuncio agli altri
         call("POST", "/seeks/$id/join", token = luca)
         assertTrue(seeks(mario).single().noCourt)
         assertTrue(sent.all { it.second.contains("nessun campo libero") })
@@ -131,6 +133,7 @@ class SeekApiTest {
     @Test fun doublesNeedsFourAndOwnerIsTold() {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); val anna = player("p3", "Anna"); val bea = player("p4", "Bea"); sent.clear()
         val id = field(call("POST", "/seeks", """{"date":"2026-11-12","fromMin":1080,"toMin":1260,"doubles":true}""", mario).body, "id")
+        sent.clear()  // l'avviso del nuovo annuncio agli altri
         call("POST", "/seeks/$id/join", token = luca)
         assertEquals("p1", sent.single().first)
         assertTrue(sent.single().second.contains("Luca"))
@@ -154,5 +157,21 @@ class SeekApiTest {
         // Passato il giorno, gli annunci spariscono.
         now = at(11, 9); api.tick()
         assertTrue(seeks(mario).none { it.date == "2026-11-10" })
+    }
+
+    @Test fun unAnnuncioNuovoArrivaAGliAltriSeVogliono() {
+        val a = player("pa", "Mario")
+        val b = player("pb", "Luca")
+        val c = player("pc", "Anna")
+        // Anna non vuole le notifiche dei nuovi annunci.
+        assertEquals(200, call("POST", "/prefs", """{"seekAlerts":false}""", c).status)
+        assertEquals(false, me(c).seekAlerts)
+        sent.clear()
+        val r = call("POST", "/seeks", """{"date":"2026-11-10","fromMin":1020,"toMin":1200,"doubles":false,"level":"","note":""}""", a)
+        assertEquals(r.body, 201, r.status)
+        val to = sent.filter { "\"n-" in it.second }.map { it.first }
+        assertEquals("solo Luca: non chi l'ha messo, non chi le ha spente", listOf("pb"), to)
+        assertTrue(sent.first { it.first == "pb" }.second.contains("Mario"))
+        assertEquals(true, me(b).seekAlerts)
     }
 }

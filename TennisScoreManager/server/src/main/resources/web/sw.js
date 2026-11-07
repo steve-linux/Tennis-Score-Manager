@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-4';
+const CACHE = 'tsm-campi-6';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
@@ -28,10 +28,13 @@ self.addEventListener('push', e => {
   }));
 });
 // Toccandola si apre (o torna davanti) la pagina.
+// La notifica di un annuncio (etichetta n-ID) apre Compagni: lì si vede se l'annuncio è ancora aperto.
 self.addEventListener('notificationclick', e => {
   e.notification.close();
+  const tag = e.notification.tag || '';
+  const seek = tag.startsWith('n-') ? tag.slice(2) : null;
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-    for (const c of list) if ('focus' in c) return c.focus();
-    return self.clients.openWindow('./');
+    for (const c of list) if ('focus' in c) { if (seek) c.postMessage({ seek }); return c.focus(); }
+    return self.clients.openWindow(seek ? './#s=' + seek : './');
   }));
 });

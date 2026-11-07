@@ -278,7 +278,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         while (true) {
             c.booking { it.me() }.onSuccess { m ->
                 me = m
-                c.booking { it.seeks() }.onSuccess { seeks = it }
+                c.booking { it.seeks() }.onSuccess { seeks = it; c.noteSeeks(it) }
                 val d = date?.takeIf { it in m.days } ?: m.days.firstOrNull()
                 date = d
                 if (d != null) c.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
@@ -287,6 +287,12 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         }
     }
     fun reload() { tick++ }
+    // Dalle novità di Gioca: si apre direttamente Compagni.
+    val wantTab by c.bookTabRequest.collectAsState()
+    LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
+    val acct by c.bookingAccount.collectAsState()
+    // Guardando Compagni gli annunci sono letti: spariscono dalle novità.
+    LaunchedEffect(tab, acct.openSeeks) { if (tab == 2 && acct.unreadSeeks.isNotEmpty()) c.readSeeks(acct.url) }
     // Tornando sulla schermata (dall'app o dal telefono) si riprende tutto: intanto altri possono aver prenotato.
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { if (me != null) reload() }
 
@@ -306,7 +312,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
         val freed = m.waits.count { it.freedCourt != null }
         Segmented(
-            listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""), SegOption(s.pbTabSeek)),
+            listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""),
+                SegOption(s.pbTabSeek + acct.unreadSeeks.size.takeIf { it > 0 }?.let { " ($it)" }.orEmpty())),
             tab, { tab = it },
         )
         when (tab) {
@@ -383,6 +390,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             else -> {
                 // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
                 Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                // Le notifiche dei nuovi annunci di questo circolo si possono spegnere (gli annunci restano qui e in Gioca).
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbSeekAlerts, s.pbSeekAlertsHint, acct.seekAlerts) { c.setSeekAlerts(it) }
                 if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
                 for (k in seeks) Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)

@@ -69,11 +69,36 @@ data class BookingAccount(
     val freedSeen: List<String> = emptyList(),
     /** Gli annunci di Cerco compagno (propri o a cui si partecipa) com'erano l'ultima volta; null = mai guardato. */
     val seekSeen: Map<String, String>? = null,
+    /** Gli annunci di Cerco compagno aperti degli altri (per le novità in Gioca) e quelli già visti o letti. */
+    val openSeeks: List<SrvSeek> = emptyList(),
+    val seekRead: List<String> = emptyList(),
+    /** Gli annunci si sono già guardati almeno una volta (la prima volta niente notifica: sono tutti "nuovi"). */
+    val seeksChecked: Boolean = false,
+    /** Notifiche dei nuovi annunci degli altri (spente = solo nelle novità di Gioca e in Compagni). */
+    val seekAlerts: Boolean = true,
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
+
+    /** Gli annunci degli altri ancora da leggere. */
+    val unreadSeeks: List<SrvSeek> get() = openSeeks.filter { it.id !in seekRead }
 }
 
 object ClubServers {
+    /** Gli annunci a cui si può ancora rispondere: degli altri, senza esserci già, non al completo. */
+    fun othersOpen(seeks: List<SrvSeek>): List<SrvSeek> = seeks.filter { !it.mine && !it.joined && it.need > 0 && it.bookedCourt == null && !it.noCourt }
+
+    /**
+     * Gli annunci appena letti dal server in [a]: (l'account aggiornato, quelli comparsi adesso). I già letti si
+     * dimenticano quando l'annuncio non c'è più.
+     */
+    fun noteSeeks(a: BookingAccount, seeks: List<SrvSeek>): Pair<BookingAccount, List<SrvSeek>> {
+        val open = othersOpen(seeks)
+        val before = a.openSeeks.map { it.id }.toSet()
+        val fresh = if (!a.seeksChecked) emptyList() else open.filter { it.id !in before && it.id !in a.seekRead }
+        val ids = open.map { it.id }.toSet()
+        return a.copy(openSeeks = open, seekRead = a.seekRead.filter { it in ids }, seeksChecked = true) to fresh
+    }
+
     /**
      * Il link dell'invito (https://circolo/#i=CODICE, anche col QR) diviso in indirizzo e codice; un codice da
      * solo dà indirizzo null. null = non è un invito.

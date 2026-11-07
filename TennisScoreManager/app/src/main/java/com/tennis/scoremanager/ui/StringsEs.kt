@@ -764,6 +764,11 @@ object EsStrings : Strings {
     override val pbPinRequiredTitle = "Último paso: elige tu PIN"
     override val pbPinRequiredText = "Te sirve para volver a entrar solo si cambias de teléfono o sales, sin pedir una nueva invitación. Se hace una sola vez."
     override val pbPinSaveTip = "Si el teléfono te propone guardarlo en el gestor de contraseñas, acepta. Si no, apúntalo en un lugar seguro."
+    override val pbSeekAlertNew = "Nuevo anuncio: busco compañero"
+    override val pbNewsHint = "Toca un anuncio para abrirlo en Compañeros y responder."
+    override val pbSeekAlerts = "Avisarme de los nuevos anuncios"
+    override val pbSeekAlertsHint = "Una notificación cuando alguien del club busca compañero. Apagada, los anuncios se ven igual aquí y en Jugar."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 novedad del club" else "$it novedades del club" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

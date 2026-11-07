@@ -802,6 +802,11 @@ interface Strings {
     val pbPinRequiredTitle: String
     val pbPinRequiredText: String
     val pbPinSaveTip: String
+    val pbSeekAlertNew: String
+    val pbNewsHint: String
+    val pbSeekAlerts: String
+    val pbSeekAlertsHint: String
+    val pbNewsTitle: (Int) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3111,6 +3116,11 @@ object ItStrings : Strings {
     override val pbPinRequiredTitle = "Ultimo passo: scegli il tuo PIN"
     override val pbPinRequiredText = "Ti serve per rientrare da solo se cambi telefono o esci: così non devi chiedere un nuovo invito. Si fa una volta sola."
     override val pbPinSaveTip = "Se il telefono ti propone di salvarlo nel gestore delle password, accetta. Se no, scrivilo in un posto sicuro."
+    override val pbSeekAlertNew = "Nuovo annuncio: cerco compagno"
+    override val pbNewsHint = "Tocca un annuncio per aprirlo in Compagni e rispondere."
+    override val pbSeekAlerts = "Avvisami dei nuovi annunci"
+    override val pbSeekAlertsHint = "Una notifica quando qualcuno del circolo cerca un compagno. Spenta, gli annunci si vedono lo stesso qui e in Gioca."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 novità dal circolo" else "$it novità dal circolo" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5383,6 +5393,11 @@ object EnStrings : Strings {
     override val pbPinRequiredTitle = "Last step: choose your PIN"
     override val pbPinRequiredText = "You need it to sign back in yourself if you change phone or sign out, without asking for a new invitation. You do it only once."
     override val pbPinSaveTip = "If the phone offers to save it in the password manager, accept. Otherwise, write it down somewhere safe."
+    override val pbSeekAlertNew = "New post: looking for a partner"
+    override val pbNewsHint = "Tap a post to open it in Partners and answer."
+    override val pbSeekAlerts = "Tell me about new posts"
+    override val pbSeekAlertsHint = "A notification when someone at the club looks for a partner. Off, the posts still show here and in Play."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 update from the club" else "$it updates from the club" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

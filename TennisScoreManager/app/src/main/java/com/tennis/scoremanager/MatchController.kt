@@ -2442,6 +2442,9 @@ class MatchController(
 
     fun setBookingReminders(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(reminders = on))
 
+    /** Notifiche dei nuovi annunci di Cerco compagno in questo circolo (gli annunci restano nelle novità e in Compagni). */
+    fun setSeekAlerts(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(seekAlerts = on))
+
     /** Disdetta da qui: non è una notizia da dare al giocatore. */
     fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
 
@@ -2462,7 +2465,11 @@ class MatchController(
         val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
         val seeks = bookingWith(a) { it.seeks() }.getOrNull()
         val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
-        saveBookingAccount(sk?.account ?: acc, a.url)
+        // Gli annunci nuovi degli altri: nelle novità di Gioca e, se si vogliono gli avvisi, una notifica.
+        val (acc2, freshSeeks) = seeks?.let { com.tennis.scoremanager.data.ClubServers.noteSeeks(sk?.account ?: acc, it) } ?: ((sk?.account ?: acc) to emptyList())
+        saveBookingAccount(acc2, a.url)
+        // Gli annunci che non sono più aperti (al completo, tolti): via le loro notifiche, che altrimenti confondono.
+        if (seeks != null) closedSeeks(a, acc2).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
         if (a.reminders) {
             com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
                 app, strings, news.remind.map { it.label }, news.removed.map { it.label },
@@ -2474,7 +2481,54 @@ class MatchController(
                 sk.booked.map { label(it.bookedCourt!!, it.bookedStart!!) + " · " + it.players.joinToString(", ") },
                 sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
             )
+            if (a.seekAlerts) for (k in freshSeeks) com.tennis.scoremanager.service.OnlineAlerts.postNewSeek(app, strings, k.id, a.url, seekLine(k, club))
         }
+    }
+
+    /** Un annuncio in una riga: "Mario · sab 8 nov 17:00–20:00 · singolo · ne manca 1" (col circolo davanti se serve). */
+    fun seekLine(k: com.tennis.scoremanager.data.SrvSeek, club: String? = null): String {
+        val s = strings
+        fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+        val day = runCatching {
+            java.time.format.DateTimeFormatter.ofPattern("EEE d MMM", options.value.lang.locale).format(java.time.LocalDate.parse(k.date))
+        }.getOrDefault(k.date)
+        return listOfNotNull(club, k.owner, "$day ${hm(k.fromMin)}–${hm(k.toMin)}", if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level.ifBlank { null }, s.pbSeekNeed(k.need)).joinToString(" · ")
+    }
+
+    /** Gli annunci letti dal telefono (dalla schermata): si aggiornano le novità senza notifica. */
+    fun noteSeeks(seeks: List<com.tennis.scoremanager.data.SrvSeek>) {
+        val a = bookingAccount.value
+        if (!a.joined) return
+        val next = com.tennis.scoremanager.data.ClubServers.noteSeeks(a, seeks).first
+        saveBookingAccount(next, a.url)
+        closedSeeks(a, next).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+    }
+
+    /** Gli annunci che c'erano in [before] e non sono più aperti in [after]. */
+    private fun closedSeeks(before: com.tennis.scoremanager.data.BookingAccount, after: com.tennis.scoremanager.data.BookingAccount): List<String> {
+        val open = after.openSeeks.map { it.id }.toSet()
+        return before.openSeeks.map { it.id }.filter { it !in open }
+    }
+
+    /** Annunci letti in [url] ([ids] null = tutti quelli aperti): spariscono dalle novità. */
+    fun readSeeks(url: String, ids: List<String>? = null) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
+        val add = ids ?: a.openSeeks.map { it.id }
+        // Letti: anche le loro notifiche non servono più.
+        add.forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+        if (add.all { it in a.seekRead }) return
+        saveBookingAccount(a.copy(seekRead = (a.seekRead + add).distinct()), url)
+    }
+
+    /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
+    val bookTabRequest = MutableStateFlow<Int?>(null)
+
+    /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
+    fun openSeekNews(url: String, id: String) {
+        readSeeks(url, listOf(id))
+        selectBooking(url)
+        bookTabRequest.value = 2
+        go(Screen.BOOK_COURT)
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */

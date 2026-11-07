@@ -41,6 +41,9 @@ object OnlineAlerts {
     private const val PLAYER_ID = 7303
     /** Dalla notifica del giocatore si apre Prenota un campo. */
     const val EXTRA_BOOK = "tsm.bookCourt"
+    /** Dalla notifica di un nuovo annuncio: il circolo (indirizzo) di cui aprire Compagni. */
+    const val EXTRA_SEEK_CLUB = "tsm.seekClub"
+    private const val SEEK_ID = 7350
 
     /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
     fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>, freed: List<String> = emptyList()) =
@@ -70,6 +73,31 @@ object OnlineAlerts {
     /** Cerco compagno: qualcuno ha risposto, partita trovata (campo prenotato), al completo ma senza campo. */
     fun postSeeks(context: Context, s: Strings, joined: List<String>, booked: List<String>, noCourt: List<String>) =
         postPlayerLines(context, s, joined.map { s.pbSeekAlertJoined to it } + booked.map { s.pbSeekAlertFound to it } + noCourt.map { s.pbSeekAlertNoCourt to it })
+
+    /**
+     * Un nuovo annuncio di Cerco compagno: una notifica per annuncio, con l'etichetta del suo id, così si toglie
+     * da sola quando l'annuncio si chiude ([cancelSeek]). Toccandola si apre Compagni del suo circolo ([club]).
+     */
+    fun postNewSeek(context: Context, s: Strings, id: String, club: String, text: String) {
+        if (!allowed(context)) return
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        val open = PendingIntent.getActivity(
+            context, SEEK_ID + (id.hashCode() and 0xfff),
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true).putExtra(EXTRA_SEEK_CLUB, club),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_tennis)
+            .setContentTitle(s.pbSeekAlertNew).setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setContentIntent(open).setAutoCancel(true)
+            .build()
+        nm.notify("seek:$id", SEEK_ID, n)
+    }
+
+    /** L'annuncio non è più aperto (al completo, tolto, letto): la sua notifica, se c'è ancora, sparisce. */
+    fun cancelSeek(context: Context, id: String) = context.getSystemService(NotificationManager::class.java).cancel("seek:$id", SEEK_ID)
 
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return

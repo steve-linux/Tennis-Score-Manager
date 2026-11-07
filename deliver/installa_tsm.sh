@@ -582,6 +582,8 @@ const APP_I18N = {
     pbLoginTitle: "Hai già un PIN?",
     pbMine: "Le tue prenotazioni",
     pbMineCell: "Tuo",
+    pbNewsHint: "Tocca un annuncio per aprirlo in Compagni e rispondere.",
+    pbNewsTitle: (it) => it === 1 ? `1 novità dal circolo` : `${it} novità dal circolo`,
     pbNone: "Nessuna prenotazione",
     pbPay: (it) => `Pagamento: ${it}`,
     pbPinActive: (it) => `Rientri con il numero che finisce per ${it} e il tuo PIN.`,
@@ -605,7 +607,10 @@ const APP_I18N = {
     pbScanPrompt: "Inquadra il QR d'invito del circolo",
     pbSeekAlertFound: "Partita trovata: campo prenotato!",
     pbSeekAlertJoined: "Qualcuno risponde al tuo annuncio",
+    pbSeekAlertNew: "Nuovo annuncio: cerco compagno",
     pbSeekAlertNoCourt: "Giocatori trovati, ma nessun campo libero",
+    pbSeekAlerts: "Avvisami dei nuovi annunci",
+    pbSeekAlertsHint: "Una notifica quando qualcuno del circolo cerca un compagno. Spenta, gli annunci si vedono lo stesso qui e in Gioca.",
     pbSeekBooked: (it) => `Campo prenotato: ${it}`,
     pbSeekDay: "Giorno",
     pbSeekDoubles: "Doppio",
@@ -1122,6 +1127,8 @@ const APP_I18N = {
     pbLoginTitle: "Already have a PIN?",
     pbMine: "Your bookings",
     pbMineCell: "Yours",
+    pbNewsHint: "Tap a post to open it in Partners and answer.",
+    pbNewsTitle: (it) => it === 1 ? `1 update from the club` : `${it} updates from the club`,
     pbNone: "No bookings",
     pbPay: (it) => `Payment: ${it}`,
     pbPinActive: (it) => `You sign in with the number ending in ${it} and your PIN.`,
@@ -1145,7 +1152,10 @@ const APP_I18N = {
     pbScanPrompt: "Scan the club invitation QR",
     pbSeekAlertFound: "Match found: court booked!",
     pbSeekAlertJoined: "Someone answered your post",
+    pbSeekAlertNew: "New post: looking for a partner",
     pbSeekAlertNoCourt: "Players found, but no free court",
+    pbSeekAlerts: "Tell me about new posts",
+    pbSeekAlertsHint: "A notification when someone at the club looks for a partner. Off, the posts still show here and in Play.",
     pbSeekBooked: (it) => `Court booked: ${it}`,
     pbSeekDay: "Day",
     pbSeekDoubles: "Doubles",
@@ -1662,6 +1672,8 @@ const APP_I18N = {
     pbLoginTitle: "Vous avez déjà un PIN ?",
     pbMine: "Vos réservations",
     pbMineCell: "À vous",
+    pbNewsHint: "Touchez une annonce pour l'ouvrir dans Partenaires et répondre.",
+    pbNewsTitle: (it) => it === 1 ? `1 nouveauté du club` : `${it} nouveautés du club`,
     pbNone: "Aucune réservation",
     pbPay: (it) => `Paiement : ${it}`,
     pbPinActive: (it) => `Vous entrez avec le numéro qui finit par ${it} et votre PIN.`,
@@ -1685,7 +1697,10 @@ const APP_I18N = {
     pbScanPrompt: "Scannez le QR d'invitation du club",
     pbSeekAlertFound: "Match trouvé : terrain réservé !",
     pbSeekAlertJoined: "Quelqu'un répond à votre annonce",
+    pbSeekAlertNew: "Nouvelle annonce : je cherche un partenaire",
     pbSeekAlertNoCourt: "Joueurs trouvés, mais aucun terrain libre",
+    pbSeekAlerts: "Me prévenir des nouvelles annonces",
+    pbSeekAlertsHint: "Une notification quand quelqu'un du club cherche un partenaire. Désactivée, les annonces se voient quand même ici et dans Jouer.",
     pbSeekBooked: (it) => `Terrain réservé : ${it}`,
     pbSeekDay: "Jour",
     pbSeekDoubles: "Double",
@@ -2202,6 +2217,8 @@ const APP_I18N = {
     pbLoginTitle: "Schon eine PIN?",
     pbMine: "Deine Buchungen",
     pbMineCell: "Deine",
+    pbNewsHint: "Tippe auf eine Anzeige, um sie unter Partner zu öffnen und zu antworten.",
+    pbNewsTitle: (it) => it === 1 ? `1 Neuigkeit aus dem Verein` : `${it} Neuigkeiten aus dem Verein`,
     pbNone: "Keine Buchungen",
     pbPay: (it) => `Bezahlung: ${it}`,
     pbPinActive: (it) => `Du meldest dich mit der Nummer auf ${it} und deiner PIN an.`,
@@ -2225,7 +2242,10 @@ const APP_I18N = {
     pbScanPrompt: "Scanne den Einladungs-QR-Code des Vereins",
     pbSeekAlertFound: "Spiel gefunden: Platz gebucht!",
     pbSeekAlertJoined: "Jemand antwortet auf deine Anzeige",
+    pbSeekAlertNew: "Neue Anzeige: Partner gesucht",
     pbSeekAlertNoCourt: "Spieler gefunden, aber kein Platz frei",
+    pbSeekAlerts: "Über neue Anzeigen benachrichtigen",
+    pbSeekAlertsHint: "Eine Benachrichtigung, wenn jemand im Verein einen Partner sucht. Aus: Die Anzeigen siehst du trotzdem hier und unter Spielen.",
     pbSeekBooked: (it) => `Platz gebucht: ${it}`,
     pbSeekDay: "Tag",
     pbSeekDoubles: "Doppel",
@@ -2742,6 +2762,8 @@ const APP_I18N = {
     pbLoginTitle: "¿Ya tienes un PIN?",
     pbMine: "Tus reservas",
     pbMineCell: "Tuya",
+    pbNewsHint: "Toca un anuncio para abrirlo en Compañeros y responder.",
+    pbNewsTitle: (it) => it === 1 ? `1 novedad del club` : `${it} novedades del club`,
     pbNone: "Ninguna reserva",
     pbPay: (it) => `Pago: ${it}`,
     pbPinActive: (it) => `Entras con el número que acaba en ${it} y tu PIN.`,
@@ -2765,7 +2787,10 @@ const APP_I18N = {
     pbScanPrompt: "Escanea el QR de invitación del club",
     pbSeekAlertFound: "Partido encontrado: ¡pista reservada!",
     pbSeekAlertJoined: "Alguien responde a tu anuncio",
+    pbSeekAlertNew: "Nuevo anuncio: busco compañero",
     pbSeekAlertNoCourt: "Jugadores encontrados, pero ninguna pista libre",
+    pbSeekAlerts: "Avisarme de los nuevos anuncios",
+    pbSeekAlertsHint: "Una notificación cuando alguien del club busca compañero. Apagada, los anuncios se ven igual aquí y en Jugar.",
     pbSeekBooked: (it) => `Pista reservada: ${it}`,
     pbSeekDay: "Día",
     pbSeekDoubles: "Dobles",
@@ -3282,6 +3307,8 @@ const APP_I18N = {
     pbLoginTitle: "Já tem um PIN?",
     pbMine: "As tuas reservas",
     pbMineCell: "Tua",
+    pbNewsHint: "Toque num anúncio para o abrir em Parceiros e responder.",
+    pbNewsTitle: (it) => it === 1 ? `1 novidade do clube` : `${it} novidades do clube`,
     pbNone: "Nenhuma reserva",
     pbPay: (it) => `Pagamento: ${it}`,
     pbPinActive: (it) => `Entra com o número que termina em ${it} e o seu PIN.`,
@@ -3305,7 +3332,10 @@ const APP_I18N = {
     pbScanPrompt: "Lê o QR de convite do clube",
     pbSeekAlertFound: "Jogo encontrado: quadra reservada!",
     pbSeekAlertJoined: "Alguém respondeu ao teu anúncio",
+    pbSeekAlertNew: "Novo anúncio: procuro parceiro",
     pbSeekAlertNoCourt: "Jogadores encontrados, mas nenhuma quadra livre",
+    pbSeekAlerts: "Avisar-me dos novos anúncios",
+    pbSeekAlertsHint: "Uma notificação quando alguém do clube procura parceiro. Desligada, os anúncios veem-se na mesma aqui e em Jogar.",
     pbSeekBooked: (it) => `Quadra reservada: ${it}`,
     pbSeekDay: "Dia",
     pbSeekDoubles: "Pares",
@@ -11991,6 +12021,13 @@ class MainActivity : ComponentActivity() {
     private fun openFromNotification(i: android.content.Intent?) {
         if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
             i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
+            // Da un nuovo annuncio: Compagni del suo circolo (lì si vede se è ancora aperto).
+            val club = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
+            if (club != null) {
+                i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
+                controller.selectBooking(club)
+                controller.bookTabRequest.value = 2
+            }
             controller.go(Screen.BOOK_COURT)
             return
         }
@@ -14505,6 +14542,9 @@ class MatchController(
 
     fun setBookingReminders(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(reminders = on))
 
+    /** Notifiche dei nuovi annunci di Cerco compagno in questo circolo (gli annunci restano nelle novità e in Compagni). */
+    fun setSeekAlerts(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(seekAlerts = on))
+
     /** Disdetta da qui: non è una notizia da dare al giocatore. */
     fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
 
@@ -14525,7 +14565,11 @@ class MatchController(
         val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
         val seeks = bookingWith(a) { it.seeks() }.getOrNull()
         val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
-        saveBookingAccount(sk?.account ?: acc, a.url)
+        // Gli annunci nuovi degli altri: nelle novità di Gioca e, se si vogliono gli avvisi, una notifica.
+        val (acc2, freshSeeks) = seeks?.let { com.tennis.scoremanager.data.ClubServers.noteSeeks(sk?.account ?: acc, it) } ?: ((sk?.account ?: acc) to emptyList())
+        saveBookingAccount(acc2, a.url)
+        // Gli annunci che non sono più aperti (al completo, tolti): via le loro notifiche, che altrimenti confondono.
+        if (seeks != null) closedSeeks(a, acc2).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
         if (a.reminders) {
             com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
                 app, strings, news.remind.map { it.label }, news.removed.map { it.label },
@@ -14537,7 +14581,54 @@ class MatchController(
                 sk.booked.map { label(it.bookedCourt!!, it.bookedStart!!) + " · " + it.players.joinToString(", ") },
                 sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
             )
+            if (a.seekAlerts) for (k in freshSeeks) com.tennis.scoremanager.service.OnlineAlerts.postNewSeek(app, strings, k.id, a.url, seekLine(k, club))
         }
+    }
+
+    /** Un annuncio in una riga: "Mario · sab 8 nov 17:00–20:00 · singolo · ne manca 1" (col circolo davanti se serve). */
+    fun seekLine(k: com.tennis.scoremanager.data.SrvSeek, club: String? = null): String {
+        val s = strings
+        fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+        val day = runCatching {
+            java.time.format.DateTimeFormatter.ofPattern("EEE d MMM", options.value.lang.locale).format(java.time.LocalDate.parse(k.date))
+        }.getOrDefault(k.date)
+        return listOfNotNull(club, k.owner, "$day ${hm(k.fromMin)}–${hm(k.toMin)}", if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level.ifBlank { null }, s.pbSeekNeed(k.need)).joinToString(" · ")
+    }
+
+    /** Gli annunci letti dal telefono (dalla schermata): si aggiornano le novità senza notifica. */
+    fun noteSeeks(seeks: List<com.tennis.scoremanager.data.SrvSeek>) {
+        val a = bookingAccount.value
+        if (!a.joined) return
+        val next = com.tennis.scoremanager.data.ClubServers.noteSeeks(a, seeks).first
+        saveBookingAccount(next, a.url)
+        closedSeeks(a, next).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+    }
+
+    /** Gli annunci che c'erano in [before] e non sono più aperti in [after]. */
+    private fun closedSeeks(before: com.tennis.scoremanager.data.BookingAccount, after: com.tennis.scoremanager.data.BookingAccount): List<String> {
+        val open = after.openSeeks.map { it.id }.toSet()
+        return before.openSeeks.map { it.id }.filter { it !in open }
+    }
+
+    /** Annunci letti in [url] ([ids] null = tutti quelli aperti): spariscono dalle novità. */
+    fun readSeeks(url: String, ids: List<String>? = null) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
+        val add = ids ?: a.openSeeks.map { it.id }
+        // Letti: anche le loro notifiche non servono più.
+        add.forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+        if (add.all { it in a.seekRead }) return
+        saveBookingAccount(a.copy(seekRead = (a.seekRead + add).distinct()), url)
+    }
+
+    /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
+    val bookTabRequest = MutableStateFlow<Int?>(null)
+
+    /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
+    fun openSeekNews(url: String, id: String) {
+        readSeeks(url, listOf(id))
+        selectBooking(url)
+        bookTabRequest.value = 2
+        go(Screen.BOOK_COURT)
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
@@ -19407,11 +19498,36 @@ data class BookingAccount(
     val freedSeen: List<String> = emptyList(),
     /** Gli annunci di Cerco compagno (propri o a cui si partecipa) com'erano l'ultima volta; null = mai guardato. */
     val seekSeen: Map<String, String>? = null,
+    /** Gli annunci di Cerco compagno aperti degli altri (per le novità in Gioca) e quelli già visti o letti. */
+    val openSeeks: List<SrvSeek> = emptyList(),
+    val seekRead: List<String> = emptyList(),
+    /** Gli annunci si sono già guardati almeno una volta (la prima volta niente notifica: sono tutti "nuovi"). */
+    val seeksChecked: Boolean = false,
+    /** Notifiche dei nuovi annunci degli altri (spente = solo nelle novità di Gioca e in Compagni). */
+    val seekAlerts: Boolean = true,
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
+
+    /** Gli annunci degli altri ancora da leggere. */
+    val unreadSeeks: List<SrvSeek> get() = openSeeks.filter { it.id !in seekRead }
 }
 
 object ClubServers {
+    /** Gli annunci a cui si può ancora rispondere: degli altri, senza esserci già, non al completo. */
+    fun othersOpen(seeks: List<SrvSeek>): List<SrvSeek> = seeks.filter { !it.mine && !it.joined && it.need > 0 && it.bookedCourt == null && !it.noCourt }
+
+    /**
+     * Gli annunci appena letti dal server in [a]: (l'account aggiornato, quelli comparsi adesso). I già letti si
+     * dimenticano quando l'annuncio non c'è più.
+     */
+    fun noteSeeks(a: BookingAccount, seeks: List<SrvSeek>): Pair<BookingAccount, List<SrvSeek>> {
+        val open = othersOpen(seeks)
+        val before = a.openSeeks.map { it.id }.toSet()
+        val fresh = if (!a.seeksChecked) emptyList() else open.filter { it.id !in before && it.id !in a.seekRead }
+        val ids = open.map { it.id }.toSet()
+        return a.copy(openSeeks = open, seekRead = a.seekRead.filter { it in ids }, seeksChecked = true) to fresh
+    }
+
     /**
      * Il link dell'invito (https://circolo/#i=CODICE, anche col QR) diviso in indirizzo e codice; un codice da
      * solo dà indirizzo null. null = non è un invito.
@@ -31486,6 +31602,9 @@ object OnlineAlerts {
     private const val PLAYER_ID = 7303
     /** Dalla notifica del giocatore si apre Prenota un campo. */
     const val EXTRA_BOOK = "tsm.bookCourt"
+    /** Dalla notifica di un nuovo annuncio: il circolo (indirizzo) di cui aprire Compagni. */
+    const val EXTRA_SEEK_CLUB = "tsm.seekClub"
+    private const val SEEK_ID = 7350
 
     /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
     fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>, freed: List<String> = emptyList()) =
@@ -31515,6 +31634,31 @@ object OnlineAlerts {
     /** Cerco compagno: qualcuno ha risposto, partita trovata (campo prenotato), al completo ma senza campo. */
     fun postSeeks(context: Context, s: Strings, joined: List<String>, booked: List<String>, noCourt: List<String>) =
         postPlayerLines(context, s, joined.map { s.pbSeekAlertJoined to it } + booked.map { s.pbSeekAlertFound to it } + noCourt.map { s.pbSeekAlertNoCourt to it })
+
+    /**
+     * Un nuovo annuncio di Cerco compagno: una notifica per annuncio, con l'etichetta del suo id, così si toglie
+     * da sola quando l'annuncio si chiude ([cancelSeek]). Toccandola si apre Compagni del suo circolo ([club]).
+     */
+    fun postNewSeek(context: Context, s: Strings, id: String, club: String, text: String) {
+        if (!allowed(context)) return
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        val open = PendingIntent.getActivity(
+            context, SEEK_ID + (id.hashCode() and 0xfff),
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true).putExtra(EXTRA_SEEK_CLUB, club),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_tennis)
+            .setContentTitle(s.pbSeekAlertNew).setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setContentIntent(open).setAutoCancel(true)
+            .build()
+        nm.notify("seek:$id", SEEK_ID, n)
+    }
+
+    /** L'annuncio non è più aperto (al completo, tolto, letto): la sua notifica, se c'è ancora, sparisce. */
+    fun cancelSeek(context: Context, id: String) = context.getSystemService(NotificationManager::class.java).cancel("seek:$id", SEEK_ID)
 
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return
@@ -38350,6 +38494,11 @@ interface Strings {
     val pbPinRequiredTitle: String
     val pbPinRequiredText: String
     val pbPinSaveTip: String
+    val pbSeekAlertNew: String
+    val pbNewsHint: String
+    val pbSeekAlerts: String
+    val pbSeekAlertsHint: String
+    val pbNewsTitle: (Int) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -40659,6 +40808,11 @@ object ItStrings : Strings {
     override val pbPinRequiredTitle = "Ultimo passo: scegli il tuo PIN"
     override val pbPinRequiredText = "Ti serve per rientrare da solo se cambi telefono o esci: così non devi chiedere un nuovo invito. Si fa una volta sola."
     override val pbPinSaveTip = "Se il telefono ti propone di salvarlo nel gestore delle password, accetta. Se no, scrivilo in un posto sicuro."
+    override val pbSeekAlertNew = "Nuovo annuncio: cerco compagno"
+    override val pbNewsHint = "Tocca un annuncio per aprirlo in Compagni e rispondere."
+    override val pbSeekAlerts = "Avvisami dei nuovi annunci"
+    override val pbSeekAlertsHint = "Una notifica quando qualcuno del circolo cerca un compagno. Spenta, gli annunci si vedono lo stesso qui e in Gioca."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 novità dal circolo" else "$it novità dal circolo" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -42931,6 +43085,11 @@ object EnStrings : Strings {
     override val pbPinRequiredTitle = "Last step: choose your PIN"
     override val pbPinRequiredText = "You need it to sign back in yourself if you change phone or sign out, without asking for a new invitation. You do it only once."
     override val pbPinSaveTip = "If the phone offers to save it in the password manager, accept. Otherwise, write it down somewhere safe."
+    override val pbSeekAlertNew = "New post: looking for a partner"
+    override val pbNewsHint = "Tap a post to open it in Partners and answer."
+    override val pbSeekAlerts = "Tell me about new posts"
+    override val pbSeekAlertsHint = "A notification when someone at the club looks for a partner. Off, the posts still show here and in Play."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 update from the club" else "$it updates from the club" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -45226,6 +45385,11 @@ object DeStrings : Strings {
     override val pbPinRequiredTitle = "Letzter Schritt: Wähle deine PIN"
     override val pbPinRequiredText = "Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder dich abmeldest, ohne neue Einladung. Das machst du nur einmal."
     override val pbPinSaveTip = "Wenn das Telefon anbietet, sie im Passwortmanager zu speichern, nimm an. Sonst schreib sie an einem sicheren Ort auf."
+    override val pbSeekAlertNew = "Neue Anzeige: Partner gesucht"
+    override val pbNewsHint = "Tippe auf eine Anzeige, um sie unter Partner zu öffnen und zu antworten."
+    override val pbSeekAlerts = "Über neue Anzeigen benachrichtigen"
+    override val pbSeekAlertsHint = "Eine Benachrichtigung, wenn jemand im Verein einen Partner sucht. Aus: Die Anzeigen siehst du trotzdem hier und unter Spielen."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 Neuigkeit aus dem Verein" else "$it Neuigkeiten aus dem Verein" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -47514,6 +47678,11 @@ object EsStrings : Strings {
     override val pbPinRequiredTitle = "Último paso: elige tu PIN"
     override val pbPinRequiredText = "Te sirve para volver a entrar solo si cambias de teléfono o sales, sin pedir una nueva invitación. Se hace una sola vez."
     override val pbPinSaveTip = "Si el teléfono te propone guardarlo en el gestor de contraseñas, acepta. Si no, apúntalo en un lugar seguro."
+    override val pbSeekAlertNew = "Nuevo anuncio: busco compañero"
+    override val pbNewsHint = "Toca un anuncio para abrirlo en Compañeros y responder."
+    override val pbSeekAlerts = "Avisarme de los nuevos anuncios"
+    override val pbSeekAlertsHint = "Una notificación cuando alguien del club busca compañero. Apagada, los anuncios se ven igual aquí y en Jugar."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 novedad del club" else "$it novedades del club" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -49804,6 +49973,11 @@ object FrStrings : Strings {
     override val pbPinRequiredTitle = "Dernière étape : choisissez votre PIN"
     override val pbPinRequiredText = "Il vous sert à revenir seul si vous changez de téléphone ou vous déconnectez, sans demander une nouvelle invitation. On le fait une seule fois."
     override val pbPinSaveTip = "Si le téléphone propose de l'enregistrer dans le gestionnaire de mots de passe, acceptez. Sinon, notez-le dans un endroit sûr."
+    override val pbSeekAlertNew = "Nouvelle annonce : je cherche un partenaire"
+    override val pbNewsHint = "Touchez une annonce pour l'ouvrir dans Partenaires et répondre."
+    override val pbSeekAlerts = "Me prévenir des nouvelles annonces"
+    override val pbSeekAlertsHint = "Une notification quand quelqu'un du club cherche un partenaire. Désactivée, les annonces se voient quand même ici et dans Jouer."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 nouveauté du club" else "$it nouveautés du club" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -52095,6 +52269,11 @@ object PtStrings : Strings {
     override val pbPinRequiredTitle = "Último passo: escolha o seu PIN"
     override val pbPinRequiredText = "Serve para voltar a entrar sozinho se trocar de telefone ou sair, sem pedir um novo convite. Faz-se uma só vez."
     override val pbPinSaveTip = "Se o telefone propuser guardá-lo no gestor de palavras-passe, aceite. Se não, anote-o num lugar seguro."
+    override val pbSeekAlertNew = "Novo anúncio: procuro parceiro"
+    override val pbNewsHint = "Toque num anúncio para o abrir em Parceiros e responder."
+    override val pbSeekAlerts = "Avisar-me dos novos anúncios"
+    override val pbSeekAlertsHint = "Uma notificação quando alguém do clube procura parceiro. Desligada, os anúncios veem-se na mesma aqui e em Jogar."
+    override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 novidade do clube" else "$it novidades do clube" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -54177,7 +54356,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         while (true) {
             c.booking { it.me() }.onSuccess { m ->
                 me = m
-                c.booking { it.seeks() }.onSuccess { seeks = it }
+                c.booking { it.seeks() }.onSuccess { seeks = it; c.noteSeeks(it) }
                 val d = date?.takeIf { it in m.days } ?: m.days.firstOrNull()
                 date = d
                 if (d != null) c.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
@@ -54186,6 +54365,12 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         }
     }
     fun reload() { tick++ }
+    // Dalle novità di Gioca: si apre direttamente Compagni.
+    val wantTab by c.bookTabRequest.collectAsState()
+    LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
+    val acct by c.bookingAccount.collectAsState()
+    // Guardando Compagni gli annunci sono letti: spariscono dalle novità.
+    LaunchedEffect(tab, acct.openSeeks) { if (tab == 2 && acct.unreadSeeks.isNotEmpty()) c.readSeeks(acct.url) }
     // Tornando sulla schermata (dall'app o dal telefono) si riprende tutto: intanto altri possono aver prenotato.
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { if (me != null) reload() }
 
@@ -54205,7 +54390,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
         val freed = m.waits.count { it.freedCourt != null }
         Segmented(
-            listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""), SegOption(s.pbTabSeek)),
+            listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""),
+                SegOption(s.pbTabSeek + acct.unreadSeeks.size.takeIf { it > 0 }?.let { " ($it)" }.orEmpty())),
             tab, { tab = it },
         )
         when (tab) {
@@ -54282,6 +54468,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             else -> {
                 // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
                 Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                // Le notifiche dei nuovi annunci di questo circolo si possono spegnere (gli annunci restano qui e in Gioca).
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbSeekAlerts, s.pbSeekAlertsHint, acct.seekAlerts) { c.setSeekAlerts(it) }
                 if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
                 for (k in seeks) Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
@@ -57627,6 +57815,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Check
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
@@ -57926,6 +58116,8 @@ private fun PlayTab(c: MatchController) {
     for (g in goals.filter { it.reachedAt != null && !it.seen }) {
         Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
     }
+    // Novità dai circoli: gli annunci di Cerco compagno ancora da leggere (toccandone uno si apre Compagni).
+    ClubNews(c)
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -58086,6 +58278,43 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
         },
         confirmButton = { androidx.compose.material3.TextButton(onClick = { c.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
     )
+}
+
+/**
+ * Le novità dai circoli in cui si è entrati: gli annunci di Cerco compagno degli altri non ancora letti, i più
+ * vicini prima. Con più circoli, ogni riga dice di quale. Restano finché non si leggono (✓) o si aprono.
+ */
+@Composable
+private fun ClubNews(c: MatchController) {
+    val s = LocalStrings.current
+    val accounts by c.bookingAccounts.collectAsState()
+    val many = accounts.size > 1
+    val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
+    if (news.isEmpty()) return
+    androidx.compose.foundation.layout.Column(
+        Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
+    ) {
+        androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.NotificationsActive, null, tint = TsmColors.Ball)
+            Text(s.pbNewsTitle(news.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+        }
+        Text(s.pbNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        for ((a, k) in news.take(6)) {
+            androidx.compose.foundation.layout.Row(
+                Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
+                    .clickable { c.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                    Text(s.pbSeekTitle, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(c.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+                androidx.compose.material3.IconButton(onClick = { c.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+            }
+        }
+        if (news.size > 1) androidx.compose.material3.TextButton(onClick = { accounts.forEach { c.readSeeks(it.url) } }) { Text(s.tdNewsReadAll) }
+    }
 }
 TSM_EOF
 
@@ -90714,6 +90943,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int, val hasPin: Boolean = false)
 /** Il giocatore sceglie numero di telefono e PIN, per rientrare da solo su un altro telefono. */
 @Serializable data class SrvPinIn(val phone: String, val pin: String)
+/** Le scelte del giocatore sulla pagina: [seekAlerts] = notifiche dei nuovi annunci di Cerco compagno. */
+@Serializable data class SrvPrefsIn(val seekAlerts: Boolean)
 @Serializable data class SrvAdmin(
     val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>,
     /** Per la segreteria: chi è in lista d'attesa e gli annunci di Cerco compagno ancora da giocare (vuoti dai server vecchi). */
@@ -90742,6 +90973,8 @@ import kotlinx.serialization.Serializable
     /** Ha scelto numero e PIN: rientra da solo; [phone] sono le ultime cifre del numero, per riconoscerlo. */
     val hasPin: Boolean = false,
     val phone: String = "",
+    /** Notifiche dei nuovi annunci di Cerco compagno (spente dal giocatore = niente). */
+    val seekAlerts: Boolean = true,
 )
 /** Una lista d'attesa vista dal giocatore: [freedCourt] non null = si è liberato quel campo. */
 @Serializable data class SrvWait(val id: String, val court: String? = null, val start: Long, val minutes: Int, val freedCourt: String? = null)
@@ -93561,6 +93794,7 @@ import com.tennis.scoremanager.data.SrvWaitIn
 import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvPinIn
+import com.tennis.scoremanager.data.SrvPrefsIn
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import com.tennis.scoremanager.data.SrvTunnel
@@ -93644,6 +93878,7 @@ class Api(
             r.method == "POST" && p == listOf("claim") -> claim(r)
             r.method == "POST" && p == listOf("login") -> login(r)
             r.method == "POST" && p == listOf("pin") -> setPin(player(r), r)
+            r.method == "POST" && p == listOf("prefs") -> setPrefs(player(r), r)
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
@@ -93887,6 +94122,13 @@ class Api(
         return ok(SrvOk.serializer(), SrvOk())
     }
 
+    /** Le scelte del giocatore: per ora, se vuole le notifiche dei nuovi annunci. */
+    private fun setPrefs(pl: Player, r: Req): Resp {
+        val i = read(SrvPrefsIn.serializer(), r)
+        store.update { s -> s.copy(players = s.players.map { if (it.id == pl.id) it.copy(seekAlerts = i.seekAlerts) else it }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
     /**
      * Entrare con numero e PIN. Dopo [PIN_TRIES] PIN sbagliati di fila si aspetta un quarto d'ora; dopo [PIN_MAX]
      * il PIN non vale più e lo azzera la segreteria. Il messaggio non dice se è sbagliato il numero o il PIN.
@@ -93954,7 +94196,7 @@ class Api(
         val waits = s.waits.filter { it.player == pl.id && it.start > now }.sortedBy { it.start }.map { SrvWait(it.id, it.court, it.start, it.minutes, it.freedCourt) }
         return ok(SrvMe.serializer(), SrvMe(
             pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits,
-            pl.pin != null, pl.phone.takeLast(3),
+            pl.pin != null, pl.phone.takeLast(3), pl.seekAlerts,
         ))
     }
 
@@ -94047,6 +94289,8 @@ class Api(
             if (s.seeks.count { it.owner.id == pl.id && !it.full && it.date >= t.toString() } >= 3) s to Result.failure<Unit>(ApiError(409, "TOO_MANY_SEEKS"))
             else s.copy(seeks = s.seeks + seek) to Result.success(Unit)
         }.getOrElse { throw it }
+        // Lo vedono tutti gli altri: una notifica a chi le ha accese (sulla pagina), così l'annuncio non passa inosservato.
+        for (other in store.state.players.filter { it.id != pl.id && it.seekAlerts }) push(other.id, ttl = 12 * 3600) { PushTexts.seekNew(it.lang, seek) }
         return ok(SrvSeek.serializer(), seekOut(pl, seek, store.state), 201)
     }
 
@@ -94344,15 +94588,15 @@ import java.util.Locale
 
 /** I testi delle notifiche ai giocatori, nella lingua del loro telefono (quella della pagina quando si sono abbonati). */
 object PushTexts {
-    private data class T(val welcome: String, val welcomeBody: String, val reminder: String, val removed: String, val freed: String, val joined: String, val found: String, val noCourt: String)
+    private data class T(val welcome: String, val welcomeBody: String, val reminder: String, val removed: String, val freed: String, val joined: String, val found: String, val noCourt: String, val newSeek: String = "", val singles: String = "", val doubles: String = "")
 
     private val texts = mapOf(
-        "it" to T("Promemoria attivi", "Ti avviseremo prima delle partite e se la segreteria cambia una prenotazione.", "Promemoria della partita", "Prenotazione tolta dalla segreteria", "Si è liberato un campo: prenotalo!", "Qualcuno risponde al tuo annuncio", "Partita trovata: campo prenotato!", "Giocatori trovati, ma nessun campo libero: prenotatelo voi"),
-        "en" to T("Reminders on", "We will remind you before your matches and tell you if the office changes a booking.", "Match reminder", "Booking removed by the club office", "A court is free: book it!", "Someone answered your post", "Match found: court booked!", "Players found, but no free court: book one yourselves"),
-        "fr" to T("Rappels activés", "Nous vous préviendrons avant vos matchs et si le secrétariat modifie une réservation.", "Rappel du match", "Réservation retirée par le secrétariat", "Un terrain s'est libéré : réservez-le !", "Quelqu'un répond à votre annonce", "Match trouvé : terrain réservé !", "Joueurs trouvés, mais aucun terrain libre : réservez-en un vous-mêmes"),
-        "de" to T("Erinnerungen an", "Wir erinnern dich vor deinen Spielen und melden, wenn das Büro eine Buchung ändert.", "Erinnerung an dein Spiel", "Buchung vom Vereinsbüro entfernt", "Ein Platz ist frei geworden: Buch ihn!", "Jemand antwortet auf deine Anzeige", "Spiel gefunden: Platz gebucht!", "Spieler gefunden, aber kein Platz frei: Bucht selbst einen"),
-        "es" to T("Recordatorios activados", "Te avisaremos antes de tus partidos y si la secretaría cambia una reserva.", "Recordatorio del partido", "Reserva quitada por la secretaría", "Se ha liberado una pista: ¡resérvala!", "Alguien responde a tu anuncio", "Partido encontrado: ¡pista reservada!", "Jugadores encontrados, pero ninguna pista libre: reservadla vosotros"),
-        "pt" to T("Lembretes ativos", "Vamos avisar-te antes dos jogos e se a secretaria mudar uma reserva.", "Lembrete do jogo", "Reserva retirada pela secretaria", "Ficou livre uma quadra: reserva-a!", "Alguém respondeu ao teu anúncio", "Jogo encontrado: quadra reservada!", "Jogadores encontrados, mas nenhuma quadra livre: reservem vocês"),
+        "it" to T("Promemoria attivi", "Ti avviseremo prima delle partite e se la segreteria cambia una prenotazione.", "Promemoria della partita", "Prenotazione tolta dalla segreteria", "Si è liberato un campo: prenotalo!", "Qualcuno risponde al tuo annuncio", "Partita trovata: campo prenotato!", "Giocatori trovati, ma nessun campo libero: prenotatelo voi", "Cerco compagno", "singolo", "doppio"),
+        "en" to T("Reminders on", "We will remind you before your matches and tell you if the office changes a booking.", "Match reminder", "Booking removed by the club office", "A court is free: book it!", "Someone answered your post", "Match found: court booked!", "Players found, but no free court: book one yourselves", "Looking for a partner", "singles", "doubles"),
+        "fr" to T("Rappels activés", "Nous vous préviendrons avant vos matchs et si le secrétariat modifie une réservation.", "Rappel du match", "Réservation retirée par le secrétariat", "Un terrain s'est libéré : réservez-le !", "Quelqu'un répond à votre annonce", "Match trouvé : terrain réservé !", "Joueurs trouvés, mais aucun terrain libre : réservez-en un vous-mêmes", "Je cherche un partenaire", "simple", "double"),
+        "de" to T("Erinnerungen an", "Wir erinnern dich vor deinen Spielen und melden, wenn das Büro eine Buchung ändert.", "Erinnerung an dein Spiel", "Buchung vom Vereinsbüro entfernt", "Ein Platz ist frei geworden: Buch ihn!", "Jemand antwortet auf deine Anzeige", "Spiel gefunden: Platz gebucht!", "Spieler gefunden, aber kein Platz frei: Bucht selbst einen", "Partner gesucht", "Einzel", "Doppel"),
+        "es" to T("Recordatorios activados", "Te avisaremos antes de tus partidos y si la secretaría cambia una reserva.", "Recordatorio del partido", "Reserva quitada por la secretaría", "Se ha liberado una pista: ¡resérvala!", "Alguien responde a tu anuncio", "Partido encontrado: ¡pista reservada!", "Jugadores encontrados, pero ninguna pista libre: reservadla vosotros", "Busco compañero", "individual", "dobles"),
+        "pt" to T("Lembretes ativos", "Vamos avisar-te antes dos jogos e se a secretaria mudar uma reserva.", "Lembrete do jogo", "Reserva retirada pela secretaria", "Ficou livre uma quadra: reserva-a!", "Alguém respondeu ao teu anúncio", "Jogo encontrado: quadra reservada!", "Jogadores encontrados, mas nenhuma quadra livre: reservem vocês", "Procuro parceiro", "singulares", "pares"),
     )
 
     private fun t(lang: String) = texts[lang] ?: texts.getValue("en")
@@ -94378,6 +94622,12 @@ object PushTexts {
     fun seekJoined(lang: String, s: com.tennis.scoremanager.data.Seek, who: String) = json(t(lang).joined, "$who · ${day(s.date, lang)}", "s-${s.id}", null)
     fun seekFound(lang: String, s: com.tennis.scoremanager.data.Seek, court: String, start: Long, zone: String) =
         json(t(lang).found, label(OnlineBooking("", court, start, 60, "", ""), zone, lang) + " · " + s.everyone.joinToString(", ") { it.name }, "s-${s.id}", start)
+    /** Un annuncio nuovo per tutti gli altri: "Mario · sab 8 nov 17:00–20:00 · singolo". */
+    fun seekNew(lang: String, s: com.tennis.scoremanager.data.Seek): String {
+        fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+        val kind = if (s.doubles) t(lang).doubles else t(lang).singles
+        return json(t(lang).newSeek, listOf(s.owner.name, day(s.date, lang) + " " + hm(s.fromMin) + "–" + hm(s.toMin), kind, s.level).filter { it.isNotBlank() }.joinToString(" · "), "n-${s.id}", null)
+    }
     fun seekNoCourt(lang: String, s: com.tennis.scoremanager.data.Seek) = json(t(lang).noCourt, day(s.date, lang) + " · " + s.everyone.joinToString(", ") { it.name }, "s-${s.id}", null)
 
     fun freed(lang: String, w: com.tennis.scoremanager.data.Wait, court: String, zone: String) =
@@ -94414,6 +94664,8 @@ data class Player(
     /** PIN sbagliati di fila e fino a quando si aspetta prima di riprovare. */
     val pinFails: Int = 0,
     val pinLockUntil: Long = 0,
+    /** Vuole le notifiche dei nuovi annunci di Cerco compagno. */
+    val seekAlerts: Boolean = true,
 )
 
 /** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
@@ -95015,16 +95267,23 @@ function render(dayError) {
 
   // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
   const freed = (me.waits || []).some(w => w.freedCourt);
-  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek];
+  if (state.tab === 2) markSeeksSeen();
+  const fresh = state.tab === 2 ? [] : unreadSeeks();
+  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : '')];
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
   const parts = [bar];
   if (state.tab === 1) {
     parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
-    parts.push(...seekSection());
+    parts.push(...seekSection().filter(Boolean));
   } else {
     // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
     if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
+    // Gli annunci nuovi degli altri, finché non si apre Compagni: altrimenti nessuno li vede.
+    if (fresh.length) parts.push(el('div', { class: 'card freed' },
+      el('b', null, T.seekNewTitle(fresh.length)),
+      ...fresh.slice(0, 5).map(k => el('div', null, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 2; save(TAB, '2'); render(dayError); } }, seekLine(k)))),
+      el('div', { class: 'actions' }, el('button', { class: 'small', onclick: () => { state.tab = 2; save(TAB, '2'); render(dayError); } }, T.seekOpen))));
     parts.push(el('h2', null, T.day), days);
     if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
     if (dayError) parts.push(el('p', { class: 'error' }, dayError));
@@ -95169,6 +95428,21 @@ function clubMinutes(ms) {
 }
 function hhmm(min) { return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
 
+// --- Annunci nuovi degli altri ---
+// Quelli a cui si può rispondere e non ancora visti in questo browser: in cima a Prenota e col numero su Compagni.
+const SEEN = 'tsm-seek-seen';
+function seekSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN) || '[]')); } catch (_) { return new Set(); } }
+function othersOpen() { return (state.seeks || []).filter(k => !k.mine && !k.joined && k.need > 0 && !k.bookedCourt && !k.noCourt); }
+function unreadSeeks() { const seen = seekSeen(); return othersOpen().filter(k => !seen.has(k.id)); }
+function markSeeksSeen() {
+  // Si tengono solo quelli ancora aperti: la lista non cresce.
+  try { localStorage.setItem(SEEN, JSON.stringify(othersOpen().map(k => k.id))); } catch (_) { /* resta da vedere */ }
+}
+function seekLine(k) {
+  const [wd, dm] = fmtDate(k.date);
+  return [k.owner, wd + ' ' + dm + ' ' + hhmm(k.fromMin) + '–' + hhmm(k.toMin), k.doubles ? T.seekDoubles : T.seekSingles, k.level, T.seekNeed(k.need)].filter(Boolean).join(' · ');
+}
+
 function seekSection() {
   const cards = (state.seeks || []).map(k => {
     const [wd, dm] = fmtDate(k.date);
@@ -95186,7 +95460,23 @@ function seekSection() {
     if (k.mine) buttons.push(el('button', { class: 'ghost small', onclick: () => seekAction('DELETE', '/seeks/' + k.id) }, T.seekRemove));
     return el('div', { class: 'card' + (k.mine ? ' freed' : '') }, ...lines, buttons.length ? el('div', { class: 'actions' }, ...buttons) : null);
   });
+  // Le notifiche dei nuovi annunci si possono spegnere: gli annunci restano qui e in cima a Prenota.
+  const box = el('input', { type: 'checkbox', checked: state.me.seekAlerts !== false ? 'checked' : null });
+  box.checked = state.me.seekAlerts !== false;
+  box.addEventListener('change', async () => {
+    try { await api('POST', '/prefs', { seekAlerts: box.checked }); state.me.seekAlerts = box.checked; toast(T.saved || '✓'); }
+    catch (e) { box.checked = !box.checked; toast(errText(e)); }
+  });
+  // Arrivati da una notifica: se quell'annuncio non è più aperto lo si dice (ha già trovato il compagno o è stato tolto).
+  let gone = null;
+  if (state.lookFor) {
+    const k = (state.seeks || []).find(x => x.id === state.lookFor);
+    if (!k || (!k.mine && !k.joined && (k.need === 0 || k.bookedCourt || k.noCourt))) gone = el('div', { class: 'card' }, el('p', null, T.seekGone));
+    state.lookFor = null;
+  }
   return [
+    gone,
+    el('label', { class: 'check' }, box, ' ', T.seekAlerts), el('p', { class: 'dim small' }, T.seekAlertsHint),
     ...(cards.length ? cards : [el('p', { class: 'dim' }, T.seekNone)]),
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: openSeek, disabled: !state.me.rules.open }, T.seekNew)),
   ];
@@ -95286,13 +95576,25 @@ $('logout').addEventListener('click', async () => {
   state.token = null; save(KEY, null); showInvite();
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.me) refresh(); });
-setInterval(() => { if (!document.hidden && state.me && $('sheet').hidden) loadDay(); }, 60000);
+// Ogni minuto il giorno e gli annunci (che si chiudono quando qualcuno accetta).
+setInterval(async () => {
+  if (document.hidden || !state.me || !$('sheet').hidden) return;
+  try { state.seeks = await api('GET', '/seeks'); } catch (_) { /* restano quelli di prima */ }
+  loadDay();
+}, 60000);
+// Dalla notifica di un annuncio, con la pagina già aperta: si va in Compagni.
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => {
+  if (e.data && e.data.seek && state.me) { state.lookFor = e.data.seek; state.tab = 2; save(TAB, '2'); refresh(); }
+});
 if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 (async () => {
   setHeader();
   state.token = load(KEY);
   // Il link del QR: https://circolo/#i=CODICE (dopo il # non arriva al server né nei log).
+  // Dalla notifica di un annuncio: si apre Compagni (e si dice se nel frattempo si è chiuso).
+  const sk = location.hash.match(/[#&]s=([A-Za-z0-9_-]+)/);
+  if (sk) { state.lookFor = sk[1]; state.tab = 2; save(TAB, '2'); history.replaceState(null, '', location.pathname); }
   const m = location.hash.match(/[#&]i=([A-Za-z0-9-]+)/);
   if (m) {
     history.replaceState(null, '', location.pathname);
@@ -95331,6 +95633,8 @@ const I18N = {
     covered: 'coperto', outdoor: 'scoperto', CLAY: 'terra', GRASS: 'erba', HARD: 'cemento', OTHER: '', free: 'gratis', today: 'Oggi',
     pinTitle: 'Rientra da solo con numero e PIN', pinHint: 'Scegli un PIN: se cambi telefono o il browser ti fa uscire, rientri da solo, senza chiedere un nuovo invito.', pinPhone: 'Il tuo numero di telefono', pinPin: 'PIN (da 4 a 8 cifre)', pinPin2: 'Ripeti il PIN', pinSave: 'Salva il PIN', pinSaved: 'PIN salvato: d\'ora in poi rientri con numero e PIN.', pinChange: 'Cambia PIN', pinMismatch: 'I due PIN sono diversi.', loginTitle: 'Hai già un PIN?', loginText: 'Entra con il tuo numero di telefono e il PIN.', loginGo: 'Entra con il PIN', pinRemind: 'Scegli un PIN in Le mie: così, se serve, rientri da solo.', pinActive: n => `Rientri con il numero che finisce per ${n} e il tuo PIN.`,
     pinRequiredTitle: 'Ultimo passo: scegli il tuo PIN', pinRequiredText: 'Ti serve per rientrare da solo se cambi telefono o se il browser ti fa uscire: così non devi chiedere un nuovo invito. Si fa una volta sola.', pinSaveTip: 'Quando il browser ti propone di salvare la password, tocca Salva: così il PIN lo ricorda lui. Se non te lo propone, scrivilo in un posto sicuro.', pinGo: 'Salva e continua',
+    seekAlerts: 'Avvisami dei nuovi annunci', seekAlertsHint: 'Una notifica quando qualcuno del circolo cerca un compagno (servono i promemoria accesi in Le mie). Spenta, gli annunci si vedono lo stesso.', seekOpen: 'Apri Compagni', seekNewTitle: n => n === 1 ? 'Un nuovo annuncio: cerco compagno' : `${n} nuovi annunci: cerco compagno`,
+    seekGone: 'Questo annuncio non è più aperto: ha già trovato il compagno o è stato tolto.',
     err: {
       FULL: 'L\'annuncio è già al completo.', TOO_MANY_SEEKS: 'Hai già 3 annunci aperti: togline uno prima.',
       FREE_NOW: 'Si è appena liberata: prenotala subito!', TOO_MANY_WAITS: 'Sei già in attesa per 3 caselle: togline una prima.',
@@ -95366,6 +95670,8 @@ const I18N = {
     covered: 'indoor', outdoor: 'outdoor', CLAY: 'clay', GRASS: 'grass', HARD: 'hard', OTHER: '', free: 'free', today: 'Today',
     pinTitle: 'Sign back in yourself with number and PIN', pinHint: 'Choose a PIN: if you change phone or the browser signs you out, you get back in yourself, without asking for a new invitation.', pinPhone: 'Your phone number', pinPin: 'PIN (4 to 8 digits)', pinPin2: 'Repeat the PIN', pinSave: 'Save the PIN', pinSaved: 'PIN saved: from now on you sign in with number and PIN.', pinChange: 'Change PIN', pinMismatch: 'The two PINs are different.', loginTitle: 'Already have a PIN?', loginText: 'Sign in with your phone number and PIN.', loginGo: 'Sign in with PIN', pinRemind: 'Choose a PIN in Mine: then, if needed, you can sign back in yourself.', pinActive: n => `You sign in with the number ending in ${n} and your PIN.`,
     pinRequiredTitle: 'Last step: choose your PIN', pinRequiredText: 'You need it to sign back in yourself if you change phone or the browser signs you out, without asking for a new invitation. You do it only once.', pinSaveTip: 'When the browser offers to save the password, tap Save: then it remembers the PIN for you. If it does not offer, write it down somewhere safe.', pinGo: 'Save and continue',
+    seekAlerts: 'Tell me about new posts', seekAlertsHint: 'A notification when someone at the club looks for a partner (reminders must be on in Mine). Off, the posts still show.', seekOpen: 'Open Partners', seekNewTitle: n => n === 1 ? 'A new post: looking for a partner' : `${n} new posts: looking for a partner`,
+    seekGone: 'This post is no longer open: they already found a partner or it was removed.',
     err: {
       FULL: 'This request is already complete.', TOO_MANY_SEEKS: 'You already have 3 open requests: remove one first.',
       FREE_NOW: 'It has just become free: book it now!', TOO_MANY_WAITS: 'You are already waiting for 3 slots: remove one first.',
@@ -95401,6 +95707,8 @@ const I18N = {
     covered: 'couvert', outdoor: 'extérieur', CLAY: 'terre battue', GRASS: 'gazon', HARD: 'dur', OTHER: '', free: 'gratuit', today: 'Aujourd\'hui',
     pinTitle: 'Revenir seul avec numéro et PIN', pinHint: 'Choisissez un PIN : si vous changez de téléphone ou si le navigateur vous déconnecte, vous revenez seul, sans demander une nouvelle invitation.', pinPhone: 'Votre numéro de téléphone', pinPin: 'PIN (de 4 à 8 chiffres)', pinPin2: 'Répétez le PIN', pinSave: 'Enregistrer le PIN', pinSaved: 'PIN enregistré : désormais vous entrez avec numéro et PIN.', pinChange: 'Changer le PIN', pinMismatch: 'Les deux PIN sont différents.', loginTitle: 'Vous avez déjà un PIN ?', loginText: 'Entrez avec votre numéro de téléphone et votre PIN.', loginGo: 'Entrer avec le PIN', pinRemind: 'Choisissez un PIN dans Les miennes : ainsi, si besoin, vous revenez seul.', pinActive: n => `Vous entrez avec le numéro qui finit par ${n} et votre PIN.`,
     pinRequiredTitle: 'Dernière étape : choisissez votre PIN', pinRequiredText: 'Il vous sert à revenir seul si vous changez de téléphone ou si le navigateur vous déconnecte, sans demander une nouvelle invitation. On le fait une seule fois.', pinSaveTip: 'Quand le navigateur propose d\'enregistrer le mot de passe, touchez Enregistrer : il se souviendra du PIN pour vous. Sinon, notez-le dans un endroit sûr.', pinGo: 'Enregistrer et continuer',
+    seekAlerts: 'Me prévenir des nouvelles annonces', seekAlertsHint: 'Une notification quand quelqu\'un du club cherche un partenaire (il faut les rappels activés dans Les miennes). Désactivée, les annonces se voient quand même.', seekOpen: 'Ouvrir Partenaires', seekNewTitle: n => n === 1 ? 'Une nouvelle annonce : je cherche un partenaire' : `${n} nouvelles annonces : je cherche un partenaire`,
+    seekGone: 'Cette annonce n\'est plus ouverte : le partenaire est déjà trouvé ou elle a été retirée.',
     err: {
       FULL: 'Cette annonce est déjà complète.', TOO_MANY_SEEKS: 'Vous avez déjà 3 annonces ouvertes : retirez-en une d\'abord.',
       FREE_NOW: 'Il vient de se libérer : réservez-le vite !', TOO_MANY_WAITS: 'Vous attendez déjà 3 créneaux : retirez-en un d\'abord.',
@@ -95436,6 +95744,8 @@ const I18N = {
     covered: 'Halle', outdoor: 'Freiplatz', CLAY: 'Sand', GRASS: 'Rasen', HARD: 'Hartplatz', OTHER: '', free: 'kostenlos', today: 'Heute',
     pinTitle: 'Selbst wieder anmelden mit Nummer und PIN', pinHint: 'Wähle eine PIN: Wenn du das Telefon wechselst oder der Browser dich abmeldet, kommst du selbst wieder hinein, ohne neue Einladung.', pinPhone: 'Deine Telefonnummer', pinPin: 'PIN (4 bis 8 Ziffern)', pinPin2: 'PIN wiederholen', pinSave: 'PIN speichern', pinSaved: 'PIN gespeichert: Ab jetzt meldest du dich mit Nummer und PIN an.', pinChange: 'PIN ändern', pinMismatch: 'Die beiden PINs sind verschieden.', loginTitle: 'Schon eine PIN?', loginText: 'Melde dich mit deiner Telefonnummer und der PIN an.', loginGo: 'Mit PIN anmelden', pinRemind: 'Wähle unter Meine eine PIN: Dann kommst du bei Bedarf selbst wieder hinein.', pinActive: n => `Du meldest dich mit der Nummer auf ${n} und deiner PIN an.`,
     pinRequiredTitle: 'Letzter Schritt: Wähle deine PIN', pinRequiredText: 'Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder der Browser dich abmeldet, ohne neue Einladung. Das machst du nur einmal.', pinSaveTip: 'Wenn der Browser anbietet, das Passwort zu speichern, tippe auf Speichern: Dann merkt er sich die PIN für dich. Sonst schreib sie an einem sicheren Ort auf.', pinGo: 'Speichern und weiter',
+    seekAlerts: 'Über neue Anzeigen benachrichtigen', seekAlertsHint: 'Eine Benachrichtigung, wenn jemand im Verein einen Partner sucht (die Erinnerungen unter Meine müssen an sein). Aus: Die Anzeigen siehst du trotzdem.', seekOpen: 'Partner öffnen', seekNewTitle: n => n === 1 ? 'Eine neue Anzeige: Partner gesucht' : `${n} neue Anzeigen: Partner gesucht`,
+    seekGone: 'Diese Anzeige ist nicht mehr offen: Der Partner ist schon gefunden oder sie wurde entfernt.',
     err: {
       FULL: 'Diese Anzeige ist schon vollständig.', TOO_MANY_SEEKS: 'Du hast schon 3 offene Anzeigen: Entferne zuerst eine.',
       FREE_NOW: 'Gerade frei geworden: Buch es jetzt!', TOO_MANY_WAITS: 'Du wartest schon auf 3 Felder: Entferne zuerst eins.',
@@ -95471,6 +95781,8 @@ const I18N = {
     covered: 'cubierta', outdoor: 'descubierta', CLAY: 'tierra batida', GRASS: 'hierba', HARD: 'dura', OTHER: '', free: 'gratis', today: 'Hoy',
     pinTitle: 'Vuelve a entrar solo con número y PIN', pinHint: 'Elige un PIN: si cambias de teléfono o el navegador te saca, vuelves a entrar solo, sin pedir una nueva invitación.', pinPhone: 'Tu número de teléfono', pinPin: 'PIN (de 4 a 8 cifras)', pinPin2: 'Repite el PIN', pinSave: 'Guardar el PIN', pinSaved: 'PIN guardado: desde ahora entras con número y PIN.', pinChange: 'Cambiar PIN', pinMismatch: 'Los dos PIN son distintos.', loginTitle: '¿Ya tienes un PIN?', loginText: 'Entra con tu número de teléfono y el PIN.', loginGo: 'Entrar con el PIN', pinRemind: 'Elige un PIN en Mías: así, si hace falta, vuelves a entrar solo.', pinActive: n => `Entras con el número que acaba en ${n} y tu PIN.`,
     pinRequiredTitle: 'Último paso: elige tu PIN', pinRequiredText: 'Te sirve para volver a entrar solo si cambias de teléfono o el navegador te saca, sin pedir una nueva invitación. Se hace una sola vez.', pinSaveTip: 'Cuando el navegador te proponga guardar la contraseña, toca Guardar: así recordará el PIN por ti. Si no te lo propone, apúntalo en un lugar seguro.', pinGo: 'Guardar y continuar',
+    seekAlerts: 'Avisarme de los nuevos anuncios', seekAlertsHint: 'Una notificación cuando alguien del club busca compañero (hacen falta los recordatorios activados en Mías). Apagada, los anuncios se ven igual.', seekOpen: 'Abrir Compañeros', seekNewTitle: n => n === 1 ? 'Un anuncio nuevo: busco compañero' : `${n} anuncios nuevos: busco compañero`,
+    seekGone: 'Este anuncio ya no está abierto: ya encontró compañero o lo han quitado.',
     err: {
       FULL: 'El anuncio ya está completo.', TOO_MANY_SEEKS: 'Ya tienes 3 anuncios abiertos: quita uno primero.',
       FREE_NOW: 'Se acaba de liberar: ¡resérvala ya!', TOO_MANY_WAITS: 'Ya esperas 3 casillas: quita una primero.',
@@ -95506,6 +95818,8 @@ const I18N = {
     covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
     pinTitle: 'Volte a entrar sozinho com número e PIN', pinHint: 'Escolha um PIN: se trocar de telefone ou o navegador o desconectar, volta a entrar sozinho, sem pedir um novo convite.', pinPhone: 'O seu número de telefone', pinPin: 'PIN (de 4 a 8 dígitos)', pinPin2: 'Repita o PIN', pinSave: 'Guardar o PIN', pinSaved: 'PIN guardado: a partir de agora entra com número e PIN.', pinChange: 'Mudar o PIN', pinMismatch: 'Os dois PIN são diferentes.', loginTitle: 'Já tem um PIN?', loginText: 'Entre com o seu número de telefone e o PIN.', loginGo: 'Entrar com o PIN', pinRemind: 'Escolha um PIN em Minhas: assim, se precisar, volta a entrar sozinho.', pinActive: n => `Entra com o número que termina em ${n} e o seu PIN.`,
     pinRequiredTitle: 'Último passo: escolha o seu PIN', pinRequiredText: 'Serve para voltar a entrar sozinho se trocar de telefone ou o navegador o desconectar, sem pedir um novo convite. Faz-se uma só vez.', pinSaveTip: 'Quando o navegador propuser guardar a palavra-passe, toque em Guardar: assim ele lembra o PIN por si. Se não propuser, anote-o num lugar seguro.', pinGo: 'Guardar e continuar',
+    seekAlerts: 'Avisar-me dos novos anúncios', seekAlertsHint: 'Uma notificação quando alguém do clube procura parceiro (os lembretes têm de estar ligados em Minhas). Desligada, os anúncios veem-se na mesma.', seekOpen: 'Abrir Parceiros', seekNewTitle: n => n === 1 ? 'Um anúncio novo: procuro parceiro' : `${n} anúncios novos: procuro parceiro`,
+    seekGone: 'Este anúncio já não está aberto: já encontrou parceiro ou foi retirado.',
     err: {
       FULL: 'O anúncio já está completo.', TOO_MANY_SEEKS: 'Já tens 3 anúncios abertos: tira um primeiro.',
       FREE_NOW: 'Acabou de ficar livre: reserva-a já!', TOO_MANY_WAITS: 'Já esperas por 3 casas: tira uma primeiro.',
@@ -96301,7 +96615,7 @@ cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-4';
+const CACHE = 'tsm-campi-6';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
@@ -96327,11 +96641,14 @@ self.addEventListener('push', e => {
   }));
 });
 // Toccandola si apre (o torna davanti) la pagina.
+// La notifica di un annuncio (etichetta n-ID) apre Compagni: lì si vede se l'annuncio è ancora aperto.
 self.addEventListener('notificationclick', e => {
   e.notification.close();
+  const tag = e.notification.tag || '';
+  const seek = tag.startsWith('n-') ? tag.slice(2) : null;
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-    for (const c of list) if ('focus' in c) return c.focus();
-    return self.clients.openWindow('./');
+    for (const c of list) if ('focus' in c) { if (seek) c.postMessage({ seek }); return c.focus(); }
+    return self.clients.openWindow(seek ? './#s=' + seek : './');
   }));
 });
 TSM_EOF
@@ -96843,6 +97160,7 @@ class SeekApiTest {
         assertTrue(seeks(mario).single().mine)
         // Il campo è occupato dalle 9 alle 10: si prende il primo libero, alle 10.
         sync(listOf(Busy("Campo 1", at(14, 9), at(14, 10))))
+        sent.clear()  // l'avviso del nuovo annuncio a Luca
         assertEquals(200, call("POST", "/seeks/$id/join", token = luca).status)
         val k = seeks(mario).single()
         assertEquals("Campo 1", k.bookedCourt)
@@ -96862,6 +97180,7 @@ class SeekApiTest {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); sent.clear()
         sync(listOf(Busy("Campo 1", at(14, 8), at(14, 22))))
         val id = field(call("POST", "/seeks", """{"date":"2026-11-14","fromMin":540,"toMin":720}""", mario).body, "id")
+        sent.clear()  // l'avviso del nuovo annuncio agli altri
         call("POST", "/seeks/$id/join", token = luca)
         assertTrue(seeks(mario).single().noCourt)
         assertTrue(sent.all { it.second.contains("nessun campo libero") })
@@ -96870,6 +97189,7 @@ class SeekApiTest {
     @Test fun doublesNeedsFourAndOwnerIsTold() {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); val anna = player("p3", "Anna"); val bea = player("p4", "Bea"); sent.clear()
         val id = field(call("POST", "/seeks", """{"date":"2026-11-12","fromMin":1080,"toMin":1260,"doubles":true}""", mario).body, "id")
+        sent.clear()  // l'avviso del nuovo annuncio agli altri
         call("POST", "/seeks/$id/join", token = luca)
         assertEquals("p1", sent.single().first)
         assertTrue(sent.single().second.contains("Luca"))
@@ -96893,6 +97213,22 @@ class SeekApiTest {
         // Passato il giorno, gli annunci spariscono.
         now = at(11, 9); api.tick()
         assertTrue(seeks(mario).none { it.date == "2026-11-10" })
+    }
+
+    @Test fun unAnnuncioNuovoArrivaAGliAltriSeVogliono() {
+        val a = player("pa", "Mario")
+        val b = player("pb", "Luca")
+        val c = player("pc", "Anna")
+        // Anna non vuole le notifiche dei nuovi annunci.
+        assertEquals(200, call("POST", "/prefs", """{"seekAlerts":false}""", c).status)
+        assertEquals(false, me(c).seekAlerts)
+        sent.clear()
+        val r = call("POST", "/seeks", """{"date":"2026-11-10","fromMin":1020,"toMin":1200,"doubles":false,"level":"","note":""}""", a)
+        assertEquals(r.body, 201, r.status)
+        val to = sent.filter { "\"n-" in it.second }.map { it.first }
+        assertEquals("solo Luca: non chi l'ha messo, non chi le ha spente", listOf("pb"), to)
+        assertTrue(sent.first { it.first == "pb" }.second.contains("Mario"))
+        assertEquals(true, me(b).seekAlerts)
     }
 }
 TSM_EOF

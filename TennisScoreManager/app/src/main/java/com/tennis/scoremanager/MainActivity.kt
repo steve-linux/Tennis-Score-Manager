@@ -33,6 +33,13 @@ class MainActivity : ComponentActivity() {
     private fun openFromNotification(i: android.content.Intent?) {
         if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
             i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
+            // Da un nuovo annuncio: Compagni del suo circolo (lì si vede se è ancora aperto).
+            val club = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
+            if (club != null) {
+                i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
+                controller.selectBooking(club)
+                controller.bookTabRequest.value = 2
+            }
             controller.go(Screen.BOOK_COURT)
             return
         }

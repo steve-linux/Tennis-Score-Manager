@@ -24,6 +24,8 @@ data class Player(
     /** PIN sbagliati di fila e fino a quando si aspetta prima di riprovare. */
     val pinFails: Int = 0,
     val pinLockUntil: Long = 0,
+    /** Vuole le notifiche dei nuovi annunci di Cerco compagno. */
+    val seekAlerts: Boolean = true,
 )
 
 /** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
