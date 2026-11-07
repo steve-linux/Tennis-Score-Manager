@@ -76,6 +76,11 @@ data class BookingAccount(
     val seeksChecked: Boolean = false,
     /** Notifiche dei nuovi annunci degli altri (spente = solo nelle novità di Gioca e in Compagni). */
     val seekAlerts: Boolean = true,
+    /** Le chat (bacheca "board", annunci "s-ID"): fino a quando si sono lette e fino a quando si è già avvisato. */
+    val chatRead: Map<String, Long> = emptyMap(),
+    val chatNotified: Map<String, Long> = emptyMap(),
+    /** Le chat con messaggi nuovi, per le novità di Gioca: stanza → titolo ("" = la bacheca). */
+    val chatNews: Map<String, String> = emptyMap(),
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 
@@ -323,6 +328,13 @@ class ClubServerClient(private val url: String, private val token: String?) {
     /** Entra con numero e PIN (scelti dal giocatore dopo l'invito). */
     fun login(phone: String, pin: String): SrvToken = call("POST", "/login", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvToken.serializer())
     fun setPin(phone: String, pin: String): SrvOk = call("POST", "/pin", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvOk.serializer())
+    /** Le chat: i messaggi di [room] arrivati dopo [after] e un messaggio nuovo; per la segreteria la bacheca e la moderazione. */
+    fun chat(room: String, after: Long): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/chat/$room?after=$after", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
+    fun postChat(room: String, text: String): SrvChatMsg = call("POST", "/chat/$room", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
+    fun adminChat(room: String): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/admin/chat/$room", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
+    fun adminChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/admin/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
+    fun postBoard(text: String): SrvChatMsg = call("POST", "/admin/chat/board", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
+    fun deleteChat(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/chat/msg/$id", null, null, SrvOk.serializer())
     fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
     fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
     fun seeks(): List<SrvSeek> = call<Unit, List<SrvSeek>>("GET", "/seeks", null, null, kotlinx.serialization.builtins.ListSerializer(SrvSeek.serializer()))

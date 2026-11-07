@@ -304,6 +304,10 @@ function render(dayError) {
   } else {
     // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
     if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
+    // La bacheca del circolo: i messaggi della segreteria (col pallino se ce ne sono di nuovi).
+    if (me.boardLast > 0) parts.push(el('div', { class: 'card' + (chatUnread('board', me.boardLast) ? ' freed' : '') },
+      el('b', null, T.boardTitle + (chatUnread('board', me.boardLast) ? ' •' : '')),
+      el('div', { class: 'actions' }, el('button', { class: 'small', onclick: () => openChat('board', T.boardTitle, false) }, T.boardOpen))));
     // Gli annunci nuovi degli altri, finché non si apre Compagni: altrimenti nessuno li vede.
     if (fresh.length) parts.push(el('div', { class: 'card freed' },
       el('b', null, T.seekNewTitle(fresh.length)),
@@ -468,6 +472,46 @@ function seekLine(k) {
   return [k.owner, wd + ' ' + dm + ' ' + hhmm(k.fromMin) + '–' + hhmm(k.toMin), k.doubles ? T.seekDoubles : T.seekSingles, k.level, T.seekNeed(k.need)].filter(Boolean).join(' · ');
 }
 
+// --- Chat: quella di un annuncio (chi c'è scrive) e la bacheca del circolo (scrive la segreteria) ---
+const READ = 'tsm-chat-read';
+function chatRead() { try { return JSON.parse(localStorage.getItem(READ) || '{}'); } catch (_) { return {}; } }
+function markChatRead(room, at) { try { const r = chatRead(); r[room] = Math.max(r[room] || 0, at); localStorage.setItem(READ, JSON.stringify(r)); } catch (_) { /* resta da leggere */ } }
+function chatUnread(room, last) { return last > 0 && last > (chatRead()[room] || 0); }
+
+/** La chat in un riquadro che sale dal basso: i messaggi si aggiornano ogni pochi secondi finché è aperta. */
+async function openChat(room, title, canWrite) {
+  const list = el('div', { class: 'chat' });
+  const input = canWrite ? el('textarea', { id: 'chatin', rows: '2', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
+  const err = el('p', { class: 'error' });
+  let last = 0, timer = 0;
+  const draw = (msgs) => {
+    for (const m of msgs) {
+      last = Math.max(last, m.at);
+      list.append(el('div', { class: 'msg' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') },
+        el('div', { class: 'who' }, (m.mine ? T.chatYou : m.name) + ' · ' + fmtTime(m.at)), el('div', null, m.text)));
+    }
+    if (msgs.length) { list.scrollTop = list.scrollHeight; markChatRead(room, last); }
+    if (!list.children.length) list.replaceChildren(el('p', { class: 'dim', id: 'chatnone' }, T.chatNone));
+    else { const n = document.getElementById('chatnone'); if (n) n.remove(); }
+  };
+  const load = async () => {
+    try { draw(await api('GET', '/chat/' + room + '?after=' + last)); err.textContent = ''; } catch (e) { err.textContent = errText(e); }
+  };
+  const send = async () => {
+    const text = input.value.trim();
+    if (!text) return;
+    try { await api('POST', '/chat/' + room, { text }); input.value = ''; await load(); } catch (e) { err.textContent = errText(e); }
+  };
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+  const close = () => { clearInterval(timer); closeSheet(); render(); };
+  sheet(el('h3', null, title), list, err,
+    input ? el('div', { class: 'chatbar' }, input, el('button', { onclick: send }, T.chatSend)) : el('p', { class: 'dim' }, T.boardHint),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: close }, T.close)));
+  await load();
+  timer = setInterval(() => { if ($('sheet').hidden) clearInterval(timer); else load(); }, 4000);
+  if (input) input.focus();
+}
+
 function seekSection() {
   const cards = (state.seeks || []).map(k => {
     const [wd, dm] = fmtDate(k.date);
@@ -483,6 +527,9 @@ function seekSection() {
     if (!k.mine && !k.joined && k.need > 0) buttons.push(el('button', { class: 'small', onclick: () => seekAction('POST', '/seeks/' + k.id + '/join', T.seekJoined) }, T.seekJoin));
     if (k.joined && !k.bookedCourt) buttons.push(el('button', { class: 'ghost small', onclick: () => seekAction('POST', '/seeks/' + k.id + '/leave') }, T.seekLeave));
     if (k.mine) buttons.push(el('button', { class: 'ghost small', onclick: () => seekAction('DELETE', '/seeks/' + k.id) }, T.seekRemove));
+    // La chat dell'annuncio: per chi l'ha messo e chi ha detto ci sto (col pallino se ci sono messaggi nuovi).
+    if (k.mine || k.joined) buttons.push(el('button', { class: 'small', onclick: () => openChat('s-' + k.id, T.chatTitle(who + ' · ' + wd + ' ' + dm), true) },
+      T.chatOpen + (chatUnread('s-' + k.id, k.chatLast) ? ' •' : '')));
     return el('div', { class: 'card' + (k.mine ? ' freed' : '') }, ...lines, buttons.length ? el('div', { class: 'actions' }, ...buttons) : null);
   });
   // Le notifiche dei nuovi annunci si possono spegnere: gli annunci restano qui e in cima a Prenota.

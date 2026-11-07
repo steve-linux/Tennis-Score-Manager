@@ -15,6 +15,9 @@ import com.tennis.scoremanager.data.SrvAdmin
 import com.tennis.scoremanager.data.SrvInvite
 import com.tennis.scoremanager.data.ClubServers
 import com.tennis.scoremanager.data.SrvBackup
+import com.tennis.scoremanager.data.SrvChatIn
+import com.tennis.scoremanager.data.SrvChatMsg
+import com.tennis.scoremanager.data.SrvChatRoom
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
@@ -138,6 +141,11 @@ interface DeskData {
     fun serverRevoke(playerId: String): String?
     /** Azzera il PIN del giocatore, fuori da [tx]; null = fatto, se no il codice dell'errore. */
     fun serverResetPin(playerId: String): String?
+    /** Le chat del circolo, fuori da [tx] (è rete): le stanze, i messaggi di una, un avviso in bacheca, un messaggio tolto. */
+    fun serverChatRooms(): List<SrvChatRoom>
+    fun serverChat(room: String): List<SrvChatMsg>
+    fun serverBoardPost(text: String)
+    fun serverChatDelete(id: String)
     fun paymentsCsv(year: Int): ByteArray?
     /** Backup della segreteria: il file di adesso, col suo nome. */
     fun officeBackup(): Pair<String, ByteArray>
@@ -412,7 +420,7 @@ class DeskApi(
         if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
         // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
-        if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p)
+        if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p, r)
         if (p.firstOrNull() == "backup") return backup(m, p.drop(1), r)
         return data.tx {
             when {
@@ -847,7 +855,7 @@ class DeskApi(
         return z.toLocalDate().toString() to z.hour * 60 + z.minute
     }
 
-    private fun online(m: String, p: List<String>): Resp {
+    private fun online(m: String, p: List<String>, r: Req): Resp {
         val conf = data.tx { data.serverConf() }
         if (!conf.paired) throw Fail(409, "NOT_PAIRED")
         return when {
@@ -876,6 +884,15 @@ class DeskApi(
                 data.serverRevoke(p[2])?.let { throw Fail(502, it) }
                 onlineOut()
             }
+            // Le chat: la bacheca (scrive la segreteria) e quelle degli annunci, da controllare.
+            m == "GET" && p == listOf("online", "chats") -> net { ok(ListSerializer(SrvChatRoom.serializer()), data.serverChatRooms()) }
+            m == "GET" && p.size == 3 && p[1] == "chat" -> net { ok(ListSerializer(SrvChatMsg.serializer()), data.serverChat(p[2])) }
+            m == "POST" && p == listOf("online", "board") -> {
+                val t = text(read(SrvChatIn.serializer(), r).text, 1000)
+                if (t.isBlank()) throw Fail(400, "EMPTY")
+                net { data.serverBoardPost(t); done() }
+            }
+            m == "DELETE" && p.size == 3 && p[1] == "chat" -> net { data.serverChatDelete(p[2]); done() }
             m == "DELETE" && p.size == 3 && p[1] in setOf("waits", "seeks") -> {
                 try { data.serverRemove(if (p[1] == "waits") "wait" else "seek", p[2]) } catch (e: Exception) {
                     throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET")
@@ -885,6 +902,8 @@ class DeskApi(
             else -> throw Fail(404, "NOT_FOUND")
         }
     }
+
+    private inline fun net(f: () -> Resp): Resp = try { f() } catch (e: com.tennis.scoremanager.data.ClubServerError) { throw Fail(502, e.code) } catch (e: java.io.IOException) { throw Fail(502, "NET") }
 
     private fun onlineOut(): Resp {
         val (conf, courts, people) = data.tx { Triple(data.serverConf(), data.courts(), data.players()) }

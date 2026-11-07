@@ -26,6 +26,8 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -233,6 +235,8 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     var pay by remember(conf.paired) { mutableStateOf(conf.payInfo) }
     var publicUrl by remember(conf.paired) { mutableStateOf(conf.publicUrl) }
     var unpair by remember { mutableStateOf(false) }
+    var chat by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var rooms by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvChatRoom>?>(null) }
     val context = LocalContext.current
     var notifOk by remember { mutableStateOf(com.tennis.scoremanager.service.OnlineAlerts.allowed(context)) }
     val notifPerm = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { notifOk = it }
@@ -286,6 +290,11 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     if (conf.alerts && !notifOk) Text(s.srvAlertsOff, color = TsmColors.Orange, fontSize = 12.sp)
                     Text(s.srvPlayers(conf.players.size), color = TsmColors.TextMain, fontSize = 14.sp)
                     Text(s.srvInviteHow, color = TsmColors.TextDim, fontSize = 12.sp)
+                    // La bacheca (scrive solo la segreteria) e le chat degli annunci, da controllare.
+                    GhostButton(s.srvBoard, Icons.Filled.Campaign, { chat = "board" to s.srvBoard }, Modifier.fillMaxWidth())
+                    GhostButton(s.srvChats, Icons.Filled.Forum, {
+                        scope.launch { c.serverAdmin { it.adminChats() }.onSuccess { rooms = it }.onFailure { e -> msg = srvErrorText(s, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") } }
+                    }, Modifier.fillMaxWidth())
 
                     SwitchRow(Icons.Filled.SportsTennis, s.srvOpen, s.srvOpenHint, rules.open) { rules = rules.copy(open = it) }
                     stepper(s.srvDaysAhead, rules.daysAhead, 0, 60) { rules = rules.copy(daysAhead = it) }
@@ -311,6 +320,32 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
         },
         confirmButton = { TextButton(onClick = { save(); onDone() }) { Text(s.ok) } },
     )
+    rooms?.let { list ->
+        AlertDialog(
+            onDismissRequest = { rooms = null },
+            title = { Text(s.srvChats, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(s.srvChatsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                    val chats = list.filter { it.room != "board" }
+                    if (chats.isEmpty()) Text(s.srvChatsNone, color = TsmColors.TextDim)
+                    for (r in chats) GhostButton("${r.title} (${r.count})", Icons.Filled.Forum, { chat = r.room to r.title }, Modifier.fillMaxWidth())
+                }
+            },
+            confirmButton = { TextButton(onClick = { rooms = null }) { Text(s.ok) } },
+        )
+    }
+    chat?.let { (room, title) ->
+        val board = room == "board"
+        com.tennis.scoremanager.ui.ChatDialog(
+            title = title,
+            load = { c.serverAdmin { it.adminChat(room) } },
+            send = if (board) { t -> c.serverAdmin { it.postBoard(t) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } } else null,
+            delete = { id -> c.serverAdmin { it.deleteChat(id) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } },
+            hint = if (board) s.srvBoardHint else s.srvChatsHint,
+            errText = { srvErrorText(s, it) },
+        ) { chat = null }
+    }
     if (unpair) AlertDialog(
         onDismissRequest = { unpair = false },
         text = { Text(s.srvUnpairAsk) },

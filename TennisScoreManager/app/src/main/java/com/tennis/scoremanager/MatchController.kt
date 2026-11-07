@@ -2365,6 +2365,18 @@ class MatchController(
         scope.launch(io) { storage.saveBookingAccounts(next); storage.saveBookingAccount(shown) }
     }
 
+    /** Il server di ciascun circolo risponde? (indirizzo → sì o no; manca = non ancora controllato). */
+    val bookingReach = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+
+    private fun markReach(url: String, ok: Boolean) {
+        if (bookingReach.value[url] != ok) bookingReach.value = bookingReach.value + (url to ok)
+    }
+
+    /** Si chiede a ogni server dei propri circoli se risponde (le funzioni online si accendono e spengono da sole). */
+    suspend fun checkBookingServers() {
+        for (a in bookingAccounts.value) markReach(a.url, serverAnswers(a.url))
+    }
+
     /** Si guarda un altro dei propri circoli. */
     fun selectBooking(url: String) {
         val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
@@ -2426,8 +2438,10 @@ class MatchController(
     private suspend fun <T> bookingWith(a: com.tennis.scoremanager.data.BookingAccount, f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
         if (!a.joined) return Result.failure(com.tennis.scoremanager.data.ClubServerError("UNAUTHORIZED"))
         return try {
-            Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) })
+            Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) }).also { markReach(a.url, true) }
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
+            // Non risponde (rete): le sue funzioni si spengono finché non torna; ogni altro errore vuol dire che risponde.
+            markReach(a.url, e.code != "NET" && e.code != "BAD_URL")
             if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(), a.url)
             Result.failure(e)
         }
@@ -2437,6 +2451,13 @@ class MatchController(
         // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
         scope.launch {
             bookingAccounts.map { l -> l.any { it.joined && it.reminders } }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
+        }
+        // Con l'app aperta, ogni tre minuti: i server dei propri circoli rispondono?
+        scope.launch {
+            while (true) {
+                if (bookingAccounts.value.isNotEmpty()) checkBookingServers()
+                delay(180_000)
+            }
         }
     }
 
@@ -2470,6 +2491,8 @@ class MatchController(
         saveBookingAccount(acc2, a.url)
         // Gli annunci che non sono più aperti (al completo, tolti): via le loro notifiche, che altrimenti confondono.
         if (seeks != null) closedSeeks(a, acc2).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+        // Le chat: bacheca e annunci in cui si è, con i messaggi nuovi.
+        saveBookingAccount(checkChats(acc2, me, seeks, club), a.url)
         if (a.reminders) {
             com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
                 app, strings, news.remind.map { it.label }, news.removed.map { it.label },
@@ -2529,6 +2552,53 @@ class MatchController(
         selectBooking(url)
         bookTabRequest.value = 2
         go(Screen.BOOK_COURT)
+    }
+
+    // ---- Chat del circolo (giocatore e segreteria) ----
+
+    /** Letta la chat [room] del circolo [url] fino ad [at]: sparisce dalle novità. */
+    fun markChatRead(url: String, room: String, at: Long) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
+        com.tennis.scoremanager.service.OnlineAlerts.cancelChat(app, room)
+        if ((a.chatRead[room] ?: 0) >= at && room !in a.chatNews) return
+        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room), url)
+    }
+
+    /**
+     * Le chat con messaggi nuovi, nel controllo in background: la bacheca (se la segreteria ha scritto) e gli
+     * annunci in cui si è. Si avvisa una volta per messaggio; l'account torna con le novità aggiornate.
+     */
+    private suspend fun checkChats(a: com.tennis.scoremanager.data.BookingAccount, me: com.tennis.scoremanager.data.SrvMe, seeks: List<com.tennis.scoremanager.data.SrvSeek>?, club: String?): com.tennis.scoremanager.data.BookingAccount {
+        val rooms = buildList {
+            if (me.boardLast > 0) add(Triple("board", "", me.boardLast))
+            seeks?.filter { (it.mine || it.joined) && it.chatLast > 0 }?.forEach { add(Triple("s-" + it.id, seekLine(it), it.chatLast)) }
+        }
+        var acc = a
+        for ((room, title, last) in rooms) {
+            if (last <= (acc.chatRead[room] ?: 0)) continue
+            val since = maxOf(acc.chatRead[room] ?: 0, acc.chatNotified[room] ?: 0)
+            if (last > since) {
+                val fresh = bookingWith(a) { it.chat(room, since) }.getOrNull().orEmpty().filter { !it.mine }
+                if (fresh.isNotEmpty() && a.reminders) {
+                    val m = fresh.last()
+                    com.tennis.scoremanager.service.OnlineAlerts.postChat(app, strings, room, a.url,
+                        if (room == "board") listOfNotNull(club, strings.pbBoardTitle).joinToString(" · ") else strings.pbChatNew,
+                        "${m.name}: ${m.text}")
+                }
+                acc = acc.copy(chatNotified = acc.chatNotified + (room to last))
+            }
+            if (last > (acc.chatRead[room] ?: 0)) acc = acc.copy(chatNews = acc.chatNews + (room to title))
+        }
+        return acc
+    }
+
+    /** La segreteria: i messaggi di una stanza, la bacheca, le stanze, togliere un messaggio. Codice d'errore o il risultato. */
+    suspend fun <T> serverAdmin(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { f(it) } })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */

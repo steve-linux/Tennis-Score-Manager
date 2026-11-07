@@ -523,6 +523,21 @@ class DeskTest {
         assertTrue(data.ledger.payTypes[1].online)
     }
 
+    @Test fun bachecaEChatDalPc() {
+        val k = login()
+        data.server = com.tennis.scoremanager.data.ClubServerConf(url = "http://srv", token = "t", club = "TC Prova")
+        assertEquals(400, req("POST", "/online/board", """{"text":"   "}""", token = k).first)
+        assertEquals(200, req("POST", "/online/board", """{"text":"  Sabato campi chiusi  "}""", token = k).first)
+        assertEquals("Sabato campi chiusi", data.chats.single().text)
+        assertTrue(req("GET", "/online/chats", token = k).second.contains("\"room\":\"board\""))
+        assertTrue(req("GET", "/online/chat/board", token = k).second.contains("Sabato campi chiusi"))
+        assertEquals(200, req("DELETE", "/online/chat/m0", token = k).first)
+        assertTrue(data.chats.isEmpty())
+        data.remoteDown = true
+        assertEquals(502, req("GET", "/online/chat/board", token = k).first)
+        assertEquals(401, req("GET", "/online/chats").first)
+    }
+
     @Test fun serverDellePrenotazioni() {
         val k = login()
         assertEquals(409, req("GET", "/online", token = k).first)

@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
@@ -410,8 +411,19 @@ private fun PlayTab(c: MatchController) {
     // Senza la scheda Progressi lo storico sta qui.
     if (PlayerFeature.PROGRESS !in pf && PlayerFeature.RACKETS !in pf && PlayerFeature.TRAINING !in pf) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Il server del circolo (se il circolo ce l'ha): prenotare i campi da qui, con l'invito della segreteria.
-    val booking by c.bookingAccount.collectAsState()
-    Entry(Icons.Filled.CalendarMonth, s.pbTitle, if (booking.joined) s.pbEntryJoined(booking.club.ifBlank { booking.url }) else s.pbEntryHint) { c.go(Screen.BOOK_COURT) }
+    // Solo a chi è entrato in un circolo; se il suo server non risponde la voce lo dice (e torna da sola).
+    val accounts by c.bookingAccounts.collectAsState()
+    val reach by c.bookingReach.collectAsState()
+    if (accounts.isNotEmpty()) {
+        val down = accounts.filter { reach[it.url] == false }
+        val names = { l: List<com.tennis.scoremanager.data.BookingAccount> -> l.joinToString(", ") { it.club.ifBlank { it.url } } }
+        val hint = when {
+            down.size == accounts.size -> s.pbOffline
+            down.isNotEmpty() -> s.pbSomeOffline(names(down))
+            else -> s.pbEntryJoined(names(accounts))
+        }
+        Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint) { c.go(Screen.BOOK_COURT) }
+    }
     SectionLabel(s.playUseAs)
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
     if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
@@ -500,6 +512,9 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
     Entry(Icons.Filled.Tune, s.pfTitle, s.pfEntryHint) { uses = true }
+    // Prima di entrare in un circolo: da qui si usa l'invito (poi la voce Prenota un campo sta in Gioca).
+    val bookingAccounts by c.bookingAccounts.collectAsState()
+    if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
     SectionLabel(s.moreGroupDevices)
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
@@ -550,16 +565,31 @@ private fun ClubNews(c: MatchController) {
     val accounts by c.bookingAccounts.collectAsState()
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
-    if (news.isEmpty()) return
+    // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
+    val chats = accounts.flatMap { a -> a.chatNews.map { (room, title) -> Triple(a, room, title) } }
+    if (news.isEmpty() && chats.isEmpty()) return
     androidx.compose.foundation.layout.Column(
         Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
     ) {
         androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Filled.NotificationsActive, null, tint = TsmColors.Ball)
-            Text(s.pbNewsTitle(news.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+            Text(s.pbNewsTitle(news.size + chats.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
         }
         Text(s.pbNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        for ((a, room, title) in chats) {
+            androidx.compose.foundation.layout.Row(
+                Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
+                    .clickable { c.selectBooking(a.url); c.bookTabRequest.value = if (room == "board") 0 else 2; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                    Text(if (room == "board") s.pbBoardTitle else s.pbChatNew, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, title.ifBlank { null }).joinToString(" · ").ifBlank { s.pbBoardRead }, color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+                androidx.compose.material3.IconButton(onClick = { c.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+            }
+        }
         for ((a, k) in news.take(6)) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
@@ -573,7 +603,9 @@ private fun ClubNews(c: MatchController) {
                 androidx.compose.material3.IconButton(onClick = { c.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
-        if (news.size > 1) androidx.compose.material3.TextButton(onClick = { accounts.forEach { c.readSeeks(it.url) } }) { Text(s.tdNewsReadAll) }
+        if (news.size + chats.size > 1) androidx.compose.material3.TextButton(onClick = {
+            accounts.forEach { a -> c.readSeeks(a.url); a.chatNews.keys.forEach { c.markChatRead(a.url, it, System.currentTimeMillis()) } }
+        }) { Text(s.tdNewsReadAll) }
     }
 }
 

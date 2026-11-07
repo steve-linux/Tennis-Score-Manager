@@ -807,6 +807,28 @@ interface Strings {
     val pbSeekAlerts: String
     val pbSeekAlertsHint: String
     val pbNewsTitle: (Int) -> String
+    val pbOffline: String
+    val pbHaveInvite: String
+    val pbHaveInviteHint: String
+    val pbCachedMine: String
+    val pbSomeOffline: (String) -> String
+    val pbChat: String
+    val pbChatSend: String
+    val pbChatYou: String
+    val pbChatNone: String
+    val pbChatPlaceholder: String
+    val pbBoardTitle: String
+    val pbBoardRead: String
+    val pbBoardHint: String
+    val pbChatNew: String
+    val pbErrChat: String
+    val pbErrChatMany: String
+    val srvBoard: String
+    val srvBoardHint: String
+    val srvChats: String
+    val srvChatsHint: String
+    val srvChatDelete: String
+    val srvChatsNone: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3121,6 +3143,28 @@ object ItStrings : Strings {
     override val pbSeekAlerts = "Avvisami dei nuovi annunci"
     override val pbSeekAlertsHint = "Una notifica quando qualcuno del circolo cerca un compagno. Spenta, gli annunci si vedono lo stesso qui e in Gioca."
     override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 novità dal circolo" else "$it novità dal circolo" }
+    override val pbOffline = "Il server del circolo non risponde: riprova tra poco. Si riaccende da solo appena torna."
+    override val pbHaveInvite = "Ho un invito del circolo"
+    override val pbHaveInviteHint = "Per prenotare i campi, se il tuo circolo ha il server TSM"
+    override val pbCachedMine = "Le tue prenotazioni, dall'ultimo controllo"
+    override val pbSomeOffline: (String) -> String = { "Non risponde: $it" }
+    override val pbChat = "Chat"
+    override val pbChatSend = "Invia"
+    override val pbChatYou = "Tu"
+    override val pbChatNone = "Ancora nessun messaggio."
+    override val pbChatPlaceholder = "Scrivi un messaggio…"
+    override val pbBoardTitle = "Bacheca del circolo"
+    override val pbBoardRead = "Leggi"
+    override val pbBoardHint = "Qui scrive la segreteria del circolo."
+    override val pbChatNew = "Nuovo messaggio: cerco compagno"
+    override val pbErrChat = "Questa chat è solo per chi partecipa all'annuncio."
+    override val pbErrChatMany = "Stai scrivendo troppo: aspetta qualche minuto."
+    override val srvBoard = "Bacheca del circolo"
+    override val srvBoardHint = "Un avviso per tutti i giocatori: arriva con una notifica. I messaggi restano 30 giorni."
+    override val srvChats = "Chat degli annunci"
+    override val srvChatsHint = "Per controllare i messaggi di Cerco compagno e togliere quelli fuori luogo."
+    override val srvChatDelete = "Togli"
+    override val srvChatsNone = "Nessuna chat."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5398,6 +5442,28 @@ object EnStrings : Strings {
     override val pbSeekAlerts = "Tell me about new posts"
     override val pbSeekAlertsHint = "A notification when someone at the club looks for a partner. Off, the posts still show here and in Play."
     override val pbNewsTitle: (Int) -> String = { if (it == 1) "1 update from the club" else "$it updates from the club" }
+    override val pbOffline = "The club server does not answer: try again shortly. It switches back on by itself when it returns."
+    override val pbHaveInvite = "I have a club invitation"
+    override val pbHaveInviteHint = "To book courts, if your club has the TSM server"
+    override val pbCachedMine = "Your bookings, as of the last check"
+    override val pbSomeOffline: (String) -> String = { "Not answering: $it" }
+    override val pbChat = "Chat"
+    override val pbChatSend = "Send"
+    override val pbChatYou = "You"
+    override val pbChatNone = "No messages yet."
+    override val pbChatPlaceholder = "Write a message…"
+    override val pbBoardTitle = "Club notice board"
+    override val pbBoardRead = "Read"
+    override val pbBoardHint = "The club office writes here."
+    override val pbChatNew = "New message: looking for a partner"
+    override val pbErrChat = "This chat is only for the players in the post."
+    override val pbErrChatMany = "You are writing too much: wait a few minutes."
+    override val srvBoard = "Club notice board"
+    override val srvBoardHint = "A notice for all players: it arrives with a notification. Messages stay 30 days."
+    override val srvChats = "Post chats"
+    override val srvChatsHint = "To check the Looking for a partner messages and remove inappropriate ones."
+    override val srvChatDelete = "Remove"
+    override val srvChatsNone = "No chats."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

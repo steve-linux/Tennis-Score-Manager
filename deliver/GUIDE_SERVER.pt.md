@@ -106,3 +106,4 @@ Para saber se a linha tem endereço público: comparem o endereço WAN da págin
 - De vez em quando façam uma cópia em **Quadras › Cópia da secretaria**: uma cópia fica também no servidor.
 - Para parar as reservas por um tempo (manutenção, fechamento), desliguem **Reservas online abertas**: os jogadores veem a agenda mas não reservam.
 - Um jogador que não deve mais reservar: na ficha dele, **Retirar o acesso online**.
+- Um aviso para todos (quadras fechadas, um torneio, uma festa): **Servidor do clube › Mural do clube**, ou **Reservas online** pelo PC. Chega aos jogadores com uma notificação e fica 30 dias. Em **Chats dos anúncios** vocês podem tirar as mensagens fora de lugar nos chats de Procuro parceiro.

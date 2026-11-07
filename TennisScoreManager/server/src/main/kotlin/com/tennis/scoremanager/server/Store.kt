@@ -32,6 +32,10 @@ data class Player(
 @Serializable
 data class PushSub(val player: String, val endpoint: String, val p256dh: String, val auth: String, val lang: String = "it", val since: Long = 0)
 
+/** Un messaggio di chat: [room] "board" o "s-ID"; [from] è l'id del giocatore ("" = la segreteria). */
+@Serializable
+data class ChatMsg(val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long)
+
 /** Un invito non ancora usato: si salva solo l'impronta del codice. */
 @Serializable
 data class Invite(val code: String, val player: String, val name: String, val expires: Long)
@@ -60,6 +64,8 @@ data class State(
     val waits: List<com.tennis.scoremanager.data.Wait> = emptyList(),
     /** Gli annunci di Cerco compagno. */
     val seeks: List<com.tennis.scoremanager.data.Seek> = emptyList(),
+    /** I messaggi delle chat (bacheca e annunci): restano al massimo [CHAT_DAYS] giorni. */
+    val chats: List<ChatMsg> = emptyList(),
 )
 
 object Secrets {

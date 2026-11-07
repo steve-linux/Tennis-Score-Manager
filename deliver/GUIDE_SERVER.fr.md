@@ -106,3 +106,4 @@ Pour savoir si la ligne a une adresse publique : comparez l'adresse WAN affiché
 - De temps en temps, faites une sauvegarde depuis **Terrains › Sauvegarde du secrétariat** : une copie est gardée aussi sur le serveur.
 - Pour arrêter les réservations un moment (entretien, fermeture), désactivez **Réservations en ligne ouvertes** : les joueurs voient le planning mais ne réservent pas.
 - Un joueur qui ne doit plus réserver : dans sa fiche, **Retirer l'accès en ligne**.
+- Une annonce pour tous (terrains fermés, un tournoi, une fête) : **Serveur du club › Tableau du club**, ou **Réservations en ligne** depuis le PC. Elle arrive aux joueurs avec une notification et reste 30 jours. Depuis **Discussions des annonces** vous pouvez retirer les messages déplacés des discussions de Je cherche un partenaire.

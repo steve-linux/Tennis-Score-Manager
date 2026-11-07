@@ -111,6 +111,10 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun localBackups(): List<OfficeBackupFile> = c.officeBackups()
     override fun localBackup(name: String): ByteArray? = c.officeBackupFile(name)?.readBytes()
     override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.officeBackupNow(onlyIfChanged = false) }
+    override fun serverChatRooms() = ClubServers.withServer(c.clubServer.value) { it.adminChats() }
+    override fun serverChat(room: String) = ClubServers.withServer(c.clubServer.value) { it.adminChat(room) }
+    override fun serverBoardPost(text: String) { ClubServers.withServer(c.clubServer.value) { it.postBoard(text) } }
+    override fun serverChatDelete(id: String) { ClubServers.withServer(c.clubServer.value) { it.deleteChat(id) } }
     override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
     override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
     override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.restoreOffice(s) }

@@ -1385,6 +1385,9 @@ async function showOnline() {
     } catch (e) { toast(errText(e)); }
     await showOnline();
   };
+  // La bacheca e le chat degli annunci: arrivano dopo, per non far aspettare il resto della pagina.
+  const chatBox = h('div.section.noprint');
+  loadChats(chatBox);
   const sync = o.lastSync ? T.srvLastSync(dateText(o.lastSync) + ' ' + hhmm(o.lastSyncMin)) : T.srvNeverSynced;
   put(main(),
     h('div.head', h('h1', T.onlineTitle), h('button', { onclick: () => act('POST', '/online/sync') }, T.srvSyncNow), h('button', { onclick: () => window.print() }, T.print)),
@@ -1411,6 +1414,7 @@ async function showOnline() {
         h('td', k.booked ? h('span.tag.ok', T.seekBooked) : k.noCourt ? h('span.tag.bad', T.pbSeekNoCourt) : h('span.tag.warn', T.pbSeekNeed(k.need))),
         h('td.num.noprint', h('button.danger', { type: 'button', onclick: () => act('DELETE', '/online/seeks/' + encodeURIComponent(k.id), T.removeSeekAsk(k.players[0] || '')) }, T.pbSeekRemove)))))))
         : h('p.dim', T.noSeeks)),
+    chatBox,
     h('div.section.noprint', h('h2', T.rulesTitle), h('div.panel', h('div.pad', h('div.form',
       h('label.check.full', open, T.srvOpen), h('p.full.dim', T.srvOpenHint),
       field(T.srvDaysAhead, days), field(T.srvMaxFuture, most), field(T.srvMaxMinutes + ' (min)', long), field(T.srvCancelHours, cancel),
@@ -1419,6 +1423,41 @@ async function showOnline() {
       field(T.srvPayInfo, pay, 'full'), h('label.check.full', alerts, T.onlineAlerts),
       h('div.full.actions', h('button.primary', { type: 'button', onclick: saveRules }, T.save)))))),
     h('p.dim.noprint', T.srvInviteHow));
+}
+
+/** La bacheca del circolo (scrive solo la segreteria, arriva a tutti con una notifica) e le chat degli annunci, da controllare. */
+async function loadChats(box, open) {
+  let rooms;
+  try { rooms = await api('GET', '/online/chats'); } catch (e) { put(box, h('h2', T.srvBoard), h('p.dim', srvError(e.message))); return; }
+  const stamp = (at) => { const d = new Date(at); return d.toLocaleDateString(locale()) + ' ' + d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }); };
+  const messages = async (room) => {
+    let list = [];
+    try { list = await api('GET', '/online/chat/' + encodeURIComponent(room)); } catch (e) { return h('p.dim', srvError(e.message)); }
+    if (!list.length) return h('p.dim', T.pbChatNone);
+    return h('div.panel', h('table', h('tbody', list.map((m) => h('tr',
+      h('td.dim', stamp(m.at)), h('td', m.office ? h('b', m.name) : m.name), h('td', { style: 'white-space:pre-wrap' }, m.text),
+      h('td.num', h('button.danger', { type: 'button', onclick: async () => {
+        if (!confirm(T.srvChatDelete + '?')) return;
+        try { await api('DELETE', '/online/chat/' + encodeURIComponent(m.id)); toast(T.saved); } catch (e) { toast(srvError(e.message)); }
+        loadChats(box, room);
+      } }, T.srvChatDelete)))))));
+  };
+  const text = h('textarea', { rows: 3, maxlength: 1000, placeholder: T.pbChatPlaceholder });
+  const send = async () => {
+    if (!text.value.trim()) return;
+    try { await api('POST', '/online/board', { text: text.value }); toast(T.saved); text.value = ''; } catch (e) { toast(e instanceof ApiError && T.err[e.message] ? errText(e) : srvError(e.message)); }
+    loadChats(box);
+  };
+  const chats = rooms.filter((x) => x.room !== 'board');
+  put(box,
+    h('h2', T.srvBoard), h('p.dim', T.srvBoardHint),
+    await messages('board'),
+    h('div.panel', h('div.pad', h('div.form', field(T.pbChatPlaceholder, text, 'full'),
+      h('div.full.actions', h('button.primary', { type: 'button', onclick: send }, T.pbChatSend))))),
+    h('h2', T.srvChats + ' (' + chats.length + ')'), h('p.dim', T.srvChatsHint),
+    chats.length ? h('div.panel', h('table', h('tbody', chats.map((x) => h('tr.row', { tabindex: 0, onclick: () => loadChats(box, x.room) },
+      h('td', x.title), h('td.num', String(x.count)), h('td.dim', x.last ? stamp(x.last) : '')))))) : h('p.dim', T.srvChatsNone),
+    open && open !== 'board' ? h('div', h('h3', (chats.find((x) => x.room === open) || {}).title || ''), await messages(open)) : null);
 }
 
 // --- Impostazioni del circolo ---

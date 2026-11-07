@@ -15,5 +15,10 @@ curl
 # Tailscale già dentro: Attiva parte subito, senza scaricarlo alla prima accensione. ps & co. per la manutenzione.
 tailscale
 procps
+# L'ora giusta da internet a ogni avvio (con l'orologio del PC indietro i certificati sembrano "non ancora validi"
+# e Tailscale non parte); ip e ping per vedere la rete.
+systemd-timesyncd
+iproute2
+iputils-ping
 ca-certificates
 caddy

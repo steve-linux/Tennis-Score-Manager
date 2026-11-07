@@ -96,6 +96,27 @@ object OnlineAlerts {
         nm.notify("seek:$id", SEEK_ID, n)
     }
 
+    /** Un messaggio nuovo in una chat ([room]); toccandola si apre Prenota un campo del circolo [club]. */
+    fun postChat(context: Context, s: Strings, room: String, club: String, title: String, text: String) {
+        if (!allowed(context)) return
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        val i = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true)
+        // La chat di un annuncio sta in Compagni.
+        if (room != "board") i.putExtra(EXTRA_SEEK_CLUB, club)
+        val open = PendingIntent.getActivity(context, SEEK_ID + 1 + (room.hashCode() and 0xfff), i, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_tennis)
+            .setContentTitle(title).setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setContentIntent(open).setAutoCancel(true)
+            .build()
+        nm.notify("chat:$room", SEEK_ID, n)
+    }
+
+    /** La chat letta: la sua notifica non serve più. */
+    fun cancelChat(context: Context, room: String) = context.getSystemService(NotificationManager::class.java).cancel("chat:$room", SEEK_ID)
+
     /** L'annuncio non è più aperto (al completo, tolto, letto): la sua notifica, se c'è ancora, sparisce. */
     fun cancelSeek(context: Context, id: String) = context.getSystemService(NotificationManager::class.java).cancel("seek:$id", SEEK_ID)
 

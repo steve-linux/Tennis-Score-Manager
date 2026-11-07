@@ -84,6 +84,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
 
@@ -119,6 +120,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "PHONE_TAKEN" -> s.pbErrPhoneTaken
     "BAD_PIN" -> s.pbErrPinFormat
     "BAD_PHONE" -> s.pbErrPhone
+    "NOT_IN_CHAT" -> s.pbErrChat
+    "TOO_MANY_MESSAGES" -> s.pbErrChatMany
     else -> s.srvErrOther(code)
 }
 
@@ -167,6 +170,9 @@ fun BookCourtScreen(c: MatchController) {
                 accounts.map { SegOption(it.club.ifBlank { it.url.substringAfter("//") }) }, accounts.indexOfFirst { it.url == account.url },
                 { c.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
             )
+            // Server che non risponde: si dice qui, e tutto si riaccende da solo quando torna.
+            val reach by c.bookingReach.collectAsState()
+            if (reach[account.url] == false) Text(s.pbOffline, color = TsmColors.Orange, fontSize = 13.sp)
             androidx.compose.runtime.key(account.url) { BookingView(c) { adding = true } }
         }
     }
@@ -271,6 +277,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     var seeks by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvSeek>>(emptyList()) }
     var newSeek by remember { mutableStateOf(false) }
     var leave by remember { mutableStateOf(false) }
+    /** La chat aperta: stanza e titolo ("board" = la bacheca, solo da leggere). */
+    var chatRoom by remember { mutableStateOf<Pair<String, String>?>(null) }
     var tick by remember { mutableStateOf(0) }
 
     // Le proprie prenotazioni e il giorno scelto, ora e poi ogni minuto (le caselle degli altri cambiano).
@@ -299,6 +307,12 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     val m = me
     if (m == null) {
         Text(error ?: "…", color = if (error != null) TsmColors.Orange else TsmColors.TextDim)
+        // Senza server si vedono almeno le proprie prenotazioni com'erano all'ultimo controllo.
+        val cached = acct.mine.orEmpty().values.filter { it.start > System.currentTimeMillis() }.sortedBy { it.start }
+        if (error != null && cached.isNotEmpty()) {
+            Text(s.pbCachedMine, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            for (b in cached) Text(b.label, color = TsmColors.TextMain, fontSize = 14.sp)
+        }
         if (error != null) GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else if (!m.hasPin) {
         // Entrato con l'invito: prima di prenotare, il PIN (si rientra da soli se si cambia telefono).
@@ -318,6 +332,11 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         )
         when (tab) {
             0 -> {
+                // La bacheca del circolo: si vede appena la segreteria ha scritto (col pallino se c'è del nuovo).
+                if (m.boardLast > 0) {
+                    val unread = m.boardLast > (acct.chatRead["board"] ?: 0)
+                    GhostButton(s.pbBoardTitle + if (unread) " •" else "", Icons.Filled.Campaign, { chatRoom = "board" to "" }, Modifier.fillMaxWidth())
+                }
                 Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     m.days.forEachIndexed { i, d ->
@@ -414,11 +433,30 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                         if (!k.mine && !k.joined && k.need > 0) TextButton(onClick = { act({ it.joinSeek(k.id) }, s.pbSeekJoined) }) { Text(s.pbSeekJoin, color = TsmColors.Ball) }
                         if (k.joined && k.bookedCourt == null) TextButton(onClick = { act({ it.leaveSeek(k.id) }) }) { Text(s.pbSeekLeave, color = TsmColors.TextDim) }
                         if (k.mine) TextButton(onClick = { act({ it.removeSeek(k.id) }) }) { Text(s.pbSeekRemove, color = TsmColors.TextDim) }
+                        // La chat dell'annuncio, per chi c'è (col pallino se ci sono messaggi nuovi).
+                        if (k.mine || k.joined) {
+                            val unread = k.chatLast > (acct.chatRead["s-" + k.id] ?: 0)
+                            TextButton(onClick = { chatRoom = "s-" + k.id to "${k.owner} · ${ct.weekday(k.date)} ${ct.dayMonth(k.date)}" }) {
+                                Text(s.pbChat + if (unread) " •" else "", color = TsmColors.Ball)
+                            }
+                        }
                     }
                 }
                 GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
 
             }
+        }
+
+        chatRoom?.let { (room, title) ->
+            val board = room == "board"
+            com.tennis.scoremanager.ui.ChatDialog(
+                title = if (board) s.pbBoardTitle else "${s.pbChat} · $title",
+                load = { c.booking { it.chat(room, 0) } },
+                send = if (board) null else { text -> c.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
+                hint = if (board) s.pbBoardHint else null,
+                errText = { bookErrorText(s, it) },
+                onRead = { at -> c.markChatRead(acct.url, room, at) },
+            ) { chatRoom = null; reload() }
         }
 
         booking?.let { (court, start) ->

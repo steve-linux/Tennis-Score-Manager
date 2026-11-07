@@ -35,6 +35,9 @@ import com.tennis.scoremanager.data.SrvWait
 import com.tennis.scoremanager.data.SrvWaitIn
 import com.tennis.scoremanager.data.Wait
 import com.tennis.scoremanager.data.WaitProblem
+import com.tennis.scoremanager.data.SrvChatIn
+import com.tennis.scoremanager.data.SrvChatMsg
+import com.tennis.scoremanager.data.SrvChatRoom
 import com.tennis.scoremanager.data.SrvPinIn
 import com.tennis.scoremanager.data.SrvPrefsIn
 import com.tennis.scoremanager.data.SrvPushSub
@@ -50,6 +53,10 @@ import java.time.ZoneId
 
 const val API_VERSION = 1
 /** PIN sbagliati di fila prima di aspettare un quarto d'ora, e in tutto prima che il PIN non valga più. */
+/** Quanti giorni restano i messaggi, quanto è lungo un messaggio, quanti se ne scrivono in dieci minuti. */
+const val CHAT_DAYS = 30
+const val CHAT_MAX = 500
+const val CHAT_BURST = 30
 const val PIN_TRIES = 5
 const val PIN_MAX = 20
 
@@ -121,6 +128,12 @@ class Api(
             r.method == "POST" && p == listOf("login") -> login(r)
             r.method == "POST" && p == listOf("pin") -> setPin(player(r), r)
             r.method == "POST" && p == listOf("prefs") -> setPrefs(player(r), r)
+            r.method == "GET" && p.size == 2 && p[0] == "chat" -> chatRead(player(r), p[1], r.query["after"])
+            r.method == "POST" && p.size == 2 && p[0] == "chat" -> chatWrite(player(r), p[1], r)
+            r.method == "GET" && p == listOf("admin", "chats") -> { admin(r); ok(ListSerializer(SrvChatRoom.serializer()), chatRooms()) }
+            r.method == "GET" && p.size == 3 && p[0] == "admin" && p[1] == "chat" -> { admin(r); chatList(null, p[2], null) }
+            r.method == "POST" && p == listOf("admin", "chat", "board") -> { admin(r); chatPost(null, "board", r) }
+            r.method == "DELETE" && p.size == 4 && p[0] == "admin" && p[1] == "chat" && p[2] == "msg" -> { admin(r); chatDelete(p[3]) }
             r.method == "GET" && p == listOf("me") -> me(player(r))
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
@@ -329,6 +342,12 @@ class Api(
         checkWaits(now)
         val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate().toString()
         if (store.state.seeks.any { it.date < today }) store.update { s -> s.copy(seeks = s.seeks.filter { it.date >= today }) to Unit }
+        // I messaggi vecchi se ne vanno: dopo CHAT_DAYS giorni, e quelli di un annuncio che non c'è più dopo tre.
+        val old = now - CHAT_DAYS * 86_400_000L
+        val gone = now - 3 * 86_400_000L
+        val ids = store.state.seeks.map { "s-" + it.id }.toSet()
+        fun stale(m: ChatMsg) = m.at < old || (m.room != "board" && m.room !in ids && m.at < gone)
+        if (store.state.chats.any(::stale)) store.update { s -> s.copy(chats = s.chats.filterNot(::stale)) to Unit }
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
@@ -362,6 +381,63 @@ class Api(
         }
         if (taken) throw ApiError(409, "PHONE_TAKEN")
         return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    // --- Chat del circolo ---
+
+    /** Il giocatore può leggere (e, negli annunci, scrivere) in [room]? La bacheca la leggono tutti. */
+    private fun canRead(pl: Player, room: String): Boolean = room == "board" ||
+        room.startsWith("s-") && store.state.seeks.any { k -> "s-" + k.id == room && k.everyone.any { it.id == pl.id } }
+
+    private fun chatList(pl: Player?, room: String, after: String?): Resp {
+        val since = after?.toLongOrNull() ?: 0L
+        val list = store.state.chats.filter { it.room == room && it.at > since }.sortedBy { it.at }.takeLast(200)
+            .map { SrvChatMsg(it.id, it.name, it.text, it.at, mine = pl != null && it.from == pl.id, office = it.from.isEmpty()) }
+        return ok(ListSerializer(SrvChatMsg.serializer()), list)
+    }
+
+    private fun chatRead(pl: Player, room: String, after: String?): Resp {
+        if (!canRead(pl, room)) throw ApiError(403, "NOT_IN_CHAT")
+        return chatList(pl, room, after)
+    }
+
+    /** Un messaggio: negli annunci solo chi c'è, in bacheca solo la segreteria. */
+    private fun chatWrite(pl: Player, room: String, r: Req): Resp {
+        if (room == "board" || !canRead(pl, room)) throw ApiError(403, "NOT_IN_CHAT")
+        return chatPost(pl, room, r)
+    }
+
+    /** [pl] null = la segreteria. Avvisa gli altri della stanza (in bacheca: tutti i giocatori). */
+    private fun chatPost(pl: Player?, room: String, r: Req): Resp {
+        val text = read(SrvChatIn.serializer(), r).text.trim().take(CHAT_MAX)
+        if (text.isEmpty()) throw ApiError(400, "EMPTY")
+        val now = store.now()
+        val msg = ChatMsg(Secrets.id("m"), room, pl?.id.orEmpty(), pl?.name ?: store.state.sync.club.ifBlank { "Segreteria" }, text, now)
+        val ok = store.update { s ->
+            // Chi scrive a raffica si ferma un po' (la segreteria no).
+            if (pl != null && s.chats.count { it.from == pl.id && it.at > now - 10 * 60_000L } >= CHAT_BURST) s to false
+            else s.copy(chats = s.chats + msg) to true
+        }
+        if (!ok) throw ApiError(429, "TOO_MANY_MESSAGES")
+        val to = if (room == "board") store.state.players.map { it.id }
+            else store.state.seeks.firstOrNull { "s-" + it.id == room }?.everyone?.map { it.id }.orEmpty()
+        for (id in to.filter { it != pl?.id }) push(id, ttl = 12 * 3600) { PushTexts.chat(it.lang, room, msg.name, text) }
+        return ok(SrvChatMsg.serializer(), SrvChatMsg(msg.id, msg.name, msg.text, msg.at, mine = pl != null, office = pl == null), 201)
+    }
+
+    /** La segreteria toglie un messaggio (moderazione). */
+    private fun chatDelete(id: String): Resp {
+        store.update { s -> s.copy(chats = s.chats.filter { it.id != id }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /** Le stanze con dei messaggi, per la segreteria: la bacheca e le chat degli annunci, le più recenti prima. */
+    private fun chatRooms(): List<SrvChatRoom> {
+        val s = store.state
+        return s.chats.groupBy { it.room }.map { (room, msgs) ->
+            val title = if (room == "board") "board" else s.seeks.firstOrNull { "s-" + it.id == room }?.let { k -> "${k.owner.name} · ${k.date}" } ?: room
+            SrvChatRoom(room, title, msgs.size, msgs.maxOf { it.at })
+        }.sortedByDescending { it.last }
     }
 
     /** Le scelte del giocatore: per ora, se vuole le notifiche dei nuovi annunci. */
@@ -439,6 +515,7 @@ class Api(
         return ok(SrvMe.serializer(), SrvMe(
             pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits,
             pl.pin != null, pl.phone.takeLast(3), pl.seekAlerts,
+            s.chats.filter { it.room == "board" }.maxOfOrNull { it.at } ?: 0L,
         ))
     }
 
@@ -501,6 +578,7 @@ class Api(
         return SrvSeek(
             k.id, k.owner.id == pl.id, k.joined.any { it.id == pl.id }, k.owner.name, k.date, k.fromMin, k.toMin, k.doubles, k.level, k.note,
             k.everyone.map { it.name }, k.need.coerceAtLeast(0), b?.court, b?.start, k.noCourt,
+            s.chats.filter { it.room == "s-" + k.id }.maxOfOrNull { it.at } ?: 0L,
         )
     }
 

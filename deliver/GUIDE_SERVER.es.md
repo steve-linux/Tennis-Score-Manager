@@ -106,3 +106,4 @@ Para saber si la línea tiene dirección pública: comparad la dirección WAN de
 - De vez en cuando haced una copia desde **Pistas › Copia de la secretaría**: una copia queda también en el servidor.
 - Para parar las reservas un tiempo (mantenimiento, cierre), desactivad **Reservas en línea abiertas**: los jugadores ven el planning pero no reservan.
 - Un jugador que ya no debe reservar: en su ficha, **Quitar el acceso en línea**.
+- Un aviso para todos (pistas cerradas, un torneo, una fiesta): **Servidor del club › Tablón del club**, o **Reservas online** desde el PC. Llega a los jugadores con una notificación y se queda 30 días. Desde **Chats de los anuncios** podéis quitar los mensajes fuera de lugar en los chats de Busco compañero.

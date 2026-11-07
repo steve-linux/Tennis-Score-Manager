@@ -79,3 +79,12 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .tabs { display: flex; gap: 6px; margin: 4px 0 12px; background: var(--surface); border: 1px solid var(--outline); border-radius: 14px; padding: 4px; }
 .tabs button { flex: 1; background: transparent; color: var(--text); font-weight: 600; padding: 8px 6px; min-height: 40px; font-size: 14px; }
 .tabs button.on { background: var(--ball); color: var(--on-ball); }
+
+/* Chat: i propri messaggi a destra, quelli della segreteria evidenziati. */
+.chat { display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow: auto; margin: 8px 0; }
+.msg { max-width: 85%; align-self: flex-start; background: var(--high); border-radius: 12px; padding: 8px 10px; }
+.msg.mine { align-self: flex-end; background: var(--ball); color: #0B1220; }
+.msg.office { border: 1px solid var(--ball); }
+.msg .who { font-size: 12px; opacity: .75; margin-bottom: 2px; }
+.chatbar { display: flex; gap: 8px; align-items: flex-end; }
+.chatbar textarea { flex: 1; resize: none; }
