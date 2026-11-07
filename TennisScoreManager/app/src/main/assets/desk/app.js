@@ -10,6 +10,8 @@ let token = read();
 let info = null;
 let T = pick((navigator.language || 'it').slice(0, 2));
 let view = 'today';
+/** Le novità online da leggere: il numero accanto a Oggi (vedi Novità e notifiche, in fondo). */
+let newsCount = 0;
 let people = [];
 
 function read() { try { return sessionStorage.getItem(KEY); } catch (_) { return null; } }
@@ -214,7 +216,8 @@ async function render() {
   put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } },
+        l, v === 'today' ? h('span.badge', { id: 'newsbadge', hidden: !newsCount }, String(newsCount)) : null)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
@@ -256,7 +259,22 @@ async function showToday() {
   if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text), () => go('teams', () => { teamId = null; fixtureId = null; })));
   if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
   const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)),
+  // Le novità dal server delle prenotazioni: restano finché non si leggono (✓) o si aprono (si va al planning del giorno).
+  const read = async (id) => { await api('POST', '/today/news/read', { id }); };
+  newsShown(d.news || []);
+  // Le notifiche del browser: si chiedono con un tasto (i browser le vogliono da un clic).
+  const canNotify = 'Notification' in window && window.isSecureContext;
+  const notifyBox = on('SERVER') ? (canNotify && Notification.permission === 'default'
+    ? h('p.noprint', h('button', { type: 'button', onclick: async () => { try { await Notification.requestPermission(); } catch (_) { /* niente */ } showToday(); } }, T.tdNotifyOn), ' ', h('span.dim', T.tdNotifyHint))
+    : (!canNotify || Notification.permission === 'denied') ? h('p.dim.noprint', T.tdNotifyBlocked) : null) : null;
+  const news = d.news && d.news.length ? h('div.panel.news', h('div.pad',
+    h('div.head', h('h2', T.tdNewsTitle(d.news.length)), d.news.length > 1 ? h('button.noprint', { type: 'button', onclick: async () => { await read(null); showToday(); } }, T.tdNewsReadAll) : null),
+    h('p.dim', T.tdNewsHint),
+    h('ul.newslist', d.news.map((n) => h('li' + (n.cancelled ? '.gone' : '.new'),
+      h('button.newsopen', { type: 'button', onclick: async () => { await read(n.id); go('plan', () => { planDate = n.date; planView = 'day'; }); } },
+        h('b', n.cancelled ? T.tdNewsCancelled : T.tdNewsBooked), ' ', n.text),
+      h('button.newsread', { type: 'button', title: T.tdNewsRead, 'aria-label': T.tdNewsRead, onclick: async () => { await read(n.id); showToday(); } }, '✓')))))) : null;
+  put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)), notifyBox, news,
     h('div.cards', cards), cards.length === 1 && !d.bookings ? h('p.dim', T.tdNothing) : null);
 }
 
@@ -355,6 +373,14 @@ function editPerson(p) {
     field(T.medicalKind, med), field(T.medical, f.medicalUntil), field(T.privacy, f.privacy), h('label.check', photos, T.photos),
     h('h3', T.guardianTitle), field(T.guardian, f.guardian), field(T.guardianPhone, f.guardianPhone),
     field(T.note, f.note, 'full'));
+  // Col server delle prenotazioni: l'invito per prenotare online e, per chi prenota già, il modo di togliere l'accesso.
+  const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
+  const online = server ? [
+    h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+    p.online ? h('button.danger', { type: 'button', onclick: async () => {
+      try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
+    } }, T.srvRevoke) : null,
+  ] : null;
   dialog(p ? p.name : T.newMember, body, async () => {
     const out = { firstName: f.firstName.value, lastName: f.lastName.value, nickname: f.nickname.value, phone: f.phone.value, email: f.email.value, birth: f.birth.value || null, note: f.note.value,
       member: member.checked, since: f.since.value || null, number: f.number.value, fitpNumber: f.fitpNumber.value, fitpCard: card.value || null, fitpYear: f.fitpYear.value ? Number(f.fitpYear.value) : null,
@@ -362,7 +388,33 @@ function editPerson(p) {
     if (p) await api('PUT', '/people/' + encodeURIComponent(p.id), out); else await api('POST', '/people', out);
     toast(T.saved);
     await showPeople();
-  });
+  }, { left: online });
+}
+
+/**
+ * L'invito per prenotare online, dal PC: il QR da mostrare al giocatore, il codice e, per mandarlo, il link da copiare,
+ * WhatsApp (WhatsApp Web o l'app del PC) ed email col messaggio già scritto. Niente parte da solo: lo manda chi è in segreteria.
+ */
+async function inviteDialog(p) {
+  let inv;
+  try { inv = await api('POST', '/online/invite/' + encodeURIComponent(p.id)); } catch (e) { toast(errText(e)); return; }
+  const canvas = h('canvas.qr', { 'aria-label': T.srvInvite });
+  drawQr(canvas, inv.rows);
+  const text = T.srvShareText(inv.club || info.club || T.title, inv.link);
+  const copy = h('button', { type: 'button', onclick: async () => {
+    try { await navigator.clipboard.writeText(inv.link); toast(T.srvLinkCopied); }
+    catch (_) { link.select(); document.execCommand('copy'); toast(T.srvLinkCopied); }
+  } }, T.srvCopyLink);
+  const link = h('input', { value: inv.link, readonly: true, 'aria-label': T.srvInvite, onfocus: () => link.select() });
+  const wa = h('a.button', { href: 'https://wa.me/' + (inv.wa || '') + '?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, T.srvSendWhatsApp);
+  const mail = h('a.button', { href: 'mailto:' + encodeURI(inv.email || '') + '?subject=' + encodeURIComponent(T.srvInvite) + '&body=' + encodeURIComponent(text) }, T.srvSendEmail);
+  dialog(T.srvInvite + ' · ' + p.name, h('div.invite',
+    canvas,
+    h('p', h('b', T.srvInviteCode(inv.code))), h('p.dim', T.srvInviteUntil(dateText(inv.until))),
+    h('p.dim', T.srvInviteHint),
+    link,
+    h('div.tools', copy, wa, mail),
+    h('p.dim', T.srvSendHint)), null);
 }
 
 /** Un CSV di Excel in italiano è spesso in Windows-1252, non in UTF-8. */
@@ -1861,15 +1913,18 @@ function editCourse(c) {
 const LIVE_VIEWS = { today: () => showToday(), plan: () => showPlan(), money: () => showMoney(), online: () => showOnline() };
 let liveBusy = false;
 async function liveRefresh() {
-  if (liveBusy || !token || !info || document.hidden || !LIVE_VIEWS[view]) return;
+  if (liveBusy || !token || !info) return;
   const busy = () => document.querySelector('dialog[open]') || (document.activeElement && document.activeElement.matches('input, select, textarea'));
-  if (busy()) return;
   liveBusy = true;
   try {
     const server = !info.features || !info.features.length || info.features.includes('SERVER');
     // Senza server abbinato (o se non risponde) si ridisegna lo stesso: i dati del telefono possono essere cambiati.
-    if (server) { try { await api('POST', '/online/sync'); } catch (_) { /* al prossimo giro */ } }
-    if (busy() || !LIVE_VIEWS[view]) return;
+    if (server) {
+      try { await api('POST', '/online/sync'); } catch (_) { /* al prossimo giro */ }
+      // Le novità anche con la scheda nascosta: è lì che servono le notifiche.
+      try { newsArrived((await api('GET', '/today')).news || []); } catch (_) { /* al prossimo giro */ }
+    }
+    if (document.hidden || busy() || !LIVE_VIEWS[view]) return;
     const y = window.scrollY;
     await LIVE_VIEWS[view]();
     window.scrollTo(0, y);
@@ -1877,3 +1932,50 @@ async function liveRefresh() {
 }
 setInterval(liveRefresh, 60_000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) liveRefresh(); });
+
+// --- Novità e notifiche ---
+// Le novità dal server delle prenotazioni: il numero accanto a Oggi e nel titolo della scheda e, se il browser lo
+// permette, una notifica per ognuna di quelle nuove. Quelle già avvisate si ricordano nel browser (anche ricaricando).
+const NEWS_KEY = 'tsm-desk-news';
+function newsSeen() {
+  try { return new Set(JSON.parse(localStorage.getItem(NEWS_KEY) || '[]')); } catch (_) { return null; }
+}
+function newsRemember(ids) {
+  try { localStorage.setItem(NEWS_KEY, JSON.stringify(ids.slice(-200))); } catch (_) { /* niente: al più un avviso in più */ }
+}
+/** Il numero delle novità da leggere: accanto a Oggi e nel titolo della scheda. */
+function newsShown(list) {
+  newsCount = list.length;
+  const b = document.getElementById('newsbadge');
+  if (b) { b.textContent = String(newsCount); b.hidden = !newsCount; }
+  const base = T.title + (info && info.club ? ' · ' + info.club : '');
+  document.title = (newsCount ? '(' + newsCount + ') ' : '') + base;
+}
+/** Le novità appena lette dal telefono: si avvisano solo quelle mai viste in questo browser. */
+function newsArrived(list) {
+  const seen = newsSeen();
+  newsShown(list);
+  const ids = list.map((n) => n.id);
+  // La prima volta in questo browser (o senza memoria) niente avvisi per quelle già lì.
+  if (!seen) return;
+  const first = localStorage.getItem(NEWS_KEY) === null;
+  const fresh = first ? [] : list.filter((n) => !seen.has(n.id));
+  newsRemember([...seen, ...ids.filter((i) => !seen.has(i))]);
+  for (const n of fresh.slice(0, 5)) notifyNews(n);
+}
+function notifyNews(n) {
+  const text = (n.cancelled ? T.tdNewsCancelled : T.tdNewsBooked) + ': ' + n.text;
+  if (!document.hidden) toast(text);
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    const note = new Notification((info && info.club) || T.title, { body: text, tag: n.id });
+    // Toccata la notifica: la pagina torna davanti sul planning di quel giorno e la novità è letta.
+    note.onclick = async () => {
+      window.focus();
+      note.close();
+      try { await api('POST', '/today/news/read', { id: n.id }); } catch (_) { /* resta da leggere */ }
+      go('plan', () => { planDate = n.date; planView = 'day'; });
+    };
+  } catch (_) { /* il browser non la mostra: resta il numero */ }
+}
+

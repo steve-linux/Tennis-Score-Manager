@@ -741,6 +741,21 @@ interface Strings {
     val noteAdded: String
     val receiveWho: (String) -> String
     val receiving: (String) -> String
+    val tdNewsBooked: String
+    val tdNewsCancelled: String
+    val tdNewsReadAll: String
+    val tdNewsRead: String
+    val tdNewsHint: String
+    val tdNewsTitle: (Int) -> String
+    val tdNotifyOn: String
+    val tdNotifyHint: String
+    val tdNotifyBlocked: String
+    val srvCopyLink: String
+    val srvLinkCopied: String
+    val srvSendWhatsApp: String
+    val srvSendEmail: String
+    val srvSendHint: String
+    val srvRevoked: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -2989,6 +3004,21 @@ object ItStrings : Strings {
     override val noteAdded = "Nota aggiunta: la trovi nel riepilogo"
     override val receiveWho: (String) -> String = { "Chi risponde da destra (parità) in $it?" }
     override val receiving: (String) -> String = { "Risponde $it" }
+    override val tdNewsBooked = "Ha prenotato"
+    override val tdNewsCancelled = "Ha disdetto"
+    override val tdNewsReadAll = "Segna tutte come lette"
+    override val tdNewsRead = "Letta"
+    override val tdNewsHint = "Tocca un messaggio per aprire il planning di quel giorno."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 novità dalle prenotazioni online" else "$it novità dalle prenotazioni online" }
+    override val tdNotifyOn = "Avvisami anche sul PC"
+    override val tdNotifyHint = "Una notifica del browser quando un giocatore prenota o disdice, anche con la pagina in un'altra scheda (lasciala aperta)."
+    override val tdNotifyBlocked = "Il browser non mostra notifiche per questa pagina: le novità si vedono qui, accanto a Oggi e nel titolo della scheda."
+    override val srvCopyLink = "Copia il link"
+    override val srvLinkCopied = "Link copiato"
+    override val srvSendWhatsApp = "Manda con WhatsApp"
+    override val srvSendEmail = "Manda per email"
+    override val srvSendHint = "Si apre il messaggio già scritto: lo mandi tu."
+    override val srvRevoked = "Non prenota più online"
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5200,6 +5230,21 @@ object EnStrings : Strings {
     override val noteAdded = "Note added: you will find it in the summary"
     override val receiveWho: (String) -> String = { "Who receives on the right (deuce) side in $it?" }
     override val receiving: (String) -> String = { "Receiving: $it" }
+    override val tdNewsBooked = "Booked"
+    override val tdNewsCancelled = "Cancelled"
+    override val tdNewsReadAll = "Mark all as read"
+    override val tdNewsRead = "Read"
+    override val tdNewsHint = "Tap a message to open that day's schedule."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 online booking update" else "$it online booking updates" }
+    override val tdNotifyOn = "Alert me on the PC too"
+    override val tdNotifyHint = "A browser notification when a player books or cancels, even with the page in another tab (leave it open)."
+    override val tdNotifyBlocked = "The browser shows no notifications for this page: updates appear here, next to Today and in the tab title."
+    override val srvCopyLink = "Copy the link"
+    override val srvLinkCopied = "Link copied"
+    override val srvSendWhatsApp = "Send with WhatsApp"
+    override val srvSendEmail = "Send by email"
+    override val srvSendHint = "The message opens already written: you send it."
+    override val srvRevoked = "No longer books online"
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

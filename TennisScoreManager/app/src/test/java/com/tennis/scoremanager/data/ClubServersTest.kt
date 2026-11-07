@@ -88,6 +88,23 @@ class ClubServersTest {
         assertTrue(gone.added.isEmpty())
     }
 
+    @Test fun leNovitaDiventanoMessaggiDaLeggere() {
+        fun ob(id: String, start: Long) = OnlineBooking(id, "Campo 1", start, 60, "p1", "Mario")
+        val label = { b: OnlineBooking -> "${b.name} ${b.id}" }
+        val first = ClubServers.onlineNews(null, listOf(ob("a", now + h)), now, label = label)
+        assertTrue("la prima volta niente messaggi", first.notices.isEmpty())
+        val next = ClubServers.onlineNews(first.seen, listOf(ob("c", now + 5 * h)), now, label = label)
+        assertEquals(listOf("ac" to false, "ca" to true), next.notices.map { it.id to it.cancelled })
+        assertEquals("Mario c", next.notices.first().label)
+        // Nella casella: niente doppioni e al massimo INBOX_MAX, i più nuovi.
+        val inbox = ClubServers.addNotices(next.notices, next.notices)
+        assertEquals(2, inbox.size)
+        val many = (1..60).map { OnlineNotice("x$it", false, "n$it", now, now) }
+        val capped = ClubServers.addNotices(inbox, many)
+        assertEquals(ClubServers.INBOX_MAX, capped.size)
+        assertEquals("x60", capped.last().id)
+    }
+
     @Test fun playerRemindersAndRemovals() {
         fun mb(id: String, start: Long) = SrvMyBooking(id, "Campo 1", start, 60, 0, false, false, true)
         val label = { b: SrvMyBooking -> b.id }

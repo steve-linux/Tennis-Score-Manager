@@ -12,6 +12,8 @@ import com.tennis.scoremanager.data.OfficeBackupFile
 import com.tennis.scoremanager.data.OfficeSnapshot
 import com.tennis.scoremanager.data.OfficeSummary
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.data.ClubServers
 import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
@@ -126,8 +128,14 @@ interface DeskData {
     fun serverState(): SrvAdmin
     /** Manda subito il planning e prende le prenotazioni nuove, fuori da [tx]; null = fatto, se no il codice dell'errore. */
     fun serverSync(): String?
+    /** Un messaggio di Oggi letto (null = tutti): sparisce anche dal telefono. */
+    fun readOnlineNotice(id: String?)
     /** La segreteria toglie un'attesa ([kind] "wait") o un annuncio ("seek") dal server, fuori da [tx]. */
     fun serverRemove(kind: String, id: String)
+    /** L'invito per prenotare online per il giocatore [player], fuori da [tx] (è rete). */
+    fun serverInvite(player: PlayerProfile): SrvInvite
+    /** Il giocatore non prenota più online, fuori da [tx]; null = fatto, se no il codice dell'errore. */
+    fun serverRevoke(playerId: String): String?
     fun paymentsCsv(year: Int): ByteArray?
     /** Backup della segreteria: il file di adesso, col suo nome. */
     fun officeBackup(): Pair<String, ByteArray>
@@ -164,7 +172,12 @@ interface DeskData {
     val bookings: Int, val online: Int, val next: List<DeskTodayLine>, val collectCents: Int, val collectPeople: Int,
     val members: Int, val blocking: Int, val memberNames: List<String>, val matches: List<DeskTodayLine>, val lessons: List<DeskTodayLine>,
     val fixtures: List<DeskTodayLine>, val challenges: Int, val late: Int,
+    /** Le novità dal server delle prenotazioni da leggere, le più nuove prima. */
+    val news: List<DeskNews> = emptyList(),
 )
+/** Un messaggio di Oggi: un giocatore ha prenotato o disdetto online ([date] il giorno della prenotazione, per il planning). */
+@Serializable data class DeskNews(val id: String, val cancelled: Boolean, val text: String, val date: String)
+@Serializable data class DeskNewsRead(val id: String? = null)
 
 @Serializable data class DeskPerson(
     val id: String = "", val name: String = "", val firstName: String = "", val lastName: String = "", val nickname: String = "",
@@ -174,7 +187,14 @@ interface DeskData {
     val guardian: String = "", val guardianPhone: String = "",
     /** Solo in uscita: cosa manca e quanto deve. */
     val issues: List<String> = emptyList(), val owedCents: Int = 0,
+    /** Solo in uscita: prenota già online (ha accettato un invito). */
+    val online: Boolean = false,
 )
+/**
+ * L'invito per prenotare online, per mostrarlo sul PC: il link e il suo QR ([rows]), il codice, fino a quando vale
+ * ([until]) e, per mandarlo, il numero per WhatsApp ([wa], solo cifre col prefisso) e l'email del giocatore.
+ */
+@Serializable data class DeskInvite(val link: String, val code: String, val until: String, val rows: List<String>, val club: String, val wa: String?, val email: String)
 
 @Serializable data class DeskCsvIn(val text: String)
 @Serializable data class DeskCsvRow(val line: Int, val firstName: String, val lastName: String, val phone: String, val email: String, val birth: String?, val fitp: String, val update: Boolean, val error: String?)
@@ -407,6 +427,7 @@ class DeskApi(
                 m == "GET" && p == listOf("month") -> month(r.query["date"])
                 m == "GET" && p == listOf("quote") -> quote(r.query)
                 m == "GET" && p == listOf("today") -> today()
+                m == "POST" && p == listOf("today", "news", "read") -> { data.readOnlineNotice(read(DeskNewsRead.serializer(), r).id); today() }
                 m == "GET" && p.size == 5 && p[0] == "charges" && p[2] == "payments" && p[4] == "receipt" ->
                     Resp(200, data.receiptPdf(charge(p[1]).id, p[3]) ?: throw Fail(404, "NOT_FOUND"), "application/pdf")
                 m == "POST" && p == listOf("bookings") -> book(read(DeskBookingIn.serializer(), r), null)
@@ -508,6 +529,7 @@ class DeskApi(
             m != null, day(m?.since), m?.number.orEmpty(), m?.fitpNumber.orEmpty(), m?.fitpCard, m?.fitpYear, m?.ranking.orEmpty(), m?.medical, day(m?.medicalUntil), day(m?.privacyAt),
             m?.photosOk == true, m?.guardian.orEmpty(), m?.guardianPhone.orEmpty(),
             Members.issues(p, now).map { it.name }, Fees.owed(book, p),
+            data.serverConf().players.any { it.id == p.id },
         )
     }
 
@@ -824,6 +846,22 @@ class DeskApi(
             m == "GET" && p == listOf("online") -> onlineOut()
             m == "POST" && p == listOf("online", "sync") -> {
                 data.serverSync()?.let { throw Fail(502, it) }
+                onlineOut()
+            }
+            // L'invito di un giocatore, come dalla sua scheda sul telefono.
+            m == "POST" && p.size == 3 && p[1] == "invite" -> {
+                val who = data.tx { Players.byId(data.players(), p[2]) } ?: throw Fail(404, "NOT_FOUND")
+                val inv = try { data.serverInvite(who) } catch (e: Exception) {
+                    throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET")
+                }
+                val link = ClubServers.inviteLink(conf, inv.code)
+                ok(DeskInvite.serializer(), DeskInvite(
+                    link, inv.code.chunked(5).joinToString("-"), day(inv.expires).orEmpty(), qr(link), conf.club,
+                    com.tennis.scoremanager.data.Notices.waNumber(who.phone), who.email,
+                ))
+            }
+            m == "DELETE" && p.size == 3 && p[1] == "players" -> {
+                data.serverRevoke(p[2])?.let { throw Fail(502, it) }
                 onlineOut()
             }
             m == "DELETE" && p.size == 3 && p[1] in setOf("waits", "seeks") -> {
@@ -1171,6 +1209,7 @@ class DeskApi(
         return ok(DeskToday.serializer(), DeskToday(
             bookings, online, next, cents, owing, issues.size, issues.count { (_, l) -> l.any(Members::blocking) }, issues.take(3).map { it.first.name },
             matches, lessons, fixtures, open.size, open.count { it.deadline < now },
+            if (ClubFeature.SERVER in f) data.serverConf().inbox.asReversed().map { DeskNews(it.id, it.cancelled, it.label, day(it.start).orEmpty()) } else emptyList(),
         ))
     }
 

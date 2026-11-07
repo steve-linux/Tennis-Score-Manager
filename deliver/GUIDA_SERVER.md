@@ -52,6 +52,8 @@ Sempre in **Campi › Server del circolo**:
 3. Toccate **Invia ora**: il planning arriva sul server.
 4. Per ogni giocatore: aprite la sua scheda e toccate **Invito per prenotare online**. Il giocatore inquadra il QR con la fotocamera e prenota dalla pagina del circolo (su iPhone: Condividi › Aggiungi alla schermata Home, e la trova come un'app).
 
+Dalla segreteria sul PC è uguale: **Soci**, aprite il socio e cliccate **Invito per prenotare online**. Oltre al QR ci sono **Copia il link**, **Manda con WhatsApp** e **Manda per email**: il messaggio si apre già scritto e lo mandate voi.
+
 Le prenotazioni dei giocatori arrivano da sole nel planning della segreteria, segnate **online**.
 
 ## 4. Modo B: da internet con Tailscale

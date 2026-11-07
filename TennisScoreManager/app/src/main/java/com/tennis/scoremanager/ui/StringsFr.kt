@@ -705,6 +705,21 @@ object FrStrings : Strings {
     override val noteAdded = "Note ajoutée : elle est dans le résumé"
     override val receiveWho: (String) -> String = { "Qui retourne à droite (égalité) dans $it ?" }
     override val receiving: (String) -> String = { "Au retour : $it" }
+    override val tdNewsBooked = "A réservé"
+    override val tdNewsCancelled = "A annulé"
+    override val tdNewsReadAll = "Tout marquer comme lu"
+    override val tdNewsRead = "Lu"
+    override val tdNewsHint = "Touchez un message pour ouvrir le planning de ce jour."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 nouveauté des réservations en ligne" else "$it nouveautés des réservations en ligne" }
+    override val tdNotifyOn = "Me prévenir aussi sur le PC"
+    override val tdNotifyHint = "Une notification du navigateur quand un joueur réserve ou annule, même avec la page dans un autre onglet (laissez-la ouverte)."
+    override val tdNotifyBlocked = "Le navigateur n'affiche pas de notifications pour cette page : les nouveautés apparaissent ici, à côté d'Aujourd'hui et dans le titre de l'onglet."
+    override val srvCopyLink = "Copier le lien"
+    override val srvLinkCopied = "Lien copié"
+    override val srvSendWhatsApp = "Envoyer par WhatsApp"
+    override val srvSendEmail = "Envoyer par e-mail"
+    override val srvSendHint = "Le message s'ouvre déjà écrit : c'est vous qui l'envoyez."
+    override val srvRevoked = "Ne réserve plus en ligne"
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"

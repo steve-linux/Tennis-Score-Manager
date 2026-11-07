@@ -52,6 +52,8 @@ Still in **Courts › Club server**:
 3. Tap **Send now**: the schedule goes to the server.
 4. For each player: open their card and tap **Invite to book online**. The player scans the QR code with the camera and books from the club page (on iPhone: Share › Add to Home Screen, and it works like an app).
 
+From the office page on the PC it is the same: **Members**, open the member and click **Invite to book online**. Besides the QR code there are **Copy the link**, **Send with WhatsApp** and **Send by email**: the message opens already written and you send it.
+
 The players' bookings reach the office schedule by themselves, marked **online**.
 
 ## 4. Way B: from the internet with Tailscale

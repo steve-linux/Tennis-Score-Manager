@@ -52,6 +52,8 @@ Weiterhin unter **Plätze › Vereinsserver**:
 3. **Jetzt senden** antippen: Der Belegungsplan geht an den Server.
 4. Für jeden Spieler: seine Karte öffnen und **Einladung zum Online-Buchen** antippen. Der Spieler scannt den QR-Code mit der Kamera und bucht über die Seite des Vereins (auf dem iPhone: Teilen › Zum Home-Bildschirm, dann öffnet sie sich wie eine App).
 
+Am PC im Büro geht es genauso: **Mitglieder**, das Mitglied öffnen und **Einladung zum Online-Buchen** klicken. Neben dem QR-Code gibt es **Link kopieren**, **Mit WhatsApp senden** und **Per E-Mail senden**: Die Nachricht öffnet sich fertig geschrieben und ihr schickt sie ab.
+
 Die Buchungen der Spieler landen von selbst im Plan des Büros, markiert mit **online**.
 
 ## 4. Art B: aus dem Internet mit Tailscale

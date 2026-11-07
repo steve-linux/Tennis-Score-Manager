@@ -702,6 +702,21 @@ object DeStrings : Strings {
     override val noteAdded = "Notiz hinzugefügt: Sie steht in der Zusammenfassung"
     override val receiveWho: (String) -> String = { "Wer returniert rechts (Einstand) bei $it?" }
     override val receiving: (String) -> String = { "Return: $it" }
+    override val tdNewsBooked = "Gebucht"
+    override val tdNewsCancelled = "Storniert"
+    override val tdNewsReadAll = "Alle als gelesen markieren"
+    override val tdNewsRead = "Gelesen"
+    override val tdNewsHint = "Tippe auf eine Nachricht, um den Plan dieses Tages zu öffnen."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 Neuigkeit aus den Online-Buchungen" else "$it Neuigkeiten aus den Online-Buchungen" }
+    override val tdNotifyOn = "Auch am PC benachrichtigen"
+    override val tdNotifyHint = "Eine Browser-Benachrichtigung, wenn ein Spieler bucht oder storniert, auch wenn die Seite in einem anderen Tab ist (offen lassen)."
+    override val tdNotifyBlocked = "Der Browser zeigt für diese Seite keine Benachrichtigungen: Neuigkeiten erscheinen hier, neben Heute und im Titel des Tabs."
+    override val srvCopyLink = "Link kopieren"
+    override val srvLinkCopied = "Link kopiert"
+    override val srvSendWhatsApp = "Mit WhatsApp senden"
+    override val srvSendEmail = "Per E-Mail senden"
+    override val srvSendHint = "Die Nachricht öffnet sich fertig geschrieben: Du schickst sie ab."
+    override val srvRevoked = "Bucht nicht mehr online"
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

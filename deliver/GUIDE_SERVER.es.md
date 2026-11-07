@@ -52,6 +52,8 @@ Siempre en **Pistas › Servidor del club**:
 3. Tocad **Enviar ahora**: el planning llega al servidor.
 4. Para cada jugador: abrid su ficha y tocad **Invitación para reservar en línea**. El jugador escanea el QR con la cámara y reserva desde la página del club (en iPhone: Compartir › Añadir a pantalla de inicio, y se abre como una app).
 
+Desde la secretaría en el PC es igual: **Socios**, abrid el socio y haced clic en **Invitación para reservar en línea**. Además del QR están **Copiar el enlace**, **Enviar por WhatsApp** y **Enviar por correo**: el mensaje se abre ya escrito y lo enviáis vosotros.
+
 Las reservas de los jugadores llegan solas al planning de la secretaría, marcadas **en línea**.
 
 ## 4. Manera B: desde internet con Tailscale

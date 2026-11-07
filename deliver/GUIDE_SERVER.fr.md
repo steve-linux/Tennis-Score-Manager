@@ -52,6 +52,8 @@ Toujours dans **Terrains › Serveur du club** :
 3. Touchez **Envoyer maintenant** : le planning part vers le serveur.
 4. Pour chaque joueur : ouvrez sa fiche et touchez **Invitation à réserver en ligne**. Le joueur scanne le QR avec l'appareil photo et réserve depuis la page du club (sur iPhone : Partager › Sur l'écran d'accueil, et elle s'ouvre comme une appli).
 
+Depuis le secrétariat sur le PC c'est pareil : **Adhérents**, ouvrez le membre et cliquez **Invitation à réserver en ligne**. En plus du QR il y a **Copier le lien**, **Envoyer par WhatsApp** et **Envoyer par e-mail** : le message s'ouvre déjà écrit et c'est vous qui l'envoyez.
+
 Les réservations des joueurs arrivent toutes seules dans le planning du secrétariat, marquées **en ligne**.
 
 ## 4. Façon B : depuis internet avec Tailscale

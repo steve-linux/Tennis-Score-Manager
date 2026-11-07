@@ -327,6 +327,46 @@ class DeskTest {
         assertEquals(404, req("GET", "/charges/${c.id}/payments/nessuno/receipt", token = k).first)
     }
 
+    @Test fun invitoERevocaDalPc() {
+        val k = login()
+        data.on = data.on + com.tennis.scoremanager.ClubFeature.SERVER
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","phone":"333 1234567","email":"mario@example.com"}""", k)
+        val id = data.players().single().id
+        // Senza server abbinato non si invita.
+        assertEquals(409, req("POST", "/online/invite/$id", "{}", k).first)
+        data.server = data.server.copy(url = "http://192.168.1.50:8080", token = "t", publicUrl = "https://tc.example.org", club = "TC Prova")
+        val (st, out) = req("POST", "/online/invite/$id", "{}", k)
+        assertEquals(out, 200, st)
+        assertTrue(out, "ABCDE-FGHJK" in out && "TC Prova" in out && "mario@example.com" in out && "\"rows\"" in out)
+        assertTrue("il numero per WhatsApp col prefisso", "393331234567" in out)
+        assertEquals(listOf(id), data.invited)
+        assertEquals(404, req("POST", "/online/invite/nessuno", "{}", k).first)
+        data.remoteDown = true
+        assertEquals(502, req("POST", "/online/invite/$id", "{}", k).first)
+        data.remoteDown = false
+        // Chi prenota già online lo si vede nella scheda e gli si toglie l'accesso.
+        data.server = data.server.copy(players = listOf(com.tennis.scoremanager.data.SrvPlayer(id, "Mario Rossi", 0, 0, 1)))
+        assertTrue(req("GET", "/people", token = k).second.contains("\"online\":true"))
+        assertEquals(200, req("DELETE", "/online/players/$id", token = k).first)
+        assertTrue(data.server.players.isEmpty())
+    }
+
+    @Test fun oggiMostraLeNovitaOnlineFinoAllaLettura() {
+        val k = login()
+        data.on = data.on + com.tennis.scoremanager.ClubFeature.SERVER
+        data.server = data.server.copy(inbox = listOf(
+            com.tennis.scoremanager.data.OnlineNotice("aX", false, "Mario · Campo 1", data.time, data.time),
+            com.tennis.scoremanager.data.OnlineNotice("cY", true, "Luca · Campo 2", data.time, data.time),
+        ))
+        val out = req("GET", "/today", token = k).second
+        assertTrue(out, "Mario · Campo 1" in out && "Luca · Campo 2" in out)
+        assertTrue("le più nuove prima", out.indexOf("Luca") < out.indexOf("Mario"))
+        val after = req("POST", "/today/news/read", """{"id":"cY"}""", k).second
+        assertTrue(after, "Luca" !in after && "Mario" in after)
+        req("POST", "/today/news/read", "{}", k)
+        assertTrue(data.server.inbox.isEmpty())
+    }
+
     @Test fun settimanaEMese() {
         val k = login()
         // 2026-11-11 è un mercoledì: la settimana parte da lunedì 9.

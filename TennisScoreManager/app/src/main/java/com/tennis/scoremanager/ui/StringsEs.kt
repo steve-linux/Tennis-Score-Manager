@@ -703,6 +703,21 @@ object EsStrings : Strings {
     override val noteAdded = "Nota añadida: está en el resumen"
     override val receiveWho: (String) -> String = { "¿Quién resta a la derecha (iguales) en $it?" }
     override val receiving: (String) -> String = { "Resta $it" }
+    override val tdNewsBooked = "Ha reservado"
+    override val tdNewsCancelled = "Ha anulado"
+    override val tdNewsReadAll = "Marcar todas como leídas"
+    override val tdNewsRead = "Leída"
+    override val tdNewsHint = "Toca un mensaje para abrir el planning de ese día."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 novedad de las reservas en línea" else "$it novedades de las reservas en línea" }
+    override val tdNotifyOn = "Avisarme también en el PC"
+    override val tdNotifyHint = "Una notificación del navegador cuando un jugador reserva o anula, también con la página en otra pestaña (déjala abierta)."
+    override val tdNotifyBlocked = "El navegador no muestra notificaciones para esta página: las novedades aparecen aquí, junto a Hoy y en el título de la pestaña."
+    override val srvCopyLink = "Copiar el enlace"
+    override val srvLinkCopied = "Enlace copiado"
+    override val srvSendWhatsApp = "Enviar por WhatsApp"
+    override val srvSendEmail = "Enviar por correo"
+    override val srvSendHint = "El mensaje se abre ya escrito: lo envías tú."
+    override val srvRevoked = "Ya no reserva en línea"
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

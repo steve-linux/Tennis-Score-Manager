@@ -706,6 +706,21 @@ object PtStrings : Strings {
     override val noteAdded = "Nota adicionada: está no resumo"
     override val receiveWho: (String) -> String = { "Quem recebe à direita (iguais) em $it?" }
     override val receiving: (String) -> String = { "Recebe $it" }
+    override val tdNewsBooked = "Reservou"
+    override val tdNewsCancelled = "Cancelou"
+    override val tdNewsReadAll = "Marcar todas como lidas"
+    override val tdNewsRead = "Lida"
+    override val tdNewsHint = "Toque numa mensagem para abrir a agenda desse dia."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 novidade das reservas online" else "$it novidades das reservas online" }
+    override val tdNotifyOn = "Avisar também no PC"
+    override val tdNotifyHint = "Uma notificação do navegador quando um jogador reserva ou cancela, mesmo com a página noutra aba (deixe-a aberta)."
+    override val tdNotifyBlocked = "O navegador não mostra notificações para esta página: as novidades aparecem aqui, ao lado de Hoje e no título da aba."
+    override val srvCopyLink = "Copiar o link"
+    override val srvLinkCopied = "Link copiado"
+    override val srvSendWhatsApp = "Enviar pelo WhatsApp"
+    override val srvSendEmail = "Enviar por e-mail"
+    override val srvSendHint = "A mensagem abre já escrita: quem envia é você."
+    override val srvRevoked = "Já não reserva online"
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"

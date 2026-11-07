@@ -2203,7 +2203,12 @@ class MatchController(
                 listOf(b.name, b.court, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
             }
             if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
-            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen) }
+            saveServer {
+                it.copy(
+                    lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen,
+                    inbox = com.tennis.scoremanager.data.ClubServers.addNotices(it.inbox, news.notices),
+                )
+            }
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
             saveServer { it.copy(error = e.code) }
@@ -2212,6 +2217,15 @@ class MatchController(
     }
 
     fun setServerAlerts(on: Boolean) = saveServer { it.copy(alerts = on) }
+
+    /** Un messaggio di Oggi letto (null = tutti): sparisce. */
+    fun readOnlineNotice(id: String?) = saveServer { conf -> conf.copy(inbox = if (id == null) emptyList() else conf.inbox.filter { it.id != id }) }
+
+    /** Aperto un messaggio di Oggi: sparisce e si va al planning di quel giorno. */
+    fun openOnlineNotice(n: com.tennis.scoremanager.data.OnlineNotice) {
+        readOnlineNotice(n.id)
+        openPlanAt(com.tennis.scoremanager.data.CourtPlans.dayStart(n.start))
+    }
 
     /** Il giorno su cui aprire il planning (dalla notifica di una prenotazione online). */
     val planDayRequest = MutableStateFlow<Long?>(null)

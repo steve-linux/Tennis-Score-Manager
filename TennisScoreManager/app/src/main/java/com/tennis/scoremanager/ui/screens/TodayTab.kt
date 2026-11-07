@@ -34,6 +34,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.EventAvailable
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Courses
@@ -85,6 +91,10 @@ fun TodayTab(c: MatchController) {
 
     com.tennis.scoremanager.ui.ClubFeaturesHint(c)
     Text(com.tennis.scoremanager.data.Notices.day(now, lang), color = TsmColors.TextDim, fontSize = 13.sp)
+
+    // Le novità dal server delle prenotazioni: restano finché non si leggono (✓) o si aprono.
+    val server by c.clubServer.collectAsState()
+    if (ClubFeature.SERVER in f && server.inbox.isNotEmpty()) OnlineNews(c, server.inbox.asReversed())
 
     if (ClubFeature.PLANNING in f) {
         val occ = CourtPlans.occupied(plan, tournaments, today).filter { it.block == null }
@@ -149,3 +159,34 @@ fun TodayTab(c: MatchController) {
     if (shown == 0) Text(s.tdNothing, color = TsmColors.TextDim)
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
+
+/** Le prenotazioni e le disdette online da leggere, le più nuove in alto: toccandone una si apre il planning di quel giorno. */
+@Composable
+private fun OnlineNews(c: MatchController, news: List<com.tennis.scoremanager.data.OnlineNotice>) {
+    val s = LocalStrings.current
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.NotificationsActive, null, tint = TsmColors.Ball)
+            Text(s.tdNewsTitle(news.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+        }
+        Text(s.tdNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        for (n in news.take(8)) {
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.openOnlineNotice(n) }.padding(start = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(if (n.cancelled) Icons.Filled.EventBusy else Icons.Filled.EventAvailable, null, tint = if (n.cancelled) TsmColors.Orange else TsmColors.Ok)
+                Column(Modifier.weight(1f).padding(horizontal = 10.dp, vertical = 8.dp)) {
+                    Text(if (n.cancelled) s.tdNewsCancelled else s.tdNewsBooked, color = if (n.cancelled) TsmColors.Orange else TsmColors.Ok, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(n.label, color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+                IconButton(onClick = { c.readOnlineNotice(n.id) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+            }
+        }
+        if (news.size > 1) TextButton(onClick = { c.readOnlineNotice(null) }) { Text(s.tdNewsReadAll) }
+    }
+}
+

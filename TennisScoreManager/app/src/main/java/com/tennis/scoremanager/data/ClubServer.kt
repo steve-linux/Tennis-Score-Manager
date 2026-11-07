@@ -18,6 +18,13 @@ import java.net.URL
 @Serializable
 data class SeenBooking(val label: String, val start: Long)
 
+/**
+ * Un messaggio per Oggi: un giocatore ha prenotato ([cancelled] false) o disdetto online. [label] è "Mario · Campo 2 ·
+ * sab 8 nov 18:00", [start] l'inizio della prenotazione, [at] quando la segreteria l'ha saputo. Resta finché non si legge.
+ */
+@Serializable
+data class OnlineNotice(val id: String, val cancelled: Boolean, val label: String, val start: Long, val at: Long)
+
 @Serializable
 data class ClubServerConf(
     val url: String = "",
@@ -36,6 +43,8 @@ data class ClubServerConf(
     val alerts: Boolean = true,
     /** Le prenotazioni online già viste, per notificare solo le novità; null = mai guardato. */
     val seen: Map<String, SeenBooking>? = null,
+    /** I messaggi di Oggi non ancora letti: prenotazioni e disdette online (al massimo [INBOX_MAX], i più nuovi). */
+    val inbox: List<OnlineNotice> = emptyList(),
 ) {
     val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
 
@@ -173,7 +182,18 @@ object ClubServers {
     }
 
     /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */
-    data class OnlineNews(val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?)
+    data class OnlineNews(
+        val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?,
+        /** Le stesse novità come messaggi per Oggi. */
+        val notices: List<OnlineNotice> = emptyList(),
+    )
+
+    /** Quanti messaggi tiene Oggi al massimo: oltre, se ne vanno i più vecchi. */
+    const val INBOX_MAX = 50
+
+    /** I messaggi nuovi in fondo a quelli da leggere, senza doppioni, al massimo [INBOX_MAX]. */
+    fun addNotices(inbox: List<OnlineNotice>, new: List<OnlineNotice>): List<OnlineNotice> =
+        (inbox + new.filter { n -> inbox.none { it.id == n.id } }).takeLast(INBOX_MAX)
 
     /**
      * Le novità per la notifica. La prima volta (dopo l'abbinamento) non c'è niente da dire: si ricorda solo cosa
@@ -184,11 +204,14 @@ object ClubServers {
     fun onlineNews(seen: Map<String, SeenBooking>?, online: List<OnlineBooking>, now: Long, officeCancelled: Set<String> = emptySet(), label: (OnlineBooking) -> String): OnlineNews {
         val current = online.filter { it.end > now }.associate { it.id to SeenBooking(label(it), it.start) }
         if (seen == null) return OnlineNews(emptyList(), emptyList(), current, null)
-        val added = current.filterKeys { it !in seen }.values.sortedBy { it.start }
+        val addedById = current.filterKeys { it !in seen }.entries.sortedBy { it.value.start }
         val ids = online.map { it.id }.toSet()
         // Quelle tolte dalla segreteria stessa non sono una notizia per lei.
-        val cancelled = seen.filterKeys { it !in ids && it !in officeCancelled }.values.filter { it.start > now }.sortedBy { it.start }
-        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start })
+        val cancelledById = seen.filterKeys { it !in ids && it !in officeCancelled }.entries.filter { it.value.start > now }.sortedBy { it.value.start }
+        val added = addedById.map { it.value }
+        val cancelled = cancelledById.map { it.value }
+        val notices = addedById.map { (id, b) -> OnlineNotice("a$id", false, b.label, b.start, now) } + cancelledById.map { (id, b) -> OnlineNotice("c$id", true, b.label, b.start, now) }
+        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start }, notices)
     }
 
     /**

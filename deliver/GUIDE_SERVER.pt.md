@@ -52,6 +52,8 @@ Ainda em **Quadras › Servidor do clube**:
 3. Toquem em **Enviar agora**: a agenda vai para o servidor.
 4. Para cada jogador: abram a ficha dele e toquem em **Convite para reservar online**. O jogador aponta a câmera para o QR e reserva pela página do clube (no iPhone: Compartilhar › Adicionar à Tela de Início, e ela abre como um app).
 
+Pela secretaria no PC é igual: **Sócios**, abram o sócio e cliquem em **Convite para reservar online**. Além do QR há **Copiar o link**, **Enviar pelo WhatsApp** e **Enviar por e-mail**: a mensagem abre já escrita e quem envia são vocês.
+
 As reservas dos jogadores chegam sozinhas à agenda da secretaria, marcadas **online**.
 
 ## 4. Modo B: pela internet com Tailscale

@@ -697,6 +697,7 @@ const APP_I18N = {
     srvButtonHint: "Facoltativo: i giocatori prenotano da soli",
     srvCancelHours: "Disdetta da soli fino a (ore prima)",
     srvConnected: (it) => `Collegato a ${it}`,
+    srvCopyLink: "Copia il link",
     srvCourts: "Campi prenotabili online",
     srvDaysAhead: "Fin quanti giorni avanti",
     srvErrAuth: "Il server non riconosce più questo telefono: scollega e abbina di nuovo.",
@@ -712,6 +713,7 @@ const APP_I18N = {
     srvInviteHow: "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online.",
     srvInviteUntil: (it) => `Vale una volta, fino al ${it}`,
     srvLastSync: (it) => `Planning inviato: ${it}`,
+    srvLinkCopied: "Link copiato",
     srvLinked: (it) => `Prenota online · ultimo accesso ${it}`,
     srvMaxFuture: "Prenotazioni per giocatore",
     srvMaxMinutes: "Durata massima",
@@ -727,6 +729,10 @@ const APP_I18N = {
     srvPublicUrlHint: "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo",
     srvRemind: "Promemoria ai giocatori (ore prima, 0 = no)",
     srvRevoke: "Togli l'accesso online",
+    srvRevoked: "Non prenota più online",
+    srvSendEmail: "Manda per email",
+    srvSendHint: "Si apre il messaggio già scritto: lo mandi tu.",
+    srvSendWhatsApp: "Manda con WhatsApp",
     srvSetupCode: "Codice di abbinamento",
     srvSetupHint: "Lo scrive il server all'avvio e nel file setup-code.txt. Vale una volta sola.",
     srvShare: "Condividi il link",
@@ -773,7 +779,16 @@ const APP_I18N = {
     tdLessons: (it) => `Lezioni oggi: ${it}`,
     tdMatches: (it) => `Partite dei tornei oggi: ${it}`,
     tdMembers: (it) => `Soci da sistemare: ${it}`,
+    tdNewsBooked: "Ha prenotato",
+    tdNewsCancelled: "Ha disdetto",
+    tdNewsHint: "Tocca un messaggio per aprire il planning di quel giorno.",
+    tdNewsRead: "Letta",
+    tdNewsReadAll: "Segna tutte come lette",
+    tdNewsTitle: (it) => it === 1 ? `1 novità dalle prenotazioni online` : `${it} novità dalle prenotazioni online`,
     tdNothing: "Niente in programma oggi.",
+    tdNotifyBlocked: "Il browser non mostra notifiche per questa pagina: le novità si vedono qui, accanto a Oggi e nel titolo della scheda.",
+    tdNotifyHint: "Una notifica del browser quando un giocatore prenota o disdice, anche con la pagina in un'altra scheda (lasciala aperta).",
+    tdNotifyOn: "Avvisami anche sul PC",
     tdOnline: (it) => `di cui online: ${it}`,
     tdPeople: (it) => it === 1 ? `da 1 persona` : `da ${it} persone`,
     tdTitle: "Oggi",
@@ -1176,6 +1191,7 @@ const APP_I18N = {
     srvButtonHint: "Optional: players book by themselves",
     srvCancelHours: "Self-cancel up to (hours before)",
     srvConnected: (it) => `Connected to ${it}`,
+    srvCopyLink: "Copy the link",
     srvCourts: "Courts bookable online",
     srvDaysAhead: "How many days ahead",
     srvErrAuth: "The server no longer knows this phone: disconnect and pair again.",
@@ -1191,6 +1207,7 @@ const APP_I18N = {
     srvInviteHow: "To invite a player: open their card and tap Invite to book online.",
     srvInviteUntil: (it) => `Works once, until ${it}`,
     srvLastSync: (it) => `Schedule sent: ${it}`,
+    srvLinkCopied: "Link copied",
     srvLinked: (it) => `Books online · last seen ${it}`,
     srvMaxFuture: "Bookings per player",
     srvMaxMinutes: "Longest booking",
@@ -1206,6 +1223,10 @@ const APP_I18N = {
     srvPublicUrlHint: "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club",
     srvRemind: "Reminder to players (hours before, 0 = none)",
     srvRevoke: "Remove online access",
+    srvRevoked: "No longer books online",
+    srvSendEmail: "Send by email",
+    srvSendHint: "The message opens already written: you send it.",
+    srvSendWhatsApp: "Send with WhatsApp",
     srvSetupCode: "Pairing code",
     srvSetupHint: "The server prints it at start-up and in the file setup-code.txt. It works only once.",
     srvShare: "Share the link",
@@ -1252,7 +1273,16 @@ const APP_I18N = {
     tdLessons: (it) => `Lessons today: ${it}`,
     tdMatches: (it) => `Tournament matches today: ${it}`,
     tdMembers: (it) => `Members to sort out: ${it}`,
+    tdNewsBooked: "Booked",
+    tdNewsCancelled: "Cancelled",
+    tdNewsHint: "Tap a message to open that day's schedule.",
+    tdNewsRead: "Read",
+    tdNewsReadAll: "Mark all as read",
+    tdNewsTitle: (it) => it === 1 ? `1 online booking update` : `${it} online booking updates`,
     tdNothing: "Nothing planned today.",
+    tdNotifyBlocked: "The browser shows no notifications for this page: updates appear here, next to Today and in the tab title.",
+    tdNotifyHint: "A browser notification when a player books or cancels, even with the page in another tab (leave it open).",
+    tdNotifyOn: "Alert me on the PC too",
     tdOnline: (it) => `of which online: ${it}`,
     tdPeople: (it) => it === 1 ? `from 1 person` : `from ${it} people`,
     tdTitle: "Today",
@@ -1655,6 +1685,7 @@ const APP_I18N = {
     srvButtonHint: "Facultatif : les joueurs réservent eux-mêmes",
     srvCancelHours: "Annulation seul jusqu'à (heures avant)",
     srvConnected: (it) => `Connecté à ${it}`,
+    srvCopyLink: "Copier le lien",
     srvCourts: "Terrains réservables en ligne",
     srvDaysAhead: "Combien de jours à l'avance",
     srvErrAuth: "Le serveur ne reconnaît plus ce téléphone : déconnectez et appairez à nouveau.",
@@ -1670,6 +1701,7 @@ const APP_I18N = {
     srvInviteHow: "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne.",
     srvInviteUntil: (it) => `Valable une fois, jusqu'au ${it}`,
     srvLastSync: (it) => `Planning envoyé : ${it}`,
+    srvLinkCopied: "Lien copié",
     srvLinked: (it) => `Réserve en ligne · vu le ${it}`,
     srvMaxFuture: "Réservations par joueur",
     srvMaxMinutes: "Durée maximale",
@@ -1685,6 +1717,10 @@ const APP_I18N = {
     srvPublicUrlHint: "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club",
     srvRemind: "Rappel aux joueurs (heures avant, 0 = aucun)",
     srvRevoke: "Retirer l'accès en ligne",
+    srvRevoked: "Ne réserve plus en ligne",
+    srvSendEmail: "Envoyer par e-mail",
+    srvSendHint: "Le message s'ouvre déjà écrit : c'est vous qui l'envoyez.",
+    srvSendWhatsApp: "Envoyer par WhatsApp",
     srvSetupCode: "Code d'appairage",
     srvSetupHint: "Le serveur l'affiche au démarrage et dans le fichier setup-code.txt. Il ne sert qu'une fois.",
     srvShare: "Partager le lien",
@@ -1731,7 +1767,16 @@ const APP_I18N = {
     tdLessons: (it) => `Leçons aujourd'hui : ${it}`,
     tdMatches: (it) => `Matchs de tournoi aujourd'hui : ${it}`,
     tdMembers: (it) => `Adhérents à régulariser : ${it}`,
+    tdNewsBooked: "A réservé",
+    tdNewsCancelled: "A annulé",
+    tdNewsHint: "Touchez un message pour ouvrir le planning de ce jour.",
+    tdNewsRead: "Lu",
+    tdNewsReadAll: "Tout marquer comme lu",
+    tdNewsTitle: (it) => it === 1 ? `1 nouveauté des réservations en ligne` : `${it} nouveautés des réservations en ligne`,
     tdNothing: "Rien de prévu aujourd'hui.",
+    tdNotifyBlocked: "Le navigateur n'affiche pas de notifications pour cette page : les nouveautés apparaissent ici, à côté d'Aujourd'hui et dans le titre de l'onglet.",
+    tdNotifyHint: "Une notification du navigateur quand un joueur réserve ou annule, même avec la page dans un autre onglet (laissez-la ouverte).",
+    tdNotifyOn: "Me prévenir aussi sur le PC",
     tdOnline: (it) => `dont en ligne : ${it}`,
     tdPeople: (it) => it === 1 ? `de 1 personne` : `de ${it} personnes`,
     tdTitle: "Aujourd'hui",
@@ -2134,6 +2179,7 @@ const APP_I18N = {
     srvButtonHint: "Optional: Spieler buchen selbst",
     srvCancelHours: "Selbst stornieren bis (Stunden vorher)",
     srvConnected: (it) => `Verbunden mit ${it}`,
+    srvCopyLink: "Link kopieren",
     srvCourts: "Online buchbare Plätze",
     srvDaysAhead: "Wie viele Tage im Voraus",
     srvErrAuth: "Der Server kennt dieses Handy nicht mehr: Trennen und neu koppeln.",
@@ -2149,6 +2195,7 @@ const APP_I18N = {
     srvInviteHow: "Um einen Spieler einzuladen: Öffne seine Karte und tippe auf Einladung zum Online-Buchen.",
     srvInviteUntil: (it) => `Gilt einmal, bis ${it}`,
     srvLastSync: (it) => `Plan gesendet: ${it}`,
+    srvLinkCopied: "Link kopiert",
     srvLinked: (it) => `Bucht online · zuletzt ${it}`,
     srvMaxFuture: "Buchungen pro Spieler",
     srvMaxMinutes: "Längste Buchung",
@@ -2164,6 +2211,10 @@ const APP_I18N = {
     srvPublicUrlHint: "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins",
     srvRemind: "Erinnerung an Spieler (Stunden vorher, 0 = keine)",
     srvRevoke: "Online-Zugang entfernen",
+    srvRevoked: "Bucht nicht mehr online",
+    srvSendEmail: "Per E-Mail senden",
+    srvSendHint: "Die Nachricht öffnet sich fertig geschrieben: Du schickst sie ab.",
+    srvSendWhatsApp: "Mit WhatsApp senden",
     srvSetupCode: "Kopplungscode",
     srvSetupHint: "Der Server zeigt ihn beim Start und in der Datei setup-code.txt. Er gilt nur einmal.",
     srvShare: "Link teilen",
@@ -2210,7 +2261,16 @@ const APP_I18N = {
     tdLessons: (it) => `Trainingsstunden heute: ${it}`,
     tdMatches: (it) => `Turnierspiele heute: ${it}`,
     tdMembers: (it) => `Mitglieder zu klären: ${it}`,
+    tdNewsBooked: "Gebucht",
+    tdNewsCancelled: "Storniert",
+    tdNewsHint: "Tippe auf eine Nachricht, um den Plan dieses Tages zu öffnen.",
+    tdNewsRead: "Gelesen",
+    tdNewsReadAll: "Alle als gelesen markieren",
+    tdNewsTitle: (it) => it === 1 ? `1 Neuigkeit aus den Online-Buchungen` : `${it} Neuigkeiten aus den Online-Buchungen`,
     tdNothing: "Heute nichts geplant.",
+    tdNotifyBlocked: "Der Browser zeigt für diese Seite keine Benachrichtigungen: Neuigkeiten erscheinen hier, neben Heute und im Titel des Tabs.",
+    tdNotifyHint: "Eine Browser-Benachrichtigung, wenn ein Spieler bucht oder storniert, auch wenn die Seite in einem anderen Tab ist (offen lassen).",
+    tdNotifyOn: "Auch am PC benachrichtigen",
     tdOnline: (it) => `davon online: ${it}`,
     tdPeople: (it) => it === 1 ? `von 1 Person` : `von ${it} Personen`,
     tdTitle: "Heute",
@@ -2613,6 +2673,7 @@ const APP_I18N = {
     srvButtonHint: "Opcional: los jugadores reservan solos",
     srvCancelHours: "Anular solo hasta (horas antes)",
     srvConnected: (it) => `Conectado a ${it}`,
+    srvCopyLink: "Copiar el enlace",
     srvCourts: "Pistas reservables en línea",
     srvDaysAhead: "Cuántos días antes",
     srvErrAuth: "El servidor ya no reconoce este teléfono: desconecta y empareja de nuevo.",
@@ -2628,6 +2689,7 @@ const APP_I18N = {
     srvInviteHow: "Para invitar a un jugador: abre su ficha y toca Invitación para reservar en línea.",
     srvInviteUntil: (it) => `Vale una vez, hasta el ${it}`,
     srvLastSync: (it) => `Planning enviado: ${it}`,
+    srvLinkCopied: "Enlace copiado",
     srvLinked: (it) => `Reserva en línea · último acceso ${it}`,
     srvMaxFuture: "Reservas por jugador",
     srvMaxMinutes: "Duración máxima",
@@ -2643,6 +2705,10 @@ const APP_I18N = {
     srvPublicUrlHint: "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club",
     srvRemind: "Recordatorio a los jugadores (horas antes, 0 = no)",
     srvRevoke: "Quitar el acceso en línea",
+    srvRevoked: "Ya no reserva en línea",
+    srvSendEmail: "Enviar por correo",
+    srvSendHint: "El mensaje se abre ya escrito: lo envías tú.",
+    srvSendWhatsApp: "Enviar por WhatsApp",
     srvSetupCode: "Código de emparejamiento",
     srvSetupHint: "El servidor lo muestra al arrancar y en el archivo setup-code.txt. Vale una sola vez.",
     srvShare: "Compartir el enlace",
@@ -2689,7 +2755,16 @@ const APP_I18N = {
     tdLessons: (it) => `Clases hoy: ${it}`,
     tdMatches: (it) => `Partidos de torneo hoy: ${it}`,
     tdMembers: (it) => `Socios por regularizar: ${it}`,
+    tdNewsBooked: "Ha reservado",
+    tdNewsCancelled: "Ha anulado",
+    tdNewsHint: "Toca un mensaje para abrir el planning de ese día.",
+    tdNewsRead: "Leída",
+    tdNewsReadAll: "Marcar todas como leídas",
+    tdNewsTitle: (it) => it === 1 ? `1 novedad de las reservas en línea` : `${it} novedades de las reservas en línea`,
     tdNothing: "Nada previsto hoy.",
+    tdNotifyBlocked: "El navegador no muestra notificaciones para esta página: las novedades aparecen aquí, junto a Hoy y en el título de la pestaña.",
+    tdNotifyHint: "Una notificación del navegador cuando un jugador reserva o anula, también con la página en otra pestaña (déjala abierta).",
+    tdNotifyOn: "Avisarme también en el PC",
     tdOnline: (it) => `de ellas en línea: ${it}`,
     tdPeople: (it) => it === 1 ? `de 1 persona` : `de ${it} personas`,
     tdTitle: "Hoy",
@@ -3092,6 +3167,7 @@ const APP_I18N = {
     srvButtonHint: "Opcional: os jogadores reservam sozinhos",
     srvCancelHours: "Cancelar sozinho até (horas antes)",
     srvConnected: (it) => `Ligado a ${it}`,
+    srvCopyLink: "Copiar o link",
     srvCourts: "Quadras reserváveis online",
     srvDaysAhead: "Quantos dias antes",
     srvErrAuth: "O servidor já não reconhece este telemóvel: desliga e emparelha de novo.",
@@ -3107,6 +3183,7 @@ const APP_I18N = {
     srvInviteHow: "Para convidar um jogador: abre a sua ficha e toca em Convite para reservar online.",
     srvInviteUntil: (it) => `Vale uma vez, até ${it}`,
     srvLastSync: (it) => `Agenda enviada: ${it}`,
+    srvLinkCopied: "Link copiado",
     srvLinked: (it) => `Reserva online · último acesso ${it}`,
     srvMaxFuture: "Reservas por jogador",
     srvMaxMinutes: "Duração máxima",
@@ -3122,6 +3199,10 @@ const APP_I18N = {
     srvPublicUrlHint: "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube",
     srvRemind: "Lembrete aos jogadores (horas antes, 0 = não)",
     srvRevoke: "Retirar o acesso online",
+    srvRevoked: "Já não reserva online",
+    srvSendEmail: "Enviar por e-mail",
+    srvSendHint: "A mensagem abre já escrita: quem envia é você.",
+    srvSendWhatsApp: "Enviar pelo WhatsApp",
     srvSetupCode: "Código de emparelhamento",
     srvSetupHint: "O servidor mostra-o ao arrancar e no ficheiro setup-code.txt. Só vale uma vez.",
     srvShare: "Partilhar a ligação",
@@ -3168,7 +3249,16 @@ const APP_I18N = {
     tdLessons: (it) => `Aulas hoje: ${it}`,
     tdMatches: (it) => `Jogos de torneio hoje: ${it}`,
     tdMembers: (it) => `Sócios por regularizar: ${it}`,
+    tdNewsBooked: "Reservou",
+    tdNewsCancelled: "Cancelou",
+    tdNewsHint: "Toque numa mensagem para abrir a agenda desse dia.",
+    tdNewsRead: "Lida",
+    tdNewsReadAll: "Marcar todas como lidas",
+    tdNewsTitle: (it) => it === 1 ? `1 novidade das reservas online` : `${it} novidades das reservas online`,
     tdNothing: "Nada previsto para hoje.",
+    tdNotifyBlocked: "O navegador não mostra notificações para esta página: as novidades aparecem aqui, ao lado de Hoje e no título da aba.",
+    tdNotifyHint: "Uma notificação do navegador quando um jogador reserva ou cancela, mesmo com a página noutra aba (deixe-a aberta).",
+    tdNotifyOn: "Avisar também no PC",
     tdOnline: (it) => `das quais online: ${it}`,
     tdPeople: (it) => it === 1 ? `de 1 pessoa` : `de ${it} pessoas`,
     tdTitle: "Hoje",
@@ -3258,6 +3348,8 @@ let token = read();
 let info = null;
 let T = pick((navigator.language || 'it').slice(0, 2));
 let view = 'today';
+/** Le novità online da leggere: il numero accanto a Oggi (vedi Novità e notifiche, in fondo). */
+let newsCount = 0;
 let people = [];
 
 function read() { try { return sessionStorage.getItem(KEY); } catch (_) { return null; } }
@@ -3462,7 +3554,8 @@ async function render() {
   put(root, h('div.shell',
     h('nav.side', { 'aria-label': T.title },
       h('div.brand', info.club || T.title, h('small', T.title)),
-      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } }, l)),
+      VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } },
+        l, v === 'today' ? h('span.badge', { id: 'newsbadge', hidden: !newsCount }, String(newsCount)) : null)),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
@@ -3504,7 +3597,22 @@ async function showToday() {
   if (on('TEAMS') && d.fixtures.length) cards.push(card(T.tdFixtures(d.fixtures.length), d.fixtures.slice(0, 3).map((l) => shortDay(l.date) + ' · ' + l.text), () => go('teams', () => { teamId = null; fixtureId = null; })));
   if (on('LADDER') && d.challenges) cards.push(card(T.tdChallenges(d.challenges), [d.late ? T.tdLate(d.late) : ''], null, d.late > 0));
   const label = new Date(info.today + 'T12:00:00').toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)),
+  // Le novità dal server delle prenotazioni: restano finché non si leggono (✓) o si aprono (si va al planning del giorno).
+  const read = async (id) => { await api('POST', '/today/news/read', { id }); };
+  newsShown(d.news || []);
+  // Le notifiche del browser: si chiedono con un tasto (i browser le vogliono da un clic).
+  const canNotify = 'Notification' in window && window.isSecureContext;
+  const notifyBox = on('SERVER') ? (canNotify && Notification.permission === 'default'
+    ? h('p.noprint', h('button', { type: 'button', onclick: async () => { try { await Notification.requestPermission(); } catch (_) { /* niente */ } showToday(); } }, T.tdNotifyOn), ' ', h('span.dim', T.tdNotifyHint))
+    : (!canNotify || Notification.permission === 'denied') ? h('p.dim.noprint', T.tdNotifyBlocked) : null) : null;
+  const news = d.news && d.news.length ? h('div.panel.news', h('div.pad',
+    h('div.head', h('h2', T.tdNewsTitle(d.news.length)), d.news.length > 1 ? h('button.noprint', { type: 'button', onclick: async () => { await read(null); showToday(); } }, T.tdNewsReadAll) : null),
+    h('p.dim', T.tdNewsHint),
+    h('ul.newslist', d.news.map((n) => h('li' + (n.cancelled ? '.gone' : '.new'),
+      h('button.newsopen', { type: 'button', onclick: async () => { await read(n.id); go('plan', () => { planDate = n.date; planView = 'day'; }); } },
+        h('b', n.cancelled ? T.tdNewsCancelled : T.tdNewsBooked), ' ', n.text),
+      h('button.newsread', { type: 'button', title: T.tdNewsRead, 'aria-label': T.tdNewsRead, onclick: async () => { await read(n.id); showToday(); } }, '✓')))))) : null;
+  put(main(), h('div.head', h('h1', T.tdTitle), h('span.dim', label)), notifyBox, news,
     h('div.cards', cards), cards.length === 1 && !d.bookings ? h('p.dim', T.tdNothing) : null);
 }
 
@@ -3603,6 +3711,14 @@ function editPerson(p) {
     field(T.medicalKind, med), field(T.medical, f.medicalUntil), field(T.privacy, f.privacy), h('label.check', photos, T.photos),
     h('h3', T.guardianTitle), field(T.guardian, f.guardian), field(T.guardianPhone, f.guardianPhone),
     field(T.note, f.note, 'full'));
+  // Col server delle prenotazioni: l'invito per prenotare online e, per chi prenota già, il modo di togliere l'accesso.
+  const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
+  const online = server ? [
+    h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+    p.online ? h('button.danger', { type: 'button', onclick: async () => {
+      try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
+    } }, T.srvRevoke) : null,
+  ] : null;
   dialog(p ? p.name : T.newMember, body, async () => {
     const out = { firstName: f.firstName.value, lastName: f.lastName.value, nickname: f.nickname.value, phone: f.phone.value, email: f.email.value, birth: f.birth.value || null, note: f.note.value,
       member: member.checked, since: f.since.value || null, number: f.number.value, fitpNumber: f.fitpNumber.value, fitpCard: card.value || null, fitpYear: f.fitpYear.value ? Number(f.fitpYear.value) : null,
@@ -3610,7 +3726,33 @@ function editPerson(p) {
     if (p) await api('PUT', '/people/' + encodeURIComponent(p.id), out); else await api('POST', '/people', out);
     toast(T.saved);
     await showPeople();
-  });
+  }, { left: online });
+}
+
+/**
+ * L'invito per prenotare online, dal PC: il QR da mostrare al giocatore, il codice e, per mandarlo, il link da copiare,
+ * WhatsApp (WhatsApp Web o l'app del PC) ed email col messaggio già scritto. Niente parte da solo: lo manda chi è in segreteria.
+ */
+async function inviteDialog(p) {
+  let inv;
+  try { inv = await api('POST', '/online/invite/' + encodeURIComponent(p.id)); } catch (e) { toast(errText(e)); return; }
+  const canvas = h('canvas.qr', { 'aria-label': T.srvInvite });
+  drawQr(canvas, inv.rows);
+  const text = T.srvShareText(inv.club || info.club || T.title, inv.link);
+  const copy = h('button', { type: 'button', onclick: async () => {
+    try { await navigator.clipboard.writeText(inv.link); toast(T.srvLinkCopied); }
+    catch (_) { link.select(); document.execCommand('copy'); toast(T.srvLinkCopied); }
+  } }, T.srvCopyLink);
+  const link = h('input', { value: inv.link, readonly: true, 'aria-label': T.srvInvite, onfocus: () => link.select() });
+  const wa = h('a.button', { href: 'https://wa.me/' + (inv.wa || '') + '?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, T.srvSendWhatsApp);
+  const mail = h('a.button', { href: 'mailto:' + encodeURI(inv.email || '') + '?subject=' + encodeURIComponent(T.srvInvite) + '&body=' + encodeURIComponent(text) }, T.srvSendEmail);
+  dialog(T.srvInvite + ' · ' + p.name, h('div.invite',
+    canvas,
+    h('p', h('b', T.srvInviteCode(inv.code))), h('p.dim', T.srvInviteUntil(dateText(inv.until))),
+    h('p.dim', T.srvInviteHint),
+    link,
+    h('div.tools', copy, wa, mail),
+    h('p.dim', T.srvSendHint)), null);
 }
 
 /** Un CSV di Excel in italiano è spesso in Windows-1252, non in UTF-8. */
@@ -5109,15 +5251,18 @@ function editCourse(c) {
 const LIVE_VIEWS = { today: () => showToday(), plan: () => showPlan(), money: () => showMoney(), online: () => showOnline() };
 let liveBusy = false;
 async function liveRefresh() {
-  if (liveBusy || !token || !info || document.hidden || !LIVE_VIEWS[view]) return;
+  if (liveBusy || !token || !info) return;
   const busy = () => document.querySelector('dialog[open]') || (document.activeElement && document.activeElement.matches('input, select, textarea'));
-  if (busy()) return;
   liveBusy = true;
   try {
     const server = !info.features || !info.features.length || info.features.includes('SERVER');
     // Senza server abbinato (o se non risponde) si ridisegna lo stesso: i dati del telefono possono essere cambiati.
-    if (server) { try { await api('POST', '/online/sync'); } catch (_) { /* al prossimo giro */ } }
-    if (busy() || !LIVE_VIEWS[view]) return;
+    if (server) {
+      try { await api('POST', '/online/sync'); } catch (_) { /* al prossimo giro */ }
+      // Le novità anche con la scheda nascosta: è lì che servono le notifiche.
+      try { newsArrived((await api('GET', '/today')).news || []); } catch (_) { /* al prossimo giro */ }
+    }
+    if (document.hidden || busy() || !LIVE_VIEWS[view]) return;
     const y = window.scrollY;
     await LIVE_VIEWS[view]();
     window.scrollTo(0, y);
@@ -5125,6 +5270,52 @@ async function liveRefresh() {
 }
 setInterval(liveRefresh, 60_000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) liveRefresh(); });
+
+// --- Novità e notifiche ---
+// Le novità dal server delle prenotazioni: il numero accanto a Oggi e nel titolo della scheda e, se il browser lo
+// permette, una notifica per ognuna di quelle nuove. Quelle già avvisate si ricordano nel browser (anche ricaricando).
+const NEWS_KEY = 'tsm-desk-news';
+function newsSeen() {
+  try { return new Set(JSON.parse(localStorage.getItem(NEWS_KEY) || '[]')); } catch (_) { return null; }
+}
+function newsRemember(ids) {
+  try { localStorage.setItem(NEWS_KEY, JSON.stringify(ids.slice(-200))); } catch (_) { /* niente: al più un avviso in più */ }
+}
+/** Il numero delle novità da leggere: accanto a Oggi e nel titolo della scheda. */
+function newsShown(list) {
+  newsCount = list.length;
+  const b = document.getElementById('newsbadge');
+  if (b) { b.textContent = String(newsCount); b.hidden = !newsCount; }
+  const base = T.title + (info && info.club ? ' · ' + info.club : '');
+  document.title = (newsCount ? '(' + newsCount + ') ' : '') + base;
+}
+/** Le novità appena lette dal telefono: si avvisano solo quelle mai viste in questo browser. */
+function newsArrived(list) {
+  const seen = newsSeen();
+  newsShown(list);
+  const ids = list.map((n) => n.id);
+  // La prima volta in questo browser (o senza memoria) niente avvisi per quelle già lì.
+  if (!seen) return;
+  const first = localStorage.getItem(NEWS_KEY) === null;
+  const fresh = first ? [] : list.filter((n) => !seen.has(n.id));
+  newsRemember([...seen, ...ids.filter((i) => !seen.has(i))]);
+  for (const n of fresh.slice(0, 5)) notifyNews(n);
+}
+function notifyNews(n) {
+  const text = (n.cancelled ? T.tdNewsCancelled : T.tdNewsBooked) + ': ' + n.text;
+  if (!document.hidden) toast(text);
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    const note = new Notification((info && info.club) || T.title, { body: text, tag: n.id });
+    // Toccata la notifica: la pagina torna davanti sul planning di quel giorno e la novità è letta.
+    note.onclick = async () => {
+      window.focus();
+      note.close();
+      try { await api('POST', '/today/news/read', { id: n.id }); } catch (_) { /* resta da leggere */ }
+      go('plan', () => { planDate = n.date; planView = 'day'; });
+    };
+  } catch (_) { /* il browser non la mostra: resta il numero */ }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/desk/i18n.js
@@ -7277,6 +7468,26 @@ tr.pass td:first-child { font-weight: 700; }
 .seat { text-align: left; white-space: normal; }
 .seat.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
 .tag.wrap { white-space: normal; border-radius: 8px; }
+
+/* Oggi: le novità dalle prenotazioni online, da leggere. */
+.news { margin-bottom: 16px; }
+.newslist { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.newslist li { display: flex; align-items: center; gap: 6px; border-radius: 10px; background: var(--hover); }
+.newslist .newsopen { flex: 1; text-align: left; background: none; border: 0; padding: 8px 10px; cursor: pointer; color: inherit; font: inherit; }
+.newslist .new b { color: var(--ok); }
+.newslist .gone b { color: var(--warn); }
+.newslist .newsread { border: 0; background: none; padding: 8px 12px; cursor: pointer; color: inherit; font-size: 1.1em; }
+
+/* Il numero delle novità accanto a Oggi, nel menu. */
+.badge { display: inline-block; min-width: 1.5em; margin-left: 8px; padding: 0 6px; border-radius: 999px; background: var(--ball); color: #17301f; font-size: .8em; font-weight: 700; text-align: center; }
+.badge[hidden] { display: none; }
+
+/* L'invito per prenotare online: il QR in mezzo, poi codice, link e i modi per mandarlo. */
+.invite { display: grid; gap: 8px; justify-items: center; text-align: center; max-width: 420px; }
+.invite input { width: 100%; }
+.invite .tools { justify-content: center; }
+a.button { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; color: inherit; text-decoration: none; background: var(--panel); }
+a.button:hover { background: var(--hover); }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -13762,7 +13973,12 @@ class MatchController(
                 listOf(b.name, b.court, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
             }
             if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
-            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen) }
+            saveServer {
+                it.copy(
+                    lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen,
+                    inbox = com.tennis.scoremanager.data.ClubServers.addNotices(it.inbox, news.notices),
+                )
+            }
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
             saveServer { it.copy(error = e.code) }
@@ -13771,6 +13987,15 @@ class MatchController(
     }
 
     fun setServerAlerts(on: Boolean) = saveServer { it.copy(alerts = on) }
+
+    /** Un messaggio di Oggi letto (null = tutti): sparisce. */
+    fun readOnlineNotice(id: String?) = saveServer { conf -> conf.copy(inbox = if (id == null) emptyList() else conf.inbox.filter { it.id != id }) }
+
+    /** Aperto un messaggio di Oggi: sparisce e si va al planning di quel giorno. */
+    fun openOnlineNotice(n: com.tennis.scoremanager.data.OnlineNotice) {
+        readOnlineNotice(n.id)
+        openPlanAt(com.tennis.scoremanager.data.CourtPlans.dayStart(n.start))
+    }
 
     /** Il giorno su cui aprire il planning (dalla notifica di una prenotazione online). */
     val planDayRequest = MutableStateFlow<Long?>(null)
@@ -18763,6 +18988,13 @@ import java.net.URL
 @Serializable
 data class SeenBooking(val label: String, val start: Long)
 
+/**
+ * Un messaggio per Oggi: un giocatore ha prenotato ([cancelled] false) o disdetto online. [label] è "Mario · Campo 2 ·
+ * sab 8 nov 18:00", [start] l'inizio della prenotazione, [at] quando la segreteria l'ha saputo. Resta finché non si legge.
+ */
+@Serializable
+data class OnlineNotice(val id: String, val cancelled: Boolean, val label: String, val start: Long, val at: Long)
+
 @Serializable
 data class ClubServerConf(
     val url: String = "",
@@ -18781,6 +19013,8 @@ data class ClubServerConf(
     val alerts: Boolean = true,
     /** Le prenotazioni online già viste, per notificare solo le novità; null = mai guardato. */
     val seen: Map<String, SeenBooking>? = null,
+    /** I messaggi di Oggi non ancora letti: prenotazioni e disdette online (al massimo [INBOX_MAX], i più nuovi). */
+    val inbox: List<OnlineNotice> = emptyList(),
 ) {
     val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
 
@@ -18918,7 +19152,18 @@ object ClubServers {
     }
 
     /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */
-    data class OnlineNews(val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?)
+    data class OnlineNews(
+        val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?,
+        /** Le stesse novità come messaggi per Oggi. */
+        val notices: List<OnlineNotice> = emptyList(),
+    )
+
+    /** Quanti messaggi tiene Oggi al massimo: oltre, se ne vanno i più vecchi. */
+    const val INBOX_MAX = 50
+
+    /** I messaggi nuovi in fondo a quelli da leggere, senza doppioni, al massimo [INBOX_MAX]. */
+    fun addNotices(inbox: List<OnlineNotice>, new: List<OnlineNotice>): List<OnlineNotice> =
+        (inbox + new.filter { n -> inbox.none { it.id == n.id } }).takeLast(INBOX_MAX)
 
     /**
      * Le novità per la notifica. La prima volta (dopo l'abbinamento) non c'è niente da dire: si ricorda solo cosa
@@ -18929,11 +19174,14 @@ object ClubServers {
     fun onlineNews(seen: Map<String, SeenBooking>?, online: List<OnlineBooking>, now: Long, officeCancelled: Set<String> = emptySet(), label: (OnlineBooking) -> String): OnlineNews {
         val current = online.filter { it.end > now }.associate { it.id to SeenBooking(label(it), it.start) }
         if (seen == null) return OnlineNews(emptyList(), emptyList(), current, null)
-        val added = current.filterKeys { it !in seen }.values.sortedBy { it.start }
+        val addedById = current.filterKeys { it !in seen }.entries.sortedBy { it.value.start }
         val ids = online.map { it.id }.toSet()
         // Quelle tolte dalla segreteria stessa non sono una notizia per lei.
-        val cancelled = seen.filterKeys { it !in ids && it !in officeCancelled }.values.filter { it.start > now }.sortedBy { it.start }
-        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start })
+        val cancelledById = seen.filterKeys { it !in ids && it !in officeCancelled }.entries.filter { it.value.start > now }.sortedBy { it.value.start }
+        val added = addedById.map { it.value }
+        val cancelled = cancelledById.map { it.value }
+        val notices = addedById.map { (id, b) -> OnlineNotice("a$id", false, b.label, b.start, now) } + cancelledById.map { (id, b) -> OnlineNotice("c$id", true, b.label, b.start, now) }
+        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start }, notices)
     }
 
     /**
@@ -25911,6 +26159,8 @@ import com.tennis.scoremanager.data.OfficeBackupFile
 import com.tennis.scoremanager.data.OfficeSnapshot
 import com.tennis.scoremanager.data.OfficeSummary
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.data.ClubServers
 import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
@@ -26025,8 +26275,14 @@ interface DeskData {
     fun serverState(): SrvAdmin
     /** Manda subito il planning e prende le prenotazioni nuove, fuori da [tx]; null = fatto, se no il codice dell'errore. */
     fun serverSync(): String?
+    /** Un messaggio di Oggi letto (null = tutti): sparisce anche dal telefono. */
+    fun readOnlineNotice(id: String?)
     /** La segreteria toglie un'attesa ([kind] "wait") o un annuncio ("seek") dal server, fuori da [tx]. */
     fun serverRemove(kind: String, id: String)
+    /** L'invito per prenotare online per il giocatore [player], fuori da [tx] (è rete). */
+    fun serverInvite(player: PlayerProfile): SrvInvite
+    /** Il giocatore non prenota più online, fuori da [tx]; null = fatto, se no il codice dell'errore. */
+    fun serverRevoke(playerId: String): String?
     fun paymentsCsv(year: Int): ByteArray?
     /** Backup della segreteria: il file di adesso, col suo nome. */
     fun officeBackup(): Pair<String, ByteArray>
@@ -26063,7 +26319,12 @@ interface DeskData {
     val bookings: Int, val online: Int, val next: List<DeskTodayLine>, val collectCents: Int, val collectPeople: Int,
     val members: Int, val blocking: Int, val memberNames: List<String>, val matches: List<DeskTodayLine>, val lessons: List<DeskTodayLine>,
     val fixtures: List<DeskTodayLine>, val challenges: Int, val late: Int,
+    /** Le novità dal server delle prenotazioni da leggere, le più nuove prima. */
+    val news: List<DeskNews> = emptyList(),
 )
+/** Un messaggio di Oggi: un giocatore ha prenotato o disdetto online ([date] il giorno della prenotazione, per il planning). */
+@Serializable data class DeskNews(val id: String, val cancelled: Boolean, val text: String, val date: String)
+@Serializable data class DeskNewsRead(val id: String? = null)
 
 @Serializable data class DeskPerson(
     val id: String = "", val name: String = "", val firstName: String = "", val lastName: String = "", val nickname: String = "",
@@ -26073,7 +26334,14 @@ interface DeskData {
     val guardian: String = "", val guardianPhone: String = "",
     /** Solo in uscita: cosa manca e quanto deve. */
     val issues: List<String> = emptyList(), val owedCents: Int = 0,
+    /** Solo in uscita: prenota già online (ha accettato un invito). */
+    val online: Boolean = false,
 )
+/**
+ * L'invito per prenotare online, per mostrarlo sul PC: il link e il suo QR ([rows]), il codice, fino a quando vale
+ * ([until]) e, per mandarlo, il numero per WhatsApp ([wa], solo cifre col prefisso) e l'email del giocatore.
+ */
+@Serializable data class DeskInvite(val link: String, val code: String, val until: String, val rows: List<String>, val club: String, val wa: String?, val email: String)
 
 @Serializable data class DeskCsvIn(val text: String)
 @Serializable data class DeskCsvRow(val line: Int, val firstName: String, val lastName: String, val phone: String, val email: String, val birth: String?, val fitp: String, val update: Boolean, val error: String?)
@@ -26306,6 +26574,7 @@ class DeskApi(
                 m == "GET" && p == listOf("month") -> month(r.query["date"])
                 m == "GET" && p == listOf("quote") -> quote(r.query)
                 m == "GET" && p == listOf("today") -> today()
+                m == "POST" && p == listOf("today", "news", "read") -> { data.readOnlineNotice(read(DeskNewsRead.serializer(), r).id); today() }
                 m == "GET" && p.size == 5 && p[0] == "charges" && p[2] == "payments" && p[4] == "receipt" ->
                     Resp(200, data.receiptPdf(charge(p[1]).id, p[3]) ?: throw Fail(404, "NOT_FOUND"), "application/pdf")
                 m == "POST" && p == listOf("bookings") -> book(read(DeskBookingIn.serializer(), r), null)
@@ -26407,6 +26676,7 @@ class DeskApi(
             m != null, day(m?.since), m?.number.orEmpty(), m?.fitpNumber.orEmpty(), m?.fitpCard, m?.fitpYear, m?.ranking.orEmpty(), m?.medical, day(m?.medicalUntil), day(m?.privacyAt),
             m?.photosOk == true, m?.guardian.orEmpty(), m?.guardianPhone.orEmpty(),
             Members.issues(p, now).map { it.name }, Fees.owed(book, p),
+            data.serverConf().players.any { it.id == p.id },
         )
     }
 
@@ -26723,6 +26993,22 @@ class DeskApi(
             m == "GET" && p == listOf("online") -> onlineOut()
             m == "POST" && p == listOf("online", "sync") -> {
                 data.serverSync()?.let { throw Fail(502, it) }
+                onlineOut()
+            }
+            // L'invito di un giocatore, come dalla sua scheda sul telefono.
+            m == "POST" && p.size == 3 && p[1] == "invite" -> {
+                val who = data.tx { Players.byId(data.players(), p[2]) } ?: throw Fail(404, "NOT_FOUND")
+                val inv = try { data.serverInvite(who) } catch (e: Exception) {
+                    throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET")
+                }
+                val link = ClubServers.inviteLink(conf, inv.code)
+                ok(DeskInvite.serializer(), DeskInvite(
+                    link, inv.code.chunked(5).joinToString("-"), day(inv.expires).orEmpty(), qr(link), conf.club,
+                    com.tennis.scoremanager.data.Notices.waNumber(who.phone), who.email,
+                ))
+            }
+            m == "DELETE" && p.size == 3 && p[1] == "players" -> {
+                data.serverRevoke(p[2])?.let { throw Fail(502, it) }
                 onlineOut()
             }
             m == "DELETE" && p.size == 3 && p[1] in setOf("waits", "seeks") -> {
@@ -27070,6 +27356,7 @@ class DeskApi(
         return ok(DeskToday.serializer(), DeskToday(
             bookings, online, next, cents, owing, issues.size, issues.count { (_, l) -> l.any(Members::blocking) }, issues.take(3).map { it.first.name },
             matches, lessons, fixtures, open.size, open.count { it.deadline < now },
+            if (ClubFeature.SERVER in f) data.serverConf().inbox.asReversed().map { DeskNews(it.id, it.cancelled, it.label, day(it.start).orEmpty()) } else emptyList(),
         ))
     }
 
@@ -27653,6 +27940,7 @@ import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.PayType
 import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.SrvInvite
 import com.tennis.scoremanager.service.DeskService
 import com.tennis.scoremanager.tv.TvServer
 import kotlinx.coroutines.CoroutineScope
@@ -27718,6 +28006,9 @@ class DeskBridge(private val c: MatchController) : DeskData {
     // Rete: gira sul filo della richiesta, mai su quello principale.
     override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
     override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
+    override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
+    override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
+    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
@@ -37594,6 +37885,21 @@ interface Strings {
     val noteAdded: String
     val receiveWho: (String) -> String
     val receiving: (String) -> String
+    val tdNewsBooked: String
+    val tdNewsCancelled: String
+    val tdNewsReadAll: String
+    val tdNewsRead: String
+    val tdNewsHint: String
+    val tdNewsTitle: (Int) -> String
+    val tdNotifyOn: String
+    val tdNotifyHint: String
+    val tdNotifyBlocked: String
+    val srvCopyLink: String
+    val srvLinkCopied: String
+    val srvSendWhatsApp: String
+    val srvSendEmail: String
+    val srvSendHint: String
+    val srvRevoked: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -39842,6 +40148,21 @@ object ItStrings : Strings {
     override val noteAdded = "Nota aggiunta: la trovi nel riepilogo"
     override val receiveWho: (String) -> String = { "Chi risponde da destra (parità) in $it?" }
     override val receiving: (String) -> String = { "Risponde $it" }
+    override val tdNewsBooked = "Ha prenotato"
+    override val tdNewsCancelled = "Ha disdetto"
+    override val tdNewsReadAll = "Segna tutte come lette"
+    override val tdNewsRead = "Letta"
+    override val tdNewsHint = "Tocca un messaggio per aprire il planning di quel giorno."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 novità dalle prenotazioni online" else "$it novità dalle prenotazioni online" }
+    override val tdNotifyOn = "Avvisami anche sul PC"
+    override val tdNotifyHint = "Una notifica del browser quando un giocatore prenota o disdice, anche con la pagina in un'altra scheda (lasciala aperta)."
+    override val tdNotifyBlocked = "Il browser non mostra notifiche per questa pagina: le novità si vedono qui, accanto a Oggi e nel titolo della scheda."
+    override val srvCopyLink = "Copia il link"
+    override val srvLinkCopied = "Link copiato"
+    override val srvSendWhatsApp = "Manda con WhatsApp"
+    override val srvSendEmail = "Manda per email"
+    override val srvSendHint = "Si apre il messaggio già scritto: lo mandi tu."
+    override val srvRevoked = "Non prenota più online"
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -42053,6 +42374,21 @@ object EnStrings : Strings {
     override val noteAdded = "Note added: you will find it in the summary"
     override val receiveWho: (String) -> String = { "Who receives on the right (deuce) side in $it?" }
     override val receiving: (String) -> String = { "Receiving: $it" }
+    override val tdNewsBooked = "Booked"
+    override val tdNewsCancelled = "Cancelled"
+    override val tdNewsReadAll = "Mark all as read"
+    override val tdNewsRead = "Read"
+    override val tdNewsHint = "Tap a message to open that day's schedule."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 online booking update" else "$it online booking updates" }
+    override val tdNotifyOn = "Alert me on the PC too"
+    override val tdNotifyHint = "A browser notification when a player books or cancels, even with the page in another tab (leave it open)."
+    override val tdNotifyBlocked = "The browser shows no notifications for this page: updates appear here, next to Today and in the tab title."
+    override val srvCopyLink = "Copy the link"
+    override val srvLinkCopied = "Link copied"
+    override val srvSendWhatsApp = "Send with WhatsApp"
+    override val srvSendEmail = "Send by email"
+    override val srvSendHint = "The message opens already written: you send it."
+    override val srvRevoked = "No longer books online"
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -44287,6 +44623,21 @@ object DeStrings : Strings {
     override val noteAdded = "Notiz hinzugefügt: Sie steht in der Zusammenfassung"
     override val receiveWho: (String) -> String = { "Wer returniert rechts (Einstand) bei $it?" }
     override val receiving: (String) -> String = { "Return: $it" }
+    override val tdNewsBooked = "Gebucht"
+    override val tdNewsCancelled = "Storniert"
+    override val tdNewsReadAll = "Alle als gelesen markieren"
+    override val tdNewsRead = "Gelesen"
+    override val tdNewsHint = "Tippe auf eine Nachricht, um den Plan dieses Tages zu öffnen."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 Neuigkeit aus den Online-Buchungen" else "$it Neuigkeiten aus den Online-Buchungen" }
+    override val tdNotifyOn = "Auch am PC benachrichtigen"
+    override val tdNotifyHint = "Eine Browser-Benachrichtigung, wenn ein Spieler bucht oder storniert, auch wenn die Seite in einem anderen Tab ist (offen lassen)."
+    override val tdNotifyBlocked = "Der Browser zeigt für diese Seite keine Benachrichtigungen: Neuigkeiten erscheinen hier, neben Heute und im Titel des Tabs."
+    override val srvCopyLink = "Link kopieren"
+    override val srvLinkCopied = "Link kopiert"
+    override val srvSendWhatsApp = "Mit WhatsApp senden"
+    override val srvSendEmail = "Per E-Mail senden"
+    override val srvSendHint = "Die Nachricht öffnet sich fertig geschrieben: Du schickst sie ab."
+    override val srvRevoked = "Bucht nicht mehr online"
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -46514,6 +46865,21 @@ object EsStrings : Strings {
     override val noteAdded = "Nota añadida: está en el resumen"
     override val receiveWho: (String) -> String = { "¿Quién resta a la derecha (iguales) en $it?" }
     override val receiving: (String) -> String = { "Resta $it" }
+    override val tdNewsBooked = "Ha reservado"
+    override val tdNewsCancelled = "Ha anulado"
+    override val tdNewsReadAll = "Marcar todas como leídas"
+    override val tdNewsRead = "Leída"
+    override val tdNewsHint = "Toca un mensaje para abrir el planning de ese día."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 novedad de las reservas en línea" else "$it novedades de las reservas en línea" }
+    override val tdNotifyOn = "Avisarme también en el PC"
+    override val tdNotifyHint = "Una notificación del navegador cuando un jugador reserva o anula, también con la página en otra pestaña (déjala abierta)."
+    override val tdNotifyBlocked = "El navegador no muestra notificaciones para esta página: las novedades aparecen aquí, junto a Hoy y en el título de la pestaña."
+    override val srvCopyLink = "Copiar el enlace"
+    override val srvLinkCopied = "Enlace copiado"
+    override val srvSendWhatsApp = "Enviar por WhatsApp"
+    override val srvSendEmail = "Enviar por correo"
+    override val srvSendHint = "El mensaje se abre ya escrito: lo envías tú."
+    override val srvRevoked = "Ya no reserva en línea"
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -48743,6 +49109,21 @@ object FrStrings : Strings {
     override val noteAdded = "Note ajoutée : elle est dans le résumé"
     override val receiveWho: (String) -> String = { "Qui retourne à droite (égalité) dans $it ?" }
     override val receiving: (String) -> String = { "Au retour : $it" }
+    override val tdNewsBooked = "A réservé"
+    override val tdNewsCancelled = "A annulé"
+    override val tdNewsReadAll = "Tout marquer comme lu"
+    override val tdNewsRead = "Lu"
+    override val tdNewsHint = "Touchez un message pour ouvrir le planning de ce jour."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 nouveauté des réservations en ligne" else "$it nouveautés des réservations en ligne" }
+    override val tdNotifyOn = "Me prévenir aussi sur le PC"
+    override val tdNotifyHint = "Une notification du navigateur quand un joueur réserve ou annule, même avec la page dans un autre onglet (laissez-la ouverte)."
+    override val tdNotifyBlocked = "Le navigateur n'affiche pas de notifications pour cette page : les nouveautés apparaissent ici, à côté d'Aujourd'hui et dans le titre de l'onglet."
+    override val srvCopyLink = "Copier le lien"
+    override val srvLinkCopied = "Lien copié"
+    override val srvSendWhatsApp = "Envoyer par WhatsApp"
+    override val srvSendEmail = "Envoyer par e-mail"
+    override val srvSendHint = "Le message s'ouvre déjà écrit : c'est vous qui l'envoyez."
+    override val srvRevoked = "Ne réserve plus en ligne"
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -50973,6 +51354,21 @@ object PtStrings : Strings {
     override val noteAdded = "Nota adicionada: está no resumo"
     override val receiveWho: (String) -> String = { "Quem recebe à direita (iguais) em $it?" }
     override val receiving: (String) -> String = { "Recebe $it" }
+    override val tdNewsBooked = "Reservou"
+    override val tdNewsCancelled = "Cancelou"
+    override val tdNewsReadAll = "Marcar todas como lidas"
+    override val tdNewsRead = "Lida"
+    override val tdNewsHint = "Toque numa mensagem para abrir a agenda desse dia."
+    override val tdNewsTitle: (Int) -> String = { if (it == 1) "1 novidade das reservas online" else "$it novidades das reservas online" }
+    override val tdNotifyOn = "Avisar também no PC"
+    override val tdNotifyHint = "Uma notificação do navegador quando um jogador reserva ou cancela, mesmo com a página noutra aba (deixe-a aberta)."
+    override val tdNotifyBlocked = "O navegador não mostra notificações para esta página: as novidades aparecem aqui, ao lado de Hoje e no título da aba."
+    override val srvCopyLink = "Copiar o link"
+    override val srvLinkCopied = "Link copiado"
+    override val srvSendWhatsApp = "Enviar pelo WhatsApp"
+    override val srvSendEmail = "Enviar por e-mail"
+    override val srvSendHint = "A mensagem abre já escrita: quem envia é você."
+    override val srvRevoked = "Já não reserva online"
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -64203,6 +64599,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.EventAvailable
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Courses
@@ -64254,6 +64656,10 @@ fun TodayTab(c: MatchController) {
 
     com.tennis.scoremanager.ui.ClubFeaturesHint(c)
     Text(com.tennis.scoremanager.data.Notices.day(now, lang), color = TsmColors.TextDim, fontSize = 13.sp)
+
+    // Le novità dal server delle prenotazioni: restano finché non si leggono (✓) o si aprono.
+    val server by c.clubServer.collectAsState()
+    if (ClubFeature.SERVER in f && server.inbox.isNotEmpty()) OnlineNews(c, server.inbox.asReversed())
 
     if (ClubFeature.PLANNING in f) {
         val occ = CourtPlans.occupied(plan, tournaments, today).filter { it.block == null }
@@ -64317,6 +64723,36 @@ fun TodayTab(c: MatchController) {
     }
     if (shown == 0) Text(s.tdNothing, color = TsmColors.TextDim)
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
+}
+
+/** Le prenotazioni e le disdette online da leggere, le più nuove in alto: toccandone una si apre il planning di quel giorno. */
+@Composable
+private fun OnlineNews(c: MatchController, news: List<com.tennis.scoremanager.data.OnlineNotice>) {
+    val s = LocalStrings.current
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.NotificationsActive, null, tint = TsmColors.Ball)
+            Text(s.tdNewsTitle(news.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+        }
+        Text(s.tdNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        for (n in news.take(8)) {
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.openOnlineNotice(n) }.padding(start = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(if (n.cancelled) Icons.Filled.EventBusy else Icons.Filled.EventAvailable, null, tint = if (n.cancelled) TsmColors.Orange else TsmColors.Ok)
+                Column(Modifier.weight(1f).padding(horizontal = 10.dp, vertical = 8.dp)) {
+                    Text(if (n.cancelled) s.tdNewsCancelled else s.tdNewsBooked, color = if (n.cancelled) TsmColors.Orange else TsmColors.Ok, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(n.label, color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+                IconButton(onClick = { c.readOnlineNotice(n.id) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+            }
+        }
+        if (news.size > 1) TextButton(onClick = { c.readOnlineNotice(null) }) { Text(s.tdNewsReadAll) }
+    }
 }
 TSM_EOF
 
@@ -83060,6 +83496,23 @@ class ClubServersTest {
         assertTrue(gone.added.isEmpty())
     }
 
+    @Test fun leNovitaDiventanoMessaggiDaLeggere() {
+        fun ob(id: String, start: Long) = OnlineBooking(id, "Campo 1", start, 60, "p1", "Mario")
+        val label = { b: OnlineBooking -> "${b.name} ${b.id}" }
+        val first = ClubServers.onlineNews(null, listOf(ob("a", now + h)), now, label = label)
+        assertTrue("la prima volta niente messaggi", first.notices.isEmpty())
+        val next = ClubServers.onlineNews(first.seen, listOf(ob("c", now + 5 * h)), now, label = label)
+        assertEquals(listOf("ac" to false, "ca" to true), next.notices.map { it.id to it.cancelled })
+        assertEquals("Mario c", next.notices.first().label)
+        // Nella casella: niente doppioni e al massimo INBOX_MAX, i più nuovi.
+        val inbox = ClubServers.addNotices(next.notices, next.notices)
+        assertEquals(2, inbox.size)
+        val many = (1..60).map { OnlineNotice("x$it", false, "n$it", now, now) }
+        val capped = ClubServers.addNotices(inbox, many)
+        assertEquals(ClubServers.INBOX_MAX, capped.size)
+        assertEquals("x60", capped.last().id)
+    }
+
     @Test fun playerRemindersAndRemovals() {
         fun mb(id: String, start: Long) = SrvMyBooking(id, "Campo 1", start, 60, 0, false, false, true)
         val label = { b: SrvMyBooking -> b.id }
@@ -86152,6 +86605,46 @@ class DeskTest {
         assertEquals(404, req("GET", "/charges/${c.id}/payments/nessuno/receipt", token = k).first)
     }
 
+    @Test fun invitoERevocaDalPc() {
+        val k = login()
+        data.on = data.on + com.tennis.scoremanager.ClubFeature.SERVER
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","phone":"333 1234567","email":"mario@example.com"}""", k)
+        val id = data.players().single().id
+        // Senza server abbinato non si invita.
+        assertEquals(409, req("POST", "/online/invite/$id", "{}", k).first)
+        data.server = data.server.copy(url = "http://192.168.1.50:8080", token = "t", publicUrl = "https://tc.example.org", club = "TC Prova")
+        val (st, out) = req("POST", "/online/invite/$id", "{}", k)
+        assertEquals(out, 200, st)
+        assertTrue(out, "ABCDE-FGHJK" in out && "TC Prova" in out && "mario@example.com" in out && "\"rows\"" in out)
+        assertTrue("il numero per WhatsApp col prefisso", "393331234567" in out)
+        assertEquals(listOf(id), data.invited)
+        assertEquals(404, req("POST", "/online/invite/nessuno", "{}", k).first)
+        data.remoteDown = true
+        assertEquals(502, req("POST", "/online/invite/$id", "{}", k).first)
+        data.remoteDown = false
+        // Chi prenota già online lo si vede nella scheda e gli si toglie l'accesso.
+        data.server = data.server.copy(players = listOf(com.tennis.scoremanager.data.SrvPlayer(id, "Mario Rossi", 0, 0, 1)))
+        assertTrue(req("GET", "/people", token = k).second.contains("\"online\":true"))
+        assertEquals(200, req("DELETE", "/online/players/$id", token = k).first)
+        assertTrue(data.server.players.isEmpty())
+    }
+
+    @Test fun oggiMostraLeNovitaOnlineFinoAllaLettura() {
+        val k = login()
+        data.on = data.on + com.tennis.scoremanager.ClubFeature.SERVER
+        data.server = data.server.copy(inbox = listOf(
+            com.tennis.scoremanager.data.OnlineNotice("aX", false, "Mario · Campo 1", data.time, data.time),
+            com.tennis.scoremanager.data.OnlineNotice("cY", true, "Luca · Campo 2", data.time, data.time),
+        ))
+        val out = req("GET", "/today", token = k).second
+        assertTrue(out, "Mario · Campo 1" in out && "Luca · Campo 2" in out)
+        assertTrue("le più nuove prima", out.indexOf("Luca") < out.indexOf("Mario"))
+        val after = req("POST", "/today/news/read", """{"id":"cY"}""", k).second
+        assertTrue(after, "Luca" !in after && "Mario" in after)
+        req("POST", "/today/news/read", "{}", k)
+        assertTrue(data.server.inbox.isEmpty())
+    }
+
     @Test fun settimanaEMese() {
         val k = login()
         // 2026-11-11 è un mercoledì: la settimana parte da lunedì 9.
@@ -86526,6 +87019,7 @@ import com.tennis.scoremanager.data.CourtSettings
 import com.tennis.scoremanager.data.Fees
 import com.tennis.scoremanager.data.PayType
 import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.SrvInvite
 
 /** I dati del circolo in memoria, al posto dell'app. */
 class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
@@ -86597,6 +87091,10 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun serverState(): SrvAdmin = if (remoteDown) throw ClubServerError("NET") else remote
     override fun serverSync(): String? = if (remoteDown) "NET" else { server = server.copy(lastSync = time); null }
     override fun serverRemove(kind: String, id: String) { removed += "$kind:$id" }
+    var invited = mutableListOf<String>()
+    override fun serverInvite(player: PlayerProfile): SrvInvite { if (remoteDown) throw ClubServerError("NET"); invited += player.id; return SrvInvite("ABCDEFGHJK", time + 7 * 86_400_000L) }
+    override fun serverRevoke(playerId: String): String? = if (remoteDown) "NET" else { server = server.copy(players = server.players.filter { it.id != playerId }); null }
+    override fun readOnlineNotice(id: String?) { server = server.copy(inbox = if (id == null) emptyList() else server.inbox.filter { it.id != id }) }
     var auto = false
     val copies = linkedMapOf<String, ByteArray>()
     val remoteCopies = linkedMapOf<String, ByteArray>()

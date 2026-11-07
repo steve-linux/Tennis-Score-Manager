@@ -31,6 +31,7 @@ import com.tennis.scoremanager.data.CourtBooking
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.PayType
 import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.SrvInvite
 import com.tennis.scoremanager.service.DeskService
 import com.tennis.scoremanager.tv.TvServer
 import kotlinx.coroutines.CoroutineScope
@@ -96,6 +97,9 @@ class DeskBridge(private val c: MatchController) : DeskData {
     // Rete: gira sul filo della richiesta, mai su quello principale.
     override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
     override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
+    override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
+    override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
+    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }

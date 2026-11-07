@@ -186,3 +186,23 @@ tr.pass td:first-child { font-weight: 700; }
 .seat { text-align: left; white-space: normal; }
 .seat.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
 .tag.wrap { white-space: normal; border-radius: 8px; }
+
+/* Oggi: le novità dalle prenotazioni online, da leggere. */
+.news { margin-bottom: 16px; }
+.newslist { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.newslist li { display: flex; align-items: center; gap: 6px; border-radius: 10px; background: var(--hover); }
+.newslist .newsopen { flex: 1; text-align: left; background: none; border: 0; padding: 8px 10px; cursor: pointer; color: inherit; font: inherit; }
+.newslist .new b { color: var(--ok); }
+.newslist .gone b { color: var(--warn); }
+.newslist .newsread { border: 0; background: none; padding: 8px 12px; cursor: pointer; color: inherit; font-size: 1.1em; }
+
+/* Il numero delle novità accanto a Oggi, nel menu. */
+.badge { display: inline-block; min-width: 1.5em; margin-left: 8px; padding: 0 6px; border-radius: 999px; background: var(--ball); color: #17301f; font-size: .8em; font-weight: 700; text-align: center; }
+.badge[hidden] { display: none; }
+
+/* L'invito per prenotare online: il QR in mezzo, poi codice, link e i modi per mandarlo. */
+.invite { display: grid; gap: 8px; justify-items: center; text-align: center; max-width: 420px; }
+.invite input { width: 100%; }
+.invite .tools { justify-content: center; }
+a.button { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; color: inherit; text-decoration: none; background: var(--panel); }
+a.button:hover { background: var(--hover); }

@@ -30,6 +30,7 @@ import com.tennis.scoremanager.data.CourtSettings
 import com.tennis.scoremanager.data.Fees
 import com.tennis.scoremanager.data.PayType
 import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.SrvInvite
 
 /** I dati del circolo in memoria, al posto dell'app. */
 class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
@@ -101,6 +102,10 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun serverState(): SrvAdmin = if (remoteDown) throw ClubServerError("NET") else remote
     override fun serverSync(): String? = if (remoteDown) "NET" else { server = server.copy(lastSync = time); null }
     override fun serverRemove(kind: String, id: String) { removed += "$kind:$id" }
+    var invited = mutableListOf<String>()
+    override fun serverInvite(player: PlayerProfile): SrvInvite { if (remoteDown) throw ClubServerError("NET"); invited += player.id; return SrvInvite("ABCDEFGHJK", time + 7 * 86_400_000L) }
+    override fun serverRevoke(playerId: String): String? = if (remoteDown) "NET" else { server = server.copy(players = server.players.filter { it.id != playerId }); null }
+    override fun readOnlineNotice(id: String?) { server = server.copy(inbox = if (id == null) emptyList() else server.inbox.filter { it.id != id }) }
     var auto = false
     val copies = linkedMapOf<String, ByteArray>()
     val remoteCopies = linkedMapOf<String, ByteArray>()
