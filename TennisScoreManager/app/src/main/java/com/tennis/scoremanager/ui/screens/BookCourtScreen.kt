@@ -294,6 +294,13 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     if (m == null) {
         Text(error ?: "…", color = if (error != null) TsmColors.Orange else TsmColors.TextDim)
         if (error != null) GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
+    } else if (!m.hasPin) {
+        // Entrato con l'invito: prima di prenotare, il PIN (si rientra da soli se si cambia telefono).
+        Text(s.pbPinRequiredTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(s.pbPinRequiredText, color = TsmColors.TextDim, fontSize = 14.sp)
+        PinSection(c, m) { reload() }
+        Text("🔑 " + s.pbPinSaveTip, color = TsmColors.TextDim, fontSize = 13.sp)
+        GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else {
         val ct = remember(m.timeZone, locale) { ClubTime(m.timeZone, locale) }
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.

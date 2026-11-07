@@ -591,7 +591,10 @@ const APP_I18N = {
     pbPinPhone: "Il tuo numero di telefono",
     pbPinPin: "PIN (da 4 a 8 cifre)",
     pbPinPin2: "Ripeti il PIN",
+    pbPinRequiredText: "Ti serve per rientrare da solo se cambi telefono o esci: così non devi chiedere un nuovo invito. Si fa una volta sola.",
+    pbPinRequiredTitle: "Ultimo passo: scegli il tuo PIN",
     pbPinSave: "Salva il PIN",
+    pbPinSaveTip: "Se il telefono ti propone di salvarlo nel gestore delle password, accetta. Se no, scrivilo in un posto sicuro.",
     pbPinSaved: "PIN salvato: d'ora in poi rientri con numero e PIN.",
     pbPinTitle: "Rientra da solo con numero e PIN",
     pbPrice: "Prezzo",
@@ -1128,7 +1131,10 @@ const APP_I18N = {
     pbPinPhone: "Your phone number",
     pbPinPin: "PIN (4 to 8 digits)",
     pbPinPin2: "Repeat the PIN",
+    pbPinRequiredText: "You need it to sign back in yourself if you change phone or sign out, without asking for a new invitation. You do it only once.",
+    pbPinRequiredTitle: "Last step: choose your PIN",
     pbPinSave: "Save the PIN",
+    pbPinSaveTip: "If the phone offers to save it in the password manager, accept. Otherwise, write it down somewhere safe.",
     pbPinSaved: "PIN saved: from now on you sign in with number and PIN.",
     pbPinTitle: "Sign back in yourself with number and PIN",
     pbPrice: "Price",
@@ -1665,7 +1671,10 @@ const APP_I18N = {
     pbPinPhone: "Votre numéro de téléphone",
     pbPinPin: "PIN (de 4 à 8 chiffres)",
     pbPinPin2: "Répétez le PIN",
+    pbPinRequiredText: "Il vous sert à revenir seul si vous changez de téléphone ou vous déconnectez, sans demander une nouvelle invitation. On le fait une seule fois.",
+    pbPinRequiredTitle: "Dernière étape : choisissez votre PIN",
     pbPinSave: "Enregistrer le PIN",
+    pbPinSaveTip: "Si le téléphone propose de l'enregistrer dans le gestionnaire de mots de passe, acceptez. Sinon, notez-le dans un endroit sûr.",
     pbPinSaved: "PIN enregistré : désormais vous entrez avec numéro et PIN.",
     pbPinTitle: "Revenir seul avec numéro et PIN",
     pbPrice: "Prix",
@@ -2202,7 +2211,10 @@ const APP_I18N = {
     pbPinPhone: "Deine Telefonnummer",
     pbPinPin: "PIN (4 bis 8 Ziffern)",
     pbPinPin2: "PIN wiederholen",
+    pbPinRequiredText: "Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder dich abmeldest, ohne neue Einladung. Das machst du nur einmal.",
+    pbPinRequiredTitle: "Letzter Schritt: Wähle deine PIN",
     pbPinSave: "PIN speichern",
+    pbPinSaveTip: "Wenn das Telefon anbietet, sie im Passwortmanager zu speichern, nimm an. Sonst schreib sie an einem sicheren Ort auf.",
     pbPinSaved: "PIN gespeichert: Ab jetzt meldest du dich mit Nummer und PIN an.",
     pbPinTitle: "Selbst wieder anmelden mit Nummer und PIN",
     pbPrice: "Preis",
@@ -2739,7 +2751,10 @@ const APP_I18N = {
     pbPinPhone: "Tu número de teléfono",
     pbPinPin: "PIN (de 4 a 8 cifras)",
     pbPinPin2: "Repite el PIN",
+    pbPinRequiredText: "Te sirve para volver a entrar solo si cambias de teléfono o sales, sin pedir una nueva invitación. Se hace una sola vez.",
+    pbPinRequiredTitle: "Último paso: elige tu PIN",
     pbPinSave: "Guardar el PIN",
+    pbPinSaveTip: "Si el teléfono te propone guardarlo en el gestor de contraseñas, acepta. Si no, apúntalo en un lugar seguro.",
     pbPinSaved: "PIN guardado: desde ahora entras con número y PIN.",
     pbPinTitle: "Vuelve a entrar solo con número y PIN",
     pbPrice: "Precio",
@@ -3276,7 +3291,10 @@ const APP_I18N = {
     pbPinPhone: "O seu número de telefone",
     pbPinPin: "PIN (de 4 a 8 dígitos)",
     pbPinPin2: "Repita o PIN",
+    pbPinRequiredText: "Serve para voltar a entrar sozinho se trocar de telefone ou sair, sem pedir um novo convite. Faz-se uma só vez.",
+    pbPinRequiredTitle: "Último passo: escolha o seu PIN",
     pbPinSave: "Guardar o PIN",
+    pbPinSaveTip: "Se o telefone propuser guardá-lo no gestor de palavras-passe, aceite. Se não, anote-o num lugar seguro.",
     pbPinSaved: "PIN guardado: a partir de agora entra com número e PIN.",
     pbPinTitle: "Volte a entrar sozinho com número e PIN",
     pbPrice: "Preço",
@@ -38329,6 +38347,9 @@ interface Strings {
     val pbErrPhoneTaken: String
     val pbErrPinFormat: String
     val pbErrPhone: String
+    val pbPinRequiredTitle: String
+    val pbPinRequiredText: String
+    val pbPinSaveTip: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -40635,6 +40656,9 @@ object ItStrings : Strings {
     override val pbErrPhoneTaken = "Questo numero è già usato da un altro giocatore: chiedi alla segreteria."
     override val pbErrPinFormat = "Il PIN deve avere da 4 a 8 cifre."
     override val pbErrPhone = "Scrivi il numero di telefono completo."
+    override val pbPinRequiredTitle = "Ultimo passo: scegli il tuo PIN"
+    override val pbPinRequiredText = "Ti serve per rientrare da solo se cambi telefono o esci: così non devi chiedere un nuovo invito. Si fa una volta sola."
+    override val pbPinSaveTip = "Se il telefono ti propone di salvarlo nel gestore delle password, accetta. Se no, scrivilo in un posto sicuro."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -42904,6 +42928,9 @@ object EnStrings : Strings {
     override val pbErrPhoneTaken = "This number is already used by another player: ask the club office."
     override val pbErrPinFormat = "The PIN must have 4 to 8 digits."
     override val pbErrPhone = "Type the full phone number."
+    override val pbPinRequiredTitle = "Last step: choose your PIN"
+    override val pbPinRequiredText = "You need it to sign back in yourself if you change phone or sign out, without asking for a new invitation. You do it only once."
+    override val pbPinSaveTip = "If the phone offers to save it in the password manager, accept. Otherwise, write it down somewhere safe."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -45196,6 +45223,9 @@ object DeStrings : Strings {
     override val pbErrPhoneTaken = "Diese Nummer nutzt schon ein anderer Spieler: Frag das Büro."
     override val pbErrPinFormat = "Die PIN muss 4 bis 8 Ziffern haben."
     override val pbErrPhone = "Gib die vollständige Telefonnummer ein."
+    override val pbPinRequiredTitle = "Letzter Schritt: Wähle deine PIN"
+    override val pbPinRequiredText = "Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder dich abmeldest, ohne neue Einladung. Das machst du nur einmal."
+    override val pbPinSaveTip = "Wenn das Telefon anbietet, sie im Passwortmanager zu speichern, nimm an. Sonst schreib sie an einem sicheren Ort auf."
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -47481,6 +47511,9 @@ object EsStrings : Strings {
     override val pbErrPhoneTaken = "Este número ya lo usa otro jugador: pregunta a la secretaría."
     override val pbErrPinFormat = "El PIN debe tener de 4 a 8 cifras."
     override val pbErrPhone = "Escribe el número de teléfono completo."
+    override val pbPinRequiredTitle = "Último paso: elige tu PIN"
+    override val pbPinRequiredText = "Te sirve para volver a entrar solo si cambias de teléfono o sales, sin pedir una nueva invitación. Se hace una sola vez."
+    override val pbPinSaveTip = "Si el teléfono te propone guardarlo en el gestor de contraseñas, acepta. Si no, apúntalo en un lugar seguro."
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -49768,6 +49801,9 @@ object FrStrings : Strings {
     override val pbErrPhoneTaken = "Ce numéro est déjà utilisé par un autre joueur : demandez au secrétariat."
     override val pbErrPinFormat = "Le PIN doit avoir de 4 à 8 chiffres."
     override val pbErrPhone = "Tapez le numéro de téléphone complet."
+    override val pbPinRequiredTitle = "Dernière étape : choisissez votre PIN"
+    override val pbPinRequiredText = "Il vous sert à revenir seul si vous changez de téléphone ou vous déconnectez, sans demander une nouvelle invitation. On le fait une seule fois."
+    override val pbPinSaveTip = "Si le téléphone propose de l'enregistrer dans le gestionnaire de mots de passe, acceptez. Sinon, notez-le dans un endroit sûr."
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -52056,6 +52092,9 @@ object PtStrings : Strings {
     override val pbErrPhoneTaken = "Este número já é usado por outro jogador: pergunte à secretaria."
     override val pbErrPinFormat = "O PIN deve ter de 4 a 8 dígitos."
     override val pbErrPhone = "Escreva o número de telefone completo."
+    override val pbPinRequiredTitle = "Último passo: escolha o seu PIN"
+    override val pbPinRequiredText = "Serve para voltar a entrar sozinho se trocar de telefone ou sair, sem pedir um novo convite. Faz-se uma só vez."
+    override val pbPinSaveTip = "Se o telefone propuser guardá-lo no gestor de palavras-passe, aceite. Se não, anote-o num lugar seguro."
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -54154,6 +54193,13 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     if (m == null) {
         Text(error ?: "…", color = if (error != null) TsmColors.Orange else TsmColors.TextDim)
         if (error != null) GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
+    } else if (!m.hasPin) {
+        // Entrato con l'invito: prima di prenotare, il PIN (si rientra da soli se si cambia telefono).
+        Text(s.pbPinRequiredTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(s.pbPinRequiredText, color = TsmColors.TextDim, fontSize = 14.sp)
+        PinSection(c, m) { reload() }
+        Text("🔑 " + s.pbPinSaveTip, color = TsmColors.TextDim, fontSize = 13.sp)
+        GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else {
         val ct = remember(m.timeZone, locale) { ClubTime(m.timeZone, locale) }
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
@@ -94846,6 +94892,40 @@ function loginCard() {
     el('div', { class: 'actions' }, el('button', { onclick: go }, T.loginGo)));
 }
 
+/**
+ * Il primo ingresso con l'invito: il PIN è obbligatorio. È un vero modulo con numero ("username") e PIN
+ * ("new-password"), così il browser propone di salvarlo nel suo gestore delle password.
+ */
+function showPinRequired() {
+  const phone = el('input', { type: 'tel', id: 'rphone', name: 'username', autocomplete: 'username', inputmode: 'tel', required: 'required' });
+  const pin = el('input', { type: 'password', id: 'rpin', name: 'password', autocomplete: 'new-password', inputmode: 'numeric', maxlength: '8', required: 'required' });
+  const pin2 = el('input', { type: 'password', id: 'rpin2', autocomplete: 'new-password', inputmode: 'numeric', maxlength: '8', required: 'required' });
+  const msg = el('p', { class: 'error' }, '');
+  const form = el('form', { id: 'pinreq', class: 'card', method: 'post', action: '#' },
+    el('h3', null, T.pinRequiredTitle),
+    el('p', null, T.pinRequiredText),
+    el('label', { for: 'rphone' }, T.pinPhone), phone,
+    el('label', { for: 'rpin' }, T.pinPin), pin,
+    el('label', { for: 'rpin2' }, T.pinPin2), pin2,
+    el('p', { class: 'dim' }, '🔑 ', T.pinSaveTip),
+    msg,
+    el('div', { class: 'actions' }, el('button', { type: 'submit' }, T.pinGo)));
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = '';
+    if (pin.value !== pin2.value) { msg.textContent = T.pinMismatch; return; }
+    try {
+      await api('POST', '/pin', { phone: phone.value, pin: pin.value });
+      // Un cambio di indirizzo dopo l'invio: è il segnale che fa proporre al browser di salvare numero e PIN.
+      history.pushState(null, '', location.pathname + '#ok');
+      // Si rileggono i dati dal server: intanto la pagina può averli ricaricati (ogni minuto).
+      await refresh();
+    } catch (err) { msg.textContent = errText(err); }
+  });
+  $('app').replaceChildren(form);
+  phone.focus();
+}
+
 /** In Le mie: scegliere (o cambiare) numero e PIN, per rientrare da solo su un altro telefono. */
 function pinCard() {
   const me = state.me;
@@ -94859,7 +94939,7 @@ function pinCard() {
       if (pin.value !== pin2.value) { msg.textContent = T.pinMismatch; return; }
       try {
         await api('POST', '/pin', { phone: phone.value, pin: pin.value });
-        me.hasPin = true; me.phone = phone.value.replace(/\D/g, '').slice(-3);
+        state.me.hasPin = true; state.me.phone = phone.value.replace(/\D/g, '').slice(-3);
         box.replaceChildren(el('b', null, T.pinTitle), el('p', null, T.pinSaved));
       } catch (e) { msg.textContent = errText(e); }
     };
@@ -94908,6 +94988,8 @@ async function loadDay() {
 
 function render(dayError) {
   const me = state.me, r = me.rules;
+  // Entrato con l'invito ma senza PIN: prima di tutto il PIN (la schermata resta finché non è salvato).
+  if (!me.hasPin) { if (!document.getElementById('pinreq')) showPinRequired(); return; }
   const mine = me.bookings.length === 0 ? [el('p', { class: 'dim' }, T.none)] : me.bookings.map(b =>
     el('div', { class: 'card row' },
       el('div', { class: 'grow' },
@@ -95248,6 +95330,7 @@ const I18N = {
     cancelRule: h => `Disdici da solo fino a ${h} ore prima.`,
     covered: 'coperto', outdoor: 'scoperto', CLAY: 'terra', GRASS: 'erba', HARD: 'cemento', OTHER: '', free: 'gratis', today: 'Oggi',
     pinTitle: 'Rientra da solo con numero e PIN', pinHint: 'Scegli un PIN: se cambi telefono o il browser ti fa uscire, rientri da solo, senza chiedere un nuovo invito.', pinPhone: 'Il tuo numero di telefono', pinPin: 'PIN (da 4 a 8 cifre)', pinPin2: 'Ripeti il PIN', pinSave: 'Salva il PIN', pinSaved: 'PIN salvato: d\'ora in poi rientri con numero e PIN.', pinChange: 'Cambia PIN', pinMismatch: 'I due PIN sono diversi.', loginTitle: 'Hai già un PIN?', loginText: 'Entra con il tuo numero di telefono e il PIN.', loginGo: 'Entra con il PIN', pinRemind: 'Scegli un PIN in Le mie: così, se serve, rientri da solo.', pinActive: n => `Rientri con il numero che finisce per ${n} e il tuo PIN.`,
+    pinRequiredTitle: 'Ultimo passo: scegli il tuo PIN', pinRequiredText: 'Ti serve per rientrare da solo se cambi telefono o se il browser ti fa uscire: così non devi chiedere un nuovo invito. Si fa una volta sola.', pinSaveTip: 'Quando il browser ti propone di salvare la password, tocca Salva: così il PIN lo ricorda lui. Se non te lo propone, scrivilo in un posto sicuro.', pinGo: 'Salva e continua',
     err: {
       FULL: 'L\'annuncio è già al completo.', TOO_MANY_SEEKS: 'Hai già 3 annunci aperti: togline uno prima.',
       FREE_NOW: 'Si è appena liberata: prenotala subito!', TOO_MANY_WAITS: 'Sei già in attesa per 3 caselle: togline una prima.',
@@ -95282,6 +95365,7 @@ const I18N = {
     cancelRule: h => `You can cancel yourself up to ${h} hours before.`,
     covered: 'indoor', outdoor: 'outdoor', CLAY: 'clay', GRASS: 'grass', HARD: 'hard', OTHER: '', free: 'free', today: 'Today',
     pinTitle: 'Sign back in yourself with number and PIN', pinHint: 'Choose a PIN: if you change phone or the browser signs you out, you get back in yourself, without asking for a new invitation.', pinPhone: 'Your phone number', pinPin: 'PIN (4 to 8 digits)', pinPin2: 'Repeat the PIN', pinSave: 'Save the PIN', pinSaved: 'PIN saved: from now on you sign in with number and PIN.', pinChange: 'Change PIN', pinMismatch: 'The two PINs are different.', loginTitle: 'Already have a PIN?', loginText: 'Sign in with your phone number and PIN.', loginGo: 'Sign in with PIN', pinRemind: 'Choose a PIN in Mine: then, if needed, you can sign back in yourself.', pinActive: n => `You sign in with the number ending in ${n} and your PIN.`,
+    pinRequiredTitle: 'Last step: choose your PIN', pinRequiredText: 'You need it to sign back in yourself if you change phone or the browser signs you out, without asking for a new invitation. You do it only once.', pinSaveTip: 'When the browser offers to save the password, tap Save: then it remembers the PIN for you. If it does not offer, write it down somewhere safe.', pinGo: 'Save and continue',
     err: {
       FULL: 'This request is already complete.', TOO_MANY_SEEKS: 'You already have 3 open requests: remove one first.',
       FREE_NOW: 'It has just become free: book it now!', TOO_MANY_WAITS: 'You are already waiting for 3 slots: remove one first.',
@@ -95316,6 +95400,7 @@ const I18N = {
     cancelRule: h => `Annulation par vous-même jusqu'à ${h} heures avant.`,
     covered: 'couvert', outdoor: 'extérieur', CLAY: 'terre battue', GRASS: 'gazon', HARD: 'dur', OTHER: '', free: 'gratuit', today: 'Aujourd\'hui',
     pinTitle: 'Revenir seul avec numéro et PIN', pinHint: 'Choisissez un PIN : si vous changez de téléphone ou si le navigateur vous déconnecte, vous revenez seul, sans demander une nouvelle invitation.', pinPhone: 'Votre numéro de téléphone', pinPin: 'PIN (de 4 à 8 chiffres)', pinPin2: 'Répétez le PIN', pinSave: 'Enregistrer le PIN', pinSaved: 'PIN enregistré : désormais vous entrez avec numéro et PIN.', pinChange: 'Changer le PIN', pinMismatch: 'Les deux PIN sont différents.', loginTitle: 'Vous avez déjà un PIN ?', loginText: 'Entrez avec votre numéro de téléphone et votre PIN.', loginGo: 'Entrer avec le PIN', pinRemind: 'Choisissez un PIN dans Les miennes : ainsi, si besoin, vous revenez seul.', pinActive: n => `Vous entrez avec le numéro qui finit par ${n} et votre PIN.`,
+    pinRequiredTitle: 'Dernière étape : choisissez votre PIN', pinRequiredText: 'Il vous sert à revenir seul si vous changez de téléphone ou si le navigateur vous déconnecte, sans demander une nouvelle invitation. On le fait une seule fois.', pinSaveTip: 'Quand le navigateur propose d\'enregistrer le mot de passe, touchez Enregistrer : il se souviendra du PIN pour vous. Sinon, notez-le dans un endroit sûr.', pinGo: 'Enregistrer et continuer',
     err: {
       FULL: 'Cette annonce est déjà complète.', TOO_MANY_SEEKS: 'Vous avez déjà 3 annonces ouvertes : retirez-en une d\'abord.',
       FREE_NOW: 'Il vient de se libérer : réservez-le vite !', TOO_MANY_WAITS: 'Vous attendez déjà 3 créneaux : retirez-en un d\'abord.',
@@ -95350,6 +95435,7 @@ const I18N = {
     cancelRule: h => `Selbst stornieren bis ${h} Stunden vorher.`,
     covered: 'Halle', outdoor: 'Freiplatz', CLAY: 'Sand', GRASS: 'Rasen', HARD: 'Hartplatz', OTHER: '', free: 'kostenlos', today: 'Heute',
     pinTitle: 'Selbst wieder anmelden mit Nummer und PIN', pinHint: 'Wähle eine PIN: Wenn du das Telefon wechselst oder der Browser dich abmeldet, kommst du selbst wieder hinein, ohne neue Einladung.', pinPhone: 'Deine Telefonnummer', pinPin: 'PIN (4 bis 8 Ziffern)', pinPin2: 'PIN wiederholen', pinSave: 'PIN speichern', pinSaved: 'PIN gespeichert: Ab jetzt meldest du dich mit Nummer und PIN an.', pinChange: 'PIN ändern', pinMismatch: 'Die beiden PINs sind verschieden.', loginTitle: 'Schon eine PIN?', loginText: 'Melde dich mit deiner Telefonnummer und der PIN an.', loginGo: 'Mit PIN anmelden', pinRemind: 'Wähle unter Meine eine PIN: Dann kommst du bei Bedarf selbst wieder hinein.', pinActive: n => `Du meldest dich mit der Nummer auf ${n} und deiner PIN an.`,
+    pinRequiredTitle: 'Letzter Schritt: Wähle deine PIN', pinRequiredText: 'Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder der Browser dich abmeldet, ohne neue Einladung. Das machst du nur einmal.', pinSaveTip: 'Wenn der Browser anbietet, das Passwort zu speichern, tippe auf Speichern: Dann merkt er sich die PIN für dich. Sonst schreib sie an einem sicheren Ort auf.', pinGo: 'Speichern und weiter',
     err: {
       FULL: 'Diese Anzeige ist schon vollständig.', TOO_MANY_SEEKS: 'Du hast schon 3 offene Anzeigen: Entferne zuerst eine.',
       FREE_NOW: 'Gerade frei geworden: Buch es jetzt!', TOO_MANY_WAITS: 'Du wartest schon auf 3 Felder: Entferne zuerst eins.',
@@ -95384,6 +95470,7 @@ const I18N = {
     cancelRule: h => `Anulas tú mismo hasta ${h} horas antes.`,
     covered: 'cubierta', outdoor: 'descubierta', CLAY: 'tierra batida', GRASS: 'hierba', HARD: 'dura', OTHER: '', free: 'gratis', today: 'Hoy',
     pinTitle: 'Vuelve a entrar solo con número y PIN', pinHint: 'Elige un PIN: si cambias de teléfono o el navegador te saca, vuelves a entrar solo, sin pedir una nueva invitación.', pinPhone: 'Tu número de teléfono', pinPin: 'PIN (de 4 a 8 cifras)', pinPin2: 'Repite el PIN', pinSave: 'Guardar el PIN', pinSaved: 'PIN guardado: desde ahora entras con número y PIN.', pinChange: 'Cambiar PIN', pinMismatch: 'Los dos PIN son distintos.', loginTitle: '¿Ya tienes un PIN?', loginText: 'Entra con tu número de teléfono y el PIN.', loginGo: 'Entrar con el PIN', pinRemind: 'Elige un PIN en Mías: así, si hace falta, vuelves a entrar solo.', pinActive: n => `Entras con el número que acaba en ${n} y tu PIN.`,
+    pinRequiredTitle: 'Último paso: elige tu PIN', pinRequiredText: 'Te sirve para volver a entrar solo si cambias de teléfono o el navegador te saca, sin pedir una nueva invitación. Se hace una sola vez.', pinSaveTip: 'Cuando el navegador te proponga guardar la contraseña, toca Guardar: así recordará el PIN por ti. Si no te lo propone, apúntalo en un lugar seguro.', pinGo: 'Guardar y continuar',
     err: {
       FULL: 'El anuncio ya está completo.', TOO_MANY_SEEKS: 'Ya tienes 3 anuncios abiertos: quita uno primero.',
       FREE_NOW: 'Se acaba de liberar: ¡resérvala ya!', TOO_MANY_WAITS: 'Ya esperas 3 casillas: quita una primero.',
@@ -95418,6 +95505,7 @@ const I18N = {
     cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
     covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
     pinTitle: 'Volte a entrar sozinho com número e PIN', pinHint: 'Escolha um PIN: se trocar de telefone ou o navegador o desconectar, volta a entrar sozinho, sem pedir um novo convite.', pinPhone: 'O seu número de telefone', pinPin: 'PIN (de 4 a 8 dígitos)', pinPin2: 'Repita o PIN', pinSave: 'Guardar o PIN', pinSaved: 'PIN guardado: a partir de agora entra com número e PIN.', pinChange: 'Mudar o PIN', pinMismatch: 'Os dois PIN são diferentes.', loginTitle: 'Já tem um PIN?', loginText: 'Entre com o seu número de telefone e o PIN.', loginGo: 'Entrar com o PIN', pinRemind: 'Escolha um PIN em Minhas: assim, se precisar, volta a entrar sozinho.', pinActive: n => `Entra com o número que termina em ${n} e o seu PIN.`,
+    pinRequiredTitle: 'Último passo: escolha o seu PIN', pinRequiredText: 'Serve para voltar a entrar sozinho se trocar de telefone ou o navegador o desconectar, sem pedir um novo convite. Faz-se uma só vez.', pinSaveTip: 'Quando o navegador propuser guardar a palavra-passe, toque em Guardar: assim ele lembra o PIN por si. Se não propuser, anote-o num lugar seguro.', pinGo: 'Guardar e continuar',
     err: {
       FULL: 'O anúncio já está completo.', TOO_MANY_SEEKS: 'Já tens 3 anúncios abertos: tira um primeiro.',
       FREE_NOW: 'Acabou de ficar livre: reserva-a já!', TOO_MANY_WAITS: 'Já esperas por 3 casas: tira uma primeiro.',
@@ -96213,7 +96301,7 @@ cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-3';
+const CACHE = 'tsm-campi-4';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));

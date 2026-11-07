@@ -760,6 +760,9 @@ object DeStrings : Strings {
     override val pbErrPhoneTaken = "Diese Nummer nutzt schon ein anderer Spieler: Frag das Büro."
     override val pbErrPinFormat = "Die PIN muss 4 bis 8 Ziffern haben."
     override val pbErrPhone = "Gib die vollständige Telefonnummer ein."
+    override val pbPinRequiredTitle = "Letzter Schritt: Wähle deine PIN"
+    override val pbPinRequiredText = "Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder dich abmeldest, ohne neue Einladung. Das machst du nur einmal."
+    override val pbPinSaveTip = "Wenn das Telefon anbietet, sie im Passwortmanager zu speichern, nimm an. Sonst schreib sie an einem sicheren Ort auf."
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

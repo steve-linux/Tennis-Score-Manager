@@ -764,6 +764,9 @@ object PtStrings : Strings {
     override val pbErrPhoneTaken = "Este número já é usado por outro jogador: pergunte à secretaria."
     override val pbErrPinFormat = "O PIN deve ter de 4 a 8 dígitos."
     override val pbErrPhone = "Escreva o número de telefone completo."
+    override val pbPinRequiredTitle = "Último passo: escolha o seu PIN"
+    override val pbPinRequiredText = "Serve para voltar a entrar sozinho se trocar de telefone ou sair, sem pedir um novo convite. Faz-se uma só vez."
+    override val pbPinSaveTip = "Se o telefone propuser guardá-lo no gestor de palavras-passe, aceite. Se não, anote-o num lugar seguro."
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"

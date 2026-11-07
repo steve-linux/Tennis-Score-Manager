@@ -761,6 +761,9 @@ object EsStrings : Strings {
     override val pbErrPhoneTaken = "Este número ya lo usa otro jugador: pregunta a la secretaría."
     override val pbErrPinFormat = "El PIN debe tener de 4 a 8 cifras."
     override val pbErrPhone = "Escribe el número de teléfono completo."
+    override val pbPinRequiredTitle = "Último paso: elige tu PIN"
+    override val pbPinRequiredText = "Te sirve para volver a entrar solo si cambias de teléfono o sales, sin pedir una nueva invitación. Se hace una sola vez."
+    override val pbPinSaveTip = "Si el teléfono te propone guardarlo en el gestor de contraseñas, acepta. Si no, apúntalo en un lugar seguro."
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

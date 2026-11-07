@@ -763,6 +763,9 @@ object FrStrings : Strings {
     override val pbErrPhoneTaken = "Ce numéro est déjà utilisé par un autre joueur : demandez au secrétariat."
     override val pbErrPinFormat = "Le PIN doit avoir de 4 à 8 chiffres."
     override val pbErrPhone = "Tapez le numéro de téléphone complet."
+    override val pbPinRequiredTitle = "Dernière étape : choisissez votre PIN"
+    override val pbPinRequiredText = "Il vous sert à revenir seul si vous changez de téléphone ou vous déconnectez, sans demander une nouvelle invitation. On le fait une seule fois."
+    override val pbPinSaveTip = "Si le téléphone propose de l'enregistrer dans le gestionnaire de mots de passe, acceptez. Sinon, notez-le dans un endroit sûr."
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"

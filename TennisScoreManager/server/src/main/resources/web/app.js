@@ -169,6 +169,40 @@ function loginCard() {
     el('div', { class: 'actions' }, el('button', { onclick: go }, T.loginGo)));
 }
 
+/**
+ * Il primo ingresso con l'invito: il PIN è obbligatorio. È un vero modulo con numero ("username") e PIN
+ * ("new-password"), così il browser propone di salvarlo nel suo gestore delle password.
+ */
+function showPinRequired() {
+  const phone = el('input', { type: 'tel', id: 'rphone', name: 'username', autocomplete: 'username', inputmode: 'tel', required: 'required' });
+  const pin = el('input', { type: 'password', id: 'rpin', name: 'password', autocomplete: 'new-password', inputmode: 'numeric', maxlength: '8', required: 'required' });
+  const pin2 = el('input', { type: 'password', id: 'rpin2', autocomplete: 'new-password', inputmode: 'numeric', maxlength: '8', required: 'required' });
+  const msg = el('p', { class: 'error' }, '');
+  const form = el('form', { id: 'pinreq', class: 'card', method: 'post', action: '#' },
+    el('h3', null, T.pinRequiredTitle),
+    el('p', null, T.pinRequiredText),
+    el('label', { for: 'rphone' }, T.pinPhone), phone,
+    el('label', { for: 'rpin' }, T.pinPin), pin,
+    el('label', { for: 'rpin2' }, T.pinPin2), pin2,
+    el('p', { class: 'dim' }, '🔑 ', T.pinSaveTip),
+    msg,
+    el('div', { class: 'actions' }, el('button', { type: 'submit' }, T.pinGo)));
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = '';
+    if (pin.value !== pin2.value) { msg.textContent = T.pinMismatch; return; }
+    try {
+      await api('POST', '/pin', { phone: phone.value, pin: pin.value });
+      // Un cambio di indirizzo dopo l'invio: è il segnale che fa proporre al browser di salvare numero e PIN.
+      history.pushState(null, '', location.pathname + '#ok');
+      // Si rileggono i dati dal server: intanto la pagina può averli ricaricati (ogni minuto).
+      await refresh();
+    } catch (err) { msg.textContent = errText(err); }
+  });
+  $('app').replaceChildren(form);
+  phone.focus();
+}
+
 /** In Le mie: scegliere (o cambiare) numero e PIN, per rientrare da solo su un altro telefono. */
 function pinCard() {
   const me = state.me;
@@ -182,7 +216,7 @@ function pinCard() {
       if (pin.value !== pin2.value) { msg.textContent = T.pinMismatch; return; }
       try {
         await api('POST', '/pin', { phone: phone.value, pin: pin.value });
-        me.hasPin = true; me.phone = phone.value.replace(/\D/g, '').slice(-3);
+        state.me.hasPin = true; state.me.phone = phone.value.replace(/\D/g, '').slice(-3);
         box.replaceChildren(el('b', null, T.pinTitle), el('p', null, T.pinSaved));
       } catch (e) { msg.textContent = errText(e); }
     };
@@ -231,6 +265,8 @@ async function loadDay() {
 
 function render(dayError) {
   const me = state.me, r = me.rules;
+  // Entrato con l'invito ma senza PIN: prima di tutto il PIN (la schermata resta finché non è salvato).
+  if (!me.hasPin) { if (!document.getElementById('pinreq')) showPinRequired(); return; }
   const mine = me.bookings.length === 0 ? [el('p', { class: 'dim' }, T.none)] : me.bookings.map(b =>
     el('div', { class: 'card row' },
       el('div', { class: 'grow' },

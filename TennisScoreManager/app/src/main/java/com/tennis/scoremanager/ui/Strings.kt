@@ -799,6 +799,9 @@ interface Strings {
     val pbErrPhoneTaken: String
     val pbErrPinFormat: String
     val pbErrPhone: String
+    val pbPinRequiredTitle: String
+    val pbPinRequiredText: String
+    val pbPinSaveTip: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3105,6 +3108,9 @@ object ItStrings : Strings {
     override val pbErrPhoneTaken = "Questo numero è già usato da un altro giocatore: chiedi alla segreteria."
     override val pbErrPinFormat = "Il PIN deve avere da 4 a 8 cifre."
     override val pbErrPhone = "Scrivi il numero di telefono completo."
+    override val pbPinRequiredTitle = "Ultimo passo: scegli il tuo PIN"
+    override val pbPinRequiredText = "Ti serve per rientrare da solo se cambi telefono o esci: così non devi chiedere un nuovo invito. Si fa una volta sola."
+    override val pbPinSaveTip = "Se il telefono ti propone di salvarlo nel gestore delle password, accetta. Se no, scrivilo in un posto sicuro."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5374,6 +5380,9 @@ object EnStrings : Strings {
     override val pbErrPhoneTaken = "This number is already used by another player: ask the club office."
     override val pbErrPinFormat = "The PIN must have 4 to 8 digits."
     override val pbErrPhone = "Type the full phone number."
+    override val pbPinRequiredTitle = "Last step: choose your PIN"
+    override val pbPinRequiredText = "You need it to sign back in yourself if you change phone or sign out, without asking for a new invitation. You do it only once."
+    override val pbPinSaveTip = "If the phone offers to save it in the password manager, accept. Otherwise, write it down somewhere safe."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
