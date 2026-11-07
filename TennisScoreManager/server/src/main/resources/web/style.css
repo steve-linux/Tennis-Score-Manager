@@ -73,6 +73,7 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .cell.waiting { background: var(--high); color: var(--ball); font-weight: 600; outline: 1px dashed var(--ball); outline-offset: -3px; }
 .legend .WAITING::before { background: var(--high); border: 1px dashed var(--ball); }
 .card.freed { border-color: var(--ball); }
+.boardbar { display: flex; justify-content: space-between; align-items: center; width: 100%; background: var(--ball); color: #0B1220; font-weight: 700; font-size: 16px; border: 0; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; text-align: left; }
 .card.row .small + .small { margin-left: 6px; }
 .ok { color: var(--ball); font-weight: 600; }
 .card .actions { margin-top: 10px; }

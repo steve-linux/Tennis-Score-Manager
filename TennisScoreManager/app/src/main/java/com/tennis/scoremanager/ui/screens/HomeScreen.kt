@@ -566,7 +566,13 @@ private fun ClubNews(c: MatchController) {
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
     // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
-    val chats = accounts.flatMap { a -> a.chatNews.map { (room, title) -> Triple(a, room, title) } }
+    val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it != "board" }.map { (room, title) -> Triple(a, room, title) } }
+    // La bacheca ha la sua striscia, in cima, col numero degli avvisi da leggere: si tocca e si apre.
+    for (a in accounts.filter { it.boardUnread > 0 }) {
+        BoardBanner(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, s.pbBoardUnread(a.boardUnread)).joinToString(" · ")) {
+            c.selectBooking(a.url); c.bookTabRequest.value = 0; c.boardRequest.value = true; c.go(Screen.BOOK_COURT)
+        }
+    }
     if (news.isEmpty() && chats.isEmpty()) return
     androidx.compose.foundation.layout.Column(
         Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),

@@ -81,6 +81,8 @@ data class BookingAccount(
     val chatNotified: Map<String, Long> = emptyMap(),
     /** Le chat con messaggi nuovi, per le novità di Gioca: stanza → titolo ("" = la bacheca). */
     val chatNews: Map<String, String> = emptyMap(),
+    /** Quanti avvisi della bacheca sono ancora da leggere (per la striscia in cima a Gioca). */
+    val boardUnread: Int = 0,
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 

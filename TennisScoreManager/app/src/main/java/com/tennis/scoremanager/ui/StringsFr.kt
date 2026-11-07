@@ -793,6 +793,7 @@ object FrStrings : Strings {
     override val srvChatsHint = "Pour vérifier les messages de Je cherche un partenaire et retirer ceux qui sont déplacés."
     override val srvChatDelete = "Retirer"
     override val srvChatsNone = "Aucune discussion."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 message à lire au tableau" else "$it messages à lire au tableau" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"

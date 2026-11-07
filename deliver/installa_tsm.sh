@@ -527,6 +527,7 @@ const APP_I18N = {
     pbBoardHint: "Qui scrive la segreteria del circolo.",
     pbBoardRead: "Leggi",
     pbBoardTitle: "Bacheca del circolo",
+    pbBoardUnread: (it) => it === 1 ? `1 messaggio da leggere in bacheca` : `${it} messaggi da leggere in bacheca`,
     pbBookNow: "Prenota",
     pbBooked: "Prenotato!",
     pbBookedInvite: "Prenotato! Qui sotto puoi invitare chi gioca con te.",
@@ -1094,6 +1095,7 @@ const APP_I18N = {
     pbBoardHint: "The club office writes here.",
     pbBoardRead: "Read",
     pbBoardTitle: "Club notice board",
+    pbBoardUnread: (it) => it === 1 ? `1 unread message on the notice board` : `${it} unread messages on the notice board`,
     pbBookNow: "Book",
     pbBooked: "Booked!",
     pbBookedInvite: "Booked! Below you can invite whoever plays with you.",
@@ -1661,6 +1663,7 @@ const APP_I18N = {
     pbBoardHint: "Ici écrit le secrétariat du club.",
     pbBoardRead: "Lire",
     pbBoardTitle: "Tableau du club",
+    pbBoardUnread: (it) => it === 1 ? `1 message à lire au tableau` : `${it} messages à lire au tableau`,
     pbBookNow: "Réserver",
     pbBooked: "Réservé !",
     pbBookedInvite: "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous.",
@@ -2228,6 +2231,7 @@ const APP_I18N = {
     pbBoardHint: "Hier schreibt das Vereinsbüro.",
     pbBoardRead: "Lesen",
     pbBoardTitle: "Vereinsbrett",
+    pbBoardUnread: (it) => it === 1 ? `1 ungelesene Mitteilung am Vereinsbrett` : `${it} ungelesene Mitteilungen am Vereinsbrett`,
     pbBookNow: "Buchen",
     pbBooked: "Gebucht!",
     pbBookedInvite: "Gebucht! Unten kannst du einladen, wer mit dir spielt.",
@@ -2795,6 +2799,7 @@ const APP_I18N = {
     pbBoardHint: "Aquí escribe la secretaría del club.",
     pbBoardRead: "Leer",
     pbBoardTitle: "Tablón del club",
+    pbBoardUnread: (it) => it === 1 ? `1 mensaje por leer en el tablón` : `${it} mensajes por leer en el tablón`,
     pbBookNow: "Reservar",
     pbBooked: "¡Reservada!",
     pbBookedInvite: "¡Reservado! Abajo puedes invitar a quien juega contigo.",
@@ -3362,6 +3367,7 @@ const APP_I18N = {
     pbBoardHint: "Aqui escreve a secretaria do clube.",
     pbBoardRead: "Ler",
     pbBoardTitle: "Mural do clube",
+    pbBoardUnread: (it) => it === 1 ? `1 mensagem por ler no mural` : `${it} mensagens por ler no mural`,
     pbBookNow: "Reservar",
     pbBooked: "Reservada!",
     pbBookedInvite: "Reservado! Aqui em baixo pode convidar quem joga consigo.",
@@ -14834,6 +14840,8 @@ class MatchController(
 
     /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
     val bookTabRequest = MutableStateFlow<Int?>(null)
+    /** Dalla striscia della bacheca in Gioca: Prenota un campo apre subito la bacheca. */
+    val boardRequest = MutableStateFlow(false)
 
     /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
     fun openSeekNews(url: String, id: String) {
@@ -14850,7 +14858,7 @@ class MatchController(
         val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
         com.tennis.scoremanager.service.OnlineAlerts.cancelChat(app, room)
         if ((a.chatRead[room] ?: 0) >= at && room !in a.chatNews) return
-        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room), url)
+        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room, boardUnread = if (room == "board") 0 else a.boardUnread), url)
     }
 
     /**
@@ -14876,7 +14884,11 @@ class MatchController(
                 }
                 acc = acc.copy(chatNotified = acc.chatNotified + (room to last))
             }
-            if (last > (acc.chatRead[room] ?: 0)) acc = acc.copy(chatNews = acc.chatNews + (room to title))
+            // La bacheca ha la sua striscia in cima a Gioca, col numero degli avvisi da leggere.
+            if (room == "board") {
+                val n = bookingWith(a) { it.chat(room, acc.chatRead[room] ?: 0) }.getOrNull()?.count { !it.mine }
+                if (n != null) acc = acc.copy(boardUnread = n)
+            } else acc = acc.copy(chatNews = acc.chatNews + (room to title))
         }
         return acc
     }
@@ -19769,6 +19781,8 @@ data class BookingAccount(
     val chatNotified: Map<String, Long> = emptyMap(),
     /** Le chat con messaggi nuovi, per le novità di Gioca: stanza → titolo ("" = la bacheca). */
     val chatNews: Map<String, String> = emptyMap(),
+    /** Quanti avvisi della bacheca sono ancora da leggere (per la striscia in cima a Gioca). */
+    val boardUnread: Int = 0,
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 
@@ -38958,6 +38972,7 @@ interface Strings {
     val srvChatsHint: String
     val srvChatDelete: String
     val srvChatsNone: String
+    val pbBoardUnread: (Int) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -41294,6 +41309,7 @@ object ItStrings : Strings {
     override val srvChatsHint = "Per controllare i messaggi di Cerco compagno e togliere quelli fuori luogo."
     override val srvChatDelete = "Togli"
     override val srvChatsNone = "Nessuna chat."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 messaggio da leggere in bacheca" else "$it messaggi da leggere in bacheca" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -43593,6 +43609,7 @@ object EnStrings : Strings {
     override val srvChatsHint = "To check the Looking for a partner messages and remove inappropriate ones."
     override val srvChatDelete = "Remove"
     override val srvChatsNone = "No chats."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 unread message on the notice board" else "$it unread messages on the notice board" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
@@ -45915,6 +45932,7 @@ object DeStrings : Strings {
     override val srvChatsHint = "Zum Prüfen der Nachrichten von Partner gesucht und zum Entfernen unpassender."
     override val srvChatDelete = "Entfernen"
     override val srvChatsNone = "Keine Chats."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 ungelesene Mitteilung am Vereinsbrett" else "$it ungelesene Mitteilungen am Vereinsbrett" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
@@ -48230,6 +48248,7 @@ object EsStrings : Strings {
     override val srvChatsHint = "Para revisar los mensajes de Busco compañero y quitar los inapropiados."
     override val srvChatDelete = "Quitar"
     override val srvChatsNone = "No hay chats."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 mensaje por leer en el tablón" else "$it mensajes por leer en el tablón" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
@@ -50547,6 +50566,7 @@ object FrStrings : Strings {
     override val srvChatsHint = "Pour vérifier les messages de Je cherche un partenaire et retirer ceux qui sont déplacés."
     override val srvChatDelete = "Retirer"
     override val srvChatsNone = "Aucune discussion."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 message à lire au tableau" else "$it messages à lire au tableau" }
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
@@ -52865,6 +52885,7 @@ object PtStrings : Strings {
     override val srvChatsHint = "Para verificar as mensagens de Procuro parceiro e retirar as inadequadas."
     override val srvChatDelete = "Retirar"
     override val srvChatsNone = "Nenhum chat."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 mensagem por ler no mural" else "$it mensagens por ler no mural" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
@@ -54754,6 +54775,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
 
@@ -54762,6 +54784,19 @@ private const val B_CELL_W = 104
 private const val B_CELL_H = 46
 
 /** L'errore del server detto al giocatore. */
+/** La striscia gialla degli avvisi della bacheca da leggere: si tocca e si apre la bacheca. */
+@Composable
+fun BoardBanner(text: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        androidx.compose.material3.Icon(Icons.Filled.Campaign, null, tint = TsmColors.OnBall)
+        Text(text, color = TsmColors.OnBall, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+        androidx.compose.material3.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.OnBall)
+    }
+}
+
 fun bookErrorText(s: Strings, code: String): String = when (code) {
     "NET", "BAD_URL" -> s.pbErrNet
     "BAD_CODE" -> s.pbErrInvite
@@ -54965,6 +55000,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     }
     fun reload() { tick++ }
     // Dalle novità di Gioca: si apre direttamente Compagni.
+    val wantBoard by c.boardRequest.collectAsState()
+    LaunchedEffect(wantBoard) { if (wantBoard) { chatRoom = "board" to ""; c.boardRequest.value = false } }
     val wantTab by c.bookTabRequest.collectAsState()
     LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
     val acct by c.bookingAccount.collectAsState()
@@ -54992,6 +55029,13 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else {
         val ct = remember(m.timeZone, locale) { ClubTime(m.timeZone, locale) }
+        // Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca.
+        val boardRead = acct.chatRead["board"] ?: 0
+        if (m.boardLast > boardRead) {
+            var unread by remember { mutableStateOf(0) }
+            LaunchedEffect(m.boardLast, boardRead) { c.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
+            BoardBanner(s.pbBoardUnread(maxOf(1, unread))) { chatRoom = "board" to "" }
+        }
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
         val freed = m.waits.count { it.freedCourt != null }
         Segmented(
@@ -55001,11 +55045,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         )
         when (tab) {
             0 -> {
-                // La bacheca del circolo: si vede appena la segreteria ha scritto (col pallino se c'è del nuovo).
-                if (m.boardLast > 0) {
-                    val unread = m.boardLast > (acct.chatRead["board"] ?: 0)
-                    GhostButton(s.pbBoardTitle + if (unread) " •" else "", Icons.Filled.Campaign, { chatRoom = "board" to "" }, Modifier.fillMaxWidth())
-                }
+                // La bacheca già letta resta qui, piccola (quella nuova è in evidenza sopra le schede).
+                if (m.boardLast in 1..boardRead) GhostButton(s.pbBoardTitle, Icons.Filled.Campaign, { chatRoom = "board" to "" }, Modifier.fillMaxWidth())
                 Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     m.days.forEachIndexed { i, d ->
@@ -58970,7 +59011,13 @@ private fun ClubNews(c: MatchController) {
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
     // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
-    val chats = accounts.flatMap { a -> a.chatNews.map { (room, title) -> Triple(a, room, title) } }
+    val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it != "board" }.map { (room, title) -> Triple(a, room, title) } }
+    // La bacheca ha la sua striscia, in cima, col numero degli avvisi da leggere: si tocca e si apre.
+    for (a in accounts.filter { it.boardUnread > 0 }) {
+        BoardBanner(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, s.pbBoardUnread(a.boardUnread)).joinToString(" · ")) {
+            c.selectBooking(a.url); c.bookTabRequest.value = 0; c.boardRequest.value = true; c.go(Screen.BOOK_COURT)
+        }
+    }
     if (news.isEmpty() && chats.isEmpty()) return
     androidx.compose.foundation.layout.Column(
         Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp)).background(TsmColors.Surface).padding(14.dp),
@@ -96093,7 +96140,7 @@ function render(dayError) {
   const fresh = state.tab === 2 ? [] : unreadSeeks();
   const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : '')];
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
-  const parts = [bar];
+  const parts = [boardNews(), bar].filter(Boolean);
   if (state.tab === 1) {
     parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
@@ -96102,8 +96149,9 @@ function render(dayError) {
     // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
     if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
     // La bacheca del circolo: i messaggi della segreteria (col pallino se ce ne sono di nuovi).
-    if (me.boardLast > 0) parts.push(el('div', { class: 'card' + (chatUnread('board', me.boardLast) ? ' freed' : '') },
-      el('b', null, T.boardTitle + (chatUnread('board', me.boardLast) ? ' •' : '')),
+    // Già letta resta qui, piccola; quella nuova sta in evidenza sopra le schede (boardNews).
+    if (me.boardLast > 0 && !chatUnread('board', me.boardLast)) parts.push(el('div', { class: 'card' },
+      el('b', null, T.boardTitle),
       el('div', { class: 'actions' }, el('button', { class: 'small', onclick: () => openChat('board', T.boardTitle, false) }, T.boardOpen))));
     // Gli annunci nuovi degli altri, finché non si apre Compagni: altrimenti nessuno li vede.
     if (fresh.length) parts.push(el('div', { class: 'card freed' },
@@ -96276,6 +96324,18 @@ function markChatRead(room, at) { try { const r = chatRead(); r[room] = Math.max
 function chatUnread(room, last) { return last > 0 && last > (chatRead()[room] || 0); }
 
 /** La chat in un riquadro che sale dal basso: i messaggi si aggiornano ogni pochi secondi finché è aperta. */
+/** Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca. */
+function boardNews() {
+  const me = state.me;
+  if (!me || !(me.boardLast > 0) || !chatUnread('board', me.boardLast)) return null;
+  if (state.boardFor !== me.boardLast) {
+    state.boardFor = me.boardLast;
+    api('GET', '/chat/board').then(list => { state.board = list; render(); }).catch(() => { /* resta il numero minimo */ });
+  }
+  const n = Math.max(1, (state.board || []).filter(m => chatUnread('board', m.at)).length);
+  return el('button', { class: 'boardbar', onclick: () => openChat('board', T.boardTitle, false) }, '📣 ' + T.boardUnread(n), el('span', null, '›'));
+}
+
 async function openChat(room, title, canWrite) {
   const list = el('div', { class: 'chat' });
   const input = canWrite ? el('textarea', { id: 'chatin', rows: '2', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
@@ -96504,7 +96564,7 @@ const I18N = {
     pinRequiredTitle: 'Ultimo passo: scegli il tuo PIN', pinRequiredText: 'Ti serve per rientrare da solo se cambi telefono o se il browser ti fa uscire: così non devi chiedere un nuovo invito. Si fa una volta sola.', pinSaveTip: 'Quando il browser ti propone di salvare la password, tocca Salva: così il PIN lo ricorda lui. Se non te lo propone, scrivilo in un posto sicuro.', pinGo: 'Salva e continua',
     seekAlerts: 'Avvisami dei nuovi annunci', seekAlertsHint: 'Una notifica quando qualcuno del circolo cerca un compagno (servono i promemoria accesi in Le mie). Spenta, gli annunci si vedono lo stesso.', seekOpen: 'Apri Compagni', seekNewTitle: n => n === 1 ? 'Un nuovo annuncio: cerco compagno' : `${n} nuovi annunci: cerco compagno`,
     seekGone: 'Questo annuncio non è più aperto: ha già trovato il compagno o è stato tolto.',
-    chatOpen: 'Chat', chatSend: 'Invia', chatYou: 'Tu', chatNone: 'Ancora nessun messaggio.', chatPlaceholder: 'Scrivi un messaggio…', boardTitle: 'Bacheca del circolo', boardOpen: 'Leggi', boardHint: 'Qui scrive la segreteria del circolo.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Invia', chatYou: 'Tu', chatNone: 'Ancora nessun messaggio.', chatPlaceholder: 'Scrivi un messaggio…', boardTitle: 'Bacheca del circolo', boardOpen: 'Leggi', boardUnread: n => n === 1 ? '1 messaggio da leggere in bacheca' : `${n} messaggi da leggere in bacheca`, boardHint: 'Qui scrive la segreteria del circolo.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'L\'annuncio è già al completo.', TOO_MANY_SEEKS: 'Hai già 3 annunci aperti: togline uno prima.',
       FREE_NOW: 'Si è appena liberata: prenotala subito!', TOO_MANY_WAITS: 'Sei già in attesa per 3 caselle: togline una prima.',
@@ -96543,7 +96603,7 @@ const I18N = {
     pinRequiredTitle: 'Last step: choose your PIN', pinRequiredText: 'You need it to sign back in yourself if you change phone or the browser signs you out, without asking for a new invitation. You do it only once.', pinSaveTip: 'When the browser offers to save the password, tap Save: then it remembers the PIN for you. If it does not offer, write it down somewhere safe.', pinGo: 'Save and continue',
     seekAlerts: 'Tell me about new posts', seekAlertsHint: 'A notification when someone at the club looks for a partner (reminders must be on in Mine). Off, the posts still show.', seekOpen: 'Open Partners', seekNewTitle: n => n === 1 ? 'A new post: looking for a partner' : `${n} new posts: looking for a partner`,
     seekGone: 'This post is no longer open: they already found a partner or it was removed.',
-    chatOpen: 'Chat', chatSend: 'Send', chatYou: 'You', chatNone: 'No messages yet.', chatPlaceholder: 'Write a message…', boardTitle: 'Club notice board', boardOpen: 'Read', boardHint: 'The club office writes here.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Send', chatYou: 'You', chatNone: 'No messages yet.', chatPlaceholder: 'Write a message…', boardTitle: 'Club notice board', boardOpen: 'Read', boardUnread: n => n === 1 ? '1 unread message on the notice board' : `${n} unread messages on the notice board`, boardHint: 'The club office writes here.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'This request is already complete.', TOO_MANY_SEEKS: 'You already have 3 open requests: remove one first.',
       FREE_NOW: 'It has just become free: book it now!', TOO_MANY_WAITS: 'You are already waiting for 3 slots: remove one first.',
@@ -96582,7 +96642,7 @@ const I18N = {
     pinRequiredTitle: 'Dernière étape : choisissez votre PIN', pinRequiredText: 'Il vous sert à revenir seul si vous changez de téléphone ou si le navigateur vous déconnecte, sans demander une nouvelle invitation. On le fait une seule fois.', pinSaveTip: 'Quand le navigateur propose d\'enregistrer le mot de passe, touchez Enregistrer : il se souviendra du PIN pour vous. Sinon, notez-le dans un endroit sûr.', pinGo: 'Enregistrer et continuer',
     seekAlerts: 'Me prévenir des nouvelles annonces', seekAlertsHint: 'Une notification quand quelqu\'un du club cherche un partenaire (il faut les rappels activés dans Les miennes). Désactivée, les annonces se voient quand même.', seekOpen: 'Ouvrir Partenaires', seekNewTitle: n => n === 1 ? 'Une nouvelle annonce : je cherche un partenaire' : `${n} nouvelles annonces : je cherche un partenaire`,
     seekGone: 'Cette annonce n\'est plus ouverte : le partenaire est déjà trouvé ou elle a été retirée.',
-    chatOpen: 'Discussion', chatSend: 'Envoyer', chatYou: 'Vous', chatNone: 'Pas encore de message.', chatPlaceholder: 'Écrivez un message…', boardTitle: 'Tableau du club', boardOpen: 'Lire', boardHint: 'Ici écrit le secrétariat du club.', chatTitle: t => `Discussion · ${t}`,
+    chatOpen: 'Discussion', chatSend: 'Envoyer', chatYou: 'Vous', chatNone: 'Pas encore de message.', chatPlaceholder: 'Écrivez un message…', boardTitle: 'Tableau du club', boardOpen: 'Lire', boardUnread: n => n === 1 ? '1 message à lire au tableau' : `${n} messages à lire au tableau`, boardHint: 'Ici écrit le secrétariat du club.', chatTitle: t => `Discussion · ${t}`,
     err: {
       FULL: 'Cette annonce est déjà complète.', TOO_MANY_SEEKS: 'Vous avez déjà 3 annonces ouvertes : retirez-en une d\'abord.',
       FREE_NOW: 'Il vient de se libérer : réservez-le vite !', TOO_MANY_WAITS: 'Vous attendez déjà 3 créneaux : retirez-en un d\'abord.',
@@ -96621,7 +96681,7 @@ const I18N = {
     pinRequiredTitle: 'Letzter Schritt: Wähle deine PIN', pinRequiredText: 'Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder der Browser dich abmeldet, ohne neue Einladung. Das machst du nur einmal.', pinSaveTip: 'Wenn der Browser anbietet, das Passwort zu speichern, tippe auf Speichern: Dann merkt er sich die PIN für dich. Sonst schreib sie an einem sicheren Ort auf.', pinGo: 'Speichern und weiter',
     seekAlerts: 'Über neue Anzeigen benachrichtigen', seekAlertsHint: 'Eine Benachrichtigung, wenn jemand im Verein einen Partner sucht (die Erinnerungen unter Meine müssen an sein). Aus: Die Anzeigen siehst du trotzdem.', seekOpen: 'Partner öffnen', seekNewTitle: n => n === 1 ? 'Eine neue Anzeige: Partner gesucht' : `${n} neue Anzeigen: Partner gesucht`,
     seekGone: 'Diese Anzeige ist nicht mehr offen: Der Partner ist schon gefunden oder sie wurde entfernt.',
-    chatOpen: 'Chat', chatSend: 'Senden', chatYou: 'Du', chatNone: 'Noch keine Nachrichten.', chatPlaceholder: 'Schreib eine Nachricht…', boardTitle: 'Vereinsbrett', boardOpen: 'Lesen', boardHint: 'Hier schreibt das Vereinsbüro.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Senden', chatYou: 'Du', chatNone: 'Noch keine Nachrichten.', chatPlaceholder: 'Schreib eine Nachricht…', boardTitle: 'Vereinsbrett', boardOpen: 'Lesen', boardUnread: n => n === 1 ? '1 ungelesene Mitteilung am Vereinsbrett' : `${n} ungelesene Mitteilungen am Vereinsbrett`, boardHint: 'Hier schreibt das Vereinsbüro.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'Diese Anzeige ist schon vollständig.', TOO_MANY_SEEKS: 'Du hast schon 3 offene Anzeigen: Entferne zuerst eine.',
       FREE_NOW: 'Gerade frei geworden: Buch es jetzt!', TOO_MANY_WAITS: 'Du wartest schon auf 3 Felder: Entferne zuerst eins.',
@@ -96660,7 +96720,7 @@ const I18N = {
     pinRequiredTitle: 'Último paso: elige tu PIN', pinRequiredText: 'Te sirve para volver a entrar solo si cambias de teléfono o el navegador te saca, sin pedir una nueva invitación. Se hace una sola vez.', pinSaveTip: 'Cuando el navegador te proponga guardar la contraseña, toca Guardar: así recordará el PIN por ti. Si no te lo propone, apúntalo en un lugar seguro.', pinGo: 'Guardar y continuar',
     seekAlerts: 'Avisarme de los nuevos anuncios', seekAlertsHint: 'Una notificación cuando alguien del club busca compañero (hacen falta los recordatorios activados en Mías). Apagada, los anuncios se ven igual.', seekOpen: 'Abrir Compañeros', seekNewTitle: n => n === 1 ? 'Un anuncio nuevo: busco compañero' : `${n} anuncios nuevos: busco compañero`,
     seekGone: 'Este anuncio ya no está abierto: ya encontró compañero o lo han quitado.',
-    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Tú', chatNone: 'Todavía no hay mensajes.', chatPlaceholder: 'Escribe un mensaje…', boardTitle: 'Tablón del club', boardOpen: 'Leer', boardHint: 'Aquí escribe la secretaría del club.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Tú', chatNone: 'Todavía no hay mensajes.', chatPlaceholder: 'Escribe un mensaje…', boardTitle: 'Tablón del club', boardOpen: 'Leer', boardUnread: n => n === 1 ? '1 mensaje por leer en el tablón' : `${n} mensajes por leer en el tablón`, boardHint: 'Aquí escribe la secretaría del club.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'El anuncio ya está completo.', TOO_MANY_SEEKS: 'Ya tienes 3 anuncios abiertos: quita uno primero.',
       FREE_NOW: 'Se acaba de liberar: ¡resérvala ya!', TOO_MANY_WAITS: 'Ya esperas 3 casillas: quita una primero.',
@@ -96699,7 +96759,7 @@ const I18N = {
     pinRequiredTitle: 'Último passo: escolha o seu PIN', pinRequiredText: 'Serve para voltar a entrar sozinho se trocar de telefone ou o navegador o desconectar, sem pedir um novo convite. Faz-se uma só vez.', pinSaveTip: 'Quando o navegador propuser guardar a palavra-passe, toque em Guardar: assim ele lembra o PIN por si. Se não propuser, anote-o num lugar seguro.', pinGo: 'Guardar e continuar',
     seekAlerts: 'Avisar-me dos novos anúncios', seekAlertsHint: 'Uma notificação quando alguém do clube procura parceiro (os lembretes têm de estar ligados em Minhas). Desligada, os anúncios veem-se na mesma.', seekOpen: 'Abrir Parceiros', seekNewTitle: n => n === 1 ? 'Um anúncio novo: procuro parceiro' : `${n} anúncios novos: procuro parceiro`,
     seekGone: 'Este anúncio já não está aberto: já encontrou parceiro ou foi retirado.',
-    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Você', chatNone: 'Ainda não há mensagens.', chatPlaceholder: 'Escreva uma mensagem…', boardTitle: 'Mural do clube', boardOpen: 'Ler', boardHint: 'Aqui escreve a secretaria do clube.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Você', chatNone: 'Ainda não há mensagens.', chatPlaceholder: 'Escreva uma mensagem…', boardTitle: 'Mural do clube', boardOpen: 'Ler', boardUnread: n => n === 1 ? '1 mensagem por ler no mural' : `${n} mensagens por ler no mural`, boardHint: 'Aqui escreve a secretaria do clube.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'O anúncio já está completo.', TOO_MANY_SEEKS: 'Já tens 3 anúncios abertos: tira um primeiro.',
       FREE_NOW: 'Acabou de ficar livre: reserva-a já!', TOO_MANY_WAITS: 'Já esperas por 3 casas: tira uma primeiro.',
@@ -97482,6 +97542,7 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .cell.waiting { background: var(--high); color: var(--ball); font-weight: 600; outline: 1px dashed var(--ball); outline-offset: -3px; }
 .legend .WAITING::before { background: var(--high); border: 1px dashed var(--ball); }
 .card.freed { border-color: var(--ball); }
+.boardbar { display: flex; justify-content: space-between; align-items: center; width: 100%; background: var(--ball); color: #0B1220; font-weight: 700; font-size: 16px; border: 0; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; text-align: left; }
 .card.row .small + .small { margin-left: 6px; }
 .ok { color: var(--ball); font-weight: 600; }
 .card .actions { margin-top: 10px; }
@@ -97505,7 +97566,7 @@ cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-7';
+const CACHE = 'tsm-campi-8';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));

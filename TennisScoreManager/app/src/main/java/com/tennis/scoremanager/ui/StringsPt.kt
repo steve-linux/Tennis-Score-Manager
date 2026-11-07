@@ -794,6 +794,7 @@ object PtStrings : Strings {
     override val srvChatsHint = "Para verificar as mensagens de Procuro parceiro e retirar as inadequadas."
     override val srvChatDelete = "Retirar"
     override val srvChatsNone = "Nenhum chat."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 mensagem por ler no mural" else "$it mensagens por ler no mural" }
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"

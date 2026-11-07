@@ -791,6 +791,7 @@ object EsStrings : Strings {
     override val srvChatsHint = "Para revisar los mensajes de Busco compañero y quitar los inapropiados."
     override val srvChatDelete = "Quitar"
     override val srvChatsNone = "No hay chats."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 mensaje por leer en el tablón" else "$it mensajes por leer en el tablón" }
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"

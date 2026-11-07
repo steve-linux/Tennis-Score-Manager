@@ -26,7 +26,7 @@ const I18N = {
     pinRequiredTitle: 'Ultimo passo: scegli il tuo PIN', pinRequiredText: 'Ti serve per rientrare da solo se cambi telefono o se il browser ti fa uscire: così non devi chiedere un nuovo invito. Si fa una volta sola.', pinSaveTip: 'Quando il browser ti propone di salvare la password, tocca Salva: così il PIN lo ricorda lui. Se non te lo propone, scrivilo in un posto sicuro.', pinGo: 'Salva e continua',
     seekAlerts: 'Avvisami dei nuovi annunci', seekAlertsHint: 'Una notifica quando qualcuno del circolo cerca un compagno (servono i promemoria accesi in Le mie). Spenta, gli annunci si vedono lo stesso.', seekOpen: 'Apri Compagni', seekNewTitle: n => n === 1 ? 'Un nuovo annuncio: cerco compagno' : `${n} nuovi annunci: cerco compagno`,
     seekGone: 'Questo annuncio non è più aperto: ha già trovato il compagno o è stato tolto.',
-    chatOpen: 'Chat', chatSend: 'Invia', chatYou: 'Tu', chatNone: 'Ancora nessun messaggio.', chatPlaceholder: 'Scrivi un messaggio…', boardTitle: 'Bacheca del circolo', boardOpen: 'Leggi', boardHint: 'Qui scrive la segreteria del circolo.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Invia', chatYou: 'Tu', chatNone: 'Ancora nessun messaggio.', chatPlaceholder: 'Scrivi un messaggio…', boardTitle: 'Bacheca del circolo', boardOpen: 'Leggi', boardUnread: n => n === 1 ? '1 messaggio da leggere in bacheca' : `${n} messaggi da leggere in bacheca`, boardHint: 'Qui scrive la segreteria del circolo.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'L\'annuncio è già al completo.', TOO_MANY_SEEKS: 'Hai già 3 annunci aperti: togline uno prima.',
       FREE_NOW: 'Si è appena liberata: prenotala subito!', TOO_MANY_WAITS: 'Sei già in attesa per 3 caselle: togline una prima.',
@@ -65,7 +65,7 @@ const I18N = {
     pinRequiredTitle: 'Last step: choose your PIN', pinRequiredText: 'You need it to sign back in yourself if you change phone or the browser signs you out, without asking for a new invitation. You do it only once.', pinSaveTip: 'When the browser offers to save the password, tap Save: then it remembers the PIN for you. If it does not offer, write it down somewhere safe.', pinGo: 'Save and continue',
     seekAlerts: 'Tell me about new posts', seekAlertsHint: 'A notification when someone at the club looks for a partner (reminders must be on in Mine). Off, the posts still show.', seekOpen: 'Open Partners', seekNewTitle: n => n === 1 ? 'A new post: looking for a partner' : `${n} new posts: looking for a partner`,
     seekGone: 'This post is no longer open: they already found a partner or it was removed.',
-    chatOpen: 'Chat', chatSend: 'Send', chatYou: 'You', chatNone: 'No messages yet.', chatPlaceholder: 'Write a message…', boardTitle: 'Club notice board', boardOpen: 'Read', boardHint: 'The club office writes here.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Send', chatYou: 'You', chatNone: 'No messages yet.', chatPlaceholder: 'Write a message…', boardTitle: 'Club notice board', boardOpen: 'Read', boardUnread: n => n === 1 ? '1 unread message on the notice board' : `${n} unread messages on the notice board`, boardHint: 'The club office writes here.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'This request is already complete.', TOO_MANY_SEEKS: 'You already have 3 open requests: remove one first.',
       FREE_NOW: 'It has just become free: book it now!', TOO_MANY_WAITS: 'You are already waiting for 3 slots: remove one first.',
@@ -104,7 +104,7 @@ const I18N = {
     pinRequiredTitle: 'Dernière étape : choisissez votre PIN', pinRequiredText: 'Il vous sert à revenir seul si vous changez de téléphone ou si le navigateur vous déconnecte, sans demander une nouvelle invitation. On le fait une seule fois.', pinSaveTip: 'Quand le navigateur propose d\'enregistrer le mot de passe, touchez Enregistrer : il se souviendra du PIN pour vous. Sinon, notez-le dans un endroit sûr.', pinGo: 'Enregistrer et continuer',
     seekAlerts: 'Me prévenir des nouvelles annonces', seekAlertsHint: 'Une notification quand quelqu\'un du club cherche un partenaire (il faut les rappels activés dans Les miennes). Désactivée, les annonces se voient quand même.', seekOpen: 'Ouvrir Partenaires', seekNewTitle: n => n === 1 ? 'Une nouvelle annonce : je cherche un partenaire' : `${n} nouvelles annonces : je cherche un partenaire`,
     seekGone: 'Cette annonce n\'est plus ouverte : le partenaire est déjà trouvé ou elle a été retirée.',
-    chatOpen: 'Discussion', chatSend: 'Envoyer', chatYou: 'Vous', chatNone: 'Pas encore de message.', chatPlaceholder: 'Écrivez un message…', boardTitle: 'Tableau du club', boardOpen: 'Lire', boardHint: 'Ici écrit le secrétariat du club.', chatTitle: t => `Discussion · ${t}`,
+    chatOpen: 'Discussion', chatSend: 'Envoyer', chatYou: 'Vous', chatNone: 'Pas encore de message.', chatPlaceholder: 'Écrivez un message…', boardTitle: 'Tableau du club', boardOpen: 'Lire', boardUnread: n => n === 1 ? '1 message à lire au tableau' : `${n} messages à lire au tableau`, boardHint: 'Ici écrit le secrétariat du club.', chatTitle: t => `Discussion · ${t}`,
     err: {
       FULL: 'Cette annonce est déjà complète.', TOO_MANY_SEEKS: 'Vous avez déjà 3 annonces ouvertes : retirez-en une d\'abord.',
       FREE_NOW: 'Il vient de se libérer : réservez-le vite !', TOO_MANY_WAITS: 'Vous attendez déjà 3 créneaux : retirez-en un d\'abord.',
@@ -143,7 +143,7 @@ const I18N = {
     pinRequiredTitle: 'Letzter Schritt: Wähle deine PIN', pinRequiredText: 'Damit kommst du selbst wieder hinein, wenn du das Telefon wechselst oder der Browser dich abmeldet, ohne neue Einladung. Das machst du nur einmal.', pinSaveTip: 'Wenn der Browser anbietet, das Passwort zu speichern, tippe auf Speichern: Dann merkt er sich die PIN für dich. Sonst schreib sie an einem sicheren Ort auf.', pinGo: 'Speichern und weiter',
     seekAlerts: 'Über neue Anzeigen benachrichtigen', seekAlertsHint: 'Eine Benachrichtigung, wenn jemand im Verein einen Partner sucht (die Erinnerungen unter Meine müssen an sein). Aus: Die Anzeigen siehst du trotzdem.', seekOpen: 'Partner öffnen', seekNewTitle: n => n === 1 ? 'Eine neue Anzeige: Partner gesucht' : `${n} neue Anzeigen: Partner gesucht`,
     seekGone: 'Diese Anzeige ist nicht mehr offen: Der Partner ist schon gefunden oder sie wurde entfernt.',
-    chatOpen: 'Chat', chatSend: 'Senden', chatYou: 'Du', chatNone: 'Noch keine Nachrichten.', chatPlaceholder: 'Schreib eine Nachricht…', boardTitle: 'Vereinsbrett', boardOpen: 'Lesen', boardHint: 'Hier schreibt das Vereinsbüro.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Senden', chatYou: 'Du', chatNone: 'Noch keine Nachrichten.', chatPlaceholder: 'Schreib eine Nachricht…', boardTitle: 'Vereinsbrett', boardOpen: 'Lesen', boardUnread: n => n === 1 ? '1 ungelesene Mitteilung am Vereinsbrett' : `${n} ungelesene Mitteilungen am Vereinsbrett`, boardHint: 'Hier schreibt das Vereinsbüro.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'Diese Anzeige ist schon vollständig.', TOO_MANY_SEEKS: 'Du hast schon 3 offene Anzeigen: Entferne zuerst eine.',
       FREE_NOW: 'Gerade frei geworden: Buch es jetzt!', TOO_MANY_WAITS: 'Du wartest schon auf 3 Felder: Entferne zuerst eins.',
@@ -182,7 +182,7 @@ const I18N = {
     pinRequiredTitle: 'Último paso: elige tu PIN', pinRequiredText: 'Te sirve para volver a entrar solo si cambias de teléfono o el navegador te saca, sin pedir una nueva invitación. Se hace una sola vez.', pinSaveTip: 'Cuando el navegador te proponga guardar la contraseña, toca Guardar: así recordará el PIN por ti. Si no te lo propone, apúntalo en un lugar seguro.', pinGo: 'Guardar y continuar',
     seekAlerts: 'Avisarme de los nuevos anuncios', seekAlertsHint: 'Una notificación cuando alguien del club busca compañero (hacen falta los recordatorios activados en Mías). Apagada, los anuncios se ven igual.', seekOpen: 'Abrir Compañeros', seekNewTitle: n => n === 1 ? 'Un anuncio nuevo: busco compañero' : `${n} anuncios nuevos: busco compañero`,
     seekGone: 'Este anuncio ya no está abierto: ya encontró compañero o lo han quitado.',
-    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Tú', chatNone: 'Todavía no hay mensajes.', chatPlaceholder: 'Escribe un mensaje…', boardTitle: 'Tablón del club', boardOpen: 'Leer', boardHint: 'Aquí escribe la secretaría del club.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Tú', chatNone: 'Todavía no hay mensajes.', chatPlaceholder: 'Escribe un mensaje…', boardTitle: 'Tablón del club', boardOpen: 'Leer', boardUnread: n => n === 1 ? '1 mensaje por leer en el tablón' : `${n} mensajes por leer en el tablón`, boardHint: 'Aquí escribe la secretaría del club.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'El anuncio ya está completo.', TOO_MANY_SEEKS: 'Ya tienes 3 anuncios abiertos: quita uno primero.',
       FREE_NOW: 'Se acaba de liberar: ¡resérvala ya!', TOO_MANY_WAITS: 'Ya esperas 3 casillas: quita una primero.',
@@ -221,7 +221,7 @@ const I18N = {
     pinRequiredTitle: 'Último passo: escolha o seu PIN', pinRequiredText: 'Serve para voltar a entrar sozinho se trocar de telefone ou o navegador o desconectar, sem pedir um novo convite. Faz-se uma só vez.', pinSaveTip: 'Quando o navegador propuser guardar a palavra-passe, toque em Guardar: assim ele lembra o PIN por si. Se não propuser, anote-o num lugar seguro.', pinGo: 'Guardar e continuar',
     seekAlerts: 'Avisar-me dos novos anúncios', seekAlertsHint: 'Uma notificação quando alguém do clube procura parceiro (os lembretes têm de estar ligados em Minhas). Desligada, os anúncios veem-se na mesma.', seekOpen: 'Abrir Parceiros', seekNewTitle: n => n === 1 ? 'Um anúncio novo: procuro parceiro' : `${n} anúncios novos: procuro parceiro`,
     seekGone: 'Este anúncio já não está aberto: já encontrou parceiro ou foi retirado.',
-    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Você', chatNone: 'Ainda não há mensagens.', chatPlaceholder: 'Escreva uma mensagem…', boardTitle: 'Mural do clube', boardOpen: 'Ler', boardHint: 'Aqui escreve a secretaria do clube.', chatTitle: t => `Chat · ${t}`,
+    chatOpen: 'Chat', chatSend: 'Enviar', chatYou: 'Você', chatNone: 'Ainda não há mensagens.', chatPlaceholder: 'Escreva uma mensagem…', boardTitle: 'Mural do clube', boardOpen: 'Ler', boardUnread: n => n === 1 ? '1 mensagem por ler no mural' : `${n} mensagens por ler no mural`, boardHint: 'Aqui escreve a secretaria do clube.', chatTitle: t => `Chat · ${t}`,
     err: {
       FULL: 'O anúncio já está completo.', TOO_MANY_SEEKS: 'Já tens 3 anúncios abertos: tira um primeiro.',
       FREE_NOW: 'Acabou de ficar livre: reserva-a já!', TOO_MANY_WAITS: 'Já esperas por 3 casas: tira uma primeiro.',

@@ -829,6 +829,7 @@ interface Strings {
     val srvChatsHint: String
     val srvChatDelete: String
     val srvChatsNone: String
+    val pbBoardUnread: (Int) -> String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3165,6 +3166,7 @@ object ItStrings : Strings {
     override val srvChatsHint = "Per controllare i messaggi di Cerco compagno e togliere quelli fuori luogo."
     override val srvChatDelete = "Togli"
     override val srvChatsNone = "Nessuna chat."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 messaggio da leggere in bacheca" else "$it messaggi da leggere in bacheca" }
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5464,6 +5466,7 @@ object EnStrings : Strings {
     override val srvChatsHint = "To check the Looking for a partner messages and remove inappropriate ones."
     override val srvChatDelete = "Remove"
     override val srvChatsNone = "No chats."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 unread message on the notice board" else "$it unread messages on the notice board" }
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

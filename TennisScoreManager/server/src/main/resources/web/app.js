@@ -296,7 +296,7 @@ function render(dayError) {
   const fresh = state.tab === 2 ? [] : unreadSeeks();
   const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : '')];
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
-  const parts = [bar];
+  const parts = [boardNews(), bar].filter(Boolean);
   if (state.tab === 1) {
     parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
@@ -305,8 +305,9 @@ function render(dayError) {
     // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
     if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
     // La bacheca del circolo: i messaggi della segreteria (col pallino se ce ne sono di nuovi).
-    if (me.boardLast > 0) parts.push(el('div', { class: 'card' + (chatUnread('board', me.boardLast) ? ' freed' : '') },
-      el('b', null, T.boardTitle + (chatUnread('board', me.boardLast) ? ' •' : '')),
+    // Già letta resta qui, piccola; quella nuova sta in evidenza sopra le schede (boardNews).
+    if (me.boardLast > 0 && !chatUnread('board', me.boardLast)) parts.push(el('div', { class: 'card' },
+      el('b', null, T.boardTitle),
       el('div', { class: 'actions' }, el('button', { class: 'small', onclick: () => openChat('board', T.boardTitle, false) }, T.boardOpen))));
     // Gli annunci nuovi degli altri, finché non si apre Compagni: altrimenti nessuno li vede.
     if (fresh.length) parts.push(el('div', { class: 'card freed' },
@@ -479,6 +480,18 @@ function markChatRead(room, at) { try { const r = chatRead(); r[room] = Math.max
 function chatUnread(room, last) { return last > 0 && last > (chatRead()[room] || 0); }
 
 /** La chat in un riquadro che sale dal basso: i messaggi si aggiornano ogni pochi secondi finché è aperta. */
+/** Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca. */
+function boardNews() {
+  const me = state.me;
+  if (!me || !(me.boardLast > 0) || !chatUnread('board', me.boardLast)) return null;
+  if (state.boardFor !== me.boardLast) {
+    state.boardFor = me.boardLast;
+    api('GET', '/chat/board').then(list => { state.board = list; render(); }).catch(() => { /* resta il numero minimo */ });
+  }
+  const n = Math.max(1, (state.board || []).filter(m => chatUnread('board', m.at)).length);
+  return el('button', { class: 'boardbar', onclick: () => openChat('board', T.boardTitle, false) }, '📣 ' + T.boardUnread(n), el('span', null, '›'));
+}
+
 async function openChat(room, title, canWrite) {
   const list = el('div', { class: 'chat' });
   const input = canWrite ? el('textarea', { id: 'chatin', rows: '2', maxlength: '500', placeholder: T.chatPlaceholder }) : null;

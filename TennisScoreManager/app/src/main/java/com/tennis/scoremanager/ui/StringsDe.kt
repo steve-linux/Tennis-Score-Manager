@@ -790,6 +790,7 @@ object DeStrings : Strings {
     override val srvChatsHint = "Zum Prüfen der Nachrichten von Partner gesucht und zum Entfernen unpassender."
     override val srvChatDelete = "Entfernen"
     override val srvChatsNone = "Keine Chats."
+    override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 ungelesene Mitteilung am Vereinsbrett" else "$it ungelesene Mitteilungen am Vereinsbrett" }
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

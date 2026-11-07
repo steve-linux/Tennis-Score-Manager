@@ -85,6 +85,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
 
@@ -93,6 +94,19 @@ private const val B_CELL_W = 104
 private const val B_CELL_H = 46
 
 /** L'errore del server detto al giocatore. */
+/** La striscia gialla degli avvisi della bacheca da leggere: si tocca e si apre la bacheca. */
+@Composable
+fun BoardBanner(text: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        androidx.compose.material3.Icon(Icons.Filled.Campaign, null, tint = TsmColors.OnBall)
+        Text(text, color = TsmColors.OnBall, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+        androidx.compose.material3.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.OnBall)
+    }
+}
+
 fun bookErrorText(s: Strings, code: String): String = when (code) {
     "NET", "BAD_URL" -> s.pbErrNet
     "BAD_CODE" -> s.pbErrInvite
@@ -296,6 +310,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     }
     fun reload() { tick++ }
     // Dalle novità di Gioca: si apre direttamente Compagni.
+    val wantBoard by c.boardRequest.collectAsState()
+    LaunchedEffect(wantBoard) { if (wantBoard) { chatRoom = "board" to ""; c.boardRequest.value = false } }
     val wantTab by c.bookTabRequest.collectAsState()
     LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
     val acct by c.bookingAccount.collectAsState()
@@ -323,6 +339,13 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else {
         val ct = remember(m.timeZone, locale) { ClubTime(m.timeZone, locale) }
+        // Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca.
+        val boardRead = acct.chatRead["board"] ?: 0
+        if (m.boardLast > boardRead) {
+            var unread by remember { mutableStateOf(0) }
+            LaunchedEffect(m.boardLast, boardRead) { c.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
+            BoardBanner(s.pbBoardUnread(maxOf(1, unread))) { chatRoom = "board" to "" }
+        }
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
         val freed = m.waits.count { it.freedCourt != null }
         Segmented(
@@ -332,11 +355,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         )
         when (tab) {
             0 -> {
-                // La bacheca del circolo: si vede appena la segreteria ha scritto (col pallino se c'è del nuovo).
-                if (m.boardLast > 0) {
-                    val unread = m.boardLast > (acct.chatRead["board"] ?: 0)
-                    GhostButton(s.pbBoardTitle + if (unread) " •" else "", Icons.Filled.Campaign, { chatRoom = "board" to "" }, Modifier.fillMaxWidth())
-                }
+                // La bacheca già letta resta qui, piccola (quella nuova è in evidenza sopra le schede).
+                if (m.boardLast in 1..boardRead) GhostButton(s.pbBoardTitle, Icons.Filled.Campaign, { chatRoom = "board" to "" }, Modifier.fillMaxWidth())
                 Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     m.days.forEachIndexed { i, d ->

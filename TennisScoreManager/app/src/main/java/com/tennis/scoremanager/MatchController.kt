@@ -2545,6 +2545,8 @@ class MatchController(
 
     /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
     val bookTabRequest = MutableStateFlow<Int?>(null)
+    /** Dalla striscia della bacheca in Gioca: Prenota un campo apre subito la bacheca. */
+    val boardRequest = MutableStateFlow(false)
 
     /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
     fun openSeekNews(url: String, id: String) {
@@ -2561,7 +2563,7 @@ class MatchController(
         val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
         com.tennis.scoremanager.service.OnlineAlerts.cancelChat(app, room)
         if ((a.chatRead[room] ?: 0) >= at && room !in a.chatNews) return
-        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room), url)
+        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room, boardUnread = if (room == "board") 0 else a.boardUnread), url)
     }
 
     /**
@@ -2587,7 +2589,11 @@ class MatchController(
                 }
                 acc = acc.copy(chatNotified = acc.chatNotified + (room to last))
             }
-            if (last > (acc.chatRead[room] ?: 0)) acc = acc.copy(chatNews = acc.chatNews + (room to title))
+            // La bacheca ha la sua striscia in cima a Gioca, col numero degli avvisi da leggere.
+            if (room == "board") {
+                val n = bookingWith(a) { it.chat(room, acc.chatRead[room] ?: 0) }.getOrNull()?.count { !it.mine }
+                if (n != null) acc = acc.copy(boardUnread = n)
+            } else acc = acc.copy(chatNews = acc.chatNews + (room to title))
         }
         return acc
     }
