@@ -23,6 +23,8 @@ function el(tag, attrs, ...kids) {
     if (v == null || v === false) continue;
     if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
     else if (k === 'class') e.className = v;
+    // Lo stile passa da JavaScript: la pagina non permette gli attributi style (Content-Security-Policy).
+    else if (k === 'style') for (const d of String(v).split(';')) { const i = d.indexOf(':'); if (i > 0) e.style.setProperty(d.slice(0, i).trim(), d.slice(i + 1).trim()); }
     else e.setAttribute(k, v === true ? '' : v);
   }
   for (const c of kids.flat()) if (c != null && c !== false) e.append(c instanceof Node ? c : String(c));
@@ -299,7 +301,7 @@ function render(dayError) {
   const chatNew = (state.rooms || []).some(x => chatUnread(x.room, x.last));
   const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : ''), T.tabChat + (chatNew ? ' •' : '')];
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
-  const parts = [boardNews(), bar].filter(Boolean);
+  const parts = [boardNews(), ...chatNews(), bar].filter(Boolean);
   if (state.tab === 1) {
     parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
@@ -497,6 +499,26 @@ function boardNews() {
   return el('button', { class: 'boardbar', onclick: () => openChat('board', T.boardTitle, false) }, '📣 ' + T.boardUnread(n), el('span', null, '›'));
 }
 
+/**
+ * Le strisce dei messaggi nuovi tra soci, in cima come quella della bacheca: la chat del circolo (col numero)
+ * e una per ogni privata; toccandole si apre la chat. Il numero arriva dopo (una chiamata in più).
+ */
+function chatNews() {
+  const rooms = state.rooms || [];
+  const out = [];
+  const club = rooms.find(x => x.room === 'club');
+  if (club && chatUnread('club', club.last)) {
+    if (state.clubFor !== club.last) {
+      state.clubFor = club.last;
+      api('GET', '/chat/club?after=' + (chatRead().club || 0)).then(l => { state.clubNew = l.filter(m => !m.mine).length; render(); }).catch(() => {});
+    }
+    out.push(el('button', { class: 'boardbar', onclick: () => { state.tab = 3; save(TAB, '3'); openRoom('club'); } }, '💬 ' + T.clubUnread(Math.max(1, state.clubNew || 0)), el('span', null, '›')));
+  }
+  for (const d of rooms.filter(x => x.room.startsWith('d-') && chatUnread(x.room, x.last)))
+    out.push(el('button', { class: 'boardbar', onclick: () => { state.tab = 3; save(TAB, '3'); openRoom(d.room, d.title); } }, '✉️ ' + T.dmFrom(d.title), el('span', null, '›')));
+  return out;
+}
+
 /** Il titolo di una chat: quella del circolo, o il nome dell'altro in una privata. */
 function roomTitle(room) {
   if (room === 'club') return T.clubChat;
@@ -516,7 +538,6 @@ function openRoom(room, name) {
 /** La scheda Chat: la chat del circolo, i messaggi privati (a chi l'ha acceso), chi si è bloccato. */
 function chatSection() {
   const me = state.me;
-  const dot = room => (state.rooms || []).some(x => x.room === room && chatUnread(room, x.last)) ? ' •' : '';
   const toggle = (key, label, hint) => {
     const box = el('input', { type: 'checkbox' });
     box.checked = !!me[key];
@@ -527,6 +548,8 @@ function chatSection() {
     return [el('label', { class: 'check' }, box, ' ', label), el('p', { class: 'dim' }, hint)];
   };
   const dms = (state.rooms || []).filter(x => x.room.startsWith('d-'));
+  const club = (state.rooms || []).find(x => x.room === 'club');
+  const preview = r => (r.previewMine ? T.chatYou + ': ' : '') + (r.preview || '');
   const write = async () => {
     let list;
     try { list = await api('GET', '/people'); } catch (e) { toast(errText(e)); return; }
@@ -536,37 +559,79 @@ function chatSection() {
       el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close)));
   };
   return [
-    el('h2', null, T.clubChat),
-    el('button', { onclick: () => openRoom('club') }, T.clubChat + dot('club')),
-    ...toggle('clubChat', T.clubChatAlerts, T.clubChatAlertsHint),
-    el('h2', null, T.dmTitle),
-    ...toggle('dmOpen', T.dmOpen, T.dmOpenHint),
-    dms.length ? el('div', { class: 'list' }, ...dms.map(d => el('button', { class: 'ghost', onclick: () => openRoom(d.room, d.title) }, d.title + dot(d.room)))) : el('p', { class: 'dim' }, T.dmNone),
+    // L'elenco come nelle app di messaggi: in cima la chat del circolo, poi le private, le più recenti prima.
+    chatRow(T.clubChat, club && club.count ? preview(club) : T.clubEntryHint, club ? club.last : 0,
+      club && chatUnread('club', club.last) ? Math.max(1, state.clubNew || 0) : 0, '💬', () => openRoom('club')),
+    ...dms.map(d => chatRow(d.title, preview(d), d.last, chatUnread(d.room, d.last) && !d.previewMine ? 1 : 0, null, () => openRoom(d.room, d.title))),
+    dms.length ? null : el('p', { class: 'dim' }, T.dmNone),
     el('button', { class: 'ghost', onclick: write }, '+ ' + T.dmWrite),
+    ...toggle('clubChat', T.clubChatAlerts, T.clubChatAlertsHint),
+    ...toggle('dmOpen', T.dmOpen, T.dmOpenHint),
     (me.blocked || []).length ? el('div', null, el('h2', null, T.blockedList), ...me.blocked.map(b => el('button', { class: 'small ghost', onclick: async () => {
       try { await api('POST', '/block', { player: b.id, on: false }); await refresh(); } catch (e) { toast(errText(e)); }
     } }, T.unblock(b.name)))) : null,
   ].filter(Boolean);
 }
 
+/** I colori dei nomi nelle chat di gruppo: ognuno sempre il suo, come nell'app (stessa impronta del nome). */
+const NAME_COLORS = ['#29B6F6', '#FF9800', '#AB47BC', '#66BB6A', '#EF5350', '#26C6DA', '#FFCA28', '#EC407A'];
+function nameColor(name) { let h = 0; for (const c of name) h = (31 * h + c.charCodeAt(0)) | 0; return NAME_COLORS[(h & 0x7fffffff) % NAME_COLORS.length]; }
+/** Le iniziali in un cerchio colorato; [icon] (un'emoji) al posto delle iniziali, per il gruppo e la bacheca. */
+function avatar(name, icon) {
+  const ini = name.split(/[ -]/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
+  return el('span', { class: 'avatar' + (icon ? ' icon' : ''), style: icon ? null : 'background:' + nameColor(name) }, icon || ini);
+}
+const dayKey = ms => new Intl.DateTimeFormat('en-CA', { timeZone: tz() }).format(new Date(ms));
+/** L'ora se è di oggi, se no la data: come negli elenchi delle chat. */
+const whenShort = ms => dayKey(ms) === dayKey(Date.now()) ? fmtTime(ms) : new Intl.DateTimeFormat(LANG, { day: '2-digit', month: '2-digit', timeZone: tz() }).format(new Date(ms));
+
+/** Una riga dell'elenco delle chat: cerchio, nome, ultimo messaggio, ora e il tondino coi non letti. */
+function chatRow(name, preview, at, unread, icon, onclick) {
+  return el('button', { class: 'chatrow', onclick },
+    avatar(name, icon),
+    el('span', { class: 'body' },
+      el('span', { class: 'top' }, el('b', null, name), el('small', { class: unread ? 'new' : '' }, at ? whenShort(at) : '')),
+      el('span', { class: 'bottom' }, el('span', { class: 'preview' }, preview), unread ? el('span', { class: 'count' }, unread > 99 ? '99+' : String(unread)) : null)));
+}
+
+/**
+ * Una chat a tutto schermo, come nelle app di messaggi: in alto il titolo, i messaggi a fumetti (i propri a destra;
+ * nelle chat di gruppo il nome colorato di chi scrive) con le date in mezzo, in basso la barra per scrivere.
+ * I messaggi si aggiornano ogni pochi secondi finché è aperta.
+ */
 async function openChat(room, title, canWrite, opts = {}) {
-  const list = el('div', { class: 'chat' });
-  const input = canWrite ? el('textarea', { id: 'chatin', rows: '2', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
+  const group = room === 'club' || room.startsWith('s-');
+  const list = el('div', { class: 'chatlist' });
+  const input = canWrite ? el('textarea', { id: 'chatin', rows: '1', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
   const err = el('p', { class: 'error' });
-  let last = 0, timer = 0;
+  let last = 0, timer = 0, lastDay = '';
+  const today = dayKey(Date.now()), yesterday = dayKey(Date.now() - 86400000);
+  // Com'è questa chat (chi la legge, come si segnala): un riquadro in cima.
+  const hint = opts.hint || (canWrite ? null : T.boardHint);
+  if (hint) list.append(el('div', { class: 'notice' }, hint));
+  const none = el('p', { class: 'dim center' }, T.chatNone);
+  list.append(none);
   const draw = (msgs) => {
     for (const m of msgs) {
       last = Math.max(last, m.at);
+      const d = dayKey(m.at);
+      if (d !== lastDay) {
+        lastDay = d;
+        list.append(el('div', { class: 'day' }, el('span', null, d === today ? T.today : d === yesterday ? T.yesterday
+          : new Intl.DateTimeFormat(LANG, { weekday: 'long', day: 'numeric', month: 'long', timeZone: tz() }).format(new Date(m.at)))));
+      }
       // Con la bandierina si segnala alla segreteria un messaggio ricevuto.
-      const flag = opts.report && !m.mine && !m.office ? el('button', { class: 'flag', title: T.report, onclick: async () => {
+      const flag = opts.report && !m.mine && !m.office ? el('button', { class: 'flag', title: T.report, 'aria-label': T.report, onclick: async () => {
+        if (!confirm(T.report + '?')) return;
         try { await api('POST', '/chat/msg/' + m.id + '/report'); toast(T.reported); } catch (e) { err.textContent = errText(e); }
       } }, '⚑') : null;
-      list.append(el('div', { class: 'msg' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') },
-        el('div', { class: 'who' }, (m.mine ? T.chatYou : m.name) + ' · ' + fmtTime(m.at), flag), el('div', null, m.text)));
+      list.append(el('div', { class: 'bubble' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') },
+        !m.mine && (group || m.office) ? el('div', { class: 'name', style: m.office ? null : 'color:' + nameColor(m.name) }, m.name) : null,
+        el('div', { class: 'text' }, m.text),
+        el('div', { class: 'meta' }, flag, fmtTime(m.at))));
     }
+    if (last) none.remove();
     if (msgs.length) { list.scrollTop = list.scrollHeight; markChatRead(room, last); }
-    if (!list.children.length) list.replaceChildren(el('p', { class: 'dim', id: 'chatnone' }, T.chatNone));
-    else { const n = document.getElementById('chatnone'); if (n) n.remove(); }
   };
   const load = async () => {
     try { draw(await api('GET', '/chat/' + room + '?after=' + last)); err.textContent = ''; } catch (e) { err.textContent = errText(e); }
@@ -574,19 +639,33 @@ async function openChat(room, title, canWrite, opts = {}) {
   const send = async () => {
     const text = input.value.trim();
     if (!text) return;
-    try { await api('POST', '/chat/' + room, { text }); input.value = ''; await load(); } catch (e) { err.textContent = errText(e); }
+    try { await api('POST', '/chat/' + room, { text }); input.value = ''; input.style.height = ''; await load(); } catch (e) { err.textContent = errText(e); }
   };
-  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
-  const close = () => { clearInterval(timer); closeSheet(); render(); };
-  const block = opts.block ? el('button', { class: 'ghost danger', onclick: async () => {
+  if (input) {
+    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+    // Il campo cresce col testo, fino a qualche riga.
+    input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; });
+  }
+  const view = el('div', { class: 'chatview', role: 'dialog', 'aria-label': title });
+  // Chiudendo, l'elenco si aggiorna (l'ultimo messaggio, i non letti).
+  const close = async () => {
+    clearInterval(timer); view.remove(); document.body.classList.remove('nochrome');
+    try { state.rooms = await api('GET', '/chats'); } catch (_) { /* resta quello di prima */ }
+    render();
+  };
+  const block = opts.block ? el('button', { class: 'small ghost danger', onclick: async () => {
     if (!confirm(T.blockAsk(opts.block.name))) return;
-    try { await api('POST', '/block', { player: opts.block.id, on: true }); clearInterval(timer); closeSheet(); await refresh(); } catch (e) { err.textContent = errText(e); }
+    try { await api('POST', '/block', { player: opts.block.id, on: true }); clearInterval(timer); view.remove(); document.body.classList.remove('nochrome'); await refresh(); } catch (e) { err.textContent = errText(e); }
   } }, T.block) : null;
-  sheet(el('h3', null, title), opts.hint ? el('p', { class: 'dim' }, opts.hint) : null, list, err,
-    input ? el('div', { class: 'chatbar' }, input, el('button', { onclick: send }, T.chatSend)) : el('p', { class: 'dim' }, T.boardHint),
-    el('div', { class: 'actions' }, block, el('button', { class: 'ghost', onclick: close }, T.close)));
+  view.append(
+    el('div', { class: 'chathead' }, el('button', { class: 'back', 'aria-label': T.close, onclick: close }, '←'),
+      avatar(title, group ? '💬' : canWrite ? null : '📣'), el('b', null, title), block),
+    list, err,
+    input ? el('div', { class: 'chatbar' }, input, el('button', { class: 'send', 'aria-label': T.chatSend, onclick: send }, '➤')) : null);
+  document.body.append(view);
+  document.body.classList.add('nochrome');
   await load();
-  timer = setInterval(() => { if ($('sheet').hidden) clearInterval(timer); else load(); }, 4000);
+  timer = setInterval(() => { if (!view.isConnected) clearInterval(timer); else load(); }, 4000);
   if (input) input.focus();
 }
 

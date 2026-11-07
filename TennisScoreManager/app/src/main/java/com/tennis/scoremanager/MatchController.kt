@@ -2563,7 +2563,8 @@ class MatchController(
         val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
         com.tennis.scoremanager.service.OnlineAlerts.cancelChat(app, room)
         if ((a.chatRead[room] ?: 0) >= at && room !in a.chatNews) return
-        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room, boardUnread = if (room == "board") 0 else a.boardUnread), url)
+        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room, boardUnread = if (room == "board") 0 else a.boardUnread,
+            clubUnread = if (room == "club") 0 else a.clubUnread), url)
     }
 
     /**
@@ -2571,11 +2572,12 @@ class MatchController(
      * annunci in cui si è. Si avvisa una volta per messaggio; l'account torna con le novità aggiornate.
      */
     private suspend fun checkChats(a: com.tennis.scoremanager.data.BookingAccount, me: com.tennis.scoremanager.data.SrvMe, seeks: List<com.tennis.scoremanager.data.SrvSeek>?, club: String?): com.tennis.scoremanager.data.BookingAccount {
+        val chats = bookingWith(a) { it.myChats() }.getOrNull()
         val rooms = buildList {
             if (me.boardLast > 0) add(Triple("board", "", me.boardLast))
             seeks?.filter { (it.mine || it.joined) && it.chatLast > 0 }?.forEach { add(Triple("s-" + it.id, seekLine(it), it.chatLast)) }
             // La chat del circolo (se se ne vogliono le notifiche) e le private.
-            bookingWith(a) { it.myChats() }.getOrNull()?.filter { it.last > 0 && (it.room != "club" || me.clubChat) }?.forEach {
+            chats?.filter { it.last > 0 && (it.room != "club" || me.clubChat) }?.forEach {
                 add(Triple(it.room, if (it.room == "club") strings.pbClubChat else it.title, it.last))
             }
         }
@@ -2604,7 +2606,25 @@ class MatchController(
                 if (n != null) acc = acc.copy(boardUnread = n)
             } else acc = acc.copy(chatNews = acc.chatNews + (room to title))
         }
+        // La chat del circolo in Gioca (anche con le notifiche spente): l'ultimo messaggio e quanti da leggere.
+        val clubRoom = chats?.firstOrNull { it.room == "club" }
+        if (clubRoom != null && clubRoom.last > acc.clubPreviewAt) {
+            val read = acc.chatRead["club"] ?: 0
+            bookingWith(a) { it.chat("club", 0) }.getOrNull()?.let { l ->
+                acc = acc.copy(clubPreview = l.lastOrNull()?.let { "${it.name}: ${it.text}" }.orEmpty().take(140),
+                    clubPreviewAt = clubRoom.last, clubUnread = l.count { !it.mine && it.at > read })
+            }
+        }
         return acc
+    }
+
+    private var newsCheckedAt = 0L
+    /** Aprendo Gioca: le novità dei circoli (chat, bacheca, annunci) subito, al massimo una volta al minuto. */
+    fun refreshClubNews() {
+        val now = System.currentTimeMillis()
+        if (bookingAccounts.value.isEmpty() || now - newsCheckedAt < 60_000) return
+        newsCheckedAt = now
+        scope.launch { checkMyBookings() }
     }
 
     /** La segreteria: i messaggi di una stanza, la bacheca, le stanze, togliere un messaggio. Codice d'errore o il risultato. */

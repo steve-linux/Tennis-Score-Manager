@@ -785,9 +785,9 @@ object DeStrings : Strings {
     override val pbErrChat = "Dieser Chat ist nur für die Spieler der Anzeige."
     override val pbErrChatMany = "Du schreibst zu viel: Warte ein paar Minuten."
     override val srvBoard = "Vereinsbrett"
-    override val srvBoardHint = "Eine Mitteilung an alle Spieler: Sie kommt mit einer Benachrichtigung. Nachrichten bleiben 30 Tage."
+    override val srvBoardHint = "Eine Mitteilung an alle Spieler: Sie kommt mit einer Benachrichtigung. Nachrichten bleiben 30 Tage. Halte eine Nachricht gedrückt, um sie zu entfernen."
     override val srvChats = "Chats und Meldungen"
-    override val srvChatsHint = "Der Vereinschat, die Chats der Anzeigen und die privaten Nachrichten, die Mitglieder gemeldet haben (nur diese): Entferne unpassende."
+    override val srvChatsHint = "Der Vereinschat, die Chats der Anzeigen und die privaten Nachrichten, die Mitglieder gemeldet haben (nur diese): Entferne unpassende. Halte eine Nachricht gedrückt, um sie zu entfernen."
     override val srvChatDelete = "Entfernen"
     override val srvChatsNone = "Keine Chats."
     override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 ungelesene Mitteilung am Vereinsbrett" else "$it ungelesene Mitteilungen am Vereinsbrett" }
@@ -812,6 +812,10 @@ object DeStrings : Strings {
     override val pbReported = "Dem Büro gemeldet"
     override val pbErrUserBlocked = "Du kannst diesem Mitglied nicht schreiben."
     override val pbErrDmClosed = "Dieses Mitglied empfängt keine privaten Nachrichten."
+    override val pbClubUnread: (Int) -> String = { if (it == 1) "1 neue Nachricht im Vereinschat" else "$it neue Nachrichten im Vereinschat" }
+    override val pbDmFrom: (String) -> String = { "Nachricht von $it" }
+    override val pbClubEntryHint = "Schreib allen Mitgliedern des Vereins"
+    override val pbYesterday = "Gestern"
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"

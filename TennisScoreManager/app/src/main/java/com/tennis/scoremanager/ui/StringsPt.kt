@@ -789,9 +789,9 @@ object PtStrings : Strings {
     override val pbErrChat = "Este chat é só para os jogadores do anúncio."
     override val pbErrChatMany = "Está a escrever demasiado: espere alguns minutos."
     override val srvBoard = "Mural do clube"
-    override val srvBoardHint = "Um aviso para todos os jogadores: chega com uma notificação. As mensagens ficam 30 dias."
+    override val srvBoardHint = "Um aviso para todos os jogadores: chega com uma notificação. As mensagens ficam 30 dias. Mantém premida uma mensagem para a tirar."
     override val srvChats = "Chats e alertas"
-    override val srvChatsHint = "O chat do clube, os dos anúncios e as mensagens privadas que os sócios assinalaram (só essas): tira as despropositadas."
+    override val srvChatsHint = "O chat do clube, os dos anúncios e as mensagens privadas que os sócios assinalaram (só essas): tira as despropositadas. Mantém premida uma mensagem para a tirar."
     override val srvChatDelete = "Retirar"
     override val srvChatsNone = "Nenhum chat."
     override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 mensagem por ler no mural" else "$it mensagens por ler no mural" }
@@ -816,6 +816,10 @@ object PtStrings : Strings {
     override val pbReported = "Assinalado à secretaria"
     override val pbErrUserBlocked = "Não podes escrever a este sócio."
     override val pbErrDmClosed = "Este sócio não recebe mensagens privadas."
+    override val pbClubUnread: (Int) -> String = { if (it == 1) "1 mensagem nova no chat do clube" else "$it mensagens novas no chat do clube" }
+    override val pbDmFrom: (String) -> String = { "Mensagem de $it" }
+    override val pbClubEntryHint = "Escreve a todos os sócios do clube"
+    override val pbYesterday = "Ontem"
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"

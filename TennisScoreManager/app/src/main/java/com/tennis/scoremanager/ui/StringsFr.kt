@@ -788,9 +788,9 @@ object FrStrings : Strings {
     override val pbErrChat = "Cette discussion est réservée aux joueurs de l'annonce."
     override val pbErrChatMany = "Vous écrivez trop : attendez quelques minutes."
     override val srvBoard = "Tableau du club"
-    override val srvBoardHint = "Un avis pour tous les joueurs : il arrive avec une notification. Les messages restent 30 jours."
+    override val srvBoardHint = "Un avis pour tous les joueurs : il arrive avec une notification. Les messages restent 30 jours. Appuyez longuement sur un message pour le retirer."
     override val srvChats = "Discussions et signalements"
-    override val srvChatsHint = "La discussion du club, celles des annonces et les messages privés signalés par les membres (eux seuls) : retirez ceux qui sont déplacés."
+    override val srvChatsHint = "La discussion du club, celles des annonces et les messages privés signalés par les membres (eux seuls) : retirez ceux qui sont déplacés. Appuyez longuement sur un message pour le retirer."
     override val srvChatDelete = "Retirer"
     override val srvChatsNone = "Aucune discussion."
     override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 message à lire au tableau" else "$it messages à lire au tableau" }
@@ -815,6 +815,10 @@ object FrStrings : Strings {
     override val pbReported = "Signalé au secrétariat"
     override val pbErrUserBlocked = "Vous ne pouvez pas écrire à ce membre."
     override val pbErrDmClosed = "Ce membre ne reçoit pas de messages privés."
+    override val pbClubUnread: (Int) -> String = { if (it == 1) "1 nouveau message dans la discussion du club" else "$it nouveaux messages dans la discussion du club" }
+    override val pbDmFrom: (String) -> String = { "Message de $it" }
+    override val pbClubEntryHint = "Écrivez à tous les membres du club"
+    override val pbYesterday = "Hier"
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"

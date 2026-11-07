@@ -36,6 +36,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Leaderboard
@@ -423,6 +425,12 @@ private fun PlayTab(c: MatchController) {
             else -> s.pbEntryJoined(names(accounts))
         }
         Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint) { c.go(Screen.BOOK_COURT) }
+        // La chat del circolo, sempre a portata: l'ultimo messaggio e quanti da leggere.
+        for (a in accounts.filter { it.joined }) {
+            val title = listOfNotNull(s.pbClubChat, a.club.takeIf { accounts.size > 1 && it.isNotBlank() }).joinToString(" · ") +
+                if (a.clubUnread > 0) " (${a.clubUnread})" else ""
+            Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
+        }
     }
     SectionLabel(s.playUseAs)
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
@@ -566,11 +574,22 @@ private fun ClubNews(c: MatchController) {
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
     // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
-    val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it != "board" }.map { (room, title) -> Triple(a, room, title) } }
+    // Nell'elenco restano le chat degli annunci; bacheca, chat del circolo e private hanno la loro striscia.
+    val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it.startsWith("s-") }.map { (room, title) -> Triple(a, room, title) } }
+    LaunchedEffect(Unit) { c.refreshClubNews() }
     // La bacheca ha la sua striscia, in cima, col numero degli avvisi da leggere: si tocca e si apre.
     for (a in accounts.filter { it.boardUnread > 0 }) {
         BoardBanner(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, s.pbBoardUnread(a.boardUnread)).joinToString(" · ")) {
             c.selectBooking(a.url); c.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
+        }
+    }
+    for (a in accounts) {
+        val where = a.club.takeIf { many && it.isNotBlank() }
+        if (a.clubUnread > 0) BoardBanner(listOfNotNull(where, s.pbClubUnread(a.clubUnread)).joinToString(" · "), Icons.Filled.Forum) {
+            c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
+        }
+        for ((room, name) in a.chatNews.filterKeys { it.startsWith("d-") }) BoardBanner(listOfNotNull(where, s.pbDmFrom(name)).joinToString(" · "), Icons.Filled.Mail) {
+            c.selectBooking(a.url); c.chatRequest.value = room; c.go(Screen.BOOK_COURT)
         }
     }
     if (news.isEmpty() && chats.isEmpty()) return

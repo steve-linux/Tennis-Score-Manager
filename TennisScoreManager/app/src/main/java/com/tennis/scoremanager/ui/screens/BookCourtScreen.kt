@@ -98,12 +98,12 @@ private const val B_CELL_H = 46
 /** L'errore del server detto al giocatore. */
 /** La striscia gialla degli avvisi della bacheca da leggere: si tocca e si apre la bacheca. */
 @Composable
-fun BoardBanner(text: String, onClick: () -> Unit) {
+fun BoardBanner(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector = Icons.Filled.Campaign, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        androidx.compose.material3.Icon(Icons.Filled.Campaign, null, tint = TsmColors.OnBall)
+        androidx.compose.material3.Icon(icon, null, tint = TsmColors.OnBall)
         Text(text, color = TsmColors.OnBall, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
         androidx.compose.material3.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.OnBall)
     }
@@ -486,20 +486,24 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     c.booking { it.setPrefs(p) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
                     reload()
                 }
-                fun dot(room: String) = if (rooms.any { it.room == room && it.last > (acct.chatRead[room] ?: 0) }) " •" else ""
-                // La chat di tutti i soci del circolo.
-                Text(s.pbClubChat, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                GhostButton(s.pbClubChat + dot("club"), Icons.Filled.Forum, { chatRoom = "club" to s.pbClubChat }, Modifier.fillMaxWidth())
-                SwitchRow(Icons.Filled.NotificationsActive, s.pbClubChatAlerts, s.pbClubChatAlertsHint, m.clubChat) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(clubChat = it)) }
-                // I messaggi privati: si scrive a chi l'ha acceso; di partenza è spento.
-                Text(s.pbDmTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                SwitchRow(Icons.Filled.Person, s.pbDmOpen, s.pbDmOpenHint, m.dmOpen) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(dmOpen = it)) }
-                val dms = rooms.filter { it.room.startsWith("d-") }
-                if (dms.isEmpty()) Text(s.pbDmNone, color = TsmColors.TextDim, fontSize = 13.sp)
-                for (d in dms) GhostButton(d.title + dot(d.room), Icons.Filled.Person, { chatRoom = d.room to d.title }, Modifier.fillMaxWidth())
+                // L'elenco come nelle app di messaggi: in cima la chat del circolo, poi le private, le più recenti prima.
+                val clubRoom = rooms.firstOrNull { it.room == "club" }
+                val clubUnread = if (clubRoom != null && clubRoom.last > (acct.chatRead["club"] ?: 0)) maxOf(1, acct.clubUnread) else 0
+                fun preview(r: com.tennis.scoremanager.data.SrvChatRoom) = if (r.previewMine) s.pbChatYou + ": " + r.preview else r.preview
+                com.tennis.scoremanager.ui.ChatRow(s.pbClubChat, clubRoom?.takeIf { it.count > 0 }?.let(::preview) ?: s.pbClubEntryHint, clubRoom?.last ?: 0, clubUnread, Icons.Filled.Forum) {
+                    chatRoom = "club" to s.pbClubChat
+                }
+                for (d in rooms.filter { it.room.startsWith("d-") }) {
+                    val unread = if (d.last > (acct.chatRead[d.room] ?: 0) && !d.previewMine) 1 else 0
+                    com.tennis.scoremanager.ui.ChatRow(d.title, preview(d), d.last, unread) { chatRoom = d.room to d.title }
+                }
+                if (rooms.none { it.room.startsWith("d-") }) Text(s.pbDmNone, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
                 GhostButton(s.pbDmWrite, Icons.Filled.Add, {
                     scope.launch { c.booking { it.people() }.onSuccess { people = it }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() } }
                 }, Modifier.fillMaxWidth())
+                // Le scelte: le notifiche della chat del circolo e chi mi può scrivere in privato (spento di partenza).
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbClubChatAlerts, s.pbClubChatAlertsHint, m.clubChat) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(clubChat = it)) }
+                SwitchRow(Icons.Filled.Person, s.pbDmOpen, s.pbDmOpenHint, m.dmOpen) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(dmOpen = it)) }
                 if (m.blocked.isNotEmpty()) {
                     Text(s.pbBlockedList, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     for (b in m.blocked) TextButton(onClick = {
@@ -547,6 +551,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 report = if (board) null else { id -> c.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
                 hint = when { board -> s.pbBoardHint; room == "club" -> s.pbClubChatHint; other != null -> s.pbDmHint; else -> null },
                 extra = other?.let { id -> s.pbBlock to { blockAsk = id to name } },
+                group = room == "club" || room.startsWith("s-"),
                 errText = { bookErrorText(s, it) },
                 onRead = { at -> c.markChatRead(acct.url, room, at) },
             ) { chatRoom = null; reload() }

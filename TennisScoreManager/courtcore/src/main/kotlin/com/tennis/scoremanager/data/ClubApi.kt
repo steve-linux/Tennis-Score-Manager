@@ -30,7 +30,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvChatMsg(val id: String, val name: String, val text: String, val at: Long, val mine: Boolean = false, val office: Boolean = false)
 @Serializable data class SrvChatIn(val text: String)
 /** Una stanza vista dalla segreteria: per la moderazione. */
-@Serializable data class SrvChatRoom(val room: String, val title: String, val count: Int, val last: Long)
+/** Una chat nell'elenco: [preview] l'ultimo messaggio ("Mario: ciao"), [previewMine] se l'ho scritto io. */
+@Serializable data class SrvChatRoom(val room: String, val title: String, val count: Int, val last: Long, val preview: String = "", val previewMine: Boolean = false)
 @Serializable data class SrvAdmin(
     val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>,
     /** Per la segreteria: chi è in lista d'attesa e gli annunci di Cerco compagno ancora da giocare (vuoti dai server vecchi). */

@@ -346,6 +346,8 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
             send = if (board) { t -> c.serverAdmin { it.postBoard(t) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } } else null,
             delete = { id -> c.serverAdmin { it.deleteChat(id) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } },
             hint = if (board) s.srvBoardHint else s.srvChatsHint,
+            group = !board,
+            icon = if (board) Icons.Filled.Campaign else null,
             errText = { srvErrorText(s, it) },
         ) { chat = null }
     }

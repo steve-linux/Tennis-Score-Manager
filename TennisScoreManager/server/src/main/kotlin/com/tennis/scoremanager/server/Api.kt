@@ -430,7 +430,9 @@ class Api(
         val hidden = pl.blocked.toSet()
         val mine = s.chats.filter { it.from !in hidden && (it.room == "club" || dmOther(pl.id, it.room) != null) }.groupBy { it.room }
         val rooms = mine.map { (room, msgs) ->
-            SrvChatRoom(room, if (room == "club") "club" else names[dmOther(pl.id, room)] ?: "?", msgs.size, msgs.maxOf { it.at })
+            val lastMsg = msgs.maxBy { it.at }
+            SrvChatRoom(room, if (room == "club") "club" else names[dmOther(pl.id, room)] ?: "?", msgs.size, lastMsg.at,
+                (if (room == "club" && lastMsg.from != pl.id) "${lastMsg.name}: " else "") + lastMsg.text.take(120), lastMsg.from == pl.id)
         }.let { l -> if (l.none { it.room == "club" }) l + SrvChatRoom("club", "club", 0, 0) else l }
         return ok(ListSerializer(SrvChatRoom.serializer()), rooms.sortedByDescending { it.last })
     }
@@ -514,7 +516,8 @@ class Api(
                 room.startsWith("d-") -> "⚑ " + room.removePrefix("d-").split("~").joinToString(" · ") { names[it] ?: "?" }
                 else -> s.seeks.firstOrNull { "s-" + it.id == room }?.let { k -> "${k.owner.name} · ${k.date}" } ?: room
             }
-            SrvChatRoom(room, title, msgs.size, msgs.maxOf { it.at })
+            val lastMsg = msgs.maxBy { it.at }
+            SrvChatRoom(room, title, msgs.size, lastMsg.at, "${lastMsg.name}: " + lastMsg.text.take(120))
         }.sortedByDescending { it.last }
     }
 

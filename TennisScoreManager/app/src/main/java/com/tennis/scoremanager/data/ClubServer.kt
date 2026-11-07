@@ -83,6 +83,10 @@ data class BookingAccount(
     val chatNews: Map<String, String> = emptyMap(),
     /** Quanti avvisi della bacheca sono ancora da leggere (per la striscia in cima a Gioca). */
     val boardUnread: Int = 0,
+    /** La chat del circolo in Gioca: l'ultimo messaggio ("Mario: …"), di quando, e quanti da leggere. */
+    val clubPreview: String = "",
+    val clubPreviewAt: Long = 0,
+    val clubUnread: Int = 0,
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 

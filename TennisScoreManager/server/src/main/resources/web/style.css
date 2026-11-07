@@ -82,14 +82,38 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .tabs button.on { background: var(--ball); color: var(--on-ball); }
 
 /* Chat: i propri messaggi a destra, quelli della segreteria evidenziati. */
-.chat { display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow: auto; margin: 8px 0; }
-.msg { max-width: 85%; align-self: flex-start; background: var(--high); border-radius: 12px; padding: 8px 10px; }
-.msg.mine { align-self: flex-end; background: var(--ball); color: #0B1220; }
-.msg.office { border: 1px solid var(--ball); }
-.msg .who { font-size: 12px; opacity: .75; margin-bottom: 2px; }
-.chatbar { display: flex; gap: 8px; align-items: flex-end; }
-.chatbar textarea { flex: 1; resize: none; }
-.msg .flag { background: transparent; border: 0; color: inherit; opacity: .6; padding: 0 4px; min-height: 0; font-size: 13px; margin-left: 6px; cursor: pointer; }
 .list { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; }
 label.check { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 label.check input { width: auto; min-height: 0; }
+/* Le chat, come nelle app di messaggi: a tutto schermo, fumetti, date in mezzo, barra in basso. */
+body.nochrome { overflow: hidden; }
+.chatview { position: fixed; inset: 0; z-index: 20; background: var(--bg); display: flex; flex-direction: column; }
+.chathead { display: flex; align-items: center; gap: 10px; padding: calc(8px + env(safe-area-inset-top)) 10px 8px; background: var(--surface); }
+.chathead b { flex: 1; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chathead .back { background: transparent; border: 0; color: var(--text); font-size: 22px; min-height: 40px; padding: 0 6px; }
+.chatlist { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 10px; }
+.notice { align-self: center; max-width: 420px; text-align: center; font-size: 12px; color: var(--dim); background: var(--surface); border-radius: 10px; padding: 6px 12px; margin-bottom: 6px; }
+.day { align-self: center; margin: 8px 0 4px; }
+.day span { font-size: 12px; color: var(--dim); background: var(--surface); border-radius: 10px; padding: 3px 10px; }
+.bubble { align-self: flex-start; max-width: min(80%, 460px); background: var(--surface); border-radius: 16px 16px 16px 4px; padding: 6px 10px 4px; overflow-wrap: anywhere; }
+.bubble.mine { align-self: flex-end; background: var(--ball); color: #0B1220; border-radius: 16px 16px 4px 16px; }
+.bubble.office { background: var(--high); }
+.bubble.office .name { color: var(--ball); }
+.bubble .name { font-weight: 700; font-size: 13px; }
+.bubble .text { font-size: 15px; white-space: pre-wrap; }
+.bubble .meta { display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 11px; opacity: .65; margin-top: 2px; }
+.bubble .flag { background: transparent; border: 0; color: inherit; padding: 0; min-height: 0; font-size: 12px; cursor: pointer; }
+.chatbar { display: flex; gap: 8px; align-items: flex-end; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
+.chatbar textarea { flex: 1; resize: none; border-radius: 22px; padding: 11px 16px; background: var(--surface); border: 0; color: var(--text); font: inherit; min-height: 44px; }
+.chatbar .send { width: 48px; height: 48px; min-height: 48px; border-radius: 50%; padding: 0; font-size: 18px; background: var(--ball); color: #0B1220; border: 0; }
+.avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 15px; }
+.avatar.icon { background: var(--ball); font-size: 20px; }
+.chatrow { display: flex; align-items: center; gap: 12px; width: 100%; background: transparent; border: 0; border-radius: 14px; padding: 8px 6px; color: var(--text); text-align: left; min-height: 0; }
+.chatrow:hover { background: var(--surface); }
+.chatrow .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.chatrow .top, .chatrow .bottom { display: flex; align-items: center; gap: 6px; }
+.chatrow .top b { flex: 1; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chatrow .top small { color: var(--dim); font-size: 12px; font-weight: 400; }
+.chatrow .top small.new { color: var(--ball); }
+.chatrow .preview { flex: 1; color: var(--dim); font-size: 14px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chatrow .count { background: var(--ball); color: #0B1220; border-radius: 999px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
