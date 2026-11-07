@@ -125,7 +125,7 @@ import com.tennis.scoremanager.ui.ReplayChip
 import com.tennis.scoremanager.ui.TvChip
 import com.tennis.scoremanager.ui.rememberArmed
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun MatchScreen(c: MatchController) {
     val s = LocalStrings.current
@@ -166,12 +166,13 @@ fun MatchScreen(c: MatchController) {
             Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TimersRow(clock, cd, s) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    TvChip(c)
-                    ReplayChip(c)
-                    CameraChip(c)
-                }
+            TimersRow(clock, cd, s)
+            // TV, moviola e telecamera su una riga loro: in mezzo ai due tempi non ci stavano (la telecamera finiva
+            // scritta in verticale e lo shot clock tagliato); se non ci stanno, vanno a capo.
+            androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                TvChip(c)
+                ReplayChip(c)
+                CameraChip(c)
             }
             if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
             if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)

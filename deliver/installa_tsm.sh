@@ -34302,6 +34302,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34394,7 +34395,8 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
     }
     Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(Modifier.fillMaxWidth().padding(10.dp), shape = RoundedCornerShape(18.dp), color = TsmColors.Surface) {
-            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Scorre: con la sagoma accesa i cursori della taratura e lo zoom non ci stanno in uno schermo.
+            Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Videocam, null, tint = TsmColors.Ball)
                     Text("  " + s.camRemoteTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
@@ -34540,7 +34542,9 @@ private fun Cmd(icon: ImageVector, label: String, color: Color, enabled: Boolean
     Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(14.dp), color = if (enabled) color else TsmColors.SurfaceHigh, modifier = modifier) {
         Column(Modifier.padding(vertical = 10.dp, horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, null, tint = if (enabled) TsmColors.TextMain else TsmColors.TextDim)
-            Text(label, color = if (enabled) TsmColors.TextMain else TsmColors.TextDim, fontSize = 12.sp, maxLines = 1)
+            // Fino a due righe, centrate: "Mostra la livella", "Obiettivo: grandangolo" in una sola non ci stanno.
+            Text(label, color = if (enabled) TsmColors.TextMain else TsmColors.TextDim, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 2,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }
@@ -60263,7 +60267,7 @@ import com.tennis.scoremanager.ui.ReplayChip
 import com.tennis.scoremanager.ui.TvChip
 import com.tennis.scoremanager.ui.rememberArmed
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun MatchScreen(c: MatchController) {
     val s = LocalStrings.current
@@ -60304,12 +60308,13 @@ fun MatchScreen(c: MatchController) {
             Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TimersRow(clock, cd, s) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    TvChip(c)
-                    ReplayChip(c)
-                    CameraChip(c)
-                }
+            TimersRow(clock, cd, s)
+            // TV, moviola e telecamera su una riga loro: in mezzo ai due tempi non ci stavano (la telecamera finiva
+            // scritta in verticale e lo shot clock tagliato); se non ci stanno, vanno a capo.
+            androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                TvChip(c)
+                ReplayChip(c)
+                CameraChip(c)
             }
             if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
             if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
