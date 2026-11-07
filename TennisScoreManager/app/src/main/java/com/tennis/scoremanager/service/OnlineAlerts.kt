@@ -43,6 +43,8 @@ object OnlineAlerts {
     const val EXTRA_BOOK = "tsm.bookCourt"
     /** Dalla notifica di un nuovo annuncio: il circolo (indirizzo) di cui aprire Compagni. */
     const val EXTRA_SEEK_CLUB = "tsm.seekClub"
+    /** Da una notifica di chat: la stanza da aprire subito (con [EXTRA_SEEK_CLUB] il circolo). */
+    const val EXTRA_CHAT_ROOM = "tsm.chatRoom"
     private const val SEEK_ID = 7350
 
     /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
@@ -102,8 +104,9 @@ object OnlineAlerts {
         val nm = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val i = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true)
-        // La chat di un annuncio sta in Compagni.
-        if (room != "board") i.putExtra(EXTRA_SEEK_CLUB, club)
+        // Toccandola si apre proprio quella chat, nel suo circolo (quella di un annuncio sta in Compagni).
+        i.putExtra(EXTRA_SEEK_CLUB, club)
+        if (!room.startsWith("s-")) i.putExtra(EXTRA_CHAT_ROOM, room)
         val open = PendingIntent.getActivity(context, SEEK_ID + 1 + (room.hashCode() and 0xfff), i, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)

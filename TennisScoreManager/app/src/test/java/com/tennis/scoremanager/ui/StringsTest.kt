@@ -85,8 +85,8 @@ class StringsTest {
             // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", e con la sagoma "Distance", "Direction", "Padel", uguali in francese.
             // Coi ruoli anche "Club" (il ruolo del circolo), uguale in francese.
             // Con l'arbitro i cronometri Medical Timeout, Toilet Break e Warm-up (in inglese come Shot Clock) e "Disqualification", uguale in francese.
-            // Con le chat del circolo anche "Chat", uguale in tedesco.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 59)
+            // Con le chat del circolo anche "Chat" (e la scheda Chat), uguale in tedesco.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 60)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }

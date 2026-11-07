@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,13 +52,18 @@ fun ChatDialog(
     load: suspend () -> Result<List<SrvChatMsg>>,
     send: (suspend (String) -> String?)? = null,
     delete: (suspend (String) -> String?)? = null,
+    /** Segnalare alla segreteria un messaggio ricevuto (la bandierina sui messaggi degli altri). */
+    report: (suspend (String) -> String?)? = null,
     hint: String? = null,
+    /** Un pulsante in più in fondo (per esempio Blocca, nelle chat private). */
+    extra: Pair<String, () -> Unit>? = null,
     errText: (String) -> String,
     onRead: (Long) -> Unit = {},
     onDone: () -> Unit,
 ) {
     val s = LocalStrings.current
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
     var msgs by remember { mutableStateOf<List<SrvChatMsg>>(emptyList()) }
     var text by remember { mutableStateOf("") }
     var err by remember { mutableStateOf<String?>(null) }
@@ -95,6 +101,9 @@ fun ChatDialog(
                                     color = if (m.mine) TsmColors.OnBall else if (m.office) TsmColors.Ball else TsmColors.TextDim, fontSize = 11.sp)
                                 Text(m.text, color = if (m.mine) TsmColors.OnBall else TsmColors.TextMain, fontSize = 14.sp)
                             }
+                            if (report != null && !m.mine && !m.office) IconButton(onClick = {
+                                scope.launch { err = report(m.id)?.let(errText); if (err == null) android.widget.Toast.makeText(context, s.pbReported, android.widget.Toast.LENGTH_SHORT).show() }
+                            }) { Icon(Icons.Filled.Flag, s.pbReport, tint = TsmColors.TextDim) }
                             if (delete != null) IconButton(onClick = { scope.launch { err = delete(m.id)?.let(errText); tick++ } }) {
                                 Icon(Icons.Filled.Delete, s.srvChatDelete, tint = TsmColors.Danger)
                             }
@@ -114,5 +123,6 @@ fun ChatDialog(
             }
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+        dismissButton = extra?.let { (label, f) -> { TextButton(onClick = f) { Text(label, color = TsmColors.Danger) } } },
     )
 }

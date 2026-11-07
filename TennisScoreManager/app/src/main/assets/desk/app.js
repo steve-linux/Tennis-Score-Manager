@@ -1456,8 +1456,8 @@ async function loadChats(box, open) {
       h('div.full.actions', h('button.primary', { type: 'button', onclick: send }, T.pbChatSend))))),
     h('h2', T.srvChats + ' (' + chats.length + ')'), h('p.dim', T.srvChatsHint),
     chats.length ? h('div.panel', h('table', h('tbody', chats.map((x) => h('tr.row', { tabindex: 0, onclick: () => loadChats(box, x.room) },
-      h('td', x.title), h('td.num', String(x.count)), h('td.dim', x.last ? stamp(x.last) : '')))))) : h('p.dim', T.srvChatsNone),
-    open && open !== 'board' ? h('div', h('h3', (chats.find((x) => x.room === open) || {}).title || ''), await messages(open)) : null);
+      h('td', x.room === 'club' ? T.pbClubChat : x.title), h('td.num', String(x.count)), h('td.dim', x.last ? stamp(x.last) : '')))))) : h('p.dim', T.srvChatsNone),
+    open && open !== 'board' ? h('div', h('h3', open === 'club' ? T.pbClubChat : (chats.find((x) => x.room === open) || {}).title || ''), await messages(open)) : null);
 }
 
 // --- Impostazioni del circolo ---

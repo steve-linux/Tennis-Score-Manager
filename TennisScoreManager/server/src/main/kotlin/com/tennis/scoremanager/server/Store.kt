@@ -26,15 +26,23 @@ data class Player(
     val pinLockUntil: Long = 0,
     /** Vuole le notifiche dei nuovi annunci di Cerco compagno. */
     val seekAlerts: Boolean = true,
+    /** Possono scrivergli gli altri soci (spento di partenza); notifiche della chat del circolo; chi ha bloccato. */
+    val dmOpen: Boolean = false,
+    val clubChat: Boolean = true,
+    val blocked: List<String> = emptyList(),
 )
 
 /** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
 @Serializable
 data class PushSub(val player: String, val endpoint: String, val p256dh: String, val auth: String, val lang: String = "it", val since: Long = 0)
 
-/** Un messaggio di chat: [room] "board" o "s-ID"; [from] è l'id del giocatore ("" = la segreteria). */
+/**
+ * Un messaggio di chat: [room] "board" (bacheca), "club" (la chat di tutti i soci), "s-ID" (un annuncio) o
+ * "d-A~B" (privata tra due soci, id in ordine); [from] è l'id del giocatore ("" = la segreteria).
+ * [reported]: segnalato da chi l'ha ricevuto, e solo allora la segreteria lo vede in una chat privata.
+ */
 @Serializable
-data class ChatMsg(val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long)
+data class ChatMsg(val id: String, val room: String, val from: String, val name: String, val text: String, val at: Long, val reported: Boolean = false)
 
 /** Un invito non ancora usato: si salva solo l'impronta del codice. */
 @Serializable

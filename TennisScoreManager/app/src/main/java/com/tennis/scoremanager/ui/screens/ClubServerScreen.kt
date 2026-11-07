@@ -329,7 +329,10 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     Text(s.srvChatsHint, color = TsmColors.TextDim, fontSize = 12.sp)
                     val chats = list.filter { it.room != "board" }
                     if (chats.isEmpty()) Text(s.srvChatsNone, color = TsmColors.TextDim)
-                    for (r in chats) GhostButton("${r.title} (${r.count})", Icons.Filled.Forum, { chat = r.room to r.title }, Modifier.fillMaxWidth())
+                    for (r in chats) {
+                        val t = if (r.room == "club") s.pbClubChat else r.title
+                        GhostButton("$t (${r.count})", Icons.Filled.Forum, { chat = r.room to t }, Modifier.fillMaxWidth())
+                    }
                 }
             },
             confirmButton = { TextButton(onClick = { rooms = null }) { Text(s.ok) } },

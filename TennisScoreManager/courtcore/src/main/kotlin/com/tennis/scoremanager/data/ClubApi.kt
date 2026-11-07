@@ -17,7 +17,11 @@ import kotlinx.serialization.Serializable
 /** Il giocatore sceglie numero di telefono e PIN, per rientrare da solo su un altro telefono. */
 @Serializable data class SrvPinIn(val phone: String, val pin: String)
 /** Le scelte del giocatore sulla pagina: [seekAlerts] = notifiche dei nuovi annunci di Cerco compagno. */
-@Serializable data class SrvPrefsIn(val seekAlerts: Boolean)
+/** Le scelte del giocatore; null = non cambia (le pagine vecchie mandano solo [seekAlerts]). */
+@Serializable data class SrvPrefsIn(val seekAlerts: Boolean? = null, val dmOpen: Boolean? = null, val clubChat: Boolean? = null)
+/** Un socio a cui si può scrivere (ha acceso "Possono scrivermi i soci"); [room] è la chat privata con lui. */
+@Serializable data class SrvPerson(val id: String, val name: String, val room: String)
+@Serializable data class SrvBlockIn(val player: String, val on: Boolean)
 
 /**
  * Un messaggio di una chat del circolo. Le stanze sono "board" (la bacheca: scrive solo la segreteria, leggono
@@ -59,6 +63,12 @@ import kotlinx.serialization.Serializable
     val seekAlerts: Boolean = true,
     /** Quando la segreteria ha scritto l'ultima volta in bacheca (0 = mai). */
     val boardLast: Long = 0,
+    /** Possono scrivermi i soci (spento di partenza); notifiche della chat del circolo; chi ho bloccato. */
+    val dmOpen: Boolean = false,
+    val clubChat: Boolean = true,
+    val blocked: List<SrvPerson> = emptyList(),
+    /** L'id del giocatore, per riconoscere l'altro in una chat privata ("d-A~B"). */
+    val id: String = "",
 )
 /** Una lista d'attesa vista dal giocatore: [freedCourt] non null = si è liberato quel campo. */
 @Serializable data class SrvWait(val id: String, val court: String? = null, val start: Long, val minutes: Int, val freedCourt: String? = null)

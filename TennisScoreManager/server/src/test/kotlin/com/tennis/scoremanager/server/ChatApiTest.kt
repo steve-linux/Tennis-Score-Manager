@@ -118,4 +118,59 @@ class ChatApiTest {
         api.tick(now)
         assertTrue(store.state.chats.isEmpty())
     }
+
+    @Test fun laChatDelCircoloLaScrivonoTutti() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); player("p3", "Anna")
+        call("POST", "/prefs", """{"clubChat":false}""", luca)
+        sent.clear()
+        assertEquals(201, call("POST", "/chat/club", """{"text":"Chi gioca sabato?"}""", mario).status)
+        // Avvisata Anna; Luca ha spento le notifiche della chat del circolo, ma la legge.
+        assertEquals(listOf("p3"), sent.map { it.first })
+        assertEquals("Chi gioca sabato?", msgs("club", luca).single().text)
+        assertTrue(call("GET", "/chats", token = luca).body.contains("\"room\":\"club\""))
+        assertTrue(call("GET", "/admin/chats", token = admin).body.contains("\"room\":\"club\""))
+    }
+
+    @Test fun iMessaggiPrivatiSoloAChiAccetta() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        val room = "d-p1~p2"
+        // Di partenza nessuno è nell'elenco e non gli si scrive.
+        assertEquals("[]", call("GET", "/people", token = mario).body)
+        assertEquals(403, call("POST", "/chat/$room", """{"text":"ciao"}""", mario).status)
+        call("POST", "/prefs", """{"dmOpen":true}""", luca)
+        assertTrue(call("GET", "/people", token = mario).body.contains(room))
+        sent.clear()
+        assertEquals(201, call("POST", "/chat/$room", """{"text":"Partita domani?"}""", mario).status)
+        assertEquals(listOf("p2"), sent.map { it.first })
+        // Luca risponde anche se Mario non ha acceso "Possono scrivermi".
+        assertEquals(201, call("POST", "/chat/$room", """{"text":"Volentieri"}""", luca).status)
+        assertEquals(listOf("Partita domani?", "Volentieri"), msgs(room, mario).map { it.text })
+        assertTrue(call("GET", "/chats", token = mario).body.contains("\"title\":\"Luca\""))
+        // Un terzo non legge, e la segreteria non vede la chat privata.
+        val anna = player("p3", "Anna")
+        assertEquals(403, call("GET", "/chat/$room", token = anna).status)
+        assertTrue(room !in call("GET", "/admin/chats", token = admin).body)
+    }
+
+    @Test fun bloccareESegnalare() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        val room = "d-p1~p2"
+        call("POST", "/prefs", """{"dmOpen":true}""", luca)
+        val m = field(call("POST", "/chat/$room", """{"text":"messaggio molesto"}""", mario).body, "id")
+        // Mario non può segnalare il suo; Luca sì, e la segreteria vede solo quello.
+        assertEquals(403, call("POST", "/chat/msg/$m/report", token = mario).status)
+        assertEquals(200, call("POST", "/chat/msg/$m/report", token = luca).status)
+        assertTrue(call("GET", "/admin/chats", token = admin).body.contains(room))
+        assertEquals(listOf("messaggio molesto"), json.decodeFromString(ListSerializer(SrvChatMsg.serializer()), call("GET", "/admin/chat/$room", token = admin).body).map { it.text })
+        // Luca blocca Mario: non gli scrive più, non lo legge più, e Mario non lo trova nell'elenco.
+        assertEquals(200, call("POST", "/block", """{"player":"p1","on":true}""", luca).status)
+        val blocked = call("POST", "/chat/$room", """{"text":"ancora"}""", mario)
+        assertEquals(403, blocked.status)
+        assertTrue("USER_BLOCKED" in blocked.body)
+        assertTrue(msgs(room, luca).isEmpty())
+        assertEquals("[]", call("GET", "/people", token = mario).body)
+        assertEquals("Mario", json.decodeFromString(SrvMe.serializer(), call("GET", "/me", token = luca).body).blocked.single().name)
+        call("POST", "/block", """{"player":"p1","on":false}""", luca)
+        assertEquals(201, call("POST", "/chat/$room", """{"text":"scusa"}""", mario).status)
+    }
 }

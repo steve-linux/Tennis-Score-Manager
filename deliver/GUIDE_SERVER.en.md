@@ -106,4 +106,4 @@ To find out whether the line has a public address: compare the WAN address shown
 - Every now and then make a backup from **Courts › Office backup**: a copy is kept on the server too.
 - To stop bookings for a while (maintenance, closure), switch off **Online booking open**: players see the schedule but cannot book.
 - A player who should no longer book: on their card, **Remove online access**.
-- A notice for everyone (courts closed, a tournament, a party): **Club server › Club notice board**, or **Online bookings** from the PC. It reaches players with a notification and stays 30 days. From **Post chats** you can remove out-of-place messages in the Looking for a partner chats.
+- A notice for everyone (courts closed, a tournament, a party): **Club server › Club notice board**, or **Online bookings** from the PC. It reaches players with a notification and stays 30 days. From **Chats and reports** you can remove out-of-place messages in the club chat, the Looking for a partner chats and reported private messages.

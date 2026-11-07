@@ -247,9 +247,11 @@ async function refresh() {
     return;
   }
   try { state.seeks = await api('GET', '/seeks'); } catch (_) { state.seeks = []; }
+  try { state.rooms = await api('GET', '/chats'); } catch (_) { state.rooms = []; }
   if (!state.date || !state.me.days.includes(state.date)) state.date = state.me.days[0];
   setHeader();
   await loadDay();
+  if (state.openRoom) { const r = state.openRoom; state.openRoom = null; openRoom(r); }
 }
 
 async function loadDay() {
@@ -294,13 +296,16 @@ function render(dayError) {
   const freed = (me.waits || []).some(w => w.freedCourt);
   if (state.tab === 2) markSeeksSeen();
   const fresh = state.tab === 2 ? [] : unreadSeeks();
-  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : '')];
+  const chatNew = (state.rooms || []).some(x => chatUnread(x.room, x.last));
+  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek + (fresh.length ? ' (' + fresh.length + ')' : ''), T.tabChat + (chatNew ? ' •' : '')];
   const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
   const parts = [boardNews(), bar].filter(Boolean);
   if (state.tab === 1) {
     parts.push(...mine, ...waits, el('div', { id: 'push' }), pinCard());
   } else if (state.tab === 2) {
     parts.push(...seekSection().filter(Boolean));
+  } else if (state.tab === 3) {
+    parts.push(...chatSection());
   } else {
     // Senza PIN: un promemoria per sceglierlo, così chi sbaglia o cambia telefono rientra da solo.
     if (!me.hasPin) parts.push(el('p', { class: 'dim' }, el('a', { href: '#', onclick: (e) => { e.preventDefault(); state.tab = 1; save(TAB, '1'); render(dayError); } }, T.pinRemind)));
@@ -492,7 +497,59 @@ function boardNews() {
   return el('button', { class: 'boardbar', onclick: () => openChat('board', T.boardTitle, false) }, '📣 ' + T.boardUnread(n), el('span', null, '›'));
 }
 
-async function openChat(room, title, canWrite) {
+/** Il titolo di una chat: quella del circolo, o il nome dell'altro in una privata. */
+function roomTitle(room) {
+  if (room === 'club') return T.clubChat;
+  const r = (state.rooms || []).find(x => x.room === room);
+  return r ? r.title : T.chatOpen;
+}
+
+/** Apre una chat tra soci: la chat del circolo o una privata (con Blocca). */
+function openRoom(room, name) {
+  const other = room.startsWith('d-') ? room.slice(2).split('~').find(id => id !== state.me.id) : null;
+  openChat(room, name || roomTitle(room), true, {
+    hint: room === 'club' ? T.clubChatHint : T.dmHint, report: true,
+    block: other ? { id: other, name: name || roomTitle(room) } : null,
+  });
+}
+
+/** La scheda Chat: la chat del circolo, i messaggi privati (a chi l'ha acceso), chi si è bloccato. */
+function chatSection() {
+  const me = state.me;
+  const dot = room => (state.rooms || []).some(x => x.room === room && chatUnread(room, x.last)) ? ' •' : '';
+  const toggle = (key, label, hint) => {
+    const box = el('input', { type: 'checkbox' });
+    box.checked = !!me[key];
+    box.addEventListener('change', async () => {
+      try { await api('POST', '/prefs', { [key]: box.checked }); me[key] = box.checked; toast(T.saved || '✓'); }
+      catch (e) { box.checked = !box.checked; toast(errText(e)); }
+    });
+    return [el('label', { class: 'check' }, box, ' ', label), el('p', { class: 'dim' }, hint)];
+  };
+  const dms = (state.rooms || []).filter(x => x.room.startsWith('d-'));
+  const write = async () => {
+    let list;
+    try { list = await api('GET', '/people'); } catch (e) { toast(errText(e)); return; }
+    sheet(el('h3', null, T.dmWrite),
+      list.length ? el('div', { class: 'list' }, ...list.map(p => el('button', { class: 'ghost', onclick: () => { closeSheet(); openRoom(p.room, p.name); } }, p.name)))
+        : el('p', { class: 'dim' }, T.dmNobody),
+      el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close)));
+  };
+  return [
+    el('h2', null, T.clubChat),
+    el('button', { onclick: () => openRoom('club') }, T.clubChat + dot('club')),
+    ...toggle('clubChat', T.clubChatAlerts, T.clubChatAlertsHint),
+    el('h2', null, T.dmTitle),
+    ...toggle('dmOpen', T.dmOpen, T.dmOpenHint),
+    dms.length ? el('div', { class: 'list' }, ...dms.map(d => el('button', { class: 'ghost', onclick: () => openRoom(d.room, d.title) }, d.title + dot(d.room)))) : el('p', { class: 'dim' }, T.dmNone),
+    el('button', { class: 'ghost', onclick: write }, '+ ' + T.dmWrite),
+    (me.blocked || []).length ? el('div', null, el('h2', null, T.blockedList), ...me.blocked.map(b => el('button', { class: 'small ghost', onclick: async () => {
+      try { await api('POST', '/block', { player: b.id, on: false }); await refresh(); } catch (e) { toast(errText(e)); }
+    } }, T.unblock(b.name)))) : null,
+  ].filter(Boolean);
+}
+
+async function openChat(room, title, canWrite, opts = {}) {
   const list = el('div', { class: 'chat' });
   const input = canWrite ? el('textarea', { id: 'chatin', rows: '2', maxlength: '500', placeholder: T.chatPlaceholder }) : null;
   const err = el('p', { class: 'error' });
@@ -500,8 +557,12 @@ async function openChat(room, title, canWrite) {
   const draw = (msgs) => {
     for (const m of msgs) {
       last = Math.max(last, m.at);
+      // Con la bandierina si segnala alla segreteria un messaggio ricevuto.
+      const flag = opts.report && !m.mine && !m.office ? el('button', { class: 'flag', title: T.report, onclick: async () => {
+        try { await api('POST', '/chat/msg/' + m.id + '/report'); toast(T.reported); } catch (e) { err.textContent = errText(e); }
+      } }, '⚑') : null;
       list.append(el('div', { class: 'msg' + (m.mine ? ' mine' : '') + (m.office ? ' office' : '') },
-        el('div', { class: 'who' }, (m.mine ? T.chatYou : m.name) + ' · ' + fmtTime(m.at)), el('div', null, m.text)));
+        el('div', { class: 'who' }, (m.mine ? T.chatYou : m.name) + ' · ' + fmtTime(m.at), flag), el('div', null, m.text)));
     }
     if (msgs.length) { list.scrollTop = list.scrollHeight; markChatRead(room, last); }
     if (!list.children.length) list.replaceChildren(el('p', { class: 'dim', id: 'chatnone' }, T.chatNone));
@@ -517,9 +578,13 @@ async function openChat(room, title, canWrite) {
   };
   if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
   const close = () => { clearInterval(timer); closeSheet(); render(); };
-  sheet(el('h3', null, title), list, err,
+  const block = opts.block ? el('button', { class: 'ghost danger', onclick: async () => {
+    if (!confirm(T.blockAsk(opts.block.name))) return;
+    try { await api('POST', '/block', { player: opts.block.id, on: true }); clearInterval(timer); closeSheet(); await refresh(); } catch (e) { err.textContent = errText(e); }
+  } }, T.block) : null;
+  sheet(el('h3', null, title), opts.hint ? el('p', { class: 'dim' }, opts.hint) : null, list, err,
     input ? el('div', { class: 'chatbar' }, input, el('button', { onclick: send }, T.chatSend)) : el('p', { class: 'dim' }, T.boardHint),
-    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: close }, T.close)));
+    el('div', { class: 'actions' }, block, el('button', { class: 'ghost', onclick: close }, T.close)));
   await load();
   timer = setInterval(() => { if ($('sheet').hidden) clearInterval(timer); else load(); }, 4000);
   if (input) input.focus();
@@ -670,6 +735,7 @@ setInterval(async () => {
 // Dalla notifica di un annuncio, con la pagina già aperta: si va in Compagni.
 if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => {
   if (e.data && e.data.seek && state.me) { state.lookFor = e.data.seek; state.tab = 2; save(TAB, '2'); refresh(); }
+  if (e.data && e.data.chat && state.me) { state.tab = 3; save(TAB, '3'); refresh().then(() => openRoom(e.data.chat)); }
 });
 if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
 
@@ -680,6 +746,8 @@ if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWor
   // Dalla notifica di un annuncio: si apre Compagni (e si dice se nel frattempo si è chiuso).
   const sk = location.hash.match(/[#&]s=([A-Za-z0-9_-]+)/);
   if (sk) { state.lookFor = sk[1]; state.tab = 2; save(TAB, '2'); history.replaceState(null, '', location.pathname); }
+  const ck = location.hash.match(/[#&]c=([^&]+)/);
+  if (ck) { state.openRoom = decodeURIComponent(ck[1]); state.tab = 3; save(TAB, '3'); history.replaceState(null, '', location.pathname); }
   const m = location.hash.match(/[#&]i=([A-Za-z0-9-]+)/);
   if (m) {
     history.replaceState(null, '', location.pathname);

@@ -106,4 +106,4 @@ Ob der Anschluss eine öffentliche Adresse hat: Vergleicht die WAN-Adresse auf d
 - Ab und zu unter **Plätze › Sicherung des Büros** eine Sicherung machen: Eine Kopie liegt auch auf dem Server.
 - Um die Buchungen eine Zeit lang zu stoppen (Wartung, Schließung), **Online-Buchung offen** ausschalten: Die Spieler sehen den Plan, buchen aber nicht.
 - Ein Spieler, der nicht mehr buchen soll: in seiner Karte **Online-Zugang entfernen**.
-- Eine Mitteilung für alle (Plätze gesperrt, ein Turnier, ein Fest): **Vereinsserver › Vereinsbrett** oder **Online-Buchungen** am PC. Sie erreicht die Spieler mit einer Benachrichtigung und bleibt 30 Tage. Unter **Chats der Anzeigen** könnt ihr unpassende Nachrichten in den Chats von Partner gesucht entfernen.
+- Eine Mitteilung für alle (Plätze gesperrt, ein Turnier, ein Fest): **Vereinsserver › Vereinsbrett** oder **Online-Buchungen** am PC. Sie erreicht die Spieler mit einer Benachrichtigung und bleibt 30 Tage. Unter **Chats und Meldungen** könnt ihr unpassende Nachrichten im Vereinschat, in den Chats von Partner gesucht und in gemeldeten privaten Nachrichten entfernen.

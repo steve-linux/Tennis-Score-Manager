@@ -85,6 +85,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
@@ -136,6 +138,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "BAD_PHONE" -> s.pbErrPhone
     "NOT_IN_CHAT" -> s.pbErrChat
     "TOO_MANY_MESSAGES" -> s.pbErrChatMany
+    "USER_BLOCKED" -> s.pbErrUserBlocked
+    "DM_CLOSED" -> s.pbErrDmClosed
     else -> s.srvErrOther(code)
 }
 
@@ -293,6 +297,10 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     var leave by remember { mutableStateOf(false) }
     /** La chat aperta: stanza e titolo ("board" = la bacheca, solo da leggere). */
     var chatRoom by remember { mutableStateOf<Pair<String, String>?>(null) }
+    /** Le proprie chat tra soci (quella del circolo e le private), chi si può scrivere, a chi scrivere. */
+    var rooms by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvChatRoom>>(emptyList()) }
+    var people by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvPerson>?>(null) }
+    var blockAsk by remember { mutableStateOf<Pair<String, String>?>(null) }
     var tick by remember { mutableStateOf(0) }
 
     // Le proprie prenotazioni e il giorno scelto, ora e poi ogni minuto (le caselle degli altri cambiano).
@@ -301,6 +309,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             c.booking { it.me() }.onSuccess { m ->
                 me = m
                 c.booking { it.seeks() }.onSuccess { seeks = it; c.noteSeeks(it) }
+                c.booking { it.myChats() }.onSuccess { rooms = it }
                 val d = date?.takeIf { it in m.days } ?: m.days.firstOrNull()
                 date = d
                 if (d != null) c.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
@@ -309,9 +318,15 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         }
     }
     fun reload() { tick++ }
-    // Dalle novità di Gioca: si apre direttamente Compagni.
-    val wantBoard by c.boardRequest.collectAsState()
-    LaunchedEffect(wantBoard) { if (wantBoard) { chatRoom = "board" to ""; c.boardRequest.value = false } }
+    // Dalle novità di Gioca o da una notifica: si apre direttamente quella chat (o Compagni).
+    val wantChat by c.chatRequest.collectAsState()
+    LaunchedEffect(wantChat) {
+        wantChat?.let { room ->
+            if (room != "board") tab = 3
+            chatRoom = room to (rooms.firstOrNull { it.room == room }?.title ?: "")
+            c.chatRequest.value = null
+        }
+    }
     val wantTab by c.bookTabRequest.collectAsState()
     LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
     val acct by c.bookingAccount.collectAsState()
@@ -350,7 +365,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         val freed = m.waits.count { it.freedCourt != null }
         Segmented(
             listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""),
-                SegOption(s.pbTabSeek + acct.unreadSeeks.size.takeIf { it > 0 }?.let { " ($it)" }.orEmpty())),
+                SegOption(s.pbTabSeek + acct.unreadSeeks.size.takeIf { it > 0 }?.let { " ($it)" }.orEmpty()),
+                SegOption(s.pbTabChat + if (rooms.any { it.last > (acct.chatRead[it.room] ?: 0) }) " •" else "")),
             tab, { tab = it },
         )
         when (tab) {
@@ -426,7 +442,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 GhostButton(s.pbAddClub, Icons.Filled.Add, onAddClub, Modifier.fillMaxWidth())
                 GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
             }
-            else -> {
+            2 -> {
                 // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
                 Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 // Le notifiche dei nuovi annunci di questo circolo si possono spegnere (gli annunci restano qui e in Gioca).
@@ -465,15 +481,72 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
 
             }
+            else -> {
+                fun prefs(p: com.tennis.scoremanager.data.SrvPrefsIn) = scope.launch {
+                    c.booking { it.setPrefs(p) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
+                    reload()
+                }
+                fun dot(room: String) = if (rooms.any { it.room == room && it.last > (acct.chatRead[room] ?: 0) }) " •" else ""
+                // La chat di tutti i soci del circolo.
+                Text(s.pbClubChat, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                GhostButton(s.pbClubChat + dot("club"), Icons.Filled.Forum, { chatRoom = "club" to s.pbClubChat }, Modifier.fillMaxWidth())
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbClubChatAlerts, s.pbClubChatAlertsHint, m.clubChat) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(clubChat = it)) }
+                // I messaggi privati: si scrive a chi l'ha acceso; di partenza è spento.
+                Text(s.pbDmTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                SwitchRow(Icons.Filled.Person, s.pbDmOpen, s.pbDmOpenHint, m.dmOpen) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(dmOpen = it)) }
+                val dms = rooms.filter { it.room.startsWith("d-") }
+                if (dms.isEmpty()) Text(s.pbDmNone, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (d in dms) GhostButton(d.title + dot(d.room), Icons.Filled.Person, { chatRoom = d.room to d.title }, Modifier.fillMaxWidth())
+                GhostButton(s.pbDmWrite, Icons.Filled.Add, {
+                    scope.launch { c.booking { it.people() }.onSuccess { people = it }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() } }
+                }, Modifier.fillMaxWidth())
+                if (m.blocked.isNotEmpty()) {
+                    Text(s.pbBlockedList, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    for (b in m.blocked) TextButton(onClick = {
+                        scope.launch { c.booking { it.block(b.id, false) }; reload() }
+                    }) { Text(s.pbUnblock(b.name), color = TsmColors.Ball) }
+                }
+            }
+        }
+
+        // A chi scrivere: solo i soci che hanno acceso "Possono scrivermi i soci".
+        people?.let { list ->
+            AlertDialog(
+                onDismissRequest = { people = null },
+                title = { Text(s.pbDmWrite, fontWeight = FontWeight.Bold) },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        if (list.isEmpty()) Text(s.pbDmNobody, color = TsmColors.TextDim)
+                        for (p in list) GhostButton(p.name, Icons.Filled.Person, { people = null; chatRoom = p.room to p.name }, Modifier.fillMaxWidth())
+                    }
+                },
+                confirmButton = { TextButton(onClick = { people = null }) { Text(s.back) } },
+            )
+        }
+        blockAsk?.let { (id, name) ->
+            AlertDialog(
+                onDismissRequest = { blockAsk = null },
+                text = { Text(s.pbBlockAsk(name)) },
+                confirmButton = { TextButton(onClick = {
+                    blockAsk = null; chatRoom = null
+                    scope.launch { c.booking { it.block(id, true) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }; reload() }
+                }) { Text(s.pbBlock, color = TsmColors.Danger) } },
+                dismissButton = { TextButton(onClick = { blockAsk = null }) { Text(s.back) } },
+            )
         }
 
         chatRoom?.let { (room, title) ->
             val board = room == "board"
+            // Nelle private l'altro è l'id che non è il mio: da lì si blocca.
+            val other = if (room.startsWith("d-")) room.removePrefix("d-").split("~").firstOrNull { it != m.id } else null
+            val name = title.ifBlank { rooms.firstOrNull { it.room == room }?.title.orEmpty() }
             com.tennis.scoremanager.ui.ChatDialog(
-                title = if (board) s.pbBoardTitle else "${s.pbChat} · $title",
+                title = when { board -> s.pbBoardTitle; room == "club" -> s.pbClubChat; other != null -> name.ifBlank { s.pbChat }; else -> "${s.pbChat} · $title" },
                 load = { c.booking { it.chat(room, 0) } },
                 send = if (board) null else { text -> c.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
-                hint = if (board) s.pbBoardHint else null,
+                report = if (board) null else { id -> c.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
+                hint = when { board -> s.pbBoardHint; room == "club" -> s.pbClubChatHint; other != null -> s.pbDmHint; else -> null },
+                extra = other?.let { id -> s.pbBlock to { blockAsk = id to name } },
                 errText = { bookErrorText(s, it) },
                 onRead = { at -> c.markChatRead(acct.url, room, at) },
             ) { chatRoom = null; reload() }

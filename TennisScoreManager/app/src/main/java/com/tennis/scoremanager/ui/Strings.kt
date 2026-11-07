@@ -830,6 +830,27 @@ interface Strings {
     val srvChatDelete: String
     val srvChatsNone: String
     val pbBoardUnread: (Int) -> String
+    val pbTabChat: String
+    val pbClubChat: String
+    val pbClubChatHint: String
+    val pbClubChatAlerts: String
+    val pbClubChatAlertsHint: String
+    val pbDmTitle: String
+    val pbDmOpen: String
+    val pbDmOpenHint: String
+    val pbDmHint: String
+    val pbDmWrite: String
+    val pbDmNobody: String
+    val pbDmNone: String
+    val pbDmNew: String
+    val pbBlock: String
+    val pbUnblock: (String) -> String
+    val pbBlockedList: String
+    val pbBlockAsk: (String) -> String
+    val pbReport: String
+    val pbReported: String
+    val pbErrUserBlocked: String
+    val pbErrDmClosed: String
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
@@ -3162,11 +3183,32 @@ object ItStrings : Strings {
     override val pbErrChatMany = "Stai scrivendo troppo: aspetta qualche minuto."
     override val srvBoard = "Bacheca del circolo"
     override val srvBoardHint = "Un avviso per tutti i giocatori: arriva con una notifica. I messaggi restano 30 giorni."
-    override val srvChats = "Chat degli annunci"
-    override val srvChatsHint = "Per controllare i messaggi di Cerco compagno e togliere quelli fuori luogo."
+    override val srvChats = "Chat e segnalazioni"
+    override val srvChatsHint = "La chat del circolo, quelle di Cerco compagno e i messaggi privati che i soci hanno segnalato (solo quelli): togli quelli fuori luogo."
     override val srvChatDelete = "Togli"
     override val srvChatsNone = "Nessuna chat."
     override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 messaggio da leggere in bacheca" else "$it messaggi da leggere in bacheca" }
+    override val pbTabChat = "Chat"
+    override val pbClubChat = "Chat del circolo"
+    override val pbClubChatHint = "Qui leggono e scrivono tutti i soci collegati. Siate gentili: la segreteria può togliere i messaggi, e con la bandierina segnali quelli fuori luogo."
+    override val pbClubChatAlerts = "Notifiche della chat del circolo"
+    override val pbClubChatAlertsHint = "Spente: i messaggi li leggi qui quando vuoi."
+    override val pbDmTitle = "Messaggi privati"
+    override val pbDmOpen = "Possono scrivermi i soci"
+    override val pbDmOpenHint = "Acceso: compari nell'elenco e gli altri soci possono scriverti. Spento: non compari, ma puoi scrivere tu a chi l'ha acceso."
+    override val pbDmHint = "Lo leggete solo voi due. Se un messaggio non va, segnalalo con la bandierina: solo allora lo vede la segreteria."
+    override val pbDmWrite = "Scrivi a un socio"
+    override val pbDmNobody = "Ancora nessun socio ha acceso «Possono scrivermi i soci»."
+    override val pbDmNone = "Nessuna conversazione."
+    override val pbDmNew = "Messaggio da un socio"
+    override val pbBlock = "Blocca"
+    override val pbUnblock: (String) -> String = { "Sblocca $it" }
+    override val pbBlockedList = "Bloccati"
+    override val pbBlockAsk: (String) -> String = { "Bloccare $it? Non potrà più scriverti e non leggerai più i suoi messaggi, neanche nella chat del circolo." }
+    override val pbReport = "Segnala"
+    override val pbReported = "Segnalato alla segreteria"
+    override val pbErrUserBlocked = "Non puoi scrivere a questo socio."
+    override val pbErrDmClosed = "Questo socio non riceve messaggi privati."
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
@@ -5462,11 +5504,32 @@ object EnStrings : Strings {
     override val pbErrChatMany = "You are writing too much: wait a few minutes."
     override val srvBoard = "Club notice board"
     override val srvBoardHint = "A notice for all players: it arrives with a notification. Messages stay 30 days."
-    override val srvChats = "Post chats"
-    override val srvChatsHint = "To check the Looking for a partner messages and remove inappropriate ones."
+    override val srvChats = "Chats and reports"
+    override val srvChatsHint = "The club chat, the Looking for a partner chats and the private messages members have reported (only those): remove out-of-place ones."
     override val srvChatDelete = "Remove"
     override val srvChatsNone = "No chats."
     override val pbBoardUnread: (Int) -> String = { if (it == 1) "1 unread message on the notice board" else "$it unread messages on the notice board" }
+    override val pbTabChat = "Chat"
+    override val pbClubChat = "Club chat"
+    override val pbClubChatHint = "Every connected member reads and writes here. Be kind: the office can remove messages, and the flag reports out-of-place ones."
+    override val pbClubChatAlerts = "Club chat notifications"
+    override val pbClubChatAlertsHint = "Off: read the messages here whenever you like."
+    override val pbDmTitle = "Private messages"
+    override val pbDmOpen = "Members can write to me"
+    override val pbDmOpenHint = "On: you are in the list and other members can write to you. Off: you are not, but you can write to those who turned it on."
+    override val pbDmHint = "Only the two of you read this. If a message is not OK, report it with the flag: only then does the office see it."
+    override val pbDmWrite = "Write to a member"
+    override val pbDmNobody = "No member has turned on “Members can write to me” yet."
+    override val pbDmNone = "No conversations."
+    override val pbDmNew = "Message from a member"
+    override val pbBlock = "Block"
+    override val pbUnblock: (String) -> String = { "Unblock $it" }
+    override val pbBlockedList = "Blocked"
+    override val pbBlockAsk: (String) -> String = { "Block $it? They will no longer be able to write to you and you will no longer see their messages, not even in the club chat." }
+    override val pbReport = "Report"
+    override val pbReported = "Reported to the office"
+    override val pbErrUserBlocked = "You cannot write to this member."
+    override val pbErrDmClosed = "This member does not receive private messages."
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"

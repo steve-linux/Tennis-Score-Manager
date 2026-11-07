@@ -89,3 +89,7 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .msg .who { font-size: 12px; opacity: .75; margin-bottom: 2px; }
 .chatbar { display: flex; gap: 8px; align-items: flex-end; }
 .chatbar textarea { flex: 1; resize: none; }
+.msg .flag { background: transparent; border: 0; color: inherit; opacity: .6; padding: 0 4px; min-height: 0; font-size: 13px; margin-left: 6px; cursor: pointer; }
+.list { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; }
+label.check { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+label.check input { width: auto; min-height: 0; }

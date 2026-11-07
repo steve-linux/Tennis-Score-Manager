@@ -38,7 +38,9 @@ class MainActivity : ComponentActivity() {
             if (club != null) {
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
                 controller.selectBooking(club)
-                controller.bookTabRequest.value = 2
+                val room = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
+                i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
+                if (room != null) controller.chatRequest.value = room else controller.bookTabRequest.value = 2
             }
             controller.go(Screen.BOOK_COURT)
             return

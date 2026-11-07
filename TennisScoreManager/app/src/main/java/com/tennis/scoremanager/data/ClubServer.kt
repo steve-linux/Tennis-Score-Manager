@@ -333,6 +333,12 @@ class ClubServerClient(private val url: String, private val token: String?) {
     /** Le chat: i messaggi di [room] arrivati dopo [after] e un messaggio nuovo; per la segreteria la bacheca e la moderazione. */
     fun chat(room: String, after: Long): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/chat/$room?after=$after", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
     fun postChat(room: String, text: String): SrvChatMsg = call("POST", "/chat/$room", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
+    /** Le chat tra soci: a chi si può scrivere, le proprie chat, le scelte, bloccare, segnalare un messaggio. */
+    fun people(): List<SrvPerson> = call<Unit, List<SrvPerson>>("GET", "/people", null, null, kotlinx.serialization.builtins.ListSerializer(SrvPerson.serializer()))
+    fun myChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
+    fun setPrefs(p: SrvPrefsIn): SrvOk = call("POST", "/prefs", SrvPrefsIn.serializer(), p, SrvOk.serializer())
+    fun block(player: String, on: Boolean): SrvOk = call("POST", "/block", SrvBlockIn.serializer(), SrvBlockIn(player, on), SrvOk.serializer())
+    fun report(id: String): SrvOk = call<Unit, SrvOk>("POST", "/chat/msg/$id/report", null, null, SrvOk.serializer())
     fun adminChat(room: String): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/admin/chat/$room", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
     fun adminChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/admin/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
     fun postBoard(text: String): SrvChatMsg = call("POST", "/admin/chat/board", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())

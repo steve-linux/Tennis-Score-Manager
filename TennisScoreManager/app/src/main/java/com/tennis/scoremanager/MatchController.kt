@@ -2545,8 +2545,8 @@ class MatchController(
 
     /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
     val bookTabRequest = MutableStateFlow<Int?>(null)
-    /** Dalla striscia della bacheca in Gioca: Prenota un campo apre subito la bacheca. */
-    val boardRequest = MutableStateFlow(false)
+    /** Da Gioca o da una notifica: Prenota un campo apre subito questa chat ("board", "club", "d-…"). */
+    val chatRequest = MutableStateFlow<String?>(null)
 
     /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
     fun openSeekNews(url: String, id: String) {
@@ -2574,6 +2574,10 @@ class MatchController(
         val rooms = buildList {
             if (me.boardLast > 0) add(Triple("board", "", me.boardLast))
             seeks?.filter { (it.mine || it.joined) && it.chatLast > 0 }?.forEach { add(Triple("s-" + it.id, seekLine(it), it.chatLast)) }
+            // La chat del circolo (se se ne vogliono le notifiche) e le private.
+            bookingWith(a) { it.myChats() }.getOrNull()?.filter { it.last > 0 && (it.room != "club" || me.clubChat) }?.forEach {
+                add(Triple(it.room, if (it.room == "club") strings.pbClubChat else it.title, it.last))
+            }
         }
         var acc = a
         for ((room, title, last) in rooms) {
@@ -2584,7 +2588,12 @@ class MatchController(
                 if (fresh.isNotEmpty() && a.reminders) {
                     val m = fresh.last()
                     com.tennis.scoremanager.service.OnlineAlerts.postChat(app, strings, room, a.url,
-                        if (room == "board") listOfNotNull(club, strings.pbBoardTitle).joinToString(" · ") else strings.pbChatNew,
+                        when {
+                            room == "board" -> listOfNotNull(club, strings.pbBoardTitle).joinToString(" · ")
+                            room == "club" -> listOfNotNull(club, strings.pbClubChat).joinToString(" · ")
+                            room.startsWith("d-") -> strings.pbDmNew
+                            else -> strings.pbChatNew
+                        },
                         "${m.name}: ${m.text}")
                 }
                 acc = acc.copy(chatNotified = acc.chatNotified + (room to last))
