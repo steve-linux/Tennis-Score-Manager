@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
@@ -69,7 +70,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Lang
-import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
@@ -87,6 +88,8 @@ fun StartScreen(c: MatchController) {
     val su by c.setup.collectAsState()
     val saved by c.saved.collectAsState()
     val bands by c.ble.bands.collectAsState()
+    val remotes by c.remotes.assigned.collectAsState()
+    val remotesOnline by c.remotes.connected.collectAsState()
     val names = remember(su, s) { Names(su, s) }
     var showSaved by remember { mutableStateOf(false) }
     var toDelete by remember { mutableStateOf<MatchRecord?>(null) }
@@ -112,6 +115,18 @@ fun StartScreen(c: MatchController) {
                         if (ready) TsmColors.player(side) else TsmColors.SurfaceHigh,
                         if (ready) TsmColors.onPlayer(side) else TsmColors.TextDim,
                         Icons.Filled.Watch,
+                    )
+                    Spacer(Modifier.width(6.dp))
+                }
+            }
+            if (o.mode == PlayMode.REMOTES) {
+                for (side in Side.entries) {
+                    val ready = remotes[side]?.descriptor?.let { it in remotesOnline } == true
+                    Pill(
+                        s.playerTag(side.ordinal + 1),
+                        if (ready) TsmColors.player(side) else TsmColors.SurfaceHigh,
+                        if (ready) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                        Icons.Filled.SettingsRemote,
                     )
                     Spacer(Modifier.width(6.dp))
                 }
@@ -145,7 +160,14 @@ fun StartScreen(c: MatchController) {
             modifier = Modifier.graphicsLayer { this.alpha = alpha },
         )
         Spacer(Modifier.height(8.dp))
-        Text(if (o.mode == PlayMode.BANDS) s.startHintBands else s.startHint, color = TsmColors.TextDim, textAlign = TextAlign.Center)
+        Text(
+            when (o.mode) {
+                PlayMode.REFEREE -> s.startHint
+                PlayMode.BANDS -> s.startHintBands
+                PlayMode.REMOTES -> s.startHintRemotes
+            },
+            color = TsmColors.TextDim, textAlign = TextAlign.Center,
+        )
         Spacer(Modifier.height(20.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(names.short(Side.P1), color = TsmColors.Player1, fontWeight = FontWeight.Bold, fontSize = 18.sp, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
@@ -154,7 +176,7 @@ fun StartScreen(c: MatchController) {
         }
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill(if (o.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak, TsmColors.SurfaceHigh, TsmColors.TextMain)
+            Pill(Reports.formatName(RulesConfig(format = o.format, gamesPerSet = o.gamesPerSet, setTiebreak = o.setTiebreak), s), TsmColors.SurfaceHigh, TsmColors.TextMain)
             Pill("${s.serving}: ${names.short(o.firstServer)}", TsmColors.player(o.firstServer), TsmColors.onPlayer(o.firstServer), Icons.Filled.SportsTennis)
         }
         Spacer(Modifier.weight(1f))

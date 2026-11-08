@@ -1,11 +1,21 @@
 Tennis Score Manager tiene il punteggio di una partita di tennis secondo le regole ITF e lo annuncia come un giudice di sedia.
 
-* Singolare e doppio: tre set con tie-break sul 6-6, oppure due set e super tie-break a 10; punto decisivo (No-Ad) a scelta.
+* Singolare e doppio: tre o cinque set, due set e super tie-break a 10, pro set a 8 o 10 game o solo super tie-break; set da 6 o 4 game, con o senza tie-break; punto decisivo (No-Ad) a scelta.
+* Anche per il padel: stesse regole del tennis, con doppio e golden point (punto d'oro) già impostati; in alternativa lo star point della FIP.
+* Tornei di padel Americano e Mexicano: da 4 a 16 giocatori e fino a 4 campi, partite a punti o a tempo, coppie e turni automatici, risultati scritti o contati punto per punto, classifica da condividere.
 * Chiamate da giudice di sedia in sei lingue (italiano, inglese, francese, tedesco, spagnolo, portoghese) con la sintesi vocale del telefono, senza internet. Si possono anche importare registrazioni proprie.
 * Shot clock (25 s), cambio campo (90 s) e pausa tra i set (120 s); cambi di campo e turni di servizio li gestisce l'app.
 * Qualsiasi punto si può annullare, anche dopo la fine di un game, di un set o della partita: il punteggio viene ricalcolato dall'inizio.
-* Braccialetti M5StickS3 in Bluetooth LE (facoltativi): ogni giocatore preme KEY1 per assegnarsi il punto e KEY2 per annullarlo. Il firmware Arduino è nello stesso repository.
+* Braccialetti M5StickS3 in Bluetooth LE (facoltativi): ogni giocatore preme KEY1 per assegnarsi il punto e KEY2 per annullarlo. Il firmware Arduino è nello stesso repository. Dal firmware 2.4 riconoscono anche dritto, rovescio, servizio e volée, dopo una breve calibrazione.
+* Senza braccialetti: due telecomandini Bluetooth da selfie (1–3 € l'uno), accoppiati come una tastiera. Un clic = punto, doppio clic, pressione lunga o l'altro tasto = annulla.
 * Tabellone a LED su TV o monitor: un secondo telefono col cavo HDMI, un Chromecast (trasmissione dello schermo) o un browser qualsiasi sull'hotspot del telefono.
-* Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON o immagine, oppure si condivide.
+* Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON, immagine o PDF completo (statistiche, cronologia e fino a 10 foto della partita), oppure si condivide.
+* Statistiche di fine partita, per la partita o per set (servizio, risposta, palle break, punti di fila…), e cronologia punto per punto con palle break, set point e match point.
+* Statistiche dettagliate, per chi segna da bordo campo: ace, doppi falli, prime di servizio, vincenti ed errori.
+* Storico sul telefono: partite finite da riaprire, giocatori con vittorie, sconfitte e scontri diretti; si importano le partite salvate (JSON) su un altro telefono, anche con un QR sulla stessa rete Wi-Fi. Foto dei giocatori, anche sul tabellone TV.
+* Ruoli Tu, Allenatore e Circolo, con le sole funzioni che usi: database giocatori, rating, obiettivi, allievi, esercizi, backup.
+* Fasce cardio, allenamenti e analisi del movimento. Telefono-telecamera: video col punteggio, diretta RTMP, highlights e moviola.
+* Circolo: soci, quote e ricevute non fiscali, planning dei campi, tornei sociali e FITP, squadre, scuola tennis, avvisi; anche dal browser del PC.
+* Server del circolo facoltativo (Raspberry Pi o chiavetta USB): prenotazioni online, lista d'attesa, Cerco compagno, bacheca e chat.
 
-Niente pubblicità, niente account, niente tracciamento. La rete serve solo al tabellone sulla rete locale. La posizione serve per il luogo della partita nel riepilogo e, come chiede Android, per la ricerca Bluetooth dei braccialetti. L'indirizzo del campo si cerca solo se attivi l'opzione apposita: usa il servizio di geocodifica del telefono, che con i servizi Google invia le coordinate a Google.
+Niente pubblicità e niente tracciamento; per usare l'app non serve un account. I dati restano sul telefono. Internet serve solo per ciò che attivi tu: diretta video, server del tuo circolo, modello per l'analisi del movimento (scaricato a richiesta da GitHub) e indirizzo del campo (geocodifica del telefono, che con i servizi Google invia le coordinate a Google). Fotocamera e microfono servono per QR, foto e video. La posizione serve per il luogo della partita e, come chiede Android, per la ricerca Bluetooth.

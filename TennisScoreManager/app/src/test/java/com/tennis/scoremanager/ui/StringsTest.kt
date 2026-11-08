@@ -31,7 +31,7 @@ class StringsTest {
                     is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi"), listOf(listOf("Rossi"))))
                     is Function2<*, *, *> -> call(
                         { (v as Function2<Any?, Any?, Any?>)(it[0], it[1]) },
-                        listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(true, false)),
+                        listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(2, "1:23"), listOf(true, false)),
                     )
                     is Function3<*, *, *, *> -> call(
                         { (v as Function3<Any?, Any?, Any?, Any?>)(it[0], it[1], it[2]) },
@@ -78,9 +78,15 @@ class StringsTest {
         val en = texts(EnStrings)
         for (lang in listOf(Lang.FR, Lang.DE, Lang.ES, Lang.PT)) {
             val t = texts(stringsFor(lang))
-            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } }.keys
-            // Restano uguali solo nomi propri e sigle: Bluetooth, OK, Firmware, Audio On/Off, online...
-            assertTrue("$lang copia l'inglese in: $same", same.size < 30)
+            // Le sigle (BP, SP, OK, SET...) restano uguali in ogni lingua: non contano come copie.
+            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
+            // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
+            // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
+            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", e con la sagoma "Distance", "Direction", "Padel", uguali in francese.
+            // Coi ruoli anche "Club" (il ruolo del circolo), uguale in francese.
+            // Con l'arbitro i cronometri Medical Timeout, Toilet Break e Warm-up (in inglese come Shot Clock) e "Disqualification", uguale in francese.
+            // Con le chat del circolo anche "Chat" (e la scheda Chat), uguale in tedesco.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 60)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }

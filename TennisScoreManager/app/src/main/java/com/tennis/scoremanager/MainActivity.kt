@@ -4,6 +4,7 @@
 package com.tennis.scoremanager
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.Toast
 import android.graphics.Color
@@ -28,9 +29,39 @@ class MainActivity : ComponentActivity() {
 
     private val controller: MatchController get() = (application as TsmApp).controller
 
+    /** La notifica di una prenotazione online apre il planning sul suo giorno. */
+    private fun openFromNotification(i: android.content.Intent?) {
+        if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
+            i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
+            // Da un nuovo annuncio: Compagni del suo circolo (lì si vede se è ancora aperto).
+            val club = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
+            if (club != null) {
+                i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
+                controller.selectBooking(club)
+                val room = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
+                i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
+                if (room != null) controller.chatRequest.value = room else controller.bookTabRequest.value = 2
+            }
+            controller.go(Screen.BOOK_COURT)
+            return
+        }
+        val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
+        if (day > 0) {
+            i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
+            controller.openPlanAt(day)
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        openFromNotification(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        controller.onActivityCreated(restored = savedInstanceState != null)
+        controller.onActivityCreated()
+        if (savedInstanceState == null) openFromNotification(intent)
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -59,6 +90,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    /** Tasti dei telecomandi Bluetooth (modalità Telecomandi): arrivano qui prima che diventino volume o clic. */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+        controller.remotes.onKey(event) || super.dispatchKeyEvent(event)
 
     override fun onResume() {
         super.onResume()

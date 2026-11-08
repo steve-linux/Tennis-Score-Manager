@@ -1,0 +1,360 @@
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.net.HttpURLConnection
+import java.net.URL
+
+/**
+ * Il server del circolo visto dalla segreteria (facoltativo: [url] vuoto = nessun server, si prenota in
+ * segreteria come sempre). [token] è la chiave della segreteria; [cancel] le prenotazioni online tolte dal
+ * planning ma non ancora tolte dal server.
+ */
+/** Una prenotazione online già vista: come la si descrive nella notifica e quando comincia. */
+@Serializable
+data class SeenBooking(val label: String, val start: Long)
+
+/**
+ * Un messaggio per Oggi: un giocatore ha prenotato ([cancelled] false) o disdetto online. [label] è "Mario · Campo 2 ·
+ * sab 8 nov 18:00", [start] l'inizio della prenotazione, [at] quando la segreteria l'ha saputo. Resta finché non si legge.
+ */
+@Serializable
+data class OnlineNotice(val id: String, val cancelled: Boolean, val label: String, val start: Long, val at: Long)
+
+@Serializable
+data class ClubServerConf(
+    val url: String = "",
+    val token: String = "",
+    /** L'indirizzo da internet (https://…, con Caddy): per gli inviti e per la segreteria fuori dal circolo. */
+    val publicUrl: String = "",
+    val club: String = "",
+    val rules: BookingRules = BookingRules(),
+    val payInfo: String = "",
+    val lastSync: Long = 0,
+    /** L'ultimo errore (codice del server, o NET se non risponde); null = tutto bene. */
+    val error: String? = null,
+    val players: List<SrvPlayer> = emptyList(),
+    val cancel: List<String> = emptyList(),
+    /** Notifica alla segreteria le prenotazioni online nuove e disdette (anche ad app chiusa). */
+    val alerts: Boolean = true,
+    /** Le prenotazioni online già viste, per notificare solo le novità; null = mai guardato. */
+    val seen: Map<String, SeenBooking>? = null,
+    /** I messaggi di Oggi non ancora letti: prenotazioni e disdette online (al massimo [INBOX_MAX], i più nuovi). */
+    val inbox: List<OnlineNotice> = emptyList(),
+) {
+    val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
+
+    /** Dove cercare il server: prima nella rete del circolo, poi da internet. */
+    val addresses: List<String> get() = listOf(url, publicUrl).filter { it.isNotBlank() }.distinct()
+}
+
+/**
+ * Il giocatore che prenota dall'app (non la segreteria): il server del suo circolo e la chiave che gli ha dato
+ * l'invito. Vuoto = non è entrato in nessun circolo.
+ */
+@Serializable
+data class BookingAccount(
+    val url: String = "", val token: String = "", val name: String = "", val player: String = "", val club: String = "",
+    /** Promemoria prima della partita e avviso se la segreteria toglie una prenotazione (notifiche sul telefono). */
+    val reminders: Boolean = true,
+    /** Le prenotazioni viste l'ultima volta (null = mai guardato), quelle già ricordate e quelle disdette da qui. */
+    val mine: Map<String, SeenBooking>? = null,
+    val reminded: List<String> = emptyList(),
+    val cancelledHere: List<String> = emptyList(),
+    /** Le liste d'attesa liberate di cui si è già dato l'avviso. */
+    val freedSeen: List<String> = emptyList(),
+    /** Gli annunci di Cerco compagno (propri o a cui si partecipa) com'erano l'ultima volta; null = mai guardato. */
+    val seekSeen: Map<String, String>? = null,
+    /** Gli annunci di Cerco compagno aperti degli altri (per le novità in Gioca) e quelli già visti o letti. */
+    val openSeeks: List<SrvSeek> = emptyList(),
+    val seekRead: List<String> = emptyList(),
+    /** Gli annunci si sono già guardati almeno una volta (la prima volta niente notifica: sono tutti "nuovi"). */
+    val seeksChecked: Boolean = false,
+    /** Notifiche dei nuovi annunci degli altri (spente = solo nelle novità di Gioca e in Compagni). */
+    val seekAlerts: Boolean = true,
+    /** Le chat (bacheca "board", annunci "s-ID"): fino a quando si sono lette e fino a quando si è già avvisato. */
+    val chatRead: Map<String, Long> = emptyMap(),
+    val chatNotified: Map<String, Long> = emptyMap(),
+    /** Le chat con messaggi nuovi, per le novità di Gioca: stanza → titolo ("" = la bacheca). */
+    val chatNews: Map<String, String> = emptyMap(),
+    /** Quanti avvisi della bacheca sono ancora da leggere (per la striscia in cima a Gioca). */
+    val boardUnread: Int = 0,
+    /** La chat del circolo in Gioca: l'ultimo messaggio ("Mario: …"), di quando, e quanti da leggere. */
+    val clubPreview: String = "",
+    val clubPreviewAt: Long = 0,
+    val clubUnread: Int = 0,
+) {
+    val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
+
+    /** Gli annunci degli altri ancora da leggere. */
+    val unreadSeeks: List<SrvSeek> get() = openSeeks.filter { it.id !in seekRead }
+}
+
+object ClubServers {
+    /** Gli annunci a cui si può ancora rispondere: degli altri, senza esserci già, non al completo. */
+    fun othersOpen(seeks: List<SrvSeek>): List<SrvSeek> = seeks.filter { !it.mine && !it.joined && it.need > 0 && it.bookedCourt == null && !it.noCourt }
+
+    /**
+     * Gli annunci appena letti dal server in [a]: (l'account aggiornato, quelli comparsi adesso). I già letti si
+     * dimenticano quando l'annuncio non c'è più.
+     */
+    fun noteSeeks(a: BookingAccount, seeks: List<SrvSeek>): Pair<BookingAccount, List<SrvSeek>> {
+        val open = othersOpen(seeks)
+        val before = a.openSeeks.map { it.id }.toSet()
+        val fresh = if (!a.seeksChecked) emptyList() else open.filter { it.id !in before && it.id !in a.seekRead }
+        val ids = open.map { it.id }.toSet()
+        return a.copy(openSeeks = open, seekRead = a.seekRead.filter { it in ids }, seeksChecked = true) to fresh
+    }
+
+    /**
+     * Il link dell'invito (https://circolo/#i=CODICE, anche col QR) diviso in indirizzo e codice; un codice da
+     * solo dà indirizzo null. null = non è un invito.
+     */
+    fun parseInvite(text: String): Pair<String?, String>? {
+        val t = text.trim()
+        val i = t.indexOf("#i=")
+        if (i >= 0) {
+            val code = t.substring(i + 3).takeWhile { it.isLetterOrDigit() || it == '-' }.filter { it.isLetterOrDigit() }.uppercase()
+            val url = cleanUrl(t.substring(0, i).substringBefore('?').trimEnd('/'))
+            return if (code.length >= 6 && url.isNotEmpty()) url to code else null
+        }
+        val code = t.filter { it.isLetterOrDigit() }.uppercase()
+        return if (t.all { it.isLetterOrDigit() || it == '-' } && code.length in 6..16) null to code else null
+    }
+
+    /** L'indirizzo come lo si scrive: senza / in fondo, http:// se manca. */
+    fun cleanUrl(u: String): String {
+        val t = u.trim().trimEnd('/')
+        return if (t.isEmpty() || t.startsWith("http://") || t.startsWith("https://")) t else "http://$t"
+    }
+
+    /** Il link dell'invito: la pagina del circolo col codice dopo il # (non arriva nei log del server). */
+    fun inviteLink(conf: ClubServerConf, code: String): String = conf.publicUrl.ifBlank { conf.url } + "/#i=" + code
+
+    /**
+     * La chiamata [f] al primo indirizzo che risponde: quello del circolo e, se non c'è rete per arrivarci (la
+     * segreteria è a casa), quello da internet. Gli altri errori (chiave, regole) non cambiano indirizzo.
+     */
+    fun <T> withServer(conf: ClubServerConf, f: (ClubServerClient) -> T): T {
+        var last: ClubServerError? = null
+        for (u in conf.addresses) {
+            try { return f(ClubServerClient(u, conf.token)) } catch (e: ClubServerError) {
+                if (e.code != "NET") throw e
+                last = e
+            }
+        }
+        throw last ?: ClubServerError("NET")
+    }
+
+    /**
+     * Quello che si manda al server: i campi, gli orari, i blocchi e tutto l'occupato della segreteria
+     * (prenotazioni e partite di torneo), senza nomi; le prenotazioni online il server le conosce già.
+     */
+    fun buildSync(conf: ClubServerConf, plan: CourtPlan, tournaments: List<ClubTournament>, courts: List<String>, club: String, timeZone: String): ClubSync {
+        val busy = plan.bookings.filter { it.online == null }.map { Busy(it.court, it.start, it.end) } +
+            tournaments.flatMap { t ->
+                t.matches.filter { m -> m.court.isNotBlank() && m.at != null && !m.bye }.map { m -> Busy(m.court, m.at!!, m.at + plan.settings.tournamentMinutes * 60_000L) }
+            }
+        val now = System.currentTimeMillis()
+        return ClubSync(
+            club = club, timeZone = timeZone, courts = courts,
+            settings = plan.settings.copy(courts = plan.settings.courts.map { it.copy(photos = emptyList()) }),
+            // Solo quello che conta da ieri in poi: il passato al server non serve.
+            blocks = plan.blocks.filter { it.to >= now - 86_400_000L },
+            busy = busy.filter { it.end >= now - 86_400_000L },
+            rules = conf.rules.copy(courts = conf.rules.courts.filter { it in courts }), payInfo = conf.payInfo,
+        )
+    }
+
+    /** Per il giocatore: i promemoria da mandare ora e le prenotazioni tolte dalla segreteria. */
+    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount, val freed: List<SrvWait> = emptyList())
+
+    /** Cosa è cambiato negli annunci del giocatore: qualcuno ha risposto, il campo è prenotato, nessun campo libero. */
+    data class SeekNews(val joined: List<SrvSeek>, val booked: List<SrvSeek>, val noCourt: List<SrvSeek>, val account: BookingAccount)
+
+    fun seekNews(a: BookingAccount, seeks: List<SrvSeek>): SeekNews {
+        val mine = seeks.filter { it.mine || it.joined }
+        fun sig(k: SrvSeek) = "${k.players.size}|${k.bookedCourt != null}|${k.noCourt}"
+        val now = mine.associate { it.id to sig(it) }
+        val before = a.seekSeen
+        val next = a.copy(seekSeen = now)
+        if (before == null) return SeekNews(emptyList(), emptyList(), emptyList(), next)
+        val changed = mine.filter { before[it.id] != null && before[it.id] != sig(it) }
+        return SeekNews(
+            joined = changed.filter { it.mine && it.bookedCourt == null && !it.noCourt },
+            booked = changed.filter { it.bookedCourt != null },
+            noCourt = changed.filter { it.noCourt && it.bookedCourt == null },
+            account = next,
+        )
+    }
+
+    /** Le liste d'attesa appena liberate (avviso una volta sola). */
+    fun freedNews(a: BookingAccount, waits: List<SrvWait>): Pair<List<SrvWait>, BookingAccount> {
+        val freed = waits.filter { it.freedCourt != null }
+        val fresh = freed.filter { it.id !in a.freedSeen }
+        return fresh to a.copy(freedSeen = freed.map { it.id })
+    }
+
+    /**
+     * Le notifiche del giocatore: il promemoria entro [remindHours] dall'inizio (una volta; la prima volta che si
+     * guarda niente promemoria per quelle già dentro le ore) e le prenotazioni sparite che non ha disdetto lui.
+     */
+    fun myNews(a: BookingAccount, bookings: List<SrvMyBooking>, remindHours: Int, now: Long, label: (SrvMyBooking) -> String): MyNews {
+        val current = bookings.filter { it.start + it.minutes * 60_000L > now }.associate { it.id to SeenBooking(label(it), it.start) }
+        val window = remindHours * 3_600_000L
+        val inWindow = if (remindHours <= 0) emptyMap() else current.filter { (id, b) -> id !in a.reminded && b.start > now && b.start - now <= window }
+        val first = a.mine == null
+        val removed = if (first) emptyList() else a.mine!!.filter { (id, b) -> id !in current && id !in a.cancelledHere && b.start > now }.values.sortedBy { it.start }
+        val next = a.copy(
+            mine = current,
+            reminded = (a.reminded.filter { it in current } + inWindow.keys).distinct(),
+            cancelledHere = a.cancelledHere.filter { it in current },
+        )
+        return MyNews(if (first) emptyList() else inWindow.values.sortedBy { it.start }, removed, next)
+    }
+
+    /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */
+    data class OnlineNews(
+        val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?,
+        /** Le stesse novità come messaggi per Oggi. */
+        val notices: List<OnlineNotice> = emptyList(),
+    )
+
+    /** Quanti messaggi tiene Oggi al massimo: oltre, se ne vanno i più vecchi. */
+    const val INBOX_MAX = 50
+
+    /** I messaggi nuovi in fondo a quelli da leggere, senza doppioni, al massimo [INBOX_MAX]. */
+    fun addNotices(inbox: List<OnlineNotice>, new: List<OnlineNotice>): List<OnlineNotice> =
+        (inbox + new.filter { n -> inbox.none { it.id == n.id } }).takeLast(INBOX_MAX)
+
+    /**
+     * Le novità per la notifica. La prima volta (dopo l'abbinamento) non c'è niente da dire: si ricorda solo cosa
+     * c'è. Le disdette contano solo se la prenotazione non era ancora cominciata (quelle giocate escono da sole).
+     * [firstDay] è l'inizio della prima novità, per aprire il planning su quel giorno; [officeCancelled] sono quelle
+     * appena tolte dalla segreteria.
+     */
+    fun onlineNews(seen: Map<String, SeenBooking>?, online: List<OnlineBooking>, now: Long, officeCancelled: Set<String> = emptySet(), label: (OnlineBooking) -> String): OnlineNews {
+        val current = online.filter { it.end > now }.associate { it.id to SeenBooking(label(it), it.start) }
+        if (seen == null) return OnlineNews(emptyList(), emptyList(), current, null)
+        val addedById = current.filterKeys { it !in seen }.entries.sortedBy { it.value.start }
+        val ids = online.map { it.id }.toSet()
+        // Quelle tolte dalla segreteria stessa non sono una notizia per lei.
+        val cancelledById = seen.filterKeys { it !in ids && it !in officeCancelled }.entries.filter { it.value.start > now }.sortedBy { it.value.start }
+        val added = addedById.map { it.value }
+        val cancelled = cancelledById.map { it.value }
+        val notices = addedById.map { (id, b) -> OnlineNotice("a$id", false, b.label, b.start, now) } + cancelledById.map { (id, b) -> OnlineNotice("c$id", true, b.label, b.start, now) }
+        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start }, notices)
+    }
+
+    /**
+     * Le prenotazioni online nel planning: quelle nuove entrano (col giocatore del database se c'è), quelle già
+     * entrate restano come le ha sistemate la segreteria. Restituisce anche quelle sparite dal server (disdette dal
+     * giocatore), da togliere dal planning; le vecchie che il server ha già dimenticato restano.
+     */
+    fun merge(plan: CourtPlan, online: List<OnlineBooking>, known: (String) -> Boolean, now: Long): Pair<List<CourtBooking>, List<CourtBooking>> {
+        val have = plan.bookings.mapNotNull { b -> b.online?.let { it to b } }.toMap()
+        val ids = online.map { it.id }.toSet()
+        val added = online.filter { it.id !in have }.map { o ->
+            CourtBooking(
+                id = "o" + o.id, court = o.court, start = o.start, minutes = o.minutes, kind = BookingKind.PLAY,
+                players = if (known(o.player)) listOf(o.player) else emptyList(), names = if (known(o.player)) emptyList() else listOf(o.name),
+                lights = o.lights, cents = o.cents, heating = o.heating, online = o.id,
+            )
+        }
+        val gone = plan.bookings.filter { it.online != null && it.online !in ids && it.end > now - 30L * 86_400_000L }
+        return added to gone
+    }
+}
+
+/** Una risposta sbagliata del server: il codice (BAD_CODE, UNAUTHORIZED…) o NET se non risponde. */
+class ClubServerError(val code: String) : Exception(code)
+
+/** Le chiamate della segreteria al server, in HTTP semplice (rete del circolo) o HTTPS (da internet). */
+class ClubServerClient(private val url: String, private val token: String?) {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+
+    private fun <I, O> call(method: String, path: String, inSer: KSerializer<I>?, body: I?, outSer: KSerializer<O>): O {
+        val c = try { URL("$url/api/v1$path").openConnection() as HttpURLConnection } catch (_: Exception) { throw ClubServerError("BAD_URL") }
+        try {
+            c.requestMethod = method
+            c.connectTimeout = 8_000; c.readTimeout = 15_000
+            c.setRequestProperty("Accept", "application/json")
+            token?.let { c.setRequestProperty("Authorization", "Bearer $it") }
+            if (inSer != null && body != null) {
+                c.doOutput = true
+                c.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                c.outputStream.use { it.write(json.encodeToString(inSer, body).toByteArray()) }
+            }
+            val code = c.responseCode
+            val text = (if (code in 200..299) c.inputStream else c.errorStream)?.use { it.readBytes().toString(Charsets.UTF_8) }.orEmpty()
+            if (code !in 200..299) throw ClubServerError(runCatching { json.decodeFromString(SrvError.serializer(), text).error }.getOrDefault("HTTP_$code"))
+            return try { json.decodeFromString(outSer, text) } catch (_: Exception) { throw ClubServerError("NOT_TSM") }
+        } catch (e: ClubServerError) {
+            throw e
+        } catch (_: Exception) {
+            throw ClubServerError("NET")
+        } finally {
+            c.disconnect()
+        }
+    }
+
+    fun info(): SrvInfo = call<Unit, SrvInfo>("GET", "/info", null, null, SrvInfo.serializer())
+    fun pair(code: String): SrvToken = call("POST", "/admin/pair", SrvCode.serializer(), SrvCode(code), SrvToken.serializer())
+    fun sync(s: ClubSync): SrvAdmin = call("PUT", "/admin/sync", ClubSync.serializer(), s, SrvAdmin.serializer())
+    fun state(): SrvAdmin = call<Unit, SrvAdmin>("GET", "/admin/state", null, null, SrvAdmin.serializer())
+    fun tunnel(): SrvTunnel = call<Unit, SrvTunnel>("GET", "/admin/tunnel", null, null, SrvTunnel.serializer())
+    fun setTunnel(on: Boolean): SrvTunnel = call("POST", "/admin/tunnel", SrvTunnelIn.serializer(), SrvTunnelIn(on), SrvTunnel.serializer())
+    fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
+    fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
+    fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun resetPin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id/pin", null, null, SrvOk.serializer())
+    fun putBackup(name: String, bytes: ByteArray): SrvOk =
+        call("POST", "/admin/backups", SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(bytes)), SrvOk.serializer())
+    fun backups(): List<SrvBackup> = call<Unit, List<SrvBackup>>("GET", "/admin/backups", null, null, kotlinx.serialization.builtins.ListSerializer(SrvBackup.serializer()))
+    fun backup(name: String): ByteArray = java.util.Base64.getDecoder().decode(
+        call<Unit, SrvBackupData>("GET", "/admin/backup?name=${java.net.URLEncoder.encode(name, "UTF-8")}", null, null, SrvBackupData.serializer()).data,
+    )
+    fun removeWaitAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/waits/$id", null, null, SrvOk.serializer())
+    fun removeSeekAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/seeks/$id", null, null, SrvOk.serializer())
+
+    // Il giocatore (con la chiave avuta dall'invito).
+    private fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")
+    fun claim(code: String): SrvToken = call("POST", "/claim", SrvCode.serializer(), SrvCode(code), SrvToken.serializer())
+    fun me(): SrvMe = call<Unit, SrvMe>("GET", "/me", null, null, SrvMe.serializer())
+    fun day(date: String): SrvDay = call<Unit, SrvDay>("GET", "/day?date=${enc(date)}", null, null, SrvDay.serializer())
+    fun quote(court: String, start: Long, minutes: Int, heating: Boolean): SrvQuote =
+        call<Unit, SrvQuote>("GET", "/quote?court=${enc(court)}&start=$start&minutes=$minutes&heating=$heating", null, null, SrvQuote.serializer())
+    fun book(b: SrvBookIn): SrvMyBooking = call("POST", "/bookings", SrvBookIn.serializer(), b, SrvMyBooking.serializer())
+    fun cancelMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/bookings/${enc(id)}", null, null, SrvOk.serializer())
+    fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
+    /** Entra con numero e PIN (scelti dal giocatore dopo l'invito). */
+    fun login(phone: String, pin: String): SrvToken = call("POST", "/login", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvToken.serializer())
+    fun setPin(phone: String, pin: String): SrvOk = call("POST", "/pin", SrvPinIn.serializer(), SrvPinIn(phone, pin), SrvOk.serializer())
+    /** Le chat: i messaggi di [room] arrivati dopo [after] e un messaggio nuovo; per la segreteria la bacheca e la moderazione. */
+    fun chat(room: String, after: Long): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/chat/$room?after=$after", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
+    fun postChat(room: String, text: String): SrvChatMsg = call("POST", "/chat/$room", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
+    /** Le chat tra soci: a chi si può scrivere, le proprie chat, le scelte, bloccare, segnalare un messaggio. */
+    fun people(): List<SrvPerson> = call<Unit, List<SrvPerson>>("GET", "/people", null, null, kotlinx.serialization.builtins.ListSerializer(SrvPerson.serializer()))
+    fun myChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
+    fun setPrefs(p: SrvPrefsIn): SrvOk = call("POST", "/prefs", SrvPrefsIn.serializer(), p, SrvOk.serializer())
+    fun block(player: String, on: Boolean): SrvOk = call("POST", "/block", SrvBlockIn.serializer(), SrvBlockIn(player, on), SrvOk.serializer())
+    /** Correggere (nei primi minuti) o eliminare un proprio messaggio. */
+    fun editChat(id: String, text: String): SrvOk = call("PUT", "/chat/msg/$id", SrvChatIn.serializer(), SrvChatIn(text), SrvOk.serializer())
+    fun deleteMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/chat/msg/$id", null, null, SrvOk.serializer())
+    fun report(id: String): SrvOk = call<Unit, SrvOk>("POST", "/chat/msg/$id/report", null, null, SrvOk.serializer())
+    fun adminChat(room: String): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/admin/chat/$room", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
+    fun adminChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/admin/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
+    fun postBoard(text: String): SrvChatMsg = call("POST", "/admin/chat/board", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
+    fun deleteChat(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/chat/msg/$id", null, null, SrvOk.serializer())
+    fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
+    fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
+    fun seeks(): List<SrvSeek> = call<Unit, List<SrvSeek>>("GET", "/seeks", null, null, kotlinx.serialization.builtins.ListSerializer(SrvSeek.serializer()))
+    fun addSeek(k: SrvSeekIn): SrvSeek = call("POST", "/seeks", SrvSeekIn.serializer(), k, SrvSeek.serializer())
+    fun joinSeek(id: String): SrvSeek = call<Unit, SrvSeek>("POST", "/seeks/${enc(id)}/join", null, null, SrvSeek.serializer())
+    fun leaveSeek(id: String): SrvOk = call<Unit, SrvOk>("POST", "/seeks/${enc(id)}/leave", null, null, SrvOk.serializer())
+    fun removeSeek(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/seeks/${enc(id)}", null, null, SrvOk.serializer())
+}

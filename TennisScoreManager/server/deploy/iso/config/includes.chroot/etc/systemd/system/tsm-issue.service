@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Sullo schermo del PC, sopra il login: l'indirizzo del server e il codice per la segreteria.
+[Unit]
+Description=TSM club server: address and pairing code on the console
+After=tsm-server.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/tsm-issue
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description=TSM club server: update the DuckDNS address
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/tsm-duckdns

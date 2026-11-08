@@ -73,10 +73,75 @@ data class TvSnapshot(
     val message: String? = null,
     val show: TvShow,
     val labels: TvLabels,
+    /** Moviola mandata al tabellone dall'arbitro (null = niente): copre il punteggio finché non la si toglie. */
+    val replay: TvReplay? = null,
+    /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
+    val club: TvClub? = null,
+    /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
+    val balls: Long? = null,
+)
+
+/**
+ * Il torneo sul tabellone: [pages] che si alternano ogni [seconds] secondi (tabellone, gironi, ordine di gioco).
+ * [id] cambia quando si manda un altro torneo, così la pagina riparte dalla prima.
+ */
+@Serializable
+data class TvClub(val id: String, val title: String, val subtitle: String, val seconds: Int, val pages: List<TvClubPage>, val labels: TvClubLabels)
+
+/** Una pagina: "draw" ([rounds]), "groups" ([groups]) o "order" ([rows]). */
+@Serializable
+data class TvClubPage(
+    val kind: String,
+    val title: String,
+    val rounds: List<TvRound> = emptyList(),
+    val groups: List<TvGroup> = emptyList(),
+    val rows: List<TvOrderRow> = emptyList(),
 )
 
 @Serializable
-data class TvPlayer(val name: String, val color: String)
+data class TvRound(val name: String, val matches: List<TvDrawMatch>)
+
+/** [win] = 0 (vince a), 1 (vince b), null = da giocare. */
+@Serializable
+data class TvDrawMatch(val a: String, val b: String, val score: String = "", val win: Int? = null)
+
+@Serializable
+data class TvGroup(val name: String, val rows: List<TvStanding>)
+
+@Serializable
+data class TvStanding(val pos: Int, val name: String, val won: Int, val played: Int, val sets: String, val games: String, val q: Boolean)
+
+/** Una riga dell'ordine di gioco: ora, campo, i due, turno, punteggio; [done] = giocata. */
+@Serializable
+data class TvOrderRow(val time: String, val court: String, val a: String, val b: String, val round: String, val score: String = "", val done: Boolean = false, val win: Int? = null)
+
+@Serializable
+data class TvClubLabels(val won: String, val sets: String, val games: String, val noMatches: String)
+
+/**
+ * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
+ * [label]. Segue i comandi dell'arbitro: a ogni [sync] nuovo il tabellone va al pezzo [part], a [posMs], e si ferma
+ * ([paused]) o riparte.
+ */
+@Serializable
+data class TvReplay(
+    val id: String,
+    val parts: Int,
+    val speed: Float,
+    val label: String,
+    val paused: Boolean = false,
+    val part: Int = 0,
+    val posMs: Long = 0,
+    val sync: Int = 0,
+)
+
+@Serializable
+data class TvPlayer(
+    val name: String,
+    val color: String,
+    /** Foto dei giocatori del lato (indirizzi sul server del tabellone); vuota = nessuna. */
+    val photos: List<String> = emptyList(),
+)
 
 @Serializable
 data class TvSet(val g1: Int, val g2: Int, val tb1: Int? = null, val tb2: Int? = null, val mtb: Boolean = false)
@@ -104,6 +169,8 @@ data class TvLabels(
     val fullscreen: String,
     /** Titolo della pagina (document.title). */
     val page: String,
+    /** La scritta dell'animazione del cambio palle. */
+    val newBalls: String = "",
 )
 
 /** Stato dell'app da cui si ricava il tabellone. */
@@ -122,6 +189,11 @@ data class TvInput(
     val tv: TvSettings,
     val strings: Strings,
     val seq: Long,
+    /** Indirizzi delle foto dei giocatori di ogni lato. */
+    val photos: Map<Side, List<String>> = emptyMap(),
+    val replay: TvReplay? = null,
+    val club: TvClub? = null,
+    val balls: Long? = null,
 )
 
 object TvSnapshots {
@@ -163,6 +235,9 @@ object TvSnapshots {
                     CountdownKind.CHANGEOVER -> s.tvChangeover
                     CountdownKind.SET_BREAK -> s.tvSetBreak
                     CountdownKind.TIEBREAK_BREAK -> s.tvTiebreakBreak
+                    CountdownKind.MEDICAL -> s.tvMedical
+                    CountdownKind.TOILET -> s.tvToilet
+                    CountdownKind.WARMUP -> s.tvWarmup
                 },
                 leftMs = i.countdownLeftMs.coerceAtLeast(0),
                 shot = k == CountdownKind.SHOT_CLOCK,
@@ -173,7 +248,10 @@ object TvSnapshots {
             lang = i.lang.code,
             phase = phase,
             title = i.tv.title.trim().ifEmpty { defaultTitle(m?.record?.setup ?: i.setup, s) },
-            players = listOf(TvPlayer(names.short(Side.P1), i.tv.color1), TvPlayer(names.short(Side.P2), i.tv.color2)),
+            players = listOf(
+                TvPlayer(names.short(Side.P1), i.tv.color1, i.photos[Side.P1].orEmpty()),
+                TvPlayer(names.short(Side.P2), i.tv.color2, i.photos[Side.P2].orEmpty()),
+            ),
             server = server,
             points = points,
             games = games,
@@ -191,6 +269,9 @@ object TvSnapshots {
             message = i.message?.takeIf { phase == "play" && i.tv.showMessages },
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
             labels = labels(s),
+            replay = i.replay,
+            club = i.club,
+            balls = i.balls,
         )
     }
 
@@ -199,7 +280,7 @@ object TvSnapshots {
         vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
         waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
         tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
-        page = s.tvPageTitle,
+        page = s.tvPageTitle, newBalls = s.newBallsCall,
     )
 
     /** "Circolo Tennis · Campo 3" dai dati della pagina 1 (un numero da solo diventa "Campo 3"). */

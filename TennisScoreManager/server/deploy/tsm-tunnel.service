@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Accende o spegne il tunnel del server del circolo (lo chiede la segreteria dall'app).
+[Unit]
+Description=TSM club server tunnel (Tailscale Funnel)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=TSM_TUNNEL_PORT=8088
+EnvironmentFile=-/etc/default/tsm-server
+ExecStart=/opt/tsm-server/tsm-tunnel
+TimeoutStartSec=1200

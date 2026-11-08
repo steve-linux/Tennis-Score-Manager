@@ -1,11 +1,21 @@
 Tennis Score Manager compte les points d'un match de tennis selon les règles de l'ITF et les annonce comme un arbitre de chaise.
 
-* Simple et double : trois sets avec jeu décisif à 6-6, ou deux sets et un super jeu décisif en 10 points ; point décisif (No-Ad) en option.
+* Simple et double : trois ou cinq sets, deux sets et un super jeu décisif en 10 points, pro set en 8 ou 10 jeux ou super jeu décisif seul ; sets en 6 ou 4 jeux, avec ou sans jeu décisif ; point décisif (No-Ad) en option.
+* Aussi pour le padel : mêmes règles que le tennis, double et golden point (point en or) déjà réglés ; le star point de la FIP est aussi proposé.
+* Tournois de padel Americano et Mexicano : de 4 à 16 joueurs et jusqu'à 4 terrains, matchs aux points ou au temps, paires et tours automatiques, résultats écrits ou comptés point par point, classement à partager.
 * Annonces d'arbitre de chaise en six langues (italien, anglais, français, allemand, espagnol, portugais) avec la synthèse vocale du téléphone, sans internet. Vous pouvez aussi importer vos propres enregistrements.
 * Shot clock (25 s), changement de côté (90 s) et pause entre les sets (120 s) ; changements de côté et ordre de service sont gérés par l'application.
 * N'importe quel point peut être annulé, même après la fin d'un jeu, d'un set ou du match : le score est recalculé depuis le début.
-* Bracelets M5StickS3 en Bluetooth LE (facultatifs) : chaque joueur appuie sur KEY1 pour marquer le point et sur KEY2 pour l'annuler. Leur firmware Arduino est dans le même dépôt.
+* Bracelets M5StickS3 en Bluetooth LE (facultatifs) : chaque joueur appuie sur KEY1 pour marquer le point et sur KEY2 pour l'annuler. Leur firmware Arduino est dans le même dépôt. Depuis le firmware 2.4, ils reconnaissent aussi coup droit, revers, service et volée après un court calibrage.
+* Sans bracelets : deux télécommandes Bluetooth pour selfie (1 à 3 € pièce), appairées comme un clavier. Un clic = point, double clic, appui long ou l'autre touche = annuler.
 * Tableau d'affichage à LED sur une TV ou un écran : un second téléphone avec un câble HDMI, un Chromecast (diffusion de l'écran) ou n'importe quel navigateur sur le point d'accès du téléphone.
-* Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON ou image, ou à partager.
+* Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON, image ou PDF complet (statistiques, déroulé et jusqu'à 10 photos du match), ou à partager.
+* Statistiques de fin de match, pour le match ou par manche (service, retour, balles de break, points d'affilée…), et déroulé point par point avec balles de break, de set et de match.
+* Statistiques détaillées, pour qui marque depuis le bord du court : aces, doubles fautes, premières balles, coups gagnants et erreurs.
+* Historique sur le téléphone : matchs terminés à rouvrir, joueurs avec victoires, défaites et face-à-face ; les matchs enregistrés (JSON) sur un autre téléphone s'importent, aussi avec un code QR sur le même Wi-Fi. Photos des joueurs, aussi sur le tableau TV.
+* Rôles Vous, Entraîneur et Club, avec seulement les fonctions utilisées : joueurs, classement Elo, objectifs, élèves, exercices, sauvegarde.
+* Ceintures cardio, entraînements et analyse du mouvement. Téléphone-caméra : vidéo avec score, direct RTMP, résumés et ralenti.
+* Club : membres, cotisations et reçus non fiscaux, planning des courts, tournois, équipes, école de tennis, avis ; aussi depuis un navigateur sur PC.
+* Serveur de club facultatif (Raspberry Pi ou clé USB) : réservation en ligne, liste d'attente, recherche de partenaire, panneau d'affichage et chat.
 
-Sans publicité, sans compte, sans pistage. Le réseau sert uniquement au tableau d'affichage sur le réseau local. La localisation sert au lieu du match dans le résumé et, comme l'exige Android, à la recherche Bluetooth des bracelets. L'adresse du court n'est recherchée que si vous activez l'option : elle utilise le service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google.
+Ni publicité ni pistage ; aucun compte n'est nécessaire pour utiliser l'application. Les données restent sur le téléphone. Internet ne sert qu'à ce que vous activez : vidéo en direct, serveur de votre club, modèle d'analyse du mouvement (téléchargé à la demande depuis GitHub) et adresse du court (géocodage du téléphone qui, avec les services Google, envoie les coordonnées à Google). Caméra et micro servent aux QR, photos et vidéos. La position sert au lieu du match et, comme l'exige Android, à la recherche Bluetooth.

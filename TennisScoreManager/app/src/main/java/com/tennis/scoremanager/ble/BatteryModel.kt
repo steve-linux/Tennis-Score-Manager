@@ -7,6 +7,7 @@ package com.tennis.scoremanager.ble
  * Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56", dal firmware 2.1 anche
  * ";usb=5010;full=0;pct=71". [charging] = alimentato dal cavo USB (dal 2.1 anche a carica completa).
  */
+@kotlinx.serialization.Serializable
 data class BandStatus(
     val millivolts: Int,
     val charging: Boolean,
@@ -44,6 +45,9 @@ object BatteryModel {
      * che pesa di più. Valore stimato: appena c'è una misura sul campo si usa quella ([baseFromMeasure]).
      */
     const val BASE_MA = 35.0
+
+    /** Riconoscimento colpi (firmware 2.4): BMI270 con accelerometro e giroscopio a 100 Hz (datasheet ~0,9 mA). */
+    const val IMU_MA = 1.0
 
     // Uso tipico in partita per ogni braccialetto: ~60 punti e ~10 game all'ora, ~1 minuto di messaggi,
     // ~40 bip (i tasti premuti da chi lo indossa più gli avvisi).
@@ -143,9 +147,15 @@ object BatteryModel {
     fun soundMa(volume: Int): Double =
         if (volume <= 0) 0.0 else BEEPS_PER_HOUR * 1.6 / 3600.0 * (15.0 + 0.6 * volume.coerceIn(0, 100))
 
-    /** Consumo medio con le impostazioni scelte; [measuredBaseMa] sostituisce la base stimata se c'è. */
+    /** Sensore di movimento acceso per il riconoscimento dei colpi. */
+    fun imuMa(s: BandSettings): Double = if (s.strokes) IMU_MA else 0.0
+
+    /**
+     * Consumo medio con le impostazioni scelte; [measuredBaseMa] sostituisce la base stimata se c'è.
+     * Il sensore dei colpi si conta nella base: è acceso sempre, come il Bluetooth.
+     */
     fun estimate(s: BandSettings, measuredBaseMa: Double? = null): PowerEstimate = PowerEstimate(
-        baseMa = measuredBaseMa ?: BASE_MA,
+        baseMa = (measuredBaseMa ?: BASE_MA) + imuMa(s),
         displayMa = displayOnMa(s.brightness) * displayDuty(s.pointSeconds),
         soundMa = soundMa(s.volume),
         measured = measuredBaseMa != null,
@@ -153,11 +163,11 @@ object BatteryModel {
 
     /**
      * Consumo di base ricavato da una misura: calo % all'ora × capacità, meno il display
-     * (acceso per [displayDuty] del tempo, misurato dal braccialetto) e il cicalino.
+     * (acceso per [displayDuty] del tempo, misurato dal braccialetto), il cicalino e il sensore dei colpi.
      */
     fun baseFromMeasure(drainPctPerHour: Double, displayDuty: Double, s: BandSettings): Double {
         val total = drainPctPerHour * CAPACITY_MAH / 100.0
-        return (total - displayOnMa(s.brightness) * displayDuty - soundMa(s.volume)).coerceIn(10.0, 150.0)
+        return (total - displayOnMa(s.brightness) * displayDuty - soundMa(s.volume) - imuMa(s)).coerceIn(10.0, 150.0)
     }
 
     /** "~7 h 10 min" oppure "~40 min". */

@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Ogni 5 minuti: se il provider cambia l'indirizzo di casa, il nome del circolo lo segue.
+[Unit]
+Description=TSM club server: update the DuckDNS address every 5 minutes
+
+[Timer]
+OnBootSec=30
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

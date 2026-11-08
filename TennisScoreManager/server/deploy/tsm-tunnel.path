@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description=TSM club server tunnel: request from the app
+
+[Path]
+PathChanged=/var/lib/tsm-server/tunnel-request
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,116 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Il server del circolo da internet senza toccare il router: un tunnel Tailscale Funnel, che parte dal server verso
+# fuori. Lo lancia systemd come root quando la segreteria lo chiede dall'app (tsm-tunnel.path) e ogni ora (tsm-tunnel.timer).
+# Il server scrive solo "on" o "off" in REQUEST; lo stato per l'app sta in DIR/status.json, che il server può solo leggere.
+# Il tunnel porta alla porta riservata del server (TSM_TUNNEL_PORT): lì ogni richiesta conta come arrivata da internet.
+set -u
+
+REQUEST=${TSM_TUNNEL_REQUEST:-/var/lib/tsm-server/tunnel-request}
+DIR=${TSM_TUNNEL_DIR:-/var/lib/tsm-tunnel}
+PORT=${TSM_TUNNEL_PORT:-8088}
+TS=${TSM_TAILSCALE:-tailscale}
+STEP=${TSM_TUNNEL_STEP:-2}
+ROUNDS=${TSM_TUNNEL_ROUNDS:-450}
+NAME=tsm-circolo
+UP=""
+FUNNEL=""
+
+put() {  # stato, indirizzo, link da aprire, codice d'errore
+    printf '{"state":"%s","url":"%s","link":"%s","code":"%s"}\n' "$1" "${2:-}" "${3:-}" "${4:-}" > "$DIR/status.tmp"
+    chmod 644 "$DIR/status.tmp"
+    mv -f "$DIR/status.tmp" "$DIR/status.json"
+}
+
+# Solo due parole valide; un collegamento simbolico al posto del file non si segue.
+want() {
+    [ -f "$REQUEST" ] && [ ! -L "$REQUEST" ] || return 0
+    case "$(head -c 4 "$REQUEST" | head -n 1)" in
+        on) echo on ;;
+        off) echo off ;;
+    esac
+}
+
+stop_jobs() {
+    for p in $UP $FUNNEL; do kill "$p" 2>/dev/null || true; done
+    UP=""; FUNNEL=""
+}
+
+turn_off() {
+    stop_jobs
+    command -v "$TS" >/dev/null 2>&1 && "$TS" funnel reset >/dev/null 2>&1
+    put OFF
+    exit 0
+}
+
+fail() { stop_jobs; put ERROR "" "" "$1"; exit 1; }
+
+# Solo link di Tailscale: è quello che la segreteria aprirà sul telefono.
+link_in() { grep -o 'https://login\.tailscale\.com/[A-Za-z0-9./?=_&%-]*' "$1" 2>/dev/null | tail -n 1; }
+
+field() { sed -n "s/.*\"$1\": *\"\\([^\"]*\\)\".*/\\1/p" "$DIR/status.ts" | head -n 1; }
+
+install_tailscale() {
+    command -v "$TS" >/dev/null 2>&1 && return 0
+    put WORKING
+    curl -fsSL -o "$DIR/install.sh" https://tailscale.com/install.sh || fail INSTALL
+    sh "$DIR/install.sh" > "$DIR/install.log" 2>&1 || fail INSTALL
+    rm -f "$DIR/install.sh"
+    command -v "$TS" >/dev/null 2>&1 || fail INSTALL
+}
+
+# L'accesso a Tailscale; serve anche quando la chiave scade (di norma dopo 180 giorni).
+log_in() {
+    command -v systemctl >/dev/null 2>&1 && systemctl enable --now tailscaled >/dev/null 2>&1
+    "$TS" up --hostname="$NAME" > "$DIR/up.log" 2>&1 &
+    UP=$!
+    i=0
+    while [ "$i" -lt "$ROUNDS" ]; do
+        [ "$(want)" = on ] || turn_off
+        "$TS" status --json --peers=false > "$DIR/status.ts" 2>/dev/null
+        [ "$(field BackendState)" = Running ] && return 0
+        l=$(field AuthURL)
+        case "$l" in https://login.tailscale.com/*) ;; *) l=$(link_in "$DIR/up.log") ;; esac
+        if [ -n "$l" ]; then put LOGIN "" "$l"; elif [ "$i" -eq 3 ]; then put WORKING; fi
+        i=$((i + 1))
+        sleep "$STEP"
+    done
+    fail LOGIN_TIMEOUT
+}
+
+# La prima volta Tailscale chiede di abilitare Funnel: il comando stampa un link e aspetta.
+open_funnel() {
+    "$TS" funnel --bg --yes "http://127.0.0.1:$PORT" > "$DIR/funnel.log" 2>&1 &
+    FUNNEL=$!
+    i=0
+    while [ "$i" -lt "$ROUNDS" ]; do
+        [ "$(want)" = on ] || turn_off
+        if ! kill -0 "$FUNNEL" 2>/dev/null; then
+            wait "$FUNNEL" || fail FUNNEL
+            FUNNEL=""
+            return 0
+        fi
+        l=$(link_in "$DIR/funnel.log")
+        [ -z "$l" ] || put ENABLE "" "$l"
+        i=$((i + 1))
+        sleep "$STEP"
+    done
+    fail ENABLE_TIMEOUT
+}
+
+mkdir -p "$DIR"
+case "$(want)" in
+    on) ;;
+    off) turn_off ;;
+    *) exit 0 ;;
+esac
+install_tailscale
+log_in
+open_funnel
+dns=$(field DNSName)
+dns=${dns%.}
+[ -n "$dns" ] || fail NO_NAME
+stop_jobs
+put ON "https://$dns"

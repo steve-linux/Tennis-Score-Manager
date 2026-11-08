@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -27,54 +28,64 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlinx.coroutines.delay
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.ui.screens.HistoryScreen
 import com.tennis.scoremanager.ui.screens.MatchScreen
 import com.tennis.scoremanager.ui.screens.OptionsScreen
 import com.tennis.scoremanager.ui.screens.SetupScreen
 import com.tennis.scoremanager.ui.screens.StartScreen
 import com.tennis.scoremanager.ui.screens.SummaryScreen
+import com.tennis.scoremanager.ui.screens.TournamentScreen
+import com.tennis.scoremanager.ui.screens.WorkoutScreen
+import com.tennis.scoremanager.ui.screens.ProgressScreen
+import com.tennis.scoremanager.ui.screens.VideosScreen
+import com.tennis.scoremanager.ui.screens.RacketsScreen
+import kotlinx.coroutines.delay
 
 @Composable
 fun AppRoot(c: MatchController) {
@@ -108,13 +119,48 @@ fun AppRoot(c: MatchController) {
     ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
             when (s) {
+                Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
                 Screen.OPTIONS -> OptionsScreen(c)
                 Screen.START -> StartScreen(c)
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
+                Screen.HISTORY -> HistoryScreen(c)
+                Screen.TOURNAMENT -> TournamentScreen(c)
+                Screen.WORKOUT -> WorkoutScreen(c)
+                Screen.PROGRESS -> ProgressScreen(c)
+                Screen.VIDEOS -> VideosScreen(c)
+                Screen.RACKETS -> RacketsScreen(c)
+                Screen.DEVICES -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.DEVICES)
+                Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
+                Screen.STROKE_SESSIONS -> com.tennis.scoremanager.ui.screens.StrokeSessionsScreen(c)
+                Screen.HELP -> com.tennis.scoremanager.ui.screens.HelpScreen(c)
+                Screen.STUDENTS -> com.tennis.scoremanager.ui.screens.StudentsScreen(c)
+                Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
+                Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
+                Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
+                Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
+                Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
+                Screen.BOOK_COURT -> com.tennis.scoremanager.ui.screens.BookCourtScreen(c)
+                Screen.COURT_STATS -> com.tennis.scoremanager.ui.screens.CourtStatsScreen(c)
+                Screen.DESK -> com.tennis.scoremanager.ui.screens.DeskScreen(c)
+                Screen.LADDERS -> com.tennis.scoremanager.ui.screens.LaddersScreen(c)
+                Screen.LADDER -> com.tennis.scoremanager.ui.screens.LadderScreen(c)
+                Screen.PAYMENTS -> com.tennis.scoremanager.ui.screens.PaymentsScreen(c)
+                Screen.CLUB_TOURNAMENTS -> com.tennis.scoremanager.ui.screens.ClubTournamentsScreen(c)
+                Screen.CLUB_TOURNAMENT -> com.tennis.scoremanager.ui.screens.ClubTournamentScreen(c)
+                Screen.NOTICE -> com.tennis.scoremanager.ui.screens.NoticeScreen(c)
+                Screen.COURTS_PLAN -> com.tennis.scoremanager.ui.screens.CourtsPlanScreen(c)
+                Screen.SCHOOL -> com.tennis.scoremanager.ui.screens.SchoolScreen(c)
+                Screen.COURSE -> com.tennis.scoremanager.ui.screens.CourseScreen(c)
+                Screen.TEAMS -> com.tennis.scoremanager.ui.screens.TeamsScreen(c)
+                Screen.TEAM -> com.tennis.scoremanager.ui.screens.TeamScreen(c)
+                Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
             }
         }
+        // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
+        val balls by c.ballsAnimation.collectAsState()
+        if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
     }
 }
 
@@ -171,6 +217,10 @@ fun ScreenScaffold(
     subtitle: String?,
     icon: ImageVector,
     bottomBar: @Composable RowScope.() -> Unit,
+    /** Pulsante facoltativo a destra del titolo. */
+    action: (@Composable () -> Unit)? = null,
+    /** Il "?" in alto: apre la guida alla sezione di questa schermata. */
+    onHelp: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
@@ -180,9 +230,16 @@ fun ScreenScaffold(
                 contentAlignment = Alignment.Center,
             ) { Icon(icon, null, tint = TsmColors.OnBall) }
             Spacer(Modifier.width(12.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)
                 if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = TsmColors.TextDim)
+            }
+            if (onHelp != null) IconButton(onClick = onHelp) {
+                Icon(Icons.AutoMirrored.Filled.HelpOutline, LocalStrings.current.moreHelp, tint = TsmColors.TextDim)
+            }
+            if (action != null) {
+                Spacer(Modifier.width(8.dp))
+                action()
             }
         }
         Column(
@@ -303,14 +360,29 @@ fun BigButton(
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = onColor),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null)
         Spacer(Modifier.width(8.dp))
-        Text(
-            text, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center, lineHeight = 17.sp,
-        )
+        ButtonLabel(text, bold = true)
     }
+}
+
+/** Margini interni dei pulsanti grandi: più stretti di quelli di Material (24 dp) per lasciare posto al testo. */
+private val ButtonPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+
+/**
+ * Testo dei pulsanti grandi: al massimo due righe e, se non ci sta (carattere grande del telefono, lingue lunghe),
+ * si rimpicciolisce quanto basta invece di troncarsi. L'altezza del pulsante resta fissa: due pulsanti affiancati
+ * restano uguali.
+ */
+@Composable
+private fun ButtonLabel(text: String, color: Color = Color.Unspecified, bold: Boolean = false) {
+    Text(
+        text, color = color, fontWeight = if (bold) FontWeight.Bold else null, maxLines = 2, overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center, lineHeight = 1.1.em,
+        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 14.sp, stepSize = 0.5.sp),
+    )
 }
 
 @Composable
@@ -320,10 +392,11 @@ fun GhostButton(text: String, icon: ImageVector, onClick: () -> Unit, modifier: 
         enabled = enabled,
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null, tint = TsmColors.TextMain)
         Spacer(Modifier.width(8.dp))
-        Text(text, color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        ButtonLabel(text, color = TsmColors.TextMain)
     }
 }
 

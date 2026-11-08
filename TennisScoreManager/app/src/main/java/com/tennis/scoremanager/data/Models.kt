@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.data
 
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -11,6 +12,10 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.voice.CallNames
 import kotlinx.serialization.Serializable
+
+/** Il padel si conta come il tennis (ITF/FIP): cambiano solo i nomi e le impostazioni proposte. */
+@Serializable
+enum class Sport { TENNIS, PADEL }
 
 /** Pagina 1: dati facoltativi. p1a/p1b sono sempre del Giocatore 1, p2a/p2b del Giocatore 2. */
 @Serializable
@@ -22,10 +27,37 @@ data class SetupData(
     val p1b: String = "",
     val p2a: String = "",
     val p2b: String = "",
+    val sport: Sport = Sport.TENNIS,
+    /** Torneo (facoltativo, per i circuiti amatoriali): nome, categoria o tabellone ("Lim. 4.1", "Over 45"), turno. */
+    val event: String = "",
+    val category: String = "",
+    val round: String = "",
+    /** Classifica di ciascun giocatore ("4.1", "NC"...), facoltativa. */
+    val p1aRank: String = "",
+    val p1bRank: String = "",
+    val p2aRank: String = "",
+    val p2bRank: String = "",
+    /** Sesso di ciascun giocatore ("M", "F" o "" = non detto): serve solo all'avatar stilizzato degli highlights. */
+    val p1aSex: String = "",
+    val p1bSex: String = "",
+    val p2aSex: String = "",
+    val p2bSex: String = "",
+    /** Racchetta virtuale: id della racchetta scelta per ciascun lato ("" = nessuna). */
+    val p1Racket: String = "",
+    val p2Racket: String = "",
+    /**
+     * Giocatore del database (Player.id) in ciascun posto: la partita è di quella persona anche se c'è un omonimo, e
+     * resta sua passando da un telefono all'altro. Vuoto = solo il nome (partite di prima o da versioni vecchie).
+     */
+    val p1aId: String = "",
+    val p1bId: String = "",
+    val p2aId: String = "",
+    val p2bId: String = "",
 )
 
+/** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
 @Serializable
-enum class PlayMode { REFEREE, BANDS }
+enum class PlayMode { REFEREE, BANDS, REMOTES }
 
 /** Pagina 2: modalità, lingua, audio, formato e sorteggio. */
 @Serializable
@@ -34,7 +66,14 @@ data class MatchOptions(
     val lang: Lang = Lang.IT,
     val audio: Boolean = true,
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
+    /** Game per set: 6 o 4 (set brevi); 8 o 10 nel pro set. */
+    val gamesPerSet: Int = 6,
+    val setTiebreak: Boolean = true,
     val noAd: Boolean = false,
+    /** Statistiche dettagliate: ace, falli, vincenti ed errori si segnano dalla schermata del punteggio. */
+    val detailedStats: Boolean = false,
+    /** Star point del padel; con [noAd] acceso non conta (l'interfaccia ne lascia acceso uno solo). */
+    val starPoint: Boolean = false,
     val tossWinner: Side? = null,
     val firstServer: Side = Side.P1,
     val p1Left: Boolean = true,
@@ -49,6 +88,13 @@ data class MatchOptions(
     val bandsOffAtEnd: Boolean = true,
     /** Cerca l'indirizzo del campo dalle coordinate (Geocoder: con i servizi Google le coordinate vanno a Google). Spento di default. */
     val addressLookup: Boolean = false,
+    /** Fasce cardio Bluetooth: battito e calorie, in qualsiasi modalità. */
+    val heartRate: Boolean = false,
+    /** Cambio palle: la prima volta dopo [newBallsFirst] game, poi ogni [newBallsEvery] (0 = niente). */
+    val newBallsFirst: Int = 0,
+    val newBallsEvery: Int = 0,
+    /** Al cambio palle, l'animazione sul telefono e sul tabellone TV. */
+    val newBallsAnimation: Boolean = false,
 )
 
 @Serializable
@@ -75,7 +121,93 @@ data class MatchRecord(
     /** Carica dei braccialetti (%) all'inizio e alla fine della partita, per verificare l'autonomia. */
     val batteryStart: Map<Side, Int> = emptyMap(),
     val batteryEnd: Map<Side, Int> = emptyMap(),
+    /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
+    val strokes: Map<Side, StrokeStats> = emptyMap(),
+    /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
+    val heart: Map<Side, HeartTrack> = emptyMap(),
+    /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
+    val notes: String = "",
+    /** Amichevole: resta nello storico ma non conta per il rating TSM. */
+    val friendly: Boolean = false,
+    /** Racchetta usata da ciascun lato, com'era quando si è iniziato (con le sensazioni dette nel riepilogo). */
+    val rackets: Map<Side, RacketUse> = emptyMap(),
 )
+
+/** Chi indossa la fascia: serve solo a stimare le calorie. */
+@Serializable
+data class HeartProfile(val age: Int, val weightKg: Int, val female: Boolean = false)
+
+/**
+ * Battito durante la partita: un valore ogni [HeartStats.STEP_S] secondi (media delle misure della fascia), [t] in
+ * secondi dall'inizio della partita. Le pause (sospensione, fascia staccata) restano buchi tra un tempo e l'altro.
+ */
+@Serializable
+data class HeartTrack(
+    val t: List<Int> = emptyList(),
+    val bpm: List<Int> = emptyList(),
+    val profile: HeartProfile? = null,
+) {
+    val size: Int get() = minOf(t.size, bpm.size)
+
+    fun add(sec: Int, value: Int): HeartTrack = copy(t = t + sec, bpm = bpm + value)
+
+    /**
+     * Misure arrivate in ritardo (dal telefono satellite, dopo un'interruzione del Wi-Fi): (secondo, battito).
+     * Si raggruppano a [step] secondi come quelle dal vivo e vanno solo dove la traccia ha un buco (nessun valore
+     * a mezzo passo o meno), al loro posto in ordine di tempo.
+     */
+    fun fill(points: List<Pair<Int, Int>>, step: Int): HeartTrack {
+        val n = size
+        val pairs = (0 until n).map { t[it] to bpm[it] }.toMutableList()
+        val groups = points.filter { it.first >= 0 }.groupBy { it.first / step }.toSortedMap()
+        for ((slot, values) in groups) {
+            val sec = slot * step + step - 1
+            if (pairs.any { kotlin.math.abs(it.first - sec) <= step / 2 }) continue
+            val avg = Math.round(values.map { it.second }.average()).toInt()
+            val at = pairs.indexOfFirst { it.first > sec }.let { if (it < 0) pairs.size else it }
+            pairs.add(at, sec to avg)
+        }
+        if (pairs.size == n) return this
+        return copy(t = pairs.map { it.first }, bpm = pairs.map { it.second })
+    }
+}
+
+/**
+ * Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti.
+ * [gyroSum]/[gyroMax]: velocità di rotazione del polso al picco (°/s) per tipo di colpo, per media e massimo.
+ */
+@Serializable
+data class StrokeStats(
+    val counts: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+    val unknown: Int = 0,
+    val gyroSum: List<Long> = List(BandProtocol.STROKE_COUNT) { 0L },
+    val gyroMax: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+) {
+    val total: Int get() = counts.sum() + unknown
+
+    fun count(stroke: Int): Int = counts.getOrElse(stroke) { 0 }
+
+    /** Media della velocità del polso per quel colpo; null se non ce ne sono (o partita salvata senza velocità). */
+    fun avgGyro(stroke: Int): Int? {
+        val n = count(stroke)
+        val sum = gyroSum.getOrElse(stroke) { 0L }
+        return if (n > 0 && sum > 0) (sum / n).toInt() else null
+    }
+
+    fun maxGyro(stroke: Int): Int? = gyroMax.getOrElse(stroke) { 0 }.takeIf { it > 0 }
+
+    fun add(stroke: Int, peakGyroDps: Int): StrokeStats {
+        if (stroke !in counts.indices) return copy(unknown = unknown + 1)
+        fun <T> List<T>.at(i: Int, f: (T) -> T) = mapIndexed { j, v -> if (j == i) f(v) else v }
+        val sums = gyroSum.takeIf { it.size == counts.size } ?: List(counts.size) { 0L }
+        val maxs = gyroMax.takeIf { it.size == counts.size } ?: List(counts.size) { 0 }
+        return copy(
+            counts = counts.at(stroke) { it + 1 },
+            gyroSum = sums.at(stroke) { it + peakGyroDps },
+            gyroMax = maxs.at(stroke) { maxOf(it, peakGyroDps) },
+        )
+    }
+}
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
 class Names(private val setup: SetupData, private val strings: Strings) : CallNames {

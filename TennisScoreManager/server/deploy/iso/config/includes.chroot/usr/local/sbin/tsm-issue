@@ -1,0 +1,44 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Scrive sopra il login gli indirizzi del server e il codice di abbinamento (lo rilancia tsm-issue.timer ogni
+# minuto: la rete arriva dopo, e l'indirizzo può cambiare).
+DATA=/var/lib/tsm-server
+PORT=$(sed -n 's/^TSM_PORT=//p' /etc/default/tsm-server 2>/dev/null); PORT=${PORT:-8080}
+mkdir -p /etc/issue.d
+NEW=$(
+    echo
+    echo "  TSM – Server del circolo / Club server"
+    IPS=""
+    for a in $(hostname -I 2>/dev/null); do
+        case "$a" in *:*) ;; *) echo "  http://$a:$PORT"; IPS=1 ;; esac
+    done
+    # Senza rete: col cavo, oppure il Wi-Fi una volta sola (resta salvato sulla chiavetta).
+    if [ -z "$IPS" ]; then
+        echo "  Nessuna rete: collega il cavo o il Wi-Fi. / No network: plug in the cable or set up Wi-Fi."
+    fi
+    echo "  http://$(hostname).local:$PORT"
+    if [ -f "$DATA/setup-code.txt" ]; then
+        echo "  Codice di abbinamento / Pairing code: $(cat "$DATA/setup-code.txt")"
+    elif [ -f "$DATA/state.json" ]; then
+        echo "  Segreteria abbinata / Office paired"
+    fi
+    # L'indirizzo da internet, se la segreteria ha acceso il tunnel dall'app.
+    NET=$(sed -n 's/.*"state":"ON","url":"\(https:[^"]*\)".*/\1/p' /var/lib/tsm-tunnel/status.json 2>/dev/null)
+    [ -z "$NET" ] || echo "  Da internet / From the internet: $NET"
+    # Senza la partizione "persistence" sulla chiavetta, al prossimo avvio il server dimentica tutto.
+    if ! grep -qs " /run/live/persistence/" /proc/mounts; then
+        echo "  ATTENZIONE: nessuna partizione persistence, i dati si perdono allo spegnimento!"
+        echo "  WARNING: no persistence partition, data is lost at shutdown!"
+    fi
+    # Il Wi-Fi si imposta dopo il login: lì /etc/motd spiega i comandi.
+    echo "  Wi-Fi: login user, password live, poi / then: sudo nmtui"
+    echo "  (Invio per aggiornare / press Enter to refresh)"
+)
+# Si riscrive (e si rinfresca lo schermo) solo se è cambiato qualcosa.
+if [ "$NEW" != "$(cat /etc/issue.d/tsm.issue 2>/dev/null)" ]; then
+    printf '%s\n\n' "$NEW" > /etc/issue.d/tsm.issue
+    command -v agetty >/dev/null && agetty --reload 2>/dev/null
+fi
+exit 0

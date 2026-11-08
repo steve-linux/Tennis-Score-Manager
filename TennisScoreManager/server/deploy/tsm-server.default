@@ -1,0 +1,8 @@
+# Impostazioni del server del circolo TSM. Dopo una modifica: sudo systemctl restart tsm-server
+# Dove ascolta: 0.0.0.0 = tutta la rete del circolo; 127.0.0.1 se davanti c'è Caddy per l'HTTPS.
+TSM_HOST=0.0.0.0
+TSM_PORT=8080
+# La porta interna del tunnel (solo 127.0.0.1): chi arriva da qui conta sempre come arrivato da internet.
+TSM_TUNNEL_PORT=8088
+# Memoria di Java: basta poco anche su un Raspberry Pi Zero 2 W (512 MB).
+JAVA_OPTS="-Xmx64m -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -XX:MaxMetaspaceSize=48m -XX:ReservedCodeCacheSize=24m"

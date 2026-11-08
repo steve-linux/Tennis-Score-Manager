@@ -40,14 +40,32 @@ enum class MatchFormat {
 
     /** Due set con tie-break a 7 sul 6-6; sull'1-1 si gioca un match tie-break (super tie-break) a 10. */
     TWO_SETS_MATCH_TIEBREAK,
+
+    /** Al meglio dei cinque set. */
+    BEST_OF_FIVE,
+
+    /** Un solo set lungo (pro set) a [RulesConfig.gamesPerSet] game, di solito 8 o 10. */
+    PRO_SET,
+
+    /** Solo un match tie-break a 10 punti. */
+    MATCH_TIEBREAK_ONLY,
 }
 
 /** Regole della partita decise prima dell'inizio (formato, sorteggio, lati del campo). */
 @Serializable
 data class RulesConfig(
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
+    /** Game per vincere un set (con 2 di scarto): 6, 4 nei set brevi, 8 o 10 nel pro set. */
+    val gamesPerSet: Int = 6,
+    /** Tie-break a 7 quando i game arrivano pari a [gamesPerSet]; false = il set va avanti finché uno ha 2 game di scarto. */
+    val setTiebreak: Boolean = true,
     /** No-Ad: sul 40-40 si gioca il punto decisivo. */
     val noAd: Boolean = false,
+    /**
+     * Star point (padel, regola FIP dal 2026): sul 40-40 si giocano al massimo due vantaggi; alla terza parità
+     * si gioca un solo punto che decide il game. Ignorato se è acceso [noAd].
+     */
+    val starPoint: Boolean = false,
     val doubles: Boolean = false,
     /** Chi serve il primo game della partita. */
     val firstServer: Side = Side.P1,
@@ -56,20 +74,116 @@ data class RulesConfig(
     /** Doppio: quale giocatore della squadra (0 o 1) serve per primo nel primo set. */
     val firstServerP1: Int = 0,
     val firstServerP2: Int = 0,
-)
+) {
+    /** Set da vincere per vincere la partita (il match tie-break conta come un set). */
+    val setsToWin: Int
+        get() = when (format) {
+            MatchFormat.BEST_OF_FIVE -> 3
+            MatchFormat.PRO_SET, MatchFormat.MATCH_TIEBREAK_ONLY -> 1
+            else -> 2
+        }
+}
+
+/**
+ * Come è finito un punto, per le statistiche dettagliate. Chi l'ha fatto si ricava dal vincitore e da chi serve:
+ * ace e doppio fallo sono di chi serve, il vincente di chi vince il punto, l'errore di chi lo perde.
+ */
+@Serializable
+enum class PointKind {
+    ACE, DOUBLE_FAULT, WINNER,
+
+    /** Errore senza dire se gratuito o forzato (anche le partite salvate prima della distinzione). */
+    ERROR,
+    UNFORCED_ERROR,
+    FORCED_ERROR;
+
+    val isError: Boolean get() = this == ERROR || this == UNFORCED_ERROR || this == FORCED_ERROR
+}
 
 /** Eventi della partita: lo stato si ricalcola sempre rigiocandoli (undo sicuro a ogni livello). */
 @Serializable
 sealed class MatchEvent {
     @Serializable
     @SerialName("point")
-    data class Point(val winner: Side, val at: Long = 0L) : MatchEvent()
+    /**
+     * [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati.
+     * [kind]: come è finito il punto (statistiche dettagliate); null = non detto. [secondServe]: la prima era fuori.
+     */
+    data class Point(
+        val winner: Side,
+        val at: Long = 0L,
+        val strokes: Int? = null,
+        val kind: PointKind? = null,
+        val secondServe: Boolean = false,
+    ) : MatchEvent()
 
     /** Doppio: ordine di servizio scelto all'inizio di un set (ammesso solo prima del primo punto del set). */
     @Serializable
     @SerialName("serveOrder")
     data class ServeOrder(val setNumber: Int, val firstP1: Int, val firstP2: Int) : MatchEvent()
+
+    /**
+     * [side] si ritira: la partita finisce col punteggio di quel momento e vince l'altro. Con [disqualified] è la
+     * squalifica decisa dall'arbitro (dopo i game di penalità o per un fatto grave): finisce allo stesso modo.
+     */
+    @Serializable
+    @SerialName("retired")
+    data class Retired(val side: Side, val at: Long = 0L, val disqualified: Boolean = false) : MatchEvent()
+
+    /** Un richiamo dell'arbitro a [side]: cosa comporta lo decide il numero di richiami dello stesso tipo ([PenaltyKind]). */
+    @Serializable
+    @SerialName("penalty")
+    data class Penalty(val side: Side, val kind: PenaltyKind, val at: Long = 0L) : MatchEvent()
+
+    /** Una pausa chiesta da [side] (medical timeout o bagno): non cambia il punteggio, si conta nel riepilogo. */
+    @Serializable
+    @SerialName("break")
+    data class Break(val side: Side, val kind: BreakKind, val at: Long = 0L) : MatchEvent()
+
+    /**
+     * Correzione dell'arbitro: da adesso serve [side] (nel doppio il giocatore [player]) senza toccare il punteggio, come
+     * dice il regolamento quando ha servito chi non doveva: i punti giocati restano.
+     */
+    @Serializable
+    @SerialName("serverFix")
+    data class ServerFix(val side: Side, val player: Int = 0, val at: Long = 0L) : MatchEvent()
+
+    /** Correzione dell'arbitro: i giocatori erano dal lato sbagliato del campo; il punteggio resta. */
+    @Serializable
+    @SerialName("endsFix")
+    data class EndsFix(val at: Long = 0L) : MatchEvent()
+
+    /**
+     * Il punteggio messo a mano (partita iniziata senza l'app, o da rimettere in pari col campo): i set finiti, i game
+     * del set in corso, i punti del game (o del tie-break) e chi serve adesso. Si continua da qui.
+     */
+    @Serializable
+    @SerialName("scoreSet")
+    data class ScoreSet(
+        val sets: List<SetScore>, val g1: Int, val g2: Int, val pt1: Int, val pt2: Int,
+        val server: Side, val serverPlayer: Int = 0, val at: Long = 0L,
+    ) : MatchEvent()
+
+    /** Doppio: chi risponde da destra (lato parità) in ciascuna squadra, per il set [setNumber]. */
+    @Serializable
+    @SerialName("receiveOrder")
+    data class ReceiveOrder(val setNumber: Int, val deuceP1: Int, val deuceP2: Int) : MatchEvent()
 }
+
+/** Le pause con il loro tempo: medical timeout 3 minuti, bagno o cambio d'abiti fino a 5. */
+@Serializable
+enum class BreakKind(val seconds: Int) { MEDICAL(180), TOILET(300) }
+
+/** I due tipi di richiamo, con le scale del regolamento: condotta e tempo (i 25 secondi tra un punto e l'altro). */
+@Serializable
+enum class PenaltyKind { CODE, TIME }
+
+/**
+ * Cosa comporta un richiamo. Condotta: 1° avvertimento, 2° punto all'avversario, poi un game all'avversario. Tempo:
+ * 1° avvertimento, poi chi serve perde il servizio (una prima fuori, o il doppio fallo sulla seconda) e chi risponde
+ * perde il punto.
+ */
+enum class PenaltyOutcome { WARNING, POINT, GAME, SERVE }
 
 /** Punteggio di un set concluso. Per il match tie-break g1/g2 valgono 1-0 e i punti stanno in tb1/tb2. */
 @Serializable
@@ -79,6 +193,8 @@ data class SetScore(
     val tb1: Int? = null,
     val tb2: Int? = null,
     val matchTiebreak: Boolean = false,
+    /** Set interrotto da un ritiro: non è vinto da nessuno, conta solo il punteggio. */
+    val partial: Boolean = false,
 ) {
     val winner: Side get() = if (g1 > g2) Side.P1 else Side.P2
     val hasTiebreak: Boolean get() = tb1 != null && tb2 != null

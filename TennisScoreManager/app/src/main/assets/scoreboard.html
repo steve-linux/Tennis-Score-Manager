@@ -48,6 +48,9 @@
     font-size: min(calc(6.2 * var(--vh)), calc(3.6 * var(--vw))); letter-spacing: .04em; text-transform: uppercase;
   }
   .name .nm { overflow: hidden; text-overflow: clip; }
+  .ph { display: flex; gap: .2em; flex: none; }
+  .ph:empty { display: none; }
+  .ph img { width: 1.35em; height: 1.35em; border-radius: 50%; object-fit: cover; border: .07em solid currentColor; }
   .ball { flex: none; width: .62em; height: .62em; border-radius: 50%; background: var(--ball); box-shadow: 0 0 .35em var(--ball); visibility: hidden; }
   .serving .ball { visibility: visible; }
   .big { padding: calc(2.8 * var(--vh)) 0 calc(3.2 * var(--vh)); min-height: 0; }
@@ -73,7 +76,11 @@
   #fr { justify-items: start; }
   #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
   #clock { height: 78%; width: auto; align-self: end; }
-  #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
+  #fc { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; }
+  /* Prima della partita, sopra il circolo: l'indirizzo del sito, che ha già il nome dell'app (durante il gioco non c'è). */
+  #brand { display: none; font-size: min(calc(4.2 * var(--vh)), calc(2.4 * var(--vw))); color: #8A8E95; white-space: nowrap; overflow: hidden; max-width: 100%; letter-spacing: .04em; padding-bottom: calc(1 * var(--vh)); }
+  #brand b { color: var(--ball); font-weight: 700; }
+  body.pre #brand { display: block; }
   #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: calc(.6 * var(--vh)); }
   #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
   #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
@@ -92,13 +99,85 @@
     font: 700 min(calc(3 * var(--vh)), calc(1.8 * var(--vw))) monospace; color: #DDD; background: #111; cursor: pointer;
   }
   body.pointer #fs.can { display: block; }
+  /* Moviola: a tutto schermo sopra il punteggio, con la scritta in alto a sinistra. */
+  #replay { display: none; position: fixed; inset: 0; z-index: 50; background: #000; align-items: center; justify-content: center; }
+  #replay video { width: 100%; height: 100%; object-fit: contain; }
+  #rl { position: absolute; top: calc(3 * var(--vh)); left: calc(3 * var(--vw)); padding: .3em .7em; border-radius: .3em;
+        background: var(--orange); color: #111; font: 900 calc(4 * var(--vh)) sans-serif; letter-spacing: .08em; }
+  /* Cambio palle: il tubo sale, salta il tappo, escono tre palle che rimbalzano e arriva la scritta. */
+  #balls { display: none; position: fixed; inset: 0; z-index: 45; overflow: hidden;
+           background: radial-gradient(ellipse at 50% 60%, rgba(30,46,70,.96), rgba(5,7,11,.98)); }
+  #balls.on { display: block; animation: bfade 5.5s ease forwards; }
+  @keyframes bfade { 0% { opacity: 0; } 6% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; } }
+  #bt { position: absolute; left: 50%; bottom: 8vh; width: 18vh; height: 46vh; margin-left: -9vh; border-radius: 4vh 4vh 3vh 3vh;
+        background: linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.28) 35%, rgba(255,255,255,.08) 70%, rgba(255,255,255,.2));
+        border: .5vh solid rgba(255,255,255,.45); box-shadow: 0 0 6vh rgba(198,244,50,.25); transform: translateY(70vh); }
+  #balls.on #bt { animation: btube 5.5s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes btube { 0% { transform: translateY(70vh); } 12% { transform: translateY(0); } 70% { transform: translateY(0); opacity: 1; } 85% { transform: translateY(60vh); opacity: 0; } 100% { transform: translateY(60vh); opacity: 0; } }
+  #lid { position: absolute; left: -1.5vh; right: -1.5vh; top: -3.2vh; height: 4.5vh; border-radius: 1.6vh; background: #C6F432; box-shadow: inset 0 -.8vh 0 rgba(0,0,0,.25); }
+  #balls.on #lid { animation: blid 5.5s ease forwards; }
+  @keyframes blid { 0%, 16% { transform: none; opacity: 1; } 26% { transform: translate(-22vw, -52vh) rotate(-260deg); opacity: 1; } 34%, 100% { transform: translate(-34vw, -20vh) rotate(-420deg); opacity: 0; } }
+  .nb { position: absolute; left: 50%; bottom: 40vh; width: 16vh; height: 16vh; margin-left: -8vh; border-radius: 50%; overflow: hidden; opacity: 0;
+          background: radial-gradient(circle at 34% 30%, #F6FFB0, #C6F432 42%, #8DB21A 100%); box-shadow: 0 2vh 4vh rgba(0,0,0,.5); }
+  .nb::before, .nb::after { content: ""; position: absolute; width: 100%; height: 100%; border: .9vh solid rgba(255,255,255,.92); border-radius: 50%; }
+  .nb::before { left: -62%; top: 0; }
+  .nb::after { left: 62%; top: 0; }
+  #balls.on .nb { animation: bfly 5.5s cubic-bezier(.3,.7,.4,1) forwards; }
+  #balls.on .b1 { --x: -32vw; --d: 0s; }
+  #balls.on .b2 { --x: 0vw; --d: .18s; }
+  #balls.on .b3 { --x: 32vw; --d: .36s; }
+  #balls.on .nb { animation-delay: var(--d); }
+  @keyframes bfly {
+    0%, 18% { opacity: 0; transform: translate(0, 10vh) scale(.6) rotate(0); }
+    20% { opacity: 1; }
+    30% { transform: translate(calc(var(--x) * .6), -40vh) scale(1) rotate(200deg); }
+    40% { transform: translate(var(--x), -6vh) scale(1, .86) rotate(330deg); }
+    46% { transform: translate(var(--x), -16vh) scale(1) rotate(380deg); }
+    52%, 86% { opacity: 1; transform: translate(var(--x), -8vh) scale(1) rotate(420deg); }
+    100% { opacity: 0; transform: translate(var(--x), -8vh) scale(1.2) rotate(460deg); }
+  }
+  #bw { position: absolute; left: 0; right: 0; top: 14vh; text-align: center; color: #F1F5FB; opacity: 0;
+        font: 900 min(14vh, 9vw) sans-serif; letter-spacing: .12em; text-shadow: 0 0 4vh rgba(198,244,50,.55); }
+  #balls.on #bw { animation: bword 5.5s ease forwards; }
+  @keyframes bword { 0%, 38% { opacity: 0; transform: scale(.4); letter-spacing: .6em; } 48% { opacity: 1; transform: scale(1.08); } 54%, 88% { opacity: 1; transform: scale(1); letter-spacing: .12em; } 100% { opacity: 0; transform: scale(1.1); } }
+  /* Torneo del circolo: sopra il punteggio (sotto la moviola), pagine che si alternano. */
+  #club { display: none; position: fixed; inset: 0; z-index: 40; background: #05070B; color: #F1F5FB; font-family: sans-serif;
+          padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
+  #club.on { display: flex; }
+  #ch { display: flex; align-items: baseline; gap: calc(2 * var(--vw)); border-bottom: 2px solid var(--line); padding-bottom: calc(1.2 * var(--vh)); }
+  #ct { font: 900 calc(6 * var(--vh)) sans-serif; color: var(--ball); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #cs { font: 600 calc(3 * var(--vh)) sans-serif; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  #cp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
+  #cdots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
+  #cb { flex: 1; min-height: 0; display: flex; padding-top: calc(2 * var(--vh)); }
+  /* Tabellone: un turno per colonna; space-around mette ogni partita a metà tra le due da cui viene. */
+  .rnd { flex: 1; min-width: 0; display: flex; flex-direction: column; margin-right: calc(1.2 * var(--vw)); }
+  .rnd h3 { margin: 0 0 calc(.8 * var(--vh)); font: 800 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); text-transform: uppercase; }
+  .rm { flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+  .bx { background: #111826; border-radius: calc(.8 * var(--vh)); padding: calc(.5 * var(--vh)) calc(.8 * var(--vw)); margin: calc(.3 * var(--vh)) 0; }
+  .bx div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bx .w { color: var(--ball); font-weight: 800; }
+  .bx .sc { color: var(--dim); }
+  /* Gironi e ordine di gioco: tabelle grandi. */
+  .grps { display: flex; flex-wrap: wrap; gap: calc(2 * var(--vw)); align-content: flex-start; width: 100%; }
+  .grp { flex: 1 1 40%; min-width: 0; }
+  .grp h3 { margin: 0 0 calc(.6 * var(--vh)); font: 800 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); }
+  table.ct { width: 100%; border-collapse: collapse; font-size: calc(3.8 * var(--vh)); align-self: flex-start; }
+  #cb > table.ct { font-size: calc(4.2 * var(--vh)); }
+  table.ct td, table.ct th { padding: calc(.5 * var(--vh)) calc(.6 * var(--vw)); text-align: left; white-space: nowrap; }
+  table.ct th { color: var(--dim); font-weight: 700; font-size: .75em; }
+  table.ct td.n { overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
+  table.ct tr.q td { color: var(--ball); font-weight: 800; }
+  table.ct tr.dn td { color: var(--dim); }
+  table.ct td .w { color: var(--ball); font-weight: 800; }
+  #cempty { font: 700 calc(4 * var(--vh)) sans-serif; color: var(--dim); margin: auto; }
 </style>
 </head>
 <body>
 <div id="board">
   <div id="main">
     <section class="side" id="side0">
-      <div class="name"><span class="nm" id="n0"></span><span class="ball"></span></div>
+      <div class="name"><span class="ph" id="ph0"></span><span class="nm" id="n0"></span><span class="ball"></span></div>
       <div class="big"><svg id="pt0"></svg></div>
     </section>
     <section id="mid">
@@ -110,29 +189,32 @@
       <div id="setrow"><svg id="s0"></svg><svg id="s1"></svg></div>
     </section>
     <section class="side" id="side1">
-      <div class="name"><span class="nm" id="n1"></span><span class="ball"></span></div>
+      <div class="name"><span class="ph" id="ph1"></span><span class="nm" id="n1"></span><span class="ball"></span></div>
       <div class="big"><svg id="pt1"></svg></div>
     </section>
   </div>
   <div id="foot">
     <div id="fl"><div id="done"></div><svg id="clock"></svg></div>
-    <div id="fc"><div id="title"></div></div>
+    <div id="fc"><div id="brand"><b>tennis-score-manager.netlify.app</b></div><div id="title"></div></div>
     <div id="fr"><div id="msg"></div><div id="timer"></div></div>
   </div>
 </div>
 <div id="banner"></div>
+<div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
+<div id="balls"><div id="bw"></div><div class="nb b1"></div><div class="nb b2"></div><div class="nb b3"></div><div id="bt"><div id="lid"></div></div></div>
+<div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
 
 <!-- Testi di ogni lingua per prima del primo stato (titolo, "connessione persa", "schermo intero") e per l'anteprima.
      Copia di quelli dell'app: TvSnapshotTest controlla che siano uguali e, se no, stampa il blocco giusto. -->
 <script type="application/json" id="texts">
 {
-"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
-"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
-"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
-"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
-"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
-"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
+"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM","newBalls":"Palle nuove"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
+"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard","newBalls":"New balls"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
+"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM","newBalls":"Balles neuves"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
+"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel","newBalls":"Neue Bälle"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
+"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM","newBalls":"Bolas nuevas"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
+"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM","newBalls":"Bolas novas"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
 }
 </script>
 <script>
@@ -159,6 +241,7 @@ let ghost = true;
 
 /** Prepara un display: "88" = due cifre, "88:88:88" = orologio. */
 function buildSeg(svg, pattern) {
+  svg.replaceChildren();
   let x = 0;
   const cells = [];
   for (const ch of pattern) {
@@ -232,6 +315,22 @@ function fitText(el, maxPx) {
   }
 }
 
+// Il nome si rimpicciolisce finché sta nel posto lasciato da foto e pallina (in doppio le foto sono due).
+function fitName(n) {
+  const box = n.parentElement, gap = parseFloat(getComputedStyle(box).columnGap) || 0;
+  let taken = 0;
+  for (const c of box.children) if (c !== n && getComputedStyle(c).display !== "none") taken += c.offsetWidth + gap;
+  fitText(n, taken + 4);
+}
+
+// Tutti e due i nomi alla stessa grandezza: quella del più lungo.
+function fitNames() {
+  const ns = [$("n0"), $("n1")];
+  ns.forEach(fitName);
+  const px = Math.min(...ns.map(n => parseFloat(getComputedStyle(n).fontSize)));
+  ns.forEach(n => { n.style.fontSize = px + "px"; });
+}
+
 function hms(ms) {
   const t = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(t / 3600) % 100, m = Math.floor(t / 60) % 60, s = t % 60;
@@ -249,15 +348,28 @@ function render() {
   setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
+  let refit = false;
   for (let i = 0; i < 2; i++) {
     const n = $("n" + i);
     n.style.color = color(i);
-    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
+    // Foto o ritratti dei giocatori accanto al nome; si rifanno solo se cambiano.
+    const ph = $("ph" + i), urls = (S.players[i].photos || []).join(" ");
+    if (ph.dataset.u !== urls) {
+      ph.dataset.u = urls;
+      ph.style.color = color(i);
+      ph.replaceChildren(...(S.players[i].photos || []).map(u => { const im = new Image(); im.src = u; im.alt = ""; return im; }));
+      refit = true;
+    }
+    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; refit = true; }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
-    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));
+    // Set senza tie-break o pro set: i game possono superare 9, allora le cifre diventano due (per tutti e due i lati).
+    const gd = Math.max(S.games[0], S.games[1]) >= 10 ? 2 : 1;
+    if (gms[i]._digits !== gd) { buildSeg(gms[i], "8".repeat(gd)); gms[i]._digits = gd; }
+    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 100), color(i));
     setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
   }
+  if (refit) fitNames();
   const vs = $("vs");
   const tb = S.phase === "play" || S.phase === "suspended" ? (S.tiebreak === "match" ? L.matchTiebreak : S.tiebreak === "set" ? L.tiebreak : "") : "";
   setText(vs, tb || L.vs);
@@ -273,6 +385,8 @@ function render() {
   setText($("done"), done);
   $("clock").classList.toggle("hide", !S.show.clock);
   setText($("title"), S.title || "");
+  const pre = S.phase === "idle" || S.phase === "ready";
+  if (document.body.classList.contains("pre") !== pre) { document.body.classList.toggle("pre", pre); if (pre) fitText($("brand")); }
 
   // messaggio: fasi speciali prima di tutto
   const msg = $("msg");
@@ -327,7 +441,133 @@ function onState(json) {
   S = json;
   recvAt = lastMsg = performance.now();
   render();
+  replayUpdate(S.replay);
+  clubUpdate(S.club);
+  ballsUpdate(S.balls);
 }
+
+// ------------------------------------------------------------------ cambio palle
+// Un numero nuovo in balls fa partire l'animazione (dura 5,5 s); null la ferma.
+let ballsSeen = null, ballsTimer = 0;
+function ballsUpdate(b) {
+  const box = $("balls");
+  if (!b) { if (ballsSeen) { box.classList.remove("on"); ballsSeen = null; } return; }
+  if (b === ballsSeen) return;
+  ballsSeen = b;
+  $("bw").textContent = ((S.labels && S.labels.newBalls) || "").toUpperCase();
+  box.classList.remove("on");
+  void box.offsetWidth;
+  box.classList.add("on");
+  clearTimeout(ballsTimer);
+  ballsTimer = setTimeout(() => box.classList.remove("on"), 5600);
+}
+// ------------------------------------------------------------------ torneo del circolo
+// Le pagine (tabellone, gironi, ordine di gioco) si alternano ogni club.seconds secondi; un torneo nuovo riparte
+// dalla prima. Il testo arriva dall'app: qui solo il disegno (con escape, i nomi li scrive chi usa l'app).
+let clId = "", clPage = 0, clTimer = null;
+function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function clubUpdate(c) {
+  const box = $("club");
+  if (!c || !c.pages || !c.pages.length) {
+    box.classList.remove("on"); clId = ""; if (clTimer) { clearInterval(clTimer); clTimer = null; }
+    return;
+  }
+  if (c.id !== clId) { clId = c.id; clPage = 0; }
+  if (!clTimer) clTimer = setInterval(() => { if (S && S.club) { clPage = (clPage + 1) % S.club.pages.length; clubDraw(S.club); } }, Math.max(5, c.seconds || 15) * 1000);
+  box.classList.add("on");
+  clubDraw(c);
+}
+function clubDraw(c) {
+  clPage = clPage % c.pages.length;
+  const p = c.pages[clPage];
+  setText($("ct"), c.title); setText($("cs"), c.subtitle); setText($("cp"), p.title);
+  $("cdots").textContent = c.pages.length > 1 ? c.pages.map((_, i) => i === clPage ? "●" : "○").join("") : "";
+  const b = $("cb");
+  let h = "";
+  if (p.kind === "draw") {
+    // Con tanti turni si mostrano gli ultimi che stanno nello schermo (al massimo 5 colonne).
+    const rounds = p.rounds.slice(Math.max(0, p.rounds.length - 5));
+    for (const r of rounds) {
+      h += `<div class="rnd"><h3>${esc(r.name)}</h3><div class="rm">`;
+      const fs = Math.max(1.6, Math.min(3.4, 44 / Math.max(1, r.matches.length * 2.6)));
+      for (const m of r.matches) {
+        h += `<div class="bx" style="font-size:calc(${fs.toFixed(2)} * var(--vh))"><div class="${m.win === 0 ? "w" : ""}">${esc(m.a) || "&mdash;"}</div>` +
+             `<div class="${m.win === 1 ? "w" : ""}">${esc(m.b) || "&mdash;"}</div><div class="sc">${esc(m.score) || "&nbsp;"}</div></div>`;
+      }
+      h += `</div></div>`;
+    }
+  } else if (p.kind === "groups") {
+    h += `<div class="grps">`;
+    for (const g of p.groups) {
+      h += `<div class="grp"><h3>${esc(g.name)}</h3><table class="ct"><tr><th></th><th></th><th>${esc(c.labels.won)}</th><th>${esc(c.labels.sets)}</th><th>${esc(c.labels.games)}</th></tr>`;
+      for (const r of g.rows) h += `<tr class="${r.q ? "q" : ""}"><td>${r.pos}.</td><td class="n">${esc(r.name)}</td><td>${r.won}/${r.played}</td><td>${esc(r.sets)}</td><td>${esc(r.games)}</td></tr>`;
+      h += `</table></div>`;
+    }
+    h += `</div>`;
+  } else if (p.kind === "order") {
+    if (!p.rows.length) h = `<div id="cempty">${esc(c.labels.noMatches)}</div>`;
+    else {
+      h += `<table class="ct">`;
+      for (const r of p.rows) {
+        h += `<tr class="${r.done ? "dn" : ""}"><td>${esc(r.time)}</td><td>${esc(r.court)}</td>` +
+             `<td class="n"><span class="${r.win === 0 ? "w" : ""}">${esc(r.a)}</span> – <span class="${r.win === 1 ? "w" : ""}">${esc(r.b)}</span></td>` +
+             `<td>${esc(r.round)}</td><td>${esc(r.score)}</td></tr>`;
+      }
+      h += `</table>`;
+    }
+  }
+  b.innerHTML = h;
+}
+// ------------------------------------------------------------------ moviola
+// L'arbitro manda la moviola: i pezzi /replay/<id>/<n>.mp4 uno dopo l'altro, in loop, alla sua velocità, sopra il
+// punteggio. Senza audio (il tabellone parte senza un tocco solo se il video è muto).
+let rpId = "", rpPart = 0, rpSync = -1, rpParts = 1;
+function replayUpdate(r) {
+  const box = $("replay"), v = $("rv");
+  if (!r) {
+    if (rpId) { v.pause(); v.removeAttribute("src"); v.load(); }
+    rpId = "";
+    box.style.display = "none";
+    return;
+  }
+  $("rl").textContent = r.label + (r.speed < 1 ? "  " + (r.speed === 0.5 ? "½×" : "¼×") : "");
+  box.style.display = "flex";
+  rpParts = r.parts;
+  if (r.id !== rpId) {
+    rpId = r.id;
+    rpPart = 0;
+    rpSync = -1;
+    v.onended = () => { if (!(S && S.replay && S.replay.paused)) { rpPart = (rpPart + 1) % rpParts; playPart(0, false); } };
+    playPart(0, false);
+  }
+  v.playbackRate = r.speed || 1;
+  // Comando dell'arbitro (pausa, ripresa, fotogramma): stesso pezzo e stesso istante, fermo o in movimento.
+  if ((r.sync || 0) !== rpSync && r.sync) {
+    rpSync = r.sync;
+    if (r.part !== rpPart) {
+      rpPart = r.part;
+      playPart(r.posMs, r.paused);
+    } else {
+      v.currentTime = r.posMs / 1000;
+      if (r.paused) v.pause(); else { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+    }
+  } else if (r.paused && !v.paused) {
+    // Ferma dall'arbitro ma qui va (un comando perso, un pezzo appena caricato): si ferma anche qui.
+    v.pause();
+  }
+}
+function playPart(posMs, paused) {
+  const v = $("rv");
+  v.src = "replay/" + rpId + "/" + rpPart + ".mp4";
+  v.playbackRate = (S && S.replay && S.replay.speed) || 1;
+  v.onloadedmetadata = () => {
+    if (posMs) v.currentTime = posMs / 1000;
+    v.playbackRate = (S && S.replay && S.replay.speed) || 1;
+    // Conta lo stato di adesso, non quello di quando si è chiesto il pezzo: nel frattempo l'arbitro può aver fermato.
+    if (paused || (S && S.replay && S.replay.paused)) v.pause(); else { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+  };
+}
+
 
 // ------------------------------------------------------------------ collegamento
 let es = null, retryMs = 2000, retryTimer = 0, reopenAt = 0;
@@ -384,7 +624,7 @@ function viewportUnits() {
   }
 }
 viewportUnits();
-window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); fitText($("msg")); });
+window.addEventListener("resize", () => { viewportUnits(); fitNames(); fitText($("msg")); fitText($("brand")); });
 keepAwake();
 setInterval(tick, 200);
 
@@ -414,8 +654,23 @@ if (isDemo) {
     long: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["0", "0"], games: [0, 0], sets: [1, 1], done: [{ g1: 6, g2: 4 }, { g1: 6, g2: 7, tb1: 5, tb2: 7 }], tiebreak: "match", message: `Rossi / Bianchi · ${labels.matchTiebreak} · ${demo.changeover}`, countdown: { label: demo.changeover, leftMs: 90000, shot: false } },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
+    // torneo del circolo (&page=0, 1, 2 per fermarsi su una pagina)
+    club: { club: { id: "demo", title: "Torneo sociale", subtitle: "Tennis Club · Singolare", seconds: 15, labels: { won: "V", sets: "Set", games: "Game", noMatches: "—" }, pages: [
+      { kind: "draw", title: "Tabellone", rounds: [
+        { name: "Quarti", matches: [{ a: "Rossi", b: "Bianchi", score: "6-3 6-4", win: 0 }, { a: "Verdi", b: "Neri", score: "4-6 6-3 10-8", win: 1 }, { a: "Gallo", b: "Conti", score: "6-1 6-0", win: 0 }, { a: "Ferri", b: "Riva", score: "w.o.", win: 1 }] },
+        { name: "Semifinali", matches: [{ a: "Rossi", b: "Neri", score: "7-6(5) 6-4", win: 0 }, { a: "Gallo", b: "Riva" }] },
+        { name: "Finale", matches: [{ a: "Rossi", b: "" }] }] },
+      { kind: "groups", title: "Gironi", groups: [
+        { name: "Girone A", rows: [{ pos: 1, name: "Rossi", won: 3, played: 3, sets: "+5", games: "+18", q: true }, { pos: 2, name: "Neri", won: 2, played: 3, sets: "+1", games: "+4", q: true }, { pos: 3, name: "Bianchi", won: 1, played: 3, sets: "-2", games: "-7", q: false }, { pos: 4, name: "Esposito", won: 0, played: 3, sets: "-4", games: "-15", q: false }] },
+        { name: "Girone B", rows: [{ pos: 1, name: "Gallo", won: 3, played: 3, sets: "+6", games: "+20", q: true }, { pos: 2, name: "Riva", won: 2, played: 3, sets: "+2", games: "+3", q: true }, { pos: 3, name: "Conti", won: 1, played: 3, sets: "-3", games: "-9", q: false }, { pos: 4, name: "Ferri", won: 0, played: 3, sets: "-5", games: "-14", q: false }] }] },
+      { kind: "order", title: "Ordine di gioco – sabato 14 novembre", rows: [
+        { time: "09:00", court: "Campo 1", a: "Rossi", b: "Neri", round: "Semifinali", score: "7-6(5) 6-4", done: true, win: 0 },
+        { time: "10:30", court: "Campo 2", a: "Gallo", b: "Riva", round: "Semifinali" },
+        { time: "16:00", court: "Centrale", a: "", b: "", round: "Finale" }] }] } },
   };
   onState(Object.assign({}, base, variants[(m && m[1]) || "play"] || {}));
+  const pg = location.search.match(/[?&]page=(\d)/);
+  if (pg && S.club) { clPage = +pg[1]; clubDraw(S.club); if (clTimer) { clearInterval(clTimer); clTimer = null; } }
   setInterval(() => { lastMsg = performance.now(); }, 1000);
 } else {
   connect();

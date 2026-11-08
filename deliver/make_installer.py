@@ -1,22 +1,35 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Stefano Spagnolo
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Genera installa_tsm.sh: ogni file del progetto come blocco `cat << 'TSM_EOF'` (il jar del wrapper in base64)."""
+"""Genera installa_tsm.sh: ogni file del progetto come blocco `cat << 'TSM_EOF'` (i file binari in base64)."""
 import base64
 import pathlib
 import subprocess
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROJ = ROOT / "TennisScoreManager"
-FW = ROOT / "firmware" / "TSM_Band" / "TSM_Band.ino"
+# Lo sketch è la cartella intera: dalla 2.4 accanto a TSM_Band.ino ci sono anche i .cpp/.h dei colpi.
+FW_DIR = ROOT / "firmware" / "TSM_Band"
+FW_FILES = sorted(p for p in FW_DIR.iterdir() if p.is_file())
 OUT = ROOT / "deliver" / "installa_tsm.sh"
 DELIM = "TSM_EOF"
 
-# File tracciati da git dentro il progetto Android (niente build/, .gradle/, local.properties)
+# Prima la guida dell'app (Altro › Aiuto), presa dalle guide qui accanto: così è sempre aggiornata.
+sys.path.insert(0, str(ROOT / "deliver"))
+import make_help  # noqa: E402
+
+help_files = [str(p.relative_to(ROOT)) for p in make_help.main()]
+# E i testi dell'app che usa la Segreteria da PC, presi da Strings*.kt.
+import make_desk_texts  # noqa: E402
+
+help_files += [str(p.relative_to(ROOT)) for p in make_desk_texts.main()]
+
+# File tracciati da git dentro il progetto Android (niente build/, .gradle/, local.properties), più la guida appena fatta
 files = subprocess.run(
     ["git", "-C", str(ROOT), "ls-files", "TennisScoreManager"], capture_output=True, text=True, check=True
-).stdout.split()
-files = [f for f in files if not f.endswith("local.properties")]
+).stdout.splitlines()
+files = sorted(set(f for f in files if not f.endswith("local.properties")) | set(help_files))
 
 lines = [
     "#!/usr/bin/env bash",
@@ -57,7 +70,13 @@ for f in files:
     path = ROOT / f
     data = path.read_bytes()
     lines.append(f"# ---------------------------------------------------------------- {rel}")
-    if rel.endswith(".jar"):
+    # I file binari (il jar del wrapper, immagini, musica) vanno in base64; il resto com'è.
+    try:
+        data.decode("utf-8")
+        binary = rel.endswith(".jar")
+    except UnicodeDecodeError:
+        binary = True
+    if binary:
         b64 = base64.encodebytes(data).decode().rstrip("\n")
         lines.append(f"base64 -d > \"$DEST/{rel}\" << '{DELIM}'")
         lines.append(b64)
@@ -83,18 +102,19 @@ lines.append(f"cat > \"$DEST/LICENSE\" << '{DELIM}'")
 lines.append(lic.rstrip("\n"))
 lines.append(DELIM)
 lines.append("")
-fw = FW.read_text()
-assert DELIM not in fw
 lines.append("# ---------------------------------------------------------------- firmware M5StickS3")
 lines.append('mkdir -p "$FWDIR"')
-lines.append(f"cat > \"$FWDIR/TSM_Band.ino\" << '{DELIM}'")
-lines.append(fw.rstrip("\n"))
-lines.append(DELIM)
-lines.append("")
+for f in FW_FILES:
+    fw = f.read_text()
+    assert DELIM not in fw, f.name
+    lines.append(f"cat > \"$FWDIR/{f.name}\" << '{DELIM}'")
+    lines.append(fw.rstrip("\n"))
+    lines.append(DELIM)
+    lines.append("")
 lines.append(f'echo ">> Fatto / done: {count} file del progetto / project files in $DEST"')
 lines.append('echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"')
 lines.append('echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."')
 
 OUT.write_text("\n".join(lines) + "\n")
 OUT.chmod(0o755)
-print(f"{OUT} ({count} file + firmware, {OUT.stat().st_size // 1024} KB)")
+print(f"{OUT} ({count} file + firmware ({len(FW_FILES)} file), {OUT.stat().st_size // 1024} KB)")

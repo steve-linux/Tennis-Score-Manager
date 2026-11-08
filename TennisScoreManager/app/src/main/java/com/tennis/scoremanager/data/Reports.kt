@@ -11,10 +11,12 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
@@ -57,8 +59,22 @@ object Reports {
 
     fun scoreLine(state: MatchState, from: Side): String = state.sets.joinToString("  ") { setText(it, from) }
 
+    /** Il risultato da leggere: col ritiro, "6-3  2-1 rit."; ritiro prima di giocare, "w.o.". */
+    fun resultLine(state: MatchState, from: Side, s: Strings): String = when {
+        isWalkover(state) -> s.ctWalkover
+        state.retired != null -> scoreLine(state, from) + " " + if (state.disqualified) s.ctDisqualified else s.ctRetired
+        else -> scoreLine(state, from)
+    }
+
+    /** Ritiro prima del primo punto: la partita non si è giocata (w.o.). */
+    fun isWalkover(state: MatchState): Boolean = state.retired != null && state.pointsPlayed == 0
+
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
+
+    /** "Open di Primavera · Lim. 4.1 · Semifinale"; null senza torneo. */
+    fun eventLine(su: SetupData): String? =
+        listOf(su.event, su.category, su.round).map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" · ").ifEmpty { null }
 
     /** "G1 92% → 71% · G2 88% → 70%" */
     fun batteryLine(rec: MatchRecord, s: Strings): String =
@@ -69,10 +85,72 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
-    fun formatLabel(rec: MatchRecord, s: Strings): String =
-        (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
-            (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
+    /** "Dritto 12 · Rovescio 8 · Servizio 5 · Volée 3" (+ i non riconosciuti, se ce ne sono); null senza colpi. */
+    fun strokesLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side]?.takeIf { it.total > 0 } ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).map { "${s.strokeName(it)} ${st.count(it)}" } +
+            listOfNotNull(st.unknown.takeIf { it > 0 }?.let { "${s.strokeOther} $it" })
+        return parts.joinToString(" · ")
+    }
+
+    /** "Dritto 1450 °/s (max 1980) · Servizio 1620 °/s (max 2010)": velocità del polso al picco; null senza dati. */
+    fun wristSpeedLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side] ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).mapNotNull { k ->
+            val avg = st.avgGyro(k) ?: return@mapNotNull null
+            "${s.strokeName(k)} $avg °/s (${s.maxShort} ${st.maxGyro(k) ?: avg})"
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
+
+    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di quel lato non ha mandato niente. */
+    fun heartLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val h = HeartStats.summary(rec.heart[side]) ?: return null
+        return s.heartLine(h.avg, h.max) + (h.kcal?.let { " · ${s.caloriesLine(it)}" } ?: "")
+    }
+
+    /** Colpi per punto (entrambi i braccialetti): [shortPct] 1-3 colpi, [mediumPct] 4-8, [longPct] 9 o più. */
+    data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
+
+    /** Dai punti con la lunghezza dello scambio (braccialetti 2.4 col riconoscimento acceso); null se non ce ne sono. */
+    fun rallyStats(rec: MatchRecord): RallyStats? = rallyStats(rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes })
+
+    /** Da una lista di lunghezze di scambio (colpi per punto); null se vuota. */
+    fun rallyStats(r: List<Int>): RallyStats? {
+        if (r.isEmpty()) return null
+        fun pct(n: Int) = Math.round(n * 100.0 / r.size).toInt()
+        val short = pct(r.count { it <= 3 })
+        val long = pct(r.count { it >= 9 })
+        return RallyStats(r.size, r.average(), r.max(), short, (100 - short - long).coerceAtLeast(0), long)
+    }
+
+    /** "media 4,2 · più lungo 15 · brevi (1-3) 45% · medi (4-8) 40% · lunghi (9+) 15%" */
+    fun rallyLine(st: RallyStats, s: Strings, lang: Lang): String =
+        "${s.rallyAverage} ${String.format(locale(lang), "%.1f", st.average)} · ${s.rallyLongest} ${st.longest} · " +
+            "${s.rallyShort} (1-3) ${st.shortPct}% · ${s.rallyMedium} (4-8) ${st.mediumPct}% · ${s.rallyLong} (9+) ${st.longPct}%"
+
+    /** "3 set · tie-break a 7", "5 set · set a 4 game · senza tie-break", "pro set a 10", "solo super tie-break a 10". */
+    fun formatName(r: RulesConfig, s: Strings): String {
+        val noTb = if (!r.setTiebreak) listOf(s.labelNoTiebreak) else emptyList()
+        val short = if (r.gamesPerSet == 4) listOf(s.labelShortSets) else emptyList()
+        val parts = when (r.format) {
+            MatchFormat.MATCH_TIEBREAK_ONLY -> listOf(s.formatMatchTiebreakOnly)
+            MatchFormat.PRO_SET -> listOf(s.labelProSet(r.gamesPerSet)) + noTb
+            MatchFormat.TWO_SETS_MATCH_TIEBREAK -> listOf(s.formatMatchTiebreak) + short + noTb
+            MatchFormat.BEST_OF_THREE, MatchFormat.BEST_OF_FIVE ->
+                listOf(s.labelSets(if (r.format == MatchFormat.BEST_OF_FIVE) 5 else 3)) + short + (if (r.setTiebreak) listOf(s.labelTiebreak7) else noTb)
+        }
+        return parts.joinToString(" · ")
+    }
+
+    fun formatLabel(rec: MatchRecord, s: Strings): String {
+        val padel = rec.setup.sport == Sport.PADEL
+        return (if (padel) "${s.sportPadel} · " else "") +
+            formatName(rec.rules, s) +
+            (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
+            (if (rec.rules.starPoint && !rec.rules.noAd) " · ${s.starPoint}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
+    }
 
     fun place(rec: MatchRecord, s: Strings): String {
         val loc = rec.location ?: return s.placeUnavailable
@@ -97,10 +175,11 @@ object Reports {
                 rec.setup.court.ifBlank { null }?.let { "${s.court} $it" },
             ).joinToString(" · "))
         }
+        eventLine(rec.setup)?.let { sb.appendLine("🏆 $it") }
         sb.appendLine(date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
         sb.appendLine()
         sb.appendLine("🏆 ${s.winner}: ${names.side(w)}")
-        sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${scoreLine(state, w)}")
+        sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${resultLine(state, w, s)}")
         sb.appendLine()
         sb.appendLine("⏱ ${s.duration}: ${duration(rec.clockMs)}")
         sb.appendLine("🕘 ${s.startTime}: ${time(rec.startedAt, lang)} · ${s.endTime}: ${time(rec.endedAt, lang)}")
@@ -108,6 +187,15 @@ object Reports {
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
+        for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
+        for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
+        rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
+        for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
+        if (rec.notes.isNotBlank()) {
+            sb.appendLine()
+            sb.appendLine("📝 ${s.matchNotesTitle}")
+            sb.appendLine(rec.notes.trim())
+        }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))
@@ -171,7 +259,7 @@ object Reports {
             }
             for ((j, set) in state.sets.withIndex()) {
                 val x = firstCol + j * colW + colW / 2
-                val won = set.winner == side
+                val won = !set.partial && set.winner == side
                 c.drawText(set.shown(side).toString(), x, y + rowH / 2 + 34f, paint(if (set.matchTiebreak) 64f else 92f, if (won) white else grey, won, Paint.Align.CENTER))
                 if (set.hasTiebreak && !set.matchTiebreak && !won) {
                     c.drawText(set.tb(side).toString(), x + 42f, y + rowH / 2 - 22f, paint(38f, grey, false, Paint.Align.LEFT))

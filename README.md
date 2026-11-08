@@ -8,7 +8,9 @@
 
 **Guida / Guide / Anleitung / Guía / Guia:** [Italiano](deliver/GUIDA.md) · [English](deliver/GUIDE.en.md) · [Français](deliver/GUIDE.fr.md) · [Deutsch](deliver/GUIDE.de.md) · [Español](deliver/GUIDE.es.md) · [Português](deliver/GUIDE.pt.md)
 
-App Android per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia (italiano, inglese, francese, tedesco, spagnolo e portoghese, anche senza internet), due braccialetti **M5StickS3** collegati in Bluetooth LE e un tabellone a LED su TV o monitor (secondo telefono col cavo HDMI, Chromecast o browser, sull'hotspot di un telefono).
+**Server del circolo, guida per la segreteria / Club server, guide for the office:** [Italiano](deliver/GUIDA_SERVER.md) · [English](deliver/GUIDE_SERVER.en.md) · [Français](deliver/GUIDE_SERVER.fr.md) · [Deutsch](deliver/GUIDE_SERVER.de.md) · [Español](deliver/GUIDE_SERVER.es.md) · [Português](deliver/GUIDE_SERVER.pt.md)
+
+App Android per tenere il punteggio del tennis (e del padel, che si conta allo stesso modo) secondo le regole ITF, con chiamate vocali da giudice di sedia (italiano, inglese, francese, tedesco, spagnolo e portoghese, anche senza internet), due braccialetti **M5StickS3** collegati in Bluetooth LE (oppure, per pochi euro, due **telecomandini Bluetooth da selfie**: guida, capitolo 6.3) e un tabellone a LED su TV o monitor (secondo telefono col cavo HDMI, Chromecast o browser, sull'hotspot di un telefono).
 
 | Cartella | Contenuto |
 |---|---|
@@ -49,11 +51,36 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Regole del punteggio (annulla = rigioca gli eventi) | `app/.../model/ScoreEngine.kt` + test in `app/src/test` |
 | Frasi e chiamate vocali | `app/.../voice/Calls.kt`, parole e ordine di ogni lingua in `voice/CallWords.kt`, correzioni di pronuncia in `voice/Pronunciation.kt` |
 | Tempi (25/90/120/30 s), messaggi, flusso partita | `app/.../MatchController.kt` |
+| Telecomandi Bluetooth da selfie (clic, doppio clic, pressione lunga) | `app/.../remote/PressDetector.kt` + test, `remote/RemoteInput.kt` |
 | Protocollo Bluetooth (condiviso col firmware) | `app/.../ble/BandProtocol.kt` e in cima a `TSM_Band.ino` |
 | Impostazioni dei braccialetti, stima autonomia | `app/.../ble/BandProtocol.kt` (`BandSettings`), `ble/BatteryModel.kt`, `ui/BandSettingsPanel.kt` |
 | Testi nelle sei lingue, grafica | `app/.../ui/Strings.kt` (+ `StringsFr/De/Es/Pt.kt`), `ui/screens/`, `ui/Theme.kt` |
+| Tunnel del server (Tailscale Funnel, porta riservata) | `server/deploy/tsm-tunnel*`, `server/.../Tunnel.kt`, `ui/screens/ClubServerScreen.kt` (`TunnelSection`) |
+| Segreteria da PC (server HTTPS sul telefono, abbinamento, API, import CSV, pagina) | `app/.../desk/`, `app/src/main/assets/desk/`, `ui/screens/DeskScreen.kt`, `service/DeskService.kt` |
 | Tabellone TV (pagina, server, telefono-tabellone) | `app/src/main/assets/scoreboard.html`, `app/.../tv/`, `ui/TvSection.kt` — anteprima: `scoreboard.html?demo=1` |
 | Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Riconoscimento dei colpi (firmware 2.4) | `TSM_Band.ino` (sezione "colpi": FIFO del BMI270, calibrazione), `swing_detector.*` e `stroke_classifier.*` (copiati da SwingSense); app: `ble/BandProtocol.kt` (`STROKE`, `parseStroke`), `ui/BandSettingsPanel.kt` (`StrokesSection`) |
+| Statistiche e cronologia punto per punto del riepilogo | `app/.../data/MatchStats.kt` (+ test), `ui/screens/MatchStatsPanels.kt` |
+| Storico, giocatori e importazione dei JSON | `app/.../data/PlayerStats.kt` (+ test), `data/Storage.kt` (`saveFinished`), `ui/screens/HistoryScreen.kt`, `MatchController.kt` (`importMatches`) |
+| Trasferimento tra telefoni col QR (storico e partite sospese) | `app/.../transfer/Transfer.kt` (server e `TransferBundle`), `MatchController.kt` (`startSending`, `receiveFrom`), `ui/screens/HistoryScreen.kt` (`SendDialog`) |
+| Statistiche in coda agli highlights (schermate, avatar, musica) | `app/.../video/HighlightStats.kt` (partita del video, righe + test), `video/StatsCardRenderer.kt` (disegno), `video/HighlightMaker.kt` (immagini e musica nel montaggio), `video/MusicClip.kt` (brano scelto), `video/StatsMusic.kt` (musica generata + test), `video/VideoPlayerActivity.kt` (`HighlightDialog`) |
+| Torneo, categoria, turno, classifica e sesso dei giocatori | `app/.../data/Models.kt` (`SetupData`), `ui/screens/SetupScreen.kt`, `data/Reports.kt` (`eventLine`) |
+| Racchetta virtuale (racchette, incordature, ore delle corde, sensazioni, confronto) | `app/.../data/Racket.kt` (`Racket`, `Stringing`, `RacketUse` copiata nella partita, `RacketCatalog`, `RacketStats` + test), `ui/screens/RacketsScreen.kt` (elenco, schede, confronto, `RacketPicker`, `RacketSessionCard`), `MatchController.kt` (`racketsFor` in `startMatch`, `setMatchRacket`, `setMatchFeel`), `data/Storage.kt` (`rackets.json`) |
+| Note della partita nel riepilogo (PDF, testo, .json) | `app/.../data/Models.kt` (`MatchRecord.notes`), `MatchController.kt` (`setNotes`), `ui/screens/SummaryScreen.kt` (`MatchNotesCard`), `data/PdfReport.kt`, `data/Reports.kt` (`text`) |
+| Avatar senza foto (ritratti uomo/donna, sesso per nome) | `app/src/main/res/drawable-nodpi/avatar_*.webp`, `ui/PlayerPhoto.kt` (`PlayerAvatar`), `data/Storage.kt` (`playerSex`), `MatchController.kt` (`isFemale`, `setPlayerSex`, `tvPhotos`), `/avatar/` in `tv/TvServer.kt` |
+| Progressi: filtri ed elenco da spuntare | `app/.../data/ProgressFilter.kt` (+ test), `data/Progress.kt`, `ui/screens/ProgressScreen.kt`, `MatchController.kt` (`progressItems`, `progressReport`) |
+| Telecamera comandata dall'arbitro (inquadratura, registra, diretta, grafica, zoom) | `relay/RelayProtocol.kt` (`CAM_CMD`, `CAM_STATE`, `CAM_FRAME`, `CamCmd`, `CamState`), `relay/PhoneRelay.kt` (`camCommand`, `camFrame`, `sendCamFrame`), `video/CameraActivity.kt` (`onRemote`, `sendPreview`), `ui/CameraRemoteUi.kt` |
+| Assistente inquadratura (inclinazione, obiettivo consigliato, livella, grandangolo) | `video/Framing.kt` (+ test), `video/FramingSensors.kt` (`CameraLenses`, `TiltSensor`), `ui/FramingUi.kt`, `video/CameraActivity.kt` (`useLens`, `setLevel`), `CamState.tilt/roll/lens` in `relay/RelayProtocol.kt` |
+| Sagoma del campo e taratura per campo | `video/Framing.kt` (`Calib`, `lines`, `project`, + test), `ui/FramingUi.kt` (`CourtOutline`, `CalibrationPanel`), `data/Storage.kt` (`framingCalib`, `framingCalibFor`), `CamCmd.OUTLINE_*`/`CALIB` e `CamState.calib` |
+| Rating TSM (Elo dallo storico, classifica, amichevoli) | `data/Rating.kt` (+ test), `ui/RatingUi.kt` (`RatingSection`, `SummaryRatingCard`), `MatchRecord.friendly`, `MatchController.kt` (`ratingTable`, `setFriendly`) |
+| Rivincita (invito da condividere, calendario, stessa partita pronta in Nuova partita) | `data/Rematch.kt` (+ test), `ui/RematchUi.kt`, `MatchController.kt` (`rematchText`, `rematchCalendarIntent`, `prepareRematch`) |
+| Allenamento al servizio (braccialetto dentro/fuori, clip per servizio, dove mettere il telefono) | `data/ServeTraining.kt` (+ test), `ui/ServeUi.kt`, `video/CameraActivity.kt` (`EXTRA_SERVE`, `serveOutcome`), `data/Storage.kt` (`saveServeSession`, `serveClipsDir`), `MatchController.serveTraining` |
+| Analisi del movimento del servizio (MoveNet sul telefono, tre momenti chiave, dentro contro fuori) | `data/ServePose.kt` (+ test), `video/PoseAnalyzer.kt` (`PoseAnalyzer`, `ServeClipAnalysis`), `video/ServeAnalysisActivity.kt`; dipendenze `de.schliweb:tensorflow-lite-fdroid` (LiteRT compilato dai sorgenti, senza Play Services) e `com.google.ai.edge.litert:litert-api` (solo Java); librerie native di LiteRT solo ARM (su x86 manca solo l'analisi); modello scaricato a richiesta (`video/PoseModel.kt`); video con lo scheletro e zoom in `video/ReplayActivity.kt` (`EXTRA_POSE_DIR`); con più persone si segue chi serve e si coprono le altre (`ServeClipAnalysis.scout`) |
+| Allenamento di dritto, rovescio e volée (direzione, dritto/rovescio della volée, posizionamento, analisi preparazione/impatto/finale) | `data/ServeTraining.kt` (`TrainedStroke`, `ShotDirection`, `Wing`), `data/ServePose.kt` (`groundMetrics`, + test), `ui/ServeUi.kt`, `video/CameraActivity.kt` (`EXTRA_STROKE`) |
+| Interfaccia a cinque schede (Gioca, Allenati, Video, Progressi, Altro), nuova partita in due passi, prima accensione guidata, profilo Tu | `ui/screens/HomeScreen.kt`, `ui/OnboardingUi.kt`, `MatchController.kt` (`HomeTab`, `home`), `ui/screens/OptionsScreen.kt` (`OptionsPage`: partita, dispositivi, lingua e voce), `ui/screens/SetupScreen.kt` |
+| Foto dei giocatori | `app/.../ui/PlayerPhoto.kt` (`PlayerAvatar`, `EditablePlayerAvatar`), `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` in `tv/TvServer.kt` e `assets/scoreboard.html` |
+| Fasce cardio Bluetooth (battito, calorie, zone, grafici) | `app/.../ble/HeartRateProtocol.kt` (+ test), `ble/HeartRateManager.kt`, `data/HeartStats.kt` (Keytel, zone, + test), `ui/HeartSection.kt`, `MatchController.kt` (`flushHeart`), `ui/screens/MatchStatsPanels.kt` (`HeartChart`, `HeartZones`) |
+| Tornei Americano e Mexicano | `app/.../data/Tournament.kt` (turni, coppie, classifica + test), `ui/screens/TournamentScreen.kt`, `MatchController.kt` (`createTournament`, `nextTournamentRound`) |
 | Scheda F-Droid (descrizioni, novità di ogni versione) | `fastlane/metadata/android/<lingua>/`, `changelogs/<versionCode>.txt` |
 
 ## Licenza
@@ -73,5 +100,13 @@ Sono tutti compatibili con la GPL 3:
 | M5Unified, M5GFX | firmware | MIT (i font FreeSans arrivano da Adafruit GFX: BSD) |
 | NimBLE-Arduino | firmware | Apache 2.0 |
 | Core Arduino per ESP32, ESP-IDF | firmware | LGPL 2.1 o successiva, Apache 2.0 |
+
+Materiale non di codice:
+
+| Materiale | File | Autore e licenza |
+|---|---|---|
+| Musica delle statistiche negli highlights (primi 31 secondi) | `app/src/main/res/raw/stats_music.m4a` | "Nowhere Land" di Kevin MacLeod ([incompetech.com](https://incompetech.com)), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): chi pubblica un video con questa musica ne cita l'autore (l'app lo ricorda nella finestra degli highlights) |
+| Ritratti stilizzati di uomo e donna | `app/src/main/res/drawable-nodpi/avatar_*.webp` | Stefano Spagnolo, GPL 3.0 o successiva come il resto dell'app |
+| Modello MoveNet SinglePose Thunder int8 (posizione del corpo, per l'analisi del servizio) | non nell'app: l'app lo scarica a richiesta dalla release [`pose-model-1`](https://github.com/steve-linux/Tennis-Score-Manager/releases/tag/pose-model-1) e controlla lo sha256 (`video/PoseModel.kt`) | Google, [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0), da [Kaggle Models](https://www.kaggle.com/models/google/movenet) (versione 1, file non modificato, sha256 `b72fed22…6d222011`) |
 
 Il codice Apache 2.0 si può unire a un programma GPL 3, non a uno "solo GPL 2": per questo la licenza è la 3 o successiva. Il firmware compilato contiene anche le librerie radio e Bluetooth di Espressif, fornite solo in binario: conta solo se un giorno si distribuisce il file `.bin` già compilato (oltre al sorgente), ed è la stessa situazione di firmware GPL per ESP32 come Tasmota e Meshtastic.

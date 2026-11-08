@@ -1,0 +1,24 @@
+# Java per il server, il nome tsm-circolo.local in rete, la rete (anche Wi-Fi con nmtui), Caddy per l'HTTPS.
+default-jre-headless
+avahi-daemon
+libnss-mdns
+network-manager
+# Wi-Fi: le password WPA e i firmware dei chip più comuni (Intel, Realtek, Atheros, Broadcom, MediaTek e altri).
+wpasupplicant
+wireless-regdb
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-misc-nonfree
+curl
+# Tailscale già dentro: Attiva parte subito, senza scaricarlo alla prima accensione. ps & co. per la manutenzione.
+tailscale
+procps
+# L'ora giusta da internet a ogni avvio (con l'orologio del PC indietro i certificati sembrano "non ancora validi"
+# e Tailscale non parte); ip e ping per vedere la rete.
+systemd-timesyncd
+iproute2
+iputils-ping
+ca-certificates
+caddy

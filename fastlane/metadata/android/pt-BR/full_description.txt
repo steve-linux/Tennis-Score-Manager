@@ -1,11 +1,21 @@
 O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regras da ITF e os anuncia como um árbitro de cadeira.
 
-* Simples e duplas: três sets com tie-break no 6-6, ou dois sets e um match tie-break de 10 pontos; ponto decisivo (No-Ad) opcional.
+* Simples e duplas: três ou cinco sets, dois sets e um match tie-break de 10 pontos, pro set de 8 ou 10 jogos ou só match tie-break; sets de 6 ou 4 jogos, com ou sem tie-break; ponto decisivo (No-Ad) opcional.
+* Também para padel: mesmas regras do tênis, com dupla e golden point (ponto de ouro) já configurados; também há o star point da FIP.
+* Torneios de padel Americano e Mexicano: de 4 a 16 jogadores e até 4 quadras, partidas por pontos ou por tempo, duplas e rodadas automáticas, resultados escritos ou contados ponto a ponto, classificação para compartilhar.
 * Anúncios de árbitro de cadeira em seis idiomas (italiano, inglês, francês, alemão, espanhol, português) com a síntese de voz do telefone, sem internet. Também é possível importar gravações próprias.
 * Shot clock (25 s), troca de lado (90 s) e intervalo entre sets (120 s); as trocas de lado e a ordem de saque ficam por conta do app.
 * Qualquer ponto pode ser desfeito, mesmo depois do fim de um game, de um set ou da partida: o placar é recalculado desde o início.
-* Pulseiras M5StickS3 via Bluetooth LE (opcionais): cada jogador aperta KEY1 para marcar o ponto e KEY2 para desfazer. O firmware Arduino está no mesmo repositório.
+* Pulseiras M5StickS3 via Bluetooth LE (opcionais): cada jogador aperta KEY1 para marcar o ponto e KEY2 para desfazer. O firmware Arduino está no mesmo repositório. A partir do firmware 2.4 reconhecem também forehand, backhand, saque e voleio, após uma breve calibração.
+* Sem pulseiras: dois controles Bluetooth de selfie bem baratos, pareados como um teclado. Um clique = ponto, clique duplo, toque longo ou o outro botão = desfazer.
 * Placar de LED numa TV ou monitor: um segundo telefone com cabo HDMI, um Chromecast (transmissão de tela) ou qualquer navegador no hotspot do telefone.
-* Resumo da partida com o placar set a set, duração, clube, quadra e local; pode ser salvo como texto, JSON ou imagem, ou compartilhado.
+* Resumo da partida com o placar set a set, duração, clube, quadra e local; pode ser salvo como texto, JSON, imagem ou PDF completo (estatísticas, histórico e até 10 fotos da partida), ou compartilhado.
+* Estatísticas de fim de partida, da partida ou por set (saque, devolução, break points, pontos seguidos…), e histórico ponto a ponto com break points, set points e match points.
+* Estatísticas detalhadas, para quem marca da beira da quadra: aces, duplas faltas, primeiros saques, winners e erros.
+* Histórico no telefone: partidas terminadas para reabrir, jogadores com vitórias, derrotas e confronto direto; dá para importar partidas salvas (JSON) em outro telefone, também com um código QR na mesma rede Wi-Fi. Fotos dos jogadores, também no placar da TV.
+* Papéis Você, Treinador e Clube, só com as funções que você usa: banco de jogadores, rating, metas, alunos, exercícios, backup.
+* Cintas cardíacas, treinos e análise do movimento. Celular-câmera: vídeo com placar, transmissão RTMP, melhores momentos e replay.
+* Clube: sócios, mensalidades e recibos não fiscais, agenda de quadras, torneios internos e federados, equipes, escola de tênis, avisos; também no navegador do PC.
+* Servidor do clube opcional (Raspberry Pi ou pen drive): reservas online, lista de espera, busca de parceiro, mural e chat.
 
-Sem anúncios, sem conta, sem rastreamento. A rede é usada só para o placar na rede local. A localização é usada para o local da partida no resumo e, como o Android exige, para a busca Bluetooth das pulseiras. O endereço da quadra só é buscado se você ativar a opção: ela usa o serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google.
+Sem anúncios e sem rastreamento; não é preciso conta para usar o app. Os dados ficam no celular. A internet só é usada para o que você ativar: vídeo ao vivo, o servidor do seu clube, o modelo de análise do movimento (baixado a pedido do GitHub) e o endereço da quadra (geocodificador do celular, que com os serviços do Google envia as coordenadas ao Google). Câmera e microfone servem para QR, fotos e vídeos. A localização serve para o local da partida e, como exige o Android, para a busca Bluetooth.

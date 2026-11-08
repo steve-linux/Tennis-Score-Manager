@@ -13,13 +13,18 @@ plugins {
 android {
     namespace = "com.tennis.scoremanager"
     compileSdk = 36
+    // LiteRT (analisi del servizio) solo per i processori ARM dei telefoni: le versioni x86 (emulatori, qualche
+    // Chromebook) pesano 7 MB. Su x86 l'app si installa lo stesso, manca solo l'analisi del movimento.
+    packaging {
+        jniLibs.excludes += setOf("lib/x86/libtensorflowlite_jni.so", "lib/x86_64/libtensorflowlite_jni.so")
+    }
 
     defaultConfig {
         applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
-        versionName = "2.4.3"
+        versionCode = 13
+        versionName = "2.6.0"
     }
 
     buildTypes {
@@ -58,6 +63,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":courtcore"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -70,6 +76,15 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)  // QR del tabellone TV
+    implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
+    // Analisi del servizio: MoveNet (posizione del corpo) con LiteRT ricompilato dai sorgenti, senza Google Play Services.
+    implementation(libs.litert.fdroid)
+    implementation(libs.litert.api)  // le interfacce Java (InterpreterApi, Tensor, DataType), solo Java
+    implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
+    implementation(libs.media3.exoplayer)  // lettore dei video delle partite, con i capitoli punto per punto
+    implementation(libs.media3.ui)
+    implementation(libs.media3.transformer)  // montaggio degli highlights sul telefono
+    implementation(libs.media3.effect)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

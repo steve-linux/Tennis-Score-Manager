@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TSM">
+<title>TSM</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="icon-192.png" alt="" class="logo">
+  <div class="head-text"><div id="club" class="club"></div><div id="who" class="who"></div></div>
+  <button id="refresh" class="ghost small icon" hidden>↻</button>
+  <button id="logout" class="ghost small" hidden></button>
+</header>
+<main id="app"><p class="dim center" id="loading">…</p></main>
+<div id="sheet" class="sheet" hidden><div class="sheet-box" id="sheet-box"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

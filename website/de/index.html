@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Tennis-Zählung mit Schiedsrichteransagen, Armbändern und TV-Anzeigetafel</title>
-<meta name="description" content="Freie und kostenlose Android-App, die den Tennis-Spielstand nach den ITF-Regeln zählt: Ansagen des Schiedsrichters, Bluetooth-Armbänder M5StickS3 und Anzeigetafel auf dem Fernseher. Funktioniert offline, in sechs Sprachen, ohne Werbung.">
+<title>Tennis Score Manager – Tennis- und Padel-Zählung mit Schiedsrichteransagen, Statistiken, Armbändern und TV-Anzeigetafel</title>
+<meta name="description" content="Freie und kostenlose Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt: Ansagen des Schiedsrichters, Statistiken und Punkt-für-Punkt-Verlauf, Bluetooth-Armbänder M5StickS3 oder günstige Selfie-Fernbedienungen und Anzeigetafel auf dem Fernseher. Funktioniert offline, in sechs Sprachen, ohne Werbung.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/de/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Tennis-Zählung nach den ITF-Regeln, mit Schiedsrichteransagen, Bluetooth-Armbändern und TV-Anzeigetafel. Frei, offline, ohne Werbung.">
+<meta property="og:description" content="Tennis- und Padel-Zählung nach den ITF-Regeln, mit Schiedsrichteransagen, Statistiken zum Matchende, Bluetooth-Armbändern und TV-Anzeigetafel. Frei, offline, ohne Werbung.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/de/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -113,6 +113,7 @@ h3{font-size:1.22rem;font-weight:800;letter-spacing:-.01em}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media (max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:600px){.cards{grid-template-columns:1fr}}
+@media (min-width:961px){.card.wide{grid-column:1/-1}.card.wide p{max-width:80ch}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:border-color .25s,transform .25s}
 .card:hover{border-color:color-mix(in srgb,var(--accent,var(--ball)) 55%,transparent);transform:translateY(-3px)}
 .card .ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;color:var(--accent,var(--ball));background:color-mix(in srgb,var(--accent,var(--ball)) 13%,transparent)}
@@ -241,6 +242,13 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
 
 <header class="nav">
@@ -249,7 +257,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Menü öffnen" data-label-open="Menü öffnen" data-label-close="Menü schließen"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Funktionen</a></li>
+      <li><a href="#stats">Statistiken</a></li>
       <li><a href="#scoreboard">Anzeigetafel</a></li>
+      <li><a href="#video">Videos</a></li>
       <li><a href="#wristbands">Armbänder</a></li>
       <li><a href="#gallery">Galerie</a></li>
       <li><a href="#download">Download</a></li>
@@ -276,7 +286,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Frei und kostenlos · Lizenz GPL-3.0</div>
       <h1>Dein Spielstand im Tennis, <em>wie bei den Profis.</em></h1>
-      <p class="lead">Die Android-App, die den Spielstand nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon oder mit zwei Bluetooth-Armbändern, und das Ergebnis kann live auf einem Fernseher erscheinen.</p>
+      <p class="lead">Die Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon, mit zwei Armbändern oder mit zwei Bluetooth-Fernbedienungen; am Ende gibt es Statistiken, den Verlauf Punkt für Punkt und mit den Armbändern auch deine Schläge, und das Ergebnis kann live auf einem Fernseher erscheinen. Mit einem Bluetooth-Brustgurt misst du auch Herzfrequenz und Kalorien, im Spiel und im Training.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> App holen</a>
         <a class="btn btn-ghost" href="#features">Funktionen entdecken <svg class="icon"><use href="#i-down"/></svg></a>
@@ -333,11 +343,91 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Sechs Sprachen, überall</h3>
         <p>Italienisch, Englisch, Französisch, Deutsch, Spanisch und Portugiesisch: Die gewählte Sprache gilt für die Bildschirme, die Stimme, die Anzeigetafel und die Armbänder.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Auch für Padel</h3>
+        <p>Padel wird wie Tennis gezählt: Wähle Padel, und die App stellt Doppel und Golden Point von selbst ein. Zusammenfassung und Teilen nennen „Padel“. Für Vereinsabende gibt es Americano- und Mexicano-Turniere mit 4 bis 16 Spielern, Runden und Tabelle automatisch.</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Statistiken und Punkt für Punkt</h3>
+        <p>Zum Matchende wie auf Ergebnisseiten: Aufschlag, Return, Breakbälle, Punkte in Folge und der Verlauf Punkt für Punkt, für das ganze Match oder Satz für Satz.</p>
+        <button class="more" data-open="d-stats">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Fernbedienungen für wenige Euro</h3>
+        <p>Statt Armbändern zwei Bluetooth-Selfie-Fernbedienungen (1–3 €): Ein Klick gibt den Punkt, ein Doppelklick nimmt ihn zurück. Keine Firmware nötig.</p>
+        <button class="more" data-open="d-remote">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div>
+        <h3>Herzfrequenz und Kalorien</h3>
+        <p>Mit einem Bluetooth-Brustgurt (Coospo, Magene, Polar, Garmin…) siehst du die Herzfrequenz jedes Spielers live und nach dem Spiel Durchschnitt, Maximum, Kalorien, Diagramm und Pulszonen.</p>
+        <button class="more" data-open="d-heart">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Training und Fortschritte</h3>
+        <p>Trainiere mit dem Gurt auch ohne Spiel: Runden, Pausen, Erholungsminute, HRV, CSV und PDF. Fortschritte vergleicht Trainings und Spiele über die Zeit und zeigt dir, ob du besser wirst.</p>
+        <button class="more" data-open="d-train">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div>
+        <h3>Zweites Telefon an der Grundlinie</h3>
+        <p>Gurte und Armbänder reichen ein paar Meter weniger weit als der Platz lang ist: Ein zweites Telefon am anderen Ende dient als Brücke, mit eigenem Netz und ohne Datenverlust.</p>
+        <button class="more" data-open="d-second">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Erkennt deine Schläge</h3>
+        <p>Mit Firmware 2.4 unterscheidet das Armband nach einer kurzen Kalibrierung Vorhand, Rückhand, Aufschlag und Volley der Person, die es trägt. Am Ende siehst du die Schläge jedes Spielers, das Handgelenk-Tempo und wie viele Schläge jeder Ballwechsel dauert.</p>
+        <button class="more" data-open="d-ble">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-video"/></svg></div>
+        <h3>Videos, Highlights und Zeitlupe</h3>
+        <p>Ein zweites Telefon auf einem Stativ filmt das Match mit eingeblendetem Spielstand, auch live. Sieh dir jeden Punkt noch einmal an, lass die App die Highlights mit den Schlussstatistiken schneiden und hol dir beim strittigen Punkt die Zeitlupe.</p>
+        <button class="more" data-open="d-video">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Dein Verein in einer App</h3>
+        <p>Mitglieder und Beiträge, Platzplan, Vereins- und Verbandsturniere, Teams, Tennisschule und Mitteilungen, auch im PC-Browser. Mit einem optionalen Server buchen die Spieler ihren Platz online.</p>
+        <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Statistiken</div>
+        <h2>Das Match in Zahlen</h2>
+        <p>Zum Matchende hat die Zusammenfassung drei Reiter: Übersicht, Statistiken und Punkt für Punkt. Alles ergibt sich aus den eingetragenen Punkten, also klappt es auch ohne Armbänder.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Aufschlag und Return<small>Gewonnene Aufschlag- und Returnpunkte und -spiele, abgewehrte und genutzte Breakbälle, mit Balken, die beide Spieler vergleichen.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Ganzes Match oder ein Satz<small>Punkte und Spiele gesamt, Punkte in Folge, letzte 10 Punkte, abgewehrte Matchbälle: für das ganze Match oder Satz für Satz.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Punkt für Punkt<small>Spiel für Spiel: wer aufschlägt, verlorene Aufschläge und der Stand nach jedem Punkt, mit hervorgehobenen Break-, Satz- und Matchbällen.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Verlauf und Spieler<small>Jedes beendete Match bleibt auf dem Telefon: Öffne es mit seiner Zusammenfassung wieder und sieh Siege, Niederlagen und direkten Vergleich jedes Spielers. Auf einem anderen Telefon gespeicherte Matches lassen sich importieren. Verlauf und unterbrochene Matches lassen sich auch per QR-Code im selben WLAN auf ein anderes Telefon übertragen. Jeder Spieler kann ein Foto haben, auch auf der TV-Anzeigetafel.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Mit Armbändern auch die Schläge<small>Vorhände, Rückhände, Aufschläge und Volleys jedes Spielers, Handgelenk-Tempo und wie viele Schläge jeder Ballwechsel dauert.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>PDF, Fotos und Fortschritte<small>Der vollständige Spielbericht wird zum PDF mit Statistiken, Verlauf und bis zu 10 Fotos vom Spiel. Im Verlauf siehst du die Entwicklung jedes Spielers, unter Fortschritte, ob du besser wirst.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Asse, Doppelfehler, erste Aufschläge, Winner sowie unerzwungene und erzwungene Fehler gibt es, wenn du die detaillierten Statistiken einschaltest; mit Armbändern oder Fernbedienungen fragt die App auf Wunsch, wie der Punkt geendet hat.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiken zum Matchende: Aufschlag, Return und Breakbälle beider Spieler im Vergleich"><span>Statistiken</span></button></li>
+          <li><button class="shot"><img src="../img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Verlauf Punkt für Punkt des ersten Satzes, mit Aufschläger, verlorenen Aufschlägen und Breakbällen"><span>Punkt für Punkt</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Anzeigetafel</div>
@@ -363,6 +453,26 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
+<section id="video" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Videos</div>
+        <h2>Das Match wie im Fernsehen</h2>
+        <p>Das Kamera-Telefon bekommt den Spielstand vom Schiedsrichter und blendet ihn ins Video ein. Nach dem Match holt die App das Beste heraus.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Aufnahme und Livestream<small>Video in der Galerie mit einem Kapitel pro Punkt, oder live auf YouTube, Twitch oder Facebook.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Punkt für Punkt<small>Jeden Punkt, jedes Spiel oder jeden Satz noch einmal ansehen; mit den Trainerfiltern nur die Punkte, die du brauchst. Auch Videos anderer Kameras, die Punkte zählst du beim Ansehen.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Automatische Highlights<small>Die schönsten Punkte in der gewählten Länge, zum Schluss die Matchstatistik wie in den Übertragungen: Foto oder Porträt der Spieler und Musik im Hintergrund.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Zeitlupe<small>Der strittige Punkt von Anfang an, auch verlangsamt, auf dem Telefon des Schiedsrichters und auf der Anzeigetafel.</small></div></li>
+        </ul>
+        <button class="more" data-open="d-video" style="margin-top:20px">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="media"><div class="tv"><img src="../img/highlights-statistiche.jpg" width="1280" height="720" loading="lazy" alt="Statistikbildschirm am Ende der Highlights: Rossi und Bianchi an den Seiten, Aufschlag und Breakbälle in der Mitte"></div></div>
+    </div>
+  </div>
+</section>
+
 <section id="wristbands">
   <div class="wrap">
     <div class="split">
@@ -376,6 +486,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Akku im Blick<small>Die App zeigt den Ladestand und schätzt die Laufzeit; am Ende des Matches schaltet sie die Armbänder aus.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Sofort startklar<small>Schalte die Armbänder ein, die App findet sie von selbst; «Erkennen» zeigt dir, welches welches ist.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Freie Firmware<small>Der Arduino-Code liegt im Repository: Du installierst ihn mit der Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Erkennt deine Schläge<small>Mit Firmware 2.4 unterscheidet es nach einer kurzen Kalibrierung Vorhand, Rückhand, Aufschlag und Volley: Die Schlagstatistiken landen in der Zusammenfassung.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Firmware der Armbänder</a></p>
       </div>
@@ -406,12 +517,19 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <ul class="gallery">
       <li><button class="shot"><img src="../img/inizio.jpg" width="540" height="1152" loading="lazy" alt="Startbildschirm des Matches mit Teamnamen und Format"><span>Matchbeginn</span></button></li>
       <li><button class="shot"><img src="../img/partita.jpg" width="720" height="1537" loading="lazy" alt="Spielbildschirm mit Spielstand und Uhren"><span>Während des Spiels</span></button></li>
-      <li><button class="shot"><img src="../img/formato.jpg" width="540" height="1152" loading="lazy" alt="Wahl des Formats: drei Sätze oder zwei Sätze mit Match-Tiebreak, No-Ad und Münzwurf"><span>Format und Münzwurf</span></button></li>
-      <li><button class="shot"><img src="../img/lingue-de.jpg" width="540" height="1152" loading="lazy" alt="Schiedsrichter- oder Armband-Modus und Wahl aus sechs Sprachen"><span>Modus und Sprache</span></button></li>
+      <li><button class="shot"><img src="../img/formato.jpg" width="540" height="1152" loading="lazy" alt="Spielregeln: Match-Tiebreak, Spiele pro Satz, Tiebreak, No-Ad und Münzwurf"><span>Format und Münzwurf</span></button></li>
+      <li><button class="shot"><img src="../img/lingue-de.jpg" width="540" height="1152" loading="lazy" alt="Wahl aus sechs Sprachen und der Schiedsrichterstimme"><span>Sprache und Stimme</span></button></li>
       <li><button class="shot"><img src="../img/voci.jpg" width="540" height="1152" loading="lazy" alt="Liste der installierten Sprachausgabe-Stimmen, offline verfügbar"><span>Schiedsrichterstimme</span></button></li>
       <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Verbindung der Armbänder mit Bluetooth- und Akkustatus"><span>Armbänder</span></button></li>
       <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Adresse und QR-Code, um die Anzeigetafel auf einem anderen Gerät zu öffnen"><span>Anzeigetafel verbinden</span></button></li>
       <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="Spielbericht am Matchende mit Sieger, Ergebnis, Dauer und Ort"><span>Spielbericht</span></button></li>
+      <li><button class="shot"><img src="../img/padel.jpg" width="540" height="1152" loading="lazy" alt="Wahl der Sportart: Tennis oder Padel, mit schon eingestelltem Doppel und Golden Point"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Modus Fernbedienungen: Jeder Spieler holt sich den Punkt mit einer Bluetooth-Selfie-Fernbedienung"><span>Fernbedienungen</span></button></li>
+      <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiken zum Matchende: Aufschlag, Return und Breakbälle beider Spieler im Vergleich"><span>Statistiken</span></button></li>
+      <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Schlagerkennung: Kalibrierung von Vorhand, Rückhand, Aufschlag und Volley am Armband"><span>Schlagerkennung</span></button></li>
+      <li><button class="shot"><img src="../img/fasce.jpg" width="540" height="1152" loading="lazy" alt="Verbundener Brustgurt mit Puls, Signal und Akku sowie Alter und Gewicht für die Kalorien"><span>Brustgurte</span></button></li>
+      <li><button class="shot"><img src="../img/battito.jpg" width="540" height="1152" loading="lazy" alt="Statistiken nach dem Spiel: Durchschnitts- und Maximalpuls, Kalorien, Pulsdiagramm und Zeit in den Pulszonen"><span>Puls im Spiel</span></button></li>
+      <li><button class="shot"><img src="../img/allenamento.jpg" width="540" height="1152" loading="lazy" alt="Zusammenfassung eines Trainings mit dem Gurt: Dauer, Puls, Kalorien, HRV, Erholung und Diagramm"><span>Training</span></button></li>
     </ul>
   </div>
 </section>
@@ -421,7 +539,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Download</div>
       <h2>Frei, kostenlos, ohne Überraschungen</h2>
-      <p>Kein Konto, keine Werbung, keine Daten an fremde Server.</p>
+      <p>Keine Werbung, kein Tracking. Die Daten bleiben auf dem Handy; der Vereinsserver ist optional und wird vom Verein betrieben.</p>
     </div>
     <div class="get">
       <div class="panel hl">
@@ -433,13 +551,14 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Voraussetzungen und Berechtigungen</h3>
         <dl class="req">
           <dt>System</dt><dd>Android 8.0 oder neuer</dd>
-          <dt>Version</dt><dd>2.4.3</dd>
+          <dt>Version</dt><dd>2.6.0</dd>
           <dt>Lizenz</dt><dd>GNU GPL v3 oder neuer</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Nur für die Armbänder.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Für Armbänder und Brustgurte und zum Verbinden des zweiten Telefons. Fernbedienungen werden in den Bluetooth-Einstellungen des Telefons gekoppelt.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Standort<small>Optional: der Ort des Platzes im Spielbericht. Bis Android 11 wird er auch für die Bluetooth-Suche benötigt.</small></div></li>
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Netzwerk<small>Nur für die Anzeigetafel im lokalen Netz.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Netzwerk<small>Anzeigetafel und zweites Handy im lokalen Netz. Internet nur für das, was du einschaltest: Live-Video, Vereinsserver, Modell zur Bewegungsanalyse.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Kamera und Mikrofon<small>Optional: QR-Codes, Fotos und Videos der Matches.</small></div></li>
         </ul>
       </div>
     </div>
@@ -473,12 +592,13 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-itf">ITF-Regeln</h3></div>
     <p>Der Spielstand folgt den ITF-Regeln: Du musst dir nicht mehr merken, wer aufschlägt oder wann die Seiten gewechselt werden.</p>
     <ul>
-      <li><strong>Zwei Formate:</strong> drei Sätze mit Tiebreak bis 7 bei 6:6 oder zwei Sätze und bei 1:1 ein Match-Tiebreak bis 10.</li>
+      <li><strong>Formate:</strong> zwei oder drei Gewinnsätze, zwei Sätze und bei 1:1 ein Match-Tiebreak bis 10, Pro-Satz bis 8 oder 10 Spiele, nur Match-Tiebreak; Sätze bis 6 oder 4 Spiele (Kurzsätze), mit oder ohne Tiebreak.</li>
       <li><strong>Einzel und Doppel,</strong> mit der Aufschlagfolge des Teams, die in jedem Satz gewählt wird.</li>
       <li><strong>No-Ad:</strong> Auf Wunsch wird bei Einstand ein entscheidender Punkt gespielt.</li>
       <li><strong>Münzwurf und Platzseiten</strong> werden vor Beginn festgelegt; die App meldet jeden Seitenwechsel.</li>
       <li><strong>Sicheres Zurücknehmen:</strong> Das Match wird als Folge von Punkten gespeichert und bei jedem Zurücknehmen neu berechnet – Aufschläger, Seite und Spielstand stimmen immer, auch wenn du mehrere Punkte hintereinander zurücknimmst.</li>
       <li><strong>Spielhinweise:</strong> Breakball, Satzball, Matchball und entscheidender Punkt erscheinen auf dem Handy und auf der Anzeigetafel, zusammen mit Tiebreaks und Seitenwechseln.</li>
+      <li><strong>Padel:</strong> wird wie Tennis gezählt; mit Padel stellt die App Doppel und Golden Point ein (bei 40:40 entscheidet ein einziger Punkt das Spiel); auch der Star Point der FIP ist wählbar (höchstens zwei Vorteile, dann ein entscheidender Punkt).</li>
     </ul>
   </div>
 </dialog>
@@ -494,6 +614,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Vorab erzeugte Audiodateien:</strong> Die App bereitet jede Ansage im Voraus vor, für eine natürlichere Wiedergabe, komplett offline.</li>
       <li><strong>Eigene Aufnahmen:</strong> Nimm die Sätze mit deiner Stimme (oder der eines Schiedsrichters) auf und importiere sie als ZIP-Datei; sie haben immer Vorrang.</li>
     </ul>
+    <p>Die Stimme kommt aus dem Telefon oder aus jedem verbundenen Bluetooth-Lautsprecher oder -Kopfhörer: der Lautsprecher, damit der ganze Platz sie hört, Kopfhörer, um sie allein zu hören, ohne die Nachbarplätze zu stören. Bei vielen Telefonen kann der Ton auf zwei Geräten gleichzeitig laufen (bei Samsung beide unter „Medienausgabe“ anhaken): Ohrhörer für jeden Spieler oder der Lautsprecher für den Platz und Kopfhörer für die Person, die zählt.</p>
     <div class="note"><strong>Sechs Sprachen:</strong> Italienisch, Englisch, Französisch, Deutsch, Spanisch und Portugiesisch. Die gewählte Sprache gilt zugleich für die Bildschirme, die Stimme, die TV-Anzeigetafel und das Display der Armbänder.</div>
   </div>
 </dialog>
@@ -526,8 +647,119 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Einstellungen vom Handy:</strong> Name (bis zu 12 Zeichen, im Armband gespeichert), Helligkeit, Anzeigedauer des Spielstands, Lautstärke des Summers, gedrehtes Display für das andere Handgelenk und automatisches Ausschalten. Ein Tipp überträgt sie auf das andere Armband.</li>
       <li><strong>Automatische Suche:</strong> Schalte die Armbänder ein, die App findet und koppelt sie von selbst. «Erkennen» lässt das gewählte Armband blinken, «S1 ↔ S2 tauschen» vertauscht die Spieler ohne neue Kopplung, und das Match startet auch mit KEY1.</li>
       <li><strong>Handy in der Tasche:</strong> auch bei ausgeschaltetem Bildschirm empfängt die App die Punkte, sagt sie an und aktualisiert die Anzeigetafel.</li>
+      <li><strong>Schlagerkennung</strong> (Firmware 2.4): Nach einer kurzen Kalibrierung unterscheidet das Armband Vorhand, Rückhand, Aufschlag und Volley der Person, die es trägt; die Zusammenfassung zeigt Schläge nach Art, Handgelenk-Tempo und Schläge pro Punkt. Der Bewegungssensor braucht etwa 1 mA mehr.</li>
     </ul>
     <div class="note">Die Firmware ist frei (GPL-3.0) und wird mit der Arduino IDE installiert: Code und Anleitung findest du im <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">Repository</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Statistiken und Punkt für Punkt</h3></div>
+    <p>Die Zusammenfassung zum Matchende hat drei Reiter.</p>
+    <ul>
+      <li><strong>Übersicht:</strong> Ergebnis, Dauer, Ort, gewonnene Punkte und Spiele und, mit Armbändern 2.4, Schläge, Handgelenk-Tempo und Schläge pro Punkt.</li>
+      <li><strong>Statistiken:</strong> für das Match oder einen Satz, beide Spieler im Balkenvergleich: Aufschlag- und Returnpunkte und -spiele, abgewehrte und genutzte Breakbälle, Punkte und Spiele gesamt, Punkte in Folge, letzte 10 Punkte, abgewehrte Matchbälle.</li>
+      <li><strong>Punkt für Punkt:</strong> Satz für Satz jedes Spiel mit Aufschläger, verlorenen Aufschlägen und dem Stand nach jedem Punkt, mit hervorgehobenen Break-, Satz- und Matchbällen.</li>
+    </ul>
+    <div class="note">Asse, Doppelfehler, erste Aufschläge, Winner und Fehler gibt es, wenn du die <strong>Detaillierte Statistik</strong> einschaltest: statt der zwei großen Tasten erscheinen Ass, Aufschlagfehler und für jeden Spieler Winner, Fehler und Punkt. Gedacht für jemanden, der vom Spielfeldrand zählt.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Bluetooth-Fernbedienungen</h3></div>
+    <p>Die günstigste Art, die Spieler selbst zählen zu lassen: zwei Bluetooth-Selfie-Fernbedienungen für je 1 bis 3 €.</p>
+    <ul>
+      <li>Kopple sie in den Bluetooth-Einstellungen des Telefons wie eine Tastatur.</li>
+      <li>Wähle den Modus <strong>Fernbedienungen</strong> und ordne jede Fernbedienung mit einem Tastendruck ihrem Spieler zu.</li>
+      <li><strong>Ein Klick</strong> gibt den Punkt; <strong>Doppelklick</strong> oder <strong>langes Drücken</strong> nimmt ihn zurück, mit denselben Schutzmechanismen wie bei den Armbändern. Bei Fernbedienungen mit zwei Tasten gibt die beim Zuordnen gedrückte Taste den Punkt, die andere nimmt ihn mit einem Klick zurück.</li>
+      <li>Während des Matches bleibt die App bei eingeschaltetem Bildschirm geöffnet: Die Tasten einer Bluetooth-Tastatur erreichen nur die sichtbare App.</li>
+    </ul>
+    <div class="note">Keine Firmware und keine Berechtigungen: Android sieht sie als Tastatur.</div>
+  </div>
+</dialog>
+
+<dialog id="d-heart" aria-labelledby="t-heart" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div><h3 id="t-heart">Bluetooth-Brustgurte</h3></div>
+    <p>Herzfrequenz und Kalorien von Brustgurten mit dem Standard-Herzfrequenzdienst von Bluetooth: Coospo (getestet mit dem H6), Magene, Polar, Garmin, Wahoo… Einer pro Spieler, in jedem Modus, auch ohne Armbänder.</p>
+    <ul>
+      <li><strong>Sofort bereit:</strong> Elektroden befeuchten und anlegen, er schaltet sich selbst ein; in der App wählst du ihn nur einmal aus.</li>
+      <li><strong>Live:</strong> Im Spiel zeigt eine Zeile die Herzfrequenz jedes Spielers.</li>
+      <li><strong>Nach dem Spiel:</strong> Durchschnitts- und Maximalpuls, Kalorien, Verlauf als Diagramm und Zeit in den Pulszonen; Pausen zählen nicht.</li>
+      <li><strong>Kalorien und Zonen:</strong> mit Alter, Gewicht und Geschlecht der Person mit dem Gurt (Keytel-Formel, typischer Fehler ±20 %; Maximalpuls geschätzt als 208 − 0,7 × Alter).</li>
+      <li><strong>Signal im Blick:</strong> Die App zeigt die Signalstärke und wie oft die Herzfrequenz nicht angekommen ist.</li>
+    </ul>
+    <div class="note"><strong>Reichweite:</strong> Ein Gurt reicht etwa 20 Meter weit, weniger, wenn du dem Telefon den Rücken zudrehst. Im Einzel steht der ferne Spieler 24-30 Meter entfernt: Mit einem zweiten Telefon an der Grundlinie geht nichts verloren.</div>
+  </div>
+</dialog>
+
+<dialog id="d-train" aria-labelledby="t-train" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-train">Training und Fortschritte</h3></div>
+    <p>Auf der ersten Seite zeichnet <strong>Training</strong> eine Einheit mit dem Gurt auf, auch ohne Spiel.</p>
+    <ul>
+      <li><strong>Runden und Pausen:</strong> „Runde“ schließt einen Abschnitt (einen Sprint, eine Übung, eine Bahnrunde) und beginnt den nächsten; Pausen zählen nicht.</li>
+      <li><strong>Erholung:</strong> Am Ende zeichnet die App noch eine Minute auf, um zu messen, wie weit der Puls sinkt.</li>
+      <li><strong>Zusammenfassung:</strong> Dauer, Durchschnitts- und Maximalpuls, Kalorien, HRV (RMSSD), Erholung, Diagramm, Pulszonen und die Werte jeder Runde; CSV Sekunde für Sekunde und PDF zum Teilen.</li>
+      <li><strong>Fortschritte:</strong> Für Trainings und für die Spiele eines Spielers aus dem Verlauf vergleicht es die erste und die zweite Hälfte des Zeitraums: ▲, wenn du besser wirst, ▼, wenn schlechter. Als PDF teilen oder drucken.</li>
+    </ul>
+    <div class="note">Vergleiche HRV und Erholung mit deinen eigenen ähnlichen Einheiten, nicht mit denen anderer.</div>
+  </div>
+</dialog>
+
+<dialog id="d-second" aria-labelledby="t-second" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div><h3 id="t-second">Zweites Telefon an der Grundlinie</h3></div>
+    <p>Gurte und Armbänder verbinden sich mit jeweils einem Telefon und reichen ein paar Meter weniger weit als der Platz lang ist. Mit einem zweiten Telefon am anderen Ende hat jeder Spieler immer eines in der Nähe.</p>
+    <ul>
+      <li><strong>Verbindung per QR-Code:</strong> Das Haupttelefon erstellt ein eigenes, nur lokales Netz: keine SIM, keine mobilen Daten, kein WLAN des Clubs.</li>
+      <li><strong>Nichts auszuwählen:</strong> Das zweite Telefon übernimmt von selbst die Gurte und Armbänder, die auf dem Haupttelefon gewählt sind.</li>
+      <li><strong>Seitenwechsel automatisch:</strong> Jeder Gurt und jedes Armband wechselt von selbst zum nächsten Telefon.</li>
+      <li><strong>Keine Daten verloren:</strong> Puls und Schläge vom zweiten Telefon warten auf die Bestätigung des Haupttelefons und füllen nach einem Netzausfall die Lücken, sobald es wieder da ist.</li>
+      <li><strong>Auch als Anzeigetafel:</strong> Das zweite Telefon kann die Anzeigetafel des Spiels im Vollbild zeigen.</li>
+    </ul>
+    <div class="note">Das Haupttelefon führt das Spiel: Spielstand, Stimme und Spielbericht bleiben dort.</div>
+  </div>
+</dialog>
+
+<dialog id="d-video" aria-labelledby="t-video" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-video"/></svg></div><h3 id="t-video">Videos, Highlights und Zeitlupe</h3></div>
+    <p>Mit einem zweiten Telefon als Kamera, per QR-Code mit dem des Schiedsrichters verbunden, wird das Match zu einem Video mit eingeblendetem Spielstand.</p>
+    <ul>
+      <li><strong>Kamera-Telefon:</strong> nimmt in 1080p mit Spielstand-Einblendung auf oder sendet per RTMP live zu YouTube, Twitch, Facebook oder einem eigenen Server.</li>
+      <li><strong>Video Punkt für Punkt:</strong> ein Kapitel pro Punkt, nach Punkt, Spiel oder Satz anzusehen; die Kapitel lassen sich auch für YouTube kopieren.</li>
+      <li><strong>Importierte Videos:</strong> auch ein Video einer anderen Kamera: Die Punkte zählst du beim Ansehen, der Spielstand ergibt sich von selbst.</li>
+      <li><strong>Trainerfilter:</strong> nur die Punkte eines Spielers, gewonnen oder verloren, bei Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen.</li>
+      <li><strong>Highlights:</strong> Asse, Winner, Break-, Satz- und Matchbälle und lange Ballwechsel in der gewählten Reihenfolge, für 1-15 Minuten oder jede gewünschte Länge. Am Ende die Matchstatistik mit Foto oder Porträt der Spieler, Turnier und Ranglisten, und Musik mit Ausblendung.</li>
+      <li><strong>Zeitlupe:</strong> Beim strittigen Punkt fordert der Schiedsrichter ihn bei der Kamera an und sieht ihn auch verlangsamt, Bild für Bild; auf Wunsch auch auf der TV-Anzeigetafel.</li>
+    </ul>
+    <div class="note">Die Musik der Statistiken ist <em>Nowhere Land</em> von Kevin MacLeod (incompetech.com), Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn. Du kannst auch einen eigenen Titel wählen.</div>
+  </div>
+</dialog>
+
+<dialog id="d-club" aria-labelledby="t-club" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Verein und Online-Buchung</h3></div>
+    <p>In der Rolle Verein wird die App zum Vereinsbüro: Die Daten bleiben auf dem Handy, und du schaltest nur die Funktionen ein, die du brauchst.</p>
+    <ul>
+      <li><strong>Mitglieder und Beiträge:</strong> Mitgliedschaften, Ablauf des ärztlichen Attests, erfasste Zahlungen und Quittungen, CSV-Export.</li>
+      <li><strong>Platzplan:</strong> Tages-, Wochen- und Monatsansicht, Serienbuchungen, Preise, Öffnungszeiten und Nutzungsstatistik.</li>
+      <li><strong>Turniere und Teams:</strong> Vereins- und Verbandsturniere mit Tableau und Gruppen, Mannschaftsligen, Forderungsrangliste: Die Matches laufen über den Punktezähler.</li>
+      <li><strong>Tennisschule und Mitteilungen:</strong> Kurse, Schüler, Anwesenheit und Beiträge; Mitteilungen per WhatsApp, Telegram, SMS oder E-Mail.</li>
+      <li><strong>Vereinsbüro am PC:</strong> Der Verein lässt sich im Browser am Computer verwalten, die Daten bleiben auf dem Handy.</li>
+      <li><strong>Optionaler Server:</strong> auf Raspberry Pi oder USB-Stick: Online-Buchung per App oder Webseite, auch auf dem iPhone, Warteliste, Partnersuche, Erinnerungen, Schwarzes Brett und Mitglieder-Chat.</li>
+    </ul>
+    <div class="note">Der Server gehört dem Verein, ohne Abo. Über Tailscale oder DuckDNS ist er aus dem Internet erreichbar. Ohne Server funktioniert die App genauso.</div>
   </div>
 </dialog>
 

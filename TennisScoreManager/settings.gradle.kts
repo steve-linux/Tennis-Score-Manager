@@ -19,8 +19,17 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Solo per RootEncoder (telecamera e diretta RTMP, Apache 2.0), che si pubblica su JitPack: compilato dai
+        // sorgenti, nient'altro arriva da qui.
+        maven("https://jitpack.io") {
+            content { includeGroupByRegex("com\\.github\\.pedroSG94.*") }
+        }
     }
 }
 
 rootProject.name = "TennisScoreManager"
 include(":app")
+// Le regole dei campi (Kotlin puro), usate dall'app e dal server del circolo.
+include(":courtcore")
+// Il server del circolo per le prenotazioni dei giocatori: facoltativo, gira su un Raspberry Pi o su un PC.
+include(":server")

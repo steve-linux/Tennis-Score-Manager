@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Tennis scoring with umpire calls, wristbands and a TV scoreboard</title>
-<meta name="description" content="Free and open source Android app that keeps the tennis score by the ITF rules: chair umpire voice calls, M5StickS3 Bluetooth wristbands and a TV scoreboard. Works offline, in six languages, with no ads.">
+<title>Tennis Score Manager – Tennis and padel scoring with umpire calls, statistics, wristbands and a TV scoreboard</title>
+<meta name="description" content="Free and open source Android app that keeps the tennis and padel score by the ITF rules: chair umpire voice calls, statistics and a point-by-point log, M5StickS3 Bluetooth wristbands or cheap selfie remotes, and a TV scoreboard. Works offline, in six languages, with no ads.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/en/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Tennis scoring by the ITF rules, with umpire calls, Bluetooth wristbands and a TV scoreboard. Free, offline, no ads.">
+<meta property="og:description" content="Tennis and padel scoring by the ITF rules, with umpire calls, end-of-match statistics, Bluetooth wristbands and a TV scoreboard. Free, offline, no ads.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/en/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -113,6 +113,7 @@ h3{font-size:1.22rem;font-weight:800;letter-spacing:-.01em}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media (max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:600px){.cards{grid-template-columns:1fr}}
+@media (min-width:961px){.card.wide{grid-column:1/-1}.card.wide p{max-width:80ch}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:border-color .25s,transform .25s}
 .card:hover{border-color:color-mix(in srgb,var(--accent,var(--ball)) 55%,transparent);transform:translateY(-3px)}
 .card .ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;color:var(--accent,var(--ball));background:color-mix(in srgb,var(--accent,var(--ball)) 13%,transparent)}
@@ -241,6 +242,13 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
 
 <header class="nav">
@@ -249,7 +257,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Open menu" data-label-open="Open menu" data-label-close="Close menu"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Features</a></li>
+      <li><a href="#stats">Statistics</a></li>
       <li><a href="#scoreboard">TV scoreboard</a></li>
+      <li><a href="#video">Videos</a></li>
       <li><a href="#wristbands">Wristbands</a></li>
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#download">Download</a></li>
@@ -276,7 +286,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Free and open source · GPL-3.0 licence</div>
       <h1>Your tennis score, <em>like a real Pro.</em></h1>
-      <p class="lead">The Android app that keeps the score by the ITF rules and calls it out loud like a chair umpire. Score from the phone or from two Bluetooth wristbands, and show the result live on a TV.</p>
+      <p class="lead">The Android app that keeps the tennis and padel score by the ITF rules and calls it out loud like a chair umpire. Score from the phone, from two wristbands or from two Bluetooth remotes; at the end you get statistics, a point-by-point log and, with the wristbands, your strokes too, and the result can go live on a TV. With a Bluetooth heart rate strap you also track heart rate and calories, in matches and in training.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Get the app</a>
         <a class="btn btn-ghost" href="#features">Explore the features <svg class="icon"><use href="#i-down"/></svg></a>
@@ -333,11 +343,91 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Six languages, everywhere</h3>
         <p>Italian, English, French, German, Spanish and Portuguese: the chosen language applies to the screens, the voice, the scoreboard and the wristbands.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Padel too</h3>
+        <p>Padel is scored like tennis: choose Padel and the app sets doubles and golden point for you. The summary and sharing say “Padel”. For club evenings there are Americano and Mexicano tournaments, 4 to 16 players, with automatic rounds and standings.</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Statistics and point by point</h3>
+        <p>At the end of the match, like on results websites: serve, return, break points, points in a row and a point-by-point log, for the whole match or set by set.</p>
+        <button class="more" data-open="d-stats">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Remotes for a few euros</h3>
+        <p>Instead of wristbands, two Bluetooth selfie remotes (€1–3): one click wins the point, a double click undoes it. No firmware to upload.</p>
+        <button class="more" data-open="d-remote">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div>
+        <h3>Heart rate and calories</h3>
+        <p>With a Bluetooth chest strap (Coospo, Magene, Polar, Garmin…) you see each player's heart rate live and, after the match, average, maximum, calories, chart and heart rate zones.</p>
+        <button class="more" data-open="d-heart">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Workouts and progress</h3>
+        <p>Work out with the strap even without a match: laps, pauses, a recovery minute, HRV, CSV and PDF. Progress compares workouts and matches over time and tells you if you are improving.</p>
+        <button class="more" data-open="d-train">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div>
+        <h3>Second phone at the far end</h3>
+        <p>Straps and wristbands reach a few metres less than the length of the court: a second phone at the other end acts as a bridge, with its own network and no data lost.</p>
+        <button class="more" data-open="d-second">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Recognizes your strokes</h3>
+        <p>With firmware 2.4 the wristband tells the wearer's forehand, backhand, serve and volley apart after a short calibration. At the end you get each player's strokes, wrist speed and how many strokes each rally lasts.</p>
+        <button class="more" data-open="d-ble">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-video"/></svg></div>
+        <h3>Videos, highlights and replay</h3>
+        <p>A second phone on a tripod films the match with the score on top, live too. Watch every point again, let the app edit the highlights with the final statistics and, on a disputed point, ask for the replay.</p>
+        <button class="more" data-open="d-video">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Your club, in one app</h3>
+        <p>Members and fees, court planner, club and federation tournaments, teams, tennis school and notices, also from a PC browser. With an optional server, players book courts online.</p>
+        <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Statistics</div>
+        <h2>The match in numbers</h2>
+        <p>At the end the summary has three tabs: Summary, Statistics and Point by point. Everything comes from the points you score, so it works without wristbands too.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Serve and return<small>Service and return points and games won, break points saved and won, with bars comparing the two players.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Whole match or one set<small>Total points and games, points in a row, last 10 points, match points saved: for the whole match or set by set.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Point by point<small>Game by game: who serves, lost serves and the score after every point, with break points, set points and match points highlighted.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>History and players<small>Every finished match stays on the phone: reopen it with its summary and see wins, losses and head to head for each player. Matches saved on another phone can be imported. History and suspended matches also move to another phone with a QR code, on the same Wi-Fi network. Each player can have a photo, on the TV scoreboard too.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>With wristbands, strokes too<small>Each player's forehands, backhands, serves and volleys, wrist speed and how many strokes each rally lasts.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>PDF, photos and progress<small>The full summary becomes a PDF with statistics, point-by-point log and up to 10 photos of the match. In the history you see each player's trend, and in Progress whether you are improving.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, double faults, first serves, winners and unforced or forced errors are there if you turn on detailed statistics; with wristbands or remotes the app can ask how the point ended, if you like.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="End-of-match statistics: serve, return and break points of the two players compared"><span>Statistics</span></button></li>
+          <li><button class="shot"><img src="../img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Point-by-point log of the first set, with the server, lost serves and break points"><span>Point by point</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">TV scoreboard</div>
@@ -363,6 +453,26 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
+<section id="video" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Videos</div>
+        <h2>The match like on TV</h2>
+        <p>The camera phone receives the score from the umpire and puts it on the video. After the match the app pulls out the best of it.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Recording and live<small>Video in the gallery with one chapter per point, or live on YouTube, Twitch or Facebook.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Point by point<small>Watch any point, game or set again; with the coach filters, only the points you need. Videos shot with another camera too, scoring the points while watching.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Automatic highlights<small>The best points, in the length you choose, closed by the match statistics like in broadcasts: player photo or portrait and background music.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Replay<small>The disputed point from the start, in slow motion too, on the umpire's phone and on the scoreboard.</small></div></li>
+        </ul>
+        <button class="more" data-open="d-video" style="margin-top:20px">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="media"><div class="tv"><img src="../img/highlights-statistiche.jpg" width="1280" height="720" loading="lazy" alt="Statistics screen at the end of the highlights: Rossi and Bianchi at the sides, serve and break points in the middle"></div></div>
+    </div>
+  </div>
+</section>
+
 <section id="wristbands">
   <div class="wrap">
     <div class="split">
@@ -376,6 +486,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Battery under control<small>The app shows the charge and estimates how long it lasts; at the end of the match it switches the wristbands off.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Ready in a moment<small>Switch the wristbands on and the app finds them by itself; «Identify» tells you which is which.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Free firmware<small>The Arduino code is in the repository: install it with the Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Recognizes your strokes<small>With firmware 2.4 it tells forehand, backhand, serve and volley apart after a short calibration: stroke statistics end up in the summary.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Wristband firmware</a></p>
       </div>
@@ -406,12 +517,19 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <ul class="gallery">
       <li><button class="shot"><img src="../img/inizio.jpg" width="540" height="1152" loading="lazy" alt="Match start screen with team names and format"><span>Match start</span></button></li>
       <li><button class="shot"><img src="../img/partita.jpg" width="720" height="1537" loading="lazy" alt="Match screen with score and clocks"><span>During play</span></button></li>
-      <li><button class="shot"><img src="../img/formato.jpg" width="540" height="1152" loading="lazy" alt="Choice of format: three sets or two sets with match tie-break, No-Ad and coin toss"><span>Format and coin toss</span></button></li>
-      <li><button class="shot"><img src="../img/lingue-en.jpg" width="540" height="1152" loading="lazy" alt="Umpire or wristband mode and choice of six languages"><span>Mode and language</span></button></li>
+      <li><button class="shot"><img src="../img/formato.jpg" width="540" height="1152" loading="lazy" alt="Match rules: match tie-break, games per set, tie-break, No-Ad and coin toss"><span>Format and coin toss</span></button></li>
+      <li><button class="shot"><img src="../img/lingue-en.jpg" width="540" height="1152" loading="lazy" alt="Choice of six languages and of the umpire voice"><span>Language and voice</span></button></li>
       <li><button class="shot"><img src="../img/voci.jpg" width="540" height="1152" loading="lazy" alt="List of installed text-to-speech voices available offline"><span>Umpire voice</span></button></li>
       <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Wristband connection with Bluetooth and battery status"><span>Wristbands</span></button></li>
       <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Address and QR code to open the scoreboard on another device"><span>Connect the scoreboard</span></button></li>
       <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="End-of-match summary with winner, score, duration and place"><span>Final summary</span></button></li>
+      <li><button class="shot"><img src="../img/padel.jpg" width="540" height="1152" loading="lazy" alt="Choosing the sport: tennis or padel, with doubles and golden point already set"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Remotes mode: each player wins the point with a Bluetooth selfie remote"><span>Remotes</span></button></li>
+      <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="End-of-match statistics: serve, return and break points of the two players compared"><span>Statistics</span></button></li>
+      <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Stroke recognition: calibrating forehand, backhand, serve and volley on the wristband"><span>Stroke recognition</span></button></li>
+      <li><button class="shot"><img src="../img/fasce.jpg" width="540" height="1152" loading="lazy" alt="Heart rate strap connected with heart rate, signal and battery, plus age and weight for calories"><span>Heart rate straps</span></button></li>
+      <li><button class="shot"><img src="../img/battito.jpg" width="540" height="1152" loading="lazy" alt="End-of-match statistics: average and maximum heart rate, calories, heart rate chart and time in heart rate zones"><span>Heart rate in a match</span></button></li>
+      <li><button class="shot"><img src="../img/allenamento.jpg" width="540" height="1152" loading="lazy" alt="Summary of a workout with the strap: duration, heart rate, calories, HRV, recovery and chart"><span>Workout</span></button></li>
     </ul>
   </div>
 </section>
@@ -421,7 +539,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Download</div>
       <h2>Free, open, no surprises</h2>
-      <p>No account, no ads, no data sent to external servers.</p>
+      <p>No ads, no tracking. Your data stays on the phone; the club server is optional and run by the club itself.</p>
     </div>
     <div class="get">
       <div class="panel hl">
@@ -433,13 +551,14 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requirements and permissions</h3>
         <dl class="req">
           <dt>System</dt><dd>Android 8.0 or later</dd>
-          <dt>Version</dt><dd>2.4.3</dd>
+          <dt>Version</dt><dd>2.6.0</dd>
           <dt>Licence</dt><dd>GNU GPL v3 or later</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Only for the wristbands.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>For wristbands and heart rate straps, and to connect the second phone. Remotes are paired from the phone's Bluetooth settings.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Location<small>Optional: the place of the court in the summary. Up to Android 11 it is also needed for the Bluetooth search.</small></div></li>
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Network<small>Only for the scoreboard on the local network.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Network<small>Scoreboard and second phone on the local network. Internet only for what you turn on: live video, club server, movement analysis model.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Camera and microphone<small>Optional: QR codes, match photos and video.</small></div></li>
         </ul>
       </div>
     </div>
@@ -473,12 +592,13 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-itf">ITF rules</h3></div>
     <p>The score follows the ITF rules: no more remembering who serves or when to change ends.</p>
     <ul>
-      <li><strong>Two formats:</strong> best of three sets with a tie-break to 7 at 6-6, or two sets and, at one set all, a 10-point match tie-break.</li>
+      <li><strong>Formats:</strong> best of three or five sets, two sets and a 10-point match tie-break at one set all, pro set to 8 or 10 games, match tie-break only; sets to 6 or 4 games (short sets), with or without tie-break.</li>
       <li><strong>Singles and doubles,</strong> with the team's serving order chosen at every set.</li>
       <li><strong>No-Ad:</strong> if you like, a single deciding point is played at deuce.</li>
       <li><strong>Coin toss and sides of the court</strong> are set before you start; the app tells you at every change of ends.</li>
       <li><strong>Safe undo:</strong> the match is stored as a sequence of points and recomputed at every undo, so server, side and score are always exact, even when you undo several points in a row.</li>
       <li><strong>Match messages:</strong> break point, set point, match point and deciding point appear on the phone and on the scoreboard, along with tie-breaks and changes of ends.</li>
+      <li><strong>Padel:</strong> scored like tennis; choosing Padel sets doubles and golden point (at 40-40 a single point decides the game); the FIP star point is also available (at most two advantages, then a deciding point).</li>
     </ul>
   </div>
 </dialog>
@@ -494,6 +614,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Pre-generated audio files:</strong> the app prepares every call in advance, for a more natural reading that is fully offline.</li>
       <li><strong>Your own recordings:</strong> record the phrases with your voice (or an umpire's) and import them as a ZIP file; they always take precedence.</li>
     </ul>
+    <p>The voice comes from the phone or from any connected Bluetooth speaker or headphones: a speaker so the whole court can hear it, headphones to hear it yourself without disturbing the courts next to you. On many phones the audio can play on two devices at once (on Samsung, tick both under “Media output”): a pair of earbuds for each player, or a speaker for the court and headphones for whoever keeps score.</p>
     <div class="note"><strong>Six languages:</strong> Italian, English, French, German, Spanish and Portuguese. The chosen language applies at once to the screens, the voice, the TV scoreboard and the wristband display.</div>
   </div>
 </dialog>
@@ -526,8 +647,119 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Settings from the phone:</strong> name (up to 12 characters, stored in the wristband), brightness, how long the score stays on the display, buzzer volume, flipped display for the other wrist and automatic power-off. One tap copies them to the other wristband.</li>
       <li><strong>Automatic search:</strong> switch the wristbands on and the app finds and pairs them by itself. «Identify» flashes the one you pick, «Swap P1 ↔ P2» swaps the players without pairing again, and the match can also start with KEY1.</li>
       <li><strong>Phone in your pocket:</strong> even with the screen off, the app keeps receiving the points, calling them out and updating the scoreboard.</li>
+      <li><strong>Stroke recognition</strong> (firmware 2.4): after a short calibration the wristband tells the wearer's forehand, backhand, serve and volley apart; the summary shows strokes by type, wrist speed and strokes per point. The motion sensor uses about 1 mA more.</li>
     </ul>
     <div class="note">The firmware is free software (GPL-3.0) and is installed with the Arduino IDE: code and instructions are in the <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">repository</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Statistics and point by point</h3></div>
+    <p>The end-of-match summary has three tabs.</p>
+    <ul>
+      <li><strong>Summary:</strong> result, duration, place, points and games won and, with 2.4 wristbands, strokes, wrist speed and strokes per point.</li>
+      <li><strong>Statistics:</strong> for the match or one set, the two players compared with bars: service and return points and games, break points saved and won, total points and games, points in a row, last 10 points, match points saved.</li>
+      <li><strong>Point by point:</strong> set by set, every game with the server, lost serves and the score after each point, with break points, set points and match points highlighted.</li>
+    </ul>
+    <div class="note">Aces, double faults, first serves, winners and errors are there if you turn on <strong>Detailed stats</strong>: instead of the two big buttons you get Ace, Fault and, for each player, Winner, Error and Point. It is meant for someone scoring from the side of the court.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Bluetooth remotes</h3></div>
+    <p>The cheapest way to let the players score: two Bluetooth selfie remotes, €1–3 each.</p>
+    <ul>
+      <li>Pair them in the phone's Bluetooth settings, like a keyboard.</li>
+      <li>Choose the <strong>Remotes</strong> mode and assign each remote to its player with a single press.</li>
+      <li><strong>One click</strong> wins the point; a <strong>double click</strong> or a <strong>long press</strong> undoes it, with the same safeguards as the wristbands. On two-button remotes, the button you press when assigning wins the point and the other one undoes it with a single click.</li>
+      <li>During the match the app stays open with the screen on: the keys of a Bluetooth keyboard only reach the visible app.</li>
+    </ul>
+    <div class="note">No firmware and no permissions: Android sees them as a keyboard.</div>
+  </div>
+</dialog>
+
+<dialog id="d-heart" aria-labelledby="t-heart" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div><h3 id="t-heart">Bluetooth heart rate straps</h3></div>
+    <p>Heart rate and calories from chest straps that use the standard Bluetooth heart rate service: Coospo (tested with the H6), Magene, Polar, Garmin, Wahoo… One per player, in any mode, even without wristbands.</p>
+    <ul>
+      <li><strong>Ready in a moment:</strong> wet the electrodes and put it on, it switches on by itself; you pick it in the app only once.</li>
+      <li><strong>Live:</strong> during the match a row shows each player's heart rate.</li>
+      <li><strong>After the match:</strong> average and maximum heart rate, calories, a chart over time and time in heart rate zones; pauses don't count.</li>
+      <li><strong>Calories and zones:</strong> with the wearer's age, weight and sex (Keytel formula, typical error ±20%; maximum heart rate estimated as 208 − 0.7 × age).</li>
+      <li><strong>Signal under control:</strong> the app shows the signal strength and how many times the heart rate didn't arrive.</li>
+    </ul>
+    <div class="note"><strong>Range:</strong> a strap reaches about 20 metres from the phone, less with your back to it. In singles the far player is 24-30 metres away: with a second phone at the far end nothing is lost.</div>
+  </div>
+</dialog>
+
+<dialog id="d-train" aria-labelledby="t-train" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-train">Workouts and progress</h3></div>
+    <p>From the first page, <strong>Workout</strong> records a workout with the strap, even without a match.</p>
+    <ul>
+      <li><strong>Laps and pauses:</strong> “Lap” closes one part (a sprint, a drill, a lap of the track) and starts the next; pauses don't count.</li>
+      <li><strong>Recovery:</strong> at the end the app records one more minute to measure how far your heart rate drops.</li>
+      <li><strong>Summary:</strong> duration, average and maximum heart rate, calories, HRV (RMSSD), recovery, chart, heart rate zones and the figures of each lap; second-by-second CSV and a PDF to share.</li>
+      <li><strong>Progress:</strong> for workouts and for the matches of a player in the history it compares the first and second half of the period: ▲ if you improve, ▼ if you get worse. Share it as a PDF or print it.</li>
+    </ul>
+    <div class="note">Compare HRV and recovery with your own similar workouts, not with other people's.</div>
+  </div>
+</dialog>
+
+<dialog id="d-second" aria-labelledby="t-second" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div><h3 id="t-second">Second phone at the far end</h3></div>
+    <p>Straps and wristbands connect to one phone at a time and reach a few metres less than the length of the court. With a second phone at the other end every player always has one close by.</p>
+    <ul>
+      <li><strong>Connects with a QR code:</strong> the main phone creates its own local-only network: no SIM, data or club Wi-Fi needed.</li>
+      <li><strong>Nothing to pick:</strong> the second phone follows the straps and wristbands chosen on the main one by itself.</li>
+      <li><strong>Automatic change of ends:</strong> each strap and wristband moves to the nearest phone by itself.</li>
+      <li><strong>No data lost:</strong> heart rate and strokes passed on by the second phone wait for the main phone's confirmation and, if the network drops, fill the gaps as soon as it is back.</li>
+      <li><strong>Scoreboard too:</strong> the second phone can show the match scoreboard full screen.</li>
+    </ul>
+    <div class="note">The main phone keeps the match: score, voice and summary stay there.</div>
+  </div>
+</dialog>
+
+<dialog id="d-video" aria-labelledby="t-video" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-video"/></svg></div><h3 id="t-video">Videos, highlights and replay</h3></div>
+    <p>With a second phone acting as a camera, linked to the umpire's phone with a QR code, the match becomes a video with the score on top.</p>
+    <ul>
+      <li><strong>Camera phone:</strong> records in 1080p with the score graphics, or goes live over RTMP to YouTube, Twitch, Facebook or your own server.</li>
+      <li><strong>Point-by-point video:</strong> one chapter per point, to watch again by point, game or set; the chapters can also be copied for YouTube.</li>
+      <li><strong>Imported videos:</strong> even a video shot with another camera: you score the points while watching and the score works itself out.</li>
+      <li><strong>Coach filters:</strong> only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points.</li>
+      <li><strong>Highlights:</strong> aces, winners, break points, set and match points and long rallies in the order you choose, for 1-15 minutes or any length you like. At the end, the match statistics with player photo or portrait, tournament and rankings, and music with a fade.</li>
+      <li><strong>Replay:</strong> on a disputed point the umpire asks the camera for it and watches it in slow motion too, frame by frame; on the TV scoreboard as well, if you like.</li>
+    </ul>
+    <div class="note">The statistics music is <em>Nowhere Land</em> by Kevin MacLeod (incompetech.com), CC BY 4.0 licence: if you publish the video, credit it. You can also pick a track of your own.</div>
+  </div>
+</dialog>
+
+<dialog id="d-club" aria-labelledby="t-club" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Club and online booking</h3></div>
+    <p>In the Club role the app becomes the club office: data stays on the phone and you turn on only the features you use.</p>
+    <ul>
+      <li><strong>Members and fees:</strong> memberships, medical certificate expiry, recorded payments and non-tax receipts, CSV export.</li>
+      <li><strong>Court planner:</strong> day, week and month views, repeat bookings, prices, opening hours and usage statistics.</li>
+      <li><strong>Tournaments and teams:</strong> club and federation tournaments with draws and groups, team leagues, challenge ladder: matches are played with the scorer.</li>
+      <li><strong>Tennis school and notices:</strong> courses, students, attendance and fees; notices by WhatsApp, Telegram, SMS or email.</li>
+      <li><strong>Club office on a PC:</strong> run the club from a computer browser, with the data still on the phone.</li>
+      <li><strong>Optional server:</strong> on a Raspberry Pi or USB stick: online booking from the app or the web page, iPhone included, waiting list, partner search, reminders, notice board and member chat.</li>
+    </ul>
+    <div class="note">The server belongs to the club, with no subscription. Tailscale or DuckDNS can make it reachable from the internet. Without a server the app works just the same.</div>
   </div>
 </dialog>
 
