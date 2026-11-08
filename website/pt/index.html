@@ -306,7 +306,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Recursos</div>
       <h2>Tudo o que você precisa na quadra</h2>
-      <p>Feito para partidas de verdade, mesmo sem árbitro: toque em quem ganhou o ponto e o app cuida do resto.</p>
+      <p>Feito para partidas de verdade, mesmo sem árbitro: toque em quem ganhou o ponto e o app cuida do resto. Escolha seu papel, Você, Treinador ou Clube, e fique só com as funções que usa; em muitas telas o «?» abre o guia na hora.</p>
     </div>
     <div class="cards">
       <article class="card">
@@ -377,6 +377,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Segundo telefone no fundo da quadra</h3>
         <p>Cintas e pulseiras alcançam alguns metros a menos que o comprimento da quadra: um segundo telefone no outro fundo faz a ponte, com rede própria e sem perder dados.</p>
         <button class="more" data-open="d-second">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Para treinadores</h3>
+        <p>Alunos com ficha e anotações, exercícios guiados, análise do movimento com o esqueleto no vídeo e um relatório para enviar ao aluno.</p>
+        <button class="more" data-open="d-coach">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Arbitragem completa</h3>
+        <p>Desistência e W.O., violações de conduta e de tempo, desqualificação, pausas, aquecimento e troca de bolas, como em uma partida com árbitro.</p>
+        <button class="more" data-open="d-umpire">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Rating, raquetes e objetivos</h3>
+        <p>Rating TSM a partir das suas partidas, raquetes e cordas comparadas, objetivos, calendário, «O meu ano» e backup automático.</p>
+        <button class="more" data-open="d-goals">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
@@ -760,6 +778,57 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Servidor opcional:</strong> em Raspberry Pi ou pen drive: reservas online pelo app ou pela página web, também no iPhone, lista de espera, busca de parceiro, lembretes, mural e chat entre sócios.</li>
     </ul>
     <div class="note">O servidor é do clube, sem assinatura. Com Tailscale ou DuckDNS ele pode ser acessado pela internet. Sem servidor, o app funciona do mesmo jeito.</div>
+  </div>
+</dialog>
+
+<dialog id="d-coach" aria-labelledby="t-coach" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div><h3 id="t-coach">Treinador e alunos</h3></div>
+    <p>No papel Treinador, o app acompanha cada aluno: sessões, vídeos e medidas ficam no celular.</p>
+    <ul>
+      <li><strong>Alunos:</strong> ficha com golpes, movimento, partidas, rating, raquete e anotações do treinador.</li>
+      <li><strong>Treino de golpes:</strong> saque, forehand, backhand e voleio, com o celular no tripé e a pulseira no punho.</li>
+      <li><strong>Exercícios guiados:</strong> um golpe e seus passos em ordem; a voz anuncia o próximo passo.</li>
+      <li><strong>Análise do movimento:</strong> o corpo reconhecido nos clipes, o esqueleto no vídeo em câmera lenta e as medidas dos momentos-chave.</li>
+      <li><strong>Comparação:</strong> dois golpes lado a lado, com o esqueleto, para ver o que muda.</li>
+      <li><strong>Relatório para o aluno:</strong> PDF completo ou imagem para enviar pelo WhatsApp.</li>
+    </ul>
+    <div class="note">O modelo de análise (MoveNet, 7 MB) é baixado uma única vez, a pedido; depois tudo acontece no celular e os clipes não saem dele. As medidas são estimativas: servem principalmente para comparar os golpes ao longo do tempo.</div>
+  </div>
+</dialog>
+
+<dialog id="d-umpire" aria-labelledby="t-umpire" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-umpire">Arbitragem completa</h3></div>
+    <p>O botão Árbitro reúne o que é preciso quando a partida não corre bem.</p>
+    <ul>
+      <li><strong>Desistência e W.O.:</strong> a desistência encerra a partida com o placar do momento; antes do primeiro ponto vira W.O.</li>
+      <li><strong>Penalizações e desqualificação:</strong> violações de conduta e de tempo, mostrando a consequência antes de confirmar.</li>
+      <li><strong>Pausas:</strong> tempo médico de 3 minutos, banheiro ou troca de roupa de 5, aquecimento de 5 antes do primeiro ponto.</li>
+      <li><strong>Troca de bolas:</strong> nos intervalos que você escolher, com animação no celular e no placar da TV.</li>
+      <li><strong>Correções:</strong> corrija quem serve e os lados; com Definir o placar você retoma uma partida iniciada sem o app.</li>
+    </ul>
+    <div class="note">Os pontos inseridos com Definir o placar não entram nas estatísticas.</div>
+  </div>
+</dialog>
+
+<dialog id="d-goals" aria-labelledby="t-goals" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-goals">Rating, raquetes e objetivos</h3></div>
+    <p>Tudo calculado no celular a partir das suas partidas, sem conta.</p>
+    <ul>
+      <li><strong>Rating TSM:</strong> sobe quando você vence, mais contra quem tem rating alto; com classificação e evolução.</li>
+      <li><strong>Raquetes:</strong> cada raquete com suas cordas, horas de jogo e sensações; comparação entre raquetes ou tensões.</li>
+      <li><strong>Objetivos:</strong> uma meta e uma barra que se enche com as médias das suas últimas partidas.</li>
+      <li><strong>O meu ano:</strong> partidas, vitórias, rival e meses mais ativos em uma imagem para compartilhar.</li>
+      <li><strong>Calendário:</strong> partidas e treinos mês a mês, e há quantas semanas seguidas você joga.</li>
+      <li><strong>Como da última vez:</strong> mesmos jogadores, quadra e regras, e direto para o sorteio.</li>
+      <li><strong>Backup:</strong> um arquivo ZIP com todos os dados e uma cópia automática todo dia, sem vídeos.</li>
+    </ul>
+    <div class="note">As 5 últimas cópias automáticas ficam em Documentos mesmo se você desinstalar o app.</div>
   </div>
 </dialog>
 

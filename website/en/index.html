@@ -306,7 +306,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Features</div>
       <h2>Everything you need on court</h2>
-      <p>Made for real matches, even without an umpire: tap who won the point and the app does the rest.</p>
+      <p>Made for real matches, even without an umpire: tap who won the point and the app does the rest. Pick your role, You, Coach or Club, and keep only the features you use; on many screens the «?» opens the guide straight away.</p>
     </div>
     <div class="cards">
       <article class="card">
@@ -377,6 +377,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Second phone at the far end</h3>
         <p>Straps and wristbands reach a few metres less than the length of the court: a second phone at the other end acts as a bridge, with its own network and no data lost.</p>
         <button class="more" data-open="d-second">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>For coaches</h3>
+        <p>Students with profile and notes, guided drills, movement analysis with the skeleton on the video and a report to send to the student.</p>
+        <button class="more" data-open="d-coach">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Full umpire tools</h3>
+        <p>Retirement and walkover, code and time violations, disqualification, breaks, warm-up and ball changes, as in an umpired match.</p>
+        <button class="more" data-open="d-umpire">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Rating, rackets and goals</h3>
+        <p>TSM rating from your matches, rackets and strings compared, goals, calendar, «My year» and automatic backup.</p>
+        <button class="more" data-open="d-goals">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
@@ -760,6 +778,57 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Optional server:</strong> on a Raspberry Pi or USB stick: online booking from the app or the web page, iPhone included, waiting list, partner search, reminders, notice board and member chat.</li>
     </ul>
     <div class="note">The server belongs to the club, with no subscription. Tailscale or DuckDNS can make it reachable from the internet. Without a server the app works just the same.</div>
+  </div>
+</dialog>
+
+<dialog id="d-coach" aria-labelledby="t-coach" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div><h3 id="t-coach">Coach and students</h3></div>
+    <p>In the Coach role the app follows each student: sessions, videos and measurements stay on the phone.</p>
+    <ul>
+      <li><strong>Students:</strong> a profile with strokes, movement, matches, rating, racket and coach's notes.</li>
+      <li><strong>Stroke practice:</strong> serve, forehand, backhand and volley, with the phone on a tripod and the wristband on.</li>
+      <li><strong>Guided drills:</strong> a stroke and its steps in order; the voice announces the next step.</li>
+      <li><strong>Movement analysis:</strong> the body recognised in the clips, the skeleton on the slow-motion video and measurements of the key moments.</li>
+      <li><strong>Comparison:</strong> two shots side by side, with the skeleton, to see what changes.</li>
+      <li><strong>Report for the student:</strong> a full PDF or an image to send on WhatsApp.</li>
+    </ul>
+    <div class="note">The analysis model (MoveNet, 7 MB) is downloaded once, on request; after that the work is done on the phone and the clips never leave it. The measurements are estimates: they are mostly useful for comparing strokes over time.</div>
+  </div>
+</dialog>
+
+<dialog id="d-umpire" aria-labelledby="t-umpire" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-umpire">Full umpire tools</h3></div>
+    <p>The Umpire button gathers what you need when a match doesn't run smoothly.</p>
+    <ul>
+      <li><strong>Retirement and walkover:</strong> retiring ends the match at the current score; before the first point it becomes a walkover.</li>
+      <li><strong>Penalties and disqualification:</strong> code and time violations, showing the consequence before you confirm.</li>
+      <li><strong>Breaks:</strong> 3-minute medical timeout, 5 minutes for toilet or change of attire, 5-minute warm-up before the first point.</li>
+      <li><strong>Ball change:</strong> at the intervals you choose, with an animation on the phone and the TV scoreboard.</li>
+      <li><strong>Corrections:</strong> fix who serves and the ends; with Set the score you can pick up a match started without the app.</li>
+    </ul>
+    <div class="note">Points entered with Set the score do not count in the statistics.</div>
+  </div>
+</dialog>
+
+<dialog id="d-goals" aria-labelledby="t-goals" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-goals">Rating, rackets and goals</h3></div>
+    <p>All calculated on the phone from your matches, with no account.</p>
+    <ul>
+      <li><strong>TSM rating:</strong> goes up when you win, more against higher-rated players; with a ranking and trend over time.</li>
+      <li><strong>Rackets:</strong> each racket with its strings, hours played and feel; compare rackets or tensions.</li>
+      <li><strong>Goals:</strong> a target and a bar that fills up with the averages of your latest matches.</li>
+      <li><strong>My year:</strong> matches, wins, rival and busiest months in an image to share.</li>
+      <li><strong>Calendar:</strong> matches and workouts month by month, and how many weeks in a row you have played.</li>
+      <li><strong>Like last time:</strong> same players, court and rules, straight to the coin toss.</li>
+      <li><strong>Backup:</strong> a ZIP file with all your data and an automatic copy every day, without videos.</li>
+    </ul>
+    <div class="note">The latest 5 automatic copies stay in Documents even if you uninstall the app.</div>
   </div>
 </dialog>
 

@@ -306,7 +306,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Funktionen</div>
       <h2>Alles, was du auf dem Platz brauchst</h2>
-      <p>Gemacht für echte Matches, auch ohne Schiedsrichter: Tippe an, wer den Punkt gewonnen hat – den Rest erledigt die App.</p>
+      <p>Gemacht für echte Matches, auch ohne Schiedsrichter: Tippe an, wer den Punkt gewonnen hat – den Rest erledigt die App. Wähle deine Rolle, Du, Trainer oder Verein, und behalte nur die Funktionen, die du nutzt; auf vielen Bildschirmen öffnet das «?» sofort die Anleitung.</p>
     </div>
     <div class="cards">
       <article class="card">
@@ -377,6 +377,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Zweites Telefon an der Grundlinie</h3>
         <p>Gurte und Armbänder reichen ein paar Meter weniger weit als der Platz lang ist: Ein zweites Telefon am anderen Ende dient als Brücke, mit eigenem Netz und ohne Datenverlust.</p>
         <button class="more" data-open="d-second">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Für Trainer</h3>
+        <p>Schüler mit Profil und Notizen, geführte Übungen, Bewegungsanalyse mit dem Skelett im Video und ein Bericht für den Schüler.</p>
+        <button class="more" data-open="d-coach">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Komplette Schiedsrichter-Werkzeuge</h3>
+        <p>Aufgabe und Walkover, Verhaltens- und Zeitverstöße, Disqualifikation, Pausen, Einspielen und Ballwechsel, wie in einem Match mit Schiedsrichter.</p>
+        <button class="more" data-open="d-umpire">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Wertung, Schläger und Ziele</h3>
+        <p>TSM-Wertung aus deinen Matches, Schläger und Saiten im Vergleich, Ziele, Kalender, «Mein Jahr» und automatische Sicherung.</p>
+        <button class="more" data-open="d-goals">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
@@ -760,6 +778,57 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Optionaler Server:</strong> auf Raspberry Pi oder USB-Stick: Online-Buchung per App oder Webseite, auch auf dem iPhone, Warteliste, Partnersuche, Erinnerungen, Schwarzes Brett und Mitglieder-Chat.</li>
     </ul>
     <div class="note">Der Server gehört dem Verein, ohne Abo. Über Tailscale oder DuckDNS ist er aus dem Internet erreichbar. Ohne Server funktioniert die App genauso.</div>
+  </div>
+</dialog>
+
+<dialog id="d-coach" aria-labelledby="t-coach" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div><h3 id="t-coach">Trainer und Schüler</h3></div>
+    <p>In der Rolle Trainer begleitet die App jeden Schüler: Einheiten, Videos und Messwerte bleiben auf dem Handy.</p>
+    <ul>
+      <li><strong>Schüler:</strong> Profil mit Schlägen, Bewegung, Matches, Wertung, Schläger und Notizen des Trainers.</li>
+      <li><strong>Schlagtraining:</strong> Aufschlag, Vorhand, Rückhand und Volley, mit dem Handy auf dem Stativ und dem Armband am Handgelenk.</li>
+      <li><strong>Geführte Übungen:</strong> ein Schlag und seine Schritte der Reihe nach; die Stimme sagt den nächsten Schritt an.</li>
+      <li><strong>Bewegungsanalyse:</strong> der Körper wird in den Clips erkannt, mit dem Skelett im Zeitlupenvideo und Messwerten der Schlüsselmomente.</li>
+      <li><strong>Vergleich:</strong> zwei Schläge nebeneinander, mit dem Skelett, um zu sehen, was sich ändert.</li>
+      <li><strong>Bericht für den Schüler:</strong> vollständiges PDF oder Bild für WhatsApp.</li>
+    </ul>
+    <div class="note">Das Analysemodell (MoveNet, 7 MB) wird einmal auf Wunsch geladen; danach läuft alles auf dem Handy, und die Clips verlassen es nicht. Die Messwerte sind Schätzungen: Sie dienen vor allem dem Vergleich der Schläge über die Zeit.</div>
+  </div>
+</dialog>
+
+<dialog id="d-umpire" aria-labelledby="t-umpire" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-umpire">Komplette Schiedsrichter-Werkzeuge</h3></div>
+    <p>Die Taste Schiri bündelt alles, was nötig ist, wenn ein Match nicht glatt läuft.</p>
+    <ul>
+      <li><strong>Aufgabe und Walkover:</strong> die Aufgabe beendet das Match beim aktuellen Stand; vor dem ersten Punkt wird daraus ein Walkover.</li>
+      <li><strong>Strafen und Disqualifikation:</strong> Verhaltens- und Zeitverstöße, mit Anzeige der Folge vor dem Bestätigen.</li>
+      <li><strong>Pausen:</strong> Medical Timeout von 3 Minuten, Toilette oder Kleiderwechsel von 5 Minuten, Einspielen von 5 Minuten vor dem ersten Punkt.</li>
+      <li><strong>Ballwechsel:</strong> in den gewählten Abständen, mit Animation auf Handy und TV-Anzeigetafel.</li>
+      <li><strong>Korrekturen:</strong> Aufschläger und Seiten korrigieren; mit Spielstand setzen ein ohne die App begonnenes Match fortführen.</li>
+    </ul>
+    <div class="note">Mit Spielstand setzen eingetragene Punkte zählen nicht in den Statistiken.</div>
+  </div>
+</dialog>
+
+<dialog id="d-goals" aria-labelledby="t-goals" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-goals">Wertung, Schläger und Ziele</h3></div>
+    <p>Alles wird auf dem Handy aus deinen Matches berechnet, ohne Konto.</p>
+    <ul>
+      <li><strong>TSM-Wertung:</strong> steigt bei Siegen, stärker gegen besser bewertete Gegner; mit Rangliste und Verlauf.</li>
+      <li><strong>Schläger:</strong> jeder Schläger mit Saiten, Spielstunden und Spielgefühl; Vergleich von Schlägern oder Spannungen.</li>
+      <li><strong>Ziele:</strong> ein Ziel und ein Balken, der sich mit den Durchschnitten deiner letzten Matches füllt.</li>
+      <li><strong>Mein Jahr:</strong> Matches, Siege, Rivale und aktivste Monate in einem Bild zum Teilen.</li>
+      <li><strong>Kalender:</strong> Matches und Training Monat für Monat und wie viele Wochen du schon in Folge spielst.</li>
+      <li><strong>Wie beim letzten Mal:</strong> gleiche Spieler, gleicher Platz, gleiche Regeln und direkt zur Platzwahl.</li>
+      <li><strong>Sicherung:</strong> eine ZIP-Datei mit allen Daten und täglich eine automatische Kopie ohne Videos.</li>
+    </ul>
+    <div class="note">Die letzten 5 automatischen Kopien bleiben in Dokumente, auch wenn du die App deinstallierst.</div>
   </div>
 </dialog>
 
