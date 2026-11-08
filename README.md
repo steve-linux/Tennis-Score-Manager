@@ -18,7 +18,7 @@ App Android per tenere il punteggio del tennis secondo le regole ITF, con chiama
 | `deliver/installa_tsm.sh` | Tutto il progetto come blocchi `cat` (alternativa al clone), rigenerabile con `make_installer.py` |
 | `deliver/FDROID.md` | Come pubblicare l'app su F-Droid |
 | `fastlane/metadata/android/` | Testi e icona della scheda di F-Droid, nelle sei lingue |
-| `website/` | Sito [tennis-score-manager.netlify.app](https://tennis-score-manager.netlify.app/) in sei lingue: pagine statiche, nessuna build. Netlify lo pubblica da GitHub (`netlify.toml`): `main` è il sito ufficiale, gli altri rami sono anteprime |
+| `website/` | Sito [tennis-score-manager.netlify.app](https://tennis-score-manager.netlify.app/) in sei lingue: pagine statiche, nessuna build. Netlify lo pubblica da `main` solo quando lo si chiede: `bash deliver/pubblica_sito.sh` (o un commit con `[sito]` nel messaggio); i commit normali e le anteprime si saltano (`netlify.toml`) |
 
 ## Avvio rapido
 
