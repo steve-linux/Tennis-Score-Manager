@@ -427,6 +427,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Soci e quote, planning dei campi, tornei sociali e FITP, squadre, scuola tennis e avvisi, anche dal browser del PC. Con un server facoltativo i giocatori prenotano il campo online.</p>
         <button class="more" data-open="d-club">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Prenota il campo, trova il compagno</h3>
+        <p>Se il circolo usa il server, i giocatori prenotano dall'app o dal web, anche su iPhone, si mettono in lista d'attesa, cercano un compagno e si parlano in chat.</p>
+        <button class="more" data-open="d-book">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -767,6 +773,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Con un secondo telefono che fa da telecamera, collegato a quello dell'arbitro con un QR, la partita diventa un video col punteggio sopra.</p>
     <ul>
       <li><strong>Telefono-telecamera:</strong> registra in 1080p con la grafica del punteggio, o va in diretta RTMP su YouTube, Twitch, Facebook o un server tuo.</li>
+      <li><strong>Assistente inquadratura:</strong> dici distanza, altezza e campo, e l'app indica come inclinare il telefono; la sagoma del campo aiuta a metterlo a posto.</li>
       <li><strong>Video punto per punto:</strong> un capitolo per ogni punto, da rivedere per punto, game o set; i capitoli si copiano anche per YouTube.</li>
       <li><strong>Video importati:</strong> anche un video fatto con un'altra fotocamera: i punti si segnano guardandolo e il punteggio si calcola da solo.</li>
       <li><strong>Filtri da allenatore:</strong> solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point.</li>
@@ -783,9 +790,10 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Circolo e prenotazioni online</h3></div>
     <p>Nel ruolo Circolo l'app diventa la segreteria: i dati stanno sul telefono e accendi solo le funzioni che usi.</p>
     <ul>
+      <li><strong>Oggi:</strong> la prima pagina della segreteria: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno.</li>
       <li><strong>Soci e quote:</strong> tessere, scadenza del certificato medico, pagamenti registrati e ricevute non fiscali, esportazione CSV.</li>
       <li><strong>Planning dei campi:</strong> vista per giorno, settimana e mese, prenotazioni ripetute, prezzi, orari e statistiche di utilizzo.</li>
-      <li><strong>Tornei e squadre:</strong> tornei sociali e FITP con tabellone e gironi, campionati a squadre, classifica a sfida: le partite si giocano col segnapunti.</li>
+      <li><strong>Tornei e squadre:</strong> tornei sociali e FITP con tabellone e gironi, campionati a squadre, classifica a sfida: le partite si giocano col segnapunti. Il tabellone del torneo va anche sul tabellone TV.</li>
       <li><strong>Scuola tennis e avvisi:</strong> corsi, allievi, presenze e quote; avvisi via WhatsApp, Telegram, SMS o email.</li>
       <li><strong>Segreteria da PC:</strong> il circolo si gestisce dal browser del computer, con i dati sempre sul telefono.</li>
       <li><strong>Server facoltativo:</strong> su Raspberry Pi o chiavetta USB: prenotazioni online dall'app o dalla pagina web anche su iPhone, lista d'attesa, Cerco compagno, promemoria, bacheca e chat tra soci.</li>
@@ -842,6 +850,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Backup:</strong> un file ZIP con tutti i dati e una copia automatica ogni giorno, senza video.</li>
     </ul>
     <div class="note">Le ultime 5 copie automatiche restano in Documenti anche se disinstalli l'app.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Prenota il campo, trova il compagno</h3></div>
+    <p>Per i giocatori dei circoli che usano il server: si entra con l'invito della segreteria.</p>
+    <ul>
+      <li><strong>Prenota:</strong> scegli il giorno e tocca una casella libera, dall'app Android o dalla pagina web anche su iPhone; disdici finché sei in tempo.</li>
+      <li><strong>Numero e PIN:</strong> rientri da solo se cambi telefono, e nell'app puoi seguire più circoli.</li>
+      <li><strong>Lista d'attesa:</strong> su una casella occupata, «Avvisami se si libera»: arriva l'avviso e vince chi prenota per primo.</li>
+      <li><strong>Cerco compagno:</strong> pubblichi un annuncio con giorno, fascia oraria e livello; al completo il server prenota da solo il primo campo libero.</li>
+      <li><strong>Chat:</strong> la chat del circolo e quella di ogni annuncio; messaggi privati solo con chi li accetta, con Blocca e Segnala.</li>
+      <li><strong>Bacheca del circolo:</strong> gli avvisi della segreteria, con una notifica.</li>
+      <li><strong>Promemoria:</strong> un avviso prima dell'orario e se la segreteria toglie la prenotazione.</li>
+    </ul>
+    <div class="note">Queste funzioni ci sono solo se il circolo usa il server. La segreteria modera le chat.</div>
   </div>
 </dialog>
 

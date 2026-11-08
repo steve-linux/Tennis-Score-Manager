@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Members and fees, court planner, club and federation tournaments, teams, tennis school and notices, also from a PC browser. With an optional server, players book courts online.</p>
         <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Book a court, find a partner</h3>
+        <p>If the club runs the server, players book from the app or the web, iPhone included, join waiting lists, look for a partner and chat.</p>
+        <button class="more" data-open="d-book">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -754,6 +760,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>With a second phone acting as a camera, linked to the umpire's phone with a QR code, the match becomes a video with the score on top.</p>
     <ul>
       <li><strong>Camera phone:</strong> records in 1080p with the score graphics, or goes live over RTMP to YouTube, Twitch, Facebook or your own server.</li>
+      <li><strong>Framing assistant:</strong> enter distance, height and court, and the app tells you how to tilt the phone; the court outline helps you line it up.</li>
       <li><strong>Point-by-point video:</strong> one chapter per point, to watch again by point, game or set; the chapters can also be copied for YouTube.</li>
       <li><strong>Imported videos:</strong> even a video shot with another camera: you score the points while watching and the score works itself out.</li>
       <li><strong>Coach filters:</strong> only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points.</li>
@@ -770,9 +777,10 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Club and online booking</h3></div>
     <p>In the Club role the app becomes the club office: data stays on the phone and you turn on only the features you use.</p>
     <ul>
+      <li><strong>Today:</strong> the club office's first page: who is playing, what to collect, members to sort out, the day's matches and lessons.</li>
       <li><strong>Members and fees:</strong> memberships, medical certificate expiry, recorded payments and non-tax receipts, CSV export.</li>
       <li><strong>Court planner:</strong> day, week and month views, repeat bookings, prices, opening hours and usage statistics.</li>
-      <li><strong>Tournaments and teams:</strong> club and federation tournaments with draws and groups, team leagues, challenge ladder: matches are played with the scorer.</li>
+      <li><strong>Tournaments and teams:</strong> club and federation tournaments with draws and groups, team leagues, challenge ladder: matches are played with the scorer. The tournament draw can also go on the TV scoreboard.</li>
       <li><strong>Tennis school and notices:</strong> courses, students, attendance and fees; notices by WhatsApp, Telegram, SMS or email.</li>
       <li><strong>Club office on a PC:</strong> run the club from a computer browser, with the data still on the phone.</li>
       <li><strong>Optional server:</strong> on a Raspberry Pi or USB stick: online booking from the app or the web page, iPhone included, waiting list, partner search, reminders, notice board and member chat.</li>
@@ -829,6 +837,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Backup:</strong> a ZIP file with all your data and an automatic copy every day, without videos.</li>
     </ul>
     <div class="note">The latest 5 automatic copies stay in Documents even if you uninstall the app.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Book a court, find a partner</h3></div>
+    <p>For players at clubs that run the server: you join with an invitation from the club office.</p>
+    <ul>
+      <li><strong>Book:</strong> pick the day and tap a free slot, from the Android app or the web page, iPhone included; cancel while there is still time.</li>
+      <li><strong>Number and PIN:</strong> get back in on your own if you change phone, and follow several clubs in the app.</li>
+      <li><strong>Waiting list:</strong> on a taken slot, «Tell me if it frees up»: you get an alert and the first to book wins.</li>
+      <li><strong>Looking for a partner:</strong> post a day, time slot and level; once full, the server books the first free court by itself.</li>
+      <li><strong>Chat:</strong> the club chat and one for each post; private messages only with those who accept them, with Block and Report.</li>
+      <li><strong>Club notice board:</strong> notices from the club office, with a notification.</li>
+      <li><strong>Reminders:</strong> an alert before your slot and if the club office removes the booking.</li>
+    </ul>
+    <div class="note">These features exist only if the club runs the server. The club office moderates the chats.</div>
   </div>
 </dialog>
 

@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Mitglieder und Beiträge, Platzplan, Vereins- und Verbandsturniere, Teams, Tennisschule und Mitteilungen, auch im PC-Browser. Mit einem optionalen Server buchen die Spieler ihren Platz online.</p>
         <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Platz buchen, Partner finden</h3>
+        <p>Nutzt der Verein den Server, buchen die Spieler per App oder im Web, auch auf dem iPhone, tragen sich in Wartelisten ein, suchen Partner und chatten.</p>
+        <button class="more" data-open="d-book">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -754,6 +760,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Mit einem zweiten Telefon als Kamera, per QR-Code mit dem des Schiedsrichters verbunden, wird das Match zu einem Video mit eingeblendetem Spielstand.</p>
     <ul>
       <li><strong>Kamera-Telefon:</strong> nimmt in 1080p mit Spielstand-Einblendung auf oder sendet per RTMP live zu YouTube, Twitch, Facebook oder einem eigenen Server.</li>
+      <li><strong>Bildassistent:</strong> Abstand, Höhe und Platz eingeben, und die App sagt, wie das Handy zu neigen ist; die Platzkontur hilft beim Ausrichten.</li>
       <li><strong>Video Punkt für Punkt:</strong> ein Kapitel pro Punkt, nach Punkt, Spiel oder Satz anzusehen; die Kapitel lassen sich auch für YouTube kopieren.</li>
       <li><strong>Importierte Videos:</strong> auch ein Video einer anderen Kamera: Die Punkte zählst du beim Ansehen, der Spielstand ergibt sich von selbst.</li>
       <li><strong>Trainerfilter:</strong> nur die Punkte eines Spielers, gewonnen oder verloren, bei Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen.</li>
@@ -770,9 +777,10 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Verein und Online-Buchung</h3></div>
     <p>In der Rolle Verein wird die App zum Vereinsbüro: Die Daten bleiben auf dem Handy, und du schaltest nur die Funktionen ein, die du brauchst.</p>
     <ul>
+      <li><strong>Heute:</strong> die Startseite des Vereinsbüros: wer spielt, was zu kassieren ist, offene Punkte bei Mitgliedern, Matches und Stunden des Tages.</li>
       <li><strong>Mitglieder und Beiträge:</strong> Mitgliedschaften, Ablauf des ärztlichen Attests, erfasste Zahlungen und Quittungen, CSV-Export.</li>
       <li><strong>Platzplan:</strong> Tages-, Wochen- und Monatsansicht, Serienbuchungen, Preise, Öffnungszeiten und Nutzungsstatistik.</li>
-      <li><strong>Turniere und Teams:</strong> Vereins- und Verbandsturniere mit Tableau und Gruppen, Mannschaftsligen, Forderungsrangliste: Die Matches laufen über den Punktezähler.</li>
+      <li><strong>Turniere und Teams:</strong> Vereins- und Verbandsturniere mit Tableau und Gruppen, Mannschaftsligen, Forderungsrangliste: Die Matches laufen über den Punktezähler. Das Turniertableau lässt sich auch auf der TV-Anzeigetafel zeigen.</li>
       <li><strong>Tennisschule und Mitteilungen:</strong> Kurse, Schüler, Anwesenheit und Beiträge; Mitteilungen per WhatsApp, Telegram, SMS oder E-Mail.</li>
       <li><strong>Vereinsbüro am PC:</strong> Der Verein lässt sich im Browser am Computer verwalten, die Daten bleiben auf dem Handy.</li>
       <li><strong>Optionaler Server:</strong> auf Raspberry Pi oder USB-Stick: Online-Buchung per App oder Webseite, auch auf dem iPhone, Warteliste, Partnersuche, Erinnerungen, Schwarzes Brett und Mitglieder-Chat.</li>
@@ -829,6 +837,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Sicherung:</strong> eine ZIP-Datei mit allen Daten und täglich eine automatische Kopie ohne Videos.</li>
     </ul>
     <div class="note">Die letzten 5 automatischen Kopien bleiben in Dokumente, auch wenn du die App deinstallierst.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Platz buchen, Partner finden</h3></div>
+    <p>Für Spieler von Vereinen mit Server: Der Zugang erfolgt über die Einladung des Vereinsbüros.</p>
+    <ul>
+      <li><strong>Buchen:</strong> Tag wählen und freies Feld antippen, in der Android-App oder auf der Webseite, auch auf dem iPhone; stornieren, solange es noch geht.</li>
+      <li><strong>Nummer und PIN:</strong> du kommst nach einem Handywechsel selbst wieder hinein und kannst in der App mehreren Vereinen folgen.</li>
+      <li><strong>Warteliste:</strong> bei einem belegten Feld «Benachrichtigen, wenn frei»: Du wirst benachrichtigt, und wer zuerst bucht, bekommt den Platz.</li>
+      <li><strong>Partner gesucht:</strong> Anzeige mit Tag, Zeitfenster und Niveau; ist sie voll, bucht der Server selbst den ersten freien Platz.</li>
+      <li><strong>Chat:</strong> der Vereinschat und einer pro Anzeige; private Nachrichten nur mit denen, die sie zulassen, mit Blockieren und Melden.</li>
+      <li><strong>Vereinsbrett:</strong> Mitteilungen des Vereinsbüros, mit Benachrichtigung.</li>
+      <li><strong>Erinnerungen:</strong> ein Hinweis vor dem Termin und wenn das Vereinsbüro die Buchung entfernt.</li>
+    </ul>
+    <div class="note">Diese Funktionen gibt es nur, wenn der Verein den Server nutzt. Das Vereinsbüro moderiert die Chats.</div>
   </div>
 </dialog>
 

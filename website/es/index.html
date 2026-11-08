@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Socios y cuotas, planning de pistas, torneos sociales y federados, equipos, escuela de tenis y avisos, también desde el navegador del PC. Con un servidor opcional, los jugadores reservan pista en línea.</p>
         <button class="more" data-open="d-club">Detalles <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Reserva pista, encuentra compañero</h3>
+        <p>Si el club usa el servidor, los jugadores reservan desde la app o la web, también en iPhone, se apuntan a listas de espera, buscan compañero y chatean.</p>
+        <button class="more" data-open="d-book">Detalles <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -754,6 +760,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Con un segundo teléfono que hace de cámara, conectado al del árbitro con un QR, el partido se convierte en un vídeo con el marcador encima.</p>
     <ul>
       <li><strong>Teléfono-cámara:</strong> graba en 1080p con el gráfico del marcador, o emite en directo por RTMP en YouTube, Twitch, Facebook o un servidor tuyo.</li>
+      <li><strong>Asistente de encuadre:</strong> indicas distancia, altura y pista, y la app dice cómo inclinar el teléfono; la silueta de la pista ayuda a colocarlo.</li>
       <li><strong>Vídeo punto a punto:</strong> un capítulo por punto, para ver por punto, juego o set; los capítulos también se copian para YouTube.</li>
       <li><strong>Vídeos importados:</strong> incluso un vídeo hecho con otra cámara: los puntos se marcan al verlo y el marcador se calcula solo.</li>
       <li><strong>Filtros de entrenador:</strong> solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o de set y de partido.</li>
@@ -770,9 +777,10 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Club y reservas en línea</h3></div>
     <p>Con el rol Club la app se convierte en la secretaría: los datos se quedan en el teléfono y activas solo las funciones que usas.</p>
     <ul>
+      <li><strong>Hoy:</strong> la primera página de la secretaría: quién juega, qué cobrar, socios pendientes, partidos y clases del día.</li>
       <li><strong>Socios y cuotas:</strong> licencias, caducidad del certificado médico, pagos registrados y recibos no fiscales, exportación CSV.</li>
       <li><strong>Planning de pistas:</strong> vistas por día, semana y mes, reservas periódicas, precios, horarios y estadísticas de uso.</li>
-      <li><strong>Torneos y equipos:</strong> torneos sociales y federados con cuadros y grupos, ligas por equipos, clasificación por desafíos: los partidos se juegan con el marcador.</li>
+      <li><strong>Torneos y equipos:</strong> torneos sociales y federados con cuadros y grupos, ligas por equipos, clasificación por desafíos: los partidos se juegan con el marcador. El cuadro del torneo también puede verse en el marcador de TV.</li>
       <li><strong>Escuela de tenis y avisos:</strong> cursos, alumnos, asistencia y cuotas; avisos por WhatsApp, Telegram, SMS o correo.</li>
       <li><strong>Secretaría desde el PC:</strong> el club se gestiona desde el navegador del ordenador, con los datos siempre en el teléfono.</li>
       <li><strong>Servidor opcional:</strong> en Raspberry Pi o memoria USB: reservas en línea desde la app o la página web, también en iPhone, lista de espera, busco compañero, recordatorios, tablón y chat entre socios.</li>
@@ -829,6 +837,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Copia de seguridad:</strong> un archivo ZIP con todos los datos y una copia automática cada día, sin vídeos.</li>
     </ul>
     <div class="note">Las 5 últimas copias automáticas se quedan en Documentos aunque desinstales la app.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Cerrar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Reserva pista, encuentra compañero</h3></div>
+    <p>Para los jugadores de clubes que usan el servidor: se entra con la invitación de la secretaría.</p>
+    <ul>
+      <li><strong>Reservar:</strong> elige el día y toca una casilla libre, desde la app Android o la página web, también en iPhone; cancela mientras estés a tiempo.</li>
+      <li><strong>Número y PIN:</strong> vuelves a entrar por tu cuenta si cambias de teléfono, y en la app puedes seguir varios clubes.</li>
+      <li><strong>Lista de espera:</strong> en una casilla ocupada, «Avísame si se libera»: llega el aviso y gana quien reserva primero.</li>
+      <li><strong>Busco compañero:</strong> publica un anuncio con día, franja horaria y nivel; al completarse, el servidor reserva solo la primera pista libre.</li>
+      <li><strong>Chat:</strong> el chat del club y el de cada anuncio; mensajes privados solo con quien los acepta, con Bloquear y Señalar.</li>
+      <li><strong>Tablón del club:</strong> los avisos de la secretaría, con una notificación.</li>
+      <li><strong>Recordatorios:</strong> un aviso antes de la hora y si la secretaría retira la reserva.</li>
+    </ul>
+    <div class="note">Estas funciones solo existen si el club usa el servidor. La secretaría modera los chats.</div>
   </div>
 </dialog>
 

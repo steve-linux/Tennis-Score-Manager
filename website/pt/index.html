@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Sócios e mensalidades, agenda de quadras, torneios internos e federados, equipes, escola de tênis e avisos, também no navegador do PC. Com um servidor opcional, os jogadores reservam a quadra online.</p>
         <button class="more" data-open="d-club">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Reserve a quadra, encontre um parceiro</h3>
+        <p>Se o clube usa o servidor, os jogadores reservam pelo app ou pela web, também no iPhone, entram em listas de espera, procuram parceiro e conversam no chat.</p>
+        <button class="more" data-open="d-book">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -754,6 +760,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Com um segundo telefone servindo de câmera, ligado ao do árbitro por um QR, a partida vira um vídeo com o placar por cima.</p>
     <ul>
       <li><strong>Telefone-câmera:</strong> grava em 1080p com o gráfico do placar, ou transmite ao vivo por RTMP no YouTube, Twitch, Facebook ou num servidor seu.</li>
+      <li><strong>Assistente de enquadramento:</strong> informe distância, altura e quadra, e o app diz como inclinar o celular; o contorno da quadra ajuda a posicioná-lo.</li>
       <li><strong>Vídeo ponto a ponto:</strong> um capítulo por ponto, para rever por ponto, game ou set; os capítulos também podem ser copiados para o YouTube.</li>
       <li><strong>Vídeos importados:</strong> até um vídeo feito com outra câmera: os pontos são marcados assistindo e o placar se calcula sozinho.</li>
       <li><strong>Filtros do treinador:</strong> só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points.</li>
@@ -770,9 +777,10 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Clube e reservas online</h3></div>
     <p>No papel Clube, o app vira a secretaria: os dados ficam no celular e você ativa só as funções que usa.</p>
     <ul>
+      <li><strong>Hoje:</strong> a primeira página da secretaria: quem joga, o que cobrar, sócios pendentes, partidas e aulas do dia.</li>
       <li><strong>Sócios e mensalidades:</strong> carteirinhas, validade do atestado médico, pagamentos registrados e recibos não fiscais, exportação CSV.</li>
       <li><strong>Agenda de quadras:</strong> visão por dia, semana e mês, reservas recorrentes, preços, horários e estatísticas de uso.</li>
-      <li><strong>Torneios e equipes:</strong> torneios internos e federados com chaves e grupos, ligas por equipes, ranking de desafios: as partidas são jogadas com o marcador.</li>
+      <li><strong>Torneios e equipes:</strong> torneios internos e federados com chaves e grupos, ligas por equipes, ranking de desafios: as partidas são jogadas com o marcador. A chave do torneio também pode aparecer no placar da TV.</li>
       <li><strong>Escola de tênis e avisos:</strong> cursos, alunos, presenças e mensalidades; avisos por WhatsApp, Telegram, SMS ou e-mail.</li>
       <li><strong>Secretaria no PC:</strong> o clube é gerido pelo navegador do computador, com os dados sempre no celular.</li>
       <li><strong>Servidor opcional:</strong> em Raspberry Pi ou pen drive: reservas online pelo app ou pela página web, também no iPhone, lista de espera, busca de parceiro, lembretes, mural e chat entre sócios.</li>
@@ -829,6 +837,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Backup:</strong> um arquivo ZIP com todos os dados e uma cópia automática todo dia, sem vídeos.</li>
     </ul>
     <div class="note">As 5 últimas cópias automáticas ficam em Documentos mesmo se você desinstalar o app.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Reserve a quadra, encontre um parceiro</h3></div>
+    <p>Para jogadores de clubes que usam o servidor: entra-se com o convite da secretaria.</p>
+    <ul>
+      <li><strong>Reservar:</strong> escolha o dia e toque em um horário livre, pelo app Android ou pela página web, também no iPhone; cancele enquanto houver tempo.</li>
+      <li><strong>Número e PIN:</strong> você volta sozinho se trocar de celular, e no app pode seguir vários clubes.</li>
+      <li><strong>Lista de espera:</strong> em um horário ocupado, «Avisa-me se ficar livre»: chega o aviso e vence quem reservar primeiro.</li>
+      <li><strong>Procuro parceiro:</strong> publique um anúncio com dia, faixa de horário e nível; ao completar, o servidor reserva sozinho a primeira quadra livre.</li>
+      <li><strong>Chat:</strong> o chat do clube e o de cada anúncio; mensagens privadas só com quem as aceita, com Bloquear e Assinalar.</li>
+      <li><strong>Mural do clube:</strong> os avisos da secretaria, com uma notificação.</li>
+      <li><strong>Lembretes:</strong> um aviso antes do horário e se a secretaria retirar a reserva.</li>
+    </ul>
+    <div class="note">Estas funções só existem se o clube usa o servidor. A secretaria modera os chats.</div>
   </div>
 </dialog>
 
