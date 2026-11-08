@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Members and fees, court planner, club and federation tournaments, teams, tennis school and notices, also from a PC browser. With an optional server, players book courts online.</p>
         <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>The club office on your computer</h3>
+        <p>Members, fees, planner and tournaments with keyboard and mouse: a computer on the same network opens the club office in the browser, with nothing to install and the data always on the phone.</p>
+        <button class="more" data-open="d-desk">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide">
         <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
         <h3>Book a court, find a partner</h3>
@@ -855,6 +861,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Reminders:</strong> an alert before your slot and if the club office removes the booking.</li>
     </ul>
     <div class="note">These features exist only if the club runs the server. The club office moderates the chats.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">The club office on your computer</h3></div>
+    <p>Entering members and payments is easier on a computer: Windows, Mac or Linux open a page in the browser, served by the phone.</p>
+    <ul>
+      <li><strong>Nothing to install:</strong> all you need is a computer on the same network as the phone; the club server is not required.</li>
+      <li><strong>Data stays on the phone:</strong> the computer sees and edits it while connected, and keeps no copies.</li>
+      <li><strong>Today and members:</strong> the day on one page; members with printing, CSV and import from Excel.</li>
+      <li><strong>Fees and planner:</strong> payments and PDF receipts; planner by day, week and month.</li>
+      <li><strong>The whole club:</strong> tournaments, tennis school, teams, statistics, settings and online booking.</li>
+      <li><strong>Backup:</strong> a single file to download to the PC, and an automatic copy every day.</li>
+      <li><strong>Security:</strong> encrypted connection, access by QR or code confirmed on the phone, one computer at a time, local network only.</li>
+    </ul>
+    <div class="note">The phone must stay on and on the same network. The first time, the browser warns that the connection is not private: this is normal, because the certificate is created by the phone.</div>
   </div>
 </dialog>
 

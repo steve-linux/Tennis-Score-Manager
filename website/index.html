@@ -427,6 +427,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Soci e quote, planning dei campi, tornei sociali e FITP, squadre, scuola tennis e avvisi, anche dal browser del PC. Con un server facoltativo i giocatori prenotano il campo online.</p>
         <button class="more" data-open="d-club">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>La segreteria dal computer</h3>
+        <p>Soci, quote, planning e tornei con tastiera e mouse: un computer sulla stessa rete apre la segreteria nel browser, senza installare niente e con i dati sempre sul telefono.</p>
+        <button class="more" data-open="d-desk">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide">
         <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
         <h3>Prenota il campo, trova il compagno</h3>
@@ -868,6 +874,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Promemoria:</strong> un avviso prima dell'orario e se la segreteria toglie la prenotazione.</li>
     </ul>
     <div class="note">Queste funzioni ci sono solo se il circolo usa il server. La segreteria modera le chat.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">La segreteria dal computer</h3></div>
+    <p>Inserire soci e pagamenti è più comodo al computer: Windows, Mac o Linux aprono nel browser una pagina servita dal telefono.</p>
+    <ul>
+      <li><strong>Senza installare niente:</strong> basta un computer sulla stessa rete del telefono; non serve il server del circolo.</li>
+      <li><strong>I dati restano sul telefono:</strong> il computer li vede e li modifica finché è collegato, e non ne tiene copie.</li>
+      <li><strong>Oggi e soci:</strong> la giornata in una pagina; soci con stampa, CSV e importazione da Excel.</li>
+      <li><strong>Quote e planning:</strong> pagamenti e ricevute in PDF; planning per giorno, settimana e mese.</li>
+      <li><strong>Tutto il circolo:</strong> tornei, scuola tennis, squadre, statistiche, impostazioni e prenotazioni online.</li>
+      <li><strong>Backup:</strong> un unico file da scaricare sul PC, e una copia automatica al giorno.</li>
+      <li><strong>Sicurezza:</strong> collegamento cifrato, accesso con QR o codice confermato sul telefono, un solo computer alla volta, solo in rete locale.</li>
+    </ul>
+    <div class="note">Il telefono deve restare acceso e sulla stessa rete. Al primo accesso il browser avvisa che la connessione non è privata: è normale, perché il certificato lo crea il telefono.</div>
   </div>
 </dialog>
 

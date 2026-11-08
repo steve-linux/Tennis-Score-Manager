@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Mitglieder und Beiträge, Platzplan, Vereins- und Verbandsturniere, Teams, Tennisschule und Mitteilungen, auch im PC-Browser. Mit einem optionalen Server buchen die Spieler ihren Platz online.</p>
         <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>Das Vereinsbüro am Computer</h3>
+        <p>Mitglieder, Beiträge, Platzplan und Turniere mit Tastatur und Maus: Ein Computer im selben Netz öffnet das Vereinsbüro im Browser, ohne Installation und mit den Daten immer auf dem Handy.</p>
+        <button class="more" data-open="d-desk">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide">
         <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
         <h3>Platz buchen, Partner finden</h3>
@@ -855,6 +861,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Erinnerungen:</strong> ein Hinweis vor dem Termin und wenn das Vereinsbüro die Buchung entfernt.</li>
     </ul>
     <div class="note">Diese Funktionen gibt es nur, wenn der Verein den Server nutzt. Das Vereinsbüro moderiert die Chats.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">Das Vereinsbüro am Computer</h3></div>
+    <p>Mitglieder und Zahlungen lassen sich am Computer bequemer erfassen: Windows, Mac oder Linux öffnen im Browser eine Seite, die das Handy bereitstellt.</p>
+    <ul>
+      <li><strong>Keine Installation:</strong> es genügt ein Computer im selben Netz wie das Handy; der Vereinsserver ist nicht nötig.</li>
+      <li><strong>Die Daten bleiben auf dem Handy:</strong> der Computer sieht und ändert sie, solange er verbunden ist, und behält keine Kopien.</li>
+      <li><strong>Heute und Mitglieder:</strong> der Tag auf einer Seite; Mitglieder mit Druck, CSV und Import aus Excel.</li>
+      <li><strong>Beiträge und Platzplan:</strong> Zahlungen und Quittungen als PDF; Platzplan nach Tag, Woche und Monat.</li>
+      <li><strong>Der ganze Verein:</strong> Turniere, Tennisschule, Teams, Statistiken, Einstellungen und Online-Buchung.</li>
+      <li><strong>Sicherung:</strong> eine einzige Datei zum Herunterladen auf den PC und täglich eine automatische Kopie.</li>
+      <li><strong>Sicherheit:</strong> verschlüsselte Verbindung, Zugang per QR oder Code mit Bestätigung am Handy, immer nur ein Computer, nur im lokalen Netz.</li>
+    </ul>
+    <div class="note">Das Handy muss eingeschaltet und im selben Netz bleiben. Beim ersten Mal warnt der Browser, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat erstellt das Handy.</div>
   </div>
 </dialog>
 

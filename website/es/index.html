@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Socios y cuotas, planning de pistas, torneos sociales y federados, equipos, escuela de tenis y avisos, también desde el navegador del PC. Con un servidor opcional, los jugadores reservan pista en línea.</p>
         <button class="more" data-open="d-club">Detalles <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>La secretaría desde el ordenador</h3>
+        <p>Socios, cuotas, planning y torneos con teclado y ratón: un ordenador en la misma red abre la secretaría en el navegador, sin instalar nada y con los datos siempre en el teléfono.</p>
+        <button class="more" data-open="d-desk">Detalles <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide">
         <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
         <h3>Reserva pista, encuentra compañero</h3>
@@ -855,6 +861,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Recordatorios:</strong> un aviso antes de la hora y si la secretaría retira la reserva.</li>
     </ul>
     <div class="note">Estas funciones solo existen si el club usa el servidor. La secretaría modera los chats.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Cerrar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">La secretaría desde el ordenador</h3></div>
+    <p>Introducir socios y pagos es más cómodo en el ordenador: Windows, Mac o Linux abren en el navegador una página servida por el teléfono.</p>
+    <ul>
+      <li><strong>Sin instalar nada:</strong> basta un ordenador en la misma red que el teléfono; no hace falta el servidor del club.</li>
+      <li><strong>Los datos se quedan en el teléfono:</strong> el ordenador los ve y los modifica mientras está conectado, y no guarda copias.</li>
+      <li><strong>Hoy y socios:</strong> el día en una página; socios con impresión, CSV e importación desde Excel.</li>
+      <li><strong>Cuotas y planning:</strong> pagos y recibos en PDF; planning por día, semana y mes.</li>
+      <li><strong>Todo el club:</strong> torneos, escuela de tenis, equipos, estadísticas, ajustes y reservas en línea.</li>
+      <li><strong>Copia de seguridad:</strong> un único archivo para descargar en el PC, y una copia automática cada día.</li>
+      <li><strong>Seguridad:</strong> conexión cifrada, acceso con QR o código confirmado en el teléfono, un solo ordenador a la vez, solo en red local.</li>
+    </ul>
+    <div class="note">El teléfono debe seguir encendido y en la misma red. La primera vez, el navegador avisa de que la conexión no es privada: es normal, porque el certificado lo crea el teléfono.</div>
   </div>
 </dialog>
 

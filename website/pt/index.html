@@ -414,6 +414,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Sócios e mensalidades, agenda de quadras, torneios internos e federados, equipes, escola de tênis e avisos, também no navegador do PC. Com um servidor opcional, os jogadores reservam a quadra online.</p>
         <button class="more" data-open="d-club">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>A secretaria no computador</h3>
+        <p>Sócios, mensalidades, agenda e torneios com teclado e mouse: um computador na mesma rede abre a secretaria no navegador, sem instalar nada e com os dados sempre no celular.</p>
+        <button class="more" data-open="d-desk">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide">
         <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
         <h3>Reserve a quadra, encontre um parceiro</h3>
@@ -855,6 +861,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Lembretes:</strong> um aviso antes do horário e se a secretaria retirar a reserva.</li>
     </ul>
     <div class="note">Estas funções só existem se o clube usa o servidor. A secretaria modera os chats.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">A secretaria no computador</h3></div>
+    <p>Lançar sócios e pagamentos é mais prático no computador: Windows, Mac ou Linux abrem no navegador uma página servida pelo celular.</p>
+    <ul>
+      <li><strong>Sem instalar nada:</strong> basta um computador na mesma rede do celular; o servidor do clube não é necessário.</li>
+      <li><strong>Os dados ficam no celular:</strong> o computador os vê e altera enquanto está conectado, e não guarda cópias.</li>
+      <li><strong>Hoje e sócios:</strong> o dia em uma página; sócios com impressão, CSV e importação do Excel.</li>
+      <li><strong>Mensalidades e agenda:</strong> pagamentos e recibos em PDF; agenda por dia, semana e mês.</li>
+      <li><strong>O clube inteiro:</strong> torneios, escola de tênis, equipes, estatísticas, configurações e reservas online.</li>
+      <li><strong>Backup:</strong> um único arquivo para baixar no PC, e uma cópia automática por dia.</li>
+      <li><strong>Segurança:</strong> conexão criptografada, acesso com QR ou código confirmado no celular, um computador por vez, só na rede local.</li>
+    </ul>
+    <div class="note">O celular precisa ficar ligado e na mesma rede. Na primeira vez, o navegador avisa que a conexão não é privada: é normal, porque o certificado é criado pelo celular.</div>
   </div>
 </dialog>
 
