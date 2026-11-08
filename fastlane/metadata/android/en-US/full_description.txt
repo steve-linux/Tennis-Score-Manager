@@ -13,5 +13,9 @@ Tennis Score Manager keeps the score of a tennis match by the ITF rules and call
 * End-of-match statistics, for the match or per set (serve, return, break points, points in a row…), and a point-by-point log with break points, set points and match points.
 * Detailed stats, for someone scoring from the side of the court: aces, double faults, first serves, winners and errors.
 * History on the phone: finished matches to reopen, players with wins, losses and head to head; matches saved (JSON) on another phone can be imported, also with a QR code on the same Wi-Fi. Player photos, on the TV scoreboard too.
+* You, Coach and Club roles, showing only the features you use: player database, rating, goals, students, drills, backup.
+* Heart rate straps, workouts and movement analysis. Camera phone: video with the score, RTMP live streaming, highlights and replay.
+* Club: members, fees and non-tax receipts, court planner, club and federation tournaments, teams, tennis school, notices; also from a PC browser.
+* Optional club server (Raspberry Pi or USB stick): online booking, waiting list, partner search, notice board and chat.
 
-No ads, no account, no tracking. The network is used only for the scoreboard and the transfer between phones, on the local network. The camera is used only to read the transfer QR code. Location is used for the place of the match in the summary and, as Android requires, for the Bluetooth search for the wristbands. The court address is looked up only if you turn on the option: it uses the phone's geocoding service, which with Google services sends the coordinates to Google.
+No ads and no tracking; you don't need an account to use the app. Your data stays on the phone. The internet is used only for what you turn on: live video, your club's server, the movement analysis model (downloaded on request from GitHub) and the court address (the phone's geocoder, which with Google services sends the coordinates to Google). Camera and microphone are for QR codes, photos and video. Location is for the match venue and, as Android requires, for Bluetooth scanning.

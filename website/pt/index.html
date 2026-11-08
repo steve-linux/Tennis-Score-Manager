@@ -390,6 +390,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Um segundo telefone num tripé filma a partida com o placar por cima, também ao vivo. Reveja cada ponto, deixe o app montar os melhores momentos com as estatísticas finais e, num ponto contestado, peça o replay.</p>
         <button class="more" data-open="d-video">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Seu clube em um app</h3>
+        <p>Sócios e mensalidades, agenda de quadras, torneios internos e federados, equipes, escola de tênis e avisos, também no navegador do PC. Com um servidor opcional, os jogadores reservam a quadra online.</p>
+        <button class="more" data-open="d-club">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -533,7 +539,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Baixar</div>
       <h2>Livre, gratuito, sem surpresas</h2>
-      <p>Sem conta, sem anúncios, nenhum dado enviado a servidores externos.</p>
+      <p>Sem anúncios e sem rastreamento. Os dados ficam no celular; o servidor do clube é opcional e administrado pelo próprio clube.</p>
     </div>
     <div class="get">
       <div class="panel hl">
@@ -545,13 +551,14 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requisitos e permissões</h3>
         <dl class="req">
           <dt>Sistema</dt><dd>Android 8.0 ou mais recente</dd>
-          <dt>Versão</dt><dd>2.5.0</dd>
+          <dt>Versão</dt><dd>2.6.0</dd>
           <dt>Licença</dt><dd>GNU GPL v3 ou posterior</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
           <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Para as pulseiras e as cintas cardíacas, e para conectar o segundo telefone. Os controles são pareados nos ajustes Bluetooth do telefone.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Localização<small>Opcional: o local da quadra no resumo. Até o Android 11 também é necessária para a busca Bluetooth.</small></div></li>
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Rede<small>Só para o placar na rede local.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Rede<small>Placar e segundo celular na rede local. Internet só para o que você ativar: vídeo ao vivo, servidor do clube, modelo de análise do movimento.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Câmera e microfone<small>Opcionais: QR, fotos e vídeos das partidas.</small></div></li>
         </ul>
       </div>
     </div>
@@ -736,6 +743,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Replay:</strong> num ponto contestado o árbitro pede à câmera e o vê também em câmera lenta, quadro a quadro; se quiser, também no placar da TV.</li>
     </ul>
     <div class="note">A música das estatísticas é <em>Nowhere Land</em> de Kevin MacLeod (incompetech.com), licença CC BY 4.0: se publicar o vídeo, dê o crédito. Você também pode escolher uma faixa sua.</div>
+  </div>
+</dialog>
+
+<dialog id="d-club" aria-labelledby="t-club" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Clube e reservas online</h3></div>
+    <p>No papel Clube, o app vira a secretaria: os dados ficam no celular e você ativa só as funções que usa.</p>
+    <ul>
+      <li><strong>Sócios e mensalidades:</strong> carteirinhas, validade do atestado médico, pagamentos registrados e recibos não fiscais, exportação CSV.</li>
+      <li><strong>Agenda de quadras:</strong> visão por dia, semana e mês, reservas recorrentes, preços, horários e estatísticas de uso.</li>
+      <li><strong>Torneios e equipes:</strong> torneios internos e federados com chaves e grupos, ligas por equipes, ranking de desafios: as partidas são jogadas com o marcador.</li>
+      <li><strong>Escola de tênis e avisos:</strong> cursos, alunos, presenças e mensalidades; avisos por WhatsApp, Telegram, SMS ou e-mail.</li>
+      <li><strong>Secretaria no PC:</strong> o clube é gerido pelo navegador do computador, com os dados sempre no celular.</li>
+      <li><strong>Servidor opcional:</strong> em Raspberry Pi ou pen drive: reservas online pelo app ou pela página web, também no iPhone, lista de espera, busca de parceiro, lembretes, mural e chat entre sócios.</li>
+    </ul>
+    <div class="note">O servidor é do clube, sem assinatura. Com Tailscale ou DuckDNS ele pode ser acessado pela internet. Sem servidor, o app funciona do mesmo jeito.</div>
   </div>
 </dialog>
 

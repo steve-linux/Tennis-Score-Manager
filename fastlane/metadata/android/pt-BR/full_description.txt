@@ -13,5 +13,9 @@ O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regra
 * Estatísticas de fim de partida, da partida ou por set (saque, devolução, break points, pontos seguidos…), e histórico ponto a ponto com break points, set points e match points.
 * Estatísticas detalhadas, para quem marca da beira da quadra: aces, duplas faltas, primeiros saques, winners e erros.
 * Histórico no telefone: partidas terminadas para reabrir, jogadores com vitórias, derrotas e confronto direto; dá para importar partidas salvas (JSON) em outro telefone, também com um código QR na mesma rede Wi-Fi. Fotos dos jogadores, também no placar da TV.
+* Papéis Você, Treinador e Clube, só com as funções que você usa: banco de jogadores, rating, metas, alunos, exercícios, backup.
+* Cintas cardíacas, treinos e análise do movimento. Celular-câmera: vídeo com placar, transmissão RTMP, melhores momentos e replay.
+* Clube: sócios, mensalidades e recibos não fiscais, agenda de quadras, torneios internos e federados, equipes, escola de tênis, avisos; também no navegador do PC.
+* Servidor do clube opcional (Raspberry Pi ou pen drive): reservas online, lista de espera, busca de parceiro, mural e chat.
 
-Sem anúncios, sem conta, sem rastreamento. A rede é usada só para o placar e a transferência entre telefones, na rede local. A câmera serve só para ler o código QR da transferência. A localização é usada para o local da partida no resumo e, como o Android exige, para a busca Bluetooth das pulseiras. O endereço da quadra só é buscado se você ativar a opção: ela usa o serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google.
+Sem anúncios e sem rastreamento; não é preciso conta para usar o app. Os dados ficam no celular. A internet só é usada para o que você ativar: vídeo ao vivo, o servidor do seu clube, o modelo de análise do movimento (baixado a pedido do GitHub) e o endereço da quadra (geocodificador do celular, que com os serviços do Google envia as coordenadas ao Google). Câmera e microfone servem para QR, fotos e vídeos. A localização serve para o local da partida e, como exige o Android, para a busca Bluetooth.

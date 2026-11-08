@@ -403,6 +403,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Un secondo telefono su un treppiede riprende la partita col punteggio sopra, anche in diretta. Rivedi ogni punto, monta da solo gli highlights con le statistiche finali e, sul punto contestato, chiedi la moviola.</p>
         <button class="more" data-open="d-video">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Il tuo circolo, in un'app</h3>
+        <p>Soci e quote, planning dei campi, tornei sociali e FITP, squadre, scuola tennis e avvisi, anche dal browser del PC. Con un server facoltativo i giocatori prenotano il campo online.</p>
+        <button class="more" data-open="d-club">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -546,7 +552,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Scarica</div>
       <h2>Libera, gratuita, senza sorprese</h2>
-      <p>Nessun account, nessuna pubblicità, nessun dato inviato a server esterni.</p>
+      <p>Nessuna pubblicità, nessun tracciamento. I dati restano sul telefono; il server del circolo è facoltativo e lo gestisce il circolo.</p>
     </div>
     <div class="get">
       <div class="panel hl">
@@ -558,13 +564,14 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requisiti e permessi</h3>
         <dl class="req">
           <dt>Sistema</dt><dd>Android 8.0 o successivo</dd>
-          <dt>Versione</dt><dd>2.5.0</dd>
+          <dt>Versione</dt><dd>2.6.0</dd>
           <dt>Licenza</dt><dd>GNU GPL v3 o successiva</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
           <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Per braccialetti e fasce cardio, e per collegare il secondo telefono. I telecomandi si accoppiano dalle impostazioni Bluetooth del telefono.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Posizione<small>Facoltativa: il luogo del campo nel riepilogo. Fino ad Android 11 serve anche alla ricerca Bluetooth.</small></div></li>
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Rete<small>Solo per il tabellone sulla rete locale.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Rete<small>Tabellone e secondo telefono sulla rete locale. Internet solo per ciò che attivi: diretta video, server del circolo, modello per l'analisi del movimento.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Fotocamera e microfono<small>Facoltativi: QR, foto e video delle partite.</small></div></li>
         </ul>
       </div>
     </div>
@@ -749,6 +756,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Moviola:</strong> sul punto contestato l'arbitro la chiede alla telecamera e la vede anche rallentata, fotogramma per fotogramma; se vuoi anche sul tabellone TV.</li>
     </ul>
     <div class="note">La musica delle statistiche è <em>Nowhere Land</em> di Kevin MacLeod (incompetech.com), licenza CC BY 4.0: se pubblichi il video, citalo. Puoi anche scegliere un brano tuo.</div>
+  </div>
+</dialog>
+
+<dialog id="d-club" aria-labelledby="t-club" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Circolo e prenotazioni online</h3></div>
+    <p>Nel ruolo Circolo l'app diventa la segreteria: i dati stanno sul telefono e accendi solo le funzioni che usi.</p>
+    <ul>
+      <li><strong>Soci e quote:</strong> tessere, scadenza del certificato medico, pagamenti registrati e ricevute non fiscali, esportazione CSV.</li>
+      <li><strong>Planning dei campi:</strong> vista per giorno, settimana e mese, prenotazioni ripetute, prezzi, orari e statistiche di utilizzo.</li>
+      <li><strong>Tornei e squadre:</strong> tornei sociali e FITP con tabellone e gironi, campionati a squadre, classifica a sfida: le partite si giocano col segnapunti.</li>
+      <li><strong>Scuola tennis e avvisi:</strong> corsi, allievi, presenze e quote; avvisi via WhatsApp, Telegram, SMS o email.</li>
+      <li><strong>Segreteria da PC:</strong> il circolo si gestisce dal browser del computer, con i dati sempre sul telefono.</li>
+      <li><strong>Server facoltativo:</strong> su Raspberry Pi o chiavetta USB: prenotazioni online dall'app o dalla pagina web anche su iPhone, lista d'attesa, Cerco compagno, promemoria, bacheca e chat tra soci.</li>
+    </ul>
+    <div class="note">Il server è del circolo, senza abbonamenti. Per raggiungerlo da internet si può usare Tailscale o DuckDNS. Senza server l'app funziona uguale.</div>
   </div>
 </dialog>
 

@@ -390,6 +390,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Un segundo teléfono en un trípode graba el partido con el marcador encima, también en directo. Vuelve a ver cada punto, deja que la app monte las mejores jugadas con las estadísticas finales y, en un punto dudoso, pide la repetición.</p>
         <button class="more" data-open="d-video">Detalles <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Tu club, en una app</h3>
+        <p>Socios y cuotas, planning de pistas, torneos sociales y federados, equipos, escuela de tenis y avisos, también desde el navegador del PC. Con un servidor opcional, los jugadores reservan pista en línea.</p>
+        <button class="more" data-open="d-club">Detalles <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -533,7 +539,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Descargar</div>
       <h2>Libre, gratuita, sin sorpresas</h2>
-      <p>Sin cuenta, sin anuncios, sin datos enviados a servidores externos.</p>
+      <p>Sin anuncios ni rastreo. Los datos se quedan en el teléfono; el servidor del club es opcional y lo gestiona el propio club.</p>
     </div>
     <div class="get">
       <div class="panel hl">
@@ -545,13 +551,14 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requisitos y permisos</h3>
         <dl class="req">
           <dt>Sistema</dt><dd>Android 8.0 o posterior</dd>
-          <dt>Versión</dt><dd>2.5.0</dd>
+          <dt>Versión</dt><dd>2.6.0</dd>
           <dt>Licencia</dt><dd>GNU GPL v3 o posterior</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
           <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Para las pulseras y las bandas de pecho, y para conectar el segundo teléfono. Los mandos se emparejan desde los ajustes Bluetooth del teléfono.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Ubicación<small>Opcional: el lugar de la pista en el resumen. Hasta Android 11 también es necesaria para la búsqueda Bluetooth.</small></div></li>
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Red<small>Solo para el marcador en la red local.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Red<small>Marcador y segundo teléfono en la red local. Internet solo para lo que actives: vídeo en directo, servidor del club, modelo de análisis del movimiento.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Cámara y micrófono<small>Opcionales: QR, fotos y vídeos de los partidos.</small></div></li>
         </ul>
       </div>
     </div>
@@ -736,6 +743,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Repetición:</strong> en un punto dudoso el árbitro la pide a la cámara y la ve también a cámara lenta, fotograma a fotograma; si quieres, también en el marcador de la TV.</li>
     </ul>
     <div class="note">La música de las estadísticas es <em>Nowhere Land</em> de Kevin MacLeod (incompetech.com), licencia CC BY 4.0: si publicas el vídeo, cítalo. También puedes elegir una pista tuya.</div>
+  </div>
+</dialog>
+
+<dialog id="d-club" aria-labelledby="t-club" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Cerrar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Club y reservas en línea</h3></div>
+    <p>Con el rol Club la app se convierte en la secretaría: los datos se quedan en el teléfono y activas solo las funciones que usas.</p>
+    <ul>
+      <li><strong>Socios y cuotas:</strong> licencias, caducidad del certificado médico, pagos registrados y recibos no fiscales, exportación CSV.</li>
+      <li><strong>Planning de pistas:</strong> vistas por día, semana y mes, reservas periódicas, precios, horarios y estadísticas de uso.</li>
+      <li><strong>Torneos y equipos:</strong> torneos sociales y federados con cuadros y grupos, ligas por equipos, clasificación por desafíos: los partidos se juegan con el marcador.</li>
+      <li><strong>Escuela de tenis y avisos:</strong> cursos, alumnos, asistencia y cuotas; avisos por WhatsApp, Telegram, SMS o correo.</li>
+      <li><strong>Secretaría desde el PC:</strong> el club se gestiona desde el navegador del ordenador, con los datos siempre en el teléfono.</li>
+      <li><strong>Servidor opcional:</strong> en Raspberry Pi o memoria USB: reservas en línea desde la app o la página web, también en iPhone, lista de espera, busco compañero, recordatorios, tablón y chat entre socios.</li>
+    </ul>
+    <div class="note">El servidor es del club, sin suscripción. Con Tailscale o DuckDNS se puede acceder desde internet. Sin servidor la app funciona igual.</div>
   </div>
 </dialog>
 

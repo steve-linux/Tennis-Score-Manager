@@ -390,6 +390,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Ein zweites Telefon auf einem Stativ filmt das Match mit eingeblendetem Spielstand, auch live. Sieh dir jeden Punkt noch einmal an, lass die App die Highlights mit den Schlussstatistiken schneiden und hol dir beim strittigen Punkt die Zeitlupe.</p>
         <button class="more" data-open="d-video">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Dein Verein in einer App</h3>
+        <p>Mitglieder und Beiträge, Platzplan, Vereins- und Verbandsturniere, Teams, Tennisschule und Mitteilungen, auch im PC-Browser. Mit einem optionalen Server buchen die Spieler ihren Platz online.</p>
+        <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -533,7 +539,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Download</div>
       <h2>Frei, kostenlos, ohne Überraschungen</h2>
-      <p>Kein Konto, keine Werbung, keine Daten an fremde Server.</p>
+      <p>Keine Werbung, kein Tracking. Die Daten bleiben auf dem Handy; der Vereinsserver ist optional und wird vom Verein betrieben.</p>
     </div>
     <div class="get">
       <div class="panel hl">
@@ -545,13 +551,14 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Voraussetzungen und Berechtigungen</h3>
         <dl class="req">
           <dt>System</dt><dd>Android 8.0 oder neuer</dd>
-          <dt>Version</dt><dd>2.5.0</dd>
+          <dt>Version</dt><dd>2.6.0</dd>
           <dt>Lizenz</dt><dd>GNU GPL v3 oder neuer</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
           <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Für Armbänder und Brustgurte und zum Verbinden des zweiten Telefons. Fernbedienungen werden in den Bluetooth-Einstellungen des Telefons gekoppelt.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Standort<small>Optional: der Ort des Platzes im Spielbericht. Bis Android 11 wird er auch für die Bluetooth-Suche benötigt.</small></div></li>
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Netzwerk<small>Nur für die Anzeigetafel im lokalen Netz.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Netzwerk<small>Anzeigetafel und zweites Handy im lokalen Netz. Internet nur für das, was du einschaltest: Live-Video, Vereinsserver, Modell zur Bewegungsanalyse.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Kamera und Mikrofon<small>Optional: QR-Codes, Fotos und Videos der Matches.</small></div></li>
         </ul>
       </div>
     </div>
@@ -736,6 +743,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Zeitlupe:</strong> Beim strittigen Punkt fordert der Schiedsrichter ihn bei der Kamera an und sieht ihn auch verlangsamt, Bild für Bild; auf Wunsch auch auf der TV-Anzeigetafel.</li>
     </ul>
     <div class="note">Die Musik der Statistiken ist <em>Nowhere Land</em> von Kevin MacLeod (incompetech.com), Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn. Du kannst auch einen eigenen Titel wählen.</div>
+  </div>
+</dialog>
+
+<dialog id="d-club" aria-labelledby="t-club" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Verein und Online-Buchung</h3></div>
+    <p>In der Rolle Verein wird die App zum Vereinsbüro: Die Daten bleiben auf dem Handy, und du schaltest nur die Funktionen ein, die du brauchst.</p>
+    <ul>
+      <li><strong>Mitglieder und Beiträge:</strong> Mitgliedschaften, Ablauf des ärztlichen Attests, erfasste Zahlungen und Quittungen, CSV-Export.</li>
+      <li><strong>Platzplan:</strong> Tages-, Wochen- und Monatsansicht, Serienbuchungen, Preise, Öffnungszeiten und Nutzungsstatistik.</li>
+      <li><strong>Turniere und Teams:</strong> Vereins- und Verbandsturniere mit Tableau und Gruppen, Mannschaftsligen, Forderungsrangliste: Die Matches laufen über den Punktezähler.</li>
+      <li><strong>Tennisschule und Mitteilungen:</strong> Kurse, Schüler, Anwesenheit und Beiträge; Mitteilungen per WhatsApp, Telegram, SMS oder E-Mail.</li>
+      <li><strong>Vereinsbüro am PC:</strong> Der Verein lässt sich im Browser am Computer verwalten, die Daten bleiben auf dem Handy.</li>
+      <li><strong>Optionaler Server:</strong> auf Raspberry Pi oder USB-Stick: Online-Buchung per App oder Webseite, auch auf dem iPhone, Warteliste, Partnersuche, Erinnerungen, Schwarzes Brett und Mitglieder-Chat.</li>
+    </ul>
+    <div class="note">Der Server gehört dem Verein, ohne Abo. Über Tailscale oder DuckDNS ist er aus dem Internet erreichbar. Ohne Server funktioniert die App genauso.</div>
   </div>
 </dialog>
 
