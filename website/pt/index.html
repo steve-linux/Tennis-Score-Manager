@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Placar de tênis e padel com voz de árbitro, estatísticas, pulseiras e placar na TV</title>
-<meta name="description" content="App Android livre e gratuito para marcar o placar do tênis e do padel segundo as regras da ITF: voz do árbitro de cadeira, estatísticas e histórico ponto a ponto, pulseiras Bluetooth M5StickS3 ou controles de selfie, e placar na TV. Funciona offline, em seis idiomas, sem anúncios.">
+<title>Tennis Score Manager – Placar de tênis e padel com voz de árbitro, estatísticas, placar na TV e gestão do clube</title>
+<meta name="description" content="App Android livre e gratuito para o placar de tênis e padel segundo as regras da ITF, com voz do árbitro de cadeira, estatísticas, pulseiras Bluetooth e placar na TV. Para clubes: sócios, mensalidades, agenda de quadras, torneios e reservas online. O marcador funciona offline. Em seis idiomas, sem anúncios.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/pt/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="de_DE">
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Placar de tênis e padel segundo as regras da ITF, com voz do árbitro, estatísticas de fim de partida, pulseiras Bluetooth e placar na TV. Livre, offline, sem anúncios.">
+<meta property="og:description" content="Placar de tênis e padel segundo as regras da ITF, com voz do árbitro, estatísticas e placar na TV. Para clubes: sócios, mensalidades, agenda de quadras, torneios e reservas online. Livre, sem anúncios.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/pt/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -286,7 +286,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Livre e gratuito · licença GPL-3.0</div>
       <h1>Seu placar de tênis, <em>como um verdadeiro Pro.</em></h1>
-      <p class="lead">O app Android que marca o placar do tênis e do padel segundo as regras da ITF e o anuncia em voz alta como um árbitro de cadeira. Os pontos são marcados no telefone, com duas pulseiras ou com dois controles Bluetooth; no fim você tem estatísticas, histórico ponto a ponto e, com as pulseiras, também seus golpes, e o resultado pode aparecer ao vivo numa TV. Com uma cinta cardíaca Bluetooth você também mede batimentos e calorias, na partida e no treino.</p>
+      <p class="lead">O app Android que marca o placar do tênis e do padel segundo as regras da ITF e o anuncia em voz alta como um árbitro de cadeira. Os pontos são marcados no telefone, com duas pulseiras ou com dois controles Bluetooth; no fim você tem estatísticas, histórico ponto a ponto e, com as pulseiras, também seus golpes, e o resultado pode aparecer ao vivo numa TV. Com uma cinta cardíaca Bluetooth você também mede batimentos e calorias, na partida e no treino. Para clubes: sócios, mensalidades, agenda de quadras, torneios e reservas online.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Baixar o app</a>
         <a class="btn btn-ghost" href="#features">Conheça os recursos <svg class="icon"><use href="#i-down"/></svg></a>
@@ -306,7 +306,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Recursos</div>
       <h2>Tudo o que você precisa na quadra</h2>
-      <p>Feito para partidas de verdade, mesmo sem árbitro: toque em quem ganhou o ponto e o app cuida do resto.</p>
+      <p>Feito para partidas de verdade, mesmo sem árbitro: toque em quem ganhou o ponto e o app cuida do resto. Escolha seu papel, Você, Treinador ou Clube, e fique só com as funções que usa; em muitas telas o «?» abre o guia na hora.</p>
     </div>
     <div class="cards">
       <article class="card">
@@ -378,6 +378,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Cintas e pulseiras alcançam alguns metros a menos que o comprimento da quadra: um segundo telefone no outro fundo faz a ponte, com rede própria e sem perder dados.</p>
         <button class="more" data-open="d-second">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Para treinadores</h3>
+        <p>Alunos com ficha e anotações, exercícios guiados, análise do movimento com o esqueleto no vídeo e um relatório para enviar ao aluno.</p>
+        <button class="more" data-open="d-coach">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Arbitragem completa</h3>
+        <p>Desistência e W.O., violações de conduta e de tempo, desqualificação, pausas, aquecimento e troca de bolas, como em uma partida com árbitro.</p>
+        <button class="more" data-open="d-umpire">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Rating, raquetes e objetivos</h3>
+        <p>Rating TSM a partir das suas partidas, raquetes e cordas comparadas, objetivos, calendário, «O meu ano» e backup automático.</p>
+        <button class="more" data-open="d-goals">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
         <h3>Reconhece seus golpes</h3>
@@ -395,6 +413,18 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Seu clube em um app</h3>
         <p>Sócios e mensalidades, agenda de quadras, torneios internos e federados, equipes, escola de tênis e avisos, também no navegador do PC. Com um servidor opcional, os jogadores reservam a quadra online.</p>
         <button class="more" data-open="d-club">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>A secretaria no computador</h3>
+        <p>Sócios, mensalidades, agenda e torneios com teclado e mouse: um computador na mesma rede abre a secretaria no navegador, sem instalar nada e com os dados sempre no celular.</p>
+        <button class="more" data-open="d-desk">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Reserve a quadra, encontre um parceiro</h3>
+        <p>Se o clube usa o servidor, os jogadores reservam pelo app ou pela web, também no iPhone, entram em listas de espera, procuram parceiro e conversam no chat.</p>
+        <button class="more" data-open="d-book">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
     </div>
   </div>
@@ -736,6 +766,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Com um segundo telefone servindo de câmera, ligado ao do árbitro por um QR, a partida vira um vídeo com o placar por cima.</p>
     <ul>
       <li><strong>Telefone-câmera:</strong> grava em 1080p com o gráfico do placar, ou transmite ao vivo por RTMP no YouTube, Twitch, Facebook ou num servidor seu.</li>
+      <li><strong>Assistente de enquadramento:</strong> informe distância, altura e quadra, e o app diz como inclinar o celular; o contorno da quadra ajuda a posicioná-lo.</li>
       <li><strong>Vídeo ponto a ponto:</strong> um capítulo por ponto, para rever por ponto, game ou set; os capítulos também podem ser copiados para o YouTube.</li>
       <li><strong>Vídeos importados:</strong> até um vídeo feito com outra câmera: os pontos são marcados assistindo e o placar se calcula sozinho.</li>
       <li><strong>Filtros do treinador:</strong> só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points.</li>
@@ -752,14 +783,102 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Clube e reservas online</h3></div>
     <p>No papel Clube, o app vira a secretaria: os dados ficam no celular e você ativa só as funções que usa.</p>
     <ul>
+      <li><strong>Hoje:</strong> a primeira página da secretaria: quem joga, o que cobrar, sócios pendentes, partidas e aulas do dia.</li>
       <li><strong>Sócios e mensalidades:</strong> carteirinhas, validade do atestado médico, pagamentos registrados e recibos não fiscais, exportação CSV.</li>
       <li><strong>Agenda de quadras:</strong> visão por dia, semana e mês, reservas recorrentes, preços, horários e estatísticas de uso.</li>
-      <li><strong>Torneios e equipes:</strong> torneios internos e federados com chaves e grupos, ligas por equipes, ranking de desafios: as partidas são jogadas com o marcador.</li>
+      <li><strong>Torneios e equipes:</strong> torneios internos e federados com chaves e grupos, ligas por equipes, ranking de desafios: as partidas são jogadas com o marcador. A chave do torneio também pode aparecer no placar da TV.</li>
       <li><strong>Escola de tênis e avisos:</strong> cursos, alunos, presenças e mensalidades; avisos por WhatsApp, Telegram, SMS ou e-mail.</li>
       <li><strong>Secretaria no PC:</strong> o clube é gerido pelo navegador do computador, com os dados sempre no celular.</li>
       <li><strong>Servidor opcional:</strong> em Raspberry Pi ou pen drive: reservas online pelo app ou pela página web, também no iPhone, lista de espera, busca de parceiro, lembretes, mural e chat entre sócios.</li>
     </ul>
     <div class="note">O servidor é do clube, sem assinatura. Com Tailscale ou DuckDNS ele pode ser acessado pela internet. Sem servidor, o app funciona do mesmo jeito.</div>
+  </div>
+</dialog>
+
+<dialog id="d-coach" aria-labelledby="t-coach" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div><h3 id="t-coach">Treinador e alunos</h3></div>
+    <p>No papel Treinador, o app acompanha cada aluno: sessões, vídeos e medidas ficam no celular.</p>
+    <ul>
+      <li><strong>Alunos:</strong> ficha com golpes, movimento, partidas, rating, raquete e anotações do treinador.</li>
+      <li><strong>Treino de golpes:</strong> saque, forehand, backhand e voleio, com o celular no tripé e a pulseira no punho.</li>
+      <li><strong>Exercícios guiados:</strong> um golpe e seus passos em ordem; a voz anuncia o próximo passo.</li>
+      <li><strong>Análise do movimento:</strong> o corpo reconhecido nos clipes, o esqueleto no vídeo em câmera lenta e as medidas dos momentos-chave.</li>
+      <li><strong>Comparação:</strong> os dois golpes juntos, alinhados no impacto, em câmera lenta ou quadro a quadro. Com Sobrepor, o esqueleto do segundo é desenhado sobre o primeiro e logo se vê onde o movimento muda.</li>
+      <li><strong>Relatório para o aluno:</strong> PDF completo ou imagem para enviar pelo WhatsApp.</li>
+    </ul>
+    <div class="note">O modelo de análise (MoveNet, 7 MB) é baixado uma única vez, a pedido; depois tudo acontece no celular e os clipes não saem dele. As medidas são estimativas: servem principalmente para comparar os golpes ao longo do tempo.</div>
+  </div>
+</dialog>
+
+<dialog id="d-umpire" aria-labelledby="t-umpire" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-umpire">Arbitragem completa</h3></div>
+    <p>O botão Árbitro reúne o que é preciso quando a partida não corre bem.</p>
+    <ul>
+      <li><strong>Desistência e W.O.:</strong> a desistência encerra a partida com o placar do momento; antes do primeiro ponto vira W.O.</li>
+      <li><strong>Penalizações e desqualificação:</strong> violações de conduta e de tempo, mostrando a consequência antes de confirmar.</li>
+      <li><strong>Pausas:</strong> tempo médico de 3 minutos, banheiro ou troca de roupa de 5, aquecimento de 5 antes do primeiro ponto.</li>
+      <li><strong>Troca de bolas:</strong> nos intervalos que você escolher, com animação no celular e no placar da TV.</li>
+      <li><strong>Correções:</strong> corrija quem serve e os lados; com Definir o placar você retoma uma partida iniciada sem o app.</li>
+    </ul>
+    <div class="note">Os pontos inseridos com Definir o placar não entram nas estatísticas.</div>
+  </div>
+</dialog>
+
+<dialog id="d-goals" aria-labelledby="t-goals" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-goals">Rating, raquetes e objetivos</h3></div>
+    <p>Tudo calculado no celular a partir das suas partidas, sem conta.</p>
+    <ul>
+      <li><strong>Rating TSM:</strong> sobe quando você vence, mais contra quem tem rating alto; com classificação e evolução.</li>
+      <li><strong>Raquetes:</strong> cada raquete com suas cordas, horas de jogo e sensações; comparação entre raquetes ou tensões.</li>
+      <li><strong>Objetivos:</strong> uma meta e uma barra que se enche com as médias das suas últimas partidas.</li>
+      <li><strong>O meu ano:</strong> partidas, vitórias, rival e meses mais ativos em uma imagem para compartilhar.</li>
+      <li><strong>Calendário:</strong> partidas e treinos mês a mês, e há quantas semanas seguidas você joga.</li>
+      <li><strong>Como da última vez:</strong> mesmos jogadores, quadra e regras, e direto para o sorteio.</li>
+      <li><strong>Backup:</strong> um arquivo ZIP com todos os dados e uma cópia automática todo dia, sem vídeos.</li>
+    </ul>
+    <div class="note">As 5 últimas cópias automáticas ficam em Documentos mesmo se você desinstalar o app.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Reserve a quadra, encontre um parceiro</h3></div>
+    <p>Para jogadores de clubes que usam o servidor: entra-se com o convite da secretaria.</p>
+    <ul>
+      <li><strong>Reservar:</strong> escolha o dia e toque em um horário livre, pelo app Android ou pela página web, também no iPhone; cancele enquanto houver tempo.</li>
+      <li><strong>Número e PIN:</strong> você volta sozinho se trocar de celular, e no app pode seguir vários clubes.</li>
+      <li><strong>Lista de espera:</strong> em um horário ocupado, «Avisa-me se ficar livre»: chega o aviso e vence quem reservar primeiro.</li>
+      <li><strong>Procuro parceiro:</strong> publique um anúncio com dia, faixa de horário e nível; ao completar, o servidor reserva sozinho a primeira quadra livre.</li>
+      <li><strong>Chat:</strong> o chat do clube e o de cada anúncio; mensagens privadas só com quem as aceita, com Bloquear e Assinalar.</li>
+      <li><strong>Mural do clube:</strong> os avisos da secretaria, com uma notificação.</li>
+      <li><strong>Lembretes:</strong> um aviso antes do horário e se a secretaria retirar a reserva.</li>
+    </ul>
+    <div class="note">Estas funções só existem se o clube usa o servidor. A secretaria modera os chats.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">A secretaria no computador</h3></div>
+    <p>Lançar sócios e pagamentos é mais prático no computador: Windows, Mac ou Linux abrem no navegador uma página servida pelo celular.</p>
+    <ul>
+      <li><strong>Sem instalar nada:</strong> basta um computador na mesma rede do celular; o servidor do clube não é necessário.</li>
+      <li><strong>Os dados ficam no celular:</strong> o computador os vê e altera enquanto está conectado, e não guarda cópias.</li>
+      <li><strong>Hoje e sócios:</strong> o dia em uma página; sócios com impressão, CSV e importação do Excel.</li>
+      <li><strong>Mensalidades e agenda:</strong> pagamentos e recibos em PDF; agenda por dia, semana e mês.</li>
+      <li><strong>O clube inteiro:</strong> torneios, escola de tênis, equipes, estatísticas, configurações e reservas online.</li>
+      <li><strong>Backup:</strong> um único arquivo para baixar no PC, e uma cópia automática por dia.</li>
+      <li><strong>Segurança:</strong> conexão criptografada, acesso com QR ou código confirmado no celular, um computador por vez, só na rede local.</li>
+    </ul>
+    <div class="note">O celular precisa ficar ligado e na mesma rede. Na primeira vez, o navegador avisa que a conexão não é privada: é normal, porque o certificado é criado pelo celular.</div>
   </div>
 </dialog>
 

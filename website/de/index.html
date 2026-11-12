@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Tennis- und Padel-Zählung mit Schiedsrichteransagen, Statistiken, Armbändern und TV-Anzeigetafel</title>
-<meta name="description" content="Freie und kostenlose Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt: Ansagen des Schiedsrichters, Statistiken und Punkt-für-Punkt-Verlauf, Bluetooth-Armbänder M5StickS3 oder günstige Selfie-Fernbedienungen und Anzeigetafel auf dem Fernseher. Funktioniert offline, in sechs Sprachen, ohne Werbung.">
+<title>Tennis Score Manager – Tennis- und Padel-Zählung mit Schiedsrichteransagen, Statistiken, TV-Anzeigetafel und Vereinsverwaltung</title>
+<meta name="description" content="Freie und kostenlose Android-App für den Spielstand im Tennis und Padel nach den ITF-Regeln, mit Schiedsrichteransagen, Statistiken, Bluetooth-Armbändern und Anzeigetafel auf dem Fernseher. Für Vereine: Mitglieder, Beiträge, Platzplan, Turniere und Online-Buchung. Der Punktezähler funktioniert offline. In sechs Sprachen, ohne Werbung.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/de/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Tennis- und Padel-Zählung nach den ITF-Regeln, mit Schiedsrichteransagen, Statistiken zum Matchende, Bluetooth-Armbändern und TV-Anzeigetafel. Frei, offline, ohne Werbung.">
+<meta property="og:description" content="Tennis- und Padel-Zählung nach den ITF-Regeln, mit Schiedsrichteransagen, Statistiken und TV-Anzeigetafel. Für Vereine: Mitglieder, Beiträge, Platzplan, Turniere und Online-Buchung. Frei, ohne Werbung.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/de/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -286,7 +286,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Frei und kostenlos · Lizenz GPL-3.0</div>
       <h1>Dein Spielstand im Tennis, <em>wie bei den Profis.</em></h1>
-      <p class="lead">Die Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon, mit zwei Armbändern oder mit zwei Bluetooth-Fernbedienungen; am Ende gibt es Statistiken, den Verlauf Punkt für Punkt und mit den Armbändern auch deine Schläge, und das Ergebnis kann live auf einem Fernseher erscheinen. Mit einem Bluetooth-Brustgurt misst du auch Herzfrequenz und Kalorien, im Spiel und im Training.</p>
+      <p class="lead">Die Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon, mit zwei Armbändern oder mit zwei Bluetooth-Fernbedienungen; am Ende gibt es Statistiken, den Verlauf Punkt für Punkt und mit den Armbändern auch deine Schläge, und das Ergebnis kann live auf einem Fernseher erscheinen. Mit einem Bluetooth-Brustgurt misst du auch Herzfrequenz und Kalorien, im Spiel und im Training. Für Vereine: Mitglieder, Beiträge, Platzplan, Turniere und Online-Buchung.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> App holen</a>
         <a class="btn btn-ghost" href="#features">Funktionen entdecken <svg class="icon"><use href="#i-down"/></svg></a>
@@ -306,7 +306,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Funktionen</div>
       <h2>Alles, was du auf dem Platz brauchst</h2>
-      <p>Gemacht für echte Matches, auch ohne Schiedsrichter: Tippe an, wer den Punkt gewonnen hat – den Rest erledigt die App.</p>
+      <p>Gemacht für echte Matches, auch ohne Schiedsrichter: Tippe an, wer den Punkt gewonnen hat – den Rest erledigt die App. Wähle deine Rolle, Du, Trainer oder Verein, und behalte nur die Funktionen, die du nutzt; auf vielen Bildschirmen öffnet das «?» sofort die Anleitung.</p>
     </div>
     <div class="cards">
       <article class="card">
@@ -378,6 +378,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Gurte und Armbänder reichen ein paar Meter weniger weit als der Platz lang ist: Ein zweites Telefon am anderen Ende dient als Brücke, mit eigenem Netz und ohne Datenverlust.</p>
         <button class="more" data-open="d-second">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Für Trainer</h3>
+        <p>Schüler mit Profil und Notizen, geführte Übungen, Bewegungsanalyse mit dem Skelett im Video und ein Bericht für den Schüler.</p>
+        <button class="more" data-open="d-coach">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Komplette Schiedsrichter-Werkzeuge</h3>
+        <p>Aufgabe und Walkover, Verhaltens- und Zeitverstöße, Disqualifikation, Pausen, Einspielen und Ballwechsel, wie in einem Match mit Schiedsrichter.</p>
+        <button class="more" data-open="d-umpire">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Wertung, Schläger und Ziele</h3>
+        <p>TSM-Wertung aus deinen Matches, Schläger und Saiten im Vergleich, Ziele, Kalender, «Mein Jahr» und automatische Sicherung.</p>
+        <button class="more" data-open="d-goals">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
         <h3>Erkennt deine Schläge</h3>
@@ -395,6 +413,18 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Dein Verein in einer App</h3>
         <p>Mitglieder und Beiträge, Platzplan, Vereins- und Verbandsturniere, Teams, Tennisschule und Mitteilungen, auch im PC-Browser. Mit einem optionalen Server buchen die Spieler ihren Platz online.</p>
         <button class="more" data-open="d-club">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>Das Vereinsbüro am Computer</h3>
+        <p>Mitglieder, Beiträge, Platzplan und Turniere mit Tastatur und Maus: Ein Computer im selben Netz öffnet das Vereinsbüro im Browser, ohne Installation und mit den Daten immer auf dem Handy.</p>
+        <button class="more" data-open="d-desk">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Platz buchen, Partner finden</h3>
+        <p>Nutzt der Verein den Server, buchen die Spieler per App oder im Web, auch auf dem iPhone, tragen sich in Wartelisten ein, suchen Partner und chatten.</p>
+        <button class="more" data-open="d-book">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
     </div>
   </div>
@@ -736,6 +766,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Mit einem zweiten Telefon als Kamera, per QR-Code mit dem des Schiedsrichters verbunden, wird das Match zu einem Video mit eingeblendetem Spielstand.</p>
     <ul>
       <li><strong>Kamera-Telefon:</strong> nimmt in 1080p mit Spielstand-Einblendung auf oder sendet per RTMP live zu YouTube, Twitch, Facebook oder einem eigenen Server.</li>
+      <li><strong>Bildassistent:</strong> Abstand, Höhe und Platz eingeben, und die App sagt, wie das Handy zu neigen ist; die Platzkontur hilft beim Ausrichten.</li>
       <li><strong>Video Punkt für Punkt:</strong> ein Kapitel pro Punkt, nach Punkt, Spiel oder Satz anzusehen; die Kapitel lassen sich auch für YouTube kopieren.</li>
       <li><strong>Importierte Videos:</strong> auch ein Video einer anderen Kamera: Die Punkte zählst du beim Ansehen, der Spielstand ergibt sich von selbst.</li>
       <li><strong>Trainerfilter:</strong> nur die Punkte eines Spielers, gewonnen oder verloren, bei Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen.</li>
@@ -752,14 +783,102 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Verein und Online-Buchung</h3></div>
     <p>In der Rolle Verein wird die App zum Vereinsbüro: Die Daten bleiben auf dem Handy, und du schaltest nur die Funktionen ein, die du brauchst.</p>
     <ul>
+      <li><strong>Heute:</strong> die Startseite des Vereinsbüros: wer spielt, was zu kassieren ist, offene Punkte bei Mitgliedern, Matches und Stunden des Tages.</li>
       <li><strong>Mitglieder und Beiträge:</strong> Mitgliedschaften, Ablauf des ärztlichen Attests, erfasste Zahlungen und Quittungen, CSV-Export.</li>
       <li><strong>Platzplan:</strong> Tages-, Wochen- und Monatsansicht, Serienbuchungen, Preise, Öffnungszeiten und Nutzungsstatistik.</li>
-      <li><strong>Turniere und Teams:</strong> Vereins- und Verbandsturniere mit Tableau und Gruppen, Mannschaftsligen, Forderungsrangliste: Die Matches laufen über den Punktezähler.</li>
+      <li><strong>Turniere und Teams:</strong> Vereins- und Verbandsturniere mit Tableau und Gruppen, Mannschaftsligen, Forderungsrangliste: Die Matches laufen über den Punktezähler. Das Turniertableau lässt sich auch auf der TV-Anzeigetafel zeigen.</li>
       <li><strong>Tennisschule und Mitteilungen:</strong> Kurse, Schüler, Anwesenheit und Beiträge; Mitteilungen per WhatsApp, Telegram, SMS oder E-Mail.</li>
       <li><strong>Vereinsbüro am PC:</strong> Der Verein lässt sich im Browser am Computer verwalten, die Daten bleiben auf dem Handy.</li>
       <li><strong>Optionaler Server:</strong> auf Raspberry Pi oder USB-Stick: Online-Buchung per App oder Webseite, auch auf dem iPhone, Warteliste, Partnersuche, Erinnerungen, Schwarzes Brett und Mitglieder-Chat.</li>
     </ul>
     <div class="note">Der Server gehört dem Verein, ohne Abo. Über Tailscale oder DuckDNS ist er aus dem Internet erreichbar. Ohne Server funktioniert die App genauso.</div>
+  </div>
+</dialog>
+
+<dialog id="d-coach" aria-labelledby="t-coach" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div><h3 id="t-coach">Trainer und Schüler</h3></div>
+    <p>In der Rolle Trainer begleitet die App jeden Schüler: Einheiten, Videos und Messwerte bleiben auf dem Handy.</p>
+    <ul>
+      <li><strong>Schüler:</strong> Profil mit Schlägen, Bewegung, Matches, Wertung, Schläger und Notizen des Trainers.</li>
+      <li><strong>Schlagtraining:</strong> Aufschlag, Vorhand, Rückhand und Volley, mit dem Handy auf dem Stativ und dem Armband am Handgelenk.</li>
+      <li><strong>Geführte Übungen:</strong> ein Schlag und seine Schritte der Reihe nach; die Stimme sagt den nächsten Schritt an.</li>
+      <li><strong>Bewegungsanalyse:</strong> der Körper wird in den Clips erkannt, mit dem Skelett im Zeitlupenvideo und Messwerten der Schlüsselmomente.</li>
+      <li><strong>Vergleich:</strong> beide Schläge zusammen, am Treffpunkt ausgerichtet, in Zeitlupe oder Bild für Bild. Mit Überlagern wird das Skelett des zweiten über das erste gelegt, und man sieht sofort, wo sich die Bewegung unterscheidet.</li>
+      <li><strong>Bericht für den Schüler:</strong> vollständiges PDF oder Bild für WhatsApp.</li>
+    </ul>
+    <div class="note">Das Analysemodell (MoveNet, 7 MB) wird einmal auf Wunsch geladen; danach läuft alles auf dem Handy, und die Clips verlassen es nicht. Die Messwerte sind Schätzungen: Sie dienen vor allem dem Vergleich der Schläge über die Zeit.</div>
+  </div>
+</dialog>
+
+<dialog id="d-umpire" aria-labelledby="t-umpire" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-umpire">Komplette Schiedsrichter-Werkzeuge</h3></div>
+    <p>Die Taste Schiri bündelt alles, was nötig ist, wenn ein Match nicht glatt läuft.</p>
+    <ul>
+      <li><strong>Aufgabe und Walkover:</strong> die Aufgabe beendet das Match beim aktuellen Stand; vor dem ersten Punkt wird daraus ein Walkover.</li>
+      <li><strong>Strafen und Disqualifikation:</strong> Verhaltens- und Zeitverstöße, mit Anzeige der Folge vor dem Bestätigen.</li>
+      <li><strong>Pausen:</strong> Medical Timeout von 3 Minuten, Toilette oder Kleiderwechsel von 5 Minuten, Einspielen von 5 Minuten vor dem ersten Punkt.</li>
+      <li><strong>Ballwechsel:</strong> in den gewählten Abständen, mit Animation auf Handy und TV-Anzeigetafel.</li>
+      <li><strong>Korrekturen:</strong> Aufschläger und Seiten korrigieren; mit Spielstand setzen ein ohne die App begonnenes Match fortführen.</li>
+    </ul>
+    <div class="note">Mit Spielstand setzen eingetragene Punkte zählen nicht in den Statistiken.</div>
+  </div>
+</dialog>
+
+<dialog id="d-goals" aria-labelledby="t-goals" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-goals">Wertung, Schläger und Ziele</h3></div>
+    <p>Alles wird auf dem Handy aus deinen Matches berechnet, ohne Konto.</p>
+    <ul>
+      <li><strong>TSM-Wertung:</strong> steigt bei Siegen, stärker gegen besser bewertete Gegner; mit Rangliste und Verlauf.</li>
+      <li><strong>Schläger:</strong> jeder Schläger mit Saiten, Spielstunden und Spielgefühl; Vergleich von Schlägern oder Spannungen.</li>
+      <li><strong>Ziele:</strong> ein Ziel und ein Balken, der sich mit den Durchschnitten deiner letzten Matches füllt.</li>
+      <li><strong>Mein Jahr:</strong> Matches, Siege, Rivale und aktivste Monate in einem Bild zum Teilen.</li>
+      <li><strong>Kalender:</strong> Matches und Training Monat für Monat und wie viele Wochen du schon in Folge spielst.</li>
+      <li><strong>Wie beim letzten Mal:</strong> gleiche Spieler, gleicher Platz, gleiche Regeln und direkt zur Platzwahl.</li>
+      <li><strong>Sicherung:</strong> eine ZIP-Datei mit allen Daten und täglich eine automatische Kopie ohne Videos.</li>
+    </ul>
+    <div class="note">Die letzten 5 automatischen Kopien bleiben in Dokumente, auch wenn du die App deinstallierst.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Platz buchen, Partner finden</h3></div>
+    <p>Für Spieler von Vereinen mit Server: Der Zugang erfolgt über die Einladung des Vereinsbüros.</p>
+    <ul>
+      <li><strong>Buchen:</strong> Tag wählen und freies Feld antippen, in der Android-App oder auf der Webseite, auch auf dem iPhone; stornieren, solange es noch geht.</li>
+      <li><strong>Nummer und PIN:</strong> du kommst nach einem Handywechsel selbst wieder hinein und kannst in der App mehreren Vereinen folgen.</li>
+      <li><strong>Warteliste:</strong> bei einem belegten Feld «Benachrichtigen, wenn frei»: Du wirst benachrichtigt, und wer zuerst bucht, bekommt den Platz.</li>
+      <li><strong>Partner gesucht:</strong> Anzeige mit Tag, Zeitfenster und Niveau; ist sie voll, bucht der Server selbst den ersten freien Platz.</li>
+      <li><strong>Chat:</strong> der Vereinschat und einer pro Anzeige; private Nachrichten nur mit denen, die sie zulassen, mit Blockieren und Melden.</li>
+      <li><strong>Vereinsbrett:</strong> Mitteilungen des Vereinsbüros, mit Benachrichtigung.</li>
+      <li><strong>Erinnerungen:</strong> ein Hinweis vor dem Termin und wenn das Vereinsbüro die Buchung entfernt.</li>
+    </ul>
+    <div class="note">Diese Funktionen gibt es nur, wenn der Verein den Server nutzt. Das Vereinsbüro moderiert die Chats.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">Das Vereinsbüro am Computer</h3></div>
+    <p>Mitglieder und Zahlungen lassen sich am Computer bequemer erfassen: Windows, Mac oder Linux öffnen im Browser eine Seite, die das Handy bereitstellt.</p>
+    <ul>
+      <li><strong>Keine Installation:</strong> es genügt ein Computer im selben Netz wie das Handy; der Vereinsserver ist nicht nötig.</li>
+      <li><strong>Die Daten bleiben auf dem Handy:</strong> der Computer sieht und ändert sie, solange er verbunden ist, und behält keine Kopien.</li>
+      <li><strong>Heute und Mitglieder:</strong> der Tag auf einer Seite; Mitglieder mit Druck, CSV und Import aus Excel.</li>
+      <li><strong>Beiträge und Platzplan:</strong> Zahlungen und Quittungen als PDF; Platzplan nach Tag, Woche und Monat.</li>
+      <li><strong>Der ganze Verein:</strong> Turniere, Tennisschule, Teams, Statistiken, Einstellungen und Online-Buchung.</li>
+      <li><strong>Sicherung:</strong> eine einzige Datei zum Herunterladen auf den PC und täglich eine automatische Kopie.</li>
+      <li><strong>Sicherheit:</strong> verschlüsselte Verbindung, Zugang per QR oder Code mit Bestätigung am Handy, immer nur ein Computer, nur im lokalen Netz.</li>
+    </ul>
+    <div class="note">Das Handy muss eingeschaltet und im selben Netz bleiben. Beim ersten Mal warnt der Browser, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat erstellt das Handy.</div>
   </div>
 </dialog>
 
