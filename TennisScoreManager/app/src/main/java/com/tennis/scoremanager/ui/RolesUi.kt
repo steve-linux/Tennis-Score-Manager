@@ -81,14 +81,24 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     var name by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
+    var phone by remember { mutableStateOf(c.storage.clubPhone) }
     val hadNone = remember { c.storage.clubCourts.isEmpty() }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.roleClub) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { ClubFields(name, courts, { name = it }, { courts = it }, courtsHere = hadNone) } },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                ClubFields(name, courts, { name = it }, { courts = it }, courtsHere = hadNone)
+                // Il telefono della segreteria va nelle schede partita: i giocatori rimandano lì il risultato.
+                OutlinedTextField(phone, { phone = it.take(30) }, label = { Text(s.clubPhone) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
+                Text(s.clubPhoneHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+        },
         confirmButton = {
             TextButton(onClick = {
                 c.storage.clubName = name
+                c.storage.clubPhone = phone
                 if (hadNone) c.setClubCourts(courts.lines())
                 onDone()
             }) { Text(s.ok) }

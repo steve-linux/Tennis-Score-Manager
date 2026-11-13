@@ -2405,4 +2405,17 @@ object DeStrings : Strings {
     override val cmTitle = "Vereinsmatches"
     override val cmHint: (Int) -> String = { if (it == 1) "1 Turnier-, Mannschafts- oder Forderungsmatch zu spielen" else "$it Turnier-, Mannschafts- und Forderungsmatches zu spielen" }
     override val cmPick = "Tippe auf ein Match: Neues Match öffnet sich mit Spielern, Turnier und Runde schon eingetragen, und am Ende geht das Ergebnis an den Verein zurück."
+    override val clubPhone = "Telefon des Büros"
+    override val clubPhoneHint = "Steht in den Matchkarten: wer zählt, schickt das Ergebnis hierher zurück."
+    override val ctRules = "Spielregeln"
+    override val ctRulesFree = "Auf dem Platz wählen"
+    override val ctRulesHint = "Sie stehen in der Matchkarte, die mit der Einladung geht: auf dem Platz sind sie schon eingestellt."
+    override val ctConvoke = "Einladen"
+    override val ntCardHowTo = "Wer zählt: die angehängte Datei mit Tennis Score Manager öffnen (Teilen › TSM), das Match ist fertig vorbereitet."
+    override val ntCardAttached: (String) -> String = { "Matchkarte angehängt: $it" }
+    override val mcTitle = "Matchkarte des Vereins"
+    override val mcPrepare = "Match vorbereiten"
+    override val mcHint = "Neues Match öffnet sich mit Spielern, Regeln, Turnier und Runde schon eingetragen; am Ende geht das Ergebnis zurück ans Büro."
+    override val mcBusy = "Ein Match läuft: beende oder unterbrich es und öffne die Datei dann erneut."
+    override val mcNotValid = "Diese Datei ist keine Matchkarte von Tennis Score Manager."
 }

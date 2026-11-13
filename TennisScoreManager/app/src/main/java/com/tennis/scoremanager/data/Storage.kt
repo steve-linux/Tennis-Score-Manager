@@ -248,6 +248,18 @@ class Storage(context: Context) {
     }
 
     /** L'allenatore: diario, obiettivi, agenda, pacchetti di lezioni e gruppi degli allievi. */
+    private val cardsFile: File get() = File(app.filesDir, "match_cards.json")
+
+    /** Le schede partita ricevute dalla segreteria (per rimandarle il risultato). */
+    fun loadReceivedCards(): List<ReceivedCard> =
+        readOr(cardsFile, emptyList()) { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(ReceivedCard.serializer()), it) }
+
+    @Synchronized
+    fun saveReceivedCards(list: List<ReceivedCard>) {
+        runCatching { writeAtomic(cardsFile, json.encodeToString(kotlinx.serialization.builtins.ListSerializer(ReceivedCard.serializer()), list)) }
+            .onFailure { Log.e("Storage", "Salvataggio delle schede partita fallito", it) }
+    }
+
     private val coachFile: File get() = File(app.filesDir, "coach_book.json")
 
     fun loadCoachBook(): CoachBook = readOr(coachFile, CoachBook()) { json.decodeFromString(CoachBook.serializer(), it) }
@@ -575,6 +587,10 @@ class Storage(context: Context) {
     var clubName: String
         get() = prefs.getString("club_name", null) ?: ""
         set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+    /** Il telefono della segreteria: va nelle schede partita, i giocatori rimandano lì il risultato. */
+    var clubPhone: String
+        get() = prefs.getString("club_phone", null) ?: ""
+        set(v) = prefs.edit().putString("club_phone", v.trim()).apply()
     var clubCourts: List<String>
         get() = prefs.getString("club_courts", null)?.split('\n')?.filter { it.isNotBlank() } ?: emptyList()
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()

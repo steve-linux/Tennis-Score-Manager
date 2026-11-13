@@ -53,6 +53,8 @@ data class CTMatch(
     val at: Long? = null,
     /** La partita segnata col segnapunti (MatchRecord.id), se è stata giocata dal vivo. */
     val record: String? = null,
+    /** Il codice della scheda partita mandata con la convocazione: il risultato che torna deve averlo. */
+    val cardCode: String? = null,
 ) {
     val played: Boolean get() = winner != null || noShow
     val bye: Boolean get() = round == 1 && (a == null) != (b == null)
@@ -89,6 +91,8 @@ data class ClubTournament(
     /** Quante modifiche a mano ha avuto il tabellone dopo il sorteggio: nei tornei FITP resta scritto. */
     val manualEdits: Int = 0,
     val createdAt: Long = 0,
+    /** Le regole delle partite (vanno nella scheda partita); null = si scelgono in campo. */
+    val rules: CardRules? = null,
 ) {
     val drawn: Boolean get() = drawnAt != null
     /** Turni del tabellone (1 = primo turno). */

@@ -52,16 +52,38 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Un file aperto o condiviso con TSM (la scheda partita della segreteria): lo legge e lo passa al controller. */
+    private fun openFile(i: android.content.Intent?) {
+        if (i == null || (i.action != android.content.Intent.ACTION_SEND && i.action != android.content.Intent.ACTION_VIEW)) return
+        @Suppress("DEPRECATION")
+        val uri = (if (i.action == android.content.Intent.ACTION_SEND) i.getParcelableExtra<android.net.Uri>(android.content.Intent.EXTRA_STREAM) else i.data) ?: return
+        i.action = null
+        lifecycleScope.launch {
+            // Una scheda è piccola: oltre 256 KB non è una scheda.
+            val text = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching { contentResolver.openInputStream(uri)?.use { s -> s.readNBytesCompat(256 * 1024) }?.toString(Charsets.UTF_8) }.getOrNull()
+            }
+            controller.receiveCardText(text)
+        }
+    }
+
+    private fun java.io.InputStream.readNBytesCompat(max: Int): ByteArray {
+        val out = java.io.ByteArrayOutputStream(); val buf = ByteArray(8192)
+        while (out.size() < max) { val n = read(buf); if (n < 0) break; out.write(buf, 0, minOf(n, max - out.size())) }
+        return out.toByteArray()
+    }
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         openFromNotification(intent)
+        openFile(intent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         controller.onActivityCreated()
-        if (savedInstanceState == null) openFromNotification(intent)
+        if (savedInstanceState == null) { openFromNotification(intent); openFile(intent) }
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),

@@ -2477,6 +2477,19 @@ interface Strings {
     val cmTitle: String
     val cmHint: (Int) -> String
     val cmPick: String
+    val clubPhone: String
+    val clubPhoneHint: String
+    val ctRules: String
+    val ctRulesFree: String
+    val ctRulesHint: String
+    val ctConvoke: String
+    val ntCardHowTo: String
+    val ntCardAttached: (String) -> String
+    val mcTitle: String
+    val mcPrepare: String
+    val mcHint: String
+    val mcBusy: String
+    val mcNotValid: String
 }
 
 object ItStrings : Strings {
@@ -4874,6 +4887,19 @@ object ItStrings : Strings {
     override val cmTitle = "Partite del circolo"
     override val cmHint: (Int) -> String = { if (it == 1) "1 partita di torneo, squadra o sfida da giocare" else "$it partite di tornei, squadre e sfide da giocare" }
     override val cmPick = "Tocca una partita: Nuova partita si apre con giocatori, torneo e turno già scritti e a fine partita il risultato torna nel circolo."
+    override val clubPhone = "Telefono della segreteria"
+    override val clubPhoneHint = "Va nelle schede partita: chi tiene il punteggio rimanda qui il risultato."
+    override val ctRules = "Regole delle partite"
+    override val ctRulesFree = "A scelta in campo"
+    override val ctRulesHint = "Vanno nella scheda partita che parte con la convocazione: in campo sono già impostate."
+    override val ctConvoke = "Convoca"
+    override val ntCardHowTo = "Chi tiene il punteggio: apri il file allegato con Tennis Score Manager (Condividi › TSM), la partita è già pronta."
+    override val ntCardAttached: (String) -> String = { "Allegata la scheda partita: $it" }
+    override val mcTitle = "Scheda partita del circolo"
+    override val mcPrepare = "Prepara la partita"
+    override val mcHint = "Nuova partita si apre con giocatori, regole, torneo e turno già scritti; a fine partita il risultato va rimandato alla segreteria."
+    override val mcBusy = "C'è una partita in corso: finiscila o sospendila, poi riapri il file."
+    override val mcNotValid = "Questo file non è una scheda partita di Tennis Score Manager."
 }
 
 object EnStrings : Strings {
@@ -7272,6 +7298,19 @@ object EnStrings : Strings {
     override val cmTitle = "Club matches"
     override val cmHint: (Int) -> String = { if (it == 1) "1 tournament, team or challenge match to play" else "$it tournament, team and challenge matches to play" }
     override val cmPick = "Tap a match: New match opens with players, event and round already filled in, and at the end the result goes back to the club."
+    override val clubPhone = "Club office phone"
+    override val clubPhoneHint = "It goes in the match cards: whoever keeps the score sends the result back here."
+    override val ctRules = "Match rules"
+    override val ctRulesFree = "Chosen on court"
+    override val ctRulesHint = "They go in the match card sent with the call-up: on court they are already set."
+    override val ctConvoke = "Call up"
+    override val ntCardHowTo = "Whoever keeps the score: open the attached file with Tennis Score Manager (Share › TSM), the match is ready."
+    override val ntCardAttached: (String) -> String = { "Match card attached: $it" }
+    override val mcTitle = "Club match card"
+    override val mcPrepare = "Prepare the match"
+    override val mcHint = "New match opens with players, rules, tournament and round already filled in; at the end the result is to be sent back to the club office."
+    override val mcBusy = "A match is in progress: finish or suspend it, then open the file again."
+    override val mcNotValid = "This file is not a Tennis Score Manager match card."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

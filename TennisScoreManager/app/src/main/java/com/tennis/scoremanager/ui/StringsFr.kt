@@ -2408,4 +2408,17 @@ object FrStrings : Strings {
     override val cmTitle = "Matchs du club"
     override val cmHint: (Int) -> String = { if (it == 1) "1 match de tournoi, d'équipe ou de défi à jouer" else "$it matchs de tournois, d'équipes et de défis à jouer" }
     override val cmPick = "Touchez un match : Nouveau match s'ouvre avec joueurs, tournoi et tour déjà remplis, et à la fin le résultat retourne au club."
+    override val clubPhone = "Téléphone du secrétariat"
+    override val clubPhoneHint = "Il figure dans les fiches de match : celui qui tient le score renvoie le résultat ici."
+    override val ctRules = "Règles des matchs"
+    override val ctRulesFree = "Au choix sur le court"
+    override val ctRulesHint = "Elles figurent dans la fiche de match envoyée avec la convocation : sur le court elles sont déjà réglées."
+    override val ctConvoke = "Convoquer"
+    override val ntCardHowTo = "Qui tient le score : ouvrez le fichier joint avec Tennis Score Manager (Partager › TSM), le match est prêt."
+    override val ntCardAttached: (String) -> String = { "Fiche de match jointe : $it" }
+    override val mcTitle = "Fiche de match du club"
+    override val mcPrepare = "Préparer le match"
+    override val mcHint = "Nouveau match s'ouvre avec joueurs, règles, tournoi et tour déjà remplis ; à la fin le résultat est à renvoyer au secrétariat."
+    override val mcBusy = "Un match est en cours : terminez-le ou suspendez-le, puis rouvrez le fichier."
+    override val mcNotValid = "Ce fichier n'est pas une fiche de match de Tennis Score Manager."
 }

@@ -83,6 +83,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         when (st) {
             Step.USE -> role == com.tennis.scoremanager.Role.PLAYER
             Step.CLUB -> role == com.tennis.scoremanager.Role.CLUB
+            // La segreteria non ha una scheda da giocatore: il nome non serve.
+            Step.YOU -> role != com.tennis.scoremanager.Role.CLUB
             else -> true
         }
     }
