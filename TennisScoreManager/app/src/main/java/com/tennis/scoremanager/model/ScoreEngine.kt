@@ -133,6 +133,23 @@ object ScoreEngine {
     fun replay(rules: RulesConfig, events: List<MatchEvent>): MatchState =
         events.fold(initial(rules)) { s, e -> apply(s, e).state }
 
+    /**
+     * "Annulla": gli eventi che restano. Una correzione dell'arbitro (ritiro, richiamo, pausa, chi serve, lati,
+     * punteggio messo a mano, ordine di risposta a set iniziato) si toglie da sola; altrimenti va via l'ultimo punto
+     * con le scelte venute dopo (ordine di servizio e di risposta del set nuovo). [state] è lo stato di adesso;
+     * null se non c'è niente da annullare.
+     */
+    fun undo(state: MatchState, events: List<MatchEvent>): List<MatchEvent>? {
+        val last = events.lastOrNull() ?: return null
+        val setStarted = state.g1 + state.g2 + state.pt1 + state.pt2 > 0
+        val alone = last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break ||
+            last is MatchEvent.ServerFix || last is MatchEvent.EndsFix || last is MatchEvent.ScoreSet ||
+            (last is MatchEvent.ReceiveOrder && setStarted)
+        if (alone) return events.dropLast(1)
+        val point = events.indexOfLast { it is MatchEvent.Point }
+        return if (point < 0) null else events.subList(0, point)
+    }
+
     fun apply(state: MatchState, event: MatchEvent): Step = when (event) {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
         is MatchEvent.ServeOrder -> Step(applyServeOrder(state, event), null)

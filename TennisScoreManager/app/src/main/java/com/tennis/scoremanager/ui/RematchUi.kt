@@ -28,6 +28,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -63,7 +64,7 @@ fun RematchCard(c: MatchController, m: LiveMatch) {
 private fun RematchDialog(c: MatchController, m: LiveMatch, onClose: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val rec = m.record
     var at by remember {
         mutableLongStateOf(Rematch.suggestedTime(rec.startedAt ?: rec.updatedAt, System.currentTimeMillis()))

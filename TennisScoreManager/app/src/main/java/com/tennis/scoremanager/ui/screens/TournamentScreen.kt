@@ -96,7 +96,7 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun TournamentScreen(c: MatchController) {
-    val t by c.tournament.collectAsState()
+    val t by c.friends.current.collectAsState()
     val cur = t
     if (cur == null) TournamentList(c) else TournamentView(c, cur)
 }
@@ -106,11 +106,11 @@ fun TournamentScreen(c: MatchController) {
 @Composable
 private fun TournamentList(c: MatchController) {
     val s = LocalStrings.current
-    val all by c.tournaments.collectAsState()
+    val all by c.friends.all.collectAsState()
     var creating by rememberSaveable { mutableStateOf(false) }
-    BackHandler { if (creating) creating = false else c.home() }
+    BackHandler { if (creating) creating = false else c.back() }
     if (creating || all.isEmpty()) {
-        NewTournament(c) { if (all.isEmpty()) c.home() else creating = false }
+        NewTournament(c) { if (all.isEmpty()) c.back() else creating = false }
         return
     }
     ScreenScaffold(
@@ -119,14 +119,14 @@ private fun TournamentList(c: MatchController) {
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.home() }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.tournamentNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {
         all.forEach { t ->
             val leader = Tournaments.standings(t).firstOrNull()?.takeIf { t.rounds.any { r -> r.matches.any { it.played } } }
             Row(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.openTournament(t) }
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.friends.open(t) }
                     .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -174,7 +174,7 @@ private fun NewTournament(c: MatchController, onCancel: () -> Unit) {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onCancel, Modifier.weight(1f))
             BigButton(s.tournamentCreate, Icons.Filled.PlayArrow, {
                 if (!valid) error = true
-                else c.createTournament(
+                else c.friends.create(
                     name, if (mexicano) TournamentKind.MEXICANO else TournamentKind.AMERICANO, names,
                     courts, if (timed) TournamentScoring.TIME else TournamentScoring.POINTS, points, minutes,
                 )
@@ -250,7 +250,7 @@ private fun TournamentView(c: MatchController, t: Tournament) {
     var counting by remember { mutableStateOf<Pair<Int, TMatch>?>(null) }
     // Si mostra sempre l'ultimo turno quando ne arriva uno nuovo.
     LaunchedEffect(t.rounds.size) { shownRound = t.rounds.size }
-    BackHandler { c.closeTournament() }
+    BackHandler { c.friends.close() }
 
     ScreenScaffold(
 
@@ -259,14 +259,14 @@ private fun TournamentView(c: MatchController, t: Tournament) {
         subtitle = if (t.scoring == TournamentScoring.POINTS) s.tournamentPointsN(t.pointsPerMatch) else s.tournamentMinutesN(t.minutes),
         icon = Icons.Filled.EmojiEvents,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.closeTournament() }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.friends.close() }, Modifier.weight(1f))
             if (t.finished) {
                 BigButton(s.tournamentShare, Icons.Filled.Share, {
-                    c.tournamentShareIntent()?.let { runCatching { context.startActivity(it) } }
+                    c.friends.shareIntent()?.let { runCatching { context.startActivity(it) } }
                 }, Modifier.weight(1f))
             } else {
                 BigButton(s.tournamentNextRound, Icons.AutoMirrored.Filled.ArrowForward, {
-                    if (!c.nextTournamentRound()) missing = true
+                    if (!c.friends.nextRound()) missing = true
                 }, Modifier.weight(1f))
             }
         },
@@ -275,7 +275,7 @@ private fun TournamentView(c: MatchController, t: Tournament) {
         if (tab == 1) {
             StandingsTable(c, t)
             if (!t.finished) GhostButton(s.tournamentShare, Icons.Filled.Share, {
-                c.tournamentShareIntent()?.let { runCatching { context.startActivity(it) } }
+                c.friends.shareIntent()?.let { runCatching { context.startActivity(it) } }
             }, Modifier.fillMaxWidth())
         } else {
             if (t.rounds.size > 1) {
@@ -287,7 +287,7 @@ private fun TournamentView(c: MatchController, t: Tournament) {
                 Text(s.tournamentRound(r.number), color = TsmColors.TextMain, fontWeight = FontWeight.Black, fontSize = 20.sp)
                 r.matches.forEach { m ->
                     MatchCard(c, t, m, editable = !t.finished, onCount = { counting = r.number to m }) { a, b ->
-                        c.setTournamentResult(r.number, m.court, a, b)
+                        c.friends.setResult(r.number, m.court, a, b)
                     }
                 }
                 if (r.resting.isNotEmpty()) {
@@ -306,15 +306,15 @@ private fun TournamentView(c: MatchController, t: Tournament) {
     }
     if (confirmFinish) {
         ConfirmDialog(Icons.Filled.Flag, s.tournamentFinish, s.tournamentFinishText, s.tournamentFinish,
-            onConfirm = { confirmFinish = false; c.finishTournament(); tab = 1 }, onDismiss = { confirmFinish = false })
+            onConfirm = { confirmFinish = false; c.friends.finish(); tab = 1 }, onDismiss = { confirmFinish = false })
     }
     if (confirmDelete) {
         ConfirmDialog(Icons.Filled.Delete, s.tournamentDeleteTitle, s.tournamentDeleteText, s.delete,
-            onConfirm = { confirmDelete = false; c.deleteTournament(t.id) }, onDismiss = { confirmDelete = false })
+            onConfirm = { confirmDelete = false; c.friends.delete(t.id) }, onDismiss = { confirmDelete = false })
     }
     counting?.let { (roundNo, m) ->
         LiveCounter(c, t, m, onDismiss = { counting = null }) { a, b ->
-            c.setTournamentResult(roundNo, m.court, a, b)
+            c.friends.setResult(roundNo, m.court, a, b)
             counting = null
         }
     }
@@ -420,7 +420,7 @@ private fun LiveCounter(c: MatchController, t: Tournament, m: TMatch, onDismiss:
                         onClick = {
                             if (!over) {
                                 history.add(side)
-                                c.announceCounter(history.count { it == Side.P1 }, history.count { it == Side.P2 })
+                                c.friends.announce(history.count { it == Side.P1 }, history.count { it == Side.P2 })
                             }
                         },
                         shape = RoundedCornerShape(24.dp),
@@ -441,7 +441,7 @@ private fun LiveCounter(c: MatchController, t: Tournament, m: TMatch, onDismiss:
                     GhostButton(s.undoPoint, Icons.AutoMirrored.Filled.Undo, {
                         if (history.isNotEmpty()) {
                             history.removeAt(history.lastIndex)
-                            c.announceCounter(history.count { it == Side.P1 }, history.count { it == Side.P2 })
+                            c.friends.announce(history.count { it == Side.P1 }, history.count { it == Side.P2 })
                         }
                     }, Modifier.weight(1f))
                     GhostButton(s.cancel, Icons.Filled.Close, onDismiss, Modifier.weight(1f))

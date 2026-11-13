@@ -49,6 +49,7 @@ mkdir -p "$DEST/app/src/main/res/mipmap-anydpi-v26"
 mkdir -p "$DEST/app/src/main/res/raw"
 mkdir -p "$DEST/app/src/main/res/values"
 mkdir -p "$DEST/app/src/main/res/xml"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/desk"
@@ -412,7 +413,6 @@ const APP_I18N = {
     crtPhotosAfter: "Le foto si aggiungono dopo aver salvato il campo.",
     crtPhotosCount: (it) => `${it} foto`,
     crtPricesHint: "Prezzi di questo campo: vuoti = quelli generali.",
-    crtTapToSet: "tocca per impostarlo",
     crtTitle: "Campi",
     ctAddEntry: "Iscrivi",
     ctBye: "bye",
@@ -532,7 +532,6 @@ const APP_I18N = {
     pbBoardTitle: "Bacheca del circolo",
     pbBoardUnread: (it) => it === 1 ? `1 messaggio da leggere in bacheca` : `${it} messaggi da leggere in bacheca`,
     pbBookNow: "Prenota",
-    pbBooked: "Prenotato!",
     pbBookedInvite: "Prenotato! Qui sotto puoi invitare chi gioca con te.",
     pbBusy: "Occupato",
     pbCachedMine: "Le tue prenotazioni, dall'ultimo controllo",
@@ -563,10 +562,8 @@ const APP_I18N = {
     pbDmNone: "Nessuna conversazione.",
     pbDmOpen: "Possono scrivermi i soci",
     pbDmOpenHint: "Acceso: compari nell'elenco e gli altri soci possono scriverti. Spento: non compari, ma puoi scrivere tu a chi l'ha acceso.",
-    pbDmTitle: "Messaggi privati",
     pbDmWrite: "Scrivi a un socio",
     pbDuration: "Durata",
-    pbEntryHint: "Se il tuo circolo ha il server TSM: entri con l'invito della segreteria",
     pbEntryJoined: (it) => `${it}: campi liberi e le tue prenotazioni`,
     pbErrAuth: "Questo telefono non è più collegato al circolo: chiedi un nuovo invito alla segreteria.",
     pbErrBlocked: "In quest'ora il campo non è prenotabile.",
@@ -618,6 +615,7 @@ const APP_I18N = {
     pbLoginTitle: "Hai già un PIN?",
     pbMine: "Le tue prenotazioni",
     pbMineCell: "Tuo",
+    pbMineEntryHint: "Prenotazioni, liste d'attesa, promemoria e PIN",
     pbMsgDelete: "Elimina",
     pbMsgDeleteAsk: "Eliminare il messaggio? Per tutti resterà «Messaggio eliminato».",
     pbMsgDeletedBy: (it) => `${it} ha eliminato il messaggio`,
@@ -660,6 +658,7 @@ const APP_I18N = {
     pbSeekBooked: (it) => `Campo prenotato: ${it}`,
     pbSeekDay: "Giorno",
     pbSeekDoubles: "Doppio",
+    pbSeekEntryHint: "Trova con chi giocare: al completo il campo si prenota da solo",
     pbSeekFrom: "Dalle",
     pbSeekHint: "Gli altri giocatori lo vedono e toccano Ci sto; quando siete al completo il server prenota il primo campo libero nella fascia scelta.",
     pbSeekJoin: "Ci sto",
@@ -813,7 +812,7 @@ const APP_I18N = {
     srvIntro: "Facoltativo. Con un piccolo server al circolo (un Raspberry Pi o un vecchio PC) i giocatori invitati prenotano i campi da soli dal telefono, anche da iPhone, con le regole decise qui. Senza server tutto resta com'è: si prenota in segreteria.",
     srvInvite: "Invito per prenotare online",
     srvInviteCode: (it) => `Codice: ${it}`,
-    srvInviteHint: "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Gioca › Prenota un campo › Inquadra il QR.",
+    srvInviteHint: "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Altro › Ho un invito del circolo › Inquadra il QR.",
     srvInviteHow: "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online.",
     srvInviteLocalOnly: "Senza indirizzo da internet questo invito funziona solo con il Wi-Fi del circolo.",
     srvInviteUntil: (it) => `Vale una volta, fino al ${it}`,
@@ -1013,7 +1012,6 @@ const APP_I18N = {
     crtPhotosAfter: "Photos can be added once the court is saved.",
     crtPhotosCount: (it) => `${it} ${it === 1 ? "photo" : "photos"}`,
     crtPricesHint: "Prices for this court: empty = the general ones.",
-    crtTapToSet: "tap to set it up",
     crtTitle: "Courts",
     ctAddEntry: "Enter",
     ctBye: "bye",
@@ -1133,7 +1131,6 @@ const APP_I18N = {
     pbBoardTitle: "Club notice board",
     pbBoardUnread: (it) => it === 1 ? `1 unread message on the notice board` : `${it} unread messages on the notice board`,
     pbBookNow: "Book",
-    pbBooked: "Booked!",
     pbBookedInvite: "Booked! Below you can invite whoever plays with you.",
     pbBusy: "Taken",
     pbCachedMine: "Your bookings, as of the last check",
@@ -1164,10 +1161,8 @@ const APP_I18N = {
     pbDmNone: "No conversations.",
     pbDmOpen: "Members can write to me",
     pbDmOpenHint: "On: you are in the list and other members can write to you. Off: you are not, but you can write to those who turned it on.",
-    pbDmTitle: "Private messages",
     pbDmWrite: "Write to a member",
     pbDuration: "Length",
-    pbEntryHint: "If your club has the TSM server: join with the office invitation",
     pbEntryJoined: (it) => `${it}: free courts and your bookings`,
     pbErrAuth: "This phone is no longer connected to the club: ask the office for a new invitation.",
     pbErrBlocked: "The court cannot be booked at this time.",
@@ -1219,6 +1214,7 @@ const APP_I18N = {
     pbLoginTitle: "Already have a PIN?",
     pbMine: "Your bookings",
     pbMineCell: "Yours",
+    pbMineEntryHint: "Bookings, waiting lists, reminders and PIN",
     pbMsgDelete: "Delete",
     pbMsgDeleteAsk: "Delete the message? Everyone will see “Message deleted”.",
     pbMsgDeletedBy: (it) => `${it} deleted this message`,
@@ -1261,6 +1257,7 @@ const APP_I18N = {
     pbSeekBooked: (it) => `Court booked: ${it}`,
     pbSeekDay: "Day",
     pbSeekDoubles: "Doubles",
+    pbSeekEntryHint: "Find someone to play with: when it is full the court is booked by itself",
     pbSeekFrom: "From",
     pbSeekHint: "Other players see it and tap I'm in; when you are complete the server books the first free court in the chosen time.",
     pbSeekJoin: "I'm in",
@@ -1414,7 +1411,7 @@ const APP_I18N = {
     srvIntro: "Optional. With a small server at the club (a Raspberry Pi or an old PC) invited players book courts by themselves from their phone, iPhone too, with the rules set here. Without a server nothing changes: bookings go through the club office.",
     srvInvite: "Invite to book online",
     srvInviteCode: (it) => `Code: ${it}`,
-    srvInviteHint: "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: Play › Book a court › Scan the QR.",
+    srvInviteHint: "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: More › I have a club invitation › Scan the QR.",
     srvInviteHow: "To invite a player: open their card and tap Invite to book online.",
     srvInviteLocalOnly: "Without an address from the internet, this invitation works only on the club Wi-Fi.",
     srvInviteUntil: (it) => `Works once, until ${it}`,
@@ -1614,7 +1611,6 @@ const APP_I18N = {
     crtPhotosAfter: "Les photos s'ajoutent une fois le terrain enregistré.",
     crtPhotosCount: (it) => `${it} image${it === 1 ? "" : "s"}`,
     crtPricesHint: "Tarifs de ce terrain : vides = les tarifs généraux.",
-    crtTapToSet: "touchez pour le configurer",
     crtTitle: "Terrains",
     ctAddEntry: "Inscrire",
     ctBye: "exempt",
@@ -1734,7 +1730,6 @@ const APP_I18N = {
     pbBoardTitle: "Tableau du club",
     pbBoardUnread: (it) => it === 1 ? `1 message à lire au tableau` : `${it} messages à lire au tableau`,
     pbBookNow: "Réserver",
-    pbBooked: "Réservé !",
     pbBookedInvite: "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous.",
     pbBusy: "Occupé",
     pbCachedMine: "Vos réservations, au dernier contrôle",
@@ -1765,10 +1760,8 @@ const APP_I18N = {
     pbDmNone: "Aucune conversation.",
     pbDmOpen: "Les membres peuvent m'écrire",
     pbDmOpenHint: "Activé : vous êtes dans la liste et les autres membres peuvent vous écrire. Désactivé : vous n'y êtes pas, mais vous pouvez écrire à ceux qui l'ont activé.",
-    pbDmTitle: "Messages privés",
     pbDmWrite: "Écrire à un membre",
     pbDuration: "Durée",
-    pbEntryHint: "Si votre club a le serveur TSM : entrez avec l'invitation du secrétariat",
     pbEntryJoined: (it) => `${it} : terrains libres et vos réservations`,
     pbErrAuth: "Ce téléphone n'est plus connecté au club : demandez une nouvelle invitation au secrétariat.",
     pbErrBlocked: "Le terrain n'est pas réservable à cette heure.",
@@ -1820,6 +1813,7 @@ const APP_I18N = {
     pbLoginTitle: "Vous avez déjà un PIN ?",
     pbMine: "Vos réservations",
     pbMineCell: "À vous",
+    pbMineEntryHint: "Réservations, listes d'attente, rappels et code PIN",
     pbMsgDelete: "Supprimer",
     pbMsgDeleteAsk: "Supprimer le message ? Tout le monde verra « Message supprimé ».",
     pbMsgDeletedBy: (it) => `${it} a supprimé ce message`,
@@ -1862,6 +1856,7 @@ const APP_I18N = {
     pbSeekBooked: (it) => `Terrain réservé : ${it}`,
     pbSeekDay: "Jour",
     pbSeekDoubles: "Double",
+    pbSeekEntryHint: "Trouvez avec qui jouer : une fois complet, le terrain se réserve tout seul",
     pbSeekFrom: "De",
     pbSeekHint: "Les autres joueurs la voient et touchent Je viens ; quand vous êtes au complet, le serveur réserve le premier terrain libre dans le créneau choisi.",
     pbSeekJoin: "Je viens",
@@ -2015,7 +2010,7 @@ const APP_I18N = {
     srvIntro: "Facultatif. Avec un petit serveur au club (un Raspberry Pi ou un vieux PC), les joueurs invités réservent eux-mêmes depuis leur téléphone, iPhone compris, avec les règles fixées ici. Sans serveur rien ne change : on réserve au secrétariat.",
     srvInvite: "Invitation à réserver en ligne",
     srvInviteCode: (it) => `Code : ${it}`,
-    srvInviteHint: "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Jouer › Réserver un terrain › Scanner le QR.",
+    srvInviteHint: "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Plus › J'ai une invitation du club › Scanner le QR.",
     srvInviteHow: "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne.",
     srvInviteLocalOnly: "Sans adresse depuis internet, cette invitation ne marche qu'avec le Wi-Fi du club.",
     srvInviteUntil: (it) => `Valable une fois, jusqu'au ${it}`,
@@ -2215,7 +2210,6 @@ const APP_I18N = {
     crtPhotosAfter: "Fotos lassen sich hinzufügen, wenn der Platz gespeichert ist.",
     crtPhotosCount: (it) => `${it} ${it === 1 ? "Foto" : "Fotos"}`,
     crtPricesHint: "Preise dieses Platzes: leer = die allgemeinen.",
-    crtTapToSet: "antippen zum Einrichten",
     crtTitle: "Plätze",
     ctAddEntry: "Anmelden",
     ctBye: "Freilos",
@@ -2335,7 +2329,6 @@ const APP_I18N = {
     pbBoardTitle: "Vereinsbrett",
     pbBoardUnread: (it) => it === 1 ? `1 ungelesene Mitteilung am Vereinsbrett` : `${it} ungelesene Mitteilungen am Vereinsbrett`,
     pbBookNow: "Buchen",
-    pbBooked: "Gebucht!",
     pbBookedInvite: "Gebucht! Unten kannst du einladen, wer mit dir spielt.",
     pbBusy: "Belegt",
     pbCachedMine: "Deine Buchungen, Stand der letzten Prüfung",
@@ -2366,10 +2359,8 @@ const APP_I18N = {
     pbDmNone: "Keine Unterhaltungen.",
     pbDmOpen: "Mitglieder dürfen mir schreiben",
     pbDmOpenHint: "An: Du stehst in der Liste und andere Mitglieder können dir schreiben. Aus: Du stehst nicht drin, kannst aber denen schreiben, die es eingeschaltet haben.",
-    pbDmTitle: "Private Nachrichten",
     pbDmWrite: "Einem Mitglied schreiben",
     pbDuration: "Dauer",
-    pbEntryHint: "Wenn dein Verein den TSM-Server hat: mit der Einladung des Büros",
     pbEntryJoined: (it) => `${it}: freie Plätze und deine Buchungen`,
     pbErrAuth: "Dieses Handy ist nicht mehr mit dem Verein verbunden: Frag im Büro nach einer neuen Einladung.",
     pbErrBlocked: "Der Platz ist zu dieser Zeit nicht buchbar.",
@@ -2421,6 +2412,7 @@ const APP_I18N = {
     pbLoginTitle: "Schon eine PIN?",
     pbMine: "Deine Buchungen",
     pbMineCell: "Deine",
+    pbMineEntryHint: "Buchungen, Wartelisten, Erinnerungen und PIN",
     pbMsgDelete: "Löschen",
     pbMsgDeleteAsk: "Nachricht löschen? Alle sehen dann „Nachricht gelöscht“.",
     pbMsgDeletedBy: (it) => `${it} hat diese Nachricht gelöscht`,
@@ -2463,6 +2455,7 @@ const APP_I18N = {
     pbSeekBooked: (it) => `Platz gebucht: ${it}`,
     pbSeekDay: "Tag",
     pbSeekDoubles: "Doppel",
+    pbSeekEntryHint: "Finde Mitspieler: wenn alle da sind, wird der Platz von selbst gebucht",
     pbSeekFrom: "Von",
     pbSeekHint: "Die anderen Spieler sehen sie und tippen auf Bin dabei; seid ihr vollständig, bucht der Server den ersten freien Platz in der gewählten Zeit.",
     pbSeekJoin: "Bin dabei",
@@ -2616,7 +2609,7 @@ const APP_I18N = {
     srvIntro: "Optional. Mit einem kleinen Server im Verein (ein Raspberry Pi oder ein alter PC) buchen eingeladene Spieler die Plätze selbst am Handy, auch am iPhone, nach den hier festgelegten Regeln. Ohne Server bleibt alles wie gehabt: gebucht wird im Vereinsbüro.",
     srvInvite: "Einladung zum Online-Buchen",
     srvInviteCode: (it) => `Code: ${it}`,
-    srvInviteHint: "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm. Mit der TSM-App: Spielen › Platz buchen › QR-Code scannen.",
+    srvInviteHint: "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm. Mit der TSM-App: Mehr › Ich habe eine Einladung vom Verein › QR-Code scannen.",
     srvInviteHow: "Um einen Spieler einzuladen: Öffne seine Karte und tippe auf Einladung zum Online-Buchen.",
     srvInviteLocalOnly: "Ohne Adresse aus dem Internet funktioniert diese Einladung nur im Vereins-WLAN.",
     srvInviteUntil: (it) => `Gilt einmal, bis ${it}`,
@@ -2816,7 +2809,6 @@ const APP_I18N = {
     crtPhotosAfter: "Las fotos se añaden después de guardar la pista.",
     crtPhotosCount: (it) => `${it} ${it === 1 ? "foto" : "fotos"}`,
     crtPricesHint: "Precios de esta pista: vacíos = los generales.",
-    crtTapToSet: "toca para configurarla",
     crtTitle: "Pistas",
     ctAddEntry: "Inscribir",
     ctBye: "bye",
@@ -2936,7 +2928,6 @@ const APP_I18N = {
     pbBoardTitle: "Tablón del club",
     pbBoardUnread: (it) => it === 1 ? `1 mensaje por leer en el tablón` : `${it} mensajes por leer en el tablón`,
     pbBookNow: "Reservar",
-    pbBooked: "¡Reservada!",
     pbBookedInvite: "¡Reservado! Abajo puedes invitar a quien juega contigo.",
     pbBusy: "Ocupada",
     pbCachedMine: "Tus reservas, de la última comprobación",
@@ -2967,10 +2958,8 @@ const APP_I18N = {
     pbDmNone: "Ninguna conversación.",
     pbDmOpen: "Los socios pueden escribirme",
     pbDmOpenHint: "Encendido: apareces en la lista y otros socios pueden escribirte. Apagado: no apareces, pero puedes escribir a quien lo tenga encendido.",
-    pbDmTitle: "Mensajes privados",
     pbDmWrite: "Escribir a un socio",
     pbDuration: "Duración",
-    pbEntryHint: "Si tu club tiene el servidor TSM: entra con la invitación de secretaría",
     pbEntryJoined: (it) => `${it}: pistas libres y tus reservas`,
     pbErrAuth: "Este teléfono ya no está conectado al club: pide una nueva invitación a secretaría.",
     pbErrBlocked: "La pista no se puede reservar a esta hora.",
@@ -3022,6 +3011,7 @@ const APP_I18N = {
     pbLoginTitle: "¿Ya tienes un PIN?",
     pbMine: "Tus reservas",
     pbMineCell: "Tuya",
+    pbMineEntryHint: "Reservas, listas de espera, recordatorios y PIN",
     pbMsgDelete: "Eliminar",
     pbMsgDeleteAsk: "¿Eliminar el mensaje? Todos verán «Mensaje eliminado».",
     pbMsgDeletedBy: (it) => `${it} eliminó este mensaje`,
@@ -3064,6 +3054,7 @@ const APP_I18N = {
     pbSeekBooked: (it) => `Pista reservada: ${it}`,
     pbSeekDay: "Día",
     pbSeekDoubles: "Dobles",
+    pbSeekEntryHint: "Encuentra con quién jugar: al completarse, la pista se reserva sola",
     pbSeekFrom: "Desde",
     pbSeekHint: "Los demás jugadores lo ven y tocan Me apunto; cuando estéis completos el servidor reserva la primera pista libre en la franja elegida.",
     pbSeekJoin: "Me apunto",
@@ -3217,7 +3208,7 @@ const APP_I18N = {
     srvIntro: "Opcional. Con un pequeño servidor en el club (una Raspberry Pi o un PC viejo) los jugadores invitados reservan las pistas solos desde el teléfono, también iPhone, con las reglas fijadas aquí. Sin servidor todo sigue igual: se reserva en secretaría.",
     srvInvite: "Invitación para reservar en línea",
     srvInviteCode: (it) => `Código: ${it}`,
-    srvInviteHint: "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio. Con la app TSM: Jugar › Reservar pista › Escanear el QR.",
+    srvInviteHint: "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio. Con la app TSM: Más › Tengo una invitación del club › Escanear el QR.",
     srvInviteHow: "Para invitar a un jugador: abre su ficha y toca Invitación para reservar en línea.",
     srvInviteLocalOnly: "Sin dirección desde internet, esta invitación solo funciona con el Wi-Fi del club.",
     srvInviteUntil: (it) => `Vale una vez, hasta el ${it}`,
@@ -3417,7 +3408,6 @@ const APP_I18N = {
     crtPhotosAfter: "As fotos se adicionam depois de salvar a quadra.",
     crtPhotosCount: (it) => `${it} ${it === 1 ? "foto" : "fotos"}`,
     crtPricesHint: "Preços desta quadra: vazios = os gerais.",
-    crtTapToSet: "toque para configurar",
     crtTitle: "Quadras",
     ctAddEntry: "Inscrever",
     ctBye: "bye",
@@ -3537,7 +3527,6 @@ const APP_I18N = {
     pbBoardTitle: "Mural do clube",
     pbBoardUnread: (it) => it === 1 ? `1 mensagem por ler no mural` : `${it} mensagens por ler no mural`,
     pbBookNow: "Reservar",
-    pbBooked: "Reservada!",
     pbBookedInvite: "Reservado! Aqui em baixo pode convidar quem joga consigo.",
     pbBusy: "Ocupada",
     pbCachedMine: "As suas reservas, da última verificação",
@@ -3568,10 +3557,8 @@ const APP_I18N = {
     pbDmNone: "Nenhuma conversa.",
     pbDmOpen: "Os sócios podem escrever-me",
     pbDmOpenHint: "Ligado: apareces na lista e os outros sócios podem escrever-te. Desligado: não apareces, mas podes escrever a quem o ligou.",
-    pbDmTitle: "Mensagens privadas",
     pbDmWrite: "Escrever a um sócio",
     pbDuration: "Duração",
-    pbEntryHint: "Se o teu clube tem o servidor TSM: entra com o convite da secretaria",
     pbEntryJoined: (it) => `${it}: quadras livres e as tuas reservas`,
     pbErrAuth: "Este telemóvel já não está ligado ao clube: pede um novo convite à secretaria.",
     pbErrBlocked: "A quadra não se pode reservar a esta hora.",
@@ -3623,6 +3610,7 @@ const APP_I18N = {
     pbLoginTitle: "Já tem um PIN?",
     pbMine: "As tuas reservas",
     pbMineCell: "Tua",
+    pbMineEntryHint: "Reservas, listas de espera, lembretes e PIN",
     pbMsgDelete: "Eliminar",
     pbMsgDeleteAsk: "Eliminar a mensagem? Todos verão «Mensagem eliminada».",
     pbMsgDeletedBy: (it) => `${it} eliminou esta mensagem`,
@@ -3665,6 +3653,7 @@ const APP_I18N = {
     pbSeekBooked: (it) => `Quadra reservada: ${it}`,
     pbSeekDay: "Dia",
     pbSeekDoubles: "Pares",
+    pbSeekEntryHint: "Encontre com quem jogar: quando completo, a quadra é reservada sozinha",
     pbSeekFrom: "Das",
     pbSeekHint: "Os outros jogadores veem-no e tocam em Conta comigo; quando estiverem completos o servidor reserva a primeira quadra livre na faixa escolhida.",
     pbSeekJoin: "Conta comigo",
@@ -3818,7 +3807,7 @@ const APP_I18N = {
     srvIntro: "Opcional. Com um pequeno servidor no clube (um Raspberry Pi ou um PC antigo) os jogadores convidados reservam as quadras sozinhos no telemóvel, também iPhone, com as regras definidas aqui. Sem servidor tudo fica igual: reserva-se na secretaria.",
     srvInvite: "Convite para reservar online",
     srvInviteCode: (it) => `Código: ${it}`,
-    srvInviteHint: "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal. Com a app TSM: Jogar › Reservar quadra › Ler o QR.",
+    srvInviteHint: "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal. Com a app TSM: Mais › Tenho um convite do clube › Ler o QR.",
     srvInviteHow: "Para convidar um jogador: abre a sua ficha e toca em Convite para reservar online.",
     srvInviteLocalOnly: "Sem endereço pela internet, este convite só funciona no Wi-Fi do clube.",
     srvInviteUntil: (it) => `Vale uma vez, até ${it}`,
@@ -8180,20 +8169,20 @@ TSM_EOF
 cat > "$DEST/app/src/main/assets/help/de.md" << 'TSM_EOF'
 ## 3.1 Wie die App aufgebaut ist
 
-Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen wirst (Punkte zählen, mit Armbändern spielen, trainieren, Matches filmen) und deinen Namen; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Unten gibt es immer **fünf Reiter**:
+Beim **ersten Start** fragt die App nach der Sprache, wer sie nutzt (die Rollen), deinem Namen, wie du sie nutzen wirst und, fürs Büro, nach dem Verein; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Unten stehen die Reiter der **aktiven Rolle**, die oben immer zu sehen ist: antippen, um zu einer anderen Rolle zu wechseln oder **Rollen und Funktionen** zu öffnen. **Jede Funktion steht in nur einer Rolle** (7.9): Du spielst, der Trainer betreut die Schüler, der Verein führt das Büro. Mit der Rolle **Du**:
 
-- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, **Wie beim letzten Mal** (gleiche Spieler, Platz und Regeln: die Regeln stehen in einer Zeile und es geht direkt zum Münzwurf; *Modus oder Regeln ändern* öffnet sie wieder), das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Spielen**: **Neues Match**, die unterbrochenen Matches zum Fortsetzen (lange drücken löscht eines), **Wie beim letzten Mal** (gleiche Spieler, Platz und Regeln, direkt zum Münzwurf; *Modus oder Regeln ändern* öffnet sie wieder), das **Turnier unter Freunden** (Americano, Mexicano) und, unter **Dieses Telefon**, die Anzeigetafel, das Kamera-Telefon und **Mit diesem Telefon aufnehmen**. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Verein** (erst nach der Einladung deines Vereins, 7.18): die Neuigkeiten vom Vereinsbrett und aus den Chats, **Platz buchen**, deine Buchungen, **Partner gesucht** und der Vereinschat.
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
-- **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
-- **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
-- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Profil und Daten** (Sicherung, Wiederherstellung, Löschen: 7.8), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
+- **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Deine Videos** (Kapitel, Highlights, Filter, Import), **Mein Jahr**, **Meine Schläger**.
+- **Mehr**: **Du** (deine Karte), **Spieler** (die Datenbank: 7.7) und, in jeder Rolle gleich, **Einstellungen** (die Sprache; die Stimme des Schiedsrichters; die Geräte: Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel; Rollen und Funktionen; Sicherung und Daten, 7.8; ganz unten **Über die App** mit App-Version, Lizenz und Quellcode), **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen) und **App-Einführung**.
 
-**Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
+**Neues Match** hat drei kurze Schritte: **wer spielt** (Einzel oder Doppel, Spieler aus der Datenbank, mit den letzten Spielern zum Antippen, und die Sportart; Ranking, Mann/Frau und Schläger stehen in einer Zeile unter den Namen und öffnen sich mit *Ändern*; Verein, Platz, Turnier und Ort unter *Weitere Angaben*), **wie gezählt wird und das Format** (die weiteren Regeln stehen in einer Zeile, *Ändern* öffnet sie) und der **Münzwurf**. Alles ist freiwillig: Es geht auch ohne Namen weiter. **Zurück** führt immer dorthin, woher du kamst.
 
 ## 4. Die Stimme (funktioniert ohne Internet)
 
 - Jede Ansage wird **in einem einzigen Satz** von der Sprachausgabe des Telefons mit einer installierten Stimme gesprochen: kein Internet und eine natürliche Satzmelodie. Die Namen der Spieler sind Teil des Satzes.
-- Mehr › **Sprache und Stimme** › **Audio und Stimme**:
+- Mehr › **Einstellungen** › **Stimme des Schiedsrichters** › **Audio und Stimme**:
   - **Sprachausgabe-Engine**: *Standard des Telefons* (bei Samsung ist das Samsung TTS) oder eine Engine deiner Wahl, z. B. *Sprachdienste von Google*. In den Tests, auf Italienisch durchgeführt, klang Google natürlicher.
   - **Stimme**: *Automatisch (beste offline)* oder eine bestimmte Stimme (Google führt seine Stimmen mit einem Code auf, als *Stimme …*; die als *online* markierten brauchen Internet).
   - **Stimme testen**: spricht eine Folge von Beispielansagen mit den eingegebenen Namen. Während des Sprechens wird die Taste zu **Test beenden**: Tippe erneut darauf, um abzubrechen (der Test stoppt auch von selbst, wenn du die Seite verlässt). Die Sprachausgabe lässt sich nicht mitten im Satz anhalten, deshalb beendet die Taste sie; drückst du erneut, beginnt sie wieder von vorn.
@@ -8207,7 +8196,7 @@ Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen
 
 ### 4.1 Sprachen
 
-Mehr › **Sprache und Stimme** › **Sprache**: Italiano, English, Français, Deutsch, Español, Português (jede Sprache ist in der Sprache selbst geschrieben, so findet man sie auch dann wieder, wenn die App auf eine Sprache eingestellt ist, die man nicht lesen kann). Die Wahl gilt zugleich für **Bildschirme, Schiedsrichterstimme, TV-Anzeigetafel, Zusammenfassung/Teilen und Armbänder**. Das Datum folgt der Sprache (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026* …).
+Mehr › **Einstellungen** › **Sprache**: Italiano, English, Français, Deutsch, Español, Português (jede Sprache ist in der Sprache selbst geschrieben, so findet man sie auch dann wieder, wenn die App auf eine Sprache eingestellt ist, die man nicht lesen kann). Die Wahl gilt zugleich für **Bildschirme, Schiedsrichterstimme, TV-Anzeigetafel, Zusammenfassung/Teilen und Armbänder**. Das Datum folgt der Sprache (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026* …).
 
 Die Ansagen sind keine Wort-für-Wort-Übersetzungen: Sie folgen den offiziellen Texten für Stuhlschiedsrichter des jeweiligen Verbands, also FFT *L'arbitrage en 255 questions* und ITF auf Französisch, den Unterlagen von DTB/BTV und Swiss Tennis, RFET *Deberes y procedimientos* und FPT *Deveres e Procedimentos* (dem einzigen veröffentlichten portugiesischen Ansagetext). Das Englische folgt der ITF. Im Englischen heißt die Null in den Satzergebnissen am Matchende *love* („six love, six four“), wie bei den Punkten.
 
@@ -8240,7 +8229,7 @@ Besonderheiten:
 | **KEY2** lang (2 s) | schaltet das Armband aus (bei angeschlossenem Kabel steht dort *LAEDT WEITER*: Es lädt auch ausgeschaltet; ab Firmware 2.3 schalten es auch KEY1 oder KEY2 wieder ein) |
 | Seitentaste | ein Klick schaltet ein; Doppelklick schaltet aus (Hardwarefunktion) |
 
-- Beim Einschalten blinkt **KOPPELN...** (0,35 s an alle 2 s, um Strom zu sparen). Die App verbindet sich von selbst mit den Armbändern, die sie kennt, sobald sie geöffnet ist; neue findet sie unter **Mehr › Geräte** (oder unter **Modus und Regeln** im Modus *Armbänder*).
+- Beim Einschalten blinkt **KOPPELN...** (0,35 s an alle 2 s, um Strom zu sparen). Die App verbindet sich von selbst mit den Armbändern, die sie kennt, sobald sie geöffnet ist; neue findet sie unter **Mehr › Einstellungen › Geräte** (oder unter **Modus und Regeln** im Modus *Armbänder*).
 - Verbunden: **GEKOPPELT** für 3 Sekunden mit zwei Pieptönen, dann **GEKOPPELT MIT** + der Name des Spielers.
 - Bei jedem Punkt geht das Display an und zeigt den Spielstand des laufenden Spiels groß (links deiner, rechts der des Gegners; der grüne Ball zeigt, wer aufschlägt), dann geht es wieder aus. Am Spielende zeigt es Spiele und Sätze. Bestätigt das Telefon einen Tastendruck nicht innerhalb von 8 Sekunden (Verbindung verloren), erscheint **NICHT GESENDET** in Rot mit zwei tiefen Pieptönen: Drücke erneut, sobald die Verbindung wieder steht. Ein Tastendruck während einer kurzen Unterbrechung geht dagegen nicht verloren: Er wird gesendet, sobald sich das Armband wieder verbindet, und erst dann piept es.
 
@@ -8262,7 +8251,7 @@ Die übrigen Stromsparmaßnahmen: CPU mit 80 MHz, Display aus, wenn es nicht geb
 
 ### 6.1 Armband-Einstellungen
 
-Unter **Mehr › Geräte** oder **Modus und Regeln** (**Einstellungen** unter dem Armband jedes Spielers) oder während des Matches (oben auf **S1**/**S2** tippen oder auf das Schieberegler-Symbol). Sie werden **im Armband** gespeichert und bleiben auch nach dem Ausschalten erhalten; bei jeder Änderung zeigt das Armband seinen Namen mit *EINSTELLUNGEN OK*. Mit Firmware 2.4 gibt es außerdem den Abschnitt **Schläge** (6.4).
+Unter **Mehr › Einstellungen › Geräte** oder **Modus und Regeln** (**Einstellungen** unter dem Armband jedes Spielers) oder während des Matches (oben auf **S1**/**S2** tippen oder auf das Schieberegler-Symbol). Sie werden **im Armband** gespeichert und bleiben auch nach dem Ausschalten erhalten; bei jeder Änderung zeigt das Armband seinen Namen mit *EINSTELLUNGEN OK*. Mit Firmware 2.4 gibt es außerdem den Abschnitt **Schläge** (6.4).
 
 | Einstellung | Werte | Standard |
 |---|---|---|
@@ -8304,7 +8293,7 @@ Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **
 
 Die günstigste Lösung, damit die Spieler selbst zählen: zwei **Bluetooth-Selfie-Fernbedienungen** (die mit dem Auslöseknopf, oft als *AB Shutter3* verkauft), 1 bis 3 € pro Stück. Android sieht sie als Tastatur: keine Firmware zum Aufspielen und keine Berechtigungen für die App. Jedes andere Bluetooth- (oder USB-)Tastenfeld oder jede Tastatur geht auch.
 
-1. Die Fernbedienung einschalten und in den **Bluetooth-Einstellungen** des Telefons koppeln, wie einen Kopfhörer (*Mehr › Geräte › Bluetooth-Einstellungen* öffnet sie). Mit der zweiten wiederholen.
+1. Die Fernbedienung einschalten und in den **Bluetooth-Einstellungen** des Telefons koppeln, wie einen Kopfhörer (*Mehr › Einstellungen › Geräte › Bluetooth-Einstellungen* öffnet sie). Mit der zweiten wiederholen.
 2. *Modus und Regeln* › Modus **Fernbedienungen** › **Zuordnen** unter Spieler 1 › die Taste seiner Fernbedienung drücken, die den Punkt geben soll; dann dasselbe für Spieler 2. Bei jedem Klick einer zugeordneten Fernbedienung zeigt ihre Zeile **Taste empfangen**: So lässt sich vor dem Spiel testen. **S1 ↔ S2 tauschen** vertauscht sie.
 3. **MATCHBEGINN**: Ein Klick auf eine Fernbedienung startet das Match, wie KEY1 an den Armbändern. Oben sind **S1**/**S2** farbig, wenn die Fernbedienungen verbunden sind.
 
@@ -8343,7 +8332,7 @@ Mit Firmware 2.4 erkennt das Armband **Vorhand, Rückhand, Aufschlag und Volley*
 Herzfrequenz und Kalorien von **Bluetooth-Brustgurten** mit dem Standard-Herzfrequenzdienst: Coospo (getestet mit dem H6), Magene, Polar, Garmin, Wahoo… Sie funktionieren in jedem Modus, auch ohne Armbänder.
 
 1. Befeuchte die Elektroden und lege den Gurt an: Er schaltet sich bei Hautkontakt selbst ein.
-2. *Modus und Regeln* (oder *Mehr › Geräte*) › **Herzfrequenz** › **Brustgurte** einschalten und für jeden Spieler den Gurt wählen (nur einmal). **Tauschen** vertauscht sie.
+2. *Modus und Regeln* (oder *Mehr › Einstellungen › Geräte*) › **Herzfrequenz** › **Brustgurte** einschalten und für jeden Spieler den Gurt wählen (nur einmal). **Tauschen** vertauscht sie.
 3. Optional **Alter, Gewicht und Geschlecht** der Person: für die Kalorien (Keytel-Formel, typischer Fehler ±20 %) und, mit dem Alter, für die Herzfrequenzzonen (geschätztes Maximum 208 − 0,7 × Alter).
 
 - Unter jedem Gurt: Status, Herzfrequenz, **Signal** in dBm (näher an 0 = stärker) und **Aussetzer**, also wie oft die Herzfrequenz länger als 3 Sekunden ausblieb, mit den verlorenen Sekunden (*2 Aussetzer (14 s)*). Sie zählen ab dem „Spiel“ des Matches, vorher ab der Wahl des Gurts. Sie zeigen, wie weit der Gurt reicht.
@@ -8354,8 +8343,8 @@ Herzfrequenz und Kalorien von **Bluetooth-Brustgurten** mit dem Standard-Herzfre
 
 Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar Meter weniger als die Platzlänge. Mit einem zweiten Telefon hinter der anderen Grundlinie hat jeder Spieler immer eines in der Nähe: Das zweite (**Satellit**) empfängt Gurte und Armbänder der Spieler auf seiner Seite und überbrückt zum **Haupttelefon**, das das Match führt.
 
-1. **Haupttelefon**: Mehr › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden**. Beim ersten Mal fragt es nach der Berechtigung *Geräte in der Nähe* (bis Android 12 nach dem Standort). Das Telefon erstellt ein **eigenes, nur lokales Netz**: keine SIM, keine Daten, kein Vereins-WLAN nötig. Ein QR-Code erscheint.
-2. **Satellit**: Mehr › **Geräte** › **Zweites Telefon** › **Als zweites Telefon dienen** › QR-Code scannen. Android fragt einmal, ob es sich mit dem Netz des Haupttelefons (*AndroidShare_…*) verbinden soll: **Verbinden** tippen. Der Satellit behält seine mobilen Daten. Er muss *Mit dem Haupttelefon verbunden* anzeigen.
+1. **Haupttelefon**: Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden**. Beim ersten Mal fragt es nach der Berechtigung *Geräte in der Nähe* (bis Android 12 nach dem Standort). Das Telefon erstellt ein **eigenes, nur lokales Netz**: keine SIM, keine Daten, kein Vereins-WLAN nötig. Ein QR-Code erscheint.
+2. **Satellit**: Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon** › **Als zweites Telefon dienen** › QR-Code scannen. Android fragt einmal, ob es sich mit dem Netz des Haupttelefons (*AndroidShare_…*) verbinden soll: **Verbinden** tippen. Der Satellit behält seine mobilen Daten. Er muss *Mit dem Haupttelefon verbunden* anzeigen.
 3. Der Satellit folgt selbst den auf dem Haupttelefon gewählten Gurten und Armbändern, auf denselben Seiten: nichts zu wählen. Lass ihn mit geöffneter App hinter der Grundlinie liegen.
 
 - **Seitenwechsel**: nichts zu tun. Jeder Gurt und jedes Armband bleibt beim verbundenen Telefon, solange das Signal hält, dann übernimmt das nähere (ein paar Sekunden). Das Haupttelefon zeigt *Über zweites Telefon*; während der Übergabe kann ein Armband kurz als getrennt erscheinen.
@@ -8372,19 +8361,19 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
    - *Schiedsrichter*, *Armbänder* oder *Fernbedienungen* (6.3). Mit den Armbändern sind eingeschaltetes Bluetooth, Standortberechtigung und aktivierter Standort Pflicht: Die Zeilen unter **Voraussetzungen** aktualisieren sich live (auch wenn du Bluetooth oder Standort in den Schnelleinstellungen ausschaltest) und werden rot, mit einer Schaltfläche zum Beheben.
    - Die **Suche läuft automatisch und ohne Unterbrechung**, solange die Seite offen ist: Schalte die Armbänder ein, und sie belegen von selbst die freien Plätze (erst Spieler 1, dann Spieler 2). **Erkennen** lässt das jeweilige Armband in der Farbe des Spielers (gelb oder rot) blinken und piepen, so siehst du sofort, welches du in der Hand hast; **S1 ↔ S2 tauschen** vertauscht sie, ohne die Verbindung zu trennen. Im Auswahlmenü kannst du jederzeit ein anderes wählen oder *Keins* (ein von Hand entferntes Armband setzt die Suche nicht wieder ein). Ein Armband kann nicht zwei Spielern zugeordnet sein.
    - **Armbänder am Matchende und beim Beenden ausschalten** (standardmäßig an): Beim Bestätigen von *Match beendet* und mit *Beenden* schalten sich die Armbänder aus, statt auf die Inaktivität zu warten.
-   - Im Schiedsrichtermodus erscheint beim Tippen auf **Weiter** ohne Standort die Aufforderung, ihn einzuschalten (sonst fehlt der Ort in der Zusammenfassung).
-   - Format (*2 Gewinnsätze*, *3 Gewinnsätze*, *2 Sätze + Match-Tie-Break bis 10*, *Pro-Satz* bis 8 oder 10 Spiele, *nur Match-Tie-Break bis 10*), Spiele pro Satz (6, oder 4 bei Kurzsätzen mit Tie-Break bei 4 beide), Tie-Break in den Sätzen an/aus (aus: der Satz läuft, bis jemand 2 Spiele vorne liegt), No-Ad. Sprache und Stimme stehen unter *Mehr › Sprache und Stimme* (4.1).
-   - **Wahl (Münzwurf)**: Die Münze dreht sich und zeigt, wer gewinnt; du stellst ein, wer aufschlägt, und die Platzseiten **vom Schiedsrichterstuhl aus gesehen** (Platzskizze mit **Seiten tauschen**). Im Doppel wählst du außerdem, wer in jedem Team zuerst aufschlägt.
+   - Im Schiedsrichtermodus erscheint beim ersten Tippen auf **Weiter** ohne Standort einmal die Aufforderung, ihn einzuschalten: mit *Ohne weiter* fehlt der Ort in der Zusammenfassung (wieder einschalten unter *Neues Match › Weitere Angaben › Ort des Matches*).
+   - Format (*2 Gewinnsätze*, *3 Gewinnsätze*, *2 Sätze + Match-Tie-Break bis 10*, *Pro-Satz* bis 8 oder 10 Spiele, *nur Match-Tie-Break bis 10*), Spiele pro Satz (6, oder 4 bei Kurzsätzen mit Tie-Break bei 4 beide), Tie-Break in den Sätzen an/aus (aus: der Satz läuft, bis jemand 2 Spiele vorne liegt), No-Ad. Außer dem Format stehen diese Regeln (und der Ballwechsel) zusammengeklappt unter **Weitere Regeln**, einer Zeile, die *Ändern* öffnet. Sprache und Stimme stehen unter *Mehr › Einstellungen* (4.1).
+   - **Wahl (Münzwurf)** (Schritt 3, eine eigene Seite): Die Münze dreht sich und zeigt, wer gewinnt; du stellst ein, wer aufschlägt, und die Platzseiten **vom Schiedsrichterstuhl aus gesehen** (Platzskizze mit **Seiten tauschen**). Im Doppel wählst du außerdem, wer in jedem Team zuerst aufschlägt.
 3. **MATCHBEGINN** blinkt: Drücke die Schaltfläche, KEY1 an einem Armband oder eine Fernbedienung. Die Stimme sagt *„erster Satz“ · „Aufschlag [Name]“ · „spielen“* mit 1 Sekunde zwischen den Sätzen; die **Match Time** startet bei „spielen“.
-4. **Match**: oben links die Matchdauer, rechts der Countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rot in den letzten 5 s). Der orange Kasten leuchtet 5 s lang auf bei *Seitenwechsel, Tie-Break, Satzball, Matchball, Breakball …*. Die beiden quadratischen Tasten (gelb = Spieler 1, rot = Spieler 2) liegen auf der Seite, auf der die Spieler tatsächlich stehen, und tauschen bei jedem Seitenwechsel die Plätze; unter dem Aufschläger erscheint **On Serve**. Darunter: *Punkt zurück*, *Unterbrechen/Fortsetzen*, Audio (Lautsprechersymbol, durchgestrichen = aus), *Neues Match*, **Beenden**. Im Armbandmodus stehen unter den Zeiten **S1**/**S2** mit Akku und Restlaufzeit: Ein Tippen darauf öffnet die Armband-Einstellungen. Ein Doppeltipp auf *Punkt zurück* nimmt nur einen Punkt zurück (ein zweiter Tipp innerhalb 1 s zählt nicht); direkt nach einem Seitenwechsel wird der zweite Tipp eines Doppeltipps ignoriert, damit er nicht auf einer Schaltfläche der neuen Seite landet. Das **Schloss** unten sperrt den Bildschirm (etwa mit dem Telefon in der Tasche oder auf der Bank): Berührungen bewirken nichts, Armbänder und Fernbedienungen schon; Entsperren durch langes Drücken auf das Schloss.
+4. **Match**: oben links die Matchdauer, rechts der Countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rot in den letzten 5 s). Der orange Kasten leuchtet 5 s lang auf bei *Seitenwechsel, Tie-Break, Satzball, Matchball, Breakball …*. Die beiden quadratischen Tasten (gelb = Spieler 1, rot = Spieler 2) liegen auf der Seite, auf der die Spieler tatsächlich stehen, und tauschen bei jedem Seitenwechsel die Plätze; unter dem Aufschläger erscheint **On Serve**. Darunter: *Punkt zurück*, *Unterbrechen/Fortsetzen*, Audio (Lautsprechersymbol, durchgestrichen = aus), **Beenden**: öffnet ein Menü mit *Zurück zum Menü* (das Match bleibt bei den unterbrochenen), *Neues Match* und *App schließen* (auch **Zurück** öffnet es). Im Armbandmodus stehen unter den Zeiten **S1**/**S2** mit Akku und Restlaufzeit: Ein Tippen darauf öffnet die Armband-Einstellungen. Ein Doppeltipp auf *Punkt zurück* nimmt nur einen Punkt zurück (ein zweiter Tipp innerhalb 1 s zählt nicht); direkt nach einem Seitenwechsel wird der zweite Tipp eines Doppeltipps ignoriert, damit er nicht auf einer Schaltfläche der neuen Seite landet. Das **Schloss** unten sperrt den Bildschirm (etwa mit dem Telefon in der Tasche oder auf der Bank): Berührungen bewirken nichts, Armbänder und Fernbedienungen schon; Entsperren durch langes Drücken auf das Schloss.
 5. Beim letzten Punkt erscheint das Popup **Match beendet / Letzten Punkt zurücknehmen**. „Match beendet“ wird **nur am Telefon** bestätigt. Eine halbe Sekunde nach dem Erscheinen ignorieren seine Schaltflächen Tipps: Ein Doppeltipp auf den letzten Punkt nimmt nichts zurück.
-6. **Zusammenfassung**: Sieger, Namen, Ergebnis Satz für Satz mit den Tie-Break-Punkten, Dauer, Beginn und Ende, Datum, Verein, Platz, Ort, Format, gewonnene Punkte und Spiele. Schaltflächen **Dateien speichern** (Dateiname + frei wählbarer Ordner + Formate .txt/.json/.png und **vollständiges PDF** mit Ergebnis, Statistik des Matches und jedes Satzes, Verlauf und Fotos). **Teilen** fragt, ob das Bild mit Text (für WhatsApp und soziale Netze) oder das vollständige PDF gesendet wird. In der Übersicht hält **Fotos vom Match** bis zu 10 Erinnerungsfotos (aus der Galerie oder direkt aufgenommen): Sie bleiben auf dem Telefon, kommen ins PDF und mit der Übertragung auf das andere Telefon, nie ins Bild für soziale Netze, **Teilen** (Bild 1080×1350 + Text für WhatsApp/Instagram/…), **Neues Match**, **Beenden**. Unter den Fotos nimmt **Notizen** freien Text auf (bis zu 2000 Zeichen): Er speichert sich von selbst, kommt ins PDF, in den geteilten Text und in die .txt- und .json-Dateien und mit der Übertragung auf das andere Telefon; ins Bild für soziale Netze kommt er nicht. Ein beendetes Match kommt von selbst in den **Verlauf** (Reiter **Fortschritt**): die Liste der Matches, mit ihrer Zusammenfassung wieder zu öffnen oder zu löschen, und der Reiter **Spieler** mit Siegen, Niederlagen und direktem Vergleich aller, deren Name unter *Neues Match* steht (Groß-/Kleinschreibung und Leerzeichen zählen nicht; im Doppel zählt jeder Spieler). **Importieren** fügt Matches hinzu, die auf einem anderen Telefon mit *Dateien speichern* als .json gespeichert wurden: beendete kommen in den Verlauf, unbeendete zu den unterbrochenen Matches zum Fortsetzen. **Übertragen** (oben rechts im Verlauf) bringt Verlauf und unterbrochene Matches per QR-Code auf ein anderes Telefon: beide Telefone müssen im selben WLAN sein oder eines im Hotspot des anderen; auf dem Telefon mit den Daten tippst du *Senden*, **wählst die Matches** (das letzte ist schon angehakt; es gibt *Alle*, *Keine*, *Letzte 7 Tage* und *Eines Spielers…*), tippst *Senden (N)* und lässt das Fenster mit dem Code offen, auf dem anderen *Empfangen* und scannst den Code (Kameraberechtigung nötig). So lässt sich auch ein laufendes Match auf einem anderen Telefon fortsetzen: unterbrechen, übertragen, fortsetzen. Die Matches kommen zu den vorhandenen hinzu. **Spielerfotos**: Tippe auf den Kreis neben dem Namen unter *Neues Match* (oder im Spielerdetail im Verlauf) und wähle ein Foto; es wird quadratisch zugeschnitten und über den Namen wiedergefunden. Es erscheint im Verlauf, in der Zusammenfassung und auf der TV-Anzeigetafel, bleibt nur auf diesem Telefon (es kommt bei der Übertragung mit) und landet nicht im geteilten Bild. Erneutes Tippen auf den Kreis ändert oder entfernt es. Schließt sich die App, während du auf der Zusammenfassung bist (Android schließt sie im Hintergrund, ein Update, ein Neustart des Telefons), findest du sie beim erneuten Öffnen wieder; nicht, wenn du sie selbst mit *Neues Match*, *Beenden* oder durch Entfernen der App aus den letzten Apps verlassen hast. Der Standardordner ist **Documents/Tennis Score Manager** (ab Android 10; unter Android 8 und 9 der App-Ordner): Er lässt sich mit jeder Dateien-App öffnen und bleibt auch nach dem Deinstallieren der App. Wird zweimal unter demselben Namen gespeichert, heißt die zweite Datei *Name (1)*; im Bild werden lange Texte (Namen, Adresse) an die Breite angepasst.
+6. **Zusammenfassung**: Sieger, Namen, Ergebnis Satz für Satz mit den Tie-Break-Punkten, Dauer, Beginn und Ende, Datum, Verein, Platz, Ort, Format, gewonnene Punkte und Spiele. Schaltflächen **Dateien speichern** (Dateiname + frei wählbarer Ordner + Formate .txt/.json/.png und **vollständiges PDF** mit Ergebnis, Statistik des Matches und jedes Satzes, Verlauf und Fotos). **Teilen** fragt, ob das Bild mit Text (für WhatsApp und soziale Netze) oder das vollständige PDF gesendet wird. In der Übersicht hält **Fotos vom Match** bis zu 10 Erinnerungsfotos (aus der Galerie oder direkt aufgenommen): Sie bleiben auf dem Telefon, kommen ins PDF und mit der Übertragung auf das andere Telefon, nie ins Bild für soziale Netze, **Teilen** (Bild 1080×1350 + Text für WhatsApp/Instagram/…), **Neues Match**, **Fertig** (zurück dorthin, wo das Match begonnen hat: der erste Bildschirm, das Turnier, die Mannschaft oder die Forderungsrangliste). Unter den Fotos nimmt **Notizen** freien Text auf (bis zu 2000 Zeichen): Er speichert sich von selbst, kommt ins PDF, in den geteilten Text und in die .txt- und .json-Dateien und mit der Übertragung auf das andere Telefon; ins Bild für soziale Netze kommt er nicht. Ein beendetes Match kommt von selbst in den **Verlauf** (Reiter **Fortschritt**): die Liste der Matches, mit ihrer Zusammenfassung wieder zu öffnen oder zu löschen, und der Reiter **Spieler** mit Siegen, Niederlagen und direktem Vergleich aller, deren Name unter *Neues Match* steht (Groß-/Kleinschreibung und Leerzeichen zählen nicht; im Doppel zählt jeder Spieler). **Importieren** fügt Matches hinzu, die auf einem anderen Telefon mit *Dateien speichern* als .json gespeichert wurden: beendete kommen in den Verlauf, unbeendete zu den unterbrochenen Matches zum Fortsetzen. **Übertragen** (oben rechts im Verlauf) bringt Verlauf und unterbrochene Matches per QR-Code auf ein anderes Telefon: beide Telefone müssen im selben WLAN sein oder eines im Hotspot des anderen; auf dem Telefon mit den Daten tippst du *Senden*, **wählst die Matches** (das letzte ist schon angehakt; es gibt *Alle*, *Keine*, *Letzte 7 Tage* und *Eines Spielers…*), tippst *Senden (N)* und lässt das Fenster mit dem Code offen, auf dem anderen *Empfangen* und scannst den Code (Kameraberechtigung nötig). So lässt sich auch ein laufendes Match auf einem anderen Telefon fortsetzen: unterbrechen, übertragen, fortsetzen. Die Matches kommen zu den vorhandenen hinzu. **Spielerfotos**: Tippe auf den Kreis neben dem Namen unter *Neues Match* (oder im Spielerdetail im Verlauf) und wähle ein Foto; es wird quadratisch zugeschnitten und über den Namen wiedergefunden. Es erscheint im Verlauf, in der Zusammenfassung und auf der TV-Anzeigetafel, bleibt nur auf diesem Telefon (es kommt bei der Übertragung mit) und landet nicht im geteilten Bild. Erneutes Tippen auf den Kreis ändert oder entfernt es. Schließt sich die App, während du auf der Zusammenfassung bist (Android schließt sie im Hintergrund, ein Update, ein Neustart des Telefons), findest du sie beim erneuten Öffnen wieder; nicht, wenn du sie selbst mit *Neues Match*, *Fertig* oder durch Entfernen der App aus den letzten Apps verlassen hast. Der Standardordner ist **Documents/Tennis Score Manager** (ab Android 10; unter Android 8 und 9 der App-Ordner): Er lässt sich mit jeder Dateien-App öffnen und bleibt auch nach dem Deinstallieren der App. Wird zweimal unter demselben Namen gespeichert, heißt die zweite Datei *Name (1)*; im Bild werden lange Texte (Namen, Adresse) an die Breite angepasst.
 
    Die Zusammenfassung hat drei Reiter. **Übersicht**: die Daten oben und, mit Armbändern 2.4, Schläge, Handgelenk-Tempo und Schläge pro Punkt (6.4). **Statistiken**, für das Match oder einen Satz: die beiden Spieler im Vergleich mit Balken, die von der Mitte ausgehen (farbig bei dem, der vorne liegt), für gewonnene Aufschlag- und Returnpunkte und -spiele, abgewehrte und genutzte Breakbälle, gewonnene Punkte und Spiele gesamt, Punkte in Folge, letzte 10 Punkte, abgewehrte Matchbälle; mit Armbändern 2.4 auch Schläge nach Art und durchschnittliches Handgelenk-Tempo. **Punkt für Punkt**: Satz für Satz jedes Spiel mit dem Ball beim Aufschläger, *AUFSCHLAG VERLOREN* bei Breaks, der Spielstand nach jedem Punkt mit **BB** (Breakball), **SB** (Satzball) und **MB** (Matchball) und dem Ausgang (*SPIEL*, *BREAK*, *SATZ*, *MATCH*). Asse, Doppelfehler, erste Aufschläge, Winner und Fehler gibt es, wenn du unter *Modus und Regeln* die **Detaillierte Statistik** einschaltest: statt der zwei großen Tasten erscheinen *Ass* und *Aufschlagfehler* (beim zweiten Mal *Doppelfehler*) und für jeden Spieler *Winner*, *Fehler* (der Punkt geht an die andere Seite) und *Punkt*; *Punkt zurück* nimmt auch einen Aufschlagfehler zurück. Gedacht für jemanden, der vom Spielfeldrand zählt. Nach *Fehler* erscheint 6 Sekunden lang *Unerzwungen / Erzwungen*; mit Armbändern oder Fernbedienungen erscheint nach jedem Punkt *Wie endete der Punkt?* (Ass, Winner, Fehler): Antworten ist freiwillig, der Spielstand ändert sich nicht. Im Verlauf zeigt das Spielerdetail den **Verlauf**: gewonnene Punkte Match für Match und die Durchschnitte von Assen, Doppelfehlern, ersten Aufschlägen, Winnern und Fehlern. Die Statistik jedes Matches zählt auch verwandelte Spiel-, Satz- und Matchbälle, Zu-null-Spiele, Spiele in Folge, nach Break-Rückstand gewonnene Sätze und in der Karte **Zeiten** die Dauer jedes Satzes und das längste Spiel.
 
    **Revanche** (unten in der Übersicht): schlägt denselben Wochentag und dieselbe Uhrzeit in der Woche darauf und den Verein des Matches vor; Datum, Uhrzeit und Ort lassen sich ändern, eine Notiz hinzufügen. **Einladung senden** öffnet das Teilen (WhatsApp, SMS, E-Mail…) mit der fertigen Nachricht: wer gegen wen, wann, wo und wie es letztes Mal ausging. **In den Kalender** legt den Termin in der Kalender-App an, **Match vorbereiten** holt Spieler, Verein, Platz und Regeln in *Neues Match* zurück (das Turnier nicht). Kein Konto: Die Einladung läuft über die Kanäle, die du schon nutzt.
 
-**App verlassen**: **Beenden** (im Match mit Rückfrage, auch in der Zusammenfassung vorhanden) schließt die App wirklich; ebenso, wenn du sie aus den zuletzt verwendeten Apps entfernst. Beim nächsten Öffnen startet sie im Reiter **Spielen**.
+**App verlassen**: Im Match öffnet **Beenden** (oder **Zurück**) ein Menü: **Zurück zum Menü** (das Match bleibt bei den unterbrochenen Matches: fortsetzen unter *Spielen*, in der Rolle Verein unter *Turniere*), **Neues Match** und **App schließen**, das die App wirklich schließt, wie wenn du sie aus den zuletzt verwendeten Apps entfernst. In der Zusammenfassung führt **Fertig** (oder Zurück) dorthin, wo das Match begonnen hat. Beim nächsten Öffnen startet die App im ersten Reiter.
 
 **Aufgabe**: Die Taste **Schiri** (der Hammer) unter dem Spielstand fragt unter **Aufgabe**, wer aufgibt, und beendet die Partie bei diesem Stand, ohne die Punkte des laufenden Spiels (z. B. `6-3 2-1 Aufgabe`). Der Gegner gewinnt, die Stimme sagt es an, und vor dem Abschluss stellt **Aufgabe zurücknehmen** alles wieder her. Bei Turnieren geht das Ergebnis mit vermerkter Aufgabe von selbst ein; die Partie zählt als Sieg, wirkt sich aber nicht auf das TSM-Rating aus.
 
@@ -8431,15 +8420,15 @@ Zum Trainieren mit dem Brustgurt ohne Match: **Trainieren** › **Training mit d
 
 Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
 
-1. **Schiedsrichter**: Mehr › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden** (QR, wie in 6.6).
-2. **Kamera**: Mehr › **Geräte** › **Zweites Telefon** › **Als Kamera dienen**, QR scannen, dann **Kamera öffnen** (Berechtigungen für Kamera und Mikrofon; das Telefon muss in 1080p aufnehmen). Bei *Spielstand verbunden* ist die Einblendung im Video (**Einblendung** schaltet sie ein oder aus); ohne Schiedsrichter nimmt es nur das Video auf.
+1. **Schiedsrichter**: Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden** (QR, wie in 6.6).
+2. **Kamera**: Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon** › **Als Kamera dienen**, QR scannen, dann **Kamera öffnen** (Berechtigungen für Kamera und Mikrofon; das Telefon muss in 1080p aufnehmen). Bei *Spielstand verbunden* ist die Einblendung im Video (**Einblendung** schaltet sie ein oder aus); ohne Schiedsrichter nimmt es nur das Video auf.
    - **Aufnehmen / Stopp**: Das Video kommt in die Galerie (*Filme/Tennis Score Manager*) mit Kapiteln, eines pro Punkt.
    - **Live**: RTMP-Übertragung zu YouTube, Twitch, Facebook oder einem eigenen Server; Server und Stream-Schlüssel unter *Live: Server*.
    - **Ausrichten** (Bildausrichtung): Gib ein, wie viele Meter hinter der Grundlinie und wie hoch das Telefon steht und auf welchem Platz gespielt wird; die App nennt die Neigung nach unten, bei der beide Grundlinien und der entfernte Spieler im Video bleiben, und ob der Platz in der Breite passt. Oft begrenzt die Breite: vom Zaun aus (etwa 6 m) schneidet das Hauptobjektiv die nahen Ecken ab, das **Weitwinkel** nicht (**Objektiv … verwenden** oder die Taste **Objektiv**, bei gestoppter Aufnahme). Mit **Wasserwaage zeigen** erscheinen in der Vorschau der Horizont und Hinweise (*2° tiefer zielen*, *im Uhrzeigersinn drehen*…), grün wenn es passt, mit einer Vibration, wenn das Telefon richtig steht. Die Wasserwaage erscheint auch im Fenster **Kamera** auf dem Telefon des Schiedsrichters. Links und rechts kennen die Sensoren nicht: mit dem Auge prüfen, dass das Netz in der Mitte ist.
    - **Umriss** (Platzumriss): In der Vorschau erscheinen die Platzlinien so, wie das Objektiv sie sieht, und sie folgen dem Telefon beim Neigen. Die Schieberegler (**Abstand**, **Höhe**, **Richtung**, **Seitlicher Versatz** und bei Bedarf **Bildwinkel** und **Neigungskorrektur**) bewegen, bis sie auf den echten Linien liegen: So stimmt auch die Mitte, und die empfohlene Neigung wird genau. Die Einstellung wird für den Platz des Matches (*Verein · Platz* des Schiedsrichters) gespeichert und beim nächsten Mal übernommen. Umriss und Regler gibt es auch im Fenster **Kamera** des Schiedsrichters. Je höher das Telefon, desto besser sieht man die entfernte Platzhälfte: aus 2,5 m ist sie knapp über dem Netz zusammengedrückt.
-3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Mehr › **Geräte** › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
+3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
 
-- **Video** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*.
+- **Fortschritt** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*.
 - **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
 - **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
   - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde. Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** unter *Neues Match*) (ohne Wahl der Mann; gilt in der ganzen App, auch unter *Neues Match*, im Verlauf, im Spielbericht, im PDF und auf der Anzeigetafel); darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (*Weitere Angaben* unter *Neues Match*) oder Club und Platz.
@@ -8485,8 +8474,8 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 
 ### 7.6 Schüler: der Teil für den Trainer
 
-- **Trainieren › Schüler** › **Neuer Schüler**: Name (derselbe wie in den Matches: Foto, Verlauf und Rating finden sich dann von selbst) und Hand.
-- **Wer trainiert**: unter Trainieren, über *Starten*, den Schüler wählen (oder *Kein Schüler*). Die Einheit gehört ihm: die letzten Einheiten, *Alle Einheiten*, der Verlauf in Fortschritt und die Zahlen auf den Schlag-Tasten zeigen nur seine, und die Clips kommen in **Schlagtraining/<Schlag>/<Schüler>/<Datum und Uhrzeit>**.
+- **Schüler** (Rolle Trainer) › **Neuer Schüler**: Name (derselbe wie in den Matches: Foto, Verlauf und Rating finden sich dann von selbst) und Hand.
+- **Wer trainiert**: im Reiter Schüler der Rolle Trainer, über *Starten*, den Schüler wählen (in der Rolle Du trainierst du selbst, ohne Schüler). Die Einheit gehört ihm: die letzten Einheiten, *Alle Einheiten*, der Verlauf in Fortschritt und die Zahlen auf den Schlag-Tasten zeigen nur seine, und die Clips kommen in **Schlagtraining/<Schlag>/<Schüler>/<Datum und Uhrzeit>**.
 - **Die Karte des Schülers** (den Namen unter *Schüler* antippen):
   - **Schläge**: für Aufschlag, Vorhand, Rückhand und Volley die Einheiten, die Schläge, das letzte Mal und die Linie der Schläge im Feld; ein Schlag antippen öffnet seine Einheiten.
   - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
@@ -8508,7 +8497,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Größe und Gewicht**: Mit Alter und Geschlecht rechnen sie die **Kalorien des Brustgurts** von selbst, wenn der Spieler spielt oder, wenn es deiner ist, trainiert (ohne fragt die App getrennt danach oder rechnet sie nicht).
   - **Heimatverein**: steht in der Karte; nützlich bei Gästen und Gegnern aus anderen Vereinen, um zu wissen, wer sie sind.
   - **Hand und Rückhand** (ein- oder beidhändig): beschreiben den Spieler in seiner Karte, nützlich für den Trainer; die Bewegungsanalyse erkennt den Schlagarm von selbst.
-  - **Schüler**: nimmt ihn unter die Schüler des Trainers auf (Trainieren › Schüler, *Wer trainiert*), mit Einheiten, Bewegung und Bericht.
+  - **Schüler**: nimmt ihn unter die Schüler des Trainers auf (Rolle Trainer, Reiter Schüler und *Wer trainiert*), mit Einheiten, Bewegung und Bericht.
   - **Telefon und E-Mail**: für die **Nachrichten** (WhatsApp, SMS, E-Mail: Turniere, Beiträge, Aufstellungen), auch wenn er kein Mitglied ist.
   - **Schläger**: geht mit jeder Einheit und jedem Match so mit, wie er an dem Tag war (Saiten und Spannung), und seine Statistiken werden verglichen; gibt es ihn noch nicht, legt *Neuer Schläger* ihn dort an.
   - Rangliste, Ausweise und Attest stehen nicht hier, sondern in den *Mitgliedsdaten*, weil sie für Turniere und Beiträge gebraucht werden.
@@ -8521,10 +8510,10 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - **Matches von einem anderen Telefon** (Übertragung oder *Importieren*): ein bekannter Spieler wird von selbst verknüpft; ein neuer kommt mit seiner Kennung dazu; hat er den Namen eines deiner Spieler, fragt die App einmal **Wer ist das?** (*Ja, das ist er* verknüpft beide, beim nächsten Mal wird er erkannt; *Nein, eine andere Person* fügt ihn hinzu). Matches alter Versionen ohne Spieler werden über den Namen verknüpft.
 - **Foto** und **Mann/Frau** gelten noch für den Namen: zwei Namensvettern teilen sie.
 
-### 7.8 Du, und Profil und Daten
+### 7.8 Du, und Sicherung und Daten
 
 - **Du** ist dein Spieler in der Datenbank: Fortschritt und Rating gehen von ihm aus. Beim ersten Start reichen Vor- und Nachname (und Spitzname); danach öffnet **Mehr › Du** deine Karte. Hast du ihn noch nicht gewählt, bietet *Wer bist du?* die vorhandenen Spieler an (du hast schon Matches gespielt) oder **Ich bin neu**. Auf der Karte eines anderen Spielers macht **Das bin ich** ihn zu deinem.
-- **Mehr › Profil und Daten**:
+- **Mehr › Einstellungen › Sicherung und Daten**:
   - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
   - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
@@ -8533,15 +8522,15 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 
 ### 7.9 Rollen: Du, Trainer, Verein
 
-- Unter **Mehr › Profil und Daten › Rollen** (und beim ersten Start) wählst du, wer die App nutzt; du kannst mehrere haben. Rollen ändern die Reiter des ersten Bildschirms, **die Daten bleiben dieselben**; bei mehreren Rollen steht oben die aktive: antippen, um zu wechseln.
-  - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
-  - **Was du nutzt** (Mehr): Behalte nur, was du brauchst. Armbänder und Fernbedienungen, Herzfrequenzgurte, Schlagtraining und Schüler, Video und Kamera, Fortschritte und Rating, Schläger, Padel: Was du ausschaltest, erscheint nicht, und leere Reiter (Trainieren, Video) verschwinden; der Verlauf bleibt immer (ohne Fortschritt kommt er zu Spielen). Anfangs ist alles an; bei der ersten Einführung schlägt die App aus der Antwort auf „Wie wirst du sie nutzen“ vor, was bleiben soll. Mehr ist in Gruppen geteilt: Geräte und Stimme, Daten, Hilfe.
-  - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
-  - **Verein**: **Heute** (die Buchungen des Tages, was offen ist, Mitglieder zu klären, Turnierspiele, Trainingsstunden, Mannschaftsspiele und Forderungen: Antippen führt dorthin), **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
-  - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik, Vereinsserver und Büro am PC. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
+- Die Rollen sagen, wer die App nutzt: Man wählt sie beim ersten Start oder unter **Mehr › Einstellungen › Rollen und Funktionen** (auch durch Antippen der Rolle oben, die immer zu sehen ist), und du kannst mehrere haben. **Jede Funktion steht in nur einer Rolle**, ohne Doppelungen; die Daten bleiben dieselben und beim Rollenwechsel geht nichts verloren.
+  - **Du** (du spielst): **Spielen** (der Zähler, das Turnier unter Freunden, das Telefon als Anzeigetafel oder Kamera), **Verein** (erst nach der Einladung: Buchungen und Chat), **Trainieren**, **Fortschritt** (Wertung, Verlauf, Videos, Schläger), Mehr (deine Karte, die Spieler).
+  - **Trainer** (du trainierst andere): **Schüler** (die Liste, die Übungen und das Schlagtraining dessen, der mit dir trainiert), Mehr. Matches werden in der Rolle Du gezählt; *Jetzt trainieren* auf der Karte eines Schülers führt hierher, mit ihm schon ausgewählt.
+  - **Verein** (das Büro): **Heute** (die Buchungen des Tages, was zu kassieren ist, Mitglieder mit offenen Punkten, Turniermatches, Stunden, Begegnungen und Forderungen: ein Feld antippen, um hinzugehen), **Belegung** (die Plätze des Tages, sofort), **Mitglieder** (Mitglieder, Beiträge und Zahlungen, Tennisschule, Nachricht an alle Mitglieder), **Turniere** (Turniere, Mannschaften, Forderungsrangliste: die Matches werden von dort mit *Mit dem Zähler spielen* gezählt und unterbrochene von dort fortgesetzt), Mehr (**Der Verein**: Name, Plätze, Zeiten und Preise, Server, Büro am PC, Sicherung des Büros).
+  - **Mehr** enthält in jeder Rolle, was zur App gehört: **Einstellungen** (Sprache, Stimme des Schiedsrichters, Geräte, Rollen und Funktionen, Sicherung und Daten und ganz unten **Über die App** mit App-Version, Lizenz und Quellcode), **Hilfe** und **App-Einführung**.
+  - **Rollen und Funktionen** lässt in den Menüs nur, was gebraucht wird. Für Du und Trainer, **Was du nutzt**: Armbänder und Fernbedienungen, Brustgurte, Schlagtraining, Video und Kamera, Fortschritte und Wertung, Schläger, Padel; was ausgeschaltet ist, erscheint nicht, und leer gebliebene Reiter verschwinden (ohne Fortschritt wandert der Verlauf nach Spielen). Für den Verein, **Vereinsfunktionen**: Grundausstattung sind Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; dazu Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik, Vereinsserver und Büro am PC. Die Daten ausgeschalteter Funktionen bleiben.
   - Das **?** oben in vielen Bildschirmen öffnet die Anleitung genau beim Abschnitt dieses Bildschirms.
-- Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
-- **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
+- Wer die App schon hatte: Beim ersten Mal schalten sich die Rollen, für die es schon Daten gibt, von selbst ein (Matches, Trainings und Buchungen gehören zu Du, die Schüler zum Trainer): nichts verschwindet.
+- **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **automatischen Sicherung** (standardmäßig an) und der **Erinnerung an die Sicherung** (wenn du die automatische ausschaltest, erinnert dich der erste Bildschirm alle 30 Tage daran); beides steht auch unter Sicherung und Daten.
 
 ### 7.10 Geführte Übungen
 
@@ -8551,7 +8540,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 
 ### 7.11 Vereinsmitglieder
 
-Mit der Rolle **Verein** stehen unter **Spieler › Mitglieder** die Eingeschriebenen, gedacht für das Gerät der Geschäftsstelle.
+Mit der Rolle **Verein** stehen unter **Mitglieder › Mitglieder** die Eingeschriebenen, gedacht für das Gerät der Geschäftsstelle.
 
 - **Neues Mitglied**: einen vorhandenen Spieler wählen (wer Matches gespielt hat oder ein Schüler) oder einen neuen anlegen. In der Karte eines Spielers geht auch **Als Mitglied aufnehmen**.
 - **Mitgliedsdaten**: Telefon und E-Mail (für Benachrichtigungen), Geburtsdatum, Mitglied seit, Vereinsausweis; **FITP-Ausweis** mit Nummer, Art (Wettkampf, Freizeit, sonstige), Jahr und Rangliste; **ärztliches Attest** mit Art und Ablaufdatum; Einwilligung zur Datenverarbeitung und zu Fotos und Videos. Für **Minderjährige** auch Elternteil oder Vormund und dessen Telefon.
@@ -8561,7 +8550,7 @@ Mit der Rolle **Verein** stehen unter **Spieler › Mitglieder** die Eingeschrie
 
 ### 7.12 Beiträge und Zahlungen
 
-Unter **Spieler › Beiträge und Zahlungen** (Rolle Verein) wird das Register des Vereins geführt. Die App **erfasst** Zahlungen, sie zieht sie nicht ein: keine Karten oder Konten verknüpft.
+Unter **Mitglieder › Beiträge und Zahlungen** (Rolle Verein) wird das Register des Vereins geführt. Die App **erfasst** Zahlungen, sie zieht sie nicht ein: keine Karten oder Konten verknüpft.
 
 - **Neuer Beitrag**: Name (z. B. *Mitgliedsbeitrag 2027*), Art (Mitgliedsbeitrag, FITP-Ausweis, Kurs, Turnier, Sonstiges), Betrag und bei Bedarf die Fälligkeit. Einen Beitrag antippen: **Allen Mitgliedern berechnen** gibt ihn allen, die ihn noch nicht haben; darunter, wie viele bezahlt haben.
 - In der Karte des Mitglieds zeigt **Beiträge und Zahlungen**, was offen ist: *bezahlt*, *offen*, *noch 100,00 €*, rot *überfällig* nach der Fälligkeit. **Neue Forderung** fügt einen Vereinsbeitrag oder einen anderen Betrag hinzu (eine Stunde, eine Besaitung).
@@ -8569,7 +8558,7 @@ Unter **Spieler › Beiträge und Zahlungen** (Rolle Verein) wird das Register d
 - Eine falsche Zahlung wird storniert (die Quittungsnummer wird nicht wiederverwendet); eine Forderung ohne Zahlungen wird gelöscht, mit Zahlungen **storniert**: nicht mehr fällig, die Zahlungen bleiben im Register.
 - Oben: eingenommen im Jahr und noch offen; **Offen** listet, wer schuldet, die größte Schuld zuerst. Auch unter *Mitglieder* steht, wer etwas schuldet, bei *zu erledigen*.
 - **Zahlungen exportieren (CSV)**: alle Zahlungen des Jahres mit Datum, Quittung, Name, Beschreibung, Zahlungsart, Referenz und Betrag, für die Tabelle des Steuerberaters.
-- Wird ein Spieler gelöscht, verschwinden seine unbezahlten Forderungen; geleistete Zahlungen bleiben mit dem Namen, denn sie sind Buchhaltung. Das Register ist in der Sicherung unter *Profil und Daten*.
+- Wird ein Spieler gelöscht, verschwinden seine unbezahlten Forderungen; geleistete Zahlungen bleiben mit dem Namen, denn sie sind Buchhaltung. Das Register ist in der Sicherung unter *Sicherung und Daten*.
 
 ### 7.13 Vereinsturniere
 
@@ -8597,7 +8586,7 @@ Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hall
 
 ### 7.15 Plätze und Platzbelegung
 
-Mit der Rolle **Verein**, im Reiter **Plätze**.
+Mit der Rolle **Verein**, im Reiter **Belegung** (Vereinsname, Plätze und *Zeiten und Preise* stehen auch unter **Mehr**, Gruppe *Der Verein*).
 
 - **Plätze**: einen Platz anlegen (**Neuer Platz**), sortieren und antippen, um ihn zu ändern: Name (beim Umbenennen folgen Buchungen, Zeiträume und Turniermatches), Belag (**Sand, Rasen, Hartplatz**, sonstiger), **Halle oder Freiplatz**, **Licht**, **Heizung**, eigene **Preise** (pro Stunde, mit Licht, Heizungszuschlag pro Stunde; leer = die allgemeinen) und **ein oder mehrere Fotos** aus der Galerie. **Platz löschen** entfernt auch seine Buchungen ab heute.
 - **Platzbelegung**: der Tag mit einem Platz pro Spalte und einer Stunde pro Zeile (◀ ▶ und der Kalender zum Tageswechsel). Ein freies Feld antippen zum Buchen: Platz, Tag, Uhrzeit und Dauer, Art (Spiel, Stunde, gesperrt, sonstiges), Spieler aus der Datenbank und Gäste, Notiz. Der **Preis** rechnet sich selbst (Licht ab der eingestellten Uhrzeit, Heizung auf Wunsch) und lässt sich ändern; **Den Spielern berechnen** teilt ihn gleichmäßig und trägt ihn in *Beiträge und Zahlungen* ein. **Wie bezahlt wird**: *am Platz* oder *online*; ist die Buchung berechnet, markiert **Bezahlt: …** sie mit einer der Zahlungsarten des Vereins als bezahlt. **Jede Woche, N Wochen lang** wiederholt die Buchung (Tage mit belegtem Platz werden übersprungen und die App sagt welche). **Spieler benachrichtigen** schickt Platz, Tag, Uhrzeit und Zahlungsweise.
@@ -8609,7 +8598,7 @@ Mit der Rolle **Verein**, im Reiter **Plätze**.
 
 ### 7.16 Tennisschule
 
-Mit der Rolle **Verein**, unter **Spieler › Tennisschule**.
+Mit der Rolle **Verein**, unter **Mitglieder › Tennisschule**.
 
 - **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung.
 - **Schüler**: aus der Datenbank hinzufügen (Mitglieder oder nicht) bis zur Platzzahl; für jeden die **Anwesenheit** (anwesend 3 von 4, unter 75 % orange) und was offen ist. Die Spielerkarte zeigt seine Kurse.
@@ -8635,10 +8624,10 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 **Nummer und PIN, mehrere Vereine**: Nach der ersten Einladung kann der Spieler **Telefonnummer und PIN** wählen (auf der Vereinsseite und in der App unter **Meine**). Wechselt er das Telefon oder meldet sich ab, kommt er mit **Schon eine PIN?** selbst wieder hinein, ohne neue Einladung. Nach 5 falschen PINs wartet man eine Viertelstunde; nach 20 gilt die PIN nicht mehr und das Büro setzt sie in der Mitgliederkarte zurück (**PIN zurücksetzen**). In der App kann man **mehreren Vereinen** beitreten: **Verein hinzufügen** unter **Meine**, dann oben den Verein wählen; Erinnerungen und Hinweise kommen von allen, mit dem Vereinsnamen.
 
 - **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
-- **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
+- **Das Büro koppeln**: *Mehr › Vereinsserver* (nach dem Einschalten unter *Rollen und Funktionen › Vereinsfunktionen*): Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
 - **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code. Am iPhone führt ihn die **TSM**-Seite durch: *Teilen › Zum Home-Bildschirm*, dann TSM vom Home-Bildschirm öffnen und den Code einfügen (Safari und die App auf dem Home-Bildschirm teilen keine Daten, deshalb wird die Einladung in der installierten App benutzt). Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
-- **Mit der TSM-App auf Android** bucht der Spieler auch unter *Spielen › Platz buchen*: den Einladungs-QR-Code scannen (oder den Link einfügen), dann die eigenen Buchungen sehen, den Tag wählen und ein freies Feld antippen; Dauer, Heizung und Preis vor dem Bestätigen, **Stornieren**, solange es noch geht, **Diesen Verein verlassen**, um das Handy zu trennen. Es gelten dieselben Regeln wie auf der Webseite.
+- **Mit der TSM-App auf Android** bucht der Spieler auch unter *Verein › Platz buchen* (beim ersten Mal über *Mehr › Ich habe eine Einladung vom Verein*): den Einladungs-QR-Code scannen (oder den Link einfügen), dann die eigenen Buchungen sehen, den Tag wählen und ein freies Feld antippen; Dauer, Heizung und Preis vor dem Bestätigen, **Stornieren**, solange es noch geht, **Diesen Verein verlassen**, um das Handy zu trennen. Es gelten dieselben Regeln wie auf der Webseite.
 - Seite und App haben **drei Reiter**: **Buchen** (Tage und Felder), **Meine** (Buchungen, Wartelisten, Erinnerungen) und **Partner** (Partner gesucht).
 - In der App schickt **Einladen** unter **Meine** dem, der mit dir spielt, Platz, Tag und Uhrzeit schon fertig geschrieben (per WhatsApp oder wohin du willst); nach einer Buchung bringt dich die App von selbst dorthin.
 - **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
@@ -8679,11 +8668,11 @@ Mit der Rolle **Verein**, unter **Turniere › Forderungsrangliste**.
 
 Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **Ein Computer (Windows, Mac oder Linux) im selben Netz wie das Telefon** öffnet im Browser eine Seite, die das Telefon bereitstellt, ohne Installation und ohne Server: **Die Daten bleiben auf dem Telefon**; der Computer sieht und ändert sie, solange er verbunden ist, und behält keine Kopien. Immer nur eine Person. Der *Vereinsserver* (7.18) ist etwas anderes und dient nur den Buchungen der Spieler.
 
-- **Einschalten**: *Vereinsfunktionen* › **Büro am PC**, dann der Eintrag im Plätze-Tab und **Einschalten**. Das Telefon zeigt die Adresse (z. B. `https://192.168.1.20:8443`) und einen Code.
+- **Einschalten**: *Mehr › Einstellungen › Rollen und Funktionen › Vereinsfunktionen* › **Büro am PC**, dann der Eintrag unter **Mehr** und **Einschalten**. Das Telefon zeigt die Adresse (z. B. `https://192.168.1.20:8443`) und einen Code.
 - **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
 - **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
 - **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). **Tennisschule** (Kurse mit Zeiten und Plätzen, Schüler, Anwesenheit, abgesagte Stunden, Monats- oder Saisongebühren zum Belasten), **Platzstatistik** (Auslastung, Einnahmen, Platz für Platz, vollste Tage und Stunden, wer am meisten bucht, nach Zeitraum, druckbar). Mit **Mahnung vorbereiten** in Beiträge und Zahlungen wählst du unter den angezeigten Forderungen, wem du schreibst: die Nachricht öffnet sich auf dem Handy und du schickst sie von dort. **Mannschaften und Ligen** (Kader, Heim- oder Auswärtsbegegnungen mit reservierten Plätzen, Verfügbarkeit, Aufstellung, Spiele und Ergebnis; Nachrichten öffnen sich auf dem Handy). **Online-Buchungen**, mit dem Vereinsserver (nächste Buchungen der Spieler, Warteliste, Anzeigen bei Partner gesucht zum Entfernen bei Bedarf, Regeln für die Spieler, **Jetzt senden**), **Einstellungen** (Vereinsname, Zeiten und Preise, Plätze mit Belag, Licht und eigenen Preisen, Zahlungsarten). WhatsApp-Nachrichten, Platzfotos und Live-Zählung bleiben in der App.
-- **Sicherung des Büros** (am PC unter Statistik; am Handy unter Plätze › Sicherung des Büros): eine einzige `.tsmclub`-Datei mit Mitgliedern und Spielern, Beiträgen und Zahlungen, Platzplan, Turnieren, Tennisschule, Mannschaften, Plätzen und Einstellungen (keine Spiele, Schläge und Videos: die hat die komplette Sicherung). **Auf den PC laden** oder vom Handy **verschicken**, wohin du willst (Google Drive, E-Mail, USB-Stick). Mit der **automatischen Sicherung** macht das Handy eine Kopie am Tag, nur wenn sich etwas geändert hat, und behält die letzten 14; mit einem Vereinsserver auch er. **Wiederherstellen** zeigt erst, was in der Datei ist, und macht eine Kopie vom jetzigen Stand, um zurückzugehen. Die Datei enthält persönliche Daten der Mitglieder: bewahre sie bei dir auf.
+- **Sicherung des Büros** (am PC unter Statistik; am Handy unter Mehr › Sicherung des Büros): eine einzige `.tsmclub`-Datei mit Mitgliedern und Spielern, Beiträgen und Zahlungen, Platzplan, Turnieren, Tennisschule, Mannschaften, Plätzen und Einstellungen (keine Spiele, Schläge und Videos: die hat die komplette Sicherung). **Auf den PC laden** oder vom Handy **verschicken**, wohin du willst (Google Drive, E-Mail, USB-Stick). Mit der **automatischen Sicherung** macht das Handy eine Kopie am Tag, nur wenn sich etwas geändert hat, und behält die letzten 14; mit einem Vereinsserver auch er. **Wiederherstellen** zeigt erst, was in der Datei ist, und macht eine Kopie vom jetzigen Stand, um zurückzugehen. Die Datei enthält persönliche Daten der Mitglieder: bewahre sie bei dir auf.
 - **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
 - **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
 
@@ -8709,7 +8698,7 @@ Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anz
 
 ### 8.2 Auf dem Telefon des Schiedsrichters
 
-1. Mehr › **Geräte** › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten. Ab Android 13 fragt die App nach der Berechtigung für Benachrichtigungen: Sie wird für die Benachrichtigung des Dienstes gebraucht, der die Anzeigetafel am Laufen hält.
+1. Mehr › **Einstellungen** › **Geräte** › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten. Ab Android 13 fragt die App nach der Berechtigung für Benachrichtigungen: Sie wird für die Benachrichtigung des Dienstes gebraucht, der die Anzeigetafel am Laufen hält.
 2. Es erscheinen die **Adresse** (z. B. `192.168.43.1:8080`), der **QR-Code** und wie viele Anzeigetafeln verbunden sind. Steht dort *Kein Netz*, schalte den Hotspot ein oder verbinde dich mit dem des anderen Telefons.
 3. **Vorschau auf diesem Telefon** öffnet die Anzeigetafel im Browser des Telefons selbst.
 4. **Aussehen der Anzeigetafel**: Farbe jedes Spielers (8 Farben), Matchdauer, Aufschlaguhr und Pausen, beendete Sätze, Meldungen (Breakball, Satzball, Seitenwechsel …), Ball beim Aufschläger, ausgeschaltete Segmente sichtbar, Text unten (leer = Verein und Platz aus *Neues Match*). Änderungen erscheinen sofort auf dem Monitor.
@@ -8755,7 +8744,7 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 - **Im Einstellungsbereich steht „Die Firmware dieses Armbands hat keine Einstellungen“**: Auf diesem Armband ist noch der alte Sketch, lade ihn neu hoch (Kapitel 5).
 - **Die Stimme spricht nicht oder spricht falsch**: Medienlautstärke, *Audio On*, Stimme der gewählten Sprache installiert (4); probiere eine andere Engine oder eine andere Stimme unter *Audio und Stimme*.
 - **Bildschirm während des Matches aus**: Im Armbandmodus hält ein Vordergrunddienst (Benachrichtigung „Match läuft“) Bluetooth, Stimme und Uhren aktiv; im Schiedsrichter- und Fernbedienungsmodus bleibt der Bildschirm an (mit den Fernbedienungen muss er das: 6.3).
-- **Die Fernbedienung tut nichts**: Ist sie dem Spieler zugeordnet (*Mehr › Geräte* › *Fernbedienungen*, Zeile mit seinem Namen)? Die App muss auf dem Match geöffnet sein, bei eingeschaltetem Bildschirm (6.3). Steht in der Zeile *Nicht verbunden*, eine Taste drücken, um sie aufzuwecken, oder sie in den Bluetooth-Einstellungen neu koppeln.
+- **Die Fernbedienung tut nichts**: Ist sie dem Spieler zugeordnet (*Mehr › Einstellungen › Geräte* › *Fernbedienungen*, Zeile mit seinem Namen)? Die App muss auf dem Match geöffnet sein, bei eingeschaltetem Bildschirm (6.3). Steht in der Zeile *Nicht verbunden*, eine Taste drücken, um sie aufzuwecken, oder sie in den Bluetooth-Einstellungen neu koppeln.
 - **Schläge werden verwechselt oder nicht erkannt**: Trage das Armband wie bei der Kalibrierung (gleiches Handgelenk, gleiche Richtung); sonst kalibriere neu und trage es dabei wie im Match (6.4).
 - **Das Armband zeigt SPEICHER VOLL**: Ein Kalibrierungsbeispiel konnte nicht gespeichert werden. Lösche die Beispiele eines Schlags (Papierkorb) und mache sie neu.
 - **Herausfinden, warum zwei Schläge verwechselt werden**: Schließe das Armband an den Computer an, öffne den seriellen Monitor (115200 Baud) und tippe `d`: Du bekommst die gespeicherten Beispiele und die letzten 40 Schläge, jeder mit seinen 11 Messwerten. Die letzten Schläge bleiben erhalten, bis sich das Armband ausschaltet oder neu startet.
@@ -8768,20 +8757,20 @@ TSM_EOF
 cat > "$DEST/app/src/main/assets/help/en.md" << 'TSM_EOF'
 ## 3.1 How the app is organised
 
-At the **first start** the app asks three questions: the language, how you'll use it (keep score, play with the wristbands, train, film matches) and your name; you can skip it and do it again from **More › App introduction**. At the bottom there are always **five tabs**:
+At the **first start** the app asks the language, who uses it (the roles), your name, how you'll use it and, for the club office, the club; you can skip it and do it again from **More › App introduction**. At the bottom there are the tabs of the **active role**, always shown at the top: tap it to switch to another role or open **Roles and features**. **Each feature lives in one role only** (7.9): You plays, the Coach follows the students, the Club runs the office. With the **You** role:
 
-- **Play**: **New match**, the suspended match to resume, **Like last time** (same players, court and rules: the rules fit in one line and you go straight to the coin toss; *Change mode or rules* opens them again), the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Play**: **New match**, the suspended matches to resume (long-press one to delete it), **Like last time** (same players, court and rules, straight to the coin toss; *Change mode or rules* opens them again), the **friends tournament** (Americano, Mexicano) and, under **This phone**, the scoreboard, the camera phone and **Record with this phone**. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Club** (only after your club's invitation, 7.18): the news from the notice board and the chats, **Book a court**, your bookings, **Looking for a partner** and the club chat.
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
-- **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
-- **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
-- **More**: **You** (your name), **Players** (the database: 7.7), **Profile and data** (backup, restore, delete: 7.8), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
+- **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **Your videos** (chapters, highlights, filters, import), **My year**, **My rackets**.
+- **More**: **You** (your card), **Players** (the database: 7.7) and, the same in every role, **Settings** (the language; the umpire's voice; the devices: wristbands, remotes, straps, second phone, TV scoreboard; roles and features; backup and data, 7.8; at the bottom **About** with the app version, the licence and the source code), **Help** (this guide, with search and tappable cross-references) and **App introduction**.
 
-**New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
+**New match** has three short steps: **who plays** (singles or doubles, players from the database, with recent players to tap, and the sport; ranking, man/woman and racket fit in one line under the names and open with *Change*; club, court, tournament and location under *More details*), **how you keep score and the format** (the other rules fit in one line, *Change* opens them) and the **coin toss**. Everything is optional: you can go on even without names. **Back** always returns to where you came from.
 
 ## 4. The voice (works without internet)
 
 - Each call is read **as a single sentence** by the phone's text-to-speech engine, using an installed voice: no internet and natural prosody. The players' names are part of the sentence.
-- More › **Language and voice** › **Audio and voice**:
+- More › **Settings** › **Umpire's voice** › **Audio and voice**:
   - **Speech engine**: *Phone default* (on Samsung phones this is Samsung TTS) or an engine of your choice, for example *Speech Services by Google*. In our tests, which were done in Italian, Google sounded more natural.
   - **Voice**: *Automatic (best offline)* or a specific voice (with Google the voices are listed by code, as *Voice* followed by a few letters; those marked *online* need internet).
   - **Test voice**: reads a sequence of sample calls with the names you entered. While it is reading, the button becomes **Stop the test**: tap it again to stop (it also stops by itself when you leave the page). Text-to-speech can't be paused mid-sentence, so the button stops it; pressing it again starts over from the beginning.
@@ -8795,7 +8784,7 @@ At the **first start** the app asks three questions: the language, how you'll us
 
 ### 4.1 Languages
 
-More › **Language and voice** › **Language**: Italiano, English, Français, Deutsch, Español, Português (each language is written in that language, so you can find it even when the app is set to a language you can't read). The choice applies at once to the **screens, umpire's voice, TV scoreboard, summary/sharing and wristbands**. Dates follow the language (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+More › **Settings** › **Language**: Italiano, English, Français, Deutsch, Español, Português (each language is written in that language, so you can find it even when the app is set to a language you can't read). The choice applies at once to the **screens, umpire's voice, TV scoreboard, summary/sharing and wristbands**. Dates follow the language (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 The calls are not word-for-word translations: they follow each federation's official texts for chair umpires, namely the FFT *L'arbitrage en 255 questions* and the ITF in French, the DTB/BTV and Swiss Tennis materials, RFET *Deberes y procedimientos*, and FPT *Deveres e Procedimentos* (the only published Portuguese script). English follows the ITF. At the end of the match a zero in the set scores is read *love* ("six love, six four"), as in the points.
 
@@ -8828,7 +8817,7 @@ Particulars:
 | **KEY2** long (2 s) | switches the wristband off (with the cable plugged in it shows *STILL CHARGING*: it charges even when off; from firmware 2.3 KEY1 or KEY2 also turn it back on) |
 | Side button | one click switches it on; a double click switches it off (hardware function) |
 
-- At power-on **PAIRING...** flashes (on for 0.35 s every 2 s to save power). As soon as it is open, the app connects by itself to the wristbands it knows; new ones are found in **More › Devices** (or in **Mode and rules** with the *Wristbands* mode).
+- At power-on **PAIRING...** flashes (on for 0.35 s every 2 s to save power). As soon as it is open, the app connects by itself to the wristbands it knows; new ones are found in **More › Settings › Devices** (or in **Mode and rules** with the *Wristbands* mode).
 - Connected: **PAIRED** for 3 seconds with two beeps, then **PAIRED WITH** + the player's name.
 - At every point the display lights up with the game score in large digits (yours on the left, the opponent's on the right; the green ball shows who is serving), then switches off. At the end of a game it shows games and sets. If the phone doesn't confirm a press within 8 seconds (link lost), **NOT SENT** appears in red with two low beeps: press again once it has reconnected. A press made during a short dropout is not lost: it is sent as soon as the wristband reconnects, and the beep comes then.
 
@@ -8850,7 +8839,7 @@ The rest of the power saving: CPU at 80 MHz, display off when not needed, Blueto
 
 ### 6.1 Wristband settings
 
-From **More › Devices** or **Mode and rules** (**Settings** under each player's wristband) or during the match (tap **P1**/**P2** at the top, or the sliders icon). They are saved **in the wristband** and are kept even when it is switched off; after every change the wristband shows its name with *SETTINGS SAVED*. With firmware 2.4 there is also the **Strokes** section (6.4).
+From **More › Settings › Devices** or **Mode and rules** (**Settings** under each player's wristband) or during the match (tap **P1**/**P2** at the top, or the sliders icon). They are saved **in the wristband** and are kept even when it is switched off; after every change the wristband shows its name with *SETTINGS SAVED*. With firmware 2.4 there is also the **Strokes** section (6.4).
 
 | Setting | Values | Default |
 |---|---|---|
@@ -8892,7 +8881,7 @@ Plug in the USB-C cable: the wristband beeps and shows the **charging screen** f
 
 The cheapest way to let the players score: two **Bluetooth selfie remotes** (the ones with a shutter button, often sold as *AB Shutter3*), €1–3 each. Android sees them as a keyboard: no firmware to flash and no permissions for the app. Any other Bluetooth (or USB) keypad or keyboard works too.
 
-1. Switch the remote on and pair it in the phone's **Bluetooth settings**, like a headset (*More › Devices › Bluetooth settings* opens them). Repeat with the second one.
+1. Switch the remote on and pair it in the phone's **Bluetooth settings**, like a headset (*More › Settings › Devices › Bluetooth settings* opens them). Repeat with the second one.
 2. *Mode and rules* › **Remotes** mode › **Assign** under Player 1 › press the button on their remote that will give the point; then the same for Player 2. Every click of an assigned remote shows **Key received** on its row, so you can test before playing. **Swap P1 ↔ P2** swaps them.
 3. **MATCH START**: one click on a remote starts the match, like KEY1 on the wristbands. At the top, **P1**/**P2** are coloured when the remotes are connected.
 
@@ -8931,7 +8920,7 @@ With firmware 2.4 the wristband recognizes **forehand, backhand, serve and volle
 Heart rate and calories from **Bluetooth chest straps** using the standard heart rate service: Coospo (tested with the H6), Magene, Polar, Garmin, Wahoo… They work in every mode, even without bands.
 
 1. Wet the electrodes and put the strap on: it switches on by itself on contact with the skin.
-2. *Mode and rules* (or *More › Devices*) › **Heart rate** › turn on **Heart rate straps** and pick each player's strap (only once). **Swap** exchanges them.
+2. *Mode and rules* (or *More › Settings › Devices*) › **Heart rate** › turn on **Heart rate straps** and pick each player's strap (only once). **Swap** exchanges them.
 3. Optional **age, weight and sex** of the wearer: used for calories (Keytel formula, typical error ±20%) and, with the age, for heart rate zones (estimated maximum 208 − 0.7 × age).
 
 - Under each strap: status, heart rate, **signal** in dBm (closer to 0 = stronger) and **dropouts**, i.e. the times the heart rate did not arrive for more than 3 seconds, with the seconds lost (*2 dropouts (14 s)*). They count from the match's "play"; before that, from when the strap was picked. They show how far the strap reaches.
@@ -8942,8 +8931,8 @@ Heart rate and calories from **Bluetooth chest straps** using the standard heart
 
 Straps and bands accept **one phone at a time** and reach a few metres less than the length of the court. With a second phone behind the other baseline every player always has one nearby: the second one (**satellite**) hears the straps and bands of the players on its side and acts as a bridge to the **main** phone, which keeps the match.
 
-1. **Main**: More › **Devices** › **Second phone** › **Use a second phone**. The first time it asks for the *Nearby devices* permission (location up to Android 12). The phone creates its **own local-only network**: no SIM or data, and no club Wi-Fi needed. A QR code appears.
-2. **Satellite**: More › **Devices** › **Second phone** › **Act as second phone** › scan the QR code. Android asks once to connect to the main phone's network (*AndroidShare_…*): tap **Connect**. The satellite keeps its mobile data. It should say *Connected to the main phone*.
+1. **Main**: More › **Settings** › **Devices** › **Second phone** › **Use a second phone**. The first time it asks for the *Nearby devices* permission (location up to Android 12). The phone creates its **own local-only network**: no SIM or data, and no club Wi-Fi needed. A QR code appears.
+2. **Satellite**: More › **Settings** › **Devices** › **Second phone** › **Act as second phone** › scan the QR code. Android asks once to connect to the main phone's network (*AndroidShare_…*): tap **Connect**. The satellite keeps its mobile data. It should say *Connected to the main phone*.
 3. The satellite follows by itself the straps and bands picked on the main phone, on the same sides: nothing to pick. Leave it behind the baseline with the app open.
 
 - **Change of ends**: nothing to do. Each strap and band stays with the phone it is connected to while the signal holds, then the nearer phone takes it (a few seconds). The main phone shows *Via second phone*; during the handover a band may show as disconnected for a moment.
@@ -8960,19 +8949,19 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
    - *Umpire*, *Wristbands* or *Remotes* (6.3). With the wristbands, Bluetooth on, location permission and location on are required: the **Requirements** rows update in real time (even if you turn Bluetooth or location off from the Quick Settings panel) and turn red, with a button to fix them.
    - The **search is automatic and continuous** while the page is open: switch the wristbands on and they fill the free slots by themselves (Player 1 first, then Player 2). **Identify** makes that wristband flash in the player's colour (yellow or red) with beeps, so you can see at once which one you are holding; **Swap P1 ↔ P2** swaps them without disconnecting them. From the drop-down menu you can always choose another one or *None* (a wristband removed by hand is not put back by the search). A wristband can't be assigned to both players.
    - **Switch the wristbands off at match end and on exit** (on by default): when *Match concluded* is confirmed and with *Exit*, the wristbands switch off instead of waiting for the idle timeout.
-   - In Umpire mode, if you press **Next** without location you are asked to turn it on (otherwise the place won't appear in the summary).
-   - Format (*3 sets*, *5 sets*, *2 sets + match tie-break to 10*, *pro set* to 8 or 10 games, *match tie-break to 10 only*), games per set (6, or 4 in short sets with a tie-break at 4-4), tie-break in sets on/off (off: the set goes on until someone leads by 2 games), No-Ad. Language and voice are in *More › Language and voice* (4.1).
-   - **Coin toss**: the coin spins and shows who wins; you set who serves and the court ends **as seen by the chair umpire** (court diagram with **Swap ends**). In doubles you also choose who serves first in each team.
+   - In Umpire mode, the first time you press **Next** without location you are asked, only once, to turn it on: with *Continue without* the place won't appear in the summary (turn it back on under *New match › More details › Match location*).
+   - Format (*3 sets*, *5 sets*, *2 sets + match tie-break to 10*, *pro set* to 8 or 10 games, *match tie-break to 10 only*), games per set (6, or 4 in short sets with a tie-break at 4-4), tie-break in sets on/off (off: the set goes on until someone leads by 2 games), No-Ad. Apart from the format, these rules (and the ball change) are folded into **Other rules**, one line that *Change* opens. Language and voice are in *More › Settings* (4.1).
+   - **Coin toss** (step 3, a page of its own): the coin spins and shows who wins; you set who serves and the court ends **as seen by the chair umpire** (court diagram with **Swap ends**). In doubles you also choose who serves first in each team.
 3. **MATCH START** flashes: press the button, KEY1 on a wristband or a remote. The voice says *"First set" · "[name] to serve" · "play"* with 1 second between the phrases; the **Match Time** starts on "play".
-4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), *New match*, **Exit**. In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings. A double tap on *Undo point* removes only one point (a second tap within 1 s doesn't count); right after a page change the second tap of a double tap is ignored, so it doesn't land on a button of the new page. The **lock** at the bottom locks the screen (for example with the phone in a pocket or on the bench): taps do nothing, wristbands and remotes still work; press and hold the lock to unlock.
+4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), **Exit**: it opens a menu with *Back to the menu* (the match stays among the suspended ones), *New match* and *Close the app* (**Back** opens it too). In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings. A double tap on *Undo point* removes only one point (a second tap within 1 s doesn't count); right after a page change the second tap of a double tap is ignored, so it doesn't land on a button of the new page. The **lock** at the bottom locks the screen (for example with the phone in a pocket or on the bench): taps do nothing, wristbands and remotes still work; press and hold the lock to unlock.
 5. At the last point the **Match concluded / Undo last point** popup appears. "Match concluded" can be confirmed **only on the phone**. For half a second after it appears its buttons ignore taps: a double tap on the last point doesn't undo anything.
-6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save files** (file name + folder of your choice + .txt/.json/.png formats and a **full PDF** with result, statistics for the match and each set, log and photos). **Share** asks whether to send the image with text (for WhatsApp and social media) or the full PDF. In the Summary, **Match photos** keeps up to 10 souvenir photos (from the gallery or taken on the spot): they stay on the phone, go into the PDF and move to the other phone with the transfer, never into the social image, **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**. Below the photos, **Notes** takes free text (up to 2000 characters): it saves by itself, goes into the PDF, the shared text and the .txt and .json files, and moves to the other phone with the transfer; it doesn't go into the social image. A finished match goes into the **History** by itself (**Progress** tab): the list of matches, to reopen with their summary or delete, and a **Players** tab with wins, losses and head to head of everyone whose name is written in *New match* (case and spaces don't matter; in doubles each player counts). **Import** adds matches saved as .json with *Save files* on another phone: finished ones go into the history, unfinished ones into the suspended matches to resume. **Transfer** (top right in the History) moves history and suspended matches to another phone with a QR code: both phones must be on the same Wi-Fi network or one on the other's hotspot; on the phone that has them tap *Send*, **pick the matches to send** (the latest starts ticked; there are *All*, *None*, *Last 7 days* and *Of a player…*), tap *Send (N)* and keep the window with the code open, on the other tap *Receive* and scan the code (camera permission needed). This way you can also carry on a match in progress on another phone: suspend it, transfer and resume it. The matches are added to the ones the phone already has. **Player photos**: tap the circle next to the name in *New match* (or in the player detail in the History) and pick a photo; it is cropped square and found again from the name. It shows in the History, the summary and the TV scoreboard, stays only on this phone (it moves with the transfer) and is not put in the shared image. Tap the circle again to change or remove it. If the app closes while you are on the summary (Android closing it in the background, an update, a phone restart), you find it again when you reopen it; not if you left it yourself with *New match*, *Exit* or by removing the app from the recent apps. The default folder is **Documents/Tennis Score Manager** (from Android 10; on Android 8 and 9 the app folder): any file manager opens it and it stays even if you uninstall the app. Saving twice with the same name makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
+6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save files** (file name + folder of your choice + .txt/.json/.png formats and a **full PDF** with result, statistics for the match and each set, log and photos). **Share** asks whether to send the image with text (for WhatsApp and social media) or the full PDF. In the Summary, **Match photos** keeps up to 10 souvenir photos (from the gallery or taken on the spot): they stay on the phone, go into the PDF and move to the other phone with the transfer, never into the social image, **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Done** (back to where the match started: the first screen, the tournament, the team or the challenge ladder). Below the photos, **Notes** takes free text (up to 2000 characters): it saves by itself, goes into the PDF, the shared text and the .txt and .json files, and moves to the other phone with the transfer; it doesn't go into the social image. A finished match goes into the **History** by itself (**Progress** tab): the list of matches, to reopen with their summary or delete, and a **Players** tab with wins, losses and head to head of everyone whose name is written in *New match* (case and spaces don't matter; in doubles each player counts). **Import** adds matches saved as .json with *Save files* on another phone: finished ones go into the history, unfinished ones into the suspended matches to resume. **Transfer** (top right in the History) moves history and suspended matches to another phone with a QR code: both phones must be on the same Wi-Fi network or one on the other's hotspot; on the phone that has them tap *Send*, **pick the matches to send** (the latest starts ticked; there are *All*, *None*, *Last 7 days* and *Of a player…*), tap *Send (N)* and keep the window with the code open, on the other tap *Receive* and scan the code (camera permission needed). This way you can also carry on a match in progress on another phone: suspend it, transfer and resume it. The matches are added to the ones the phone already has. **Player photos**: tap the circle next to the name in *New match* (or in the player detail in the History) and pick a photo; it is cropped square and found again from the name. It shows in the History, the summary and the TV scoreboard, stays only on this phone (it moves with the transfer) and is not put in the shared image. Tap the circle again to change or remove it. If the app closes while you are on the summary (Android closing it in the background, an update, a phone restart), you find it again when you reopen it; not if you left it yourself with *New match*, *Done* or by removing the app from the recent apps. The default folder is **Documents/Tennis Score Manager** (from Android 10; on Android 8 and 9 the app folder): any file manager opens it and it stays even if you uninstall the app. Saving twice with the same name makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
 
    The summary has three tabs. **Summary**: the data above and, with 2.4 wristbands, strokes, wrist speed and strokes per point (6.4). **Statistics**, for the match or for one set: the two players compared with bars starting from the centre (coloured for whoever is ahead) for service and return points and games won, break points saved and won, total points and games, points in a row, last 10 points, match points saved; with 2.4 wristbands also strokes by type and average wrist speed. **Point by point**: set by set, every game with the ball of the server, *LOST SERVE* on breaks, the score after each point with **BP** (break point), **SP** (set point) and **MP** (match point) and the outcome (*GAME*, *BREAK*, *SET*, *MATCH*). Aces, double faults, first serves, winners and errors are there if you turn on **Detailed stats** in *Mode and rules*: instead of the two big buttons you get *Ace* and *Fault* (the second time it becomes *Double fault*) and, for each player, *Winner*, *Error* (the point goes to the other side) and *Point*; *Undo point* also removes a fault. It is meant for someone scoring from the side of the court. After *Error*, *Unforced / Forced* shows for 6 seconds; with wristbands or remotes, after every point *How did the point end?* (Ace, Winner, Error) shows: answering is optional and the score doesn't change. In the History, a player's detail shows the **trend**: points won match by match and the averages of aces, double faults, first serves, winners and errors. Each match's statistics also count game, set and match points converted, love games, games in a row, sets won from a break down and, in the **Times** card, the length of each set and the longest game.
 
    **Rematch** (at the bottom of the summary): it suggests the same weekday and time the following week and the match's club; you can change date, time and place and add a note. **Send the invite** opens sharing (WhatsApp, SMS, email…) with the message ready: who plays whom, when, where and how it ended last time. **Add to calendar** creates the event in the calendar app, **Set up the match** brings players, club, court and rules back to *New match* (not the tournament). No account: the invite goes through the channels you already use.
 
-**Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the **Play** tab.
+**Exiting**: during a match **Exit** (or **Back**) opens a menu: **Back to the menu** (the match stays among the suspended ones: resume it from *Play*, or from *Tournaments* in the Club role), **New match** and **Close the app**, which really closes the app like swiping it away from the recent apps. On the summary **Done** (or Back) returns to where the match started. When reopened, the app starts again from the first tab.
 
 **Retirement**: the **Umpire** button (the gavel) under the score, under **Retire**, asks who is retiring and ends the match at that score, without the points of the current game (e.g. `6-3 2-1 ret.`). The opponent wins, the voice announces it and, before **Match concluded**, **Undo retirement** restores everything. In tournaments the result goes in by itself with the retirement marked; the match counts as a win but does not affect the TSM rating.
 
@@ -9019,15 +9008,15 @@ To train with the heart rate strap without a match: **Train** › **Workout with
 
 A second phone on a tripod films the match and puts the umpire's score on the video.
 
-1. **Umpire**: More › **Devices** › **Second phone** › **Use a second phone** (QR, as in 6.6).
-2. **Camera**: More › **Devices** › **Second phone** › **Act as camera**, scan the QR, then **Open the camera** (camera and microphone permissions; the phone must record in 1080p). With *Score connected* the score graphics are on the video (**Overlay** turns them on or off); without an umpire it records the video only.
+1. **Umpire**: More › **Settings** › **Devices** › **Second phone** › **Use a second phone** (QR, as in 6.6).
+2. **Camera**: More › **Settings** › **Devices** › **Second phone** › **Act as camera**, scan the QR, then **Open the camera** (camera and microphone permissions; the phone must record in 1080p). With *Score connected* the score graphics are on the video (**Overlay** turns them on or off); without an umpire it records the video only.
    - **Record / Stop**: the video goes to the gallery (*Movies/Tennis Score Manager*) with chapters, one per point.
    - **Go live**: RTMP broadcast to YouTube, Twitch, Facebook or your own server; server and stream key in *Live: server*.
    - **Framing** (framing assistant): enter how many metres behind the baseline and how high you put the phone and which court you play on; the app gives the downward tilt that keeps both baselines and the far player in the video, and whether the court fits in width. Width is often the real limit: from the fence (about 6 m) the main lens cuts the near corners, the **wide** one doesn't (**Use the … lens**, or the **Lens** button, with recording stopped). With **Show the level** the preview shows the horizon and directions (*aim 2° lower*, *turn clockwise*…), green when right, with a vibration when the phone is in position. The level is also shown in the **Camera** window on the umpire's phone. The sensors can't tell left from right: check by eye that the net is in the middle.
    - **Outline** (court outline): the preview shows the court lines as the lens sees them, and they follow the phone as you tilt it. Move the sliders (**Distance**, **Height**, **Direction**, **Sideways offset** and, if needed, **Field of view** and **Tilt correction**) until they match the real lines: that also sets the centring, and the suggested tilt becomes accurate. The calibration is remembered for the match court (the umpire's *Club · Court*) and restored next time. Outline and sliders are also in the umpire's **Camera** window. The higher the phone, the better you see the far half of the court: from 2.5 m it is squeezed just above the net.
-3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in More › **Devices** › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
+3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in More › **Settings** › **Devices** › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
 
-- **Video** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*.
+- **Progress** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*.
 - **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
 - **Highlights**: automatic edit of the best points (aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
   - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn. The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice in *New match*) (without a choice, the man; this applies across the app, also in *New match*, history, summary, PDF and TV scoreboard); below, the percentage of points won. At the top, tournament, category and round (*More details* in *New match*), or club and court.
@@ -9073,8 +9062,8 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 
 ### 7.6 Students: the coach's part
 
-- **Practice › Students** › **New student**: name (the same as in matches: photo, history and rating are then found by themselves) and hand.
-- **Who is practising**: in Practice, above *Start*, pick the student (or *No student*). The session is theirs: the last sessions, *All sessions*, the trend in Progress and the numbers on the stroke buttons are only theirs, and the clips go into **Stroke practice/<stroke>/<student>/<date and time>**.
+- **Students** (Coach role) › **New student**: name (the same as in matches: photo, history and rating are then found by themselves) and hand.
+- **Who is practising**: on the Students tab of the Coach role, above *Start*, pick the student (in the You role you practise yourself, with no student). The session is theirs: the last sessions, *All sessions*, the trend in Progress and the numbers on the stroke buttons are only theirs, and the clips go into **Stroke practice/<stroke>/<student>/<date and time>**.
 - **The student's card** (tap the name in *Students*):
   - **Strokes**: for serve, forehand, backhand and volley the sessions, the shots, the last time and the line of shots in; tapping a stroke opens its sessions.
   - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
@@ -9096,7 +9085,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **Height and weight**: with age and sex they let the **heart strap's calories** be worked out by themselves when the player plays or, if it's yours, trains (without them the app asks separately or doesn't calculate them).
   - **Home club**: shown on the card; useful for guests and opponents from other clubs, to know who they are.
   - **Hand and backhand** (one or two hands): describe the player on their card, useful to the coach; the movement analysis recognises the hitting arm by itself.
-  - **Student**: puts them among the coach's students (Practice › Students, *Who's practising*), with sessions, movement and report.
+  - **Student**: puts them among the coach's students (Coach role, Students tab and *Who is practising*), with sessions, movement and report.
   - **Phone and email**: used for **notices** (WhatsApp, SMS, email: tournaments, fees, call-ups) even if they're not a member.
   - **Racket**: goes with every session and match as it was that day (strings and tension) and its statistics are compared; if it isn't there, *New racket* creates it from there.
   - Ranking, cards and certificate aren't here: they're in the *Member details*, because they're used for tournaments and fees.
@@ -9109,10 +9098,10 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - **Matches from another phone** (transfer or *Import*): a player the phone knows links by itself; a new one is added with its ID; if it has the name of one of yours the app asks once **Who is it?** (*Yes, it's them* links the two, so next time it is recognised; *No, someone else* adds them). Matches from old versions, without players, link by name.
 - The **photo** and **man/woman** still belong to the name: two namesakes share them.
 
-### 7.8 You, and Profile and data
+### 7.8 You, and Backup and data
 
 - **You** is your player in the database: Progress and rating start from them. At the first start first and last name (and nickname) are enough; then **More › You** opens your card. If you haven't chosen it yet, *Who are you?* offers the existing players (you have already played matches) or **I'm new**. On another player's card, **This is me** makes it yours.
-- **More › Profile and data**:
+- **More › Settings › Backup and data**:
   - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
   - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
@@ -9121,15 +9110,15 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 
 ### 7.9 Roles: You, Coach, Club
 
-- In **More › Profile and data › Roles** (and at the first start) you choose who uses the app; you can have more than one. Roles change the tabs of the first screen, **the data is the same**; with several roles the active one is shown at the top: tap it to switch to another.
-  - **You**: Play, Practice, Video, Progress, More (the app as always).
-  - **What you use** (More): keep only what you need. Wristbands and remotes, heart rate straps, stroke training and students, video and camera, progress and rating, rackets, padel: what you turn off does not appear, and tabs left empty (Practice, Video) disappear; the history always stays (without Progress it moves to Play). At first everything is on; on the first introduction the app suggests what to keep from the answer to "how will you use it". More is split into groups: Devices and voice, Data, Help.
-  - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
-  - **Club**: **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
-  - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
+- Roles say who uses the app: you choose them at the first start or in **More › Settings › Roles and features** (also by tapping the role at the top, always shown) and you can have more than one. **Each feature lives in one role only**, with no duplicates; the data is the same and switching role loses nothing.
+  - **You** (you play): **Play** (the scorer, the friends tournament, the phone as scoreboard or camera), **Club** (only after the invitation: bookings and chat), **Train**, **Progress** (rating, history, videos, rackets), More (your card, the players).
+  - **Coach** (you coach): **Students** (the list, the drills and the stroke practice of whoever trains with you), More. Matches are scored from the You role; *Practise now* on a student's card brings you here with that student already chosen.
+  - **Club** (the office): **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Planner** (the day's courts, straight away), **Members** (members, fees and payments, tennis school, message to all members), **Tournaments** (tournaments, teams, challenge ladder: matches are scored from there with *Play with the scorer* and the ones left unfinished are resumed from there), More (**The club**: name, courts, hours and prices, server, office from PC, office backup).
+  - **More** has the app-wide things in every role: **Settings** (language, umpire's voice, devices, roles and features, backup and data and, at the bottom, **About** with the app version, the licence and the source code), **Help** and **App introduction**.
+  - **Roles and features** keeps in the menus only what you need. For You and Coach, **What you use**: wristbands and remotes, heart rate straps, stroke training, video and camera, progress and rating, rackets, padel; what you turn off does not appear and tabs left empty disappear (without Progress the history moves to Play). For the Club, **Club features**: the basics are Members, Fees and payments, Court planner and Club tournaments; the extras are Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. The data of features turned off stays.
   - The **?** at the top of many screens opens the guide right at that screen's section.
-- The scoreboard is there in every role: nothing stops you from scoring a match.
-- **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
+- For those who already had the app, the first time the roles that already have data turn on by themselves (matches, workouts and bookings belong to You, students to the Coach): nothing disappears.
+- **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **automatic backup** (on by default) and the **backup reminder** (if you turn the automatic one off, every 30 days the first screen reminds you to make one); both are also in Backup and data.
 
 ### 7.10 Guided drills
 
@@ -9139,7 +9128,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 
 ### 7.11 Club members
 
-With the **Club** role, **Players › Members** lists the people enrolled, meant for the club office's device.
+With the **Club** role, **Members › Members** lists the people enrolled, meant for the club office's device.
 
 - **New member**: pick a player who is already there (someone who played matches or a student) or create a new one. From a player's card you can also tap **Enrol as member**.
 - **Member details**: phone and email (used for notices), date of birth, member since, club card; **FITP card** with number, type (competitive, non-competitive, other), year and ranking; **medical certificate** with type and expiry; consent to data processing and to photos and videos. For **under-18s** also the parent or guardian and their phone.
@@ -9149,7 +9138,7 @@ With the **Club** role, **Players › Members** lists the people enrolled, meant
 
 ### 7.12 Fees and payments
 
-**Players › Fees and payments** (Club role) keeps the club's register. The app **records** payments, it doesn't collect them: no cards or bank accounts linked.
+**Members › Fees and payments** (Club role) keeps the club's register. The app **records** payments, it doesn't collect them: no cards or bank accounts linked.
 
 - **New fee**: name (e.g. *Membership 2027*), type (membership, FITP card, course, tournament, other), amount and, if needed, a due date. Tap a fee and **Charge all members** gives it to whoever doesn't have it yet; below you see how many have paid.
 - On the member's card, **Fees and payments** shows what they owe: *paid*, *to pay*, *€100.00 left*, in red *late* after the due date. **New charge** adds a club fee or another amount (a lesson, a restringing).
@@ -9157,7 +9146,7 @@ With the **Club** role, **Players › Members** lists the people enrolled, meant
 - A wrong payment can be cancelled (the receipt number is not reused); a charge without payments is deleted, one with payments is **cancelled**: no longer owed, and the payments stay in the register.
 - At the top: collected this year and what's still to collect; **To collect** lists who owes, biggest debt first. In *Members* too, whoever owes something is among those *to sort out*.
 - **Export payments (CSV)**: all the year's payments with date, receipt, name, description, method, reference and amount, for the accountant's spreadsheet.
-- Deleting a player removes their unpaid charges; payments made stay with the name, because they are accounts. The register is in the *Profile and data* backup.
+- Deleting a player removes their unpaid charges; payments made stay with the name, because they are accounts. The register is in the *Backup and data* backup.
 
 ### 7.13 Club tournaments
 
@@ -9185,7 +9174,7 @@ The app prepares the messages, already written and personal ("Hi Mario, …"), a
 
 ### 7.15 Courts and planner
 
-With the **Club** role, on the **Courts** tab.
+With the **Club** role, on the **Planner** tab (club name, courts and *Hours and prices* are also in **More**, in the *The club* group).
 
 - **Courts**: create a court (**New court**), put them in order and tap one to change it: name (renaming it, bookings, periods and tournament matches follow), surface (**clay, grass, hard**, other), **indoor or outdoor**, **lights**, **heating**, its own **prices** (per hour, with lights, heating supplement per hour; empty = the general ones) and **one or more photos** from the gallery. **Delete the court** also removes its bookings from today on.
 - **Court planner**: the day with one court per column and one hour per row (◀ ▶ and the calendar to change day). Tap a free slot to book: court, day, time and length, type (play, lesson, closed, other), players from the database and guests, a note. The **price** is worked out by itself (lights from the set time, heating if asked) and can be changed; **Charge the players** splits it equally and puts it into *Fees and payments*. **How it's paid**: *at the court* or *online*; once charged, **Paid: …** marks it paid with one of the club's payment methods. **Every week for N weeks** repeats the booking (dates when the court is taken are skipped and the app tells you). **Notify the players** sends court, day, time and how to pay.
@@ -9197,7 +9186,7 @@ With the **Club** role, on the **Courts** tab.
 
 ### 7.16 Tennis school
 
-With the **Club** role, under **Players › Tennis school**.
+With the **Club** role, under **Members › Tennis school**.
 
 - **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner.
 - **Students**: added from the database (members or not) up to the places; for each, **attendance** (attended 3 of 4, orange under 75 %) and what they owe. A player's card shows their courses.
@@ -9223,10 +9212,10 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 **Number and PIN, several clubs**: after the first invitation the player can choose a **phone number and PIN** (on the club page and in the app, under **Mine**). Then, after changing phone or signing out, they get back in with **Already have a PIN?**, without a new invitation. After 5 wrong PINs there is a fifteen-minute wait; after 20 the PIN stops working and the office resets it from the member card (**Reset the PIN**). In the app you can join **several clubs**: **Add a club** under **Mine**, then pick the club at the top; reminders and alerts come from all of them, with the club name.
 
 - **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
-- **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
+- **Pairing the office**: *More › Club server* (after turning it on in *Roles and features › Club features*): server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
 - **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR. On iPhone the **TSM** page walks them through it: *Share › Add to Home Screen*, then open TSM from the Home Screen and paste the code (Safari and the Home Screen app do not share data, so the invitation is used in the installed app). The card shows who books online; **Remove online access** disconnects them.
-- **With the TSM app on Android** a player can also book from *Play › Book a court*: scan the invitation QR (or paste the link), then see your bookings, pick the day and tap a free slot; length, heating and price before confirming, **Cancel** while still in time, **Leave this club** to disconnect the phone. The rules are the same as on the web page.
+- **With the TSM app on Android** a player can also book from *Club › Book a court* (the first time from *More › I have a club invitation*): scan the invitation QR (or paste the link), then see your bookings, pick the day and tap a free slot; length, heating and price before confirming, **Cancel** while still in time, **Leave this club** to disconnect the phone. The rules are the same as on the web page.
 - The page and the app have **three tabs**: **Book** (days and slots), **Mine** (bookings, waiting lists, reminders) and **Partners** (Looking for a partner).
 - In the app, under **Mine**, **Invite** sends whoever plays with you the court, day and time already written (on WhatsApp or wherever you like); after booking the app takes you there by itself.
 - **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
@@ -9267,11 +9256,11 @@ With the **Club** role, in **Tournaments › Challenge ladder**.
 
 Entering members and payments is easier with a keyboard and mouse. **A computer (Windows, Mac or Linux) on the same network as the phone** opens a page served by the phone in its browser, with nothing to install and no server: **the data stays on the phone**; the computer views and edits it while connected and keeps no copies. One person at a time. The *club server* (7.18) is something else, only for players' bookings.
 
-- **Turn on**: *Club features* › **Office from PC**, then the entry in the courts tab and **Turn on**. The phone shows the address (e.g. `https://192.168.1.20:8443`) and a code.
+- **Turn on**: *More › Settings › Roles and features › Club features* › **Office from PC**, then the entry in **More** and **Turn on**. The phone shows the address (e.g. `https://192.168.1.20:8443`) and a code.
 - **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
 - **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
 - **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). **Tennis school** (courses with times and courts, students, attendance, cancelled lessons, monthly or season fees to charge), **Court statistics** (occupancy, takings, court by court, busiest days and hours, who books most, by period, printable). With **Prepare reminder** in Fees and payments you pick whom to write to among the charges you see: the message opens on the phone and you send it from there. **Teams and leagues** (roster, home or away fixtures with held courts, availability, call-ups, rubbers and result; notices open on the phone). **Online bookings**, with the club server (players' upcoming bookings, waiting list, Looking for a partner posts to remove if needed, rules for players, **Send now**), **Settings** (club name, hours and prices, courts with surface, lights and their own prices, payment methods). WhatsApp notices, court photos and live scoring stay in the app.
-- **Office backup** (on the PC, below Statistics; on the phone under Courts › Office backup): one `.tsmclub` file with members and players, fees and payments, planner, tournaments, tennis school, teams, courts and settings (not matches, strokes and videos: the full backup has those). **Download to the PC** or, from the phone, **send it** wherever you like (Google Drive, email, a USB stick). With the **automatic backup** the phone makes a copy a day only if something changed and keeps the last 14; with a club server it keeps them too. **Restore** first shows what's in the file and makes a copy of now, so you can go back. The file holds members' personal data: keep it somewhere of yours.
+- **Office backup** (on the PC, below Statistics; on the phone under More › Office backup): one `.tsmclub` file with members and players, fees and payments, planner, tournaments, tennis school, teams, courts and settings (not matches, strokes and videos: the full backup has those). **Download to the PC** or, from the phone, **send it** wherever you like (Google Drive, email, a USB stick). With the **automatic backup** the phone makes a copy a day only if something changed and keeps the last 14; with a club server it keeps them too. **Restore** first shows what's in the file and makes a copy of now, so you can go back. The file holds members' personal data: keep it somewhere of yours.
 - **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
 - **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
 
@@ -9297,7 +9286,7 @@ The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboa
 
 ### 8.2 On the umpire's phone
 
-1. More › **Devices** › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**. On Android 13 and later the app asks for the notification permission: it's needed for the notification of the service that keeps the scoreboard running.
+1. More › **Settings** › **Devices** › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**. On Android 13 and later the app asks for the notification permission: it's needed for the notification of the service that keeps the scoreboard running.
 2. The **address** (e.g. `192.168.43.1:8080`), the **QR code** and the number of connected scoreboards appear. If it says *No network*, turn on the hotspot or connect to the other phone's hotspot.
 3. **Preview on this phone** opens the scoreboard in the phone's own browser.
 4. **Scoreboard look**: each player's colour (8 colours), match time, serve clock and breaks, finished sets, messages (break point, set point, change ends…), ball next to the server, unlit segments visible, bottom line (empty = club and court from *New match*). Changes reach the monitor straight away.
@@ -9343,7 +9332,7 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 - **The settings panel says "This wristband's firmware has no settings"**: that wristband still has the old sketch; upload the new one (chapter 5).
 - **The voice doesn't speak or reads badly**: media volume, *Audio On*, voice for the chosen language installed (4); try another engine or another voice in *Audio and voice*.
 - **Screen goes off during the match**: in Wristbands mode a foreground service (notification "Match in progress") keeps Bluetooth, voice and timers running; in Umpire and Remotes mode the screen stays on (with the remotes it has to: 6.3).
-- **The remote does nothing**: is it assigned to the player (*More › Devices* › *Remotes*, row with their name)? The app must be open on the match, with the screen on (6.3). If the row says *Not connected*, press a key to wake it up or pair it again in the Bluetooth settings.
+- **The remote does nothing**: is it assigned to the player (*More › Settings › Devices* › *Remotes*, row with their name)? The app must be open on the match, with the screen on (6.3). If the row says *Not connected*, press a key to wake it up or pair it again in the Bluetooth settings.
 - **Strokes are mixed up or come out as not recognized**: wear the wristband as during calibration (same wrist, same direction); otherwise redo the calibration wearing it as in a match (6.4).
 - **The wristband shows MEMORY FULL**: a calibration example could not be saved. Clear the examples of one stroke (bin) and redo them.
 - **The scoreboard phone can't find the umpire's phone**: are they on the same network? (one of the two provides the hotspot, the other is connected to it). Is *TV scoreboard* on on the umpire's phone? Try typing the address by hand. Some hotspots isolate connected devices from each other ("client isolation"): if so, turn it off.
@@ -9355,20 +9344,20 @@ TSM_EOF
 cat > "$DEST/app/src/main/assets/help/es.md" << 'TSM_EOF'
 ## 3.1 Cómo está organizada la app
 
-En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a usar (llevar el marcador, jugar con las pulseras, entrenar, grabar partidos) y tu nombre; se puede saltar y repetir desde **Más › Presentación de la app**. Abajo hay siempre **cinco pestañas**:
+En el **primer arranque** la app pregunta el idioma, quién la usa (los roles), tu nombre, cómo la vas a usar y, para la secretaría, el club; se puede saltar y repetir desde **Más › Presentación de la app**. Abajo están las pestañas del **rol activo**, que se ve siempre arriba: tócalo para pasar a otro rol o abrir **Roles y funciones**. **Cada función está en un solo rol** (7.9): Tú juega, el Entrenador sigue a los alumnos, el Club lleva la secretaría. Con el rol **Tú**:
 
-- **Jugar**: **Nuevo partido**, el partido suspendido para reanudar, **Como la última vez** (mismos jugadores, pista y reglas: las reglas caben en una línea y se va directo al sorteo; *Cambiar modo o reglas* las vuelve a abrir), el **torneo entre amigos** (Americano, Mexicano) y **Usar este teléfono como** marcador o cámara. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
+- **Jugar**: **Nuevo partido**, los partidos suspendidos para reanudar (manteniendo pulsado se borra uno), **Como la última vez** (mismos jugadores, pista y reglas, directo al sorteo; *Cambiar modo o reglas* las vuelve a abrir), el **torneo entre amigos** (Americano, Mexicano) y, bajo **Este teléfono**, el marcador, el teléfono-cámara y **Grabar con este teléfono**. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
+- **Club** (solo después de la invitación de tu club, 7.18): las novedades del tablón y de los chats, **Reservar pista**, tus reservas, **Busco compañero** y el chat del club.
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
-- **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
-- **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.
-- **Más**: **Tú** (tu nombre), **Jugadores** (la base: 7.7), **Perfil y datos** (copia, restauración, borrado: 7.8), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
+- **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar), **Mi año**, **Mis raquetas**.
+- **Más**: **Tú** (tu ficha), **Jugadores** (la base: 7.7) y, iguales en todos los roles, **Ajustes** (el idioma; la voz del árbitro; los dispositivos: pulseras, mandos, bandas, segundo teléfono, marcador en TV; roles y funciones; copia de seguridad y datos, 7.8; al final **Acerca de** con la versión de la app, la licencia y el código fuente), **Ayuda** (esta guía, con búsqueda y referencias que se tocan) y **Presentación de la app**.
 
-**Nuevo partido** son dos pasos: **quién juega** (individual o dobles, los nombres, con los jugadores recientes para tocar, y el deporte; club, pista y torneo en *Más detalles*) y **cómo llevas el marcador y las reglas**. Todo es opcional: se puede seguir sin nombres. Desde cada pantalla **Atrás** vuelve a la pestaña de la que se venía.
+**Nuevo partido** son tres pasos cortos: **quién juega** (individual o dobles, los jugadores de la base, con los recientes para tocar, y el deporte; clasificación, hombre/mujer y raqueta caben en una línea bajo los nombres y se abren con *Cambiar*; club, pista, torneo y lugar en *Más detalles*), **cómo llevas el marcador y el formato** (las otras reglas caben en una línea, *Cambiar* las abre) y el **sorteo**. Todo es opcional: se puede seguir sin nombres. **Atrás** vuelve siempre a donde estabas.
 
 ## 4. La voz (funciona sin internet)
 
 - Cada canto lo lee **en una sola frase** la síntesis de voz del teléfono, con una voz instalada: sin internet y con una entonación natural. Los nombres de los jugadores forman parte de la frase.
-- Más › **Idioma y voz** › **Audio y voz**:
+- Más › **Ajustes** › **Voz del árbitro** › **Audio y voz**:
   - **Motor de síntesis de voz**: *Predeterminado del teléfono* (en los Samsung es Samsung TTS) o el motor que elijas, por ejemplo *Servicios de voz de Google*. En nuestras pruebas, hechas en italiano, Google sonaba más natural.
   - **Voz**: *Automática (la mejor sin conexión)* o una voz concreta (Google identifica sus voces con un código; las marcadas *en línea* necesitan internet).
   - **Probar voz**: lee una secuencia de cantos de ejemplo con los nombres introducidos. Mientras lee, el botón pasa a ser **Detener la prueba**: tócalo otra vez para interrumpirla (también se detiene sola al salir de la página). La síntesis de voz no se puede pausar a mitad de frase, así que el botón la detiene; si lo vuelves a pulsar, empieza desde el principio.
@@ -9382,7 +9371,7 @@ En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a 
 
 ### 4.1 Idiomas
 
-Más › **Idioma y voz** › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito en su propia lengua, así lo encuentras aunque la app esté en un idioma que no entiendas). La elección se aplica a la vez a **pantallas, voz del juez, marcador de TV, resumen/compartir y pulseras**. Las fechas siguen el idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+Más › **Ajustes** › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito en su propia lengua, así lo encuentras aunque la app esté en un idioma que no entiendas). La elección se aplica a la vez a **pantallas, voz del juez, marcador de TV, resumen/compartir y pulseras**. Las fechas siguen el idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 Los cantos no son traducciones palabra por palabra: siguen los textos oficiales para jueces de silla de cada federación, es decir, FFT *L'arbitrage en 255 questions* e ITF en francés, los materiales de DTB/BTV y Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (el único guion portugués publicado). El inglés sigue a la ITF. En inglés, el cero de los sets al final del partido se dice *love* («six love, six four»), como en los puntos.
 
@@ -9415,7 +9404,7 @@ Particularidades:
 | **KEY2** largo (2 s) | apaga la pulsera (con el cable conectado muestra *SIGUE CARGANDO*: se carga también apagada; desde el firmware 2.3 también KEY1 o KEY2 la vuelven a encender) |
 | Botón lateral | un clic enciende; doble clic apaga (función del hardware) |
 
-- Al encenderla parpadea **VINCULANDO...** (encendida 0,35 s cada 2 s, para ahorrar). La app se conecta sola a las pulseras que ya conoce en cuanto se abre; las nuevas las encuentra en **Más › Dispositivos** (o en **Modo y reglas** con el modo *Pulseras*).
+- Al encenderla parpadea **VINCULANDO...** (encendida 0,35 s cada 2 s, para ahorrar). La app se conecta sola a las pulseras que ya conoce en cuanto se abre; las nuevas las encuentra en **Más › Ajustes › Dispositivos** (o en **Modo y reglas** con el modo *Pulseras*).
 - Conectada: **VINCULADA** durante 3 segundos con dos pitidos, luego **VINCULADA A** + el nombre del jugador.
 - En cada punto la pantalla se enciende con el tanteo del juego en grande (a la izquierda el tuyo, a la derecha el del rival; la pelota verde indica quién saca) y luego se apaga. Al final de cada juego muestra juegos y sets. Si el teléfono no confirma una pulsación en 8 segundos (conexión perdida), aparece **NO ENVIADO** en rojo con dos pitidos graves: vuelve a pulsar cuando se haya reconectado. Una pulsación hecha durante un corte breve, en cambio, no se pierde: se envía en cuanto la pulsera se reconecta, y el pitido suena en ese momento.
 
@@ -9437,7 +9426,7 @@ El resto del ahorro: CPU a 80 MHz, pantalla apagada cuando no hace falta, Blueto
 
 ### 6.1 Ajustes de la pulsera
 
-Desde **Más › Dispositivos** o **Modo y reglas** (**Ajustes** debajo de la pulsera de cada jugador) o durante el partido (toca **J1**/**J2** arriba, o el icono de los controles deslizantes). Se guardan **en la pulsera** y se conservan aunque se apague; con cada cambio la pulsera muestra su nombre con *AJUSTES OK*. Con el firmware 2.4 también está la sección **Golpes** (6.4).
+Desde **Más › Ajustes › Dispositivos** o **Modo y reglas** (**Ajustes** debajo de la pulsera de cada jugador) o durante el partido (toca **J1**/**J2** arriba, o el icono de los controles deslizantes). Se guardan **en la pulsera** y se conservan aunque se apague; con cada cambio la pulsera muestra su nombre con *AJUSTES OK*. Con el firmware 2.4 también está la sección **Golpes** (6.4).
 
 | Ajuste | Valores | Predeterminado |
 |---|---|---|
@@ -9479,7 +9468,7 @@ Conecta el cable USB-C: la pulsera emite un pitido y muestra la **pantalla de ca
 
 El sistema más económico para que los jugadores se anoten los puntos: dos **mandos Bluetooth para selfies** (los del botón de disparo, a menudo vendidos como *AB Shutter3*), de 1 a 3 € cada uno. Android los ve como un teclado: sin firmware que cargar y sin permisos para la app. También sirve cualquier otra botonera o teclado Bluetooth (o USB).
 
-1. Enciende el mando y emparéjalo en los **ajustes de Bluetooth** del teléfono, como unos auriculares (*Más › Dispositivos › Ajustes de Bluetooth* los abre). Repite con el segundo.
+1. Enciende el mando y emparéjalo en los **ajustes de Bluetooth** del teléfono, como unos auriculares (*Más › Ajustes › Dispositivos › Ajustes de Bluetooth* los abre). Repite con el segundo.
 2. *Modo y reglas* › modo **Mandos** › **Asignar** debajo del Jugador 1 › pulsa la tecla de su mando que dará el punto; luego lo mismo para el Jugador 2. Con cada clic de un mando asignado su fila muestra **Tecla recibida**: así se prueba antes de jugar. **Intercambiar J1 ↔ J2** los invierte.
 3. **INICIO DEL PARTIDO**: un clic en un mando empieza el partido, como KEY1 de las pulseras. Arriba, **J1**/**J2** se colorean cuando los mandos están conectados.
 
@@ -9518,7 +9507,7 @@ Con el firmware 2.4 la pulsera reconoce **derecha, revés, saque y volea** con s
 Frecuencia cardíaca y calorías desde **bandas de pecho Bluetooth** con el servicio cardíaco estándar: Coospo (probada la H6), Magene, Polar, Garmin, Wahoo… Valen en todos los modos, incluso sin pulseras.
 
 1. Moja los electrodos y ponte la banda: se enciende sola al contacto con la piel.
-2. *Modo y reglas* (o *Más › Dispositivos*) › **Frecuencia cardíaca** › activa **Bandas de pecho** y elige la banda de cada jugador (una sola vez). **Intercambiar** las invierte.
+2. *Modo y reglas* (o *Más › Ajustes › Dispositivos*) › **Frecuencia cardíaca** › activa **Bandas de pecho** y elige la banda de cada jugador (una sola vez). **Intercambiar** las invierte.
 3. **Edad, peso y sexo** de quien la lleva (opcionales): para las calorías (fórmula de Keytel, error típico ±20 %) y, con la edad, para las zonas cardíacas (máximo estimado 208 − 0,7 × edad).
 
 - Bajo cada banda: estado, pulso, **señal** en dBm (más cerca de 0 = más fuerte) y **cortes**, es decir, las veces que el pulso no llegó durante más de 3 segundos, con los segundos perdidos (*2 cortes (14 s)*). Cuentan desde el «juego» del partido; antes, desde que se eligió la banda. Sirven para saber hasta dónde llega la banda.
@@ -9529,8 +9518,8 @@ Frecuencia cardíaca y calorías desde **bandas de pecho Bluetooth** con el serv
 
 Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos que el largo de la pista. Con un segundo teléfono detrás de la otra línea de fondo cada jugador tiene siempre uno cerca: el segundo (**satélite**) capta las bandas y pulseras de los jugadores de su lado y hace de puente con el **principal**, que lleva el partido.
 
-1. **Principal**: Más › **Dispositivos** › **Segundo teléfono** › **Usar un segundo teléfono**. La primera vez pide el permiso *Dispositivos cercanos* (la ubicación hasta Android 12). El teléfono crea su **propia red, solo local**: sin SIM ni datos, y sin necesidad del Wi-Fi del club. Aparece un QR.
-2. **Satélite**: Más › **Dispositivos** › **Segundo teléfono** › **Hacer de segundo teléfono** › escanea el QR. Android pide una vez conectarse a la red del principal (*AndroidShare_…*): toca **Conectar**. El satélite mantiene sus datos móviles. Debe decir *Conectado al teléfono principal*.
+1. **Principal**: Más › **Ajustes** › **Dispositivos** › **Segundo teléfono** › **Usar un segundo teléfono**. La primera vez pide el permiso *Dispositivos cercanos* (la ubicación hasta Android 12). El teléfono crea su **propia red, solo local**: sin SIM ni datos, y sin necesidad del Wi-Fi del club. Aparece un QR.
+2. **Satélite**: Más › **Ajustes** › **Dispositivos** › **Segundo teléfono** › **Hacer de segundo teléfono** › escanea el QR. Android pide una vez conectarse a la red del principal (*AndroidShare_…*): toca **Conectar**. El satélite mantiene sus datos móviles. Debe decir *Conectado al teléfono principal*.
 3. El satélite sigue solo las bandas y pulseras elegidas en el principal, en los mismos lados: no hay que elegir nada. Déjalo detrás de la línea de fondo con la app abierta.
 
 - **Cambio de lado**: no hay que hacer nada. Cada banda y cada pulsera sigue con el teléfono al que está conectada mientras la señal aguante; luego la toma el más cercano (unos segundos). En el principal aparece *Desde el segundo teléfono*; durante el paso una pulsera puede aparecer desconectada un momento.
@@ -9547,19 +9536,19 @@ Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos
    - *Juez*, *Pulseras* o *Mandos* (6.3). Con las pulseras son obligatorios el Bluetooth activado, el permiso de ubicación y la ubicación activada: las filas de **Requisitos** se actualizan en tiempo real (aunque desactives el Bluetooth o la ubicación desde los ajustes rápidos) y se ponen en rojo, con el botón para arreglarlo.
    - La **búsqueda es automática y continua** mientras la página está abierta: enciende las pulseras y ocupan solas los puestos libres (primero Jugador 1, luego Jugador 2). **Identificar** hace parpadear esa pulsera en el color del jugador (amarillo o rojo) con unos pitidos, así ves enseguida cuál tienes en la mano; **Intercambiar J1 ↔ J2** las invierte sin desconectarlas. En el menú desplegable siempre puedes elegir otra o *Ninguna* (la que quitas a mano no la vuelve a poner la búsqueda). Una pulsera no puede estar asignada a dos jugadores.
    - **Apagar las pulseras al final del partido y al salir** (activado de serie): al confirmar *Partido terminado* y con *Salir*, las pulseras se apagan en lugar de esperar a la inactividad.
-   - En modo juez, si pulsas **Siguiente** sin ubicación aparece la invitación a activarla (si no, el lugar no aparecerá en el resumen).
-   - Formato (*3 sets*, *5 sets*, *2 sets + súper tie-break a 10*, *pro set* a 8 o 10 juegos, *solo súper tie-break a 10*), juegos por set (6, o 4 en sets cortos con tie-break en 4-4), tie-break en los sets sí/no (no: el set sigue hasta que alguien saque 2 juegos de ventaja), *Sin ventaja (punto decisivo)*. El idioma y la voz están en *Más › Idioma y voz* (4.1).
-   - **Sorteo**: la moneda gira e indica quién gana; indicas quién saca y los lados de la pista **vistos desde la silla del juez** (esquema de la pista con **Cambiar lados**). En dobles eliges también quién saca primero en cada pareja.
+   - En modo juez, la primera vez que pulsas **Siguiente** sin ubicación aparece, una sola vez, la invitación a activarla: con *Continuar sin ella* el lugar no aparecerá en el resumen (se vuelve a activar en *Nuevo partido › Más detalles › Lugar del partido*).
+   - Formato (*3 sets*, *5 sets*, *2 sets + súper tie-break a 10*, *pro set* a 8 o 10 juegos, *solo súper tie-break a 10*), juegos por set (6, o 4 en sets cortos con tie-break en 4-4), tie-break en los sets sí/no (no: el set sigue hasta que alguien saque 2 juegos de ventaja), *Sin ventaja (punto decisivo)*. Salvo el formato, estas reglas (y el cambio de bolas) están plegadas en **Otras reglas**, una línea que *Cambiar* abre. El idioma y la voz están en *Más › Ajustes* (4.1).
+   - **Sorteo** (paso 3, una página propia): la moneda gira e indica quién gana; indicas quién saca y los lados de la pista **vistos desde la silla del juez** (esquema de la pista con **Cambiar lados**). En dobles eliges también quién saca primero en cada pareja.
 3. **INICIO DEL PARTIDO** parpadea: pulsa el botón, KEY1 de una pulsera o un mando. La voz dice *«Primer set» · «al servicio [nombre]» · «jueguen»* con 1 segundo entre frases; el **Match Time** empieza con «jueguen».
-4. **Partido**: arriba a la izquierda, el tiempo de partido; a la derecha, la cuenta atrás (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; en rojo en los últimos 5 s). El recuadro naranja se enciende 5 s para *cambio de lado, tie-break, bola de set, bola de partido, bola de break…*. Los dos botones cuadrados (amarillo = Jugador 1, rojo = Jugador 2) están del lado en que se encuentran realmente los jugadores y se intercambian en cada cambio de lado; debajo de quien saca aparece **On Serve**. Abajo: *Anular punto*, *Suspender/Reanudar*, audio (icono del altavoz, tachado = apagado), *Nuevo partido*, **Salir**. En modo pulseras, debajo de los tiempos están **J1**/**J2** con batería y autonomía: al tocarlos se abren los ajustes de la pulsera. Un doble toque en *Anular punto* quita un solo punto (un segundo toque en menos de 1 s no cuenta); justo después de un cambio de página se ignora el segundo toque de un doble toque, para que no caiga en un botón de la página nueva. El **candado** de abajo bloquea la pantalla (por ejemplo con el teléfono en el bolsillo o en el banco): los toques no hacen nada, las pulseras y los mandos sí; se desbloquea manteniendo pulsado el candado.
+4. **Partido**: arriba a la izquierda, el tiempo de partido; a la derecha, la cuenta atrás (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; en rojo en los últimos 5 s). El recuadro naranja se enciende 5 s para *cambio de lado, tie-break, bola de set, bola de partido, bola de break…*. Los dos botones cuadrados (amarillo = Jugador 1, rojo = Jugador 2) están del lado en que se encuentran realmente los jugadores y se intercambian en cada cambio de lado; debajo de quien saca aparece **On Serve**. Abajo: *Anular punto*, *Suspender/Reanudar*, audio (icono del altavoz, tachado = apagado), **Salir**: abre un menú con *Volver al menú* (el partido queda entre los suspendidos), *Nuevo partido* y *Cerrar la app* (**Atrás** también lo abre). En modo pulseras, debajo de los tiempos están **J1**/**J2** con batería y autonomía: al tocarlos se abren los ajustes de la pulsera. Un doble toque en *Anular punto* quita un solo punto (un segundo toque en menos de 1 s no cuenta); justo después de un cambio de página se ignora el segundo toque de un doble toque, para que no caiga en un botón de la página nueva. El **candado** de abajo bloquea la pantalla (por ejemplo con el teléfono en el bolsillo o en el banco): los toques no hacen nada, las pulseras y los mandos sí; se desbloquea manteniendo pulsado el candado.
 5. En el último punto aparece la ventana **Partido terminado / Anular el último punto**. «Partido terminado» se confirma **solo desde el teléfono**. Durante medio segundo después de aparecer, sus botones ignoran los toques: un doble toque en el último punto no anula nada.
-6. **Resumen**: ganador, nombres, resultado set por set con los puntos del tie-break, duración, hora de inicio y de fin, fecha, club, pista, lugar, formato, puntos y juegos ganados. Botones **Guardar archivos** (nombre de archivo + carpeta a elegir + formatos .txt/.json/.png y **PDF completo** con resultado, estadísticas del partido y de cada set, historial y fotos). **Compartir** pregunta si enviar la imagen con texto (para WhatsApp y las redes) o el PDF completo. En el Resumen, **Fotos del partido** guarda hasta 10 fotos de recuerdo (de la galería o hechas en el momento): se quedan en el teléfono, van al PDF y pasan al otro teléfono con la transferencia, nunca a la imagen para las redes, **Compartir** (imagen de 1080×1350 + texto para WhatsApp/Instagram/…), **Nuevo partido**, **Salir**. Debajo de las fotos, **Notas** admite un texto libre (hasta 2000 caracteres): se guarda solo, va al PDF, al texto compartido y a los archivos .txt y .json, y pasa al otro teléfono con la transferencia; no va a la imagen para las redes. El partido terminado entra solo en el **Historial** (pestaña **Progresos**): la lista de partidos, para volver a abrirlos con su resumen o eliminarlos, y la pestaña **Jugadores** con victorias, derrotas y cara a cara de quien tiene el nombre escrito en *Nuevo partido* (mayúsculas y espacios no cuentan; en dobles cuenta cada jugador). **Importar** añade los partidos guardados como .json con *Guardar archivos* en otro teléfono: los terminados van al historial y los no terminados a los partidos suspendidos para reanudar. **Transferir** (arriba a la derecha en el Historial) pasa el historial y los partidos suspendidos a otro teléfono con un código QR: los dos teléfonos deben estar en la misma red Wi-Fi o uno en el punto de acceso del otro; en el que los tiene toca *Enviar*, **elige los partidos que mandar** (el último ya está marcado; hay *Todos*, *Ninguno*, *Últimos 7 días* y *De un jugador…*), toca *Enviar (N)* y deja abierta la ventana con el código, en el otro *Recibir* y escanea el código (hace falta el permiso de la cámara). Así también puedes seguir un partido en curso en otro teléfono: suspéndelo, transfiérelo y reanúdalo. Los partidos se suman a los que el teléfono ya tiene. **Fotos de los jugadores**: toca el círculo junto al nombre en *Nuevo partido* (o en el detalle del jugador en el Historial) y elige una foto; se recorta cuadrada y se encuentra por el nombre. Aparece en el Historial, en el resumen y en el marcador de la TV, se queda solo en este teléfono (pasa al otro con la transferencia) y no va en la imagen compartida. Tocando otra vez el círculo la cambias o la quitas. Si la app se cierra mientras estás en el resumen (Android que la cierra en segundo plano, una actualización, un reinicio del teléfono), lo vuelves a encontrar al abrirla; no si lo has dejado tú con *Nuevo partido*, *Salir* o quitando la app de las recientes. La carpeta predeterminada es **Documents/Tennis Score Manager** (desde Android 10; en Android 8 y 9 la carpeta de la app): se abre con cualquier gestor de archivos y se queda aunque desinstales la app. Al guardar dos veces con el mismo nombre, el segundo pasa a ser *nombre (1)*; en la imagen los textos largos (nombres, dirección) se ajustan al ancho.
+6. **Resumen**: ganador, nombres, resultado set por set con los puntos del tie-break, duración, hora de inicio y de fin, fecha, club, pista, lugar, formato, puntos y juegos ganados. Botones **Guardar archivos** (nombre de archivo + carpeta a elegir + formatos .txt/.json/.png y **PDF completo** con resultado, estadísticas del partido y de cada set, historial y fotos). **Compartir** pregunta si enviar la imagen con texto (para WhatsApp y las redes) o el PDF completo. En el Resumen, **Fotos del partido** guarda hasta 10 fotos de recuerdo (de la galería o hechas en el momento): se quedan en el teléfono, van al PDF y pasan al otro teléfono con la transferencia, nunca a la imagen para las redes, **Compartir** (imagen de 1080×1350 + texto para WhatsApp/Instagram/…), **Nuevo partido**, **Hecho** (vuelve a donde empezó el partido: la primera pantalla, el torneo, el equipo o la clasificación por desafíos). Debajo de las fotos, **Notas** admite un texto libre (hasta 2000 caracteres): se guarda solo, va al PDF, al texto compartido y a los archivos .txt y .json, y pasa al otro teléfono con la transferencia; no va a la imagen para las redes. El partido terminado entra solo en el **Historial** (pestaña **Progresos**): la lista de partidos, para volver a abrirlos con su resumen o eliminarlos, y la pestaña **Jugadores** con victorias, derrotas y cara a cara de quien tiene el nombre escrito en *Nuevo partido* (mayúsculas y espacios no cuentan; en dobles cuenta cada jugador). **Importar** añade los partidos guardados como .json con *Guardar archivos* en otro teléfono: los terminados van al historial y los no terminados a los partidos suspendidos para reanudar. **Transferir** (arriba a la derecha en el Historial) pasa el historial y los partidos suspendidos a otro teléfono con un código QR: los dos teléfonos deben estar en la misma red Wi-Fi o uno en el punto de acceso del otro; en el que los tiene toca *Enviar*, **elige los partidos que mandar** (el último ya está marcado; hay *Todos*, *Ninguno*, *Últimos 7 días* y *De un jugador…*), toca *Enviar (N)* y deja abierta la ventana con el código, en el otro *Recibir* y escanea el código (hace falta el permiso de la cámara). Así también puedes seguir un partido en curso en otro teléfono: suspéndelo, transfiérelo y reanúdalo. Los partidos se suman a los que el teléfono ya tiene. **Fotos de los jugadores**: toca el círculo junto al nombre en *Nuevo partido* (o en el detalle del jugador en el Historial) y elige una foto; se recorta cuadrada y se encuentra por el nombre. Aparece en el Historial, en el resumen y en el marcador de la TV, se queda solo en este teléfono (pasa al otro con la transferencia) y no va en la imagen compartida. Tocando otra vez el círculo la cambias o la quitas. Si la app se cierra mientras estás en el resumen (Android que la cierra en segundo plano, una actualización, un reinicio del teléfono), lo vuelves a encontrar al abrirla; no si lo has dejado tú con *Nuevo partido*, *Hecho* o quitando la app de las recientes. La carpeta predeterminada es **Documents/Tennis Score Manager** (desde Android 10; en Android 8 y 9 la carpeta de la app): se abre con cualquier gestor de archivos y se queda aunque desinstales la app. Al guardar dos veces con el mismo nombre, el segundo pasa a ser *nombre (1)*; en la imagen los textos largos (nombres, dirección) se ajustan al ancho.
 
    El resumen tiene tres pestañas. **Resumen**: los datos de arriba y, con las pulseras 2.4, golpes, velocidad de muñeca y golpes por punto (6.4). **Estadísticas**, del partido o de un set: los dos jugadores comparados con barras que salen del centro (coloreada la de quien va por delante) para puntos y juegos ganados con el saque y al resto, bolas de break salvadas y ganadas, total de puntos y juegos, puntos seguidos, últimos 10 puntos, bolas de partido salvadas; con las pulseras 2.4 también golpes por tipo y velocidad media de muñeca. **Punto a punto**: set por set, cada juego con la pelota de quien saca, *SAQUE PERDIDO* en las roturas, el marcador tras cada punto con **BB** (bola de break), **BS** (bola de set) y **BP** (bola de partido) y el desenlace (*JUEGO*, *ROTURA*, *SET*, *PARTIDO*). Aces, dobles faltas, primeros saques, golpes ganadores y errores aparecen si activas las **estadísticas detalladas** en *Modo y reglas*: en lugar de los dos botones grandes salen *Ace* y *Falta* (la segunda vez pasa a *Doble falta*) y, para cada jugador, *Ganador*, *Error* (el punto va al otro) y *Punto*; *Anular punto* también quita una falta. Está pensado para quien anota desde fuera de la pista. Después de *Error* aparece 6 segundos *No forzado / Forzado*; con pulseras o mandos, después de cada punto aparece *¿Cómo terminó el punto?* (Ace, Ganador, Error): responder es opcional y el marcador no cambia. En el Historial, el detalle de un jugador muestra la **evolución**: puntos ganados partido a partido y las medias de aces, dobles faltas, primeros saques, ganadores y errores. Las estadísticas de cada partido cuentan también bolas de juego, de set y de partido convertidas, juegos en blanco, juegos seguidos, sets ganados tras ir un break abajo y, en la tarjeta **Tiempos**, la duración de cada set y el juego más largo.
 
    **Revancha** (al final del resumen): propone el mismo día de la semana y la misma hora, la semana siguiente, y el club del partido; se cambian fecha, hora y lugar y se añade una nota. **Mandar la invitación** abre el menú de compartir (WhatsApp, SMS, correo…) con el mensaje listo: quién contra quién, cuándo, dónde y cómo acabó la última vez. **Añadir al calendario** crea el evento en la app del calendario, **Preparar el partido** devuelve a *Nuevo partido* jugadores, club, pista y reglas (el torneo no). Sin cuentas: la invitación pasa por los canales que ya usas.
 
-**Para salir**: **Salir** (durante el partido pide confirmación, y también está en el resumen) cierra la app de verdad; lo mismo ocurre si la quitas de las aplicaciones recientes. Al volver a abrirla empieza desde la pestaña **Jugar**.
+**Para salir**: durante el partido **Salir** (o **Atrás**) abre un menú: **Volver al menú** (el partido queda entre los suspendidos: lo reanudas desde *Jugar*, o desde *Torneos* con el rol Club), **Nuevo partido** y **Cerrar la app**, que cierra la app de verdad como quitarla de las aplicaciones recientes. En el resumen **Hecho** (o Atrás) vuelve a donde empezó el partido. Al volver a abrirla empieza desde la primera pestaña.
 
 **Retirada**: el botón **Árbitro** (el mazo) bajo el marcador, en **Retirada**, pregunta quién se retira y termina el partido con ese marcador, sin los puntos del juego en curso (p. ej. `6-3 2-1 ret.`). Gana el rival, la voz lo anuncia y, antes de concluir, **Deshacer la retirada** lo deja todo como estaba. En los torneos el resultado entra solo con la retirada anotada; el partido cuenta como victoria pero no pesa en el rating TSM.
 
@@ -9606,15 +9595,15 @@ Para entrenar con la banda de pecho sin partido: **Entrenar** › **Entrenamient
 
 Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marcador del árbitro.
 
-1. **Árbitro**: Más › **Dispositivos** › **Segundo teléfono** › **Usar un segundo teléfono** (QR, como en 6.6).
-2. **Cámara**: Más › **Dispositivos** › **Segundo teléfono** › **Hacer de cámara**, escanea el QR y luego **Abrir la cámara** (permisos de cámara y micrófono; el teléfono debe grabar en 1080p). Con *Marcador conectado* el gráfico del marcador está en el vídeo (**Gráfico** lo enciende o lo apaga); sin árbitro graba solo el vídeo.
+1. **Árbitro**: Más › **Ajustes** › **Dispositivos** › **Segundo teléfono** › **Usar un segundo teléfono** (QR, como en 6.6).
+2. **Cámara**: Más › **Ajustes** › **Dispositivos** › **Segundo teléfono** › **Hacer de cámara**, escanea el QR y luego **Abrir la cámara** (permisos de cámara y micrófono; el teléfono debe grabar en 1080p). Con *Marcador conectado* el gráfico del marcador está en el vídeo (**Gráfico** lo enciende o lo apaga); sin árbitro graba solo el vídeo.
    - **Grabar / Parar**: el vídeo va a la galería (*Películas/Tennis Score Manager*) con capítulos, uno por punto.
    - **Directo**: emisión RTMP en YouTube, Twitch, Facebook o un servidor tuyo; servidor y clave de la emisión en *Directo: servidor*.
    - **Encuadrar** (asistente de encuadre): escribe a cuántos metros detrás de la línea de fondo y a qué altura has puesto el teléfono y en qué pista juegas; la app da la inclinación hacia abajo que mantiene en el vídeo las dos líneas de fondo y al jugador lejano, y dice si la pista cabe a lo ancho. A menudo el límite es el ancho: desde la valla (unos 6 m) el objetivo principal corta las esquinas cercanas, el **gran angular** no (**Usar el objetivo…**, o el botón **Objetivo**, con la grabación parada). Con **Mostrar el nivel** la vista previa muestra el horizonte e indicaciones (*apunta 2° más abajo*, *gira en sentido horario*…), en verde cuando está bien, con una vibración cuando el teléfono está en posición. El nivel también se ve en la ventana **Cámara** del teléfono del árbitro. Los sensores no saben izquierda y derecha: comprueba a ojo que la red esté en el centro.
    - **Silueta** (silueta de la pista): la vista previa muestra las líneas de la pista como las ve el objetivo, y siguen al teléfono cuando lo inclinas. Mueve los controles (**Distancia**, **Altura**, **Dirección**, **Desplazamiento lateral** y, si hace falta, **Campo de visión** y **Corrección de inclinación**) hasta que coincidan con las reales: así se ajusta también el centrado, y la inclinación aconsejada se vuelve precisa. El ajuste se recuerda para la pista del partido (*Club · Pista* del árbitro) y se recupera la próxima vez. Silueta y controles también están en la ventana **Cámara** del árbitro. Cuanto más alto esté el teléfono, mejor se ve la mitad lejana de la pista: desde 2,5 m queda aplastada justo encima de la red.
-3. **Cámara en alto, manejada por el árbitro**: en el teléfono del árbitro, **Cámara** (junto a *Repetición* durante el partido, o *Encuadre y mandos de la cámara* en la Más › **Dispositivos** › **Segundo teléfono**, útil para colocarla antes de empezar) muestra el encuadre del teléfono-cámara tal como queda en el vídeo, con el gráfico, y **Grabar / Parar**, **Directo**, **Gráfico** y el **zoom**. También se ven la duración de la grabación, la batería y el espacio libre (en naranja si son bajos). La imagen es pequeña y a saltos (unos 3 fotogramas por segundo) y solo se envía mientras se mira; la clave del directo se pone en el teléfono-cámara.
+3. **Cámara en alto, manejada por el árbitro**: en el teléfono del árbitro, **Cámara** (junto a *Repetición* durante el partido, o *Encuadre y mandos de la cámara* en la Más › **Ajustes** › **Dispositivos** › **Segundo teléfono**, útil para colocarla antes de empezar) muestra el encuadre del teléfono-cámara tal como queda en el vídeo, con el gráfico, y **Grabar / Parar**, **Directo**, **Gráfico** y el **zoom**. También se ven la duración de la grabación, la batería y el espacio libre (en naranja si son bajos). La imagen es pequeña y a saltos (unos 3 fotogramas por segundo) y solo se envía mientras se mira; la clave del directo se pone en el teléfono-cámara.
 
-- **Vídeo** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*.
+- **Progresos** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*.
 - **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
 - **Mejores jugadas**: montaje automático de los mejores puntos (aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
   - **Estadísticas al final del vídeo**: 2 o 3 pantallas de 10 segundos como en las retransmisiones de los torneos: saque y bolas de break; puntos, errores y peloteos cortos y largos; pulso, si se llevaba la banda. El partido es el del historial jugado mientras se grababa, o el de los puntos marcados en un vídeo importado. A los lados, la foto del jugador; sin foto, un retrato estilizado de hombre o de mujer (elección **Hombre / Mujer** en *Nuevo partido*) (sin elección, el del hombre; vale en toda la app, también en *Nuevo partido*, el historial, el resumen, el PDF y el marcador de la TV); debajo, el porcentaje de puntos ganados. Arriba, torneo, categoría y ronda (*Más detalles* en *Nuevo partido*), o club y pista.
@@ -9660,8 +9649,8 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 
 ### 7.6 Alumnos: la parte del entrenador
 
-- **Entrenar › Alumnos** › **Nuevo alumno**: nombre (el mismo de los partidos: así foto, historial y rating aparecen solos) y mano.
-- **Quién entrena**: en Entrenar, encima de *Empezar*, elige al alumno (o *Ningún alumno*). La sesión es suya: las últimas sesiones, *Todas las sesiones*, la evolución en Progresos y los números de los botones de los golpes son solo suyos, y los clips van a **Entrenamiento de golpes/<golpe>/<alumno>/<fecha y hora>**.
+- **Alumnos** (rol Entrenador) › **Nuevo alumno**: nombre (el mismo de los partidos: así foto, historial y rating aparecen solos) y mano.
+- **Quién entrena**: en la pestaña Alumnos del rol Entrenador, encima de *Empezar*, elige al alumno (en el rol Tú entrenas tú, sin alumno). La sesión es suya: las últimas sesiones, *Todas las sesiones*, la evolución en Progresos y los números de los botones de los golpes son solo suyos, y los clips van a **Entrenamiento de golpes/<golpe>/<alumno>/<fecha y hora>**.
 - **La ficha del alumno** (toca el nombre en *Alumnos*):
   - **Golpes**: para saque, derecha, revés y volea las sesiones, los golpes, la última vez y la línea de golpes dentro; al tocar un golpe se abren sus sesiones.
   - **Movimiento**: las medidas del análisis (6.4 y 7.5) de la última sesión analizada junto a la anterior, para ver qué cambia.
@@ -9683,7 +9672,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Altura y peso**: con edad y sexo hacen que las **calorías de la banda cardio** se calculen solas cuando el jugador juega o, si eres tú, entrena (sin ellos la app las pide aparte o no las calcula).
   - **Club de pertenencia**: se ve en la ficha; útil para invitados y rivales de otros clubes, para saber quiénes son.
   - **Mano y revés** (a una o dos manos): describen al jugador en su ficha, útil para el entrenador; el análisis del movimiento reconoce solo el brazo que golpea.
-  - **Alumno**: lo pone entre los alumnos del entrenador (Entrenar › Alumnos, *Quién entrena*), con sesiones, movimiento e informe.
+  - **Alumno**: lo pone entre los alumnos del entrenador (rol Entrenador, pestaña Alumnos y *Quién entrena*), con sesiones, movimiento e informe.
   - **Teléfono y correo**: sirven para los **avisos** (WhatsApp, SMS, correo: torneos, cuotas, convocatorias) aunque no sea socio.
   - **Raqueta**: va con cada sesión y partido tal como estaba ese día (cuerdas y tensión) y se comparan sus estadísticas; si no existe, *Nueva raqueta* la crea desde ahí.
   - Clasificación, licencias y certificado no están aquí: están en los *Datos del socio*, porque sirven para torneos y cuotas.
@@ -9696,10 +9685,10 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - **Partidos de otro teléfono** (transferencia o *Importar*): un jugador que el teléfono conoce se enlaza solo; uno nuevo se añade con su identificador; si tiene el nombre de uno de los tuyos la app pregunta una vez **¿Quién es?** (*Sí, es él* enlaza los dos y la próxima vez lo reconoce; *No, otra persona* lo añade). Los partidos de versiones antiguas, sin jugadores, se enlazan por el nombre.
 - La **foto** y **hombre/mujer** siguen siendo del nombre: dos homónimos las comparten.
 
-### 7.8 Tú, y Perfil y datos
+### 7.8 Tú, y Copia de seguridad y datos
 
 - **Tú** es tu jugador de la base: Progresos y rating parten de él. En el primer arranque bastan nombre y apellido (y apodo); luego **Más › Tú** abre tu ficha. Si aún no lo has elegido, *¿Quién eres?* propone los jugadores que hay (ya has jugado partidos) o **Soy nuevo**. En la ficha de otro jugador, **Soy yo** lo hace tuyo.
-- **Más › Perfil y datos**:
+- **Más › Ajustes › Copia de seguridad y datos**:
   - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
   - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
@@ -9708,15 +9697,15 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 
 ### 7.9 Roles: Tú, Entrenador, Club
 
-- En **Más › Perfil y datos › Roles** (y en el primer arranque) eliges quién usa la app; puedes tener más de uno. Los roles cambian las pestañas de la primera pantalla, **los datos son los mismos**; con varios roles, arriba está el activo: tócalo para pasar a otro.
-  - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
-  - **Lo que usas** (Más): te quedas solo con lo que necesitas. Pulseras y mandos, bandas de pulso, entrenamiento de golpes y alumnos, vídeo y cámara, progresos y rating, raquetas, pádel: lo que apagas no aparece, y las pestañas que quedan vacías (Entrenar, Vídeo) desaparecen; el historial se queda siempre (sin Progresos pasa a Jugar). Al principio todo está encendido; en la primera presentación la app propone qué dejar según la respuesta a «cómo la usarás». Más se divide en grupos: Dispositivos y voz, Datos, Ayuda.
-  - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
-  - **Club**: **Hoy** (las reservas del día, lo que hay por cobrar, los socios por regularizar, los partidos de torneo, las clases, los encuentros y los desafíos: se toca un recuadro para ir), **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
-  - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas, Servidor del club y Secretaría desde el PC. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
-  - El **?** arriba en muchas pantallas abre la guía justo en la sección de esa pantalla.
-- El marcador está en todos los roles: nada te impide anotar un partido.
-- **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
+- Los roles dicen quién usa la app: se eligen en el primer arranque o en **Más › Ajustes › Roles y funciones** (también tocando el rol de arriba, siempre visible) y puedes tener más de uno. **Cada función está en un solo rol**, sin duplicados; los datos son los mismos y al cambiar de rol no se pierde nada.
+  - **Tú** (juegas): **Jugar** (el marcador, el torneo entre amigos, el teléfono como marcador o cámara), **Club** (solo después de la invitación: reservas y chat), **Entrenar**, **Progresos** (rating, historial, vídeos, raquetas), Más (tu ficha, los jugadores).
+  - **Entrenador** (entrenas a otros): **Alumnos** (la lista, los ejercicios y el entrenamiento de golpes de quien entrena contigo), Más. Los partidos se marcan desde el rol Tú; *Entrenar ahora* en la ficha de un alumno trae aquí con él ya elegido.
+  - **Club** (la secretaría): **Hoy** (las reservas del día, lo que hay que cobrar, los socios por regularizar, los partidos de los torneos, las clases, los encuentros y los desafíos: toca un recuadro para ir), **Reservas** (las pistas del día, al momento), **Socios** (socios, cuotas y pagos, escuela de tenis, mensaje a todos los socios), **Torneos** (torneos, equipos, clasificación por desafíos: los partidos se marcan desde ahí con *Jugar con el marcador* y los que quedaron a medias se reanudan desde ahí), Más (**El club**: nombre, pistas, horarios y precios, servidor, secretaría desde el PC, copia de la secretaría).
+  - **Más** tiene en todos los roles lo que es de la app: **Ajustes** (idioma, voz del árbitro, dispositivos, roles y funciones, copia de seguridad y datos y, al final, **Acerca de** con la versión de la app, la licencia y el código fuente), **Ayuda** y **Presentación de la app**.
+  - **Roles y funciones** deja en los menús solo lo que hace falta. Para Tú y Entrenador, **Lo que usas**: pulseras y mandos, bandas de pulso, entrenamiento de golpes, vídeo y cámara, progresos y rating, raquetas, pádel; lo que se apaga no aparece y las pestañas que quedan vacías desaparecen (sin Progresos el historial pasa a Jugar). Para el Club, **Funciones del club**: de base Socios, Cuotas y pagos, Planning de pistas y Torneos del club; además Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas, Servidor del club y Secretaría desde el PC. Los datos de las funciones apagadas se quedan.
+  - El **?** de arriba en muchas pantallas abre la guía justo en la sección de esa pantalla.
+- A quien ya tenía la app, la primera vez se encienden solos los roles de los que ya hay datos (partidos, entrenamientos y reservas son de Tú, los alumnos del Entrenador): no desaparece nada.
+- **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con la **copia automática** (activada de serie) y el **recordatorio de copia** (si apagas la automática, cada 30 días la primera pantalla te recuerda hacer una); están también en Copia de seguridad y datos.
 
 ### 7.10 Ejercicios guiados
 
@@ -9726,7 +9715,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 
 ### 7.11 Socios del club
 
-Con el rol **Club**, en **Jugadores › Socios** está la lista de inscritos, pensada para el dispositivo de la secretaría.
+Con el rol **Club**, en **Socios › Socios** está la lista de inscritos, pensada para el dispositivo de la secretaría.
 
 - **Nuevo socio**: elige un jugador que ya esté (quien jugó partidos o un alumno) o crea uno nuevo. Desde la ficha de un jugador también se puede tocar **Inscribir como socio**.
 - **Datos del socio**: teléfono y correo (sirven para los avisos), fecha de nacimiento, socio desde, carné del club; **licencia FITP** con número, tipo (competición, no competición, otra), año y clasificación; **certificado médico** con tipo y caducidad; consentimiento al tratamiento de datos y a fotos y vídeos. Para los **menores**, también el padre, la madre o el tutor y su teléfono.
@@ -9736,7 +9725,7 @@ Con el rol **Club**, en **Jugadores › Socios** está la lista de inscritos, pe
 
 ### 7.12 Cuotas y pagos
 
-En **Jugadores › Cuotas y pagos** (rol Club) se lleva el registro del club. La app **registra** los pagos, no los cobra: ninguna tarjeta ni cuenta vinculada.
+En **Socios › Cuotas y pagos** (rol Club) se lleva el registro del club. La app **registra** los pagos, no los cobra: ninguna tarjeta ni cuenta vinculada.
 
 - **Nueva cuota**: nombre (p. ej. *Cuota de socio 2027*), tipo (cuota de socio, licencia FITP, curso, torneo, otra), importe y, si hace falta, el vencimiento. Tocando una cuota, **Cargar a todos los socios** la asigna a quien aún no la tiene; debajo se ve cuántos han pagado.
 - En la ficha del socio, **Cuotas y pagos** muestra lo que debe: *pagado*, *por pagar*, *faltan 100,00 €*, en rojo *con retraso* tras el vencimiento. **Nuevo cargo** añade una cuota del club u otro importe (una clase, un encordado).
@@ -9744,7 +9733,7 @@ En **Jugadores › Cuotas y pagos** (rol Club) se lleva el registro del club. La
 - Un pago equivocado se anula (el número de recibo no se reutiliza); un cargo sin pagos se elimina, con pagos se **anula**: ya no se debe y los pagos quedan en el registro.
 - Arriba: cobrado en el año y lo que queda por cobrar; **Por cobrar** lista quién debe, de la deuda mayor a la menor. También en *Socios* quien debe algo está entre los *por resolver*.
 - **Exportar los pagos (CSV)**: todos los pagos del año con fecha, recibo, nombre, descripción, método, referencia e importe, para la hoja de cálculo del gestor.
-- Al borrar un jugador desaparecen sus cargos sin pagar; los pagos hechos se quedan con el nombre, porque son contabilidad. El registro está en la copia de seguridad de *Perfil y datos*.
+- Al borrar un jugador desaparecen sus cargos sin pagar; los pagos hechos se quedan con el nombre, porque son contabilidad. El registro está en la copia de seguridad de *Copia de seguridad y datos*.
 
 ### 7.13 Torneos del club
 
@@ -9772,7 +9761,7 @@ La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y a
 
 ### 7.15 Pistas y planning
 
-Con el rol **Club**, en la pestaña **Pistas**.
+Con el rol **Club**, en la pestaña **Reservas** (el nombre del club, las pistas y *Horarios y precios* están también en **Más**, grupo *El club*).
 
 - **Las pistas**: se crea una pista (**Nueva pista**), se ordenan y se toca una para cambiarla: nombre (al renombrarla, reservas, periodos y partidos de los torneos la siguen), superficie (**tierra batida, hierba, cemento**, otra), **cubierta o descubierta**, **luz**, **calefacción**, sus **precios** (por hora, con luz, suplemento de calefacción por hora; vacíos = los generales) y **una o varias fotos** de la galería. **Eliminar la pista** quita también sus reservas desde hoy.
 - **Planning de pistas**: el día con una pista por columna y una hora por fila (◀ ▶ y el calendario para cambiar de día). Toca una casilla libre para reservar: pista, día, hora y duración, tipo (juego, clase, cerrada, otro), jugadores de la base de datos e invitados, nota. El **precio** se calcula solo (luz desde la hora fijada, calefacción si se pide) y se puede cambiar; **Cargar a los jugadores** lo divide a partes iguales y lo lleva a *Cuotas y pagos*. **Cómo se paga**: *en la pista* u *online*; con la reserva cargada, **Pagado: …** la marca pagada con uno de los medios de pago del club. **Cada semana durante N semanas** repite la reserva (las fechas con la pista ocupada se saltan y la app lo dice). **Avisar a los jugadores** envía pista, día, hora y cómo pagar.
@@ -9784,7 +9773,7 @@ Con el rol **Club**, en la pestaña **Pistas**.
 
 ### 7.16 Escuela de tenis
 
-Con el rol **Club**, en **Jugadores › Escuela de tenis**.
+Con el rol **Club**, en **Socios › Escuela de tenis**.
 
 - **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza.
 - **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
@@ -9810,10 +9799,10 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 **Número y PIN, varios clubes**: tras la primera invitación el jugador puede elegir **número de teléfono y PIN** (en la página del club y en la app, en **Mías**). Así, si cambia de teléfono o sale, vuelve a entrar solo con **¿Ya tienes un PIN?**, sin nueva invitación. Tras 5 PIN erróneos se espera un cuarto de hora; tras 20 el PIN ya no vale y la secretaría lo restablece desde la ficha del socio (**Restablecer el PIN**). En la app se puede entrar en **varios clubes**: **Añadir un club** en **Mías**, y luego se elige el club arriba; recordatorios y avisos llegan de todos, con el nombre del club.
 
 - **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
-- **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
+- **Emparejar la secretaría**: *Más › Servidor del club* (después de activarlo en *Roles y funciones › Funciones del club*): dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
 - **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).
 - **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR. En iPhone la página **TSM** le guía: *Compartir › Añadir a pantalla de inicio*, luego abre TSM desde la pantalla de inicio y pega el código (Safari y la app de la pantalla de inicio no comparten datos, así que la invitación se usa en la app instalada). En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
-- **Con la app TSM en Android** el jugador también reserva desde *Jugar › Reservar pista*: escanea el QR de la invitación (o pega el enlace), luego ve sus reservas, elige el día y toca una casilla libre; duración, calefacción y precio antes de confirmar, **Anular** mientras haya tiempo, **Salir de este club** para desconectar el teléfono. Las reglas son las mismas que en la página web.
+- **Con la app TSM en Android** el jugador también reserva desde *Club › Reservar pista* (la primera vez desde *Más › Tengo una invitación del club*): escanea el QR de la invitación (o pega el enlace), luego ve sus reservas, elige el día y toca una casilla libre; duración, calefacción y precio antes de confirmar, **Anular** mientras haya tiempo, **Salir de este club** para desconectar el teléfono. Las reglas son las mismas que en la página web.
 - La página y la app tienen **tres pestañas**: **Reservar** (días y casillas), **Mías** (reservas, listas de espera, recordatorios) y **Compañeros** (Busco compañero).
 - En la app, en **Mías**, **Invitar** envía a quien juega contigo la pista, el día y la hora ya escritos (por WhatsApp o donde quieras); tras una reserva la app te lleva ahí sola.
 - **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
@@ -9854,11 +9843,11 @@ Con el rol **Club**, en **Torneos › Clasificación por desafíos**.
 
 Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (Windows, Mac o Linux) en la misma red que el teléfono** abre en el navegador una página servida por el teléfono, sin instalar nada y sin servidor: **los datos se quedan en el teléfono**; el ordenador los ve y los cambia mientras está conectado y no guarda copias. Una persona cada vez. El *servidor del club* (7.18) es otra cosa y solo sirve para las reservas de los jugadores.
 
-- **Encender**: *Funciones del club* › **Secretaría desde el PC**, luego la entrada de la pestaña de pistas y **Encender**. El teléfono muestra la dirección (p. ej. `https://192.168.1.20:8443`) y un código.
+- **Encender**: *Más › Ajustes › Roles y funciones › Funciones del club* › **Secretaría desde el PC**, luego la entrada en **Más** y **Encender**. El teléfono muestra la dirección (p. ej. `https://192.168.1.20:8443`) y un código.
 - **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
 - **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
 - **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). **Escuela de tenis** (cursos con horarios y pistas, alumnos, lista de las clases, clases anuladas, cuotas del mes o de la temporada por cargar), **Estadísticas de las pistas** (ocupación, ingresos, pista por pista, días y horas más llenos, quién reserva más, por periodo, para imprimir). Con **Preparar recordatorio** en Cuotas y pagos eliges a quién escribir entre los cargos que ves: el mensaje se abre en el teléfono y lo envías desde allí. **Equipos y ligas** (plantilla, encuentros en casa o fuera con pistas reservadas, disponibilidad, convocados, partidos y resultado; los avisos se abren en el teléfono). **Reservas online**, con el servidor del club (próximas reservas de los jugadores, lista de espera, anuncios de Busco compañero que quitar si hace falta, reglas para los jugadores, **Enviar ahora**), **Ajustes** (nombre del club, horarios y precios, pistas con superficie, luces y precios propios, formas de pago). Avisos de WhatsApp, fotos de las pistas y marcador en directo siguen en la app.
-- **Copia de la secretaría** (en el PC, debajo de Estadísticas; en el teléfono en Pistas › Copia de la secretaría): un solo archivo `.tsmclub` con socios y jugadores, cuotas y pagos, planning, torneos, escuela de tenis, equipos, pistas y ajustes (no partidos, golpes ni vídeos: la copia completa los tiene). **Descargar al PC** o, desde el teléfono, **enviarla** donde quieras (Google Drive, correo, un pendrive). Con la **copia automática** el teléfono hace una copia al día solo si algo ha cambiado y guarda las últimas 14; con un servidor del club, también él. **Restaurar** muestra primero lo que hay en el archivo y hace una copia de ahora, para volver atrás. El archivo contiene datos personales de los socios: guárdalo en un sitio tuyo.
+- **Copia de la secretaría** (en el PC, debajo de Estadísticas; en el teléfono en Más › Copia de la secretaría): un solo archivo `.tsmclub` con socios y jugadores, cuotas y pagos, planning, torneos, escuela de tenis, equipos, pistas y ajustes (no partidos, golpes ni vídeos: la copia completa los tiene). **Descargar al PC** o, desde el teléfono, **enviarla** donde quieras (Google Drive, correo, un pendrive). Con la **copia automática** el teléfono hace una copia al día solo si algo ha cambiado y guarda las últimas 14; con un servidor del club, también él. **Restaurar** muestra primero lo que hay en el archivo y hace una copia de ahora, para volver atrás. El archivo contiene datos personales de los socios: guárdalo en un sitio tuyo.
 - **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
 - **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
 
@@ -9884,7 +9873,7 @@ El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador
 
 ### 8.2 En el teléfono del juez
 
-1. Más › **Dispositivos** › **Marcador en TV** › activa **Marcador en TV o monitor**. En Android 13 y posteriores la app pide el permiso de notificaciones: hace falta para la notificación del servicio que mantiene activo el marcador.
+1. Más › **Ajustes** › **Dispositivos** › **Marcador en TV** › activa **Marcador en TV o monitor**. En Android 13 y posteriores la app pide el permiso de notificaciones: hace falta para la notificación del servicio que mantiene activo el marcador.
 2. Aparecen la **dirección** (p. ej. `192.168.43.1:8080`), el **QR** y cuántos marcadores hay conectados. Si pone *Sin red*, activa el punto de acceso o conéctate al del otro teléfono.
 3. **Vista previa en este teléfono** abre el marcador en el navegador del propio teléfono.
 4. **Aspecto del marcador**: color de cada jugador (8 colores), tiempo de partido, reloj de saque y descansos, sets terminados, mensajes (bola de break, bola de set, cambio de lado…), pelota junto a quien saca, segmentos apagados visibles, texto inferior (vacío = club y pista de *Nuevo partido*). Los cambios llegan al monitor al instante.
@@ -9930,7 +9919,7 @@ Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LIST
 - **En el panel de ajustes aparece «El firmware de esta pulsera no tiene ajustes»**: esa pulsera todavía tiene el sketch antiguo; vuelve a cargarlo (capítulo 5).
 - **La voz no habla o lee mal**: volumen multimedia, *Audio On*, voz del idioma elegido instalada (4); prueba otro motor u otra voz en *Audio y voz*.
 - **Pantalla apagada durante el partido**: en modo pulseras, un servicio en primer plano (notificación «Partido en curso») mantiene activos el Bluetooth, la voz y los cronómetros; en modo juez y mandos, la pantalla se queda encendida (con los mandos debe hacerlo: 6.3).
-- **El mando no hace nada**: ¿está asignado al jugador (*Más › Dispositivos* › *Mandos*, fila con su nombre)? La app tiene que estar abierta en el partido, con la pantalla encendida (6.3). Si la fila dice *No conectado*, pulsa una tecla para despertarlo o vuelve a emparejarlo en los ajustes de Bluetooth.
+- **El mando no hace nada**: ¿está asignado al jugador (*Más › Ajustes › Dispositivos* › *Mandos*, fila con su nombre)? La app tiene que estar abierta en el partido, con la pantalla encendida (6.3). Si la fila dice *No conectado*, pulsa una tecla para despertarlo o vuelve a emparejarlo en los ajustes de Bluetooth.
 - **Los golpes se confunden o salen como no reconocidos**: lleva la pulsera como durante la calibración (misma muñeca, mismo sentido); si no, repite la calibración llevándola como en el partido (6.4).
 - **La pulsera muestra MEMORIA LLENA**: no se ha podido guardar un ejemplo de calibración. Borra los ejemplos de un golpe (papelera) y repítelos.
 - **El teléfono-marcador no encuentra al juez**: ¿están en la misma red? (uno de los dos hace de punto de acceso y el otro está conectado a él). ¿*Marcador en TV* está activado en el teléfono del juez? Prueba a escribir la dirección a mano. Algunos puntos de acceso aíslan entre sí los dispositivos conectados («aislamiento de clientes»): si es así, desactívalo.
@@ -9942,20 +9931,20 @@ TSM_EOF
 cat > "$DEST/app/src/main/assets/help/fr.md" << 'TSM_EOF'
 ## 3.1 Comment l'appli est organisée
 
-Au **premier démarrage**, l'appli pose trois questions : la langue, comment vous l'utiliserez (compter les points, jouer avec les bracelets, vous entraîner, filmer les matchs) et votre nom ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. En bas, il y a toujours **cinq onglets** :
+Au **premier démarrage**, l'appli demande la langue, qui l'utilise (les rôles), votre nom, comment vous l'utiliserez et, pour le secrétariat, le club ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. En bas se trouvent les onglets du **rôle actif**, toujours affiché en haut : touchez-le pour passer à un autre rôle ou ouvrir **Rôles et fonctions**. **Chaque fonction se trouve dans un seul rôle** (7.9) : Vous joue, l'Entraîneur suit les élèves, le Club tient le secrétariat. Avec le rôle **Vous** :
 
-- **Jouer** : **Nouveau match**, le match suspendu à reprendre, **Comme la dernière fois** (mêmes joueurs, court et règles : les règles tiennent sur une ligne et on passe directement au tirage au sort ; *Changer de mode ou de règles* les rouvre), le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **Jouer** : **Nouveau match**, les matchs suspendus à reprendre (un appui long en supprime un), **Comme la dernière fois** (mêmes joueurs, court et règles, directement au tirage au sort ; *Changer de mode ou de règles* les rouvre), le **tournoi entre amis** (Americano, Mexicano) et, sous **Ce téléphone**, le tableau, le téléphone-caméra et **Filmer avec ce téléphone**. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **Club** (seulement après l'invitation de votre club, 7.18) : les nouvelles du tableau du club et des discussions, **Réserver un terrain**, vos réservations, **Je cherche un partenaire** et la discussion du club.
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
-- **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
-- **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
-- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Profil et données** (sauvegarde, restauration, effacement : 7.8), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
+- **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Vos vidéos** (chapitres, temps forts, filtres, import), **Mon année**, **Mes raquettes**.
+- **Plus** : **Vous** (votre fiche), **Joueurs** (la base : 7.7) et, identiques dans chaque rôle, **Réglages** (la langue ; la voix de l'arbitre ; les appareils : bracelets, télécommandes, ceintures, second téléphone, tableau TV ; rôles et fonctions ; sauvegarde et données, 7.8 ; tout en bas **À propos** avec la version de l'appli, la licence et le code source), **Aide** (ce guide, avec recherche et renvois cliquables) et **Présentation de l'appli**.
 
-**Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
+**Nouveau match** se fait en trois étapes courtes : **qui joue** (simple ou double, les joueurs de la base, avec les récents à toucher, et le sport ; classement, homme/femme et raquette tiennent sur une ligne sous les noms et s'ouvrent avec *Changer* ; club, court, tournoi et lieu dans *Autres détails*), **façon de compter et format** (les autres règles tiennent sur une ligne, *Changer* les ouvre) et le **tirage au sort**. Tout est facultatif : on peut continuer sans noms. **Retour** ramène toujours d'où vous venez.
 
 ## 4. La voix (fonctionne sans internet)
 
 - Chaque annonce est lue **d'une seule phrase** par la synthèse vocale du téléphone, avec une voix installée : pas d'internet et une prosodie naturelle. Les noms des joueurs font partie de la phrase.
-- Plus › **Langue et voix** › **Audio et voix** :
+- Plus › **Réglages** › **Voix de l'arbitre** › **Audio et voix** :
   - **Moteur de synthèse vocale** : *Par défaut du téléphone* (sur les Samsung, c'est Samsung TTS) ou un moteur au choix, par exemple *Services vocaux Google*. Lors des tests, faits en italien, Google sonnait plus naturel.
   - **Voix** : *Automatique (meilleure hors ligne)* ou une voix précise (Google désigne ses voix par un code, que l'application affiche sous la forme « Voix » + code ; celles marquées *en ligne* nécessitent internet).
   - **Tester la voix** : lit une séquence d'annonces d'exemple avec les noms saisis. Pendant la lecture, le bouton devient **Arrêter le test** : touchez-le à nouveau pour l'interrompre (la lecture s'arrête aussi d'elle-même quand vous quittez la page). La synthèse vocale ne peut pas être mise en pause au milieu d'une phrase, donc le bouton l'arrête ; si vous appuyez de nouveau, elle reprend depuis le début.
@@ -9969,7 +9958,7 @@ Au **premier démarrage**, l'appli pose trois questions : la langue, comment vou
 
 ### 4.1 Langues
 
-Plus › **Langue et voix** › **Langue** : Italiano, English, Français, Deutsch, Español, Português (chaque langue est écrite dans sa propre langue, pour qu'on la retrouve même quand l'application est dans une langue qu'on ne lit pas). Le choix s'applique à la fois aux **écrans, à la voix de l'arbitre, au tableau d'affichage TV, au récapitulatif et au partage, et aux bracelets**. Les dates suivent la langue (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+Plus › **Réglages** › **Langue** : Italiano, English, Français, Deutsch, Español, Português (chaque langue est écrite dans sa propre langue, pour qu'on la retrouve même quand l'application est dans une langue qu'on ne lit pas). Le choix s'applique à la fois aux **écrans, à la voix de l'arbitre, au tableau d'affichage TV, au récapitulatif et au partage, et aux bracelets**. Les dates suivent la langue (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 Les annonces ne sont pas des traductions mot à mot : elles suivent les textes officiels pour les arbitres de chaise de chaque fédération, à savoir *L'arbitrage en 255 questions* de la FFT et l'ITF en français, les documents DTB/BTV et Swiss Tennis, *Deberes y procedimientos* de la RFET, *Deveres e Procedimentos* de la FPT (le seul script portugais publié). L'anglais suit l'ITF. En anglais, le zéro des manches en fin de match se dit *love* (« six love, six four »), comme pour les points.
 
@@ -10002,7 +9991,7 @@ Particularités :
 | **KEY2**, appui long (2 s) | éteint le bracelet (câble branché, il affiche *LA CHARGE CONTINUE* : il se recharge même éteint ; depuis le firmware 2.3, KEY1 ou KEY2 le rallument aussi) |
 | Bouton latéral | un clic allume ; un double clic éteint (fonction matérielle) |
 
-- À l'allumage, **APPAIRAGE...** clignote (allumé 0,35 s toutes les 2 s, pour économiser la batterie). L'application se connecte d'elle-même aux bracelets qu'elle connaît dès qu'elle est ouverte ; les nouveaux, elle les trouve dans **Plus › Appareils** (ou dans **Mode et règles** avec le mode *Bracelets*).
+- À l'allumage, **APPAIRAGE...** clignote (allumé 0,35 s toutes les 2 s, pour économiser la batterie). L'application se connecte d'elle-même aux bracelets qu'elle connaît dès qu'elle est ouverte ; les nouveaux, elle les trouve dans **Plus › Réglages › Appareils** (ou dans **Mode et règles** avec le mode *Bracelets*).
 - Une fois connecté : **APPAIRE** pendant 3 secondes avec deux bips, puis **ASSOCIE A** + le nom du joueur.
 - À chaque point, l'écran s'allume avec le score du jeu en grand (à gauche le vôtre, à droite celui de l'adversaire ; la balle verte indique qui sert), puis s'éteint. À la fin d'un jeu, il affiche les jeux et les manches. Si le téléphone ne confirme pas un appui dans les 8 secondes (liaison perdue), **NON ENVOYE** s'affiche en rouge avec deux bips graves : appuyez de nouveau une fois reconnecté. Un appui fait pendant une courte coupure n'est en revanche pas perdu : il part dès que le bracelet se reconnecte, et le bip retentit à ce moment-là.
 
@@ -10024,7 +10013,7 @@ Les autres économies : CPU à 80 MHz, écran éteint quand il ne sert pas, Blue
 
 ### 6.1 Réglages du bracelet
 
-Depuis **Plus › Appareils** ou **Mode et règles** (**Réglages** sous le bracelet de chaque joueur) ou pendant le match (touchez **J1**/**J2** en haut, ou l'icône des curseurs). Ils sont enregistrés **dans le bracelet** et sont conservés même quand on l'éteint ; à chaque modification, le bracelet affiche son nom avec *REGLAGES OK*. Avec le firmware 2.4 il y a aussi la section **Coups** (6.4).
+Depuis **Plus › Réglages › Appareils** ou **Mode et règles** (**Réglages** sous le bracelet de chaque joueur) ou pendant le match (touchez **J1**/**J2** en haut, ou l'icône des curseurs). Ils sont enregistrés **dans le bracelet** et sont conservés même quand on l'éteint ; à chaque modification, le bracelet affiche son nom avec *REGLAGES OK*. Avec le firmware 2.4 il y a aussi la section **Coups** (6.4).
 
 | Réglage | Valeurs | Par défaut |
 |---|---|---|
@@ -10066,7 +10055,7 @@ Branchez le câble USB-C : le bracelet émet un bip et affiche l'**écran de cha
 
 La solution la plus économique pour laisser les joueurs marquer : deux **télécommandes Bluetooth pour selfie** (celles avec un bouton de déclenchement, souvent vendues sous le nom *AB Shutter3*), de 1 à 3 € pièce. Android les voit comme un clavier : pas de firmware à charger et aucune autorisation pour l'application. N'importe quel autre pavé ou clavier Bluetooth (ou USB) convient aussi.
 
-1. Allumez la télécommande et appairez-la dans les **réglages Bluetooth** du téléphone, comme un casque (*Plus › Appareils › Réglages Bluetooth* les ouvre). Recommencez avec la seconde.
+1. Allumez la télécommande et appairez-la dans les **réglages Bluetooth** du téléphone, comme un casque (*Plus › Réglages › Appareils › Réglages Bluetooth* les ouvre). Recommencez avec la seconde.
 2. *Mode et règles* › mode **Télécommandes** › **Associer** sous le Joueur 1 › appuyez sur la touche de sa télécommande qui donnera le point ; puis pareil pour le Joueur 2. À chaque clic d'une télécommande associée, sa ligne affiche **Touche reçue** : on peut ainsi tester avant de jouer. **Échanger J1 ↔ J2** les inverse.
 3. **DÉBUT DU MATCH** : un clic sur une télécommande lance le match, comme KEY1 des bracelets. En haut, **J1**/**J2** sont en couleur quand les télécommandes sont connectées.
 
@@ -10105,7 +10094,7 @@ Avec le firmware 2.4, le bracelet reconnaît **coup droit, revers, service et vo
 Fréquence cardiaque et calories depuis des **ceintures pectorales Bluetooth** utilisant le service cardio standard : Coospo (testée avec la H6), Magene, Polar, Garmin, Wahoo… Elles fonctionnent dans tous les modes, même sans bracelets.
 
 1. Mouillez les électrodes et mettez la ceinture : elle s'allume toute seule au contact de la peau.
-2. *Mode et règles* (ou *Plus › Appareils*) › **Fréquence cardiaque** › activez **Ceintures cardio** et choisissez la ceinture de chaque joueur (une seule fois). **Échanger** les inverse.
+2. *Mode et règles* (ou *Plus › Réglages › Appareils*) › **Fréquence cardiaque** › activez **Ceintures cardio** et choisissez la ceinture de chaque joueur (une seule fois). **Échanger** les inverse.
 3. **Âge, poids et sexe** de la personne (facultatifs) : pour les calories (formule de Keytel, erreur typique ±20 %) et, avec l'âge, pour les zones cardio (maximum estimé 208 − 0,7 × âge).
 
 - Sous chaque ceinture : état, fréquence, **signal** en dBm (plus proche de 0 = plus fort) et **coupures**, c'est-à-dire les fois où la fréquence n'est pas arrivée pendant plus de 3 secondes, avec les secondes perdues (*2 coupures (14 s)*). Elles comptent depuis le « jeu » du match ; avant, depuis le choix de la ceinture. Elles indiquent jusqu'où porte la ceinture.
@@ -10116,8 +10105,8 @@ Fréquence cardiaque et calories depuis des **ceintures pectorales Bluetooth** u
 
 Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelques mètres de moins que la longueur du court. Avec un second téléphone derrière l'autre ligne de fond, chaque joueur en a toujours un à proximité : le second (**satellite**) capte les ceintures et bracelets des joueurs de son côté et sert de relais vers le **principal**, qui tient le match.
 
-1. **Principal** : Plus › **Appareils** › **Second téléphone** › **Utiliser un second téléphone**. La première fois il demande l'autorisation *Appareils à proximité* (la position jusqu'à Android 12). Le téléphone crée son **propre réseau local** : ni SIM ni données, pas besoin du Wi-Fi du club. Un QR apparaît.
-2. **Satellite** : Plus › **Appareils** › **Second téléphone** › **Servir de second téléphone** › scannez le QR. Android demande une fois de se connecter au réseau du principal (*AndroidShare_…*) : touchez **Connecter**. Le satellite garde ses données mobiles. Il doit afficher *Connecté au téléphone principal*.
+1. **Principal** : Plus › **Réglages** › **Appareils** › **Second téléphone** › **Utiliser un second téléphone**. La première fois il demande l'autorisation *Appareils à proximité* (la position jusqu'à Android 12). Le téléphone crée son **propre réseau local** : ni SIM ni données, pas besoin du Wi-Fi du club. Un QR apparaît.
+2. **Satellite** : Plus › **Réglages** › **Appareils** › **Second téléphone** › **Servir de second téléphone** › scannez le QR. Android demande une fois de se connecter au réseau du principal (*AndroidShare_…*) : touchez **Connecter**. Le satellite garde ses données mobiles. Il doit afficher *Connecté au téléphone principal*.
 3. Le satellite suit tout seul les ceintures et bracelets choisis sur le principal, des mêmes côtés : rien à choisir. Laissez-le derrière la ligne de fond avec l'app ouverte.
 
 - **Changement de côté** : rien à faire. Chaque ceinture et chaque bracelet reste au téléphone auquel il est connecté tant que le signal tient, puis le téléphone le plus proche le prend (quelques secondes). Le principal affiche *Via le second téléphone* ; pendant le passage un bracelet peut apparaître déconnecté un instant.
@@ -10134,19 +10123,19 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
    - *Arbitre*, *Bracelets* ou *Télécommandes* (6.3). Avec les bracelets, le Bluetooth activé, l'autorisation de localisation et la localisation activée sont obligatoires : les lignes des **Prérequis** se mettent à jour en temps réel (même si vous coupez le Bluetooth ou la localisation depuis le volet des réglages rapides) et deviennent rouges, avec le bouton pour corriger.
    - La **recherche est automatique et continue** tant que la page est ouverte : allumez les bracelets et ils se placent tout seuls sur les emplacements libres (d'abord Joueur 1, puis Joueur 2). **Identifier** fait clignoter le bracelet concerné dans la couleur du joueur (jaune ou rouge) avec des bips, pour voir tout de suite lequel vous avez en main ; **Échanger J1 ↔ J2** les inverse sans les déconnecter. Dans le menu déroulant, vous pouvez toujours en choisir un autre ou *Aucun* (un bracelet retiré à la main n'est pas remis par la recherche). Un bracelet ne peut pas être attribué à deux joueurs.
    - **Éteindre les bracelets en fin de match et en quittant** (activé par défaut) : à la confirmation de *Match terminé* et avec *Quitter*, les bracelets s'éteignent au lieu d'attendre l'inactivité.
-   - En mode arbitre, si vous appuyez sur **Suivant** sans localisation, l'application vous invite à l'activer (sinon le lieu ne figurera pas dans le récapitulatif).
-   - Format (*3 manches*, *5 manches*, *2 manches + super jeu décisif à 10*, *pro set* en 8 ou 10 jeux, *super jeu décisif à 10 seulement*), jeux par manche (6, ou 4 en manches courtes avec jeu décisif à 4-4), jeu décisif dans les manches oui/non (non : la manche continue jusqu'à 2 jeux d'écart), No-Ad. Langue et voix sont dans *Plus › Langue et voix* (4.1).
-   - **Tirage au sort** : la pièce tourne et désigne le gagnant ; vous indiquez qui sert et les côtés du court **vus depuis la chaise d'arbitre** (schéma du court avec **Inverser les côtés**). En double, choisissez aussi qui sert en premier dans chaque équipe.
+   - En mode arbitre, la première fois que vous appuyez sur **Suivant** sans localisation, l'appli vous invite à l'activer, une seule fois : avec *Continuer sans*, le lieu ne figurera pas dans le récapitulatif (il se réactive dans *Nouveau match › Autres détails › Lieu du match*).
+   - Format (*3 manches*, *5 manches*, *2 manches + super jeu décisif à 10*, *pro set* en 8 ou 10 jeux, *super jeu décisif à 10 seulement*), jeux par manche (6, ou 4 en manches courtes avec jeu décisif à 4-4), jeu décisif dans les manches oui/non (non : la manche continue jusqu'à 2 jeux d'écart), No-Ad. Sauf le format, ces règles (et le changement de balles) sont repliées dans **Autres règles**, une ligne que *Changer* ouvre. Langue et voix sont dans *Plus › Réglages* (4.1).
+   - **Tirage au sort** (étape 3, une page à part) : la pièce tourne et désigne le gagnant ; vous indiquez qui sert et les côtés du court **vus depuis la chaise d'arbitre** (schéma du court avec **Inverser les côtés**). En double, choisissez aussi qui sert en premier dans chaque équipe.
 3. **DÉBUT DU MATCH** clignote : appuyez sur le bouton, sur KEY1 d'un bracelet ou sur une télécommande. La voix annonce *« Première manche » · « au service [nom] » · « jouez »* avec 1 seconde entre les phrases ; le **Match Time** démarre sur « jouez ».
-4. **Match** : en haut à gauche la durée du match, à droite le compte à rebours (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time** ; en rouge pendant les 5 dernières secondes). Le cadre orange s'allume 5 s pour *changement de côté, jeu décisif, balle de set, balle de match, balle de break…*. Les deux boutons carrés (jaune = Joueur 1, rouge = Joueur 2) sont du côté où se trouvent réellement les joueurs et s'inversent à chaque changement de côté ; sous le serveur apparaît **On Serve**. En dessous : *Annuler le point*, *Suspendre/Reprendre*, audio (icône du haut-parleur, barrée = coupé), *Nouveau match*, **Quitter**. En mode bracelets, sous les temps se trouvent **J1**/**J2** avec la batterie et l'autonomie : les toucher ouvre les réglages du bracelet. Un double appui sur *Annuler le point* n'enlève qu'un point (un second appui dans la seconde ne compte pas) ; juste après un changement de page, le second appui d'un double appui est ignoré, pour qu'il ne tombe pas sur un bouton de la nouvelle page. Le **cadenas** en bas verrouille l'écran (par exemple téléphone en poche ou sur le banc) : les touchers ne font rien, bracelets et télécommandes oui ; on déverrouille en maintenant le cadenas appuyé.
+4. **Match** : en haut à gauche la durée du match, à droite le compte à rebours (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time** ; en rouge pendant les 5 dernières secondes). Le cadre orange s'allume 5 s pour *changement de côté, jeu décisif, balle de set, balle de match, balle de break…*. Les deux boutons carrés (jaune = Joueur 1, rouge = Joueur 2) sont du côté où se trouvent réellement les joueurs et s'inversent à chaque changement de côté ; sous le serveur apparaît **On Serve**. En dessous : *Annuler le point*, *Suspendre/Reprendre*, audio (icône du haut-parleur, barrée = coupé), **Quitter** : il ouvre un menu avec *Retour au menu* (le match reste parmi les matchs suspendus), *Nouveau match* et *Fermer l'app* (**Retour** l'ouvre aussi). En mode bracelets, sous les temps se trouvent **J1**/**J2** avec la batterie et l'autonomie : les toucher ouvre les réglages du bracelet. Un double appui sur *Annuler le point* n'enlève qu'un point (un second appui dans la seconde ne compte pas) ; juste après un changement de page, le second appui d'un double appui est ignoré, pour qu'il ne tombe pas sur un bouton de la nouvelle page. Le **cadenas** en bas verrouille l'écran (par exemple téléphone en poche ou sur le banc) : les touchers ne font rien, bracelets et télécommandes oui ; on déverrouille en maintenant le cadenas appuyé.
 5. Au dernier point apparaît la fenêtre **Match terminé / Annuler le dernier point**. « Match terminé » se confirme **uniquement sur le téléphone**. Pendant une demi-seconde après son apparition, ses boutons ignorent les appuis : un double appui sur le dernier point n'annule rien.
-6. **Récapitulatif** : vainqueur, noms, score manche par manche avec les points du jeu décisif, durée, heures de début et de fin, date, club, court, lieu, format, points et jeux gagnés. Boutons **Enregistrer les fichiers** (nom du fichier + dossier au choix + formats .txt/.json/.png et **PDF complet** avec résultat, statistiques du match et de chaque manche, déroulé et photos). **Partager** demande s'il faut envoyer l'image avec le texte (pour WhatsApp et les réseaux) ou le PDF complet. Dans le Résumé, **Photos du match** garde jusqu'à 10 photos souvenir (de la galerie ou prises sur le moment) : elles restent sur le téléphone, vont dans le PDF et passent sur l'autre téléphone avec le transfert, jamais dans l'image pour les réseaux, **Partager** (image 1080×1350 + texte pour WhatsApp/Instagram/…), **Nouveau match**, **Quitter**. Sous les photos, **Notes du match** accueille un texte libre (jusqu'à 2000 caractères) : il s'enregistre tout seul, va dans le PDF, le texte partagé et les fichiers .txt et .json, et passe sur l'autre téléphone avec le transfert ; il ne va pas dans l'image pour les réseaux. Le match terminé entre tout seul dans l'**Historique** (onglet **Progrès**) : la liste des matchs, à rouvrir avec leur récapitulatif ou à supprimer, et l'onglet **Joueurs** avec victoires, défaites et face-à-face de ceux dont le nom est écrit dans *Nouveau match* (majuscules et espaces ne comptent pas ; en double chaque joueur compte). **Importer** ajoute les matchs enregistrés en .json avec *Enregistrer les fichiers* sur un autre téléphone : les terminés vont dans l'historique, les autres dans les matchs suspendus à reprendre. **Transférer** (en haut à droite dans l'Historique) déplace l'historique et les matchs suspendus vers un autre téléphone avec un code QR : les deux téléphones doivent être sur le même réseau Wi-Fi ou l'un sur le point d'accès de l'autre ; sur celui qui les a, touchez *Envoyer*, **choisissez les matchs à envoyer** (le dernier est déjà coché ; il y a *Tous*, *Aucun*, *7 derniers jours* et *D'un joueur…*), touchez *Envoyer (N)* et laissez ouverte la fenêtre avec le code, sur l'autre *Recevoir* et scannez le code (autorisation de l'appareil photo nécessaire). On peut ainsi continuer un match en cours sur un autre téléphone : suspendez-le, transférez et reprenez-le. Les matchs s'ajoutent à ceux que le téléphone a déjà. **Photos des joueurs** : touchez le cercle à côté du nom dans *Nouveau match* (ou dans le détail du joueur dans l'Historique) et choisissez une photo ; elle est recadrée au carré et se retrouve grâce au nom. Elle apparaît dans l'Historique, le récapitulatif et le tableau TV, reste uniquement sur ce téléphone (elle suit le transfert) et ne va pas dans l'image partagée. Touchez à nouveau le cercle pour la changer ou la retirer. Si l'application se ferme pendant que vous êtes sur le récapitulatif (Android qui la ferme en arrière-plan, une mise à jour, un redémarrage du téléphone), vous le retrouvez en la rouvrant ; pas si vous l'avez quitté vous-même avec *Nouveau match*, *Quitter* ou en retirant l'application des applications récentes. Le dossier par défaut est **Documents/Tennis Score Manager** (depuis Android 10 ; sous Android 8 et 9 le dossier de l'appli) : n'importe quel gestionnaire de fichiers l'ouvre et il reste même si l'on désinstalle l'appli. En enregistrant deux fois sous le même nom, le second devient *nom (1)* ; dans l'image, les textes longs (noms, adresse) s'adaptent à la largeur.
+6. **Récapitulatif** : vainqueur, noms, score manche par manche avec les points du jeu décisif, durée, heures de début et de fin, date, club, court, lieu, format, points et jeux gagnés. Boutons **Enregistrer les fichiers** (nom du fichier + dossier au choix + formats .txt/.json/.png et **PDF complet** avec résultat, statistiques du match et de chaque manche, déroulé et photos). **Partager** demande s'il faut envoyer l'image avec le texte (pour WhatsApp et les réseaux) ou le PDF complet. Dans le Résumé, **Photos du match** garde jusqu'à 10 photos souvenir (de la galerie ou prises sur le moment) : elles restent sur le téléphone, vont dans le PDF et passent sur l'autre téléphone avec le transfert, jamais dans l'image pour les réseaux, **Partager** (image 1080×1350 + texte pour WhatsApp/Instagram/…), **Nouveau match**, **Terminé** (retour à l'endroit d'où le match est parti : le premier écran, le tournoi, l'équipe ou le classement à défis). Sous les photos, **Notes du match** accueille un texte libre (jusqu'à 2000 caractères) : il s'enregistre tout seul, va dans le PDF, le texte partagé et les fichiers .txt et .json, et passe sur l'autre téléphone avec le transfert ; il ne va pas dans l'image pour les réseaux. Le match terminé entre tout seul dans l'**Historique** (onglet **Progrès**) : la liste des matchs, à rouvrir avec leur récapitulatif ou à supprimer, et l'onglet **Joueurs** avec victoires, défaites et face-à-face de ceux dont le nom est écrit dans *Nouveau match* (majuscules et espaces ne comptent pas ; en double chaque joueur compte). **Importer** ajoute les matchs enregistrés en .json avec *Enregistrer les fichiers* sur un autre téléphone : les terminés vont dans l'historique, les autres dans les matchs suspendus à reprendre. **Transférer** (en haut à droite dans l'Historique) déplace l'historique et les matchs suspendus vers un autre téléphone avec un code QR : les deux téléphones doivent être sur le même réseau Wi-Fi ou l'un sur le point d'accès de l'autre ; sur celui qui les a, touchez *Envoyer*, **choisissez les matchs à envoyer** (le dernier est déjà coché ; il y a *Tous*, *Aucun*, *7 derniers jours* et *D'un joueur…*), touchez *Envoyer (N)* et laissez ouverte la fenêtre avec le code, sur l'autre *Recevoir* et scannez le code (autorisation de l'appareil photo nécessaire). On peut ainsi continuer un match en cours sur un autre téléphone : suspendez-le, transférez et reprenez-le. Les matchs s'ajoutent à ceux que le téléphone a déjà. **Photos des joueurs** : touchez le cercle à côté du nom dans *Nouveau match* (ou dans le détail du joueur dans l'Historique) et choisissez une photo ; elle est recadrée au carré et se retrouve grâce au nom. Elle apparaît dans l'Historique, le récapitulatif et le tableau TV, reste uniquement sur ce téléphone (elle suit le transfert) et ne va pas dans l'image partagée. Touchez à nouveau le cercle pour la changer ou la retirer. Si l'application se ferme pendant que vous êtes sur le récapitulatif (Android qui la ferme en arrière-plan, une mise à jour, un redémarrage du téléphone), vous le retrouvez en la rouvrant ; pas si vous l'avez quitté vous-même avec *Nouveau match*, *Terminé* ou en retirant l'application des applications récentes. Le dossier par défaut est **Documents/Tennis Score Manager** (depuis Android 10 ; sous Android 8 et 9 le dossier de l'appli) : n'importe quel gestionnaire de fichiers l'ouvre et il reste même si l'on désinstalle l'appli. En enregistrant deux fois sous le même nom, le second devient *nom (1)* ; dans l'image, les textes longs (noms, adresse) s'adaptent à la largeur.
 
    Le récapitulatif a trois onglets. **Résumé** : les données ci-dessus et, avec les bracelets 2.4, les coups, la vitesse du poignet et les coups par point (6.4). **Statistiques**, pour le match ou pour une manche : les deux joueurs comparés avec des barres qui partent du centre (colorée pour celui qui mène) pour les points et jeux gagnés au service et en retour, les balles de break sauvées et converties, le total des points et des jeux, les points d'affilée, les 10 derniers points, les balles de match sauvées ; avec les bracelets 2.4 aussi les coups par type et la vitesse moyenne du poignet. **Point par point** : manche par manche, chaque jeu avec la balle de celui qui sert, *SERVICE PERDU* sur les breaks, le score après chaque point avec **BB** (balle de break), **BS** (balle de set) et **BM** (balle de match) et l'issue (*JEU*, *BREAK*, *MANCHE*, *MATCH*). Aces, doubles fautes, premières balles, coups gagnants et erreurs sont là si vous activez les **statistiques détaillées** dans *Mode et règles* : à la place des deux grands boutons apparaissent *Ace* et *Faute* (la deuxième fois elle devient *Double faute*) et, pour chaque joueur, *Gagnant*, *Erreur* (le point va à l'autre) et *Point* ; *Annuler le point* enlève aussi une faute. C'est pensé pour qui marque depuis le bord du court. Après *Erreur*, *Directe / Provoquée* s'affiche 6 secondes ; avec bracelets ou télécommandes, après chaque point s'affiche *Comment s'est fini le point ?* (Ace, Gagnant, Erreur) : répondre est facultatif et le score ne change pas. Dans l'Historique, le détail d'un joueur montre l'**évolution** : points gagnés match par match et moyennes d'aces, doubles fautes, premières balles, coups gagnants et erreurs. Les statistiques de chaque match comptent aussi balles de jeu, de manche et de match converties, jeux blancs, jeux d'affilée, manches gagnées après un break de retard et, dans la carte **Durées**, la durée de chaque manche et le jeu le plus long.
 
    **Revanche** (en bas du résumé) : propose le même jour de la semaine et la même heure, la semaine suivante, et le club du match ; on change date, heure et lieu et on ajoute une note. **Envoyer l'invitation** ouvre le partage (WhatsApp, SMS, e-mail…) avec le message prêt : qui contre qui, quand, où et comment s'est fini le dernier match. **Ajouter à l'agenda** crée l'événement dans l'appli d'agenda, **Préparer le match** remet dans *Nouveau match* joueurs, club, court et règles (pas le tournoi). Pas de compte : l'invitation passe par les canaux que vous utilisez déjà.
 
-**Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de l'onglet **Jouer**.
+**Quitter l'application** : pendant le match, **Quitter** (ou **Retour**) ouvre un menu : **Retour au menu** (le match reste parmi les matchs suspendus : reprenez-le depuis *Jouer*, ou depuis *Tournois* avec le rôle Club), **Nouveau match** et **Fermer l'app**, qui ferme vraiment l'application comme la retirer des applications récentes. Dans le récapitulatif, **Terminé** (ou Retour) ramène à l'endroit d'où le match est parti. À la réouverture, l'appli repart du premier onglet.
 
 **Abandon** : le bouton **Arbitre** (le marteau) sous le score, à la ligne **Abandon**, demande qui abandonne et termine le match à ce score, sans les points du jeu en cours (par ex. `6-3 2-1 abandon`). L'adversaire gagne, la voix l'annonce et, avant de conclure, **Annuler l'abandon** remet tout comme avant. Dans les tournois, le résultat entre tout seul avec l'abandon noté ; le match compte comme une victoire mais ne pèse pas sur le rating TSM.
 
@@ -10193,15 +10182,15 @@ Pour s'entraîner avec la ceinture cardio sans match : **S'entraîner** › **En
 
 Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
 
-1. **Arbitre** : Plus › **Appareils** › **Second téléphone** › **Utiliser un second téléphone** (QR, comme en 6.6).
-2. **Caméra** : Plus › **Appareils** › **Second téléphone** › **Servir de caméra**, scannez le QR, puis **Ouvrir la caméra** (autorisations caméra et micro ; le téléphone doit filmer en 1080p). Avec *Score connecté*, l'habillage du score est sur la vidéo (**Habillage** l'active ou le désactive) ; sans arbitre, il filme seulement.
+1. **Arbitre** : Plus › **Réglages** › **Appareils** › **Second téléphone** › **Utiliser un second téléphone** (QR, comme en 6.6).
+2. **Caméra** : Plus › **Réglages** › **Appareils** › **Second téléphone** › **Servir de caméra**, scannez le QR, puis **Ouvrir la caméra** (autorisations caméra et micro ; le téléphone doit filmer en 1080p). Avec *Score connecté*, l'habillage du score est sur la vidéo (**Habillage** l'active ou le désactive) ; sans arbitre, il filme seulement.
    - **Filmer / Arrêter** : la vidéo va dans la galerie (*Films/Tennis Score Manager*) avec ses chapitres, un par point.
    - **Direct** : diffusion RTMP sur YouTube, Twitch, Facebook ou votre serveur ; serveur et clé du flux dans *Direct : serveur*.
    - **Cadrer** (assistant de cadrage) : indiquez à combien de mètres derrière la ligne de fond et à quelle hauteur vous avez mis le téléphone, et sur quel terrain vous jouez ; l'appli donne l'inclinaison vers le bas qui garde dans la vidéo les deux lignes de fond et le joueur éloigné, et dit si le terrain tient en largeur. C'est souvent la largeur qui limite : depuis le grillage (environ 6 m) l'objectif principal coupe les coins proches, le **grand-angle** non (**Utiliser l'objectif…**, ou le bouton **Objectif**, enregistrement arrêté). Avec **Afficher le niveau**, l'aperçu montre l'horizon et des indications (*visez 2° plus bas*, *tournez dans le sens horaire*…), en vert quand c'est bon, avec une vibration quand le téléphone est en place. Le niveau s'affiche aussi dans la fenêtre **Caméra** du téléphone de l'arbitre. Les capteurs ne savent pas la gauche et la droite : vérifiez à l'œil que le filet est au centre.
    - **Tracé** (tracé du terrain) : l'aperçu montre les lignes du terrain telles que l'objectif les voit, et elles suivent le téléphone quand on l'incline. Déplacez les curseurs (**Distance**, **Hauteur**, **Direction**, **Décalage latéral** et, si besoin, **Champ de vision** et **Correction d'inclinaison**) jusqu'à ce qu'elles coïncident avec les vraies : cela règle aussi le centrage, et l'inclinaison conseillée devient précise. Le réglage est mémorisé pour le terrain du match (*Club · Court* de l'arbitre) et repris la fois suivante. Tracé et curseurs sont aussi dans la fenêtre **Caméra** de l'arbitre. Plus le téléphone est haut, mieux on voit la moitié éloignée du terrain : à 2,5 m elle est écrasée juste au-dessus du filet.
-3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en Plus › **Appareils** › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
+3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en Plus › **Réglages** › **Appareils** › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
 
-- **Vidéo** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*.
+- **Progrès** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*.
 - **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
 - **Temps forts** : montage automatique des plus beaux points (aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
   - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture. Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** dans *Nouveau match*) (sans choix, celui de l'homme ; valable dans toute l'application, aussi dans *Nouveau match*, l'historique, le résumé, le PDF et le tableau TV) ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (*Autres détails* dans *Nouveau match*), ou club et court.
@@ -10247,8 +10236,8 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 
 ### 7.6 Élèves : la partie pour l'entraîneur
 
-- **S'entraîner › Élèves** › **Nouvel élève** : nom (le même que dans les matchs : photo, historique et classement se retrouvent tout seuls) et main.
-- **Qui s'entraîne** : dans S'entraîner, au-dessus de *Commencer*, choisissez l'élève (ou *Aucun élève*). La séance est à lui : les dernières séances, *Toutes les séances*, l'évolution dans Progrès et les nombres sur les boutons des coups ne concernent que lui, et les clips vont dans **Entraînement des coups/<coup>/<élève>/<date et heure>**.
+- **Élèves** (rôle Entraîneur) › **Nouvel élève** : nom (le même que dans les matchs : photo, historique et classement se retrouvent tout seuls) et main.
+- **Qui s'entraîne** : dans l'onglet Élèves du rôle Entraîneur, au-dessus de *Commencer*, choisissez l'élève (dans le rôle Vous, c'est vous qui vous entraînez, sans élève). La séance est à lui : les dernières séances, *Toutes les séances*, l'évolution dans Progrès et les nombres sur les boutons des coups ne concernent que lui, et les clips vont dans **Entraînement des coups/<coup>/<élève>/<date et heure>**.
 - **La fiche de l'élève** (touchez le nom dans *Élèves*) :
   - **Coups** : pour le service, le coup droit, le revers et la volée les séances, les coups, la dernière fois et la courbe des coups dedans ; toucher un coup ouvre ses séances.
   - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
@@ -10270,7 +10259,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Taille et poids** : avec l'âge et le sexe, ils font calculer tout seuls les **calories de la ceinture cardio** quand le joueur joue ou, si c'est le vôtre, s'entraîne (sans eux, l'appli les demande à part ou ne les calcule pas).
   - **Club d'appartenance** : visible dans la fiche ; utile pour les invités et les adversaires d'autres clubs, pour savoir qui ils sont.
   - **Main et revers** (à une ou deux mains) : décrivent le joueur dans sa fiche, utile à l'entraîneur ; l'analyse du mouvement reconnaît toute seule le bras qui frappe.
-  - **Élève** : le met parmi les élèves de l'entraîneur (S'entraîner › Élèves, *Qui s'entraîne*), avec séances, mouvement et bilan.
+  - **Élève** : le met parmi les élèves de l'entraîneur (rôle Entraîneur, onglet Élèves et *Qui s'entraîne*), avec séances, mouvement et bilan.
   - **Téléphone et e-mail** : servent aux **avis** (WhatsApp, SMS, e-mail : tournois, cotisations, convocations) même s'il n'est pas adhérent.
   - **Raquette** : accompagne chaque séance et match tels qu'ils étaient ce jour-là (cordage et tension) et on en compare les statistiques ; si elle n'existe pas, *Nouvelle raquette* la crée depuis là.
   - Classement, licences et certificat ne sont pas ici : ils sont dans les *Données de l'adhérent*, car ils servent aux tournois et aux cotisations.
@@ -10283,10 +10272,10 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - **Matchs d'un autre téléphone** (transfert ou *Importer*) : un joueur connu du téléphone se relie tout seul ; un nouveau s'ajoute avec son identifiant ; s'il a le nom d'un des vôtres l'appli demande une fois **Qui est-ce ?** (*Oui, c'est lui* relie les deux, la fois suivante il est reconnu ; *Non, une autre personne* l'ajoute). Les matchs des anciennes versions, sans joueurs, se relient par le nom.
 - La **photo** et **homme/femme** valent encore pour le nom : deux homonymes les partagent.
 
-### 7.8 Vous, et Profil et données
+### 7.8 Vous, et Sauvegarde et données
 
 - **Vous** est votre joueur de la base : Progrès et classement partent de lui. Au premier démarrage prénom et nom (et surnom) suffisent ; ensuite **Plus › Vous** ouvre votre fiche. Si vous ne l'avez pas encore choisi, *Qui êtes-vous ?* propose les joueurs existants (vous avez déjà joué des matchs) ou **Je suis nouveau**. Sur la fiche d'un autre joueur, **C'est moi** le rend vôtre.
-- **Plus › Profil et données** :
+- **Plus › Réglages › Sauvegarde et données** :
   - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
   - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
@@ -10295,15 +10284,15 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 
 ### 7.9 Rôles : Vous, Entraîneur, Club
 
-- Dans **Plus › Profil et données › Rôles** (et au premier démarrage) vous choisissez qui utilise l'appli ; vous pouvez en avoir plusieurs. Les rôles changent les onglets du premier écran, **les données sont les mêmes** ; avec plusieurs rôles, le rôle actif est en haut : touchez-le pour passer à un autre.
-  - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
-  - **Ce que vous utilisez** (Plus) : on garde seulement ce qui sert. Bracelets et télécommandes, ceintures cardio, entraînement des coups et élèves, vidéo et caméra, progrès et classement, raquettes, padel : ce qu'on désactive n'apparaît pas, et les onglets restés vides (S'entraîner, Vidéo) disparaissent ; l'historique reste toujours (sans Progrès il passe dans Jouer). Au début tout est activé ; à la première présentation, l'app propose quoi garder d'après la réponse à « comment l'utiliserez-vous ». Plus est divisé en groupes : Appareils et voix, Données, Aide.
-  - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
-  - **Club** : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs de tournoi, les leçons, les rencontres et les défis : on touche un encadré pour y aller), **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
-  - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains, Serveur du club et Secrétariat sur PC. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
+- Les rôles disent qui utilise l'appli : on les choisit au premier démarrage ou dans **Plus › Réglages › Rôles et fonctions** (aussi en touchant le rôle en haut, toujours affiché) et on peut en avoir plusieurs. **Chaque fonction se trouve dans un seul rôle**, sans doublons ; les données sont les mêmes et changer de rôle ne fait rien perdre.
+  - **Vous** (vous jouez) : **Jouer** (le marqueur, le tournoi entre amis, le téléphone comme tableau ou caméra), **Club** (seulement après l'invitation : réservations et discussion), **S'entraîner**, **Progrès** (classement, historique, vidéos, raquettes), Plus (votre fiche, les joueurs).
+  - **Entraîneur** (vous entraînez) : **Élèves** (la liste, les exercices et l'entraînement des coups de celui qui s'entraîne avec vous), Plus. Les matchs se comptent depuis le rôle Vous ; *S'entraîner maintenant* dans la fiche d'un élève amène ici avec lui déjà choisi.
+  - **Club** (le secrétariat) : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs des tournois, les cours, les rencontres et les défis : touchez un encadré pour y aller), **Planning** (les terrains du jour, tout de suite), **Adhérents** (adhérents, cotisations et paiements, école de tennis, message à tous les adhérents), **Tournois** (tournois, équipes, classement à défis : les matchs se comptent de là avec *Jouer avec le marqueur* et ceux laissés en cours se reprennent de là), Plus (**Le club** : nom, terrains, horaires et tarifs, serveur, secrétariat sur PC, sauvegarde du secrétariat).
+  - **Plus** contient dans chaque rôle ce qui concerne l'appli : **Réglages** (langue, voix de l'arbitre, appareils, rôles et fonctions, sauvegarde et données et, tout en bas, **À propos** avec la version de l'appli, la licence et le code source), **Aide** et **Présentation de l'appli**.
+  - **Rôles et fonctions** ne garde dans les menus que ce qui sert. Pour Vous et Entraîneur, **Ce que vous utilisez** : bracelets et télécommandes, ceintures cardio, entraînement des coups, vidéo et caméra, progrès et classement, raquettes, padel ; ce qu'on éteint n'apparaît plus et les onglets restés vides disparaissent (sans Progrès, l'historique passe dans Jouer). Pour le Club, **Fonctions du club** : de base Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains, Serveur du club et Secrétariat sur PC. Les données des fonctions éteintes restent.
   - Le **?** en haut de nombreux écrans ouvre le guide à la section de cet écran.
-- Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
-- **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
+- Pour ceux qui avaient déjà l'appli, la première fois les rôles qui ont déjà des données s'allument tout seuls (matchs, entraînements et réservations sont à Vous, les élèves à l'Entraîneur) : rien ne disparaît.
+- **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), comment vous utilisez l'appli (avec *Vous*), le club (avec *Club*), vos données avec la **sauvegarde automatique** (activée par défaut) et le **rappel de sauvegarde** (si vous éteignez l'automatique, tous les 30 jours le premier écran vous rappelle d'en faire une) ; on les retrouve dans Sauvegarde et données.
 
 ### 7.10 Exercices guidés
 
@@ -10313,7 +10302,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 
 ### 7.11 Adhérents du club
 
-Avec le rôle **Club**, **Joueurs › Adhérents** liste les inscrits, pour l'appareil du secrétariat.
+Avec le rôle **Club**, **Adhérents › Adhérents** liste les inscrits, pour l'appareil du secrétariat.
 
 - **Nouvel adhérent** : choisissez un joueur déjà présent (qui a joué des matchs ou un élève) ou créez-en un nouveau. Depuis la fiche d'un joueur, on peut aussi toucher **Inscrire comme adhérent**.
 - **Données de l'adhérent** : téléphone et e-mail (pour les avis), date de naissance, adhérent depuis, carte du club ; **licence FITP** avec numéro, type (compétition, loisir, autre), année et classement ; **certificat médical** avec type et échéance ; consentement au traitement des données et aux photos et vidéos. Pour les **mineurs**, aussi le parent ou tuteur et son téléphone.
@@ -10323,7 +10312,7 @@ Avec le rôle **Club**, **Joueurs › Adhérents** liste les inscrits, pour l'ap
 
 ### 7.12 Cotisations et paiements
 
-Dans **Joueurs › Cotisations et paiements** (rôle Club), on tient le registre du club. L'appli **enregistre** les paiements, elle ne les encaisse pas : aucune carte ni compte relié.
+Dans **Adhérents › Cotisations et paiements** (rôle Club), on tient le registre du club. L'appli **enregistre** les paiements, elle ne les encaisse pas : aucune carte ni compte relié.
 
 - **Nouvelle cotisation** : nom (ex. *Cotisation 2027*), type (cotisation, licence FITP, cours, tournoi, autre), montant et, si besoin, l'échéance. En touchant une cotisation, **Facturer à tous les adhérents** l'attribue à ceux qui ne l'ont pas encore ; en dessous, combien ont payé.
 - Dans la fiche de l'adhérent, **Cotisations et paiements** montre ce qu'il doit : *payé*, *à payer*, *reste 100,00 €*, en rouge *en retard* après l'échéance. **Nouvelle facturation** ajoute une cotisation du club ou un autre montant (une leçon, un cordage).
@@ -10331,7 +10320,7 @@ Dans **Joueurs › Cotisations et paiements** (rôle Club), on tient le registre
 - Un paiement erroné s'annule (le numéro du reçu n'est pas réutilisé) ; une facturation sans paiement se supprime, avec des paiements elle s'**annule** : elle n'est plus due et les paiements restent dans le registre.
 - En haut : encaissé dans l'année et reste à encaisser ; **À encaisser** liste qui doit, de la plus grosse dette. Dans *Adhérents* aussi, qui doit quelque chose est parmi ceux *à régler*.
 - **Exporter les paiements (CSV)** : tous les paiements de l'année avec date, reçu, nom, libellé, mode, référence et montant, pour le tableur du comptable.
-- En supprimant un joueur, ses facturations non payées disparaissent ; les paiements faits restent avec le nom, car c'est de la comptabilité. Le registre est dans la sauvegarde de *Profil et données*.
+- En supprimant un joueur, ses facturations non payées disparaissent ; les paiements faits restent avec le nom, car c'est de la comptabilité. Le registre est dans la sauvegarde de *Sauvegarde et données*.
 
 ### 7.13 Tournois du club
 
@@ -10359,7 +10348,7 @@ L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, �
 
 ### 7.15 Terrains et planning
 
-Avec le rôle **Club**, dans l'onglet **Terrains**.
+Avec le rôle **Club**, dans l'onglet **Planning** (le nom du club, les terrains et *Horaires et tarifs* sont aussi dans **Plus**, groupe *Le club*).
 
 - **Les terrains** : on crée un terrain (**Nouveau terrain**), on les met en ordre et on en touche un pour le modifier : nom (en le renommant, réservations, périodes et matchs des tournois suivent), surface (**terre battue, gazon, dur**, autre), **couvert ou extérieur**, **éclairage**, **chauffage**, ses **tarifs** (à l'heure, avec éclairage, supplément chauffage à l'heure ; vides = les tarifs généraux) et **une ou plusieurs photos** de la galerie. **Supprimer le terrain** retire aussi ses réservations à partir d'aujourd'hui.
 - **Planning des terrains** : la journée avec un terrain par colonne et une heure par ligne (◀ ▶ et le calendrier pour changer de jour). Touchez une case libre pour réserver : terrain, jour, heure et durée, type (jeu, leçon, fermé, autre), joueurs de la base et invités, remarque. Le **tarif** se calcule tout seul (éclairage à partir de l'heure choisie, chauffage si on le demande) et peut être modifié ; **Facturer aux joueurs** le divise en parts égales et le met dans *Cotisations et paiements*. **Comment on paie** : *au terrain* ou *en ligne* ; une fois facturée, **Payé : …** la marque payée avec un des moyens de paiement du club. **Chaque semaine pendant N semaines** répète la réservation (les dates où le terrain est pris sont sautées et l'appli les indique). **Prévenir les joueurs** envoie terrain, jour, heure et comment payer.
@@ -10371,7 +10360,7 @@ Avec le rôle **Club**, dans l'onglet **Terrains**.
 
 ### 7.16 École de tennis
 
-Avec le rôle **Club**, dans **Joueurs › École de tennis**.
+Avec le rôle **Club**, dans **Adhérents › École de tennis**.
 
 - **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour.
 - **Élèves** : on les ajoute depuis la base (adhérents ou non) jusqu'aux places ; pour chacun la **présence** (présent 3 sur 4, en orange sous 75 %) et ce qu'il doit. La fiche du joueur montre ses cours.
@@ -10397,10 +10386,10 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 **Numéro et PIN, plusieurs clubs** : après la première invitation le joueur peut choisir un **numéro de téléphone et un PIN** (sur la page du club et dans l'appli, dans **Les miennes**). Ainsi, s'il change de téléphone ou se déconnecte, il revient seul avec **Vous avez déjà un PIN ?**, sans nouvelle invitation. Après 5 PIN erronés on attend un quart d'heure ; après 20 le PIN ne vaut plus et le secrétariat le réinitialise depuis la fiche du membre (**Réinitialiser le PIN**). Dans l'appli on peut entrer dans **plusieurs clubs** : **Ajouter un club** dans **Les miennes**, puis on choisit le club en haut ; rappels et alertes arrivent de tous, avec le nom du club.
 
 - **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
-- **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
+- **Appairer le secrétariat** : *Plus › Serveur du club* (après l'avoir activé dans *Rôles et fonctions › Fonctions du club*) : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
 - **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR. Sur iPhone, la page **TSM** le guide : *Partager › Sur l'écran d'accueil*, puis il ouvre TSM depuis l'écran d'accueil et colle le code (Safari et l'app de l'écran d'accueil ne partagent pas leurs données, l'invitation s'utilise donc dans l'app installée). La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
-- **Avec l'app TSM sur Android**, le joueur réserve aussi depuis *Jouer › Réserver un terrain* : il scanne le QR de l'invitation (ou colle le lien), puis voit ses réservations, choisit le jour et touche un créneau libre ; durée, chauffage et prix avant de confirmer, **Annuler** tant qu'il est temps, **Quitter ce club** pour déconnecter le téléphone. Les règles sont les mêmes que sur la page web.
+- **Avec l'app TSM sur Android**, le joueur réserve aussi depuis *Club › Réserver un terrain* (la première fois depuis *Plus › J'ai une invitation du club*) : il scanne le QR de l'invitation (ou colle le lien), puis voit ses réservations, choisit le jour et touche un créneau libre ; durée, chauffage et prix avant de confirmer, **Annuler** tant qu'il est temps, **Quitter ce club** pour déconnecter le téléphone. Les règles sont les mêmes que sur la page web.
 - La page et l'app ont **trois onglets** : **Réserver** (jours et créneaux), **Les miennes** (réservations, listes d'attente, rappels) et **Partenaires** (Je cherche un partenaire).
 - Dans l'app, sous **Les miennes**, **Inviter** envoie à qui joue avec vous le court, le jour et l'heure déjà écrits (sur WhatsApp ou ailleurs) ; après une réservation, l'app vous y amène toute seule.
 - **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
@@ -10441,11 +10430,11 @@ Avec le rôle **Club**, dans **Tournois › Classement à défis**.
 
 Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un ordinateur (Windows, Mac ou Linux) sur le même réseau que le téléphone** ouvre dans le navigateur une page servie par le téléphone, sans rien installer et sans serveur : **les données restent sur le téléphone** ; l'ordinateur les consulte et les modifie tant qu'il est connecté, sans en garder de copie. Une personne à la fois. Le *serveur du club* (7.18) est autre chose : il ne sert qu'aux réservations des joueurs.
 
-- **Activer** : *Fonctions du club* › **Secrétariat sur PC**, puis l'entrée dans l'onglet des terrains et **Activer**. Le téléphone affiche l'adresse (par ex. `https://192.168.1.20:8443`) et un code.
+- **Activer** : *Plus › Réglages › Rôles et fonctions › Fonctions du club* › **Secrétariat sur PC**, puis l'entrée dans **Plus** et **Activer**. Le téléphone affiche l'adresse (par ex. `https://192.168.1.20:8443`) et un code.
 - **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
 - **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
 - **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). **École de tennis** (groupes avec horaires et courts, élèves, appel des cours, cours annulés, frais du mois ou de la saison à débiter), **Statistiques des terrains** (occupation, recettes, court par court, jours et heures les plus pleins, qui réserve le plus, par période, à imprimer). Avec **Préparer une relance** dans Cotisations et paiements, vous choisissez à qui écrire parmi les débits affichés : le message s'ouvre sur le téléphone et vous l'envoyez de là. **Équipes et championnats** (effectif, rencontres à domicile ou à l'extérieur avec courts réservés, disponibilités, convocations, matchs et résultat ; les avis s'ouvrent sur le téléphone). **Réservations en ligne**, avec le serveur du club (prochaines réservations des joueurs, liste d'attente, annonces de « Je cherche un partenaire » à retirer si besoin, règles pour les joueurs, **Envoyer maintenant**), **Réglages** (nom du club, horaires et tarifs, courts avec surface, éclairage et tarifs propres, modes de paiement). Avis WhatsApp, photos des courts et marquage en direct restent dans l'app.
-- **Sauvegarde du secrétariat** (sur le PC, sous Statistiques ; sur le téléphone dans Terrains › Sauvegarde du secrétariat) : un seul fichier `.tsmclub` avec adhérents et joueurs, cotisations et paiements, planning, tournois, école de tennis, équipes, courts et réglages (pas les matchs, coups et vidéos : la sauvegarde complète les a). **Télécharger sur le PC** ou, depuis le téléphone, l'**envoyer** où vous voulez (Google Drive, e-mail, une clé USB). Avec la **sauvegarde automatique** le téléphone fait une copie par jour seulement si quelque chose a changé et garde les 14 dernières ; avec un serveur du club, lui aussi. **Restaurer** montre d'abord ce que contient le fichier et fait une copie de maintenant, pour revenir en arrière. Le fichier contient des données personnelles des adhérents : gardez-le chez vous.
+- **Sauvegarde du secrétariat** (sur le PC, sous Statistiques ; sur le téléphone dans Plus › Sauvegarde du secrétariat) : un seul fichier `.tsmclub` avec adhérents et joueurs, cotisations et paiements, planning, tournois, école de tennis, équipes, courts et réglages (pas les matchs, coups et vidéos : la sauvegarde complète les a). **Télécharger sur le PC** ou, depuis le téléphone, l'**envoyer** où vous voulez (Google Drive, e-mail, une clé USB). Avec la **sauvegarde automatique** le téléphone fait une copie par jour seulement si quelque chose a changé et garde les 14 dernières ; avec un serveur du club, lui aussi. **Restaurer** montre d'abord ce que contient le fichier et fait une copie de maintenant, pour revenir en arrière. Le fichier contient des données personnelles des adhérents : gardez-le chez vous.
 - **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
 - **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
 
@@ -10471,7 +10460,7 @@ Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-F
 
 ### 8.2 Sur le téléphone de l'arbitre
 
-1. Plus › **Appareils** › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**. Sur Android 13 et ultérieur, l'application demande l'autorisation des notifications : elle sert à la notification du service qui maintient le tableau actif.
+1. Plus › **Réglages** › **Appareils** › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**. Sur Android 13 et ultérieur, l'application demande l'autorisation des notifications : elle sert à la notification du service qui maintient le tableau actif.
 2. L'**adresse** (ex. `192.168.43.1:8080`), le **QR code** et le nombre de tableaux connectés apparaissent. S'il est écrit *Aucun réseau*, activez le point d'accès ou connectez-vous à celui de l'autre téléphone.
 3. **Aperçu sur ce téléphone** ouvre le tableau dans le navigateur du téléphone lui-même.
 4. **Apparence du tableau** : couleur de chaque joueur (8 couleurs), durée du match, chrono du service et des pauses, manches terminées, messages (balle de break, balle de set, changement de côté…), balle à côté du serveur, segments éteints visibles, texte en bas (vide = club et court de *Nouveau match*). Les modifications arrivent aussitôt sur l'écran.
@@ -10517,7 +10506,7 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 - **Le panneau des réglages affiche « Le firmware de ce bracelet n'a pas de réglages »** : ce bracelet a encore l'ancien sketch, rechargez-le (chapitre 5).
 - **La voix ne parle pas ou lit mal** : volume multimédia, *Audio On*, voix de la langue choisie installée (4) ; essayez un autre moteur ou une autre voix dans *Audio et voix*.
 - **Écran éteint pendant le match** : en mode bracelets, un service au premier plan (notification « Match en cours ») garde actifs le Bluetooth, la voix et les chronomètres ; en mode arbitre et télécommandes, l'écran reste allumé (avec les télécommandes, il le doit : 6.3).
-- **La télécommande ne fait rien** : est-elle associée au joueur (*Plus › Appareils* › *Télécommandes*, ligne avec son nom) ? L'application doit être ouverte sur le match, écran allumé (6.3). Si la ligne indique *Non connectée*, appuyez sur une touche pour la réveiller ou appairez-la de nouveau dans les réglages Bluetooth.
+- **La télécommande ne fait rien** : est-elle associée au joueur (*Plus › Réglages › Appareils* › *Télécommandes*, ligne avec son nom) ? L'application doit être ouverte sur le match, écran allumé (6.3). Si la ligne indique *Non connectée*, appuyez sur une touche pour la réveiller ou appairez-la de nouveau dans les réglages Bluetooth.
 - **Les coups sont confondus ou non reconnus** : portez le bracelet comme pendant le calibrage (même poignet, même sens) ; sinon refaites le calibrage en le portant comme en match (6.4).
 - **Le bracelet affiche MEMOIRE PLEINE** : un exemple de calibrage n'a pas pu être enregistré. Effacez les exemples d'un coup (corbeille) et refaites-les.
 - **Le téléphone-tableau ne trouve pas l'arbitre** : même réseau ? (l'un des deux fait point d'accès, l'autre y est connecté). *Tableau d'affichage TV* activé sur le téléphone de l'arbitre ? Essayez l'adresse à la main. Certains points d'accès isolent les appareils connectés les uns des autres (« isolation des clients ») : si c'est le cas, désactivez-la.
@@ -10529,20 +10518,20 @@ TSM_EOF
 cat > "$DEST/app/src/main/assets/help/it.md" << 'TSM_EOF'
 ## 3.1 Come è organizzata l'app
 
-Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segnare il punteggio, giocare coi braccialetti, allenarti, riprendere le partite) e il tuo nome; si può saltare e rifare da **Altro › Presentazione dell'app**. In basso ci sono sempre **cinque schede**:
+Alla **prima accensione** l'app chiede la lingua, chi la usa (i ruoli), il tuo nome, come la userai e, per la segreteria, il circolo; si può saltare e rifare da **Altro › Presentazione dell'app**. In basso ci sono le schede del **ruolo attivo**, che si vede sempre in alto: toccandolo si passa a un altro ruolo o si apre **Ruoli e funzioni**. **Ogni funzione sta in un ruolo solo** (7.9): Tu gioca, l'Allenatore segue gli allievi, il Circolo fa la segreteria. Col ruolo **Tu**:
 
-- **Gioca**: **Nuova partita**, la partita sospesa da riprendere, **Come l'ultima volta** (stessi giocatori, campo e regole: le regole stanno in una riga e si va dritti al sorteggio; *Cambia modalità o regole* le riapre), il **torneo tra amici** (Americano, Mexicano) e **Usa questo telefono come** tabellone o telecamera. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
+- **Gioca**: **Nuova partita**, le partite sospese da riprendere (tenendo premuto se ne elimina una), **Come l'ultima volta** (stessi giocatori, campo e regole, e si va dritti al sorteggio; *Cambia modalità o regole* le riapre), il **torneo tra amici** (Americano, Mexicano) e, sotto **Questo telefono**, il tabellone, il telefono-telecamera e **Riprendi con questo telefono**. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
+- **Circolo** (solo dopo l'invito del tuo circolo, 7.18): le novità della bacheca e delle chat, **Prenota un campo**, le tue prenotazioni, **Cerco compagno** e la chat del circolo.
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
-- **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
-- **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
-- **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Profilo e dati** (backup, ripristino, cancellazione: 7.8), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
+- **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **I tuoi video** (capitoli, highlights, filtri, importa), **Il mio anno**, **Le mie racchette**.
+- **Altro**: **Tu** (la tua scheda), **Giocatori** (il database: 7.7) e, uguali in ogni ruolo, **Impostazioni** (la lingua; la voce dell'arbitro; i dispositivi: braccialetti, telecomandi, fasce, secondo telefono, tabellone TV; ruoli e funzioni; backup e dati, 7.8; in fondo **Informazioni** con la versione dell'app, la licenza e il codice sorgente), **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare) e **Presentazione dell'app**.
 
-**Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i giocatori scelti dal database, con i recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
+**Nuova partita** sono tre passi corti: **chi gioca** (singolo o doppio, i giocatori scelti dal database, con i recenti da toccare, e lo sport; classifica, uomo/donna e racchetta stanno in una riga sotto i nomi e si aprono con *Cambia*; circolo, campo, torneo e luogo in *Altri dettagli*), **come segni il punteggio e il formato** (le altre regole stanno in una riga, *Cambia* le apre) e il **sorteggio**. Tutto è facoltativo: si può andare avanti anche senza nomi. **Indietro** torna sempre da dove sei arrivato.
 
 ## 4. La voce (funziona senza internet)
 
 - Ogni chiamata è letta **in un'unica frase** dalla sintesi vocale del telefono, con una voce installata: niente internet e prosodia naturale. I nomi dei giocatori entrano nella frase.
-- Altro › **Lingua e voce** › **Audio e voce**:
+- Altro › **Impostazioni** › **Voce dell'arbitro** › **Audio e voce**:
   - **Motore sintesi vocale**: *Predefinito del telefono* (sui Samsung è Samsung TTS) oppure un motore a scelta, ad esempio *Servizi di sintesi vocale di Google*. Nei test Google italiano suona più naturale.
   - **Voce**: *Automatica* (la migliore offline) oppure una voce precisa (con Google: Voce ITB, ITC, ITD, KDA; quelle *online* richiedono internet).
   - **Prova voce**: legge una sequenza di chiamate di esempio con i nomi inseriti. Mentre legge il tasto diventa **Ferma la prova**: toccalo di nuovo per interromperla (si ferma da sola anche uscendo dalla pagina). La sintesi vocale non si può mettere in pausa a metà frase, quindi il tasto la ferma; ripremendolo riparte dall'inizio.
@@ -10556,7 +10545,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 
 ### 4.1 Lingue
 
-Altro › **Lingua e voce** › **Lingua**: Italiano, English, Français, Deutsch, Español, Português (ogni lingua è scritta nella lingua stessa, così la si ritrova anche con l'app in una lingua che non si legge). La scelta vale insieme per **schermate, voce dell'arbitro, tabellone TV, riepilogo/condivisione e braccialetti**. Le date seguono la lingua (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+Altro › **Impostazioni** › **Lingua**: Italiano, English, Français, Deutsch, Español, Português (ogni lingua è scritta nella lingua stessa, così la si ritrova anche con l'app in una lingua che non si legge). La scelta vale insieme per **schermate, voce dell'arbitro, tabellone TV, riepilogo/condivisione e braccialetti**. Le date seguono la lingua (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 Le chiamate non sono traduzioni parola per parola: seguono i testi ufficiali per i giudici di sedia di ciascuna federazione, cioè FFT *L'arbitrage en 255 questions* e ITF in francese, i materiali DTB/BTV e Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (l'unico copione portoghese pubblicato). L'inglese segue l'ITF. In inglese lo zero dei set a fine partita si dice *love* ("six love, six four"), come nei punti.
 
@@ -10589,7 +10578,7 @@ Particolarità:
 | **KEY2** lungo (2 s) | spegne il braccialetto (col cavo collegato scrive *LA CARICA CONTINUA*: si ricarica anche spento; dal firmware 2.3 si riaccende anche con KEY1 o KEY2) |
 | Tasto laterale | un clic accende; doppio clic spegne (funzione hardware) |
 
-- All'accensione lampeggia **PAIRING...** (acceso 0,35 s ogni 2 s per risparmiare). L'app si collega da sola ai braccialetti che conosce appena è aperta; quelli nuovi li trova in **Altro › Dispositivi** (o in **Modalità e regole** con la modalità *Braccialetti*).
+- All'accensione lampeggia **PAIRING...** (acceso 0,35 s ogni 2 s per risparmiare). L'app si collega da sola ai braccialetti che conosce appena è aperta; quelli nuovi li trova in **Altro › Impostazioni › Dispositivi** (o in **Modalità e regole** con la modalità *Braccialetti*).
 - Collegato: **PAIRING OK** per 3 secondi con due bip, poi **ASSOCIATO A** + il nome del giocatore.
 - A ogni punto il display si accende con il punteggio del game in grande (a sinistra il tuo, a destra l'avversario; la pallina verde indica chi serve), poi si spegne. A fine game mostra game e set. Se il telefono non conferma un tocco entro 8 secondi (collegamento perso) compare **NON INVIATO** in rosso con due bip bassi: premi di nuovo quando è ricollegato. Un tocco fatto durante un'interruzione breve invece non si perde: parte appena il braccialetto si ricollega, e il bip arriva in quel momento.
 
@@ -10611,7 +10600,7 @@ Il resto del risparmio: CPU a 80 MHz, display spento quando non serve, Bluetooth
 
 ### 6.1 Impostazioni del braccialetto
 
-Da **Altro › Dispositivi** o da **Modalità e regole** (**Impostazioni** sotto il braccialetto di ciascun giocatore) o durante la partita (tocca **G1**/**G2** in alto, oppure l'icona dei cursori). Si salvano **nel braccialetto** e restano anche spegnendolo; a ogni modifica il braccialetto mostra il nome con *IMPOSTAZIONI OK*. Col firmware 2.4 c'è anche la sezione **Colpi** (6.4).
+Da **Altro › Impostazioni › Dispositivi** o da **Modalità e regole** (**Impostazioni** sotto il braccialetto di ciascun giocatore) o durante la partita (tocca **G1**/**G2** in alto, oppure l'icona dei cursori). Si salvano **nel braccialetto** e restano anche spegnendolo; a ogni modifica il braccialetto mostra il nome con *IMPOSTAZIONI OK*. Col firmware 2.4 c'è anche la sezione **Colpi** (6.4).
 
 | Impostazione | Valori | Predefinito |
 |---|---|---|
@@ -10653,7 +10642,7 @@ Collega il cavo USB-C: il braccialetto fa un bip e mostra la **schermata di cari
 
 Il sistema più economico per far segnare i punti ai giocatori: due **telecomandini Bluetooth da selfie** (quelli col tasto di scatto, spesso venduti come *AB Shutter3*), da 1 a 3 € l'uno. Android li vede come una tastiera: niente firmware da caricare e nessun permesso per l'app. Va bene anche qualsiasi altra pulsantiera o tastiera Bluetooth (o USB).
 
-1. Accendi il telecomando e accoppialo dalle **impostazioni Bluetooth** del telefono, come una cuffia (*Altro › Dispositivi › Impostazioni Bluetooth* le apre). Ripeti col secondo.
+1. Accendi il telecomando e accoppialo dalle **impostazioni Bluetooth** del telefono, come una cuffia (*Altro › Impostazioni › Dispositivi › Impostazioni Bluetooth* le apre). Ripeti col secondo.
 2. *Modalità e regole* › modalità **Telecomandi** › **Associa** sotto il Giocatore 1 › premi il tasto del suo telecomando che darà il punto; poi lo stesso per il Giocatore 2. A ogni clic di un telecomando associato la sua riga mostra **Tasto ricevuto**: così si prova prima di giocare. **Scambia G1 ↔ G2** li inverte.
 3. **INIZIO PARTITA**: un clic su un telecomando avvia la partita, come KEY1 dei braccialetti. In alto **G1**/**G2** sono colorati quando i telecomandi sono collegati.
 
@@ -10692,7 +10681,7 @@ Col firmware 2.4 il braccialetto riconosce **dritto, rovescio, servizio e volée
 Battito e calorie da **fasce toraciche Bluetooth** che usano il servizio cardio standard: Coospo (provata la H6), Magene, Polar, Garmin, Wahoo… Valgono in tutte le modalità, anche senza braccialetti.
 
 1. Bagna gli elettrodi e indossa la fascia: si accende da sola a contatto con la pelle.
-2. *Modalità e regole* (o *Altro › Dispositivi*) › **Battito cardiaco** › attiva **Fasce cardio** e scegli la fascia di ciascun giocatore (si sceglie una volta sola). **Scambia** le inverte.
+2. *Modalità e regole* (o *Altro › Impostazioni › Dispositivi*) › **Battito cardiaco** › attiva **Fasce cardio** e scegli la fascia di ciascun giocatore (si sceglie una volta sola). **Scambia** le inverte.
 3. Facoltativi **età, peso e sesso** di chi la indossa: servono per le calorie (formula di Keytel, errore tipico ±20%) e, con l'età, per le zone cardio (massimo stimato 208 − 0,7 × età).
 
 - Sotto ogni fascia: stato, battito, **segnale** in dBm (più vicino a 0 = più forte) e **stacchi**, cioè le volte in cui il battito non è arrivato per più di 3 secondi, con i secondi persi (*2 stacchi (14 s)*). Contano dal «gioco» della partita; prima, da quando la fascia è stata scelta. Servono a capire fin dove arriva la fascia.
@@ -10703,8 +10692,8 @@ Battito e calorie da **fasce toraciche Bluetooth** che usano il servizio cardio 
 
 Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi metri meno della lunghezza del campo. Con un secondo telefono all'altro fondo campo ogni giocatore ne ha sempre uno vicino: il secondo (**satellite**) sente fasce e braccialetti dei giocatori dalla sua parte e fa da ponte con il **principale**, che tiene la partita.
 
-1. **Principale**: Altro › **Dispositivi** › **Secondo telefono** › **Usa un secondo telefono**. La prima volta chiede il permesso *Dispositivi nelle vicinanze* (fino ad Android 12 la posizione). Il telefono crea una **rete sua, solo locale**: niente SIM né dati, e non serve il Wi-Fi del circolo. Compare un QR.
-2. **Satellite**: Altro › **Dispositivi** › **Secondo telefono** › **Fai da secondo telefono** › inquadra il QR. Android chiede una volta di collegarsi alla rete del principale (*AndroidShare_…*): tocca **Connetti**. Il satellite tiene i dati mobili. Deve dire *Collegato al telefono principale*.
+1. **Principale**: Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono** › **Usa un secondo telefono**. La prima volta chiede il permesso *Dispositivi nelle vicinanze* (fino ad Android 12 la posizione). Il telefono crea una **rete sua, solo locale**: niente SIM né dati, e non serve il Wi-Fi del circolo. Compare un QR.
+2. **Satellite**: Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono** › **Fai da secondo telefono** › inquadra il QR. Android chiede una volta di collegarsi alla rete del principale (*AndroidShare_…*): tocca **Connetti**. Il satellite tiene i dati mobili. Deve dire *Collegato al telefono principale*.
 3. Il satellite segue da solo le fasce e i braccialetti scelti sul principale, sugli stessi lati: non si sceglie niente. Lascialo a fondo campo con l'app aperta.
 
 - **Cambio campo**: non serve fare niente. Ogni fascia e ogni braccialetto resta al telefono a cui è collegato finché il segnale regge, poi lo prende quello più vicino (qualche secondo). Sul principale compare *Dal secondo telefono*; durante il passaggio un braccialetto può risultare scollegato per un attimo.
@@ -10721,19 +10710,19 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
    - *Arbitro*, *Braccialetti* o *Telecomandi* (6.3). Con i braccialetti sono obbligatori Bluetooth acceso, permesso posizione e posizione attiva: le righe dei **Requisiti** si aggiornano in tempo reale (anche se spegni Bluetooth o posizione dalla tendina) e diventano rosse con il pulsante per sistemarle.
    - La **ricerca è automatica e continua** finché la pagina è aperta: accendi i braccialetti e vanno da soli nei posti liberi (prima Giocatore 1, poi Giocatore 2). **Identifica** fa lampeggiare quel braccialetto nel colore del giocatore (giallo o rosso) con dei bip, così vedi subito quale hai in mano; **Scambia G1 ↔ G2** li inverte senza scollegarli. Dal menu a tendina puoi sempre sceglierne un altro o *Nessuno* (quello tolto a mano non viene rimesso dalla ricerca). Un braccialetto non può stare su due giocatori.
    - **Spegni i braccialetti a fine partita e all'uscita** (attivo di serie): alla conferma di *Partita conclusa* e con *Esci* i braccialetti si spengono invece di aspettare l'inattività.
-   - In modalità arbitro, premendo **Avanti** senza posizione compare l'invito ad attivarla (altrimenti il luogo non sarà nel riepilogo).
-   - Formato (*3 set*, *5 set*, *2 set + super tie-break a 10*, *pro set* a 8 o 10 game, *solo super tie-break a 10*), game per set (6 oppure 4 nei set brevi, con tie-break sul 4-4), tie-break nei set sì/no (no: il set va avanti finché uno ha 2 game di scarto), No-Ad. Lingua e voce sono in *Altro › Lingua e voce* (4.1).
-   - **Sorteggio**: la moneta gira e indica chi vince; imposti chi serve e i lati del campo **visti dal giudice di sedia** (schema del campo con **Inverti lati**). Nel doppio scegli anche chi serve per primo in ogni squadra.
+   - In modalità arbitro, la prima volta che premi **Avanti** senza posizione compare, una volta sola, l'invito ad attivarla: con *Continua senza* il luogo non sarà nel riepilogo (si riaccende in *Nuova partita › Altri dettagli › Luogo della partita*).
+   - Formato (*3 set*, *5 set*, *2 set + super tie-break a 10*, *pro set* a 8 o 10 game, *solo super tie-break a 10*), game per set (6 oppure 4 nei set brevi, con tie-break sul 4-4), tie-break nei set sì/no (no: il set va avanti finché uno ha 2 game di scarto), No-Ad. Tranne il formato, queste regole (e il cambio palle) stanno chiuse in **Altre regole**, una riga che *Cambia* apre. Lingua e voce sono in *Altro › Impostazioni* (4.1).
+   - **Sorteggio** (passo 3, una pagina sua): la moneta gira e indica chi vince; imposti chi serve e i lati del campo **visti dal giudice di sedia** (schema del campo con **Inverti lati**). Nel doppio scegli anche chi serve per primo in ogni squadra.
 3. **INIZIO PARTITA** lampeggia: premi il pulsante, KEY1 di un braccialetto o un telecomando. La voce dice *"Primo set" · "[nome] al servizio" · "gioco"* con 1 secondo tra le frasi; il **Match Time** parte su "gioco".
-4. **Partita**: in alto a sinistra il tempo partita, a destra il countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rosso negli ultimi 5 s). Il riquadro arancione si accende 5 s per *cambio campo, tie-break, set point, match point, palla break…*. I due tasti quadrati (giallo = Giocatore 1, rosso = Giocatore 2) stanno dal lato in cui si trovano davvero i giocatori e si scambiano a ogni cambio campo; sotto chi serve compare **On Serve**. Sotto: *Annulla punto*, *Sospendi/Riprendi*, audio (icona dell'altoparlante, barrata = spento), *Nuova partita*, **Esci**. In modalità braccialetti, sotto i tempi ci sono **G1**/**G2** con batteria e autonomia: toccandoli si aprono le impostazioni del braccialetto. Un doppio tocco su *Annulla punto* toglie un solo punto (il secondo tocco entro 1 s non conta); subito dopo un cambio di pagina il secondo tocco di un doppio tocco viene ignorato, così non finisce sul pulsante della pagina nuova. Il **lucchetto** in basso blocca lo schermo (per esempio col telefono in tasca o in panchina): i tocchi non fanno niente, braccialetti e telecomandi sì; si sblocca tenendo premuto il lucchetto.
+4. **Partita**: in alto a sinistra il tempo partita, a destra il countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rosso negli ultimi 5 s). Il riquadro arancione si accende 5 s per *cambio campo, tie-break, set point, match point, palla break…*. I due tasti quadrati (giallo = Giocatore 1, rosso = Giocatore 2) stanno dal lato in cui si trovano davvero i giocatori e si scambiano a ogni cambio campo; sotto chi serve compare **On Serve**. Sotto: *Annulla punto*, *Sospendi/Riprendi*, audio (icona dell'altoparlante, barrata = spento), **Esci**: apre un menu con *Torna al menu* (la partita resta tra le sospese), *Nuova partita* e *Chiudi l'app* (anche **Indietro** lo apre). In modalità braccialetti, sotto i tempi ci sono **G1**/**G2** con batteria e autonomia: toccandoli si aprono le impostazioni del braccialetto. Un doppio tocco su *Annulla punto* toglie un solo punto (il secondo tocco entro 1 s non conta); subito dopo un cambio di pagina il secondo tocco di un doppio tocco viene ignorato, così non finisce sul pulsante della pagina nuova. Il **lucchetto** in basso blocca lo schermo (per esempio col telefono in tasca o in panchina): i tocchi non fanno niente, braccialetti e telecomandi sì; si sblocca tenendo premuto il lucchetto.
 5. All'ultimo punto compare il popup **Partita conclusa / Annulla ultimo punto**. "Partita conclusa" si conferma **solo dal telefono**. Per mezzo secondo dopo la comparsa i suoi pulsanti ignorano i tocchi: un doppio tocco sull'ultimo punto non annulla niente.
-6. **Riepilogo**: vincitore, nomi, punteggio set per set con i punti del tie-break, durata, ora di inizio e fine, data, circolo, campo, luogo, formato, punti e game vinti. Pulsanti **Salva file** (nome file + cartella a scelta + formati .txt/.json/.png e **PDF completo** con risultato, statistiche della partita e di ogni set, cronologia e foto). **Condividi** chiede se mandare l'immagine col testo (per WhatsApp e i social) o il PDF completo. Nel Riassunto, **Foto della partita** tiene fino a 10 foto ricordo (dalla galleria o scattate): restano sul telefono, vanno nel PDF e passano all'altro telefono col trasferimento, mai nell'immagine per i social, **Condividi** (immagine 1080×1350 + testo per WhatsApp/Instagram/…), **Nuova partita**, **Esci**. Sotto le foto, **Note** accoglie un testo libero (fino a 2000 caratteri): si salva da solo, va nel PDF, nel testo condiviso e nei file .txt e .json, e passa all'altro telefono col trasferimento; non va nell'immagine per i social. La partita finita entra da sola nello **Storico** (scheda **Progressi**): elenco delle partite, da riaprire col loro riepilogo o eliminare, e scheda **Giocatori** con vittorie, sconfitte e scontri diretti di chi ha il nome scritto in *Nuova partita* (maiuscole e spazi non contano; nel doppio conta ogni giocatore). **Importa** aggiunge le partite salvate come .json con *Salva file* su un altro telefono: le finite vanno nello storico, quelle non finite tra le partite sospese da riprendere. **Trasferisci** (in alto a destra nello Storico) sposta storico e partite sospese su un altro telefono con un QR: i due telefoni devono stare sulla stessa rete Wi-Fi o uno sull'hotspot dell'altro; su quello che li ha tocchi *Invia*, **scegli le partite da mandare** (si parte con l'ultima spuntata; ci sono *Tutte*, *Nessuna*, *Ultimi 7 giorni* e *Di un giocatore…*), tocchi *Invia (N)* e lasci aperta la finestra col codice, sull'altro *Ricevi* e inquadri il codice (serve il permesso della fotocamera). Così si continua su un altro telefono anche una partita in corso: sospendila, trasferisci e riprendila. Le partite si aggiungono a quelle che il telefono ha già. **Foto dei giocatori**: tocca il cerchio accanto al nome in *Nuova partita* (o nel dettaglio del giocatore nello Storico) e scegli una foto; si ritaglia quadrata e si ritrova dal nome. Compare nello Storico, nel riepilogo e sul tabellone TV, resta solo su questo telefono (passa all'altro col trasferimento) e non finisce nell'immagine condivisa. Toccando di nuovo il cerchio la si cambia o la si toglie. Se l'app si chiude mentre sei sul riepilogo (Android che la chiude in secondo piano, un aggiornamento, un riavvio del telefono), riaprendola lo ritrovi; non se l'hai lasciato tu con *Nuova partita*, *Esci* o togliendo l'app dalle recenti. La cartella predefinita è **Documenti/Tennis Score Manager** (da Android 10; su Android 8 e 9 la cartella dell'app): si apre da qualsiasi app di gestione file e resta anche disinstallando l'app. Salvando due volte con lo stesso nome il secondo diventa *nome (1)*; nell'immagine i testi lunghi (nomi, indirizzo) si adattano alla larghezza.
+6. **Riepilogo**: vincitore, nomi, punteggio set per set con i punti del tie-break, durata, ora di inizio e fine, data, circolo, campo, luogo, formato, punti e game vinti. Pulsanti **Salva file** (nome file + cartella a scelta + formati .txt/.json/.png e **PDF completo** con risultato, statistiche della partita e di ogni set, cronologia e foto). **Condividi** chiede se mandare l'immagine col testo (per WhatsApp e i social) o il PDF completo. Nel Riassunto, **Foto della partita** tiene fino a 10 foto ricordo (dalla galleria o scattate): restano sul telefono, vanno nel PDF e passano all'altro telefono col trasferimento, mai nell'immagine per i social, **Condividi** (immagine 1080×1350 + testo per WhatsApp/Instagram/…), **Nuova partita**, **Fatto** (torna da dove era partita la partita: la prima schermata, il torneo, la squadra o la classifica a sfida). Sotto le foto, **Note** accoglie un testo libero (fino a 2000 caratteri): si salva da solo, va nel PDF, nel testo condiviso e nei file .txt e .json, e passa all'altro telefono col trasferimento; non va nell'immagine per i social. La partita finita entra da sola nello **Storico** (scheda **Progressi**): elenco delle partite, da riaprire col loro riepilogo o eliminare, e scheda **Giocatori** con vittorie, sconfitte e scontri diretti di chi ha il nome scritto in *Nuova partita* (maiuscole e spazi non contano; nel doppio conta ogni giocatore). **Importa** aggiunge le partite salvate come .json con *Salva file* su un altro telefono: le finite vanno nello storico, quelle non finite tra le partite sospese da riprendere. **Trasferisci** (in alto a destra nello Storico) sposta storico e partite sospese su un altro telefono con un QR: i due telefoni devono stare sulla stessa rete Wi-Fi o uno sull'hotspot dell'altro; su quello che li ha tocchi *Invia*, **scegli le partite da mandare** (si parte con l'ultima spuntata; ci sono *Tutte*, *Nessuna*, *Ultimi 7 giorni* e *Di un giocatore…*), tocchi *Invia (N)* e lasci aperta la finestra col codice, sull'altro *Ricevi* e inquadri il codice (serve il permesso della fotocamera). Così si continua su un altro telefono anche una partita in corso: sospendila, trasferisci e riprendila. Le partite si aggiungono a quelle che il telefono ha già. **Foto dei giocatori**: tocca il cerchio accanto al nome in *Nuova partita* (o nel dettaglio del giocatore nello Storico) e scegli una foto; si ritaglia quadrata e si ritrova dal nome. Compare nello Storico, nel riepilogo e sul tabellone TV, resta solo su questo telefono (passa all'altro col trasferimento) e non finisce nell'immagine condivisa. Toccando di nuovo il cerchio la si cambia o la si toglie. Se l'app si chiude mentre sei sul riepilogo (Android che la chiude in secondo piano, un aggiornamento, un riavvio del telefono), riaprendola lo ritrovi; non se l'hai lasciato tu con *Nuova partita*, *Fatto* o togliendo l'app dalle recenti. La cartella predefinita è **Documenti/Tennis Score Manager** (da Android 10; su Android 8 e 9 la cartella dell'app): si apre da qualsiasi app di gestione file e resta anche disinstallando l'app. Salvando due volte con lo stesso nome il secondo diventa *nome (1)*; nell'immagine i testi lunghi (nomi, indirizzo) si adattano alla larghezza.
 
    Il riepilogo ha tre schede. **Riassunto**: i dati qui sopra e, coi braccialetti 2.4, colpi, velocità del polso e colpi per punto (6.4). **Statistiche**, per la partita o per un set: i due giocatori a confronto con barre che partono dal centro (colorata quella di chi è avanti) per punti e game vinti al servizio e in risposta, palle break salvate e vinte, totale punti e game, punti di fila, ultimi 10 punti, match point annullati; coi braccialetti 2.4 anche colpi per tipo e velocità media del polso. **Cronologia**: set per set, ogni game con la pallina di chi serve, *SERVIZIO PERSO* sui break, il punteggio dopo ogni punto con **PB** (palla break), **SP** (set point) e **MP** (match point) e l'esito (*GAME*, *BREAK*, *SET*, *PARTITA*). Ace, doppi falli, prime di servizio, vincenti ed errori ci sono se in *Modalità e regole* accendi le **statistiche dettagliate**: al posto dei due tasti grandi compaiono *Ace* e *Fallo* (la seconda volta diventa *Doppio fallo*) e, per ciascun giocatore, *Vincente*, *Errore* (il punto va all'altro) e *Punto*; *Annulla punto* toglie anche un fallo. È pensata per chi segna da bordo campo. Dopo *Errore* compare per 6 secondi *Gratuito / Forzato*; con braccialetti o telecomandi, dopo ogni punto compare *Com'è finito il punto?* (Ace, Vincente, Errore): rispondere è facoltativo, il punteggio non cambia. Nello Storico il dettaglio di un giocatore mostra l'**andamento**: punti vinti partita per partita e le medie di ace, doppi falli, prime, vincenti ed errori. Le statistiche di ogni partita contano anche palle game, set point e match point trasformati, game vinti a zero, game di fila, set vinti da sotto di un break e, nella scheda **Tempi**, la durata di ogni set e il game più lungo.
 
    **Rivincita** (in fondo al riassunto): propone lo stesso giorno della settimana e la stessa ora, la settimana dopo, e il circolo della partita; si cambiano data, ora e luogo e si aggiunge una nota. **Manda l'invito** apre la condivisione (WhatsApp, SMS, email…) con il messaggio pronto: chi contro chi, quando, dove e com'è finita l'ultima volta. **Metti in calendario** crea l'evento nell'app del calendario, **Prepara la partita** riporta in *Nuova partita* giocatori, circolo, campo e regole (il torneo no). Niente account: l'invito passa dai canali che usi già.
 
-**Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
+**Uscire**: in partita **Esci** (o **Indietro**) apre un menu: **Torna al menu** (la partita resta tra le sospese: la riprendi da *Gioca*, o da *Tornei* col ruolo Circolo), **Nuova partita** e **Chiudi l'app**, che chiude davvero l'app come toglierla dalle app recenti. Nel riepilogo **Fatto** (o Indietro) torna da dove era partita la partita. Alla riapertura l'app riparte dalla prima scheda.
 
 **Ritiro**: il tasto **Arbitro** (il martelletto) sotto il punteggio, alla voce **Ritiro**, chiede chi si ritira e chiude la partita col punteggio di quel momento, senza i punti del game in corso (es. `6-3 2-1 rit.`). Vince l'avversario, la voce lo annuncia e, prima di **Partita conclusa**, **Annulla il ritiro** rimette tutto com'era. Nei tornei il risultato entra da solo con il ritiro segnato; la partita conta come vittoria ma non pesa sul rating TSM.
 
@@ -10780,15 +10769,15 @@ Per allenarsi con la fascia cardio senza una partita: **Allenati** › **Allenam
 
 Un secondo telefono su un treppiede riprende la partita e mette sul video il punteggio dell'arbitro.
 
-1. **Arbitro**: Altro › **Dispositivi** › **Secondo telefono** › **Usa un secondo telefono** (QR, come in 6.6).
-2. **Telecamera**: Altro › **Dispositivi** › **Secondo telefono** › **Fai da telecamera**, inquadra il QR, poi **Apri la telecamera** (permessi di fotocamera e microfono; serve un telefono che registri in 1080p). Con *Punteggio collegato* la grafica del punteggio è sul video (**Grafica** la accende o la spegne); senza arbitro registra solo il video.
+1. **Arbitro**: Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono** › **Usa un secondo telefono** (QR, come in 6.6).
+2. **Telecamera**: Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono** › **Fai da telecamera**, inquadra il QR, poi **Apri la telecamera** (permessi di fotocamera e microfono; serve un telefono che registri in 1080p). Con *Punteggio collegato* la grafica del punteggio è sul video (**Grafica** la accende o la spegne); senza arbitro registra solo il video.
    - **Registra / Ferma**: il video va in galleria (*Film/Tennis Score Manager*) con i capitoli, uno per punto.
    - **Diretta**: trasmissione RTMP su YouTube, Twitch, Facebook o un server tuo; server e chiave dello stream in *Diretta: server*.
    - **Inquadra** (assistente inquadratura): scrivi quanti metri dietro la linea di fondo e a che altezza hai messo il telefono e su che campo giochi; l'app dice l'inclinazione verso il basso che tiene nel video tutte e due le linee di fondo e il giocatore lontano, e se il campo ci sta in larghezza. Spesso il limite è proprio la larghezza: dalla recinzione (circa 6 m) l'obiettivo principale taglia gli angoli vicini, il **grandangolo** no (**Usa l'obiettivo…**, oppure il tasto **Obiettivo**, a registrazione ferma). Con **Mostra la livella** sull'anteprima compaiono l'orizzonte e le indicazioni (*punta più in basso di 2°*, *gira in senso orario*…), verdi quando va bene, con una vibrazione quando il telefono è in posizione. La livella si vede anche nel riquadro **Telecamera** del telefono dell'arbitro. Destra e sinistra i sensori non le sanno: controlla a occhio che la rete sia al centro.
    - **Sagoma** (sagoma del campo): sull'anteprima compaiono le linee del campo come le vede l'obiettivo, e seguono il telefono mentre lo inclini. Muovi i cursori (**Distanza**, **Altezza**, **Direzione**, **Spostamento laterale** e, se serve, **Campo visivo** e **Correzione inclinazione**) finché combaciano con le linee vere: così si sistema anche la centratura, e l'inclinazione consigliata diventa precisa. La taratura viene ricordata per il campo della partita (*Circolo · Campo* dell'arbitro) e ripresa la volta dopo. Sagoma e cursori ci sono anche nel riquadro **Telecamera** dell'arbitro. Più in alto è il telefono, meglio si vede la metà lontana del campo: da 2,5 m è schiacciata appena sopra la rete.
-3. **Telecamera in alto, comandata dall'arbitro**: sul telefono dell'arbitro **Telecamera** (accanto a *Moviola* in partita, oppure *Inquadratura e comandi della telecamera* in Altro › **Dispositivi** › **Secondo telefono**, utile per sistemarla prima di iniziare) mostra l'inquadratura del telefono-telecamera com'è nel video, grafica compresa, con **Registra / Ferma**, **Diretta**, **Grafica** e lo **zoom**. Si vedono anche durata della registrazione, batteria e spazio libero (in arancione se sono bassi). L'immagine è piccola e a scatti (circa 3 fotogrammi al secondo) e passa solo mentre la si guarda; la chiave della diretta va messa sul telefono-telecamera.
+3. **Telecamera in alto, comandata dall'arbitro**: sul telefono dell'arbitro **Telecamera** (accanto a *Moviola* in partita, oppure *Inquadratura e comandi della telecamera* in Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono**, utile per sistemarla prima di iniziare) mostra l'inquadratura del telefono-telecamera com'è nel video, grafica compresa, con **Registra / Ferma**, **Diretta**, **Grafica** e lo **zoom**. Si vedono anche durata della registrazione, batteria e spazio libero (in arancione se sono bassi). L'immagine è piccola e a scatti (circa 3 fotogrammi al secondo) e passa solo mentre la si guarda; la chiave della diretta va messa sul telefono-telecamera.
 
-- **Video** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*.
+- **Progressi** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*.
 - **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
 - **Highlights**: montaggio automatico dei punti più belli (ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
   - **Statistiche a fine video**: 2 o 3 schermate da 10 secondi come nelle dirette dei tornei: servizio e palle break; punti, errori e scambi corti e lunghi; battito, se c'era la fascia. La partita è quella dello storico giocata mentre si registrava, o quella dei punti segnati su un video importato. Ai lati la foto del giocatore; senza foto un ritratto stilizzato di uomo o di donna (scelta **Uomo / Donna** in *Nuova partita*) (senza scelta, quello dell'uomo; vale in tutta l'app, anche in *Nuova partita*, storico, riepilogo, PDF e tabellone TV); sotto, la percentuale di punti vinti. In alto torneo, categoria e turno (*Altri dettagli* in *Nuova partita*), oppure circolo e campo.
@@ -10834,8 +10823,8 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 
 ### 7.6 Allievi: la parte per l'allenatore
 
-- **Allenati › Allievi** › **Nuovo allievo**: nome (lo stesso delle partite: così foto, storico e rating si ritrovano da soli) e mano.
-- **Chi si allena**: in Allenati, sopra *Inizia*, scegli l'allievo (o *Nessun allievo*). La sessione è sua: le ultime sessioni, *Tutte le sessioni*, l'andamento in Progressi e i numeri sui tasti dei colpi sono solo i suoi, e le clip vanno in **Allenamento colpi/<colpo>/<allievo>/<data e ora>**.
+- **Allievi** (ruolo Allenatore) › **Nuovo allievo**: nome (lo stesso delle partite: così foto, storico e rating si ritrovano da soli) e mano.
+- **Chi si allena**: nella scheda Allievi del ruolo Allenatore, sopra *Inizia*, scegli l'allievo (nel ruolo Tu ti alleni tu, senza allievo). La sessione è sua: le ultime sessioni, *Tutte le sessioni*, l'andamento in Progressi e i numeri sui tasti dei colpi sono solo i suoi, e le clip vanno in **Allenamento colpi/<colpo>/<allievo>/<data e ora>**.
 - **La scheda dell'allievo** (tocca il nome in *Allievi*):
   - **Colpi**: per servizio, dritto, rovescio e volée le sessioni, i colpi, l'ultima volta e la linea dei colpi dentro; toccando un colpo si aprono le sue sessioni.
   - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
@@ -10857,7 +10846,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Altezza e peso**: con età e sesso fanno calcolare da sole le **calorie della fascia cardio** quando il giocatore gioca o, se è il tuo, si allena (senza, l'app le chiede a parte o non le calcola).
   - **Circolo di appartenenza**: si vede nella scheda; utile per gli ospiti e per gli avversari di altri circoli, per sapere chi sono.
   - **Mano e rovescio** (a una o due mani): descrivono il giocatore nella sua scheda, utile all'allenatore; l'analisi del movimento riconosce da sola il braccio che colpisce.
-  - **Allievo**: lo mette tra gli allievi dell'allenatore (Allenati › Allievi, *Chi si allena*), con sessioni, movimento e report.
+  - **Allievo**: lo mette tra gli allievi dell'allenatore (ruolo Allenatore, scheda Allievi e *Chi si allena*), con sessioni, movimento e report.
   - **Telefono ed email**: servono agli **avvisi** (WhatsApp, SMS, email: tornei, quote, convocazioni) anche se non è socio.
   - **Racchetta**: va con ogni sua sessione e partita com'era quel giorno (corde e tensione) e se ne confrontano le statistiche; se non c'è, *Nuova racchetta* la crea da lì.
   - Classifica, tessere e certificato non sono qui: sono nei *Dati del socio*, perché servono ai tornei e alle quote.
@@ -10870,10 +10859,10 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - **Partite da un altro telefono** (trasferimento o *Importa*): un giocatore che il telefono conosce si aggancia da solo; uno nuovo si aggiunge col suo identificativo; se ha il nome di uno dei tuoi l'app chiede una volta **Chi è?** (*Sì, è lui* lega i due, così le volte dopo lo riconosce; *No, un'altra persona* lo aggiunge). Le partite delle versioni vecchie, senza giocatori, si agganciano per nome.
 - La **foto** e **uomo/donna** valgono ancora per il nome: due omonimi le condividono.
 
-### 7.8 Tu, e Profilo e dati
+### 7.8 Tu, e Backup e dati
 
 - **Tu** è il tuo giocatore del database: Progressi e rating partono da lui. Alla prima apertura bastano nome e cognome (e il soprannome); poi **Altro › Tu** apre la tua scheda. Se non l'hai ancora scelto, *Chi sei?* propone i giocatori che ci sono (hai già giocato partite) o **Sono nuovo**. Nella scheda di un altro giocatore, **Sono io** lo rende tuo.
-- **Altro › Profilo e dati**:
+- **Altro › Impostazioni › Backup e dati**:
   - **Crea il backup**: un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce; con **Includi i video** anche clip dei colpi, moviola e highlights (il file diventa grande). Lo salvi dove vuoi (Download, un PC, una chiavetta): niente cloud. Non entrano il modello dell'analisi del movimento (si riscarica) e i file che hai salvato tu in Documenti.
   - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
   - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano.
@@ -10882,15 +10871,15 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 
 ### 7.9 Ruoli: Tu, Allenatore, Circolo
 
-- In **Altro › Profilo e dati › Ruoli** (e alla prima apertura) scegli chi usa l'app; puoi averne più di uno. I ruoli cambiano le schede della prima schermata, **i dati sono gli stessi**; con più ruoli, in alto c'è il ruolo attivo: toccandolo passi a un altro.
-  - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
-  - **Cosa usi** (Altro): si tiene solo quello che serve. Braccialetti e telecomandi, fasce cardio, allenamento dei colpi e allievi, video e telecamera, progressi e rating, racchette, padel: quello che si spegne non compare, e le schede rimaste vuote (Allenati, Video) spariscono; lo storico resta sempre (senza Progressi va in Gioca). All'inizio è tutto acceso; alla prima presentazione l'app propone cosa tenere dalla risposta a "come la userai". Altro è diviso in gruppi: Dispositivi e voce, Dati, Aiuto.
-  - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
-  - **Circolo**: **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
-  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi, Server del circolo e Segreteria da PC. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
+- I ruoli dicono chi usa l'app: si scelgono alla prima apertura o in **Altro › Impostazioni › Ruoli e funzioni** (anche toccando il ruolo in alto, sempre visibile) e puoi averne più di uno. **Ogni funzione sta in un ruolo solo**, senza doppioni; i dati sono gli stessi e cambiando ruolo non si perde niente.
+  - **Tu** (giochi): **Gioca** (il segnapunti, il torneo tra amici, il telefono come tabellone o telecamera), **Circolo** (solo dopo l'invito: prenotazioni e chat), **Allenati**, **Progressi** (rating, storico, video, racchette), Altro (la tua scheda, i giocatori).
+  - **Allenatore** (alleni): **Allievi** (l'elenco, gli esercizi e l'allenamento dei colpi di chi si allena con te), Altro. Le partite si segnano dal ruolo Tu; *Allena ora* nella scheda di un allievo porta qui con lui già scelto.
+  - **Circolo** (la segreteria): **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Planning** (i campi del giorno, subito), **Soci** (soci, quote e pagamenti, scuola tennis, messaggio a tutti i soci), **Tornei** (tornei, squadre, classifica a sfida: le partite si segnano da lì con *Gioca col segnapunti* e quelle lasciate a metà si riprendono da lì), Altro (**Il circolo**: nome, campi, orari e prezzi, server, segreteria da PC, backup della segreteria).
+  - **Altro** ha in ogni ruolo le cose dell'app: **Impostazioni** (lingua, voce dell'arbitro, dispositivi, ruoli e funzioni, backup e dati e, in fondo, **Informazioni** con la versione dell'app, la licenza e il codice sorgente), **Aiuto** e **Presentazione dell'app**.
+  - **Ruoli e funzioni** tiene nei menu solo quello che serve. Per Tu e Allenatore, **Cosa usi**: braccialetti e telecomandi, fasce cardio, allenamento dei colpi, video e telecamera, progressi e rating, racchette, padel; quello che si spegne non compare e le schede rimaste vuote spariscono (senza Progressi lo storico va in Gioca). Per il Circolo, **Funzioni del circolo**: di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi, Server del circolo e Segreteria da PC. I dati delle funzioni spente restano.
   - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
-- Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
-- **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
+- A chi aveva già l'app, la prima volta si accendono da soli i ruoli di cui ci sono già dati (partite, allenamenti e prenotazioni sono di Tu, gli allievi dell'Allenatore): niente sparisce.
+- **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **backup automatico** (acceso di serie) e il **promemoria del backup** (se spegni quello automatico, ogni 30 giorni la prima schermata ti ricorda di farne uno); li trovi anche in Backup e dati.
 
 ### 7.10 Esercizi guidati
 
@@ -10900,7 +10889,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 
 ### 7.11 Soci del circolo
 
-Col ruolo **Circolo**, in **Giocatori › Soci** c'è l'elenco degli iscritti, pensato per il dispositivo della segreteria.
+Col ruolo **Circolo**, in **Soci › Soci** c'è l'elenco degli iscritti, pensato per il dispositivo della segreteria.
 
 - **Nuovo socio**: scegli un giocatore che c'è già (chi ha giocato partite o è un allievo) o creane uno nuovo. Dalla scheda di un giocatore si può anche toccare **Iscrivi come socio**.
 - **Dati del socio**: telefono ed email (servono per gli avvisi), data di nascita, socio dal, tessera del circolo; **tessera FITP** con numero, tipo (agonista, non agonista, altro), anno e classifica; **certificato medico** con tipo e scadenza; consenso al trattamento dei dati e a foto e video. Per i **minorenni** anche il genitore o tutore e il suo telefono.
@@ -10910,7 +10899,7 @@ Col ruolo **Circolo**, in **Giocatori › Soci** c'è l'elenco degli iscritti, p
 
 ### 7.12 Quote e pagamenti
 
-In **Giocatori › Quote e pagamenti** (ruolo Circolo) si tiene il registro del circolo. L'app **registra** i pagamenti, non li incassa: niente carte né conti collegati.
+In **Soci › Quote e pagamenti** (ruolo Circolo) si tiene il registro del circolo. L'app **registra** i pagamenti, non li incassa: niente carte né conti collegati.
 
 - **Nuova quota**: nome (es. *Quota sociale 2027*), tipo (quota sociale, tessera FITP, corso, torneo, altro), importo e, se serve, la scadenza. Toccando una quota, **Addebita a tutti i soci** la mette a chi non l'ha ancora; sotto si vede quanti hanno pagato.
 - Nella scheda del socio, **Quote e pagamenti** mostra cosa deve: *pagato*, *da pagare*, *mancano 100,00 €*, in rosso *in ritardo* dopo la scadenza. **Nuovo addebito** aggiunge una quota del circolo o un altro importo (una lezione, un'incordatura).
@@ -10918,7 +10907,7 @@ In **Giocatori › Quote e pagamenti** (ruolo Circolo) si tiene il registro del 
 - Un pagamento sbagliato si annulla (il numero della ricevuta non si riusa); un addebito senza pagamenti si elimina, con dei pagamenti si **annulla**: non si deve più e i pagamenti restano nel registro.
 - In alto: incassato nell'anno e quanto c'è da incassare; **Da incassare** elenca chi deve, dal debito più grande. Anche in *Soci* chi deve qualcosa è tra i *da sistemare*.
 - **Esporta i pagamenti (CSV)**: tutti i pagamenti dell'anno con data, ricevuta, nome, descrizione, metodo, riferimento e importo, per il foglio di calcolo del commercialista.
-- Cancellando un giocatore spariscono i suoi addebiti non pagati; i pagamenti fatti restano col nome, perché sono contabilità. Il registro è nel backup di *Profilo e dati*.
+- Cancellando un giocatore spariscono i suoi addebiti non pagati; i pagamenti fatti restano col nome, perché sono contabilità. Il registro è nel backup di *Backup e dati*.
 
 ### 7.13 Tornei del circolo
 
@@ -10946,7 +10935,7 @@ L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l
 
 ### 7.15 Campi e planning
 
-Col ruolo **Circolo**, nella scheda **Campi**.
+Col ruolo **Circolo**, nella scheda **Planning** (nome del circolo, campi e *Orari e prezzi* sono anche in **Altro**, nel gruppo *Il circolo*).
 
 - **I campi**: si crea un campo (**Nuovo campo**), lo si mette in ordine e lo si tocca per cambiarlo: nome (rinominandolo, prenotazioni, periodi e partite dei tornei lo seguono), superficie (**terra, erba, cemento**, altro), **coperto o scoperto**, **luci**, **riscaldamento**, i **prezzi** suoi (all'ora, con le luci, supplemento riscaldamento all'ora; vuoti = quelli generali) e **una o più foto** dalla galleria. **Elimina il campo** toglie anche le sue prenotazioni da oggi in poi.
 - **Planning dei campi**: il giorno con un campo per colonna e un'ora per riga (◀ ▶ e il calendario per cambiare giorno). Tocca una casella libera per prenotare: campo, giorno, ora e durata, tipo (gioco, lezione, chiuso, altro), giocatori dal database e ospiti, nota. Il **prezzo** si calcola da solo (luci dall'ora scelta, riscaldamento se lo si chiede) e si può cambiare; **Addebita ai giocatori** lo divide in parti uguali e lo mette in *Quote e pagamenti*. **Come si paga**: *al campo* o *online*; a prenotazione addebitata, **Pagato: …** la segna pagata con uno dei modi di pagamento del circolo. **Ogni settimana per N settimane** ripete la prenotazione (le date col campo occupato si saltano e l'app le dice). **Avvisa i giocatori** manda campo, giorno, ora e come si paga.
@@ -10958,7 +10947,7 @@ Col ruolo **Circolo**, nella scheda **Campi**.
 
 ### 7.16 Scuola tennis
 
-Col ruolo **Circolo**, in **Giocatori › Scuola tennis**.
+Col ruolo **Circolo**, in **Soci › Scuola tennis**.
 
 - **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna.
 - **Allievi**: si aggiungono dal database (soci o no) fino ai posti; per ciascuno la **presenza** (presente 3 su 4, in arancione sotto il 75 %) e cosa deve pagare. Nella scheda del giocatore ci sono i suoi corsi.
@@ -10984,10 +10973,10 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 **Numero e PIN, più circoli**: dopo il primo invito il giocatore può scegliersi **numero di telefono e PIN** (nella pagina del circolo e nell'app, in **Le mie**). Così, se cambia telefono o esce, rientra da solo con **Hai già un PIN?**, senza un nuovo invito. Dopo 5 PIN sbagliati si aspetta un quarto d'ora; dopo 20 il PIN non vale più e la segreteria lo azzera dalla scheda del socio (**Azzera il PIN**). Nell'app si può entrare in **più circoli**: **Aggiungi un circolo** in **Le mie**, poi si sceglie il circolo in alto; promemoria e avvisi arrivano da tutti, col nome del circolo.
 
 - **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
-- **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
+- **Abbinare la segreteria**: *Altro › Server del circolo* (dopo averlo acceso in *Ruoli e funzioni › Funzioni del circolo*): indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
 - **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR. Su iPhone la pagina **TSM** lo guida: *Condividi › Aggiungi alla schermata Home*, poi apre TSM dalla Home e incolla il codice (Safari e l'app sulla Home non condividono i dati, quindi l'invito si usa nell'app installata). Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
-- **Con l'app TSM su Android** il giocatore prenota anche da *Gioca › Prenota un campo*: inquadra il QR dell'invito (o incolla il link), poi vede le sue prenotazioni, sceglie il giorno e tocca una casella libera; durata, riscaldamento e prezzo prima di confermare, **Disdici** finché si è in tempo, **Esci da questo circolo** per scollegare il telefono. Le regole sono le stesse della pagina web.
+- **Con l'app TSM su Android** il giocatore prenota anche da *Circolo › Prenota un campo* (la prima volta da *Altro › Ho un invito del circolo*): inquadra il QR dell'invito (o incolla il link), poi vede le sue prenotazioni, sceglie il giorno e tocca una casella libera; durata, riscaldamento e prezzo prima di confermare, **Disdici** finché si è in tempo, **Esci da questo circolo** per scollegare il telefono. Le regole sono le stesse della pagina web.
 - La pagina e l'app hanno **tre schede**: **Prenota** (giorni e caselle), **Le mie** (prenotazioni, liste d'attesa, promemoria) e **Compagni** (Cerco compagno).
 - Nell'app, in **Le mie**, **Invita** manda a chi gioca con te il campo, il giorno e l'ora già scritti (su WhatsApp o dove vuoi); dopo una prenotazione l'app ti porta lì da sola.
 - **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
@@ -11028,11 +11017,11 @@ Col ruolo **Circolo**, in **Tornei › Classifica a sfida**.
 
 Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Windows, Mac o Linux) sulla stessa rete del telefono** apre nel browser una pagina servita dal telefono, senza installare niente e senza server: **i dati restano sul telefono**, il computer li vede e li modifica finché è collegato e non ne tiene copie. Lo usa una persona alla volta. Il *server del circolo* (7.18) è un'altra cosa e serve solo alle prenotazioni dei giocatori.
 
-- **Accendere**: *Funzioni del circolo* › **Segreteria da PC**, poi la voce nella scheda dei campi e **Accendi**. Il telefono mostra indirizzo (es. `https://192.168.1.20:8443`) e codice.
+- **Accendere**: *Altro › Impostazioni › Ruoli e funzioni › Funzioni del circolo* › **Segreteria da PC**, poi la voce in **Altro** e **Accendi**. Il telefono mostra indirizzo (es. `https://192.168.1.20:8443`) e codice.
 - **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
 - **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
 - **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). **Scuola tennis** (corsi con orari e campi, allievi, appello delle lezioni, lezioni annullate, quote del mese o della stagione da addebitare), **Statistiche dei campi** (occupazione, incassi, campo per campo, giorni e ore più pieni, chi prenota di più, per periodo, da stampare). Con **Prepara sollecito** in Quote e pagamenti scegli a chi scrivere tra gli addebiti che vedi: il messaggio si apre sul telefono e lo mandi da lì. **Squadre e campionati** (rosa, incontri in casa o in trasferta coi campi tenuti, disponibilità, convocati, partite e risultato; gli avvisi si aprono sul telefono). **Prenotazioni online**, col server del circolo (prossime prenotazioni dei giocatori, lista d'attesa, annunci di Cerco compagno da togliere se serve, regole per i giocatori, **Invia ora**), **Impostazioni** (nome del circolo, orari e prezzi, campi con superficie, luci e prezzi propri, modi di pagamento). Avvisi WhatsApp, foto dei campi e segnapunti dal vivo restano nell'app.
-- **Backup della segreteria** (sul PC, sotto Statistiche; sul telefono in Campi › Backup della segreteria): un solo file `.tsmclub` con soci e giocatori, quote e pagamenti, planning, tornei, scuola tennis, squadre, campi e impostazioni (non partite, colpi e video: per quelli c'è il backup completo). **Scarica sul PC** o, dal telefono, **mandalo** dove vuoi (Google Drive, email, una chiavetta). Col **backup automatico** il telefono fa una copia al giorno solo se è cambiato qualcosa e tiene le ultime 14; col server del circolo le tiene anche lui. **Ripristina** mostra prima cosa c'è nel file e fa una copia di adesso, per tornare indietro. Il file contiene dati personali dei soci: tienilo in un posto tuo.
+- **Backup della segreteria** (sul PC, sotto Statistiche; sul telefono in Altro › Backup della segreteria): un solo file `.tsmclub` con soci e giocatori, quote e pagamenti, planning, tornei, scuola tennis, squadre, campi e impostazioni (non partite, colpi e video: per quelli c'è il backup completo). **Scarica sul PC** o, dal telefono, **mandalo** dove vuoi (Google Drive, email, una chiavetta). Col **backup automatico** il telefono fa una copia al giorno solo se è cambiato qualcosa e tiene le ultime 14; col server del circolo le tiene anche lui. **Ripristina** mostra prima cosa c'è nel file e fa una copia di adesso, per tornare indietro. Il file contiene dati personali dei soci: tienilo in un posto tuo.
 - **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
 - **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
 
@@ -11058,7 +11047,7 @@ Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone
 
 ### 8.2 Sul telefono dell'arbitro
 
-1. Altro › **Dispositivi** › **Tabellone su TV** › attiva **Tabellone su TV o monitor**. Su Android 13 e successivi l'app chiede il permesso delle notifiche: serve per la notifica del servizio che tiene acceso il tabellone.
+1. Altro › **Impostazioni** › **Dispositivi** › **Tabellone su TV** › attiva **Tabellone su TV o monitor**. Su Android 13 e successivi l'app chiede il permesso delle notifiche: serve per la notifica del servizio che tiene acceso il tabellone.
 2. Compaiono l'**indirizzo** (es. `192.168.43.1:8080`), il **QR** e quanti tabelloni sono collegati. Se c'è scritto *Nessuna rete*, accendi l'hotspot o collegati a quello dell'altro telefono.
 3. **Anteprima su questo telefono** apre il tabellone nel browser del telefono stesso.
 4. **Aspetto del tabellone**: colore di ciascun giocatore (8 colori), tempo partita, cronometro servizio e pause, set conclusi, messaggi (palla break, set point, cambio campo…), pallina di chi serve, segmenti spenti visibili, scritta in basso (vuota = circolo e campo di *Nuova partita*). Le modifiche arrivano subito sul monitor.
@@ -11104,7 +11093,7 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 - **Nel pannello impostazioni c'è "Il firmware di questo braccialetto non ha le impostazioni"**: quel braccialetto ha ancora lo sketch vecchio, ricaricalo (capitolo 5).
 - **La voce non parla o legge male**: volume multimediale, *Audio On*, voce della lingua scelta installata (4); prova un altro motore o un'altra voce in *Audio e voce*.
 - **Schermo spento durante la partita**: in modalità braccialetti un servizio in primo piano (notifica "Partita in corso") tiene attivi Bluetooth, voce e cronometri; in modalità arbitro e telecomandi lo schermo resta acceso (con i telecomandi deve restarlo: 6.3).
-- **Il telecomando non fa niente**: è associato al giocatore (*Altro › Dispositivi* › *Telecomandi*, riga col suo nome)? L'app deve essere aperta sulla partita, a schermo acceso (6.3). Se la riga dice *Non collegato*, premi un tasto per svegliarlo oppure riaccoppialo dalle impostazioni Bluetooth.
+- **Il telecomando non fa niente**: è associato al giocatore (*Altro › Impostazioni › Dispositivi* › *Telecomandi*, riga col suo nome)? L'app deve essere aperta sulla partita, a schermo acceso (6.3). Se la riga dice *Non collegato*, premi un tasto per svegliarlo oppure riaccoppialo dalle impostazioni Bluetooth.
 - **I colpi vengono confusi o risultano non riconosciuti**: il braccialetto va portato come durante la calibrazione (stesso polso, stesso verso); altrimenti rifai la calibrazione indossandolo come in partita (6.4).
 - **Il braccialetto mostra MEMORIA PIENA**: un esempio di calibrazione non si è potuto salvare. Cancella gli esempi di un colpo (cestino) e rifalli.
 - **Il telefono-tabellone non trova l'arbitro**: stessa rete? (uno dei due fa l'hotspot, l'altro è collegato). *Tabellone su TV* acceso sull'arbitro? Prova l'indirizzo a mano. Alcuni hotspot isolano i dispositivi collegati tra loro ("isolamento client"): se c'è, disattivalo.
@@ -11116,20 +11105,20 @@ TSM_EOF
 cat > "$DEST/app/src/main/assets/help/pt.md" << 'TSM_EOF'
 ## 3.1 Como o app está organizado
 
-Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo (marcar o placar, jogar com as pulseiras, treinar, filmar partidas) e o seu nome; dá para pular e refazer em **Mais › Apresentação do app**. Embaixo há sempre **cinco abas**:
+Na **primeira vez** o app pergunta o idioma, quem o usa (os papéis), o seu nome, como vai usá-lo e, para a secretaria, o clube; dá para pular e refazer em **Mais › Apresentação do app**. Embaixo ficam as abas do **papel ativo**, que aparece sempre no alto: toque nele para passar a outro papel ou abrir **Papéis e funções**. **Cada função fica num só papel** (7.9): Você joga, o Treinador acompanha os alunos, o Clube cuida da secretaria. Com o papel **Você**:
 
-- **Jogar**: **Nova partida**, a partida suspensa para retomar, **Como da última vez** (mesmos jogadores, quadra e regras: as regras cabem numa linha e vai-se direto para o sorteio; *Mudar modo ou regras* reabre-as), o **torneio entre amigos** (Americano, Mexicano) e **Usar este telefone como** placar ou câmera. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
+- **Jogar**: **Nova partida**, as partidas suspensas para retomar (mantendo pressionado apaga-se uma), **Como da última vez** (mesmos jogadores, quadra e regras, direto para o sorteio; *Mudar modo ou regras* reabre-as), o **torneio entre amigos** (Americano, Mexicano) e, em **Este telefone**, o placar, o telefone-câmera e **Gravar com este telefone**. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
+- **Clube** (só depois do convite do seu clube, 7.18): as novidades do mural e das conversas, **Reservar quadra**, as suas reservas, **Procuro parceiro** e o chat do clube.
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
-- **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
-- **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
-- **Mais**: **Você** (o seu nome), **Jogadores** (o banco: 7.7), **Perfil e dados** (backup, restauração, apagar: 7.8), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
+- **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar), **O meu ano**, **As minhas raquetes**.
+- **Mais**: **Você** (a sua ficha), **Jogadores** (o banco: 7.7) e, iguais em todos os papéis, **Configurações** (o idioma; a voz do árbitro; os dispositivos: pulseiras, controles, cintas, segundo telefone, placar na TV; papéis e funções; backup e dados, 7.8; no fim **Sobre o app** com a versão do app, a licença e o código-fonte), **Ajuda** (este guia, com pesquisa e referências para tocar) e **Apresentação do app**.
 
-**Nova partida** são dois passos: **quem joga** (simples ou duplas, os nomes, com os jogadores recentes para tocar, e o esporte; clube, quadra e torneio em *Mais detalhes*) e **como você marca o placar e as regras**. Tudo é opcional: dá para seguir mesmo sem nomes. De cada tela **Voltar** retorna à aba de onde se veio.
+**Nova partida** são três passos curtos: **quem joga** (simples ou duplas, os jogadores do banco, com os recentes para tocar, e o esporte; classificação, homem/mulher e raquete cabem numa linha sob os nomes e abrem-se com *Trocar*; clube, quadra, torneio e local em *Mais detalhes*), **como você marca o placar e o formato** (as outras regras cabem numa linha, *Trocar* abre-as) e o **sorteio**. Tudo é opcional: dá para seguir mesmo sem nomes. **Voltar** retorna sempre de onde você veio.
 
 ## 4. A voz (funciona sem internet)
 
 - Cada anúncio é lido **numa única frase** pela síntese de voz do telefone, com uma voz instalada: sem internet e com prosódia natural. Os nomes dos jogadores entram na frase.
-- Mais › **Idioma e voz** › **Áudio e voz**:
+- Mais › **Configurações** › **Voz do árbitro** › **Áudio e voz**:
   - **Mecanismo de síntese de voz**: *Padrão do telefone* (nos Samsung é o Samsung TTS) ou um mecanismo à sua escolha, por exemplo *Serviços de voz do Google*. Nos testes, feitos em italiano, o Google soou mais natural.
   - **Voz**: *Automática (melhor offline)* ou uma voz específica (o Google lista as vozes por código, como *Voz* seguido de três letras; as marcadas como *online* precisam de internet).
   - **Testar voz**: lê uma sequência de anúncios de exemplo com os nomes digitados. Enquanto lê, o botão vira **Parar o teste**: toque de novo para interrompê-lo (ele também para sozinho quando você sai da página). A síntese de voz não pode ser pausada no meio de uma frase, por isso o botão a interrompe; tocando de novo, ela recomeça do início.
@@ -11143,7 +11132,7 @@ Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo 
 
 ### 4.1 Idiomas
 
-Mais › **Idioma e voz** › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito no próprio idioma, para que você o encontre mesmo com o app num idioma que não lê). A escolha vale ao mesmo tempo para **telas, voz do árbitro, placar na TV, resumo/compartilhamento e pulseiras**. As datas seguem o idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+Mais › **Configurações** › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito no próprio idioma, para que você o encontre mesmo com o app num idioma que não lê). A escolha vale ao mesmo tempo para **telas, voz do árbitro, placar na TV, resumo/compartilhamento e pulseiras**. As datas seguem o idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 Os anúncios não são traduções palavra por palavra: seguem os textos oficiais para árbitros de cadeira de cada federação, ou seja, FFT *L'arbitrage en 255 questions* e ITF em francês, os materiais DTB/BTV e Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (o único roteiro português publicado). O inglês segue a ITF. Em inglês, o zero dos sets no fim da partida é dito *love* ("six love, six four"), como nos pontos.
 
@@ -11176,7 +11165,7 @@ Particularidades:
 | **KEY2** longo (2 s) | desliga a pulseira (com o cabo conectado mostra *CONTINUA CARREGANDO*: ela carrega mesmo desligada; a partir do firmware 2.3, KEY1 ou KEY2 também a ligam de novo) |
 | Botão lateral | um clique liga; clique duplo desliga (função do hardware) |
 
-- Ao ligar, pisca **PAREANDO...** (acesa 0,35 s a cada 2 s, para economizar). O app se conecta sozinho às pulseiras que já conhece assim que é aberto; as novas ele encontra em **Mais › Dispositivos** (ou em **Modo e regras** com o modo *Pulseiras*).
+- Ao ligar, pisca **PAREANDO...** (acesa 0,35 s a cada 2 s, para economizar). O app se conecta sozinho às pulseiras que já conhece assim que é aberto; as novas ele encontra em **Mais › Configurações › Dispositivos** (ou em **Modo e regras** com o modo *Pulseiras*).
 - Conectada: **PAREADA** por 3 segundos com dois bipes, depois **PAREADA COM** + o nome do jogador.
 - A cada ponto a tela acende com o placar do jogo em tamanho grande (à esquerda o seu, à direita o do adversário; a bolinha verde indica quem serve) e depois apaga. No fim do jogo mostra jogos e sets. Se o telefone não confirmar um toque em 8 segundos (conexão perdida), aparece **NAO ENVIADO** em vermelho com dois bipes graves: pressione de novo quando ela tiver reconectado. Já um toque feito durante uma queda curta não se perde: é enviado assim que a pulseira reconecta, e o bipe toca nesse momento.
 
@@ -11198,7 +11187,7 @@ O resto da economia: CPU a 80 MHz, tela apagada quando não é necessária, Blue
 
 ### 6.1 Ajustes da pulseira
 
-Em **Mais › Dispositivos** ou **Modo e regras** (**Ajustes** embaixo da pulseira de cada jogador) ou durante a partida (toque em **J1**/**J2** no alto, ou no ícone dos controles deslizantes). Eles são salvos **na pulseira** e continuam valendo mesmo depois de desligá-la; a cada mudança a pulseira mostra o nome com *AJUSTES OK*. Com o firmware 2.4 há também a seção **Golpes** (6.4).
+Em **Mais › Configurações › Dispositivos** ou **Modo e regras** (**Ajustes** embaixo da pulseira de cada jogador) ou durante a partida (toque em **J1**/**J2** no alto, ou no ícone dos controles deslizantes). Eles são salvos **na pulseira** e continuam valendo mesmo depois de desligá-la; a cada mudança a pulseira mostra o nome com *AJUSTES OK*. Com o firmware 2.4 há também a seção **Golpes** (6.4).
 
 | Ajuste | Valores | Padrão |
 |---|---|---|
@@ -11240,7 +11229,7 @@ Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 
 
 O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles Bluetooth de selfie** (os de botão de disparo, muitas vezes vendidos como *AB Shutter3*), que custam muito pouco. O Android os vê como um teclado: nenhum firmware para gravar e nenhuma permissão para o app. Qualquer outro teclado ou botoeira Bluetooth (ou USB) também serve.
 
-1. Ligue o controle e pareie nas **configurações de Bluetooth** do telefone, como um fone de ouvido (*Mais › Dispositivos › Configurações de Bluetooth* abre a tela). Repita com o segundo.
+1. Ligue o controle e pareie nas **configurações de Bluetooth** do telefone, como um fone de ouvido (*Mais › Configurações › Dispositivos › Configurações de Bluetooth* abre a tela). Repita com o segundo.
 2. *Modo e regras* › modo **Controles** › **Associar** embaixo do Jogador 1 › aperte a tecla do controle dele que vai dar o ponto; depois o mesmo para o Jogador 2. A cada clique de um controle associado a linha dele mostra **Tecla recebida**: assim dá para testar antes de jogar. **Trocar J1 ↔ J2** inverte os dois.
 3. **INÍCIO DA PARTIDA**: um clique num controle começa a partida, como o KEY1 das pulseiras. No alto, **J1**/**J2** ficam coloridos quando os controles estão conectados.
 
@@ -11279,7 +11268,7 @@ Com o firmware 2.4 a pulseira reconhece **forehand, backhand, saque e voleio** c
 Frequência cardíaca e calorias de **cintas peitorais Bluetooth** com o serviço cardíaco padrão: Coospo (testada a H6), Magene, Polar, Garmin, Wahoo… Valem em todos os modos, mesmo sem pulseiras.
 
 1. Molhe os eletrodos e coloque a cinta: ela liga sozinha em contato com a pele.
-2. *Modo e regras* (ou *Mais › Dispositivos*) › **Frequência cardíaca** › ative **Cintas cardíacas** e escolha a cinta de cada jogador (uma vez só). **Trocar** as inverte.
+2. *Modo e regras* (ou *Mais › Configurações › Dispositivos*) › **Frequência cardíaca** › ative **Cintas cardíacas** e escolha a cinta de cada jogador (uma vez só). **Trocar** as inverte.
 3. **Idade, peso e sexo** de quem a usa (opcionais): para as calorias (fórmula de Keytel, erro típico ±20%) e, com a idade, para as zonas cardíacas (máximo estimado 208 − 0,7 × idade).
 
 - Sob cada cinta: estado, frequência, **sinal** em dBm (mais perto de 0 = mais forte) e **quedas**, ou seja, as vezes em que a frequência não chegou por mais de 3 segundos, com os segundos perdidos (*2 quedas (14 s)*). Contam a partir do «jogo» da partida; antes, desde a escolha da cinta. Mostram até onde a cinta alcança.
@@ -11290,8 +11279,8 @@ Frequência cardíaca e calorias de **cintas peitorais Bluetooth** com o serviç
 
 Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros a menos que o comprimento da quadra. Com um segundo telefone atrás da outra linha de fundo cada jogador sempre tem um por perto: o segundo (**satélite**) capta as cintas e pulseiras dos jogadores do seu lado e faz a ponte com o **principal**, que controla a partida.
 
-1. **Principal**: Mais › **Dispositivos** › **Segundo telefone** › **Usar um segundo telefone**. Na primeira vez pede a permissão *Dispositivos próximos* (a localização até o Android 12). O telefone cria a sua **própria rede, só local**: sem SIM nem dados, e sem precisar do Wi-Fi do clube. Aparece um QR.
-2. **Satélite**: Mais › **Dispositivos** › **Segundo telefone** › **Servir de segundo telefone** › escaneie o QR. O Android pede uma vez para conectar à rede do principal (*AndroidShare_…*): toque em **Conectar**. O satélite mantém os dados móveis. Deve mostrar *Conectado ao telefone principal*.
+1. **Principal**: Mais › **Configurações** › **Dispositivos** › **Segundo telefone** › **Usar um segundo telefone**. Na primeira vez pede a permissão *Dispositivos próximos* (a localização até o Android 12). O telefone cria a sua **própria rede, só local**: sem SIM nem dados, e sem precisar do Wi-Fi do clube. Aparece um QR.
+2. **Satélite**: Mais › **Configurações** › **Dispositivos** › **Segundo telefone** › **Servir de segundo telefone** › escaneie o QR. O Android pede uma vez para conectar à rede do principal (*AndroidShare_…*): toque em **Conectar**. O satélite mantém os dados móveis. Deve mostrar *Conectado ao telefone principal*.
 3. O satélite segue sozinho as cintas e pulseiras escolhidas no principal, nos mesmos lados: não é preciso escolher nada. Deixe-o atrás da linha de fundo com o app aberto.
 
 - **Troca de lado**: não é preciso fazer nada. Cada cinta e cada pulseira fica com o telefone a que está conectada enquanto o sinal aguentar; depois o telefone mais próximo a assume (alguns segundos). No principal aparece *Pelo segundo telefone*; durante a passagem uma pulseira pode aparecer desconectada por um instante.
@@ -11308,19 +11297,19 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
    - *Árbitro*, *Pulseiras* ou *Controles* (6.3). Com as pulseiras são obrigatórios Bluetooth ligado, permissão de localização e localização ativada: as linhas dos **Requisitos** se atualizam em tempo real (mesmo se você desligar o Bluetooth ou a localização pelo painel de notificações) e ficam vermelhas, com o botão para corrigir.
    - A **busca é automática e contínua** enquanto a página estiver aberta: ligue as pulseiras e elas ocupam sozinhas os lugares livres (primeiro Jogador 1, depois Jogador 2). **Identificar** faz aquela pulseira piscar na cor do jogador (amarelo ou vermelho) com bipes, para você ver logo qual tem na mão; **Trocar J1 ↔ J2** as inverte sem desconectá-las. No menu suspenso você sempre pode escolher outra ou *Nenhuma* (a que for tirada à mão não é recolocada pela busca). Uma pulseira não pode ficar com dois jogadores.
    - **Desligar as pulseiras no fim da partida e ao sair** (ativado por padrão): ao confirmar *Partida encerrada* e com *Sair*, as pulseiras se desligam em vez de esperar a inatividade.
-   - No modo árbitro, tocando em **Avançar** sem localização aparece o convite para ativá-la (senão o local não vai constar no resumo).
-   - Formato (*3 sets*, *5 sets*, *2 sets + tie-break decisivo a 10*, *pro set* de 8 ou 10 jogos, *só tie-break decisivo a 10*), jogos por set (6, ou 4 em sets curtos com tie-break no 4-4), tie-break nos sets sim/não (não: o set continua até alguém ter 2 jogos de vantagem), *Sem vantagem* (No-Ad). Idioma e voz ficam em *Mais › Idioma e voz* (4.1).
-   - **Sorteio**: a moeda gira e indica quem vence; você define quem serve e os lados da quadra **vistos da cadeira do árbitro** (esquema da quadra com **Inverter lados**). Nas duplas, escolha também quem serve primeiro em cada equipe.
+   - No modo árbitro, na primeira vez que você toca em **Avançar** sem localização aparece, uma vez só, o convite para ativá-la: com *Continuar sem* o local não vai constar no resumo (reativa-se em *Nova partida › Mais detalhes › Local da partida*).
+   - Formato (*3 sets*, *5 sets*, *2 sets + tie-break decisivo a 10*, *pro set* de 8 ou 10 jogos, *só tie-break decisivo a 10*), jogos por set (6, ou 4 em sets curtos com tie-break no 4-4), tie-break nos sets sim/não (não: o set continua até alguém ter 2 jogos de vantagem), *Sem vantagem* (No-Ad). Exceto o formato, estas regras (e a troca de bolas) ficam recolhidas em **Outras regras**, uma linha que *Trocar* abre. Idioma e voz ficam em *Mais › Configurações* (4.1).
+   - **Sorteio** (passo 3, uma página própria): a moeda gira e indica quem vence; você define quem serve e os lados da quadra **vistos da cadeira do árbitro** (esquema da quadra com **Inverter lados**). Nas duplas, escolha também quem serve primeiro em cada equipe.
 3. **INÍCIO DA PARTIDA** pisca: toque no botão, pressione KEY1 de uma pulseira ou aperte um controle. A voz diz *"Primeiro set" · "[nome] ao serviço" · "joguem"* com 1 segundo entre as frases; o **Match Time** começa em "joguem".
-4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), *Nova partida*, **Sair**. No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira. Um toque duplo em *Anular ponto* tira um ponto só (um segundo toque em menos de 1 s não conta); logo depois de uma troca de página o segundo toque de um toque duplo é ignorado, para não cair num botão da página nova. O **cadeado** embaixo bloqueia a tela (por exemplo com o telefone no bolso ou no banco): os toques não fazem nada, pulseiras e controles sim; para desbloquear, segure o cadeado.
+4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), **Sair**: abre um menu com *Voltar ao menu* (a partida fica entre as suspensas), *Nova partida* e *Fechar o app* (**Voltar** também o abre). No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira. Um toque duplo em *Anular ponto* tira um ponto só (um segundo toque em menos de 1 s não conta); logo depois de uma troca de página o segundo toque de um toque duplo é ignorado, para não cair num botão da página nova. O **cadeado** embaixo bloqueia a tela (por exemplo com o telefone no bolso ou no banco): os toques não fazem nada, pulseiras e controles sim; para desbloquear, segure o cadeado.
 5. No último ponto aparece o popup **Partida encerrada / Anular o último ponto**. "Partida encerrada" só se confirma **no telefone**. Por meio segundo depois de aparecer, os botões dele ignoram toques: um toque duplo no último ponto não anula nada.
-6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar arquivos** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png e **PDF completo** com resultado, estatísticas da partida e de cada set, histórico e fotos). **Compartilhar** pergunta se envia a imagem com texto (para WhatsApp e redes sociais) ou o PDF completo. No Resumo, **Fotos da partida** guarda até 10 fotos de recordação (da galeria ou tiradas na hora): ficam no telefone, vão para o PDF e passam para o outro telefone com a transferência, nunca para a imagem das redes, **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**. Abaixo das fotos, **Notas** aceita um texto livre (até 2000 caracteres): salva sozinho, vai para o PDF, o texto compartilhado e os arquivos .txt e .json, e passa para o outro telefone com a transferência; não vai para a imagem das redes. A partida terminada entra sozinha no **Histórico** (aba **Progresso**): a lista das partidas, para reabrir com o resumo ou excluir, e a aba **Jogadores** com vitórias, derrotas e confronto direto de quem tem o nome escrito em *Nova partida* (maiúsculas e espaços não contam; nas duplas conta cada jogador). **Importar** adiciona as partidas salvas como .json com *Salvar arquivos* em outro telefone: as terminadas vão para o histórico e as não terminadas para as partidas suspensas para retomar. **Transferir** (no alto à direita no Histórico) passa o histórico e as partidas suspensas para outro telefone com um código QR: os dois telefones precisam estar na mesma rede Wi-Fi ou um no hotspot do outro; no que tem as partidas toque em *Enviar*, **escolha as partidas para mandar** (a última já vem marcada; há *Todas*, *Nenhuma*, *Últimos 7 dias* e *De um jogador…*), toque em *Enviar (N)* e deixe aberta a janela com o código, no outro em *Receber* e escaneie o código (precisa da permissão da câmera). Assim dá para continuar em outro telefone até uma partida em andamento: suspenda, transfira e retome. As partidas se somam às que o telefone já tem. **Fotos dos jogadores**: toque no círculo ao lado do nome em *Nova partida* (ou no detalhe do jogador no Histórico) e escolha uma foto; ela é cortada quadrada e encontrada pelo nome. Aparece no Histórico, no resumo e no placar da TV, fica só neste telefone (vai junto na transferência) e não entra na imagem compartilhada. Tocando de novo no círculo você troca ou remove a foto. Se o app fechar enquanto você está no resumo (o Android fechando o app em segundo plano, uma atualização, uma reinicialização do telefone), ele volta quando o app é reaberto; não se você mesmo saiu com *Nova partida*, *Sair* ou tirando o app dos recentes. A pasta padrão é **Documents/Tennis Score Manager** (a partir do Android 10; no Android 8 e 9 a pasta do app): qualquer gerenciador de arquivos a abre e ela fica mesmo desinstalando o app. Salvando duas vezes com o mesmo nome, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
+6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar arquivos** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png e **PDF completo** com resultado, estatísticas da partida e de cada set, histórico e fotos). **Compartilhar** pergunta se envia a imagem com texto (para WhatsApp e redes sociais) ou o PDF completo. No Resumo, **Fotos da partida** guarda até 10 fotos de recordação (da galeria ou tiradas na hora): ficam no telefone, vão para o PDF e passam para o outro telefone com a transferência, nunca para a imagem das redes, **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Concluído** (volta para onde a partida começou: a primeira tela, o torneio, a equipe ou a classificação por desafios). Abaixo das fotos, **Notas** aceita um texto livre (até 2000 caracteres): salva sozinho, vai para o PDF, o texto compartilhado e os arquivos .txt e .json, e passa para o outro telefone com a transferência; não vai para a imagem das redes. A partida terminada entra sozinha no **Histórico** (aba **Progresso**): a lista das partidas, para reabrir com o resumo ou excluir, e a aba **Jogadores** com vitórias, derrotas e confronto direto de quem tem o nome escrito em *Nova partida* (maiúsculas e espaços não contam; nas duplas conta cada jogador). **Importar** adiciona as partidas salvas como .json com *Salvar arquivos* em outro telefone: as terminadas vão para o histórico e as não terminadas para as partidas suspensas para retomar. **Transferir** (no alto à direita no Histórico) passa o histórico e as partidas suspensas para outro telefone com um código QR: os dois telefones precisam estar na mesma rede Wi-Fi ou um no hotspot do outro; no que tem as partidas toque em *Enviar*, **escolha as partidas para mandar** (a última já vem marcada; há *Todas*, *Nenhuma*, *Últimos 7 dias* e *De um jogador…*), toque em *Enviar (N)* e deixe aberta a janela com o código, no outro em *Receber* e escaneie o código (precisa da permissão da câmera). Assim dá para continuar em outro telefone até uma partida em andamento: suspenda, transfira e retome. As partidas se somam às que o telefone já tem. **Fotos dos jogadores**: toque no círculo ao lado do nome em *Nova partida* (ou no detalhe do jogador no Histórico) e escolha uma foto; ela é cortada quadrada e encontrada pelo nome. Aparece no Histórico, no resumo e no placar da TV, fica só neste telefone (vai junto na transferência) e não entra na imagem compartilhada. Tocando de novo no círculo você troca ou remove a foto. Se o app fechar enquanto você está no resumo (o Android fechando o app em segundo plano, uma atualização, uma reinicialização do telefone), ele volta quando o app é reaberto; não se você mesmo saiu com *Nova partida*, *Concluído* ou tirando o app dos recentes. A pasta padrão é **Documents/Tennis Score Manager** (a partir do Android 10; no Android 8 e 9 a pasta do app): qualquer gerenciador de arquivos a abre e ela fica mesmo desinstalando o app. Salvando duas vezes com o mesmo nome, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
 
    O resumo tem três abas. **Resumo**: os dados acima e, com as pulseiras 2.4, golpes, velocidade do pulso e golpes por ponto (6.4). **Estatísticas**, da partida ou de um set: os dois jogadores comparados com barras que saem do centro (colorida a de quem está à frente) para pontos e jogos ganhos no saque e na devolução, break points salvos e convertidos, total de pontos e jogos, pontos seguidos, últimos 10 pontos, match points salvos; com as pulseiras 2.4 também golpes por tipo e velocidade média do pulso. **Ponto a ponto**: set a set, cada jogo com a bola de quem saca, *SAQUE PERDIDO* nas quebras, o placar depois de cada ponto com **BP** (break point), **SP** (set point) e **MP** (match point) e o resultado (*JOGO*, *QUEBRA*, *SET*, *PARTIDA*). Aces, duplas faltas, primeiros saques, winners e erros aparecem se você ativar as **estatísticas detalhadas** em *Modo e regras*: no lugar dos dois botões grandes surgem *Ace* e *Falta* (na segunda vez vira *Dupla falta*) e, para cada jogador, *Winner*, *Erro* (o ponto vai para o outro) e *Ponto*; *Anular ponto* também tira uma falta. É pensado para quem marca da beira da quadra. Depois de *Erro* aparece por 6 segundos *Não forçado / Forçado*; com pulseiras ou controles, depois de cada ponto aparece *Como terminou o ponto?* (Ace, Winner, Erro): responder é opcional e o placar não muda. No Histórico, o detalhe de um jogador mostra a **evolução**: pontos ganhos partida a partida e as médias de aces, duplas faltas, primeiros saques, winners e erros. As estatísticas de cada partida contam também game, set e match points convertidos, games vencidos a zero, games seguidos, sets vencidos depois de estar um break atrás e, no cartão **Tempos**, a duração de cada set e o game mais longo.
 
    **Revanche** (no fim do resumo): propõe o mesmo dia da semana e a mesma hora, na semana seguinte, e o clube da partida; dá para mudar data, hora e local e acrescentar uma nota. **Mandar o convite** abre o compartilhamento (WhatsApp, SMS, e-mail…) com a mensagem pronta: quem contra quem, quando, onde e como terminou da última vez. **Pôr na agenda** cria o evento no app de agenda, **Preparar a partida** traz de volta para *Nova partida* jogadores, clube, quadra e regras (o torneio não). Sem conta: o convite passa pelos canais que você já usa.
 
-**Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela aba **Jogar**.
+**Sair**: na partida **Sair** (ou **Voltar**) abre um menu: **Voltar ao menu** (a partida fica entre as suspensas: retome-a em *Jogar*, ou em *Torneios* com o papel Clube), **Nova partida** e **Fechar o app**, que fecha de verdade o app como tirá-lo dos apps recentes. No resumo **Concluído** (ou Voltar) volta para onde a partida começou. Ao reabrir, o app começa pela primeira aba.
 
 **Desistência**: o botão **Árbitro** (o martelo) abaixo do placar, em **Desistência**, pergunta quem desiste e termina a partida com esse placar, sem os pontos do game em andamento (ex. `6-3 2-1 desist.`). O adversário vence, a voz anuncia e, antes de concluir, **Desfazer a desistência** deixa tudo como estava. Nos torneios o resultado entra sozinho com a desistência marcada; a partida conta como vitória, mas não pesa no rating TSM.
 
@@ -11367,15 +11356,15 @@ Para treinar com a cinta cardíaca sem partida: **Treinar** › **Treino com a c
 
 Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do árbitro.
 
-1. **Árbitro**: Mais › **Dispositivos** › **Segundo telefone** › **Usar um segundo telefone** (QR, como em 6.6).
-2. **Câmera**: Mais › **Dispositivos** › **Segundo telefone** › **Servir de câmera**, escaneie o QR e depois **Abrir a câmera** (permissões de câmera e microfone; o telefone precisa gravar em 1080p). Com *Placar conectado* o gráfico do placar está no vídeo (**Gráfico** liga ou desliga); sem árbitro grava só o vídeo.
+1. **Árbitro**: Mais › **Configurações** › **Dispositivos** › **Segundo telefone** › **Usar um segundo telefone** (QR, como em 6.6).
+2. **Câmera**: Mais › **Configurações** › **Dispositivos** › **Segundo telefone** › **Servir de câmera**, escaneie o QR e depois **Abrir a câmera** (permissões de câmera e microfone; o telefone precisa gravar em 1080p). Com *Placar conectado* o gráfico do placar está no vídeo (**Gráfico** liga ou desliga); sem árbitro grava só o vídeo.
    - **Gravar / Parar**: o vídeo vai para a galeria (*Filmes/Tennis Score Manager*) com capítulos, um por ponto.
    - **Ao vivo**: transmissão RTMP no YouTube, Twitch, Facebook ou num servidor seu; servidor e chave da transmissão em *Ao vivo: servidor*.
    - **Enquadrar** (assistente de enquadramento): informe a quantos metros atrás da linha de fundo e a que altura você colocou o telefone e em que quadra joga; o app indica a inclinação para baixo que mantém no vídeo as duas linhas de fundo e o jogador distante, e diz se a quadra cabe na largura. Muitas vezes o limite é a largura: da grade (cerca de 6 m) a lente principal corta os cantos próximos, a **grande-angular** não (**Usar a lente…**, ou o botão **Lente**, com a gravação parada). Com **Mostrar o nível** a pré-visualização mostra o horizonte e indicações (*aponte 2° mais para baixo*, *gire no sentido horário*…), em verde quando está certo, com uma vibração quando o telefone está na posição. O nível aparece também na janela **Câmera** do telefone do árbitro. Os sensores não sabem esquerda e direita: confira a olho se a rede está no centro.
    - **Contorno** (contorno da quadra): a pré-visualização mostra as linhas da quadra como a lente as vê, e elas acompanham o telefone quando você o inclina. Mova os controles (**Distância**, **Altura**, **Direção**, **Deslocamento lateral** e, se preciso, **Campo de visão** e **Correção da inclinação**) até coincidirem com as linhas reais: assim se acerta também o centro, e a inclinação sugerida fica precisa. O ajuste é lembrado para a quadra da partida (*Clube · Quadra* do árbitro) e recuperado na próxima vez. Contorno e controles também estão na janela **Câmera** do árbitro. Quanto mais alto o telefone, melhor se vê a metade distante da quadra: a 2,5 m ela fica espremida logo acima da rede.
-3. **Câmera no alto, comandada pelo árbitro**: no telefone do árbitro, **Câmera** (ao lado de *Replay* durante a partida, ou *Enquadramento e comandos da câmera* na Mais › **Dispositivos** › **Segundo telefone**, útil para ajustá-la antes de começar) mostra o enquadramento do telefone-câmera como fica no vídeo, com o gráfico, e **Gravar / Parar**, **Ao vivo**, **Gráfico** e o **zoom**. Mostra também a duração da gravação, a bateria e o espaço livre (em laranja quando baixos). A imagem é pequena e aos saltos (cerca de 3 quadros por segundo) e só é enviada enquanto se olha; a chave da transmissão é colocada no telefone-câmera.
+3. **Câmera no alto, comandada pelo árbitro**: no telefone do árbitro, **Câmera** (ao lado de *Replay* durante a partida, ou *Enquadramento e comandos da câmera* na Mais › **Configurações** › **Dispositivos** › **Segundo telefone**, útil para ajustá-la antes de começar) mostra o enquadramento do telefone-câmera como fica no vídeo, com o gráfico, e **Gravar / Parar**, **Ao vivo**, **Gráfico** e o **zoom**. Mostra também a duração da gravação, a bateria e o espaço livre (em laranja quando baixos). A imagem é pequena e aos saltos (cerca de 3 quadros por segundo) e só é enviada enquanto se olha; a chave da transmissão é colocada no telefone-câmera.
 
-- **Vídeo** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*.
+- **Progresso** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*.
 - **Filtros do treinador** (ícone do filtro): só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points. **Reproduzir** coloca-os em sequência.
 - **Melhores momentos**: montagem automática dos melhores pontos (aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
   - **Estatísticas no fim do vídeo**: 2 ou 3 telas de 10 segundos como nas transmissões dos torneios: saque e break points; pontos, erros e trocas de bola curtas e longas; batimentos, se a cinta foi usada. A partida é a do histórico jogada durante a gravação, ou a dos pontos marcados num vídeo importado. Nas laterais, a foto do jogador; sem foto, um retrato estilizado de homem ou de mulher (escolha **Homem / Mulher** em *Nova partida*) (sem escolha, o do homem; vale em todo o app, também em *Nova partida*, no histórico, no resumo, no PDF e no placar da TV); embaixo, a porcentagem de pontos ganhos. No alto, torneio, categoria e fase (*Mais detalhes* em *Nova partida*), ou clube e quadra.
@@ -11421,8 +11410,8 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 
 ### 7.6 Alunos: a parte do treinador
 
-- **Treinar › Alunos** › **Novo aluno**: nome (o mesmo das partidas: assim foto, histórico e rating aparecem sozinhos) e mão.
-- **Quem treina**: em Treinar, acima de *Começar*, escolha o aluno (ou *Nenhum aluno*). A sessão é dele: as últimas sessões, *Todas as sessões*, a evolução em Progresso e os números nos botões dos golpes são só dele, e os clipes vão para **Treino de golpes/<golpe>/<aluno>/<data e hora>**.
+- **Alunos** (papel Treinador) › **Novo aluno**: nome (o mesmo das partidas: assim foto, histórico e rating aparecem sozinhos) e mão.
+- **Quem treina**: na aba Alunos do papel Treinador, acima de *Começar*, escolha o aluno (no papel Você quem treina é você, sem aluno). A sessão é dele: as últimas sessões, *Todas as sessões*, a evolução em Progresso e os números nos botões dos golpes são só dele, e os clipes vão para **Treino de golpes/<golpe>/<aluno>/<data e hora>**.
 - **A ficha do aluno** (toque no nome em *Alunos*):
   - **Golpes**: para saque, forehand, backhand e voleio as sessões, os golpes, a última vez e a linha dos golpes dentro; tocando num golpe abrem-se as sessões dele.
   - **Movimento**: as medidas da análise (6.4 e 7.5) da última sessão analisada ao lado da anterior, para ver o que muda.
@@ -11444,7 +11433,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Altura e peso**: com idade e sexo fazem as **calorias da cinta cardíaca** se calcularem sozinhas quando o jogador joga ou, se é você, treina (sem eles o app pede à parte ou não calcula).
   - **Clube de origem**: aparece na ficha; útil para convidados e adversários de outros clubes, para saber quem são.
   - **Mão e backhand** (com uma ou duas mãos): descrevem o jogador na ficha, útil para o treinador; a análise do movimento reconhece sozinha o braço que bate.
-  - **Aluno**: coloca-o entre os alunos do treinador (Treinar › Alunos, *Quem treina*), com sessões, movimento e relatório.
+  - **Aluno**: coloca-o entre os alunos do treinador (papel Treinador, aba Alunos e *Quem treina*), com sessões, movimento e relatório.
   - **Telefone e e-mail**: servem para os **avisos** (WhatsApp, SMS, e-mail: torneios, mensalidades, convocações) mesmo que não seja sócio.
   - **Raquete**: vai com cada sessão e partida como estava naquele dia (cordas e tensão) e comparam-se as estatísticas; se não existe, *Nova raquete* cria-a dali.
   - Ranking, cartões e atestado não ficam aqui: ficam nos *Dados do sócio*, porque servem para torneios e mensalidades.
@@ -11457,10 +11446,10 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - **Partidas de outro telefone** (transferência ou *Importar*): um jogador que o telefone conhece se liga sozinho; um novo entra com o identificador dele; se tem o nome de um dos seus o app pergunta uma vez **Quem é?** (*Sim, é ele* liga os dois e da próxima vez reconhece; *Não, outra pessoa* adiciona). Partidas de versões antigas, sem jogadores, se ligam pelo nome.
 - A **foto** e **homem/mulher** ainda valem para o nome: dois homônimos as compartilham.
 
-### 7.8 Você, e Perfil e dados
+### 7.8 Você, e Backup e dados
 
 - **Você** é o seu jogador do banco: Progresso e rating partem dele. Na primeira abertura bastam nome e sobrenome (e apelido); depois **Mais › Você** abre a sua ficha. Se ainda não escolheu, *Quem é você?* oferece os jogadores que existem (você já jogou partidas) ou **Sou novo**. Na ficha de outro jogador, **Sou eu** faz dele o seu.
-- **Mais › Perfil e dados**:
+- **Mais › Configurações › Backup e dados**:
   - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
   - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
   - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
@@ -11469,15 +11458,15 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 
 ### 7.9 Papéis: Você, Treinador, Clube
 
-- Em **Mais › Perfil e dados › Papéis** (e na primeira abertura) você escolhe quem usa o app; pode ter mais de um. Os papéis mudam as abas da primeira tela, **os dados são os mesmos**; com vários papéis, no alto aparece o ativo: toque para passar a outro.
-  - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
-  - **O que usas** (Mais): fica-se só com o que é preciso. Pulseiras e comandos, cintas cardíacas, treino de pancadas e alunos, vídeo e câmara, progressos e rating, raquetes, padel: o que se desliga não aparece, e os separadores que ficam vazios (Treinar, Vídeo) desaparecem; o histórico fica sempre (sem Progressos passa para Jogar). No início está tudo ligado; na primeira apresentação a app propõe o que manter a partir da resposta a «como vais usá-la». Mais está dividido em grupos: Dispositivos e voz, Dados, Ajuda.
-  - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
-  - **Clube**: **Hoje** (as reservas do dia, o que há por receber, os sócios por regularizar, os jogos de torneio, as aulas, os encontros e os desafios: toca-se num quadro para lá ir), **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
-  - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras, Servidor do clube e Secretaria no PC. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
-  - O **?** em cima em muitos ecrãs abre o guia logo na secção desse ecrã.
-- O placar está em todos os papéis: nada impede você de marcar uma partida.
-- **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
+- Os papéis dizem quem usa o app: escolhem-se na primeira vez ou em **Mais › Configurações › Papéis e funções** (também tocando no papel no alto, sempre visível) e você pode ter mais de um. **Cada função fica num só papel**, sem duplicatas; os dados são os mesmos e ao mudar de papel nada se perde.
+  - **Você** (você joga): **Jogar** (o marcador, o torneio entre amigos, o telefone como placar ou câmera), **Clube** (só depois do convite: reservas e chat), **Treinar**, **Progresso** (rating, histórico, vídeos, raquetes), Mais (a sua ficha, os jogadores).
+  - **Treinador** (você treina outros): **Alunos** (a lista, os exercícios e o treino de golpes de quem treina com você), Mais. As partidas são marcadas no papel Você; *Treinar agora* na ficha de um aluno traz para cá com ele já escolhido.
+  - **Clube** (a secretaria): **Hoje** (as reservas do dia, o que há para receber, os sócios a regularizar, as partidas dos torneios, as aulas, os confrontos e os desafios: toque num quadro para ir até lá), **Agenda** (as quadras do dia, na hora), **Sócios** (sócios, mensalidades e pagamentos, escola de tênis, mensagem a todos os sócios), **Torneios** (torneios, equipes, classificação por desafios: as partidas são marcadas dali com *Jogar com o marcador* e as que ficaram pela metade retomam-se dali), Mais (**O clube**: nome, quadras, horários e preços, servidor, secretaria no PC, cópia da secretaria).
+  - **Mais** tem em todos os papéis o que é do app: **Configurações** (idioma, voz do árbitro, dispositivos, papéis e funções, backup e dados e, no fim, **Sobre o app** com a versão do app, a licença e o código-fonte), **Ajuda** e **Apresentação do app**.
+  - **Papéis e funções** deixa nos menus só o que é preciso. Para Você e Treinador, **O que usas**: pulseiras e controles, cintas cardíacas, treino de golpes, vídeo e câmera, progressos e rating, raquetes, padel; o que se desliga não aparece e as abas que ficam vazias somem (sem Progresso o histórico vai para Jogar). Para o Clube, **Funções do clube**: de base Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; além disso Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras, Servidor do clube e Secretaria no PC. Os dados das funções desligadas ficam.
+  - O **?** no alto de muitas telas abre o guia justamente na seção daquela tela.
+- Para quem já tinha o app, na primeira vez ligam-se sozinhos os papéis de que já há dados (partidas, treinos e reservas são de Você, os alunos do Treinador): nada some.
+- **Primeira vez**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **backup automático** (ligado por padrão) e o **lembrete de backup** (se você desligar o automático, a cada 30 dias a primeira tela lembra de fazer um); estão também em Backup e dados.
 
 ### 7.10 Exercícios guiados
 
@@ -11487,7 +11476,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 
 ### 7.11 Sócios do clube
 
-Com o papel **Clube**, em **Jogadores › Sócios** fica a lista dos inscritos, pensada para o aparelho da secretaria.
+Com o papel **Clube**, em **Sócios › Sócios** fica a lista dos inscritos, pensada para o aparelho da secretaria.
 
 - **Novo sócio**: escolha um jogador que já existe (quem jogou partidas ou um aluno) ou crie um novo. Na ficha de um jogador também dá para tocar em **Inscrever como sócio**.
 - **Dados do sócio**: telefone e e-mail (servem para os avisos), data de nascimento, sócio desde, cartão do clube; **cartão FITP** com número, tipo (competição, não competição, outro), ano e ranking; **atestado médico** com tipo e vencimento; consentimento ao tratamento de dados e a fotos e vídeos. Para os **menores**, também o responsável e o telefone dele.
@@ -11497,7 +11486,7 @@ Com o papel **Clube**, em **Jogadores › Sócios** fica a lista dos inscritos, 
 
 ### 7.12 Mensalidades e pagamentos
 
-Em **Jogadores › Mensalidades e pagamentos** (papel Clube) fica o registro do clube. O app **registra** os pagamentos, não os recebe: nenhum cartão ou conta vinculado.
+Em **Sócios › Mensalidades e pagamentos** (papel Clube) fica o registro do clube. O app **registra** os pagamentos, não os recebe: nenhum cartão ou conta vinculado.
 
 - **Nova mensalidade**: nome (ex. *Anuidade 2027*), tipo (anuidade, cartão FITP, curso, torneio, outro), valor e, se precisar, o vencimento. Tocando numa mensalidade, **Cobrar de todos os sócios** a atribui a quem ainda não a tem; embaixo se vê quantos pagaram.
 - Na ficha do sócio, **Mensalidades e pagamentos** mostra o que ele deve: *pago*, *a pagar*, *faltam 100,00 €*, em vermelho *atrasado* depois do vencimento. **Nova cobrança** adiciona uma mensalidade do clube ou outro valor (uma aula, um encordoamento).
@@ -11505,7 +11494,7 @@ Em **Jogadores › Mensalidades e pagamentos** (papel Clube) fica o registro do 
 - Um pagamento errado se cancela (o número do recibo não é reutilizado); uma cobrança sem pagamentos se exclui, com pagamentos se **cancela**: não é mais devida e os pagamentos ficam no registro.
 - No alto: recebido no ano e o que falta receber; **A receber** lista quem deve, da maior dívida para a menor. Também em *Sócios* quem deve algo está entre os *a resolver*.
 - **Exportar os pagamentos (CSV)**: todos os pagamentos do ano com data, recibo, nome, descrição, método, referência e valor, para a planilha do contador.
-- Ao excluir um jogador somem as cobranças não pagas; os pagamentos feitos ficam com o nome, porque são contabilidade. O registro está no backup de *Perfil e dados*.
+- Ao excluir um jogador somem as cobranças não pagas; os pagamentos feitos ficam com o nome, porque são contabilidade. O registro está no backup de *Backup e dados*.
 
 ### 7.13 Torneios do clube
 
@@ -11533,7 +11522,7 @@ O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre 
 
 ### 7.15 Quadras e agenda
 
-Com o papel **Clube**, na aba **Quadras**.
+Com o papel **Clube**, na aba **Agenda** (o nome do clube, as quadras e *Horários e preços* ficam também em **Mais**, grupo *O clube*).
 
 - **As quadras**: crie uma quadra (**Nova quadra**), ordene e toque numa para mudá-la: nome (ao renomear, reservas, períodos e partidas dos torneios acompanham), piso (**saibro, grama, rápida**, outro), **coberta ou descoberta**, **iluminação**, **aquecimento**, os **preços** dela (por hora, com iluminação, adicional de aquecimento por hora; vazios = os gerais) e **uma ou mais fotos** da galeria. **Excluir a quadra** remove também as reservas dela a partir de hoje.
 - **Agenda das quadras**: o dia com uma quadra por coluna e uma hora por linha (◀ ▶ e o calendário para mudar de dia). Toque num horário livre para reservar: quadra, dia, hora e duração, tipo (jogo, aula, fechada, outro), jogadores do banco de dados e convidados, nota. O **preço** se calcula sozinho (iluminação a partir da hora definida, aquecimento se pedido) e pode ser alterado; **Cobrar dos jogadores** divide em partes iguais e leva para *Mensalidades e pagamentos*. **Como se paga**: *na quadra* ou *online*; com a reserva cobrada, **Pago: …** marca como paga com um dos meios de pagamento do clube. **Toda semana por N semanas** repete a reserva (as datas com a quadra ocupada são puladas e o app avisa). **Avisar os jogadores** envia quadra, dia, hora e como pagar.
@@ -11545,7 +11534,7 @@ Com o papel **Clube**, na aba **Quadras**.
 
 ### 7.16 Escola de tênis
 
-Com o papel **Clube**, em **Jogadores › Escola de tênis**.
+Com o papel **Clube**, em **Sócios › Escola de tênis**.
 
 - **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza.
 - **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
@@ -11571,10 +11560,10 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 **Número e PIN, vários clubes**: depois do primeiro convite o jogador pode escolher **número de telefone e PIN** (na página do clube e na app, em **Minhas**). Assim, se trocar de telefone ou sair, volta a entrar sozinho com **Já tem um PIN?**, sem novo convite. Depois de 5 PIN errados espera-se um quarto de hora; depois de 20 o PIN já não vale e a secretaria repõe-no a partir da ficha do sócio (**Repor o PIN**). Na app pode-se entrar em **vários clubes**: **Adicionar um clube** em **Minhas**, depois escolhe-se o clube em cima; lembretes e avisos chegam de todos, com o nome do clube.
 
 - **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
-- **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
+- **Emparelhar a secretaria**: *Mais › Servidor do clube* (depois de ativá-lo em *Papéis e funções › Funções do clube*): endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
 - **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).
 - **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR. No iPhone a página **TSM** guia-o: *Partilhar › Adicionar ao ecrã principal*, depois abre o TSM a partir do ecrã principal e cola o código (o Safari e a app do ecrã principal não partilham dados, por isso o convite usa-se na app instalada). Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
-- **Com a app TSM no Android** o jogador também reserva em *Jogar › Reservar quadra*: lê o QR do convite (ou cola a ligação), depois vê as suas reservas, escolhe o dia e toca numa casa livre; duração, aquecimento e preço antes de confirmar, **Cancelar** enquanto há tempo, **Sair deste clube** para desligar o telemóvel. As regras são as mesmas da página web.
+- **Com a app TSM no Android** o jogador também reserva em *Clube › Reservar quadra* (na primeira vez em *Mais › Tenho um convite do clube*): lê o QR do convite (ou cola a ligação), depois vê as suas reservas, escolhe o dia e toca numa casa livre; duração, aquecimento e preço antes de confirmar, **Cancelar** enquanto há tempo, **Sair deste clube** para desligar o telemóvel. As regras são as mesmas da página web.
 - A página e a app têm **três separadores**: **Reservar** (dias e casas), **Minhas** (reservas, listas de espera, lembretes) e **Parceiros** (Procuro parceiro).
 - No app, em **Minhas**, **Convidar** envia a quem joga consigo a quadra, o dia e a hora já escritos (pelo WhatsApp ou onde quiser); depois de uma reserva o app leva-o lá sozinho.
 - **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
@@ -11615,11 +11604,11 @@ Com o papel **Clube**, em **Torneios › Classificação por desafios**.
 
 Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computador (Windows, Mac ou Linux) na mesma rede do telefone** abre no navegador uma página servida pelo telefone, sem instalar nada e sem servidor: **os dados ficam no telefone**; o computador vê e altera os dados enquanto está conectado e não guarda cópias. Uma pessoa de cada vez. O *servidor do clube* (7.18) é outra coisa e serve só para as reservas dos jogadores.
 
-- **Ativar**: *Funções do clube* › **Secretaria no PC**, depois a entrada na aba das quadras e **Ativar**. O telefone mostra o endereço (ex. `https://192.168.1.20:8443`) e um código.
+- **Ativar**: *Mais › Configurações › Papéis e funções › Funções do clube* › **Secretaria no PC**, depois a entrada em **Mais** e **Ativar**. O telefone mostra o endereço (ex. `https://192.168.1.20:8443`) e um código.
 - **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
 - **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
 - **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). **Escola de tênis** (cursos com horários e quadras, alunos, chamada das aulas, aulas canceladas, mensalidades do mês ou da temporada a debitar), **Estatísticas das quadras** (ocupação, receitas, quadra a quadra, dias e horas mais cheios, quem reserva mais, por período, para imprimir). Com **Preparar lembrete** em Mensalidades e pagamentos escolhe a quem escrever entre os débitos que vê: a mensagem abre-se no telefone e envia-a de lá. **Equipes e campeonatos** (plantel, encontros em casa ou fora com quadras reservadas, disponibilidade, convocados, jogos e resultado; os avisos abrem-se no telefone). **Reservas online**, com o servidor do clube (próximas reservas dos jogadores, lista de espera, anúncios de Procuro parceiro a tirar se preciso, regras para os jogadores, **Enviar agora**), **Definições** (nome do clube, horários e preços, quadras com piso, luzes e preços próprios, formas de pagamento). Avisos de WhatsApp, fotos das quadras e marcador ao vivo continuam no app.
-- **Cópia da secretaria** (no PC, abaixo de Estatísticas; no telefone em Quadras › Cópia da secretaria): um só arquivo `.tsmclub` com sócios e jogadores, mensalidades e pagamentos, agenda, torneios, escola de tênis, equipes, quadras e definições (não jogos, golpes e vídeos: a cópia completa tem esses). **Baixar para o PC** ou, do telefone, **enviá-la** para onde quiser (Google Drive, e-mail, um pen drive). Com a **cópia automática** o telefone faz uma cópia por dia só se algo mudou e guarda as últimas 14; com um servidor do clube, ele também. **Restaurar** mostra primeiro o que há no arquivo e faz uma cópia de agora, para voltar atrás. O arquivo contém dados pessoais dos sócios: guarde-o num lugar seu.
+- **Cópia da secretaria** (no PC, abaixo de Estatísticas; no telefone em Mais › Cópia da secretaria): um só arquivo `.tsmclub` com sócios e jogadores, mensalidades e pagamentos, agenda, torneios, escola de tênis, equipes, quadras e definições (não jogos, golpes e vídeos: a cópia completa tem esses). **Baixar para o PC** ou, do telefone, **enviá-la** para onde quiser (Google Drive, e-mail, um pen drive). Com a **cópia automática** o telefone faz uma cópia por dia só se algo mudou e guarda as últimas 14; com um servidor do clube, ele também. **Restaurar** mostra primeiro o que há no arquivo e faz uma cópia de agora, para voltar atrás. O arquivo contém dados pessoais dos sócios: guarde-o num lugar seu.
 - **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
 - **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
 
@@ -11645,7 +11634,7 @@ O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o pl
 
 ### 8.2 No telefone do árbitro
 
-1. Mais › **Dispositivos** › **Placar na TV** › ative **Placar na TV ou monitor**. No Android 13 ou mais recente o app pede a permissão de notificações: ela é necessária para a notificação do serviço que mantém o placar ativo.
+1. Mais › **Configurações** › **Dispositivos** › **Placar na TV** › ative **Placar na TV ou monitor**. No Android 13 ou mais recente o app pede a permissão de notificações: ela é necessária para a notificação do serviço que mantém o placar ativo.
 2. Aparecem o **endereço** (ex. `192.168.43.1:8080`), o **QR** e quantos placares estão conectados. Se aparecer *Sem rede*, ative o hotspot ou conecte-se ao do outro telefone.
 3. **Prévia neste telefone** abre o placar no navegador do próprio telefone.
 4. **Aparência do placar**: cor de cada jogador (8 cores), tempo de partida, relógio de serviço e pausas, sets terminados, mensagens (break point, set point, troca de lado…), bola ao lado de quem serve, segmentos apagados visíveis, texto embaixo (vazio = clube e quadra de *Nova partida*). As mudanças chegam na hora ao monitor.
@@ -11691,7 +11680,7 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 - **No painel de ajustes aparece "O firmware desta pulseira não tem ajustes"**: essa pulseira ainda tem o sketch antigo; carregue-o de novo (capítulo 5).
 - **A voz não fala ou lê errado**: volume de mídia, *Audio On*, voz do idioma escolhido instalada (4); tente outro mecanismo ou outra voz em *Áudio e voz*.
 - **Tela apagada durante a partida**: no modo pulseiras, um serviço em primeiro plano (notificação "Partida em andamento") mantém ativos Bluetooth, voz e cronômetros; nos modos árbitro e controles a tela fica acesa (com os controles ela precisa ficar: 6.3).
-- **O controle não faz nada**: ele está associado ao jogador (*Mais › Dispositivos* › *Controles*, linha com o nome dele)? O app precisa estar aberto na partida, com a tela acesa (6.3). Se a linha diz *Desconectado*, aperte uma tecla para despertá-lo ou pareie de novo nas configurações de Bluetooth.
+- **O controle não faz nada**: ele está associado ao jogador (*Mais › Configurações › Dispositivos* › *Controles*, linha com o nome dele)? O app precisa estar aberto na partida, com a tela acesa (6.3). Se a linha diz *Desconectado*, aperte uma tecla para despertá-lo ou pareie de novo nas configurações de Bluetooth.
 - **Os golpes são confundidos ou saem como não reconhecidos**: use a pulseira como durante a calibração (mesmo pulso, mesmo sentido); senão refaça a calibração usando-a como na partida (6.4).
 - **A pulseira mostra MEMORIA CHEIA**: um exemplo de calibração não pôde ser salvo. Apague os exemplos de um golpe (lixeira) e refaça.
 - **O telefone-placar não encontra o árbitro**: mesma rede? (um dos dois faz o hotspot, o outro está conectado a ele). *Placar na TV* ativado no telefone do árbitro? Tente o endereço à mão. Alguns hotspots isolam os dispositivos conectados entre si ("isolamento de clientes"): se houver essa opção, desative-a.
@@ -12383,6 +12372,150 @@ if (isDemo) {
 </html>
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/FriendsTournaments.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/FriendsTournaments.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager
+
+import android.content.Intent
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.data.Tournament
+import com.tennis.scoremanager.data.TournamentKind
+import com.tennis.scoremanager.data.TournamentScoring
+import com.tennis.scoremanager.data.Tournaments
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * Il torneo tra amici (Americano e Mexicano): l'elenco dei tornei, quello aperto, i turni e la classifica da
+ * condividere. Vive per conto suo accanto a [MatchController]: usa solo i file, la navigazione e la voce.
+ */
+class FriendsTournaments(
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+    private val nav: Navigator,
+    private val strings: () -> Strings,
+    private val lang: () -> Lang,
+    /** Dice il punteggio di una partita contata punto per punto (se la voce è accesa). */
+    private val sayScore: (Int, Int) -> Unit,
+) {
+    /** Tutti i tornei salvati, dal più recente. */
+    val all = MutableStateFlow<List<Tournament>>(emptyList())
+    /** Torneo aperto; null = elenco dei tornei e creazione di uno nuovo. */
+    val current = MutableStateFlow<Tournament?>(null)
+
+    /** Apre la schermata dei tornei; si riapre da solo l'ultimo torneo non concluso. */
+    fun show() {
+        refresh()
+        if (current.value == null) {
+            scope.launch {
+                withContext(io) { storage.loadTournaments() }.firstOrNull { !it.finished }?.let { current.value = it }
+            }
+        }
+        nav.push(Screen.TOURNAMENT)
+    }
+
+    private fun refresh() {
+        scope.launch { all.value = withContext(io) { storage.loadTournaments() } }
+    }
+
+    private fun save(t: Tournament) {
+        current.value = t
+        scope.launch {
+            withContext(io) { storage.saveTournament(t) }
+            refresh()
+        }
+    }
+
+    fun create(
+        name: String, kind: TournamentKind, players: List<String>, courts: Int,
+        scoring: TournamentScoring, pointsPerMatch: Int, minutes: Int,
+    ) {
+        val now = System.currentTimeMillis()
+        val t = Tournament(
+            id = "t$now", name = name.trim(), kind = kind, players = players.map { it.trim() },
+            courts = courts, scoring = scoring, pointsPerMatch = pointsPerMatch, minutes = minutes, createdAt = now,
+        )
+        save(t.copy(rounds = listOf(Tournaments.nextRound(t))))
+    }
+
+    fun open(t: Tournament) {
+        current.value = t
+    }
+
+    /** Torna all'elenco dei tornei (quello aperto resta salvato). */
+    fun close() {
+        current.value = null
+        refresh()
+    }
+
+    /** Risultato di una partita del turno [round]; null = ancora da giocare. */
+    fun setResult(round: Int, court: Int, a: Int?, b: Int?) {
+        val t = current.value ?: return
+        val rounds = t.rounds.map { r ->
+            if (r.number != round) r
+            else r.copy(matches = r.matches.map { if (it.court == court) it.copy(scoreA = a, scoreB = b) else it })
+        }
+        save(t.copy(rounds = rounds))
+    }
+
+    /** Turno successivo, solo se tutte le partite del turno in corso hanno il risultato. */
+    fun nextRound(): Boolean {
+        val t = current.value ?: return false
+        if (t.current?.complete == false) return false
+        save(t.copy(rounds = t.rounds + Tournaments.nextRound(t)))
+        return true
+    }
+
+    /** Conclude il torneo. L'ultimo turno, se non è stato giocato per niente, si toglie. */
+    fun finish() {
+        val t = current.value ?: return
+        val rounds = t.rounds.filterIndexed { i, r -> i < t.rounds.size - 1 || r.matches.any { it.played } }
+        save(t.copy(rounds = rounds, finished = true))
+    }
+
+    fun delete(id: String) {
+        if (current.value?.id == id) current.value = null
+        scope.launch {
+            withContext(io) { storage.deleteTournament(id) }
+            refresh()
+        }
+    }
+
+    /** La voce dice il punteggio di una partita contata punto per punto. */
+    fun announce(a: Int, b: Int) = sayScore(a, b)
+
+    /** Classifica del torneo come testo da condividere. */
+    fun shareIntent(): Intent? {
+        val t = current.value ?: return null
+        val s = strings()
+        val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
+        val text = buildString {
+            appendLine(listOf(t.name.ifBlank { kind }, kind).distinct().joinToString(" · "))
+            appendLine(s.tournamentRoundsPlayed(t.rounds.count { r -> r.matches.any { it.played } }))
+            Tournaments.standings(t).forEachIndexed { i, st ->
+                appendLine("${i + 1}. ${st.name} – ${st.points} (${s.tournamentWonShort} ${st.won}, ${st.diff.let { if (it > 0) "+$it" else "$it" }})")
+            }
+            append("Tennis Score Manager · ${Reports.siteUrl(lang())}")
+        }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        return Intent.createChooser(send, s.tournamentShare)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/MainActivity.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/MainActivity.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -12479,6 +12612,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /** Tasti dei telecomandi Bluetooth (modalità Telecomandi): arrivano qui prima che diventino volume o clic. */
+    @android.annotation.SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
         controller.remotes.onKey(event) || super.dispatchKeyEvent(event)
 
@@ -12632,25 +12766,28 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
+enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
  * ([Role.tabs]).
  */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
+enum class HomeTab { PLAY, BOOKING, TRAIN, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
 
 /**
  * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
- * Il tabellone c'è in tutti: l'allenatore arbitra le partite tra allievi, il circolo quelle dei tornei.
+ * Ogni funzione sta in un ruolo solo, senza doppioni: il segnapunti, i video e lo storico sono di Tu, gli allievi
+ * dell'Allenatore, la segreteria del Circolo (che segna le sue partite dal torneo, dall'incontro o dalla sfida). Solo
+ * Altro, con impostazioni e aiuto, è di tutti. La scheda Circolo di chi gioca ([HomeTab.BOOKING]) compare solo dopo
+ * l'invito della segreteria.
  */
 enum class Role(val tabs: List<HomeTab>) {
-    /** Tu: giochi, ti alleni, i tuoi video e progressi (l'app di sempre). */
-    PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
-    /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
-    COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
-    /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
-    CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+    /** Tu: giochi (segnapunti, tabellone, video), il tuo circolo, ti alleni, i tuoi progressi. */
+    PLAYER(listOf(HomeTab.PLAY, HomeTab.BOOKING, HomeTab.TRAIN, HomeTab.PROGRESS, HomeTab.MORE)),
+    /** Allenatore: gli allievi, i loro allenamenti dei colpi e gli esercizi. */
+    COACH(listOf(HomeTab.STUDENTS, HomeTab.MORE)),
+    /** Circolo: oggi (cosa serve adesso), il planning, i soci, i tornei; il circolo e i suoi strumenti in Altro. */
+    CLUB(listOf(HomeTab.TODAY, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.TOURNAMENTS, HomeTab.MORE)),
 }
 
 /** Cosa usa chi gioca (ruoli Tu e Allenatore): quello che non usa non compare (i dati restano). */
@@ -12732,14 +12869,16 @@ class MatchController(
     /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
     val remotes = RemoteInput(app, storage, scope)
 
-    val screen = MutableStateFlow(Screen.HOME)
+    /** Le schermate e la strada fatta: Indietro torna da dove si è arrivati (vedi [Navigator]). */
+    val nav = Navigator()
+    val screen = nav.screen
     /** Scheda della prima schermata: resta quella da cui si è partiti, così "Indietro" ci torna. */
     val homeTab = MutableStateFlow(HomeTab.PLAY)
 
     /** Torna alla prima schermata ([tab] se dato, altrimenti la scheda di prima). */
     fun home(tab: HomeTab? = null) {
         tab?.let { homeTab.value = it }
-        screen.value = Screen.HOME
+        nav.home()
     }
     val setup = MutableStateFlow(storage.setup)
     val options = MutableStateFlow(storage.options)
@@ -13209,54 +13348,20 @@ class MatchController(
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
         if (to == Screen.START && needsService()) MatchService.start(app)
-        screen.value = to
+        nav.push(to)
     }
 
+    /** Indietro: la schermata da cui si è arrivati (la partita si lascia col suo menu, il riepilogo con "Fatto"). */
     fun back() {
-        screen.value = when (screen.value) {
-            Screen.OPTIONS -> Screen.SETUP
-            Screen.SETUP -> Screen.HOME
-            Screen.PROGRESS -> Screen.HOME
-            Screen.RACKETS -> Screen.HOME
-            Screen.VIDEOS -> Screen.HOME
-            Screen.DEVICES -> Screen.HOME
-            Screen.VOICE -> Screen.HOME
-            Screen.STROKE_SESSIONS -> strokeSessionsBack
-            Screen.HELP -> helpBack.also { helpBack = Screen.HOME }
-            Screen.STUDENTS -> Screen.HOME
-            Screen.STUDENT -> studentBack
-            Screen.PLAYERS -> Screen.HOME
-            Screen.DATA -> Screen.HOME
-            Screen.DRILLS -> Screen.HOME
-            Screen.MEMBERS -> Screen.HOME
-            Screen.PAYMENTS -> Screen.HOME
-            Screen.CLUB_TOURNAMENTS -> Screen.HOME
-            Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
-            Screen.NOTICE -> noticeBack
-            Screen.COURTS_PLAN -> Screen.HOME
-            Screen.BOOK_COURT -> Screen.HOME
-            Screen.DESK -> Screen.HOME
-            Screen.COURT_STATS -> statsBack
-            Screen.LADDERS -> Screen.HOME
-            Screen.LADDER -> Screen.LADDERS
-            Screen.SCHOOL -> Screen.HOME
-            Screen.COURSE -> Screen.SCHOOL
-            Screen.TEAMS -> Screen.HOME
-            Screen.TEAM -> Screen.TEAMS
-            Screen.FIXTURE -> Screen.TEAM
+        when (screen.value) {
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
-            Screen.WORKOUT -> if (workoutDetail.value != null) {
-                workoutDetail.value = null
-                Screen.WORKOUT
-            } else {
-                Screen.HOME
-            }
-            Screen.START -> {
-                if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
-                Screen.OPTIONS
-            }
-            else -> screen.value
+            Screen.WORKOUT -> if (workoutDetail.value != null) { workoutDetail.value = null; return }
+            Screen.START -> if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
+            Screen.MATCH -> return
+            Screen.SUMMARY -> { closeSummary(); return }
+            else -> {}
         }
+        nav.back()
     }
 
     // ---------------------------------------------------------------- braccialetti
@@ -13594,11 +13699,8 @@ class MatchController(
     /** Apre tutte le sessioni del colpo [stroke] (dell'allievo scelto); Indietro torna da dove si è partiti. */
     fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
         trainStroke.value = stroke
-        strokeSessionsBack = if (screen.value == Screen.STUDENT) Screen.STUDENT else Screen.HOME
-        screen.value = Screen.STROKE_SESSIONS
+        nav.push(Screen.STROKE_SESSIONS)
     }
-
-    private var strokeSessionsBack = Screen.HOME
 
     // ---------------------------------------------------------------- giocatori e allievi
 
@@ -13869,21 +13971,34 @@ class MatchController(
     fun setTrainStudent(id: String?) {
         trainStudent.value = id
         storage.trainStudent = id.orEmpty()
+        // L'allenatore ritrova il suo allievo anche dopo essersi allenato da solo (nel profilo Tu non c'è allievo).
+        if (id != null) storage.coachStudent = id
+    }
+
+    /** Tornando al profilo Allenatore senza nessuno scelto: l'allievo dell'ultima volta, se c'è ancora. */
+    fun restoreCoachStudent() {
+        if (trainStudent.value != null) return
+        storage.coachStudent.takeIf { id -> students.value.any { it.id == id } }?.let { setTrainStudent(it) }
+    }
+
+    /** "Allena ora" dalla scheda di un allievo: si passa al profilo Allenatore (acceso, se non lo era) con lui scelto. */
+    fun coachNow(id: String) {
+        if (Role.COACH !in roles.value) setRoles(roles.value + Role.COACH)
+        setActiveRole(Role.COACH)
+        setTrainStudent(id)
+        home(HomeTab.STUDENTS)
     }
 
     fun openStudents() {
         refreshPlayers()
-        screen.value = Screen.STUDENTS
+        nav.push(Screen.STUDENTS)
     }
 
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE, Screen.TEAM, Screen.FIXTURE) } ?: Screen.STUDENTS
-        screen.value = Screen.STUDENT
+        nav.push(Screen.STUDENT)
     }
-
-    private var studentBack = Screen.STUDENTS
 
     // ---- Obiettivi (Progressi) ----
 
@@ -13924,20 +14039,20 @@ class MatchController(
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
         refreshPlayers()
-        screen.value = Screen.MEMBERS
+        nav.push(Screen.MEMBERS)
     }
 
     /** Circolo › Quote e pagamenti. */
     fun openPayments() {
         refreshPlayers()
-        screen.value = Screen.PAYMENTS
+        nav.push(Screen.PAYMENTS)
     }
 
     /** Altro › Giocatori: tutto il database. */
     fun openPlayers() {
         refreshPlayers()
         refreshHistory()
-        screen.value = Screen.PLAYERS
+        nav.push(Screen.PLAYERS)
     }
 
     /** Chi è il giocatore nelle statistiche: il suo identificativo e quelli che sono lui (alias). */
@@ -13992,12 +14107,12 @@ class MatchController(
 
     fun openClubTournaments() {
         refreshPlayers()
-        screen.value = Screen.CLUB_TOURNAMENTS
+        nav.push(Screen.CLUB_TOURNAMENTS)
     }
 
     fun openClubTournament(id: String) {
         openClubTournamentId.value = id
-        screen.value = Screen.CLUB_TOURNAMENT
+        nav.push(Screen.CLUB_TOURNAMENT)
     }
 
     fun clubTournament(id: String?): com.tennis.scoremanager.data.ClubTournament? = id?.let { i -> clubTournaments.value.firstOrNull { it.id == i } }
@@ -14150,18 +14265,18 @@ class MatchController(
 
     fun openTeams() {
         refreshPlayers()
-        screen.value = Screen.TEAMS
+        nav.push(Screen.TEAMS)
     }
 
     fun openTeam(id: String) {
         openTeamId.value = id
-        screen.value = Screen.TEAM
+        nav.push(Screen.TEAM)
     }
 
     fun openFixture(teamId: String, fixtureId: String) {
         openTeamId.value = teamId
         openFixtureId.value = fixtureId
-        screen.value = Screen.FIXTURE
+        nav.push(Screen.FIXTURE)
     }
 
     fun team(id: String?): com.tennis.scoremanager.data.Team? = id?.let { i -> teams.value.firstOrNull { it.id == i } }
@@ -14285,25 +14400,20 @@ class MatchController(
         }
     }
 
-    // ---- Statistiche dei campi (dal planning o dalla scheda Campi: Indietro torna lì) ----
-
-    private var statsBack = Screen.COURTS_PLAN
+    // ---- Statistiche dei campi (dal planning o dalla scheda Planning: Indietro torna lì) ----
 
     fun openCourtStats() {
-        statsBack = if (screen.value == Screen.COURTS_PLAN) Screen.COURTS_PLAN else Screen.HOME
-        screen.value = Screen.COURT_STATS
+        nav.push(Screen.COURT_STATS)
     }
 
     // ---- Aiuto al punto giusto ----
 
     /** La sezione della guida da aprire (dal "?" di una schermata), e dove si torna. */
     val helpSection = MutableStateFlow<String?>(null)
-    private var helpBack = Screen.HOME
 
     fun openHelp(section: String) {
         helpSection.value = section
-        helpBack = screen.value
-        screen.value = Screen.HELP
+        nav.push(Screen.HELP)
     }
 
     // ---- Classifica a sfida ----
@@ -14312,9 +14422,9 @@ class MatchController(
     val openLadderId = MutableStateFlow<String?>(null)
     private var pendingLadder: Pair<String, String>? = null
 
-    fun openLadders() { refreshPlayers(); screen.value = Screen.LADDERS }
+    fun openLadders() { refreshPlayers(); nav.push(Screen.LADDERS) }
 
-    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); screen.value = Screen.LADDER }
+    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); nav.push(Screen.LADDER) }
 
     fun ladder(id: String?): com.tennis.scoremanager.data.Ladder? = ladders.value.firstOrNull { it.id == id }
 
@@ -14382,12 +14492,12 @@ class MatchController(
 
     fun openSchool() {
         refreshPlayers()
-        screen.value = Screen.SCHOOL
+        nav.push(Screen.SCHOOL)
     }
 
     fun openCourse(id: String) {
         openCourseId.value = id
-        screen.value = Screen.COURSE
+        nav.push(Screen.COURSE)
     }
 
     fun course(id: String?): com.tennis.scoremanager.data.Course? = id?.let { i -> courses.value.firstOrNull { it.id == i } }
@@ -14452,7 +14562,7 @@ class MatchController(
 
     fun openCourtsPlan() {
         refreshPlayers()
-        screen.value = Screen.COURTS_PLAN
+        nav.push(Screen.COURTS_PLAN)
     }
 
     fun saveCourtSettings(st: com.tennis.scoremanager.data.CourtSettings) {
@@ -15180,12 +15290,10 @@ class MatchController(
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
 
     val notice = MutableStateFlow<com.tennis.scoremanager.data.NoticePlan?>(null)
-    private var noticeBack = Screen.HOME
 
     private fun openNotice(plan: com.tennis.scoremanager.data.NoticePlan) {
         notice.value = plan
-        noticeBack = screen.value
-        screen.value = Screen.NOTICE
+        nav.push(Screen.NOTICE)
     }
 
     private fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
@@ -15336,6 +15444,33 @@ class MatchController(
         storage.roles = roles.value.map { it.name }.toSet()
         if (activeRole.value !in roles.value) setActiveRole(roles.value.first())
     }
+
+    /**
+     * Una volta sola, da quando ogni funzione sta in un profilo solo: chi ha già dati di un profilo che non ha acceso
+     * (partite, allenamenti e prenotazioni sono di Tu, gli allievi dell'Allenatore) se lo ritrova tra i ruoli, così
+     * non perde di vista niente. Il ruolo attivo resta quello di prima.
+     */
+    private fun addRolesForData() {
+        if (storage.rolesForDataDone) return
+        scope.launch {
+            val add = withContext(io) {
+                buildSet {
+                    if (storage.loadPlayers().any { it.student }) add(Role.COACH)
+                    if (storage.loadFinished().isNotEmpty() || storage.loadUnfinished().isNotEmpty() || storage.loadWorkouts().isNotEmpty() ||
+                        storage.loadServeSessions().any { it.student == null } || storage.loadBookingAccounts().isNotEmpty()
+                    ) add(Role.PLAYER)
+                }
+            }
+            storage.rolesForDataDone = true
+            if ((add - roles.value).isNotEmpty()) setRoles(roles.value + add)
+        }
+    }
+
+    /** La partita [id] è di una competizione del circolo (torneo, incontro di squadra, sfida)? Si riprende da lì. */
+    fun isClubRecord(id: String): Boolean =
+        clubTournaments.value.any { t -> t.matches.any { it.record == id } } ||
+            teams.value.any { t -> t.fixtures.any { f -> f.rubbers.any { it.record == id } } } ||
+            ladders.value.any { l -> l.challenges.any { it.record == id } }
 
     /** Passa a un ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
     fun setActiveRole(r: Role) {
@@ -15668,7 +15803,7 @@ class MatchController(
         lastPointAt = 0
         rallyStrokes = 0
         faultPending.value = false
-        screen.value = Screen.MATCH
+        nav.play(Screen.MATCH)
         persist()
         if (needsService()) MatchService.start(app)
         batteryWarned.clear()
@@ -15852,16 +15987,12 @@ class MatchController(
             showMessage(strings.msgFaultUndone)
             return
         }
-        val events = lm.record.events.toMutableList()
-        // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
-        val last = events.lastOrNull()
-        if (last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break || last is MatchEvent.ServerFix || last is MatchEvent.EndsFix) events.removeAt(events.lastIndex)
-        else {
-            while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
-            if (events.isEmpty()) return
-            // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
-            rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
-        }
+        // Dopo un ritiro, un richiamo o una correzione si annulla quello, non l'ultimo punto.
+        val events = ScoreEngine.undo(lm.state, lm.record.events) ?: return
+        // Il primo evento tolto: il punto annullato (con le scelte del set nuovo venute dopo) o la correzione.
+        val removed = lm.record.events[events.size]
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        if (removed is MatchEvent.Point) rallyStrokes += removed.strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -15876,12 +16007,13 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(when (last) {
+        showMessage(when (removed) {
+            is MatchEvent.Point -> strings.msgPointUndone
             is MatchEvent.Penalty -> strings.penaltyUndone
-            is MatchEvent.Retired -> if (last.disqualified) strings.disqualifyUndone else strings.retireUndone
+            is MatchEvent.Retired -> if (removed.disqualified) strings.disqualifyUndone else strings.retireUndone
             is MatchEvent.Break -> strings.breakUndone
-            is MatchEvent.ServerFix, is MatchEvent.EndsFix -> strings.fixUndone
-            else -> strings.msgPointUndone
+            // Chi serve, lati, punteggio messo a mano, ordine di risposta.
+            else -> strings.fixUndone
         })
         showTvMessage(null)
     }
@@ -16113,10 +16245,11 @@ class MatchController(
         clubMatchFinished(rec, lm.state)
         teamRubberFinished(rec, lm.state)
         ladderMatchFinished(rec, lm.state)
+        // Prima si salva la partita finita, poi si toglie la sospesa: in mezzo non resta mai senza copia.
         scope.launch(io) {
-            storage.deleteMatch(rec.id)
             storage.saveFinished(rec)
             storage.saveLastFinished(rec)
+            storage.deleteMatch(rec.id)
         }
         // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
         storage.summaryOpen = rec.id
@@ -16125,7 +16258,7 @@ class MatchController(
         live.value = null
         endDialog.value = false
         stopCountdown()
-        screen.value = Screen.SUMMARY
+        nav.replace(Screen.SUMMARY)
         // Col tabellone acceso il servizio resta (il risultato è ancora sul tabellone): si riavvia solo per il testo della notifica.
         if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
@@ -16135,8 +16268,35 @@ class MatchController(
         }
     }
 
-    /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
+    /** Una partita nuova. Quella di adesso, se non è finita, resta salvata tra le sospese. */
     fun newMatch() {
+        val from = screen.value
+        closeMatch()
+        // Dalla partita o dal suo riepilogo la partita nuova ne prende il posto: Indietro torna da dove era partita.
+        if (from == Screen.MATCH || from == Screen.SUMMARY) nav.replace(Screen.SETUP) else nav.push(Screen.SETUP)
+    }
+
+    /** Lascia la partita (resta tra le sospese, la si riprende da Gioca) e torna da dove era partita. */
+    fun leaveMatch() {
+        closeMatch()
+        nav.back()
+    }
+
+    /** "Fatto" nel riepilogo (anche Indietro): si torna da dove era partita la partita, o allo storico. */
+    fun closeSummary() {
+        val fromHistory = summaryFromHistory.value
+        if (fromHistory) {
+            summary.value = null
+            summaryFromHistory.value = false
+            refreshHistory()
+        } else {
+            closeMatch()
+        }
+        nav.back()
+    }
+
+    /** Chiude la partita in corso (sospesa, se non è finita) e il riepilogo: tempi, voce e servizio a riposo. */
+    private fun closeMatch() {
         live.value?.let { lm ->
             val total = currentClock()
             runningSince = null
@@ -16157,7 +16317,6 @@ class MatchController(
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
         quickStart.value = false
-        screen.value = Screen.SETUP
     }
 
     fun resumeSaved(rec: MatchRecord) {
@@ -16181,7 +16340,7 @@ class MatchController(
         faultPending.value = false
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
-        screen.value = Screen.MATCH
+        nav.play(Screen.MATCH)
         if (!state.isFinished) showMessage(strings.msgSuspended)
         if (rec.location == null) fetchLocation()
         if (o.mode == PlayMode.BANDS) ble.reconnectAll()
@@ -16212,7 +16371,7 @@ class MatchController(
 
     fun openHistory() {
         refreshHistory()
-        screen.value = Screen.HISTORY
+        nav.push(Screen.HISTORY)
     }
 
     // ---------------------------------------------------------------- racchetta virtuale
@@ -16233,7 +16392,7 @@ class MatchController(
     fun openRackets() {
         refreshHistory()
         refreshWorkouts()
-        screen.value = Screen.RACKETS
+        nav.push(Screen.RACKETS)
     }
 
     private fun storeRackets(list: List<Racket>) {
@@ -16334,7 +16493,7 @@ class MatchController(
     fun openProgress() {
         refreshHistory()
         refreshWorkouts()
-        screen.value = Screen.PROGRESS
+        nav.push(Screen.PROGRESS)
     }
 
     private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
@@ -16447,7 +16606,7 @@ class MatchController(
     fun openWorkouts() {
         workoutDetail.value = null
         refreshWorkouts()
-        screen.value = Screen.WORKOUT
+        nav.push(Screen.WORKOUT)
     }
 
     private fun refreshWorkouts() {
@@ -16520,21 +16679,11 @@ class MatchController(
         }
     }
 
-    /** Il riepilogo di una partita dello storico; Indietro torna a [back] (lo storico, o Progressi dal calendario). */
-    fun openFromHistory(m: LiveMatch, back: Screen = Screen.HISTORY) {
+    /** Il riepilogo di una partita dello storico (o del calendario, di un torneo...); Indietro torna lì. */
+    fun openFromHistory(m: LiveMatch) {
         summary.value = m
         summaryFromHistory.value = true
-        summaryBack = back
-        screen.value = Screen.SUMMARY
-    }
-
-    private var summaryBack = Screen.HISTORY
-
-    /** "Indietro" dal riepilogo aperto dallo storico. */
-    fun backToHistory() {
-        summary.value = null
-        summaryFromHistory.value = false
-        if (summaryBack == Screen.PROGRESS) { summaryBack = Screen.HISTORY; screen.value = Screen.PROGRESS } else openHistory()
+        nav.push(Screen.SUMMARY)
     }
 
     fun deleteFromHistory(id: String) {
@@ -16545,7 +16694,7 @@ class MatchController(
                 // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
                 if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
             }
-            if (summary.value?.record?.id == id) backToHistory() else refreshHistory()
+            if (summary.value?.record?.id == id && screen.value == Screen.SUMMARY) closeSummary() else refreshHistory()
         }
     }
 
@@ -16607,112 +16756,9 @@ class MatchController(
 
     // ---------------------------------------------------------------- tornei Americano e Mexicano
 
-    /** Tutti i tornei salvati, dal più recente. */
-    val tournaments = MutableStateFlow<List<Tournament>>(emptyList())
-    /** Torneo aperto; null = elenco dei tornei e creazione di uno nuovo. */
-    val tournament = MutableStateFlow<Tournament?>(null)
-
-    fun openTournaments() {
-        refreshTournaments()
-        // Si riapre da solo l'ultimo torneo non concluso.
-        if (tournament.value == null) {
-            scope.launch {
-                withContext(io) { storage.loadTournaments() }.firstOrNull { !it.finished }?.let { tournament.value = it }
-            }
-        }
-        screen.value = Screen.TOURNAMENT
-    }
-
-    private fun refreshTournaments() {
-        scope.launch { tournaments.value = withContext(io) { storage.loadTournaments() } }
-    }
-
-    private fun saveTournament(t: Tournament) {
-        tournament.value = t
-        scope.launch {
-            withContext(io) { storage.saveTournament(t) }
-            refreshTournaments()
-        }
-    }
-
-    fun createTournament(
-        name: String, kind: TournamentKind, players: List<String>, courts: Int,
-        scoring: TournamentScoring, pointsPerMatch: Int, minutes: Int,
-    ) {
-        val now = System.currentTimeMillis()
-        val t = Tournament(
-            id = "t$now", name = name.trim(), kind = kind, players = players.map { it.trim() },
-            courts = courts, scoring = scoring, pointsPerMatch = pointsPerMatch, minutes = minutes, createdAt = now,
-        )
-        saveTournament(t.copy(rounds = listOf(Tournaments.nextRound(t))))
-    }
-
-    fun openTournament(t: Tournament) {
-        tournament.value = t
-    }
-
-    /** Torna all'elenco dei tornei (quello aperto resta salvato). */
-    fun closeTournament() {
-        tournament.value = null
-        refreshTournaments()
-    }
-
-    /** Risultato di una partita del turno [round]; null = ancora da giocare. */
-    fun setTournamentResult(round: Int, court: Int, a: Int?, b: Int?) {
-        val t = tournament.value ?: return
-        val rounds = t.rounds.map { r ->
-            if (r.number != round) r
-            else r.copy(matches = r.matches.map { if (it.court == court) it.copy(scoreA = a, scoreB = b) else it })
-        }
-        saveTournament(t.copy(rounds = rounds))
-    }
-
-    /** Turno successivo, solo se tutte le partite del turno in corso hanno il risultato. */
-    fun nextTournamentRound(): Boolean {
-        val t = tournament.value ?: return false
-        if (t.current?.complete == false) return false
-        saveTournament(t.copy(rounds = t.rounds + Tournaments.nextRound(t)))
-        return true
-    }
-
-    /** Conclude il torneo. L'ultimo turno, se non è stato giocato per niente, si toglie. */
-    fun finishTournament() {
-        val t = tournament.value ?: return
-        val rounds = t.rounds.filterIndexed { i, r -> i < t.rounds.size - 1 || r.matches.any { it.played } }
-        saveTournament(t.copy(rounds = rounds, finished = true))
-    }
-
-    fun deleteTournament(id: String) {
-        if (tournament.value?.id == id) tournament.value = null
-        scope.launch {
-            withContext(io) { storage.deleteTournament(id) }
-            refreshTournaments()
-        }
-    }
-
-    /** La voce dice il punteggio di una partita contata punto per punto (se la voce è accesa). */
-    fun announceCounter(a: Int, b: Int) {
+    /** Il torneo tra amici (Americano e Mexicano), per conto suo: elenco, turni, classifica. */
+    val friends = FriendsTournaments(storage, scope, io, nav, { strings }, { options.value.lang }) { a, b ->
         if (options.value.audio) announcer.announce(calls().counterScore(a, b))
-    }
-
-    /** Classifica del torneo come testo da condividere. */
-    fun tournamentShareIntent(): Intent? {
-        val t = tournament.value ?: return null
-        val s = strings
-        val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
-        val text = buildString {
-            appendLine(listOf(t.name.ifBlank { kind }, kind).distinct().joinToString(" · "))
-            appendLine(s.tournamentRoundsPlayed(t.rounds.count { r -> r.matches.any { it.played } }))
-            Tournaments.standings(t).forEachIndexed { i, st ->
-                appendLine("${i + 1}. ${st.name} – ${st.points} (${s.tournamentWonShort} ${st.won}, ${st.diff.let { if (it > 0) "+$it" else "$it" }})")
-            }
-            append("Tennis Score Manager · ${Reports.siteUrl(options.value.lang)}")
-        }
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, text)
-        }
-        return Intent.createChooser(send, s.tournamentShare)
     }
 
     // ---------------------------------------------------------------- foto dei giocatori
@@ -16825,11 +16871,14 @@ class MatchController(
     /** Nuova partita più corta: le regole si vedono in una riga e si va dritti al sorteggio (finché non si tocca Cambia). */
     val quickStart = MutableStateFlow(false)
 
-    /** Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio. Indietro porta ai giocatori. */
+    /**
+     * Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio (coi braccialetti o i telecomandi
+     * prima la pagina dove si collegano). Indietro porta ai giocatori.
+     */
     fun startLikeLast(rec: MatchRecord) {
         prepareRematch(rec)
         quickStart.value = true
-        screen.value = Screen.OPTIONS
+        go(if (options.value.mode == PlayMode.REFEREE) Screen.TOSS else Screen.OPTIONS)
     }
 
     fun prepareRematch(rec: MatchRecord) {
@@ -17094,7 +17143,16 @@ class MatchController(
         scope.launch(io) { storage.saveMatch(snapshot) }
     }
 
+    /** Il luogo della partita nel riepilogo (Nuova partita › Altri dettagli): spento, la posizione non si chiede. */
+    val matchPlace = MutableStateFlow(storage.matchPlace)
+
+    fun setMatchPlace(on: Boolean) {
+        storage.matchPlace = on
+        matchPlace.value = on
+    }
+
     private fun fetchLocation() {
+        if (!storage.matchPlace) return
         val id = (live.value ?: summary.value)?.record?.id ?: return
         if (locationJob?.isActive == true && locationFor == id) return
         locationJob?.cancel()
@@ -17380,12 +17438,13 @@ class MatchController(
     fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
+        addRolesForData()
         if (live.value != null || summary.value != null || screen.value != Screen.HOME) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
         summaryFromHistory.value = false
-        screen.value = Screen.SUMMARY
+        nav.replace(Screen.SUMMARY)
     }
 
     /**
@@ -17402,6 +17461,72 @@ class MatchController(
                 if (sm.record.location == null && System.currentTimeMillis() - ended < LATE_LOCATION_MS) fetchLocation()
             }
         }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/Navigator.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/Navigator.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager
+
+import kotlinx.coroutines.flow.MutableStateFlow
+
+/**
+ * La strada fatta tra le schermate: "Indietro" torna a quella da cui si è arrivati, non a una scelta fissa. I passi di
+ * una partita nuova (chi gioca, regole, sorteggio, inizio) spariscono quando si comincia a giocare: finita o lasciata,
+ * la partita torna da dove era partita (la prima schermata, un torneo, una squadra, la classifica a sfida...).
+ */
+class Navigator(val screen: MutableStateFlow<Screen> = MutableStateFlow(Screen.HOME)) {
+    private val stack = ArrayList<Screen>()
+
+    /** Le schermate da cui si è arrivati, dalla prima. */
+    val trail: List<Screen> get() = stack.toList()
+
+    /**
+     * Va a [to]; Indietro tornerà qui. Una schermata che è già sulla strada non si ripete: si torna a quel punto (la
+     * strada non gira in tondo).
+     */
+    fun push(to: Screen) {
+        val from = screen.value
+        if (from == to) return
+        val i = stack.indexOf(to)
+        if (i >= 0) while (stack.size > i) stack.removeAt(stack.lastIndex) else stack += from
+        screen.value = to
+    }
+
+    /** [to] prende il posto di quella di adesso, che Indietro non ritrova (la partita finita lascia il posto al riepilogo). */
+    fun replace(to: Screen) {
+        screen.value = to
+    }
+
+    /** Si gioca: via i passi della partita nuova, così Indietro e "Fatto" tornano da dove si era partiti. */
+    fun play(to: Screen) {
+        val from = screen.value
+        stack.removeAll { it in STEPS }
+        if (from != to && from !in STEPS) {
+            stack.remove(to)
+            stack += from
+        }
+        screen.value = to
+    }
+
+    /** Indietro: la schermata di prima, o la prima schermata. */
+    fun back() {
+        screen.value = if (stack.isEmpty()) Screen.HOME else stack.removeAt(stack.lastIndex)
+    }
+
+    /** La prima schermata, da capo. */
+    fun home() {
+        stack.clear()
+        screen.value = Screen.HOME
+    }
+
+    companion object {
+        /** I passi di una partita nuova, prima del gioco. */
+        val STEPS = setOf(Screen.SETUP, Screen.OPTIONS, Screen.TOSS, Screen.START)
     }
 }
 TSM_EOF
@@ -17430,6 +17555,8 @@ class TsmApp : Application() {
         val voice = VoicePack(this)
         val ble = BleManager(this)
         controller = MatchController(this, Storage(this), ble, HeartRateManager(this, ble), voice, Announcer(this, voice))
+        // I backup automatici sono accesi di serie: il lavoro di ogni giorno va programmato anche se nessuno li ha toccati.
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(this, controller.storage)
     }
 }
 TSM_EOF
@@ -24169,6 +24296,74 @@ object Reports {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/SafeFiles.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/SafeFiles.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+
+/**
+ * Lettura e scrittura dei file di dati senza perderli: una scrittura non lascia mai un file a metà, e un file che non
+ * si legge non viene sovrascritto in silenzio dal salvataggio dopo.
+ */
+object SafeFiles {
+    /** Le copie messe da parte: "players.json.unreadable-1794332985659". */
+    const val ASIDE = ".unreadable-"
+
+    /**
+     * Scrive [text] in [file]: prima in un file d'appoggio scritto fino in fondo sul disco (fsync, contro lo spegnimento
+     * brusco), poi lo scambio col nome vero, che è atomico.
+     */
+    fun write(file: File, text: String) {
+        val tmp = File(file.parentFile, file.name + ".tmp")
+        FileOutputStream(tmp).use { out ->
+            out.write(text.toByteArray())
+            out.fd.sync()
+        }
+        if (!tmp.renameTo(file)) {
+            file.delete()
+            if (!tmp.renameTo(file)) throw IOException("Non riesco a scrivere ${file.name}")
+        }
+    }
+
+    /**
+     * Legge [file] con [decode]; senza file, [default]. Un file che c'è ma non si legge (rovinato, o scritto da una
+     * versione più nuova) non diventa vuoto in silenzio: se ne mette da parte una copia, che i salvataggi dopo non
+     * toccano, e si chiama [onUnreadable] col suo nome.
+     */
+    fun <T> read(file: File, default: T, decode: (String) -> T, onUnreadable: (String) -> Unit = {}): T {
+        if (!file.exists()) return default
+        return try {
+            decode(file.readText())
+        } catch (e: Exception) {
+            setAside(file)
+            onUnreadable(file.name)
+            default
+        }
+    }
+
+    /** Le copie messe da parte di [file], dalla più vecchia. */
+    fun asideCopies(file: File): List<File> =
+        file.parentFile?.listFiles { f -> f.name.startsWith(file.name + ASIDE) }.orEmpty().sortedBy { it.name }
+
+    /** Una copia di [file] accanto, una sola per contenuto: la stessa lettura fallita più volte non ne fa altre. */
+    private fun setAside(file: File) {
+        val dir = file.parentFile ?: return
+        runCatching {
+            val bytes = file.readBytes()
+            if (asideCopies(file).none { it.length() == bytes.size.toLong() && it.readBytes().contentEquals(bytes) }) {
+                File(dir, file.name + ASIDE + System.currentTimeMillis()).writeBytes(bytes)
+            }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/School.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/School.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -24990,6 +25185,15 @@ class Storage(context: Context) {
         prettyPrint = true
     }
 
+    /** I file messi da parte in questa sessione perché non si leggevano (vedi [readOr]): la prima schermata lo dice. */
+    val unreadable: MutableList<String> = java.util.concurrent.CopyOnWriteArrayList()
+
+    /** Legge [file] con [decode]; senza file, [default]. Vedi [SafeFiles.read]; [report] = da segnalare in [unreadable]. */
+    private fun <T> readOr(file: File, default: T, report: Boolean = true, decode: (String) -> T): T =
+        SafeFiles.read(file, default, decode) { name -> if (report && name !in unreadable) unreadable += name }
+
+    private fun writeAtomic(file: File, text: String) = SafeFiles.write(file, text)
+
     private val matchesDir: File get() = File(app.filesDir, "matches").apply { mkdirs() }
     private val lastFinishedFile: File get() = File(app.filesDir, "last_finished.json")
     /** Foto dei giocatori, una per nome (chiave di PlayerStats.key): JPEG quadrati e piccoli. */
@@ -25010,7 +25214,7 @@ class Storage(context: Context) {
             photoFile(key).writeBytes(jpeg)
             val idx = File(photosDir, "index.txt")
             val keys = (runCatching { idx.readLines() }.getOrDefault(emptyList()) + key).filter { it.isNotBlank() }.distinct()
-            idx.writeText(keys.joinToString("\n"))
+            writeAtomic(idx, keys.joinToString("\n"))
         }.onFailure { Log.e("Storage", "Salvataggio foto fallito", it) }
     }
 
@@ -25049,15 +25253,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveTournament(t: Tournament) {
-        runCatching {
-            val f = File(tournamentsDir, "${t.id}.json")
-            val tmp = File(tournamentsDir, "${t.id}.tmp")
-            tmp.writeText(json.encodeToString(Tournament.serializer(), t))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio torneo fallito", it) }
+        runCatching { writeAtomic(File(tournamentsDir, "${t.id}.json"), json.encodeToString(Tournament.serializer(), t)) }.onFailure { Log.e("Storage", "Salvataggio torneo fallito", it) }
     }
 
     /** Tornei, dal più recente. */
@@ -25076,15 +25272,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveWorkout(w: WorkoutRecord) {
-        runCatching {
-            val f = File(workoutsDir, "${w.id}.json")
-            val tmp = File(workoutsDir, "${w.id}.tmp")
-            tmp.writeText(json.encodeToString(WorkoutRecord.serializer(), w))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio allenamento fallito", it) }
+        runCatching { writeAtomic(File(workoutsDir, "${w.id}.json"), json.encodeToString(WorkoutRecord.serializer(), w)) }.onFailure { Log.e("Storage", "Salvataggio allenamento fallito", it) }
     }
 
     /** Allenamenti, dal più recente. */
@@ -25176,15 +25364,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveServeSession(sess: ServeSession) {
-        runCatching {
-            val f = File(servesDir, "${sess.id}.json")
-            val tmp = File(servesDir, "${sess.id}.tmp")
-            tmp.writeText(json.encodeToString(ServeSession.serializer(), sess))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio allenamento al servizio fallito", it) }
+        runCatching { writeAtomic(File(servesDir, "${sess.id}.json"), json.encodeToString(ServeSession.serializer(), sess)) }.onFailure { Log.e("Storage", "Salvataggio allenamento al servizio fallito", it) }
     }
 
     fun loadServeSessions(): List<ServeSession> =
@@ -25206,18 +25386,11 @@ class Storage(context: Context) {
     private val drillsFile: File get() = File(app.filesDir, "drills.json")
 
     fun loadDrills(): List<Drill>? =
-        runCatching { json.decodeFromString(ListSerializer(Drill.serializer()), drillsFile.readText()) }.getOrNull()
+        readOr(drillsFile, null) { json.decodeFromString(ListSerializer(Drill.serializer()), it) }
 
     @Synchronized
     fun saveDrills(list: List<Drill>) {
-        runCatching {
-            val tmp = File(app.filesDir, "drills.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Drill.serializer()), list))
-            if (!tmp.renameTo(drillsFile)) {
-                drillsFile.delete()
-                tmp.renameTo(drillsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+        runCatching { writeAtomic(drillsFile, json.encodeToString(ListSerializer(Drill.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
     /** Le squadre del circolo, coi loro incontri, in un file solo. */
@@ -25225,85 +25398,53 @@ class Storage(context: Context) {
     private val goalsFile: File get() = File(app.filesDir, "goals.json")
 
     fun loadGoals(): List<Goal> =
-        runCatching { json.decodeFromString(ListSerializer(Goal.serializer()), goalsFile.readText()) }.getOrDefault(emptyList())
+        readOr(goalsFile, emptyList()) { json.decodeFromString(ListSerializer(Goal.serializer()), it) }
 
     @Synchronized
     fun saveGoals(list: List<Goal>) {
-        runCatching {
-            val tmp = File(app.filesDir, "goals.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Goal.serializer()), list))
-            if (!tmp.renameTo(goalsFile)) { goalsFile.delete(); tmp.renameTo(goalsFile) }
-        }
+        runCatching { writeAtomic(goalsFile, json.encodeToString(ListSerializer(Goal.serializer()), list)) }
     }
 
     private val laddersFile: File get() = File(app.filesDir, "club_ladders.json")
 
     fun loadLadders(): List<Ladder> =
-        runCatching { json.decodeFromString(ListSerializer(Ladder.serializer()), laddersFile.readText()) }.getOrDefault(emptyList())
+        readOr(laddersFile, emptyList()) { json.decodeFromString(ListSerializer(Ladder.serializer()), it) }
 
     @Synchronized
     fun saveLadders(list: List<Ladder>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_ladders.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Ladder.serializer()), list))
-            if (!tmp.renameTo(laddersFile)) {
-                laddersFile.delete()
-                tmp.renameTo(laddersFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio delle classifiche a sfida fallito", it) }
+        runCatching { writeAtomic(laddersFile, json.encodeToString(ListSerializer(Ladder.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio delle classifiche a sfida fallito", it) }
     }
 
     private val teamsFile: File get() = File(app.filesDir, "club_teams.json")
 
     fun loadTeams(): List<Team> =
-        runCatching { json.decodeFromString(ListSerializer(Team.serializer()), teamsFile.readText()) }.getOrDefault(emptyList())
+        readOr(teamsFile, emptyList()) { json.decodeFromString(ListSerializer(Team.serializer()), it) }
 
     @Synchronized
     fun saveTeams(list: List<Team>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_teams.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Team.serializer()), list))
-            if (!tmp.renameTo(teamsFile)) {
-                teamsFile.delete()
-                tmp.renameTo(teamsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio delle squadre fallito", it) }
+        runCatching { writeAtomic(teamsFile, json.encodeToString(ListSerializer(Team.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio delle squadre fallito", it) }
     }
 
     /** I corsi della scuola tennis, in un file solo. */
     private val schoolFile: File get() = File(app.filesDir, "club_school.json")
 
     fun loadCourses(): List<Course> =
-        runCatching { json.decodeFromString(ListSerializer(Course.serializer()), schoolFile.readText()) }.getOrDefault(emptyList())
+        readOr(schoolFile, emptyList()) { json.decodeFromString(ListSerializer(Course.serializer()), it) }
 
     @Synchronized
     fun saveCourses(list: List<Course>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_school.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Course.serializer()), list))
-            if (!tmp.renameTo(schoolFile)) {
-                schoolFile.delete()
-                tmp.renameTo(schoolFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio dei corsi fallito", it) }
+        runCatching { writeAtomic(schoolFile, json.encodeToString(ListSerializer(Course.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio dei corsi fallito", it) }
     }
 
     /** Il planning dei campi: orari, prezzi e prenotazioni. */
     private val courtPlanFile: File get() = File(app.filesDir, "club_courts.json")
 
     fun loadCourtPlan(): CourtPlan =
-        runCatching { json.decodeFromString(CourtPlan.serializer(), courtPlanFile.readText()) }.getOrDefault(CourtPlan())
+        readOr(courtPlanFile, CourtPlan()) { json.decodeFromString(CourtPlan.serializer(), it) }
 
     @Synchronized
     fun saveCourtPlan(plan: CourtPlan) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_courts.tmp")
-            tmp.writeText(json.encodeToString(CourtPlan.serializer(), plan))
-            if (!tmp.renameTo(courtPlanFile)) {
-                courtPlanFile.delete()
-                tmp.renameTo(courtPlanFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
+        runCatching { writeAtomic(courtPlanFile, json.encodeToString(CourtPlan.serializer(), plan)) }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
     }
 
     /** Il giocatore che prenota dall'app: il server del suo circolo e la sua chiave. */
@@ -25313,34 +25454,22 @@ class Storage(context: Context) {
 
     /** Tutti i circoli in cui il giocatore è entrato; la prima volta, quello di prima (un circolo solo). */
     fun loadBookingAccounts(): List<BookingAccount> =
-        runCatching { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), bookingsFile.readText()) }
-            .getOrElse { listOf(loadBookingAccount()).filter { it.joined } }
+        if (!bookingsFile.exists()) listOf(loadBookingAccount()).filter { it.joined }
+        else readOr(bookingsFile, emptyList()) { json.decodeFromString(ListSerializer(BookingAccount.serializer()), it) }
 
     @Synchronized
     fun saveBookingAccounts(list: List<BookingAccount>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_bookings.tmp")
-            tmp.writeText(json.encodeToString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), list.filter { it.joined }))
-            if (!tmp.renameTo(bookingsFile)) {
-                bookingsFile.delete()
-                tmp.renameTo(bookingsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio dei circoli fallito", it) }
+        runCatching { writeAtomic(bookingsFile, json.encodeToString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), list.filter { it.joined })) }.onFailure { Log.e("Storage", "Salvataggio dei circoli fallito", it) }
     }
 
     fun loadBookingAccount(): BookingAccount =
-        runCatching { json.decodeFromString(BookingAccount.serializer(), bookingFile.readText()) }.getOrDefault(BookingAccount())
+        readOr(bookingFile, BookingAccount()) { json.decodeFromString(BookingAccount.serializer(), it) }
 
     @Synchronized
     fun saveBookingAccount(a: BookingAccount) {
         runCatching {
             if (!a.joined) { bookingFile.delete(); return }
-            val tmp = File(app.filesDir, "club_booking.tmp")
-            tmp.writeText(json.encodeToString(BookingAccount.serializer(), a))
-            if (!tmp.renameTo(bookingFile)) {
-                bookingFile.delete()
-                tmp.renameTo(bookingFile)
-            }
+            writeAtomic(bookingFile, json.encodeToString(BookingAccount.serializer(), a))
         }.onFailure { Log.e("Storage", "Salvataggio della prenotazione online fallito", it) }
     }
 
@@ -25348,18 +25477,13 @@ class Storage(context: Context) {
     private val clubServerFile: File get() = File(app.filesDir, "club_server.json")
 
     fun loadClubServer(): ClubServerConf =
-        runCatching { json.decodeFromString(ClubServerConf.serializer(), clubServerFile.readText()) }.getOrDefault(ClubServerConf())
+        readOr(clubServerFile, ClubServerConf()) { json.decodeFromString(ClubServerConf.serializer(), it) }
 
     @Synchronized
     fun saveClubServer(conf: ClubServerConf) {
         runCatching {
             if (!conf.paired && conf == ClubServerConf()) { clubServerFile.delete(); return }
-            val tmp = File(app.filesDir, "club_server.tmp")
-            tmp.writeText(json.encodeToString(ClubServerConf.serializer(), conf))
-            if (!tmp.renameTo(clubServerFile)) {
-                clubServerFile.delete()
-                tmp.renameTo(clubServerFile)
-            }
+            writeAtomic(clubServerFile, json.encodeToString(ClubServerConf.serializer(), conf))
         }.onFailure { Log.e("Storage", "Salvataggio del server del circolo fallito", it) }
     }
 
@@ -25367,36 +25491,22 @@ class Storage(context: Context) {
     private val clubTournamentsFile: File get() = File(app.filesDir, "club_tournaments.json")
 
     fun loadClubTournaments(): List<ClubTournament> =
-        runCatching { json.decodeFromString(ListSerializer(ClubTournament.serializer()), clubTournamentsFile.readText()) }.getOrDefault(emptyList())
+        readOr(clubTournamentsFile, emptyList()) { json.decodeFromString(ListSerializer(ClubTournament.serializer()), it) }
 
     @Synchronized
     fun saveClubTournaments(list: List<ClubTournament>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_tournaments.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(ClubTournament.serializer()), list))
-            if (!tmp.renameTo(clubTournamentsFile)) {
-                clubTournamentsFile.delete()
-                tmp.renameTo(clubTournamentsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio dei tornei del circolo fallito", it) }
+        runCatching { writeAtomic(clubTournamentsFile, json.encodeToString(ListSerializer(ClubTournament.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio dei tornei del circolo fallito", it) }
     }
 
     /** Il registro del circolo: quote, addebiti, pagamenti e numerazione delle ricevute. */
     private val clubBookFile: File get() = File(app.filesDir, "club_book.json")
 
     fun loadClubBook(): ClubBook =
-        runCatching { json.decodeFromString(ClubBook.serializer(), clubBookFile.readText()) }.getOrDefault(ClubBook())
+        readOr(clubBookFile, ClubBook()) { json.decodeFromString(ClubBook.serializer(), it) }
 
     @Synchronized
     fun saveClubBook(book: ClubBook) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_book.tmp")
-            tmp.writeText(json.encodeToString(ClubBook.serializer(), book))
-            if (!tmp.renameTo(clubBookFile)) {
-                clubBookFile.delete()
-                tmp.renameTo(clubBookFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio del registro del circolo fallito", it) }
+        runCatching { writeAtomic(clubBookFile, json.encodeToString(ClubBook.serializer(), book)) }.onFailure { Log.e("Storage", "Salvataggio del registro del circolo fallito", it) }
     }
 
     /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
@@ -25407,36 +25517,29 @@ class Storage(context: Context) {
     @Synchronized
     fun loadPlayers(): List<PlayerProfile> {
         if (!playersFile.exists() && studentsFile.exists()) {
-            val old = runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
+            val old = readOr(studentsFile, emptyList()) { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), it) }
             savePlayers(old.map { it.copy(student = true) })
             studentsFile.delete()
         }
         // Nati dallo storico con un nome solo: quel nome è il soprannome (le partite non cambiano), nome e cognome da completare.
-        return runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), playersFile.readText()) }.getOrDefault(emptyList())
+        return readOr(playersFile, emptyList()) { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), it) }
             .map { if (it.firstName.isBlank() && it.lastName.isBlank() && it.nickname.isBlank()) it.copy(nickname = it.name) else it }
     }
 
     @Synchronized
     fun savePlayers(list: List<PlayerProfile>) {
-        runCatching {
-            val tmp = File(app.filesDir, "players.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(PlayerProfile.serializer()), list))
-            if (!tmp.renameTo(playersFile)) {
-                playersFile.delete()
-                tmp.renameTo(playersFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio giocatori fallito", it) }
+        runCatching { writeAtomic(playersFile, json.encodeToString(ListSerializer(PlayerProfile.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio giocatori fallito", it) }
     }
 
     /** Domande in sospeso sui giocatori arrivati da un altro telefono con un nome che abbiamo già. */
     private val questionsFile: File get() = File(app.filesDir, "player_questions.json")
 
     fun loadPlayerQuestions(): List<Players.Question> =
-        runCatching { json.decodeFromString(ListSerializer(Players.Question.serializer()), questionsFile.readText()) }.getOrDefault(emptyList())
+        readOr(questionsFile, emptyList(), report = false) { json.decodeFromString(ListSerializer(Players.Question.serializer()), it) }
 
     @Synchronized
     fun savePlayerQuestions(list: List<Players.Question>) {
-        runCatching { if (list.isEmpty()) questionsFile.delete() else questionsFile.writeText(json.encodeToString(ListSerializer(Players.Question.serializer()), list)) }
+        runCatching { if (list.isEmpty()) questionsFile.delete() else writeAtomic(questionsFile, json.encodeToString(ListSerializer(Players.Question.serializer()), list)) }
     }
 
     /**
@@ -25500,22 +25603,20 @@ class Storage(context: Context) {
         get() = prefs.getString("train_student", null) ?: ""
         set(v) = prefs.edit().putString("train_student", v).apply()
 
+    /** L'ultimo allievo scelto dall'allenatore: lo ritrova tornando al suo profilo (nel profilo Tu ci si allena da soli). */
+    var coachStudent: String
+        get() = prefs.getString("coach_student", null) ?: ""
+        set(v) = prefs.edit().putString("coach_student", v).apply()
+
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")
 
     fun loadRackets(): List<Racket> =
-        runCatching { json.decodeFromString(ListSerializer(Racket.serializer()), racketsFile.readText()) }.getOrDefault(emptyList())
+        readOr(racketsFile, emptyList()) { json.decodeFromString(ListSerializer(Racket.serializer()), it) }
 
     @Synchronized
     fun saveRackets(list: List<Racket>) {
-        runCatching {
-            val tmp = File(app.filesDir, "rackets.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Racket.serializer()), list))
-            if (!tmp.renameTo(racketsFile)) {
-                racketsFile.delete()
-                tmp.renameTo(racketsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio racchette fallito", it) }
+        runCatching { writeAtomic(racketsFile, json.encodeToString(ListSerializer(Racket.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio racchette fallito", it) }
     }
 
     /** Racchetta scelta per gli allenamenti ("" = nessuna). */
@@ -25617,6 +25718,10 @@ class Storage(context: Context) {
     var activeRole: String
         get() = prefs.getString("active_role", null) ?: "PLAYER"
         set(v) = prefs.edit().putString("active_role", v).apply()
+    /** Fatto una volta: a chi aveva già dati di un profilo non acceso, quel profilo è stato acceso (vedi addRolesForData). */
+    var rolesForDataDone: Boolean
+        get() = prefs.getBoolean("roles_for_data_done", false)
+        set(v) = prefs.edit().putBoolean("roles_for_data_done", v).apply()
 
     /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
     var clubName: String
@@ -25627,17 +25732,20 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
-    /** Backup automatico di tutti i dati (senza video), ogni giorno solo se è cambiato qualcosa; l'impronta dell'ultimo. */
+    /**
+     * Backup automatico di tutti i dati (senza video), ogni giorno solo se è cambiato qualcosa; l'impronta dell'ultimo.
+     * Acceso di serie: i dati stanno solo sul telefono.
+     */
     var personalBackupAuto: Boolean
-        get() = prefs.getBoolean("personal_backup_auto", false)
+        get() = prefs.getBoolean("personal_backup_auto", true)
         set(v) = prefs.edit().putBoolean("personal_backup_auto", v).apply()
     var personalBackupPrint: String
         get() = prefs.getString("personal_backup_print", null) ?: ""
         set(v) = prefs.edit().putString("personal_backup_print", v).apply()
 
-    /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa), l'impronta e l'ora dell'ultimo. */
+    /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa, acceso di serie), l'impronta e l'ora dell'ultimo. */
     var officeBackupAuto: Boolean
-        get() = prefs.getBoolean("office_backup_auto", false)
+        get() = prefs.getBoolean("office_backup_auto", true)
         set(v) = prefs.edit().putBoolean("office_backup_auto", v).apply()
     var officeBackupPrint: String
         get() = prefs.getString("office_backup_print", null) ?: ""
@@ -25651,6 +25759,20 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("office_backup_server_error", v).apply()
     /** Le copie automatiche della segreteria (fuori dal backup completo: sono già una copia). */
     val officeBackupDir: File get() = File(app.filesDir, "office_backups")
+
+    /** Il luogo della partita (riepilogo e PDF) dalla posizione del telefono; chi non lo vuole lo spegne. */
+    var matchPlace: Boolean
+        get() = prefs.getBoolean("match_place", true)
+        set(v) = prefs.edit().putBoolean("match_place", v).apply()
+    /** La domanda sulla posizione prima della partita si fa una volta sola. */
+    var locationAsked: Boolean
+        get() = prefs.getBoolean("location_asked", false)
+        set(v) = prefs.edit().putBoolean("location_asked", v).apply()
+
+    /** Chi aveva già l'app ha visto l'avviso che il backup automatico ora è acceso di serie. */
+    var autoBackupNoticeSeen: Boolean
+        get() = prefs.getBoolean("auto_backup_notice_seen", false)
+        set(v) = prefs.edit().putBoolean("auto_backup_notice_seen", v).apply()
 
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
@@ -25772,15 +25894,7 @@ class Storage(context: Context) {
     /** Scrittura atomica: prima su file temporaneo, poi rinomina (sicuro anche se il telefono si spegne). */
     @Synchronized
     fun saveMatch(rec: MatchRecord) {
-        runCatching {
-            val f = File(matchesDir, "${rec.id}.json")
-            val tmp = File(matchesDir, "${rec.id}.tmp")
-            tmp.writeText(json.encodeToString(MatchRecord.serializer(), rec))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio partita fallito", it) }
+        runCatching { writeAtomic(File(matchesDir, "${rec.id}.json"), json.encodeToString(MatchRecord.serializer(), rec)) }.onFailure { Log.e("Storage", "Salvataggio partita fallito", it) }
     }
 
     fun loadUnfinished(): List<MatchRecord> =
@@ -25796,15 +25910,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveFinished(rec: MatchRecord) {
-        runCatching {
-            val f = File(finishedDir, "${rec.id}.json")
-            val tmp = File(finishedDir, "${rec.id}.tmp")
-            tmp.writeText(json.encodeToString(MatchRecord.serializer(), rec))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio nello storico fallito", it) }
+        runCatching { writeAtomic(File(finishedDir, "${rec.id}.json"), json.encodeToString(MatchRecord.serializer(), rec)) }.onFailure { Log.e("Storage", "Salvataggio nello storico fallito", it) }
     }
 
     /** Partite dello storico, dalla più recente. */
@@ -25825,11 +25931,12 @@ class Storage(context: Context) {
     }
 
     fun saveLastFinished(rec: MatchRecord) {
-        runCatching { lastFinishedFile.writeText(json.encodeToString(MatchRecord.serializer(), rec)) }
+        runCatching { writeAtomic(lastFinishedFile, json.encodeToString(MatchRecord.serializer(), rec)) }
     }
 
     fun loadLastFinished(): MatchRecord? =
-        runCatching { json.decodeFromString(MatchRecord.serializer(), lastFinishedFile.readText()) }.getOrNull()
+        // È solo una copia (per riaprire il riepilogo): se non si legge non serve avvisare.
+        readOr(lastFinishedFile, null, report = false) { json.decodeFromString(MatchRecord.serializer(), it) }
 
     /** Cartella predefinita dello storico se l'utente non ne sceglie una. */
     val defaultHistoryDir: File
@@ -29440,7 +29547,7 @@ object MembersCsv {
 
     /** Le righe del testo, con i campi tra virgolette (che possono contenere separatori e a capo). */
     fun table(text: String): List<Pair<Int, List<String>>> {
-        val t = text.removePrefix("﻿")
+        val t = text.removePrefix("\uFEFF")
         val d = delimiter(t.lineSequence().firstOrNull { it.isNotBlank() }.orEmpty())
         val rows = mutableListOf<Pair<Int, List<String>>>()
         var row = mutableListOf<String>()
@@ -29923,6 +30030,23 @@ object ScoreEngine {
     /** Ricostruisce lo stato applicando in ordine tutti gli eventi. */
     fun replay(rules: RulesConfig, events: List<MatchEvent>): MatchState =
         events.fold(initial(rules)) { s, e -> apply(s, e).state }
+
+    /**
+     * "Annulla": gli eventi che restano. Una correzione dell'arbitro (ritiro, richiamo, pausa, chi serve, lati,
+     * punteggio messo a mano, ordine di risposta a set iniziato) si toglie da sola; altrimenti va via l'ultimo punto
+     * con le scelte venute dopo (ordine di servizio e di risposta del set nuovo). [state] è lo stato di adesso;
+     * null se non c'è niente da annullare.
+     */
+    fun undo(state: MatchState, events: List<MatchEvent>): List<MatchEvent>? {
+        val last = events.lastOrNull() ?: return null
+        val setStarted = state.g1 + state.g2 + state.pt1 + state.pt2 > 0
+        val alone = last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break ||
+            last is MatchEvent.ServerFix || last is MatchEvent.EndsFix || last is MatchEvent.ScoreSet ||
+            (last is MatchEvent.ReceiveOrder && setStarted)
+        if (alone) return events.dropLast(1)
+        val point = events.indexOfLast { it is MatchEvent.Point }
+        return if (point < 0) null else events.subList(0, point)
+    }
 
     fun apply(state: MatchState, event: MatchEvent): Step = when (event) {
         is MatchEvent.Point -> pointWonBy(state, event.winner)
@@ -31915,7 +32039,8 @@ class DailyBackupJob : JobService() {
     override fun onStartJob(params: JobParameters): Boolean {
         val c = (application as TsmApp).controller
         scope.launch {
-            runCatching { if (c.storage.officeBackupAuto) c.officeBackupNow(onlyIfChanged = true) }
+            // La segreteria solo per chi fa il circolo: per gli altri sarebbe una copia vuota.
+            runCatching { if (c.storage.officeBackupAuto && com.tennis.scoremanager.Role.CLUB in c.roles.value) c.officeBackupNow(onlyIfChanged = true) }
             runCatching { if (c.storage.personalBackupAuto) c.personalBackupNow(onlyIfChanged = true) }
             jobFinished(params, false)
         }
@@ -35000,15 +35125,6 @@ fun ClubFeaturesHint(c: MatchController) {
     }
     if (open) ClubFeaturesDialog(c) { open = false; seen = true; c.storage.clubFeaturesSeen = true }
 }
-
-/** In fondo alle schede del Circolo: cambia le funzioni. */
-@Composable
-fun ClubFeaturesButton(c: MatchController) {
-    val s = LocalStrings.current
-    var open by remember { mutableStateOf(false) }
-    GhostButton(s.cfTitle, Icons.Filled.Tune, { open = true }, Modifier.fillMaxWidth())
-    if (open) ClubFeaturesDialog(c) { open = false; c.storage.clubFeaturesSeen = true }
-}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ClubTournamentUi.kt
@@ -35221,6 +35337,7 @@ fun AppRoot(c: MatchController) {
                 Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
                 Screen.OPTIONS -> OptionsScreen(c)
+                Screen.TOSS -> com.tennis.scoremanager.ui.screens.TossScreen(c)
                 Screen.START -> StartScreen(c)
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
@@ -35238,6 +35355,7 @@ fun AppRoot(c: MatchController) {
                 Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
                 Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
                 Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
+                Screen.SETTINGS -> com.tennis.scoremanager.ui.screens.SettingsScreen(c)
                 Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
                 Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
                 Screen.BOOK_COURT -> com.tennis.scoremanager.ui.screens.BookCourtScreen(c)
@@ -35888,7 +36006,7 @@ fun GoalsCard(c: MatchController) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     var adding by remember { mutableStateOf(false) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     SectionCard(s.goalsTitle, Icons.Filled.Flag) {
         if (c.myKey().isEmpty()) { Text(s.goalNeedMe, color = TsmColors.TextDim, fontSize = 13.sp); return@SectionCard }
         Text(s.goalsHint, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -35951,7 +36069,7 @@ fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
     val context = LocalContext.current
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val lines = remember(history) { c.myLines() }
     val years = remember(lines) { YearReview.years(lines).ifEmpty { listOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) } }
     var year by remember { mutableIntStateOf(years.first()) }
@@ -35982,7 +36100,7 @@ fun ActivityCalendarCard(c: MatchController) {
     val s = LocalStrings.current
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val today = java.util.Calendar.getInstance()
     var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
@@ -36043,7 +36161,7 @@ fun ActivityCalendarCard(c: MatchController) {
             for (id in info?.matches.orEmpty()) history.firstOrNull { it.record.id == id }?.let { lm ->
                 val rec = lm.record
                 val names2 = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { com.tennis.scoremanager.data.PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
-                TextButton(onClick = { c.openFromHistory(lm, com.tennis.scoremanager.Screen.PROGRESS) }, modifier = Modifier.fillMaxWidth()) {
+                TextButton(onClick = { c.openFromHistory(lm) }, modifier = Modifier.fillMaxWidth()) {
                     Text("${Reports.time(rec.startedAt ?: rec.updatedAt, lang)} · $names2", color = TsmColors.TextMain, modifier = Modifier.fillMaxWidth())
                 }
             }
@@ -36654,6 +36772,7 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Watch
@@ -36706,6 +36825,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var club by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
     var reminder by remember { mutableStateOf(true) }
+    var autoBackup by remember { mutableStateOf(c.storage.personalBackupAuto) }
     val steps = Step.entries.filter { st ->
         when (st) {
             Step.USE -> com.tennis.scoremanager.Role.PLAYER in roles
@@ -36729,6 +36849,9 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
+        c.setPersonalBackupAuto(autoBackup)
+        // Il backup automatico l'ha appena visto qui: niente avviso nella prima schermata.
+        c.storage.autoBackupNoticeSeen = true
         if (first.isNotBlank() && last.isNotBlank()) {
             // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
             val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
@@ -36746,7 +36869,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
             Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
-            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.VIDEO) }
+            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()
@@ -36785,6 +36908,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     Step.PRIVACY -> {
                         Text(s.onbPrivacyTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(s.onbPrivacyText, color = TsmColors.TextMain, fontSize = 15.sp)
+                        SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, autoBackup) { autoBackup = it }
                         SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it }
                     }
                     Step.USE -> {
@@ -37513,6 +37637,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -37548,7 +37673,7 @@ fun RematchCard(c: MatchController, m: LiveMatch) {
 private fun RematchDialog(c: MatchController, m: LiveMatch, onClose: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val rec = m.record
     var at by remember {
         mutableLongStateOf(Rematch.suggestedTime(rec.startedAt ?: rec.updatedAt, System.currentTimeMillis()))
@@ -37796,10 +37921,14 @@ package com.tennis.scoremanager.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37866,6 +37995,40 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/**
+ * Ruoli e funzioni, in un posto solo (Altro e il ruolo in alto): chi usa l'app e, per il ruolo attivo, cosa tenere nei
+ * menu (Cosa usi per Tu e Allenatore, le funzioni del circolo per la segreteria). Spento non vuol dire cancellato.
+ */
+@Composable
+fun RolesFeaturesDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val roles by c.roles.collectAsState()
+    val role by c.activeRole.collectAsState()
+    var features by remember { mutableStateOf(false) }
+    if (features) {
+        if (role == Role.CLUB) ClubFeaturesDialog(c) { features = false; c.storage.clubFeaturesSeen = true }
+        else PlayerFeaturesDialog(c) { features = false; c.storage.playerFeaturesSeen = true }
+        return
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { androidx.compose.material3.Icon(Icons.Filled.Tune, null, tint = TsmColors.Ball) },
+        title = { Text(s.rolesFeatures) },
+        text = {
+            Column(androidx.compose.ui.Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.rolesTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                RolesPicker(roles) { c.setRoles(it) }
+                val club = role == Role.CLUB
+                Text(if (club) s.cfTitle else s.pfTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = androidx.compose.ui.Modifier.padding(top = 8.dp))
+                Text(if (club) s.cfHint else s.pfEntryHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                GhostButton(if (club) s.cfTitle else s.pfTitle, Icons.Filled.Tune, { features = true }, androidx.compose.ui.Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
 }
 TSM_EOF
@@ -38142,10 +38305,11 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
 
 /**
  * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
- * le altre in "Tutte le sessioni".
+ * le altre in "Tutte le sessioni". Nel profilo Tu ci si allena da soli; in quello dell'Allenatore ([coach]) si sceglie
+ * l'allievo, e sessioni, cartelle e andamento sono suoi.
  */
 @Composable
-fun ServeTrainingCard(c: MatchController) {
+fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val sessions by c.serveSessions.collectAsState()
@@ -38153,12 +38317,18 @@ fun ServeTrainingCard(c: MatchController) {
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
     LaunchedEffect(Unit) { c.refreshServeSessions(); c.refreshStudents() }
+    // Tu: nessun allievo (ti alleni tu). Allenatore: l'allievo dell'ultima volta, se non ce n'è già uno scelto.
+    LaunchedEffect(coach) { if (coach) c.restoreCoachStudent() else if (c.trainStudent.value != null) c.setTrainStudent(null) }
     val trainee by c.trainStudent.collectAsState()
     // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
     val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        TraineeRow(c)
+        if (coach) {
+            TraineeRow(c)
+            // Prima si sceglie chi si allena: il resto (colpo, esercizio, avvio, sessioni) è suo.
+            if (trainee == null) return@SectionCard
+        }
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
@@ -38186,7 +38356,7 @@ fun ServeTrainingCard(c: MatchController) {
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
-/** Chi si allena: un allievo (le sessioni, le cartelle e l'andamento sono suoi) o nessuno. */
+/** Chi si allena con l'allenatore: uno dei suoi allievi (le sessioni, le cartelle e l'andamento sono suoi). */
 @Composable
 fun TraineeRow(c: MatchController) {
     val s = LocalStrings.current
@@ -38223,7 +38393,6 @@ fun TraineeRow(c: MatchController) {
                         Text(label, color = if (id == trainee) TsmColors.Ball else TsmColors.TextMain, fontWeight = if (id == trainee) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier.padding(start = 10.dp))
                     }
-                    option(s.trainNoStudent, null, null)
                     for (st in students) option(st.name, st.id, st.name)
                 }
             },
@@ -38269,7 +38438,7 @@ fun PlayerEditDialog(
     var student by remember { mutableStateOf(player?.student ?: asStudent) }
     var phone by remember { mutableStateOf(player?.phone.orEmpty()) }
     var email by remember { mutableStateOf(player?.email.orEmpty()) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
     val players by c.players.collectAsState()
@@ -38409,7 +38578,7 @@ fun SessionRow(
     c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,
 ) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val n = ServeTraining.count(sess.serves)
     Row(modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(vertical = 6.dp)) {
         Column(Modifier.weight(1f)) {
@@ -38644,7 +38813,6 @@ interface Strings {
 
     // Pagina 1
     val setupTitle: String
-    val setupSubtitle: String
     val clubSection: String
     val clubName: String
     val courtNumber: String
@@ -38880,7 +39048,6 @@ interface Strings {
     val videoPoint: String
     val videoGame: String
     val videoSet: String
-    val videoReplay: String
     val videoStart: String
     val videoKind: (String) -> String
     val videoImport: String
@@ -38982,7 +39149,6 @@ interface Strings {
     val heartLine: (Int, Int) -> String
     /** "~620 kcal (stima)" */
     val caloriesLine: (Int) -> String
-    val heartStatsHint: String
     val heartZones: String
     /** "Z3 Moderata": zone da 0 a 4. */
     val zoneName: (Int) -> String
@@ -39272,8 +39438,6 @@ interface Strings {
     val audioOff: String
     val newMatch: String
     val suspendedOverlay: String
-    val newMatchConfirmTitle: String
-    val newMatchConfirmText: String
     val endDialogTitle: String
     /** Vincitore, punteggio, doppio (il verbo va al plurale: "Vincono Rossi e Bianchi"). */
     val endDialogText: (String, String, Boolean) -> String
@@ -39306,7 +39470,6 @@ interface Strings {
     /** "Annulla punto" corto, per il tasto accanto a Sospendi e Arbitro. */
     val undoShort: String
     /** "Nuova partita" corto, per il tasto in fondo alla partita. */
-    val newMatchShort: String
     val disqualifyButton: String
     val disqualifyTitle: String
     val disqualifyHint: String
@@ -39457,7 +39620,6 @@ interface Strings {
     val pbClubChatHint: String
     val pbClubChatAlerts: String
     val pbClubChatAlertsHint: String
-    val pbDmTitle: String
     val pbDmOpen: String
     val pbDmOpenHint: String
     val pbDmHint: String
@@ -39488,9 +39650,7 @@ interface Strings {
     val serveOrderTitle: (Int) -> String
     val whoServesFirst: (String) -> String
     val confirm: String
-    val backDisabled: String
     val exit: String
-    val exitConfirmTitle: String
     val exitConfirmText: String
     val exitConfirmBands: String
 
@@ -39623,8 +39783,6 @@ interface Strings {
     val rematchNoCalendar: String
     val rematchPreview: String
     /** Allenamento al servizio: telefono a fianco di chi serve, braccialetto per dentro e fuori. */
-    val serveTitle: String
-    val serveHint: String
     val serveStart: String
     val serveNoBand: String
     val serveBandOk: (String) -> String
@@ -39755,19 +39913,13 @@ interface Strings {
     val studentWonLost: (Int, Int) -> String
     val studentDeleteAsk: (String) -> String
     val studentRacket: String
-    val studentRacketNone: String
     val studentRacketPick: String
     val studentPurge: String
     val studentPurgeConfirm: String
     val studentPurgeAsk: (String, Int) -> String
-    val playerLinked: (String) -> String
-    val playerHomonyms: (Int, String) -> String
-    val playerCreate: (String) -> String
     val playerMatchesHint: (Int, String) -> String
     val studentPickExisting: String
     val studentFromExisting: String
-    val playerNotHim: String
-    val playerNew: (String) -> String
     val playersTitle: String
     val playersHint: String
     val playersSearch: String
@@ -39822,7 +39974,6 @@ interface Strings {
     val dataVideos: (Int) -> String
     val dataRestoreAsk: (String, String, Boolean) -> String
     val tabTournaments: String
-    val tabCourts: String
     val roleCoach: String
     val roleClub: String
     val roleYouHint: String
@@ -40184,7 +40335,6 @@ interface Strings {
     val crtHeating: String
     val crtNoLightsWarn: String
     val crtTitle: String
-    val crtTapToSet: String
     val crtClay: String
     val crtGrass: String
     val crtHard: String
@@ -40448,7 +40598,6 @@ interface Strings {
     val srvErrPairLocal: String
     // Prenota un campo (il giocatore).
     val pbTitle: String
-    val pbEntryHint: String
     val pbEntryJoined: (String) -> String
     val pbJoinIntro: String
     val pbScan: String
@@ -40475,7 +40624,6 @@ interface Strings {
     val pbPrice: String
     val pbFreePrice: String
     val pbPay: (String) -> String
-    val pbBooked: String
     val pbClosed: String
     val pbRules: (Int, Int) -> String
     val pbCancelRule: (Int) -> String
@@ -40653,8 +40801,6 @@ interface Strings {
     val pfRackets: String
     val pfRacketsHint: String
     val pfPadelHint: String
-    val moreGroupDevices: String
-    val moreGroupData: String
     val moreGroupHelp: String
     /** Segreteria da PC: l'avviso del browser spiegato prima, browser per browser. */
     val deskFirstTitle: String
@@ -40680,7 +40826,7 @@ interface Strings {
     val likeLastTitle: String
     val likeLastChange: String
     val playLikeLast: (String) -> String
-    /** Profilo e dati: il backup automatico di tutti i dati. */
+    /** Backup e dati: il backup automatico di tutti i dati. */
     val autoBackup: String
     val autoBackupHint: String
     val autoBackupNone: String
@@ -40708,7 +40854,6 @@ interface Strings {
     val yrRival: String
     val yrNone: String
     val yrShare: String
-    val yrYear: String
     val goalAtLeast: (String) -> String
     val goalAtMost: (String) -> String
     val goalReached: (String) -> String
@@ -40721,13 +40866,10 @@ interface Strings {
     val yrStreak: (Int) -> String
     val yrAces: (Int) -> String
     val yrWorkouts: (Int) -> String
-    val yrRecord: (Int, Int) -> String
     /** Progressi › Calendario e Prenota › Invita. */
     val calTitle: String
     val calHint: String
     val calNoneDay: String
-    val calPrev: String
-    val calNext: String
     val pbInviteSend: String
     val pbBookedInvite: String
     val calStreak: (Int) -> String
@@ -40779,13 +40921,11 @@ interface Strings {
     /** Prima schermata a cinque schede (Gioca, Allenati, Video, Progressi, Altro). */
     val tabPlay: String
     val tabTrain: String
-    val tabVideo: String
     val tabProgress: String
     val tabMore: String
     val playNewMatchHint: String
     val playResume: (String) -> String
     val playTournamentHint: String
-    val playUseAs: String
     val playAsBoardHint: String
     val playAsCamera: String
     val playAsCameraHint: String
@@ -40802,9 +40942,6 @@ interface Strings {
     val moreDevicesHint: String
     val moreVoice: String
     val moreVoiceHint: String
-    val moreRacketsHint: String
-    val moreTransfer: String
-    val moreTransferHint: String
     val statusBands: (Int) -> String
     val statusStraps: (Int) -> String
     val statusCamera: String
@@ -40815,7 +40952,6 @@ interface Strings {
     val step2Hint: String
     val moreDetails: String
     val moreDetailsHint: String
-    val recentPlayers: String
     /** Prima accensione guidata e profilo Tu. */
     val onbWelcome: String
     val onbLang: String
@@ -40836,7 +40972,6 @@ interface Strings {
     val moreProfileHint: String
     val moreTour: String
     val moreTourHint: String
-    val profileName: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -40844,7 +40979,6 @@ interface Strings {
     val shareImage: String
     val sharePdf: String
     // Tornei Americano e Mexicano
-    val tournamentButton: String
     val tournamentTitle: String
     val tournamentSubtitle: String
     val tournamentNew: String
@@ -40956,7 +41090,6 @@ interface Strings {
 
     // Telefono usato come tabellone
     val displayMode: String
-    val displayModeHint: String
     val displaySearching: String
     val displaySteps: String
     val displayManual: String
@@ -40980,7 +41113,6 @@ interface Strings {
     val racketNone: String
     val racketEmpty: String
     val racketField: String
-    val racketSetupHint: String
     val racketCatalog: String
     val racketCatalogHint: String
     val racketName: String
@@ -41035,6 +41167,37 @@ interface Strings {
 
     val aboutLicense: (String) -> String
     val aboutSource: String
+
+    val unreadableTitle: String
+    val unreadableHint: (String) -> String
+    val autoBackupOnTitle: String
+    val autoBackupOnHint: String
+
+    val leaveTitle: String
+    val leaveToMenu: String
+    val closeApp: String
+    val keepPlaying: String
+    val done: String
+    val matchPlace: String
+    val matchPlaceHint: String
+
+    val step3Hint: String
+    val otherRules: String
+    val playerDetails: String
+
+    val tabPlanning: String
+    val playThisPhone: String
+    val rolesFeatures: String
+    val rolesFeaturesHint: String
+    val moreGroupClub: String
+    val pbMineEntryHint: String
+    val pbSeekEntryHint: String
+
+    val settingsTitle: String
+    val settingsHint: String
+    val aboutTitle: String
+    val aboutVersion: (String, Int) -> String
+    val aboutSite: String
 }
 
 object ItStrings : Strings {
@@ -41042,7 +41205,6 @@ object ItStrings : Strings {
     override val datePattern = "EEEE d MMMM yyyy"
 
     override val setupTitle = "Nuova partita"
-    override val setupSubtitle = "Configurazione facoltativa: puoi lasciare tutto vuoto e andare avanti."
     override val clubSection = "Circolo e campo"
     override val clubName = "Nome circolo tennis"
     override val courtNumber = "Numero campo"
@@ -41274,7 +41436,6 @@ object ItStrings : Strings {
     override val videoPoint = "Punto"
     override val videoGame = "Game"
     override val videoSet = "Set"
-    override val videoReplay = "Rivedi il punto"
     override val videoStart = "Inizio"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doppio fallo"; "WINNER" -> "Vincente"; "UNFORCED_ERROR" -> "Errore gratuito"; "FORCED_ERROR" -> "Errore forzato"; "ERROR" -> "Errore"; else -> k } }
     override val videoImport = "Importa video"
@@ -41374,7 +41535,6 @@ object ItStrings : Strings {
     override val heartChart = "Battito durante la partita"
     override val heartLine: (Int, Int) -> String = { a, m -> "medio $a · max $m bpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (stima)" }
-    override val heartStatsHint = "Calorie stimate dal battito con la formula di Keytel: l'errore tipico è del 20%."
     override val heartZones = "Tempo nelle zone cardio"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Molto leggera", "Leggera", "Moderata", "Intensa", "Massima").getOrElse(it) { "" } }
     override val heartZonesHint = "Zone in percentuale del battito massimo stimato dall'età (208 − 0,7 × età): serve l'età di chi indossa la fascia."
@@ -41645,8 +41805,6 @@ object ItStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "Nuova partita"
     override val suspendedOverlay = "PARTITA SOSPESA"
-    override val newMatchConfirmTitle = "Nuova partita?"
-    override val newMatchConfirmText = "La partita in corso resta salvata tra le partite sospese e potrai riprenderla."
     override val endDialogTitle = "Gioco, set, partita"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Vincono" else "Vince"} $name\n$score" }
     override val matchConcluded = "Partita conclusa"
@@ -41676,7 +41834,6 @@ object ItStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "condotta $c · tempo $t" }
     override val retireUndone = "Ritiro annullato"
     override val undoShort = "Annulla"
-    override val newMatchShort = "Nuova"
     override val disqualifyButton = "Squalifica"
     override val disqualifyTitle = "Chi viene squalificato?"
     override val disqualifyHint = "Dopo i game di penalità, o per un fatto grave, l'arbitro può squalificare: la partita finisce col punteggio attuale e vince l'avversario."
@@ -41827,7 +41984,6 @@ object ItStrings : Strings {
     override val pbClubChatHint = "Qui leggono e scrivono tutti i soci collegati. Siate gentili: la segreteria può togliere i messaggi, e con la bandierina segnali quelli fuori luogo."
     override val pbClubChatAlerts = "Notifiche della chat del circolo"
     override val pbClubChatAlertsHint = "Spente: i messaggi li leggi qui quando vuoi."
-    override val pbDmTitle = "Messaggi privati"
     override val pbDmOpen = "Possono scrivermi i soci"
     override val pbDmOpenHint = "Acceso: compari nell'elenco e gli altri soci possono scriverti. Spento: non compari, ma puoi scrivere tu a chi l'ha acceso."
     override val pbDmHint = "Lo leggete solo voi due. Se un messaggio non va, segnalalo con la bandierina: solo allora lo vede la segreteria."
@@ -41858,9 +42014,7 @@ object ItStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
-    override val backDisabled = "Durante la partita usa «Nuova partita» o «Esci»."
     override val exit = "Esci"
-    override val exitConfirmTitle = "Uscire dall'app?"
     override val exitConfirmText = "La partita resta salvata tra le partite sospese e potrai riprenderla."
     override val exitConfirmBands = "I braccialetti vengono spenti."
 
@@ -41994,8 +42148,6 @@ object ItStrings : Strings {
     override val rematchEvent: (String) -> String = { "Rivincita: $it" }
     override val rematchNoCalendar = "Nessuna app di calendario su questo telefono."
     override val rematchPreview = "Il messaggio"
-    override val serveTitle = "Allenamento al servizio"
-    override val serveHint = "Telefono sul cavalletto a fianco di chi serve, braccialetto al polso: KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni servizio diventa una clip da rivedere."
     override val serveStart = "Inizia"
     override val serveNoBand = "Nessun braccialetto collegato: segna dentro e fuori coi tasti sullo schermo."
     override val serveBandOk: (String) -> String = { "Braccialetto $it: KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla" }
@@ -42120,26 +42272,20 @@ object ItStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w vinte, $l perse" }
     override val studentDeleteAsk: (String) -> String = { "Togliere $it dagli allievi? Le sue sessioni restano, senza allievo." }
     override val studentRacket = "Racchetta"
-    override val studentRacketNone = "Nessuna racchetta in Le mie racchette: aggiungila da Progressi › Le mie racchette."
     override val studentRacketPick = "Scegli la sua racchetta"
     override val studentPurge = "Cancella il giocatore e i suoi dati"
     override val studentPurgeConfirm = "Cancella tutto"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Cancellare $name e tutti i suoi dati da questo telefono? Si cancellano le sue $n sessioni con video e analisi, le note e la foto; la racchetta resta ma non è più sua. Le partite nello storico restano (ci sono anche gli avversari). Non si può annullare." }
-    override val playerLinked: (String) -> String = { "✓ $it, dal database dei giocatori" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "Ci sono $n giocatori di nome $name: tocca quello giusto o creane un altro." }
-    override val playerCreate: (String) -> String = { "Un altro $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partita, $d" else "$n partite, l'ultima $d" }
     override val studentPickExisting = "Tocca il giocatore se è lui: le sue partite sono già nel database."
     override val studentFromExisting = "Allievo dal database dei giocatori: con le sue partite."
-    override val playerNotHim = "Non è lui: un altro giocatore"
-    override val playerNew: (String) -> String = { "Nuovo giocatore: $it entra nel database all'inizio della partita" }
     override val playersTitle = "Giocatori"
     override val playersHint = "Tutti i giocatori delle partite e gli allievi: unisci chi è scritto in due modi, separa gli omonimi"
     override val playersSearch = "Cerca"
     override val playersNone = "Ancora nessun giocatore: si aggiungono da soli con le partite."
     override val playerTwin = "omonimo"
     override val playerStudentToggle = "Allievo"
-    override val playerStudentToggleHint = "Compare in Allenati › Allievi e in Chi si allena"
+    override val playerStudentToggleHint = "Compare tra gli Allievi (ruolo Allenatore) e in Chi si allena"
     override val playerMerge = "Unisci con un altro giocatore"
     override val playerMergeHint = "La stessa persona scritta in due modi o creata due volte: le sue partite e sessioni passano a questo giocatore."
     override val playerSplit = "Separa un omonimo"
@@ -42162,7 +42308,7 @@ object ItStrings : Strings {
     override val meNew = "Sono nuovo"
     override val meIsYou = "Sei tu"
     override val meThisIsMe = "Sono io"
-    override val dataTitle = "Profilo e dati"
+    override val dataTitle = "Backup e dati"
     override val dataHint = "Backup in un file che resta tuo, ripristino su questo o su un altro telefono, cancellazione di tutto"
     override val dataBackup = "Backup"
     override val dataBackupHint = "Un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce. Salvalo dove vuoi (anche su un PC o in una chiavetta): nessun cloud."
@@ -42187,14 +42333,13 @@ object ItStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Includi i video ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup del $date (app $app" + (if (videos) ", con i video" else ", senza video") + "). Sostituisce tutti i dati di adesso: se ti servono, prima fai un backup." }
     override val tabTournaments = "Tornei"
-    override val tabCourts = "Campi"
     override val roleCoach = "Allenatore"
     override val roleClub = "Circolo"
-    override val roleYouHint = "Giochi, ti alleni, i tuoi video, progressi e racchette."
-    override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, movimento, partite e note. Arbitri le partite tra allievi."
-    override val roleClubHint = "Tornei, campi coi loro tabelloni TV, giocatori e allenatori."
+    override val roleYouHint = "Giochi: segnapunti, allenamenti, video, progressi, racchette e le prenotazioni al tuo circolo."
+    override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, esercizi, movimento, report e note. Le partite si segnano dal ruolo Tu."
+    override val roleClubHint = "La segreteria: oggi, planning dei campi, soci e quote, scuola tennis, tornei e squadre."
     override val rolesTitle = "Ruoli"
-    override val rolesHint = "Puoi averne più di uno (chi gioca e allena): cambiano le schede della prima schermata, i dati sono gli stessi. In alto passi da un ruolo all'altro."
+    override val rolesHint = "Ogni ruolo ha le sue funzioni, senza doppioni. Puoi averne più di uno (chi gioca e allena): in alto passi dall'uno all'altro, i dati sono gli stessi."
     override val clubNoName = "Il circolo"
     override val clubNoCourts = "Tocca per scrivere nome e campi"
     override val clubCourtsLabel = "Campi (uno per riga)"
@@ -42205,7 +42350,7 @@ object ItStrings : Strings {
     override val onbRolesTitle = "Chi usa l'app?"
     override val onbClubTitle = "Il tuo circolo"
     override val onbPrivacyTitle = "I tuoi dati"
-    override val onbPrivacyText = "Partite, giocatori, video e note restano su questo telefono: nessun account, nessun server. Se segui allievi (anche minorenni), chiedi il loro consenso a riprenderli e a tenerne i dati; li puoi cancellare quando vuoi. Fai ogni tanto un backup in Altro › Profilo e dati: è l'unica copia."
+    override val onbPrivacyText = "Partite, giocatori, video e note restano su questo telefono: nessun account, nessun server. Se segui allievi (anche minorenni), chiedi il loro consenso a riprenderli e a tenerne i dati; li puoi cancellare quando vuoi. Ogni giorno l'app ne fa una copia in Documenti; ogni tanto mettine una anche fuori dal telefono (Altro › Impostazioni › Backup e dati)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Non hai ancora mai salvato un backup: tocca per farlo." else "Ultimo backup: $last. Tocca per farne uno nuovo." }
     override val drillsTitle = "Esercizi"
     override val drillsHint = "Esercizi guidati: un colpo e i passi in fila (es. 20 dritti incrociati, poi 20 lungolinea)"
@@ -42549,7 +42694,6 @@ object ItStrings : Strings {
     override val crtHeating = "Riscaldamento"
     override val crtNoLightsWarn = "Questo campo non ha le luci."
     override val crtTitle = "Campi"
-    override val crtTapToSet = "tocca per impostarlo"
     override val crtClay = "Terra"
     override val crtGrass = "Erba"
     override val crtHard = "Cemento"
@@ -42782,7 +42926,7 @@ object ItStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Giocatori collegati: $it" }
     override val srvInviteHow = "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online."
     override val srvInvite = "Invito per prenotare online"
-    override val srvInviteHint = "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Gioca › Prenota un campo › Inquadra il QR."
+    override val srvInviteHint = "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Altro › Ho un invito del circolo › Inquadra il QR."
     override val srvInviteCode: (String) -> String = { "Codice: $it" }
     override val srvInviteUntil: (String) -> String = { "Vale una volta, fino al $it" }
     override val srvShare = "Condividi il link"
@@ -42811,7 +42955,6 @@ object ItStrings : Strings {
     override val srvPublicUrlHint = "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo"
     override val srvErrPairLocal = "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080)."
     override val pbTitle = "Prenota un campo"
-    override val pbEntryHint = "Se il tuo circolo ha il server TSM: entri con l'invito della segreteria"
     override val pbEntryJoined: (String) -> String = { "$it: campi liberi e le tue prenotazioni" }
     override val pbJoinIntro = "Inquadra il QR d'invito che ti ha dato la segreteria del circolo, oppure incolla il link dell'invito (o scrivi il codice e l'indirizzo del circolo)."
     override val pbScan = "Inquadra il QR"
@@ -42838,7 +42981,6 @@ object ItStrings : Strings {
     override val pbPrice = "Prezzo"
     override val pbFreePrice = "gratis"
     override val pbPay: (String) -> String = { "Pagamento: $it" }
-    override val pbBooked = "Prenotato!"
     override val pbClosed = "Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota."
     override val pbRules: (Int, Int) -> String = { a, b -> "Prenoti fino a $a giorni avanti, al massimo $b prenotazioni per volta." }
     override val pbCancelRule: (Int) -> String = { "Disdici da solo fino a $it ore prima." }
@@ -43011,8 +43153,6 @@ object ItStrings : Strings {
     override val pfRackets = "Racchette"
     override val pfRacketsHint = "Le tue racchette, le corde e la racchetta virtuale"
     override val pfPadelHint = "La scelta tennis o padel nella nuova partita"
-    override val moreGroupDevices = "Dispositivi e voce"
-    override val moreGroupData = "Dati"
     override val moreGroupHelp = "Aiuto"
     override val deskFirstTitle = "La prima volta il browser dirà «La connessione non è privata»"
     override val deskFirstWhy = "È normale e non è un pericolo: la pagina la serve questo telefono, con un certificato fatto da lui e non da un'azienda che il browser conosce. Il collegamento resta cifrato."
@@ -43061,7 +43201,6 @@ object ItStrings : Strings {
     override val yrRival = "Il rivale"
     override val yrNone = "Nessuna partita in quest'anno."
     override val yrShare = "Condividi"
-    override val yrYear = "Anno"
     override val goalAtLeast: (String) -> String = { "almeno $it" }
     override val goalAtMost: (String) -> String = { "al massimo $it" }
     override val goalReached: (String) -> String = { "Raggiunto il $it" }
@@ -43074,12 +43213,9 @@ object ItStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Serie più lunga: 1 vittoria" else "Serie più lunga: $it vittorie di fila" }
     override val yrAces: (Int) -> String = { "Ace: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 allenamento" else "$it allenamenti" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a vinte, $b perse" }
     override val calTitle = "Calendario"
     override val calHint = "I giorni con partite e allenamenti: tocca un giorno per vedere cosa hai fatto."
     override val calNoneDay = "Niente in questo giorno."
-    override val calPrev = "Mese prima"
-    override val calNext = "Mese dopo"
     override val pbInviteSend = "Invita"
     override val pbBookedInvite = "Prenotato! Qui sotto puoi invitare chi gioca con te."
     override val calStreak: (Int) -> String = { if (it == 1) "Hai giocato o ti sei allenato questa settimana" else "Da $it settimane di fila giochi o ti alleni" }
@@ -43127,13 +43263,11 @@ object ItStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisi del colpo $a di $b…" }
     override val tabPlay = "Gioca"
     override val tabTrain = "Allenati"
-    override val tabVideo = "Video"
     override val tabProgress = "Progressi"
     override val tabMore = "Altro"
     override val playNewMatchHint = "Chi gioca, regole e come segni il punteggio"
     override val playResume: (String) -> String = { "Riprendi: $it" }
     override val playTournamentHint = "Americano o Mexicano, a coppie che girano"
-    override val playUseAs = "Usa questo telefono come"
     override val playAsBoardHint = "Lo schermo diventa il tabellone di una partita"
     override val playAsCamera = "Telefono-telecamera"
     override val playAsCameraHint = "Riprende la partita col punteggio dell'arbitro"
@@ -43148,22 +43282,18 @@ object ItStrings : Strings {
     override val progressRacketsHint = "Statistiche e sensazioni per racchetta"
     override val moreDevices = "Dispositivi"
     override val moreDevicesHint = "Braccialetti, fasce, telecomandi, secondo telefono, tabellone TV"
-    override val moreVoice = "Lingua e voce"
-    override val moreVoiceHint = "Lingua dell'app, voce che annuncia il punteggio"
-    override val moreRacketsHint = "Corde, tensioni e incordature"
-    override val moreTransfer = "Trasferisci le partite"
-    override val moreTransferHint = "Su un altro telefono, con un codice"
+    override val moreVoice = "Voce dell'arbitro"
+    override val moreVoiceHint = "Chiamate vocali, motore e voce, voci registrate da te"
     override val statusBands: (Int) -> String = { "Braccialetti $it/2" }
     override val statusStraps: (Int) -> String = { "Fasce $it" }
     override val statusCamera = "Telecamera collegata"
     override val statusTv = "Tabellone TV"
     override val statusNone = "Nessun dispositivo collegato"
     override val playTournament = "Torneo tra amici"
-    override val step1Hint = "Passo 1 di 2 · Chi gioca. Tutto facoltativo: puoi andare avanti anche senza nomi."
-    override val step2Hint = "Passo 2 di 2 · Come segni il punteggio e le regole della partita."
+    override val step1Hint = "Passo 1 di 3 · Chi gioca. Tutto facoltativo: puoi andare avanti anche senza nomi."
+    override val step2Hint = "Passo 2 di 3 · Come segni il punteggio e le regole della partita."
     override val moreDetails = "Altri dettagli"
     override val moreDetailsHint = "Circolo, campo e torneo, se vuoi"
-    override val recentPlayers = "Giocatori recenti"
     override val onbWelcome = "Benvenuto in Tennis Score Manager"
     override val onbLang = "Scegli la lingua"
     override val onbUseTitle = "Come userai TSM?"
@@ -43183,14 +43313,12 @@ object ItStrings : Strings {
     override val moreProfileHint = "Il tuo nome, per progressi e rating"
     override val moreTour = "Presentazione dell'app"
     override val moreTourHint = "Le prime domande, di nuovo"
-    override val profileName = "Il tuo nome"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
     override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
     override val shareImage = "Immagine"
     override val sharePdf = "PDF completo"
-    override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
     override val tournamentNew = "Nuovo torneo"
@@ -43291,7 +43419,6 @@ object ItStrings : Strings {
     override val tvChromecastHint = "Con un Chromecast: sul telefono-tabellone usa il pulsante «Trasmetti» delle impostazioni rapide («Trasmissione schermo» fino ad Android 14, «Smart View» sui Samsung). Il Chromecast vuole una rete con internet: accendi i dati mobili sul telefono che fa l'hotspot."
 
     override val displayMode = "Usa come tabellone"
-    override val displayModeHint = "Questo telefono mostra il punteggio sul monitor (cavo HDMI o Chromecast)"
     override val displaySearching = "Cerco il telefono dell'arbitro…"
     override val displaySteps = "1. Accendi l'hotspot su uno dei due telefoni e collega l'altro.\n2. Sul telefono dell'arbitro: pagina 2 → «Tabellone su TV» acceso.\n3. Collega questo telefono al monitor (cavo USB-C/HDMI) o trasmetti lo schermo a un Chromecast."
     override val displayManual = "Indirizzo (es. 192.168.43.1:8080)"
@@ -43313,7 +43440,6 @@ object ItStrings : Strings {
     override val racketNone = "Nessuna"
     override val racketEmpty = "Nessuna racchetta. Aggiungi le tue racchette con corde e tensione: poi scegli quella usata prima di ogni partita o allenamento."
     override val racketField = "Racchetta"
-    override val racketSetupHint = "Scegli la racchetta di ciascun giocatore: la partita ricorderà racchetta, corde e tensione di oggi."
     override val racketCatalog = "Dal catalogo"
     override val racketCatalogHint = "Dati del produttore, indicativi: se hai misurato la tua racchetta correggili."
     override val racketName = "Soprannome (A, B…)"
@@ -43368,6 +43494,37 @@ object ItStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software libero con licenza GNU GPL versione 3 o successiva, senza alcuna garanzia." }
     override val aboutSource = "Codice sorgente"
+
+    override val unreadableTitle = "Alcuni dati non si leggevano"
+    override val unreadableHint: (String) -> String = { "$it: ne ho messo da parte una copia, che non tocco. Se ti manca qualcosa, tocca qui e ripristina l'ultimo backup." }
+    override val autoBackupOnTitle = "Il backup ora è automatico"
+    override val autoBackupOnHint = "Ogni giorno, se è cambiato qualcosa, una copia di tutti i dati (senza video) va in Documenti › Tennis Score Manager › Backup. Tocca per vederlo o spegnerlo."
+
+    override val leaveTitle = "Uscire dalla partita?"
+    override val leaveToMenu = "Torna al menu"
+    override val closeApp = "Chiudi l'app"
+    override val keepPlaying = "Continua a giocare"
+    override val done = "Fatto"
+    override val matchPlace = "Luogo della partita"
+    override val matchPlaceHint = "Dalla posizione del telefono, nel riepilogo e nel PDF. Resta sul telefono."
+
+    override val step3Hint = "Passo 3 di 3 · Chi serve per primo e da che lato si parte."
+    override val otherRules = "Altre regole"
+    override val playerDetails = "Classifica, uomo/donna, racchetta"
+
+    override val tabPlanning = "Planning"
+    override val playThisPhone = "Questo telefono"
+    override val rolesFeatures = "Ruoli e funzioni"
+    override val rolesFeaturesHint = "Chi usa l'app e cosa tenere nei menu: il resto non compare, i dati restano"
+    override val moreGroupClub = "Il circolo"
+    override val pbMineEntryHint = "Prenotazioni, liste d'attesa, promemoria e PIN"
+    override val pbSeekEntryHint = "Trova con chi giocare: al completo il campo si prenota da solo"
+
+    override val settingsTitle = "Impostazioni"
+    override val settingsHint = "Lingua, voce, dispositivi, ruoli e funzioni, backup e versione dell'app"
+    override val aboutTitle = "Informazioni"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Versione $v (build $n)" }
+    override val aboutSite = "Sito e guida"
 }
 
 object EnStrings : Strings {
@@ -43375,7 +43532,6 @@ object EnStrings : Strings {
     override val datePattern = "EEEE, d MMMM yyyy"
 
     override val setupTitle = "New match"
-    override val setupSubtitle = "Optional setup: you can leave everything empty and go on."
     override val clubSection = "Club and court"
     override val clubName = "Tennis club name"
     override val courtNumber = "Court number"
@@ -43607,7 +43763,6 @@ object EnStrings : Strings {
     override val videoPoint = "Point"
     override val videoGame = "Game"
     override val videoSet = "Set"
-    override val videoReplay = "Replay the point"
     override val videoStart = "Start"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double fault"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unforced error"; "FORCED_ERROR" -> "Forced error"; "ERROR" -> "Error"; else -> k } }
     override val videoImport = "Import video"
@@ -43707,7 +43862,6 @@ object EnStrings : Strings {
     override val heartChart = "Heart rate during the match"
     override val heartLine: (Int, Int) -> String = { a, m -> "average $a · max $m bpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (estimate)" }
-    override val heartStatsHint = "Calories estimated from heart rate with the Keytel formula: the typical error is 20%."
     override val heartZones = "Time in heart rate zones"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Very light", "Light", "Moderate", "Hard", "Maximum").getOrElse(it) { "" } }
     override val heartZonesHint = "Zones as a percentage of the maximum heart rate estimated from age (208 − 0.7 × age): the wearer's age is needed."
@@ -43978,8 +44132,6 @@ object EnStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "New match"
     override val suspendedOverlay = "MATCH SUSPENDED"
-    override val newMatchConfirmTitle = "New match?"
-    override val newMatchConfirmText = "The current match stays saved among suspended matches and can be resumed."
     override val endDialogTitle = "Game, set and match"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "$name ${if (team) "win" else "wins"}\n$score" }
     override val matchConcluded = "Match concluded"
@@ -44009,7 +44161,6 @@ object EnStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "code $c · time $t" }
     override val retireUndone = "Retirement undone"
     override val undoShort = "Undo"
-    override val newMatchShort = "New"
     override val disqualifyButton = "Disqualification"
     override val disqualifyTitle = "Who is disqualified?"
     override val disqualifyHint = "After the penalty games, or for a serious offence, the umpire can disqualify: the match ends at the current score and the opponent wins."
@@ -44160,7 +44311,6 @@ object EnStrings : Strings {
     override val pbClubChatHint = "Every connected member reads and writes here. Be kind: the office can remove messages, and the flag reports out-of-place ones."
     override val pbClubChatAlerts = "Club chat notifications"
     override val pbClubChatAlertsHint = "Off: read the messages here whenever you like."
-    override val pbDmTitle = "Private messages"
     override val pbDmOpen = "Members can write to me"
     override val pbDmOpenHint = "On: you are in the list and other members can write to you. Off: you are not, but you can write to those who turned it on."
     override val pbDmHint = "Only the two of you read this. If a message is not OK, report it with the flag: only then does the office see it."
@@ -44191,9 +44341,7 @@ object EnStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
-    override val backDisabled = "During the match use «New match» or «Exit»."
     override val exit = "Exit"
-    override val exitConfirmTitle = "Exit the app?"
     override val exitConfirmText = "The match stays saved among suspended matches and can be resumed."
     override val exitConfirmBands = "The wristbands are switched off."
 
@@ -44327,8 +44475,6 @@ object EnStrings : Strings {
     override val rematchEvent: (String) -> String = { "Rematch: $it" }
     override val rematchNoCalendar = "No calendar app on this phone."
     override val rematchPreview = "The message"
-    override val serveTitle = "Serve practice"
-    override val serveHint = "Phone on the tripod beside the server, wristband on the wrist: KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every serve becomes a clip to watch again."
     override val serveStart = "Start"
     override val serveNoBand = "No wristband connected: mark in and out with the buttons on the screen."
     override val serveBandOk: (String) -> String = { "Wristband $it: KEY1 in, KEY2 out, KEY1 held down undoes" }
@@ -44453,26 +44599,20 @@ object EnStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w won, $l lost" }
     override val studentDeleteAsk: (String) -> String = { "Remove $it from the students? Their sessions stay, without a student." }
     override val studentRacket = "Racket"
-    override val studentRacketNone = "No racket in My rackets yet: add it from Progress › My rackets."
     override val studentRacketPick = "Pick their racket"
     override val studentPurge = "Delete player and their data"
     override val studentPurgeConfirm = "Delete everything"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Delete $name and all their data from this phone? Their $n sessions with videos and analysis, the notes and the photo are deleted; the racket stays but is no longer theirs. Matches in the history stay (the opponents are in them too). This cannot be undone." }
-    override val playerLinked: (String) -> String = { "✓ $it, from the players database" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "There are $n players called $name: tap the right one or create another." }
-    override val playerCreate: (String) -> String = { "Another $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 match, $d" else "$n matches, last $d" }
     override val studentPickExisting = "Tap the player if it's them: their matches are already in the database."
     override val studentFromExisting = "Student from the players database: with their matches."
-    override val playerNotHim = "Not them: another player"
-    override val playerNew: (String) -> String = { "New player: $it joins the database when the match starts" }
     override val playersTitle = "Players"
     override val playersHint = "Everyone from the matches and the students: merge those written two ways, split homonyms"
     override val playersSearch = "Search"
     override val playersNone = "No players yet: they add themselves with the matches."
     override val playerTwin = "same name"
     override val playerStudentToggle = "Student"
-    override val playerStudentToggleHint = "Shows in Practice › Students and in Who is practising"
+    override val playerStudentToggleHint = "Shows among the Students (Coach role) and in Who is practising"
     override val playerMerge = "Merge with another player"
     override val playerMergeHint = "The same person written two ways or created twice: their matches and sessions move to this player."
     override val playerSplit = "Split a homonym"
@@ -44495,7 +44635,7 @@ object EnStrings : Strings {
     override val meNew = "I'm new"
     override val meIsYou = "This is you"
     override val meThisIsMe = "This is me"
-    override val dataTitle = "Profile and data"
+    override val dataTitle = "Backup and data"
     override val dataHint = "Backup in a file that stays yours, restore on this or another phone, delete everything"
     override val dataBackup = "Backup"
     override val dataBackupHint = "A ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings. Save it wherever you like (even on a PC or a USB stick): no cloud."
@@ -44520,14 +44660,13 @@ object EnStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Include the videos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup of $date (app $app" + (if (videos) ", with videos" else ", without videos") + "). It replaces all the data here now: if you need it, make a backup first." }
     override val tabTournaments = "Tournaments"
-    override val tabCourts = "Courts"
     override val roleCoach = "Coach"
     override val roleClub = "Club"
-    override val roleYouHint = "You play, practise, your videos, progress and rackets."
-    override val roleCoachHint = "Your students: stroke practice, movement, matches and notes. You umpire matches between students."
-    override val roleClubHint = "Tournaments, courts with their TV scoreboards, players and coaches."
+    override val roleYouHint = "You play: scoring, training, videos, progress, rackets and bookings at your club."
+    override val roleCoachHint = "Your students: stroke practice, drills, movement, reports and notes. Matches are scored from the You role."
+    override val roleClubHint = "The club office: today, court planner, members and fees, tennis school, tournaments and teams."
     override val rolesTitle = "Roles"
-    override val rolesHint = "You can have more than one (someone who plays and coaches): they change the tabs of the first screen, the data is the same. At the top you switch between roles."
+    override val rolesHint = "Each role has its own features, with no duplicates. You can have more than one (someone who plays and coaches): switch between them at the top, the data is the same."
     override val clubNoName = "The club"
     override val clubNoCourts = "Tap to write name and courts"
     override val clubCourtsLabel = "Courts (one per line)"
@@ -44538,7 +44677,7 @@ object EnStrings : Strings {
     override val onbRolesTitle = "Who uses the app?"
     override val onbClubTitle = "Your club"
     override val onbPrivacyTitle = "Your data"
-    override val onbPrivacyText = "Matches, players, videos and notes stay on this phone: no account, no server. If you coach students (even minors), ask for their consent to film them and keep their data; you can delete it whenever you like. Make a backup now and then in More › Profile and data: it is the only copy."
+    override val onbPrivacyText = "Matches, players, videos and notes stay on this phone: no account, no server. If you coach students (even minors), ask for their consent to film them and keep their data; you can delete it whenever you like. Every day the app copies them to Documents; now and then keep a copy off the phone too (More › Settings › Backup and data)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "You have never saved a backup yet: tap to make one." else "Last backup: $last. Tap to make a new one." }
     override val drillsTitle = "Drills"
     override val drillsHint = "Guided drills: a stroke and its steps in a row (e.g. 20 cross-court forehands, then 20 down the line)"
@@ -44882,7 +45021,6 @@ object EnStrings : Strings {
     override val crtHeating = "Heating"
     override val crtNoLightsWarn = "This court has no lights."
     override val crtTitle = "Courts"
-    override val crtTapToSet = "tap to set it up"
     override val crtClay = "Clay"
     override val crtGrass = "Grass"
     override val crtHard = "Hard"
@@ -45115,7 +45253,7 @@ object EnStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Connected players: $it" }
     override val srvInviteHow = "To invite a player: open their card and tap Invite to book online."
     override val srvInvite = "Invite to book online"
-    override val srvInviteHint = "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: Play › Book a court › Scan the QR."
+    override val srvInviteHint = "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: More › I have a club invitation › Scan the QR."
     override val srvInviteCode: (String) -> String = { "Code: $it" }
     override val srvInviteUntil: (String) -> String = { "Works once, until $it" }
     override val srvShare = "Share the link"
@@ -45144,7 +45282,6 @@ object EnStrings : Strings {
     override val srvPublicUrlHint = "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club"
     override val srvErrPairLocal = "Pairing works only from the club network: use the local address (http://…:8080)."
     override val pbTitle = "Book a court"
-    override val pbEntryHint = "If your club has the TSM server: join with the office invitation"
     override val pbEntryJoined: (String) -> String = { "$it: free courts and your bookings" }
     override val pbJoinIntro = "Scan the invitation QR the club office gave you, or paste the invitation link (or type the code and the club address)."
     override val pbScan = "Scan the QR"
@@ -45171,7 +45308,6 @@ object EnStrings : Strings {
     override val pbPrice = "Price"
     override val pbFreePrice = "free"
     override val pbPay: (String) -> String = { "Payment: $it" }
-    override val pbBooked = "Booked!"
     override val pbClosed = "Online booking is closed right now: you can see the schedule but not book."
     override val pbRules: (Int, Int) -> String = { a, b -> "You can book up to $a days ahead, at most $b bookings at a time." }
     override val pbCancelRule: (Int) -> String = { "You can cancel yourself up to $it hours before." }
@@ -45344,8 +45480,6 @@ object EnStrings : Strings {
     override val pfRackets = "Rackets"
     override val pfRacketsHint = "Your rackets, strings and the virtual racket"
     override val pfPadelHint = "The tennis or padel choice in a new match"
-    override val moreGroupDevices = "Devices and voice"
-    override val moreGroupData = "Data"
     override val moreGroupHelp = "Help"
     override val deskFirstTitle = "The first time, the browser will say “Your connection is not private”"
     override val deskFirstWhy = "That's normal and not a danger: the page is served by this phone, with a certificate it made itself rather than one from a company the browser knows. The connection stays encrypted."
@@ -45394,7 +45528,6 @@ object EnStrings : Strings {
     override val yrRival = "The rival"
     override val yrNone = "No matches this year."
     override val yrShare = "Share"
-    override val yrYear = "Year"
     override val goalAtLeast: (String) -> String = { "at least $it" }
     override val goalAtMost: (String) -> String = { "at most $it" }
     override val goalReached: (String) -> String = { "Reached on $it" }
@@ -45407,12 +45540,9 @@ object EnStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Longest streak: 1 win" else "Longest streak: $it wins in a row" }
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 workout" else "$it workouts" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a won, $b lost" }
     override val calTitle = "Calendar"
     override val calHint = "Days with matches and workouts: tap a day to see what you did."
     override val calNoneDay = "Nothing on this day."
-    override val calPrev = "Previous month"
-    override val calNext = "Next month"
     override val pbInviteSend = "Invite"
     override val pbBookedInvite = "Booked! Below you can invite whoever plays with you."
     override val calStreak: (Int) -> String = { if (it == 1) "You played or trained this week" else "$it weeks in a row of playing or training" }
@@ -45460,13 +45590,11 @@ object EnStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analysing shot $a of $b…" }
     override val tabPlay = "Play"
     override val tabTrain = "Train"
-    override val tabVideo = "Video"
     override val tabProgress = "Progress"
     override val tabMore = "More"
     override val playNewMatchHint = "Who plays, rules and how you keep score"
     override val playResume: (String) -> String = { "Resume: $it" }
     override val playTournamentHint = "Americano or Mexicano, with rotating pairs"
-    override val playUseAs = "Use this phone as"
     override val playAsBoardHint = "The screen becomes a match scoreboard"
     override val playAsCamera = "Camera phone"
     override val playAsCameraHint = "Films the match with the umpire's score"
@@ -45481,22 +45609,18 @@ object EnStrings : Strings {
     override val progressRacketsHint = "Statistics and feel per racket"
     override val moreDevices = "Devices"
     override val moreDevicesHint = "Wristbands, straps, remotes, second phone, TV scoreboard"
-    override val moreVoice = "Language and voice"
-    override val moreVoiceHint = "App language, voice that calls the score"
-    override val moreRacketsHint = "Strings, tensions and restringing"
-    override val moreTransfer = "Transfer matches"
-    override val moreTransferHint = "To another phone, with a code"
+    override val moreVoice = "Umpire's voice"
+    override val moreVoiceHint = "Voice calls, engine and voice, your own recordings"
     override val statusBands: (Int) -> String = { "Wristbands $it/2" }
     override val statusStraps: (Int) -> String = { "Straps $it" }
     override val statusCamera = "Camera connected"
     override val statusTv = "TV scoreboard"
     override val statusNone = "No device connected"
     override val playTournament = "Friends tournament"
-    override val step1Hint = "Step 1 of 2 · Who plays. All optional: you can go on even without names."
-    override val step2Hint = "Step 2 of 2 · How you keep score and the match rules."
+    override val step1Hint = "Step 1 of 3 · Who plays. All optional: you can go on even without names."
+    override val step2Hint = "Step 2 of 3 · How you keep score and the match rules."
     override val moreDetails = "More details"
     override val moreDetailsHint = "Club, court and tournament, if you like"
-    override val recentPlayers = "Recent players"
     override val onbWelcome = "Welcome to Tennis Score Manager"
     override val onbLang = "Choose the language"
     override val onbUseTitle = "How will you use TSM?"
@@ -45516,14 +45640,12 @@ object EnStrings : Strings {
     override val moreProfileHint = "Your name, for progress and rating"
     override val moreTour = "App introduction"
     override val moreTourHint = "The first questions, again"
-    override val profileName = "Your name"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
     override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."
     override val shareImage = "Image"
     override val sharePdf = "Full PDF"
-    override val tournamentButton = "Americano or Mexicano tournament"
     override val tournamentTitle = "Tournament"
     override val tournamentSubtitle = "Americano and Mexicano: partners change every round"
     override val tournamentNew = "New tournament"
@@ -45625,7 +45747,6 @@ object EnStrings : Strings {
     override val tvChromecastHint = "With a Chromecast: on the scoreboard phone use the «Cast» tile in Quick Settings («Screen Cast» up to Android 14, «Smart View» on Samsung). The Chromecast needs a network with internet: turn on mobile data on the hotspot phone."
 
     override val displayMode = "Use as scoreboard"
-    override val displayModeHint = "This phone shows the score on the monitor (HDMI cable or Chromecast)"
     override val displaySearching = "Looking for the umpire's phone…"
     override val displaySteps = "1. Turn on the hotspot on one phone and connect the other.\n2. On the umpire's phone: page 2 → «TV scoreboard» on.\n3. Connect this phone to the monitor (USB-C/HDMI cable) or cast the screen to a Chromecast."
     override val displayManual = "Address (e.g. 192.168.43.1:8080)"
@@ -45647,7 +45768,6 @@ object EnStrings : Strings {
     override val racketNone = "None"
     override val racketEmpty = "No rackets yet. Add your rackets with strings and tension, then pick the one you use before each match or workout."
     override val racketField = "Racket"
-    override val racketSetupHint = "Pick each player's racket: the match will remember today's racket, strings and tension."
     override val racketCatalog = "From catalogue"
     override val racketCatalogHint = "Manufacturer specs, approximate: correct them if you measured your racket."
     override val racketName = "Nickname (A, B…)"
@@ -45702,6 +45822,37 @@ object EnStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · free software under the GNU GPL version 3 or later, with absolutely no warranty." }
     override val aboutSource = "Source code"
+
+    override val unreadableTitle = "Some data could not be read"
+    override val unreadableHint: (String) -> String = { "$it: I set a copy aside and will not touch it. If something is missing, tap here and restore the latest backup." }
+    override val autoBackupOnTitle = "Backup is now automatic"
+    override val autoBackupOnHint = "Every day, if something changed, a copy of all data (without videos) goes to Documents › Tennis Score Manager › Backup. Tap to see it or turn it off."
+
+    override val leaveTitle = "Leave the match?"
+    override val leaveToMenu = "Back to the menu"
+    override val closeApp = "Close the app"
+    override val keepPlaying = "Keep playing"
+    override val done = "Done"
+    override val matchPlace = "Match location"
+    override val matchPlaceHint = "From the phone's location, in the summary and the PDF. It stays on the phone."
+
+    override val step3Hint = "Step 3 of 3 · Who serves first and which side each player starts on."
+    override val otherRules = "Other rules"
+    override val playerDetails = "Ranking, man/woman, racket"
+
+    override val tabPlanning = "Planner"
+    override val playThisPhone = "This phone"
+    override val rolesFeatures = "Roles and features"
+    override val rolesFeaturesHint = "Who uses the app and what to keep in the menus: the rest does not appear, the data stays"
+    override val moreGroupClub = "The club"
+    override val pbMineEntryHint = "Bookings, waiting lists, reminders and PIN"
+    override val pbSeekEntryHint = "Find someone to play with: when it is full the court is booked by itself"
+
+    override val settingsTitle = "Settings"
+    override val settingsHint = "Language, voice, devices, roles and features, backup and app version"
+    override val aboutTitle = "About"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (build $n)" }
+    override val aboutSite = "Website and guide"
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -45731,7 +45882,6 @@ object DeStrings : Strings {
     override val datePattern = "EEEE, d. MMMM yyyy"
 
     override val setupTitle = "Neues Match"
-    override val setupSubtitle = "Einrichtung optional: Du kannst alles leer lassen und weitermachen."
     override val clubSection = "Verein und Platz"
     override val clubName = "Name des Tennisvereins"
     override val courtNumber = "Platznummer"
@@ -45963,7 +46113,6 @@ object DeStrings : Strings {
     override val videoPoint = "Punkt"
     override val videoGame = "Spiel"
     override val videoSet = "Satz"
-    override val videoReplay = "Punkt wiederholen"
     override val videoStart = "Start"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ass"; "DOUBLE_FAULT" -> "Doppelfehler"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unerzwungener Fehler"; "FORCED_ERROR" -> "Erzwungener Fehler"; "ERROR" -> "Fehler"; else -> k } }
     override val videoImport = "Video importieren"
@@ -46063,7 +46212,6 @@ object DeStrings : Strings {
     override val heartChart = "Herzfrequenz während des Spiels"
     override val heartLine: (Int, Int) -> String = { a, m -> "Schnitt $a · max. $m bpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (Schätzung)" }
-    override val heartStatsHint = "Kalorien aus der Herzfrequenz mit der Keytel-Formel geschätzt: Der typische Fehler liegt bei 20 %."
     override val heartZones = "Zeit in den Pulszonen"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Sehr leicht", "Leicht", "Moderat", "Intensiv", "Maximal").getOrElse(it) { "" } }
     override val heartZonesHint = "Zonen in Prozent des aus dem Alter geschätzten Maximalpulses (208 − 0,7 × Alter): Das Alter der Person mit dem Gurt wird benötigt."
@@ -46334,8 +46482,6 @@ object DeStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "Neues Match"
     override val suspendedOverlay = "MATCH UNTERBROCHEN"
-    override val newMatchConfirmTitle = "Neues Match?"
-    override val newMatchConfirmText = "Das laufende Match bleibt bei den unterbrochenen Matches gespeichert und kann fortgesetzt werden."
     override val endDialogTitle = "Spiel, Satz und Sieg"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Sieg für $name\n$score" }
     override val matchConcluded = "Match beendet"
@@ -46365,7 +46511,6 @@ object DeStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "Verhalten $c · Zeit $t" }
     override val retireUndone = "Aufgabe zurückgenommen"
     override val undoShort = "Zurück"
-    override val newMatchShort = "Neu"
     override val disqualifyButton = "Disqualifikation"
     override val disqualifyTitle = "Wer wird disqualifiziert?"
     override val disqualifyHint = "Nach den Spielstrafen oder bei einem schweren Verstoß kann der Schiedsrichter disqualifizieren: Die Partie endet beim aktuellen Stand, der Gegner gewinnt."
@@ -46516,7 +46661,6 @@ object DeStrings : Strings {
     override val pbClubChatHint = "Hier lesen und schreiben alle verbundenen Mitglieder. Seid freundlich: Das Büro kann Nachrichten entfernen, und mit der Fahne meldest du unpassende."
     override val pbClubChatAlerts = "Benachrichtigungen des Vereinschats"
     override val pbClubChatAlertsHint = "Aus: Du liest die Nachrichten hier, wann du willst."
-    override val pbDmTitle = "Private Nachrichten"
     override val pbDmOpen = "Mitglieder dürfen mir schreiben"
     override val pbDmOpenHint = "An: Du stehst in der Liste und andere Mitglieder können dir schreiben. Aus: Du stehst nicht drin, kannst aber denen schreiben, die es eingeschaltet haben."
     override val pbDmHint = "Nur ihr beide lest das. Ist eine Nachricht nicht in Ordnung, melde sie mit der Fahne: Erst dann sieht sie das Büro."
@@ -46547,9 +46691,7 @@ object DeStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
     override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
     override val confirm = "Bestätigen"
-    override val backDisabled = "Während des Matches «Neues Match» oder «Beenden» verwenden."
     override val exit = "Beenden"
-    override val exitConfirmTitle = "App beenden?"
     override val exitConfirmText = "Das Match bleibt bei den unterbrochenen Matches gespeichert und kann fortgesetzt werden."
     override val exitConfirmBands = "Die Armbänder werden ausgeschaltet."
 
@@ -46683,8 +46825,6 @@ object DeStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche: $it" }
     override val rematchNoCalendar = "Keine Kalender-App auf diesem Telefon."
     override val rematchPreview = "Die Nachricht"
-    override val serveTitle = "Aufschlagtraining"
-    override val serveHint = "Telefon auf dem Stativ neben dem Aufschläger, Armband am Handgelenk: KEY1 drin, KEY2 aus, KEY1 gedrückt halten macht den letzten rückgängig. Jeder Aufschlag wird ein Clip zum Anschauen."
     override val serveStart = "Starten"
     override val serveNoBand = "Kein Armband verbunden: drin und aus mit den Tasten auf dem Bildschirm markieren."
     override val serveBandOk: (String) -> String = { "Armband $it: KEY1 drin, KEY2 aus, KEY1 gedrückt halten macht rückgängig" }
@@ -46809,26 +46949,20 @@ object DeStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w gewonnen, $l verloren" }
     override val studentDeleteAsk: (String) -> String = { "$it aus den Schülern entfernen? Die Einheiten bleiben, ohne Schüler." }
     override val studentRacket = "Schläger"
-    override val studentRacketNone = "Noch kein Schläger in Meine Schläger: unter Fortschritt › Meine Schläger hinzufügen."
     override val studentRacketPick = "Seinen Schläger wählen"
     override val studentPurge = "Spieler und seine Daten löschen"
     override val studentPurgeConfirm = "Alles löschen"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "$name und alle seine Daten von diesem Telefon löschen? Gelöscht werden seine $n Einheiten mit Videos und Analyse, die Notizen und das Foto; der Schläger bleibt, gehört aber nicht mehr ihm. Die Matches im Verlauf bleiben (die Gegner sind auch darin). Das lässt sich nicht rückgängig machen." }
-    override val playerLinked: (String) -> String = { "✓ $it, aus der Spielerdatenbank" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "Es gibt $n Spieler namens $name: tippe den richtigen an oder lege einen neuen an." }
-    override val playerCreate: (String) -> String = { "Ein anderer $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 Match, $d" else "$n Matches, zuletzt $d" }
     override val studentPickExisting = "Tippe den Spieler an, wenn er es ist: seine Matches sind schon in der Datenbank."
     override val studentFromExisting = "Schüler aus der Spielerdatenbank: mit seinen Matches."
-    override val playerNotHim = "Nicht er: ein anderer Spieler"
-    override val playerNew: (String) -> String = { "Neuer Spieler: $it kommt beim Matchbeginn in die Datenbank" }
     override val playersTitle = "Spieler"
     override val playersHint = "Alle Spieler aus den Matches und die Schüler: zweimal geschriebene zusammenführen, Namensvettern trennen"
     override val playersSearch = "Suchen"
     override val playersNone = "Noch keine Spieler: sie kommen mit den Matches von selbst dazu."
     override val playerTwin = "gleicher Name"
     override val playerStudentToggle = "Schüler"
-    override val playerStudentToggleHint = "Erscheint unter Trainieren › Schüler und bei Wer trainiert"
+    override val playerStudentToggleHint = "Erscheint bei den Schülern (Rolle Trainer) und bei Wer trainiert"
     override val playerMerge = "Mit einem anderen Spieler zusammenführen"
     override val playerMergeHint = "Dieselbe Person auf zwei Arten geschrieben oder zweimal angelegt: ihre Matches und Einheiten gehen auf diesen Spieler über."
     override val playerSplit = "Namensvetter trennen"
@@ -46851,7 +46985,7 @@ object DeStrings : Strings {
     override val meNew = "Ich bin neu"
     override val meIsYou = "Das bist du"
     override val meThisIsMe = "Das bin ich"
-    override val dataTitle = "Profil und Daten"
+    override val dataTitle = "Sicherung und Daten"
     override val dataHint = "Sicherung in einer Datei, die dir gehört, Wiederherstellung auf diesem oder einem anderen Telefon, alles löschen"
     override val dataBackup = "Sicherung"
     override val dataBackupHint = "Eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen. Speichere sie, wo du willst (auch auf einem PC oder USB-Stick): keine Cloud."
@@ -46876,14 +47010,13 @@ object DeStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Videos einschließen ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sicherung vom $date (App $app" + (if (videos) ", mit Videos" else ", ohne Videos") + "). Sie ersetzt alle jetzigen Daten: wenn nötig, erst eine Sicherung machen." }
     override val tabTournaments = "Turniere"
-    override val tabCourts = "Plätze"
     override val roleCoach = "Trainer"
     override val roleClub = "Verein"
-    override val roleYouHint = "Du spielst, trainierst, deine Videos, Fortschritte und Schläger."
-    override val roleCoachHint = "Deine Schüler: Schlagtraining, Bewegung, Matches und Notizen. Du leitest Matches zwischen Schülern."
-    override val roleClubHint = "Turniere, Plätze mit ihren TV-Anzeigetafeln, Spieler und Trainer."
+    override val roleYouHint = "Du spielst: Zählen, Training, Videos, Fortschritte, Schläger und Buchungen in deinem Verein."
+    override val roleCoachHint = "Deine Schüler: Schlagtraining, Übungen, Bewegung, Berichte und Notizen. Matches werden in der Rolle Du gezählt."
+    override val roleClubHint = "Das Vereinsbüro: Heute, Platzbelegung, Mitglieder und Beiträge, Tennisschule, Turniere und Mannschaften."
     override val rolesTitle = "Rollen"
-    override val rolesHint = "Du kannst mehrere haben (wer spielt und trainiert): sie ändern die Reiter des ersten Bildschirms, die Daten bleiben dieselben. Oben wechselst du die Rolle."
+    override val rolesHint = "Jede Rolle hat ihre eigenen Funktionen, ohne Doppelungen. Du kannst mehrere haben (wer spielt und trainiert): oben wechselst du zwischen ihnen, die Daten bleiben dieselben."
     override val clubNoName = "Der Verein"
     override val clubNoCourts = "Tippen, um Name und Plätze einzutragen"
     override val clubCourtsLabel = "Plätze (einer pro Zeile)"
@@ -46894,7 +47027,7 @@ object DeStrings : Strings {
     override val onbRolesTitle = "Wer nutzt die App?"
     override val onbClubTitle = "Dein Verein"
     override val onbPrivacyTitle = "Deine Daten"
-    override val onbPrivacyText = "Matches, Spieler, Videos und Notizen bleiben auf diesem Telefon: kein Konto, kein Server. Wenn du Schüler betreust (auch Minderjährige), frage nach ihrer Zustimmung, sie zu filmen und ihre Daten zu behalten; du kannst sie jederzeit löschen. Mach ab und zu eine Sicherung unter Mehr › Profil und Daten: das ist die einzige Kopie."
+    override val onbPrivacyText = "Matches, Spieler, Videos und Notizen bleiben auf diesem Telefon: kein Konto, kein Server. Wenn du Schüler betreust (auch Minderjährige), frage nach ihrer Zustimmung, sie zu filmen und ihre Daten zu behalten; du kannst sie jederzeit löschen. Jeden Tag legt die App eine Kopie in Dokumente ab; bewahre ab und zu auch eine außerhalb des Telefons auf (Mehr › Einstellungen › Sicherung und Daten)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Du hast noch nie eine Sicherung gespeichert: tippen, um eine zu machen." else "Letzte Sicherung: $last. Tippen, um eine neue zu machen." }
     override val drillsTitle = "Übungen"
     override val drillsHint = "Geführte Übungen: ein Schlag und seine Schritte nacheinander (z. B. 20 Vorhand cross, dann 20 longline)"
@@ -47238,7 +47371,6 @@ object DeStrings : Strings {
     override val crtHeating = "Heizung"
     override val crtNoLightsWarn = "Dieser Platz hat kein Licht."
     override val crtTitle = "Plätze"
-    override val crtTapToSet = "antippen zum Einrichten"
     override val crtClay = "Sand"
     override val crtGrass = "Rasen"
     override val crtHard = "Hartplatz"
@@ -47471,7 +47603,7 @@ object DeStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Verbundene Spieler: $it" }
     override val srvInviteHow = "Um einen Spieler einzuladen: Öffne seine Karte und tippe auf Einladung zum Online-Buchen."
     override val srvInvite = "Einladung zum Online-Buchen"
-    override val srvInviteHint = "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm. Mit der TSM-App: Spielen › Platz buchen › QR-Code scannen."
+    override val srvInviteHint = "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm. Mit der TSM-App: Mehr › Ich habe eine Einladung vom Verein › QR-Code scannen."
     override val srvInviteCode: (String) -> String = { "Code: $it" }
     override val srvInviteUntil: (String) -> String = { "Gilt einmal, bis $it" }
     override val srvShare = "Link teilen"
@@ -47500,7 +47632,6 @@ object DeStrings : Strings {
     override val srvPublicUrlHint = "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins"
     override val srvErrPairLocal = "Koppeln geht nur aus dem Vereinsnetz: Nutze die lokale Adresse (http://…:8080)."
     override val pbTitle = "Platz buchen"
-    override val pbEntryHint = "Wenn dein Verein den TSM-Server hat: mit der Einladung des Büros"
     override val pbEntryJoined: (String) -> String = { "$it: freie Plätze und deine Buchungen" }
     override val pbJoinIntro = "Scanne den Einladungs-QR-Code vom Vereinsbüro oder füge den Einladungslink ein (oder gib Code und Vereinsadresse ein)."
     override val pbScan = "QR-Code scannen"
@@ -47527,7 +47658,6 @@ object DeStrings : Strings {
     override val pbPrice = "Preis"
     override val pbFreePrice = "kostenlos"
     override val pbPay: (String) -> String = { "Bezahlung: $it" }
-    override val pbBooked = "Gebucht!"
     override val pbClosed = "Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht."
     override val pbRules: (Int, Int) -> String = { a, b -> "Buchbar bis $a Tage im Voraus, höchstens $b Buchungen gleichzeitig." }
     override val pbCancelRule: (Int) -> String = { "Selbst stornieren bis $it Stunden vorher." }
@@ -47700,8 +47830,6 @@ object DeStrings : Strings {
     override val pfRackets = "Schläger"
     override val pfRacketsHint = "Deine Schläger, Saiten und der virtuelle Schläger"
     override val pfPadelHint = "Die Wahl Tennis oder Padel im neuen Match"
-    override val moreGroupDevices = "Geräte und Stimme"
-    override val moreGroupData = "Daten"
     override val moreGroupHelp = "Hilfe"
     override val deskFirstTitle = "Beim ersten Mal sagt der Browser „Dies ist keine sichere Verbindung“"
     override val deskFirstWhy = "Das ist normal und keine Gefahr: Die Seite kommt von diesem Handy, mit einem selbst erstellten Zertifikat statt einem von einer Firma, die der Browser kennt. Die Verbindung bleibt verschlüsselt."
@@ -47750,7 +47878,6 @@ object DeStrings : Strings {
     override val yrRival = "Der Rivale"
     override val yrNone = "Keine Matches in diesem Jahr."
     override val yrShare = "Teilen"
-    override val yrYear = "Jahr"
     override val goalAtLeast: (String) -> String = { "mindestens $it" }
     override val goalAtMost: (String) -> String = { "höchstens $it" }
     override val goalReached: (String) -> String = { "Erreicht am $it" }
@@ -47763,12 +47890,9 @@ object DeStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Längste Serie: 1 Sieg" else "Längste Serie: $it Siege in Folge" }
     override val yrAces: (Int) -> String = { "Asse: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 Training" else "$it Trainings" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a gewonnen, $b verloren" }
     override val calTitle = "Kalender"
     override val calHint = "Die Tage mit Matches und Trainings: tippe auf einen Tag, um zu sehen, was du gemacht hast."
     override val calNoneDay = "An diesem Tag nichts."
-    override val calPrev = "Voriger Monat"
-    override val calNext = "Nächster Monat"
     override val pbInviteSend = "Einladen"
     override val pbBookedInvite = "Gebucht! Unten kannst du einladen, wer mit dir spielt."
     override val calStreak: (Int) -> String = { if (it == 1) "Diese Woche hast du gespielt oder trainiert" else "Seit $it Wochen in Folge spielst oder trainierst du" }
@@ -47816,13 +47940,11 @@ object DeStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Schlag $a von $b wird analysiert…" }
     override val tabPlay = "Spielen"
     override val tabTrain = "Trainieren"
-    override val tabVideo = "Video"
     override val tabProgress = "Fortschritt"
     override val tabMore = "Mehr"
     override val playNewMatchHint = "Wer spielt, Regeln und wie gezählt wird"
     override val playResume: (String) -> String = { "Fortsetzen: $it" }
     override val playTournamentHint = "Americano oder Mexicano, mit wechselnden Paaren"
-    override val playUseAs = "Dieses Telefon verwenden als"
     override val playAsBoardHint = "Der Bildschirm wird zur Anzeigetafel eines Matches"
     override val playAsCamera = "Kamera-Telefon"
     override val playAsCameraHint = "Filmt das Match mit dem Stand des Schiedsrichters"
@@ -47837,22 +47959,18 @@ object DeStrings : Strings {
     override val progressRacketsHint = "Statistiken und Gefühl pro Schläger"
     override val moreDevices = "Geräte"
     override val moreDevicesHint = "Armbänder, Gurte, Fernbedienungen, zweites Telefon, TV-Anzeige"
-    override val moreVoice = "Sprache und Stimme"
-    override val moreVoiceHint = "App-Sprache, Stimme für den Spielstand"
-    override val moreRacketsHint = "Saiten, Spannungen und Besaitungen"
-    override val moreTransfer = "Matches übertragen"
-    override val moreTransferHint = "Auf ein anderes Telefon, mit einem Code"
+    override val moreVoice = "Stimme des Schiedsrichters"
+    override val moreVoiceHint = "Ansagen, Sprachausgabe und Stimme, eigene Aufnahmen"
     override val statusBands: (Int) -> String = { "Armbänder $it/2" }
     override val statusStraps: (Int) -> String = { "Gurte $it" }
     override val statusCamera = "Kamera verbunden"
     override val statusTv = "TV-Anzeige"
     override val statusNone = "Kein Gerät verbunden"
     override val playTournament = "Turnier unter Freunden"
-    override val step1Hint = "Schritt 1 von 2 · Wer spielt. Alles freiwillig: Es geht auch ohne Namen weiter."
-    override val step2Hint = "Schritt 2 von 2 · Wie gezählt wird und die Regeln des Matches."
+    override val step1Hint = "Schritt 1 von 3 · Wer spielt. Alles freiwillig: Es geht auch ohne Namen weiter."
+    override val step2Hint = "Schritt 2 von 3 · Wie gezählt wird und die Regeln des Matches."
     override val moreDetails = "Weitere Angaben"
     override val moreDetailsHint = "Verein, Platz und Turnier, wenn du willst"
-    override val recentPlayers = "Letzte Spieler"
     override val onbWelcome = "Willkommen bei Tennis Score Manager"
     override val onbLang = "Sprache wählen"
     override val onbUseTitle = "Wie wirst du TSM nutzen?"
@@ -47872,14 +47990,12 @@ object DeStrings : Strings {
     override val moreProfileHint = "Dein Name, für Fortschritt und Wertung"
     override val moreTour = "App-Einführung"
     override val moreTourHint = "Die ersten Fragen noch einmal"
-    override val profileName = "Dein Name"
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
     override val shareChooseHint = "Das Bild mit Text passt für WhatsApp und soziale Netze; das PDF enthält auch Statistik, Verlauf und Fotos vom Match."
     override val shareImage = "Bild"
     override val sharePdf = "Vollständiges PDF"
-    override val tournamentButton = "Americano- oder Mexicano-Turnier"
     override val tournamentTitle = "Turnier"
     override val tournamentSubtitle = "Americano und Mexicano: wechselnde Paare in jeder Runde"
     override val tournamentNew = "Neues Turnier"
@@ -47984,7 +48100,6 @@ object DeStrings : Strings {
     override val tvChromecastHint = "Mit einem Chromecast: Auf dem Anzeigetafel-Telefon die Kachel «Streamen» in den Schnelleinstellungen verwenden («Bildschirm übertragen» bis Android 14, «Smart View» bei Samsung). Der Chromecast braucht ein Netz mit Internet: Schalte die mobilen Daten auf dem Hotspot-Telefon ein."
 
     override val displayMode = "Als Anzeigetafel verwenden"
-    override val displayModeHint = "Dieses Telefon zeigt den Spielstand auf dem Monitor (HDMI-Kabel oder Chromecast)"
     override val displaySearching = "Suche das Telefon des Schiedsrichters…"
     override val displaySteps = "1. Schalte auf einem der beiden Telefone den Hotspot ein und verbinde das andere.\n2. Auf dem Telefon des Schiedsrichters: Seite 2 → «TV-Anzeigetafel» ein.\n3. Verbinde dieses Telefon mit dem Monitor (USB-C/HDMI-Kabel) oder übertrage den Bildschirm auf einen Chromecast."
     override val displayManual = "Adresse (z. B. 192.168.43.1:8080)"
@@ -48006,7 +48121,6 @@ object DeStrings : Strings {
     override val racketNone = "Keiner"
     override val racketEmpty = "Noch keine Schläger. Füge deine Schläger mit Saite und Spannung hinzu und wähle vor jedem Match oder Training den benutzten aus."
     override val racketField = "Schläger"
-    override val racketSetupHint = "Wähle den Schläger jedes Spielers: das Match merkt sich Schläger, Saite und Spannung von heute."
     override val racketCatalog = "Aus dem Katalog"
     override val racketCatalogHint = "Herstellerangaben, ungefähr: korrigiere sie, wenn du deinen Schläger gemessen hast."
     override val racketName = "Spitzname (A, B…)"
@@ -48061,6 +48175,37 @@ object DeStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · freie Software unter der GNU GPL Version 3 oder später, ohne jegliche Gewährleistung." }
     override val aboutSource = "Quellcode"
+
+    override val unreadableTitle = "Einige Daten waren nicht lesbar"
+    override val unreadableHint: (String) -> String = { "$it: Eine Kopie wurde beiseitegelegt und bleibt unverändert. Fehlt etwas, hier tippen und die letzte Sicherung wiederherstellen." }
+    override val autoBackupOnTitle = "Die Sicherung ist jetzt automatisch"
+    override val autoBackupOnHint = "Jeden Tag, wenn sich etwas geändert hat, kommt eine Kopie aller Daten (ohne Videos) nach Dokumente › Tennis Score Manager › Backup. Tippen zum Ansehen oder Ausschalten."
+
+    override val leaveTitle = "Match verlassen?"
+    override val leaveToMenu = "Zurück zum Menü"
+    override val closeApp = "App schließen"
+    override val keepPlaying = "Weiterspielen"
+    override val done = "Fertig"
+    override val matchPlace = "Ort des Matches"
+    override val matchPlaceHint = "Aus dem Standort des Telefons, in der Übersicht und im PDF. Er bleibt auf dem Telefon."
+
+    override val step3Hint = "Schritt 3 von 3 · Wer zuerst aufschlägt und auf welcher Seite wer beginnt."
+    override val otherRules = "Weitere Regeln"
+    override val playerDetails = "Ranking, Mann/Frau, Schläger"
+
+    override val tabPlanning = "Belegung"
+    override val playThisPhone = "Dieses Telefon"
+    override val rolesFeatures = "Rollen und Funktionen"
+    override val rolesFeaturesHint = "Wer die App nutzt und was in den Menüs bleibt: der Rest erscheint nicht, die Daten bleiben"
+    override val moreGroupClub = "Der Verein"
+    override val pbMineEntryHint = "Buchungen, Wartelisten, Erinnerungen und PIN"
+    override val pbSeekEntryHint = "Finde Mitspieler: wenn alle da sind, wird der Platz von selbst gebucht"
+
+    override val settingsTitle = "Einstellungen"
+    override val settingsHint = "Sprache, Stimme, Geräte, Rollen und Funktionen, Sicherung und App-Version"
+    override val aboutTitle = "Über die App"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (Build $n)" }
+    override val aboutSite = "Website und Anleitung"
 }
 TSM_EOF
 
@@ -48079,7 +48224,6 @@ object EsStrings : Strings {
     override val datePattern = "EEEE, d 'de' MMMM 'de' yyyy"
 
     override val setupTitle = "Nuevo partido"
-    override val setupSubtitle = "Configuración opcional: puedes dejarlo todo vacío y continuar."
     override val clubSection = "Club y pista"
     override val clubName = "Nombre del club de tenis"
     override val courtNumber = "Número de pista"
@@ -48311,7 +48455,6 @@ object EsStrings : Strings {
     override val videoPoint = "Punto"
     override val videoGame = "Juego"
     override val videoSet = "Set"
-    override val videoReplay = "Ver el punto otra vez"
     override val videoStart = "Inicio"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doble falta"; "WINNER" -> "Ganador"; "UNFORCED_ERROR" -> "Error no forzado"; "FORCED_ERROR" -> "Error forzado"; "ERROR" -> "Error"; else -> k } }
     override val videoImport = "Importar vídeo"
@@ -48411,7 +48554,6 @@ object EsStrings : Strings {
     override val heartChart = "Pulso durante el partido"
     override val heartLine: (Int, Int) -> String = { a, m -> "medio $a · máx. $m lpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (estimación)" }
-    override val heartStatsHint = "Calorías estimadas a partir del pulso con la fórmula de Keytel: el error típico es del 20 %."
     override val heartZones = "Tiempo en zonas de pulso"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Muy suave", "Suave", "Moderada", "Intensa", "Máxima").getOrElse(it) { "" } }
     override val heartZonesHint = "Zonas en porcentaje del pulso máximo estimado por la edad (208 − 0,7 × edad): hace falta la edad de quien lleva la banda."
@@ -48683,8 +48825,6 @@ object EsStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "Nuevo partido"
     override val suspendedOverlay = "PARTIDO SUSPENDIDO"
-    override val newMatchConfirmTitle = "¿Nuevo partido?"
-    override val newMatchConfirmText = "El partido en curso queda guardado entre los partidos suspendidos y podrás reanudarlo."
     override val endDialogTitle = "Juego, set y partido"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Ganan" else "Gana"} $name\n$score" }
     override val matchConcluded = "Partido terminado"
@@ -48714,7 +48854,6 @@ object EsStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "conducta $c · tiempo $t" }
     override val retireUndone = "Retirada anulada"
     override val undoShort = "Anular"
-    override val newMatchShort = "Nueva"
     override val disqualifyButton = "Descalificación"
     override val disqualifyTitle = "¿Quién queda descalificado?"
     override val disqualifyHint = "Tras los juegos de penalización, o por una falta grave, el árbitro puede descalificar: el partido termina con el marcador actual y gana el rival."
@@ -48865,7 +49004,6 @@ object EsStrings : Strings {
     override val pbClubChatHint = "Aquí leen y escriben todos los socios conectados. Sed amables: la secretaría puede quitar mensajes, y con la banderita se señalan los que están fuera de lugar."
     override val pbClubChatAlerts = "Notificaciones del chat del club"
     override val pbClubChatAlertsHint = "Apagadas: lees los mensajes aquí cuando quieras."
-    override val pbDmTitle = "Mensajes privados"
     override val pbDmOpen = "Los socios pueden escribirme"
     override val pbDmOpenHint = "Encendido: apareces en la lista y otros socios pueden escribirte. Apagado: no apareces, pero puedes escribir a quien lo tenga encendido."
     override val pbDmHint = "Solo lo leéis vosotros dos. Si un mensaje no está bien, señálalo con la banderita: solo entonces lo ve la secretaría."
@@ -48896,9 +49034,7 @@ object EsStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
     override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
     override val confirm = "Confirmar"
-    override val backDisabled = "Durante el partido usa «Nuevo partido» o «Salir»."
     override val exit = "Salir"
-    override val exitConfirmTitle = "¿Salir de la app?"
     override val exitConfirmText = "El partido queda guardado entre los partidos suspendidos y podrás reanudarlo."
     override val exitConfirmBands = "Las pulseras se apagarán."
 
@@ -49032,8 +49168,6 @@ object EsStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revancha: $it" }
     override val rematchNoCalendar = "No hay ninguna app de calendario en este teléfono."
     override val rematchPreview = "El mensaje"
-    override val serveTitle = "Entrenamiento del saque"
-    override val serveHint = "Teléfono en el trípode al lado de quien saca, pulsera en la muñeca: KEY1 dentro, KEY2 fuera, KEY1 mantenido anula el último. Cada saque se convierte en un clip para volver a ver."
     override val serveStart = "Empezar"
     override val serveNoBand = "No hay ninguna pulsera conectada: marca dentro y fuera con los botones de la pantalla."
     override val serveBandOk: (String) -> String = { "Pulsera $it: KEY1 dentro, KEY2 fuera, KEY1 mantenido anula" }
@@ -49158,26 +49292,20 @@ object EsStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w ganados, $l perdidos" }
     override val studentDeleteAsk: (String) -> String = { "¿Quitar a $it de los alumnos? Sus sesiones se quedan, sin alumno." }
     override val studentRacket = "Raqueta"
-    override val studentRacketNone = "No hay raquetas en Mis raquetas: añádela desde Progresos › Mis raquetas."
     override val studentRacketPick = "Elegir su raqueta"
     override val studentPurge = "Borrar jugador y sus datos"
     override val studentPurgeConfirm = "Borrar todo"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "¿Borrar a $name y todos sus datos de este teléfono? Se borran sus $n sesiones con vídeos y análisis, las notas y la foto; la raqueta se queda pero ya no es suya. Los partidos del historial se quedan (también están los rivales). No se puede deshacer." }
-    override val playerLinked: (String) -> String = { "✓ $it, de la base de jugadores" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "Hay $n jugadores llamados $name: toca el correcto o crea otro." }
-    override val playerCreate: (String) -> String = { "Otro $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partido, $d" else "$n partidos, el último $d" }
     override val studentPickExisting = "Toca al jugador si es él: sus partidos ya están en la base."
     override val studentFromExisting = "Alumno de la base de jugadores: con sus partidos."
-    override val playerNotHim = "No es él: otro jugador"
-    override val playerNew: (String) -> String = { "Jugador nuevo: $it entra en la base al empezar el partido" }
     override val playersTitle = "Jugadores"
     override val playersHint = "Todos los jugadores de los partidos y los alumnos: une a quien está escrito de dos formas, separa a los homónimos"
     override val playersSearch = "Buscar"
     override val playersNone = "Todavía no hay jugadores: se añaden solos con los partidos."
     override val playerTwin = "homónimo"
     override val playerStudentToggle = "Alumno"
-    override val playerStudentToggleHint = "Aparece en Entrenar › Alumnos y en Quién entrena"
+    override val playerStudentToggleHint = "Aparece entre los Alumnos (rol Entrenador) y en Quién entrena"
     override val playerMerge = "Unir con otro jugador"
     override val playerMergeHint = "La misma persona escrita de dos formas o creada dos veces: sus partidos y sesiones pasan a este jugador."
     override val playerSplit = "Separar un homónimo"
@@ -49200,7 +49328,7 @@ object EsStrings : Strings {
     override val meNew = "Soy nuevo"
     override val meIsYou = "Eres tú"
     override val meThisIsMe = "Soy yo"
-    override val dataTitle = "Perfil y datos"
+    override val dataTitle = "Copia de seguridad y datos"
     override val dataHint = "Copia de seguridad en un archivo que es tuyo, restauración en este u otro teléfono, borrar todo"
     override val dataBackup = "Copia de seguridad"
     override val dataBackupHint = "Un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz. Guárdalo donde quieras (también en un PC o un pendrive): nada de nube."
@@ -49225,14 +49353,13 @@ object EsStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Incluir los vídeos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Copia del $date (app $app" + (if (videos) ", con vídeos" else ", sin vídeos") + "). Sustituye todos los datos de ahora: si te hacen falta, haz antes una copia." }
     override val tabTournaments = "Torneos"
-    override val tabCourts = "Pistas"
     override val roleCoach = "Entrenador"
     override val roleClub = "Club"
-    override val roleYouHint = "Juegas, entrenas, tus vídeos, progresos y raquetas."
-    override val roleCoachHint = "Tus alumnos: entrenamiento de golpes, movimiento, partidos y notas. Arbitras los partidos entre alumnos."
-    override val roleClubHint = "Torneos, pistas con sus marcadores de TV, jugadores y entrenadores."
+    override val roleYouHint = "Juegas: marcador, entrenamientos, vídeos, progresos, raquetas y reservas en tu club."
+    override val roleCoachHint = "Tus alumnos: entrenamiento de golpes, ejercicios, movimiento, informes y notas. Los partidos se marcan desde el rol Tú."
+    override val roleClubHint = "La secretaría: hoy, planning de pistas, socios y cuotas, escuela de tenis, torneos y equipos."
     override val rolesTitle = "Roles"
-    override val rolesHint = "Puedes tener más de uno (quien juega y entrena): cambian las pestañas de la primera pantalla, los datos son los mismos. Arriba pasas de un rol a otro."
+    override val rolesHint = "Cada rol tiene sus funciones, sin duplicados. Puedes tener más de uno (quien juega y entrena): arriba pasas de uno a otro, los datos son los mismos."
     override val clubNoName = "El club"
     override val clubNoCourts = "Toca para escribir el nombre y las pistas"
     override val clubCourtsLabel = "Pistas (una por línea)"
@@ -49243,7 +49370,7 @@ object EsStrings : Strings {
     override val onbRolesTitle = "¿Quién usa la app?"
     override val onbClubTitle = "Tu club"
     override val onbPrivacyTitle = "Tus datos"
-    override val onbPrivacyText = "Partidos, jugadores, vídeos y notas se quedan en este teléfono: sin cuenta, sin servidor. Si sigues a alumnos (también menores), pide su consentimiento para grabarlos y guardar sus datos; puedes borrarlos cuando quieras. Haz de vez en cuando una copia en Más › Perfil y datos: es la única copia."
+    override val onbPrivacyText = "Partidos, jugadores, vídeos y notas se quedan en este teléfono: sin cuenta, sin servidor. Si sigues a alumnos (también menores), pide su consentimiento para grabarlos y guardar sus datos; puedes borrarlos cuando quieras. Cada día la app hace una copia en Documentos; de vez en cuando guarda una también fuera del teléfono (Más › Ajustes › Copia de seguridad y datos)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Todavía no has guardado ninguna copia: toca para hacerla." else "Última copia: $last. Toca para hacer otra." }
     override val drillsTitle = "Ejercicios"
     override val drillsHint = "Ejercicios guiados: un golpe y sus pasos seguidos (p. ej. 20 derechas cruzadas, luego 20 paralelas)"
@@ -49587,7 +49714,6 @@ object EsStrings : Strings {
     override val crtHeating = "Calefacción"
     override val crtNoLightsWarn = "Esta pista no tiene luz."
     override val crtTitle = "Pistas"
-    override val crtTapToSet = "toca para configurarla"
     override val crtClay = "Tierra batida"
     override val crtGrass = "Hierba"
     override val crtHard = "Cemento"
@@ -49820,7 +49946,7 @@ object EsStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Jugadores conectados: $it" }
     override val srvInviteHow = "Para invitar a un jugador: abre su ficha y toca Invitación para reservar en línea."
     override val srvInvite = "Invitación para reservar en línea"
-    override val srvInviteHint = "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio. Con la app TSM: Jugar › Reservar pista › Escanear el QR."
+    override val srvInviteHint = "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio. Con la app TSM: Más › Tengo una invitación del club › Escanear el QR."
     override val srvInviteCode: (String) -> String = { "Código: $it" }
     override val srvInviteUntil: (String) -> String = { "Vale una vez, hasta el $it" }
     override val srvShare = "Compartir el enlace"
@@ -49849,7 +49975,6 @@ object EsStrings : Strings {
     override val srvPublicUrlHint = "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club"
     override val srvErrPairLocal = "El emparejamiento solo se hace desde la red del club: usa la dirección local (http://…:8080)."
     override val pbTitle = "Reservar pista"
-    override val pbEntryHint = "Si tu club tiene el servidor TSM: entra con la invitación de secretaría"
     override val pbEntryJoined: (String) -> String = { "$it: pistas libres y tus reservas" }
     override val pbJoinIntro = "Escanea el QR de invitación que te dio la secretaría del club, o pega el enlace de la invitación (o escribe el código y la dirección del club)."
     override val pbScan = "Escanear el QR"
@@ -49876,7 +50001,6 @@ object EsStrings : Strings {
     override val pbPrice = "Precio"
     override val pbFreePrice = "gratis"
     override val pbPay: (String) -> String = { "Pago: $it" }
-    override val pbBooked = "¡Reservada!"
     override val pbClosed = "Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva."
     override val pbRules: (Int, Int) -> String = { a, b -> "Reservas hasta $a días antes, como mucho $b reservas a la vez." }
     override val pbCancelRule: (Int) -> String = { "Anulas tú mismo hasta $it horas antes." }
@@ -50049,8 +50173,6 @@ object EsStrings : Strings {
     override val pfRackets = "Raquetas"
     override val pfRacketsHint = "Tus raquetas, los cordajes y la raqueta virtual"
     override val pfPadelHint = "La elección tenis o pádel en el nuevo partido"
-    override val moreGroupDevices = "Dispositivos y voz"
-    override val moreGroupData = "Datos"
     override val moreGroupHelp = "Ayuda"
     override val deskFirstTitle = "La primera vez el navegador dirá «La conexión no es privada»"
     override val deskFirstWhy = "Es normal y no es un peligro: la página la sirve este teléfono, con un certificado hecho por él y no por una empresa que el navegador conoce. La conexión sigue cifrada."
@@ -50099,7 +50221,6 @@ object EsStrings : Strings {
     override val yrRival = "El rival"
     override val yrNone = "Ningún partido este año."
     override val yrShare = "Compartir"
-    override val yrYear = "Año"
     override val goalAtLeast: (String) -> String = { "al menos $it" }
     override val goalAtMost: (String) -> String = { "como mucho $it" }
     override val goalReached: (String) -> String = { "Conseguido el $it" }
@@ -50112,12 +50233,9 @@ object EsStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Racha más larga: 1 victoria" else "Racha más larga: $it victorias seguidas" }
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entrenamiento" else "$it entrenamientos" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganados, $b perdidos" }
     override val calTitle = "Calendario"
     override val calHint = "Los días con partidos y entrenamientos: toca un día para ver qué hiciste."
     override val calNoneDay = "Nada este día."
-    override val calPrev = "Mes anterior"
-    override val calNext = "Mes siguiente"
     override val pbInviteSend = "Invitar"
     override val pbBookedInvite = "¡Reservado! Abajo puedes invitar a quien juega contigo."
     override val calStreak: (Int) -> String = { if (it == 1) "Esta semana has jugado o entrenado" else "Llevas $it semanas seguidas jugando o entrenando" }
@@ -50165,13 +50283,11 @@ object EsStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analizando el golpe $a de $b…" }
     override val tabPlay = "Jugar"
     override val tabTrain = "Entrenar"
-    override val tabVideo = "Vídeo"
     override val tabProgress = "Progresos"
     override val tabMore = "Más"
     override val playNewMatchHint = "Quién juega, reglas y cómo llevas el marcador"
     override val playResume: (String) -> String = { "Reanudar: $it" }
     override val playTournamentHint = "Americano o Mexicano, con parejas que rotan"
-    override val playUseAs = "Usar este teléfono como"
     override val playAsBoardHint = "La pantalla se convierte en el marcador de un partido"
     override val playAsCamera = "Teléfono-cámara"
     override val playAsCameraHint = "Graba el partido con el marcador del árbitro"
@@ -50186,22 +50302,18 @@ object EsStrings : Strings {
     override val progressRacketsHint = "Estadísticas y sensaciones por raqueta"
     override val moreDevices = "Dispositivos"
     override val moreDevicesHint = "Pulseras, bandas, mandos, segundo teléfono, marcador en TV"
-    override val moreVoice = "Idioma y voz"
-    override val moreVoiceHint = "Idioma de la app, voz que canta el marcador"
-    override val moreRacketsHint = "Cuerdas, tensiones y encordados"
-    override val moreTransfer = "Transferir partidos"
-    override val moreTransferHint = "A otro teléfono, con un código"
+    override val moreVoice = "Voz del árbitro"
+    override val moreVoiceHint = "Anuncios por voz, motor y voz, tus grabaciones"
     override val statusBands: (Int) -> String = { "Pulseras $it/2" }
     override val statusStraps: (Int) -> String = { "Bandas $it" }
     override val statusCamera = "Cámara conectada"
     override val statusTv = "Marcador en TV"
     override val statusNone = "Ningún dispositivo conectado"
     override val playTournament = "Torneo entre amigos"
-    override val step1Hint = "Paso 1 de 2 · Quién juega. Todo es opcional: puedes seguir sin nombres."
-    override val step2Hint = "Paso 2 de 2 · Cómo llevas el marcador y las reglas del partido."
+    override val step1Hint = "Paso 1 de 3 · Quién juega. Todo es opcional: puedes seguir sin nombres."
+    override val step2Hint = "Paso 2 de 3 · Cómo llevas el marcador y las reglas del partido."
     override val moreDetails = "Más detalles"
     override val moreDetailsHint = "Club, pista y torneo, si quieres"
-    override val recentPlayers = "Jugadores recientes"
     override val onbWelcome = "Bienvenido a Tennis Score Manager"
     override val onbLang = "Elige el idioma"
     override val onbUseTitle = "¿Cómo vas a usar TSM?"
@@ -50221,14 +50333,12 @@ object EsStrings : Strings {
     override val moreProfileHint = "Tu nombre, para progresos y rating"
     override val moreTour = "Presentación de la app"
     override val moreTourHint = "Las primeras preguntas, otra vez"
-    override val profileName = "Tu nombre"
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
     override val shareChooseHint = "La imagen con texto va bien para WhatsApp y las redes; el PDF tiene también estadísticas, historial y fotos del partido."
     override val shareImage = "Imagen"
     override val sharePdf = "PDF completo"
-    override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano y Mexicano: parejas que cambian en cada ronda"
     override val tournamentNew = "Nuevo torneo"
@@ -50333,7 +50443,6 @@ object EsStrings : Strings {
     override val tvChromecastHint = "Con un Chromecast: en el teléfono-marcador usa el botón «Enviar» de los ajustes rápidos («Enviar pantalla» hasta Android 14, «Smart View» en Samsung). El Chromecast necesita una red con internet: activa los datos móviles en el teléfono que hace de punto de acceso."
 
     override val displayMode = "Usar como marcador"
-    override val displayModeHint = "Este teléfono muestra el marcador en el monitor (cable HDMI o Chromecast)"
     override val displaySearching = "Buscando el teléfono del juez…"
     override val displaySteps = "1. Activa el punto de acceso en uno de los dos teléfonos y conecta el otro.\n2. En el teléfono del juez: página 2 → «Marcador en TV» activado.\n3. Conecta este teléfono al monitor (cable USB-C/HDMI) o envía la pantalla a un Chromecast."
     override val displayManual = "Dirección (p. ej. 192.168.43.1:8080)"
@@ -50355,7 +50464,6 @@ object EsStrings : Strings {
     override val racketNone = "Ninguna"
     override val racketEmpty = "Ninguna raqueta. Añade tus raquetas con cuerdas y tensión y elige la que usas antes de cada partido o entrenamiento."
     override val racketField = "Raqueta"
-    override val racketSetupHint = "Elige la raqueta de cada jugador: el partido recordará la raqueta, las cuerdas y la tensión de hoy."
     override val racketCatalog = "Del catálogo"
     override val racketCatalogHint = "Datos del fabricante, orientativos: corrígelos si has medido tu raqueta."
     override val racketName = "Apodo (A, B…)"
@@ -50410,6 +50518,37 @@ object EsStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software libre bajo la GNU GPL versión 3 o posterior, sin ninguna garantía." }
     override val aboutSource = "Código fuente"
+
+    override val unreadableTitle = "Algunos datos no se podían leer"
+    override val unreadableHint: (String) -> String = { "$it: he apartado una copia, que no toco. Si te falta algo, toca aquí y restaura la última copia de seguridad." }
+    override val autoBackupOnTitle = "La copia de seguridad ahora es automática"
+    override val autoBackupOnHint = "Cada día, si algo ha cambiado, una copia de todos los datos (sin vídeos) va a Documentos › Tennis Score Manager › Backup. Toca para verla o desactivarla."
+
+    override val leaveTitle = "¿Salir del partido?"
+    override val leaveToMenu = "Volver al menú"
+    override val closeApp = "Cerrar la app"
+    override val keepPlaying = "Seguir jugando"
+    override val done = "Hecho"
+    override val matchPlace = "Lugar del partido"
+    override val matchPlaceHint = "Desde la ubicación del teléfono, en el resumen y en el PDF. Se queda en el teléfono."
+
+    override val step3Hint = "Paso 3 de 3 · Quién saca primero y en qué lado empieza cada uno."
+    override val otherRules = "Otras reglas"
+    override val playerDetails = "Clasificación, hombre/mujer, raqueta"
+
+    override val tabPlanning = "Reservas"
+    override val playThisPhone = "Este teléfono"
+    override val rolesFeatures = "Roles y funciones"
+    override val rolesFeaturesHint = "Quién usa la app y qué dejar en los menús: lo demás no aparece, los datos se quedan"
+    override val moreGroupClub = "El club"
+    override val pbMineEntryHint = "Reservas, listas de espera, recordatorios y PIN"
+    override val pbSeekEntryHint = "Encuentra con quién jugar: al completarse, la pista se reserva sola"
+
+    override val settingsTitle = "Ajustes"
+    override val settingsHint = "Idioma, voz, dispositivos, roles y funciones, copia de seguridad y versión de la app"
+    override val aboutTitle = "Acerca de"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Versión $v (compilación $n)" }
+    override val aboutSite = "Web y guía"
 }
 TSM_EOF
 
@@ -50431,7 +50570,6 @@ object FrStrings : Strings {
     override val datePattern = "EEEE d MMMM yyyy"
 
     override val setupTitle = "Nouveau match"
-    override val setupSubtitle = "Configuration facultative : vous pouvez tout laisser vide et continuer."
     override val clubSection = "Club et court"
     override val clubName = "Nom du club de tennis"
     override val courtNumber = "Numéro du court"
@@ -50663,7 +50801,6 @@ object FrStrings : Strings {
     override val videoPoint = "Point"
     override val videoGame = "Jeu"
     override val videoSet = "Set"
-    override val videoReplay = "Revoir le point"
     override val videoStart = "Début"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double faute"; "WINNER" -> "Coup gagnant"; "UNFORCED_ERROR" -> "Faute directe"; "FORCED_ERROR" -> "Faute provoquée"; "ERROR" -> "Faute"; else -> k } }
     override val videoImport = "Importer une vidéo"
@@ -50763,7 +50900,6 @@ object FrStrings : Strings {
     override val heartChart = "Fréquence cardiaque pendant le match"
     override val heartLine: (Int, Int) -> String = { a, m -> "moyenne $a · max $m bpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (estimation)" }
-    override val heartStatsHint = "Calories estimées à partir de la fréquence cardiaque avec la formule de Keytel : l'erreur typique est de 20 %."
     override val heartZones = "Temps dans les zones cardio"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Très légère", "Légère", "Modérée", "Intense", "Maximale").getOrElse(it) { "" } }
     override val heartZonesHint = "Zones en pourcentage de la fréquence maximale estimée d'après l'âge (208 − 0,7 × âge) : il faut l'âge de la personne qui porte la ceinture."
@@ -51034,8 +51170,6 @@ object FrStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "Nouveau match"
     override val suspendedOverlay = "MATCH SUSPENDU"
-    override val newMatchConfirmTitle = "Nouveau match ?"
-    override val newMatchConfirmText = "Le match en cours reste enregistré parmi les matchs suspendus et pourra être repris."
     override val endDialogTitle = "Jeu, set et match"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Victoire de $name\n$score" }
     override val matchConcluded = "Match terminé"
@@ -51065,7 +51199,6 @@ object FrStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "conduite $c · temps $t" }
     override val retireUndone = "Abandon annulé"
     override val undoShort = "Annuler"
-    override val newMatchShort = "Nouvelle"
     override val disqualifyButton = "Disqualification"
     override val disqualifyTitle = "Qui est disqualifié ?"
     override val disqualifyHint = "Après les jeux de pénalité, ou pour un fait grave, l'arbitre peut disqualifier : le match s'arrête au score actuel et l'adversaire gagne."
@@ -51216,7 +51349,6 @@ object FrStrings : Strings {
     override val pbClubChatHint = "Tous les membres connectés lisent et écrivent ici. Soyez aimables : le secrétariat peut retirer les messages, et le drapeau signale ceux qui sont déplacés."
     override val pbClubChatAlerts = "Notifications de la discussion du club"
     override val pbClubChatAlertsHint = "Désactivées : vous lisez les messages ici quand vous voulez."
-    override val pbDmTitle = "Messages privés"
     override val pbDmOpen = "Les membres peuvent m'écrire"
     override val pbDmOpenHint = "Activé : vous êtes dans la liste et les autres membres peuvent vous écrire. Désactivé : vous n'y êtes pas, mais vous pouvez écrire à ceux qui l'ont activé."
     override val pbDmHint = "Vous seuls le lisez. Si un message ne va pas, signalez-le avec le drapeau : alors seulement le secrétariat le voit."
@@ -51247,9 +51379,7 @@ object FrStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
-    override val backDisabled = "Pendant le match, utilisez « Nouveau match » ou « Quitter »."
     override val exit = "Quitter"
-    override val exitConfirmTitle = "Quitter l'application ?"
     override val exitConfirmText = "Le match reste enregistré parmi les matchs suspendus et pourra être repris."
     override val exitConfirmBands = "Les bracelets seront éteints."
 
@@ -51383,8 +51513,6 @@ object FrStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche : $it" }
     override val rematchNoCalendar = "Aucune application d'agenda sur ce téléphone."
     override val rematchPreview = "Le message"
-    override val serveTitle = "Entraînement au service"
-    override val serveHint = "Téléphone sur le trépied à côté du serveur, bracelet au poignet : KEY1 bon, KEY2 faute, KEY1 maintenu annule le dernier. Chaque service devient un clip à revoir."
     override val serveStart = "Commencer"
     override val serveNoBand = "Aucun bracelet connecté : marquez bon et faute avec les boutons à l'écran."
     override val serveBandOk: (String) -> String = { "Bracelet $it : KEY1 bon, KEY2 faute, KEY1 maintenu annule" }
@@ -51509,26 +51637,20 @@ object FrStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w gagnés, $l perdus" }
     override val studentDeleteAsk: (String) -> String = { "Retirer $it des élèves ? Ses séances restent, sans élève." }
     override val studentRacket = "Raquette"
-    override val studentRacketNone = "Aucune raquette dans Mes raquettes : ajoutez-la depuis Progrès › Mes raquettes."
     override val studentRacketPick = "Choisir sa raquette"
     override val studentPurge = "Supprimer le joueur et ses données"
     override val studentPurgeConfirm = "Tout supprimer"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Supprimer $name et toutes ses données de ce téléphone ? Ses $n séances avec vidéos et analyse, les notes et la photo sont supprimées ; la raquette reste mais n'est plus la sienne. Les matchs de l'historique restent (les adversaires y sont aussi). C'est définitif." }
-    override val playerLinked: (String) -> String = { "✓ $it, de la base des joueurs" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "Il y a $n joueurs nommés $name : touchez le bon ou créez-en un autre." }
-    override val playerCreate: (String) -> String = { "Un autre $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 match, $d" else "$n matchs, dernier le $d" }
     override val studentPickExisting = "Touchez le joueur si c'est lui : ses matchs sont déjà dans la base."
     override val studentFromExisting = "Élève tiré de la base des joueurs : avec ses matchs."
-    override val playerNotHim = "Ce n'est pas lui : un autre joueur"
-    override val playerNew: (String) -> String = { "Nouveau joueur : $it entre dans la base au début du match" }
     override val playersTitle = "Joueurs"
     override val playersHint = "Tous les joueurs des matchs et les élèves : fusionnez ceux écrits de deux façons, séparez les homonymes"
     override val playersSearch = "Chercher"
     override val playersNone = "Pas encore de joueurs : ils s'ajoutent tout seuls avec les matchs."
     override val playerTwin = "homonyme"
     override val playerStudentToggle = "Élève"
-    override val playerStudentToggleHint = "Apparaît dans S'entraîner › Élèves et dans Qui s'entraîne"
+    override val playerStudentToggleHint = "Apparaît parmi les Élèves (rôle Entraîneur) et dans Qui s'entraîne"
     override val playerMerge = "Fusionner avec un autre joueur"
     override val playerMergeHint = "La même personne écrite de deux façons ou créée deux fois : ses matchs et séances passent à ce joueur."
     override val playerSplit = "Séparer un homonyme"
@@ -51551,7 +51673,7 @@ object FrStrings : Strings {
     override val meNew = "Je suis nouveau"
     override val meIsYou = "C'est vous"
     override val meThisIsMe = "C'est moi"
-    override val dataTitle = "Profil et données"
+    override val dataTitle = "Sauvegarde et données"
     override val dataHint = "Sauvegarde dans un fichier qui reste à vous, restauration sur ce téléphone ou un autre, effacement de tout"
     override val dataBackup = "Sauvegarde"
     override val dataBackupHint = "Un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix. Enregistrez-le où vous voulez (même sur un PC ou une clé USB) : pas de cloud."
@@ -51576,14 +51698,13 @@ object FrStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Inclure les vidéos ($mb Mo)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sauvegarde du $date (appli $app" + (if (videos) ", avec les vidéos" else ", sans vidéos") + "). Elle remplace toutes les données actuelles : si besoin, faites d'abord une sauvegarde." }
     override val tabTournaments = "Tournois"
-    override val tabCourts = "Terrains"
     override val roleCoach = "Entraîneur"
     override val roleClub = "Club"
-    override val roleYouHint = "Vous jouez, vous vous entraînez, vos vidéos, progrès et raquettes."
-    override val roleCoachHint = "Vos élèves : entraînement des coups, mouvement, matchs et notes. Vous arbitrez les matchs entre élèves."
-    override val roleClubHint = "Tournois, courts avec leurs tableaux TV, joueurs et entraîneurs."
+    override val roleYouHint = "Vous jouez : comptage des points, entraînements, vidéos, progrès, raquettes et réservations dans votre club."
+    override val roleCoachHint = "Vos élèves : entraînement des coups, exercices, mouvement, rapports et notes. Les matchs se comptent depuis le rôle Vous."
+    override val roleClubHint = "Le secrétariat : aujourd'hui, planning des terrains, adhérents et cotisations, école de tennis, tournois et équipes."
     override val rolesTitle = "Rôles"
-    override val rolesHint = "Vous pouvez en avoir plusieurs (qui joue et entraîne) : ils changent les onglets du premier écran, les données sont les mêmes. En haut vous passez d'un rôle à l'autre."
+    override val rolesHint = "Chaque rôle a ses fonctions, sans doublons. Vous pouvez en avoir plusieurs (qui joue et entraîne) : en haut vous passez de l'un à l'autre, les données sont les mêmes."
     override val clubNoName = "Le club"
     override val clubNoCourts = "Touchez pour écrire le nom et les courts"
     override val clubCourtsLabel = "Terrains (un par ligne)"
@@ -51594,7 +51715,7 @@ object FrStrings : Strings {
     override val onbRolesTitle = "Qui utilise l'appli ?"
     override val onbClubTitle = "Votre club"
     override val onbPrivacyTitle = "Vos données"
-    override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Faites de temps en temps une sauvegarde dans Plus › Profil et données : c'est la seule copie."
+    override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Chaque jour l'app en fait une copie dans Documents ; de temps en temps, gardez-en une aussi hors du téléphone (Plus › Réglages › Sauvegarde et données)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Vous n'avez encore jamais enregistré de sauvegarde : touchez pour en faire une." else "Dernière sauvegarde : $last. Touchez pour en faire une nouvelle." }
     override val drillsTitle = "Exercices"
     override val drillsHint = "Exercices guidés : un coup et ses étapes à la suite (p. ex. 20 coups droits croisés, puis 20 le long de la ligne)"
@@ -51938,7 +52059,6 @@ object FrStrings : Strings {
     override val crtHeating = "Chauffage"
     override val crtNoLightsWarn = "Ce terrain n'a pas d'éclairage."
     override val crtTitle = "Terrains"
-    override val crtTapToSet = "touchez pour le configurer"
     override val crtClay = "Terre battue"
     override val crtGrass = "Gazon"
     override val crtHard = "Dur"
@@ -52171,7 +52291,7 @@ object FrStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Joueurs connectés : $it" }
     override val srvInviteHow = "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne."
     override val srvInvite = "Invitation à réserver en ligne"
-    override val srvInviteHint = "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Jouer › Réserver un terrain › Scanner le QR."
+    override val srvInviteHint = "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Plus › J'ai une invitation du club › Scanner le QR."
     override val srvInviteCode: (String) -> String = { "Code : $it" }
     override val srvInviteUntil: (String) -> String = { "Valable une fois, jusqu'au $it" }
     override val srvShare = "Partager le lien"
@@ -52200,7 +52320,6 @@ object FrStrings : Strings {
     override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club"
     override val srvErrPairLocal = "L'appairage se fait seulement depuis le réseau du club : utilisez l'adresse locale (http://…:8080)."
     override val pbTitle = "Réserver un terrain"
-    override val pbEntryHint = "Si votre club a le serveur TSM : entrez avec l'invitation du secrétariat"
     override val pbEntryJoined: (String) -> String = { "$it : terrains libres et vos réservations" }
     override val pbJoinIntro = "Scannez le QR d'invitation donné par le secrétariat du club, ou collez le lien d'invitation (ou saisissez le code et l'adresse du club)."
     override val pbScan = "Scanner le QR"
@@ -52227,7 +52346,6 @@ object FrStrings : Strings {
     override val pbPrice = "Prix"
     override val pbFreePrice = "gratuit"
     override val pbPay: (String) -> String = { "Paiement : $it" }
-    override val pbBooked = "Réservé !"
     override val pbClosed = "Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas."
     override val pbRules: (Int, Int) -> String = { a, b -> "Réservation jusqu'à $a jours à l'avance, $b réservations au maximum à la fois." }
     override val pbCancelRule: (Int) -> String = { "Annulation par vous-même jusqu'à $it heures avant." }
@@ -52400,8 +52518,6 @@ object FrStrings : Strings {
     override val pfRackets = "Raquettes"
     override val pfRacketsHint = "Vos raquettes, les cordages et la raquette virtuelle"
     override val pfPadelHint = "Le choix tennis ou padel dans un nouveau match"
-    override val moreGroupDevices = "Appareils et voix"
-    override val moreGroupData = "Données"
     override val moreGroupHelp = "Aide"
     override val deskFirstTitle = "La première fois, le navigateur dira « Votre connexion n'est pas privée »"
     override val deskFirstWhy = "C'est normal et sans danger : la page est servie par ce téléphone, avec un certificat qu'il a créé lui-même et non par une société que le navigateur connaît. La liaison reste chiffrée."
@@ -52450,7 +52566,6 @@ object FrStrings : Strings {
     override val yrRival = "Le rival"
     override val yrNone = "Aucun match cette année."
     override val yrShare = "Partager"
-    override val yrYear = "Année"
     override val goalAtLeast: (String) -> String = { "au moins $it" }
     override val goalAtMost: (String) -> String = { "au plus $it" }
     override val goalReached: (String) -> String = { "Atteint le $it" }
@@ -52463,12 +52578,9 @@ object FrStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Plus longue série : 1 victoire" else "Plus longue série : $it victoires de suite" }
     override val yrAces: (Int) -> String = { "Aces : $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entraînement" else "$it entraînements" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a gagnés, $b perdus" }
     override val calTitle = "Calendrier"
     override val calHint = "Les jours avec matchs et entraînements : touchez un jour pour voir ce que vous avez fait."
     override val calNoneDay = "Rien ce jour-là."
-    override val calPrev = "Mois précédent"
-    override val calNext = "Mois suivant"
     override val pbInviteSend = "Inviter"
     override val pbBookedInvite = "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous."
     override val calStreak: (Int) -> String = { if (it == 1) "Vous avez joué ou vous êtes entraîné cette semaine" else "$it semaines de suite à jouer ou vous entraîner" }
@@ -52516,13 +52628,11 @@ object FrStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analyse du coup $a sur $b…" }
     override val tabPlay = "Jouer"
     override val tabTrain = "S'entraîner"
-    override val tabVideo = "Vidéo"
     override val tabProgress = "Progrès"
     override val tabMore = "Plus"
     override val playNewMatchHint = "Qui joue, règles et façon de compter"
     override val playResume: (String) -> String = { "Reprendre : $it" }
     override val playTournamentHint = "Americano ou Mexicano, avec des paires qui tournent"
-    override val playUseAs = "Utiliser ce téléphone comme"
     override val playAsBoardHint = "L'écran devient le tableau d'un match"
     override val playAsCamera = "Téléphone-caméra"
     override val playAsCameraHint = "Filme le match avec le score de l'arbitre"
@@ -52537,22 +52647,18 @@ object FrStrings : Strings {
     override val progressRacketsHint = "Statistiques et sensations par raquette"
     override val moreDevices = "Appareils"
     override val moreDevicesHint = "Bracelets, ceintures, télécommandes, deuxième téléphone, tableau TV"
-    override val moreVoice = "Langue et voix"
-    override val moreVoiceHint = "Langue de l'appli, voix qui annonce le score"
-    override val moreRacketsHint = "Cordages, tensions et recordages"
-    override val moreTransfer = "Transférer les matchs"
-    override val moreTransferHint = "Vers un autre téléphone, avec un code"
+    override val moreVoice = "Voix de l'arbitre"
+    override val moreVoiceHint = "Annonces vocales, moteur et voix, vos enregistrements"
     override val statusBands: (Int) -> String = { "Bracelets $it/2" }
     override val statusStraps: (Int) -> String = { "Ceintures $it" }
     override val statusCamera = "Caméra connectée"
     override val statusTv = "Tableau TV"
     override val statusNone = "Aucun appareil connecté"
     override val playTournament = "Tournoi entre amis"
-    override val step1Hint = "Étape 1 sur 2 · Qui joue. Tout est facultatif : vous pouvez continuer sans noms."
-    override val step2Hint = "Étape 2 sur 2 · Façon de compter et règles du match."
+    override val step1Hint = "Étape 1 sur 3 · Qui joue. Tout est facultatif : vous pouvez continuer sans noms."
+    override val step2Hint = "Étape 2 sur 3 · Façon de compter et règles du match."
     override val moreDetails = "Autres détails"
     override val moreDetailsHint = "Club, court et tournoi, si vous voulez"
-    override val recentPlayers = "Joueurs récents"
     override val onbWelcome = "Bienvenue dans Tennis Score Manager"
     override val onbLang = "Choisissez la langue"
     override val onbUseTitle = "Comment utiliserez-vous TSM ?"
@@ -52572,14 +52678,12 @@ object FrStrings : Strings {
     override val moreProfileHint = "Votre nom, pour les progrès et le classement"
     override val moreTour = "Présentation de l'appli"
     override val moreTourHint = "Les premières questions, à nouveau"
-    override val profileName = "Votre nom"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
     override val shareChooseHint = "L'image avec le texte convient à WhatsApp et aux réseaux sociaux ; le PDF contient aussi statistiques, déroulé et photos du match."
     override val shareImage = "Image et texte"
     override val sharePdf = "PDF complet"
-    override val tournamentButton = "Tournoi Americano ou Mexicano"
     override val tournamentTitle = "Tournoi"
     override val tournamentSubtitle = "Americano et Mexicano : les paires changent à chaque tour"
     override val tournamentNew = "Nouveau tournoi"
@@ -52684,7 +52788,6 @@ object FrStrings : Strings {
     override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez le bouton « Caster » des réglages rapides (« Diffusion de l'écran » jusqu'à Android 14, « Smart View » sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
 
     override val displayMode = "Utiliser comme tableau"
-    override val displayModeHint = "Ce téléphone affiche le score sur l'écran (câble HDMI ou Chromecast)"
     override val displaySearching = "Recherche du téléphone de l'arbitre…"
     override val displaySteps = "1. Activez le point d'accès sur l'un des deux téléphones et connectez-y l'autre.\n2. Sur le téléphone de l'arbitre : page 2 → « Tableau d'affichage TV » activé.\n3. Branchez ce téléphone à l'écran (câble USB-C/HDMI) ou castez l'écran sur un Chromecast."
     override val displayManual = "Adresse (ex. 192.168.43.1:8080)"
@@ -52706,7 +52809,6 @@ object FrStrings : Strings {
     override val racketNone = "Aucune"
     override val racketEmpty = "Aucune raquette. Ajoutez vos raquettes avec cordage et tension, puis choisissez celle utilisée avant chaque match ou entraînement."
     override val racketField = "Raquette"
-    override val racketSetupHint = "Choisissez la raquette de chaque joueur : le match retiendra la raquette, le cordage et la tension du jour."
     override val racketCatalog = "Depuis le catalogue"
     override val racketCatalogHint = "Données du fabricant, indicatives : corrigez-les si vous avez mesuré votre raquette."
     override val racketName = "Surnom (A, B…)"
@@ -52761,6 +52863,37 @@ object FrStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · logiciel libre sous licence GNU GPL version 3 ou ultérieure, sans aucune garantie." }
     override val aboutSource = "Code source"
+
+    override val unreadableTitle = "Certaines données étaient illisibles"
+    override val unreadableHint: (String) -> String = { "$it : j'en ai mis une copie de côté, que je ne touche pas. S'il manque quelque chose, touchez ici et restaurez la dernière sauvegarde." }
+    override val autoBackupOnTitle = "La sauvegarde est maintenant automatique"
+    override val autoBackupOnHint = "Chaque jour, si quelque chose a changé, une copie de toutes les données (sans vidéos) va dans Documents › Tennis Score Manager › Backup. Touchez pour la voir ou la désactiver."
+
+    override val leaveTitle = "Quitter le match ?"
+    override val leaveToMenu = "Retour au menu"
+    override val closeApp = "Fermer l'app"
+    override val keepPlaying = "Continuer à jouer"
+    override val done = "Terminé"
+    override val matchPlace = "Lieu du match"
+    override val matchPlaceHint = "D'après la position du téléphone, dans le récapitulatif et le PDF. Elle reste sur le téléphone."
+
+    override val step3Hint = "Étape 3 sur 3 · Qui sert en premier et de quel côté chacun commence."
+    override val otherRules = "Autres règles"
+    override val playerDetails = "Classement, homme/femme, raquette"
+
+    override val tabPlanning = "Planning"
+    override val playThisPhone = "Ce téléphone"
+    override val rolesFeatures = "Rôles et fonctions"
+    override val rolesFeaturesHint = "Qui utilise l'app et quoi garder dans les menus : le reste n'apparaît pas, les données restent"
+    override val moreGroupClub = "Le club"
+    override val pbMineEntryHint = "Réservations, listes d'attente, rappels et code PIN"
+    override val pbSeekEntryHint = "Trouvez avec qui jouer : une fois complet, le terrain se réserve tout seul"
+
+    override val settingsTitle = "Réglages"
+    override val settingsHint = "Langue, voix, appareils, rôles et fonctions, sauvegarde et version de l'appli"
+    override val aboutTitle = "À propos"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (compilation $n)" }
+    override val aboutSite = "Site et guide"
 }
 TSM_EOF
 
@@ -52782,7 +52915,6 @@ object PtStrings : Strings {
     override val datePattern = "EEEE, d 'de' MMMM 'de' yyyy"
 
     override val setupTitle = "Nova partida"
-    override val setupSubtitle = "Configuração opcional: você pode deixar tudo em branco e continuar."
     override val clubSection = "Clube e quadra"
     override val clubName = "Nome do clube de tênis"
     override val courtNumber = "Número da quadra"
@@ -53014,7 +53146,6 @@ object PtStrings : Strings {
     override val videoPoint = "Ponto"
     override val videoGame = "Game"
     override val videoSet = "Set"
-    override val videoReplay = "Rever o ponto"
     override val videoStart = "Início"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Dupla falta"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Erro não forçado"; "FORCED_ERROR" -> "Erro forçado"; "ERROR" -> "Erro"; else -> k } }
     override val videoImport = "Importar vídeo"
@@ -53114,7 +53245,6 @@ object PtStrings : Strings {
     override val heartChart = "Batimentos durante a partida"
     override val heartLine: (Int, Int) -> String = { a, m -> "média $a · máx. $m bpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (estimativa)" }
-    override val heartStatsHint = "Calorias estimadas a partir dos batimentos com a fórmula de Keytel: o erro típico é de 20%."
     override val heartZones = "Tempo nas zonas cardíacas"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Muito leve", "Leve", "Moderada", "Intensa", "Máxima").getOrElse(it) { "" } }
     override val heartZonesHint = "Zonas em porcentagem do batimento máximo estimado pela idade (208 − 0,7 × idade): é preciso a idade de quem usa a cinta."
@@ -53386,8 +53516,6 @@ object PtStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "Nova partida"
     override val suspendedOverlay = "PARTIDA SUSPENSA"
-    override val newMatchConfirmTitle = "Nova partida?"
-    override val newMatchConfirmText = "A partida em andamento fica salva entre as partidas suspensas e você poderá retomá-la."
     override val endDialogTitle = "Jogo, set e partida"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Vitória de $name\n$score" }
     override val matchConcluded = "Partida encerrada"
@@ -53417,7 +53545,6 @@ object PtStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "conduta $c · tempo $t" }
     override val retireUndone = "Desistência anulada"
     override val undoShort = "Anular"
-    override val newMatchShort = "Nova"
     override val disqualifyButton = "Desqualificação"
     override val disqualifyTitle = "Quem é desqualificado?"
     override val disqualifyHint = "Depois dos jogos de penalização, ou por uma falta grave, o árbitro pode desqualificar: a partida termina com o placar atual e vence o adversário."
@@ -53568,7 +53695,6 @@ object PtStrings : Strings {
     override val pbClubChatHint = "Aqui leem e escrevem todos os sócios ligados. Sejam simpáticos: a secretaria pode tirar mensagens, e com a bandeirinha assinala as despropositadas."
     override val pbClubChatAlerts = "Notificações do chat do clube"
     override val pbClubChatAlertsHint = "Desligadas: lês as mensagens aqui quando quiseres."
-    override val pbDmTitle = "Mensagens privadas"
     override val pbDmOpen = "Os sócios podem escrever-me"
     override val pbDmOpenHint = "Ligado: apareces na lista e os outros sócios podem escrever-te. Desligado: não apareces, mas podes escrever a quem o ligou."
     override val pbDmHint = "Só vocês dois leem isto. Se uma mensagem não está bem, assinala-a com a bandeirinha: só então a secretaria a vê."
@@ -53599,9 +53725,7 @@ object PtStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
     override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
     override val confirm = "Confirmar"
-    override val backDisabled = "Durante a partida use «Nova partida» ou «Sair»."
     override val exit = "Sair"
-    override val exitConfirmTitle = "Sair do app?"
     override val exitConfirmText = "A partida fica salva entre as partidas suspensas e você poderá retomá-la."
     override val exitConfirmBands = "As pulseiras serão desligadas."
 
@@ -53735,8 +53859,6 @@ object PtStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche: $it" }
     override val rematchNoCalendar = "Nenhum app de agenda neste telefone."
     override val rematchPreview = "A mensagem"
-    override val serveTitle = "Treino de saque"
-    override val serveHint = "Telefone no tripé ao lado de quem saca, pulseira no pulso: KEY1 dentro, KEY2 fora, KEY1 pressionado desfaz o último. Cada saque vira um clipe para rever."
     override val serveStart = "Começar"
     override val serveNoBand = "Nenhuma pulseira conectada: marque dentro e fora com os botões da tela."
     override val serveBandOk: (String) -> String = { "Pulseira $it: KEY1 dentro, KEY2 fora, KEY1 pressionado desfaz" }
@@ -53861,26 +53983,20 @@ object PtStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w ganhas, $l perdidas" }
     override val studentDeleteAsk: (String) -> String = { "Remover $it dos alunos? As sessões ficam, sem aluno." }
     override val studentRacket = "Raquete"
-    override val studentRacketNone = "Ainda não há raquetes em As minhas raquetes: adicione em Progresso › As minhas raquetes."
     override val studentRacketPick = "Escolher a raquete dele"
     override val studentPurge = "Apagar jogador e os dados dele"
     override val studentPurgeConfirm = "Apagar tudo"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Apagar $name e todos os dados dele deste telefone? Apagam-se as $n sessões com vídeos e análise, as notas e a foto; a raquete fica, mas não é mais dele. As partidas do histórico ficam (os adversários também estão nelas). Não dá para desfazer." }
-    override val playerLinked: (String) -> String = { "✓ $it, do banco de jogadores" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "Há $n jogadores chamados $name: toque no certo ou crie outro." }
-    override val playerCreate: (String) -> String = { "Outro $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partida, $d" else "$n partidas, a última em $d" }
     override val studentPickExisting = "Toque no jogador se for ele: as partidas dele já estão no banco."
     override val studentFromExisting = "Aluno do banco de jogadores: com as partidas dele."
-    override val playerNotHim = "Não é ele: outro jogador"
-    override val playerNew: (String) -> String = { "Jogador novo: $it entra no banco no início da partida" }
     override val playersTitle = "Jogadores"
     override val playersHint = "Todos os jogadores das partidas e os alunos: junte quem está escrito de dois jeitos, separe os homônimos"
     override val playersSearch = "Pesquisar"
     override val playersNone = "Ainda não há jogadores: entram sozinhos com as partidas."
     override val playerTwin = "homônimo"
     override val playerStudentToggle = "Aluno"
-    override val playerStudentToggleHint = "Aparece em Treinar › Alunos e em Quem treina"
+    override val playerStudentToggleHint = "Aparece entre os Alunos (papel Treinador) e em Quem treina"
     override val playerMerge = "Juntar com outro jogador"
     override val playerMergeHint = "A mesma pessoa escrita de dois jeitos ou criada duas vezes: as partidas e sessões passam para este jogador."
     override val playerSplit = "Separar um homônimo"
@@ -53903,7 +54019,7 @@ object PtStrings : Strings {
     override val meNew = "Sou novo"
     override val meIsYou = "É você"
     override val meThisIsMe = "Sou eu"
-    override val dataTitle = "Perfil e dados"
+    override val dataTitle = "Backup e dados"
     override val dataHint = "Backup num arquivo que é seu, restauração neste ou em outro telefone, apagar tudo"
     override val dataBackup = "Backup"
     override val dataBackupHint = "Um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz. Salve onde quiser (também num PC ou pen drive): sem nuvem."
@@ -53928,14 +54044,13 @@ object PtStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Incluir os vídeos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup de $date (app $app" + (if (videos) ", com vídeos" else ", sem vídeos") + "). Substitui todos os dados atuais: se precisar, faça antes um backup." }
     override val tabTournaments = "Torneios"
-    override val tabCourts = "Quadras"
     override val roleCoach = "Treinador"
     override val roleClub = "Clube"
-    override val roleYouHint = "Você joga, treina, seus vídeos, progresso e raquetes."
-    override val roleCoachHint = "Seus alunos: treino de golpes, movimento, partidas e notas. Você arbitra as partidas entre alunos."
-    override val roleClubHint = "Torneios, quadras com seus placares de TV, jogadores e treinadores."
+    override val roleYouHint = "Você joga: placar, treinos, vídeos, progresso, raquetes e reservas no seu clube."
+    override val roleCoachHint = "Seus alunos: treino de golpes, exercícios, movimento, relatórios e notas. As partidas são marcadas no papel Você."
+    override val roleClubHint = "A secretaria: hoje, agenda das quadras, sócios e mensalidades, escola de tênis, torneios e equipes."
     override val rolesTitle = "Papéis"
-    override val rolesHint = "Você pode ter mais de um (quem joga e treina): mudam as abas da primeira tela, os dados são os mesmos. No alto você passa de um papel a outro."
+    override val rolesHint = "Cada papel tem as suas funções, sem duplicatas. Você pode ter mais de um (quem joga e treina): no alto você passa de um a outro, os dados são os mesmos."
     override val clubNoName = "O clube"
     override val clubNoCourts = "Toque para escrever o nome e as quadras"
     override val clubCourtsLabel = "Quadras (uma por linha)"
@@ -53946,7 +54061,7 @@ object PtStrings : Strings {
     override val onbRolesTitle = "Quem usa o app?"
     override val onbClubTitle = "O seu clube"
     override val onbPrivacyTitle = "Seus dados"
-    override val onbPrivacyText = "Partidas, jogadores, vídeos e notas ficam neste telefone: sem conta, sem servidor. Se você acompanha alunos (inclusive menores), peça o consentimento para filmá-los e guardar os dados; você pode apagar quando quiser. Faça de vez em quando um backup em Mais › Perfil e dados: é a única cópia."
+    override val onbPrivacyText = "Partidas, jogadores, vídeos e notas ficam neste telefone: sem conta, sem servidor. Se você acompanha alunos (inclusive menores), peça o consentimento para filmá-los e guardar os dados; você pode apagar quando quiser. Todos os dias o app faz uma cópia em Documentos; de vez em quando guarde uma também fora do telefone (Mais › Configurações › Backup e dados)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Você ainda nunca salvou um backup: toque para fazer." else "Último backup: $last. Toque para fazer um novo." }
     override val drillsTitle = "Exercícios"
     override val drillsHint = "Exercícios guiados: um golpe e os passos em sequência (ex. 20 forehands cruzados, depois 20 na paralela)"
@@ -54290,7 +54405,6 @@ object PtStrings : Strings {
     override val crtHeating = "Aquecimento"
     override val crtNoLightsWarn = "Esta quadra não tem iluminação."
     override val crtTitle = "Quadras"
-    override val crtTapToSet = "toque para configurar"
     override val crtClay = "Saibro"
     override val crtGrass = "Grama"
     override val crtHard = "Rápida"
@@ -54523,7 +54637,7 @@ object PtStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Jogadores ligados: $it" }
     override val srvInviteHow = "Para convidar um jogador: abre a sua ficha e toca em Convite para reservar online."
     override val srvInvite = "Convite para reservar online"
-    override val srvInviteHint = "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal. Com a app TSM: Jogar › Reservar quadra › Ler o QR."
+    override val srvInviteHint = "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal. Com a app TSM: Mais › Tenho um convite do clube › Ler o QR."
     override val srvInviteCode: (String) -> String = { "Código: $it" }
     override val srvInviteUntil: (String) -> String = { "Vale uma vez, até $it" }
     override val srvShare = "Partilhar a ligação"
@@ -54552,7 +54666,6 @@ object PtStrings : Strings {
     override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube"
     override val srvErrPairLocal = "O emparelhamento só se faz a partir da rede do clube: usa o endereço local (http://…:8080)."
     override val pbTitle = "Reservar quadra"
-    override val pbEntryHint = "Se o teu clube tem o servidor TSM: entra com o convite da secretaria"
     override val pbEntryJoined: (String) -> String = { "$it: quadras livres e as tuas reservas" }
     override val pbJoinIntro = "Lê o QR de convite que a secretaria do clube te deu, ou cola a ligação do convite (ou escreve o código e o endereço do clube)."
     override val pbScan = "Ler o QR"
@@ -54579,7 +54692,6 @@ object PtStrings : Strings {
     override val pbPrice = "Preço"
     override val pbFreePrice = "grátis"
     override val pbPay: (String) -> String = { "Pagamento: $it" }
-    override val pbBooked = "Reservada!"
     override val pbClosed = "As reservas online estão fechadas agora: vê-se a agenda mas não se reserva."
     override val pbRules: (Int, Int) -> String = { a, b -> "Reservas até $a dias antes, no máximo $b reservas de cada vez." }
     override val pbCancelRule: (Int) -> String = { "Cancelas sozinho até $it horas antes." }
@@ -54752,8 +54864,6 @@ object PtStrings : Strings {
     override val pfRackets = "Raquetes"
     override val pfRacketsHint = "As tuas raquetes, as cordas e a raquete virtual"
     override val pfPadelHint = "A escolha ténis ou padel no novo jogo"
-    override val moreGroupDevices = "Dispositivos e voz"
-    override val moreGroupData = "Dados"
     override val moreGroupHelp = "Ajuda"
     override val deskFirstTitle = "Da primeira vez o navegador dirá «A sua ligação não é privada»"
     override val deskFirstWhy = "É normal e não é um perigo: a página é servida por este telefone, com um certificado feito por ele e não por uma empresa que o navegador conhece. A ligação continua cifrada."
@@ -54802,7 +54912,6 @@ object PtStrings : Strings {
     override val yrRival = "O rival"
     override val yrNone = "Nenhuma partida neste ano."
     override val yrShare = "Partilhar"
-    override val yrYear = "Ano"
     override val goalAtLeast: (String) -> String = { "pelo menos $it" }
     override val goalAtMost: (String) -> String = { "no máximo $it" }
     override val goalReached: (String) -> String = { "Alcançado a $it" }
@@ -54815,12 +54924,9 @@ object PtStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Maior série: 1 vitória" else "Maior série: $it vitórias seguidas" }
     override val yrAces: (Int) -> String = { "Aces: $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 treino" else "$it treinos" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a ganhas, $b perdidas" }
     override val calTitle = "Calendário"
     override val calHint = "Os dias com partidas e treinos: toque num dia para ver o que fez."
     override val calNoneDay = "Nada neste dia."
-    override val calPrev = "Mês anterior"
-    override val calNext = "Mês seguinte"
     override val pbInviteSend = "Convidar"
     override val pbBookedInvite = "Reservado! Aqui em baixo pode convidar quem joga consigo."
     override val calStreak: (Int) -> String = { if (it == 1) "Esta semana jogou ou treinou" else "Há $it semanas seguidas que joga ou treina" }
@@ -54868,13 +54974,11 @@ object PtStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisando o golpe $a de $b…" }
     override val tabPlay = "Jogar"
     override val tabTrain = "Treinar"
-    override val tabVideo = "Vídeo"
     override val tabProgress = "Progresso"
     override val tabMore = "Mais"
     override val playNewMatchHint = "Quem joga, regras e como você marca o placar"
     override val playResume: (String) -> String = { "Retomar: $it" }
     override val playTournamentHint = "Americano ou Mexicano, com duplas que trocam"
-    override val playUseAs = "Usar este telefone como"
     override val playAsBoardHint = "A tela vira o placar de uma partida"
     override val playAsCamera = "Telefone-câmera"
     override val playAsCameraHint = "Filma a partida com o placar do árbitro"
@@ -54889,22 +54993,18 @@ object PtStrings : Strings {
     override val progressRacketsHint = "Estatísticas e sensações por raquete"
     override val moreDevices = "Dispositivos"
     override val moreDevicesHint = "Pulseiras, cintas, controles, segundo telefone, placar na TV"
-    override val moreVoice = "Idioma e voz"
-    override val moreVoiceHint = "Idioma do app, voz que anuncia o placar"
-    override val moreRacketsHint = "Cordas, tensões e encordoamentos"
-    override val moreTransfer = "Transferir partidas"
-    override val moreTransferHint = "Para outro telefone, com um código"
+    override val moreVoice = "Voz do árbitro"
+    override val moreVoiceHint = "Anúncios por voz, motor e voz, as suas gravações"
     override val statusBands: (Int) -> String = { "Pulseiras $it/2" }
     override val statusStraps: (Int) -> String = { "Cintas $it" }
     override val statusCamera = "Câmera conectada"
     override val statusTv = "Placar na TV"
     override val statusNone = "Nenhum dispositivo conectado"
     override val playTournament = "Torneio entre amigos"
-    override val step1Hint = "Passo 1 de 2 · Quem joga. Tudo opcional: dá para seguir mesmo sem nomes."
-    override val step2Hint = "Passo 2 de 2 · Como você marca o placar e as regras da partida."
+    override val step1Hint = "Passo 1 de 3 · Quem joga. Tudo opcional: dá para seguir mesmo sem nomes."
+    override val step2Hint = "Passo 2 de 3 · Como você marca o placar e as regras da partida."
     override val moreDetails = "Mais detalhes"
     override val moreDetailsHint = "Clube, quadra e torneio, se quiser"
-    override val recentPlayers = "Jogadores recentes"
     override val onbWelcome = "Bem-vindo ao Tennis Score Manager"
     override val onbLang = "Escolha o idioma"
     override val onbUseTitle = "Como você vai usar o TSM?"
@@ -54924,14 +55024,12 @@ object PtStrings : Strings {
     override val moreProfileHint = "O seu nome, para progresso e rating"
     override val moreTour = "Apresentação do app"
     override val moreTourHint = "As primeiras perguntas, de novo"
-    override val profileName = "O seu nome"
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
     override val shareChooseHint = "A imagem com texto serve para WhatsApp e redes sociais; o PDF tem também estatísticas, histórico e fotos da partida."
     override val shareImage = "Imagem"
     override val sharePdf = "PDF completo"
-    override val tournamentButton = "Torneio Americano ou Mexicano"
     override val tournamentTitle = "Torneio"
     override val tournamentSubtitle = "Americano e Mexicano: duplas que mudam a cada rodada"
     override val tournamentNew = "Novo torneio"
@@ -55036,7 +55134,6 @@ object PtStrings : Strings {
     override val tvChromecastHint = "Com um Chromecast: no telefone-placar use o botão de transmissão das configurações rápidas («Transmitir», «Transmissão» ou «Transmissão de tela», conforme a versão do Android; «Smart View» nos Samsung). O Chromecast precisa de uma rede com internet: ative os dados móveis no telefone que faz o hotspot."
 
     override val displayMode = "Usar como placar"
-    override val displayModeHint = "Este telefone mostra o placar no monitor (cabo HDMI ou Chromecast)"
     override val displaySearching = "Procurando o telefone do árbitro…"
     override val displaySteps = "1. Ative o hotspot num dos dois telefones e conecte o outro.\n2. No telefone do árbitro: página 2 → «Placar na TV» ativado.\n3. Ligue este telefone ao monitor (cabo USB-C/HDMI) ou transmita a tela para um Chromecast."
     override val displayManual = "Endereço (ex. 192.168.43.1:8080)"
@@ -55058,7 +55155,6 @@ object PtStrings : Strings {
     override val racketNone = "Nenhuma"
     override val racketEmpty = "Nenhuma raquete. Adicione as suas raquetes com cordas e tensão e escolha a usada antes de cada jogo ou treino."
     override val racketField = "Raquete"
-    override val racketSetupHint = "Escolha a raquete de cada jogador: o jogo guardará a raquete, as cordas e a tensão de hoje."
     override val racketCatalog = "Do catálogo"
     override val racketCatalogHint = "Dados do fabricante, indicativos: corrija-os se mediu a sua raquete."
     override val racketName = "Alcunha (A, B…)"
@@ -55113,6 +55209,37 @@ object PtStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software livre sob a GNU GPL versão 3 ou posterior, sem nenhuma garantia." }
     override val aboutSource = "Código-fonte"
+
+    override val unreadableTitle = "Alguns dados não podiam ser lidos"
+    override val unreadableHint: (String) -> String = { "$it: guardei uma cópia à parte, que não mexo. Se faltar algo, toque aqui e restaure a última cópia de segurança." }
+    override val autoBackupOnTitle = "A cópia de segurança agora é automática"
+    override val autoBackupOnHint = "Todos os dias, se algo mudou, uma cópia de todos os dados (sem vídeos) vai para Documentos › Tennis Score Manager › Backup. Toque para ver ou desligar."
+
+    override val leaveTitle = "Sair da partida?"
+    override val leaveToMenu = "Voltar ao menu"
+    override val closeApp = "Fechar o app"
+    override val keepPlaying = "Continuar a jogar"
+    override val done = "Concluído"
+    override val matchPlace = "Local da partida"
+    override val matchPlaceHint = "Pela localização do telefone, no resumo e no PDF. Fica no telefone."
+
+    override val step3Hint = "Passo 3 de 3 · Quem saca primeiro e de que lado começa cada um."
+    override val otherRules = "Outras regras"
+    override val playerDetails = "Classificação, homem/mulher, raquete"
+
+    override val tabPlanning = "Agenda"
+    override val playThisPhone = "Este telefone"
+    override val rolesFeatures = "Papéis e funções"
+    override val rolesFeaturesHint = "Quem usa o app e o que manter nos menus: o resto não aparece, os dados ficam"
+    override val moreGroupClub = "O clube"
+    override val pbMineEntryHint = "Reservas, listas de espera, lembretes e PIN"
+    override val pbSeekEntryHint = "Encontre com quem jogar: quando completo, a quadra é reservada sozinha"
+
+    override val settingsTitle = "Configurações"
+    override val settingsHint = "Idioma, voz, dispositivos, papéis e funções, backup e versão do app"
+    override val aboutTitle = "Sobre o app"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Versão $v (compilação $n)" }
+    override val aboutSite = "Site e guia"
 }
 TSM_EOF
 
@@ -55684,7 +55811,7 @@ private fun PinSection(c: MatchController, me: SrvMe, onSaved: () -> Unit) {
 private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val locale = c.options.value.lang.locale
+    val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     var me by remember { mutableStateOf<SrvMe?>(null) }
     var day by remember { mutableStateOf<SrvDay?>(null) }
@@ -56087,7 +56214,7 @@ private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onBusy: (CourtInfo, Lon
 @Composable
 private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInfo, start: Long, ct: ClubTime, onDone: (Boolean) -> Unit) {
     val s = LocalStrings.current
-    val locale = c.options.value.lang.locale
+    val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     val options = (slot..maxOf(me.rules.maxMinutes, slot) step slot).toList()
     var minutes by remember { mutableStateOf(options.first()) }
@@ -56350,7 +56477,7 @@ private fun whenText(t: Long, lang: com.tennis.scoremanager.model.Lang): String 
 fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
     val s = LocalStrings.current
     val conf by c.clubServer.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     if (!conf.paired) return
     LaunchedEffect(conf.url) {
         while (true) { c.syncServerNow(); kotlinx.coroutines.delay(60_000) }
@@ -56420,7 +56547,7 @@ private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data
 @Composable
 fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val conf by c.clubServer.collectAsState()
     val courts by c.clubCourts.collectAsState()
     val scope = rememberCoroutineScope()
@@ -56560,7 +56687,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
 @Composable
 fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val conf by c.clubServer.collectAsState()
     if (!conf.paired) return
     val scope = rememberCoroutineScope()
@@ -56593,7 +56720,7 @@ fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
 @Composable
 private fun InviteDialog(c: MatchController, inv: SrvInvite, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val context = LocalContext.current
     val conf by c.clubServer.collectAsState()
     val link = ClubServers.inviteLink(conf, inv.code)
@@ -56721,7 +56848,7 @@ fun ClubTournamentsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val list by c.clubTournaments.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.13") },
@@ -56845,7 +56972,7 @@ private fun EntriesTab(
     onAdd: () -> Unit, onOpen: (String) -> Unit,
 ) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     // Le informazioni del torneo.
     val info = listOfNotNull(
         t.start?.let { st -> s.ctDates(shortDate(st, lang), t.end?.let { shortDate(it, lang) } ?: shortDate(st, lang)) },
@@ -57018,7 +57145,7 @@ private fun DrawTab(c: MatchController, t: ClubTournament, onOpen: (String) -> U
 @Composable
 private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
     // Prima quelle da giocare (in ordine di orario), poi le giocate; i bye non contano.
     val ms = t.matches.filter { !it.bye }
@@ -57046,7 +57173,7 @@ private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -
 private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val a = entryName(c, t.entries.firstOrNull { it.id == m.a })
     val b = entryName(c, t.entries.firstOrNull { it.id == m.b })
     var winner by remember { mutableStateOf(m.winner) }
@@ -57185,7 +57312,7 @@ private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () ->
 @Composable
 private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var pickDay by remember { mutableStateOf(false) }
     val open = t.matches.filter { !it.played && it.a != null && it.b != null }
     // I giorni con partite in programma (a mezzanotte, uno per giorno).
@@ -57215,7 +57342,7 @@ private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: ()
 @Composable
 private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone: (String?) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var name by remember { mutableStateOf(t?.name.orEmpty()) }
     var kind by remember { mutableStateOf(t?.kind ?: CTKind.SOCIAL) }
     var doubles by remember { mutableStateOf(t?.doubles ?: false) }
@@ -57373,14 +57500,14 @@ fun CourtStatsScreen(c: MatchController) {
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
     val courts by c.clubCourts.collectAsState()
-    val locale = c.options.value.lang.locale
+    val locale = c.options.collectAsState().value.lang.locale
     var kind by rememberSaveable { mutableIntStateOf(0) }
     val (from, to) = period(kind, System.currentTimeMillis())
     val r = remember(plan, tournaments, courts, from, to) { CourtStats.report(plan, tournaments, courts, from, to) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.15") },
         title = s.stTitle,
-        subtitle = shortDate(from, c.options.value.lang) + " – " + shortDate(CourtPlans.addDays(to, -1), c.options.value.lang),
+        subtitle = shortDate(from, c.options.collectAsState().value.lang) + " – " + shortDate(CourtPlans.addDays(to, -1), c.options.collectAsState().value.lang),
         icon = Icons.Filled.BarChart,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
@@ -57481,6 +57608,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57546,6 +57674,7 @@ import com.tennis.scoremanager.data.Occupied
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.Players
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.PlayerEditDialog
@@ -57598,11 +57727,30 @@ private fun occupiedLabel(c: MatchController, s: Strings, o: Occupied): String {
 @Composable
 fun CourtsPlanScreen(c: MatchController) {
     val s = LocalStrings.current
-    val context = LocalContext.current
     BackHandler { c.back() }
+    var settings by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        onHelp = { c.openHelp("7.15") },
+        title = s.planTitle,
+        subtitle = null,
+        icon = Icons.Filled.CalendarMonth,
+        action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.planSettings, tint = TsmColors.Ball) } },
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) { PlanBody(c) }
+    if (settings) PlanSettingsDialog(c, c.courtPlan.collectAsState().value.settings) { settings = false }
+}
+
+/**
+ * Il planning: il giorno, un campo per colonna e un'ora per riga. Sta nella sua schermata e nella scheda Planning del
+ * Circolo ([inTab]: lì, senza l'ingranaggio in alto, Orari e prezzi è un tasto).
+ */
+@Composable
+fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
@@ -57617,14 +57765,14 @@ fun CourtsPlanScreen(c: MatchController) {
     val occ = CourtPlans.occupied(plan, tournaments, day)
     val slots = CourtPlans.slots(day, plan.settings)
     val stepMs = plan.settings.slotMinutes * 60_000L
-    ScreenScaffold(
-        onHelp = { c.openHelp("7.15") },
-        title = s.planTitle,
-        subtitle = com.tennis.scoremanager.data.Notices.day(day, lang),
-        icon = Icons.Filled.CalendarMonth,
-        action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.planSettings, tint = TsmColors.Ball) } },
-        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
-    ) {
+    // Senza campi non c'è planning: prima si scrivono.
+    if (courts.isEmpty()) {
+        Text(s.clubNoCourts, color = TsmColors.TextDim)
+        BigButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.fillMaxWidth())
+        if (manage) CourtsManageDialog(c) { manage = false }
+        return
+    }
+    run {
         // Il giorno: indietro, oggi, il calendario, avanti.
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { day = CourtPlans.addDays(day, -1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null, tint = TsmColors.TextMain) }
@@ -57637,6 +57785,7 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
+        if (inTab) GhostButton(s.planSettings, Icons.Filled.Settings, { settings = true }, Modifier.fillMaxWidth())
         val features by c.clubFeatures.collectAsState()
         if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
@@ -57700,7 +57849,7 @@ fun CourtsPlanScreen(c: MatchController) {
 private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, onDone: (List<Long>?) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
     val courts = c.storage.clubCourts
@@ -57856,9 +58005,9 @@ fun PlayerPickDialog(c: MatchController, except: Set<String>, title: String? = n
 
 /** Orari, caselle, prezzi e luci del planning. */
 @Composable
-private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: () -> Unit) {
+internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var st by remember { mutableStateOf(st0) }
     var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
     var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
@@ -57886,7 +58035,7 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
                 GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
                 if (c.has(com.tennis.scoremanager.ClubFeature.SERVER)) {
                     GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
-                    Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                    Text(if (c.clubServer.collectAsState().value.paired) s.srvConnected(c.clubServer.collectAsState().value.club.ifBlank { c.clubServer.collectAsState().value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 }
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
@@ -57925,7 +58074,7 @@ fun courtTraits(s: Strings, i: com.tennis.scoremanager.data.CourtInfo): String =
 @Composable
 fun CourtsManageDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     val plan by c.courtPlan.collectAsState()
     var edit by remember { mutableStateOf<com.tennis.scoremanager.data.CourtInfo?>(null) }
@@ -57975,7 +58124,7 @@ private fun CourtThumb(c: MatchController, name: String, size: Int, onClick: (()
 private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data.CourtInfo, isNew: Boolean, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
     var i by remember { mutableStateOf(i0) }
     var name by remember { mutableStateOf(i0.name) }
@@ -58081,7 +58230,7 @@ private fun blockLine(s: Strings, b: com.tennis.scoremanager.data.CourtBlock, la
 @Composable
 private fun BlocksDialog(c: MatchController, onEdit: (com.tennis.scoremanager.data.CourtBlock) -> Unit, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
     AlertDialog(
         onDismissRequest = onDone,
@@ -58111,7 +58260,7 @@ private fun BlocksDialog(c: MatchController, onEdit: (com.tennis.scoremanager.da
 private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data.CourtBlock, isNew: Boolean, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts = c.storage.clubCourts
     val tournaments by c.clubTournaments.collectAsState()
     var b by remember { mutableStateOf(b0) }
@@ -58230,7 +58379,7 @@ fun DataScreen(c: MatchController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     BackHandler { c.back() }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var videos by remember { mutableStateOf(false) }
     var wipeVideos by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
@@ -58272,11 +58421,6 @@ fun DataScreen(c: MatchController) {
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
         // Chi usa l'app: i ruoli cambiano le schede della prima schermata, non i dati.
-        val roles by c.roles.collectAsState()
-        SectionCard(s.rolesTitle, Icons.Filled.Groups) {
-            Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
-            com.tennis.scoremanager.ui.RolesPicker(roles) { c.setRoles(it) }
-        }
         SectionCard(s.dataBackup, Icons.Filled.Backup) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }
@@ -58701,6 +58845,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58741,7 +58886,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun HelpScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val sections = remember(lang) {
         val text = runCatching { context.assets.open("help/${lang.code}.md").bufferedReader().readText() }
             .recoverCatching { context.assets.open("help/en.md").bufferedReader().readText() }.getOrDefault("")
@@ -58957,7 +59102,7 @@ fun HistoryScreen(c: MatchController) {
     val sendUrl by c.transferUrl.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
-    BackHandler { if (player != null) player = null else c.home() }
+    BackHandler { if (player != null) player = null else c.back() }
 
     ScreenScaffold(
 
@@ -58966,7 +59111,7 @@ fun HistoryScreen(c: MatchController) {
         subtitle = s.historySubtitle,
         icon = Icons.Filled.History,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.home() },
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.back() },
                 Modifier.weight(1f))
             BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
                 Modifier.weight(1f))
@@ -59038,7 +59183,7 @@ fun HistoryScreen(c: MatchController) {
 @Composable
 private fun TransferPickDialog(c: MatchController, onDone: (Set<String>?) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val all = remember { c.sendableMatches() }
     // Di solito si manda l'ultima partita: parte già spuntata.
     var picked by remember { mutableStateOf(setOfNotNull(all.firstOrNull()?.id)) }
@@ -59300,7 +59445,13 @@ import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.EventNote
+import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59340,8 +59491,9 @@ import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.video.CameraActivity
 
 /**
- * Prima schermata: cinque schede in basso, per cosa si vuole fare (giocare, allenarsi, i video, i progressi, il resto).
- * Ogni voce porta alla sua schermata; "Indietro" da lì torna alla scheda da cui si è partiti.
+ * Prima schermata: le schede in basso del ruolo attivo, ognuna per una cosa da fare (giocare, il circolo, allenarsi, i
+ * progressi; per la segreteria oggi, planning, soci e tornei) e Altro per le impostazioni. Ogni voce porta alla sua
+ * schermata; "Indietro" da lì torna alla scheda da cui si è partiti.
  */
 @Composable
 fun HomeScreen(c: MatchController) {
@@ -59352,7 +59504,7 @@ fun HomeScreen(c: MatchController) {
     // Partite arrivate da un altro telefono con un giocatore che si chiama come uno dei nostri: è lui?
     val questions by c.playerQuestions.collectAsState()
     questions.firstOrNull()?.let { PlayerQuestionDialog(c, it) }
-    // Prima accensione: le tre domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
+    // Prima accensione: le domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
     var tour by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     var asked by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -59367,37 +59519,55 @@ fun HomeScreen(c: MatchController) {
     if (tour) com.tennis.scoremanager.ui.OnboardingFlow(c) { tour = false }
     // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
     val role by c.activeRole.collectAsState()
-    val roles by c.roles.collectAsState()
-    // Le schede di Tu e Allenatore che restano vuote con quello che non si usa spariscono.
+    // Le schede che restano vuote con quello che non si usa spariscono.
     val pf by c.playerFeatures.collectAsState()
+    val cf by c.clubFeatures.collectAsState()
+    val accounts by c.bookingAccounts.collectAsState()
     val tabs = role.tabs.filter { t ->
         when (t) {
+            // Il circolo di chi gioca: solo dopo esserci entrati con l'invito della segreteria.
+            HomeTab.BOOKING -> accounts.isNotEmpty()
             HomeTab.TRAIN -> PlayerFeature.HEART in pf || PlayerFeature.TRAINING in pf
-            HomeTab.VIDEO -> PlayerFeature.VIDEO in pf
-            HomeTab.PROGRESS -> PlayerFeature.PROGRESS in pf || PlayerFeature.RACKETS in pf || PlayerFeature.TRAINING in pf
+            HomeTab.PROGRESS -> PlayerFeature.PROGRESS in pf || PlayerFeature.RACKETS in pf || PlayerFeature.TRAINING in pf || PlayerFeature.VIDEO in pf
+            HomeTab.COURTS -> ClubFeature.PLANNING in cf
+            HomeTab.PEOPLE -> ClubFeature.MEMBERS in cf || ClubFeature.PAYMENTS in cf || ClubFeature.SCHOOL in cf
+            HomeTab.TOURNAMENTS -> ClubFeature.TOURNAMENTS in cf || ClubFeature.TEAMS in cf || ClubFeature.LADDER in cf
             else -> true
         }
     }
-    LaunchedEffect(role, tab) { if (tab !in tabs) c.homeTab.value = tabs.first() }
+    LaunchedEffect(role, tab, tabs) { if (tab !in tabs) c.homeTab.value = tabs.first() }
     // Da un'altra scheda "Indietro" torna alla prima; dalla prima esce dall'app come sempre.
     BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
     val (title, icon) = tabInfo(s, tab)
     ScreenScaffold(
-        onHelp = { c.openHelp("3.1") },
+        onHelp = { c.openHelp(tabHelp(tab)) },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
-        action = if (roles.size > 1) { { RoleSwitch(c) } } else null,
+        // Il ruolo attivo sempre in alto: da lì si passa a un altro e si scelgono ruoli e funzioni.
+        action = { RoleSwitch(c) },
     ) {
-        // Promemoria del backup (se acceso in Profilo e dati): ogni 30 giorni.
+        // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
         if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
+        // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
+        val unreadable = c.storage.unreadable.toList()
+        if (unreadable.isNotEmpty()) Entry(Icons.Filled.Warning, s.unreadableTitle, s.unreadableHint(unreadable.joinToString(", "))) {
+            c.storage.unreadable.clear()
+            c.go(Screen.DATA)
+        }
+        // Chi aveva già l'app: il backup automatico ora è acceso di serie, lo si dice una volta.
+        if (!c.storage.autoBackupNoticeSeen && c.storage.personalBackupAuto) Entry(Icons.Filled.Backup, s.autoBackupOnTitle, s.autoBackupOnHint) {
+            c.storage.autoBackupNoticeSeen = true
+            c.go(Screen.DATA)
+        }
         when (tab) {
-            HomeTab.PLAY -> PlayTab(c)
+            // Senza la scheda Progressi (spenta in Cosa usi) lo storico sta in Gioca.
+            HomeTab.PLAY -> PlayTab(c, historyHere = HomeTab.PROGRESS !in tabs)
+            HomeTab.BOOKING -> BookingTab(c)
             HomeTab.TRAIN -> TrainTab(c)
-            HomeTab.VIDEO -> VideoTab(c)
             HomeTab.PROGRESS -> ProgressTab(c)
-            HomeTab.MORE -> MoreTab(c) { tour = true }
+            HomeTab.MORE -> MoreTab(c, role) { tour = true }
             HomeTab.STUDENTS -> CoachTab(c)
             HomeTab.TOURNAMENTS -> TournamentsTab(c)
-            HomeTab.COURTS -> CourtsTab(c)
+            HomeTab.COURTS -> PlanBody(c, inTab = true)
             HomeTab.PEOPLE -> PeopleTab(c)
             HomeTab.TODAY -> TodayTab(c)
         }
@@ -59407,15 +59577,28 @@ fun HomeScreen(c: MatchController) {
 /** Titolo e icona di una scheda. */
 private fun tabInfo(s: com.tennis.scoremanager.ui.Strings, t: HomeTab): Pair<String, ImageVector> = when (t) {
     HomeTab.PLAY -> s.tabPlay to Icons.Filled.SportsTennis
+    HomeTab.BOOKING -> s.roleClub to Icons.Filled.Business
     HomeTab.TRAIN -> s.tabTrain to Icons.Filled.FitnessCenter
-    HomeTab.VIDEO -> s.tabVideo to Icons.Filled.Videocam
     HomeTab.PROGRESS -> s.tabProgress to Icons.AutoMirrored.Filled.TrendingUp
     HomeTab.MORE -> s.tabMore to Icons.Filled.MoreHoriz
     HomeTab.STUDENTS -> s.studentsTitle to Icons.Filled.Groups
     HomeTab.TOURNAMENTS -> s.tabTournaments to Icons.Filled.EmojiEvents
-    HomeTab.COURTS -> s.tabCourts to Icons.Filled.Tv
-    HomeTab.PEOPLE -> s.playersTitle to Icons.Filled.Groups
+    HomeTab.COURTS -> s.tabPlanning to Icons.Filled.CalendarMonth
+    HomeTab.PEOPLE -> s.membersTitle to Icons.Filled.CardMembership
     HomeTab.TODAY -> s.tdTitle to Icons.Filled.Today
+}
+
+/** La sezione della guida che apre il "?" di ogni scheda. */
+private fun tabHelp(t: HomeTab): String = when (t) {
+    HomeTab.PLAY -> "7"
+    HomeTab.BOOKING -> "7.18"
+    HomeTab.TRAIN -> "7.1"
+    HomeTab.PROGRESS -> "7.2"
+    HomeTab.STUDENTS -> "7.6"
+    HomeTab.TOURNAMENTS -> "7.13"
+    HomeTab.COURTS -> "7.15"
+    HomeTab.PEOPLE -> "7.11"
+    HomeTab.TODAY, HomeTab.MORE -> "3.1"
 }
 
 fun roleName(s: com.tennis.scoremanager.ui.Strings, r: com.tennis.scoremanager.Role) = when (r) {
@@ -59430,13 +59613,14 @@ fun roleIcon(r: com.tennis.scoremanager.Role): ImageVector = when (r) {
     com.tennis.scoremanager.Role.CLUB -> Icons.Filled.Business
 }
 
-/** Il ruolo attivo, in alto: toccandolo si passa a un altro dei propri ruoli. */
+/** Il ruolo attivo, sempre in alto: toccandolo si passa a un altro dei propri ruoli o si scelgono ruoli e funzioni. */
 @Composable
 private fun RoleSwitch(c: MatchController) {
     val s = LocalStrings.current
     val role by c.activeRole.collectAsState()
     val roles by c.roles.collectAsState()
     var open by remember { mutableStateOf(false) }
+    var settings by remember { mutableStateOf(false) }
     Box {
         Row(
             Modifier.clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { open = true }.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -59453,11 +59637,18 @@ private fun RoleSwitch(c: MatchController) {
                     onClick = { open = false; c.setActiveRole(r) },
                 )
             }
+            androidx.compose.material3.HorizontalDivider()
+            androidx.compose.material3.DropdownMenuItem(
+                text = { Text(s.rolesFeatures) },
+                leadingIcon = { Icon(Icons.Filled.Tune, null, tint = TsmColors.TextDim) },
+                onClick = { open = false; settings = true },
+            )
         }
     }
+    if (settings) com.tennis.scoremanager.ui.RolesFeaturesDialog(c) { settings = false }
 }
 
-/** Allenatore: chi si allena e i suoi allenamenti dei colpi, gli allievi, una partita tra allievi. */
+/** Allenatore: gli allievi, gli esercizi e l'allenamento dei colpi di chi si allena con lui. */
 @Composable
 private fun CoachTab(c: MatchController) {
     val s = LocalStrings.current
@@ -59465,64 +59656,32 @@ private fun CoachTab(c: MatchController) {
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
     Entry(Icons.Filled.FormatListNumbered, s.drillsTitle, s.drillsHint) { c.go(Screen.DRILLS) }
-    ServeTrainingCard(c)
+    ServeTrainingCard(c, coach = true)
 }
 
-/** Circolo: i tornei, una partita, un telefono come tabellone. */
+/**
+ * Circolo: i tornei, le squadre e le sfide. Il segnapunti parte da lì (Gioca col segnapunti) e le loro partite lasciate
+ * a metà si riprendono da qui; il resto del segnapunti (partita libera, storico, tabellone) è del profilo Tu.
+ */
 @Composable
 private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
-    val context = LocalContext.current
     val f by c.clubFeatures.collectAsState()
     if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
-    if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
-    if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint) { c.openLadders() }
-    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
-    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = ClubFeature.TOURNAMENTS !in f) { c.go(Screen.SETUP) }
-    Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
-    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
+    if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint, main = ClubFeature.TOURNAMENTS !in f) { c.openTeams() }
+    if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint, main = ClubFeature.TOURNAMENTS !in f && ClubFeature.TEAMS !in f) { c.openLadders() }
+    ResumeEntries(c, club = true)
 }
 
-/** Circolo: nome e campi (si usano in Nuova partita e per i tabelloni), il tabellone TV. */
-@Composable
-private fun CourtsTab(c: MatchController) {
-    val s = LocalStrings.current
-    var edit by remember { mutableStateOf(false) }
-    var manage by remember { mutableStateOf(false) }
-    var server by remember { mutableStateOf(false) }
-    var backup by remember { mutableStateOf(false) }
-    val name = c.storage.clubName
-    val courts by c.clubCourts.collectAsState()
-    val f by c.clubFeatures.collectAsState()
-    if (ClubFeature.PLANNING in f) Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
-    Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
-    Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
-    if (ClubFeature.STATS in f) Entry(Icons.Filled.BarChart, s.stTitle, s.cfStatsHint) { c.openCourtStats() }
-    if (ClubFeature.SERVER in f) {
-        val srv by c.clubServer.collectAsState()
-        Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
-    }
-    if (ClubFeature.DESK in f) Entry(Icons.Filled.Computer, s.deskTitle, s.deskHint) { c.go(Screen.DESK) }
-    Entry(Icons.Filled.Backup, s.obTitle, s.obHint) { backup = true }
-    Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
-    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
-    if (server) ClubServerDialog(c) { server = false }
-    if (backup) com.tennis.scoremanager.ui.OfficeBackupDialog(c) { backup = false }
-    if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
-    if (manage) CourtsManageDialog(c) { manage = false }
-}
-
-/** Circolo: giocatori e allievi del database. */
+/** Circolo: soci, quote, scuola tennis e il messaggio a tutti i soci. */
 @Composable
 private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
     val f by c.clubFeatures.collectAsState()
     if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
-    if (ClubFeature.PAYMENTS in f) Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
-    if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
-    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint, main = ClubFeature.MEMBERS !in f) { c.openPlayers() }
-    Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
-    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
+    if (ClubFeature.PAYMENTS in f) Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint, main = ClubFeature.MEMBERS !in f) { c.openPayments() }
+    if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint, main = ClubFeature.MEMBERS !in f && ClubFeature.PAYMENTS !in f) { c.openSchool() }
+    if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.Campaign, s.ntMembersAll, null) { c.noticeMembersAll() }
 }
 
 @Composable
@@ -59550,7 +59709,7 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
 /** Una voce della prima schermata: icona, titolo, una riga di spiegazione; [main] = l'azione principale della scheda. */
 @Composable
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+internal fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
     // Con [onLongClick] la voce si tiene premuta per un'altra azione (eliminare la partita sospesa).
     Surface(shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface,
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
@@ -59567,7 +59726,7 @@ private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String) {
     Text(text, color = TsmColors.TextDim, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
 }
 
@@ -59604,16 +59763,14 @@ private fun Chip(label: String, ok: Boolean?, onClick: () -> Unit) {
 }
 
 @Composable
-private fun PlayTab(c: MatchController) {
+private fun PlayTab(c: MatchController, historyHere: Boolean) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val saved by c.saved.collectAsState()
     val history by c.history.collectAsState()
     LaunchedEffect(Unit) {
         c.refreshSaved()
         c.refreshHistory()
     }
-    var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
     val pf by c.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
@@ -59622,16 +59779,40 @@ private fun PlayTab(c: MatchController) {
     for (g in goals.filter { it.reachedAt != null && !it.seen }) {
         Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
     }
-    // Novità dai circoli: gli annunci di Cerco compagno ancora da leggere (toccandone uno si apre Compagni).
-    ClubNews(c)
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
-    for (rec in saved.take(2)) {
+    ResumeEntries(c, club = false)
+    history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
+        val su = last.record.setup
+        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
+            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
+            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
+        }
+    }
+    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.friends.show() }
+    if (historyHere) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
+    // Questo telefono come tabellone, come telecamera dell'arbitro o per riprendere da solo.
+    SectionLabel(s.playThisPhone)
+    Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
+    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.PlayCircle, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.Videocam, s.videoRecord, s.videoRecordHint) { context.startActivity(Intent(context, CameraActivity::class.java)) }
+}
+
+/**
+ * Le partite sospese più recenti, da riprendere con un tocco; tenendo premuto si eliminano (con conferma). Ognuna sta
+ * in un profilo solo: quelle di un torneo, di una squadra o di una sfida ([club]) nel Circolo, le altre in Gioca.
+ */
+@Composable
+private fun ResumeEntries(c: MatchController, club: Boolean) {
+    val s = LocalStrings.current
+    val saved by c.saved.collectAsState()
+    LaunchedEffect(Unit) { c.refreshSaved() }
+    var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
+    for (rec in saved.filter { c.isClubRecord(it.id) == club }.take(2)) {
         val names = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
-        val lang = c.options.value.lang
+        val lang = c.options.collectAsState().value.lang
         val at = rec.startedAt ?: rec.updatedAt
-        // Tenendo premuto si elimina (con conferma), senza passare da Nuova partita.
         Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}",
             onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
     }
@@ -59645,61 +59826,44 @@ private fun PlayTab(c: MatchController) {
             dismissButton = { androidx.compose.material3.TextButton(onClick = { toDelete = null }) { Text(s.back) } },
         )
     }
-    history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
-        val su = last.record.setup
-        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
-            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
-            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
-        }
-    }
-    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
-    // Senza la scheda Progressi lo storico sta qui.
-    if (PlayerFeature.PROGRESS !in pf && PlayerFeature.RACKETS !in pf && PlayerFeature.TRAINING !in pf) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
-    // Il server del circolo (se il circolo ce l'ha): prenotare i campi da qui, con l'invito della segreteria.
-    // Solo a chi è entrato in un circolo; se il suo server non risponde la voce lo dice (e torna da sola).
-    val accounts by c.bookingAccounts.collectAsState()
-    val reach by c.bookingReach.collectAsState()
-    if (accounts.isNotEmpty()) {
-        val down = accounts.filter { reach[it.url] == false }
-        val names = { l: List<com.tennis.scoremanager.data.BookingAccount> -> l.joinToString(", ") { it.club.ifBlank { it.url } } }
-        val hint = when {
-            down.size == accounts.size -> s.pbOffline
-            down.isNotEmpty() -> s.pbSomeOffline(names(down))
-            else -> s.pbEntryJoined(names(accounts))
-        }
-        Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint) { c.go(Screen.BOOK_COURT) }
-        // La chat del circolo, sempre a portata: l'ultimo messaggio e quanti da leggere.
-        for (a in accounts.filter { it.joined }) {
-            val title = listOfNotNull(s.pbClubChat, a.club.takeIf { accounts.size > 1 && it.isNotBlank() }).joinToString(" · ") +
-                if (a.clubUnread > 0) " (${a.clubUnread})" else ""
-            Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
-        }
-    }
-    SectionLabel(s.playUseAs)
-    Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
-    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
 }
 
+/**
+ * Il circolo di chi gioca (dopo l'invito della segreteria): le novità (bacheca, chat, annunci), prenotare un campo, le
+ * proprie prenotazioni, Cerco compagno e la chat del circolo. Se il server non risponde la voce lo dice.
+ */
+@Composable
+private fun BookingTab(c: MatchController) {
+    val s = LocalStrings.current
+    ClubNews(c)
+    val accounts by c.bookingAccounts.collectAsState()
+    val reach by c.bookingReach.collectAsState()
+    val down = accounts.filter { reach[it.url] == false }
+    val names = { l: List<com.tennis.scoremanager.data.BookingAccount> -> l.joinToString(", ") { it.club.ifBlank { it.url } } }
+    val hint = when {
+        down.size == accounts.size -> s.pbOffline
+        down.isNotEmpty() -> s.pbSomeOffline(names(down))
+        else -> s.pbEntryJoined(names(accounts))
+    }
+    Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint, main = true) { c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
+    // La chat del circolo, sempre a portata: l'ultimo messaggio e quanti da leggere.
+    for (a in accounts.filter { it.joined }) {
+        val title = listOfNotNull(s.pbClubChat, a.club.takeIf { accounts.size > 1 && it.isNotBlank() }).joinToString(" · ") +
+            if (a.clubUnread > 0) " (${a.clubUnread})" else ""
+        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
+    }
+}
+
+/** Tu: l'allenamento con la fascia e l'allenamento dei tuoi colpi (quello degli allievi è nel profilo Allenatore). */
 @Composable
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
     val pf by c.playerFeatures.collectAsState()
     if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
-    if (PlayerFeature.TRAINING in pf) {
-        // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
-        ServeTrainingCard(c)
-        // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
-        Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
-    }
-}
-
-@Composable
-private fun VideoTab(c: MatchController) {
-    val s = LocalStrings.current
-    val context = LocalContext.current
-    Entry(Icons.Filled.Videocam, s.videoRecord, s.videoRecordHint, main = true) { context.startActivity(Intent(context, CameraActivity::class.java)) }
-    Entry(Icons.Filled.VideoLibrary, s.videoLibrary, s.videoLibraryHint) { c.screen.value = Screen.VIDEOS }
-    Entry(Icons.Filled.PlayCircle, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+    // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
+    if (PlayerFeature.TRAINING in pf) ServeTrainingCard(c, coach = false)
 }
 
 @Composable
@@ -59717,23 +59881,25 @@ private fun ProgressTab(c: MatchController) {
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
+    // Le partite riprese: capitoli, highlights e moviola stanno coi propri progressi.
+    if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.VideoLibrary, s.videoLibrary, s.videoLibraryHint) { c.go(Screen.VIDEOS) }
     var year by remember { mutableStateOf(false) }
     Entry(Icons.Filled.CalendarMonth, s.yrTitle, s.yrHint) { year = true }
     if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
     if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
-    // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
+    // Allenamento dei tuoi colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione (quelli degli
+    // allievi stanno nelle loro schede).
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val trainee by c.trainStudent.collectAsState()
-    val ofTrainee = sessions.filter { it.student == trainee }
+    val ofTrainee = sessions.filter { it.student == null }
     val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> ofTrainee.any { it.stroke == t } }
     if (done.isNotEmpty() && PlayerFeature.TRAINING in pf) {
-        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes + (c.studentById(trainee)?.name?.let { " · $it" } ?: ""), Icons.Filled.SportsTennis) {
+        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes, Icons.Filled.SportsTennis) {
             Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
             for (t in done) {
                 val mine = ofTrainee.filter { it.stroke == t }
                 val title = "${com.tennis.scoremanager.ui.strokeLabel(s, t)} · ${mine.size}"
-                Surface(onClick = { c.openStrokeSessions(t) }, color = TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+                Surface(onClick = { c.setTrainStudent(null); c.openStrokeSessions(t) }, color = TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
                     // Con una sessione sola non c'è linea: basta il nome del colpo.
                     if (mine.count { com.tennis.scoremanager.data.ServeTraining.count(it.serves).pct != null } >= 2) {
                         com.tennis.scoremanager.ui.StrokeTrend(mine, title)
@@ -59746,38 +59912,65 @@ private fun ProgressTab(c: MatchController) {
     }
 }
 
+/**
+ * Altro: prima le cose del profilo (chi gioca il suo profilo e i giocatori, la segreteria il circolo), poi quelle
+ * dell'app, uguali per tutti: le impostazioni (lingua, voce, dispositivi, ruoli e funzioni, backup, versione) e l'aiuto.
+ */
 @Composable
-private fun MoreTab(c: MatchController, onTour: () -> Unit) {
+private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTour: () -> Unit) {
     val s = LocalStrings.current
-    var profile by remember { mutableStateOf(false) }
-    val players by c.players.collectAsState()
-    val mine = remember(players) { c.me() }
-    val me = mine?.name ?: c.storage.myName
-    // Col tuo giocatore si apre la tua scheda; senza, si sceglie chi sei.
-    Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) {
-        if (mine != null) c.openStudent(mine.id) else profile = true
+    when (role) {
+        com.tennis.scoremanager.Role.CLUB -> ClubGroup(c)
+        com.tennis.scoremanager.Role.PLAYER -> {
+            var profile by remember { mutableStateOf(false) }
+            val players by c.players.collectAsState()
+            val mine = remember(players) { c.me() }
+            val me = mine?.name ?: c.storage.myName
+            // Col tuo giocatore si apre la tua scheda; senza, si sceglie chi sei.
+            Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) {
+                if (mine != null) c.openStudent(mine.id) else profile = true
+            }
+            if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+            Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+            // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
+            val bookingAccounts by c.bookingAccounts.collectAsState()
+            if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
+        }
+        com.tennis.scoremanager.Role.COACH -> {}
     }
-    if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
-    val pf by c.playerFeatures.collectAsState()
-    var uses by remember { mutableStateOf(false) }
-    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
-    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
-    Entry(Icons.Filled.Tune, s.pfTitle, s.pfEntryHint) { uses = true }
-    // Prima di entrare in un circolo: da qui si usa l'invito (poi la voce Prenota un campo sta in Gioca).
-    val bookingAccounts by c.bookingAccounts.collectAsState()
-    if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
-    SectionLabel(s.moreGroupDevices)
-    Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
-    Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
-    SectionLabel(s.moreGroupData)
-    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
-    Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
+    Entry(Icons.Filled.Settings, s.settingsTitle, s.settingsHint) { c.go(Screen.SETTINGS) }
     SectionLabel(s.moreGroupHelp)
     Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
-    if (uses) com.tennis.scoremanager.ui.PlayerFeaturesDialog(c) { uses = false; c.storage.playerFeaturesSeen = true }
-    // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
-    AboutFooter()
+}
+
+/** Altro del Circolo: il circolo e i suoi strumenti, nome e campi, orari e prezzi, server, segreteria da PC, backup. */
+@Composable
+private fun ClubGroup(c: MatchController) {
+    val s = LocalStrings.current
+    val f by c.clubFeatures.collectAsState()
+    val courts by c.clubCourts.collectAsState()
+    val plan by c.courtPlan.collectAsState()
+    var edit by remember { mutableStateOf(false) }
+    var manage by remember { mutableStateOf(false) }
+    var hours by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf(false) }
+    var backup by remember { mutableStateOf(false) }
+    SectionLabel(s.moreGroupClub)
+    Entry(Icons.Filled.Business, c.storage.clubName.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
+    Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
+    if (ClubFeature.PLANNING in f) Entry(Icons.Filled.Schedule, s.planSettings, null) { hours = true }
+    if (ClubFeature.SERVER in f) {
+        val srv by c.clubServer.collectAsState()
+        Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
+    }
+    if (ClubFeature.DESK in f) Entry(Icons.Filled.Computer, s.deskTitle, s.deskHint) { c.go(Screen.DESK) }
+    Entry(Icons.Filled.Backup, s.obTitle, s.obHint) { backup = true }
+    if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
+    if (manage) CourtsManageDialog(c) { manage = false }
+    if (hours) PlanSettingsDialog(c, plan.settings) { hours = false }
+    if (server) ClubServerDialog(c) { server = false }
+    if (backup) com.tennis.scoremanager.ui.OfficeBackupDialog(c) { backup = false }
 }
 
 /** Una domanda alla volta: il giocatore arrivato è uno dei nostri con quel nome, o un'altra persona? */
@@ -59994,7 +60187,7 @@ fun LadderScreen(c: MatchController) {
     val list by c.ladders.collectAsState()
     val id by c.openLadderId.collectAsState()
     val l = list.firstOrNull { it.id == id } ?: run { c.back(); return }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     fun name(p: String) = c.playerById(p)?.name ?: "?"
     var arrange by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
@@ -60149,7 +60342,6 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MatchScreen.kt
 package com.tennis.scoremanager.ui.screens
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -60197,6 +60389,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
@@ -60257,7 +60450,6 @@ import com.tennis.scoremanager.model.PenaltyOutcome
 import com.tennis.scoremanager.model.PenaltyKind
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
-import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.RemoteKeysInDialog
@@ -60289,8 +60481,8 @@ fun MatchScreen(c: MatchController) {
     val names = remember(lm.record.setup, s) { Names(lm.record.setup, s) }
     val state = lm.state
     val suspended = lm.record.suspended
-    var confirmNew by remember { mutableStateOf(false) }
-    var confirmExit by remember { mutableStateOf(false) }
+    /** Il menu per lasciare la partita (tasto Esci e Indietro): al menu, nuova partita, chiudere l'app. */
+    var leave by remember { mutableStateOf(false) }
     /** Ritiro (false) o squalifica (true) da confermare scegliendo il giocatore. */
     var confirmRetire by remember { mutableStateOf<Boolean?>(null) }
     var breakKind by remember { mutableStateOf<BreakKind?>(null) }
@@ -60304,7 +60496,8 @@ fun MatchScreen(c: MatchController) {
     /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
     var locked by rememberSaveable { mutableStateOf(false) }
 
-    BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
+    // Indietro non fa perdere niente: chiede cosa fare (la partita resta tra le sospese).
+    BackHandler { leave = true }
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -60376,8 +60569,8 @@ fun MatchScreen(c: MatchController) {
                     contentDescription = if (o.audio) s.audioOn else s.audioOff,
                 ) { c.toggleAudio() }
                 ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
-                ControlButton(Icons.Filled.AddCircle, s.newMatchShort, Modifier.weight(1.3f), contentDescription = s.newMatch) { confirmNew = true }
-                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+                // Uscire: al menu, partita nuova o app chiusa, in un posto solo (la partita resta tra le sospese).
+                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { leave = true }
             }
         }
         if (locked) LockOverlay(s) { locked = false }
@@ -60540,17 +60733,28 @@ fun MatchScreen(c: MatchController) {
         )
     }
 
-    if (confirmExit) {
-        ConfirmDialog(
-            icon = Icons.AutoMirrored.Filled.ExitToApp,
-            title = s.exitConfirmTitle,
-            text = s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "",
-            confirm = s.exit,
-            onConfirm = {
-                confirmExit = false
-                activity?.let { c.exitApp(it) }
+    if (leave) {
+        val armed = rememberArmed()
+        AlertDialog(
+            onDismissRequest = { leave = false },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, tint = TsmColors.Orange) },
+            title = { Text(s.leaveTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.exitConfirmText)
+                    @Composable fun item(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, onClick: () -> Unit) =
+                        OutlinedButton(onClick = { if (armed) { leave = false; onClick() } }, modifier = Modifier.fillMaxWidth()) {
+                            Icon(icon, null, tint = TsmColors.TextMain)
+                            Spacer(Modifier.width(8.dp))
+                            Text(text, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                        }
+                    item(Icons.Filled.Home, s.leaveToMenu) { c.leaveMatch() }
+                    item(Icons.Filled.AddCircle, s.newMatch) { c.newMatch() }
+                    item(Icons.Filled.PowerSettingsNew, s.closeApp) { activity?.let { c.exitApp(it) } }
+                    if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) Text(s.exitConfirmBands, color = TsmColors.TextDim, fontSize = 13.sp)
+                }
             },
-            onDismiss = { confirmExit = false },
+            confirmButton = { TextButton(onClick = { leave = false }) { Text(s.keepPlaying) } },
         )
     }
 
@@ -60604,20 +60808,6 @@ fun MatchScreen(c: MatchController) {
                     Text(if (state.retired != null) (if (state.disqualified) s.disqualifyUndo else s.retireUndo) else s.undoLastPoint, color = TsmColors.TextMain)
                 }
             },
-        )
-    }
-
-    if (confirmNew) {
-        ConfirmDialog(
-            icon = Icons.Filled.AddCircle,
-            title = s.newMatchConfirmTitle,
-            text = s.newMatchConfirmText,
-            confirm = s.newMatch,
-            onConfirm = {
-                confirmNew = false
-                c.newMatch()
-            },
-            onDismiss = { confirmNew = false },
         )
     }
 
@@ -61637,7 +61827,7 @@ fun MembersScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val players by c.players.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var todoOnly by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
@@ -61759,7 +61949,7 @@ private fun MemberPickDialog(c: MatchController, onDone: (PlayerProfile?) -> Uni
 @Composable
 fun MemberSection(c: MatchController, p: PlayerProfile) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val roles by c.roles.collectAsState()
     var edit by remember { mutableStateOf(false) }
     var remove by remember { mutableStateOf(false) }
@@ -61838,7 +62028,7 @@ private fun DateField(label: String, value: Long?, lang: com.tennis.scoremanager
 @Composable
 private fun MemberEditDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val m0 = p.member ?: Membership()
     var phone by remember { mutableStateOf(p.phone) }
     var email by remember { mutableStateOf(p.email) }
@@ -62267,6 +62457,9 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
     BackHandler { c.back() }
 
+    // La posizione serve solo al luogo nel riepilogo: si chiede una volta, poi decide l'interruttore in Altri dettagli.
+    fun askLocation() = c.storage.matchPlace && !(locPerm && locOn) && !c.storage.locationAsked
+
     fun onNext() {
         if (o.mode == PlayMode.BANDS) {
             if (!bandsReadyEnv) {
@@ -62288,12 +62481,12 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                     return
                 }
             }
-            if (!(locPerm && locOn)) {
+            if (askLocation()) {
                 locationDialog = true
                 return
             }
         }
-        c.go(Screen.START)
+        c.go(Screen.TOSS)
     }
 
     val match = page == OptionsPage.MATCH
@@ -62323,27 +62516,9 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         val quick by c.quickStart.collectAsState()
         val short = match && quick
         if (short) SectionCard(s.likeLastTitle, Icons.Filled.Replay) {
-            val mode = when (o.mode) { PlayMode.REFEREE -> s.modeReferee; PlayMode.BANDS -> s.modeBands; PlayMode.REMOTES -> s.modeRemotes }
-            val format = when (o.format) {
-                MatchFormat.BEST_OF_THREE -> s.formatBestOfThree
-                MatchFormat.BEST_OF_FIVE -> s.formatBestOfFive
-                MatchFormat.TWO_SETS_MATCH_TIEBREAK -> s.formatMatchTiebreak
-                MatchFormat.PRO_SET -> s.formatProSet
-                MatchFormat.MATCH_TIEBREAK_ONLY -> s.formatMatchTiebreakOnly
-            }
-            val extra = when {
-                o.format == MatchFormat.MATCH_TIEBREAK_ONLY -> null
-                o.noAd -> if (su.sport == Sport.PADEL) s.goldenPoint else s.noAd
-                o.starPoint -> s.starPoint
-                else -> null
-            }
-            // Il pro set e i set brevi dicono a quanti game: "Pro set · 8 game".
-            val games = s.gamesN(o.gamesPerSet).takeIf { o.format == MatchFormat.PRO_SET || (o.format != MatchFormat.MATCH_TIEBREAK_ONLY && o.gamesPerSet != 6) }
-            Text(listOfNotNull(mode, format, games, extra).joinToString(" · "), color = TsmColors.TextMain)
+            Text(likeLastLine(o, su.sport == Sport.PADEL, s), color = TsmColors.TextMain)
             GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false }, Modifier.fillMaxWidth())
         }
-        // Come l'ultima volta il sorteggio viene subito: è l'unica cosa da fare.
-        if (short) CoinTossSection(c, o, names, su.doubles)
         // Modalità (come l'ultima volta si vede solo coi braccialetti o i telecomandi: vanno collegati)
         if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
@@ -62390,22 +62565,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
         if (devices) RelaySection(c, names)
 
-        // Lingua
-        if (page == OptionsPage.VOICE) SectionCard(s.languageSection, Icons.Filled.Language) {
-            // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
-            // Bloccata mentre si generano i file vocali, come motore e voce (vedi VoiceSection).
-            val generating = c.voiceProgress.collectAsState().value != null
-            Segmented(
-                Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
-                selected = o.lang.ordinal,
-                onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
-                columns = 2,
-                enabled = !generating,
-            )
-            Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        }
-
-        // Audio e voce
+        // Audio e voce (la lingua si sceglie in Impostazioni)
         if (page == OptionsPage.VOICE) VoiceSection(c, o)
 
         // Tabellone su TV
@@ -62434,7 +62594,20 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             }
             // Solo super tie-break: niente game, quindi niente game per set, tie-break dei set né vantaggi.
             val onlyTiebreak = o.format == MatchFormat.MATCH_TIEBREAK_ONLY
-            if (!onlyTiebreak) {
+            val padel = su.sport == Sport.PADEL
+            // Le altre regole, chiuse in una riga finché non servono (si aprono da sole se non sono quelle di sempre).
+            var moreRules by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+            val line = otherRulesLine(o, padel, s)
+            if (!moreRules && line.isNotEmpty()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(s.otherRules, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(line, color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    TextButton(onClick = { moreRules = true }) { Text(s.setupChange, color = TsmColors.Ball) }
+                }
+            }
+            if (moreRules && !onlyTiebreak) {
                 Text(s.gamesPerSetTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 val choices = if (o.format == MatchFormat.PRO_SET) listOf(8, 10) else listOf(6, 4)
                 Segmented(
@@ -62447,18 +62620,17 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                     c.updateOptions { it.copy(setTiebreak = v) }
                 }
             }
-            val padel = su.sport == Sport.PADEL
-            if (!onlyTiebreak) SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+            if (moreRules && !onlyTiebreak) SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
                 c.updateOptions { it.copy(noAd = v, starPoint = if (v) false else it.starPoint) }
             }
             // Golden point e star point si escludono: accenderne uno spegne l'altro; spenti tutti e due = vantaggi.
-            if (padel && !onlyTiebreak) {
+            if (moreRules && padel && !onlyTiebreak) {
                 SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
                     c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
                 }
             }
             // Cambio palle dei tornei: niente, 7/9, 9/11, 11/13; con l'animazione facoltativa.
-            if (!padel && !short) {
+            if (moreRules && !padel) {
                 Text(s.newBalls, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 Text(s.newBallsHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 val choices = listOf(0 to 0) + com.tennis.scoremanager.model.NewBalls.choices
@@ -62474,8 +62646,6 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             }
         }
 
-        // Sorteggio
-        if (match && !short) CoinTossSection(c, o, names, su.doubles)
     }
 
     if (locationDialog) {
@@ -62487,13 +62657,17 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             confirmButton = {
                 Button(onClick = {
                     locationDialog = false
+                    c.storage.locationAsked = true
                     if (!locPerm) requestLocation() else openLocationSettings()
                 }) { Text(s.enable) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     locationDialog = false
-                    c.go(Screen.START)
+                    c.storage.locationAsked = true
+                    // Senza posizione: niente luogo nel riepilogo (si riaccende in Nuova partita › Altri dettagli).
+                    c.setMatchPlace(false)
+                    c.go(Screen.TOSS)
                 }) { Text(s.continueWithout) }
             },
         )
@@ -62526,7 +62700,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             confirmButton = {
                 Button(onClick = {
                     missingRemotes = null
-                    if (!(locPerm && locOn)) locationDialog = true else c.go(Screen.START)
+                    if (askLocation()) locationDialog = true else c.go(Screen.TOSS)
                 }) { Text(s.continueAnyway) }
             },
             dismissButton = { TextButton(onClick = { missingRemotes = null }) { Text(s.cancel) } },
@@ -62541,7 +62715,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             confirmButton = {
                 Button(onClick = {
                     missingBands = null
-                    c.go(Screen.START)
+                    c.go(Screen.TOSS)
                 }) { Text(s.continueAnyway) }
             },
             dismissButton = { TextButton(onClick = { missingBands = null }) { Text(s.cancel) } },
@@ -62912,6 +63086,69 @@ private fun SmallAction(text: String, icon: androidx.compose.ui.graphics.vector.
     }
 }
 
+/** Le altre regole in una riga: "6 game · Tie-break nei set · No-Ad · Cambio palle 7/9". */
+internal fun otherRulesLine(o: MatchOptions, padel: Boolean, s: Strings): String {
+    if (o.format == MatchFormat.MATCH_TIEBREAK_ONLY) return ""
+    return listOfNotNull(
+        s.gamesN(o.gamesPerSet),
+        s.setTiebreak.takeIf { o.setTiebreak },
+        (if (padel) s.goldenPoint else s.noAd).takeIf { o.noAd },
+        s.starPoint.takeIf { padel && o.starPoint && !o.noAd },
+        "${s.newBalls} ${o.newBallsFirst}/${o.newBallsEvery}".takeIf { !padel && o.newBallsFirst > 0 },
+    ).joinToString(" · ")
+}
+
+/**
+ * Passo 3 di Nuova partita: il sorteggio, chi serve e i lati. Con "Come l'ultima volta" ci si arriva subito, con le
+ * regole di allora in una riga (Cambia le riapre).
+ */
+@Composable
+fun TossScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val o by c.options.collectAsState()
+    val su by c.setup.collectAsState()
+    val quick by c.quickStart.collectAsState()
+    val names = remember(su, s) { Names(su, s) }
+    BackHandler { c.back() }
+    ScreenScaffold(
+        onHelp = { c.openHelp("7") },
+        title = s.coinToss,
+        subtitle = s.step3Hint,
+        icon = Icons.Filled.Casino,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.START) }, Modifier.weight(1f))
+        },
+    ) {
+        if (quick) SectionCard(s.likeLastTitle, Icons.Filled.Replay) {
+            Text(likeLastLine(o, su.sport == Sport.PADEL, s), color = TsmColors.TextMain)
+            GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false; c.go(Screen.OPTIONS) }, Modifier.fillMaxWidth())
+        }
+        CoinTossSection(c, o, names, su.doubles)
+    }
+}
+
+/** Modalità, formato e regole in una riga, per "Come l'ultima volta": "Arbitro · 3 set · No-Ad". */
+private fun likeLastLine(o: MatchOptions, padel: Boolean, s: Strings): String {
+    val mode = when (o.mode) { PlayMode.REFEREE -> s.modeReferee; PlayMode.BANDS -> s.modeBands; PlayMode.REMOTES -> s.modeRemotes }
+    val format = when (o.format) {
+        MatchFormat.BEST_OF_THREE -> s.formatBestOfThree
+        MatchFormat.BEST_OF_FIVE -> s.formatBestOfFive
+        MatchFormat.TWO_SETS_MATCH_TIEBREAK -> s.formatMatchTiebreak
+        MatchFormat.PRO_SET -> s.formatProSet
+        MatchFormat.MATCH_TIEBREAK_ONLY -> s.formatMatchTiebreakOnly
+    }
+    val extra = when {
+        o.format == MatchFormat.MATCH_TIEBREAK_ONLY -> null
+        o.noAd -> if (padel) s.goldenPoint else s.noAd
+        o.starPoint -> s.starPoint
+        else -> null
+    }
+    // Il pro set e i set brevi dicono a quanti game: "Pro set · 8 game".
+    val games = s.gamesN(o.gamesPerSet).takeIf { o.format == MatchFormat.PRO_SET || (o.format != MatchFormat.MATCH_TIEBREAK_ONLY && o.gamesPerSet != 6) }
+    return listOfNotNull(mode, format, games, extra).joinToString(" · ")
+}
+
 @Composable
 private fun FormatOption(title: String, hint: String, selected: Boolean, onClick: () -> Unit) {
     Row(
@@ -63186,7 +63423,7 @@ fun PaymentsScreen(c: MatchController) {
     BackHandler { c.back() }
     val book by c.clubBook.collectAsState()
     val players by c.players.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val year = Members.year(now)
     var editFee by remember { mutableStateOf<Fee?>(null) }
@@ -63285,7 +63522,7 @@ fun PaymentsScreen(c: MatchController) {
 @Composable
 private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val players by c.players.collectAsState()
     var name by remember { mutableStateOf(fee?.name.orEmpty()) }
     var kind by remember { mutableStateOf(fee?.kind ?: FeeKind.MEMBERSHIP) }
@@ -63326,7 +63563,7 @@ private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
     if (askAll) {
         val f = current() ?: fee!!
         val members = players.filter { it.member != null }
-        val todo = Fees.chargeAll(c.clubBook.value, f, members, 0L).second
+        val todo = Fees.chargeAll(c.clubBook.collectAsState().value, f, members, 0L).second
         AlertDialog(
             onDismissRequest = { askAll = false },
             text = { Text(if (todo == 0) s.feeChargeAllDone else s.feeChargeAllAsk(f.name, todo)) },
@@ -63364,7 +63601,7 @@ fun ChargesSection(c: MatchController, p: PlayerProfile) {
     val s = LocalStrings.current
     val book by c.clubBook.collectAsState()
     val roles by c.roles.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val mine = Fees.of(book, p)
     if (mine.isEmpty() && (p.member == null || com.tennis.scoremanager.Role.CLUB !in roles)) return
     val now = System.currentTimeMillis()
@@ -63394,7 +63631,7 @@ fun ChargesSection(c: MatchController, p: PlayerProfile) {
 private fun NewChargeDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
     val book by c.clubBook.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var free by remember { mutableStateOf(book.fees.isEmpty()) }
     var label by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
@@ -63437,7 +63674,7 @@ private fun NewChargeDialog(c: MatchController, p: PlayerProfile, onDone: () -> 
 private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var paying by remember { mutableStateOf(false) }
     var unpay by remember { mutableStateOf<String?>(null) }
     var cancel by remember { mutableStateOf(false) }
@@ -63495,7 +63732,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
 @Composable
 private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
     var at by remember { mutableStateOf(today()) }
     // I modi di pagamento del circolo: il primo è quello proposto.
@@ -64621,7 +64858,7 @@ fun SchoolScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val list by c.courses.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -64674,7 +64911,7 @@ fun CourseScreen(c: MatchController) {
     val co = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var tab by rememberSaveable { mutableStateOf(0) }
     var edit by remember { mutableStateOf(false) }
@@ -64771,7 +65008,7 @@ fun CourseScreen(c: MatchController) {
 @Composable
 private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
     AlertDialog(
@@ -64811,7 +65048,7 @@ private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -
 private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     val today = CourtPlans.dayStart(System.currentTimeMillis())
     var x by remember { mutableStateOf(co ?: Course(Courses.newId("k"), "", from = today, to = CourtPlans.addDays(today, 180), createdAt = System.currentTimeMillis())) }
@@ -64906,6 +65143,105 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SettingsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SettingsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.BuildConfig
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.RolesFeaturesDialog
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+
+/** Indirizzo del codice sorgente, mostrato con la versione e la licenza. */
+private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
+
+/**
+ * Altro › Impostazioni, le stesse per tutti i profili: la lingua in cima, poi la voce dell'arbitro, i dispositivi, ruoli
+ * e funzioni, backup e dati, e in fondo le informazioni sull'app (versione, licenza e codice sorgente: la GPL chiede di
+ * mostrarli).
+ */
+@Composable
+fun SettingsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val o by c.options.collectAsState()
+    var roles by remember { mutableStateOf(false) }
+    BackHandler { c.back() }
+    ScreenScaffold(
+        onHelp = { c.openHelp("3.1") },
+        // La versione si vede subito, senza scorrere fino a Informazioni.
+        title = s.settingsTitle, subtitle = "Tennis Score Manager ${BuildConfig.VERSION_NAME}", icon = Icons.Filled.Settings,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        SectionCard(s.languageSection, Icons.Filled.Language) {
+            // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
+            // Bloccata mentre si generano i file vocali (sono nella lingua di adesso).
+            val generating = c.voiceProgress.collectAsState().value != null
+            Segmented(
+                Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
+                selected = o.lang.ordinal,
+                onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
+                columns = 2,
+                enabled = !generating,
+            )
+            Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
+        Entry(Icons.Filled.RecordVoiceOver, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
+        Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
+        Entry(Icons.Filled.Tune, s.rolesFeatures, s.rolesFeaturesHint) { roles = true }
+        Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
+        SectionCard(s.aboutTitle, Icons.Filled.Info) {
+            Text("Tennis Score Manager", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(s.aboutVersion(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+            Text(s.aboutLicense(BuildConfig.VERSION_NAME), color = TsmColors.TextDim, fontSize = 13.sp)
+            // Nessun browser installato: il tocco non fa nulla invece di chiudere l'app.
+            fun open(url: String) = runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+            GhostButton(s.aboutSite, Icons.Filled.Public, { open(Reports.siteUrl(o.lang)) }, Modifier.fillMaxWidth())
+            GhostButton(s.aboutSource, Icons.Filled.Code, { open(SOURCE_URL) }, Modifier.fillMaxWidth())
+        }
+    }
+    if (roles) RolesFeaturesDialog(c) { roles = false }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -64995,6 +65331,7 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandMore
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -65005,8 +65342,12 @@ fun SetupScreen(c: MatchController) {
     val o by c.options.collectAsState()
     val rackets by c.rackets.collectAsState()
     val context = LocalContext.current
-    // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
+    // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna da dove la si è aperta.
     androidx.activity.compose.BackHandler { c.back() }
+    var permTick by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val locationPermission = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permTick++ }
     // In campo vanno giocatori del database: un nome senza scheda (partite di prima, rivincite) si sceglie dall'elenco
     // o si crea, prima di andare avanti.
     val creating by c.playerToCreate.collectAsState()
@@ -65082,8 +65423,17 @@ fun SetupScreen(c: MatchController) {
                             .clickable { c.updateSetup { it.copy(court = ct, club = it.club.ifBlank { c.storage.clubName }) } }.padding(horizontal = 10.dp, vertical = 6.dp),
                     )
                 }
+                // Il luogo nel riepilogo: dalla posizione del telefono (chiesta una volta prima della partita).
+                val place by c.matchPlace.collectAsState()
+                SwitchRow(Icons.Filled.Place, s.matchPlace, s.matchPlaceHint, place) { v -> c.setMatchPlace(v) }
+                val located = remember(permTick) { com.tennis.scoremanager.data.LocationHelper.hasPermission(context) }
+                if (place && !located) {
+                    GhostButton("${s.allow}: ${s.location}", Icons.Filled.Place, {
+                        locationPermission.launch(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION))
+                    }, Modifier.fillMaxWidth())
+                }
                 // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
-                SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
+                if (place) SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
                     c.updateOptions { it.copy(addressLookup = v) }
                 }
                 // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
@@ -65093,25 +65443,6 @@ fun SetupScreen(c: MatchController) {
                 Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
                 Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
             }
-        }
-    }
-}
-
-/** Indirizzo del codice sorgente, mostrato in fondo alla pagina 1. */
-private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
-
-/** Versione, licenza e assenza di garanzia (la GPL chiede di mostrarle nei programmi con interfaccia), più il link al codice. */
-@Composable
-internal fun AboutFooter() {
-    val s = LocalStrings.current
-    val context = LocalContext.current
-    Column(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(s.aboutLicense(BuildConfig.VERSION_NAME), color = TsmColors.TextDim, fontSize = 12.sp, textAlign = TextAlign.Center)
-        TextButton(onClick = {
-            // Nessun browser installato: il tocco non fa nulla invece di chiudere l'app.
-            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_URL))) }
-        }) {
-            Text("${s.aboutSource}: ${SOURCE_URL.removePrefix("https://")}", color = TsmColors.Ball, fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }
 }
@@ -65127,6 +65458,27 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
         val b = if (side == Side.P1) su.p1b else su.p2b
         // A sinistra di ogni nome la sua foto: si tocca per metterla o cambiarla.
         PlayerSlot(c, su, side, false, recent, accent)
+        if (su.doubles) PlayerSlot(c, su, side, true, recent, accent)
+        // Classifica, uomo/donna e racchetta arrivano dalla scheda del giocatore: qui in una riga, aperti solo se servono.
+        val rackets by c.rackets.collectAsState()
+        var details by androidx.compose.runtime.saveable.rememberSaveable(side) { mutableStateOf(false) }
+        if (!details) {
+            val racket = rackets.firstOrNull { it.id == (if (side == Side.P1) su.p1Racket else su.p2Racket) }?.label
+            val sexOf = { name: String, field: String -> when (field.ifEmpty { if (name.isBlank()) "" else c.storage.playerSex(PlayerStats.key(name)) }) { "M" -> s.heartMale; "F" -> s.heartFemale; else -> null } }
+            val line = listOfNotNull(
+                (if (side == Side.P1) su.p1aRank else su.p2aRank).ifBlank { null },
+                sexOf(a, if (side == Side.P1) su.p1aSex else su.p2aSex),
+                if (su.doubles) (if (side == Side.P1) su.p1bRank else su.p2bRank).ifBlank { null } else null,
+                if (su.doubles) sexOf(b, if (side == Side.P1) su.p1bSex else su.p2bSex) else null,
+                racket?.ifBlank { null },
+            ).joinToString(" · ")
+            // Una riga da toccare, con la freccia: "Cambia" accanto al nome è già quello che cambia il giocatore.
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { details = true }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(line.ifEmpty { s.playerDetails }, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Icon(Icons.Filled.ExpandMore, s.playerDetails, tint = accent)
+            }
+            return@SectionCard
+        }
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
         }
@@ -65134,13 +65486,12 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
             c.updateSetup { if (side == Side.P1) it.copy(p1aSex = v) else it.copy(p2aSex = v) }
         }
         // La racchetta di oggi: la partita ne tiene una copia con corde e tensione.
-        if (c.rackets.collectAsState().value.isNotEmpty()) {
+        if (rackets.isNotEmpty()) {
             RacketPicker(c, if (side == Side.P1) su.p1Racket else su.p2Racket, a) { id ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1Racket = id) else it.copy(p2Racket = id) }
             }
         }
         if (su.doubles) {
-            PlayerSlot(c, su, side, true, recent, accent)
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
@@ -65278,24 +65629,6 @@ private fun Field(
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(Modifier.width(0.dp))
-}
-
-@Composable
-private fun HomeShortcut(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    tint: androidx.compose.ui.graphics.Color,
-    label: String,
-    modifier: Modifier,
-    onClick: () -> Unit,
-) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 2.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, null, tint = tint)
-            // Quattro scorciatoie in una riga: "Allenamento" deve starci anche sui telefoni stretti.
-            Text(label, color = TsmColors.TextMain, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, letterSpacing = 0.sp,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-        }
-    }
 }
 TSM_EOF
 
@@ -65625,7 +65958,7 @@ fun StrokeSessionsScreen(c: MatchController) {
     val trainee by c.trainStudent.collectAsState()
     val list = all.filter { it.stroke == stroke && it.student == trainee }
     val who = c.studentById(trainee)?.name
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val disk by produceState(emptyMap<String, Disk>(), list) {
         value = withContext(Dispatchers.IO) {
             list.associate { sess ->
@@ -65809,7 +66142,7 @@ fun StudentsScreen(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     var create by remember { mutableStateOf(false) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = s.studentsTitle,
@@ -65863,7 +66196,7 @@ fun StudentScreen(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     val mine = Students.sessionsOf(sessions, st.id)
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var edit by remember { mutableStateOf(false) }
     var delete by remember { mutableStateOf(false) }
     var purge by remember { mutableStateOf(false) }
@@ -65881,7 +66214,7 @@ fun StudentScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(if (c.activeRole.value == com.tennis.scoremanager.Role.COACH) HomeTab.STUDENTS else HomeTab.TRAIN) }, Modifier.weight(1f))
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.coachNow(st.id) }, Modifier.weight(1f))
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -66140,7 +66473,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
 @Composable
 private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val lines = remember(st) { c.studentMatches(st).reversed() }
     var picked by remember { mutableStateOf(emptySet<String>()) }
     AlertDialog(
@@ -66178,7 +66511,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -66211,12 +66543,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
@@ -66290,7 +66622,6 @@ import kotlinx.coroutines.delay
 fun SummaryScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val activity = LocalActivity.current
     val sm by c.summary.collectAsState()
     val done = sm ?: return
     val rec = done.record
@@ -66305,8 +66636,8 @@ fun SummaryScreen(c: MatchController) {
     var confirmDelete by remember { mutableStateOf(false) }
     /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
     var shareChoice by remember { mutableStateOf(false) }
-    // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
-    BackHandler { if (fromHistory) c.backToHistory() }
+    // Indietro come "Fatto": si torna da dove era partita la partita (un torneo, la prima schermata) o allo storico.
+    BackHandler { c.closeSummary() }
 
     // Con l'app a tutto schermo la tastiera non restringe la pagina da sola: ci pensa imePadding. Mentre si
     // scrivono le note i pulsanti in basso spariscono, così resta spazio per vedere il testo.
@@ -66423,11 +66754,11 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // La partita finita è già nello storico: uscire non fa perdere niente.
                 if (fromHistory) {
-                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.backToHistory() }, Modifier.weight(1f))
+                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.closeSummary() }, Modifier.weight(1f))
                     GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.weight(1f))
                 } else {
                     GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
-                    GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                    GhostButton(s.done, Icons.Filled.Check, { c.closeSummary() }, Modifier.weight(1f))
                 }
             }
         }
@@ -66748,7 +67079,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun SuspendedList(c: MatchController) {
     val s = LocalStrings.current
     val saved by c.saved.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val list = saved.sortedByDescending { it.updatedAt }
     var picked by remember { mutableStateOf(setOf<String>()) }
     var ask by remember { mutableStateOf<Set<String>?>(null) }
@@ -67125,7 +67456,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
 private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     var f by remember { mutableStateOf(f0) }
     var askDelete by remember { mutableStateOf(false) }
@@ -67257,7 +67588,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67306,7 +67639,7 @@ private fun TodayCard(icon: ImageVector, title: String, lines: List<String>, ale
 @Composable
 fun TodayTab(c: MatchController) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val f by c.clubFeatures.collectAsState()
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
@@ -67315,7 +67648,14 @@ fun TodayTab(c: MatchController) {
     val courses by c.courses.collectAsState()
     val teams by c.teams.collectAsState()
     val ladders by c.ladders.collectAsState()
-    val now = remember { System.currentTimeMillis() }
+    // Si aggiorna ogni minuto: lasciata aperta (un tablet in segreteria) passa da sola al giorno dopo.
+    var now by remember { androidx.compose.runtime.mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(60_000)
+            now = System.currentTimeMillis()
+        }
+    }
     val today = CourtPlans.dayStart(now)
     val tomorrow = CourtPlans.addDays(today, 1)
     fun hm(t: Long) = Reports.time(t, lang)
@@ -67389,7 +67729,6 @@ fun TodayTab(c: MatchController) {
         }
     }
     if (shown == 0) Text(s.tdNothing, color = TsmColors.TextDim)
-    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 
 /** Le prenotazioni e le disdette online da leggere, le più nuove in alto: toccandone una si apre il planning di quel giorno. */
@@ -67523,7 +67862,7 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun TournamentScreen(c: MatchController) {
-    val t by c.tournament.collectAsState()
+    val t by c.friends.current.collectAsState()
     val cur = t
     if (cur == null) TournamentList(c) else TournamentView(c, cur)
 }
@@ -67533,11 +67872,11 @@ fun TournamentScreen(c: MatchController) {
 @Composable
 private fun TournamentList(c: MatchController) {
     val s = LocalStrings.current
-    val all by c.tournaments.collectAsState()
+    val all by c.friends.all.collectAsState()
     var creating by rememberSaveable { mutableStateOf(false) }
-    BackHandler { if (creating) creating = false else c.home() }
+    BackHandler { if (creating) creating = false else c.back() }
     if (creating || all.isEmpty()) {
-        NewTournament(c) { if (all.isEmpty()) c.home() else creating = false }
+        NewTournament(c) { if (all.isEmpty()) c.back() else creating = false }
         return
     }
     ScreenScaffold(
@@ -67546,14 +67885,14 @@ private fun TournamentList(c: MatchController) {
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.home() }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.tournamentNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {
         all.forEach { t ->
             val leader = Tournaments.standings(t).firstOrNull()?.takeIf { t.rounds.any { r -> r.matches.any { it.played } } }
             Row(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.openTournament(t) }
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.friends.open(t) }
                     .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -67601,7 +67940,7 @@ private fun NewTournament(c: MatchController, onCancel: () -> Unit) {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onCancel, Modifier.weight(1f))
             BigButton(s.tournamentCreate, Icons.Filled.PlayArrow, {
                 if (!valid) error = true
-                else c.createTournament(
+                else c.friends.create(
                     name, if (mexicano) TournamentKind.MEXICANO else TournamentKind.AMERICANO, names,
                     courts, if (timed) TournamentScoring.TIME else TournamentScoring.POINTS, points, minutes,
                 )
@@ -67677,7 +68016,7 @@ private fun TournamentView(c: MatchController, t: Tournament) {
     var counting by remember { mutableStateOf<Pair<Int, TMatch>?>(null) }
     // Si mostra sempre l'ultimo turno quando ne arriva uno nuovo.
     LaunchedEffect(t.rounds.size) { shownRound = t.rounds.size }
-    BackHandler { c.closeTournament() }
+    BackHandler { c.friends.close() }
 
     ScreenScaffold(
 
@@ -67686,14 +68025,14 @@ private fun TournamentView(c: MatchController, t: Tournament) {
         subtitle = if (t.scoring == TournamentScoring.POINTS) s.tournamentPointsN(t.pointsPerMatch) else s.tournamentMinutesN(t.minutes),
         icon = Icons.Filled.EmojiEvents,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.closeTournament() }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.friends.close() }, Modifier.weight(1f))
             if (t.finished) {
                 BigButton(s.tournamentShare, Icons.Filled.Share, {
-                    c.tournamentShareIntent()?.let { runCatching { context.startActivity(it) } }
+                    c.friends.shareIntent()?.let { runCatching { context.startActivity(it) } }
                 }, Modifier.weight(1f))
             } else {
                 BigButton(s.tournamentNextRound, Icons.AutoMirrored.Filled.ArrowForward, {
-                    if (!c.nextTournamentRound()) missing = true
+                    if (!c.friends.nextRound()) missing = true
                 }, Modifier.weight(1f))
             }
         },
@@ -67702,7 +68041,7 @@ private fun TournamentView(c: MatchController, t: Tournament) {
         if (tab == 1) {
             StandingsTable(c, t)
             if (!t.finished) GhostButton(s.tournamentShare, Icons.Filled.Share, {
-                c.tournamentShareIntent()?.let { runCatching { context.startActivity(it) } }
+                c.friends.shareIntent()?.let { runCatching { context.startActivity(it) } }
             }, Modifier.fillMaxWidth())
         } else {
             if (t.rounds.size > 1) {
@@ -67714,7 +68053,7 @@ private fun TournamentView(c: MatchController, t: Tournament) {
                 Text(s.tournamentRound(r.number), color = TsmColors.TextMain, fontWeight = FontWeight.Black, fontSize = 20.sp)
                 r.matches.forEach { m ->
                     MatchCard(c, t, m, editable = !t.finished, onCount = { counting = r.number to m }) { a, b ->
-                        c.setTournamentResult(r.number, m.court, a, b)
+                        c.friends.setResult(r.number, m.court, a, b)
                     }
                 }
                 if (r.resting.isNotEmpty()) {
@@ -67733,15 +68072,15 @@ private fun TournamentView(c: MatchController, t: Tournament) {
     }
     if (confirmFinish) {
         ConfirmDialog(Icons.Filled.Flag, s.tournamentFinish, s.tournamentFinishText, s.tournamentFinish,
-            onConfirm = { confirmFinish = false; c.finishTournament(); tab = 1 }, onDismiss = { confirmFinish = false })
+            onConfirm = { confirmFinish = false; c.friends.finish(); tab = 1 }, onDismiss = { confirmFinish = false })
     }
     if (confirmDelete) {
         ConfirmDialog(Icons.Filled.Delete, s.tournamentDeleteTitle, s.tournamentDeleteText, s.delete,
-            onConfirm = { confirmDelete = false; c.deleteTournament(t.id) }, onDismiss = { confirmDelete = false })
+            onConfirm = { confirmDelete = false; c.friends.delete(t.id) }, onDismiss = { confirmDelete = false })
     }
     counting?.let { (roundNo, m) ->
         LiveCounter(c, t, m, onDismiss = { counting = null }) { a, b ->
-            c.setTournamentResult(roundNo, m.court, a, b)
+            c.friends.setResult(roundNo, m.court, a, b)
             counting = null
         }
     }
@@ -67847,7 +68186,7 @@ private fun LiveCounter(c: MatchController, t: Tournament, m: TMatch, onDismiss:
                         onClick = {
                             if (!over) {
                                 history.add(side)
-                                c.announceCounter(history.count { it == Side.P1 }, history.count { it == Side.P2 })
+                                c.friends.announce(history.count { it == Side.P1 }, history.count { it == Side.P2 })
                             }
                         },
                         shape = RoundedCornerShape(24.dp),
@@ -67868,7 +68207,7 @@ private fun LiveCounter(c: MatchController, t: Tournament, m: TMatch, onDismiss:
                     GhostButton(s.undoPoint, Icons.AutoMirrored.Filled.Undo, {
                         if (history.isNotEmpty()) {
                             history.removeAt(history.lastIndex)
-                            c.announceCounter(history.count { it == Side.P1 }, history.count { it == Side.P2 })
+                            c.friends.announce(history.count { it == Side.P1 }, history.count { it == Side.P2 })
                         }
                     }, Modifier.weight(1f))
                     GhostButton(s.cancel, Icons.Filled.Close, onDismiss, Modifier.weight(1f))
@@ -69818,7 +70157,9 @@ import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -69853,6 +70194,7 @@ import java.io.File
  * momenti chiave in comune. "Sovrapponi" disegna lo scheletro del secondo sopra il primo, con le anche nello stesso
  * punto e il busto della stessa lunghezza: si vede subito dove il movimento cambia.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class CompareActivity : ComponentActivity() {
     private val controller get() = (application as TsmApp).controller
 
@@ -69927,7 +70269,7 @@ class CompareActivity : ComponentActivity() {
 
     @Composable
     private fun Content() {
-        val s = stringsFor(controller.options.value.lang)
+        val s = stringsFor(controller.options.collectAsState().value.lang)
         var speed by remember { mutableFloatStateOf(0.5f) }
         var playing by remember { mutableStateOf(true) }
         var skeleton by remember { mutableStateOf(true) }
@@ -70020,12 +70362,15 @@ class CompareActivity : ComponentActivity() {
     @Composable
     private fun VideoBox(sd: Side, over: @Composable () -> Unit) {
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
-        remember(sd) {
-            sd.player.addListener(object : Player.Listener {
+        // Le proporzioni arrivano col primo fotogramma; l'ascolto si toglie quando il riquadro sparisce.
+        DisposableEffect(sd) {
+            val l = object : Player.Listener {
                 override fun onVideoSizeChanged(v: VideoSize) {
                     if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
                 }
-            })
+            }
+            sd.player.addListener(l)
+            onDispose { sd.player.removeListener(l) }
         }
         Box(Modifier.aspectRatio(ratio)) {
             AndroidView(factory = { ctx -> TextureView(ctx).also { sd.player.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
@@ -71431,26 +71776,27 @@ object ServeClipAnalysis {
         fun readInOrder(wantedTimes: List<Long>, each: (Bitmap, Long) -> Unit) {
             for ((pi, ts) in wantedTimes.groupBy { t -> starts.indexOfLast { it <= t } }.filterKeys { it >= 0 }.toSortedMap()) {
                 val r = retrievers.getOrPut(parts[pi]) { MediaMetadataRetriever().apply { setDataSource(parts[pi].absolutePath) } }
-                val count = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toIntOrNull() ?: 0
+                val count = if (Build.VERSION.SDK_INT >= 28) r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toIntOrNull() ?: 0 else 0
                 val durMs = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
-                if (Build.VERSION.SDK_INT < 28 || count <= 0 || durMs <= 0) {
-                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { each(it, t); it.recycle() }
-                    continue
-                }
-                val wanted = ts.groupBy { t -> ((t - starts[pi]) * count / durMs).toInt().coerceIn(0, count - 1) }
-                val lo = wanted.keys.min()
-                val hi = wanted.keys.max()
-                val params = MediaMetadataRetriever.BitmapParams().apply { preferredConfig = Bitmap.Config.RGB_565 }
-                var k = lo
-                while (k <= hi) {
-                    val n = minOf(CHUNK, hi - k + 1)
-                    val list = runCatching { r.getFramesAtIndex(k, n, params) }.getOrDefault(emptyList())
-                    list.forEachIndexed { j, bmp ->
-                        wanted[k + j]?.forEach { t -> each(bmp, t) }
-                        bmp.recycle()
+                if (Build.VERSION.SDK_INT >= 28 && count > 0 && durMs > 0) {
+                    val wanted = ts.groupBy { t -> ((t - starts[pi]) * count / durMs).toInt().coerceIn(0, count - 1) }
+                    val lo = wanted.keys.min()
+                    val hi = wanted.keys.max()
+                    val params = MediaMetadataRetriever.BitmapParams().apply { preferredConfig = Bitmap.Config.RGB_565 }
+                    var k = lo
+                    while (k <= hi) {
+                        val n = minOf(CHUNK, hi - k + 1)
+                        val list = runCatching { r.getFramesAtIndex(k, n, params) }.getOrDefault(emptyList())
+                        list.forEachIndexed { j, bmp ->
+                            wanted[k + j]?.forEach { t -> each(bmp, t) }
+                            bmp.recycle()
+                        }
+                        if (list.isEmpty()) break
+                        k += n
                     }
-                    if (list.isEmpty()) break
-                    k += n
+                } else {
+                    // Android 8: un fotogramma alla volta (più lento, ma c'è).
+                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { each(it, t); it.recycle() }
                 }
             }
         }
@@ -71713,7 +72059,9 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -71751,6 +72099,7 @@ import java.io.File
  * Con [EXTRA_POSE_DIR] (clip di un servizio analizzato) disegna sopra lo scheletro del giocatore, che segue il video
  * anche ingrandito, e ha i tasti per saltare ai tre momenti chiave.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class ReplayActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
@@ -71838,19 +72187,22 @@ class ReplayActivity : ComponentActivity() {
 
     @Composable
     private fun Content(p: ExoPlayer) {
-        val s = stringsFor(controller.options.value.lang)
+        val s = stringsFor(controller.options.collectAsState().value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
         var speed by remember { mutableFloatStateOf(if (pose?.metrics != null || pose?.ground != null) 0.5f else 1f) }
         var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(Offset.Zero) }
-        remember(p) {
-            p.addListener(object : Player.Listener {
+        // Le proporzioni arrivano col primo fotogramma; l'ascolto si toglie quando la pagina sparisce.
+        DisposableEffect(p) {
+            val l = object : Player.Listener {
                 override fun onVideoSizeChanged(v: VideoSize) {
                     if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
                 }
-            })
+            }
+            p.addListener(l)
+            onDispose { p.removeListener(l) }
         }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
             // L'immagine: proporzioni del video, al centro; due dita per ingrandire e spostare.
@@ -85462,6 +85814,81 @@ cat > "$DEST/app/src/main/res/xml/network_security_config.xml" << 'TSM_EOF'
 </network-security-config>
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/NavigatorTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/NavigatorTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class NavigatorTest {
+
+    @Test fun indietroTornaDaDoveSiEArrivati() {
+        val n = Navigator()
+        n.push(Screen.CLUB_TOURNAMENTS)
+        n.push(Screen.CLUB_TOURNAMENT)
+        n.push(Screen.STUDENT)
+        n.back()
+        assertEquals(Screen.CLUB_TOURNAMENT, n.screen.value)
+        n.back()
+        n.back()
+        assertEquals(Screen.HOME, n.screen.value)
+        n.back()
+        assertEquals("dalla prima schermata non si va oltre", Screen.HOME, n.screen.value)
+    }
+
+    @Test fun laPartitaTornaDaDoveEraPartita() {
+        val n = Navigator()
+        n.push(Screen.CLUB_TOURNAMENTS)
+        n.push(Screen.CLUB_TOURNAMENT)
+        // Gioca col segnapunti: i tre passi, poi la partita.
+        n.push(Screen.SETUP)
+        n.push(Screen.OPTIONS)
+        n.push(Screen.TOSS)
+        n.push(Screen.START)
+        n.play(Screen.MATCH)
+        assertEquals(listOf(Screen.HOME, Screen.CLUB_TOURNAMENTS, Screen.CLUB_TOURNAMENT), n.trail)
+        // Finita: il riepilogo prende il posto della partita, "Fatto" torna al torneo.
+        n.replace(Screen.SUMMARY)
+        n.back()
+        assertEquals(Screen.CLUB_TOURNAMENT, n.screen.value)
+    }
+
+    @Test fun riprendereDaUnaSchermataCiTorna() {
+        val n = Navigator()
+        n.push(Screen.HISTORY)
+        n.play(Screen.MATCH)
+        n.back()
+        assertEquals(Screen.HISTORY, n.screen.value)
+    }
+
+    @Test fun nuovaPartitaDallaPartitaTornaAllOrigine() {
+        val n = Navigator()
+        n.push(Screen.SETUP)
+        n.push(Screen.TOSS)
+        n.push(Screen.START)
+        n.play(Screen.MATCH)
+        n.replace(Screen.SETUP)
+        n.back()
+        assertEquals(Screen.HOME, n.screen.value)
+    }
+
+    @Test fun unaSchermataGiaSullaStradaNonSiRipete() {
+        val n = Navigator()
+        n.push(Screen.STUDENTS)
+        n.push(Screen.STUDENT)
+        n.push(Screen.PLAYERS)
+        n.push(Screen.STUDENT)
+        assertEquals(listOf(Screen.HOME, Screen.STUDENTS), n.trail)
+        n.home()
+        assertEquals(emptyList<Screen>(), n.trail)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BandEventTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BandEventTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -88210,6 +88637,59 @@ class RematchTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/SafeFilesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/SafeFilesTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.File
+import java.nio.file.Files
+
+class SafeFilesTest {
+
+    private fun dir(): File = Files.createTempDirectory("safefiles").toFile().apply { deleteOnExit() }
+
+    @Test fun scriveERilegge() {
+        val f = File(dir(), "players.json")
+        SafeFiles.write(f, "[1,2]")
+        assertEquals("[1,2]", f.readText())
+        SafeFiles.write(f, "[3]")
+        assertEquals("[3]", f.readText())
+        assertFalse("niente file d'appoggio rimasti", File(f.parentFile, "players.json.tmp").exists())
+    }
+
+    @Test fun senzaFileIlValorePredefinito() {
+        val f = File(dir(), "goals.json")
+        var reported = false
+        assertEquals(listOf<Int>(), SafeFiles.read<List<Int>>(f, listOf(), { error("non si legge") }) { reported = true })
+        assertFalse("un file che non c'è non è un problema", reported)
+    }
+
+    @Test fun unFileIllegibileSiMetteDaParteUnaVolta() {
+        val f = File(dir(), "club_book.json").apply { writeText("{ rovinato") }
+        val names = mutableListOf<String>()
+        fun load() = SafeFiles.read(f, "vuoto", { if (it.startsWith("{ \"ok\"")) it else throw IllegalArgumentException(it) }) { names += it }
+        assertEquals("vuoto", load())
+        assertEquals("vuoto", load())
+        assertEquals(listOf("club_book.json", "club_book.json"), names)
+        // Una copia sola, con il contenuto di prima: il salvataggio dopo non la tocca.
+        val aside = SafeFiles.asideCopies(f)
+        assertEquals(1, aside.size)
+        assertEquals("{ rovinato", aside.single().readText())
+        SafeFiles.write(f, "{ \"ok\": 1 }")
+        assertEquals("{ \"ok\": 1 }", load())
+        assertTrue(aside.single().exists())
+        assertEquals("{ rovinato", aside.single().readText())
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/SchoolTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/SchoolTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -90452,6 +90932,40 @@ class ScoreEngineTest {
         val st = ScoreEngine.apply(ScoreEngine.initial(RulesConfig()), MatchEvent.ScoreSet(emptyList(), 6, 6, 3, 2, P1)).state
         assertTrue(st.inTiebreak)
         assertEquals("3", st.pointLabel(P1))
+    }
+
+    /** Lo stato dopo gli eventi e quello che resta con "Annulla". */
+    private fun undo(rules: RulesConfig, events: List<MatchEvent>): List<MatchEvent>? =
+        ScoreEngine.undo(ScoreEngine.replay(rules, events), events)
+
+    @Test fun annullaDopoIlPunteggioImpostatoTogliesoloQuello() {
+        val r = RulesConfig()
+        val set = MatchEvent.ScoreSet(listOf(SetScore(6, 3)), 4, 3, 2, 1, P2)
+        val points = listOf(MatchEvent.Point(P1), MatchEvent.Point(P2))
+        assertEquals("i punti di prima restano", points, undo(r, points + set))
+        assertEquals("partita iniziata col punteggio a mano: si torna a zero", emptyList<MatchEvent>(), undo(r, listOf(set)))
+    }
+
+    @Test fun annullaTogliesoloLaCorrezioneDellArbitro() {
+        val r = RulesConfig()
+        val points = listOf(MatchEvent.Point(P1), MatchEvent.Point(P1))
+        for (fix in listOf(MatchEvent.ServerFix(P2), MatchEvent.EndsFix(), MatchEvent.Penalty(P1, PenaltyKind.CODE), MatchEvent.Break(P2, BreakKind.MEDICAL))) {
+            assertEquals(fix.toString(), points, undo(r, points + fix))
+        }
+        assertEquals(listOf(MatchEvent.Point(P1)), undo(r, points))
+        assertNull("niente da annullare", undo(r, emptyList()))
+    }
+
+    @Test fun annullaIlPuntoDelSetConLeScelteDelSetNuovo() {
+        val r = RulesConfig(doubles = true)
+        // 6-0 per P1: il set nuovo parte con ordine di servizio e di risposta scelti dopo l'ultimo punto.
+        val set = List(24) { MatchEvent.Point(P1) }
+        val orders = listOf(MatchEvent.ServeOrder(2, 1, 0), MatchEvent.ReceiveOrder(2, 1, 0))
+        assertEquals(2, ScoreEngine.replay(r, set + orders).setNumber)
+        assertEquals("va via il punto del set e le scelte dopo", set.dropLast(1), undo(r, set + orders))
+        // A set iniziato l'ordine di risposta è una correzione: si toglie da solo, il punto resta.
+        val mid = set + MatchEvent.Point(P2) + MatchEvent.ReceiveOrder(2, 0, 1)
+        assertEquals(mid.dropLast(1), undo(r, mid))
     }
 
     @Test fun ordineDiRispostaNelDoppio() {
@@ -102729,6 +103243,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 323 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 329 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

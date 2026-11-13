@@ -322,7 +322,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
 private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     var f by remember { mutableStateOf(f0) }
     var askDelete by remember { mutableStateOf(false) }

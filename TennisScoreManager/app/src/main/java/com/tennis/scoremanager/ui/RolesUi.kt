@@ -6,10 +6,14 @@ package com.tennis.scoremanager.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -76,5 +80,39 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/**
+ * Ruoli e funzioni, in un posto solo (Altro e il ruolo in alto): chi usa l'app e, per il ruolo attivo, cosa tenere nei
+ * menu (Cosa usi per Tu e Allenatore, le funzioni del circolo per la segreteria). Spento non vuol dire cancellato.
+ */
+@Composable
+fun RolesFeaturesDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val roles by c.roles.collectAsState()
+    val role by c.activeRole.collectAsState()
+    var features by remember { mutableStateOf(false) }
+    if (features) {
+        if (role == Role.CLUB) ClubFeaturesDialog(c) { features = false; c.storage.clubFeaturesSeen = true }
+        else PlayerFeaturesDialog(c) { features = false; c.storage.playerFeaturesSeen = true }
+        return
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { androidx.compose.material3.Icon(Icons.Filled.Tune, null, tint = TsmColors.Ball) },
+        title = { Text(s.rolesFeatures) },
+        text = {
+            Column(androidx.compose.ui.Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.rolesTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                RolesPicker(roles) { c.setRoles(it) }
+                val club = role == Role.CLUB
+                Text(if (club) s.cfTitle else s.pfTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = androidx.compose.ui.Modifier.padding(top = 8.dp))
+                Text(if (club) s.cfHint else s.pfEntryHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                GhostButton(if (club) s.cfTitle else s.pfTitle, Icons.Filled.Tune, { features = true }, androidx.compose.ui.Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
 }

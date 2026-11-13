@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /** Tasti dei telecomandi Bluetooth (modalità Telecomandi): arrivano qui prima che diventino volume o clic. */
+    @android.annotation.SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean =
         controller.remotes.onKey(event) || super.dispatchKeyEvent(event)
 

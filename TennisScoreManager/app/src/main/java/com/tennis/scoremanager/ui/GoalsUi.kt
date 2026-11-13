@@ -71,7 +71,7 @@ fun GoalsCard(c: MatchController) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     var adding by remember { mutableStateOf(false) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     SectionCard(s.goalsTitle, Icons.Filled.Flag) {
         if (c.myKey().isEmpty()) { Text(s.goalNeedMe, color = TsmColors.TextDim, fontSize = 13.sp); return@SectionCard }
         Text(s.goalsHint, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -134,7 +134,7 @@ fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
     val context = LocalContext.current
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val lines = remember(history) { c.myLines() }
     val years = remember(lines) { YearReview.years(lines).ifEmpty { listOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) } }
     var year by remember { mutableIntStateOf(years.first()) }
@@ -165,7 +165,7 @@ fun ActivityCalendarCard(c: MatchController) {
     val s = LocalStrings.current
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val today = java.util.Calendar.getInstance()
     var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
@@ -226,7 +226,7 @@ fun ActivityCalendarCard(c: MatchController) {
             for (id in info?.matches.orEmpty()) history.firstOrNull { it.record.id == id }?.let { lm ->
                 val rec = lm.record
                 val names2 = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { com.tennis.scoremanager.data.PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
-                TextButton(onClick = { c.openFromHistory(lm, com.tennis.scoremanager.Screen.PROGRESS) }, modifier = Modifier.fillMaxWidth()) {
+                TextButton(onClick = { c.openFromHistory(lm) }, modifier = Modifier.fillMaxWidth()) {
                     Text("${Reports.time(rec.startedAt ?: rec.updatedAt, lang)} · $names2", color = TsmColors.TextMain, modifier = Modifier.fillMaxWidth())
                 }
             }

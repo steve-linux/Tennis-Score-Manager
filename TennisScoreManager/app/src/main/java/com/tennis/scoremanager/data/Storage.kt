@@ -27,6 +27,15 @@ class Storage(context: Context) {
         prettyPrint = true
     }
 
+    /** I file messi da parte in questa sessione perché non si leggevano (vedi [readOr]): la prima schermata lo dice. */
+    val unreadable: MutableList<String> = java.util.concurrent.CopyOnWriteArrayList()
+
+    /** Legge [file] con [decode]; senza file, [default]. Vedi [SafeFiles.read]; [report] = da segnalare in [unreadable]. */
+    private fun <T> readOr(file: File, default: T, report: Boolean = true, decode: (String) -> T): T =
+        SafeFiles.read(file, default, decode) { name -> if (report && name !in unreadable) unreadable += name }
+
+    private fun writeAtomic(file: File, text: String) = SafeFiles.write(file, text)
+
     private val matchesDir: File get() = File(app.filesDir, "matches").apply { mkdirs() }
     private val lastFinishedFile: File get() = File(app.filesDir, "last_finished.json")
     /** Foto dei giocatori, una per nome (chiave di PlayerStats.key): JPEG quadrati e piccoli. */
@@ -47,7 +56,7 @@ class Storage(context: Context) {
             photoFile(key).writeBytes(jpeg)
             val idx = File(photosDir, "index.txt")
             val keys = (runCatching { idx.readLines() }.getOrDefault(emptyList()) + key).filter { it.isNotBlank() }.distinct()
-            idx.writeText(keys.joinToString("\n"))
+            writeAtomic(idx, keys.joinToString("\n"))
         }.onFailure { Log.e("Storage", "Salvataggio foto fallito", it) }
     }
 
@@ -86,15 +95,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveTournament(t: Tournament) {
-        runCatching {
-            val f = File(tournamentsDir, "${t.id}.json")
-            val tmp = File(tournamentsDir, "${t.id}.tmp")
-            tmp.writeText(json.encodeToString(Tournament.serializer(), t))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio torneo fallito", it) }
+        runCatching { writeAtomic(File(tournamentsDir, "${t.id}.json"), json.encodeToString(Tournament.serializer(), t)) }.onFailure { Log.e("Storage", "Salvataggio torneo fallito", it) }
     }
 
     /** Tornei, dal più recente. */
@@ -113,15 +114,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveWorkout(w: WorkoutRecord) {
-        runCatching {
-            val f = File(workoutsDir, "${w.id}.json")
-            val tmp = File(workoutsDir, "${w.id}.tmp")
-            tmp.writeText(json.encodeToString(WorkoutRecord.serializer(), w))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio allenamento fallito", it) }
+        runCatching { writeAtomic(File(workoutsDir, "${w.id}.json"), json.encodeToString(WorkoutRecord.serializer(), w)) }.onFailure { Log.e("Storage", "Salvataggio allenamento fallito", it) }
     }
 
     /** Allenamenti, dal più recente. */
@@ -213,15 +206,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveServeSession(sess: ServeSession) {
-        runCatching {
-            val f = File(servesDir, "${sess.id}.json")
-            val tmp = File(servesDir, "${sess.id}.tmp")
-            tmp.writeText(json.encodeToString(ServeSession.serializer(), sess))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio allenamento al servizio fallito", it) }
+        runCatching { writeAtomic(File(servesDir, "${sess.id}.json"), json.encodeToString(ServeSession.serializer(), sess)) }.onFailure { Log.e("Storage", "Salvataggio allenamento al servizio fallito", it) }
     }
 
     fun loadServeSessions(): List<ServeSession> =
@@ -243,18 +228,11 @@ class Storage(context: Context) {
     private val drillsFile: File get() = File(app.filesDir, "drills.json")
 
     fun loadDrills(): List<Drill>? =
-        runCatching { json.decodeFromString(ListSerializer(Drill.serializer()), drillsFile.readText()) }.getOrNull()
+        readOr(drillsFile, null) { json.decodeFromString(ListSerializer(Drill.serializer()), it) }
 
     @Synchronized
     fun saveDrills(list: List<Drill>) {
-        runCatching {
-            val tmp = File(app.filesDir, "drills.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Drill.serializer()), list))
-            if (!tmp.renameTo(drillsFile)) {
-                drillsFile.delete()
-                tmp.renameTo(drillsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+        runCatching { writeAtomic(drillsFile, json.encodeToString(ListSerializer(Drill.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
     /** Le squadre del circolo, coi loro incontri, in un file solo. */
@@ -262,85 +240,53 @@ class Storage(context: Context) {
     private val goalsFile: File get() = File(app.filesDir, "goals.json")
 
     fun loadGoals(): List<Goal> =
-        runCatching { json.decodeFromString(ListSerializer(Goal.serializer()), goalsFile.readText()) }.getOrDefault(emptyList())
+        readOr(goalsFile, emptyList()) { json.decodeFromString(ListSerializer(Goal.serializer()), it) }
 
     @Synchronized
     fun saveGoals(list: List<Goal>) {
-        runCatching {
-            val tmp = File(app.filesDir, "goals.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Goal.serializer()), list))
-            if (!tmp.renameTo(goalsFile)) { goalsFile.delete(); tmp.renameTo(goalsFile) }
-        }
+        runCatching { writeAtomic(goalsFile, json.encodeToString(ListSerializer(Goal.serializer()), list)) }
     }
 
     private val laddersFile: File get() = File(app.filesDir, "club_ladders.json")
 
     fun loadLadders(): List<Ladder> =
-        runCatching { json.decodeFromString(ListSerializer(Ladder.serializer()), laddersFile.readText()) }.getOrDefault(emptyList())
+        readOr(laddersFile, emptyList()) { json.decodeFromString(ListSerializer(Ladder.serializer()), it) }
 
     @Synchronized
     fun saveLadders(list: List<Ladder>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_ladders.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Ladder.serializer()), list))
-            if (!tmp.renameTo(laddersFile)) {
-                laddersFile.delete()
-                tmp.renameTo(laddersFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio delle classifiche a sfida fallito", it) }
+        runCatching { writeAtomic(laddersFile, json.encodeToString(ListSerializer(Ladder.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio delle classifiche a sfida fallito", it) }
     }
 
     private val teamsFile: File get() = File(app.filesDir, "club_teams.json")
 
     fun loadTeams(): List<Team> =
-        runCatching { json.decodeFromString(ListSerializer(Team.serializer()), teamsFile.readText()) }.getOrDefault(emptyList())
+        readOr(teamsFile, emptyList()) { json.decodeFromString(ListSerializer(Team.serializer()), it) }
 
     @Synchronized
     fun saveTeams(list: List<Team>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_teams.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Team.serializer()), list))
-            if (!tmp.renameTo(teamsFile)) {
-                teamsFile.delete()
-                tmp.renameTo(teamsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio delle squadre fallito", it) }
+        runCatching { writeAtomic(teamsFile, json.encodeToString(ListSerializer(Team.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio delle squadre fallito", it) }
     }
 
     /** I corsi della scuola tennis, in un file solo. */
     private val schoolFile: File get() = File(app.filesDir, "club_school.json")
 
     fun loadCourses(): List<Course> =
-        runCatching { json.decodeFromString(ListSerializer(Course.serializer()), schoolFile.readText()) }.getOrDefault(emptyList())
+        readOr(schoolFile, emptyList()) { json.decodeFromString(ListSerializer(Course.serializer()), it) }
 
     @Synchronized
     fun saveCourses(list: List<Course>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_school.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Course.serializer()), list))
-            if (!tmp.renameTo(schoolFile)) {
-                schoolFile.delete()
-                tmp.renameTo(schoolFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio dei corsi fallito", it) }
+        runCatching { writeAtomic(schoolFile, json.encodeToString(ListSerializer(Course.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio dei corsi fallito", it) }
     }
 
     /** Il planning dei campi: orari, prezzi e prenotazioni. */
     private val courtPlanFile: File get() = File(app.filesDir, "club_courts.json")
 
     fun loadCourtPlan(): CourtPlan =
-        runCatching { json.decodeFromString(CourtPlan.serializer(), courtPlanFile.readText()) }.getOrDefault(CourtPlan())
+        readOr(courtPlanFile, CourtPlan()) { json.decodeFromString(CourtPlan.serializer(), it) }
 
     @Synchronized
     fun saveCourtPlan(plan: CourtPlan) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_courts.tmp")
-            tmp.writeText(json.encodeToString(CourtPlan.serializer(), plan))
-            if (!tmp.renameTo(courtPlanFile)) {
-                courtPlanFile.delete()
-                tmp.renameTo(courtPlanFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
+        runCatching { writeAtomic(courtPlanFile, json.encodeToString(CourtPlan.serializer(), plan)) }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
     }
 
     /** Il giocatore che prenota dall'app: il server del suo circolo e la sua chiave. */
@@ -350,34 +296,22 @@ class Storage(context: Context) {
 
     /** Tutti i circoli in cui il giocatore è entrato; la prima volta, quello di prima (un circolo solo). */
     fun loadBookingAccounts(): List<BookingAccount> =
-        runCatching { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), bookingsFile.readText()) }
-            .getOrElse { listOf(loadBookingAccount()).filter { it.joined } }
+        if (!bookingsFile.exists()) listOf(loadBookingAccount()).filter { it.joined }
+        else readOr(bookingsFile, emptyList()) { json.decodeFromString(ListSerializer(BookingAccount.serializer()), it) }
 
     @Synchronized
     fun saveBookingAccounts(list: List<BookingAccount>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_bookings.tmp")
-            tmp.writeText(json.encodeToString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), list.filter { it.joined }))
-            if (!tmp.renameTo(bookingsFile)) {
-                bookingsFile.delete()
-                tmp.renameTo(bookingsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio dei circoli fallito", it) }
+        runCatching { writeAtomic(bookingsFile, json.encodeToString(kotlinx.serialization.builtins.ListSerializer(BookingAccount.serializer()), list.filter { it.joined })) }.onFailure { Log.e("Storage", "Salvataggio dei circoli fallito", it) }
     }
 
     fun loadBookingAccount(): BookingAccount =
-        runCatching { json.decodeFromString(BookingAccount.serializer(), bookingFile.readText()) }.getOrDefault(BookingAccount())
+        readOr(bookingFile, BookingAccount()) { json.decodeFromString(BookingAccount.serializer(), it) }
 
     @Synchronized
     fun saveBookingAccount(a: BookingAccount) {
         runCatching {
             if (!a.joined) { bookingFile.delete(); return }
-            val tmp = File(app.filesDir, "club_booking.tmp")
-            tmp.writeText(json.encodeToString(BookingAccount.serializer(), a))
-            if (!tmp.renameTo(bookingFile)) {
-                bookingFile.delete()
-                tmp.renameTo(bookingFile)
-            }
+            writeAtomic(bookingFile, json.encodeToString(BookingAccount.serializer(), a))
         }.onFailure { Log.e("Storage", "Salvataggio della prenotazione online fallito", it) }
     }
 
@@ -385,18 +319,13 @@ class Storage(context: Context) {
     private val clubServerFile: File get() = File(app.filesDir, "club_server.json")
 
     fun loadClubServer(): ClubServerConf =
-        runCatching { json.decodeFromString(ClubServerConf.serializer(), clubServerFile.readText()) }.getOrDefault(ClubServerConf())
+        readOr(clubServerFile, ClubServerConf()) { json.decodeFromString(ClubServerConf.serializer(), it) }
 
     @Synchronized
     fun saveClubServer(conf: ClubServerConf) {
         runCatching {
             if (!conf.paired && conf == ClubServerConf()) { clubServerFile.delete(); return }
-            val tmp = File(app.filesDir, "club_server.tmp")
-            tmp.writeText(json.encodeToString(ClubServerConf.serializer(), conf))
-            if (!tmp.renameTo(clubServerFile)) {
-                clubServerFile.delete()
-                tmp.renameTo(clubServerFile)
-            }
+            writeAtomic(clubServerFile, json.encodeToString(ClubServerConf.serializer(), conf))
         }.onFailure { Log.e("Storage", "Salvataggio del server del circolo fallito", it) }
     }
 
@@ -404,36 +333,22 @@ class Storage(context: Context) {
     private val clubTournamentsFile: File get() = File(app.filesDir, "club_tournaments.json")
 
     fun loadClubTournaments(): List<ClubTournament> =
-        runCatching { json.decodeFromString(ListSerializer(ClubTournament.serializer()), clubTournamentsFile.readText()) }.getOrDefault(emptyList())
+        readOr(clubTournamentsFile, emptyList()) { json.decodeFromString(ListSerializer(ClubTournament.serializer()), it) }
 
     @Synchronized
     fun saveClubTournaments(list: List<ClubTournament>) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_tournaments.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(ClubTournament.serializer()), list))
-            if (!tmp.renameTo(clubTournamentsFile)) {
-                clubTournamentsFile.delete()
-                tmp.renameTo(clubTournamentsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio dei tornei del circolo fallito", it) }
+        runCatching { writeAtomic(clubTournamentsFile, json.encodeToString(ListSerializer(ClubTournament.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio dei tornei del circolo fallito", it) }
     }
 
     /** Il registro del circolo: quote, addebiti, pagamenti e numerazione delle ricevute. */
     private val clubBookFile: File get() = File(app.filesDir, "club_book.json")
 
     fun loadClubBook(): ClubBook =
-        runCatching { json.decodeFromString(ClubBook.serializer(), clubBookFile.readText()) }.getOrDefault(ClubBook())
+        readOr(clubBookFile, ClubBook()) { json.decodeFromString(ClubBook.serializer(), it) }
 
     @Synchronized
     fun saveClubBook(book: ClubBook) {
-        runCatching {
-            val tmp = File(app.filesDir, "club_book.tmp")
-            tmp.writeText(json.encodeToString(ClubBook.serializer(), book))
-            if (!tmp.renameTo(clubBookFile)) {
-                clubBookFile.delete()
-                tmp.renameTo(clubBookFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio del registro del circolo fallito", it) }
+        runCatching { writeAtomic(clubBookFile, json.encodeToString(ClubBook.serializer(), book)) }.onFailure { Log.e("Storage", "Salvataggio del registro del circolo fallito", it) }
     }
 
     /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
@@ -444,36 +359,29 @@ class Storage(context: Context) {
     @Synchronized
     fun loadPlayers(): List<PlayerProfile> {
         if (!playersFile.exists() && studentsFile.exists()) {
-            val old = runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
+            val old = readOr(studentsFile, emptyList()) { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), it) }
             savePlayers(old.map { it.copy(student = true) })
             studentsFile.delete()
         }
         // Nati dallo storico con un nome solo: quel nome è il soprannome (le partite non cambiano), nome e cognome da completare.
-        return runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), playersFile.readText()) }.getOrDefault(emptyList())
+        return readOr(playersFile, emptyList()) { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), it) }
             .map { if (it.firstName.isBlank() && it.lastName.isBlank() && it.nickname.isBlank()) it.copy(nickname = it.name) else it }
     }
 
     @Synchronized
     fun savePlayers(list: List<PlayerProfile>) {
-        runCatching {
-            val tmp = File(app.filesDir, "players.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(PlayerProfile.serializer()), list))
-            if (!tmp.renameTo(playersFile)) {
-                playersFile.delete()
-                tmp.renameTo(playersFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio giocatori fallito", it) }
+        runCatching { writeAtomic(playersFile, json.encodeToString(ListSerializer(PlayerProfile.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio giocatori fallito", it) }
     }
 
     /** Domande in sospeso sui giocatori arrivati da un altro telefono con un nome che abbiamo già. */
     private val questionsFile: File get() = File(app.filesDir, "player_questions.json")
 
     fun loadPlayerQuestions(): List<Players.Question> =
-        runCatching { json.decodeFromString(ListSerializer(Players.Question.serializer()), questionsFile.readText()) }.getOrDefault(emptyList())
+        readOr(questionsFile, emptyList(), report = false) { json.decodeFromString(ListSerializer(Players.Question.serializer()), it) }
 
     @Synchronized
     fun savePlayerQuestions(list: List<Players.Question>) {
-        runCatching { if (list.isEmpty()) questionsFile.delete() else questionsFile.writeText(json.encodeToString(ListSerializer(Players.Question.serializer()), list)) }
+        runCatching { if (list.isEmpty()) questionsFile.delete() else writeAtomic(questionsFile, json.encodeToString(ListSerializer(Players.Question.serializer()), list)) }
     }
 
     /**
@@ -537,22 +445,20 @@ class Storage(context: Context) {
         get() = prefs.getString("train_student", null) ?: ""
         set(v) = prefs.edit().putString("train_student", v).apply()
 
+    /** L'ultimo allievo scelto dall'allenatore: lo ritrova tornando al suo profilo (nel profilo Tu ci si allena da soli). */
+    var coachStudent: String
+        get() = prefs.getString("coach_student", null) ?: ""
+        set(v) = prefs.edit().putString("coach_student", v).apply()
+
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")
 
     fun loadRackets(): List<Racket> =
-        runCatching { json.decodeFromString(ListSerializer(Racket.serializer()), racketsFile.readText()) }.getOrDefault(emptyList())
+        readOr(racketsFile, emptyList()) { json.decodeFromString(ListSerializer(Racket.serializer()), it) }
 
     @Synchronized
     fun saveRackets(list: List<Racket>) {
-        runCatching {
-            val tmp = File(app.filesDir, "rackets.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Racket.serializer()), list))
-            if (!tmp.renameTo(racketsFile)) {
-                racketsFile.delete()
-                tmp.renameTo(racketsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio racchette fallito", it) }
+        runCatching { writeAtomic(racketsFile, json.encodeToString(ListSerializer(Racket.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio racchette fallito", it) }
     }
 
     /** Racchetta scelta per gli allenamenti ("" = nessuna). */
@@ -654,6 +560,10 @@ class Storage(context: Context) {
     var activeRole: String
         get() = prefs.getString("active_role", null) ?: "PLAYER"
         set(v) = prefs.edit().putString("active_role", v).apply()
+    /** Fatto una volta: a chi aveva già dati di un profilo non acceso, quel profilo è stato acceso (vedi addRolesForData). */
+    var rolesForDataDone: Boolean
+        get() = prefs.getBoolean("roles_for_data_done", false)
+        set(v) = prefs.edit().putBoolean("roles_for_data_done", v).apply()
 
     /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
     var clubName: String
@@ -664,17 +574,20 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
-    /** Backup automatico di tutti i dati (senza video), ogni giorno solo se è cambiato qualcosa; l'impronta dell'ultimo. */
+    /**
+     * Backup automatico di tutti i dati (senza video), ogni giorno solo se è cambiato qualcosa; l'impronta dell'ultimo.
+     * Acceso di serie: i dati stanno solo sul telefono.
+     */
     var personalBackupAuto: Boolean
-        get() = prefs.getBoolean("personal_backup_auto", false)
+        get() = prefs.getBoolean("personal_backup_auto", true)
         set(v) = prefs.edit().putBoolean("personal_backup_auto", v).apply()
     var personalBackupPrint: String
         get() = prefs.getString("personal_backup_print", null) ?: ""
         set(v) = prefs.edit().putString("personal_backup_print", v).apply()
 
-    /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa), l'impronta e l'ora dell'ultimo. */
+    /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa, acceso di serie), l'impronta e l'ora dell'ultimo. */
     var officeBackupAuto: Boolean
-        get() = prefs.getBoolean("office_backup_auto", false)
+        get() = prefs.getBoolean("office_backup_auto", true)
         set(v) = prefs.edit().putBoolean("office_backup_auto", v).apply()
     var officeBackupPrint: String
         get() = prefs.getString("office_backup_print", null) ?: ""
@@ -688,6 +601,20 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("office_backup_server_error", v).apply()
     /** Le copie automatiche della segreteria (fuori dal backup completo: sono già una copia). */
     val officeBackupDir: File get() = File(app.filesDir, "office_backups")
+
+    /** Il luogo della partita (riepilogo e PDF) dalla posizione del telefono; chi non lo vuole lo spegne. */
+    var matchPlace: Boolean
+        get() = prefs.getBoolean("match_place", true)
+        set(v) = prefs.edit().putBoolean("match_place", v).apply()
+    /** La domanda sulla posizione prima della partita si fa una volta sola. */
+    var locationAsked: Boolean
+        get() = prefs.getBoolean("location_asked", false)
+        set(v) = prefs.edit().putBoolean("location_asked", v).apply()
+
+    /** Chi aveva già l'app ha visto l'avviso che il backup automatico ora è acceso di serie. */
+    var autoBackupNoticeSeen: Boolean
+        get() = prefs.getBoolean("auto_backup_notice_seen", false)
+        set(v) = prefs.edit().putBoolean("auto_backup_notice_seen", v).apply()
 
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
@@ -809,15 +736,7 @@ class Storage(context: Context) {
     /** Scrittura atomica: prima su file temporaneo, poi rinomina (sicuro anche se il telefono si spegne). */
     @Synchronized
     fun saveMatch(rec: MatchRecord) {
-        runCatching {
-            val f = File(matchesDir, "${rec.id}.json")
-            val tmp = File(matchesDir, "${rec.id}.tmp")
-            tmp.writeText(json.encodeToString(MatchRecord.serializer(), rec))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio partita fallito", it) }
+        runCatching { writeAtomic(File(matchesDir, "${rec.id}.json"), json.encodeToString(MatchRecord.serializer(), rec)) }.onFailure { Log.e("Storage", "Salvataggio partita fallito", it) }
     }
 
     fun loadUnfinished(): List<MatchRecord> =
@@ -833,15 +752,7 @@ class Storage(context: Context) {
 
     @Synchronized
     fun saveFinished(rec: MatchRecord) {
-        runCatching {
-            val f = File(finishedDir, "${rec.id}.json")
-            val tmp = File(finishedDir, "${rec.id}.tmp")
-            tmp.writeText(json.encodeToString(MatchRecord.serializer(), rec))
-            if (!tmp.renameTo(f)) {
-                f.delete()
-                tmp.renameTo(f)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio nello storico fallito", it) }
+        runCatching { writeAtomic(File(finishedDir, "${rec.id}.json"), json.encodeToString(MatchRecord.serializer(), rec)) }.onFailure { Log.e("Storage", "Salvataggio nello storico fallito", it) }
     }
 
     /** Partite dello storico, dalla più recente. */
@@ -862,11 +773,12 @@ class Storage(context: Context) {
     }
 
     fun saveLastFinished(rec: MatchRecord) {
-        runCatching { lastFinishedFile.writeText(json.encodeToString(MatchRecord.serializer(), rec)) }
+        runCatching { writeAtomic(lastFinishedFile, json.encodeToString(MatchRecord.serializer(), rec)) }
     }
 
     fun loadLastFinished(): MatchRecord? =
-        runCatching { json.decodeFromString(MatchRecord.serializer(), lastFinishedFile.readText()) }.getOrNull()
+        // È solo una copia (per riaprire il riepilogo): se non si legge non serve avvisare.
+        readOr(lastFinishedFile, null, report = false) { json.decodeFromString(MatchRecord.serializer(), it) }
 
     /** Cartella predefinita dello storico se l'utente non ne sceglie una. */
     val defaultHistoryDir: File

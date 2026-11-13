@@ -87,7 +87,7 @@ fun SchoolScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val list by c.courses.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -140,7 +140,7 @@ fun CourseScreen(c: MatchController) {
     val co = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var tab by rememberSaveable { mutableStateOf(0) }
     var edit by remember { mutableStateOf(false) }
@@ -237,7 +237,7 @@ fun CourseScreen(c: MatchController) {
 @Composable
 private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
     AlertDialog(
@@ -277,7 +277,7 @@ private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -
 private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     val today = CourtPlans.dayStart(System.currentTimeMillis())
     var x by remember { mutableStateOf(co ?: Course(Courses.newId("k"), "", from = today, to = CourtPlans.addDays(today, 180), createdAt = System.currentTimeMillis())) }

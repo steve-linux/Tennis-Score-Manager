@@ -136,10 +136,11 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
 
 /**
  * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
- * le altre in "Tutte le sessioni".
+ * le altre in "Tutte le sessioni". Nel profilo Tu ci si allena da soli; in quello dell'Allenatore ([coach]) si sceglie
+ * l'allievo, e sessioni, cartelle e andamento sono suoi.
  */
 @Composable
-fun ServeTrainingCard(c: MatchController) {
+fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val sessions by c.serveSessions.collectAsState()
@@ -147,12 +148,18 @@ fun ServeTrainingCard(c: MatchController) {
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
     LaunchedEffect(Unit) { c.refreshServeSessions(); c.refreshStudents() }
+    // Tu: nessun allievo (ti alleni tu). Allenatore: l'allievo dell'ultima volta, se non ce n'è già uno scelto.
+    LaunchedEffect(coach) { if (coach) c.restoreCoachStudent() else if (c.trainStudent.value != null) c.setTrainStudent(null) }
     val trainee by c.trainStudent.collectAsState()
     // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
     val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        TraineeRow(c)
+        if (coach) {
+            TraineeRow(c)
+            // Prima si sceglie chi si allena: il resto (colpo, esercizio, avvio, sessioni) è suo.
+            if (trainee == null) return@SectionCard
+        }
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
@@ -180,7 +187,7 @@ fun ServeTrainingCard(c: MatchController) {
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
-/** Chi si allena: un allievo (le sessioni, le cartelle e l'andamento sono suoi) o nessuno. */
+/** Chi si allena con l'allenatore: uno dei suoi allievi (le sessioni, le cartelle e l'andamento sono suoi). */
 @Composable
 fun TraineeRow(c: MatchController) {
     val s = LocalStrings.current
@@ -217,7 +224,6 @@ fun TraineeRow(c: MatchController) {
                         Text(label, color = if (id == trainee) TsmColors.Ball else TsmColors.TextMain, fontWeight = if (id == trainee) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier.padding(start = 10.dp))
                     }
-                    option(s.trainNoStudent, null, null)
                     for (st in students) option(st.name, st.id, st.name)
                 }
             },
@@ -263,7 +269,7 @@ fun PlayerEditDialog(
     var student by remember { mutableStateOf(player?.student ?: asStudent) }
     var phone by remember { mutableStateOf(player?.phone.orEmpty()) }
     var email by remember { mutableStateOf(player?.email.orEmpty()) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
     val players by c.players.collectAsState()
@@ -403,7 +409,7 @@ fun SessionRow(
     c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,
 ) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val n = ServeTraining.count(sess.serves)
     Row(modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(vertical = 6.dp)) {
         Column(Modifier.weight(1f)) {

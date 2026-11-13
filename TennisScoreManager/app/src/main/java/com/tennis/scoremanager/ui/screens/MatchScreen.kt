@@ -4,7 +4,6 @@
 package com.tennis.scoremanager.ui.screens
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -52,6 +51,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
@@ -112,7 +112,6 @@ import com.tennis.scoremanager.model.PenaltyOutcome
 import com.tennis.scoremanager.model.PenaltyKind
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
-import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.RemoteKeysInDialog
@@ -144,8 +143,8 @@ fun MatchScreen(c: MatchController) {
     val names = remember(lm.record.setup, s) { Names(lm.record.setup, s) }
     val state = lm.state
     val suspended = lm.record.suspended
-    var confirmNew by remember { mutableStateOf(false) }
-    var confirmExit by remember { mutableStateOf(false) }
+    /** Il menu per lasciare la partita (tasto Esci e Indietro): al menu, nuova partita, chiudere l'app. */
+    var leave by remember { mutableStateOf(false) }
     /** Ritiro (false) o squalifica (true) da confermare scegliendo il giocatore. */
     var confirmRetire by remember { mutableStateOf<Boolean?>(null) }
     var breakKind by remember { mutableStateOf<BreakKind?>(null) }
@@ -159,7 +158,8 @@ fun MatchScreen(c: MatchController) {
     /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
     var locked by rememberSaveable { mutableStateOf(false) }
 
-    BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
+    // Indietro non fa perdere niente: chiede cosa fare (la partita resta tra le sospese).
+    BackHandler { leave = true }
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -231,8 +231,8 @@ fun MatchScreen(c: MatchController) {
                     contentDescription = if (o.audio) s.audioOn else s.audioOff,
                 ) { c.toggleAudio() }
                 ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
-                ControlButton(Icons.Filled.AddCircle, s.newMatchShort, Modifier.weight(1.3f), contentDescription = s.newMatch) { confirmNew = true }
-                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+                // Uscire: al menu, partita nuova o app chiusa, in un posto solo (la partita resta tra le sospese).
+                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { leave = true }
             }
         }
         if (locked) LockOverlay(s) { locked = false }
@@ -395,17 +395,28 @@ fun MatchScreen(c: MatchController) {
         )
     }
 
-    if (confirmExit) {
-        ConfirmDialog(
-            icon = Icons.AutoMirrored.Filled.ExitToApp,
-            title = s.exitConfirmTitle,
-            text = s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "",
-            confirm = s.exit,
-            onConfirm = {
-                confirmExit = false
-                activity?.let { c.exitApp(it) }
+    if (leave) {
+        val armed = rememberArmed()
+        AlertDialog(
+            onDismissRequest = { leave = false },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, tint = TsmColors.Orange) },
+            title = { Text(s.leaveTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.exitConfirmText)
+                    @Composable fun item(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, onClick: () -> Unit) =
+                        OutlinedButton(onClick = { if (armed) { leave = false; onClick() } }, modifier = Modifier.fillMaxWidth()) {
+                            Icon(icon, null, tint = TsmColors.TextMain)
+                            Spacer(Modifier.width(8.dp))
+                            Text(text, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                        }
+                    item(Icons.Filled.Home, s.leaveToMenu) { c.leaveMatch() }
+                    item(Icons.Filled.AddCircle, s.newMatch) { c.newMatch() }
+                    item(Icons.Filled.PowerSettingsNew, s.closeApp) { activity?.let { c.exitApp(it) } }
+                    if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) Text(s.exitConfirmBands, color = TsmColors.TextDim, fontSize = 13.sp)
+                }
             },
-            onDismiss = { confirmExit = false },
+            confirmButton = { TextButton(onClick = { leave = false }) { Text(s.keepPlaying) } },
         )
     }
 
@@ -459,20 +470,6 @@ fun MatchScreen(c: MatchController) {
                     Text(if (state.retired != null) (if (state.disqualified) s.disqualifyUndo else s.retireUndo) else s.undoLastPoint, color = TsmColors.TextMain)
                 }
             },
-        )
-    }
-
-    if (confirmNew) {
-        ConfirmDialog(
-            icon = Icons.Filled.AddCircle,
-            title = s.newMatchConfirmTitle,
-            text = s.newMatchConfirmText,
-            confirm = s.newMatch,
-            onConfirm = {
-                confirmNew = false
-                c.newMatch()
-            },
-            onDismiss = { confirmNew = false },
         )
     }
 

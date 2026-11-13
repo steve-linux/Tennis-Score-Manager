@@ -34,7 +34,9 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -72,6 +74,7 @@ import java.io.File
  * Con [EXTRA_POSE_DIR] (clip di un servizio analizzato) disegna sopra lo scheletro del giocatore, che segue il video
  * anche ingrandito, e ha i tasti per saltare ai tre momenti chiave.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class ReplayActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
@@ -159,19 +162,22 @@ class ReplayActivity : ComponentActivity() {
 
     @Composable
     private fun Content(p: ExoPlayer) {
-        val s = stringsFor(controller.options.value.lang)
+        val s = stringsFor(controller.options.collectAsState().value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
         var speed by remember { mutableFloatStateOf(if (pose?.metrics != null || pose?.ground != null) 0.5f else 1f) }
         var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(Offset.Zero) }
-        remember(p) {
-            p.addListener(object : Player.Listener {
+        // Le proporzioni arrivano col primo fotogramma; l'ascolto si toglie quando la pagina sparisce.
+        DisposableEffect(p) {
+            val l = object : Player.Listener {
                 override fun onVideoSizeChanged(v: VideoSize) {
                     if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
                 }
-            })
+            }
+            p.addListener(l)
+            onDispose { p.removeListener(l) }
         }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
             // L'immagine: proporzioni del video, al centro; due dita per ingrandire e spostare.

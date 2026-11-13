@@ -7,7 +7,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,12 +39,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
@@ -119,7 +118,6 @@ import kotlinx.coroutines.delay
 fun SummaryScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val activity = LocalActivity.current
     val sm by c.summary.collectAsState()
     val done = sm ?: return
     val rec = done.record
@@ -134,8 +132,8 @@ fun SummaryScreen(c: MatchController) {
     var confirmDelete by remember { mutableStateOf(false) }
     /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
     var shareChoice by remember { mutableStateOf(false) }
-    // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
-    BackHandler { if (fromHistory) c.backToHistory() }
+    // Indietro come "Fatto": si torna da dove era partita la partita (un torneo, la prima schermata) o allo storico.
+    BackHandler { c.closeSummary() }
 
     // Con l'app a tutto schermo la tastiera non restringe la pagina da sola: ci pensa imePadding. Mentre si
     // scrivono le note i pulsanti in basso spariscono, così resta spazio per vedere il testo.
@@ -252,11 +250,11 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // La partita finita è già nello storico: uscire non fa perdere niente.
                 if (fromHistory) {
-                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.backToHistory() }, Modifier.weight(1f))
+                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.closeSummary() }, Modifier.weight(1f))
                     GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.weight(1f))
                 } else {
                     GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
-                    GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                    GhostButton(s.done, Icons.Filled.Check, { c.closeSummary() }, Modifier.weight(1f))
                 }
             }
         }

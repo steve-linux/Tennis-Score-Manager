@@ -20,5 +20,7 @@ class TsmApp : Application() {
         val voice = VoicePack(this)
         val ble = BleManager(this)
         controller = MatchController(this, Storage(this), ble, HeartRateManager(this, ble), voice, Announcer(this, voice))
+        // I backup automatici sono accesi di serie: il lavoro di ogni giorno va programmato anche se nessuno li ha toccati.
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(this, controller.storage)
     }
 }

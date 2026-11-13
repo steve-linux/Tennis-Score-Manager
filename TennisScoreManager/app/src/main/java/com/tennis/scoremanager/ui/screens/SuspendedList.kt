@@ -50,7 +50,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun SuspendedList(c: MatchController) {
     val s = LocalStrings.current
     val saved by c.saved.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val list = saved.sortedByDescending { it.updatedAt }
     var picked by remember { mutableStateOf(setOf<String>()) }
     var ask by remember { mutableStateOf<Set<String>?>(null) }

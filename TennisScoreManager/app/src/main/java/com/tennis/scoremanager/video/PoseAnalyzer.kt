@@ -234,26 +234,27 @@ object ServeClipAnalysis {
         fun readInOrder(wantedTimes: List<Long>, each: (Bitmap, Long) -> Unit) {
             for ((pi, ts) in wantedTimes.groupBy { t -> starts.indexOfLast { it <= t } }.filterKeys { it >= 0 }.toSortedMap()) {
                 val r = retrievers.getOrPut(parts[pi]) { MediaMetadataRetriever().apply { setDataSource(parts[pi].absolutePath) } }
-                val count = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toIntOrNull() ?: 0
+                val count = if (Build.VERSION.SDK_INT >= 28) r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toIntOrNull() ?: 0 else 0
                 val durMs = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
-                if (Build.VERSION.SDK_INT < 28 || count <= 0 || durMs <= 0) {
-                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { each(it, t); it.recycle() }
-                    continue
-                }
-                val wanted = ts.groupBy { t -> ((t - starts[pi]) * count / durMs).toInt().coerceIn(0, count - 1) }
-                val lo = wanted.keys.min()
-                val hi = wanted.keys.max()
-                val params = MediaMetadataRetriever.BitmapParams().apply { preferredConfig = Bitmap.Config.RGB_565 }
-                var k = lo
-                while (k <= hi) {
-                    val n = minOf(CHUNK, hi - k + 1)
-                    val list = runCatching { r.getFramesAtIndex(k, n, params) }.getOrDefault(emptyList())
-                    list.forEachIndexed { j, bmp ->
-                        wanted[k + j]?.forEach { t -> each(bmp, t) }
-                        bmp.recycle()
+                if (Build.VERSION.SDK_INT >= 28 && count > 0 && durMs > 0) {
+                    val wanted = ts.groupBy { t -> ((t - starts[pi]) * count / durMs).toInt().coerceIn(0, count - 1) }
+                    val lo = wanted.keys.min()
+                    val hi = wanted.keys.max()
+                    val params = MediaMetadataRetriever.BitmapParams().apply { preferredConfig = Bitmap.Config.RGB_565 }
+                    var k = lo
+                    while (k <= hi) {
+                        val n = minOf(CHUNK, hi - k + 1)
+                        val list = runCatching { r.getFramesAtIndex(k, n, params) }.getOrDefault(emptyList())
+                        list.forEachIndexed { j, bmp ->
+                            wanted[k + j]?.forEach { t -> each(bmp, t) }
+                            bmp.recycle()
+                        }
+                        if (list.isEmpty()) break
+                        k += n
                     }
-                    if (list.isEmpty()) break
-                    k += n
+                } else {
+                    // Android 8: un fotogramma alla volta (più lento, ma c'è).
+                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { each(it, t); it.recycle() }
                 }
             }
         }

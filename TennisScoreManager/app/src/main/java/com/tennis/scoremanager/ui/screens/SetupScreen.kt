@@ -85,6 +85,7 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandMore
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -95,8 +96,12 @@ fun SetupScreen(c: MatchController) {
     val o by c.options.collectAsState()
     val rackets by c.rackets.collectAsState()
     val context = LocalContext.current
-    // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
+    // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna da dove la si è aperta.
     androidx.activity.compose.BackHandler { c.back() }
+    var permTick by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val locationPermission = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permTick++ }
     // In campo vanno giocatori del database: un nome senza scheda (partite di prima, rivincite) si sceglie dall'elenco
     // o si crea, prima di andare avanti.
     val creating by c.playerToCreate.collectAsState()
@@ -172,8 +177,17 @@ fun SetupScreen(c: MatchController) {
                             .clickable { c.updateSetup { it.copy(court = ct, club = it.club.ifBlank { c.storage.clubName }) } }.padding(horizontal = 10.dp, vertical = 6.dp),
                     )
                 }
+                // Il luogo nel riepilogo: dalla posizione del telefono (chiesta una volta prima della partita).
+                val place by c.matchPlace.collectAsState()
+                SwitchRow(Icons.Filled.Place, s.matchPlace, s.matchPlaceHint, place) { v -> c.setMatchPlace(v) }
+                val located = remember(permTick) { com.tennis.scoremanager.data.LocationHelper.hasPermission(context) }
+                if (place && !located) {
+                    GhostButton("${s.allow}: ${s.location}", Icons.Filled.Place, {
+                        locationPermission.launch(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION))
+                    }, Modifier.fillMaxWidth())
+                }
                 // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
-                SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
+                if (place) SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
                     c.updateOptions { it.copy(addressLookup = v) }
                 }
                 // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
@@ -183,25 +197,6 @@ fun SetupScreen(c: MatchController) {
                 Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
                 Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
             }
-        }
-    }
-}
-
-/** Indirizzo del codice sorgente, mostrato in fondo alla pagina 1. */
-private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
-
-/** Versione, licenza e assenza di garanzia (la GPL chiede di mostrarle nei programmi con interfaccia), più il link al codice. */
-@Composable
-internal fun AboutFooter() {
-    val s = LocalStrings.current
-    val context = LocalContext.current
-    Column(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(s.aboutLicense(BuildConfig.VERSION_NAME), color = TsmColors.TextDim, fontSize = 12.sp, textAlign = TextAlign.Center)
-        TextButton(onClick = {
-            // Nessun browser installato: il tocco non fa nulla invece di chiudere l'app.
-            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_URL))) }
-        }) {
-            Text("${s.aboutSource}: ${SOURCE_URL.removePrefix("https://")}", color = TsmColors.Ball, fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }
 }
@@ -217,6 +212,27 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
         val b = if (side == Side.P1) su.p1b else su.p2b
         // A sinistra di ogni nome la sua foto: si tocca per metterla o cambiarla.
         PlayerSlot(c, su, side, false, recent, accent)
+        if (su.doubles) PlayerSlot(c, su, side, true, recent, accent)
+        // Classifica, uomo/donna e racchetta arrivano dalla scheda del giocatore: qui in una riga, aperti solo se servono.
+        val rackets by c.rackets.collectAsState()
+        var details by androidx.compose.runtime.saveable.rememberSaveable(side) { mutableStateOf(false) }
+        if (!details) {
+            val racket = rackets.firstOrNull { it.id == (if (side == Side.P1) su.p1Racket else su.p2Racket) }?.label
+            val sexOf = { name: String, field: String -> when (field.ifEmpty { if (name.isBlank()) "" else c.storage.playerSex(PlayerStats.key(name)) }) { "M" -> s.heartMale; "F" -> s.heartFemale; else -> null } }
+            val line = listOfNotNull(
+                (if (side == Side.P1) su.p1aRank else su.p2aRank).ifBlank { null },
+                sexOf(a, if (side == Side.P1) su.p1aSex else su.p2aSex),
+                if (su.doubles) (if (side == Side.P1) su.p1bRank else su.p2bRank).ifBlank { null } else null,
+                if (su.doubles) sexOf(b, if (side == Side.P1) su.p1bSex else su.p2bSex) else null,
+                racket?.ifBlank { null },
+            ).joinToString(" · ")
+            // Una riga da toccare, con la freccia: "Cambia" accanto al nome è già quello che cambia il giocatore.
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { details = true }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(line.ifEmpty { s.playerDetails }, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Icon(Icons.Filled.ExpandMore, s.playerDetails, tint = accent)
+            }
+            return@SectionCard
+        }
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
         }
@@ -224,13 +240,12 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
             c.updateSetup { if (side == Side.P1) it.copy(p1aSex = v) else it.copy(p2aSex = v) }
         }
         // La racchetta di oggi: la partita ne tiene una copia con corde e tensione.
-        if (c.rackets.collectAsState().value.isNotEmpty()) {
+        if (rackets.isNotEmpty()) {
             RacketPicker(c, if (side == Side.P1) su.p1Racket else su.p2Racket, a) { id ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1Racket = id) else it.copy(p2Racket = id) }
             }
         }
         if (su.doubles) {
-            PlayerSlot(c, su, side, true, recent, accent)
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
@@ -368,22 +383,4 @@ private fun Field(
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(Modifier.width(0.dp))
-}
-
-@Composable
-private fun HomeShortcut(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    tint: androidx.compose.ui.graphics.Color,
-    label: String,
-    modifier: Modifier,
-    onClick: () -> Unit,
-) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 2.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, null, tint = tint)
-            // Quattro scorciatoie in una riga: "Allenamento" deve starci anche sui telefoni stretti.
-            Text(label, color = TsmColors.TextMain, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, letterSpacing = 0.sp,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-        }
-    }
 }

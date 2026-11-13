@@ -131,25 +131,28 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
+enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
  * ([Role.tabs]).
  */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
+enum class HomeTab { PLAY, BOOKING, TRAIN, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
 
 /**
  * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
- * Il tabellone c'è in tutti: l'allenatore arbitra le partite tra allievi, il circolo quelle dei tornei.
+ * Ogni funzione sta in un ruolo solo, senza doppioni: il segnapunti, i video e lo storico sono di Tu, gli allievi
+ * dell'Allenatore, la segreteria del Circolo (che segna le sue partite dal torneo, dall'incontro o dalla sfida). Solo
+ * Altro, con impostazioni e aiuto, è di tutti. La scheda Circolo di chi gioca ([HomeTab.BOOKING]) compare solo dopo
+ * l'invito della segreteria.
  */
 enum class Role(val tabs: List<HomeTab>) {
-    /** Tu: giochi, ti alleni, i tuoi video e progressi (l'app di sempre). */
-    PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
-    /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
-    COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
-    /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
-    CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+    /** Tu: giochi (segnapunti, tabellone, video), il tuo circolo, ti alleni, i tuoi progressi. */
+    PLAYER(listOf(HomeTab.PLAY, HomeTab.BOOKING, HomeTab.TRAIN, HomeTab.PROGRESS, HomeTab.MORE)),
+    /** Allenatore: gli allievi, i loro allenamenti dei colpi e gli esercizi. */
+    COACH(listOf(HomeTab.STUDENTS, HomeTab.MORE)),
+    /** Circolo: oggi (cosa serve adesso), il planning, i soci, i tornei; il circolo e i suoi strumenti in Altro. */
+    CLUB(listOf(HomeTab.TODAY, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.TOURNAMENTS, HomeTab.MORE)),
 }
 
 /** Cosa usa chi gioca (ruoli Tu e Allenatore): quello che non usa non compare (i dati restano). */
@@ -231,14 +234,16 @@ class MatchController(
     /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
     val remotes = RemoteInput(app, storage, scope)
 
-    val screen = MutableStateFlow(Screen.HOME)
+    /** Le schermate e la strada fatta: Indietro torna da dove si è arrivati (vedi [Navigator]). */
+    val nav = Navigator()
+    val screen = nav.screen
     /** Scheda della prima schermata: resta quella da cui si è partiti, così "Indietro" ci torna. */
     val homeTab = MutableStateFlow(HomeTab.PLAY)
 
     /** Torna alla prima schermata ([tab] se dato, altrimenti la scheda di prima). */
     fun home(tab: HomeTab? = null) {
         tab?.let { homeTab.value = it }
-        screen.value = Screen.HOME
+        nav.home()
     }
     val setup = MutableStateFlow(storage.setup)
     val options = MutableStateFlow(storage.options)
@@ -708,54 +713,20 @@ class MatchController(
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
         if (to == Screen.START && needsService()) MatchService.start(app)
-        screen.value = to
+        nav.push(to)
     }
 
+    /** Indietro: la schermata da cui si è arrivati (la partita si lascia col suo menu, il riepilogo con "Fatto"). */
     fun back() {
-        screen.value = when (screen.value) {
-            Screen.OPTIONS -> Screen.SETUP
-            Screen.SETUP -> Screen.HOME
-            Screen.PROGRESS -> Screen.HOME
-            Screen.RACKETS -> Screen.HOME
-            Screen.VIDEOS -> Screen.HOME
-            Screen.DEVICES -> Screen.HOME
-            Screen.VOICE -> Screen.HOME
-            Screen.STROKE_SESSIONS -> strokeSessionsBack
-            Screen.HELP -> helpBack.also { helpBack = Screen.HOME }
-            Screen.STUDENTS -> Screen.HOME
-            Screen.STUDENT -> studentBack
-            Screen.PLAYERS -> Screen.HOME
-            Screen.DATA -> Screen.HOME
-            Screen.DRILLS -> Screen.HOME
-            Screen.MEMBERS -> Screen.HOME
-            Screen.PAYMENTS -> Screen.HOME
-            Screen.CLUB_TOURNAMENTS -> Screen.HOME
-            Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
-            Screen.NOTICE -> noticeBack
-            Screen.COURTS_PLAN -> Screen.HOME
-            Screen.BOOK_COURT -> Screen.HOME
-            Screen.DESK -> Screen.HOME
-            Screen.COURT_STATS -> statsBack
-            Screen.LADDERS -> Screen.HOME
-            Screen.LADDER -> Screen.LADDERS
-            Screen.SCHOOL -> Screen.HOME
-            Screen.COURSE -> Screen.SCHOOL
-            Screen.TEAMS -> Screen.HOME
-            Screen.TEAM -> Screen.TEAMS
-            Screen.FIXTURE -> Screen.TEAM
+        when (screen.value) {
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
-            Screen.WORKOUT -> if (workoutDetail.value != null) {
-                workoutDetail.value = null
-                Screen.WORKOUT
-            } else {
-                Screen.HOME
-            }
-            Screen.START -> {
-                if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
-                Screen.OPTIONS
-            }
-            else -> screen.value
+            Screen.WORKOUT -> if (workoutDetail.value != null) { workoutDetail.value = null; return }
+            Screen.START -> if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
+            Screen.MATCH -> return
+            Screen.SUMMARY -> { closeSummary(); return }
+            else -> {}
         }
+        nav.back()
     }
 
     // ---------------------------------------------------------------- braccialetti
@@ -1093,11 +1064,8 @@ class MatchController(
     /** Apre tutte le sessioni del colpo [stroke] (dell'allievo scelto); Indietro torna da dove si è partiti. */
     fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
         trainStroke.value = stroke
-        strokeSessionsBack = if (screen.value == Screen.STUDENT) Screen.STUDENT else Screen.HOME
-        screen.value = Screen.STROKE_SESSIONS
+        nav.push(Screen.STROKE_SESSIONS)
     }
-
-    private var strokeSessionsBack = Screen.HOME
 
     // ---------------------------------------------------------------- giocatori e allievi
 
@@ -1368,21 +1336,34 @@ class MatchController(
     fun setTrainStudent(id: String?) {
         trainStudent.value = id
         storage.trainStudent = id.orEmpty()
+        // L'allenatore ritrova il suo allievo anche dopo essersi allenato da solo (nel profilo Tu non c'è allievo).
+        if (id != null) storage.coachStudent = id
+    }
+
+    /** Tornando al profilo Allenatore senza nessuno scelto: l'allievo dell'ultima volta, se c'è ancora. */
+    fun restoreCoachStudent() {
+        if (trainStudent.value != null) return
+        storage.coachStudent.takeIf { id -> students.value.any { it.id == id } }?.let { setTrainStudent(it) }
+    }
+
+    /** "Allena ora" dalla scheda di un allievo: si passa al profilo Allenatore (acceso, se non lo era) con lui scelto. */
+    fun coachNow(id: String) {
+        if (Role.COACH !in roles.value) setRoles(roles.value + Role.COACH)
+        setActiveRole(Role.COACH)
+        setTrainStudent(id)
+        home(HomeTab.STUDENTS)
     }
 
     fun openStudents() {
         refreshPlayers()
-        screen.value = Screen.STUDENTS
+        nav.push(Screen.STUDENTS)
     }
 
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE, Screen.TEAM, Screen.FIXTURE) } ?: Screen.STUDENTS
-        screen.value = Screen.STUDENT
+        nav.push(Screen.STUDENT)
     }
-
-    private var studentBack = Screen.STUDENTS
 
     // ---- Obiettivi (Progressi) ----
 
@@ -1423,20 +1404,20 @@ class MatchController(
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
         refreshPlayers()
-        screen.value = Screen.MEMBERS
+        nav.push(Screen.MEMBERS)
     }
 
     /** Circolo › Quote e pagamenti. */
     fun openPayments() {
         refreshPlayers()
-        screen.value = Screen.PAYMENTS
+        nav.push(Screen.PAYMENTS)
     }
 
     /** Altro › Giocatori: tutto il database. */
     fun openPlayers() {
         refreshPlayers()
         refreshHistory()
-        screen.value = Screen.PLAYERS
+        nav.push(Screen.PLAYERS)
     }
 
     /** Chi è il giocatore nelle statistiche: il suo identificativo e quelli che sono lui (alias). */
@@ -1491,12 +1472,12 @@ class MatchController(
 
     fun openClubTournaments() {
         refreshPlayers()
-        screen.value = Screen.CLUB_TOURNAMENTS
+        nav.push(Screen.CLUB_TOURNAMENTS)
     }
 
     fun openClubTournament(id: String) {
         openClubTournamentId.value = id
-        screen.value = Screen.CLUB_TOURNAMENT
+        nav.push(Screen.CLUB_TOURNAMENT)
     }
 
     fun clubTournament(id: String?): com.tennis.scoremanager.data.ClubTournament? = id?.let { i -> clubTournaments.value.firstOrNull { it.id == i } }
@@ -1649,18 +1630,18 @@ class MatchController(
 
     fun openTeams() {
         refreshPlayers()
-        screen.value = Screen.TEAMS
+        nav.push(Screen.TEAMS)
     }
 
     fun openTeam(id: String) {
         openTeamId.value = id
-        screen.value = Screen.TEAM
+        nav.push(Screen.TEAM)
     }
 
     fun openFixture(teamId: String, fixtureId: String) {
         openTeamId.value = teamId
         openFixtureId.value = fixtureId
-        screen.value = Screen.FIXTURE
+        nav.push(Screen.FIXTURE)
     }
 
     fun team(id: String?): com.tennis.scoremanager.data.Team? = id?.let { i -> teams.value.firstOrNull { it.id == i } }
@@ -1784,25 +1765,20 @@ class MatchController(
         }
     }
 
-    // ---- Statistiche dei campi (dal planning o dalla scheda Campi: Indietro torna lì) ----
-
-    private var statsBack = Screen.COURTS_PLAN
+    // ---- Statistiche dei campi (dal planning o dalla scheda Planning: Indietro torna lì) ----
 
     fun openCourtStats() {
-        statsBack = if (screen.value == Screen.COURTS_PLAN) Screen.COURTS_PLAN else Screen.HOME
-        screen.value = Screen.COURT_STATS
+        nav.push(Screen.COURT_STATS)
     }
 
     // ---- Aiuto al punto giusto ----
 
     /** La sezione della guida da aprire (dal "?" di una schermata), e dove si torna. */
     val helpSection = MutableStateFlow<String?>(null)
-    private var helpBack = Screen.HOME
 
     fun openHelp(section: String) {
         helpSection.value = section
-        helpBack = screen.value
-        screen.value = Screen.HELP
+        nav.push(Screen.HELP)
     }
 
     // ---- Classifica a sfida ----
@@ -1811,9 +1787,9 @@ class MatchController(
     val openLadderId = MutableStateFlow<String?>(null)
     private var pendingLadder: Pair<String, String>? = null
 
-    fun openLadders() { refreshPlayers(); screen.value = Screen.LADDERS }
+    fun openLadders() { refreshPlayers(); nav.push(Screen.LADDERS) }
 
-    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); screen.value = Screen.LADDER }
+    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); nav.push(Screen.LADDER) }
 
     fun ladder(id: String?): com.tennis.scoremanager.data.Ladder? = ladders.value.firstOrNull { it.id == id }
 
@@ -1881,12 +1857,12 @@ class MatchController(
 
     fun openSchool() {
         refreshPlayers()
-        screen.value = Screen.SCHOOL
+        nav.push(Screen.SCHOOL)
     }
 
     fun openCourse(id: String) {
         openCourseId.value = id
-        screen.value = Screen.COURSE
+        nav.push(Screen.COURSE)
     }
 
     fun course(id: String?): com.tennis.scoremanager.data.Course? = id?.let { i -> courses.value.firstOrNull { it.id == i } }
@@ -1951,7 +1927,7 @@ class MatchController(
 
     fun openCourtsPlan() {
         refreshPlayers()
-        screen.value = Screen.COURTS_PLAN
+        nav.push(Screen.COURTS_PLAN)
     }
 
     fun saveCourtSettings(st: com.tennis.scoremanager.data.CourtSettings) {
@@ -2679,12 +2655,10 @@ class MatchController(
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
 
     val notice = MutableStateFlow<com.tennis.scoremanager.data.NoticePlan?>(null)
-    private var noticeBack = Screen.HOME
 
     private fun openNotice(plan: com.tennis.scoremanager.data.NoticePlan) {
         notice.value = plan
-        noticeBack = screen.value
-        screen.value = Screen.NOTICE
+        nav.push(Screen.NOTICE)
     }
 
     private fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
@@ -2835,6 +2809,33 @@ class MatchController(
         storage.roles = roles.value.map { it.name }.toSet()
         if (activeRole.value !in roles.value) setActiveRole(roles.value.first())
     }
+
+    /**
+     * Una volta sola, da quando ogni funzione sta in un profilo solo: chi ha già dati di un profilo che non ha acceso
+     * (partite, allenamenti e prenotazioni sono di Tu, gli allievi dell'Allenatore) se lo ritrova tra i ruoli, così
+     * non perde di vista niente. Il ruolo attivo resta quello di prima.
+     */
+    private fun addRolesForData() {
+        if (storage.rolesForDataDone) return
+        scope.launch {
+            val add = withContext(io) {
+                buildSet {
+                    if (storage.loadPlayers().any { it.student }) add(Role.COACH)
+                    if (storage.loadFinished().isNotEmpty() || storage.loadUnfinished().isNotEmpty() || storage.loadWorkouts().isNotEmpty() ||
+                        storage.loadServeSessions().any { it.student == null } || storage.loadBookingAccounts().isNotEmpty()
+                    ) add(Role.PLAYER)
+                }
+            }
+            storage.rolesForDataDone = true
+            if ((add - roles.value).isNotEmpty()) setRoles(roles.value + add)
+        }
+    }
+
+    /** La partita [id] è di una competizione del circolo (torneo, incontro di squadra, sfida)? Si riprende da lì. */
+    fun isClubRecord(id: String): Boolean =
+        clubTournaments.value.any { t -> t.matches.any { it.record == id } } ||
+            teams.value.any { t -> t.fixtures.any { f -> f.rubbers.any { it.record == id } } } ||
+            ladders.value.any { l -> l.challenges.any { it.record == id } }
 
     /** Passa a un ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
     fun setActiveRole(r: Role) {
@@ -3167,7 +3168,7 @@ class MatchController(
         lastPointAt = 0
         rallyStrokes = 0
         faultPending.value = false
-        screen.value = Screen.MATCH
+        nav.play(Screen.MATCH)
         persist()
         if (needsService()) MatchService.start(app)
         batteryWarned.clear()
@@ -3351,16 +3352,12 @@ class MatchController(
             showMessage(strings.msgFaultUndone)
             return
         }
-        val events = lm.record.events.toMutableList()
-        // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
-        val last = events.lastOrNull()
-        if (last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break || last is MatchEvent.ServerFix || last is MatchEvent.EndsFix) events.removeAt(events.lastIndex)
-        else {
-            while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
-            if (events.isEmpty()) return
-            // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
-            rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
-        }
+        // Dopo un ritiro, un richiamo o una correzione si annulla quello, non l'ultimo punto.
+        val events = ScoreEngine.undo(lm.state, lm.record.events) ?: return
+        // Il primo evento tolto: il punto annullato (con le scelte del set nuovo venute dopo) o la correzione.
+        val removed = lm.record.events[events.size]
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        if (removed is MatchEvent.Point) rallyStrokes += removed.strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -3375,12 +3372,13 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(when (last) {
+        showMessage(when (removed) {
+            is MatchEvent.Point -> strings.msgPointUndone
             is MatchEvent.Penalty -> strings.penaltyUndone
-            is MatchEvent.Retired -> if (last.disqualified) strings.disqualifyUndone else strings.retireUndone
+            is MatchEvent.Retired -> if (removed.disqualified) strings.disqualifyUndone else strings.retireUndone
             is MatchEvent.Break -> strings.breakUndone
-            is MatchEvent.ServerFix, is MatchEvent.EndsFix -> strings.fixUndone
-            else -> strings.msgPointUndone
+            // Chi serve, lati, punteggio messo a mano, ordine di risposta.
+            else -> strings.fixUndone
         })
         showTvMessage(null)
     }
@@ -3612,10 +3610,11 @@ class MatchController(
         clubMatchFinished(rec, lm.state)
         teamRubberFinished(rec, lm.state)
         ladderMatchFinished(rec, lm.state)
+        // Prima si salva la partita finita, poi si toglie la sospesa: in mezzo non resta mai senza copia.
         scope.launch(io) {
-            storage.deleteMatch(rec.id)
             storage.saveFinished(rec)
             storage.saveLastFinished(rec)
+            storage.deleteMatch(rec.id)
         }
         // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
         storage.summaryOpen = rec.id
@@ -3624,7 +3623,7 @@ class MatchController(
         live.value = null
         endDialog.value = false
         stopCountdown()
-        screen.value = Screen.SUMMARY
+        nav.replace(Screen.SUMMARY)
         // Col tabellone acceso il servizio resta (il risultato è ancora sul tabellone): si riavvia solo per il testo della notifica.
         if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
@@ -3634,8 +3633,35 @@ class MatchController(
         }
     }
 
-    /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
+    /** Una partita nuova. Quella di adesso, se non è finita, resta salvata tra le sospese. */
     fun newMatch() {
+        val from = screen.value
+        closeMatch()
+        // Dalla partita o dal suo riepilogo la partita nuova ne prende il posto: Indietro torna da dove era partita.
+        if (from == Screen.MATCH || from == Screen.SUMMARY) nav.replace(Screen.SETUP) else nav.push(Screen.SETUP)
+    }
+
+    /** Lascia la partita (resta tra le sospese, la si riprende da Gioca) e torna da dove era partita. */
+    fun leaveMatch() {
+        closeMatch()
+        nav.back()
+    }
+
+    /** "Fatto" nel riepilogo (anche Indietro): si torna da dove era partita la partita, o allo storico. */
+    fun closeSummary() {
+        val fromHistory = summaryFromHistory.value
+        if (fromHistory) {
+            summary.value = null
+            summaryFromHistory.value = false
+            refreshHistory()
+        } else {
+            closeMatch()
+        }
+        nav.back()
+    }
+
+    /** Chiude la partita in corso (sospesa, se non è finita) e il riepilogo: tempi, voce e servizio a riposo. */
+    private fun closeMatch() {
         live.value?.let { lm ->
             val total = currentClock()
             runningSince = null
@@ -3656,7 +3682,6 @@ class MatchController(
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
         quickStart.value = false
-        screen.value = Screen.SETUP
     }
 
     fun resumeSaved(rec: MatchRecord) {
@@ -3680,7 +3705,7 @@ class MatchController(
         faultPending.value = false
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
-        screen.value = Screen.MATCH
+        nav.play(Screen.MATCH)
         if (!state.isFinished) showMessage(strings.msgSuspended)
         if (rec.location == null) fetchLocation()
         if (o.mode == PlayMode.BANDS) ble.reconnectAll()
@@ -3711,7 +3736,7 @@ class MatchController(
 
     fun openHistory() {
         refreshHistory()
-        screen.value = Screen.HISTORY
+        nav.push(Screen.HISTORY)
     }
 
     // ---------------------------------------------------------------- racchetta virtuale
@@ -3732,7 +3757,7 @@ class MatchController(
     fun openRackets() {
         refreshHistory()
         refreshWorkouts()
-        screen.value = Screen.RACKETS
+        nav.push(Screen.RACKETS)
     }
 
     private fun storeRackets(list: List<Racket>) {
@@ -3833,7 +3858,7 @@ class MatchController(
     fun openProgress() {
         refreshHistory()
         refreshWorkouts()
-        screen.value = Screen.PROGRESS
+        nav.push(Screen.PROGRESS)
     }
 
     private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
@@ -3946,7 +3971,7 @@ class MatchController(
     fun openWorkouts() {
         workoutDetail.value = null
         refreshWorkouts()
-        screen.value = Screen.WORKOUT
+        nav.push(Screen.WORKOUT)
     }
 
     private fun refreshWorkouts() {
@@ -4019,21 +4044,11 @@ class MatchController(
         }
     }
 
-    /** Il riepilogo di una partita dello storico; Indietro torna a [back] (lo storico, o Progressi dal calendario). */
-    fun openFromHistory(m: LiveMatch, back: Screen = Screen.HISTORY) {
+    /** Il riepilogo di una partita dello storico (o del calendario, di un torneo...); Indietro torna lì. */
+    fun openFromHistory(m: LiveMatch) {
         summary.value = m
         summaryFromHistory.value = true
-        summaryBack = back
-        screen.value = Screen.SUMMARY
-    }
-
-    private var summaryBack = Screen.HISTORY
-
-    /** "Indietro" dal riepilogo aperto dallo storico. */
-    fun backToHistory() {
-        summary.value = null
-        summaryFromHistory.value = false
-        if (summaryBack == Screen.PROGRESS) { summaryBack = Screen.HISTORY; screen.value = Screen.PROGRESS } else openHistory()
+        nav.push(Screen.SUMMARY)
     }
 
     fun deleteFromHistory(id: String) {
@@ -4044,7 +4059,7 @@ class MatchController(
                 // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
                 if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
             }
-            if (summary.value?.record?.id == id) backToHistory() else refreshHistory()
+            if (summary.value?.record?.id == id && screen.value == Screen.SUMMARY) closeSummary() else refreshHistory()
         }
     }
 
@@ -4106,112 +4121,9 @@ class MatchController(
 
     // ---------------------------------------------------------------- tornei Americano e Mexicano
 
-    /** Tutti i tornei salvati, dal più recente. */
-    val tournaments = MutableStateFlow<List<Tournament>>(emptyList())
-    /** Torneo aperto; null = elenco dei tornei e creazione di uno nuovo. */
-    val tournament = MutableStateFlow<Tournament?>(null)
-
-    fun openTournaments() {
-        refreshTournaments()
-        // Si riapre da solo l'ultimo torneo non concluso.
-        if (tournament.value == null) {
-            scope.launch {
-                withContext(io) { storage.loadTournaments() }.firstOrNull { !it.finished }?.let { tournament.value = it }
-            }
-        }
-        screen.value = Screen.TOURNAMENT
-    }
-
-    private fun refreshTournaments() {
-        scope.launch { tournaments.value = withContext(io) { storage.loadTournaments() } }
-    }
-
-    private fun saveTournament(t: Tournament) {
-        tournament.value = t
-        scope.launch {
-            withContext(io) { storage.saveTournament(t) }
-            refreshTournaments()
-        }
-    }
-
-    fun createTournament(
-        name: String, kind: TournamentKind, players: List<String>, courts: Int,
-        scoring: TournamentScoring, pointsPerMatch: Int, minutes: Int,
-    ) {
-        val now = System.currentTimeMillis()
-        val t = Tournament(
-            id = "t$now", name = name.trim(), kind = kind, players = players.map { it.trim() },
-            courts = courts, scoring = scoring, pointsPerMatch = pointsPerMatch, minutes = minutes, createdAt = now,
-        )
-        saveTournament(t.copy(rounds = listOf(Tournaments.nextRound(t))))
-    }
-
-    fun openTournament(t: Tournament) {
-        tournament.value = t
-    }
-
-    /** Torna all'elenco dei tornei (quello aperto resta salvato). */
-    fun closeTournament() {
-        tournament.value = null
-        refreshTournaments()
-    }
-
-    /** Risultato di una partita del turno [round]; null = ancora da giocare. */
-    fun setTournamentResult(round: Int, court: Int, a: Int?, b: Int?) {
-        val t = tournament.value ?: return
-        val rounds = t.rounds.map { r ->
-            if (r.number != round) r
-            else r.copy(matches = r.matches.map { if (it.court == court) it.copy(scoreA = a, scoreB = b) else it })
-        }
-        saveTournament(t.copy(rounds = rounds))
-    }
-
-    /** Turno successivo, solo se tutte le partite del turno in corso hanno il risultato. */
-    fun nextTournamentRound(): Boolean {
-        val t = tournament.value ?: return false
-        if (t.current?.complete == false) return false
-        saveTournament(t.copy(rounds = t.rounds + Tournaments.nextRound(t)))
-        return true
-    }
-
-    /** Conclude il torneo. L'ultimo turno, se non è stato giocato per niente, si toglie. */
-    fun finishTournament() {
-        val t = tournament.value ?: return
-        val rounds = t.rounds.filterIndexed { i, r -> i < t.rounds.size - 1 || r.matches.any { it.played } }
-        saveTournament(t.copy(rounds = rounds, finished = true))
-    }
-
-    fun deleteTournament(id: String) {
-        if (tournament.value?.id == id) tournament.value = null
-        scope.launch {
-            withContext(io) { storage.deleteTournament(id) }
-            refreshTournaments()
-        }
-    }
-
-    /** La voce dice il punteggio di una partita contata punto per punto (se la voce è accesa). */
-    fun announceCounter(a: Int, b: Int) {
+    /** Il torneo tra amici (Americano e Mexicano), per conto suo: elenco, turni, classifica. */
+    val friends = FriendsTournaments(storage, scope, io, nav, { strings }, { options.value.lang }) { a, b ->
         if (options.value.audio) announcer.announce(calls().counterScore(a, b))
-    }
-
-    /** Classifica del torneo come testo da condividere. */
-    fun tournamentShareIntent(): Intent? {
-        val t = tournament.value ?: return null
-        val s = strings
-        val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
-        val text = buildString {
-            appendLine(listOf(t.name.ifBlank { kind }, kind).distinct().joinToString(" · "))
-            appendLine(s.tournamentRoundsPlayed(t.rounds.count { r -> r.matches.any { it.played } }))
-            Tournaments.standings(t).forEachIndexed { i, st ->
-                appendLine("${i + 1}. ${st.name} – ${st.points} (${s.tournamentWonShort} ${st.won}, ${st.diff.let { if (it > 0) "+$it" else "$it" }})")
-            }
-            append("Tennis Score Manager · ${Reports.siteUrl(options.value.lang)}")
-        }
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, text)
-        }
-        return Intent.createChooser(send, s.tournamentShare)
     }
 
     // ---------------------------------------------------------------- foto dei giocatori
@@ -4324,11 +4236,14 @@ class MatchController(
     /** Nuova partita più corta: le regole si vedono in una riga e si va dritti al sorteggio (finché non si tocca Cambia). */
     val quickStart = MutableStateFlow(false)
 
-    /** Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio. Indietro porta ai giocatori. */
+    /**
+     * Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio (coi braccialetti o i telecomandi
+     * prima la pagina dove si collegano). Indietro porta ai giocatori.
+     */
     fun startLikeLast(rec: MatchRecord) {
         prepareRematch(rec)
         quickStart.value = true
-        screen.value = Screen.OPTIONS
+        go(if (options.value.mode == PlayMode.REFEREE) Screen.TOSS else Screen.OPTIONS)
     }
 
     fun prepareRematch(rec: MatchRecord) {
@@ -4593,7 +4508,16 @@ class MatchController(
         scope.launch(io) { storage.saveMatch(snapshot) }
     }
 
+    /** Il luogo della partita nel riepilogo (Nuova partita › Altri dettagli): spento, la posizione non si chiede. */
+    val matchPlace = MutableStateFlow(storage.matchPlace)
+
+    fun setMatchPlace(on: Boolean) {
+        storage.matchPlace = on
+        matchPlace.value = on
+    }
+
     private fun fetchLocation() {
+        if (!storage.matchPlace) return
         val id = (live.value ?: summary.value)?.record?.id ?: return
         if (locationJob?.isActive == true && locationFor == id) return
         locationJob?.cancel()
@@ -4879,12 +4803,13 @@ class MatchController(
     fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
+        addRolesForData()
         if (live.value != null || summary.value != null || screen.value != Screen.HOME) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
         summaryFromHistory.value = false
-        screen.value = Screen.SUMMARY
+        nav.replace(Screen.SUMMARY)
     }
 
     /**

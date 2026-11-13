@@ -62,7 +62,7 @@ fun DataScreen(c: MatchController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     BackHandler { c.back() }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var videos by remember { mutableStateOf(false) }
     var wipeVideos by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
@@ -104,11 +104,6 @@ fun DataScreen(c: MatchController) {
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
         // Chi usa l'app: i ruoli cambiano le schede della prima schermata, non i dati.
-        val roles by c.roles.collectAsState()
-        SectionCard(s.rolesTitle, Icons.Filled.Groups) {
-            Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
-            com.tennis.scoremanager.ui.RolesPicker(roles) { c.setRoles(it) }
-        }
         SectionCard(s.dataBackup, Icons.Filled.Backup) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }

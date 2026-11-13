@@ -115,7 +115,7 @@ fun PaymentsScreen(c: MatchController) {
     BackHandler { c.back() }
     val book by c.clubBook.collectAsState()
     val players by c.players.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val year = Members.year(now)
     var editFee by remember { mutableStateOf<Fee?>(null) }
@@ -214,7 +214,7 @@ fun PaymentsScreen(c: MatchController) {
 @Composable
 private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val players by c.players.collectAsState()
     var name by remember { mutableStateOf(fee?.name.orEmpty()) }
     var kind by remember { mutableStateOf(fee?.kind ?: FeeKind.MEMBERSHIP) }
@@ -255,7 +255,7 @@ private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
     if (askAll) {
         val f = current() ?: fee!!
         val members = players.filter { it.member != null }
-        val todo = Fees.chargeAll(c.clubBook.value, f, members, 0L).second
+        val todo = Fees.chargeAll(c.clubBook.collectAsState().value, f, members, 0L).second
         AlertDialog(
             onDismissRequest = { askAll = false },
             text = { Text(if (todo == 0) s.feeChargeAllDone else s.feeChargeAllAsk(f.name, todo)) },
@@ -293,7 +293,7 @@ fun ChargesSection(c: MatchController, p: PlayerProfile) {
     val s = LocalStrings.current
     val book by c.clubBook.collectAsState()
     val roles by c.roles.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val mine = Fees.of(book, p)
     if (mine.isEmpty() && (p.member == null || com.tennis.scoremanager.Role.CLUB !in roles)) return
     val now = System.currentTimeMillis()
@@ -323,7 +323,7 @@ fun ChargesSection(c: MatchController, p: PlayerProfile) {
 private fun NewChargeDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
     val book by c.clubBook.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var free by remember { mutableStateOf(book.fees.isEmpty()) }
     var label by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
@@ -366,7 +366,7 @@ private fun NewChargeDialog(c: MatchController, p: PlayerProfile, onDone: () -> 
 private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var paying by remember { mutableStateOf(false) }
     var unpay by remember { mutableStateOf<String?>(null) }
     var cancel by remember { mutableStateOf(false) }
@@ -424,7 +424,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
 @Composable
 private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
     var at by remember { mutableStateOf(today()) }
     // I modi di pagamento del circolo: il primo è quello proposto.

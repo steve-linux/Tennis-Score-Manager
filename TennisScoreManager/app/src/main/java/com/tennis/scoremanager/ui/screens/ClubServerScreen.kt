@@ -153,7 +153,7 @@ private fun whenText(t: Long, lang: com.tennis.scoremanager.model.Lang): String 
 fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
     val s = LocalStrings.current
     val conf by c.clubServer.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     if (!conf.paired) return
     LaunchedEffect(conf.url) {
         while (true) { c.syncServerNow(); kotlinx.coroutines.delay(60_000) }
@@ -223,7 +223,7 @@ private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data
 @Composable
 fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val conf by c.clubServer.collectAsState()
     val courts by c.clubCourts.collectAsState()
     val scope = rememberCoroutineScope()
@@ -363,7 +363,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
 @Composable
 fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val conf by c.clubServer.collectAsState()
     if (!conf.paired) return
     val scope = rememberCoroutineScope()
@@ -396,7 +396,7 @@ fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
 @Composable
 private fun InviteDialog(c: MatchController, inv: SrvInvite, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val context = LocalContext.current
     val conf by c.clubServer.collectAsState()
     val link = ClubServers.inviteLink(conf, inv.code)

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Watch
@@ -77,6 +78,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var club by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
     var reminder by remember { mutableStateOf(true) }
+    var autoBackup by remember { mutableStateOf(c.storage.personalBackupAuto) }
     val steps = Step.entries.filter { st ->
         when (st) {
             Step.USE -> com.tennis.scoremanager.Role.PLAYER in roles
@@ -100,6 +102,9 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
+        c.setPersonalBackupAuto(autoBackup)
+        // Il backup automatico l'ha appena visto qui: niente avviso nella prima schermata.
+        c.storage.autoBackupNoticeSeen = true
         if (first.isNotBlank() && last.isNotBlank()) {
             // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
             val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
@@ -117,7 +122,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
             Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
-            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.VIDEO) }
+            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()
@@ -156,6 +161,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     Step.PRIVACY -> {
                         Text(s.onbPrivacyTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(s.onbPrivacyText, color = TsmColors.TextMain, fontSize = 15.sp)
+                        SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, autoBackup) { autoBackup = it }
                         SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it }
                     }
                     Step.USE -> {

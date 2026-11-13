@@ -99,7 +99,7 @@ fun ClubTournamentsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val list by c.clubTournaments.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.13") },
@@ -223,7 +223,7 @@ private fun EntriesTab(
     onAdd: () -> Unit, onOpen: (String) -> Unit,
 ) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     // Le informazioni del torneo.
     val info = listOfNotNull(
         t.start?.let { st -> s.ctDates(shortDate(st, lang), t.end?.let { shortDate(it, lang) } ?: shortDate(st, lang)) },
@@ -396,7 +396,7 @@ private fun DrawTab(c: MatchController, t: ClubTournament, onOpen: (String) -> U
 @Composable
 private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
     // Prima quelle da giocare (in ordine di orario), poi le giocate; i bye non contano.
     val ms = t.matches.filter { !it.bye }
@@ -424,7 +424,7 @@ private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -
 private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val a = entryName(c, t.entries.firstOrNull { it.id == m.a })
     val b = entryName(c, t.entries.firstOrNull { it.id == m.b })
     var winner by remember { mutableStateOf(m.winner) }
@@ -563,7 +563,7 @@ private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () ->
 @Composable
 private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var pickDay by remember { mutableStateOf(false) }
     val open = t.matches.filter { !it.played && it.a != null && it.b != null }
     // I giorni con partite in programma (a mezzanotte, uno per giorno).
@@ -593,7 +593,7 @@ private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: ()
 @Composable
 private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone: (String?) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var name by remember { mutableStateOf(t?.name.orEmpty()) }
     var kind by remember { mutableStateOf(t?.kind ?: CTKind.SOCIAL) }
     var doubles by remember { mutableStateOf(t?.doubles ?: false) }

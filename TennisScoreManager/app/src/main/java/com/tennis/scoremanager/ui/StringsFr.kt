@@ -14,7 +14,6 @@ object FrStrings : Strings {
     override val datePattern = "EEEE d MMMM yyyy"
 
     override val setupTitle = "Nouveau match"
-    override val setupSubtitle = "Configuration facultative : vous pouvez tout laisser vide et continuer."
     override val clubSection = "Club et court"
     override val clubName = "Nom du club de tennis"
     override val courtNumber = "Numéro du court"
@@ -246,7 +245,6 @@ object FrStrings : Strings {
     override val videoPoint = "Point"
     override val videoGame = "Jeu"
     override val videoSet = "Set"
-    override val videoReplay = "Revoir le point"
     override val videoStart = "Début"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double faute"; "WINNER" -> "Coup gagnant"; "UNFORCED_ERROR" -> "Faute directe"; "FORCED_ERROR" -> "Faute provoquée"; "ERROR" -> "Faute"; else -> k } }
     override val videoImport = "Importer une vidéo"
@@ -346,7 +344,6 @@ object FrStrings : Strings {
     override val heartChart = "Fréquence cardiaque pendant le match"
     override val heartLine: (Int, Int) -> String = { a, m -> "moyenne $a · max $m bpm" }
     override val caloriesLine: (Int) -> String = { "~$it kcal (estimation)" }
-    override val heartStatsHint = "Calories estimées à partir de la fréquence cardiaque avec la formule de Keytel : l'erreur typique est de 20 %."
     override val heartZones = "Temps dans les zones cardio"
     override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Très légère", "Légère", "Modérée", "Intense", "Maximale").getOrElse(it) { "" } }
     override val heartZonesHint = "Zones en pourcentage de la fréquence maximale estimée d'après l'âge (208 − 0,7 × âge) : il faut l'âge de la personne qui porte la ceinture."
@@ -617,8 +614,6 @@ object FrStrings : Strings {
     override val audioOff = "Audio Off"
     override val newMatch = "Nouveau match"
     override val suspendedOverlay = "MATCH SUSPENDU"
-    override val newMatchConfirmTitle = "Nouveau match ?"
-    override val newMatchConfirmText = "Le match en cours reste enregistré parmi les matchs suspendus et pourra être repris."
     override val endDialogTitle = "Jeu, set et match"
     override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Victoire de $name\n$score" }
     override val matchConcluded = "Match terminé"
@@ -648,7 +643,6 @@ object FrStrings : Strings {
     override val penaltyCount: (Int, Int) -> String = { c, t -> "conduite $c · temps $t" }
     override val retireUndone = "Abandon annulé"
     override val undoShort = "Annuler"
-    override val newMatchShort = "Nouvelle"
     override val disqualifyButton = "Disqualification"
     override val disqualifyTitle = "Qui est disqualifié ?"
     override val disqualifyHint = "Après les jeux de pénalité, ou pour un fait grave, l'arbitre peut disqualifier : le match s'arrête au score actuel et l'adversaire gagne."
@@ -799,7 +793,6 @@ object FrStrings : Strings {
     override val pbClubChatHint = "Tous les membres connectés lisent et écrivent ici. Soyez aimables : le secrétariat peut retirer les messages, et le drapeau signale ceux qui sont déplacés."
     override val pbClubChatAlerts = "Notifications de la discussion du club"
     override val pbClubChatAlertsHint = "Désactivées : vous lisez les messages ici quand vous voulez."
-    override val pbDmTitle = "Messages privés"
     override val pbDmOpen = "Les membres peuvent m'écrire"
     override val pbDmOpenHint = "Activé : vous êtes dans la liste et les autres membres peuvent vous écrire. Désactivé : vous n'y êtes pas, mais vous pouvez écrire à ceux qui l'ont activé."
     override val pbDmHint = "Vous seuls le lisez. Si un message ne va pas, signalez-le avec le drapeau : alors seulement le secrétariat le voit."
@@ -830,9 +823,7 @@ object FrStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
     override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
     override val confirm = "Confirmer"
-    override val backDisabled = "Pendant le match, utilisez « Nouveau match » ou « Quitter »."
     override val exit = "Quitter"
-    override val exitConfirmTitle = "Quitter l'application ?"
     override val exitConfirmText = "Le match reste enregistré parmi les matchs suspendus et pourra être repris."
     override val exitConfirmBands = "Les bracelets seront éteints."
 
@@ -966,8 +957,6 @@ object FrStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche : $it" }
     override val rematchNoCalendar = "Aucune application d'agenda sur ce téléphone."
     override val rematchPreview = "Le message"
-    override val serveTitle = "Entraînement au service"
-    override val serveHint = "Téléphone sur le trépied à côté du serveur, bracelet au poignet : KEY1 bon, KEY2 faute, KEY1 maintenu annule le dernier. Chaque service devient un clip à revoir."
     override val serveStart = "Commencer"
     override val serveNoBand = "Aucun bracelet connecté : marquez bon et faute avec les boutons à l'écran."
     override val serveBandOk: (String) -> String = { "Bracelet $it : KEY1 bon, KEY2 faute, KEY1 maintenu annule" }
@@ -1092,26 +1081,20 @@ object FrStrings : Strings {
     override val studentWonLost: (Int, Int) -> String = { w, l -> "$w gagnés, $l perdus" }
     override val studentDeleteAsk: (String) -> String = { "Retirer $it des élèves ? Ses séances restent, sans élève." }
     override val studentRacket = "Raquette"
-    override val studentRacketNone = "Aucune raquette dans Mes raquettes : ajoutez-la depuis Progrès › Mes raquettes."
     override val studentRacketPick = "Choisir sa raquette"
     override val studentPurge = "Supprimer le joueur et ses données"
     override val studentPurgeConfirm = "Tout supprimer"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Supprimer $name et toutes ses données de ce téléphone ? Ses $n séances avec vidéos et analyse, les notes et la photo sont supprimées ; la raquette reste mais n'est plus la sienne. Les matchs de l'historique restent (les adversaires y sont aussi). C'est définitif." }
-    override val playerLinked: (String) -> String = { "✓ $it, de la base des joueurs" }
-    override val playerHomonyms: (Int, String) -> String = { n, name -> "Il y a $n joueurs nommés $name : touchez le bon ou créez-en un autre." }
-    override val playerCreate: (String) -> String = { "Un autre $it" }
     override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 match, $d" else "$n matchs, dernier le $d" }
     override val studentPickExisting = "Touchez le joueur si c'est lui : ses matchs sont déjà dans la base."
     override val studentFromExisting = "Élève tiré de la base des joueurs : avec ses matchs."
-    override val playerNotHim = "Ce n'est pas lui : un autre joueur"
-    override val playerNew: (String) -> String = { "Nouveau joueur : $it entre dans la base au début du match" }
     override val playersTitle = "Joueurs"
     override val playersHint = "Tous les joueurs des matchs et les élèves : fusionnez ceux écrits de deux façons, séparez les homonymes"
     override val playersSearch = "Chercher"
     override val playersNone = "Pas encore de joueurs : ils s'ajoutent tout seuls avec les matchs."
     override val playerTwin = "homonyme"
     override val playerStudentToggle = "Élève"
-    override val playerStudentToggleHint = "Apparaît dans S'entraîner › Élèves et dans Qui s'entraîne"
+    override val playerStudentToggleHint = "Apparaît parmi les Élèves (rôle Entraîneur) et dans Qui s'entraîne"
     override val playerMerge = "Fusionner avec un autre joueur"
     override val playerMergeHint = "La même personne écrite de deux façons ou créée deux fois : ses matchs et séances passent à ce joueur."
     override val playerSplit = "Séparer un homonyme"
@@ -1134,7 +1117,7 @@ object FrStrings : Strings {
     override val meNew = "Je suis nouveau"
     override val meIsYou = "C'est vous"
     override val meThisIsMe = "C'est moi"
-    override val dataTitle = "Profil et données"
+    override val dataTitle = "Sauvegarde et données"
     override val dataHint = "Sauvegarde dans un fichier qui reste à vous, restauration sur ce téléphone ou un autre, effacement de tout"
     override val dataBackup = "Sauvegarde"
     override val dataBackupHint = "Un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix. Enregistrez-le où vous voulez (même sur un PC ou une clé USB) : pas de cloud."
@@ -1159,14 +1142,13 @@ object FrStrings : Strings {
     override val dataVideos: (Int) -> String = { mb -> "Inclure les vidéos ($mb Mo)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sauvegarde du $date (appli $app" + (if (videos) ", avec les vidéos" else ", sans vidéos") + "). Elle remplace toutes les données actuelles : si besoin, faites d'abord une sauvegarde." }
     override val tabTournaments = "Tournois"
-    override val tabCourts = "Terrains"
     override val roleCoach = "Entraîneur"
     override val roleClub = "Club"
-    override val roleYouHint = "Vous jouez, vous vous entraînez, vos vidéos, progrès et raquettes."
-    override val roleCoachHint = "Vos élèves : entraînement des coups, mouvement, matchs et notes. Vous arbitrez les matchs entre élèves."
-    override val roleClubHint = "Tournois, courts avec leurs tableaux TV, joueurs et entraîneurs."
+    override val roleYouHint = "Vous jouez : comptage des points, entraînements, vidéos, progrès, raquettes et réservations dans votre club."
+    override val roleCoachHint = "Vos élèves : entraînement des coups, exercices, mouvement, rapports et notes. Les matchs se comptent depuis le rôle Vous."
+    override val roleClubHint = "Le secrétariat : aujourd'hui, planning des terrains, adhérents et cotisations, école de tennis, tournois et équipes."
     override val rolesTitle = "Rôles"
-    override val rolesHint = "Vous pouvez en avoir plusieurs (qui joue et entraîne) : ils changent les onglets du premier écran, les données sont les mêmes. En haut vous passez d'un rôle à l'autre."
+    override val rolesHint = "Chaque rôle a ses fonctions, sans doublons. Vous pouvez en avoir plusieurs (qui joue et entraîne) : en haut vous passez de l'un à l'autre, les données sont les mêmes."
     override val clubNoName = "Le club"
     override val clubNoCourts = "Touchez pour écrire le nom et les courts"
     override val clubCourtsLabel = "Terrains (un par ligne)"
@@ -1177,7 +1159,7 @@ object FrStrings : Strings {
     override val onbRolesTitle = "Qui utilise l'appli ?"
     override val onbClubTitle = "Votre club"
     override val onbPrivacyTitle = "Vos données"
-    override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Faites de temps en temps une sauvegarde dans Plus › Profil et données : c'est la seule copie."
+    override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Chaque jour l'app en fait une copie dans Documents ; de temps en temps, gardez-en une aussi hors du téléphone (Plus › Réglages › Sauvegarde et données)."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Vous n'avez encore jamais enregistré de sauvegarde : touchez pour en faire une." else "Dernière sauvegarde : $last. Touchez pour en faire une nouvelle." }
     override val drillsTitle = "Exercices"
     override val drillsHint = "Exercices guidés : un coup et ses étapes à la suite (p. ex. 20 coups droits croisés, puis 20 le long de la ligne)"
@@ -1521,7 +1503,6 @@ object FrStrings : Strings {
     override val crtHeating = "Chauffage"
     override val crtNoLightsWarn = "Ce terrain n'a pas d'éclairage."
     override val crtTitle = "Terrains"
-    override val crtTapToSet = "touchez pour le configurer"
     override val crtClay = "Terre battue"
     override val crtGrass = "Gazon"
     override val crtHard = "Dur"
@@ -1754,7 +1735,7 @@ object FrStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Joueurs connectés : $it" }
     override val srvInviteHow = "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne."
     override val srvInvite = "Invitation à réserver en ligne"
-    override val srvInviteHint = "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Jouer › Réserver un terrain › Scanner le QR."
+    override val srvInviteHint = "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil. Avec l'app TSM : Plus › J'ai une invitation du club › Scanner le QR."
     override val srvInviteCode: (String) -> String = { "Code : $it" }
     override val srvInviteUntil: (String) -> String = { "Valable une fois, jusqu'au $it" }
     override val srvShare = "Partager le lien"
@@ -1783,7 +1764,6 @@ object FrStrings : Strings {
     override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club"
     override val srvErrPairLocal = "L'appairage se fait seulement depuis le réseau du club : utilisez l'adresse locale (http://…:8080)."
     override val pbTitle = "Réserver un terrain"
-    override val pbEntryHint = "Si votre club a le serveur TSM : entrez avec l'invitation du secrétariat"
     override val pbEntryJoined: (String) -> String = { "$it : terrains libres et vos réservations" }
     override val pbJoinIntro = "Scannez le QR d'invitation donné par le secrétariat du club, ou collez le lien d'invitation (ou saisissez le code et l'adresse du club)."
     override val pbScan = "Scanner le QR"
@@ -1810,7 +1790,6 @@ object FrStrings : Strings {
     override val pbPrice = "Prix"
     override val pbFreePrice = "gratuit"
     override val pbPay: (String) -> String = { "Paiement : $it" }
-    override val pbBooked = "Réservé !"
     override val pbClosed = "Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas."
     override val pbRules: (Int, Int) -> String = { a, b -> "Réservation jusqu'à $a jours à l'avance, $b réservations au maximum à la fois." }
     override val pbCancelRule: (Int) -> String = { "Annulation par vous-même jusqu'à $it heures avant." }
@@ -1983,8 +1962,6 @@ object FrStrings : Strings {
     override val pfRackets = "Raquettes"
     override val pfRacketsHint = "Vos raquettes, les cordages et la raquette virtuelle"
     override val pfPadelHint = "Le choix tennis ou padel dans un nouveau match"
-    override val moreGroupDevices = "Appareils et voix"
-    override val moreGroupData = "Données"
     override val moreGroupHelp = "Aide"
     override val deskFirstTitle = "La première fois, le navigateur dira « Votre connexion n'est pas privée »"
     override val deskFirstWhy = "C'est normal et sans danger : la page est servie par ce téléphone, avec un certificat qu'il a créé lui-même et non par une société que le navigateur connaît. La liaison reste chiffrée."
@@ -2033,7 +2010,6 @@ object FrStrings : Strings {
     override val yrRival = "Le rival"
     override val yrNone = "Aucun match cette année."
     override val yrShare = "Partager"
-    override val yrYear = "Année"
     override val goalAtLeast: (String) -> String = { "au moins $it" }
     override val goalAtMost: (String) -> String = { "au plus $it" }
     override val goalReached: (String) -> String = { "Atteint le $it" }
@@ -2046,12 +2022,9 @@ object FrStrings : Strings {
     override val yrStreak: (Int) -> String = { if (it == 1) "Plus longue série : 1 victoire" else "Plus longue série : $it victoires de suite" }
     override val yrAces: (Int) -> String = { "Aces : $it" }
     override val yrWorkouts: (Int) -> String = { if (it == 1) "1 entraînement" else "$it entraînements" }
-    override val yrRecord: (Int, Int) -> String = { a, b -> "$a gagnés, $b perdus" }
     override val calTitle = "Calendrier"
     override val calHint = "Les jours avec matchs et entraînements : touchez un jour pour voir ce que vous avez fait."
     override val calNoneDay = "Rien ce jour-là."
-    override val calPrev = "Mois précédent"
-    override val calNext = "Mois suivant"
     override val pbInviteSend = "Inviter"
     override val pbBookedInvite = "Réservé ! Ci-dessous vous pouvez inviter qui joue avec vous."
     override val calStreak: (Int) -> String = { if (it == 1) "Vous avez joué ou vous êtes entraîné cette semaine" else "$it semaines de suite à jouer ou vous entraîner" }
@@ -2099,13 +2072,11 @@ object FrStrings : Strings {
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analyse du coup $a sur $b…" }
     override val tabPlay = "Jouer"
     override val tabTrain = "S'entraîner"
-    override val tabVideo = "Vidéo"
     override val tabProgress = "Progrès"
     override val tabMore = "Plus"
     override val playNewMatchHint = "Qui joue, règles et façon de compter"
     override val playResume: (String) -> String = { "Reprendre : $it" }
     override val playTournamentHint = "Americano ou Mexicano, avec des paires qui tournent"
-    override val playUseAs = "Utiliser ce téléphone comme"
     override val playAsBoardHint = "L'écran devient le tableau d'un match"
     override val playAsCamera = "Téléphone-caméra"
     override val playAsCameraHint = "Filme le match avec le score de l'arbitre"
@@ -2120,22 +2091,18 @@ object FrStrings : Strings {
     override val progressRacketsHint = "Statistiques et sensations par raquette"
     override val moreDevices = "Appareils"
     override val moreDevicesHint = "Bracelets, ceintures, télécommandes, deuxième téléphone, tableau TV"
-    override val moreVoice = "Langue et voix"
-    override val moreVoiceHint = "Langue de l'appli, voix qui annonce le score"
-    override val moreRacketsHint = "Cordages, tensions et recordages"
-    override val moreTransfer = "Transférer les matchs"
-    override val moreTransferHint = "Vers un autre téléphone, avec un code"
+    override val moreVoice = "Voix de l'arbitre"
+    override val moreVoiceHint = "Annonces vocales, moteur et voix, vos enregistrements"
     override val statusBands: (Int) -> String = { "Bracelets $it/2" }
     override val statusStraps: (Int) -> String = { "Ceintures $it" }
     override val statusCamera = "Caméra connectée"
     override val statusTv = "Tableau TV"
     override val statusNone = "Aucun appareil connecté"
     override val playTournament = "Tournoi entre amis"
-    override val step1Hint = "Étape 1 sur 2 · Qui joue. Tout est facultatif : vous pouvez continuer sans noms."
-    override val step2Hint = "Étape 2 sur 2 · Façon de compter et règles du match."
+    override val step1Hint = "Étape 1 sur 3 · Qui joue. Tout est facultatif : vous pouvez continuer sans noms."
+    override val step2Hint = "Étape 2 sur 3 · Façon de compter et règles du match."
     override val moreDetails = "Autres détails"
     override val moreDetailsHint = "Club, court et tournoi, si vous voulez"
-    override val recentPlayers = "Joueurs récents"
     override val onbWelcome = "Bienvenue dans Tennis Score Manager"
     override val onbLang = "Choisissez la langue"
     override val onbUseTitle = "Comment utiliserez-vous TSM ?"
@@ -2155,14 +2122,12 @@ object FrStrings : Strings {
     override val moreProfileHint = "Votre nom, pour les progrès et le classement"
     override val moreTour = "Présentation de l'appli"
     override val moreTourHint = "Les premières questions, à nouveau"
-    override val profileName = "Votre nom"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
     override val shareChooseHint = "L'image avec le texte convient à WhatsApp et aux réseaux sociaux ; le PDF contient aussi statistiques, déroulé et photos du match."
     override val shareImage = "Image et texte"
     override val sharePdf = "PDF complet"
-    override val tournamentButton = "Tournoi Americano ou Mexicano"
     override val tournamentTitle = "Tournoi"
     override val tournamentSubtitle = "Americano et Mexicano : les paires changent à chaque tour"
     override val tournamentNew = "Nouveau tournoi"
@@ -2267,7 +2232,6 @@ object FrStrings : Strings {
     override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez le bouton « Caster » des réglages rapides (« Diffusion de l'écran » jusqu'à Android 14, « Smart View » sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
 
     override val displayMode = "Utiliser comme tableau"
-    override val displayModeHint = "Ce téléphone affiche le score sur l'écran (câble HDMI ou Chromecast)"
     override val displaySearching = "Recherche du téléphone de l'arbitre…"
     override val displaySteps = "1. Activez le point d'accès sur l'un des deux téléphones et connectez-y l'autre.\n2. Sur le téléphone de l'arbitre : page 2 → « Tableau d'affichage TV » activé.\n3. Branchez ce téléphone à l'écran (câble USB-C/HDMI) ou castez l'écran sur un Chromecast."
     override val displayManual = "Adresse (ex. 192.168.43.1:8080)"
@@ -2289,7 +2253,6 @@ object FrStrings : Strings {
     override val racketNone = "Aucune"
     override val racketEmpty = "Aucune raquette. Ajoutez vos raquettes avec cordage et tension, puis choisissez celle utilisée avant chaque match ou entraînement."
     override val racketField = "Raquette"
-    override val racketSetupHint = "Choisissez la raquette de chaque joueur : le match retiendra la raquette, le cordage et la tension du jour."
     override val racketCatalog = "Depuis le catalogue"
     override val racketCatalogHint = "Données du fabricant, indicatives : corrigez-les si vous avez mesuré votre raquette."
     override val racketName = "Surnom (A, B…)"
@@ -2344,4 +2307,35 @@ object FrStrings : Strings {
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · logiciel libre sous licence GNU GPL version 3 ou ultérieure, sans aucune garantie." }
     override val aboutSource = "Code source"
+
+    override val unreadableTitle = "Certaines données étaient illisibles"
+    override val unreadableHint: (String) -> String = { "$it : j'en ai mis une copie de côté, que je ne touche pas. S'il manque quelque chose, touchez ici et restaurez la dernière sauvegarde." }
+    override val autoBackupOnTitle = "La sauvegarde est maintenant automatique"
+    override val autoBackupOnHint = "Chaque jour, si quelque chose a changé, une copie de toutes les données (sans vidéos) va dans Documents › Tennis Score Manager › Backup. Touchez pour la voir ou la désactiver."
+
+    override val leaveTitle = "Quitter le match ?"
+    override val leaveToMenu = "Retour au menu"
+    override val closeApp = "Fermer l'app"
+    override val keepPlaying = "Continuer à jouer"
+    override val done = "Terminé"
+    override val matchPlace = "Lieu du match"
+    override val matchPlaceHint = "D'après la position du téléphone, dans le récapitulatif et le PDF. Elle reste sur le téléphone."
+
+    override val step3Hint = "Étape 3 sur 3 · Qui sert en premier et de quel côté chacun commence."
+    override val otherRules = "Autres règles"
+    override val playerDetails = "Classement, homme/femme, raquette"
+
+    override val tabPlanning = "Planning"
+    override val playThisPhone = "Ce téléphone"
+    override val rolesFeatures = "Rôles et fonctions"
+    override val rolesFeaturesHint = "Qui utilise l'app et quoi garder dans les menus : le reste n'apparaît pas, les données restent"
+    override val moreGroupClub = "Le club"
+    override val pbMineEntryHint = "Réservations, listes d'attente, rappels et code PIN"
+    override val pbSeekEntryHint = "Trouvez avec qui jouer : une fois complet, le terrain se réserve tout seul"
+
+    override val settingsTitle = "Réglages"
+    override val settingsHint = "Langue, voix, appareils, rôles et fonctions, sauvegarde et version de l'appli"
+    override val aboutTitle = "À propos"
+    override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (compilation $n)" }
+    override val aboutSite = "Site et guide"
 }

@@ -86,7 +86,7 @@ fun StudentsScreen(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     var create by remember { mutableStateOf(false) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = s.studentsTitle,
@@ -140,7 +140,7 @@ fun StudentScreen(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     val mine = Students.sessionsOf(sessions, st.id)
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var edit by remember { mutableStateOf(false) }
     var delete by remember { mutableStateOf(false) }
     var purge by remember { mutableStateOf(false) }
@@ -158,7 +158,7 @@ fun StudentScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(if (c.activeRole.value == com.tennis.scoremanager.Role.COACH) HomeTab.STUDENTS else HomeTab.TRAIN) }, Modifier.weight(1f))
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.coachNow(st.id) }, Modifier.weight(1f))
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -417,7 +417,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
 @Composable
 private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val lines = remember(st) { c.studentMatches(st).reversed() }
     var picked by remember { mutableStateOf(emptySet<String>()) }
     AlertDialog(

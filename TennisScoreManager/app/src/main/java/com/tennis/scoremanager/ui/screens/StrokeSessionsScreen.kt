@@ -66,7 +66,7 @@ fun StrokeSessionsScreen(c: MatchController) {
     val trainee by c.trainStudent.collectAsState()
     val list = all.filter { it.stroke == stroke && it.student == trainee }
     val who = c.studentById(trainee)?.name
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val disk by produceState(emptyMap<String, Disk>(), list) {
         value = withContext(Dispatchers.IO) {
             list.associate { sess ->
