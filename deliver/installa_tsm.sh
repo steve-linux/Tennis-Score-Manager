@@ -36160,7 +36160,7 @@ fun ActivityCalendarCard(c: MatchController) {
             if (info == null) Text(s.calNoneDay, color = TsmColors.TextDim, fontSize = 13.sp)
             for (id in info?.matches.orEmpty()) history.firstOrNull { it.record.id == id }?.let { lm ->
                 val rec = lm.record
-                val names2 = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { com.tennis.scoremanager.data.PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+                val names2 = com.tennis.scoremanager.ui.screens.matchNames(rec, s)
                 TextButton(onClick = { c.openFromHistory(lm) }, modifier = Modifier.fillMaxWidth()) {
                     Text("${Reports.time(rec.startedAt ?: rec.updatedAt, lang)} · $names2", color = TsmColors.TextMain, modifier = Modifier.fillMaxWidth())
                 }
@@ -59810,14 +59810,15 @@ private fun ResumeEntries(c: MatchController, club: Boolean) {
     LaunchedEffect(Unit) { c.refreshSaved() }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
     for (rec in saved.filter { c.isClubRecord(it.id) == club }.take(2)) {
-        val names = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
         val lang = c.options.collectAsState().value.lang
         val at = rec.startedAt ?: rec.updatedAt
-        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}",
+        // Il punteggio a cui ci si era fermati, accanto alla data.
+        val hint = listOf("${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}", suspendedScore(rec)).filter { it.isNotBlank() }.joinToString(" · ")
+        Entry(Icons.Filled.History, s.playResume(matchNames(rec, s)), hint,
             onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
     }
     toDelete?.let { rec ->
-        val n = Side.entries.joinToString(" ${s.vs} ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+        val n = matchNames(rec, s, " ${s.vs} ")
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { toDelete = null },
             title = { Text(s.deleteSavedTitle) },
@@ -67105,7 +67106,7 @@ fun SuspendedList(c: MatchController) {
             ) {
                 Checkbox(checked = on, onCheckedChange = { picked = if (it) picked + rec.id else picked - rec.id })
                 Column(Modifier.weight(1f)) {
-                    Text(names(rec), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(names(rec, s), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     val at = rec.startedAt ?: rec.updatedAt
                     Text(listOfNotNull("${Reports.date(at, lang)} ${Reports.time(at, lang)}", score.ifBlank { null }, rec.setup.event.ifBlank { null }).joinToString(" · "),
                         color = TsmColors.TextDim, fontSize = 12.sp)
@@ -67120,14 +67121,28 @@ fun SuspendedList(c: MatchController) {
         AlertDialog(
             onDismissRequest = { ask = null },
             title = { Text(s.deleteSavedTitle) },
-            text = { Text(if (one != null) s.deleteSavedText(names(one)) else s.susDeleteAsk(set.size)) },
+            text = { Text(if (one != null) s.deleteSavedText(names(one, s)) else s.susDeleteAsk(set.size)) },
             confirmButton = { TextButton(onClick = { c.deleteSaved(set); picked = picked - set; ask = null }) { Text(s.delete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },
         )
     }
 }
 
-private fun names(rec: MatchRecord): String = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+/**
+ * I nomi di una partita come in campo: senza nomi scritti, "Giocatore 1 – Giocatore 2" (le partite si possono
+ * iniziare anche senza nomi).
+ */
+internal fun matchNames(rec: MatchRecord, s: com.tennis.scoremanager.ui.Strings, sep: String = " – "): String =
+    com.tennis.scoremanager.data.Names(rec.setup, s).let { n -> Side.entries.joinToString(sep) { n.short(it) } }
+
+/** Dove si era fermata una partita sospesa: "6-4 2-1"; vuoto se non si è giocato nemmeno un punto. */
+internal fun suspendedScore(rec: MatchRecord): String {
+    val st = com.tennis.scoremanager.model.ScoreEngine.replay(rec.rules, rec.events)
+    if (st.pointsPlayed == 0) return ""
+    return listOf(com.tennis.scoremanager.data.Reports.scoreLine(st, Side.P1), "${st.g1}-${st.g2}").filter { it.isNotBlank() }.joinToString(" ")
+}
+
+private fun names(rec: MatchRecord, s: com.tennis.scoremanager.ui.Strings): String = matchNames(rec, s)
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/TeamsScreen.kt

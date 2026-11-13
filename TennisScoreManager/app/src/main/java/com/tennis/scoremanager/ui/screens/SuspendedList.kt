@@ -76,7 +76,7 @@ fun SuspendedList(c: MatchController) {
             ) {
                 Checkbox(checked = on, onCheckedChange = { picked = if (it) picked + rec.id else picked - rec.id })
                 Column(Modifier.weight(1f)) {
-                    Text(names(rec), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(names(rec, s), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     val at = rec.startedAt ?: rec.updatedAt
                     Text(listOfNotNull("${Reports.date(at, lang)} ${Reports.time(at, lang)}", score.ifBlank { null }, rec.setup.event.ifBlank { null }).joinToString(" · "),
                         color = TsmColors.TextDim, fontSize = 12.sp)
@@ -91,11 +91,25 @@ fun SuspendedList(c: MatchController) {
         AlertDialog(
             onDismissRequest = { ask = null },
             title = { Text(s.deleteSavedTitle) },
-            text = { Text(if (one != null) s.deleteSavedText(names(one)) else s.susDeleteAsk(set.size)) },
+            text = { Text(if (one != null) s.deleteSavedText(names(one, s)) else s.susDeleteAsk(set.size)) },
             confirmButton = { TextButton(onClick = { c.deleteSaved(set); picked = picked - set; ask = null }) { Text(s.delete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },
         )
     }
 }
 
-private fun names(rec: MatchRecord): String = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+/**
+ * I nomi di una partita come in campo: senza nomi scritti, "Giocatore 1 – Giocatore 2" (le partite si possono
+ * iniziare anche senza nomi).
+ */
+internal fun matchNames(rec: MatchRecord, s: com.tennis.scoremanager.ui.Strings, sep: String = " – "): String =
+    com.tennis.scoremanager.data.Names(rec.setup, s).let { n -> Side.entries.joinToString(sep) { n.short(it) } }
+
+/** Dove si era fermata una partita sospesa: "6-4 2-1"; vuoto se non si è giocato nemmeno un punto. */
+internal fun suspendedScore(rec: MatchRecord): String {
+    val st = com.tennis.scoremanager.model.ScoreEngine.replay(rec.rules, rec.events)
+    if (st.pointsPlayed == 0) return ""
+    return listOf(com.tennis.scoremanager.data.Reports.scoreLine(st, Side.P1), "${st.g1}-${st.g2}").filter { it.isNotBlank() }.joinToString(" ")
+}
+
+private fun names(rec: MatchRecord, s: com.tennis.scoremanager.ui.Strings): String = matchNames(rec, s)

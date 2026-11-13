@@ -422,14 +422,15 @@ private fun ResumeEntries(c: MatchController, club: Boolean) {
     LaunchedEffect(Unit) { c.refreshSaved() }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
     for (rec in saved.filter { c.isClubRecord(it.id) == club }.take(2)) {
-        val names = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
         val lang = c.options.collectAsState().value.lang
         val at = rec.startedAt ?: rec.updatedAt
-        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}",
+        // Il punteggio a cui ci si era fermati, accanto alla data.
+        val hint = listOf("${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}", suspendedScore(rec)).filter { it.isNotBlank() }.joinToString(" · ")
+        Entry(Icons.Filled.History, s.playResume(matchNames(rec, s)), hint,
             onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
     }
     toDelete?.let { rec ->
-        val n = Side.entries.joinToString(" ${s.vs} ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+        val n = matchNames(rec, s, " ${s.vs} ")
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { toDelete = null },
             title = { Text(s.deleteSavedTitle) },

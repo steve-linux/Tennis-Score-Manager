@@ -225,7 +225,7 @@ fun ActivityCalendarCard(c: MatchController) {
             if (info == null) Text(s.calNoneDay, color = TsmColors.TextDim, fontSize = 13.sp)
             for (id in info?.matches.orEmpty()) history.firstOrNull { it.record.id == id }?.let { lm ->
                 val rec = lm.record
-                val names2 = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { com.tennis.scoremanager.data.PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+                val names2 = com.tennis.scoremanager.ui.screens.matchNames(rec, s)
                 TextButton(onClick = { c.openFromHistory(lm) }, modifier = Modifier.fillMaxWidth()) {
                     Text("${Reports.time(rec.startedAt ?: rec.updatedAt, lang)} · $names2", color = TsmColors.TextMain, modifier = Modifier.fillMaxWidth())
                 }
