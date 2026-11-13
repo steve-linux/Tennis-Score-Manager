@@ -2407,6 +2407,7 @@ interface Strings {
     val aboutTitle: String
     val aboutVersion: (String, Int) -> String
     val aboutSite: String
+    val coachTrainTitle: String
 }
 
 object ItStrings : Strings {
@@ -4734,6 +4735,7 @@ object ItStrings : Strings {
     override val aboutTitle = "Informazioni"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versione $v (build $n)" }
     override val aboutSite = "Sito e guida"
+    override val coachTrainTitle = "Allena un allievo"
 }
 
 object EnStrings : Strings {
@@ -7062,6 +7064,7 @@ object EnStrings : Strings {
     override val aboutTitle = "About"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (build $n)" }
     override val aboutSite = "Website and guide"
+    override val coachTrainTitle = "Coach a student"
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

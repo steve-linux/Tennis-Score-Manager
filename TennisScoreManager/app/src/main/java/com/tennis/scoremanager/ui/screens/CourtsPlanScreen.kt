@@ -165,7 +165,6 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
-    var server by remember { mutableStateOf(false) }
     var editBlock by remember { mutableStateOf<com.tennis.scoremanager.data.CourtBlock?>(null) }
     val occ = CourtPlans.occupied(plan, tournaments, day)
     val slots = CourtPlans.slots(day, plan.settings)
@@ -194,7 +193,8 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
         val features by c.clubFeatures.collectAsState()
         if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
-        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
+        // Solo lo stato (e la sincronizzazione ogni minuto): il server si apre da Altro.
+        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c)
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -244,7 +244,6 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     }
     if (settings) PlanSettingsDialog(c, plan.settings) { settings = false }
     if (manage) CourtsManageDialog(c) { manage = false }
-    if (server) ClubServerDialog(c) { server = false }
     if (blocks) BlocksDialog(c, onEdit = { blocks = false; editBlock = it }) { blocks = false }
     editBlock?.let { b -> BlockEditDialog(c, b, isNew = plan.blocks.none { it.id == b.id }) { editBlock = null } }
 }
@@ -416,8 +415,6 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
     var st by remember { mutableStateOf(st0) }
     var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
     var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
-    var courtsOpen by remember { mutableStateOf(false) }
-    var serverOpen by remember { mutableStateOf(false) }
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
         IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
@@ -437,11 +434,7 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
                 MoneyField(price, s.planPrice) { price = it }
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
-                GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
-                if (c.has(com.tennis.scoremanager.ClubFeature.SERVER)) {
-                    GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
-                    Text(if (c.clubServer.collectAsState().value.paired) s.srvConnected(c.clubServer.collectAsState().value.club.ifBlank { c.clubServer.collectAsState().value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
-                }
+                // I campi hanno il loro tasto nel planning e il server sta in Altro: qui solo orari e prezzi.
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
@@ -456,8 +449,6 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
-    if (courtsOpen) CourtsManageDialog(c) { courtsOpen = false }
-    if (serverOpen) ClubServerDialog(c) { serverOpen = false }
 }
 
 fun surfaceName(s: Strings, x: com.tennis.scoremanager.data.Surface): String = when (x) {

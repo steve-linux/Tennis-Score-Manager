@@ -153,7 +153,8 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     val trainee by c.trainStudent.collectAsState()
     // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
     val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
-    SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
+    // Due funzioni diverse sullo stesso motore: il tuo allenamento (Tu) e quello di un allievo (Allenatore).
+    SectionCard(if (coach) s.coachTrainTitle else s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
         if (coach) {
             TraineeRow(c)

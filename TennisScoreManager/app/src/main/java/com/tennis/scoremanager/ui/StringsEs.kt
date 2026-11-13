@@ -2336,4 +2336,5 @@ object EsStrings : Strings {
     override val aboutTitle = "Acerca de"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versión $v (compilación $n)" }
     override val aboutSite = "Web y guía"
+    override val coachTrainTitle = "Entrenar a un alumno"
 }

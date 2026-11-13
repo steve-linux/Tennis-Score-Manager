@@ -260,14 +260,14 @@ private fun RoleSwitch(c: MatchController) {
     if (settings) com.tennis.scoremanager.ui.RolesFeaturesDialog(c) { settings = false }
 }
 
-/** Allenatore: gli allievi, gli esercizi e l'allenamento dei colpi di chi si allena con lui. */
+/** Allenatore: gli allievi e l'allenamento dei colpi di chi si allena con lui, coi suoi esercizi. */
 @Composable
 private fun CoachTab(c: MatchController) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
-    Entry(Icons.Filled.FormatListNumbered, s.drillsTitle, s.drillsHint) { c.go(Screen.DRILLS) }
+    // Gli esercizi si scelgono e si gestiscono dentro l'allenamento (Esercizio › Gestisci), una strada sola.
     ServeTrainingCard(c, coach = true)
 }
 
@@ -557,22 +557,20 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
 }
 
-/** Altro del Circolo: il circolo e i suoi strumenti, nome e campi, orari e prezzi, server, segreteria da PC, backup. */
+/** Altro del Circolo: il circolo e i suoi strumenti, nome, server, segreteria da PC, backup (campi e orari nel Planning). */
 @Composable
 private fun ClubGroup(c: MatchController) {
     val s = LocalStrings.current
     val f by c.clubFeatures.collectAsState()
     val courts by c.clubCourts.collectAsState()
-    val plan by c.courtPlan.collectAsState()
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
-    var hours by remember { mutableStateOf(false) }
     var server by remember { mutableStateOf(false) }
     var backup by remember { mutableStateOf(false) }
     SectionLabel(s.moreGroupClub)
     Entry(Icons.Filled.Business, c.storage.clubName.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
-    Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
-    if (ClubFeature.PLANNING in f) Entry(Icons.Filled.Schedule, s.planSettings, null) { hours = true }
+    // Campi, orari e prezzi stanno nel Planning; senza Planning i campi (per tornei e Nuova partita) si scrivono qui.
+    if (ClubFeature.PLANNING !in f) Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
     if (ClubFeature.SERVER in f) {
         val srv by c.clubServer.collectAsState()
         Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
@@ -581,7 +579,6 @@ private fun ClubGroup(c: MatchController) {
     Entry(Icons.Filled.Backup, s.obTitle, s.obHint) { backup = true }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
-    if (hours) PlanSettingsDialog(c, plan.settings) { hours = false }
     if (server) ClubServerDialog(c) { server = false }
     if (backup) com.tennis.scoremanager.ui.OfficeBackupDialog(c) { backup = false }
 }

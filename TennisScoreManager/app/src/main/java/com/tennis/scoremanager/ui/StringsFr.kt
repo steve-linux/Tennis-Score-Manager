@@ -2338,4 +2338,5 @@ object FrStrings : Strings {
     override val aboutTitle = "À propos"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (compilation $n)" }
     override val aboutSite = "Site et guide"
+    override val coachTrainTitle = "Entraîner un élève"
 }

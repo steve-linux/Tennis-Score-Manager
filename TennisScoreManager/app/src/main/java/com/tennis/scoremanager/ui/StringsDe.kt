@@ -2335,4 +2335,5 @@ object DeStrings : Strings {
     override val aboutTitle = "Über die App"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (Build $n)" }
     override val aboutSite = "Website und Anleitung"
+    override val coachTrainTitle = "Einen Schüler trainieren"
 }

@@ -8524,8 +8524,8 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 
 - Die Rollen sagen, wer die App nutzt: Man wählt sie beim ersten Start oder unter **Mehr › Einstellungen › Rollen und Funktionen** (auch durch Antippen der Rolle oben, die immer zu sehen ist), und du kannst mehrere haben. **Jede Funktion steht in nur einer Rolle**, ohne Doppelungen; die Daten bleiben dieselben und beim Rollenwechsel geht nichts verloren.
   - **Du** (du spielst): **Spielen** (der Zähler, das Turnier unter Freunden, das Telefon als Anzeigetafel oder Kamera), **Verein** (erst nach der Einladung: Buchungen und Chat), **Trainieren**, **Fortschritt** (Wertung, Verlauf, Videos, Schläger), Mehr (deine Karte, die Spieler).
-  - **Trainer** (du trainierst andere): **Schüler** (die Liste, die Übungen und das Schlagtraining dessen, der mit dir trainiert), Mehr. Matches werden in der Rolle Du gezählt; *Jetzt trainieren* auf der Karte eines Schülers führt hierher, mit ihm schon ausgewählt.
-  - **Verein** (das Büro): **Heute** (die Buchungen des Tages, was zu kassieren ist, Mitglieder mit offenen Punkten, Turniermatches, Stunden, Begegnungen und Forderungen: ein Feld antippen, um hinzugehen), **Belegung** (die Plätze des Tages, sofort), **Mitglieder** (Mitglieder, Beiträge und Zahlungen, Tennisschule, Nachricht an alle Mitglieder), **Turniere** (Turniere, Mannschaften, Forderungsrangliste: die Matches werden von dort mit *Mit dem Zähler spielen* gezählt und unterbrochene von dort fortgesetzt), Mehr (**Der Verein**: Name, Plätze, Zeiten und Preise, Server, Büro am PC, Sicherung des Büros).
+  - **Trainer** (du trainierst andere): **Schüler** (die Liste und **Einen Schüler trainieren**, das Schlagtraining dessen, der mit dir trainiert, mit seinen Übungen), Mehr. Matches werden in der Rolle Du gezählt; *Jetzt trainieren* auf der Karte eines Schülers führt hierher, mit ihm schon ausgewählt.
+  - **Verein** (das Büro): **Heute** (die Buchungen des Tages, was zu kassieren ist, Mitglieder mit offenen Punkten, Turniermatches, Stunden, Begegnungen und Forderungen: ein Feld antippen, um hinzugehen), **Belegung** (die Plätze des Tages, sofort), **Mitglieder** (Mitglieder, Beiträge und Zahlungen, Tennisschule, Nachricht an alle Mitglieder), **Turniere** (Turniere, Mannschaften, Forderungsrangliste: die Matches werden von dort mit *Mit dem Zähler spielen* gezählt und unterbrochene von dort fortgesetzt), Mehr (**Der Verein**: Name, Server, Büro am PC, Sicherung des Büros; Plätze und Zeiten stehen in der Belegung).
   - **Mehr** enthält in jeder Rolle, was zur App gehört: **Einstellungen** (Sprache, Stimme des Schiedsrichters, Geräte, Rollen und Funktionen, Sicherung und Daten und ganz unten **Über die App** mit App-Version, Lizenz und Quellcode), **Hilfe** und **App-Einführung**.
   - **Rollen und Funktionen** lässt in den Menüs nur, was gebraucht wird. Für Du und Trainer, **Was du nutzt**: Armbänder und Fernbedienungen, Brustgurte, Schlagtraining, Video und Kamera, Fortschritte und Wertung, Schläger, Padel; was ausgeschaltet ist, erscheint nicht, und leer gebliebene Reiter verschwinden (ohne Fortschritt wandert der Verlauf nach Spielen). Für den Verein, **Vereinsfunktionen**: Grundausstattung sind Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; dazu Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik, Vereinsserver und Büro am PC. Die Daten ausgeschalteter Funktionen bleiben.
   - Das **?** oben in vielen Bildschirmen öffnet die Anleitung genau beim Abschnitt dieses Bildschirms.
@@ -8535,7 +8535,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 ### 7.10 Geführte Übungen
 
 - Eine **Übung** ist ein Schlag mit Schritten nacheinander: zum Beispiel *20 Vorhand cross, dann 20 longline*, oder beim Aufschlag *10 erste Aufschläge von der Einstandseite durch die Mitte, dann 10 nach außen…*. Es gibt vier fertige Beispiele, eines pro Schlag.
-- **Übungen** (im Reiter *Schüler* des Trainers oder über die Auswahl unter *Starten*): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
+- **Übungen** (über die Auswahl **Übung** unter *Starten*, im Schlagtraining): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
 
 ### 7.11 Vereinsmitglieder
@@ -8586,7 +8586,7 @@ Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hall
 
 ### 7.15 Plätze und Platzbelegung
 
-Mit der Rolle **Verein**, im Reiter **Belegung** (Vereinsname, Plätze und *Zeiten und Preise* stehen auch unter **Mehr**, Gruppe *Der Verein*).
+Mit der Rolle **Verein**, im Reiter **Belegung**: hier sind die Plätze und *Zeiten und Preise*; der Vereinsname steht unter **Mehr**.
 
 - **Plätze**: einen Platz anlegen (**Neuer Platz**), sortieren und antippen, um ihn zu ändern: Name (beim Umbenennen folgen Buchungen, Zeiträume und Turniermatches), Belag (**Sand, Rasen, Hartplatz**, sonstiger), **Halle oder Freiplatz**, **Licht**, **Heizung**, eigene **Preise** (pro Stunde, mit Licht, Heizungszuschlag pro Stunde; leer = die allgemeinen) und **ein oder mehrere Fotos** aus der Galerie. **Platz löschen** entfernt auch seine Buchungen ab heute.
 - **Platzbelegung**: der Tag mit einem Platz pro Spalte und einer Stunde pro Zeile (◀ ▶ und der Kalender zum Tageswechsel). Ein freies Feld antippen zum Buchen: Platz, Tag, Uhrzeit und Dauer, Art (Spiel, Stunde, gesperrt, sonstiges), Spieler aus der Datenbank und Gäste, Notiz. Der **Preis** rechnet sich selbst (Licht ab der eingestellten Uhrzeit, Heizung auf Wunsch) und lässt sich ändern; **Den Spielern berechnen** teilt ihn gleichmäßig und trägt ihn in *Beiträge und Zahlungen* ein. **Wie bezahlt wird**: *am Platz* oder *online*; ist die Buchung berechnet, markiert **Bezahlt: …** sie mit einer der Zahlungsarten des Vereins als bezahlt. **Jede Woche, N Wochen lang** wiederholt die Buchung (Tage mit belegtem Platz werden übersprungen und die App sagt welche). **Spieler benachrichtigen** schickt Platz, Tag, Uhrzeit und Zahlungsweise.
@@ -9112,8 +9112,8 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 
 - Roles say who uses the app: you choose them at the first start or in **More › Settings › Roles and features** (also by tapping the role at the top, always shown) and you can have more than one. **Each feature lives in one role only**, with no duplicates; the data is the same and switching role loses nothing.
   - **You** (you play): **Play** (the scorer, the friends tournament, the phone as scoreboard or camera), **Club** (only after the invitation: bookings and chat), **Train**, **Progress** (rating, history, videos, rackets), More (your card, the players).
-  - **Coach** (you coach): **Students** (the list, the drills and the stroke practice of whoever trains with you), More. Matches are scored from the You role; *Practise now* on a student's card brings you here with that student already chosen.
-  - **Club** (the office): **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Planner** (the day's courts, straight away), **Members** (members, fees and payments, tennis school, message to all members), **Tournaments** (tournaments, teams, challenge ladder: matches are scored from there with *Play with the scorer* and the ones left unfinished are resumed from there), More (**The club**: name, courts, hours and prices, server, office from PC, office backup).
+  - **Coach** (you coach): **Students** (the list and **Coach a student**, the stroke practice of whoever trains with you, with its drills), More. Matches are scored from the You role; *Practise now* on a student's card brings you here with that student already chosen.
+  - **Club** (the office): **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Planner** (the day's courts, straight away), **Members** (members, fees and payments, tennis school, message to all members), **Tournaments** (tournaments, teams, challenge ladder: matches are scored from there with *Play with the scorer* and the ones left unfinished are resumed from there), More (**The club**: name, server, office from PC, office backup; courts and hours are in the Planner).
   - **More** has the app-wide things in every role: **Settings** (language, umpire's voice, devices, roles and features, backup and data and, at the bottom, **About** with the app version, the licence and the source code), **Help** and **App introduction**.
   - **Roles and features** keeps in the menus only what you need. For You and Coach, **What you use**: wristbands and remotes, heart rate straps, stroke training, video and camera, progress and rating, rackets, padel; what you turn off does not appear and tabs left empty disappear (without Progress the history moves to Play). For the Club, **Club features**: the basics are Members, Fees and payments, Court planner and Club tournaments; the extras are Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. The data of features turned off stays.
   - The **?** at the top of many screens opens the guide right at that screen's section.
@@ -9123,7 +9123,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 ### 7.10 Guided drills
 
 - A **drill** is a stroke and steps in a row: for example *20 cross-court forehands, then 20 down the line*, or for the serve *10 first serves from the deuce side to the T, then 10 wide…*. There are four ready examples, one per stroke.
-- **Drills** (from the coach's *Students* tab, or from the choice under *Start*): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
+- **Drills** (from the **Drill** choice under *Start*, in stroke practice): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
 
 ### 7.11 Club members
@@ -9174,7 +9174,7 @@ The app prepares the messages, already written and personal ("Hi Mario, …"), a
 
 ### 7.15 Courts and planner
 
-With the **Club** role, on the **Planner** tab (club name, courts and *Hours and prices* are also in **More**, in the *The club* group).
+With the **Club** role, on the **Planner** tab: courts and *Hours and prices* are here; the club name is in **More**.
 
 - **Courts**: create a court (**New court**), put them in order and tap one to change it: name (renaming it, bookings, periods and tournament matches follow), surface (**clay, grass, hard**, other), **indoor or outdoor**, **lights**, **heating**, its own **prices** (per hour, with lights, heating supplement per hour; empty = the general ones) and **one or more photos** from the gallery. **Delete the court** also removes its bookings from today on.
 - **Court planner**: the day with one court per column and one hour per row (◀ ▶ and the calendar to change day). Tap a free slot to book: court, day, time and length, type (play, lesson, closed, other), players from the database and guests, a note. The **price** is worked out by itself (lights from the set time, heating if asked) and can be changed; **Charge the players** splits it equally and puts it into *Fees and payments*. **How it's paid**: *at the court* or *online*; once charged, **Paid: …** marks it paid with one of the club's payment methods. **Every week for N weeks** repeats the booking (dates when the court is taken are skipped and the app tells you). **Notify the players** sends court, day, time and how to pay.
@@ -9699,8 +9699,8 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 
 - Los roles dicen quién usa la app: se eligen en el primer arranque o en **Más › Ajustes › Roles y funciones** (también tocando el rol de arriba, siempre visible) y puedes tener más de uno. **Cada función está en un solo rol**, sin duplicados; los datos son los mismos y al cambiar de rol no se pierde nada.
   - **Tú** (juegas): **Jugar** (el marcador, el torneo entre amigos, el teléfono como marcador o cámara), **Club** (solo después de la invitación: reservas y chat), **Entrenar**, **Progresos** (rating, historial, vídeos, raquetas), Más (tu ficha, los jugadores).
-  - **Entrenador** (entrenas a otros): **Alumnos** (la lista, los ejercicios y el entrenamiento de golpes de quien entrena contigo), Más. Los partidos se marcan desde el rol Tú; *Entrenar ahora* en la ficha de un alumno trae aquí con él ya elegido.
-  - **Club** (la secretaría): **Hoy** (las reservas del día, lo que hay que cobrar, los socios por regularizar, los partidos de los torneos, las clases, los encuentros y los desafíos: toca un recuadro para ir), **Reservas** (las pistas del día, al momento), **Socios** (socios, cuotas y pagos, escuela de tenis, mensaje a todos los socios), **Torneos** (torneos, equipos, clasificación por desafíos: los partidos se marcan desde ahí con *Jugar con el marcador* y los que quedaron a medias se reanudan desde ahí), Más (**El club**: nombre, pistas, horarios y precios, servidor, secretaría desde el PC, copia de la secretaría).
+  - **Entrenador** (entrenas a otros): **Alumnos** (la lista y **Entrenar a un alumno**, el entrenamiento de golpes de quien entrena contigo, con sus ejercicios), Más. Los partidos se marcan desde el rol Tú; *Entrenar ahora* en la ficha de un alumno trae aquí con él ya elegido.
+  - **Club** (la secretaría): **Hoy** (las reservas del día, lo que hay que cobrar, los socios por regularizar, los partidos de los torneos, las clases, los encuentros y los desafíos: toca un recuadro para ir), **Reservas** (las pistas del día, al momento), **Socios** (socios, cuotas y pagos, escuela de tenis, mensaje a todos los socios), **Torneos** (torneos, equipos, clasificación por desafíos: los partidos se marcan desde ahí con *Jugar con el marcador* y los que quedaron a medias se reanudan desde ahí), Más (**El club**: nombre, servidor, secretaría desde el PC, copia de la secretaría; las pistas y los horarios están en Reservas).
   - **Más** tiene en todos los roles lo que es de la app: **Ajustes** (idioma, voz del árbitro, dispositivos, roles y funciones, copia de seguridad y datos y, al final, **Acerca de** con la versión de la app, la licencia y el código fuente), **Ayuda** y **Presentación de la app**.
   - **Roles y funciones** deja en los menús solo lo que hace falta. Para Tú y Entrenador, **Lo que usas**: pulseras y mandos, bandas de pulso, entrenamiento de golpes, vídeo y cámara, progresos y rating, raquetas, pádel; lo que se apaga no aparece y las pestañas que quedan vacías desaparecen (sin Progresos el historial pasa a Jugar). Para el Club, **Funciones del club**: de base Socios, Cuotas y pagos, Planning de pistas y Torneos del club; además Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas, Servidor del club y Secretaría desde el PC. Los datos de las funciones apagadas se quedan.
   - El **?** de arriba en muchas pantallas abre la guía justo en la sección de esa pantalla.
@@ -9710,7 +9710,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 ### 7.10 Ejercicios guiados
 
 - Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
-- **Ejercicios** (desde la pestaña *Alumnos* del entrenador, o desde la elección bajo *Empezar*): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
+- **Ejercicios** (desde la elección **Ejercicio** bajo *Empezar*, en el entrenamiento de golpes): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
 
 ### 7.11 Socios del club
@@ -9761,7 +9761,7 @@ La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y a
 
 ### 7.15 Pistas y planning
 
-Con el rol **Club**, en la pestaña **Reservas** (el nombre del club, las pistas y *Horarios y precios* están también en **Más**, grupo *El club*).
+Con el rol **Club**, en la pestaña **Reservas**: aquí están las pistas y *Horarios y precios*; el nombre del club está en **Más**.
 
 - **Las pistas**: se crea una pista (**Nueva pista**), se ordenan y se toca una para cambiarla: nombre (al renombrarla, reservas, periodos y partidos de los torneos la siguen), superficie (**tierra batida, hierba, cemento**, otra), **cubierta o descubierta**, **luz**, **calefacción**, sus **precios** (por hora, con luz, suplemento de calefacción por hora; vacíos = los generales) y **una o varias fotos** de la galería. **Eliminar la pista** quita también sus reservas desde hoy.
 - **Planning de pistas**: el día con una pista por columna y una hora por fila (◀ ▶ y el calendario para cambiar de día). Toca una casilla libre para reservar: pista, día, hora y duración, tipo (juego, clase, cerrada, otro), jugadores de la base de datos e invitados, nota. El **precio** se calcula solo (luz desde la hora fijada, calefacción si se pide) y se puede cambiar; **Cargar a los jugadores** lo divide a partes iguales y lo lleva a *Cuotas y pagos*. **Cómo se paga**: *en la pista* u *online*; con la reserva cargada, **Pagado: …** la marca pagada con uno de los medios de pago del club. **Cada semana durante N semanas** repite la reserva (las fechas con la pista ocupada se saltan y la app lo dice). **Avisar a los jugadores** envía pista, día, hora y cómo pagar.
@@ -10286,8 +10286,8 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 
 - Les rôles disent qui utilise l'appli : on les choisit au premier démarrage ou dans **Plus › Réglages › Rôles et fonctions** (aussi en touchant le rôle en haut, toujours affiché) et on peut en avoir plusieurs. **Chaque fonction se trouve dans un seul rôle**, sans doublons ; les données sont les mêmes et changer de rôle ne fait rien perdre.
   - **Vous** (vous jouez) : **Jouer** (le marqueur, le tournoi entre amis, le téléphone comme tableau ou caméra), **Club** (seulement après l'invitation : réservations et discussion), **S'entraîner**, **Progrès** (classement, historique, vidéos, raquettes), Plus (votre fiche, les joueurs).
-  - **Entraîneur** (vous entraînez) : **Élèves** (la liste, les exercices et l'entraînement des coups de celui qui s'entraîne avec vous), Plus. Les matchs se comptent depuis le rôle Vous ; *S'entraîner maintenant* dans la fiche d'un élève amène ici avec lui déjà choisi.
-  - **Club** (le secrétariat) : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs des tournois, les cours, les rencontres et les défis : touchez un encadré pour y aller), **Planning** (les terrains du jour, tout de suite), **Adhérents** (adhérents, cotisations et paiements, école de tennis, message à tous les adhérents), **Tournois** (tournois, équipes, classement à défis : les matchs se comptent de là avec *Jouer avec le marqueur* et ceux laissés en cours se reprennent de là), Plus (**Le club** : nom, terrains, horaires et tarifs, serveur, secrétariat sur PC, sauvegarde du secrétariat).
+  - **Entraîneur** (vous entraînez) : **Élèves** (la liste et **Entraîner un élève**, l'entraînement des coups de celui qui s'entraîne avec vous, avec ses exercices), Plus. Les matchs se comptent depuis le rôle Vous ; *S'entraîner maintenant* dans la fiche d'un élève amène ici avec lui déjà choisi.
+  - **Club** (le secrétariat) : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs des tournois, les cours, les rencontres et les défis : touchez un encadré pour y aller), **Planning** (les terrains du jour, tout de suite), **Adhérents** (adhérents, cotisations et paiements, école de tennis, message à tous les adhérents), **Tournois** (tournois, équipes, classement à défis : les matchs se comptent de là avec *Jouer avec le marqueur* et ceux laissés en cours se reprennent de là), Plus (**Le club** : nom, serveur, secrétariat sur PC, sauvegarde du secrétariat ; terrains et horaires sont dans le Planning).
   - **Plus** contient dans chaque rôle ce qui concerne l'appli : **Réglages** (langue, voix de l'arbitre, appareils, rôles et fonctions, sauvegarde et données et, tout en bas, **À propos** avec la version de l'appli, la licence et le code source), **Aide** et **Présentation de l'appli**.
   - **Rôles et fonctions** ne garde dans les menus que ce qui sert. Pour Vous et Entraîneur, **Ce que vous utilisez** : bracelets et télécommandes, ceintures cardio, entraînement des coups, vidéo et caméra, progrès et classement, raquettes, padel ; ce qu'on éteint n'apparaît plus et les onglets restés vides disparaissent (sans Progrès, l'historique passe dans Jouer). Pour le Club, **Fonctions du club** : de base Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains, Serveur du club et Secrétariat sur PC. Les données des fonctions éteintes restent.
   - Le **?** en haut de nombreux écrans ouvre le guide à la section de cet écran.
@@ -10297,7 +10297,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 ### 7.10 Exercices guidés
 
 - Un **exercice** est un coup et des étapes à la suite : par exemple *20 coups droits croisés, puis 20 le long de la ligne*, ou pour le service *10 premières côté égalité au T, puis 10 extérieures…*. Il y a quatre exemples prêts, un par coup.
-- **Exercices** (depuis l'onglet *Élèves* de l'entraîneur, ou depuis le choix sous *Commencer*) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
+- **Exercices** (depuis le choix **Exercice** sous *Commencer*, dans l'entraînement des coups) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
 
 ### 7.11 Adhérents du club
@@ -10348,7 +10348,7 @@ L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, �
 
 ### 7.15 Terrains et planning
 
-Avec le rôle **Club**, dans l'onglet **Planning** (le nom du club, les terrains et *Horaires et tarifs* sont aussi dans **Plus**, groupe *Le club*).
+Avec le rôle **Club**, dans l'onglet **Planning** : ici se trouvent les terrains et *Horaires et tarifs* ; le nom du club est dans **Plus**.
 
 - **Les terrains** : on crée un terrain (**Nouveau terrain**), on les met en ordre et on en touche un pour le modifier : nom (en le renommant, réservations, périodes et matchs des tournois suivent), surface (**terre battue, gazon, dur**, autre), **couvert ou extérieur**, **éclairage**, **chauffage**, ses **tarifs** (à l'heure, avec éclairage, supplément chauffage à l'heure ; vides = les tarifs généraux) et **une ou plusieurs photos** de la galerie. **Supprimer le terrain** retire aussi ses réservations à partir d'aujourd'hui.
 - **Planning des terrains** : la journée avec un terrain par colonne et une heure par ligne (◀ ▶ et le calendrier pour changer de jour). Touchez une case libre pour réserver : terrain, jour, heure et durée, type (jeu, leçon, fermé, autre), joueurs de la base et invités, remarque. Le **tarif** se calcule tout seul (éclairage à partir de l'heure choisie, chauffage si on le demande) et peut être modifié ; **Facturer aux joueurs** le divise en parts égales et le met dans *Cotisations et paiements*. **Comment on paie** : *au terrain* ou *en ligne* ; une fois facturée, **Payé : …** la marque payée avec un des moyens de paiement du club. **Chaque semaine pendant N semaines** répète la réservation (les dates où le terrain est pris sont sautées et l'appli les indique). **Prévenir les joueurs** envoie terrain, jour, heure et comment payer.
@@ -10873,8 +10873,8 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 
 - I ruoli dicono chi usa l'app: si scelgono alla prima apertura o in **Altro › Impostazioni › Ruoli e funzioni** (anche toccando il ruolo in alto, sempre visibile) e puoi averne più di uno. **Ogni funzione sta in un ruolo solo**, senza doppioni; i dati sono gli stessi e cambiando ruolo non si perde niente.
   - **Tu** (giochi): **Gioca** (il segnapunti, il torneo tra amici, il telefono come tabellone o telecamera), **Circolo** (solo dopo l'invito: prenotazioni e chat), **Allenati**, **Progressi** (rating, storico, video, racchette), Altro (la tua scheda, i giocatori).
-  - **Allenatore** (alleni): **Allievi** (l'elenco, gli esercizi e l'allenamento dei colpi di chi si allena con te), Altro. Le partite si segnano dal ruolo Tu; *Allena ora* nella scheda di un allievo porta qui con lui già scelto.
-  - **Circolo** (la segreteria): **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Planning** (i campi del giorno, subito), **Soci** (soci, quote e pagamenti, scuola tennis, messaggio a tutti i soci), **Tornei** (tornei, squadre, classifica a sfida: le partite si segnano da lì con *Gioca col segnapunti* e quelle lasciate a metà si riprendono da lì), Altro (**Il circolo**: nome, campi, orari e prezzi, server, segreteria da PC, backup della segreteria).
+  - **Allenatore** (alleni): **Allievi** (l'elenco e **Allena un allievo**, l'allenamento dei colpi di chi si allena con te, coi suoi esercizi), Altro. Le partite si segnano dal ruolo Tu; *Allena ora* nella scheda di un allievo porta qui con lui già scelto.
+  - **Circolo** (la segreteria): **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Planning** (i campi del giorno, subito), **Soci** (soci, quote e pagamenti, scuola tennis, messaggio a tutti i soci), **Tornei** (tornei, squadre, classifica a sfida: le partite si segnano da lì con *Gioca col segnapunti* e quelle lasciate a metà si riprendono da lì), Altro (**Il circolo**: nome, server, segreteria da PC, backup della segreteria; campi e orari stanno nel Planning).
   - **Altro** ha in ogni ruolo le cose dell'app: **Impostazioni** (lingua, voce dell'arbitro, dispositivi, ruoli e funzioni, backup e dati e, in fondo, **Informazioni** con la versione dell'app, la licenza e il codice sorgente), **Aiuto** e **Presentazione dell'app**.
   - **Ruoli e funzioni** tiene nei menu solo quello che serve. Per Tu e Allenatore, **Cosa usi**: braccialetti e telecomandi, fasce cardio, allenamento dei colpi, video e telecamera, progressi e rating, racchette, padel; quello che si spegne non compare e le schede rimaste vuote spariscono (senza Progressi lo storico va in Gioca). Per il Circolo, **Funzioni del circolo**: di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi, Server del circolo e Segreteria da PC. I dati delle funzioni spente restano.
   - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
@@ -10884,7 +10884,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 ### 7.10 Esercizi guidati
 
 - Un **esercizio** è un colpo e dei passi in fila: per esempio *20 dritti incrociati, poi 20 lungolinea*, o per il servizio *10 prime da destra al T, poi 10 esterne…*. Ci sono quattro esempi pronti, uno per colpo.
-- **Esercizi** (dalla scheda *Allievi* dell'allenatore, o dalla scelta sotto *Inizia*): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
+- **Esercizi** (dalla scelta **Esercizio** sotto *Inizia*, nell'allenamento dei colpi): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
 
 ### 7.11 Soci del circolo
@@ -10935,7 +10935,7 @@ L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l
 
 ### 7.15 Campi e planning
 
-Col ruolo **Circolo**, nella scheda **Planning** (nome del circolo, campi e *Orari e prezzi* sono anche in **Altro**, nel gruppo *Il circolo*).
+Col ruolo **Circolo**, nella scheda **Planning**: qui ci sono i campi e *Orari e prezzi*; il nome del circolo sta in **Altro**.
 
 - **I campi**: si crea un campo (**Nuovo campo**), lo si mette in ordine e lo si tocca per cambiarlo: nome (rinominandolo, prenotazioni, periodi e partite dei tornei lo seguono), superficie (**terra, erba, cemento**, altro), **coperto o scoperto**, **luci**, **riscaldamento**, i **prezzi** suoi (all'ora, con le luci, supplemento riscaldamento all'ora; vuoti = quelli generali) e **una o più foto** dalla galleria. **Elimina il campo** toglie anche le sue prenotazioni da oggi in poi.
 - **Planning dei campi**: il giorno con un campo per colonna e un'ora per riga (◀ ▶ e il calendario per cambiare giorno). Tocca una casella libera per prenotare: campo, giorno, ora e durata, tipo (gioco, lezione, chiuso, altro), giocatori dal database e ospiti, nota. Il **prezzo** si calcola da solo (luci dall'ora scelta, riscaldamento se lo si chiede) e si può cambiare; **Addebita ai giocatori** lo divide in parti uguali e lo mette in *Quote e pagamenti*. **Come si paga**: *al campo* o *online*; a prenotazione addebitata, **Pagato: …** la segna pagata con uno dei modi di pagamento del circolo. **Ogni settimana per N settimane** ripete la prenotazione (le date col campo occupato si saltano e l'app le dice). **Avvisa i giocatori** manda campo, giorno, ora e come si paga.
@@ -11460,8 +11460,8 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 
 - Os papéis dizem quem usa o app: escolhem-se na primeira vez ou em **Mais › Configurações › Papéis e funções** (também tocando no papel no alto, sempre visível) e você pode ter mais de um. **Cada função fica num só papel**, sem duplicatas; os dados são os mesmos e ao mudar de papel nada se perde.
   - **Você** (você joga): **Jogar** (o marcador, o torneio entre amigos, o telefone como placar ou câmera), **Clube** (só depois do convite: reservas e chat), **Treinar**, **Progresso** (rating, histórico, vídeos, raquetes), Mais (a sua ficha, os jogadores).
-  - **Treinador** (você treina outros): **Alunos** (a lista, os exercícios e o treino de golpes de quem treina com você), Mais. As partidas são marcadas no papel Você; *Treinar agora* na ficha de um aluno traz para cá com ele já escolhido.
-  - **Clube** (a secretaria): **Hoje** (as reservas do dia, o que há para receber, os sócios a regularizar, as partidas dos torneios, as aulas, os confrontos e os desafios: toque num quadro para ir até lá), **Agenda** (as quadras do dia, na hora), **Sócios** (sócios, mensalidades e pagamentos, escola de tênis, mensagem a todos os sócios), **Torneios** (torneios, equipes, classificação por desafios: as partidas são marcadas dali com *Jogar com o marcador* e as que ficaram pela metade retomam-se dali), Mais (**O clube**: nome, quadras, horários e preços, servidor, secretaria no PC, cópia da secretaria).
+  - **Treinador** (você treina outros): **Alunos** (a lista e **Treinar um aluno**, o treino de golpes de quem treina com você, com os seus exercícios), Mais. As partidas são marcadas no papel Você; *Treinar agora* na ficha de um aluno traz para cá com ele já escolhido.
+  - **Clube** (a secretaria): **Hoje** (as reservas do dia, o que há para receber, os sócios a regularizar, as partidas dos torneios, as aulas, os confrontos e os desafios: toque num quadro para ir até lá), **Agenda** (as quadras do dia, na hora), **Sócios** (sócios, mensalidades e pagamentos, escola de tênis, mensagem a todos os sócios), **Torneios** (torneios, equipes, classificação por desafios: as partidas são marcadas dali com *Jogar com o marcador* e as que ficaram pela metade retomam-se dali), Mais (**O clube**: nome, servidor, secretaria no PC, cópia da secretaria; quadras e horários ficam na Agenda).
   - **Mais** tem em todos os papéis o que é do app: **Configurações** (idioma, voz do árbitro, dispositivos, papéis e funções, backup e dados e, no fim, **Sobre o app** com a versão do app, a licença e o código-fonte), **Ajuda** e **Apresentação do app**.
   - **Papéis e funções** deixa nos menus só o que é preciso. Para Você e Treinador, **O que usas**: pulseiras e controles, cintas cardíacas, treino de golpes, vídeo e câmera, progressos e rating, raquetes, padel; o que se desliga não aparece e as abas que ficam vazias somem (sem Progresso o histórico vai para Jogar). Para o Clube, **Funções do clube**: de base Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; além disso Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras, Servidor do clube e Secretaria no PC. Os dados das funções desligadas ficam.
   - O **?** no alto de muitas telas abre o guia justamente na seção daquela tela.
@@ -11471,7 +11471,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 ### 7.10 Exercícios guiados
 
 - Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
-- **Exercícios** (na aba *Alunos* do treinador, ou na escolha embaixo de *Começar*): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
+- **Exercícios** (na escolha **Exercício** embaixo de *Começar*, no treino de golpes): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
 
 ### 7.11 Sócios do clube
@@ -11522,7 +11522,7 @@ O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre 
 
 ### 7.15 Quadras e agenda
 
-Com o papel **Clube**, na aba **Agenda** (o nome do clube, as quadras e *Horários e preços* ficam também em **Mais**, grupo *O clube*).
+Com o papel **Clube**, na aba **Agenda**: aqui ficam as quadras e *Horários e preços*; o nome do clube fica em **Mais**.
 
 - **As quadras**: crie uma quadra (**Nova quadra**), ordene e toque numa para mudá-la: nome (ao renomear, reservas, períodos e partidas dos torneios acompanham), piso (**saibro, grama, rápida**, outro), **coberta ou descoberta**, **iluminação**, **aquecimento**, os **preços** dela (por hora, com iluminação, adicional de aquecimento por hora; vazios = os gerais) e **uma ou mais fotos** da galeria. **Excluir a quadra** remove também as reservas dela a partir de hoje.
 - **Agenda das quadras**: o dia com uma quadra por coluna e uma hora por linha (◀ ▶ e o calendário para mudar de dia). Toque num horário livre para reservar: quadra, dia, hora e duração, tipo (jogo, aula, fechada, outro), jogadores do banco de dados e convidados, nota. O **preço** se calcula sozinho (iluminação a partir da hora definida, aquecimento se pedido) e pode ser alterado; **Cobrar dos jogadores** divide em partes iguais e leva para *Mensalidades e pagamentos*. **Como se paga**: *na quadra* ou *online*; com a reserva cobrada, **Pago: …** marca como paga com um dos meios de pagamento do clube. **Toda semana por N semanas** repete a reserva (as datas com a quadra ocupada são puladas e o app avisa). **Avisar os jogadores** envia quadra, dia, hora e como pagar.
@@ -38322,7 +38322,8 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     val trainee by c.trainStudent.collectAsState()
     // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
     val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
-    SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
+    // Due funzioni diverse sullo stesso motore: il tuo allenamento (Tu) e quello di un allievo (Allenatore).
+    SectionCard(if (coach) s.coachTrainTitle else s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
         if (coach) {
             TraineeRow(c)
@@ -41198,6 +41199,7 @@ interface Strings {
     val aboutTitle: String
     val aboutVersion: (String, Int) -> String
     val aboutSite: String
+    val coachTrainTitle: String
 }
 
 object ItStrings : Strings {
@@ -43525,6 +43527,7 @@ object ItStrings : Strings {
     override val aboutTitle = "Informazioni"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versione $v (build $n)" }
     override val aboutSite = "Sito e guida"
+    override val coachTrainTitle = "Allena un allievo"
 }
 
 object EnStrings : Strings {
@@ -45853,6 +45856,7 @@ object EnStrings : Strings {
     override val aboutTitle = "About"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (build $n)" }
     override val aboutSite = "Website and guide"
+    override val coachTrainTitle = "Coach a student"
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -48206,6 +48210,7 @@ object DeStrings : Strings {
     override val aboutTitle = "Über die App"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (Build $n)" }
     override val aboutSite = "Website und Anleitung"
+    override val coachTrainTitle = "Einen Schüler trainieren"
 }
 TSM_EOF
 
@@ -50549,6 +50554,7 @@ object EsStrings : Strings {
     override val aboutTitle = "Acerca de"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versión $v (compilación $n)" }
     override val aboutSite = "Web y guía"
+    override val coachTrainTitle = "Entrenar a un alumno"
 }
 TSM_EOF
 
@@ -52894,6 +52900,7 @@ object FrStrings : Strings {
     override val aboutTitle = "À propos"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (compilation $n)" }
     override val aboutSite = "Site et guide"
+    override val coachTrainTitle = "Entraîner un élève"
 }
 TSM_EOF
 
@@ -55240,6 +55247,7 @@ object PtStrings : Strings {
     override val aboutTitle = "Sobre o app"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versão $v (compilação $n)" }
     override val aboutSite = "Site e guia"
+    override val coachTrainTitle = "Treinar um aluno"
 }
 TSM_EOF
 
@@ -56474,7 +56482,7 @@ private fun whenText(t: Long, lang: com.tennis.scoremanager.model.Lang): String 
  * Mentre il planning è aperto, ogni minuto si manda e si riprende tutto, così le prenotazioni online arrivano da sole.
  */
 @Composable
-fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
+fun ServerStatusLine(c: MatchController, onClick: (() -> Unit)? = null) {
     val s = LocalStrings.current
     val conf by c.clubServer.collectAsState()
     val lang = c.options.collectAsState().value.lang
@@ -56483,7 +56491,7 @@ fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
         while (true) { c.syncServerNow(); kotlinx.coroutines.delay(60_000) }
     }
     val err = conf.error
-    Row(Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Icon(if (err == null) Icons.Filled.Cloud else Icons.Filled.CloudOff, null, tint = if (err == null) TsmColors.Ball else TsmColors.Orange)
         Text(
             if (err != null) srvErrorText(s, err) else if (conf.lastSync > 0) s.srvLastSync(whenText(conf.lastSync, lang)) else s.srvNeverSynced,
@@ -57760,7 +57768,6 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
-    var server by remember { mutableStateOf(false) }
     var editBlock by remember { mutableStateOf<com.tennis.scoremanager.data.CourtBlock?>(null) }
     val occ = CourtPlans.occupied(plan, tournaments, day)
     val slots = CourtPlans.slots(day, plan.settings)
@@ -57789,7 +57796,8 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
         val features by c.clubFeatures.collectAsState()
         if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
-        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
+        // Solo lo stato (e la sincronizzazione ogni minuto): il server si apre da Altro.
+        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c)
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -57839,7 +57847,6 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     }
     if (settings) PlanSettingsDialog(c, plan.settings) { settings = false }
     if (manage) CourtsManageDialog(c) { manage = false }
-    if (server) ClubServerDialog(c) { server = false }
     if (blocks) BlocksDialog(c, onEdit = { blocks = false; editBlock = it }) { blocks = false }
     editBlock?.let { b -> BlockEditDialog(c, b, isNew = plan.blocks.none { it.id == b.id }) { editBlock = null } }
 }
@@ -58011,8 +58018,6 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
     var st by remember { mutableStateOf(st0) }
     var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
     var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
-    var courtsOpen by remember { mutableStateOf(false) }
-    var serverOpen by remember { mutableStateOf(false) }
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
         IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
@@ -58032,11 +58037,7 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
                 MoneyField(price, s.planPrice) { price = it }
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
-                GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
-                if (c.has(com.tennis.scoremanager.ClubFeature.SERVER)) {
-                    GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
-                    Text(if (c.clubServer.collectAsState().value.paired) s.srvConnected(c.clubServer.collectAsState().value.club.ifBlank { c.clubServer.collectAsState().value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
-                }
+                // I campi hanno il loro tasto nel planning e il server sta in Altro: qui solo orari e prezzi.
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
@@ -58051,8 +58052,6 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
-    if (courtsOpen) CourtsManageDialog(c) { courtsOpen = false }
-    if (serverOpen) ClubServerDialog(c) { serverOpen = false }
 }
 
 fun surfaceName(s: Strings, x: com.tennis.scoremanager.data.Surface): String = when (x) {
@@ -59648,14 +59647,14 @@ private fun RoleSwitch(c: MatchController) {
     if (settings) com.tennis.scoremanager.ui.RolesFeaturesDialog(c) { settings = false }
 }
 
-/** Allenatore: gli allievi, gli esercizi e l'allenamento dei colpi di chi si allena con lui. */
+/** Allenatore: gli allievi e l'allenamento dei colpi di chi si allena con lui, coi suoi esercizi. */
 @Composable
 private fun CoachTab(c: MatchController) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
-    Entry(Icons.Filled.FormatListNumbered, s.drillsTitle, s.drillsHint) { c.go(Screen.DRILLS) }
+    // Gli esercizi si scelgono e si gestiscono dentro l'allenamento (Esercizio › Gestisci), una strada sola.
     ServeTrainingCard(c, coach = true)
 }
 
@@ -59945,22 +59944,20 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
 }
 
-/** Altro del Circolo: il circolo e i suoi strumenti, nome e campi, orari e prezzi, server, segreteria da PC, backup. */
+/** Altro del Circolo: il circolo e i suoi strumenti, nome, server, segreteria da PC, backup (campi e orari nel Planning). */
 @Composable
 private fun ClubGroup(c: MatchController) {
     val s = LocalStrings.current
     val f by c.clubFeatures.collectAsState()
     val courts by c.clubCourts.collectAsState()
-    val plan by c.courtPlan.collectAsState()
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
-    var hours by remember { mutableStateOf(false) }
     var server by remember { mutableStateOf(false) }
     var backup by remember { mutableStateOf(false) }
     SectionLabel(s.moreGroupClub)
     Entry(Icons.Filled.Business, c.storage.clubName.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
-    Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
-    if (ClubFeature.PLANNING in f) Entry(Icons.Filled.Schedule, s.planSettings, null) { hours = true }
+    // Campi, orari e prezzi stanno nel Planning; senza Planning i campi (per tornei e Nuova partita) si scrivono qui.
+    if (ClubFeature.PLANNING !in f) Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
     if (ClubFeature.SERVER in f) {
         val srv by c.clubServer.collectAsState()
         Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
@@ -59969,7 +59966,6 @@ private fun ClubGroup(c: MatchController) {
     Entry(Icons.Filled.Backup, s.obTitle, s.obHint) { backup = true }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
-    if (hours) PlanSettingsDialog(c, plan.settings) { hours = false }
     if (server) ClubServerDialog(c) { server = false }
     if (backup) com.tennis.scoremanager.ui.OfficeBackupDialog(c) { backup = false }
 }

@@ -2339,4 +2339,5 @@ object PtStrings : Strings {
     override val aboutTitle = "Sobre o app"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versão $v (compilação $n)" }
     override val aboutSite = "Site e guia"
+    override val coachTrainTitle = "Treinar um aluno"
 }
