@@ -270,6 +270,9 @@ fun PlayerEditDialog(
     var student by remember { mutableStateOf(player?.student ?: asStudent) }
     var phone by remember { mutableStateOf(player?.phone.orEmpty()) }
     var email by remember { mutableStateOf(player?.email.orEmpty()) }
+    var guardian by remember { mutableStateOf(player?.guardian.orEmpty()) }
+    var guardianPhone by remember { mutableStateOf(player?.guardianPhone.orEmpty()) }
+    var consentAt by remember { mutableStateOf(player?.consentAt) }
     val lang = c.options.collectAsState().value.lang
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
@@ -350,6 +353,10 @@ fun PlayerEditDialog(
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
                 androidx.compose.material3.OutlinedTextField(email, { email = it.trim().take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.memberEmail) },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email))
+                // Per gli allievi: il genitore (minorenni) e il consenso a riprese e dati.
+                if (student) GuardianFields(guardian, guardianPhone, consentAt != null, { guardian = it }, { guardianPhone = it }) { on ->
+                    consentAt = if (on) consentAt ?: System.currentTimeMillis() else null
+                }
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
                 val choices = rackets.filter { !it.retired || it.id == racket }
                 Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -373,6 +380,7 @@ fun PlayerEditDialog(
                     hand = hand, racket = racket, student = student,
                     sex = sex, birth = birth, heightCm = height.toIntOrNull(), weightKg = weight.toIntOrNull(), club = club.trim(), backhand = backhand,
                     phone = phone.trim(), email = email.trim(),
+                    guardian = guardian.trim(), guardianPhone = guardianPhone.trim(), consentAt = consentAt,
                 )
                 c.savePlayer(p)
                 // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.

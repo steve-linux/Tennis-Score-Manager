@@ -154,8 +154,6 @@ fun HomeScreen(c: MatchController) {
     ScreenScaffold(
         onHelp = { c.openHelp(tabHelp(tab)) },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
-        // Il ruolo attivo sempre in alto: da lì si passa a un altro e si scelgono ruoli e funzioni.
-        action = { RoleSwitch(c) },
     ) {
         // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
         if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
@@ -225,48 +223,19 @@ fun roleIcon(r: com.tennis.scoremanager.Role): ImageVector = when (r) {
     com.tennis.scoremanager.Role.CLUB -> Icons.Filled.Business
 }
 
-/** Il ruolo attivo, sempre in alto: toccandolo si passa a un altro dei propri ruoli o si scelgono ruoli e funzioni. */
-@Composable
-private fun RoleSwitch(c: MatchController) {
-    val s = LocalStrings.current
-    val role by c.activeRole.collectAsState()
-    val roles by c.roles.collectAsState()
-    var open by remember { mutableStateOf(false) }
-    var settings by remember { mutableStateOf(false) }
-    Box {
-        Row(
-            Modifier.clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { open = true }.padding(horizontal = 10.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(roleIcon(role), null, tint = TsmColors.Ball, modifier = Modifier.size(18.dp))
-            Text(" " + roleName(s, role) + " ▾", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        }
-        androidx.compose.material3.DropdownMenu(open, { open = false }) {
-            for (r in com.tennis.scoremanager.Role.entries.filter { it in roles }) {
-                androidx.compose.material3.DropdownMenuItem(
-                    text = { Text(roleName(s, r), fontWeight = if (r == role) FontWeight.Bold else FontWeight.Normal) },
-                    leadingIcon = { Icon(roleIcon(r), null, tint = if (r == role) TsmColors.Ball else TsmColors.TextDim) },
-                    onClick = { open = false; c.setActiveRole(r) },
-                )
-            }
-            androidx.compose.material3.HorizontalDivider()
-            androidx.compose.material3.DropdownMenuItem(
-                text = { Text(s.rolesFeatures) },
-                leadingIcon = { Icon(Icons.Filled.Tune, null, tint = TsmColors.TextDim) },
-                onClick = { open = false; settings = true },
-            )
-        }
-    }
-    if (settings) com.tennis.scoremanager.ui.RolesFeaturesDialog(c) { settings = false }
-}
-
-/** Allenatore: gli allievi e l'allenamento dei colpi di chi si allena con lui, coi suoi esercizi. */
+/** Allenatore: le partite sospese, gli allievi, l'agenda e l'allenamento dei colpi di chi si allena con lui. */
 @Composable
 private fun CoachTab(c: MatchController) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
+    // Le partite lasciate a metà (da "Partita con…"), da riprendere con un tocco.
+    ResumeEntries(c, club = false)
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
+    // L'agenda delle lezioni: la prossima nella riga, e dentro il promemoria di quelle di domani.
+    val book by c.coachBook.collectAsState()
+    val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
+    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coAgendaHint) { c.openLessons() }
     // Gli esercizi si scelgono e si gestiscono dentro l'allenamento (Esercizio › Gestisci), una strada sola.
     ServeTrainingCard(c, coach = true)
 }
@@ -282,7 +251,8 @@ private fun TournamentsTab(c: MatchController) {
     if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
     if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint, main = ClubFeature.TOURNAMENTS !in f) { c.openTeams() }
     if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint, main = ClubFeature.TOURNAMENTS !in f && ClubFeature.TEAMS !in f) { c.openLadders() }
-    ResumeEntries(c, club = true)
+    // La segreteria non segna punteggi: dal campo si passa al ruolo Tu (Gioca › Partite del circolo).
+    if (ClubFeature.TOURNAMENTS in f || ClubFeature.TEAMS in f || ClubFeature.LADDER in f) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
 }
 
 /** Circolo: soci, quote, scuola tennis e il messaggio a tutti i soci. */
@@ -393,8 +363,14 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
-    // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
-    ResumeEntries(c, club = false)
+    // La partita lasciata a metà (anche di un torneo del circolo) e la rivincita dell'ultima: quello che di solito si
+    // vuole fare subito.
+    ResumeEntries(c, club = null)
+    // Le partite di tornei, squadre e sfide del circolo pronte da giocare: si segnano da qui, il risultato torna lì.
+    val ready = com.tennis.scoremanager.ui.clubMatchesReady(c)
+    var clubMatches by remember { mutableStateOf(false) }
+    if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
+    if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
     history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
         val su = last.record.setup
         if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
@@ -412,16 +388,16 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
 }
 
 /**
- * Le partite sospese più recenti, da riprendere con un tocco; tenendo premuto si eliminano (con conferma). Ognuna sta
- * in un profilo solo: quelle di un torneo, di una squadra o di una sfida ([club]) nel Circolo, le altre in Gioca.
+ * Le partite sospese più recenti, da riprendere con un tocco; tenendo premuto si eliminano (con conferma). In Gioca
+ * (Tu) tutte ([club] null), anche quelle di tornei, squadre e sfide del circolo; in Allievi le altre ([club] false).
  */
 @Composable
-private fun ResumeEntries(c: MatchController, club: Boolean) {
+private fun ResumeEntries(c: MatchController, club: Boolean?) {
     val s = LocalStrings.current
     val saved by c.saved.collectAsState()
     LaunchedEffect(Unit) { c.refreshSaved() }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
-    for (rec in saved.filter { c.isClubRecord(it.id) == club }.take(2)) {
+    for (rec in saved.filter { club == null || c.isClubRecord(it.id) == club }.take(2)) {
         val lang = c.options.collectAsState().value.lang
         val at = rec.startedAt ?: rec.updatedAt
         // Il punteggio a cui ci si era fermati, accanto alla data.
@@ -534,7 +510,8 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
     val s = LocalStrings.current
     when (role) {
         com.tennis.scoremanager.Role.CLUB -> ClubGroup(c)
-        com.tennis.scoremanager.Role.PLAYER -> {
+        // Tu e Allenatore: il tuo nome (va sui report dell'allenatore), il database dei giocatori e l'invito del circolo.
+        com.tennis.scoremanager.Role.PLAYER, com.tennis.scoremanager.Role.COACH -> {
             var profile by remember { mutableStateOf(false) }
             val players by c.players.collectAsState()
             val mine = remember(players) { c.me() }
@@ -545,11 +522,14 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
             }
             if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
             Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+            // L'allenatore non ha Progressi: le racchette (sue e degli allievi) stanno qui.
+            if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.playerFeatures.collectAsState().value) {
+                Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+            }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
             val bookingAccounts by c.bookingAccounts.collectAsState()
             if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
         }
-        com.tennis.scoremanager.Role.COACH -> {}
     }
     Entry(Icons.Filled.Settings, s.settingsTitle, s.settingsHint) { c.go(Screen.SETTINGS) }
     SectionLabel(s.moreGroupHelp)

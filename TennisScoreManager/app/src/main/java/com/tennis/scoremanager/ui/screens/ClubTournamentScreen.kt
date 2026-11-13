@@ -442,7 +442,8 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("$a – $b", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                if (!m.played && m.a != null && m.b != null) BigButton(s.ctPlayLive, Icons.Filled.PlayArrow, { onDone(); c.playClubMatch(t, m.copy(court = court)) }, Modifier.fillMaxWidth())
+                // Il punteggio dal campo si tiene nel ruolo Tu (Gioca › Partite del circolo): qui il risultato a mano.
+                if (!m.played && m.a != null && m.b != null) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
                 Text(s.ctWinner, color = TsmColors.TextDim, fontSize = 13.sp)
                 val sides = listOf(m.a, m.b)
                 Segmented(listOf(SegOption(a), SegOption(b)), sides.indexOf(winner).takeIf { winner != null } ?: -1, { winner = sides[it] }, columns = 1)

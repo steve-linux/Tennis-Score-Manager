@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,8 +46,8 @@ import com.tennis.scoremanager.ui.TsmColors
 private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
 
 /**
- * Altro › Impostazioni, le stesse per tutti i profili: la lingua in cima, poi la voce dell'arbitro, i dispositivi, ruoli
- * e funzioni, backup e dati, e in fondo le informazioni sull'app (versione, licenza e codice sorgente: la GPL chiede di
+ * Altro › Impostazioni, le stesse per tutti i profili: la ruolo e la lingua in cima, poi la voce dell'arbitro, i
+ * dispositivi, backup e dati, e in fondo le informazioni sull'app (versione, licenza e codice sorgente: la GPL chiede di
  * mostrarli).
  */
 @Composable
@@ -64,6 +63,9 @@ fun SettingsScreen(c: MatchController) {
         title = s.settingsTitle, subtitle = "Tennis Score Manager ${BuildConfig.VERSION_NAME}", icon = Icons.Filled.Settings,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // Il ruolo in cima: si cambia da qui (le schede cambiano, i dati restano).
+        val role by c.activeRole.collectAsState()
+        Entry(com.tennis.scoremanager.ui.screens.roleIcon(role), s.roleNow(com.tennis.scoremanager.ui.screens.roleName(s, role)), s.rolesFeaturesHint, main = true) { roles = true }
         SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             // Bloccata mentre si generano i file vocali (sono nella lingua di adesso).
@@ -79,7 +81,6 @@ fun SettingsScreen(c: MatchController) {
         }
         Entry(Icons.Filled.RecordVoiceOver, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
         Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
-        Entry(Icons.Filled.Tune, s.rolesFeatures, s.rolesFeaturesHint) { roles = true }
         Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
         SectionCard(s.aboutTitle, Icons.Filled.Info) {
             Text("Tennis Score Manager", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)

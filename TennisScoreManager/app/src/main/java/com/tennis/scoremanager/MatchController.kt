@@ -131,7 +131,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
+enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, LESSONS, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -140,17 +140,16 @@ enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, 
 enum class HomeTab { PLAY, BOOKING, TRAIN, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
 
 /**
- * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
- * Ogni funzione sta in un ruolo solo, senza doppioni: il segnapunti, i video e lo storico sono di Tu, gli allievi
- * dell'Allenatore, la segreteria del Circolo (che segna le sue partite dal torneo, dall'incontro o dalla sfida). Solo
- * Altro, con impostazioni e aiuto, è di tutti. La scheda Circolo di chi gioca ([HomeTab.BOOKING]) compare solo dopo
- * l'invito della segreteria.
+ * Chi usa l'app, un ruolo solo per volta (si cambia dalle Impostazioni, i dati restano): ogni funzione sta in un ruolo
+ * solo. Tu gioca (segnapunti, video, storico); l'Allenatore segue gli allievi e li fa giocare con "Partita con…"; il
+ * Circolo gestisce (segreteria, planning, soci, tornei). Altro, con impostazioni e aiuto, è di tutti. La scheda Circolo
+ * di chi gioca o allena ([HomeTab.BOOKING]) compare solo dopo l'invito della segreteria.
  */
 enum class Role(val tabs: List<HomeTab>) {
     /** Tu: giochi (segnapunti, tabellone, video), il tuo circolo, ti alleni, i tuoi progressi. */
     PLAYER(listOf(HomeTab.PLAY, HomeTab.BOOKING, HomeTab.TRAIN, HomeTab.PROGRESS, HomeTab.MORE)),
-    /** Allenatore: gli allievi, i loro allenamenti dei colpi e gli esercizi. */
-    COACH(listOf(HomeTab.STUDENTS, HomeTab.MORE)),
+    /** Allenatore: gli allievi (allenamenti, agenda, partite), il circolo dove prenota i campi. */
+    COACH(listOf(HomeTab.STUDENTS, HomeTab.BOOKING, HomeTab.MORE)),
     /** Circolo: oggi (cosa serve adesso), il planning, i soci, i tornei; il circolo e i suoi strumenti in Altro. */
     CLUB(listOf(HomeTab.TODAY, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.TOURNAMENTS, HomeTab.MORE)),
 }
@@ -1026,7 +1025,11 @@ class MatchController(
     val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
 
     fun refreshServeSessions() {
-        scope.launch { serveSessions.value = withContext(io) { storage.loadServeSessions() } }
+        scope.launch {
+            serveSessions.value = withContext(io) { storage.loadServeSessions() }
+            // Gli obiettivi degli allievi si controllano sulle sessioni nuove.
+            checkStudentGoals()
+        }
     }
 
     /**
@@ -1346,10 +1349,8 @@ class MatchController(
         storage.coachStudent.takeIf { id -> students.value.any { it.id == id } }?.let { setTrainStudent(it) }
     }
 
-    /** "Allena ora" dalla scheda di un allievo: si passa al profilo Allenatore (acceso, se non lo era) con lui scelto. */
+    /** "Allena ora" dalla scheda di un allievo (ruolo Allenatore): lui scelto, pronto per Inizia. */
     fun coachNow(id: String) {
-        if (Role.COACH !in roles.value) setRoles(roles.value + Role.COACH)
-        setActiveRole(Role.COACH)
         setTrainStudent(id)
         home(HomeTab.STUDENTS)
     }
@@ -1363,6 +1364,98 @@ class MatchController(
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
         nav.push(Screen.STUDENT)
+    }
+
+    // ---- Allenatore: diario, obiettivi, agenda, pacchetti di lezioni, gruppi ----
+
+    val coachBook = MutableStateFlow(storage.loadCoachBook())
+
+    private fun putCoach(b: com.tennis.scoremanager.data.CoachBook) {
+        coachBook.value = b
+        scope.launch(io) { storage.saveCoachBook(b) }
+    }
+
+    fun addDiary(student: String, text: String, at: Long = System.currentTimeMillis()) {
+        val t = text.trim().take(2000)
+        if (t.isEmpty()) return
+        val b = coachBook.value
+        putCoach(b.copy(diary = b.diary + com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), student, at, t)))
+    }
+
+    fun deleteDiary(id: String) = coachBook.value.let { b -> putCoach(b.copy(diary = b.diary.filter { it.id != id })) }
+
+    /** Un obiettivo nuovo; se è già raggiunto lo si sa subito. */
+    fun addStudentGoal(student: String, stroke: com.tennis.scoremanager.data.TrainedStroke, targetPct: Int, window: Int) {
+        val now = System.currentTimeMillis()
+        val g = com.tennis.scoremanager.data.StudentGoal(com.tennis.scoremanager.data.Coaching.newId("g"), student, stroke, targetPct, window, createdAt = now)
+        val reached = com.tennis.scoremanager.data.Coaching.goalStatus(g, serveSessions.value).reached(g)
+        coachBook.value.let { b -> putCoach(b.copy(goals = b.goals + g.copy(reachedAt = if (reached) now else null))) }
+    }
+
+    fun deleteStudentGoal(id: String) = coachBook.value.let { b -> putCoach(b.copy(goals = b.goals.filter { it.id != id })) }
+
+    /** Dopo un allenamento: gli obiettivi raggiunti adesso prendono la data. */
+    private fun checkStudentGoals() {
+        val b = coachBook.value
+        if (b.goals.none { it.reachedAt == null }) return
+        val next = com.tennis.scoremanager.data.Coaching.markReached(b, serveSessions.value, System.currentTimeMillis())
+        if (next != b) putCoach(next)
+    }
+
+    fun saveLesson(l: com.tennis.scoremanager.data.CoachLesson) = coachBook.value.let { b ->
+        putCoach(b.copy(lessons = b.lessons.filter { it.id != l.id } + l))
+    }
+
+    fun deleteLesson(id: String) = coachBook.value.let { b -> putCoach(b.copy(lessons = b.lessons.filter { it.id != id })) }
+
+    fun savePack(p: com.tennis.scoremanager.data.LessonPack) = coachBook.value.let { b ->
+        putCoach(b.copy(packs = b.packs.filter { it.id != p.id } + p))
+    }
+
+    fun deletePack(id: String) = coachBook.value.let { b -> putCoach(b.copy(packs = b.packs.filter { it.id != id })) }
+
+    fun saveGroup(g: com.tennis.scoremanager.data.StudentGroup) = coachBook.value.let { b ->
+        putCoach(b.copy(groups = b.groups.filter { it.id != g.id } + g))
+    }
+
+    fun deleteGroup(id: String) = coachBook.value.let { b -> putCoach(b.copy(groups = b.groups.filter { it.id != id })) }
+
+    fun openLessons() {
+        refreshPlayers()
+        nav.push(Screen.LESSONS)
+    }
+
+    /** "lunedì 16 novembre, 18:00 · Campo 2". */
+    fun lessonWhen(l: com.tennis.scoremanager.data.CoachLesson): String {
+        val lang = options.value.lang
+        return listOfNotNull("${com.tennis.scoremanager.data.Notices.day(l.start, lang)}, ${Reports.time(l.start, lang)}", l.place.ifBlank { null }).joinToString(" · ")
+    }
+
+    /** Un messaggio libero agli allievi (a chi è minorenne arriva al genitore): WhatsApp, SMS o email dall'app degli avvisi. */
+    fun noticeStudents(ids: List<String>) {
+        val now = System.currentTimeMillis()
+        val rec = ids.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.coWriteTitle, strings.studentsTitle, "", rec, editable = true))
+    }
+
+    /** Il promemoria delle lezioni [lessons]: a ogni allievo la sua (giorno, ora, dove). */
+    fun noticeLessons(lessons: List<com.tennis.scoremanager.data.CoachLesson>) {
+        val s = strings; val now = System.currentTimeMillis()
+        val rec = lessons.sortedBy { it.start }.flatMap { l ->
+            l.students.mapNotNull { playerById(it) }.map { p ->
+                val text = listOfNotNull(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.coRemind(lessonWhen(l)), l.note.ifBlank { null }).joinToString("\n")
+                com.tennis.scoremanager.data.Notices.recipient(p, text, now)
+            }
+        }.distinctBy { it.id }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.coLessons, s.coLessons, lessons.firstOrNull()?.let { s.coRemind(lessonWhen(it)) }.orEmpty(), rec))
+    }
+
+    /** Partita tra due allievi dalla scheda: i due in campo, e si va in Nuova partita (Indietro torna alla scheda). */
+    fun matchWith(a: String, b: String) {
+        val pa = playerById(a) ?: return
+        val pb = playerById(b) ?: return
+        updateSetup { it.copy(doubles = false, p1a = pa.name, p1aId = pa.id, p2a = pb.name, p2aId = pb.id, p1b = "", p1bId = "", p2b = "", p2bId = "") }
+        go(Screen.SETUP)
     }
 
     // ---- Obiettivi (Progressi) ----
@@ -2661,7 +2754,7 @@ class MatchController(
         nav.push(Screen.NOTICE)
     }
 
-    private fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
+    fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
         t.entries.firstOrNull { it.id == id }?.let { e -> e.players.mapIndexed { i, p -> playerById(p)?.name ?: e.names.getOrNull(i).orEmpty() }.joinToString(" / ") } ?: "—"
 
     private fun peopleOf(t: com.tennis.scoremanager.data.ClubTournament, entryIds: Collection<String?>): List<com.tennis.scoremanager.data.PlayerProfile> =
@@ -2798,38 +2891,17 @@ class MatchController(
 
     // ---------------------------------------------------------------- ruoli
 
-    /** I ruoli scelti (almeno uno) e quello attivo, che decide le schede della prima schermata. */
-    val roles = MutableStateFlow(storage.roles.mapNotNull { r -> Role.entries.firstOrNull { it.name == r } }.toSet().ifEmpty { setOf(Role.PLAYER) })
-    val activeRole = MutableStateFlow(Role.entries.firstOrNull { it.name == storage.activeRole }?.takeIf { it in roles.value } ?: roles.value.first())
-
-    /** Cambia i ruoli; se quello attivo non c'è più si passa al primo rimasto. Almeno uno resta sempre. */
-    fun setRoles(set: Set<Role>) {
-        val v = set.ifEmpty { setOf(Role.PLAYER) }
-        roles.value = Role.entries.filter { it in v }.toSet()
-        storage.roles = roles.value.map { it.name }.toSet()
-        if (activeRole.value !in roles.value) setActiveRole(roles.value.first())
-    }
-
     /**
-     * Una volta sola, da quando ogni funzione sta in un profilo solo: chi ha già dati di un profilo che non ha acceso
-     * (partite, allenamenti e prenotazioni sono di Tu, gli allievi dell'Allenatore) se lo ritrova tra i ruoli, così
-     * non perde di vista niente. Il ruolo attivo resta quello di prima.
+     * Il ruolo, uno solo: decide le schede della prima schermata e cosa c'è in Altro. I dati sono gli stessi per tutti e
+     * cambiando ruolo (Impostazioni) non si perde niente. Chi aveva più ruoli accesi resta in quello che stava usando.
      */
-    private fun addRolesForData() {
-        if (storage.rolesForDataDone) return
-        scope.launch {
-            val add = withContext(io) {
-                buildSet {
-                    if (storage.loadPlayers().any { it.student }) add(Role.COACH)
-                    if (storage.loadFinished().isNotEmpty() || storage.loadUnfinished().isNotEmpty() || storage.loadWorkouts().isNotEmpty() ||
-                        storage.loadServeSessions().any { it.student == null } || storage.loadBookingAccounts().isNotEmpty()
-                    ) add(Role.PLAYER)
-                }
-            }
-            storage.rolesForDataDone = true
-            if ((add - roles.value).isNotEmpty()) setRoles(roles.value + add)
-        }
-    }
+    val activeRole = MutableStateFlow(
+        Role.entries.firstOrNull { it.name == storage.activeRole && it.name in storage.roles }
+            ?: Role.entries.firstOrNull { it.name in storage.roles } ?: Role.PLAYER,
+    )
+
+    /** Il ruolo come insieme (sempre di uno solo), per chi chiede "c'è il Circolo?". */
+    val roles = MutableStateFlow(setOf(activeRole.value))
 
     /** La partita [id] è di una competizione del circolo (torneo, incontro di squadra, sfida)? Si riprende da lì. */
     fun isClubRecord(id: String): Boolean =
@@ -2837,10 +2909,12 @@ class MatchController(
             teams.value.any { t -> t.fixtures.any { f -> f.rubbers.any { it.record == id } } } ||
             ladders.value.any { l -> l.challenges.any { it.record == id } }
 
-    /** Passa a un ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
-    fun setActiveRole(r: Role) {
+    /** Sceglie il ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
+    fun setRole(r: Role) {
         activeRole.value = r
+        roles.value = setOf(r)
         storage.activeRole = r.name
+        storage.roles = setOf(r.name)
         homeTab.value = r.tabs.first()
     }
 
@@ -4803,7 +4877,6 @@ class MatchController(
     fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        addRolesForData()
         if (live.value != null || summary.value != null || screen.value != Screen.HOME) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return

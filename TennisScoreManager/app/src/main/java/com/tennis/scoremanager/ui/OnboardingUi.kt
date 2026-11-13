@@ -73,16 +73,16 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     val o by c.options.collectAsState()
     var step by remember { mutableIntStateOf(0) }
     var use by remember { mutableStateOf<Use?>(null) }
-    // Ruoli (Tu, Allenatore, Circolo), circolo e promemoria del backup.
-    var roles by remember { mutableStateOf(c.roles.value) }
+    // Il ruolo (Tu, Allenatore o Circolo), il circolo e il promemoria del backup.
+    var role by remember { mutableStateOf(c.activeRole.value) }
     var club by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
     var reminder by remember { mutableStateOf(true) }
     var autoBackup by remember { mutableStateOf(c.storage.personalBackupAuto) }
     val steps = Step.entries.filter { st ->
         when (st) {
-            Step.USE -> com.tennis.scoremanager.Role.PLAYER in roles
-            Step.CLUB -> com.tennis.scoremanager.Role.CLUB in roles
+            Step.USE -> role == com.tennis.scoremanager.Role.PLAYER
+            Step.CLUB -> role == com.tennis.scoremanager.Role.CLUB
             else -> true
         }
     }
@@ -95,8 +95,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         // Solo alla prima presentazione si propone cosa tenere: rifatta da Altro, non spegne niente.
         val firstTime = !c.storage.onboarded
         c.storage.onboarded = true
-        c.setRoles(roles)
-        if (com.tennis.scoremanager.Role.CLUB in roles) {
+        c.setRole(role)
+        if (role == com.tennis.scoremanager.Role.CLUB) {
             c.storage.clubName = club
             c.setClubCourts(courts.lines())
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
@@ -115,10 +115,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             c.setMe(p)
             if (c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = p.name, p1aId = p.id) }
         }
-        // Si parte dal primo ruolo scelto; per chi gioca, dalla scheda dell'uso detto.
-        val first = com.tennis.scoremanager.Role.entries.first { it in roles }
-        c.setActiveRole(first)
-        if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
+        // Si parte dalla prima scheda del ruolo; per chi gioca, da quella dell'uso detto.
+        if (role == com.tennis.scoremanager.Role.PLAYER) when (use) {
             Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
             Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
@@ -152,7 +150,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     Step.ROLES -> {
                         Text(s.onbRolesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                        RolesPicker(roles) { roles = it }
+                        RolePicker(role) { role = it }
                     }
                     Step.CLUB -> {
                         Text(s.onbClubTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)

@@ -2408,6 +2408,75 @@ interface Strings {
     val aboutVersion: (String, Int) -> String
     val aboutSite: String
     val coachTrainTitle: String
+
+    val coDiary: String
+    val coDiaryHint: String
+    val coDiaryAdd: String
+    val coDiaryNone: String
+    val coGoals: String
+    val coGoalNew: String
+    val coGoalsNone: String
+    val coGoalLine: (String, Int) -> String
+    val coGoalNow: (Int, Int) -> String
+    val coGoalNoData: String
+    val coGoalReached: (String) -> String
+    val coGoalTarget: String
+    val coGoalWindow: String
+    val coAgenda: String
+    val coAgendaHint: String
+    val coNextLesson: (String) -> String
+    val coLessons: String
+    val coLessonNew: String
+    val coNoLessons: String
+    val coUpcoming: String
+    val coToMark: String
+    val coDone: String
+    val coCancelLesson: String
+    val coCancelled: String
+    val coWhen: String
+    val coMinutes: (Int) -> String
+    val coPlace: String
+    val coNote: String
+    val coWho: String
+    val coRemindTomorrow: (Int) -> String
+    val coRemind: (String) -> String
+    val coNotify: String
+    val coPacks: String
+    val coPackNew: String
+    val coPackLine: (Int, String) -> String
+    val coBalance: (Int, Int, Int) -> String
+    val coDue: (String) -> String
+    val coPaid: String
+    val coMarkPaid: String
+    val coPackLessons: String
+    val coPackPrice: String
+    val coPackPaidNow: String
+    val coWrite: String
+    val coWriteTitle: String
+    val coGuardian: String
+    val coGuardianPhone: String
+    val coConsent: String
+    val coConsentHint: String
+    val coConsentGiven: (String) -> String
+    val coConsentMissing: String
+    val coMatchWith: String
+    val coSearch: String
+    val coSortName: String
+    val coSortLast: String
+    val coAway: String
+    val coAwayHint: String
+    val coGroups: String
+    val coGroupNew: String
+    val coGroupName: String
+    val coGroupCount: (Int) -> String
+    val coAll: String
+    val coNever: String
+    val roleNow: (String) -> String
+    val coBookCourt: String
+    val ctScoreFromYou: String
+    val cmTitle: String
+    val cmHint: (Int) -> String
+    val cmPick: String
 }
 
 object ItStrings : Strings {
@@ -3546,10 +3615,10 @@ object ItStrings : Strings {
     override val roleCoach = "Allenatore"
     override val roleClub = "Circolo"
     override val roleYouHint = "Giochi: segnapunti, allenamenti, video, progressi, racchette e le prenotazioni al tuo circolo."
-    override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, esercizi, movimento, report e note. Le partite si segnano dal ruolo Tu."
+    override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, esercizi, agenda delle lezioni, pacchetti, report e note; con Partita con… li fai giocare tra loro."
     override val roleClubHint = "La segreteria: oggi, planning dei campi, soci e quote, scuola tennis, tornei e squadre."
-    override val rolesTitle = "Ruoli"
-    override val rolesHint = "Ogni ruolo ha le sue funzioni, senza doppioni. Puoi averne più di uno (chi gioca e allena): in alto passi dall'uno all'altro, i dati sono gli stessi."
+    override val rolesTitle = "Ruolo"
+    override val rolesHint = "Scegli un ruolo solo: l'app mostra le sue funzioni e nient'altro. Puoi cambiarlo quando vuoi dalle Impostazioni: i dati restano tutti."
     override val clubNoName = "Il circolo"
     override val clubNoCourts = "Tocca per scrivere nome e campi"
     override val clubCourtsLabel = "Campi (uno per riga)"
@@ -4724,18 +4793,87 @@ object ItStrings : Strings {
 
     override val tabPlanning = "Planning"
     override val playThisPhone = "Questo telefono"
-    override val rolesFeatures = "Ruoli e funzioni"
-    override val rolesFeaturesHint = "Chi usa l'app e cosa tenere nei menu: il resto non compare, i dati restano"
+    override val rolesFeatures = "Ruolo e funzioni"
+    override val rolesFeaturesHint = "Cambia ruolo e scegli cosa tenere nei menu: il resto non compare, i dati restano"
     override val moreGroupClub = "Il circolo"
     override val pbMineEntryHint = "Prenotazioni, liste d'attesa, promemoria e PIN"
     override val pbSeekEntryHint = "Trova con chi giocare: al completo il campo si prenota da solo"
 
     override val settingsTitle = "Impostazioni"
-    override val settingsHint = "Lingua, voce, dispositivi, ruoli e funzioni, backup e versione dell'app"
+    override val settingsHint = "Lingua, voce, dispositivi, ruolo e funzioni, backup e versione dell'app"
     override val aboutTitle = "Informazioni"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Versione $v (build $n)" }
     override val aboutSite = "Sito e guida"
     override val coachTrainTitle = "Allena un allievo"
+
+    override val coDiary = "Diario delle lezioni"
+    override val coDiaryHint = "Cosa avete fatto e cosa resta da fare: una riga per lezione, con la data."
+    override val coDiaryAdd = "Aggiungi al diario"
+    override val coDiaryNone = "Ancora niente nel diario."
+    override val coGoals = "Obiettivi"
+    override val coGoalNew = "Nuovo obiettivo"
+    override val coGoalsNone = "Nessun obiettivo: fissane uno su un colpo."
+    override val coGoalLine: (String, Int) -> String = { k, p -> "$k: $p% dentro" }
+    override val coGoalNow: (Int, Int) -> String = { p, n -> "ora $p% nelle ultime $n sessioni" }
+    override val coGoalNoData = "Ancora nessuna sessione di questo colpo"
+    override val coGoalReached: (String) -> String = { "Raggiunto il $it" }
+    override val coGoalTarget = "Colpi dentro (%)"
+    override val coGoalWindow = "Sulla media delle ultime sessioni"
+    override val coAgenda = "Agenda delle lezioni"
+    override val coAgendaHint = "Lezioni in calendario, promemoria e lezioni rimaste"
+    override val coNextLesson: (String) -> String = { "Prossima: $it" }
+    override val coLessons = "Lezioni"
+    override val coLessonNew = "Nuova lezione"
+    override val coNoLessons = "Nessuna lezione in programma."
+    override val coUpcoming = "In programma"
+    override val coToMark = "Passate, da segnare"
+    override val coDone = "Fatta"
+    override val coCancelLesson = "Annulla la lezione"
+    override val coCancelled = "Annullata"
+    override val coWhen = "Quando"
+    override val coMinutes: (Int) -> String = { "$it min" }
+    override val coPlace = "Dove (campo, circolo)"
+    override val coNote = "Nota"
+    override val coWho = "Chi"
+    override val coRemindTomorrow: (Int) -> String = { "Ricorda le lezioni di domani ($it)" }
+    override val coRemind: (String) -> String = { "Ti ricordo la lezione: $it." }
+    override val coNotify = "Avvisa"
+    override val coPacks = "Pacchetti di lezioni"
+    override val coPackNew = "Nuovo pacchetto"
+    override val coPackLine: (Int, String) -> String = { n, p -> "$n lezioni · $p" }
+    override val coBalance: (Int, Int, Int) -> String = { a, b, c -> "Comprate $a, fatte $b, rimaste $c" }
+    override val coDue: (String) -> String = { "Da pagare: $it" }
+    override val coPaid = "Pagato"
+    override val coMarkPaid = "Segna pagato"
+    override val coPackLessons = "Numero di lezioni"
+    override val coPackPrice = "Prezzo del pacchetto"
+    override val coPackPaidNow = "Già pagato"
+    override val coWrite = "Scrivi"
+    override val coWriteTitle = "Messaggio agli allievi"
+    override val coGuardian = "Genitore o tutore"
+    override val coGuardianPhone = "Telefono del genitore"
+    override val coConsent = "Consenso a riprese e dati"
+    override val coConsentHint = "Segna quando l'allievo (o il genitore, se è minorenne) ha accettato di essere ripreso e che i suoi dati restino qui."
+    override val coConsentGiven: (String) -> String = { "Consenso dato il $it" }
+    override val coConsentMissing = "Consenso a riprese e dati non segnato"
+    override val coMatchWith = "Partita con…"
+    override val coSearch = "Cerca un allievo"
+    override val coSortName = "Per nome"
+    override val coSortLast = "Per ultima volta"
+    override val coAway = "Da rivedere"
+    override val coAwayHint = "Non li vedi da più di 2 settimane"
+    override val coGroups = "Gruppi"
+    override val coGroupNew = "Nuovo gruppo"
+    override val coGroupName = "Nome del gruppo"
+    override val coGroupCount: (Int) -> String = { if (it == 1) "1 allievo" else "$it allievi" }
+    override val coAll = "Tutti"
+    override val coNever = "mai visto"
+    override val roleNow: (String) -> String = { "Ruolo: $it" }
+    override val coBookCourt = "Prenota il campo"
+    override val ctScoreFromYou = "Per tenere il punteggio dal campo: Impostazioni › Ruolo › Tu, poi Gioca › Partite del circolo. Il risultato torna qui da solo."
+    override val cmTitle = "Partite del circolo"
+    override val cmHint: (Int) -> String = { if (it == 1) "1 partita di torneo, squadra o sfida da giocare" else "$it partite di tornei, squadre e sfide da giocare" }
+    override val cmPick = "Tocca una partita: Nuova partita si apre con giocatori, torneo e turno già scritti e a fine partita il risultato torna nel circolo."
 }
 
 object EnStrings : Strings {
@@ -5874,10 +6012,10 @@ object EnStrings : Strings {
     override val roleCoach = "Coach"
     override val roleClub = "Club"
     override val roleYouHint = "You play: scoring, training, videos, progress, rackets and bookings at your club."
-    override val roleCoachHint = "Your students: stroke practice, drills, movement, reports and notes. Matches are scored from the You role."
+    override val roleCoachHint = "Your students: stroke practice, drills, lesson schedule, packs, reports and notes; with Match with… they play each other."
     override val roleClubHint = "The club office: today, court planner, members and fees, tennis school, tournaments and teams."
-    override val rolesTitle = "Roles"
-    override val rolesHint = "Each role has its own features, with no duplicates. You can have more than one (someone who plays and coaches): switch between them at the top, the data is the same."
+    override val rolesTitle = "Role"
+    override val rolesHint = "Pick one role: the app shows its features and nothing else. You can change it any time in Settings: all the data stays."
     override val clubNoName = "The club"
     override val clubNoCourts = "Tap to write name and courts"
     override val clubCourtsLabel = "Courts (one per line)"
@@ -7053,18 +7191,87 @@ object EnStrings : Strings {
 
     override val tabPlanning = "Planner"
     override val playThisPhone = "This phone"
-    override val rolesFeatures = "Roles and features"
-    override val rolesFeaturesHint = "Who uses the app and what to keep in the menus: the rest does not appear, the data stays"
+    override val rolesFeatures = "Role and features"
+    override val rolesFeaturesHint = "Change role and choose what to keep in the menus: the rest does not appear, the data stays"
     override val moreGroupClub = "The club"
     override val pbMineEntryHint = "Bookings, waiting lists, reminders and PIN"
     override val pbSeekEntryHint = "Find someone to play with: when it is full the court is booked by itself"
 
     override val settingsTitle = "Settings"
-    override val settingsHint = "Language, voice, devices, roles and features, backup and app version"
+    override val settingsHint = "Language, voice, devices, role and features, backup and app version"
     override val aboutTitle = "About"
     override val aboutVersion: (String, Int) -> String = { v, n -> "Version $v (build $n)" }
     override val aboutSite = "Website and guide"
     override val coachTrainTitle = "Coach a student"
+
+    override val coDiary = "Lesson diary"
+    override val coDiaryHint = "What you did and what is left to do: one line per lesson, with the date."
+    override val coDiaryAdd = "Add to the diary"
+    override val coDiaryNone = "Nothing in the diary yet."
+    override val coGoals = "Goals"
+    override val coGoalNew = "New goal"
+    override val coGoalsNone = "No goals: set one on a stroke."
+    override val coGoalLine: (String, Int) -> String = { k, p -> "$k: $p% in" }
+    override val coGoalNow: (Int, Int) -> String = { p, n -> "now $p% over the last $n sessions" }
+    override val coGoalNoData = "No sessions of this stroke yet"
+    override val coGoalReached: (String) -> String = { "Reached on $it" }
+    override val coGoalTarget = "Shots in (%)"
+    override val coGoalWindow = "On the average of the last sessions"
+    override val coAgenda = "Lesson schedule"
+    override val coAgendaHint = "Lessons on the calendar, reminders and lessons left"
+    override val coNextLesson: (String) -> String = { "Next: $it" }
+    override val coLessons = "Lessons"
+    override val coLessonNew = "New lesson"
+    override val coNoLessons = "No lessons scheduled."
+    override val coUpcoming = "Scheduled"
+    override val coToMark = "Past, to be marked"
+    override val coDone = "Done"
+    override val coCancelLesson = "Cancel the lesson"
+    override val coCancelled = "Cancelled"
+    override val coWhen = "When"
+    override val coMinutes: (Int) -> String = { "$it min" }
+    override val coPlace = "Where (court, club)"
+    override val coNote = "Note"
+    override val coWho = "Who"
+    override val coRemindTomorrow: (Int) -> String = { "Remind tomorrow's lessons ($it)" }
+    override val coRemind: (String) -> String = { "A reminder of your lesson: $it." }
+    override val coNotify = "Notify"
+    override val coPacks = "Lesson packs"
+    override val coPackNew = "New pack"
+    override val coPackLine: (Int, String) -> String = { n, p -> "$n lessons · $p" }
+    override val coBalance: (Int, Int, Int) -> String = { a, b, c -> "Bought $a, done $b, left $c" }
+    override val coDue: (String) -> String = { "To pay: $it" }
+    override val coPaid = "Paid"
+    override val coMarkPaid = "Mark as paid"
+    override val coPackLessons = "Number of lessons"
+    override val coPackPrice = "Pack price"
+    override val coPackPaidNow = "Already paid"
+    override val coWrite = "Write"
+    override val coWriteTitle = "Message to students"
+    override val coGuardian = "Parent or guardian"
+    override val coGuardianPhone = "Parent's phone"
+    override val coConsent = "Consent to filming and data"
+    override val coConsentHint = "Mark it when the student (or the parent, for a minor) agreed to be filmed and to have their data kept here."
+    override val coConsentGiven: (String) -> String = { "Consent given on $it" }
+    override val coConsentMissing = "Consent to filming and data not marked"
+    override val coMatchWith = "Match with…"
+    override val coSearch = "Search a student"
+    override val coSortName = "By name"
+    override val coSortLast = "By last time"
+    override val coAway = "Not seen lately"
+    override val coAwayHint = "Not seen for more than 2 weeks"
+    override val coGroups = "Groups"
+    override val coGroupNew = "New group"
+    override val coGroupName = "Group name"
+    override val coGroupCount: (Int) -> String = { if (it == 1) "1 student" else "$it students" }
+    override val coAll = "All"
+    override val coNever = "never seen"
+    override val roleNow: (String) -> String = { "Role: $it" }
+    override val coBookCourt = "Book the court"
+    override val ctScoreFromYou = "To keep the score on court: Settings › Role › You, then Play › Club matches. The result comes back here by itself."
+    override val cmTitle = "Club matches"
+    override val cmHint: (Int) -> String = { if (it == 1) "1 tournament, team or challenge match to play" else "$it tournament, team and challenge matches to play" }
+    override val cmPick = "Tap a match: New match opens with players, event and round already filled in, and at the end the result goes back to the club."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

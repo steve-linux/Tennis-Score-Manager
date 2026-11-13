@@ -44,15 +44,16 @@ object Notices {
 
     /** Il telefono a cui scrivere: il suo, o quello del genitore per un minorenne (o se lui non ne ha). */
     fun phoneOf(p: PlayerProfile, now: Long): String {
-        val guardian = p.member?.guardianPhone.orEmpty()
+        // Il genitore: quello della scheda del giocatore (allievi) o quello del socio.
+        val guardian = p.guardianPhone.ifBlank { p.member?.guardianPhone.orEmpty() }
         return if (guardian.isNotBlank() && (Members.minor(p, now) || p.phone.isBlank())) guardian else p.phone
     }
 
     private fun firstName(p: PlayerProfile): String = p.firstName.ifBlank { p.name }
 
     /** Il saluto: al genitore di un minorenne si scrive del figlio. */
-    private fun hello(s: Strings, p: PlayerProfile, now: Long): String =
-        if (Members.minor(p, now) && p.member?.guardianPhone?.isNotBlank() == true && p.phone.isBlank()) s.ntHelloParent(firstName(p)) else s.ntHello(firstName(p))
+    fun hello(s: Strings, p: PlayerProfile, now: Long): String =
+        if (Members.minor(p, now) && p.guardianPhone.ifBlank { p.member?.guardianPhone.orEmpty() }.isNotBlank() && p.phone.isBlank()) s.ntHelloParent(firstName(p)) else s.ntHello(firstName(p))
 
     private fun sign(club: String): List<String> = if (club.isBlank()) emptyList() else listOf("", club)
 

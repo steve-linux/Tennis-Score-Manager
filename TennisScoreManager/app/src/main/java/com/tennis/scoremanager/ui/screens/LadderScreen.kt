@@ -136,7 +136,6 @@ fun LadderScreen(c: MatchController) {
                     color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 Text(if (ch.deadline < now) s.ldLate else s.ldBy(shortDate(ch.deadline, lang)), color = if (ch.deadline < now) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = { c.playChallenge(l, ch) }) { Text(s.ldPlay, color = TsmColors.Ball) }
                     TextButton(onClick = { result = ch }) { Text(s.ldResult) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {

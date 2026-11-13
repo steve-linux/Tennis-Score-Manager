@@ -3,7 +3,10 @@
 
 package com.tennis.scoremanager.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.text.font.FontWeight
@@ -31,9 +34,9 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Role
 
-/** I tre ruoli, ciascuno acceso o spento (almeno uno resta): in Profilo e dati e alla prima apertura. */
+/** I tre ruoli, se ne sceglie uno: alla prima apertura e in Impostazioni › Ruolo. */
 @Composable
-fun RolesPicker(selected: Set<Role>, onChange: (Set<Role>) -> Unit) {
+fun RolePicker(selected: Role, onChange: (Role) -> Unit) {
     val s = LocalStrings.current
     for ((r, title, hint) in listOf(
         Triple(Role.PLAYER, s.moreProfile, s.roleYouHint),
@@ -41,9 +44,20 @@ fun RolesPicker(selected: Set<Role>, onChange: (Set<Role>) -> Unit) {
         Triple(Role.CLUB, s.roleClub, s.roleClubHint),
     )) {
         val icon = when (r) { Role.PLAYER -> Icons.Filled.Person; Role.COACH -> Icons.Filled.School; Role.CLUB -> Icons.Filled.Business }
-        SwitchRow(icon, title, hint, r in selected) { on ->
-            val next = if (on) selected + r else selected - r
-            if (next.isNotEmpty()) onChange(next)
+        val on = r == selected
+        androidx.compose.foundation.layout.Row(
+            Modifier.fillMaxWidth()
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp))
+                .background(if (on) TsmColors.SurfaceHigh else TsmColors.Surface)
+                .clickable { onChange(r) }.padding(12.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            androidx.compose.material3.Icon(icon, null, tint = if (on) TsmColors.Ball else TsmColors.TextDim)
+            Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(hint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+            androidx.compose.material3.RadioButton(on, { onChange(r) })
         }
     }
 }
@@ -84,13 +98,12 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
 }
 
 /**
- * Ruoli e funzioni, in un posto solo (Altro e il ruolo in alto): chi usa l'app e, per il ruolo attivo, cosa tenere nei
- * menu (Cosa usi per Tu e Allenatore, le funzioni del circolo per la segreteria). Spento non vuol dire cancellato.
+ * Ruolo e funzioni, in Impostazioni: il ruolo (uno solo; cambiandolo i dati restano) e, per quel ruolo, cosa tenere
+ * nei menu (Cosa usi per Tu e Allenatore, le funzioni del circolo per la segreteria). Spento non vuol dire cancellato.
  */
 @Composable
 fun RolesFeaturesDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val roles by c.roles.collectAsState()
     val role by c.activeRole.collectAsState()
     var features by remember { mutableStateOf(false) }
     if (features) {
@@ -106,7 +119,7 @@ fun RolesFeaturesDialog(c: MatchController, onDone: () -> Unit) {
             Column(androidx.compose.ui.Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(s.rolesTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                RolesPicker(roles) { c.setRoles(it) }
+                RolePicker(role) { if (it != role) c.setRole(it) }
                 val club = role == Role.CLUB
                 Text(if (club) s.cfTitle else s.pfTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = androidx.compose.ui.Modifier.padding(top = 8.dp))
                 Text(if (club) s.cfHint else s.pfEntryHint, color = TsmColors.TextDim, fontSize = 13.sp)

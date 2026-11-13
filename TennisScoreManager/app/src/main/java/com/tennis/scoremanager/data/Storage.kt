@@ -247,6 +247,16 @@ class Storage(context: Context) {
         runCatching { writeAtomic(goalsFile, json.encodeToString(ListSerializer(Goal.serializer()), list)) }
     }
 
+    /** L'allenatore: diario, obiettivi, agenda, pacchetti di lezioni e gruppi degli allievi. */
+    private val coachFile: File get() = File(app.filesDir, "coach_book.json")
+
+    fun loadCoachBook(): CoachBook = readOr(coachFile, CoachBook()) { json.decodeFromString(CoachBook.serializer(), it) }
+
+    @Synchronized
+    fun saveCoachBook(book: CoachBook) {
+        runCatching { writeAtomic(coachFile, json.encodeToString(CoachBook.serializer(), book)) }.onFailure { Log.e("Storage", "Salvataggio dell'allenatore fallito", it) }
+    }
+
     private val laddersFile: File get() = File(app.filesDir, "club_ladders.json")
 
     fun loadLadders(): List<Ladder> =
@@ -553,17 +563,13 @@ class Storage(context: Context) {
         get() = prefs.getBoolean("club_features_seen", false)
         set(v) = prefs.edit().putBoolean("club_features_seen", v).apply()
 
-    /** Ruoli scelti (Role.name) e quello attivo; di serie Tu, come prima dei ruoli. */
+    /** Il ruolo (Role.name; prima se ne potevano accendere più di uno) e quello attivo; di serie Tu. */
     var roles: Set<String>
         get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")
         set(v) = prefs.edit().putStringSet("roles", v).apply()
     var activeRole: String
         get() = prefs.getString("active_role", null) ?: "PLAYER"
         set(v) = prefs.edit().putString("active_role", v).apply()
-    /** Fatto una volta: a chi aveva già dati di un profilo non acceso, quel profilo è stato acceso (vedi addRolesForData). */
-    var rolesForDataDone: Boolean
-        get() = prefs.getBoolean("roles_for_data_done", false)
-        set(v) = prefs.edit().putBoolean("roles_for_data_done", v).apply()
 
     /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
     var clubName: String
