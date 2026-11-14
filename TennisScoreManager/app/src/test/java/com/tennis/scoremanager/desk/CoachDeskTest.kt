@@ -41,6 +41,7 @@ class FakeCoach(var time: Long) : CoachData {
         book = book.copy(courses = book.courses.filter { it.card.course.id != c.id } + (old?.copy(card = old.card.copy(course = c)) ?: CoachCourse(CourseCard(code = "", issuedAt = 1, course = c), personal = true)))
     }
     override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
+    override fun country() = "IT"
     val colors = mutableMapOf<String, String>()
     override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
@@ -141,6 +142,23 @@ class CoachDeskTest {
         assertEquals(400, req("PUT", "/coach/courses/club/color", """{"text":"#123456"}""", tk).first)
         assertEquals(200, req("DELETE", "/coach/courses/${c.id}", token = tk).first)
         assertTrue(coach.book.courses.none { it.card.course.id == c.id })
+    }
+
+    @Test fun lessonsCountGivesTheEndAndSkipsHolidays() {
+        val tk = login()
+        // Il martedì dal 1° dicembre 2026: l'8 è l'Immacolata.
+        val base = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60,"court":""}],"lessons":2"""
+        assertTrue(req("POST", "/coach/courses/end", "$base}", tk).second.contains("2026-12-15"))
+        assertTrue(req("POST", "/coach/courses/end", "$base,\"skipHolidays\":false}", tk).second.contains("2026-12-08"))
+        assertEquals(200, req("POST", "/coach/courses", "$base}", tk).first)
+        val c = coach.saved.last()
+        assertEquals(java.time.LocalDate.of(2026, 12, 15), java.time.Instant.ofEpochMilli(c.to).atZone(zone).toLocalDate())
+        assertEquals(1, c.cancelled.size)
+        val cal = req("GET", "/coach/calendar", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(cal, "\"holiday\":\"Immacolata Concezione\"" in cal)
+        coach.time = java.time.LocalDate.of(2026, 12, 9).atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
+        val reg = req("GET", "/coach/courses/${c.id}", token = tk).second
+        assertTrue(reg, "Immacolata" in reg)
     }
 
     @Test fun studentsFromThePcWithoutDuplicates() {

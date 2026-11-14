@@ -2595,6 +2595,19 @@ object FrStrings : Strings {
     override val ccOwnTag = "Mon cours"
     override val ccClubCourses = "Cours du secrétariat"
     override val ccColor = "Couleur"
+    override val pkOnlyChosen = "Seulement les choisis"
+    override val pkAllShown = "Choisir ceux affichés"
+    override val pkAll = "Tous"
+    override val pkNone = "Aucun"
+    override val pkAddGroup = "Ajouter un groupe…"
+    override val pkClear = "Tout retirer"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 choisi" else "$it choisis" }
+    override val pkMore: (Int) -> String = { "$it de plus : tapez un nom pour les trouver" }
+    override val ccLessonsCount = "Nombre de séances"
+    override val ccSkipHolidays = "Sauter les jours fériés"
+    override val ccSkipHolidaysHint = "Les séances des jours fériés ne comptent pas et sont annulées (on les rétablit depuis l'appel)."
+    override val hdHoliday = "Jour férié"
+    override val ccEndAuto: (String) -> String = { "Fin : $it (calculée)" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }

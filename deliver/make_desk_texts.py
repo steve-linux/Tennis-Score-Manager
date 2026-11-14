@@ -17,9 +17,9 @@ OUT = ROOT / "TennisScoreManager" / "app" / "src" / "main" / "assets" / "desk" /
 # I testi che servono: per prefisso, più qualcuno preso da solo.
 PREFIXES = ("ct", "blk", "td", "st", "sc", "tm", "plan", "crt", "pt", "srv", "pb",
             # Allenatore da PC: allievi, valutazioni, test, classifica, risultati, corsi, mese, ricevute, registro, Excel.
-            "co", "ev", "ft", "rk", "mm", "se", "la", "cc", "cm", "rc", "rg", "xl", "as", "mr")
+            "co", "ev", "ft", "rk", "mm", "se", "la", "cc", "cm", "rc", "rg", "xl", "as", "mr", "pk")
 SINGLE = {"bkOther", "reportTitle", "receiptTitle", "receiptNotFiscal", "studentsTitle", "studentLast", "studentNotes", "studentWon", "studentLost",
-          "studentNew", "playerFirstName", "playerLastName", "playerNickname", "memberPhone", "memberEmail"}
+          "studentNew", "playerFirstName", "playerLastName", "playerNickname", "memberPhone", "memberEmail", "hdHoliday"}
 # Troppo complicati da tradurre in JavaScript da soli: li ha i18n.js, scritti a mano.
 SKIP = {"scStudentsCount", "crtDeleteAsk", "coBalance", "cmPrivate"}
 LANGS = ("it", "en", "fr", "de", "es", "pt")

@@ -451,11 +451,13 @@ const APP_I18N = {
     ccDeskSaveAttendance: "Salva le presenze",
     ccDeskSent: "Le presenze si mandano alla segreteria dal telefono (I miei corsi › Manda le presenze).",
     ccDeskTitle: "Allenatore da PC",
+    ccEndAuto: (it) => `Fine: ${it} (calcolata)`,
     ccFilePrefix: "Corso",
     ccFrom: (it) => `da ${it}`,
     ccIncomingHint: "Il corso va in Allievi › I miei corsi e gli iscritti diventano tuoi allievi, con i contatti dei genitori. Le presenze le segni lì e le rimandi alla segreteria.",
     ccIncomingTitle: "Scheda corso",
     ccLessonNote: "Cosa avete fatto (va nel diario di chi c'era)",
+    ccLessonsCount: "Numero di lezioni",
     ccLessonsMarked: (it) => it === 1 ? `1 lezione segnata` : `${it} lezioni segnate`,
     ccLevel: "Livello",
     ccMatchPrefix: "Partita",
@@ -480,6 +482,8 @@ const APP_I18N = {
     ccSendAttendance: "Manda le presenze",
     ccSendToCoach: "Manda all'allenatore",
     ccSent: (it) => `Presenze mandate il ${it}`,
+    ccSkipHolidays: "Salta le feste",
+    ccSkipHolidaysHint: "Le lezioni nei giorni di festa nazionale non contano e risultano annullate (si rimettono dall'appello).",
     ccSlots: "Orari",
     ccTitle: "I miei corsi",
     ccToMark: (it) => `${it} da segnare`,
@@ -706,6 +710,7 @@ const APP_I18N = {
     ftSprint: "Scatto 20 m (s)",
     ftTitle: "Test fisici",
     ftYoyo: "Yo-yo test (livello)",
+    hdHoliday: "Festa",
     laAbsent: "Assente",
     laExcused: "Giustificato",
     laPresent: "Presente",
@@ -914,6 +919,14 @@ const APP_I18N = {
     pbWaitText: "Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo.",
     pbWaiting: "In attesa",
     pbYesterday: "Ieri",
+    pkAddGroup: "Aggiungi un gruppo…",
+    pkAll: "Tutti",
+    pkAllShown: "Scegli quelli mostrati",
+    pkChosen: (it) => it === 1 ? `1 scelto` : `${it} scelti`,
+    pkClear: "Togli tutti",
+    pkMore: (it) => `Altri ${it}: scrivi un nome per cercarli`,
+    pkNone: "Nessuno",
+    pkOnlyChosen: "Solo i selezionati",
     planBusy: (it) => `${it}h occupato`,
     planClose: "Chiusura",
     planDay: "Giorno",
@@ -1275,11 +1288,13 @@ const APP_I18N = {
     ccDeskSaveAttendance: "Save attendance",
     ccDeskSent: "Attendance is sent to the club office from the phone (My courses › Send attendance).",
     ccDeskTitle: "Coach from PC",
+    ccEndAuto: (it) => `End: ${it} (calculated)`,
     ccFilePrefix: "Course",
     ccFrom: (it) => `from ${it}`,
     ccIncomingHint: "The course goes to Students › My courses and the participants become your students, with their parents' contacts. You mark attendance there and send it back to the office.",
     ccIncomingTitle: "Course card",
     ccLessonNote: "What you did (goes in the diary of those present)",
+    ccLessonsCount: "Number of lessons",
     ccLessonsMarked: (it) => it === 1 ? `1 lesson marked` : `${it} lessons marked`,
     ccLevel: "Level",
     ccMatchPrefix: "Match",
@@ -1304,6 +1319,8 @@ const APP_I18N = {
     ccSendAttendance: "Send attendance",
     ccSendToCoach: "Send to the coach",
     ccSent: (it) => `Attendance sent on ${it}`,
+    ccSkipHolidays: "Skip holidays",
+    ccSkipHolidaysHint: "Lessons on national holidays don't count and are marked cancelled (you can restore them from the roll call).",
     ccSlots: "Times",
     ccTitle: "My courses",
     ccToMark: (it) => `${it} to mark`,
@@ -1530,6 +1547,7 @@ const APP_I18N = {
     ftSprint: "20 m sprint (s)",
     ftTitle: "Fitness tests",
     ftYoyo: "Yo-yo test (level)",
+    hdHoliday: "Holiday",
     laAbsent: "Absent",
     laExcused: "Excused",
     laPresent: "Present",
@@ -1738,6 +1756,14 @@ const APP_I18N = {
     pbWaitText: "This slot is taken. If it becomes free we tell you right away: whoever books first gets it.",
     pbWaiting: "Waiting",
     pbYesterday: "Yesterday",
+    pkAddGroup: "Add a group…",
+    pkAll: "All",
+    pkAllShown: "Pick those shown",
+    pkChosen: (it) => `${it} chosen`,
+    pkClear: "Remove all",
+    pkMore: (it) => `${it} more: type a name to find them`,
+    pkNone: "None",
+    pkOnlyChosen: "Chosen only",
     planBusy: (it) => `${it}h booked`,
     planClose: "Closing",
     planDay: "Day",
@@ -2099,11 +2125,13 @@ const APP_I18N = {
     ccDeskSaveAttendance: "Enregistrer les présences",
     ccDeskSent: "Les présences s'envoient au secrétariat depuis le téléphone (Mes cours › Envoyer les présences).",
     ccDeskTitle: "Entraîneur depuis le PC",
+    ccEndAuto: (it) => `Fin : ${it} (calculée)`,
     ccFilePrefix: "Cours",
     ccFrom: (it) => `de ${it}`,
     ccIncomingHint: "Le cours va dans Élèves › Mes cours et les inscrits deviennent vos élèves, avec les contacts des parents. Vous notez les présences là et les renvoyez au secrétariat.",
     ccIncomingTitle: "Fiche de cours",
     ccLessonNote: "Ce que vous avez fait (va dans le journal des présents)",
+    ccLessonsCount: "Nombre de séances",
     ccLessonsMarked: (it) => it === 1 ? `1 cours noté` : `${it} cours notés`,
     ccLevel: "Niveau",
     ccMatchPrefix: "Partie",
@@ -2128,6 +2156,8 @@ const APP_I18N = {
     ccSendAttendance: "Envoyer les présences",
     ccSendToCoach: "Envoyer à l'entraîneur",
     ccSent: (it) => `Présences envoyées le ${it}`,
+    ccSkipHolidays: "Sauter les jours fériés",
+    ccSkipHolidaysHint: "Les séances des jours fériés ne comptent pas et sont annulées (on les rétablit depuis l'appel).",
     ccSlots: "Horaires",
     ccTitle: "Mes cours",
     ccToMark: (it) => `${it} à noter`,
@@ -2354,6 +2384,7 @@ const APP_I18N = {
     ftSprint: "Sprint 20 m (s)",
     ftTitle: "Tests physiques",
     ftYoyo: "Test yo-yo (palier)",
+    hdHoliday: "Jour férié",
     laAbsent: "Absent(e)",
     laExcused: "Excusé",
     laPresent: "Présent",
@@ -2562,6 +2593,14 @@ const APP_I18N = {
     pbWaitText: "Ce créneau est occupé. S'il se libère, nous vous prévenons tout de suite : le premier qui réserve l'obtient.",
     pbWaiting: "En attente",
     pbYesterday: "Hier",
+    pkAddGroup: "Ajouter un groupe…",
+    pkAll: "Tous",
+    pkAllShown: "Choisir ceux affichés",
+    pkChosen: (it) => it === 1 ? `1 choisi` : `${it} choisis`,
+    pkClear: "Tout retirer",
+    pkMore: (it) => `${it} de plus : tapez un nom pour les trouver`,
+    pkNone: "Aucun",
+    pkOnlyChosen: "Seulement les choisis",
     planBusy: (it) => `${it}h occupé`,
     planClose: "Fermeture",
     planDay: "Jour",
@@ -2923,11 +2962,13 @@ const APP_I18N = {
     ccDeskSaveAttendance: "Anwesenheit speichern",
     ccDeskSent: "Die Anwesenheit schickst du vom Telefon ans Büro (Meine Kurse › Anwesenheit schicken).",
     ccDeskTitle: "Trainer am PC",
+    ccEndAuto: (it) => `Ende: ${it} (berechnet)`,
     ccFilePrefix: "Kurs",
     ccFrom: (it) => `von ${it}`,
     ccIncomingHint: "Der Kurs kommt unter Schüler › Meine Kurse und die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern. Die Anwesenheit trägst du dort ein und schickst sie ans Büro.",
     ccIncomingTitle: "Kurskarte",
     ccLessonNote: "Was ihr gemacht habt (kommt ins Tagebuch der Anwesenden)",
+    ccLessonsCount: "Anzahl der Stunden",
     ccLessonsMarked: (it) => it === 1 ? `1 Stunde eingetragen` : `${it} Stunden eingetragen`,
     ccLevel: "Niveau",
     ccMatchPrefix: "Spiel",
@@ -2952,6 +2993,8 @@ const APP_I18N = {
     ccSendAttendance: "Anwesenheit schicken",
     ccSendToCoach: "An den Trainer schicken",
     ccSent: (it) => `Anwesenheit am ${it} geschickt`,
+    ccSkipHolidays: "Feiertage überspringen",
+    ccSkipHolidaysHint: "Stunden an gesetzlichen Feiertagen zählen nicht und gelten als abgesagt (in der Anwesenheit wiederherstellbar).",
     ccSlots: "Zeiten",
     ccTitle: "Meine Kurse",
     ccToMark: (it) => `${it} einzutragen`,
@@ -3178,6 +3221,7 @@ const APP_I18N = {
     ftSprint: "20-m-Sprint (s)",
     ftTitle: "Fitnesstests",
     ftYoyo: "Yo-Yo-Test (Stufe)",
+    hdHoliday: "Feiertag",
     laAbsent: "Gefehlt",
     laExcused: "Entschuldigt",
     laPresent: "Da",
@@ -3386,6 +3430,14 @@ const APP_I18N = {
     pbWaitText: "Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es.",
     pbWaiting: "Wartend",
     pbYesterday: "Gestern",
+    pkAddGroup: "Gruppe hinzufügen…",
+    pkAll: "Alle",
+    pkAllShown: "Angezeigte wählen",
+    pkChosen: (it) => `${it} ausgewählt`,
+    pkClear: "Alle entfernen",
+    pkMore: (it) => `${it} weitere: Namen eingeben, um sie zu finden`,
+    pkNone: "Keiner",
+    pkOnlyChosen: "Nur ausgewählte",
     planBusy: (it) => `${it} Std. belegt`,
     planClose: "Schließung",
     planDay: "Tag",
@@ -3747,11 +3799,13 @@ const APP_I18N = {
     ccDeskSaveAttendance: "Guardar asistencia",
     ccDeskSent: "La asistencia se envía a la secretaría desde el teléfono (Mis cursos › Enviar asistencia).",
     ccDeskTitle: "Entrenador desde el PC",
+    ccEndAuto: (it) => `Fin: ${it} (calculado)`,
     ccFilePrefix: "Curso",
     ccFrom: (it) => `de ${it}`,
     ccIncomingHint: "El curso va a Alumnos › Mis cursos y los inscritos pasan a ser tus alumnos, con los contactos de los padres. La asistencia la marcas allí y la devuelves a la secretaría.",
     ccIncomingTitle: "Ficha de curso",
     ccLessonNote: "Qué habéis hecho (va al diario de los presentes)",
+    ccLessonsCount: "Número de clases",
     ccLessonsMarked: (it) => it === 1 ? `1 clase marcada` : `${it} clases marcadas`,
     ccLevel: "Nivel",
     ccMatchPrefix: "Partido",
@@ -3776,6 +3830,8 @@ const APP_I18N = {
     ccSendAttendance: "Enviar asistencia",
     ccSendToCoach: "Enviar al entrenador",
     ccSent: (it) => `Asistencia enviada el ${it}`,
+    ccSkipHolidays: "Saltar los festivos",
+    ccSkipHolidaysHint: "Las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde pasar lista).",
     ccSlots: "Horarios",
     ccTitle: "Mis cursos",
     ccToMark: (it) => `${it} por marcar`,
@@ -4002,6 +4058,7 @@ const APP_I18N = {
     ftSprint: "Sprint 20 m (s)",
     ftTitle: "Pruebas físicas",
     ftYoyo: "Test yo-yo (nivel)",
+    hdHoliday: "Festivo",
     laAbsent: "Ausente",
     laExcused: "Justificado",
     laPresent: "Presente",
@@ -4210,6 +4267,14 @@ const APP_I18N = {
     pbWaitText: "Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero.",
     pbWaiting: "En espera",
     pbYesterday: "Ayer",
+    pkAddGroup: "Añadir un grupo…",
+    pkAll: "Todos",
+    pkAllShown: "Elegir los mostrados",
+    pkChosen: (it) => it === 1 ? `1 elegido` : `${it} elegidos`,
+    pkClear: "Quitar todos",
+    pkMore: (it) => `${it} más: escribe un nombre para buscarlos`,
+    pkNone: "Ninguno",
+    pkOnlyChosen: "Solo los elegidos",
     planBusy: (it) => `${it}h ocupada`,
     planClose: "Cierre",
     planDay: "Día",
@@ -4571,11 +4636,13 @@ const APP_I18N = {
     ccDeskSaveAttendance: "Guardar presenças",
     ccDeskSent: "As presenças enviam-se à secretaria a partir do telefone (Os meus cursos › Enviar presenças).",
     ccDeskTitle: "Treinador no PC",
+    ccEndAuto: (it) => `Fim: ${it} (calculado)`,
     ccFilePrefix: "Curso",
     ccFrom: (it) => `de ${it}`,
     ccIncomingHint: "O curso vai para Alunos › Os meus cursos e os inscritos passam a ser seus alunos, com os contactos dos pais. As presenças marca-as lá e devolve-as à secretaria.",
     ccIncomingTitle: "Ficha de curso",
     ccLessonNote: "O que fizeram (vai para o diário de quem esteve)",
+    ccLessonsCount: "Número de aulas",
     ccLessonsMarked: (it) => it === 1 ? `1 aula marcada` : `${it} aulas marcadas`,
     ccLevel: "Nível",
     ccMatchPrefix: "Partida",
@@ -4600,6 +4667,8 @@ const APP_I18N = {
     ccSendAttendance: "Enviar presenças",
     ccSendToCoach: "Enviar ao treinador",
     ccSent: (it) => `Presenças enviadas em ${it}`,
+    ccSkipHolidays: "Saltar os feriados",
+    ccSkipHolidaysHint: "As aulas em feriados nacionais não contam e ficam anuladas (repõem-se na chamada).",
     ccSlots: "Horários",
     ccTitle: "Os meus cursos",
     ccToMark: (it) => `${it} por marcar`,
@@ -4826,6 +4895,7 @@ const APP_I18N = {
     ftSprint: "Sprint 20 m (s)",
     ftTitle: "Testes físicos",
     ftYoyo: "Teste yo-yo (nível)",
+    hdHoliday: "Feriado",
     laAbsent: "Faltou",
     laExcused: "Justificado",
     laPresent: "Presente",
@@ -5034,6 +5104,14 @@ const APP_I18N = {
     pbWaitText: "Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro.",
     pbWaiting: "Em espera",
     pbYesterday: "Ontem",
+    pkAddGroup: "Adicionar um grupo…",
+    pkAll: "Todos",
+    pkAllShown: "Escolher os mostrados",
+    pkChosen: (it) => it === 1 ? `1 escolhido` : `${it} escolhidos`,
+    pkClear: "Remover todos",
+    pkMore: (it) => `Mais ${it}: escreva um nome para os encontrar`,
+    pkNone: "Nenhum",
+    pkOnlyChosen: "Só os escolhidos",
     planBusy: (it) => `${it}h ocupada`,
     planClose: "Fechamento",
     planDay: "Dia",
@@ -6038,9 +6116,9 @@ async function showPlan() {
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const x of m.days) {
       const n = Number(x.date.slice(8));
-      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : ''), {
-        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
-      }, h('b', n),
+      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : '') + (x.holiday ? '.hol' : ''), {
+        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (x.holiday ? ' · ' + x.holiday : ''), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+      }, h('b', n), x.holiday ? h('span.holname', x.holiday) : null,
       x.bookings ? h('span', T.nBookings(x.bookings)) : null,
       x.matches ? h('span', '🏆 ' + x.matches) : null,
       x.blocked >= 100 ? h('span.dim', T.blkShort) : x.blocked ? h('span.dim', T.blkShort + ' ' + x.blocked + '%') : null,
@@ -6061,7 +6139,7 @@ async function showPlan() {
   } else {
     d = await api('GET', '/day?date=' + planDate);
     days = [d];
-    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + (d.holiday ? ' · ' + d.holiday : '');
   }
   // In settimana con tanti campi se ne guarda uno alla volta, se no non si legge.
   let courts = d.courts;
@@ -6086,8 +6164,8 @@ async function showPlan() {
   grid.style.gridTemplateRows = 'repeat(' + heads + ', auto) repeat(' + rows + ', ' + Math.max(ROW, Math.round(ROW * slot / 30)) + 'px)';
   const place = (e, row, col, span, colSpan) => { e.style.gridRow = row + ' / span ' + span; e.style.gridColumn = col + ' / span ' + (colSpan || 1); grid.append(e); };
   place(h('div'), 1, 1, heads);
-  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : ''), {
-    type: 'button', title: T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : '') + (x.holiday ? '.hol' : ''), {
+    type: 'button', title: x.holiday ? x.holiday : T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
   }, long(x.date, { weekday: 'short', day: 'numeric' })), 1, 2 + i * courts.length, 1, courts.length));
   if (!week || two) cols.forEach((c, i) => place(h('div.gcourt' + (two ? '.small' : ''), c.court), heads, i + 2, 1));
   for (let r = 0; r < rows; r++) {
@@ -7634,8 +7712,8 @@ async function showAgenda() {
     const cells = [];
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const d of m.days) {
-      cells.push(h('div.mday' + (d.date === info.today ? '.now' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) },
-        h('b', Number(d.date.slice(8))), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
+      cells.push(h('div.mday' + (d.date === info.today ? '.now' : '') + (d.holiday ? '.hol' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (d.holiday ? ' · ' + d.holiday : '') },
+        h('b', Number(d.date.slice(8))), d.holiday ? h('span.holname', d.holiday) : null, d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
     }
     put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
       h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legendOf(m.days.flatMap((d) => d.items)));
@@ -7649,10 +7727,11 @@ async function showAgenda() {
   const months = [...new Set(days.map((x) => x.slice(0, 8) + '01'))];
   const cals = await Promise.all(months.map((x) => api('GET', '/coach/calendar?date=' + x)));
   const byDay = Object.fromEntries(cals.flatMap((c) => c.days).map((d) => [d.date, d.items]));
+  const hol = Object.fromEntries(cals.flatMap((c) => c.days).filter((d) => d.holiday).map((d) => [d.date, d.holiday]));
   const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
   put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
-    h('div.panel', h('div.month', days.map((d) => h('div.mhead', long(d, { weekday: 'short', day: 'numeric' }))),
-      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
+    h('div.panel', h('div.month', days.map((d) => h('div.mhead' + (hol[d] ? '.hol' : ''), { title: hol[d] || '' }, long(d, { weekday: 'short', day: 'numeric' }))),
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : '') + (hol[d] ? '.hol' : ''), { style: 'min-height:240px' }, hol[d] ? h('span.holname', hol[d]) : null, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
 }
 
 /** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
@@ -7704,11 +7783,45 @@ async function showCourseRegister(id) {
       try { await api('PUT', '/coach/courses/' + encodeURIComponent(id) + '/color', { text: col }); showCourseRegister(id); } catch (e) { toast(errText(e)); }
     }))),
     h('div.printonly.phead', h('b', T.rgTitle + ' · ' + c.name), ' · ', dateText(info.today)),
+    // Con tanti allievi: un filtro per nome sulle righe del registro.
+    r.rows.length > 12 ? h('input.noprint', { type: 'search', placeholder: T.coSearch, style: 'max-width:320px;margin:6px 0', oninput: (ev) => {
+      const q = ev.target.value.trim().toLowerCase();
+      document.querySelectorAll('tr[data-name]').forEach((tr) => { tr.hidden = !!q && !tr.dataset.name.includes(q); });
+    } }) : null,
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
-      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center', onclick: () => { if (l.past) attendanceDialog(r, l); } },
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
-      h('tbody', r.rows.map((row) => h('tr', h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
+      h('tbody', r.rows.map((row) => h('tr', { 'data-name': row.name.toLowerCase() }, h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
+}
+
+/**
+ * Scegliere gli allievi anche tra centinaia: si cerca per nome (il menu sotto mostra i primi dieci che non ci sono
+ * ancora; Invio aggiunge il primo), si aggiunge un gruppo intero, si toglie con la ✕. [chosen] è l'insieme degli id.
+ */
+function studentPicker(students, groups, chosen) {
+  const byId = Object.fromEntries(students.map((s) => [s.id, s]));
+  const input = h('input', { type: 'search', placeholder: T.coSearch, 'aria-label': T.coSearch, autocomplete: 'off' });
+  const hits = h('div.hits');
+  const count = h('p.dim');
+  const tags = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow:auto' });
+  const group = select([['', T.pkAddGroup]].concat(groups.map((g) => [g.id, g.name + ' (' + g.students.length + ')'])), '');
+  const draw = () => {
+    const q = input.value.trim().toLowerCase();
+    const list = q ? students.filter((s) => !chosen.has(s.id) && s.name.toLowerCase().includes(q)).slice(0, 10) : [];
+    put(hits, list.map((s) => h('button', { type: 'button', onclick: () => { chosen.add(s.id); input.value = ''; draw(); input.focus(); } }, s.name)),
+      q && !list.length ? h('div.dim.pad', T.noResults) : null);
+    count.textContent = T.pkChosen(chosen.size);
+    put(tags, [...chosen].map((id) => byId[id]).filter(Boolean).sort((a, b) => a.name.localeCompare(b.name)).map((s) =>
+      h('span', { style: 'display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 10px;border-radius:14px;background:var(--hover)' }, s.name,
+        h('button', { type: 'button', 'aria-label': T.remove, style: 'border:0;background:none;padding:0 4px', onclick: () => { chosen.delete(s.id); draw(); } }, '✕'))));
+  };
+  input.addEventListener('input', draw);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+  group.addEventListener('change', () => { const g = groups.find((x) => x.id === group.value); if (g) g.students.forEach((id) => { if (byId[id]) chosen.add(id); }); group.value = ''; draw(); });
+  draw();
+  return h('div.picker', { style: 'max-width:none' }, input, hits, h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' }, groups.length ? group : null,
+    h('button', { type: 'button', onclick: () => { chosen.clear(); draw(); } }, T.pkClear), count), tags);
 }
 
 /**
@@ -7716,18 +7829,33 @@ async function showCourseRegister(id) {
  * durata, dove) e allievi. Salvato, si apre il suo registro.
  */
 async function editOwnCourse(c) {
-  let students = [];
-  try { students = await api('GET', '/coach/students'); } catch (e) { toast(errText(e)); return; }
+  let students = [], groups = [];
+  try { [students, groups] = await Promise.all([api('GET', '/coach/students'), api('GET', '/coach/groups')]); } catch (e) { toast(errText(e)); return; }
   const name = h('input', { value: c ? c.name : '', maxlength: 60, required: true });
   const level = h('input', { value: c ? c.level : '', maxlength: 40 });
   const plus = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setMonth(x.getMonth() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
   const from = h('input', { type: 'date', value: c ? c.from : info.today });
   const to = h('input', { type: 'date', value: c ? c.to : plus(info.today, 6) });
+  // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
+  const count = h('input', { type: 'number', min: 1, max: 200, value: c ? '' : '10', placeholder: '—' });
+  const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const endBox = h('div.full');
+  let endSeq = 0;
+  const drawEnd = async () => {
+    const n = Number(count.value);
+    if (!count.value || !(n > 0)) { put(endBox, field(T.ctEnd, to)); return; }
+    const my = ++endSeq;
+    let out = null;
+    try { out = await api('POST', '/coach/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    if (my !== endSeq) return;
+    put(endBox, h('p', out && out.to ? T.ccEndAuto(dateText(out.to)) : h('span.dim', T.ccSlots + ' —')));
+  };
+  count.oninput = drawEnd; from.onchange = drawEnd; skipHol.onchange = drawEnd;
   let slots = c ? c.slots.slice() : [];
   const slotList = h('div');
   const drawSlots = () => put(slotList, slots.length ? slots.map((x, i) => h('div', { style: 'display:flex;gap:8px;align-items:center' },
     h('span', weekdayName(x.weekday) + ' ' + hhmm(x.startMin) + ' · ' + T.coMinutes(x.minutes) + (x.court ? ' · ' + x.court : '')),
-    h('button', { type: 'button', onclick: () => { slots.splice(i, 1); drawSlots(); } }, '✕'))) : h('p.dim', '—'));
+    h('button', { type: 'button', onclick: () => { slots.splice(i, 1); drawSlots(); drawEnd(); } }, '✕'))) : h('p.dim', '—'));
   const wd = select([1, 2, 3, 4, 5, 6, 7].map((k) => [String(k), weekdayName(k)]), '1');
   const time = h('input', { type: 'time', value: '17:00', step: 300 });
   const mins = select([45, 60, 90, 120].map((k) => [String(k), T.coMinutes(k)]), '60');
@@ -7737,7 +7865,7 @@ async function editOwnCourse(c) {
     if (Number.isNaN(hh)) return;
     slots.push({ weekday: Number(wd.value), startMin: hh * 60 + (mm || 0), minutes: Number(mins.value), court: place.value.trim() });
     slots.sort((a, b) => a.weekday - b.weekday || a.startMin - b.startMin);
-    drawSlots();
+    drawSlots(); drawEnd();
   } }, T.ccAddSlot);
   let color = c ? c.color : '#29B6F6';
   const colors = c ? c.colors : ['#C6F432', '#29B6F6', '#FF9800', '#E53935', '#AB47BC', '#26A69A', '#FFD600', '#EC407A'];
@@ -7745,15 +7873,19 @@ async function editOwnCourse(c) {
   const drawColors = () => put(colorRow, h('span.dim', T.ccColor), colors.map((col) => dot(col, col === color, () => { color = col; drawColors(); })));
   drawColors();
   const chosen = new Set(c ? c.studentIds : []);
-  const boxes = students.map((s) => { const b = h('input', { type: 'checkbox' }); b.checked = chosen.has(s.id); return [s.id, h('label.check', b, s.name), b]; });
-  drawSlots();
+  const picker = studentPicker(students, groups, chosen);
+  drawSlots(); drawEnd();
   dialog(c ? c.name : T.ccNew, h('div.form',
-    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), colorRow, field(T.ctStart, from), field(T.ctEnd, to),
+    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), colorRow,
     h('h3.full', T.ccSlots), h('div.full', slotList),
     field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
-    h('h3.full', T.ccPickStudents), h('div.full', boxes.map((b) => b[1]))), async () => {
+    field(T.ctStart, from), field(T.ccLessonsCount, count),
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox,
+    h('h3.full', T.ccPickStudents), h('div.full', picker)), async () => {
     if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
-    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]), color };
+    const n = Number(count.value);
+    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: [...chosen], color,
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
     const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
     toast(T.saved);
     coachView = 'courses'; coachCourseId = out.id;
@@ -7766,14 +7898,20 @@ function attendanceDialog(r, l) {
     const idx = r.lessons.indexOf(l);
     const cb = h('input', { type: 'checkbox' });
     cb.checked = l.marked ? row.marks[idx] === '✓' : true;
-    return [row.id, cb, h('label', { style: 'display:flex;gap:8px;align-items:center' }, cb, row.name)];
+    return [row.id, cb, h('label', { style: 'display:flex;gap:8px;align-items:center' }, cb, row.name), row.name.toLowerCase()];
   });
   const cancelled = h('input', { type: 'checkbox' }); cancelled.checked = l.cancelled;
   const note = h('textarea', { rows: 3, style: 'width:100%' }); note.value = r.notes[l.key] || '';
   const dlg = h('dialog', h('form', { method: 'dialog', style: 'min-width:320px' },
     h('h2', dateText(l.date) + ' ' + hhmm(l.startMin)),
     h('label', { style: 'display:flex;gap:8px;align-items:center' }, cancelled, T.scCancelLesson),
-    h('p.dim', T.scWhoWasThere), boxes.map((b) => b[2]),
+    h('p.dim', T.scWhoWasThere),
+    // Con tanti iscritti: cerca, tutti presenti o nessuno (poi si tolgono o aggiungono gli altri).
+    h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' },
+      boxes.length > 12 ? h('input', { type: 'search', placeholder: T.coSearch, oninput: (ev) => { const q = ev.target.value.trim().toLowerCase(); boxes.forEach((b) => { b[2].hidden = !!q && !b[3].includes(q); }); } }) : null,
+      h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = true; }) }, T.pkAll),
+      h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = false; }) }, T.pkNone)),
+    h('div', { style: 'max-height:50vh;overflow:auto' }, boxes.map((b) => b[2])),
     h('label', T.ccLessonNote, note),
     h('div.actions',
       h('button', { type: 'button', onclick: () => dlg.close() }, '✕'),
@@ -9996,6 +10134,9 @@ tr.pass td:first-child { font-weight: 700; }
 .invite .tools { justify-content: center; }
 a.button { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; color: inherit; text-decoration: none; background: var(--panel); }
 a.button:hover { background: var(--hover); }
+/* Festività nazionali: il giorno in rosso, col nome. */
+.mday.hol b, .mhead.hol, .gday.hol { color: var(--bad); }
+.holname { color: var(--bad); font-size: 11px; font-weight: 600; }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -24863,6 +25004,82 @@ object HelpDoc {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Holidays.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Holidays.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.time.LocalDate
+import java.time.ZoneId
+
+/**
+ * Le festività nazionali (non quelle locali, come il santo patrono) del Paese del telefono, col nome nella sua lingua:
+ * Italia, Francia, Germania, Spagna, Portogallo, Brasile, Regno Unito, Stati Uniti. Le feste mobili partono dalla Pasqua.
+ */
+object Holidays {
+    /** La domenica di Pasqua dell'anno (calendario gregoriano). */
+    fun easter(year: Int): LocalDate {
+        val a = year % 19; val b = year / 100; val c = year % 100
+        val d = b / 4; val e = b % 4; val f = (b + 8) / 25; val g = (b - f + 1) / 3
+        val h = (19 * a + b - d - g + 15) % 30; val i = c / 4; val k = c % 4
+        val l = (32 + 2 * e + 2 * i - h - k) % 7; val m = (a + 11 * h + 22 * l) / 451
+        val month = (h + l - 7 * m + 114) / 31; val day = (h + l - 7 * m + 114) % 31 + 1
+        return LocalDate.of(year, month, day)
+    }
+
+    /** Il Paese del telefono; se manca, quello della lingua dell'app. */
+    fun country(language: String = java.util.Locale.getDefault().language): String =
+        java.util.Locale.getDefault().country.uppercase().ifBlank { mapOf("it" to "IT", "fr" to "FR", "de" to "DE", "es" to "ES", "pt" to "BR", "en" to "GB")[language] ?: "IT" }
+
+    /** Le feste dell'anno nel Paese [country]: giorno → nome. */
+    fun of(year: Int, country: String): Map<LocalDate, String> {
+        val e = easter(year)
+        fun d(m: Int, day: Int) = LocalDate.of(year, m, day)
+        /** L'[n]-esimo [dow] (1 = lunedì) del mese; n = -1 l'ultimo. */
+        fun nth(m: Int, dow: Int, n: Int): LocalDate {
+            if (n < 0) { var x = d(m, 1).plusMonths(1).minusDays(1); while (x.dayOfWeek.value != dow) x = x.minusDays(1); return x }
+            var x = d(m, 1); while (x.dayOfWeek.value != dow) x = x.plusDays(1); return x.plusWeeks((n - 1).toLong())
+        }
+        return when (country) {
+            "IT", "SM", "VA" -> mapOf(d(1, 1) to "Capodanno", d(1, 6) to "Epifania", e to "Pasqua", e.plusDays(1) to "Lunedì dell'Angelo",
+                d(4, 25) to "Festa della Liberazione", d(5, 1) to "Festa del Lavoro", d(6, 2) to "Festa della Repubblica", d(8, 15) to "Ferragosto",
+                d(11, 1) to "Ognissanti", d(12, 8) to "Immacolata Concezione", d(12, 25) to "Natale", d(12, 26) to "Santo Stefano")
+            "FR" -> mapOf(d(1, 1) to "Jour de l'an", e.plusDays(1) to "Lundi de Pâques", d(5, 1) to "Fête du Travail", d(5, 8) to "Victoire 1945",
+                e.plusDays(39) to "Ascension", e.plusDays(50) to "Lundi de Pentecôte", d(7, 14) to "Fête nationale", d(8, 15) to "Assomption",
+                d(11, 1) to "Toussaint", d(11, 11) to "Armistice", d(12, 25) to "Noël")
+            "DE", "AT" -> mapOf(d(1, 1) to "Neujahr", e.minusDays(2) to "Karfreitag", e.plusDays(1) to "Ostermontag", d(5, 1) to "Tag der Arbeit",
+                e.plusDays(39) to "Christi Himmelfahrt", e.plusDays(50) to "Pfingstmontag", d(10, 3) to "Tag der Deutschen Einheit",
+                d(12, 25) to "1. Weihnachtstag", d(12, 26) to "2. Weihnachtstag")
+            "ES" -> mapOf(d(1, 1) to "Año Nuevo", d(1, 6) to "Reyes", e.minusDays(2) to "Viernes Santo", d(5, 1) to "Día del Trabajo",
+                d(8, 15) to "Asunción", d(10, 12) to "Fiesta Nacional", d(11, 1) to "Todos los Santos", d(12, 6) to "Día de la Constitución",
+                d(12, 8) to "Inmaculada Concepción", d(12, 25) to "Navidad")
+            "PT" -> mapOf(d(1, 1) to "Ano Novo", e.minusDays(2) to "Sexta-feira Santa", e to "Páscoa", d(4, 25) to "Dia da Liberdade",
+                d(5, 1) to "Dia do Trabalhador", e.plusDays(60) to "Corpo de Deus", d(6, 10) to "Dia de Portugal", d(8, 15) to "Assunção",
+                d(10, 5) to "Implantação da República", d(11, 1) to "Todos os Santos", d(12, 1) to "Restauração da Independência",
+                d(12, 8) to "Imaculada Conceição", d(12, 25) to "Natal")
+            "BR" -> mapOf(d(1, 1) to "Confraternização Universal", e.minusDays(48) to "Carnaval", e.minusDays(47) to "Carnaval",
+                e.minusDays(2) to "Sexta-feira Santa", d(4, 21) to "Tiradentes", d(5, 1) to "Dia do Trabalho", e.plusDays(60) to "Corpus Christi",
+                d(9, 7) to "Independência", d(10, 12) to "Nossa Senhora Aparecida", d(11, 2) to "Finados", d(11, 15) to "Proclamação da República",
+                d(11, 20) to "Consciência Negra", d(12, 25) to "Natal")
+            "US" -> mapOf(d(1, 1) to "New Year's Day", nth(1, 1, 3) to "Martin Luther King Jr. Day", nth(2, 1, 3) to "Presidents' Day",
+                nth(5, 1, -1) to "Memorial Day", d(6, 19) to "Juneteenth", d(7, 4) to "Independence Day", nth(9, 1, 1) to "Labor Day",
+                nth(10, 1, 2) to "Columbus Day", d(11, 11) to "Veterans Day", nth(11, 4, 4) to "Thanksgiving", d(12, 25) to "Christmas Day")
+            else -> mapOf(d(1, 1) to "New Year's Day", e.minusDays(2) to "Good Friday", e.plusDays(1) to "Easter Monday",
+                nth(5, 1, 1) to "Early May bank holiday", nth(5, 1, -1) to "Spring bank holiday", nth(8, 1, -1) to "Summer bank holiday",
+                d(12, 25) to "Christmas Day", d(12, 26) to "Boxing Day")
+        }
+    }
+
+    /** La festa del giorno di [t] (null = giorno normale). */
+    fun on(t: Long, country: String, zone: ZoneId = ZoneId.systemDefault()): String? {
+        val day = java.time.Instant.ofEpochMilli(t).atZone(zone).toLocalDate()
+        return of(day.year, country)[day]
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Ladder.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Ladder.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -28248,6 +28465,19 @@ object Courses {
     }
 
     /** Il corso è pieno (con un massimo di allievi). */
+    /**
+     * Il giorno dell'[n]-esima lezione partendo da [from] con quegli orari, saltando i giorni [skip] (le feste); null
+     * senza orari o con [n] < 1. Serve a calcolare la fine del corso dal numero di lezioni.
+     */
+    fun endAfter(from: Long, slots: List<CourseSlot>, n: Int, skip: (Long) -> Boolean = { false }): Long? {
+        if (slots.isEmpty() || n < 1) return null
+        val probe = Course("x", "", slots = slots, from = from, to = CourtPlans.addDays(from, 3 * 366))
+        return lessons(probe).filter { !skip(it.start) }.getOrNull(n - 1)?.let { CourtPlans.dayStart(it.start) }
+    }
+
+    /** Le lezioni del corso che cadono in un giorno [skip] (le feste): da segnare annullate. */
+    fun skipped(c: Course, skip: (Long) -> Boolean): Set<String> = lessons(c).filter { skip(it.start) }.map { it.key }.toSet()
+
     fun full(c: Course): Boolean = c.maxStudents > 0 && c.students.size >= c.maxStudents
 }
 TSM_EOF
@@ -31216,6 +31446,8 @@ interface CoachData {
     fun setCourseColor(id: String, color: String) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
+    /** Il Paese per le festività nazionali (quello del telefono). */
+    fun country(): String = com.tennis.scoremanager.data.Holidays.country()
     fun receiptPdf(packId: String): ByteArray?
     fun reportPdf(student: String, days: Int?): ByteArray?
     fun registerPdf(courseId: String): ByteArray?
@@ -31256,8 +31488,11 @@ interface CoachData {
 @Serializable data class CdCourseIn(
     val name: String = "", val level: String = "", val from: String = "", val to: String = "", val slots: List<CdSlot> = emptyList(), val students: List<String> = emptyList(),
     val color: String? = null,
+    /** Quante lezioni (la fine si calcola da inizio e orari) e se le feste nazionali non contano (e risultano annullate). */
+    val lessons: Int? = null, val skipHolidays: Boolean = true,
 )
-@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
+@Serializable data class CdEnd(val to: String? = null)
+@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
 @Serializable data class CdMonth(
@@ -31275,9 +31510,11 @@ interface CoachData {
     /** Il colore del corso (per le lezioni dei corsi). */
     val color: String? = null,
 )
-@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>)
+@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>, val holiday: String? = null)
 @Serializable data class CdCal(val first: String, val days: List<CdCalDay>)
 @Serializable data class CdText(val text: String = "")
+/** Un gruppo di allievi dell'allenatore (per aggiungerli tutti insieme a un corso). */
+@Serializable data class CdGroup(val id: String, val name: String, val students: List<String>)
 @Serializable data class CdAttendanceIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean = false, val note: String = "")
 @Serializable data class CdDoneIn(val done: Boolean = true)
 @Serializable data class CdInfo(val mode: String = "coach", val club: String, val lang: String, val today: String, val year: Int, val coach: String)
@@ -31300,6 +31537,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
     fun route(m: String, p: List<String>, r: DeskApi.Req, club: String): DeskApi.Resp = when {
         m == "GET" && p == listOf("info") -> ok(CdInfo.serializer(), CdInfo(club = club, lang = data.lang, today = day(data.now())!!, year = Instant.ofEpochMilli(data.now()).atZone(zone()).year, coach = data.coachName()))
         m == "GET" && p == listOf("coach", "students") -> ok(ListSerializer(CdStudent.serializer()), students().sortedBy { it.name.lowercase() })
+        m == "GET" && p == listOf("coach", "groups") -> ok(ListSerializer(CdGroup.serializer()), data.book().groups.sortedBy { it.name.lowercase() }.map { CdGroup(it.id, it.name, it.students) })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
         m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> saveStudent(student(p[2]), read(CdStudentIn.serializer(), r))
@@ -31317,6 +31555,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p == listOf("coach", "courses") -> ok(ListSerializer(CdCourse.serializer()), data.book().courses.map { course(it.card.course.id) }.sortedBy { it.name.lowercase() })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ok(CdRegister.serializer(), register(p[2]))
         m == "POST" && p == listOf("coach", "courses") -> ownCourse(null, read(CdCourseIn.serializer(), r))
+        m == "POST" && p == listOf("coach", "courses", "end") -> read(CdCourseIn.serializer(), r).let { i -> ok(CdEnd.serializer(), CdEnd(day(endOf(i)))) }
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ownCourse(p[2], read(CdCourseIn.serializer(), r))
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "color" -> {
             if (data.book().courses.none { it.card.course.id == p[2] }) throw DeskApi.Fail(404, "NOT_FOUND")
@@ -31423,7 +31662,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val lessons = Courses.lessons(co).filter { it.start <= now + 7L * 86_400_000L }
         return CdRegister(
             head,
-            lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L) },
+            lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L,
+                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone())) },
             co.students.sortedBy { (names[it] ?: "").lowercase() }.map { sid ->
                 val (a, t) = Courses.attendanceOf(co, sid, now)
                 CdRegRow(sid, names[sid] ?: "—", lessons.map { com.tennis.scoremanager.data.AttendancePdf.mark(co, it.key, sid) }, a, t)
@@ -31436,18 +31676,29 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
     private fun ownCourse(id: String?, i: CdCourseIn): DeskApi.Resp {
         val name = i.name.trim().take(60)
         if (name.isEmpty() || i.slots.isEmpty() || i.slots.any { it.weekday !in 1..7 || it.startMin !in 0 until 24 * 60 || it.minutes !in 15..300 }) throw DeskApi.Fail(400, "BAD_REQUEST")
-        val from = dayStart(i.from); val to = dayStart(i.to)
+        val from = dayStart(i.from)
+        val to = endOf(i) ?: dayStart(i.to)
         if (to < from) throw DeskApi.Fail(400, "BAD_REQUEST")
         val students = i.students.filter { s -> data.players().any { it.id == s && it.student } }.distinct()
         val old = id?.let { x -> data.book().courses.firstOrNull { it.card.course.id == x } ?: throw DeskApi.Fail(404, "NOT_FOUND") }
         if (old != null && !old.personal) throw DeskApi.Fail(409, "NOT_OWN")
         val base = old?.card?.course ?: com.tennis.scoremanager.data.Course(Coaching.newId("cc"), name, from = from, to = to, createdAt = data.now())
-        val co = base.copy(name = name, level = i.level.trim().take(40), from = from, to = to,
+        val co0 = base.copy(name = name, level = i.level.trim().take(40), from = from, to = to,
             slots = i.slots.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court.trim().take(30)) }.distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })),
             students = students)
+        // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
+        val co = if (i.skipHolidays) co0.copy(cancelled = co0.cancelled + Courses.skipped(co0) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else co0
         data.saveOwnCourse(co)
         i.color?.takeIf { it in com.tennis.scoremanager.data.CourseCards.COLORS }?.let { data.setCourseColor(co.id, it) }
         return ok(CdCourse.serializer(), course(co.id))
+    }
+
+    /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
+    private fun endOf(i: CdCourseIn): Long? {
+        val n = i.lessons ?: return null
+        val from = runCatching { dayStart(i.from) }.getOrNull() ?: return null
+        val slots = i.slots.filter { it.weekday in 1..7 }.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
+        return Courses.endAfter(from, slots, n) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
     }
 
     private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {
@@ -31475,8 +31726,9 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         }
         for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)
         val byDay = items.sortedBy { it.first }.groupBy { day(it.first)!! }
+        val holidays = com.tennis.scoremanager.data.Holidays.of(start.year, data.country())
         val days = generateSequence(start) { it.plusDays(1) }.takeWhile { it.isBefore(start.plusMonths(1)) }
-            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }) }.toList()
+            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }, holidays[d]) }.toList()
         return CdCal(start.toString(), days)
     }
 
@@ -31572,6 +31824,8 @@ interface DeskData {
     val club: String
     val lang: String
     fun now(): Long
+    /** Il Paese per le festività nazionali del planning. */
+    fun country(): String = com.tennis.scoremanager.data.Holidays.country(lang)
     fun players(): List<PlayerProfile>
     fun savePlayers(list: List<PlayerProfile>)
     fun book(): ClubBook
@@ -31758,11 +32012,11 @@ interface DeskData {
     /** Partita di torneo: il torneo. Blocco: il motivo, e se si cambia da qui (non quelli di corsi e squadre). */
     val cup: String? = null, val reason: BlockReason? = null, val editable: Boolean = false,
 )
-@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>)
+@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>, val holiday: String? = null)
 /** La settimana da lunedì: i sette giorni come in [DeskDay]. */
 @Serializable data class DeskWeek(val from: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val days: List<DeskDay>)
 /** Un giorno del mese in breve: prenotazioni, partite, quanto sono occupati e chiusi i campi (in percentuale). */
-@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int)
+@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int, val holiday: String? = null)
 @Serializable data class DeskMonth(val first: String, val courts: List<String>, val days: List<DeskDaySum>)
 @Serializable data class DeskBookingIn(
     val court: String, val date: String, val startMin: Int, val minutes: Int, val kind: BookingKind = BookingKind.PLAY,
@@ -32216,7 +32470,7 @@ class DeskApi(
             }
         }
         val s = plan.settings
-        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items)
+        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, com.tennis.scoremanager.data.Holidays.on(start + 12 * 3_600_000L, data.country(), zone()))
     }
 
     private fun localDay(date: String?): LocalDate = runCatching { LocalDate.parse(date.orEmpty()) }.getOrElse { throw Fail(400, "BAD_DATE") }
@@ -32234,6 +32488,7 @@ class DeskApi(
         val plan = data.plan(); val cups = data.tournaments(); val courts = data.courts()
         val s = plan.settings
         val open = (s.closeHour - s.openHour).coerceAtLeast(1) * 60
+        val holidays = com.tennis.scoremanager.data.Holidays.of(first.year, data.country())
         val days = (0 until first.lengthOfMonth()).map { i ->
             val d = first.plusDays(i.toLong())
             val start = dayStart(d.toString())
@@ -32243,7 +32498,7 @@ class DeskApi(
             val used = occ.filter { it.block == null }.sumOf(::minutes)
             val closed = occ.filter { it.block != null }.sumOf { o -> minutes(o) * (if (o.court == CourtPlans.ALL) courts.size else 1) }
             val cap = (open * courts.size).coerceAtLeast(1)
-            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100))
+            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d])
         }
         return ok(DeskMonth.serializer(), DeskMonth(first.toString(), courts, days))
     }
@@ -33538,6 +33793,7 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
     override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
+    override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
@@ -39902,6 +40158,12 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     var picking by remember { mutableStateOf(false) }
     var askDelete by remember { mutableStateOf(false) }
     var color by remember { mutableStateOf(cc?.label ?: com.tennis.scoremanager.data.CourseCards.OWN) }
+    // Quante lezioni: dalla data d'inizio e dagli orari la fine si calcola da sola; le feste (se le si salta) non contano.
+    var lessonsText by remember { mutableStateOf(cc?.course?.let { x -> Courses.lessons(x).count { it.key !in x.cancelled }.toString() } ?: "10") }
+    var skipHolidays by remember { mutableStateOf(true) }
+    val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
+    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
+    val skip = { t: Long -> skipHolidays && isHoliday(t) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
     var wd by remember { mutableStateOf(1) }
     var startMin by remember { mutableStateOf(17 * 60) }
@@ -39919,7 +40181,6 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp)
                 CourseColorDots(color) { color = it }
                 com.tennis.scoremanager.ui.screens.DateButton(s.ctStart, co.from, lang) { d -> co = co.copy(from = d, to = maxOf(co.to, d)) }
-                com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
                 Text(s.ccSlots, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 for (sl in co.slots) Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("${dayName(sl.weekday)} ${hm(sl.startMin)} · ${s.coMinutes(sl.minutes)}" + (sl.court.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
@@ -39935,6 +40196,13 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 GhostButton(s.ccAddSlot, Icons.Filled.Add, {
                     co = co.copy(slots = (co.slots + com.tennis.scoremanager.data.CourseSlot(wd, startMin, minutes, place.trim())).distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })))
                 }, Modifier.fillMaxWidth())
+                // Numero di lezioni e fine: calcolata da inizio, orari e feste; senza numero si sceglie a mano.
+                OutlinedTextField(lessonsText, { v -> lessonsText = v.filter(Char::isDigit).take(3) }, Modifier.fillMaxWidth(), singleLine = true,
+                    label = { Text(s.ccLessonsCount) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                SwitchRow(Icons.Filled.EventBusy, s.ccSkipHolidays, s.ccSkipHolidaysHint, skipHolidays) { skipHolidays = it }
+                val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) }
+                if (autoEnd != null) Text(s.ccEndAuto(shortDate(autoEnd, lang)), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                else com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
                 Text(s.coGroupCount(co.students.size) + if (co.students.isNotEmpty()) ": " + co.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") else "",
                     color = TsmColors.TextMain, fontSize = 14.sp)
                 GhostButton(s.ccPickStudents, Icons.Filled.School, { picking = true }, Modifier.fillMaxWidth())
@@ -39942,7 +40210,12 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
             }
         },
         confirmButton = {
-            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim()), color); onDone(co.id) }) { Text(s.save) }
+            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = {
+                val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) } ?: co.to
+                val x = co.copy(name = co.name.trim(), level = co.level.trim(), to = end)
+                // Le lezioni nei giorni di festa risultano annullate (si possono sempre rimettere dall'appello).
+                c.saveCoachOwnCourse(if (skipHolidays) x.copy(cancelled = x.cancelled + Courses.skipped(x, isHoliday)) else x, color); onDone(co.id)
+            }) { Text(s.save) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
@@ -40009,7 +40282,10 @@ fun CoachCourseScreen(c: MatchController) {
         }
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
-            for (sid in co.students) {
+            // Con tanti iscritti: un filtro per nome.
+            var who by remember { mutableStateOf("") }
+            if (co.students.size > 12) OutlinedTextField(who, { who = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+            for (sid in co.students.filter { sid -> who.isBlank() || (c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name.orEmpty()).contains(who.trim(), ignoreCase = true) }) {
                 val p = c.playerById(sid)
                 val (pres, tot) = Courses.attendanceOf(co, sid, now)
                 Row(Modifier.fillMaxWidth().clickable(enabled = p != null) { p?.let { c.openStudent(it.id) } }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -40029,7 +40305,11 @@ fun CoachCourseScreen(c: MatchController) {
                 val cancelled = l.key in co.cancelled
                 val marked = co.attendance[l.key]
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { open = l }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(lessonText(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Column(Modifier.weight(1f)) {
+                        Text(lessonText(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp)
+                        // Lezione in un giorno di festa: in rosso, si vede subito.
+                        com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                    }
                     Text(
                         when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
                         color = when { cancelled -> TsmColors.Danger; marked != null -> TsmColors.Ok; l.start <= now -> TsmColors.Orange; else -> TsmColors.TextDim }, fontSize = 13.sp,
@@ -40082,6 +40362,7 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
     var note by remember { mutableStateOf(cc.notes[l.key].orEmpty()) }
+    var query by remember { mutableStateOf("") }
     val canMark = l.start <= System.currentTimeMillis() + 3_600_000L
     AlertDialog(
         onDismissRequest = onDone,
@@ -40096,11 +40377,16 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
                         c.noticeCourseCancelled(co.id, l.start)
                     }, Modifier.fillMaxWidth())
                 } else if (canMark) {
-                    Text(s.scWhoWasThere, color = TsmColors.TextDim, fontSize = 13.sp)
-                    for (sid in co.students) {
-                        val name = c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name ?: continue
-                        SwitchRow(Icons.Filled.School, name, null, sid in present) { on -> present = if (on) present + sid else present - sid }
+                    Text(s.scWhoWasThere + " (${present.size}/${co.students.size})", color = TsmColors.TextDim, fontSize = 13.sp)
+                    // Con tanti iscritti: cerca, tutti presenti o nessuno, poi si sistemano gli altri.
+                    val names = co.students.associateWith { sid -> c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name }
+                    if (co.students.size > 12) OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+                    val shown = co.students.filter { sid -> names[sid] != null && (query.isBlank() || names[sid]!!.contains(query.trim(), ignoreCase = true)) }
+                    Row {
+                        TextButton(onClick = { present = present + shown }) { Text(s.pkAll, color = TsmColors.Ball) }
+                        TextButton(onClick = { present = present - shown.toSet() }) { Text(s.pkNone, color = TsmColors.Ball) }
                     }
+                    for (sid in shown) SwitchRow(Icons.Filled.School, names[sid]!!, null, sid in present) { on -> present = if (on) present + sid else present - sid }
                     OutlinedTextField(note, { note = it.take(500) }, Modifier.fillMaxWidth(), label = { Text(s.ccLessonNote) },
                         trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(500) } })
                 } else Text(s.ccNotYet, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -40859,13 +41145,31 @@ fun PackDialog(c: MatchController, student: String, onDone: () -> Unit) {
 fun StudentPickDialog(c: MatchController, title: String, exclude: Set<String> = emptySet(), initial: Set<String> = emptySet(), multi: Boolean, onDone: (List<String>) -> Unit) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
+    val groups = c.coachBook.collectAsState().value.groups
     var picked by remember { mutableStateOf(initial) }
+    // Anche con centinaia di allievi: si cerca per nome, si guarda un gruppo, solo i scelti; se ne mostrano 100.
+    var query by remember { mutableStateOf("") }
+    var group by remember { mutableStateOf<String?>(null) }
+    var onlyPicked by remember { mutableStateOf(false) }
+    val all = students.filter { it.id !in exclude }
+    val shown = all
+        .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }
+        .filter { p -> group == null || groups.firstOrNull { it.id == group }?.students?.contains(p.id) == true }
+        .filter { !onlyPicked || it.id in picked }
     AlertDialog(
         onDismissRequest = { onDone(if (multi) picked.toList() else emptyList()) },
-        title = { Text(title) },
+        title = { Text(title + if (multi && picked.isNotEmpty()) " (${picked.size})" else "") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                for (p in students.filter { it.id !in exclude }) Row(
+                if (all.size > 8) OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+                if (groups.isNotEmpty() || multi) androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick = { group = null }) { Text(s.coAll, color = if (group == null) TsmColors.Ball else TsmColors.TextDim) }
+                    for (g in groups) TextButton(onClick = { group = g.id }) { Text(g.name, color = if (group == g.id) TsmColors.Ball else TsmColors.TextDim) }
+                    if (multi) TextButton(onClick = { onlyPicked = !onlyPicked }) { Text(s.pkOnlyChosen, color = if (onlyPicked) TsmColors.Ball else TsmColors.TextDim) }
+                    if (multi && shown.isNotEmpty()) TextButton(onClick = { picked = picked + shown.map { it.id } }) { Text(s.pkAllShown, color = TsmColors.Ball) }
+                }
+                if (shown.size > 100) Text(s.pkMore(shown.size - 100), color = TsmColors.TextDim, fontSize = 12.sp)
+                for (p in shown.take(100)) Row(
                     Modifier.fillMaxWidth().clickable {
                         if (!multi) onDone(listOf(p.id)) else picked = if (p.id in picked) picked - p.id else picked + p.id
                     }.padding(vertical = 8.dp),
@@ -47817,6 +48121,19 @@ interface Strings {
     val ccOwnTag: String
     val ccClubCourses: String
     val ccColor: String
+    val pkOnlyChosen: String
+    val pkAllShown: String
+    val pkAll: String
+    val pkNone: String
+    val pkAddGroup: String
+    val pkClear: String
+    val pkChosen: (Int) -> String
+    val pkMore: (Int) -> String
+    val ccLessonsCount: String
+    val ccSkipHolidays: String
+    val ccSkipHolidaysHint: String
+    val hdHoliday: String
+    val ccEndAuto: (String) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
@@ -50405,6 +50722,19 @@ object ItStrings : Strings {
     override val ccOwnTag = "Corso mio"
     override val ccClubCourses = "Corsi della segreteria"
     override val ccColor = "Colore"
+    override val pkOnlyChosen = "Solo i selezionati"
+    override val pkAllShown = "Scegli quelli mostrati"
+    override val pkAll = "Tutti"
+    override val pkNone = "Nessuno"
+    override val pkAddGroup = "Aggiungi un gruppo…"
+    override val pkClear = "Togli tutti"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 scelto" else "$it scelti" }
+    override val pkMore: (Int) -> String = { "Altri $it: scrivi un nome per cercarli" }
+    override val ccLessonsCount = "Numero di lezioni"
+    override val ccSkipHolidays = "Salta le feste"
+    override val ccSkipHolidaysHint = "Le lezioni nei giorni di festa nazionale non contano e risultano annullate (si rimettono dall'appello)."
+    override val hdHoliday = "Festa"
+    override val ccEndAuto: (String) -> String = { "Fine: $it (calcolata)" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
@@ -52994,6 +53324,19 @@ object EnStrings : Strings {
     override val ccOwnTag = "My course"
     override val ccClubCourses = "Club office courses"
     override val ccColor = "Colour"
+    override val pkOnlyChosen = "Chosen only"
+    override val pkAllShown = "Pick those shown"
+    override val pkAll = "All"
+    override val pkNone = "None"
+    override val pkAddGroup = "Add a group…"
+    override val pkClear = "Remove all"
+    override val pkChosen: (Int) -> String = { "$it chosen" }
+    override val pkMore: (Int) -> String = { "$it more: type a name to find them" }
+    override val ccLessonsCount = "Number of lessons"
+    override val ccSkipHolidays = "Skip holidays"
+    override val ccSkipHolidaysHint = "Lessons on national holidays don't count and are marked cancelled (you can restore them from the roll call)."
+    override val hdHoliday = "Holiday"
+    override val ccEndAuto: (String) -> String = { "End: $it (calculated)" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
@@ -55608,6 +55951,19 @@ object DeStrings : Strings {
     override val ccOwnTag = "Mein Kurs"
     override val ccClubCourses = "Kurse des Büros"
     override val ccColor = "Farbe"
+    override val pkOnlyChosen = "Nur ausgewählte"
+    override val pkAllShown = "Angezeigte wählen"
+    override val pkAll = "Alle"
+    override val pkNone = "Keiner"
+    override val pkAddGroup = "Gruppe hinzufügen…"
+    override val pkClear = "Alle entfernen"
+    override val pkChosen: (Int) -> String = { "$it ausgewählt" }
+    override val pkMore: (Int) -> String = { "$it weitere: Namen eingeben, um sie zu finden" }
+    override val ccLessonsCount = "Anzahl der Stunden"
+    override val ccSkipHolidays = "Feiertage überspringen"
+    override val ccSkipHolidaysHint = "Stunden an gesetzlichen Feiertagen zählen nicht und gelten als abgesagt (in der Anwesenheit wiederherstellbar)."
+    override val hdHoliday = "Feiertag"
+    override val ccEndAuto: (String) -> String = { "Ende: $it (berechnet)" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
@@ -58212,6 +58568,19 @@ object EsStrings : Strings {
     override val ccOwnTag = "Mi curso"
     override val ccClubCourses = "Cursos de la secretaría"
     override val ccColor = "Color de la etiqueta"
+    override val pkOnlyChosen = "Solo los elegidos"
+    override val pkAllShown = "Elegir los mostrados"
+    override val pkAll = "Todos"
+    override val pkNone = "Ninguno"
+    override val pkAddGroup = "Añadir un grupo…"
+    override val pkClear = "Quitar todos"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 elegido" else "$it elegidos" }
+    override val pkMore: (Int) -> String = { "$it más: escribe un nombre para buscarlos" }
+    override val ccLessonsCount = "Número de clases"
+    override val ccSkipHolidays = "Saltar los festivos"
+    override val ccSkipHolidaysHint = "Las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde pasar lista)."
+    override val hdHoliday = "Festivo"
+    override val ccEndAuto: (String) -> String = { "Fin: $it (calculado)" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
@@ -60818,6 +61187,19 @@ object FrStrings : Strings {
     override val ccOwnTag = "Mon cours"
     override val ccClubCourses = "Cours du secrétariat"
     override val ccColor = "Couleur"
+    override val pkOnlyChosen = "Seulement les choisis"
+    override val pkAllShown = "Choisir ceux affichés"
+    override val pkAll = "Tous"
+    override val pkNone = "Aucun"
+    override val pkAddGroup = "Ajouter un groupe…"
+    override val pkClear = "Tout retirer"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 choisi" else "$it choisis" }
+    override val pkMore: (Int) -> String = { "$it de plus : tapez un nom pour les trouver" }
+    override val ccLessonsCount = "Nombre de séances"
+    override val ccSkipHolidays = "Sauter les jours fériés"
+    override val ccSkipHolidaysHint = "Les séances des jours fériés ne comptent pas et sont annulées (on les rétablit depuis l'appel)."
+    override val hdHoliday = "Jour férié"
+    override val ccEndAuto: (String) -> String = { "Fin : $it (calculée)" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
@@ -63425,6 +63807,19 @@ object PtStrings : Strings {
     override val ccOwnTag = "O meu curso"
     override val ccClubCourses = "Cursos da secretaria"
     override val ccColor = "Cor"
+    override val pkOnlyChosen = "Só os escolhidos"
+    override val pkAllShown = "Escolher os mostrados"
+    override val pkAll = "Todos"
+    override val pkNone = "Nenhum"
+    override val pkAddGroup = "Adicionar um grupo…"
+    override val pkClear = "Remover todos"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 escolhido" else "$it escolhidos" }
+    override val pkMore: (Int) -> String = { "Mais $it: escreva um nome para os encontrar" }
+    override val ccLessonsCount = "Número de aulas"
+    override val ccSkipHolidays = "Saltar os feriados"
+    override val ccSkipHolidaysHint = "As aulas em feriados nacionais não contam e ficam anuladas (repõem-se na chamada)."
+    override val hdHoliday = "Feriado"
+    override val ccEndAuto: (String) -> String = { "Fim: $it (calculado)" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
@@ -65998,6 +66393,10 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
             // Il giorno prende lo spazio che resta: le due frecce restano a vista.
             DateButton(s.planDay, day, lang, Modifier.weight(1f)) { day = CourtPlans.dayStart(it) }
             IconButton(onClick = { day = CourtPlans.addDays(day, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
+        }
+        // Festa nazionale: in rosso, così si vede subito.
+        com.tennis.scoremanager.data.Holidays.on(day + 12 * 3_600_000L, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { name ->
+            Text("${s.hdHoliday}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -68638,6 +69037,10 @@ private fun LessonRow(c: MatchController, l: CoachLesson, onClick: () -> Unit) {
     val s = LocalStrings.current
     Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp)) {
         Text(c.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        // Lezione in un giorno di festa: in rosso.
+        com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code))?.let {
+            Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
         Text(l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") + if (l.cancelled) " · ${s.coCancelled}" else if (l.done) " · ${s.coDone}" else "",
             color = if (l.cancelled) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
     }
@@ -96228,6 +96631,47 @@ class HelpDocTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/HolidaysTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/HolidaysTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+import java.time.LocalDate
+import java.time.ZoneId
+
+class HolidaysTest {
+    @Test fun easterAndItalianHolidays() {
+        assertEquals(LocalDate.of(2026, 4, 5), Holidays.easter(2026))
+        assertEquals(LocalDate.of(2027, 3, 28), Holidays.easter(2027))
+        val it = Holidays.of(2026, "IT")
+        assertEquals("Lunedì dell'Angelo", it[LocalDate.of(2026, 4, 6)])
+        assertEquals("Immacolata Concezione", it[LocalDate.of(2026, 12, 8)])
+        assertEquals(12, it.size)
+        assertEquals("Thanksgiving", Holidays.of(2026, "US")[LocalDate.of(2026, 11, 26)])
+        assertEquals("Pfingstmontag", Holidays.of(2026, "DE")[LocalDate.of(2026, 5, 25)])
+    }
+
+    @Test fun endDateFromLessonsSkippingHolidays() {
+        val zone = ZoneId.systemDefault()
+        // Martedì 1 dicembre 2026, il martedì alle 17: la 2ª lezione è l'8 (festa) se non la si salta.
+        val from = LocalDate.of(2026, 12, 1).atStartOfDay(zone).toInstant().toEpochMilli()
+        val slots = listOf(CourseSlot(2, 17 * 60))
+        val day = { t: Long -> java.time.Instant.ofEpochMilli(t).atZone(zone).toLocalDate() }
+        assertEquals(LocalDate.of(2026, 12, 8), day(Courses.endAfter(from, slots, 2)!!))
+        val skip = { t: Long -> Holidays.on(t, "IT", zone) != null }
+        assertEquals(LocalDate.of(2026, 12, 15), day(Courses.endAfter(from, slots, 2, skip)!!))
+        assertNull(Courses.endAfter(from, emptyList(), 3))
+        val co = Course("c", "x", slots = slots, from = from, to = LocalDate.of(2026, 12, 31).atStartOfDay(zone).toInstant().toEpochMilli())
+        assertEquals(1, Courses.skipped(co, skip).size)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/LadderTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/LadderTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -98346,6 +98790,7 @@ class FakeCoach(var time: Long) : CoachData {
         book = book.copy(courses = book.courses.filter { it.card.course.id != c.id } + (old?.copy(card = old.card.copy(course = c)) ?: CoachCourse(CourseCard(code = "", issuedAt = 1, course = c), personal = true)))
     }
     override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
+    override fun country() = "IT"
     val colors = mutableMapOf<String, String>()
     override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
@@ -98448,6 +98893,22 @@ class CoachDeskTest {
         assertTrue(coach.book.courses.none { it.card.course.id == c.id })
     }
 
+    @Test fun lessonsCountGivesTheEndAndSkipsHolidays() {
+        val tk = login()
+        // Il martedì dal 1° dicembre 2026: l'8 è l'Immacolata.
+        val base = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60,"court":""}],"lessons":2"""
+        assertTrue(req("POST", "/coach/courses/end", "$base}", tk).second.contains("2026-12-15"))
+        assertTrue(req("POST", "/coach/courses/end", "$base,\"skipHolidays\":false}", tk).second.contains("2026-12-08"))
+        assertEquals(200, req("POST", "/coach/courses", "$base}", tk).first)
+        val c = coach.saved.last()
+        assertEquals(java.time.LocalDate.of(2026, 12, 15), java.time.Instant.ofEpochMilli(c.to).atZone(zone).toLocalDate())
+        assertEquals(1, c.cancelled.size)
+        val cal = req("GET", "/coach/calendar", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(cal, "\"holiday\":\"Immacolata Concezione\"" in cal)
+        val reg = req("GET", "/coach/courses/${c.id}", token = tk).second
+        assertTrue(reg, "Immacolata" in reg)
+    }
+
     @Test fun studentsFromThePcWithoutDuplicates() {
         val tk = login()
         val made = req("POST", "/coach/students", """{"firstName":"Giulia","lastName":"Verdi","guardian":"Marta Verdi","guardianPhone":"3331234567","consent":true}""", tk)
@@ -98517,6 +98978,13 @@ class DeskTest {
         val id = field(req("POST", "/pair", """{"code":"${auth.shownCode}"}""").second, "id")!!
         auth.answer(true)
         return field(req("GET", "/pair/$id").second, "token")!!
+    }
+
+    @Test fun ilPlanningMostraLeFeste() {
+        val tk = login()
+        val m = req("GET", "/month", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(m, "\"holiday\":\"Natale\"" in m)
+        assertTrue(req("GET", "/day", token = tk, q = mapOf("date" to "2026-12-08")).second.contains("Immacolata"))
     }
 
     @Test fun senzaChiaveNonSiVedeNiente() {
@@ -99244,6 +99712,7 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun <T> tx(f: () -> T): T = synchronized(this) { f() }
     override var club = "TC Prova"
     override var lang = "it"
+    override fun country() = "IT"
     override fun now() = time
     override fun players() = list
     override fun savePlayers(list: List<PlayerProfile>) { val ids = list.map { it.id }.toSet(); this.list = this.list.filter { it.id !in ids } + list }
@@ -112458,6 +112927,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 360 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 362 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

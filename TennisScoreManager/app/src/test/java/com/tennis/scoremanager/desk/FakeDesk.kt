@@ -41,6 +41,7 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun <T> tx(f: () -> T): T = synchronized(this) { f() }
     override var club = "TC Prova"
     override var lang = "it"
+    override fun country() = "IT"
     override fun now() = time
     override fun players() = list
     override fun savePlayers(list: List<PlayerProfile>) { val ids = list.map { it.id }.toSet(); this.list = this.list.filter { it.id !in ids } + list }

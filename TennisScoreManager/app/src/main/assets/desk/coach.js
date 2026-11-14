@@ -202,8 +202,8 @@ async function showAgenda() {
     const cells = [];
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const d of m.days) {
-      cells.push(h('div.mday' + (d.date === info.today ? '.now' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) },
-        h('b', Number(d.date.slice(8))), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
+      cells.push(h('div.mday' + (d.date === info.today ? '.now' : '') + (d.holiday ? '.hol' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (d.holiday ? ' · ' + d.holiday : '') },
+        h('b', Number(d.date.slice(8))), d.holiday ? h('span.holname', d.holiday) : null, d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
     }
     put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
       h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legendOf(m.days.flatMap((d) => d.items)));
@@ -217,10 +217,11 @@ async function showAgenda() {
   const months = [...new Set(days.map((x) => x.slice(0, 8) + '01'))];
   const cals = await Promise.all(months.map((x) => api('GET', '/coach/calendar?date=' + x)));
   const byDay = Object.fromEntries(cals.flatMap((c) => c.days).map((d) => [d.date, d.items]));
+  const hol = Object.fromEntries(cals.flatMap((c) => c.days).filter((d) => d.holiday).map((d) => [d.date, d.holiday]));
   const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
   put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
-    h('div.panel', h('div.month', days.map((d) => h('div.mhead', long(d, { weekday: 'short', day: 'numeric' }))),
-      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
+    h('div.panel', h('div.month', days.map((d) => h('div.mhead' + (hol[d] ? '.hol' : ''), { title: hol[d] || '' }, long(d, { weekday: 'short', day: 'numeric' }))),
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : '') + (hol[d] ? '.hol' : ''), { style: 'min-height:240px' }, hol[d] ? h('span.holname', hol[d]) : null, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
 }
 
 /** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
@@ -272,11 +273,45 @@ async function showCourseRegister(id) {
       try { await api('PUT', '/coach/courses/' + encodeURIComponent(id) + '/color', { text: col }); showCourseRegister(id); } catch (e) { toast(errText(e)); }
     }))),
     h('div.printonly.phead', h('b', T.rgTitle + ' · ' + c.name), ' · ', dateText(info.today)),
+    // Con tanti allievi: un filtro per nome sulle righe del registro.
+    r.rows.length > 12 ? h('input.noprint', { type: 'search', placeholder: T.coSearch, style: 'max-width:320px;margin:6px 0', oninput: (ev) => {
+      const q = ev.target.value.trim().toLowerCase();
+      document.querySelectorAll('tr[data-name]').forEach((tr) => { tr.hidden = !!q && !tr.dataset.name.includes(q); });
+    } }) : null,
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
-      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center', onclick: () => { if (l.past) attendanceDialog(r, l); } },
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
-      h('tbody', r.rows.map((row) => h('tr', h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
+      h('tbody', r.rows.map((row) => h('tr', { 'data-name': row.name.toLowerCase() }, h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
+}
+
+/**
+ * Scegliere gli allievi anche tra centinaia: si cerca per nome (il menu sotto mostra i primi dieci che non ci sono
+ * ancora; Invio aggiunge il primo), si aggiunge un gruppo intero, si toglie con la ✕. [chosen] è l'insieme degli id.
+ */
+function studentPicker(students, groups, chosen) {
+  const byId = Object.fromEntries(students.map((s) => [s.id, s]));
+  const input = h('input', { type: 'search', placeholder: T.coSearch, 'aria-label': T.coSearch, autocomplete: 'off' });
+  const hits = h('div.hits');
+  const count = h('p.dim');
+  const tags = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow:auto' });
+  const group = select([['', T.pkAddGroup]].concat(groups.map((g) => [g.id, g.name + ' (' + g.students.length + ')'])), '');
+  const draw = () => {
+    const q = input.value.trim().toLowerCase();
+    const list = q ? students.filter((s) => !chosen.has(s.id) && s.name.toLowerCase().includes(q)).slice(0, 10) : [];
+    put(hits, list.map((s) => h('button', { type: 'button', onclick: () => { chosen.add(s.id); input.value = ''; draw(); input.focus(); } }, s.name)),
+      q && !list.length ? h('div.dim.pad', T.noResults) : null);
+    count.textContent = T.pkChosen(chosen.size);
+    put(tags, [...chosen].map((id) => byId[id]).filter(Boolean).sort((a, b) => a.name.localeCompare(b.name)).map((s) =>
+      h('span', { style: 'display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 10px;border-radius:14px;background:var(--hover)' }, s.name,
+        h('button', { type: 'button', 'aria-label': T.remove, style: 'border:0;background:none;padding:0 4px', onclick: () => { chosen.delete(s.id); draw(); } }, '✕'))));
+  };
+  input.addEventListener('input', draw);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = hits.querySelector('button'); if (b) b.click(); } });
+  group.addEventListener('change', () => { const g = groups.find((x) => x.id === group.value); if (g) g.students.forEach((id) => { if (byId[id]) chosen.add(id); }); group.value = ''; draw(); });
+  draw();
+  return h('div.picker', { style: 'max-width:none' }, input, hits, h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' }, groups.length ? group : null,
+    h('button', { type: 'button', onclick: () => { chosen.clear(); draw(); } }, T.pkClear), count), tags);
 }
 
 /**
@@ -284,18 +319,33 @@ async function showCourseRegister(id) {
  * durata, dove) e allievi. Salvato, si apre il suo registro.
  */
 async function editOwnCourse(c) {
-  let students = [];
-  try { students = await api('GET', '/coach/students'); } catch (e) { toast(errText(e)); return; }
+  let students = [], groups = [];
+  try { [students, groups] = await Promise.all([api('GET', '/coach/students'), api('GET', '/coach/groups')]); } catch (e) { toast(errText(e)); return; }
   const name = h('input', { value: c ? c.name : '', maxlength: 60, required: true });
   const level = h('input', { value: c ? c.level : '', maxlength: 40 });
   const plus = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setMonth(x.getMonth() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
   const from = h('input', { type: 'date', value: c ? c.from : info.today });
   const to = h('input', { type: 'date', value: c ? c.to : plus(info.today, 6) });
+  // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
+  const count = h('input', { type: 'number', min: 1, max: 200, value: c ? '' : '10', placeholder: '—' });
+  const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const endBox = h('div.full');
+  let endSeq = 0;
+  const drawEnd = async () => {
+    const n = Number(count.value);
+    if (!count.value || !(n > 0)) { put(endBox, field(T.ctEnd, to)); return; }
+    const my = ++endSeq;
+    let out = null;
+    try { out = await api('POST', '/coach/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    if (my !== endSeq) return;
+    put(endBox, h('p', out && out.to ? T.ccEndAuto(dateText(out.to)) : h('span.dim', T.ccSlots + ' —')));
+  };
+  count.oninput = drawEnd; from.onchange = drawEnd; skipHol.onchange = drawEnd;
   let slots = c ? c.slots.slice() : [];
   const slotList = h('div');
   const drawSlots = () => put(slotList, slots.length ? slots.map((x, i) => h('div', { style: 'display:flex;gap:8px;align-items:center' },
     h('span', weekdayName(x.weekday) + ' ' + hhmm(x.startMin) + ' · ' + T.coMinutes(x.minutes) + (x.court ? ' · ' + x.court : '')),
-    h('button', { type: 'button', onclick: () => { slots.splice(i, 1); drawSlots(); } }, '✕'))) : h('p.dim', '—'));
+    h('button', { type: 'button', onclick: () => { slots.splice(i, 1); drawSlots(); drawEnd(); } }, '✕'))) : h('p.dim', '—'));
   const wd = select([1, 2, 3, 4, 5, 6, 7].map((k) => [String(k), weekdayName(k)]), '1');
   const time = h('input', { type: 'time', value: '17:00', step: 300 });
   const mins = select([45, 60, 90, 120].map((k) => [String(k), T.coMinutes(k)]), '60');
@@ -305,7 +355,7 @@ async function editOwnCourse(c) {
     if (Number.isNaN(hh)) return;
     slots.push({ weekday: Number(wd.value), startMin: hh * 60 + (mm || 0), minutes: Number(mins.value), court: place.value.trim() });
     slots.sort((a, b) => a.weekday - b.weekday || a.startMin - b.startMin);
-    drawSlots();
+    drawSlots(); drawEnd();
   } }, T.ccAddSlot);
   let color = c ? c.color : '#29B6F6';
   const colors = c ? c.colors : ['#C6F432', '#29B6F6', '#FF9800', '#E53935', '#AB47BC', '#26A69A', '#FFD600', '#EC407A'];
@@ -313,15 +363,19 @@ async function editOwnCourse(c) {
   const drawColors = () => put(colorRow, h('span.dim', T.ccColor), colors.map((col) => dot(col, col === color, () => { color = col; drawColors(); })));
   drawColors();
   const chosen = new Set(c ? c.studentIds : []);
-  const boxes = students.map((s) => { const b = h('input', { type: 'checkbox' }); b.checked = chosen.has(s.id); return [s.id, h('label.check', b, s.name), b]; });
-  drawSlots();
+  const picker = studentPicker(students, groups, chosen);
+  drawSlots(); drawEnd();
   dialog(c ? c.name : T.ccNew, h('div.form',
-    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), colorRow, field(T.ctStart, from), field(T.ctEnd, to),
+    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), colorRow,
     h('h3.full', T.ccSlots), h('div.full', slotList),
     field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
-    h('h3.full', T.ccPickStudents), h('div.full', boxes.map((b) => b[1]))), async () => {
+    field(T.ctStart, from), field(T.ccLessonsCount, count),
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox,
+    h('h3.full', T.ccPickStudents), h('div.full', picker)), async () => {
     if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
-    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]), color };
+    const n = Number(count.value);
+    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: [...chosen], color,
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
     const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
     toast(T.saved);
     coachView = 'courses'; coachCourseId = out.id;
@@ -334,14 +388,20 @@ function attendanceDialog(r, l) {
     const idx = r.lessons.indexOf(l);
     const cb = h('input', { type: 'checkbox' });
     cb.checked = l.marked ? row.marks[idx] === '✓' : true;
-    return [row.id, cb, h('label', { style: 'display:flex;gap:8px;align-items:center' }, cb, row.name)];
+    return [row.id, cb, h('label', { style: 'display:flex;gap:8px;align-items:center' }, cb, row.name), row.name.toLowerCase()];
   });
   const cancelled = h('input', { type: 'checkbox' }); cancelled.checked = l.cancelled;
   const note = h('textarea', { rows: 3, style: 'width:100%' }); note.value = r.notes[l.key] || '';
   const dlg = h('dialog', h('form', { method: 'dialog', style: 'min-width:320px' },
     h('h2', dateText(l.date) + ' ' + hhmm(l.startMin)),
     h('label', { style: 'display:flex;gap:8px;align-items:center' }, cancelled, T.scCancelLesson),
-    h('p.dim', T.scWhoWasThere), boxes.map((b) => b[2]),
+    h('p.dim', T.scWhoWasThere),
+    // Con tanti iscritti: cerca, tutti presenti o nessuno (poi si tolgono o aggiungono gli altri).
+    h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' },
+      boxes.length > 12 ? h('input', { type: 'search', placeholder: T.coSearch, oninput: (ev) => { const q = ev.target.value.trim().toLowerCase(); boxes.forEach((b) => { b[2].hidden = !!q && !b[3].includes(q); }); } }) : null,
+      h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = true; }) }, T.pkAll),
+      h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = false; }) }, T.pkNone)),
+    h('div', { style: 'max-height:50vh;overflow:auto' }, boxes.map((b) => b[2])),
     h('label', T.ccLessonNote, note),
     h('div.actions',
       h('button', { type: 'button', onclick: () => dlg.close() }, '✕'),

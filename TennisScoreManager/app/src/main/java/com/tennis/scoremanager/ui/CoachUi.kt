@@ -300,13 +300,31 @@ fun PackDialog(c: MatchController, student: String, onDone: () -> Unit) {
 fun StudentPickDialog(c: MatchController, title: String, exclude: Set<String> = emptySet(), initial: Set<String> = emptySet(), multi: Boolean, onDone: (List<String>) -> Unit) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
+    val groups = c.coachBook.collectAsState().value.groups
     var picked by remember { mutableStateOf(initial) }
+    // Anche con centinaia di allievi: si cerca per nome, si guarda un gruppo, solo i scelti; se ne mostrano 100.
+    var query by remember { mutableStateOf("") }
+    var group by remember { mutableStateOf<String?>(null) }
+    var onlyPicked by remember { mutableStateOf(false) }
+    val all = students.filter { it.id !in exclude }
+    val shown = all
+        .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }
+        .filter { p -> group == null || groups.firstOrNull { it.id == group }?.students?.contains(p.id) == true }
+        .filter { !onlyPicked || it.id in picked }
     AlertDialog(
         onDismissRequest = { onDone(if (multi) picked.toList() else emptyList()) },
-        title = { Text(title) },
+        title = { Text(title + if (multi && picked.isNotEmpty()) " (${picked.size})" else "") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                for (p in students.filter { it.id !in exclude }) Row(
+                if (all.size > 8) OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+                if (groups.isNotEmpty() || multi) androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick = { group = null }) { Text(s.coAll, color = if (group == null) TsmColors.Ball else TsmColors.TextDim) }
+                    for (g in groups) TextButton(onClick = { group = g.id }) { Text(g.name, color = if (group == g.id) TsmColors.Ball else TsmColors.TextDim) }
+                    if (multi) TextButton(onClick = { onlyPicked = !onlyPicked }) { Text(s.pkOnlyChosen, color = if (onlyPicked) TsmColors.Ball else TsmColors.TextDim) }
+                    if (multi && shown.isNotEmpty()) TextButton(onClick = { picked = picked + shown.map { it.id } }) { Text(s.pkAllShown, color = TsmColors.Ball) }
+                }
+                if (shown.size > 100) Text(s.pkMore(shown.size - 100), color = TsmColors.TextDim, fontSize = 12.sp)
+                for (p in shown.take(100)) Row(
                     Modifier.fillMaxWidth().clickable {
                         if (!multi) onDone(listOf(p.id)) else picked = if (p.id in picked) picked - p.id else picked + p.id
                     }.padding(vertical = 8.dp),

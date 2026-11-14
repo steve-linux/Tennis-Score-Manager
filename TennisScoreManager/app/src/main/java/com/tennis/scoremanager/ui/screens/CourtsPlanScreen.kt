@@ -184,6 +184,10 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
             DateButton(s.planDay, day, lang, Modifier.weight(1f)) { day = CourtPlans.dayStart(it) }
             IconButton(onClick = { day = CourtPlans.addDays(day, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
         }
+        // Festa nazionale: in rosso, così si vede subito.
+        com.tennis.scoremanager.data.Holidays.on(day + 12 * 3_600_000L, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { name ->
+            Text("${s.hdHoliday}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))

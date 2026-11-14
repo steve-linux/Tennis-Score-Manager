@@ -42,6 +42,13 @@ class DeskTest {
         return field(req("GET", "/pair/$id").second, "token")!!
     }
 
+    @Test fun ilPlanningMostraLeFeste() {
+        val tk = login()
+        val m = req("GET", "/month", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(m, "\"holiday\":\"Natale\"" in m)
+        assertTrue(req("GET", "/day", token = tk, q = mapOf("date" to "2026-12-08")).second.contains("Immacolata"))
+    }
+
     @Test fun senzaChiaveNonSiVedeNiente() {
         for ((m, p) in listOf("GET" to "/people", "GET" to "/money", "GET" to "/day", "POST" to "/fees", "GET" to "/info", "DELETE" to "/bookings/x")) {
             assertEquals(p, 401, req(m, p).first)

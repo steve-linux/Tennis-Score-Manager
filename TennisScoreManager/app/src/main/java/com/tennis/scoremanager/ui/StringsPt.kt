@@ -2596,6 +2596,19 @@ object PtStrings : Strings {
     override val ccOwnTag = "O meu curso"
     override val ccClubCourses = "Cursos da secretaria"
     override val ccColor = "Cor"
+    override val pkOnlyChosen = "Só os escolhidos"
+    override val pkAllShown = "Escolher os mostrados"
+    override val pkAll = "Todos"
+    override val pkNone = "Nenhum"
+    override val pkAddGroup = "Adicionar um grupo…"
+    override val pkClear = "Remover todos"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 escolhido" else "$it escolhidos" }
+    override val pkMore: (Int) -> String = { "Mais $it: escreva um nome para os encontrar" }
+    override val ccLessonsCount = "Número de aulas"
+    override val ccSkipHolidays = "Saltar os feriados"
+    override val ccSkipHolidaysHint = "As aulas em feriados nacionais não contam e ficam anuladas (repõem-se na chamada)."
+    override val hdHoliday = "Feriado"
+    override val ccEndAuto: (String) -> String = { "Fim: $it (calculado)" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }

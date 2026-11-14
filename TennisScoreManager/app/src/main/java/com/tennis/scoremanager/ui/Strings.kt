@@ -2664,6 +2664,19 @@ interface Strings {
     val ccOwnTag: String
     val ccClubCourses: String
     val ccColor: String
+    val pkOnlyChosen: String
+    val pkAllShown: String
+    val pkAll: String
+    val pkNone: String
+    val pkAddGroup: String
+    val pkClear: String
+    val pkChosen: (Int) -> String
+    val pkMore: (Int) -> String
+    val ccLessonsCount: String
+    val ccSkipHolidays: String
+    val ccSkipHolidaysHint: String
+    val hdHoliday: String
+    val ccEndAuto: (String) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
@@ -5252,6 +5265,19 @@ object ItStrings : Strings {
     override val ccOwnTag = "Corso mio"
     override val ccClubCourses = "Corsi della segreteria"
     override val ccColor = "Colore"
+    override val pkOnlyChosen = "Solo i selezionati"
+    override val pkAllShown = "Scegli quelli mostrati"
+    override val pkAll = "Tutti"
+    override val pkNone = "Nessuno"
+    override val pkAddGroup = "Aggiungi un gruppo…"
+    override val pkClear = "Togli tutti"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 scelto" else "$it scelti" }
+    override val pkMore: (Int) -> String = { "Altri $it: scrivi un nome per cercarli" }
+    override val ccLessonsCount = "Numero di lezioni"
+    override val ccSkipHolidays = "Salta le feste"
+    override val ccSkipHolidaysHint = "Le lezioni nei giorni di festa nazionale non contano e risultano annullate (si rimettono dall'appello)."
+    override val hdHoliday = "Festa"
+    override val ccEndAuto: (String) -> String = { "Fine: $it (calcolata)" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
@@ -7841,6 +7867,19 @@ object EnStrings : Strings {
     override val ccOwnTag = "My course"
     override val ccClubCourses = "Club office courses"
     override val ccColor = "Colour"
+    override val pkOnlyChosen = "Chosen only"
+    override val pkAllShown = "Pick those shown"
+    override val pkAll = "All"
+    override val pkNone = "None"
+    override val pkAddGroup = "Add a group…"
+    override val pkClear = "Remove all"
+    override val pkChosen: (Int) -> String = { "$it chosen" }
+    override val pkMore: (Int) -> String = { "$it more: type a name to find them" }
+    override val ccLessonsCount = "Number of lessons"
+    override val ccSkipHolidays = "Skip holidays"
+    override val ccSkipHolidaysHint = "Lessons on national holidays don't count and are marked cancelled (you can restore them from the roll call)."
+    override val hdHoliday = "Holiday"
+    override val ccEndAuto: (String) -> String = { "End: $it (calculated)" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }

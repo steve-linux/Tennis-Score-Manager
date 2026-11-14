@@ -688,9 +688,9 @@ async function showPlan() {
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const x of m.days) {
       const n = Number(x.date.slice(8));
-      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : ''), {
-        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
-      }, h('b', n),
+      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : '') + (x.holiday ? '.hol' : ''), {
+        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (x.holiday ? ' · ' + x.holiday : ''), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+      }, h('b', n), x.holiday ? h('span.holname', x.holiday) : null,
       x.bookings ? h('span', T.nBookings(x.bookings)) : null,
       x.matches ? h('span', '🏆 ' + x.matches) : null,
       x.blocked >= 100 ? h('span.dim', T.blkShort) : x.blocked ? h('span.dim', T.blkShort + ' ' + x.blocked + '%') : null,
@@ -711,7 +711,7 @@ async function showPlan() {
   } else {
     d = await api('GET', '/day?date=' + planDate);
     days = [d];
-    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + (d.holiday ? ' · ' + d.holiday : '');
   }
   // In settimana con tanti campi se ne guarda uno alla volta, se no non si legge.
   let courts = d.courts;
@@ -736,8 +736,8 @@ async function showPlan() {
   grid.style.gridTemplateRows = 'repeat(' + heads + ', auto) repeat(' + rows + ', ' + Math.max(ROW, Math.round(ROW * slot / 30)) + 'px)';
   const place = (e, row, col, span, colSpan) => { e.style.gridRow = row + ' / span ' + span; e.style.gridColumn = col + ' / span ' + (colSpan || 1); grid.append(e); };
   place(h('div'), 1, 1, heads);
-  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : ''), {
-    type: 'button', title: T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : '') + (x.holiday ? '.hol' : ''), {
+    type: 'button', title: x.holiday ? x.holiday : T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
   }, long(x.date, { weekday: 'short', day: 'numeric' })), 1, 2 + i * courts.length, 1, courts.length));
   if (!week || two) cols.forEach((c, i) => place(h('div.gcourt' + (two ? '.small' : ''), c.court), heads, i + 2, 1));
   for (let r = 0; r < rows; r++) {

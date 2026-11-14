@@ -85,6 +85,10 @@ private fun LessonRow(c: MatchController, l: CoachLesson, onClick: () -> Unit) {
     val s = LocalStrings.current
     Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp)) {
         Text(c.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        // Lezione in un giorno di festa: in rosso.
+        com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.collectAsState().value.lang.code))?.let {
+            Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
         Text(l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") + if (l.cancelled) " · ${s.coCancelled}" else if (l.done) " · ${s.coDone}" else "",
             color = if (l.cancelled) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
     }

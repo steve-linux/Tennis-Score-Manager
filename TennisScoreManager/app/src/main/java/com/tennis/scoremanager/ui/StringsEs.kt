@@ -2593,6 +2593,19 @@ object EsStrings : Strings {
     override val ccOwnTag = "Mi curso"
     override val ccClubCourses = "Cursos de la secretaría"
     override val ccColor = "Color de la etiqueta"
+    override val pkOnlyChosen = "Solo los elegidos"
+    override val pkAllShown = "Elegir los mostrados"
+    override val pkAll = "Todos"
+    override val pkNone = "Ninguno"
+    override val pkAddGroup = "Añadir un grupo…"
+    override val pkClear = "Quitar todos"
+    override val pkChosen: (Int) -> String = { if (it == 1) "1 elegido" else "$it elegidos" }
+    override val pkMore: (Int) -> String = { "$it más: escribe un nombre para buscarlos" }
+    override val ccLessonsCount = "Número de clases"
+    override val ccSkipHolidays = "Saltar los festivos"
+    override val ccSkipHolidaysHint = "Las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde pasar lista)."
+    override val hdHoliday = "Festivo"
+    override val ccEndAuto: (String) -> String = { "Fin: $it (calculado)" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }

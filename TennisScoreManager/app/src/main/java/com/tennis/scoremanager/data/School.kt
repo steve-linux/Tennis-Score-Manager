@@ -133,5 +133,18 @@ object Courses {
     }
 
     /** Il corso è pieno (con un massimo di allievi). */
+    /**
+     * Il giorno dell'[n]-esima lezione partendo da [from] con quegli orari, saltando i giorni [skip] (le feste); null
+     * senza orari o con [n] < 1. Serve a calcolare la fine del corso dal numero di lezioni.
+     */
+    fun endAfter(from: Long, slots: List<CourseSlot>, n: Int, skip: (Long) -> Boolean = { false }): Long? {
+        if (slots.isEmpty() || n < 1) return null
+        val probe = Course("x", "", slots = slots, from = from, to = CourtPlans.addDays(from, 3 * 366))
+        return lessons(probe).filter { !skip(it.start) }.getOrNull(n - 1)?.let { CourtPlans.dayStart(it.start) }
+    }
+
+    /** Le lezioni del corso che cadono in un giorno [skip] (le feste): da segnare annullate. */
+    fun skipped(c: Course, skip: (Long) -> Boolean): Set<String> = lessons(c).filter { skip(it.start) }.map { it.key }.toSet()
+
     fun full(c: Course): Boolean = c.maxStudents > 0 && c.students.size >= c.maxStudents
 }

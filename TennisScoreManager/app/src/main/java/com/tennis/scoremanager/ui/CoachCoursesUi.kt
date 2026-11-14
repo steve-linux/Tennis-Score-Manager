@@ -132,6 +132,12 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     var picking by remember { mutableStateOf(false) }
     var askDelete by remember { mutableStateOf(false) }
     var color by remember { mutableStateOf(cc?.label ?: com.tennis.scoremanager.data.CourseCards.OWN) }
+    // Quante lezioni: dalla data d'inizio e dagli orari la fine si calcola da sola; le feste (se le si salta) non contano.
+    var lessonsText by remember { mutableStateOf(cc?.course?.let { x -> Courses.lessons(x).count { it.key !in x.cancelled }.toString() } ?: "10") }
+    var skipHolidays by remember { mutableStateOf(true) }
+    val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
+    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
+    val skip = { t: Long -> skipHolidays && isHoliday(t) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
     var wd by remember { mutableStateOf(1) }
     var startMin by remember { mutableStateOf(17 * 60) }
@@ -149,7 +155,6 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp)
                 CourseColorDots(color) { color = it }
                 com.tennis.scoremanager.ui.screens.DateButton(s.ctStart, co.from, lang) { d -> co = co.copy(from = d, to = maxOf(co.to, d)) }
-                com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
                 Text(s.ccSlots, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 for (sl in co.slots) Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("${dayName(sl.weekday)} ${hm(sl.startMin)} · ${s.coMinutes(sl.minutes)}" + (sl.court.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
@@ -165,6 +170,13 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 GhostButton(s.ccAddSlot, Icons.Filled.Add, {
                     co = co.copy(slots = (co.slots + com.tennis.scoremanager.data.CourseSlot(wd, startMin, minutes, place.trim())).distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })))
                 }, Modifier.fillMaxWidth())
+                // Numero di lezioni e fine: calcolata da inizio, orari e feste; senza numero si sceglie a mano.
+                OutlinedTextField(lessonsText, { v -> lessonsText = v.filter(Char::isDigit).take(3) }, Modifier.fillMaxWidth(), singleLine = true,
+                    label = { Text(s.ccLessonsCount) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                SwitchRow(Icons.Filled.EventBusy, s.ccSkipHolidays, s.ccSkipHolidaysHint, skipHolidays) { skipHolidays = it }
+                val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) }
+                if (autoEnd != null) Text(s.ccEndAuto(shortDate(autoEnd, lang)), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                else com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
                 Text(s.coGroupCount(co.students.size) + if (co.students.isNotEmpty()) ": " + co.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") else "",
                     color = TsmColors.TextMain, fontSize = 14.sp)
                 GhostButton(s.ccPickStudents, Icons.Filled.School, { picking = true }, Modifier.fillMaxWidth())
@@ -172,7 +184,12 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
             }
         },
         confirmButton = {
-            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim()), color); onDone(co.id) }) { Text(s.save) }
+            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = {
+                val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) } ?: co.to
+                val x = co.copy(name = co.name.trim(), level = co.level.trim(), to = end)
+                // Le lezioni nei giorni di festa risultano annullate (si possono sempre rimettere dall'appello).
+                c.saveCoachOwnCourse(if (skipHolidays) x.copy(cancelled = x.cancelled + Courses.skipped(x, isHoliday)) else x, color); onDone(co.id)
+            }) { Text(s.save) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
@@ -239,7 +256,10 @@ fun CoachCourseScreen(c: MatchController) {
         }
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
-            for (sid in co.students) {
+            // Con tanti iscritti: un filtro per nome.
+            var who by remember { mutableStateOf("") }
+            if (co.students.size > 12) OutlinedTextField(who, { who = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+            for (sid in co.students.filter { sid -> who.isBlank() || (c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name.orEmpty()).contains(who.trim(), ignoreCase = true) }) {
                 val p = c.playerById(sid)
                 val (pres, tot) = Courses.attendanceOf(co, sid, now)
                 Row(Modifier.fillMaxWidth().clickable(enabled = p != null) { p?.let { c.openStudent(it.id) } }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -259,7 +279,11 @@ fun CoachCourseScreen(c: MatchController) {
                 val cancelled = l.key in co.cancelled
                 val marked = co.attendance[l.key]
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { open = l }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(lessonText(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Column(Modifier.weight(1f)) {
+                        Text(lessonText(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp)
+                        // Lezione in un giorno di festa: in rosso, si vede subito.
+                        com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                    }
                     Text(
                         when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
                         color = when { cancelled -> TsmColors.Danger; marked != null -> TsmColors.Ok; l.start <= now -> TsmColors.Orange; else -> TsmColors.TextDim }, fontSize = 13.sp,
@@ -312,6 +336,7 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
     var note by remember { mutableStateOf(cc.notes[l.key].orEmpty()) }
+    var query by remember { mutableStateOf("") }
     val canMark = l.start <= System.currentTimeMillis() + 3_600_000L
     AlertDialog(
         onDismissRequest = onDone,
@@ -326,11 +351,16 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
                         c.noticeCourseCancelled(co.id, l.start)
                     }, Modifier.fillMaxWidth())
                 } else if (canMark) {
-                    Text(s.scWhoWasThere, color = TsmColors.TextDim, fontSize = 13.sp)
-                    for (sid in co.students) {
-                        val name = c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name ?: continue
-                        SwitchRow(Icons.Filled.School, name, null, sid in present) { on -> present = if (on) present + sid else present - sid }
+                    Text(s.scWhoWasThere + " (${present.size}/${co.students.size})", color = TsmColors.TextDim, fontSize = 13.sp)
+                    // Con tanti iscritti: cerca, tutti presenti o nessuno, poi si sistemano gli altri.
+                    val names = co.students.associateWith { sid -> c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name }
+                    if (co.students.size > 12) OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+                    val shown = co.students.filter { sid -> names[sid] != null && (query.isBlank() || names[sid]!!.contains(query.trim(), ignoreCase = true)) }
+                    Row {
+                        TextButton(onClick = { present = present + shown }) { Text(s.pkAll, color = TsmColors.Ball) }
+                        TextButton(onClick = { present = present - shown.toSet() }) { Text(s.pkNone, color = TsmColors.Ball) }
                     }
+                    for (sid in shown) SwitchRow(Icons.Filled.School, names[sid]!!, null, sid in present) { on -> present = if (on) present + sid else present - sid }
                     OutlinedTextField(note, { note = it.take(500) }, Modifier.fillMaxWidth(), label = { Text(s.ccLessonNote) },
                         trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(500) } })
                 } else Text(s.ccNotYet, color = TsmColors.TextDim, fontSize = 13.sp)

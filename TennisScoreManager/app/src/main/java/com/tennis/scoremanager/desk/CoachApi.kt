@@ -35,6 +35,8 @@ interface CoachData {
     fun setCourseColor(id: String, color: String) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
+    /** Il Paese per le festività nazionali (quello del telefono). */
+    fun country(): String = com.tennis.scoremanager.data.Holidays.country()
     fun receiptPdf(packId: String): ByteArray?
     fun reportPdf(student: String, days: Int?): ByteArray?
     fun registerPdf(courseId: String): ByteArray?
@@ -75,8 +77,11 @@ interface CoachData {
 @Serializable data class CdCourseIn(
     val name: String = "", val level: String = "", val from: String = "", val to: String = "", val slots: List<CdSlot> = emptyList(), val students: List<String> = emptyList(),
     val color: String? = null,
+    /** Quante lezioni (la fine si calcola da inizio e orari) e se le feste nazionali non contano (e risultano annullate). */
+    val lessons: Int? = null, val skipHolidays: Boolean = true,
 )
-@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
+@Serializable data class CdEnd(val to: String? = null)
+@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
 @Serializable data class CdMonth(
@@ -94,9 +99,11 @@ interface CoachData {
     /** Il colore del corso (per le lezioni dei corsi). */
     val color: String? = null,
 )
-@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>)
+@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>, val holiday: String? = null)
 @Serializable data class CdCal(val first: String, val days: List<CdCalDay>)
 @Serializable data class CdText(val text: String = "")
+/** Un gruppo di allievi dell'allenatore (per aggiungerli tutti insieme a un corso). */
+@Serializable data class CdGroup(val id: String, val name: String, val students: List<String>)
 @Serializable data class CdAttendanceIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean = false, val note: String = "")
 @Serializable data class CdDoneIn(val done: Boolean = true)
 @Serializable data class CdInfo(val mode: String = "coach", val club: String, val lang: String, val today: String, val year: Int, val coach: String)
@@ -119,6 +126,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
     fun route(m: String, p: List<String>, r: DeskApi.Req, club: String): DeskApi.Resp = when {
         m == "GET" && p == listOf("info") -> ok(CdInfo.serializer(), CdInfo(club = club, lang = data.lang, today = day(data.now())!!, year = Instant.ofEpochMilli(data.now()).atZone(zone()).year, coach = data.coachName()))
         m == "GET" && p == listOf("coach", "students") -> ok(ListSerializer(CdStudent.serializer()), students().sortedBy { it.name.lowercase() })
+        m == "GET" && p == listOf("coach", "groups") -> ok(ListSerializer(CdGroup.serializer()), data.book().groups.sortedBy { it.name.lowercase() }.map { CdGroup(it.id, it.name, it.students) })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
         m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> saveStudent(student(p[2]), read(CdStudentIn.serializer(), r))
@@ -136,6 +144,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p == listOf("coach", "courses") -> ok(ListSerializer(CdCourse.serializer()), data.book().courses.map { course(it.card.course.id) }.sortedBy { it.name.lowercase() })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ok(CdRegister.serializer(), register(p[2]))
         m == "POST" && p == listOf("coach", "courses") -> ownCourse(null, read(CdCourseIn.serializer(), r))
+        m == "POST" && p == listOf("coach", "courses", "end") -> read(CdCourseIn.serializer(), r).let { i -> ok(CdEnd.serializer(), CdEnd(day(endOf(i)))) }
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ownCourse(p[2], read(CdCourseIn.serializer(), r))
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "color" -> {
             if (data.book().courses.none { it.card.course.id == p[2] }) throw DeskApi.Fail(404, "NOT_FOUND")
@@ -242,7 +251,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val lessons = Courses.lessons(co).filter { it.start <= now + 7L * 86_400_000L }
         return CdRegister(
             head,
-            lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L) },
+            lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L,
+                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone())) },
             co.students.sortedBy { (names[it] ?: "").lowercase() }.map { sid ->
                 val (a, t) = Courses.attendanceOf(co, sid, now)
                 CdRegRow(sid, names[sid] ?: "—", lessons.map { com.tennis.scoremanager.data.AttendancePdf.mark(co, it.key, sid) }, a, t)
@@ -255,18 +265,29 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
     private fun ownCourse(id: String?, i: CdCourseIn): DeskApi.Resp {
         val name = i.name.trim().take(60)
         if (name.isEmpty() || i.slots.isEmpty() || i.slots.any { it.weekday !in 1..7 || it.startMin !in 0 until 24 * 60 || it.minutes !in 15..300 }) throw DeskApi.Fail(400, "BAD_REQUEST")
-        val from = dayStart(i.from); val to = dayStart(i.to)
+        val from = dayStart(i.from)
+        val to = endOf(i) ?: dayStart(i.to)
         if (to < from) throw DeskApi.Fail(400, "BAD_REQUEST")
         val students = i.students.filter { s -> data.players().any { it.id == s && it.student } }.distinct()
         val old = id?.let { x -> data.book().courses.firstOrNull { it.card.course.id == x } ?: throw DeskApi.Fail(404, "NOT_FOUND") }
         if (old != null && !old.personal) throw DeskApi.Fail(409, "NOT_OWN")
         val base = old?.card?.course ?: com.tennis.scoremanager.data.Course(Coaching.newId("cc"), name, from = from, to = to, createdAt = data.now())
-        val co = base.copy(name = name, level = i.level.trim().take(40), from = from, to = to,
+        val co0 = base.copy(name = name, level = i.level.trim().take(40), from = from, to = to,
             slots = i.slots.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court.trim().take(30)) }.distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })),
             students = students)
+        // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
+        val co = if (i.skipHolidays) co0.copy(cancelled = co0.cancelled + Courses.skipped(co0) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else co0
         data.saveOwnCourse(co)
         i.color?.takeIf { it in com.tennis.scoremanager.data.CourseCards.COLORS }?.let { data.setCourseColor(co.id, it) }
         return ok(CdCourse.serializer(), course(co.id))
+    }
+
+    /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
+    private fun endOf(i: CdCourseIn): Long? {
+        val n = i.lessons ?: return null
+        val from = runCatching { dayStart(i.from) }.getOrNull() ?: return null
+        val slots = i.slots.filter { it.weekday in 1..7 }.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
+        return Courses.endAfter(from, slots, n) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
     }
 
     private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {
@@ -294,8 +315,9 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         }
         for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)
         val byDay = items.sortedBy { it.first }.groupBy { day(it.first)!! }
+        val holidays = com.tennis.scoremanager.data.Holidays.of(start.year, data.country())
         val days = generateSequence(start) { it.plusDays(1) }.takeWhile { it.isBefore(start.plusMonths(1)) }
-            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }) }.toList()
+            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }, holidays[d]) }.toList()
         return CdCal(start.toString(), days)
     }
 

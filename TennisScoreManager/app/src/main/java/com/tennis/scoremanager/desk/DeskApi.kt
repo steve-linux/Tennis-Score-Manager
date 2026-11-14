@@ -72,6 +72,8 @@ interface DeskData {
     val club: String
     val lang: String
     fun now(): Long
+    /** Il Paese per le festività nazionali del planning. */
+    fun country(): String = com.tennis.scoremanager.data.Holidays.country(lang)
     fun players(): List<PlayerProfile>
     fun savePlayers(list: List<PlayerProfile>)
     fun book(): ClubBook
@@ -258,11 +260,11 @@ interface DeskData {
     /** Partita di torneo: il torneo. Blocco: il motivo, e se si cambia da qui (non quelli di corsi e squadre). */
     val cup: String? = null, val reason: BlockReason? = null, val editable: Boolean = false,
 )
-@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>)
+@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>, val holiday: String? = null)
 /** La settimana da lunedì: i sette giorni come in [DeskDay]. */
 @Serializable data class DeskWeek(val from: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val days: List<DeskDay>)
 /** Un giorno del mese in breve: prenotazioni, partite, quanto sono occupati e chiusi i campi (in percentuale). */
-@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int)
+@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int, val holiday: String? = null)
 @Serializable data class DeskMonth(val first: String, val courts: List<String>, val days: List<DeskDaySum>)
 @Serializable data class DeskBookingIn(
     val court: String, val date: String, val startMin: Int, val minutes: Int, val kind: BookingKind = BookingKind.PLAY,
@@ -716,7 +718,7 @@ class DeskApi(
             }
         }
         val s = plan.settings
-        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items)
+        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, com.tennis.scoremanager.data.Holidays.on(start + 12 * 3_600_000L, data.country(), zone()))
     }
 
     private fun localDay(date: String?): LocalDate = runCatching { LocalDate.parse(date.orEmpty()) }.getOrElse { throw Fail(400, "BAD_DATE") }
@@ -734,6 +736,7 @@ class DeskApi(
         val plan = data.plan(); val cups = data.tournaments(); val courts = data.courts()
         val s = plan.settings
         val open = (s.closeHour - s.openHour).coerceAtLeast(1) * 60
+        val holidays = com.tennis.scoremanager.data.Holidays.of(first.year, data.country())
         val days = (0 until first.lengthOfMonth()).map { i ->
             val d = first.plusDays(i.toLong())
             val start = dayStart(d.toString())
@@ -743,7 +746,7 @@ class DeskApi(
             val used = occ.filter { it.block == null }.sumOf(::minutes)
             val closed = occ.filter { it.block != null }.sumOf { o -> minutes(o) * (if (o.court == CourtPlans.ALL) courts.size else 1) }
             val cap = (open * courts.size).coerceAtLeast(1)
-            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100))
+            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d])
         }
         return ok(DeskMonth.serializer(), DeskMonth(first.toString(), courts, days))
     }
