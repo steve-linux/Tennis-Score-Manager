@@ -2418,4 +2418,8 @@ object DeStrings : Strings {
     override val mcHint = "Neues Match öffnet sich mit Spielern, Regeln, Turnier und Runde schon eingetragen; am Ende geht das Ergebnis zurück ans Büro."
     override val mcBusy = "Ein Match läuft: beende oder unterbrich es und öffne die Datei dann erneut."
     override val mcNotValid = "Diese Datei ist keine Matchkarte von Tennis Score Manager."
+    override val onbRestore = "Hattest du die App schon? Daten wiederherstellen"
+    override val onbRestoreHint = "Die automatischen Kopien bleiben in Dokumente › Tennis Score Manager › Backup, auch wenn du die App deinstallierst: wähle die neueste."
+    override val dataWipeCopies = "Auch die automatischen Kopien"
+    override val dataWipeCopiesHint = "Die Kopien in Dokumente › Tennis Score Manager › Backup bleiben auch nach dem Deinstallieren: einschalten, um sie zu löschen."
 }

@@ -65,6 +65,7 @@ fun DataScreen(c: MatchController) {
     val lang = c.options.collectAsState().value.lang
     var videos by remember { mutableStateOf(false) }
     var wipeVideos by remember { mutableStateOf(false) }
+    var wipeCopies by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
@@ -155,6 +156,7 @@ fun DataScreen(c: MatchController) {
         SectionCard(s.dataWipe, Icons.Filled.DeleteForever, accent = TsmColors.Danger) {
             Text(s.dataWipeHint, color = TsmColors.TextDim, fontSize = 13.sp)
             SwitchRow(Icons.Filled.Videocam, s.dataWipeVideos, s.dataWipeVideosHint, wipeVideos) { wipeVideos = it }
+            SwitchRow(Icons.Filled.Schedule, s.dataWipeCopies, s.dataWipeCopiesHint, wipeCopies) { wipeCopies = it }
             GhostButton(s.dataWipe, Icons.Filled.DeleteForever, { wipeAsk = 1 }, Modifier.fillMaxWidth())
         }
     }
@@ -199,7 +201,7 @@ fun DataScreen(c: MatchController) {
                     wipeAsk = 0
                     busy = s.dataBusy
                     scope.launch {
-                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName)) }
+                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName), autoCopies = wipeCopies) }
                         busy = null
                         closeAfter = true
                         message = s.dataWipeDone

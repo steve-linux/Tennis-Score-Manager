@@ -148,6 +148,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                         Text(s.onbLang, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         // Ogni lingua è scritta in sé stessa: si ritrova anche se l'app parte in una lingua che non si legge.
                         Segmented(Lang.entries.map { SegOption("${it.flag}  ${it.label}") }, o.lang.ordinal, { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } }, columns = 2)
+                        // Solo la prima volta: chi aveva già l'app (e l'ha reinstallata) riprende i suoi dati da una copia.
+                        if (!c.storage.onboarded) FirstStartRestore(c)
                     }
                     Step.ROLES -> {
                         Text(s.onbRolesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)

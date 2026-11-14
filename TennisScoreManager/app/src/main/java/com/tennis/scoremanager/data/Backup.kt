@@ -176,9 +176,11 @@ object Backup {
     /**
      * Cancella i dati dell'app: cartella interna (non il modello dell'analisi), impostazioni, voce, analisi delle clip
      * dei colpi in Documenti ([strokesFolders]); con [videos] anche i video delle clip, la moviola e gli highlights. I file salvati
-     * dall'utente in Documenti e i video della galleria restano.
+     * dall'utente in Documenti e i video della galleria restano; con [autoCopies] anche le copie automatiche (Backup).
      */
-    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>) {
+    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>, autoCopies: Boolean = false) {
+        // Le copie automatiche in Documenti restano anche se si disinstalla l'app: a richiesta si tolgono anche quelle.
+        if (autoCopies) autoList(storage).forEach { it.delete() }
         c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.forEach { it.deleteRecursively() }
         PREFS.map { File(prefsDir(c), it) }.forEach { it.delete() }
         extDir(c)?.let { ext ->

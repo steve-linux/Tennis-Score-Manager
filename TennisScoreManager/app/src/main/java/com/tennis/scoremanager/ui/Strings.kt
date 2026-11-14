@@ -2490,6 +2490,10 @@ interface Strings {
     val mcHint: String
     val mcBusy: String
     val mcNotValid: String
+    val onbRestore: String
+    val onbRestoreHint: String
+    val dataWipeCopies: String
+    val dataWipeCopiesHint: String
 }
 
 object ItStrings : Strings {
@@ -4900,6 +4904,10 @@ object ItStrings : Strings {
     override val mcHint = "Nuova partita si apre con giocatori, regole, torneo e turno già scritti; a fine partita il risultato va rimandato alla segreteria."
     override val mcBusy = "C'è una partita in corso: finiscila o sospendila, poi riapri il file."
     override val mcNotValid = "Questo file non è una scheda partita di Tennis Score Manager."
+    override val onbRestore = "Avevi già l'app? Ripristina i tuoi dati"
+    override val onbRestoreHint = "Le copie automatiche restano in Documenti › Tennis Score Manager › Backup anche se disinstalli l'app: scegli la più recente."
+    override val dataWipeCopies = "Anche le copie automatiche"
+    override val dataWipeCopiesHint = "Le copie in Documenti › Tennis Score Manager › Backup restano anche se disinstalli l'app: accendi per toglierle."
 }
 
 object EnStrings : Strings {
@@ -7311,6 +7319,10 @@ object EnStrings : Strings {
     override val mcHint = "New match opens with players, rules, tournament and round already filled in; at the end the result is to be sent back to the club office."
     override val mcBusy = "A match is in progress: finish or suspend it, then open the file again."
     override val mcNotValid = "This file is not a Tennis Score Manager match card."
+    override val onbRestore = "Had the app before? Restore your data"
+    override val onbRestoreHint = "The automatic copies stay in Documents › Tennis Score Manager › Backup even if you uninstall the app: pick the latest one."
+    override val dataWipeCopies = "The automatic copies too"
+    override val dataWipeCopiesHint = "The copies in Documents › Tennis Score Manager › Backup stay even if you uninstall the app: turn on to remove them."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

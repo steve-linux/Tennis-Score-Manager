@@ -253,6 +253,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <application
         android:name=".TsmApp"
         android:allowBackup="true"
+        android:hasFragileUserData="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
@@ -8572,7 +8573,8 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - **Mehr › Einstellungen › Sicherung und Daten**:
   - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
-  - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
+  - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben. Mit **Auch die automatischen Kopien** verschwinden auch die in Dokumente › Tennis Score Manager › Backup, die sonst auch nach dem Deinstallieren bleiben.
+  - **Deinstallieren und neu installieren**: beim Deinstallieren fragt Android, ob die Daten der App behalten werden sollen: behältst du sie, sind sie nach der Neuinstallation wieder da. Sonst öffnet beim ersten Start **Hattest du die App schon? Daten wiederherstellen** den Ordner der automatischen Kopien: wähle die neueste und die App startet mit deinen Daten.
 
 **Automatische Sicherung jeden Tag**: ohne Videos, nur wenn sich etwas geändert hat. Die letzten 5 Kopien kommen nach Dokumente › Tennis Score Manager › Backup, das auch bleibt, wenn du die App deinstallierst; in der Liste *Automatische Kopien* lässt sich jede **senden** (Drive, E-Mail…) oder **wiederherstellen**. Zur Sicherheit behalte eine auch außerhalb des Handys: auf Drive, am PC oder indem du den Ordner synchronisieren lässt.
 
@@ -9168,7 +9170,8 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - **More › Settings › Backup and data**:
   - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
-  - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
+  - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay. With **The automatic copies too** the ones in Documents › Tennis Score Manager › Backup go as well, otherwise they stay even after uninstalling.
+  - **Uninstalling and reinstalling**: when you uninstall the app, Android asks whether to keep its data: if you keep it, reinstalling brings it back as it was. If you didn't, at the first start **Had the app before? Restore your data** opens the folder of the automatic copies: pick the latest one and the app starts again with your data.
 
 **Automatic backup every day**: without videos, only if something changed. The last 5 copies go to Documents › Tennis Score Manager › Backup, which stays even if you uninstall the app; from the *Automatic copies* list each one can be **sent** (Drive, email…) or **restored**. To be safe keep one off the phone too: on Drive, on the PC or by syncing that folder.
 
@@ -9763,7 +9766,8 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - **Más › Ajustes › Copia de seguridad y datos**:
   - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
-  - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
+  - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan. Con **También las copias automáticas** se borran también las de Documentos › Tennis Score Manager › Backup, que si no se quedan incluso tras desinstalar.
+  - **Desinstalar y reinstalar**: al desinstalar la app, Android pregunta si conservar sus datos: si los conservas, al reinstalarla los encuentras como estaban. Si no, en el primer arranque **¿Ya tenías la app? Restaura tus datos** abre la carpeta de las copias automáticas: elige la más reciente y la app vuelve a empezar con tus datos.
 
 **Copia automática cada día**: sin vídeos, solo si algo ha cambiado. Las últimas 5 copias van a Documentos › Tennis Score Manager › Backup, que se queda aunque desinstales la app; desde la lista *Copias automáticas* cada una se **envía** (Drive, correo…) o se **restaura**. Por seguridad guarda una también fuera del teléfono: en Drive, en el PC o sincronizando esa carpeta.
 
@@ -10358,7 +10362,8 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - **Plus › Réglages › Sauvegarde et données** :
   - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
-  - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
+  - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent. Avec **Aussi les copies automatiques** celles de Documents › Tennis Score Manager › Backup partent aussi, sinon elles restent même après la désinstallation.
+  - **Désinstaller et réinstaller** : quand vous désinstallez l'appli, Android demande s'il faut garder ses données : si vous les gardez, en la réinstallant vous les retrouvez telles quelles. Sinon, au premier démarrage **Vous aviez déjà l'appli ? Restaurez vos données** ouvre le dossier des copies automatiques : choisissez la plus récente et l'appli repart avec vos données.
 
 **Sauvegarde automatique chaque jour** : sans vidéos, seulement si quelque chose a changé. Les 5 dernières copies vont dans Documents › Tennis Score Manager › Backup, qui reste même si vous désinstallez l'app ; depuis la liste *Copies automatiques*, chacune s'**envoie** (Drive, e-mail…) ou se **restaure**. Par sécurité, gardez-en une hors du téléphone : sur Drive, sur le PC ou en synchronisant ce dossier.
 
@@ -10953,7 +10958,8 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - **Altro › Impostazioni › Backup e dati**:
   - **Crea il backup**: un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce; con **Includi i video** anche clip dei colpi, moviola e highlights (il file diventa grande). Lo salvi dove vuoi (Download, un PC, una chiavetta): niente cloud. Non entrano il modello dell'analisi del movimento (si riscarica) e i file che hai salvato tu in Documenti.
   - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
-  - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano.
+  - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano. Con **Anche le copie automatiche** si tolgono pure quelle in Documenti › Tennis Score Manager › Backup, che altrimenti restano anche dopo la disinstallazione.
+  - **Disinstallare e reinstallare**: quando disinstalli l'app, Android chiede se tenerne i dati: se li tieni, reinstallandola li ritrovi com'erano. Se non li hai tenuti, alla prima apertura **Avevi già l'app? Ripristina i tuoi dati** apre la cartella delle copie automatiche: scegli la più recente e l'app riparte con i tuoi dati.
 
 **Backup automatico ogni giorno**: senza video, solo se è cambiato qualcosa. Le ultime 5 copie vanno in Documenti › Tennis Score Manager › Backup, che resta anche se disinstalli l'app; dall'elenco *Copie automatiche* ognuna si **manda** (Drive, email…) o si **ripristina**. Per sicurezza tienine una anche fuori dal telefono: su Drive, sul PC o facendo sincronizzare quella cartella.
 
@@ -11548,7 +11554,8 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - **Mais › Configurações › Backup e dados**:
   - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
   - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
-  - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
+  - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam. Com **Também as cópias automáticas** apagam-se também as de Documentos › Tennis Score Manager › Backup, que senão ficam mesmo depois de desinstalar.
+  - **Desinstalar e reinstalar**: ao desinstalar o app, o Android pergunta se quer manter os dados: se os mantiver, ao reinstalar você os encontra como estavam. Se não, na primeira abertura **Já tinha o app? Restaure seus dados** abre a pasta das cópias automáticas: escolha a mais recente e o app recomeça com os seus dados.
 
 **Cópia automática todos os dias**: sem vídeos, só se algo mudou. As últimas 5 cópias vão para Documentos › Tennis Score Manager › Backup, que fica mesmo que desinstale o app; na lista *Cópias automáticas* cada uma **envia-se** (Drive, e-mail…) ou **restaura-se**. Por segurança guarde uma também fora do telefone: no Drive, no PC ou sincronizando essa pasta.
 
@@ -20006,9 +20013,11 @@ object Backup {
     /**
      * Cancella i dati dell'app: cartella interna (non il modello dell'analisi), impostazioni, voce, analisi delle clip
      * dei colpi in Documenti ([strokesFolders]); con [videos] anche i video delle clip, la moviola e gli highlights. I file salvati
-     * dall'utente in Documenti e i video della galleria restano.
+     * dall'utente in Documenti e i video della galleria restano; con [autoCopies] anche le copie automatiche (Backup).
      */
-    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>) {
+    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>, autoCopies: Boolean = false) {
+        // Le copie automatiche in Documenti restano anche se si disinstalla l'app: a richiesta si tolgono anche quelle.
+        if (autoCopies) autoList(storage).forEach { it.delete() }
         c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.forEach { it.deleteRecursively() }
         PREFS.map { File(prefsDir(c), it) }.forEach { it.delete() }
         extDir(c)?.let { ext ->
@@ -37986,6 +37995,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                         Text(s.onbLang, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         // Ogni lingua è scritta in sé stessa: si ritrova anche se l'app parte in una lingua che non si legge.
                         Segmented(Lang.entries.map { SegOption("${it.flag}  ${it.label}") }, o.lang.ordinal, { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } }, columns = 2)
+                        // Solo la prima volta: chi aveva già l'app (e l'ha reinstallata) riprende i suoi dati da una copia.
+                        if (!c.storage.onboarded) FirstStartRestore(c)
                     }
                     Step.ROLES -> {
                         Text(s.onbRolesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -38998,6 +39009,112 @@ private fun Btn(icon: ImageVector?, label: String?, on: Boolean, onClick: () -> 
             icon?.let { Icon(it, null, tint = if (on) TsmColors.OnOrange else TsmColors.TextMain) }
             label?.let { Text(it, color = if (on) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
         }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RestoreUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RestoreUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.DocumentsContract
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Backup
+import com.tennis.scoremanager.data.Reports
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * La scelta del file che si apre già nella cartella delle copie automatiche (Documenti/Tennis Score Manager/Backup):
+ * dopo una reinstallazione l'app non vede più da sola i file della vecchia installazione, ma chi li sceglie qui sì.
+ */
+private class OpenBackup : ActivityResultContracts.OpenDocument() {
+    override fun createIntent(context: Context, input: Array<String>): Intent = super.createIntent(context, input).apply {
+        runCatching {
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI,
+                DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Documents/Tennis Score Manager/${Backup.AUTO_DIR}"))
+        }
+    }
+}
+
+/**
+ * Prima apertura: chi aveva già l'app ritrova i suoi dati da una copia (quelle automatiche restano in Documenti anche
+ * se si disinstalla). Dopo il ripristino l'app si chiude e si riapre con i dati di prima.
+ */
+@Composable
+fun FirstStartRestore(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val lang = c.options.collectAsState().value.lang
+    var ask by remember { mutableStateOf<Pair<Uri, Backup.Manifest>?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf<String?>(null) }
+    var done by remember { mutableStateOf(false) }
+    val open = rememberLauncherForActivityResult(OpenBackup()) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        scope.launch {
+            val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
+            if (m == null) message = s.dataNotBackup else ask = uri to m
+        }
+    }
+    GhostButton(s.onbRestore, Icons.Filled.Restore, { open.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, Modifier.fillMaxWidth())
+    Text(s.onbRestoreHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    ask?.let { (uri, m) ->
+        AlertDialog(
+            onDismissRequest = { ask = null },
+            title = { Text(s.dataRestore) },
+            text = { Text(s.dataRestoreAsk(Reports.date(m.createdAt, lang), m.app, m.videos)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    ask = null
+                    busy = true
+                    scope.launch {
+                        val ok = withContext(Dispatchers.IO) {
+                            runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
+                        }
+                        busy = false
+                        done = ok
+                        message = if (ok) s.dataRestoreDone else s.dataNotBackup
+                    }
+                }) { Text(s.dataRestoreDo, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },
+        )
+    }
+    if (busy) AlertDialog(onDismissRequest = {}, text = { Text(s.dataBusy) }, confirmButton = {})
+    message?.let { msg ->
+        AlertDialog(
+            onDismissRequest = { message = null; if (done) c.closeAfterData() },
+            text = { Text(msg) },
+            confirmButton = { TextButton(onClick = { message = null; if (done) c.closeAfterData() }) { Text(s.ok) } },
+        )
     }
 }
 TSM_EOF
@@ -42404,6 +42521,10 @@ interface Strings {
     val mcHint: String
     val mcBusy: String
     val mcNotValid: String
+    val onbRestore: String
+    val onbRestoreHint: String
+    val dataWipeCopies: String
+    val dataWipeCopiesHint: String
 }
 
 object ItStrings : Strings {
@@ -44814,6 +44935,10 @@ object ItStrings : Strings {
     override val mcHint = "Nuova partita si apre con giocatori, regole, torneo e turno già scritti; a fine partita il risultato va rimandato alla segreteria."
     override val mcBusy = "C'è una partita in corso: finiscila o sospendila, poi riapri il file."
     override val mcNotValid = "Questo file non è una scheda partita di Tennis Score Manager."
+    override val onbRestore = "Avevi già l'app? Ripristina i tuoi dati"
+    override val onbRestoreHint = "Le copie automatiche restano in Documenti › Tennis Score Manager › Backup anche se disinstalli l'app: scegli la più recente."
+    override val dataWipeCopies = "Anche le copie automatiche"
+    override val dataWipeCopiesHint = "Le copie in Documenti › Tennis Score Manager › Backup restano anche se disinstalli l'app: accendi per toglierle."
 }
 
 object EnStrings : Strings {
@@ -47225,6 +47350,10 @@ object EnStrings : Strings {
     override val mcHint = "New match opens with players, rules, tournament and round already filled in; at the end the result is to be sent back to the club office."
     override val mcBusy = "A match is in progress: finish or suspend it, then open the file again."
     override val mcNotValid = "This file is not a Tennis Score Manager match card."
+    override val onbRestore = "Had the app before? Restore your data"
+    override val onbRestoreHint = "The automatic copies stay in Documents › Tennis Score Manager › Backup even if you uninstall the app: pick the latest one."
+    override val dataWipeCopies = "The automatic copies too"
+    override val dataWipeCopiesHint = "The copies in Documents › Tennis Score Manager › Backup stay even if you uninstall the app: turn on to remove them."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -49661,6 +49790,10 @@ object DeStrings : Strings {
     override val mcHint = "Neues Match öffnet sich mit Spielern, Regeln, Turnier und Runde schon eingetragen; am Ende geht das Ergebnis zurück ans Büro."
     override val mcBusy = "Ein Match läuft: beende oder unterbrich es und öffne die Datei dann erneut."
     override val mcNotValid = "Diese Datei ist keine Matchkarte von Tennis Score Manager."
+    override val onbRestore = "Hattest du die App schon? Daten wiederherstellen"
+    override val onbRestoreHint = "Die automatischen Kopien bleiben in Dokumente › Tennis Score Manager › Backup, auch wenn du die App deinstallierst: wähle die neueste."
+    override val dataWipeCopies = "Auch die automatischen Kopien"
+    override val dataWipeCopiesHint = "Die Kopien in Dokumente › Tennis Score Manager › Backup bleiben auch nach dem Deinstallieren: einschalten, um sie zu löschen."
 }
 TSM_EOF
 
@@ -52087,6 +52220,10 @@ object EsStrings : Strings {
     override val mcHint = "Nuevo partido se abre con jugadores, reglas, torneo y ronda ya escritos; al final el resultado se devuelve a la secretaría."
     override val mcBusy = "Hay un partido en curso: termínalo o suspéndelo y luego vuelve a abrir el archivo."
     override val mcNotValid = "Este archivo no es una ficha de partido de Tennis Score Manager."
+    override val onbRestore = "¿Ya tenías la app? Restaura tus datos"
+    override val onbRestoreHint = "Las copias automáticas se quedan en Documentos › Tennis Score Manager › Backup aunque desinstales la app: elige la más reciente."
+    override val dataWipeCopies = "También las copias automáticas"
+    override val dataWipeCopiesHint = "Las copias en Documentos › Tennis Score Manager › Backup se quedan aunque desinstales la app: actívalo para borrarlas."
 }
 TSM_EOF
 
@@ -54515,6 +54652,10 @@ object FrStrings : Strings {
     override val mcHint = "Nouveau match s'ouvre avec joueurs, règles, tournoi et tour déjà remplis ; à la fin le résultat est à renvoyer au secrétariat."
     override val mcBusy = "Un match est en cours : terminez-le ou suspendez-le, puis rouvrez le fichier."
     override val mcNotValid = "Ce fichier n'est pas une fiche de match de Tennis Score Manager."
+    override val onbRestore = "Vous aviez déjà l'appli ? Restaurez vos données"
+    override val onbRestoreHint = "Les copies automatiques restent dans Documents › Tennis Score Manager › Backup même si vous désinstallez l'appli : choisissez la plus récente."
+    override val dataWipeCopies = "Aussi les copies automatiques"
+    override val dataWipeCopiesHint = "Les copies dans Documents › Tennis Score Manager › Backup restent même si vous désinstallez l'appli : activez pour les supprimer."
 }
 TSM_EOF
 
@@ -56944,6 +57085,10 @@ object PtStrings : Strings {
     override val mcHint = "Nova partida abre com jogadores, regras, torneio e rodada já preenchidos; no fim o resultado é devolvido à secretaria."
     override val mcBusy = "Há uma partida em andamento: termine-a ou suspenda-a e depois abra o arquivo de novo."
     override val mcNotValid = "Este arquivo não é uma ficha de partida do Tennis Score Manager."
+    override val onbRestore = "Já tinha o app? Restaure seus dados"
+    override val onbRestoreHint = "As cópias automáticas ficam em Documentos › Tennis Score Manager › Backup mesmo se você desinstalar o app: escolha a mais recente."
+    override val dataWipeCopies = "Também as cópias automáticas"
+    override val dataWipeCopiesHint = "As cópias em Documentos › Tennis Score Manager › Backup ficam mesmo se você desinstalar o app: ative para apagá-las."
 }
 TSM_EOF
 
@@ -60108,6 +60253,7 @@ fun DataScreen(c: MatchController) {
     val lang = c.options.collectAsState().value.lang
     var videos by remember { mutableStateOf(false) }
     var wipeVideos by remember { mutableStateOf(false) }
+    var wipeCopies by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
@@ -60198,6 +60344,7 @@ fun DataScreen(c: MatchController) {
         SectionCard(s.dataWipe, Icons.Filled.DeleteForever, accent = TsmColors.Danger) {
             Text(s.dataWipeHint, color = TsmColors.TextDim, fontSize = 13.sp)
             SwitchRow(Icons.Filled.Videocam, s.dataWipeVideos, s.dataWipeVideosHint, wipeVideos) { wipeVideos = it }
+            SwitchRow(Icons.Filled.Schedule, s.dataWipeCopies, s.dataWipeCopiesHint, wipeCopies) { wipeCopies = it }
             GhostButton(s.dataWipe, Icons.Filled.DeleteForever, { wipeAsk = 1 }, Modifier.fillMaxWidth())
         }
     }
@@ -60242,7 +60389,7 @@ fun DataScreen(c: MatchController) {
                     wipeAsk = 0
                     busy = s.dataBusy
                     scope.launch {
-                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName)) }
+                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName), autoCopies = wipeCopies) }
                         busy = null
                         closeAfter = true
                         message = s.dataWipeDone
@@ -105286,6 +105433,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 337 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 338 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

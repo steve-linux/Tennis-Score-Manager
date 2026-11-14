@@ -2421,4 +2421,8 @@ object FrStrings : Strings {
     override val mcHint = "Nouveau match s'ouvre avec joueurs, règles, tournoi et tour déjà remplis ; à la fin le résultat est à renvoyer au secrétariat."
     override val mcBusy = "Un match est en cours : terminez-le ou suspendez-le, puis rouvrez le fichier."
     override val mcNotValid = "Ce fichier n'est pas une fiche de match de Tennis Score Manager."
+    override val onbRestore = "Vous aviez déjà l'appli ? Restaurez vos données"
+    override val onbRestoreHint = "Les copies automatiques restent dans Documents › Tennis Score Manager › Backup même si vous désinstallez l'appli : choisissez la plus récente."
+    override val dataWipeCopies = "Aussi les copies automatiques"
+    override val dataWipeCopiesHint = "Les copies dans Documents › Tennis Score Manager › Backup restent même si vous désinstallez l'appli : activez pour les supprimer."
 }

@@ -2419,4 +2419,8 @@ object EsStrings : Strings {
     override val mcHint = "Nuevo partido se abre con jugadores, reglas, torneo y ronda ya escritos; al final el resultado se devuelve a la secretaría."
     override val mcBusy = "Hay un partido en curso: termínalo o suspéndelo y luego vuelve a abrir el archivo."
     override val mcNotValid = "Este archivo no es una ficha de partido de Tennis Score Manager."
+    override val onbRestore = "¿Ya tenías la app? Restaura tus datos"
+    override val onbRestoreHint = "Las copias automáticas se quedan en Documentos › Tennis Score Manager › Backup aunque desinstales la app: elige la más reciente."
+    override val dataWipeCopies = "También las copias automáticas"
+    override val dataWipeCopiesHint = "Las copias en Documentos › Tennis Score Manager › Backup se quedan aunque desinstales la app: actívalo para borrarlas."
 }
