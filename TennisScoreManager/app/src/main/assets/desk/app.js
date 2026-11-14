@@ -220,6 +220,8 @@ async function render() {
       h('div.brand', info.club || T.title, h('small', T.title)),
       VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } },
         l, v === 'today' ? h('span.badge', { id: 'newsbadge', hidden: !newsCount }, String(newsCount)) : null)),
+      // I file arrivati su WhatsApp Web o per email: risultati dal campo, presenze dell'allenatore, allievi proposti.
+      h('button', { onclick: uploadFile, title: T.ccUploadHint }, T.ccUpload),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
@@ -292,6 +294,40 @@ function saveCsv(name, rows) {
 
 /** L'intestazione che compare solo sulla carta: circolo, cosa e quando. */
 const printHead = (what) => h('div.printonly.phead', h('b', info.club), ' · ', h('span.what', what), ' · ', dateText(info.today));
+
+/** Scarica un file del telefono (Excel) col suo nome. */
+async function deskDownload(path, name) {
+  try {
+    const blob = await api('GET', path, undefined, true);
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name }); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { toast(errText(e)); }
+}
+
+/**
+ * Carica un file ricevuto (.tsm): il telefono lo legge e dice cos'è e com'è rispetto ai dati (da registrare, già
+ * registrato, diverso, codice sbagliato); se si può, Registra fa come sul telefono.
+ */
+function uploadFile() {
+  const input = h('input', { type: 'file', accept: '.tsm,.json,application/json,application/octet-stream' });
+  input.addEventListener('change', async () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    if (f.size > 512 * 1024) { toast(T.err.NOT_A_FILE); return; }
+    const text = await f.text();
+    let x;
+    try { x = await api('POST', '/files/check', { text }); } catch (e) { toast(errText(e)); return; }
+    const course = x.kind === 'PROPOSAL' ? select([['', T.ccNoCourse]].concat(x.courses.map((c) => [c.id, c.name])), x.course || '') : null;
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null),
+      x.canApply ? async () => {
+        await api('POST', '/files/apply', { text, course: course ? course.value || null : null });
+        toast(T.saved);
+        await render();
+      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : T.mrApply) });
+  });
+  input.click();
+}
 
 /** Apre un PDF del telefono in una scheda nuova (o lo scarica, se il browser blocca la scheda). */
 async function openPdf(path, name) {
@@ -1127,6 +1163,15 @@ function openMatch(t, m, who) {
   const clear = (m.winner || m.noShow) && h('button.danger.left', { type: 'button', onclick: async () => {
     try { await api('POST', base + '/result', {}); d.close(); toast(T.saved); await showCup(t.id); } catch (e) { toast(errText(e)); }
   } }, T.ctClearResult);
+  // Convoca: giorno, ora e campo (salvati prima, se cambiati) e la scheda partita; l'avviso si apre sul telefono.
+  const convoke = !m.winner && !m.noShow && m.a && m.b && h('button', { type: 'button', onclick: async () => {
+    try {
+      const sched = { court: court.value, date: date.value || null, startMin: time.value ? toMin(time.value) : null };
+      if (sched.court !== m.court || sched.date !== (m.date || null) || (sched.date && sched.startMin !== m.startMin)) await api('POST', base + '/schedule', sched);
+      await api('POST', base + '/convoke', {});
+      d.close(); alert(T.noticeOpened); await showCup(t.id);
+    } catch (e) { toast(errText(e)); }
+  } }, T.ctConvoke);
   const d = dialog(roundName(t, m) + ': ' + who(m.a) + ' – ' + who(m.b), h('div.form',
     h('h3', T.ctWinner), h('label.check.full', wa, who(m.a)), h('label.check.full', wb, who(m.b)),
     field(T.ctScore, score, 'full'), h('label.check', wo, T.ctWalkoverLong), h('label.check', rit, T.ctRetiredLong),
@@ -1150,7 +1195,7 @@ function openMatch(t, m, who) {
     }
     toast(T.saved);
     await showCup(t.id);
-  }, { left: clear });
+  }, { left: h('span.left', clear || null, convoke || null) });
 }
 
 function editCup(t) {
@@ -1693,7 +1738,10 @@ function showFixture(t, f) {
     score.addEventListener('input', () => { wo.checked = false; const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
     const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true', walkover: wo.checked });
     return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won), h('td', h('label.check', wo, T.ctWalkover)),
-      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
+      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save),
+        // Formazione pronta e partita da giocare: la scheda partita ai nostri (l'avviso si apre sul telefono).
+        ru.won == null && ru.ours.filter(Boolean).length === (ru.doubles ? 2 : 1)
+          ? h('button', { type: 'button', onclick: async () => { if (await fixDo('/rubber-notice', { index: i })) alert(T.noticeOpened); } }, T.ctConvoke) : null));
   }))));
 
   put(main(),
@@ -1812,6 +1860,11 @@ function showCourse(c) {
   put(main(),
     h('div.head', h('button', { onclick: () => { courseId = null; showSchool(); }, 'aria-label': T.scTitle, title: T.scTitle }, '←'), h('h1', c.name),
       h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editCourse(c) }, T.edit)),
+    // La scheda corso all'allenatore (l'invio si apre sul telefono) e il registro presenze in PDF o Excel.
+    h('div.actions.noprint', { style: 'justify-content:flex-start;margin-top:0' },
+      c.coach ? h('button', { onclick: async () => { try { await api('POST', '/courses/' + encodeURIComponent(c.id) + '/send-coach', {}); alert(T.noticeOpened); } catch (e) { toast(errText(e)); } } }, T.ccSendToCoach) : null,
+      h('button', { onclick: () => openPdf('/courses/' + encodeURIComponent(c.id) + '/register.pdf', T.rgTitle + ' ' + c.name) }, T.rgPdf),
+      h('button', { onclick: () => deskDownload('/courses/' + encodeURIComponent(c.id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave)),
     h('p.dim', [c.level, coachOf(c) ? T.scCoachLine(coachOf(c)) : '', dateText(c.from) + ' – ' + dateText(c.to), feeText(c)].filter(Boolean).join(' · '),
       h('br'), c.slots.length ? c.slots.map(slotText).join(' · ') : T.scNoLessons),
     printHead(T.scTitle + ' · ' + c.name + ' · ' + Object.fromEntries(tabs)[courseTab]),

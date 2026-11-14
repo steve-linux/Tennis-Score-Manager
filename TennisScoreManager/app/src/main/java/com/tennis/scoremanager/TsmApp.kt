@@ -22,5 +22,6 @@ class TsmApp : Application() {
         controller = MatchController(this, Storage(this), ble, HeartRateManager(this, ble), voice, Announcer(this, voice))
         // I backup automatici sono accesi di serie: il lavoro di ogni giorno va programmato anche se nessuno li ha toccati.
         com.tennis.scoremanager.service.DailyBackupJob.schedule(this, controller.storage)
+        com.tennis.scoremanager.service.RemindersJob.schedule(this, controller.storage.remindersOn)
     }
 }

@@ -149,6 +149,8 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         }
         // Dopo una lezione di prova: i suoi dati alla segreteria, per iscriverlo a un corso.
         GhostButton(s.ccPropose, Icons.Filled.Message, { propose = true }, Modifier.fillMaxWidth())
+        // I suoi progressi (valutazione, obiettivi, test, lezioni) da tenere nell'app, nel ruolo Tu.
+        GhostButton(s.pcSend, Icons.Filled.Message, { c.noticeProgressCard(st.id) }, Modifier.fillMaxWidth())
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
     receipt?.let { id ->
@@ -246,6 +248,12 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                         })
                     }
                     GhostButton(s.coNotify, Icons.Filled.Message, { c.saveLesson(l); onDone(); c.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
+                    // La lezione nel calendario del telefono (con chi e dove).
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    GhostButton(s.calAdd, Icons.Filled.Event, {
+                        val who = l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ")
+                        addToCalendar(ctx, calendarIntent("${s.coLessons}: $who", l.start, l.minutes, l.place, l.note), s)
+                    }, Modifier.fillMaxWidth())
                     TextButton(onClick = { c.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             }

@@ -348,6 +348,14 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun report(id: String): SrvOk = call<Unit, SrvOk>("POST", "/chat/msg/$id/report", null, null, SrvOk.serializer())
     fun adminChat(room: String): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/admin/chat/$room", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
     fun adminChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/admin/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
+    // La casella dei file: la segreteria lascia (a un giocatore) e prende (i suoi); il giocatore lo stesso con la segreteria.
+    fun sendMail(to: String, kind: String, text: String): SrvOk = call("POST", "/admin/mail", SrvMailIn.serializer(), SrvMailIn(to, kind, text), SrvOk.serializer())
+    fun adminMail(): List<SrvMail> = call<Unit, List<SrvMail>>("GET", "/admin/mail", null, null, kotlinx.serialization.builtins.ListSerializer(SrvMail.serializer()))
+    fun dropAdminMail(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/mail/" + java.net.URLEncoder.encode(id, "UTF-8"), null, null, SrvOk.serializer())
+    fun postMail(kind: String, text: String): SrvOk = call("POST", "/mail", SrvMailIn.serializer(), SrvMailIn("", kind, text), SrvOk.serializer())
+    fun myMail(): List<SrvMail> = call<Unit, List<SrvMail>>("GET", "/mail", null, null, kotlinx.serialization.builtins.ListSerializer(SrvMail.serializer()))
+    fun dropMyMail(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/mail/" + java.net.URLEncoder.encode(id, "UTF-8"), null, null, SrvOk.serializer())
+
     fun postBoard(text: String): SrvChatMsg = call("POST", "/admin/chat/board", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
     fun deleteChat(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/chat/msg/$id", null, null, SrvOk.serializer())
     fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())

@@ -259,7 +259,14 @@ private fun EventDialog(c: MatchController, e0: StudentEvent, isNew: Boolean, on
                 com.tennis.scoremanager.ui.screens.DateButton(s.payDate, e.at, lang) { d -> e = e.copy(at = d) }
                 OutlinedTextField(e.place, { e = e.copy(place = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.sePlace) })
                 OutlinedTextField(e.note, { e = e.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) })
-                if (!isNew) TextButton(onClick = { c.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) {
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    GhostButton(s.calAdd, Icons.Filled.Leaderboard, {
+                        val who = c.playerById(e.student)?.name.orEmpty()
+                        addToCalendar(ctx, calendarIntent("${e.name} · $who", com.tennis.scoremanager.data.CourtPlans.dayStart(e.at), 24 * 60, e.place, e.note, allDay = true), s)
+                    }, Modifier.fillMaxWidth())
+                    TextButton(onClick = { c.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                }
             }
         },
         confirmButton = { TextButton(enabled = e.name.isNotBlank(), onClick = { c.saveStudentEvent(e); onDone() }) { Text(s.save) } },

@@ -29,8 +29,17 @@ class MainActivity : ComponentActivity() {
 
     private val controller: MatchController get() = (application as TsmApp).controller
 
-    /** La notifica di una prenotazione online apre il planning sul suo giorno. */
+    /** La notifica di una prenotazione online apre il planning sul suo giorno; quella di un promemoria, dove serve. */
     private fun openFromNotification(i: android.content.Intent?) {
+        i?.getStringExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)?.let { target ->
+            i.removeExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)
+            when {
+                target == "inbox" -> controller.openInbox()
+                target == "lessons" -> controller.openLessons()
+                target.startsWith("course:") -> controller.openCoachCourse(target.removePrefix("course:"))
+            }
+            return
+        }
         if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
             i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
             // Da un nuovo annuncio: Compagni del suo circolo (lì si vede se è ancora aperto).

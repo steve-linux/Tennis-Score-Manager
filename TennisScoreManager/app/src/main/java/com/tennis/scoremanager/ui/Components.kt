@@ -170,6 +170,7 @@ fun AppRoot(c: MatchController) {
         c.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
         c.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
         c.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
+        c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }

@@ -81,6 +81,64 @@ class DeskBridge(private val c: MatchController) : DeskData {
         "CALLUP" -> c.noticeCallUp(t, f)
         else -> c.noticeResult(t, f)
     }
+    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
+    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
+    override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+
+    /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
+    override fun incomingFile(text: String): DeskIncoming? {
+        val s = c.strings
+        com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
+            val st = c.resultStatus(r)
+            val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
+            val msg = when (st) {
+                com.tennis.scoremanager.data.ResultStatus.READY -> s.mrReady
+                com.tennis.scoremanager.data.ResultStatus.SAME -> s.mrSame
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.resultNow(r))
+                com.tennis.scoremanager.data.ResultStatus.BAD_CODE -> s.mrBadCode
+                com.tennis.scoremanager.data.ResultStatus.NOT_FOUND -> s.mrNotFound
+            }
+            return DeskIncoming("RESULT", s.mrTitle, listOfNotNull(listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · "), "${r.side1} – ${r.side2}",
+                com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), winner?.let { s.mrWinner(it) }), msg,
+                st == com.tennis.scoremanager.data.ResultStatus.READY || st == com.tennis.scoremanager.data.ResultStatus.CONFLICT, replace = st == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
+            val st = c.attendanceStatus(r)
+            val msg = when (st) {
+                com.tennis.scoremanager.data.AttendanceStatus.READY -> s.ccAttReady
+                com.tennis.scoremanager.data.AttendanceStatus.SAME -> s.ccAttSame
+                com.tennis.scoremanager.data.AttendanceStatus.BAD_CODE -> s.ccAttBadCode
+                com.tennis.scoremanager.data.AttendanceStatus.NOT_FOUND -> s.ccAttNotFound
+            }
+            return DeskIncoming("ATTENDANCE", s.ccAttendanceTitle, listOfNotNull(r.courseName, r.coach.ifBlank { null }?.let { s.ccFrom(it) }, s.ccLessonsMarked(r.attendance.size)),
+                msg, st == com.tennis.scoremanager.data.AttendanceStatus.READY)
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p ->
+            val x = p.student
+            val guardian = listOf(x.guardian, x.guardianPhone).filter { it.isNotBlank() }.joinToString(" ")
+            return DeskIncoming("PROPOSAL", s.ccProposalTitle, listOfNotNull(x.name, x.phone.ifBlank { null }, x.email.ifBlank { null }, guardian.ifBlank { null }?.let { "${s.coGuardian}: $it" },
+                listOfNotNull(p.coach.ifBlank { null }?.let { s.ccFrom(it) }, p.level.ifBlank { null }, p.note.ifBlank { null }).joinToString(" · ").ifBlank { null }),
+                s.ccProposalCourse, true, courses = c.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.courses.value.any { it.id == id } })
+        }
+        return null
+    }
+
+    override fun applyIncoming(text: String, course: String?): String? {
+        com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
+            val st = c.resultStatus(r)
+            if (st != com.tennis.scoremanager.data.ResultStatus.READY && st != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return st.name
+            c.applyResult(r); return null
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
+            val st = c.attendanceStatus(r)
+            if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
+            c.applyAttendance(r); return null
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.courses.value.any { it.id == id } }); return null }
+        return "NOT_A_FILE"
+    }
     override fun setClubName(name: String) { c.storage.clubName = name }
     override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
     override fun addCourt(info: CourtInfo): Boolean = c.addCourt(info)

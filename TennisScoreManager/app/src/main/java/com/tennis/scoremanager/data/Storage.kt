@@ -251,6 +251,26 @@ class Storage(context: Context) {
     private val cardsFile: File get() = File(app.filesDir, "match_cards.json")
 
     /** Le schede partita ricevute dalla segreteria (per rimandarle il risultato). */
+    private val inboxFile: File get() = File(app.filesDir, "server_inbox.json")
+
+    /** I file arrivati dal server del circolo e non ancora aperti. */
+    fun loadInbox(): List<InboxItem> = readOr(inboxFile, emptyList()) { json.decodeFromString(ListSerializer(InboxItem.serializer()), it) }
+
+    @Synchronized
+    fun saveInbox(list: List<InboxItem>) {
+        runCatching { writeAtomic(inboxFile, json.encodeToString(ListSerializer(InboxItem.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio della casella fallito", it) }
+    }
+
+    private val myProgressFile: File get() = File(app.filesDir, "my_progress.json")
+
+    /** La scheda progressi ricevuta dal proprio allenatore (null = nessuna). */
+    fun loadMyProgress(): ProgressCard? = readOr<ProgressCard?>(myProgressFile, null) { json.decodeFromString(ProgressCard.serializer(), it) }
+
+    @Synchronized
+    fun saveMyProgress(c: ProgressCard) {
+        runCatching { writeAtomic(myProgressFile, json.encodeToString(ProgressCard.serializer(), c)) }.onFailure { Log.e("Storage", "Salvataggio della scheda progressi fallito", it) }
+    }
+
     fun loadReceivedCards(): List<ReceivedCard> =
         readOr(cardsFile, emptyList()) { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(ReceivedCard.serializer()), it) }
 
@@ -587,6 +607,14 @@ class Storage(context: Context) {
     var clubName: String
         get() = prefs.getString("club_name", null) ?: ""
         set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+    /** Promemoria del telefono (lezioni di domani, presenze da mandare, partita del giorno) e quelli già mostrati. */
+    var remindersOn: Boolean
+        get() = prefs.getBoolean("reminders_on", true)
+        set(v) = prefs.edit().putBoolean("reminders_on", v).apply()
+    var remindersShown: Set<String>
+        get() = prefs.getStringSet("reminders_shown", null)?.toSet() ?: emptySet()
+        set(v) = prefs.edit().putStringSet("reminders_shown", v).apply()
+
     /** Il telefono della segreteria: va nelle schede partita, i giocatori rimandano lì il risultato. */
     var clubPhone: String
         get() = prefs.getString("club_phone", null) ?: ""

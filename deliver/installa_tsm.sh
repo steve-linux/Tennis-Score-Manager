@@ -360,6 +360,12 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!-- Ogni ora, se acceso: i promemoria (lezioni di domani, presenze da mandare, partita del giorno). -->
+        <service
+            android:name=".service.RemindersJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <!-- Segreteria da PC: server HTTPS sulla rete locale, solo quando lo si accende -->
         <service
             android:name=".service.DeskService"
@@ -468,6 +474,8 @@ const APP_I18N = {
     ccToMark: (it) => `${it} da segnare`,
     ccToSend: "Presenze da mandare alla segreteria",
     ccUpdate: "Aggiorna il corso",
+    ccUpload: "Carica un file",
+    ccUploadHint: "Un file ricevuto su WhatsApp Web o per email: risultato dal campo, presenze dell'allenatore, allievo proposto.",
     cmCourses: (a, b) => `Lezioni dei corsi: ${a} (${b})`,
     cmEmpty: "Niente in questo mese.",
     cmHint: (it) => it === 1 ? `1 partita di torneo, squadra o sfida da giocare` : `${it} partite di tornei, squadre e sfide da giocare`,
@@ -632,7 +640,6 @@ const APP_I18N = {
     ctPaidOnlyHint: "Chi non ha pagato resta tra gli iscritti ma non entra nel sorteggio.",
     ctPaidOnlyShort: "solo chi ha pagato",
     ctPickPartner: (it) => `Il compagno di ${it}`,
-    ctPlayLive: "Gioca col segnapunti",
     ctPlayed: "Giocate",
     ctQualify: "Passano da ogni girone",
     ctQuarter: "Quarti di finale",
@@ -700,6 +707,20 @@ const APP_I18N = {
     mmOpponent: "Avversario",
     mmScore: "Punteggio (dal lato dell'allievo)",
     mmTitle: "Risultati da fuori",
+    mrApplied: "Risultato registrato",
+    mrApply: "Registra",
+    mrBadCode: "Il codice non è quello della scheda mandata per questa partita: il risultato non si registra.",
+    mrConflict: (it) => `Nel tabellone c'è già un altro risultato (${it}): vuoi sostituirlo?`,
+    mrFilePrefix: "Risultato",
+    mrNotFound: "La partita non c'è più (cancellata o annullata) in questo telefono.",
+    mrPending: (it) => `Risultato da mandare: ${it}`,
+    mrReady: "È la partita convocata: registrandolo, il tabellone si aggiorna.",
+    mrReplace: "Sostituisci",
+    mrSame: "Questo risultato è già registrato.",
+    mrSend: "Manda il risultato alla segreteria",
+    mrSendAgain: "Rimanda il risultato alla segreteria",
+    mrTitle: "Risultato dal campo",
+    mrWinner: (it) => `Vince ${it}`,
     pbAddCancel: "Annulla",
     pbAddClub: "Aggiungi un circolo",
     pbAlertChannel: "Le tue prenotazioni",
@@ -1260,6 +1281,8 @@ const APP_I18N = {
     ccToMark: (it) => `${it} to mark`,
     ccToSend: "Attendance to send to the club office",
     ccUpdate: "Update the course",
+    ccUpload: "Upload a file",
+    ccUploadHint: "A file received on WhatsApp Web or by email: result from the court, coach's attendance, proposed student.",
     cmCourses: (a, b) => `Course lessons: ${a} (${b})`,
     cmEmpty: "Nothing this month.",
     cmHint: (it) => it === 1 ? `1 tournament, team or challenge match to play` : `${it} tournament, team and challenge matches to play`,
@@ -1424,7 +1447,6 @@ const APP_I18N = {
     ctPaidOnlyHint: "Who hasn't paid stays among the entries but is not drawn.",
     ctPaidOnlyShort: "paid only",
     ctPickPartner: (it) => `${it}'s partner`,
-    ctPlayLive: "Play with the scorer",
     ctPlayed: "Played",
     ctQualify: "Qualify from each group",
     ctQuarter: "Quarter-finals",
@@ -1492,6 +1514,20 @@ const APP_I18N = {
     mmOpponent: "Opponent",
     mmScore: "Score (from the student's side)",
     mmTitle: "Results from elsewhere",
+    mrApplied: "Result recorded",
+    mrApply: "Record",
+    mrBadCode: "The code is not the one of the card sent for this match: the result is not recorded.",
+    mrConflict: (it) => `There is already a different result (${it}): replace it?`,
+    mrFilePrefix: "Result",
+    mrNotFound: "The match is no longer on this phone (deleted or cancelled).",
+    mrPending: (it) => `Result to send: ${it}`,
+    mrReady: "It is the match that was called up: recording it updates the draw.",
+    mrReplace: "Replace",
+    mrSame: "This result is already recorded.",
+    mrSend: "Send the result to the club office",
+    mrSendAgain: "Send the result again",
+    mrTitle: "Result from the court",
+    mrWinner: (it) => `Winner: ${it}`,
     pbAddCancel: "Cancel",
     pbAddClub: "Add a club",
     pbAlertChannel: "Your bookings",
@@ -2052,6 +2088,8 @@ const APP_I18N = {
     ccToMark: (it) => `${it} à noter`,
     ccToSend: "Présences à envoyer au secrétariat",
     ccUpdate: "Mettre à jour le cours",
+    ccUpload: "Charger un fichier",
+    ccUploadHint: "Un fichier reçu sur WhatsApp Web ou par e-mail : résultat du court, présences de l'entraîneur, élève proposé.",
     cmCourses: (a, b) => `Cours collectifs : ${a} (${b})`,
     cmEmpty: "Rien ce mois-ci.",
     cmHint: (it) => it === 1 ? `1 match de tournoi, d'équipe ou de défi à jouer` : `${it} matchs de tournois, d'équipes et de défis à jouer`,
@@ -2216,7 +2254,6 @@ const APP_I18N = {
     ctPaidOnlyHint: "Qui n'a pas payé reste inscrit mais n'est pas tiré au sort.",
     ctPaidOnlyShort: "payés seulement",
     ctPickPartner: (it) => `Partenaire de ${it}`,
-    ctPlayLive: "Jouer avec le marqueur",
     ctPlayed: "Joués",
     ctQualify: "Qualifiés par poule",
     ctQuarter: "Quarts de finale",
@@ -2284,6 +2321,20 @@ const APP_I18N = {
     mmOpponent: "Adversaire",
     mmScore: "Score (du côté de l'élève)",
     mmTitle: "Résultats d'ailleurs",
+    mrApplied: "Résultat enregistré",
+    mrApply: "Enregistrer",
+    mrBadCode: "Le code n'est pas celui de la fiche envoyée pour ce match : le résultat n'est pas enregistré.",
+    mrConflict: (it) => `Il y a déjà un autre résultat (${it}) : le remplacer ?`,
+    mrFilePrefix: "Résultat",
+    mrNotFound: "Le match n'est plus sur ce téléphone (supprimé ou annulé).",
+    mrPending: (it) => `Résultat à envoyer : ${it}`,
+    mrReady: "C'est le match convoqué : en l'enregistrant, le tableau se met à jour.",
+    mrReplace: "Remplacer",
+    mrSame: "Ce résultat est déjà enregistré.",
+    mrSend: "Envoyer le résultat au secrétariat",
+    mrSendAgain: "Renvoyer le résultat au secrétariat",
+    mrTitle: "Résultat du court",
+    mrWinner: (it) => `Vainqueur : ${it}`,
     pbAddCancel: "Annuler",
     pbAddClub: "Ajouter un club",
     pbAlertChannel: "Vos réservations",
@@ -2844,6 +2895,8 @@ const APP_I18N = {
     ccToMark: (it) => `${it} einzutragen`,
     ccToSend: "Anwesenheit ans Büro zu schicken",
     ccUpdate: "Kurs aktualisieren",
+    ccUpload: "Datei hochladen",
+    ccUploadHint: "Eine per WhatsApp Web oder E-Mail erhaltene Datei: Ergebnis vom Platz, Anwesenheit vom Trainer, vorgeschlagener Schüler.",
     cmCourses: (a, b) => `Kursstunden: ${a} (${b})`,
     cmEmpty: "Nichts in diesem Monat.",
     cmHint: (it) => it === 1 ? `1 Turnier-, Mannschafts- oder Forderungsmatch zu spielen` : `${it} Turnier-, Mannschafts- und Forderungsmatches zu spielen`,
@@ -3008,7 +3061,6 @@ const APP_I18N = {
     ctPaidOnlyHint: "Wer nicht bezahlt hat, bleibt gemeldet, wird aber nicht ausgelost.",
     ctPaidOnlyShort: "nur bezahlt",
     ctPickPartner: (it) => `Partner von ${it}`,
-    ctPlayLive: "Mit dem Zähler spielen",
     ctPlayed: "Gespielt",
     ctQualify: "Weiter pro Gruppe",
     ctQuarter: "Viertelfinale",
@@ -3076,6 +3128,20 @@ const APP_I18N = {
     mmOpponent: "Gegner",
     mmScore: "Ergebnis (aus Sicht des Schülers)",
     mmTitle: "Ergebnisse von außerhalb",
+    mrApplied: "Ergebnis gespeichert",
+    mrApply: "Speichern",
+    mrBadCode: "Der Code passt nicht zur Matchkarte dieses Matches: das Ergebnis wird nicht gespeichert.",
+    mrConflict: (it) => `Es gibt schon ein anderes Ergebnis (${it}): ersetzen?`,
+    mrFilePrefix: "Ergebnis",
+    mrNotFound: "Das Match ist auf diesem Telefon nicht mehr vorhanden (gelöscht oder abgesagt).",
+    mrPending: (it) => `Ergebnis zu schicken: ${it}`,
+    mrReady: "Es ist das eingeladene Match: beim Speichern wird das Tableau aktualisiert.",
+    mrReplace: "Ersetzen",
+    mrSame: "Dieses Ergebnis ist schon gespeichert.",
+    mrSend: "Ergebnis ans Büro schicken",
+    mrSendAgain: "Ergebnis erneut schicken",
+    mrTitle: "Ergebnis vom Platz",
+    mrWinner: (it) => `Sieger: ${it}`,
     pbAddCancel: "Abbrechen",
     pbAddClub: "Verein hinzufügen",
     pbAlertChannel: "Deine Buchungen",
@@ -3636,6 +3702,8 @@ const APP_I18N = {
     ccToMark: (it) => `${it} por marcar`,
     ccToSend: "Asistencia por enviar a la secretaría",
     ccUpdate: "Actualizar el curso",
+    ccUpload: "Subir un archivo",
+    ccUploadHint: "Un archivo recibido por WhatsApp Web o por correo: resultado de la pista, asistencia del entrenador, alumno propuesto.",
     cmCourses: (a, b) => `Clases de los cursos: ${a} (${b})`,
     cmEmpty: "Nada este mes.",
     cmHint: (it) => it === 1 ? `1 partido de torneo, equipo o desafío por jugar` : `${it} partidos de torneos, equipos y desafíos por jugar`,
@@ -3800,7 +3868,6 @@ const APP_I18N = {
     ctPaidOnlyHint: "Quien no ha pagado sigue inscrito pero no entra en el sorteo.",
     ctPaidOnlyShort: "solo pagados",
     ctPickPartner: (it) => `Pareja de ${it}`,
-    ctPlayLive: "Jugar con el marcador",
     ctPlayed: "Jugados",
     ctQualify: "Pasan de cada grupo",
     ctQuarter: "Cuartos de final",
@@ -3868,6 +3935,20 @@ const APP_I18N = {
     mmOpponent: "Rival",
     mmScore: "Resultado (desde el lado del alumno)",
     mmTitle: "Resultados de fuera",
+    mrApplied: "Resultado registrado",
+    mrApply: "Registrar",
+    mrBadCode: "El código no es el de la ficha enviada para este partido: el resultado no se registra.",
+    mrConflict: (it) => `Ya hay otro resultado (${it}): ¿sustituirlo?`,
+    mrFilePrefix: "Resultado",
+    mrNotFound: "El partido ya no está en este teléfono (borrado o anulado).",
+    mrPending: (it) => `Resultado por enviar: ${it}`,
+    mrReady: "Es el partido convocado: al registrarlo, el cuadro se actualiza.",
+    mrReplace: "Sustituir",
+    mrSame: "Este resultado ya está registrado.",
+    mrSend: "Enviar el resultado a la secretaría",
+    mrSendAgain: "Volver a enviar el resultado",
+    mrTitle: "Resultado de la pista",
+    mrWinner: (it) => `Gana ${it}`,
     pbAddCancel: "Cancelar",
     pbAddClub: "Añadir un club",
     pbAlertChannel: "Tus reservas",
@@ -4428,6 +4509,8 @@ const APP_I18N = {
     ccToMark: (it) => `${it} por marcar`,
     ccToSend: "Presenças a enviar à secretaria",
     ccUpdate: "Atualizar o curso",
+    ccUpload: "Carregar um arquivo",
+    ccUploadHint: "Um arquivo recebido no WhatsApp Web ou por email: resultado da quadra, presenças do treinador, aluno proposto.",
     cmCourses: (a, b) => `Aulas dos cursos: ${a} (${b})`,
     cmEmpty: "Nada neste mês.",
     cmHint: (it) => it === 1 ? `1 partida de torneio, equipe ou desafio para jogar` : `${it} partidas de torneios, equipes e desafios para jogar`,
@@ -4592,7 +4675,6 @@ const APP_I18N = {
     ctPaidOnlyHint: "Quem não pagou continua inscrito mas não entra no sorteio.",
     ctPaidOnlyShort: "só pagos",
     ctPickPartner: (it) => `Parceiro de ${it}`,
-    ctPlayLive: "Jogar com o marcador",
     ctPlayed: "Jogadas",
     ctQualify: "Passam de cada grupo",
     ctQuarter: "Quartas de final",
@@ -4660,6 +4742,20 @@ const APP_I18N = {
     mmOpponent: "Adversário",
     mmScore: "Placar (do lado do aluno)",
     mmTitle: "Resultados de fora",
+    mrApplied: "Resultado registrado",
+    mrApply: "Registrar",
+    mrBadCode: "O código não é o da ficha enviada para esta partida: o resultado não é registrado.",
+    mrConflict: (it) => `Já há outro resultado (${it}): substituí-lo?`,
+    mrFilePrefix: "Resultado",
+    mrNotFound: "A partida já não está neste telefone (apagada ou anulada).",
+    mrPending: (it) => `Resultado a enviar: ${it}`,
+    mrReady: "É a partida convocada: ao registrá-lo, a chave é atualizada.",
+    mrReplace: "Substituir",
+    mrSame: "Este resultado já está registrado.",
+    mrSend: "Enviar o resultado à secretaria",
+    mrSendAgain: "Reenviar o resultado à secretaria",
+    mrTitle: "Resultado da quadra",
+    mrWinner: (it) => `Vence ${it}`,
     pbAddCancel: "Cancelar",
     pbAddClub: "Adicionar um clube",
     pbAlertChannel: "As tuas reservas",
@@ -5372,6 +5468,8 @@ async function render() {
       h('div.brand', info.club || T.title, h('small', T.title)),
       VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } },
         l, v === 'today' ? h('span.badge', { id: 'newsbadge', hidden: !newsCount }, String(newsCount)) : null)),
+      // I file arrivati su WhatsApp Web o per email: risultati dal campo, presenze dell'allenatore, allievi proposti.
+      h('button', { onclick: uploadFile, title: T.ccUploadHint }, T.ccUpload),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
@@ -5444,6 +5542,40 @@ function saveCsv(name, rows) {
 
 /** L'intestazione che compare solo sulla carta: circolo, cosa e quando. */
 const printHead = (what) => h('div.printonly.phead', h('b', info.club), ' · ', h('span.what', what), ' · ', dateText(info.today));
+
+/** Scarica un file del telefono (Excel) col suo nome. */
+async function deskDownload(path, name) {
+  try {
+    const blob = await api('GET', path, undefined, true);
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name }); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { toast(errText(e)); }
+}
+
+/**
+ * Carica un file ricevuto (.tsm): il telefono lo legge e dice cos'è e com'è rispetto ai dati (da registrare, già
+ * registrato, diverso, codice sbagliato); se si può, Registra fa come sul telefono.
+ */
+function uploadFile() {
+  const input = h('input', { type: 'file', accept: '.tsm,.json,application/json,application/octet-stream' });
+  input.addEventListener('change', async () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    if (f.size > 512 * 1024) { toast(T.err.NOT_A_FILE); return; }
+    const text = await f.text();
+    let x;
+    try { x = await api('POST', '/files/check', { text }); } catch (e) { toast(errText(e)); return; }
+    const course = x.kind === 'PROPOSAL' ? select([['', T.ccNoCourse]].concat(x.courses.map((c) => [c.id, c.name])), x.course || '') : null;
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null),
+      x.canApply ? async () => {
+        await api('POST', '/files/apply', { text, course: course ? course.value || null : null });
+        toast(T.saved);
+        await render();
+      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : T.mrApply) });
+  });
+  input.click();
+}
 
 /** Apre un PDF del telefono in una scheda nuova (o lo scarica, se il browser blocca la scheda). */
 async function openPdf(path, name) {
@@ -6279,6 +6411,15 @@ function openMatch(t, m, who) {
   const clear = (m.winner || m.noShow) && h('button.danger.left', { type: 'button', onclick: async () => {
     try { await api('POST', base + '/result', {}); d.close(); toast(T.saved); await showCup(t.id); } catch (e) { toast(errText(e)); }
   } }, T.ctClearResult);
+  // Convoca: giorno, ora e campo (salvati prima, se cambiati) e la scheda partita; l'avviso si apre sul telefono.
+  const convoke = !m.winner && !m.noShow && m.a && m.b && h('button', { type: 'button', onclick: async () => {
+    try {
+      const sched = { court: court.value, date: date.value || null, startMin: time.value ? toMin(time.value) : null };
+      if (sched.court !== m.court || sched.date !== (m.date || null) || (sched.date && sched.startMin !== m.startMin)) await api('POST', base + '/schedule', sched);
+      await api('POST', base + '/convoke', {});
+      d.close(); alert(T.noticeOpened); await showCup(t.id);
+    } catch (e) { toast(errText(e)); }
+  } }, T.ctConvoke);
   const d = dialog(roundName(t, m) + ': ' + who(m.a) + ' – ' + who(m.b), h('div.form',
     h('h3', T.ctWinner), h('label.check.full', wa, who(m.a)), h('label.check.full', wb, who(m.b)),
     field(T.ctScore, score, 'full'), h('label.check', wo, T.ctWalkoverLong), h('label.check', rit, T.ctRetiredLong),
@@ -6302,7 +6443,7 @@ function openMatch(t, m, who) {
     }
     toast(T.saved);
     await showCup(t.id);
-  }, { left: clear });
+  }, { left: h('span.left', clear || null, convoke || null) });
 }
 
 function editCup(t) {
@@ -6845,7 +6986,10 @@ function showFixture(t, f) {
     score.addEventListener('input', () => { wo.checked = false; const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
     const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true', walkover: wo.checked });
     return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won), h('td', h('label.check', wo, T.ctWalkover)),
-      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
+      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save),
+        // Formazione pronta e partita da giocare: la scheda partita ai nostri (l'avviso si apre sul telefono).
+        ru.won == null && ru.ours.filter(Boolean).length === (ru.doubles ? 2 : 1)
+          ? h('button', { type: 'button', onclick: async () => { if (await fixDo('/rubber-notice', { index: i })) alert(T.noticeOpened); } }, T.ctConvoke) : null));
   }))));
 
   put(main(),
@@ -6964,6 +7108,11 @@ function showCourse(c) {
   put(main(),
     h('div.head', h('button', { onclick: () => { courseId = null; showSchool(); }, 'aria-label': T.scTitle, title: T.scTitle }, '←'), h('h1', c.name),
       h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editCourse(c) }, T.edit)),
+    // La scheda corso all'allenatore (l'invio si apre sul telefono) e il registro presenze in PDF o Excel.
+    h('div.actions.noprint', { style: 'justify-content:flex-start;margin-top:0' },
+      c.coach ? h('button', { onclick: async () => { try { await api('POST', '/courses/' + encodeURIComponent(c.id) + '/send-coach', {}); alert(T.noticeOpened); } catch (e) { toast(errText(e)); } } }, T.ccSendToCoach) : null,
+      h('button', { onclick: () => openPdf('/courses/' + encodeURIComponent(c.id) + '/register.pdf', T.rgTitle + ' ' + c.name) }, T.rgPdf),
+      h('button', { onclick: () => deskDownload('/courses/' + encodeURIComponent(c.id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave)),
     h('p.dim', [c.level, coachOf(c) ? T.scCoachLine(coachOf(c)) : '', dateText(c.from) + ' – ' + dateText(c.to), feeText(c)].filter(Boolean).join(' · '),
       h('br'), c.slots.length ? c.slots.map(slotText).join(' · ') : T.scNoLessons),
     printHead(T.scTitle + ' · ' + c.name + ' · ' + Object.fromEntries(tabs)[courseTab]),
@@ -7693,6 +7842,8 @@ const DESK_I18N = {
       OTHER: "Altro",
     },
     err: {
+      NOT_A_FILE: "Questo file non è un risultato, un file di presenze o un allievo proposto di TSM.",
+      NO_COACH: "Il corso non ha un istruttore del database: sceglilo in Modifica.",
       NOT_BACKUP: "Questo file non è un backup della segreteria di TSM.",
       NOT_PAIRED: "Il server delle prenotazioni non è abbinato.",
       COURT_EXISTS: "C'è già un campo con questo nome.",
@@ -8014,6 +8165,8 @@ const DESK_I18N = {
       OTHER: "Other",
     },
     err: {
+      NOT_A_FILE: "This file is not a TSM result, attendance file or proposed student.",
+      NO_COACH: "The course has no coach from the database: pick one in Edit.",
       NOT_BACKUP: "This file isn't a TSM office backup.",
       NOT_PAIRED: "The booking server isn't paired.",
       COURT_EXISTS: "There's already a court with this name.",
@@ -8336,6 +8489,8 @@ const DESK_I18N = {
       OTHER: "Autre",
     },
     err: {
+      NOT_A_FILE: "Ce fichier n'est pas un résultat, un fichier de présences ou un élève proposé de TSM.",
+      NO_COACH: "Le cours n'a pas d'entraîneur de la base : choisissez-le dans Modifier.",
       NOT_BACKUP: "Ce fichier n'est pas une sauvegarde du secrétariat TSM.",
       NOT_PAIRED: "Le serveur des réservations n'est pas associé.",
       COURT_EXISTS: "Il y a déjà un court avec ce nom.",
@@ -8657,6 +8812,8 @@ const DESK_I18N = {
       OTHER: "Andere",
     },
     err: {
+      NOT_A_FILE: "Diese Datei ist kein TSM-Ergebnis, keine Anwesenheitsdatei und kein vorgeschlagener Schüler.",
+      NO_COACH: "Der Kurs hat keinen Trainer aus der Datenbank: unter Bearbeiten wählen.",
       NOT_BACKUP: "Diese Datei ist keine Büro-Sicherung von TSM.",
       NOT_PAIRED: "Der Buchungsserver ist nicht gekoppelt.",
       COURT_EXISTS: "Es gibt schon einen Platz mit diesem Namen.",
@@ -8978,6 +9135,8 @@ const DESK_I18N = {
       OTHER: "Otro",
     },
     err: {
+      NOT_A_FILE: "Este archivo no es un resultado, un archivo de asistencia ni un alumno propuesto de TSM.",
+      NO_COACH: "El curso no tiene un entrenador de la base de datos: elígelo en Editar.",
       NOT_BACKUP: "Este archivo no es una copia de la secretaría de TSM.",
       NOT_PAIRED: "El servidor de reservas no está vinculado.",
       COURT_EXISTS: "Ya hay una pista con este nombre.",
@@ -9299,6 +9458,8 @@ const DESK_I18N = {
       OTHER: "Outro",
     },
     err: {
+      NOT_A_FILE: "Este arquivo não é um resultado, um arquivo de presenças nem um aluno proposto do TSM.",
+      NO_COACH: "O curso não tem um treinador da base de dados: escolha-o em Editar.",
       NOT_BACKUP: "Este arquivo não é uma cópia da secretaria do TSM.",
       NOT_PAIRED: "O servidor de reservas não está associado.",
       COURT_EXISTS: "Já há uma quadra com este nome.",
@@ -9905,6 +10066,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
 - **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken. In der Übersicht liefert **Quittungen <Jahr> (Excel)** die Liste der Paketquittungen des Jahres, für den Steuerberater.
 - **Trainer am PC** (*Mehr › Trainer am PC*): wie das Büro am PC (7.20) öffnet der Computer zu Hause eine Seite, die das Telefon im selben Netz bereitstellt, nach der Kopplung per QR oder Code. Es gibt nur die Daten des Trainers: **Schüler** (die Karte mit Tagebuch, Notizen, Bewertung, Tests, Rangliste und Turnieren, Ergebnissen, Paketen mit PDF-Quittungen und dem Bericht), **Stundenplan** (die Stunden und die noch als erledigt zu markierenden), **Meine Kurse** (die Liste, Anwesenheit per Klick auf eine Stunde, PDF und Excel) und **Monatsübersicht** (mit den Quittungen des Jahres in Excel). Jede Seite lässt sich drucken; die Daten bleiben auf dem Telefon.
+- **Kalender, Erinnerungen und Fortschrittskarte**: **Zum Kalender hinzufügen** trägt in den Telefonkalender eine Stunde ein (aus der Stunde), die Stunden eines Kurses jede Woche (**Kalender** im Kurs), ein Turnier des Schülers und das Match einer erhaltenen Einladung. Die **Erinnerungen** (Einstellungen, standardmäßig an) melden am Vorabend die Stunden von morgen, noch zu schickende Kursanwesenheit und, wer eingeladen ist, das Match des Tages. **Fortschrittskarte schicken** (Karte des Schülers) schickt ihm Bewertung, Ziele, Tests, Rangliste, nächste Stunden und übrige Stunden: der Schüler öffnet sie mit TSM und findet sie unter *Fortschritte › Von meinem Trainer* (Tagebuch und Notizen bleiben bei dir).
 
 ### 7.7 Spieler: die Datenbank
 
@@ -9995,6 +10157,7 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Das Büro führt keine Spielstände: auf dem Platz wechselt man in die Rolle **Du**, wo *Spielen › Vereinsmatches* Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt öffnet; am Ende kommt das Ergebnis von selbst ins Tableau. Ein Match hier antippen: das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
 - **Mit der Matchkarte einladen** (ohne Server): ein Match antippen, **Einladen** schickt jedem Spieler per WhatsApp (oder E-Mail) Tag, Uhrzeit und Platz mit einer kleinen angehängten Datei, der *Matchkarte* (z. B. `Finale Rossi - Bianchi.tsm`); *Mitteilungen an die Teilnehmer › Nächstes Match* macht dasselbe. Wer zählt, öffnet sie mit **Teilen › TSM**: das Match erscheint und **Match vorbereiten** öffnet Neues Match mit Spielern (in seiner Liste gefunden oder angelegt), Ranglisten, Turnier, Runde, Platz und Regeln schon eingetragen. Die Regeln legt man unter **Bearbeiten** des Turniers fest (*Spielregeln*: auf dem Platz wählen, 3 Sätze, 2 Sätze + Match-Tiebreak, Pro-Satz; Spiele pro Satz und No-Ad); das **Telefon des Büros** unter *Mehr › Der Verein* kommt in die Karte, um das Ergebnis zurückzuschicken. **Das Ergebnis kommt zurück**: am Ende bietet die Zusammenfassung **Ergebnis ans Büro schicken** (WhatsApp direkt an das Telefon des Büros, mit einer Datei und dem geschriebenen Ergebnis); schickst du es nicht gleich, bleibt es unter *Spielen*, bis du es tust. Das Büro öffnet es mit **Teilen › TSM**: die App prüft, dass es das eingeladene Match ist (der Code der Karte), und **Speichern** aktualisiert das Tableau; ist es schon gespeichert, sagt sie es, gibt es ein anderes Ergebnis, fragt sie, ob es ersetzt werden soll.
+- **Mit dem Vereinsserver** (optional, 7.18): beim Einladen kommt die Matchkarte auch in das Postfach der registrierten Spieler auf dem Server, die Kurskarte in das des Trainers. In ihrer App erscheint **Vom Verein: N Dateien zu öffnen** (und eine Mitteilung). Am Ende kommt das Ergebnis von selbst über den Server zurück, ebenso Anwesenheit und Vorschläge des Trainers; das Büro speichert sofort die mit dem richtigen Code (eine Mitteilung sagt es) und lässt die zu prüfenden unter *Vom Verein*. Antwortet der Server nicht, geht es wie immer per WhatsApp.
 
 - **Auf der TV-Anzeigetafel**: Bei eingeschalteter TV-Anzeigetafel (*Geräte*) legt **Auf der TV-Anzeigetafel zeigen** im Turnier das Turnier über den Spielstand, in Seiten, die alle 15 Sekunden wechseln: **Tableau** (Sieger gelb), **Gruppen** mit Tabelle (wer weiterkommt, hervorgehoben) und **Spielplan** von heute (oder die nächsten angesetzten Matches) mit Platz, Uhrzeit und Ergebnis. Jedes Ergebnis, auch vom Zähler, erscheint sofort. **Von der TV-Anzeigetafel nehmen** zeigt wieder den Spielstand.
 
@@ -10096,6 +10259,7 @@ Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **
 - **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
 - **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
 - **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). **Tennisschule** (Kurse mit Zeiten und Plätzen, Schüler, Anwesenheit, abgesagte Stunden, Monats- oder Saisongebühren zum Belasten), **Platzstatistik** (Auslastung, Einnahmen, Platz für Platz, vollste Tage und Stunden, wer am meisten bucht, nach Zeitraum, druckbar). Mit **Mahnung vorbereiten** in Beiträge und Zahlungen wählst du unter den angezeigten Forderungen, wem du schreibst: die Nachricht öffnet sich auf dem Handy und du schickst sie von dort. **Mannschaften und Ligen** (Kader, Heim- oder Auswärtsbegegnungen mit reservierten Plätzen, Verfügbarkeit, Aufstellung, Spiele und Ergebnis; Nachrichten öffnen sich auf dem Handy). **Online-Buchungen**, mit dem Vereinsserver (nächste Buchungen der Spieler, Warteliste, Anzeigen bei Partner gesucht zum Entfernen bei Bedarf, Regeln für die Spieler, **Jetzt senden**), **Einstellungen** (Vereinsname, Zeiten und Preise, Plätze mit Belag, Licht und eigenen Preisen, Zahlungsarten). WhatsApp-Nachrichten, Platzfotos und Live-Zählung bleiben in der App.
+- **Neues vom Telefon auch am PC**: im Turniermatch und im Mannschaftsspiel **Einladen** (die Matchkarte; die Mitteilung öffnet sich auf dem Telefon); im Kurs **An den Trainer schicken**, **Anwesenheitsliste (PDF)** und **Als Excel speichern**; im Menü **Datei hochladen** für per WhatsApp Web oder E-Mail erhaltene Dateien (Ergebnisse vom Platz, Anwesenheit vom Trainer, vorgeschlagene Schüler): die Seite sagt, was es ist und wie es zu den Daten steht, und **Speichern** macht es wie das Telefon.
 - **Sicherung des Büros** (am PC unter Statistik; am Handy unter Mehr › Sicherung des Büros): eine einzige `.tsmclub`-Datei mit Mitgliedern und Spielern, Beiträgen und Zahlungen, Platzplan, Turnieren, Tennisschule, Mannschaften, Plätzen und Einstellungen (keine Spiele, Schläge und Videos: die hat die komplette Sicherung). **Auf den PC laden** oder vom Handy **verschicken**, wohin du willst (Google Drive, E-Mail, USB-Stick). Mit der **automatischen Sicherung** macht das Handy eine Kopie am Tag, nur wenn sich etwas geändert hat, und behält die letzten 14; mit einem Vereinsserver auch er. **Wiederherstellen** zeigt erst, was in der Datei ist, und macht eine Kopie vom jetzigen Stand, um zurückzugehen. Die Datei enthält persönliche Daten der Mitglieder: bewahre sie bei dir auf.
 - **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
 - **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
@@ -10508,6 +10672,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
 - **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office. In the summary, **Receipts <year> (Excel)** gives the list of the year's pack receipts, for the accountant.
 - **Coach from PC** (*More › Coach from PC*): like the Club office from PC (7.20), the home computer opens a page served by the phone, on the same network, after pairing with a QR or code. Only the coach's data is there: **Students** (the card with diary, notes, assessment, tests, ranking and tournaments, results, packs with PDF receipts and the report), **Schedule** (lessons and those to mark as done), **My courses** (the register, roll call by clicking a lesson, PDF and Excel) and **Monthly summary** (with the year's receipts in Excel). Every page can be printed; the data stays on the phone.
+- **Calendar, reminders and progress card**: **Add to calendar** puts in the phone's calendar a lesson (from the lesson), a course's lessons every week (**Calendar** in the course), a student's tournament and the match of a call-up received. **Reminders** (Settings, on by default) tell you the evening before about tomorrow's lessons, a course's attendance still to send and, to whoever is called up, the match of the day. **Send the progress card** (student's card) sends them assessment, goals, tests, ranking, next lessons and lessons left: the student opens it with TSM and finds it in *Progress › From my coach* (diary and notes stay yours).
 
 ### 7.7 Players: the database
 
@@ -10598,6 +10763,7 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - The club office does not keep scores: on court switch to the **You** role, where *Play › Club matches* opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Tapping a match here: enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
 - **Call up with the match card** (no server needed): tapping a match, **Call up** sends each player on WhatsApp (or by email) day, time and court with a small file attached, the *match card* (e.g. `Final Rossi - Bianchi.tsm`); *Notices to participants › Next match* does the same. Whoever keeps the score opens it with **Share › TSM**: the match appears and **Prepare the match** opens New match with players (found or created in their list), rankings, tournament, round, court and rules already filled in. The rules are set in the tournament's **Edit** (*Match rules*: chosen on court, 3 sets, 2 sets + match tie-break, pro set; games per set and No-Ad); the **club office phone** in *More › The club* goes into the card, to send the result back. **The result comes back**: at the end the summary has **Send the result to the club office** (WhatsApp straight to the office phone, with a file and the written score); if you don't send it right away, it stays in *Play* until you do. The office opens it with **Share › TSM**: the app checks it is the match that was called up (the card's code) and **Record** updates the draw; if it is already recorded it says so, if there is a different result it asks whether to replace it.
+- **With the club server** (optional, 7.18): when calling up, the match card also goes into the server mailbox of the registered players; the course card into the coach's. In their app **From the club: N files to open** appears (and a notification). At the end the result comes back by itself through the server, and so do the coach's attendance and proposals; the office records at once those with the right code (a notification says so) and leaves in *From the club* those to check. If the server doesn't answer, WhatsApp is used as always.
 
 - **On the TV scoreboard**: with the TV scoreboard on (*Devices*), **Show on the TV scoreboard** in the tournament covers the score with the tournament, in pages that alternate every 15 seconds: **draw** (winners in yellow), **groups** with their standings (those going through highlighted) and today's **order of play** (or the next scheduled matches), with court, time and results. Every result, including those from the scorer, shows at once. **Remove from the TV scoreboard** goes back to the score.
 
@@ -10699,6 +10865,7 @@ Entering members and payments is easier with a keyboard and mouse. **A computer 
 - **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
 - **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
 - **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). **Tennis school** (courses with times and courts, students, attendance, cancelled lessons, monthly or season fees to charge), **Court statistics** (occupancy, takings, court by court, busiest days and hours, who books most, by period, printable). With **Prepare reminder** in Fees and payments you pick whom to write to among the charges you see: the message opens on the phone and you send it from there. **Teams and leagues** (roster, home or away fixtures with held courts, availability, call-ups, rubbers and result; notices open on the phone). **Online bookings**, with the club server (players' upcoming bookings, waiting list, Looking for a partner posts to remove if needed, rules for players, **Send now**), **Settings** (club name, hours and prices, courts with surface, lights and their own prices, payment methods). WhatsApp notices, court photos and live scoring stay in the app.
+- **Phone features on the PC too**: in a tournament match and in a rubber **Call up** (the match card; the notice opens on the phone); in a course **Send to the coach**, **Attendance register (PDF)** and **Save as Excel**; in the menu **Upload a file** for files received on WhatsApp Web or by email (results from the court, coach's attendance, proposed students): the page says what it is and how it compares with the data, and **Record** does what the phone does.
 - **Office backup** (on the PC, below Statistics; on the phone under More › Office backup): one `.tsmclub` file with members and players, fees and payments, planner, tournaments, tennis school, teams, courts and settings (not matches, strokes and videos: the full backup has those). **Download to the PC** or, from the phone, **send it** wherever you like (Google Drive, email, a USB stick). With the **automatic backup** the phone makes a copy a day only if something changed and keeps the last 14; with a club server it keeps them too. **Restore** first shows what's in the file and makes a copy of now, so you can go back. The file holds members' personal data: keep it somewhere of yours.
 - **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
 - **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
@@ -11110,6 +11277,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
 - **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría. En el resumen, **Recibos <año> (Excel)** da la lista de recibos de paquetes del año, para el gestor.
 - **Entrenador desde el PC** (*Más › Entrenador desde el PC*): como la Secretaría desde el PC (7.20), el ordenador de casa abre una página servida por el teléfono, en la misma red, tras emparejar con QR o código. Solo están los datos del entrenador: **Alumnos** (la ficha con diario, notas, evaluación, pruebas, clasificación y torneos, resultados, paquetes con los recibos en PDF y el informe), **Agenda** (las clases y las que hay que marcar como hechas), **Mis cursos** (el registro, pasar lista pulsando una clase, PDF y Excel) y **Resumen del mes** (con los recibos del año en Excel). Cada página se imprime; los datos se quedan en el teléfono.
+- **Calendario, recordatorios y ficha de progresos**: **Añadir al calendario** pone en el calendario del teléfono una clase (desde la clase), las clases de un curso cada semana (**Calendario** en el curso), un torneo del alumno y el partido de una convocatoria recibida. Los **recordatorios** (Ajustes, activados por defecto) avisan la noche antes de las clases de mañana, de la asistencia de un curso por enviar y, a quien está convocado, del partido del día. **Enviar la ficha de progresos** (ficha del alumno) le envía evaluación, objetivos, pruebas, clasificación, próximas clases y clases que quedan: el alumno la abre con TSM y la encuentra en *Progresos › De mi entrenador* (el diario y las notas siguen siendo tuyos).
 
 ### 7.7 Jugadores: la base
 
@@ -11200,6 +11368,7 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - La secretaría no lleva marcadores: en la pista se pasa al rol **Tú**, donde *Jugar › Partidos del club* abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. Tocando un partido aquí: el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
 - **Convocar con la ficha de partido** (sin servidor): tocando un partido, **Convocar** envía a cada jugador por WhatsApp (o por correo) día, hora y pista con un pequeño archivo adjunto, la *ficha de partido* (p. ej. `Final Rossi - Bianchi.tsm`); *Avisos a los participantes › Próximo partido* hace lo mismo. Quien lleva el marcador la abre con **Compartir › TSM**: aparece el partido y **Preparar el partido** abre Nuevo partido con jugadores (encontrados o creados en su lista), clasificaciones, torneo, ronda, pista y reglas ya escritos. Las reglas se fijan en **Editar** del torneo (*Reglas de los partidos*: a elegir en la pista, 3 sets, 2 sets + super tie-break, pro set; juegos por set y No-Ad); el **teléfono de la secretaría** en *Más › El club* va en la ficha, para devolver el resultado. **El resultado vuelve**: al final el resumen tiene **Enviar el resultado a la secretaría** (WhatsApp directo al teléfono de la secretaría, con un archivo y el resultado escrito); si no lo envías enseguida, se queda en *Jugar* hasta que lo hagas. La secretaría lo abre con **Compartir › TSM**: la app comprueba que es el partido convocado (el código de la ficha) y **Registrar** actualiza el cuadro; si ya está registrado lo dice, si hay otro resultado pregunta si sustituirlo.
+- **Con el servidor del club** (opcional, 7.18): al convocar, la ficha de partido va también al buzón en el servidor de los jugadores inscritos; la ficha de curso al del entrenador. En su app aparece **Del club: N archivos por abrir** (y una notificación). Al final el resultado vuelve solo por el servidor, y también la asistencia y las propuestas del entrenador; la secretaría registra enseguida los que tienen el código correcto (lo dice una notificación) y deja en *Del club* los que hay que revisar. Si el servidor no responde se usa WhatsApp como siempre.
 
 - **En el marcador de la TV**: con el marcador de la TV encendido (*Dispositivos*), **Mostrar en el marcador de la TV** en el torneo cubre el marcador con el torneo, en páginas que se alternan cada 15 segundos: **cuadro** (ganadores en amarillo), **grupos** con su clasificación (destacados quienes pasan) y **orden de juego** de hoy (o los próximos partidos programados), con pista, hora y resultados. Cada resultado, también el del marcador, se ve al momento. **Quitar del marcador de la TV** vuelve al marcador.
 
@@ -11301,6 +11470,7 @@ Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (
 - **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
 - **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
 - **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). **Escuela de tenis** (cursos con horarios y pistas, alumnos, lista de las clases, clases anuladas, cuotas del mes o de la temporada por cargar), **Estadísticas de las pistas** (ocupación, ingresos, pista por pista, días y horas más llenos, quién reserva más, por periodo, para imprimir). Con **Preparar recordatorio** en Cuotas y pagos eliges a quién escribir entre los cargos que ves: el mensaje se abre en el teléfono y lo envías desde allí. **Equipos y ligas** (plantilla, encuentros en casa o fuera con pistas reservadas, disponibilidad, convocados, partidos y resultado; los avisos se abren en el teléfono). **Reservas online**, con el servidor del club (próximas reservas de los jugadores, lista de espera, anuncios de Busco compañero que quitar si hace falta, reglas para los jugadores, **Enviar ahora**), **Ajustes** (nombre del club, horarios y precios, pistas con superficie, luces y precios propios, formas de pago). Avisos de WhatsApp, fotos de las pistas y marcador en directo siguen en la app.
+- **Novedades del teléfono también en el PC**: en el partido del torneo y en el del encuentro **Convocar** (la ficha de partido; el aviso se abre en el teléfono); en el curso **Enviar al entrenador**, **Registro de asistencia (PDF)** y **Guardar en Excel**; en el menú **Subir un archivo** para los archivos recibidos por WhatsApp Web o por correo (resultados de la pista, asistencia del entrenador, alumnos propuestos): la página dice qué es y cómo está respecto a los datos, y **Registrar** hace como el teléfono.
 - **Copia de la secretaría** (en el PC, debajo de Estadísticas; en el teléfono en Más › Copia de la secretaría): un solo archivo `.tsmclub` con socios y jugadores, cuotas y pagos, planning, torneos, escuela de tenis, equipos, pistas y ajustes (no partidos, golpes ni vídeos: la copia completa los tiene). **Descargar al PC** o, desde el teléfono, **enviarla** donde quieras (Google Drive, correo, un pendrive). Con la **copia automática** el teléfono hace una copia al día solo si algo ha cambiado y guarda las últimas 14; con un servidor del club, también él. **Restaurar** muestra primero lo que hay en el archivo y hace una copia de ahora, para volver atrás. El archivo contiene datos personales de los socios: guárdalo en un sitio tuyo.
 - **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
 - **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
@@ -11712,6 +11882,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
 - **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat. Dans le récapitulatif, **Reçus <année> (Excel)** donne la liste des reçus de forfaits de l'année, pour le comptable.
 - **Entraîneur depuis le PC** (*Plus › Entraîneur depuis le PC*) : comme le Secrétariat depuis le PC (7.20), l'ordinateur de la maison ouvre une page servie par le téléphone, sur le même réseau, après l'appairage par QR ou code. Il n'y a que les données de l'entraîneur : **Élèves** (la fiche avec journal, notes, évaluation, tests, classement et tournois, résultats, forfaits avec les reçus PDF et le rapport), **Agenda** (les cours et ceux à marquer comme faits), **Mes cours** (le registre, l'appel en cliquant sur une séance, PDF et Excel) et **Récapitulatif du mois** (avec les reçus de l'année en Excel). Chaque page s'imprime ; les données restent sur le téléphone.
+- **Agenda, rappels et fiche de progrès** : **Ajouter à l'agenda** met dans l'agenda du téléphone un cours (depuis le cours), les séances d'un cours chaque semaine (**Agenda** dans le cours), un tournoi de l'élève et le match d'une convocation reçue. Les **rappels** (Réglages, activés par défaut) préviennent la veille des cours du lendemain, des présences d'un cours encore à envoyer et, pour qui est convoqué, du match du jour. **Envoyer la fiche de progrès** (fiche de l'élève) lui envoie évaluation, objectifs, tests, classement, prochains cours et cours restants : l'élève l'ouvre avec TSM et la trouve dans *Progrès › De mon entraîneur* (le journal et les notes restent à vous).
 
 ### 7.7 Joueurs : la base
 
@@ -11802,6 +11973,7 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - Le secrétariat ne tient pas les scores : sur le court on passe au rôle **Vous**, où *Jouer › Matchs du club* ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. En touchant un match ici : le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
 - **Convoquer avec la fiche de match** (sans serveur) : en touchant un match, **Convoquer** envoie à chaque joueur sur WhatsApp (ou par e-mail) jour, heure et court avec en pièce jointe un petit fichier, la *fiche de match* (ex. `Finale Rossi - Bianchi.tsm`) ; *Avis aux participants › Prochain match* fait de même. Celui qui tient le score l'ouvre avec **Partager › TSM** : le match apparaît et **Préparer le match** ouvre Nouveau match avec joueurs (trouvés ou créés dans sa liste), classements, tournoi, tour, court et règles déjà remplis. Les règles se fixent dans **Modifier** du tournoi (*Règles des matchs* : au choix sur le court, 3 sets, 2 sets + super tie-break, pro set ; jeux par set et No-Ad) ; le **téléphone du secrétariat** dans *Plus › Le club* va dans la fiche, pour renvoyer le résultat. **Le résultat revient** : à la fin le récapitulatif propose **Envoyer le résultat au secrétariat** (WhatsApp directement au téléphone du secrétariat, avec un fichier et le score écrit) ; si vous ne l'envoyez pas tout de suite, il reste dans *Jouer* jusqu'à ce que vous le fassiez. Le secrétariat l'ouvre avec **Partager › TSM** : l'appli vérifie que c'est le match convoqué (le code de la fiche) et **Enregistrer** met à jour le tableau ; s'il est déjà enregistré elle le dit, s'il y a un autre résultat elle demande s'il faut le remplacer.
+- **Avec le serveur du club** (facultatif, 7.18) : en convoquant, la fiche de match va aussi dans la boîte sur le serveur des joueurs inscrits ; la fiche de cours dans celle de l'entraîneur. Dans leur appli apparaît **Du club : N fichiers à ouvrir** (et une notification). À la fin, le résultat revient tout seul par le serveur, ainsi que les présences et les propositions de l'entraîneur ; le secrétariat enregistre aussitôt ceux qui ont le bon code (une notification le dit) et laisse dans *Du club* ceux à vérifier. Si le serveur ne répond pas, on utilise WhatsApp comme d'habitude.
 
 - **Sur le tableau TV** : avec le tableau TV allumé (*Appareils*), **Afficher sur le tableau TV** dans le tournoi couvre le score avec le tournoi, en pages qui alternent toutes les 15 secondes : **tableau** (vainqueurs en jaune), **poules** avec leur classement (les qualifiés en évidence) et **ordre des matchs** du jour (ou les prochains matchs programmés), avec terrain, heure et résultats. Chaque résultat, même celui du marqueur, s'affiche tout de suite. **Retirer du tableau TV** revient au score.
 
@@ -11903,6 +12075,7 @@ Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un 
 - **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
 - **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
 - **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). **École de tennis** (groupes avec horaires et courts, élèves, appel des cours, cours annulés, frais du mois ou de la saison à débiter), **Statistiques des terrains** (occupation, recettes, court par court, jours et heures les plus pleins, qui réserve le plus, par période, à imprimer). Avec **Préparer une relance** dans Cotisations et paiements, vous choisissez à qui écrire parmi les débits affichés : le message s'ouvre sur le téléphone et vous l'envoyez de là. **Équipes et championnats** (effectif, rencontres à domicile ou à l'extérieur avec courts réservés, disponibilités, convocations, matchs et résultat ; les avis s'ouvrent sur le téléphone). **Réservations en ligne**, avec le serveur du club (prochaines réservations des joueurs, liste d'attente, annonces de « Je cherche un partenaire » à retirer si besoin, règles pour les joueurs, **Envoyer maintenant**), **Réglages** (nom du club, horaires et tarifs, courts avec surface, éclairage et tarifs propres, modes de paiement). Avis WhatsApp, photos des courts et marquage en direct restent dans l'app.
+- **Les nouveautés du téléphone aussi sur le PC** : dans un match du tournoi et dans un match de rencontre **Convoquer** (la fiche de match ; l'avis s'ouvre sur le téléphone) ; dans un cours **Envoyer à l'entraîneur**, **Registre des présences (PDF)** et **Enregistrer en Excel** ; dans le menu **Charger un fichier** pour les fichiers reçus sur WhatsApp Web ou par e-mail (résultats du court, présences de l'entraîneur, élèves proposés) : la page dit ce que c'est et où il en est par rapport aux données, et **Enregistrer** fait comme le téléphone.
 - **Sauvegarde du secrétariat** (sur le PC, sous Statistiques ; sur le téléphone dans Plus › Sauvegarde du secrétariat) : un seul fichier `.tsmclub` avec adhérents et joueurs, cotisations et paiements, planning, tournois, école de tennis, équipes, courts et réglages (pas les matchs, coups et vidéos : la sauvegarde complète les a). **Télécharger sur le PC** ou, depuis le téléphone, l'**envoyer** où vous voulez (Google Drive, e-mail, une clé USB). Avec la **sauvegarde automatique** le téléphone fait une copie par jour seulement si quelque chose a changé et garde les 14 dernières ; avec un serveur du club, lui aussi. **Restaurer** montre d'abord ce que contient le fichier et fait une copie de maintenant, pour revenir en arrière. Le fichier contient des données personnelles des adhérents : gardez-le chez vous.
 - **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
 - **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
@@ -12314,6 +12487,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
 - **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria. Nel riepilogo, **Ricevute <anno> (Excel)** dà l'elenco delle ricevute dei pacchetti dell'anno, per il commercialista.
 - **Allenatore da PC** (*Altro › Allenatore da PC*): come la Segreteria da PC (7.20), il computer di casa apre una pagina servita dal telefono, sulla stessa rete, dopo l'abbinamento con QR o codice. Ci sono solo i dati dell'allenatore: **Allievi** (la scheda con diario, note, valutazione, test, classifica e tornei, risultati, pacchetti con le ricevute in PDF e il report), **Agenda** (le lezioni e quelle da segnare come fatte), **I miei corsi** (il registro, l'appello cliccando una lezione, PDF ed Excel) e **Riepilogo del mese** (con le ricevute dell'anno in Excel). Ogni pagina si stampa; i dati restano sul telefono.
+- **Calendario, promemoria e scheda progressi**: **Aggiungi al calendario** mette nel calendario del telefono una lezione (dalla lezione), le lezioni di un corso ogni settimana (**Calendario** nel corso), un torneo dell'allievo e la partita di una convocazione ricevuta. I **promemoria** (Impostazioni, accesi di serie) avvisano la sera prima delle lezioni di domani, le presenze di un corso ancora da mandare e, a chi è convocato, la partita del giorno. **Manda la scheda progressi** (scheda dell'allievo) gli manda valutazione, obiettivi, test, classifica, prossime lezioni e lezioni rimaste: l'allievo la apre con TSM e la trova in *Progressi › Dal mio allenatore* (il diario e le note restano tue).
 
 ### 7.7 Giocatori: il database
 
@@ -12404,6 +12578,7 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - La segreteria non segna punteggi: dal campo si passa al ruolo **Tu**, dove *Gioca › Partite del circolo* apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Toccando una partita qui: il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
 - **Convoca con la scheda partita** (senza server): toccando una partita, **Convoca** manda a ciascun giocatore su WhatsApp (o per email) giorno, ora e campo con allegato un piccolo file, la *scheda partita* (es. `Finale Rossi - Bianchi.tsm`); lo stesso fa *Avvisi ai partecipanti › Prossima partita*. Chi tiene il punteggio lo apre con **Condividi › TSM**: compare la partita e **Prepara la partita** apre Nuova partita con giocatori (trovati o creati nel suo elenco), classifiche, torneo, turno, campo e regole già scritti. Le regole si fissano in **Modifica** del torneo (*Regole delle partite*: a scelta in campo, 3 set, 2 set + super tie-break, pro set; game per set e No-Ad); il **telefono della segreteria** in *Altro › Il circolo* va nella scheda, per rimandare il risultato. **Il risultato torna**: a fine partita il riepilogo ha **Manda il risultato alla segreteria** (WhatsApp dritto al telefono della segreteria, con un file e il punteggio scritto); se non lo mandi subito, resta in *Gioca* finché non lo fai. La segreteria lo apre con **Condividi › TSM**: l'app controlla che sia la partita convocata (il codice della scheda) e con **Registra** aggiorna il tabellone; se è già registrato lo dice, se c'è un risultato diverso chiede se sostituirlo.
+- **Col server del circolo** (facoltativo, 7.18): convocando, la scheda partita va anche nella casella sul server dei giocatori iscritti; la scheda corso in quella dell'allenatore. Nella loro app compare **Dal circolo: N file da aprire** (e una notifica). A fine partita il risultato torna da solo dal server, e le presenze e le proposte dell'allenatore pure; la segreteria registra subito quelli col codice giusto (una notifica lo dice) e lascia in *Dal circolo* quelli da controllare. Se il server non risponde si usa WhatsApp come sempre.
 
 - **Sul tabellone TV**: con il tabellone TV acceso (*Dispositivi*), nel torneo **Mostra sul tabellone TV** copre il punteggio con il torneo, in pagine che si alternano ogni 15 secondi: **tabellone** (in giallo chi ha vinto), **gironi** con la classifica (in evidenza chi passa) e **ordine di gioco** di oggi (o le prossime partite in programma), con campo, ora e risultati. Ogni risultato, anche quello che arriva dal segnapunti, si vede subito. **Togli dal tabellone TV** torna al punteggio.
 
@@ -12505,6 +12680,7 @@ Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Wi
 - **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
 - **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
 - **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). **Scuola tennis** (corsi con orari e campi, allievi, appello delle lezioni, lezioni annullate, quote del mese o della stagione da addebitare), **Statistiche dei campi** (occupazione, incassi, campo per campo, giorni e ore più pieni, chi prenota di più, per periodo, da stampare). Con **Prepara sollecito** in Quote e pagamenti scegli a chi scrivere tra gli addebiti che vedi: il messaggio si apre sul telefono e lo mandi da lì. **Squadre e campionati** (rosa, incontri in casa o in trasferta coi campi tenuti, disponibilità, convocati, partite e risultato; gli avvisi si aprono sul telefono). **Prenotazioni online**, col server del circolo (prossime prenotazioni dei giocatori, lista d'attesa, annunci di Cerco compagno da togliere se serve, regole per i giocatori, **Invia ora**), **Impostazioni** (nome del circolo, orari e prezzi, campi con superficie, luci e prezzi propri, modi di pagamento). Avvisi WhatsApp, foto dei campi e segnapunti dal vivo restano nell'app.
+- **Novità dal telefono anche sul PC**: nella partita del torneo e in quella dell'incontro **Convoca** (la scheda partita; l'avviso si apre sul telefono); nel corso **Manda all'allenatore**, **Registro presenze (PDF)** e **Salva in Excel**; nel menu **Carica un file** per i file ricevuti su WhatsApp Web o per email (risultati dal campo, presenze dell'allenatore, allievi proposti): la pagina dice cos'è e com'è rispetto ai dati e con **Registra** fa come il telefono.
 - **Backup della segreteria** (sul PC, sotto Statistiche; sul telefono in Altro › Backup della segreteria): un solo file `.tsmclub` con soci e giocatori, quote e pagamenti, planning, tornei, scuola tennis, squadre, campi e impostazioni (non partite, colpi e video: per quelli c'è il backup completo). **Scarica sul PC** o, dal telefono, **mandalo** dove vuoi (Google Drive, email, una chiavetta). Col **backup automatico** il telefono fa una copia al giorno solo se è cambiato qualcosa e tiene le ultime 14; col server del circolo le tiene anche lui. **Ripristina** mostra prima cosa c'è nel file e fa una copia di adesso, per tornare indietro. Il file contiene dati personali dei soci: tienilo in un posto tuo.
 - **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
 - **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
@@ -12916,6 +13092,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
 - **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria. No resumo, **Recibos <ano> (Excel)** dá a lista dos recibos de pacotes do ano, para o contabilista.
 - **Treinador no PC** (*Mais › Treinador no PC*): como a Secretaria no PC (7.20), o computador de casa abre uma página servida pelo telefone, na mesma rede, depois de emparelhar com QR ou código. Só estão os dados do treinador: **Alunos** (a ficha com diário, notas, avaliação, testes, ranking e torneios, resultados, pacotes com os recibos em PDF e o relatório), **Agenda** (as aulas e as que falta marcar como feitas), **Os meus cursos** (o registo, a chamada clicando numa aula, PDF e Excel) e **Resumo do mês** (com os recibos do ano em Excel). Cada página imprime-se; os dados ficam no telefone.
+- **Calendário, lembretes e ficha de progresso**: **Adicionar ao calendário** põe no calendário do telefone uma aula (a partir da aula), as aulas de um curso todas as semanas (**Calendário** no curso), um torneio do aluno e a partida de uma convocação recebida. Os **lembretes** (Configurações, ligados por defeito) avisam na véspera das aulas de amanhã, das presenças de um curso por enviar e, a quem está convocado, da partida do dia. **Enviar a ficha de progresso** (ficha do aluno) envia-lhe avaliação, objetivos, testes, ranking, próximas aulas e aulas restantes: o aluno abre-a com o TSM e encontra-a em *Progresso › Do meu treinador* (o diário e as notas ficam seus).
 
 ### 7.7 Jogadores: o banco
 
@@ -13006,6 +13183,7 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - A secretaria não marca placares: na quadra passa-se ao papel **Você**, onde *Jogar › Partidas do clube* abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Tocando numa partida aqui: o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
 - **Convocar com a ficha de partida** (sem servidor): tocando numa partida, **Convocar** envia a cada jogador por WhatsApp (ou por email) dia, hora e quadra com um pequeno arquivo anexo, a *ficha de partida* (ex. `Final Rossi - Bianchi.tsm`); *Avisos aos participantes › Próxima partida* faz o mesmo. Quem marca o placar abre-a com **Compartilhar › TSM**: aparece a partida e **Preparar a partida** abre Nova partida com jogadores (encontrados ou criados na sua lista), rankings, torneio, rodada, quadra e regras já preenchidos. As regras definem-se em **Editar** do torneio (*Regras das partidas*: à escolha na quadra, 3 sets, 2 sets + super tie-break, pro set; games por set e No-Ad); o **telefone da secretaria** em *Mais › O clube* vai na ficha, para devolver o resultado. **O resultado volta**: no fim o resumo tem **Enviar o resultado à secretaria** (WhatsApp direto ao telefone da secretaria, com um arquivo e o placar escrito); se não o enviar logo, fica em *Jogar* até o fazer. A secretaria abre-o com **Compartilhar › TSM**: o app verifica que é a partida convocada (o código da ficha) e **Registrar** atualiza a chave; se já está registrado diz isso, se há outro resultado pergunta se quer substituí-lo.
+- **Com o servidor do clube** (opcional, 7.18): ao convocar, a ficha de partida vai também para a caixa no servidor dos jogadores inscritos; a ficha de curso para a do treinador. Na app deles aparece **Do clube: N arquivos por abrir** (e uma notificação). No fim o resultado volta sozinho pelo servidor, tal como as presenças e as propostas do treinador; a secretaria regista logo os que têm o código certo (uma notificação diz isso) e deixa em *Do clube* os que há que verificar. Se o servidor não responder usa-se o WhatsApp como sempre.
 
 - **No placar da TV**: com o placar da TV ligado (*Dispositivos*), **Mostrar no placar da TV** no torneio cobre o placar com o torneio, em páginas que se alternam a cada 15 segundos: **chave** (vencedores em amarelo), **grupos** com a classificação (em destaque quem passa) e **ordem de jogos** de hoje (ou as próximas partidas programadas), com quadra, hora e resultados. Cada resultado, também o do marcador, aparece na hora. **Tirar do placar da TV** volta ao placar.
 
@@ -13107,6 +13285,7 @@ Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computado
 - **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
 - **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
 - **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). **Escola de tênis** (cursos com horários e quadras, alunos, chamada das aulas, aulas canceladas, mensalidades do mês ou da temporada a debitar), **Estatísticas das quadras** (ocupação, receitas, quadra a quadra, dias e horas mais cheios, quem reserva mais, por período, para imprimir). Com **Preparar lembrete** em Mensalidades e pagamentos escolhe a quem escrever entre os débitos que vê: a mensagem abre-se no telefone e envia-a de lá. **Equipes e campeonatos** (plantel, encontros em casa ou fora com quadras reservadas, disponibilidade, convocados, jogos e resultado; os avisos abrem-se no telefone). **Reservas online**, com o servidor do clube (próximas reservas dos jogadores, lista de espera, anúncios de Procuro parceiro a tirar se preciso, regras para os jogadores, **Enviar agora**), **Definições** (nome do clube, horários e preços, quadras com piso, luzes e preços próprios, formas de pagamento). Avisos de WhatsApp, fotos das quadras e marcador ao vivo continuam no app.
+- **Novidades do telefone também no PC**: na partida do torneio e na do confronto **Convocar** (a ficha de partida; o aviso abre-se no telefone); no curso **Enviar ao treinador**, **Registo de presenças (PDF)** e **Guardar em Excel**; no menu **Carregar um arquivo** para os arquivos recebidos no WhatsApp Web ou por email (resultados da quadra, presenças do treinador, alunos propostos): a página diz o que é e como está em relação aos dados, e **Registrar** faz como o telefone.
 - **Cópia da secretaria** (no PC, abaixo de Estatísticas; no telefone em Mais › Cópia da secretaria): um só arquivo `.tsmclub` com sócios e jogadores, mensalidades e pagamentos, agenda, torneios, escola de tênis, equipes, quadras e definições (não jogos, golpes e vídeos: a cópia completa tem esses). **Baixar para o PC** ou, do telefone, **enviá-la** para onde quiser (Google Drive, e-mail, um pen drive). Com a **cópia automática** o telefone faz uma cópia por dia só se algo mudou e guarda as últimas 14; com um servidor do clube, ele também. **Restaurar** mostra primeiro o que há no arquivo e faz uma cópia de agora, para voltar atrás. O arquivo contém dados pessoais dos sócios: guarde-o num lugar seu.
 - **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
 - **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
@@ -14048,8 +14227,17 @@ class MainActivity : ComponentActivity() {
 
     private val controller: MatchController get() = (application as TsmApp).controller
 
-    /** La notifica di una prenotazione online apre il planning sul suo giorno. */
+    /** La notifica di una prenotazione online apre il planning sul suo giorno; quella di un promemoria, dove serve. */
     private fun openFromNotification(i: android.content.Intent?) {
+        i?.getStringExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)?.let { target ->
+            i.removeExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)
+            when {
+                target == "inbox" -> controller.openInbox()
+                target == "lessons" -> controller.openLessons()
+                target.startsWith("course:") -> controller.openCoachCourse(target.removePrefix("course:"))
+            }
+            return
+        }
         if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
             i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
             // Da un nuovo annuncio: Compagni del suo circolo (lì si vede se è ancora aperto).
@@ -15539,13 +15727,18 @@ class MatchController(
     /** Un risultato arrivato dal campo (segreteria): la finestra dice com'è e chiede se registrarlo. */
     val incomingResult = MutableStateFlow<com.tennis.scoremanager.data.MatchResult?>(null)
 
+    /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
+    private var incomingVia: String? = null
+
     /** Il testo di un file aperto con TSM: una scheda partita o un risultato; sennò lo si dice. */
-    fun receiveCardText(text: String?) {
+    fun receiveCardText(text: String?, via: String? = null) {
+        incomingVia = via
         val card = text?.let { com.tennis.scoremanager.data.MatchCards.decode(it) }
         if (card != null) { incomingCard.value = card; return }
         val result = text?.let { com.tennis.scoremanager.data.MatchCards.decodeResult(it) }
         if (result != null) { incomingResult.value = result; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decode(it) }?.let { incomingCourse.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { incomingProgress.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { incomingAttendance.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { incomingProposal.value = it; return }
         // Una partita (da "File della partita" di un altro telefono): nello storico.
@@ -15605,6 +15798,8 @@ class MatchController(
         val list = receivedCards.value.map { if (it.card.code == rc.card.code) it.copy(result = result, sentAt = null) else it }
         receivedCards.value = list
         scope.launch(io) { storage.saveReceivedCards(list) }
+        // Arrivata dal server del circolo: il risultato torna da lì, da solo (se non c'è rete, resta il pulsante).
+        rc.via?.let { url -> scope.launch { if (postToOffice(url, "result", com.tennis.scoremanager.data.MatchCards.encodeResult(result))) resultSent(rc.card.code) } }
     }
 
     /** Il file del risultato da mandare e il testo che lo accompagna (si legge anche senza aprire il file). */
@@ -15622,6 +15817,20 @@ class MatchController(
             winner?.let { s.mrWinner(it) },
         ).joinToString("\n")
         return f to text
+    }
+
+    /**
+     * Manda il risultato della scheda [code]: arrivata dal server del circolo, da lì (senza WhatsApp); sennò, o se il
+     * server non risponde, [fallback] (WhatsApp o condivisione).
+     */
+    fun sendResultAuto(code: String, fallback: () -> Unit) {
+        val rc = receivedCards.value.firstOrNull { it.card.code == code } ?: return
+        val r = rc.result ?: return
+        val url = rc.via ?: return fallback()
+        scope.launch {
+            if (postToOffice(url, "result", com.tennis.scoremanager.data.MatchCards.encodeResult(r))) { resultSent(code); _toasts.tryEmit(strings.ibSentServer) }
+            else fallback()
+        }
     }
 
     /** Il risultato è stato mandato (la voce in Gioca sparisce). */
@@ -15685,7 +15894,7 @@ class MatchController(
         // La scheda resta tra le ricevute (l'ultima convocazione della partita sostituisce le altre).
         val now = System.currentTimeMillis()
         val list = receivedCards.value.filter { it.card.code != card.code } +
-            com.tennis.scoremanager.data.ReceivedCard(card, receivedCards.value.firstOrNull { it.card.code == card.code }?.record, now)
+            com.tennis.scoremanager.data.ReceivedCard(card, receivedCards.value.firstOrNull { it.card.code == card.code }?.record, now, via = incomingVia)
         receivedCards.value = list
         scope.launch(io) { storage.saveReceivedCards(list) }
         pendingCard = card
@@ -15837,6 +16046,7 @@ class MatchController(
         val text = listOf(s.ccCardText(co.name, co.students.size), "${com.tennis.scoremanager.ui.screens.shortDate(co.from, lang)} – ${com.tennis.scoremanager.ui.screens.shortDate(co.to, lang)}",
             s.ccCardHowTo, clubSign).filter { it.isNotBlank() }.joinToString("\n")
         val rec = listOfNotNull(coach?.let { com.tennis.scoremanager.data.Notices.recipient(it, text, now).copy(attachment = file) })
+        if (coach != null && file != null) serverMail(coach.id, "course", file)
         openNotice(com.tennis.scoremanager.data.NoticePlan(s.ccSendToCoach, co.name, text, rec))
     }
 
@@ -15868,7 +16078,8 @@ class MatchController(
         if (changed.isNotEmpty()) savePlayers(changed)
         cs_ranking(card.students, now)
         val b = coachBook.value
-        putCoach(b.copy(courses = com.tennis.scoremanager.data.CourseCards.receive(b.courses, card)))
+        val via = incomingVia
+        putCoach(b.copy(courses = com.tennis.scoremanager.data.CourseCards.receive(b.courses, card).map { if (it.card.course.id == card.course.id && via != null) it.copy(via = via) else it }))
         openCoachCourse(card.course.id)
     }
 
@@ -16009,6 +16220,128 @@ class MatchController(
 
     /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
     fun coachOffice(): String = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+
+    // ---- Scheda progressi: l'allenatore la manda, l'allievo la tiene in Progressi ----
+
+    val incomingProgress = MutableStateFlow<com.tennis.scoremanager.data.ProgressCard?>(null)
+    val myProgress = MutableStateFlow(storage.loadMyProgress())
+
+    /** Allenatore: la scheda progressi dell'allievo in un file da mandargli. */
+    fun progressCardFile(studentId: String): File? {
+        val st = playerById(studentId) ?: return null
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val card = com.tennis.scoremanager.data.ProgressCards.build(coachBook.value, serveSessions.value, st.id, st.name, me()?.name ?: storage.myName, club, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.ProgressCards.fileName(strings.pcTitle, st.name)).apply { writeText(com.tennis.scoremanager.data.ProgressCards.encode(card)) } }.getOrNull()
+    }
+
+    /** Allenatore: manda la scheda progressi all'allievo (al genitore se è minorenne), col file allegato. */
+    fun noticeProgressCard(studentId: String) {
+        val st = playerById(studentId) ?: return
+        val f = progressCardFile(studentId) ?: return
+        val now = System.currentTimeMillis()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.pcText).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.pcTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Allievo: la scheda arrivata va nei suoi progressi (una più vecchia di quella che c'è non la sostituisce). */
+    fun acceptProgress(card: com.tennis.scoremanager.data.ProgressCard) {
+        incomingProgress.value = null
+        val old = myProgress.value
+        if (old != null && old.issuedAt > card.issuedAt) return
+        myProgress.value = card
+        scope.launch(io) { storage.saveMyProgress(card) }
+    }
+
+    // ---- Casella del server del circolo (facoltativo): schede, risultati, presenze viaggiano da soli ----
+
+    /** I file arrivati dal server e non ancora aperti (Dal circolo, nella prima schermata). */
+    val inbox = MutableStateFlow(storage.loadInbox())
+
+    private fun putInbox(list: List<com.tennis.scoremanager.data.InboxItem>) {
+        inbox.value = list
+        scope.launch(io) { storage.saveInbox(list) }
+    }
+
+    /** Apre il primo file della casella come se arrivasse da WhatsApp (ma ricordando che viene dal server). */
+    fun openInbox() {
+        val first = inbox.value.firstOrNull() ?: return
+        putInbox(inbox.value.drop(1))
+        receiveCardText(first.text, first.via.ifBlank { null })
+    }
+
+    /** Segreteria: lascia un file nella casella del giocatore sul server (se c'è il server e lui è iscritto). */
+    private fun serverMail(to: String, kind: String, file: File) {
+        val conf = clubServer.value
+        if (!conf.paired) return
+        val text = runCatching { file.readText() }.getOrNull() ?: return
+        scope.launch(io) { runCatching { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.sendMail(to, kind, text) } } }
+    }
+
+    /** Giocatore o allenatore: lascia un file alla segreteria sul server [url]; true se è arrivato. */
+    suspend fun postToOffice(url: String, kind: String, text: String): Boolean {
+        val a = bookingAccounts.value.firstOrNull { it.url == url && it.joined } ?: return false
+        return bookingWith(a) { it.postMail(kind, text) }.isSuccess
+    }
+
+    /** Il server del circolo da cui sono arrivati i corsi dell'allenatore (per mandare presenze e proposte da lì). */
+    fun coachVia(): String? = coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> bookingAccounts.value.any { it.url == url && it.joined } }
+
+    /** Allenatore: le presenze del corso alla segreteria dal server; true se arrivate. */
+    suspend fun sendAttendanceServer(courseId: String): Boolean {
+        val cc = coachCourse(courseId) ?: return false
+        val url = cc.via ?: return false
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis())
+        val ok = postToOffice(url, "attendance", com.tennis.scoremanager.data.CourseCards.encodeReport(r))
+        if (ok) attendanceSent(courseId)
+        return ok
+    }
+
+    /** Allenatore: l'allievo proposto alla segreteria dal server; true se arrivato. */
+    suspend fun sendProposalServer(st: com.tennis.scoremanager.data.PlayerProfile, level: String, note: String): Boolean {
+        val url = coachVia() ?: return false
+        val p = com.tennis.scoremanager.data.StudentProposal(student = com.tennis.scoremanager.data.CourseCards.student(st, st.id), coach = me()?.name ?: storage.myName,
+            level = level.trim(), note = note.trim(), sentAt = System.currentTimeMillis())
+        return postToOffice(url, "proposal", com.tennis.scoremanager.data.CourseCards.encodeProposal(p))
+    }
+
+    /** Giocatore/allenatore: prende i file della sua casella su quel server, li tiene da aprire e li toglie dal server. */
+    private suspend fun fetchMyMail(a: com.tennis.scoremanager.data.BookingAccount) {
+        val mail = bookingWith(a) { it.myMail() }.getOrNull().orEmpty()
+        if (mail.isEmpty()) return
+        val have = inbox.value.map { it.id }.toSet()
+        val fresh = mail.filter { it.id !in have }.map { com.tennis.scoremanager.data.InboxItem(it.id, it.kind, it.text, it.fromName, a.url, it.at) }
+        putInbox(inbox.value + fresh)
+        mail.forEach { m -> bookingWith(a) { it.dropMyMail(m.id) } }
+        if (fresh.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
+    }
+
+    /**
+     * Segreteria: prende i file della sua casella. Risultati e presenze col codice giusto si registrano subito (come
+     * con Registra); gli altri (diversi da quello che c'è, allievi proposti) restano da aprire.
+     */
+    private suspend fun fetchOfficeMail(conf: com.tennis.scoremanager.data.ClubServerConf) {
+        val mail = runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.adminMail() } } }.getOrNull().orEmpty()
+        if (mail.isEmpty()) return
+        val keep = mutableListOf<com.tennis.scoremanager.data.InboxItem>()
+        val done = mutableListOf<String>()
+        for (m in mail) {
+            val r = com.tennis.scoremanager.data.MatchCards.decodeResult(m.text)
+            val a = com.tennis.scoremanager.data.CourseCards.decodeReport(m.text)
+            when {
+                r != null && resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.READY -> { applyResult(r); done += "${r.side1} – ${r.side2} ${r.score}" }
+                r != null && resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.SAME -> {}
+                a != null && attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.READY -> { applyAttendance(a); done += a.courseName }
+                a != null && attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.SAME -> {}
+                else -> keep += com.tennis.scoremanager.data.InboxItem(m.id, m.kind, m.text, m.fromName, "", m.at)
+            }
+        }
+        val have = inbox.value.map { it.id }.toSet()
+        putInbox(inbox.value + keep.filter { it.id !in have })
+        mail.forEach { m -> runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.dropAdminMail(m.id) } } } }
+        if (done.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibApplied, done.joinToString(" · "))
+        if (keep.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
+    }
 
     // ---- Allenatore: ricevute dei pacchetti e registro presenze ----
 
@@ -16579,6 +16912,7 @@ class MatchController(
         val card = challengeCardFile(l.id, ch.id)
         val personal = listOfNotNull(l.name, s.ldVs(a, b), s.ldBy(com.tennis.scoremanager.ui.screens.shortDate(ch.deadline, options.value.lang)),
             s.ntCardHowTo.takeIf { card != null }, storage.clubName).filter { it.isNotBlank() }.joinToString("\n")
+        card?.let { f -> listOf(ch.challenger, ch.defender).forEach { serverMail(it, "card", f) } }
         val rec = listOfNotNull(playerById(ch.challenger), playerById(ch.defender)).map { com.tennis.scoremanager.data.Notices.recipient(it, personal, now).copy(attachment = card) }
         openNotice(com.tennis.scoremanager.data.NoticePlan(s.ldNoticeTitle, l.name, text, rec))
     }
@@ -16904,6 +17238,8 @@ class MatchController(
             }
             val sync = srv.buildSync(conf, courtPlan.value, clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
             val st = withContext(Dispatchers.IO) { srv.withServer(conf) { it.sync(sync) } }
+            // La casella: risultati dal campo, presenze e proposte degli allenatori.
+            runCatching { fetchOfficeMail(conf) }
             val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
             gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
             if (added.isNotEmpty()) putBookings(added)
@@ -17188,6 +17524,8 @@ class MatchController(
     private suspend fun checkMyBookings(a: com.tennis.scoremanager.data.BookingAccount, many: Boolean) {
         if (!a.joined) return
         val me = bookingWith(a) { it.me() }.getOrNull() ?: return
+        // La casella dei file (convocazioni, schede corso) da questo circolo.
+        runCatching { fetchMyMail(a) }
         val now = System.currentTimeMillis()
         val club = if (many) me.club.ifBlank { a.club }.ifBlank { null } else null
         fun label(court: String, start: Long) = listOfNotNull(club, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", court, start))).joinToString(" · ")
@@ -17440,6 +17778,7 @@ class MatchController(
         val names = { id: String? -> entryNameOf(t, id) }
         return ms.flatMap { m ->
             val card = matchCardFile(t.id, m.id)
+            card?.let { f -> peopleOf(t, listOf(m.a, m.b)).forEach { p -> serverMail(p.id, "card", f) } }
             peopleOf(t, listOf(m.a, m.b)).map { p ->
                 val text = com.tennis.scoremanager.data.Notices.matchText(s, t, m, clubRoundName(t, m), names, p, clubSign, lang, now, card = card != null)
                 com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
@@ -17508,6 +17847,7 @@ class MatchController(
         val theirs = r.theirs.filter { it.isNotBlank() }.joinToString(" / ").ifBlank { f.opponent }
         val lines = listOfNotNull(s.ntMatch(rubberName(t, index), "${t.name} – ${f.opponent}"), "$ours – $theirs", fixtureWhen(f), s.ntCardHowTo.takeIf { card != null })
         val now = System.currentTimeMillis()
+        card?.let { f -> r.ours.forEach { serverMail(it, "card", f) } }
         val rec = r.ours.mapNotNull { playerById(it) }.map { p ->
             val text = (listOf(s.ntHello(p.firstName.ifBlank { p.name })) + lines + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n")
             com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
@@ -19756,6 +20096,7 @@ class TsmApp : Application() {
         controller = MatchController(this, Storage(this), ble, HeartRateManager(this, ble), voice, Announcer(this, voice))
         // I backup automatici sono accesi di serie: il lavoro di ogni giorno va programmato anche se nessuno li ha toccati.
         com.tennis.scoremanager.service.DailyBackupJob.schedule(this, controller.storage)
+        com.tennis.scoremanager.service.RemindersJob.schedule(this, controller.storage.remindersOn)
     }
 }
 TSM_EOF
@@ -22703,6 +23044,14 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun report(id: String): SrvOk = call<Unit, SrvOk>("POST", "/chat/msg/$id/report", null, null, SrvOk.serializer())
     fun adminChat(room: String): List<SrvChatMsg> = call<Unit, List<SrvChatMsg>>("GET", "/admin/chat/$room", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatMsg.serializer()))
     fun adminChats(): List<SrvChatRoom> = call<Unit, List<SrvChatRoom>>("GET", "/admin/chats", null, null, kotlinx.serialization.builtins.ListSerializer(SrvChatRoom.serializer()))
+    // La casella dei file: la segreteria lascia (a un giocatore) e prende (i suoi); il giocatore lo stesso con la segreteria.
+    fun sendMail(to: String, kind: String, text: String): SrvOk = call("POST", "/admin/mail", SrvMailIn.serializer(), SrvMailIn(to, kind, text), SrvOk.serializer())
+    fun adminMail(): List<SrvMail> = call<Unit, List<SrvMail>>("GET", "/admin/mail", null, null, kotlinx.serialization.builtins.ListSerializer(SrvMail.serializer()))
+    fun dropAdminMail(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/mail/" + java.net.URLEncoder.encode(id, "UTF-8"), null, null, SrvOk.serializer())
+    fun postMail(kind: String, text: String): SrvOk = call("POST", "/mail", SrvMailIn.serializer(), SrvMailIn("", kind, text), SrvOk.serializer())
+    fun myMail(): List<SrvMail> = call<Unit, List<SrvMail>>("GET", "/mail", null, null, kotlinx.serialization.builtins.ListSerializer(SrvMail.serializer()))
+    fun dropMyMail(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/mail/" + java.net.URLEncoder.encode(id, "UTF-8"), null, null, SrvOk.serializer())
+
     fun postBoard(text: String): SrvChatMsg = call("POST", "/admin/chat/board", SrvChatIn.serializer(), SrvChatIn(text), SrvChatMsg.serializer())
     fun deleteChat(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/chat/msg/$id", null, null, SrvOk.serializer())
     fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
@@ -23484,6 +23833,8 @@ data class CoachCourse(
     val notes: Map<String, String> = emptyMap(),
     val changedAt: Long = 0,
     val sentAt: Long? = null,
+    /** Arrivata dal server del circolo (il suo indirizzo): le presenze tornano da lì. */
+    val via: String? = null,
 ) {
     /** Il corso con le presenze dell'allenatore sopra quelle della segreteria. */
     val course: Course get() = card.course.copy(
@@ -24529,7 +24880,13 @@ data class ReceivedCard(
     val receivedAt: Long = 0,
     val result: MatchResult? = null,
     val sentAt: Long? = null,
+    /** Arrivata dal server del circolo (il suo indirizzo): il risultato torna da lì, da solo. */
+    val via: String? = null,
 )
+
+/** Un file arrivato dalla casella del server del circolo, da aprire (una scheda, un risultato da controllare…). */
+@Serializable
+data class InboxItem(val id: String, val kind: String, val text: String, val from: String = "", val via: String = "", val at: Long = 0)
 
 /** Com'è un risultato arrivato rispetto a quello che c'è nel telefono della segreteria. */
 enum class ResultStatus { READY, SAME, CONFLICT, BAD_CODE, NOT_FOUND }
@@ -26157,6 +26514,70 @@ object Progress {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ProgressCards.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ProgressCards.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+/** Un obiettivo come lo vede l'allievo: colpo, percentuale voluta, a che punto è, raggiunto quando. */
+@Serializable
+data class PcGoal(val stroke: TrainedStroke, val target: Int, val now: Int? = null, val reachedAt: Long? = null)
+
+/**
+ * La scheda progressi che l'allenatore manda all'allievo (un file .tsm): valutazioni tecniche, test fisici, obiettivi,
+ * classifica, tornei in programma, prossime lezioni e lezioni rimaste. Niente diario né note dell'allenatore, che
+ * restano sue. L'allievo la apre con TSM e la ritrova in Progressi; una scheda più nuova sostituisce la vecchia.
+ */
+@Serializable
+data class ProgressCard(
+    val tsm: String = ProgressCards.KIND,
+    val v: Int = 1,
+    val issuedAt: Long,
+    val coach: String = "",
+    val club: String = "",
+    val student: String,
+    val studentName: String,
+    val evaluations: List<Evaluation> = emptyList(),
+    val tests: List<FitnessTest> = emptyList(),
+    val goals: List<PcGoal> = emptyList(),
+    val rankings: List<RankingEntry> = emptyList(),
+    val events: List<StudentEvent> = emptyList(),
+    val nextLessons: List<Long> = emptyList(),
+    val lessonsLeft: Int? = null,
+)
+
+object ProgressCards {
+    const val KIND = "tsm-progress-card"
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }
+
+    fun encode(c: ProgressCard): String = json.encodeToString(ProgressCard.serializer(), c)
+    fun decode(text: String): ProgressCard? = runCatching { json.decodeFromString(ProgressCard.serializer(), text) }.getOrNull()?.takeIf { it.tsm == KIND }
+
+    /** La scheda di [student] da quello che l'allenatore ha nel telefono. */
+    fun build(book: CoachBook, sessions: List<ServeSession>, student: String, name: String, coach: String, club: String, now: Long): ProgressCard {
+        val bal = Coaching.balance(book, student)
+        return ProgressCard(
+            issuedAt = now, coach = coach, club = club, student = student, studentName = name,
+            evaluations = Coaching.evaluationsOf(book, student).takeLast(6),
+            tests = Coaching.testsOf(book, student).takeLast(6),
+            goals = book.goals.filter { it.student == student }.map { g -> PcGoal(g.stroke, g.targetPct, Coaching.goalStatus(g, sessions).pct, g.reachedAt) },
+            rankings = book.rankings.filter { it.student == student }.sortedBy { it.at }.takeLast(10),
+            events = book.events.filter { it.student == student && it.at >= now - 86_400_000L }.sortedBy { it.at },
+            nextLessons = Coaching.upcoming(Coaching.lessonsOf(book, student), now).take(5).map { it.start },
+            lessonsLeft = bal.left.takeIf { bal.bought > 0 },
+        )
+    }
+
+    fun fileName(prefix: String, name: String): String =
+        "$prefix $name".replace(Regex("[\\\\/:*?\"<>|\\n]"), "_").take(80).trim() + "." + MatchCards.EXT
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ProgressFilter.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ProgressFilter.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -26949,6 +27370,61 @@ object Rematch {
         if (note.isNotBlank()) appendLine(note.trim())
         appendLine()
         append(credit)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Reminders.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Reminders.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.util.Calendar
+
+/**
+ * I promemoria del telefono (notifiche, niente messaggi a nessuno): all'allenatore la sera prima delle lezioni e le
+ * presenze di un corso ancora da mandare; a chi ha ricevuto una scheda partita, la mattina del giorno della partita.
+ * Ognuno ha una chiave: già mostrato, non torna.
+ */
+object Reminders {
+    /** Un promemoria: [key] per non ripeterlo, [target] dove porta il tocco ("lessons", "course:<id>", "home"). */
+    data class Item(val key: String, val kind: Kind, val count: Int, val text: String, val target: String)
+    enum class Kind { TOMORROW, SEND, MATCH }
+
+    private fun dayKey(t: Long): String = Calendar.getInstance().apply { timeInMillis = t }.let { "%04d-%02d-%02d".format(it.get(Calendar.YEAR), it.get(Calendar.MONTH) + 1, it.get(Calendar.DAY_OF_MONTH)) }
+    private fun hour(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.HOUR_OF_DAY)
+    private fun hhmm(t: Long): String = Calendar.getInstance().apply { timeInMillis = t }.let { "%02d:%02d".format(it.get(Calendar.HOUR_OF_DAY), it.get(Calendar.MINUTE)) }
+
+    /**
+     * Quelli da mostrare adesso ([now]) e non ancora mostrati ([shown]). [coach] = ruolo Allenatore; [names] dà il nome
+     * di un allievo.
+     */
+    fun due(now: Long, coach: Boolean, book: CoachBook, cards: List<ReceivedCard>, shown: Set<String>, names: (String) -> String): List<Item> {
+        val out = mutableListOf<Item>()
+        val today = CourtPlans.dayStart(now)
+        val tomorrow = CourtPlans.addDays(today, 1)
+        val after = CourtPlans.addDays(today, 2)
+        if (coach && hour(now) in 17..21) {
+            // Lezioni private e dei corsi di domani: l'ora e con chi (le prime tre).
+            val priv = book.lessons.filter { !it.cancelled && it.start in tomorrow until after }.map { it.start to it.students.joinToString(", ") { s -> names(s) } }
+            val courses = book.courses.flatMap { cc -> Courses.lessons(cc.course).filter { it.start in tomorrow until after && it.key !in cc.course.cancelled }.map { it.start to cc.card.course.name } }
+            val all = (priv + courses).sortedBy { it.first }
+            val key = "tomorrow:" + dayKey(tomorrow)
+            if (all.isNotEmpty() && key !in shown) out += Item(key, Kind.TOMORROW, all.size, all.take(3).joinToString(" · ") { "${hhmm(it.first)} ${it.second}" }, "lessons")
+        }
+        if (coach && hour(now) in 9..21) for (cc in book.courses.filter { it.toSend && now - it.changedAt > 20L * 3_600_000L }) {
+            val key = "send:${cc.card.course.id}:" + dayKey(now)
+            if (key !in shown) out += Item(key, Kind.SEND, 1, cc.card.course.name, "course:" + cc.card.course.id)
+        }
+        if (hour(now) >= 7) for (rc in cards.filter { it.record == null && it.card.at != null && it.card.at in now until tomorrow }) {
+            val key = "card:${rc.card.code}:" + dayKey(now)
+            val c = rc.card
+            if (key !in shown) out += Item(key, Kind.MATCH, 1, listOf(hhmm(c.at!!), c.court, c.side1.joinToString(" / ") { it.name } + " – " + c.side2.joinToString(" / ") { it.name })
+                .filter { it.isNotBlank() }.joinToString(" · "), "home")
+        }
+        return out
     }
 }
 TSM_EOF
@@ -28380,6 +28856,26 @@ class Storage(context: Context) {
     private val cardsFile: File get() = File(app.filesDir, "match_cards.json")
 
     /** Le schede partita ricevute dalla segreteria (per rimandarle il risultato). */
+    private val inboxFile: File get() = File(app.filesDir, "server_inbox.json")
+
+    /** I file arrivati dal server del circolo e non ancora aperti. */
+    fun loadInbox(): List<InboxItem> = readOr(inboxFile, emptyList()) { json.decodeFromString(ListSerializer(InboxItem.serializer()), it) }
+
+    @Synchronized
+    fun saveInbox(list: List<InboxItem>) {
+        runCatching { writeAtomic(inboxFile, json.encodeToString(ListSerializer(InboxItem.serializer()), list)) }.onFailure { Log.e("Storage", "Salvataggio della casella fallito", it) }
+    }
+
+    private val myProgressFile: File get() = File(app.filesDir, "my_progress.json")
+
+    /** La scheda progressi ricevuta dal proprio allenatore (null = nessuna). */
+    fun loadMyProgress(): ProgressCard? = readOr<ProgressCard?>(myProgressFile, null) { json.decodeFromString(ProgressCard.serializer(), it) }
+
+    @Synchronized
+    fun saveMyProgress(c: ProgressCard) {
+        runCatching { writeAtomic(myProgressFile, json.encodeToString(ProgressCard.serializer(), c)) }.onFailure { Log.e("Storage", "Salvataggio della scheda progressi fallito", it) }
+    }
+
     fun loadReceivedCards(): List<ReceivedCard> =
         readOr(cardsFile, emptyList()) { json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(ReceivedCard.serializer()), it) }
 
@@ -28716,6 +29212,14 @@ class Storage(context: Context) {
     var clubName: String
         get() = prefs.getString("club_name", null) ?: ""
         set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+    /** Promemoria del telefono (lezioni di domani, presenze da mandare, partita del giorno) e quelli già mostrati. */
+    var remindersOn: Boolean
+        get() = prefs.getBoolean("reminders_on", true)
+        set(v) = prefs.edit().putBoolean("reminders_on", v).apply()
+    var remindersShown: Set<String>
+        get() = prefs.getStringSet("reminders_shown", null)?.toSet() ?: emptySet()
+        set(v) = prefs.edit().putStringSet("reminders_shown", v).apply()
+
     /** Il telefono della segreteria: va nelle schede partita, i giocatori rimandano lì il risultato. */
     var clubPhone: String
         get() = prefs.getString("club_phone", null) ?: ""
@@ -30690,6 +31194,18 @@ interface DeskData {
     fun deleteTeam(t: Team)
     /** Apre sul telefono l'avviso dell'incontro: disponibilità (a tutti o a chi non ha risposto), convocazione, risultato. */
     fun teamNotice(t: Team, f: Fixture, kind: String)
+    /** Apre sul telefono la convocazione con la scheda partita: di una partita del tabellone, di una partita dell'incontro. */
+    fun convokeMatch(t: ClubTournament, matchId: String) {}
+    fun convokeRubber(t: Team, f: Fixture, index: Int) {}
+    /** Apre sul telefono l'invio della scheda corso all'allenatore. */
+    fun sendCourseToCoach(c: Course) {}
+    /** Il registro presenze del corso, in PDF o in Excel (fatto dal telefono). */
+    fun registerPdf(c: Course): ByteArray? = null
+    fun registerXlsx(c: Course): ByteArray? = null
+    /** Un file ricevuto (risultato dal campo, presenze dell'allenatore, allievo proposto): cos'è e se si può registrare. */
+    fun incomingFile(text: String): DeskIncoming? = null
+    /** Lo registra come farebbe il telefono; null se fatto, sennò il codice dell'errore. */
+    fun applyIncoming(text: String, course: String?): String? = "NOT_FOUND"
     /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
     fun setClubName(name: String)
     fun saveCourtSettings(st: CourtSettings)
@@ -30753,6 +31269,14 @@ interface DeskData {
 @Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
 /** Il QR da disegnare: una stringa di 0 e 1 per riga. */
 @Serializable data class DeskQrOut(val id: String, val rows: List<String>)
+/** Un file ricevuto, letto: cosa è ([kind]), le righe da mostrare, com'è rispetto ai dati e se si può registrare. */
+@Serializable data class DeskIncoming(
+    val kind: String, val title: String, val lines: List<String>, val status: String, val canApply: Boolean,
+    val replace: Boolean = false, val courses: List<DeskIdName> = emptyList(), val course: String? = null,
+)
+@Serializable data class DeskIdName(val id: String, val name: String)
+@Serializable data class DeskFileIn(val text: String = "", val course: String? = null)
+@Serializable data class DeskIndexIn(val index: Int = 0)
 @Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
 @Serializable data class DeskTodayLine(val text: String, val startMin: Int? = null, val court: String = "", val date: String? = null, val cup: String? = null)
@@ -31006,6 +31530,12 @@ class DeskApi(
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
+                m == "POST" && p == listOf("files", "check") -> ok(DeskIncoming.serializer(), data.incomingFile(read(DeskFileIn.serializer(), r).text) ?: throw Fail(400, "NOT_A_FILE"))
+                m == "POST" && p == listOf("files", "apply") -> {
+                    val i = read(DeskFileIn.serializer(), r)
+                    data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
+                    done()
+                }
                 m == "GET" && p == listOf("people") -> people()
                 m == "POST" && p == listOf("people") -> savePerson(read(DeskPerson.serializer(), r), null)
                 m == "PUT" && p.size == 2 && p[0] == "people" -> savePerson(read(DeskPerson.serializer(), r), p[1])
@@ -31691,6 +32221,12 @@ class DeskApi(
             withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
                 else Teams.setRubber(withPlayers, i.index, score, i.won, walkover = i.walkover))
         }
+        m == "POST" && rest == listOf("rubber-notice") -> {
+            val i = read(DeskIndexIn.serializer(), r).index
+            val ru = f.rubbers.getOrNull(i) ?: throw Fail(404, "NOT_FOUND")
+            if (ru.ours.size != (if (ru.doubles) 2 else 1) || ru.won != null) throw Fail(409, "NOT_READY")
+            data.convokeRubber(t, f, i); done()
+        }
         m == "POST" && rest == listOf("notice") -> {
             val kind = read(DeskNoticeIn.serializer(), r).kind
             if (kind !in setOf("AVAILABILITY", "MISSING", "CALLUP", "RESULT")) throw Fail(400, "BAD_REQUEST")
@@ -31738,6 +32274,9 @@ class DeskApi(
         val rest = p.drop(1)
         return when {
             m == "PUT" && rest.isEmpty() -> saveCourse(c, read(DeskCourseIn.serializer(), r))
+            m == "POST" && rest == listOf("send-coach") -> { if (c.coach == null) throw Fail(409, "NO_COACH"); data.sendCourseToCoach(c); done() }
+            m == "GET" && rest == listOf("register.pdf") -> Resp(200, data.registerPdf(c) ?: throw Fail(404, "NOT_FOUND"), "application/pdf")
+            m == "GET" && rest == listOf("register.xlsx") -> Resp(200, data.registerXlsx(c) ?: throw Fail(404, "NOT_FOUND"), com.tennis.scoremanager.data.Xlsx.MIME)
             m == "DELETE" && rest.isEmpty() -> { data.deleteCourse(c); done() }
             m == "POST" && rest == listOf("students") -> {
                 val people = data.players()
@@ -31864,6 +32403,11 @@ class DeskApi(
             }
             m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "result" -> result(t, rest[1], read(DeskResultIn.serializer(), r))
             m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "schedule" -> schedule(t, rest[1], read(DeskScheduleIn.serializer(), r))
+            m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "convoke" -> {
+                val mt = t.matches.firstOrNull { it.id == rest[1] } ?: throw Fail(404, "NOT_FOUND")
+                if (mt.played || mt.a == null || mt.b == null) throw Fail(409, "NOT_READY")
+                data.convokeMatch(t, mt.id); done()
+            }
             else -> throw Fail(404, "NOT_FOUND")
         }
     }
@@ -32454,6 +32998,64 @@ class DeskBridge(private val c: MatchController) : DeskData {
         "MISSING" -> c.noticeAvailability(t, f, missingOnly = true)
         "CALLUP" -> c.noticeCallUp(t, f)
         else -> c.noticeResult(t, f)
+    }
+    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
+    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
+    override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+
+    /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
+    override fun incomingFile(text: String): DeskIncoming? {
+        val s = c.strings
+        com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
+            val st = c.resultStatus(r)
+            val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
+            val msg = when (st) {
+                com.tennis.scoremanager.data.ResultStatus.READY -> s.mrReady
+                com.tennis.scoremanager.data.ResultStatus.SAME -> s.mrSame
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.resultNow(r))
+                com.tennis.scoremanager.data.ResultStatus.BAD_CODE -> s.mrBadCode
+                com.tennis.scoremanager.data.ResultStatus.NOT_FOUND -> s.mrNotFound
+            }
+            return DeskIncoming("RESULT", s.mrTitle, listOfNotNull(listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · "), "${r.side1} – ${r.side2}",
+                com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), winner?.let { s.mrWinner(it) }), msg,
+                st == com.tennis.scoremanager.data.ResultStatus.READY || st == com.tennis.scoremanager.data.ResultStatus.CONFLICT, replace = st == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
+            val st = c.attendanceStatus(r)
+            val msg = when (st) {
+                com.tennis.scoremanager.data.AttendanceStatus.READY -> s.ccAttReady
+                com.tennis.scoremanager.data.AttendanceStatus.SAME -> s.ccAttSame
+                com.tennis.scoremanager.data.AttendanceStatus.BAD_CODE -> s.ccAttBadCode
+                com.tennis.scoremanager.data.AttendanceStatus.NOT_FOUND -> s.ccAttNotFound
+            }
+            return DeskIncoming("ATTENDANCE", s.ccAttendanceTitle, listOfNotNull(r.courseName, r.coach.ifBlank { null }?.let { s.ccFrom(it) }, s.ccLessonsMarked(r.attendance.size)),
+                msg, st == com.tennis.scoremanager.data.AttendanceStatus.READY)
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p ->
+            val x = p.student
+            val guardian = listOf(x.guardian, x.guardianPhone).filter { it.isNotBlank() }.joinToString(" ")
+            return DeskIncoming("PROPOSAL", s.ccProposalTitle, listOfNotNull(x.name, x.phone.ifBlank { null }, x.email.ifBlank { null }, guardian.ifBlank { null }?.let { "${s.coGuardian}: $it" },
+                listOfNotNull(p.coach.ifBlank { null }?.let { s.ccFrom(it) }, p.level.ifBlank { null }, p.note.ifBlank { null }).joinToString(" · ").ifBlank { null }),
+                s.ccProposalCourse, true, courses = c.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.courses.value.any { it.id == id } })
+        }
+        return null
+    }
+
+    override fun applyIncoming(text: String, course: String?): String? {
+        com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
+            val st = c.resultStatus(r)
+            if (st != com.tennis.scoremanager.data.ResultStatus.READY && st != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return st.name
+            c.applyResult(r); return null
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
+            val st = c.attendanceStatus(r)
+            if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
+            c.applyAttendance(r); return null
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.courses.value.any { it.id == id } }); return null }
+        return "NOT_A_FILE"
     }
     override fun setClubName(name: String) { c.storage.clubName = name }
     override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
@@ -35755,6 +36357,104 @@ class ServerCheckJob : JobService() {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/RemindersJob.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/RemindersJob.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.service
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.job.JobInfo
+import android.app.job.JobParameters
+import android.app.job.JobScheduler
+import android.app.job.JobService
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.tennis.scoremanager.MainActivity
+import com.tennis.scoremanager.R
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.Reminders
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
+/** Ogni ora, se i promemoria sono accesi: guarda se c'è qualcosa da ricordare (vedi [Reminders]) e lo notifica. */
+class RemindersJob : JobService() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun onStartJob(params: JobParameters): Boolean {
+        val c = (application as TsmApp).controller
+        scope.launch {
+            runCatching { post(this@RemindersJob, c) }
+            jobFinished(params, false)
+        }
+        return true
+    }
+
+    override fun onStopJob(params: JobParameters): Boolean = true
+
+    companion object {
+        private const val JOB = 7307
+        private const val CHANNEL = "reminders"
+        private const val ID = 6100
+        const val EXTRA_TARGET = "tsm.reminder"
+
+        fun schedule(context: Context, on: Boolean) {
+            val js = context.getSystemService(JobScheduler::class.java) ?: return
+            if (!on) { js.cancel(JOB); return }
+            if (js.getPendingJob(JOB) != null) return
+            js.schedule(JobInfo.Builder(JOB, ComponentName(context, RemindersJob::class.java)).setPeriodic(3_600_000L).setPersisted(true).build())
+        }
+
+        /** Avviso di qualcosa arrivato dal server del circolo (convocazione, scheda, risultato registrato). */
+        fun notifyInbox(context: Context, title: String, text: String) {
+            if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+            val nm = context.getSystemService(NotificationManager::class.java)
+            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, title, NotificationManager.IMPORTANCE_DEFAULT))
+            val open = PendingIntent.getActivity(context, ID - 1,
+                Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_TARGET, "inbox"),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            nm.notify(ID - 1 - (title.hashCode() and 0xff), NotificationCompat.Builder(context, CHANNEL).setSmallIcon(R.drawable.ic_stat_tennis)
+                .setContentTitle(title).setContentText(text).setStyle(NotificationCompat.BigTextStyle().bigText(text)).setContentIntent(open).setAutoCancel(true).build())
+        }
+
+        /** I promemoria di adesso, uno per notifica; ciascuno una volta sola. */
+        fun post(context: Context, c: com.tennis.scoremanager.MatchController) {
+            if (!c.storage.remindersOn) return
+            if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+            val s = c.strings
+            val shown = c.storage.remindersShown
+            val items = Reminders.due(System.currentTimeMillis(), c.activeRole.value == com.tennis.scoremanager.Role.COACH, c.coachBook.value, c.receivedCards.value, shown) { id -> c.playerById(id)?.name ?: "—" }
+            if (items.isEmpty()) return
+            val nm = context.getSystemService(NotificationManager::class.java)
+            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.rmChannel, NotificationManager.IMPORTANCE_DEFAULT))
+            for (it in items) {
+                val title = when (it.kind) {
+                    Reminders.Kind.TOMORROW -> s.rmTomorrow(it.count)
+                    Reminders.Kind.SEND -> s.rmSend
+                    Reminders.Kind.MATCH -> s.rmMatch
+                }
+                val open = PendingIntent.getActivity(context, ID + (it.key.hashCode() and 0xfff),
+                    Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_TARGET, it.target),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                nm.notify(ID + (it.key.hashCode() and 0xfff), NotificationCompat.Builder(context, CHANNEL).setSmallIcon(R.drawable.ic_stat_tennis)
+                    .setContentTitle(title).setContentText(it.text).setStyle(NotificationCompat.BigTextStyle().bigText(it.text))
+                    .setContentIntent(open).setAutoCancel(true).build())
+            }
+            // Le chiavi vecchie si buttano: bastano le ultime 60.
+            c.storage.remindersShown = (shown + items.map { it.key }).toList().takeLast(60).toSet()
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/transfer/Transfer.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/transfer/Transfer.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -37726,6 +38426,42 @@ private fun PanelButton(text: String, icon: ImageVector, modifier: Modifier, ena
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CalendarUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CalendarUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Context
+import android.content.Intent
+import android.provider.CalendarContract
+import android.widget.Toast
+
+/**
+ * Un evento nel calendario del telefono (lo crea l'app del calendario: niente permessi). [allDay] per i tornei;
+ * [weeklyUntil] lo ripete ogni settimana fino a quel giorno (le lezioni di un corso).
+ */
+fun calendarIntent(title: String, start: Long, minutes: Int, place: String = "", text: String = "", allDay: Boolean = false, weeklyUntil: Long? = null): Intent =
+    Intent(Intent.ACTION_INSERT).setData(CalendarContract.Events.CONTENT_URI).apply {
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, start)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, start + minutes * 60_000L)
+        putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, allDay)
+        putExtra(CalendarContract.Events.TITLE, title)
+        if (place.isNotBlank()) putExtra(CalendarContract.Events.EVENT_LOCATION, place)
+        if (text.isNotBlank()) putExtra(CalendarContract.Events.DESCRIPTION, text)
+        weeklyUntil?.let {
+            val until = java.text.SimpleDateFormat("yyyyMMdd'T'235959'Z'", java.util.Locale.ROOT).apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }.format(java.util.Date(it))
+            putExtra(CalendarContract.Events.RRULE, "FREQ=WEEKLY;UNTIL=$until")
+        }
+    }
+
+/** Apre il calendario; senza un'app del calendario lo dice. */
+fun addToCalendar(context: Context, intent: Intent, s: Strings) {
+    runCatching { context.startActivity(intent) }.onFailure { Toast.makeText(context, s.calNoApp, Toast.LENGTH_LONG).show() }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CameraRemoteUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CameraRemoteUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -38668,6 +39404,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.StudentProposal
 import com.tennis.scoremanager.ui.screens.shortDate
 import java.io.File
+import kotlinx.coroutines.launch
 
 /** Un file alla segreteria: WhatsApp dritto al suo numero se lo si sa (dalla scheda corso), sennò si sceglie a chi. */
 fun sendToOffice(context: Context, file: File, text: String, office: String): Boolean {
@@ -38719,16 +39456,26 @@ fun CoachCourseScreen(c: MatchController) {
     var open by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
     var register by remember { mutableStateOf(false) }
+    var calendar by remember { mutableStateOf(false) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, cc.card.club.ifBlank { null }, "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
         icon = Icons.Filled.School,
-        action = { TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) } },
+        action = {
+            Row {
+                TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
+                TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
+            }
+        },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
-                c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) }
+                val byApp = { c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) } }
+                // Corso arrivato dal server del circolo: le presenze tornano da lì; se non risponde, su WhatsApp.
+                if (cc.via != null) scope.launch { if (c.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
+                else byApp()
             }, Modifier.weight(1f))
         },
     ) {
@@ -38775,6 +39522,24 @@ fun CoachCourseScreen(c: MatchController) {
         }
     }
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
+    // Le lezioni del corso nel calendario: un evento che si ripete ogni settimana per ogni orario, fino alla fine.
+    if (calendar) AlertDialog(
+        onDismissRequest = { calendar = false },
+        title = { Text(s.calRepeat) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val now = System.currentTimeMillis()
+                for (slot in co.slots) {
+                    val first = Courses.lessons(co).firstOrNull { it.start > now && CourtPlans.weekday(it.start) == slot.weekday && it.court == slot.court } ?: continue
+                    GhostButton(java.text.SimpleDateFormat("EEEE HH:mm", lang.locale).format(java.util.Date(first.start)) + (slot.court.ifBlank { null }?.let { " · $it" } ?: ""),
+                        Icons.Filled.School, {
+                            addToCalendar(context, calendarIntent(co.name, first.start, slot.minutes, listOf(cc.card.club, slot.court).filter { it.isNotBlank() }.joinToString(" · "), weeklyUntil = co.to), s)
+                        }, Modifier.fillMaxWidth())
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { calendar = false }) { Text(s.back) } },
+    )
     if (register) {
         val file = remember { c.registerFile(co.id, coachSide = true) }
         PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = true) }) { register = false }
@@ -38912,6 +39677,7 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
     val context = LocalContext.current
     var level by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.ccPropose) },
@@ -38925,7 +39691,10 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
         },
         confirmButton = {
             TextButton(onClick = {
-                c.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) }
+                val byApp = { c.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) } }
+                // Con il server del circolo dei suoi corsi la proposta va da lì; se non risponde, su WhatsApp.
+                if (c.coachVia() != null) scope.launch { if (c.sendProposalServer(st, level, note)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
+                else byApp()
                 onDone()
             }) { Text(s.ccPropose) }
         },
@@ -39243,7 +40012,14 @@ private fun EventDialog(c: MatchController, e0: StudentEvent, isNew: Boolean, on
                 com.tennis.scoremanager.ui.screens.DateButton(s.payDate, e.at, lang) { d -> e = e.copy(at = d) }
                 OutlinedTextField(e.place, { e = e.copy(place = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.sePlace) })
                 OutlinedTextField(e.note, { e = e.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) })
-                if (!isNew) TextButton(onClick = { c.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) {
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    GhostButton(s.calAdd, Icons.Filled.Leaderboard, {
+                        val who = c.playerById(e.student)?.name.orEmpty()
+                        addToCalendar(ctx, calendarIntent("${e.name} · $who", com.tennis.scoremanager.data.CourtPlans.dayStart(e.at), 24 * 60, e.place, e.note, allDay = true), s)
+                    }, Modifier.fillMaxWidth())
+                    TextButton(onClick = { c.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                }
             }
         },
         confirmButton = { TextButton(enabled = e.name.isNotBlank(), onClick = { c.saveStudentEvent(e); onDone() }) { Text(s.save) } },
@@ -39405,6 +40181,8 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         }
         // Dopo una lezione di prova: i suoi dati alla segreteria, per iscriverlo a un corso.
         GhostButton(s.ccPropose, Icons.Filled.Message, { propose = true }, Modifier.fillMaxWidth())
+        // I suoi progressi (valutazione, obiettivi, test, lezioni) da tenere nell'app, nel ruolo Tu.
+        GhostButton(s.pcSend, Icons.Filled.Message, { c.noticeProgressCard(st.id) }, Modifier.fillMaxWidth())
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
     receipt?.let { id ->
@@ -39502,6 +40280,12 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                         })
                     }
                     GhostButton(s.coNotify, Icons.Filled.Message, { c.saveLesson(l); onDone(); c.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
+                    // La lezione nel calendario del telefono (con chi e dove).
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    GhostButton(s.calAdd, Icons.Filled.Event, {
+                        val who = l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ")
+                        addToCalendar(ctx, calendarIntent("${s.coLessons}: $who", l.start, l.minutes, l.place, l.note), s)
+                    }, Modifier.fillMaxWidth())
                     TextButton(onClick = { c.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             }
@@ -39803,6 +40587,7 @@ fun AppRoot(c: MatchController) {
         c.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
         c.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
         c.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
+        c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
@@ -41047,7 +41832,19 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
             }
         },
         confirmButton = { if (!busy) TextButton(onClick = { c.prepareCard(card) }) { Text(s.mcPrepare) } },
-        dismissButton = { TextButton(onClick = { c.incomingCard.value = null }) { Text(s.back) } },
+        dismissButton = {
+            androidx.compose.foundation.layout.Row {
+                // La partita convocata nel calendario (giorno, ora, campo).
+                val ctx = androidx.compose.ui.platform.LocalContext.current
+                card.at?.let { at ->
+                    TextButton(onClick = {
+                        val who = card.side1.joinToString(" / ") { it.name } + " – " + card.side2.joinToString(" / ") { it.name }
+                        addToCalendar(ctx, calendarIntent("${card.round.ifBlank { card.event }}: $who", at, 90, listOf(card.club, card.court).filter { it.isNotBlank() }.joinToString(" · "), card.event), s)
+                    }) { Text(s.calShort) }
+                }
+                TextButton(onClick = { c.incomingCard.value = null }) { Text(s.back) }
+            }
+        },
     )
 }
 
@@ -41055,7 +41852,9 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
  * Manda il risultato della partita della scheda [code] alla segreteria: WhatsApp dritto al suo numero (dalla scheda),
  * o si sceglie a chi se la scheda non ha il numero. Il testo si legge anche senza aprire il file.
  */
-fun sendResult(context: android.content.Context, c: MatchController, code: String) {
+fun sendResult(context: android.content.Context, c: MatchController, code: String) = c.sendResultAuto(code) { sendResultByApp(context, c, code) }
+
+private fun sendResultByApp(context: android.content.Context, c: MatchController, code: String) {
     val (file, text) = c.resultToSend(code) ?: return
     val office = c.receivedCards.value.firstOrNull { it.card.code == code }?.card?.office.orEmpty()
     val wa = com.tennis.scoremanager.data.Notices.waNumber(office)
@@ -41944,6 +42743,107 @@ fun EditablePlayerAvatar(c: MatchController, name: String, color: Color, size: D
             text = { Text(s.photoNeedsName) },
             confirmButton = { TextButton(onClick = { needName = false }) { Text(s.ok) } },
         )
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ProgressCardUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ProgressCardUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Grading
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Coaching
+import com.tennis.scoremanager.data.ProgressCard
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.screens.shortDate
+
+/** È arrivata la scheda progressi dall'allenatore: chi la manda, di chi è, e la si salva nei propri progressi. */
+@Composable
+fun IncomingProgressDialog(c: MatchController, card: ProgressCard) {
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    AlertDialog(
+        onDismissRequest = { c.incomingProgress.value = null },
+        icon = { Icon(Icons.Filled.Grading, null, tint = TsmColors.Ball) },
+        title = { Text(s.pcTitle) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(card.studentName, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(listOfNotNull(card.coach.ifBlank { null }?.let { s.pcFrom(it) }, card.club.ifBlank { null }, s.pcUpdated(shortDate(card.issuedAt, lang))).joinToString(" · "),
+                    color = TsmColors.TextDim, fontSize = 13.sp)
+                Text(s.pcHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.acceptProgress(card) }) { Text(s.pcSave) } },
+        dismissButton = { TextButton(onClick = { c.incomingProgress.value = null }) { Text(s.back) } },
+    )
+}
+
+/** Progressi (ruolo Tu): l'ultima scheda dell'allenatore, con valutazione, obiettivi, test, classifica e lezioni. */
+@Composable
+fun MyCoachSection(c: MatchController) {
+    val s = LocalStrings.current
+    val card by c.myProgress.collectAsState()
+    val p = card ?: return
+    val lang = c.options.collectAsState().value.lang
+    SectionCard(s.pcSection, Icons.Filled.Grading) {
+        Text(listOfNotNull(p.coach.ifBlank { null }?.let { s.pcFrom(it) }, s.pcUpdated(shortDate(p.issuedAt, lang))).joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
+        val last = p.evaluations.lastOrNull()
+        val prev = p.evaluations.getOrNull(p.evaluations.size - 2)
+        if (last != null) {
+            Text(s.evLast(shortDate(last.at, lang)), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            for (k in Coaching.ASPECTS) {
+                val v = last.scores[k] ?: continue
+                val d = prev?.scores?.get(k)?.let { v - it }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(aspectLabel(s, k), color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text("●".repeat(v) + "○".repeat(5 - v), color = TsmColors.Ball, fontSize = 14.sp)
+                    if (d != null && d != 0) Text(" " + (if (d > 0) "+$d" else "$d"), color = if (d > 0) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            if (last.note.isNotBlank()) Text(last.note, color = TsmColors.TextMain, fontSize = 13.sp)
+        }
+        if (p.goals.isNotEmpty()) {
+            Text(s.coGoals, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            for (g in p.goals) Text(s.coGoalLine(strokeLabel(s, g.stroke), g.target) + " · " +
+                (g.reachedAt?.let { s.coGoalReached(shortDate(it, lang)) } ?: g.now?.let { "$it%" } ?: s.coGoalNoData),
+                color = if (g.reachedAt != null) TsmColors.Ok else TsmColors.TextMain, fontSize = 14.sp)
+        }
+        val tests = p.tests
+        if (tests.isNotEmpty()) {
+            Text(s.ftTitle, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            for ((k, lowerBetter) in Coaching.TESTS) {
+                val (v, before) = Coaching.lastTwo(tests, k)
+                if (v == null) continue
+                val better = before?.let { if (lowerBetter) v < it else v > it }
+                Text("${testLabel(s, k)}: ${testValue(k, v)}" + (before?.takeIf { it != v }?.let { " (${testValue(k, it)})" } ?: ""),
+                    color = if (better == true) TsmColors.Ok else TsmColors.TextMain, fontSize = 14.sp)
+            }
+        }
+        p.rankings.lastOrNull()?.let { Text(s.rkNow(it.ranking) + if (p.rankings.size > 1) "  (" + p.rankings.takeLast(4).joinToString(" → ") { r -> r.ranking } + ")" else "", color = TsmColors.TextMain, fontSize = 14.sp) }
+        for (e in p.events.filter { it.at >= System.currentTimeMillis() - 86_400_000L }) Text("${shortDate(e.at, lang)} · ${e.name}" + (e.place.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+        p.nextLessons.firstOrNull { it > System.currentTimeMillis() }?.let { Text(s.pcNext("${Reports.date(it, lang)} ${Reports.time(it, lang)}"), color = TsmColors.TextMain, fontSize = 14.sp) }
+        p.lessonsLeft?.let { Text(s.pcLessonsLeft(it), color = if (it <= 1) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp) }
     }
 }
 TSM_EOF
@@ -45110,7 +46010,6 @@ interface Strings {
     val ctGroupsFirst: String
     val ctToPlay: String
     val ctPlayed: String
-    val ctPlayLive: String
     val ctWinner: String
     val ctScore: String
     val ctWalkoverLong: String
@@ -45674,7 +46573,6 @@ interface Strings {
     val ldVs: (String, String) -> String
     val ldBy: (String) -> String
     val ldLate: String
-    val ldPlay: String
     val ldResult: String
     val ldScore: String
     val ldWinner: String
@@ -46355,6 +47253,33 @@ interface Strings {
     val ccDeskReportAll: String
     val ccDeskSaveAttendance: String
     val ccDeskSent: String
+    val ccUpload: String
+    val ccUploadHint: String
+    val calAdd: String
+    val calShort: String
+    val calRepeat: String
+    val calNoApp: String
+    val rmChannel: String
+    val rmSend: String
+    val rmMatch: String
+    val rmSetting: String
+    val rmSettingHint: String
+    val rmTomorrow: (Int) -> String
+    val pcSend: String
+    val pcTitle: String
+    val pcHint: String
+    val pcSave: String
+    val pcSection: String
+    val pcText: String
+    val pcFrom: (String) -> String
+    val pcUpdated: (String) -> String
+    val pcNext: (String) -> String
+    val pcLessonsLeft: (Int) -> String
+    val ibHint: String
+    val ibNew: String
+    val ibApplied: String
+    val ibSentServer: String
+    val ibTitle: (Int) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -47694,7 +48619,6 @@ object ItStrings : Strings {
     override val ctGroupsFirst = "Il tabellone finale si fa a gironi finiti."
     override val ctToPlay = "Da giocare"
     override val ctPlayed = "Giocate"
-    override val ctPlayLive = "Gioca col segnapunti"
     override val ctWinner = "Chi ha vinto"
     override val ctScore = "Punteggio (es. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Vinta a tavolino (w.o.)"
@@ -48254,7 +49178,6 @@ object ItStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a sfida $b" }
     override val ldBy: (String) -> String = { "da giocare entro il $it" }
     override val ldLate = "Scaduta: giocatela o annullatela"
-    override val ldPlay = "Gioca col segnapunti"
     override val ldResult = "Risultato"
     override val ldScore = "Punteggio (dal lato dello sfidante)"
     override val ldWinner = "Chi ha vinto"
@@ -48907,6 +49830,33 @@ object ItStrings : Strings {
     override val ccDeskReportAll = "Report completo (PDF)"
     override val ccDeskSaveAttendance = "Salva le presenze"
     override val ccDeskSent = "Le presenze si mandano alla segreteria dal telefono (I miei corsi › Manda le presenze)."
+    override val ccUpload = "Carica un file"
+    override val ccUploadHint = "Un file ricevuto su WhatsApp Web o per email: risultato dal campo, presenze dell'allenatore, allievo proposto."
+    override val calAdd = "Aggiungi al calendario"
+    override val calShort = "Calendario"
+    override val calRepeat = "Ogni settimana nel calendario"
+    override val calNoApp = "Su questo telefono non c'è un'app del calendario."
+    override val rmChannel = "Promemoria"
+    override val rmSend = "Presenze del corso da mandare"
+    override val rmMatch = "Oggi giochi"
+    override val rmSetting = "Promemoria"
+    override val rmSettingHint = "Lezioni di domani, presenze da mandare, partita del giorno: notifiche sul telefono."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "Domani 1 lezione: avvisa gli allievi" else "Domani $it lezioni: avvisa gli allievi" }
+    override val pcSend = "Manda la scheda progressi"
+    override val pcTitle = "Scheda progressi"
+    override val pcHint = "I progressi che ti manda l'allenatore: valutazione, obiettivi, test, classifica e prossime lezioni. Li trovi in Progressi."
+    override val pcSave = "Salva nei miei progressi"
+    override val pcSection = "Dal mio allenatore"
+    override val pcText = "Ecco la tua scheda progressi: aprila con Tennis Score Manager (Condividi › TSM) e la trovi in Progressi."
+    override val pcFrom: (String) -> String = { "dal tuo allenatore $it" }
+    override val pcUpdated: (String) -> String = { "aggiornata il $it" }
+    override val pcNext: (String) -> String = { "Prossima lezione: $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "Ti resta 1 lezione nel pacchetto" else "Lezioni rimaste nel pacchetto: $it" }
+    override val ibHint = "Convocazioni, schede e risultati arrivati dal server del circolo: tocca per aprirli uno alla volta."
+    override val ibNew = "Nuovo dal circolo"
+    override val ibApplied = "Registrato dal campo"
+    override val ibSentServer = "Mandato alla segreteria dal server del circolo."
+    override val ibTitle: (Int) -> String = { if (it == 1) "Dal circolo: 1 file da aprire" else "Dal circolo: $it file da aprire" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -50246,7 +51196,6 @@ object EnStrings : Strings {
     override val ctGroupsFirst = "The final draw is made once the groups are over."
     override val ctToPlay = "To play"
     override val ctPlayed = "Played"
-    override val ctPlayLive = "Play with the scorer"
     override val ctWinner = "Winner"
     override val ctScore = "Score (e.g. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Won by walkover (w/o)"
@@ -50806,7 +51755,6 @@ object EnStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a challenges $b" }
     override val ldBy: (String) -> String = { "to be played by $it" }
     override val ldLate = "Overdue: play it or cancel it"
-    override val ldPlay = "Play with the scorer"
     override val ldResult = "Result"
     override val ldScore = "Score (challenger's side)"
     override val ldWinner = "Who won"
@@ -51460,6 +52408,33 @@ object EnStrings : Strings {
     override val ccDeskReportAll = "Full report (PDF)"
     override val ccDeskSaveAttendance = "Save attendance"
     override val ccDeskSent = "Attendance is sent to the club office from the phone (My courses › Send attendance)."
+    override val ccUpload = "Upload a file"
+    override val ccUploadHint = "A file received on WhatsApp Web or by email: result from the court, coach's attendance, proposed student."
+    override val calAdd = "Add to calendar"
+    override val calShort = "Calendar"
+    override val calRepeat = "Weekly in the calendar"
+    override val calNoApp = "There is no calendar app on this phone."
+    override val rmChannel = "Reminders"
+    override val rmSend = "Course attendance to send"
+    override val rmMatch = "You play today"
+    override val rmSetting = "Reminders"
+    override val rmSettingHint = "Tomorrow's lessons, attendance to send, today's match: notifications on the phone."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "1 lesson tomorrow: notify the students" else "$it lessons tomorrow: notify the students" }
+    override val pcSend = "Send the progress card"
+    override val pcTitle = "Progress card"
+    override val pcHint = "The progress your coach sends you: assessment, goals, tests, ranking and next lessons. You find them in Progress."
+    override val pcSave = "Save in my progress"
+    override val pcSection = "From my coach"
+    override val pcText = "Here is your progress card: open it with Tennis Score Manager (Share › TSM) and you'll find it in Progress."
+    override val pcFrom: (String) -> String = { "from your coach $it" }
+    override val pcUpdated: (String) -> String = { "updated on $it" }
+    override val pcNext: (String) -> String = { "Next lesson: $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "1 lesson left in the pack" else "Lessons left in the pack: $it" }
+    override val ibHint = "Call-ups, cards and results from the club server: tap to open them one at a time."
+    override val ibNew = "New from the club"
+    override val ibApplied = "Recorded from the court"
+    override val ibSentServer = "Sent to the club office through the club server."
+    override val ibTitle: (Int) -> String = { if (it == 1) "From the club: 1 file to open" else "From the club: $it files to open" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
@@ -52821,7 +53796,6 @@ object DeStrings : Strings {
     override val ctGroupsFirst = "Das Finaltableau gibt es nach den Gruppen."
     override val ctToPlay = "Zu spielen"
     override val ctPlayed = "Gespielt"
-    override val ctPlayLive = "Mit dem Zähler spielen"
     override val ctWinner = "Sieger"
     override val ctScore = "Ergebnis (z. B. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Kampflos gewonnen"
@@ -53381,7 +54355,6 @@ object DeStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a fordert $b" }
     override val ldBy: (String) -> String = { "zu spielen bis $it" }
     override val ldLate = "Überfällig: spielen oder absagen"
-    override val ldPlay = "Mit dem Zähler spielen"
     override val ldResult = "Ergebnis"
     override val ldScore = "Ergebnis (aus Sicht des Fordernden)"
     override val ldWinner = "Wer hat gewonnen"
@@ -54038,6 +55011,33 @@ object DeStrings : Strings {
     override val ccDeskReportAll = "Vollständiger Bericht (PDF)"
     override val ccDeskSaveAttendance = "Anwesenheit speichern"
     override val ccDeskSent = "Die Anwesenheit schickst du vom Telefon ans Büro (Meine Kurse › Anwesenheit schicken)."
+    override val ccUpload = "Datei hochladen"
+    override val ccUploadHint = "Eine per WhatsApp Web oder E-Mail erhaltene Datei: Ergebnis vom Platz, Anwesenheit vom Trainer, vorgeschlagener Schüler."
+    override val calAdd = "Zum Kalender hinzufügen"
+    override val calShort = "Kalender"
+    override val calRepeat = "Wöchentlich im Kalender"
+    override val calNoApp = "Auf diesem Telefon gibt es keine Kalender-App."
+    override val rmChannel = "Erinnerungen"
+    override val rmSend = "Kursanwesenheit zu schicken"
+    override val rmMatch = "Heute spielst du"
+    override val rmSetting = "Erinnerungen"
+    override val rmSettingHint = "Stunden von morgen, Anwesenheit zu schicken, Match des Tages: Mitteilungen auf dem Telefon."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "Morgen 1 Stunde: Schüler benachrichtigen" else "Morgen $it Stunden: Schüler benachrichtigen" }
+    override val pcSend = "Fortschrittskarte schicken"
+    override val pcTitle = "Fortschrittskarte"
+    override val pcHint = "Die Fortschritte, die dir der Trainer schickt: Bewertung, Ziele, Tests, Rangliste und nächste Stunden. Du findest sie unter Fortschritte."
+    override val pcSave = "In meinen Fortschritten speichern"
+    override val pcSection = "Von meinem Trainer"
+    override val pcText = "Hier ist deine Fortschrittskarte: öffne sie mit Tennis Score Manager (Teilen › TSM), dann findest du sie unter Fortschritte."
+    override val pcFrom: (String) -> String = { "von deinem Trainer $it" }
+    override val pcUpdated: (String) -> String = { "aktualisiert am $it" }
+    override val pcNext: (String) -> String = { "Nächste Stunde: $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "Noch 1 Stunde im Paket" else "Übrige Stunden im Paket: $it" }
+    override val ibHint = "Einladungen, Karten und Ergebnisse vom Vereinsserver: antippen, um sie einzeln zu öffnen."
+    override val ibNew = "Neu vom Verein"
+    override val ibApplied = "Vom Platz gespeichert"
+    override val ibSentServer = "Über den Vereinsserver ans Büro geschickt."
+    override val ibTitle: (Int) -> String = { if (it == 1) "Vom Verein: 1 Datei zu öffnen" else "Vom Verein: $it Dateien zu öffnen" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
@@ -55389,7 +56389,6 @@ object EsStrings : Strings {
     override val ctGroupsFirst = "El cuadro final se hace al terminar los grupos."
     override val ctToPlay = "Por jugar"
     override val ctPlayed = "Jugados"
-    override val ctPlayLive = "Jugar con el marcador"
     override val ctWinner = "Ganador"
     override val ctScore = "Resultado (p. ej. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Ganado por w.o."
@@ -55949,7 +56948,6 @@ object EsStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a desafía a $b" }
     override val ldBy: (String) -> String = { "a jugar antes del $it" }
     override val ldLate = "Vencido: jugadlo o anuladlo"
-    override val ldPlay = "Jugar con el marcador"
     override val ldResult = "Resultado"
     override val ldScore = "Resultado (del lado del retador)"
     override val ldWinner = "Quién ha ganado"
@@ -56606,6 +57604,33 @@ object EsStrings : Strings {
     override val ccDeskReportAll = "Informe completo (PDF)"
     override val ccDeskSaveAttendance = "Guardar asistencia"
     override val ccDeskSent = "La asistencia se envía a la secretaría desde el teléfono (Mis cursos › Enviar asistencia)."
+    override val ccUpload = "Subir un archivo"
+    override val ccUploadHint = "Un archivo recibido por WhatsApp Web o por correo: resultado de la pista, asistencia del entrenador, alumno propuesto."
+    override val calAdd = "Añadir al calendario"
+    override val calShort = "Calendario"
+    override val calRepeat = "Cada semana en el calendario"
+    override val calNoApp = "No hay una app de calendario en este teléfono."
+    override val rmChannel = "Recordatorios"
+    override val rmSend = "Asistencia del curso por enviar"
+    override val rmMatch = "Hoy juegas"
+    override val rmSetting = "Recordatorios"
+    override val rmSettingHint = "Clases de mañana, asistencia por enviar, partido del día: notificaciones en el teléfono."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "Mañana 1 clase: avisa a los alumnos" else "Mañana $it clases: avisa a los alumnos" }
+    override val pcSend = "Enviar la ficha de progresos"
+    override val pcTitle = "Ficha de progresos"
+    override val pcHint = "Los progresos que te envía el entrenador: evaluación, objetivos, pruebas, clasificación y próximas clases. Los encuentras en Progresos."
+    override val pcSave = "Guardar en mis progresos"
+    override val pcSection = "De mi entrenador"
+    override val pcText = "Aquí tienes tu ficha de progresos: ábrela con Tennis Score Manager (Compartir › TSM) y la encontrarás en Progresos."
+    override val pcFrom: (String) -> String = { "de tu entrenador $it" }
+    override val pcUpdated: (String) -> String = { "actualizada el $it" }
+    override val pcNext: (String) -> String = { "Próxima clase: $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "Te queda 1 clase en el paquete" else "Clases que quedan en el paquete: $it" }
+    override val ibHint = "Convocatorias, fichas y resultados llegados del servidor del club: toca para abrirlos uno a uno."
+    override val ibNew = "Nuevo del club"
+    override val ibApplied = "Registrado desde la pista"
+    override val ibSentServer = "Enviado a la secretaría por el servidor del club."
+    override val ibTitle: (Int) -> String = { if (it == 1) "Del club: 1 archivo por abrir" else "Del club: $it archivos por abrir" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
@@ -57959,7 +58984,6 @@ object FrStrings : Strings {
     override val ctGroupsFirst = "Le tableau final se fait une fois les poules terminées."
     override val ctToPlay = "À jouer"
     override val ctPlayed = "Joués"
-    override val ctPlayLive = "Jouer avec le marqueur"
     override val ctWinner = "Vainqueur"
     override val ctScore = "Score (ex. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Gagné par forfait"
@@ -58519,7 +59543,6 @@ object FrStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a défie $b" }
     override val ldBy: (String) -> String = { "à jouer avant le $it" }
     override val ldLate = "En retard : jouez-le ou annulez-le"
-    override val ldPlay = "Jouer avec le marqueur"
     override val ldResult = "Résultat"
     override val ldScore = "Score (côté du challenger)"
     override val ldWinner = "Qui a gagné"
@@ -59176,6 +60199,33 @@ object FrStrings : Strings {
     override val ccDeskReportAll = "Rapport complet (PDF)"
     override val ccDeskSaveAttendance = "Enregistrer les présences"
     override val ccDeskSent = "Les présences s'envoient au secrétariat depuis le téléphone (Mes cours › Envoyer les présences)."
+    override val ccUpload = "Charger un fichier"
+    override val ccUploadHint = "Un fichier reçu sur WhatsApp Web ou par e-mail : résultat du court, présences de l'entraîneur, élève proposé."
+    override val calAdd = "Ajouter à l'agenda"
+    override val calShort = "Agenda"
+    override val calRepeat = "Chaque semaine dans l'agenda"
+    override val calNoApp = "Il n'y a pas d'appli d'agenda sur ce téléphone."
+    override val rmChannel = "Rappels"
+    override val rmSend = "Présences du cours à envoyer"
+    override val rmMatch = "Vous jouez aujourd'hui"
+    override val rmSetting = "Rappels"
+    override val rmSettingHint = "Cours de demain, présences à envoyer, match du jour : notifications sur le téléphone."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "1 cours demain : prévenez les élèves" else "$it cours demain : prévenez les élèves" }
+    override val pcSend = "Envoyer la fiche de progrès"
+    override val pcTitle = "Fiche de progrès"
+    override val pcHint = "Les progrès que l'entraîneur vous envoie : évaluation, objectifs, tests, classement et prochains cours. Vous les trouvez dans Progrès."
+    override val pcSave = "Enregistrer dans mes progrès"
+    override val pcSection = "De mon entraîneur"
+    override val pcText = "Voici ta fiche de progrès : ouvre-la avec Tennis Score Manager (Partager › TSM) et tu la retrouves dans Progrès."
+    override val pcFrom: (String) -> String = { "de ton entraîneur $it" }
+    override val pcUpdated: (String) -> String = { "mise à jour le $it" }
+    override val pcNext: (String) -> String = { "Prochain cours : $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "Il te reste 1 cours dans le forfait" else "Cours restants dans le forfait : $it" }
+    override val ibHint = "Convocations, fiches et résultats arrivés du serveur du club : touchez pour les ouvrir un par un."
+    override val ibNew = "Nouveau du club"
+    override val ibApplied = "Enregistré depuis le court"
+    override val ibSentServer = "Envoyé au secrétariat par le serveur du club."
+    override val ibTitle: (Int) -> String = { if (it == 1) "Du club : 1 fichier à ouvrir" else "Du club : $it fichiers à ouvrir" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
@@ -60530,7 +61580,6 @@ object PtStrings : Strings {
     override val ctGroupsFirst = "A chave final é feita depois dos grupos."
     override val ctToPlay = "A jogar"
     override val ctPlayed = "Jogadas"
-    override val ctPlayLive = "Jogar com o marcador"
     override val ctWinner = "Vencedor"
     override val ctScore = "Placar (ex. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Vitória por W.O."
@@ -61090,7 +62139,6 @@ object PtStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a desafia $b" }
     override val ldBy: (String) -> String = { "a jogar até $it" }
     override val ldLate = "Em atraso: joguem-no ou anulem-no"
-    override val ldPlay = "Jogar com o marcador"
     override val ldResult = "Resultado"
     override val ldScore = "Resultado (do lado do desafiante)"
     override val ldWinner = "Quem ganhou"
@@ -61747,6 +62795,33 @@ object PtStrings : Strings {
     override val ccDeskReportAll = "Relatório completo (PDF)"
     override val ccDeskSaveAttendance = "Guardar presenças"
     override val ccDeskSent = "As presenças enviam-se à secretaria a partir do telefone (Os meus cursos › Enviar presenças)."
+    override val ccUpload = "Carregar um arquivo"
+    override val ccUploadHint = "Um arquivo recebido no WhatsApp Web ou por email: resultado da quadra, presenças do treinador, aluno proposto."
+    override val calAdd = "Adicionar ao calendário"
+    override val calShort = "Calendário"
+    override val calRepeat = "Todas as semanas no calendário"
+    override val calNoApp = "Não há uma app de calendário neste telefone."
+    override val rmChannel = "Lembretes"
+    override val rmSend = "Presenças do curso por enviar"
+    override val rmMatch = "Hoje joga"
+    override val rmSetting = "Lembretes"
+    override val rmSettingHint = "Aulas de amanhã, presenças por enviar, partida do dia: notificações no telefone."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "Amanhã 1 aula: avise os alunos" else "Amanhã $it aulas: avise os alunos" }
+    override val pcSend = "Enviar a ficha de progresso"
+    override val pcTitle = "Ficha de progresso"
+    override val pcHint = "O progresso que o treinador lhe envia: avaliação, objetivos, testes, ranking e próximas aulas. Encontra-o em Progresso."
+    override val pcSave = "Guardar no meu progresso"
+    override val pcSection = "Do meu treinador"
+    override val pcText = "Aqui está a tua ficha de progresso: abre-a com o Tennis Score Manager (Compartilhar › TSM) e encontras em Progresso."
+    override val pcFrom: (String) -> String = { "do teu treinador $it" }
+    override val pcUpdated: (String) -> String = { "atualizada em $it" }
+    override val pcNext: (String) -> String = { "Próxima aula: $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "Resta-te 1 aula no pacote" else "Aulas restantes no pacote: $it" }
+    override val ibHint = "Convocações, fichas e resultados vindos do servidor do clube: toque para os abrir um a um."
+    override val ibNew = "Novo do clube"
+    override val ibApplied = "Registado a partir da quadra"
+    override val ibSentServer = "Enviado à secretaria pelo servidor do clube."
+    override val ibTitle: (Int) -> String = { if (it == 1) "Do clube: 1 arquivo por abrir" else "Do clube: $it arquivos por abrir" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
@@ -65949,6 +67024,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -66080,6 +67156,9 @@ fun HomeScreen(c: MatchController) {
         onHelp = { c.openHelp(tabHelp(tab)) },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
     ) {
+        // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
+        val inbox by c.inbox.collectAsState()
+        if (inbox.isNotEmpty()) Entry(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint, main = true) { c.openInbox() }
         // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
         if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
         // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
@@ -66407,6 +67486,8 @@ private fun ProgressTab(c: MatchController) {
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
+    // La scheda progressi mandata dal proprio allenatore (valutazione, obiettivi, test, lezioni).
+    com.tennis.scoremanager.ui.MyCoachSection(c)
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Le partite riprese: capitoli, highlights e moviola stanno coi propri progressi.
     if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.VideoLibrary, s.videoLibrary, s.videoLibraryHint) { c.go(Screen.VIDEOS) }
@@ -71797,6 +72878,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Info
@@ -71869,6 +72951,12 @@ fun SettingsScreen(c: MatchController) {
         Entry(Icons.Filled.RecordVoiceOver, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
         Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
         Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
+        // I promemoria del telefono: si spengono qui (e con loro il controllo di ogni ora).
+        var reminders by remember { mutableStateOf(c.storage.remindersOn) }
+        com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Alarm, s.rmSetting, s.rmSettingHint, reminders) {
+            reminders = it; c.storage.remindersOn = it
+            com.tennis.scoremanager.service.RemindersJob.schedule(context, it)
+        }
         SectionCard(s.aboutTitle, Icons.Filled.Info) {
             Text("Tennis Score Manager", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(s.aboutVersion(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
@@ -95277,6 +96365,45 @@ class PlayersTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ProgressCardsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ProgressCardsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class ProgressCardsTest {
+    @Test fun cardCarriesProgressButNotTheCoachDiary() {
+        val now = 1_000_000_000L
+        val book = CoachBook(
+            diary = listOf(DiaryEntry("d", "s1", 1, "nota privata dell'allenatore")),
+            evaluations = listOf(Evaluation("e", "s1", 5, mapOf("serve" to 3)), Evaluation("x", "s2", 5, mapOf("serve" to 1))),
+            goals = listOf(StudentGoal("g", "s1", TrainedStroke.FOREHAND, 70)),
+            rankings = listOf(RankingEntry("r", "s1", 3, "4.3")),
+            lessons = listOf(CoachLesson("l", now + 86_400_000L, students = listOf("s1"))),
+            packs = listOf(LessonPack("p", "s1", 10)),
+        )
+        val card = ProgressCards.build(book, emptyList(), "s1", "Anna", "Marco", "TC", now)
+        assertEquals(1, card.evaluations.size)
+        assertEquals(70, card.goals.single().target)
+        assertNull(card.goals.single().now)
+        assertEquals("4.3", card.rankings.single().ranking)
+        assertEquals(listOf(now + 86_400_000L), card.nextLessons)
+        assertEquals(10, card.lessonsLeft)
+        val text = ProgressCards.encode(card)
+        assertFalse("nota privata" in text)
+        assertEquals(card, ProgressCards.decode(text))
+        assertNull(MatchCards.decode(text))
+        assertNull(ProgressCards.decode(MatchCards.encodeResult(MatchResult(code = "c", ref = "r", match = "m"))))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ProgressFilterTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ProgressFilterTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -95672,6 +96799,60 @@ class RematchTest {
         assertTrue(m.endsWith("netlify.app"))
         // Senza luogo e senza nota non restano righe vuote in mezzo.
         assertFalse(Rematch.message("R", "A", "B", "vs", "domani", " ", null, " ", "c").contains("📍"))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/RemindersTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/RemindersTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class RemindersTest {
+    private fun at(dayOffset: Int, h: Int, m: Int = 0): Long = Calendar.getInstance().apply {
+        set(2026, Calendar.NOVEMBER, 14, h, m, 0); set(Calendar.MILLISECOND, 0); add(Calendar.DAY_OF_MONTH, dayOffset)
+    }.timeInMillis
+    private val names = { id: String -> if (id == "s1") "Anna" else id }
+
+    @Test fun coachGetsTomorrowsLessonsOnlyInTheEveningAndOnce() {
+        val book = CoachBook(lessons = listOf(CoachLesson("l1", at(1, 18), students = listOf("s1")), CoachLesson("l2", at(1, 9), cancelled = true)))
+        val evening = Reminders.due(at(0, 19), true, book, emptyList(), emptySet(), names)
+        assertEquals(1, evening.size)
+        assertEquals(Reminders.Kind.TOMORROW, evening[0].kind)
+        assertEquals(1, evening[0].count)
+        assertTrue(evening[0].text, "18:00 Anna" in evening[0].text)
+        assertEquals("lessons", evening[0].target)
+        assertTrue(Reminders.due(at(0, 10), true, book, emptyList(), emptySet(), names).isEmpty())
+        assertTrue(Reminders.due(at(0, 19), false, book, emptyList(), emptySet(), names).isEmpty())
+        assertTrue(Reminders.due(at(0, 20), true, book, emptyList(), setOf(evening[0].key), names).isEmpty())
+    }
+
+    @Test fun attendanceToSendAfterADay() {
+        val course = Course("c1", "Under 10", from = 0, to = 0)
+        val cc = CoachCourse(CourseCard(code = "X", issuedAt = 1, course = course), changedAt = at(-2, 18))
+        val r = Reminders.due(at(0, 10), true, CoachBook(courses = listOf(cc)), emptyList(), emptySet(), names)
+        assertEquals(listOf(Reminders.Kind.SEND), r.map { it.kind })
+        assertEquals("course:c1", r[0].target)
+        // Mandate dopo l'ultima modifica: niente.
+        assertTrue(Reminders.due(at(0, 10), true, CoachBook(courses = listOf(cc.copy(sentAt = at(-1, 9)))), emptyList(), emptySet(), names).isEmpty())
+    }
+
+    @Test fun matchDayFromAReceivedCard() {
+        val card = MatchCard(code = "C", issuedAt = 1, event = "Sociale", ref = "t", match = "m", court = "Campo 2", at = at(0, 18),
+            side1 = listOf(CardPlayer("a", "Rossi")), side2 = listOf(CardPlayer("b", "Bianchi")))
+        val r = Reminders.due(at(0, 8), false, CoachBook(), listOf(ReceivedCard(card)), emptySet(), names)
+        assertEquals(1, r.size)
+        assertTrue(r[0].text, r[0].text.startsWith("18:00 · Campo 2 · Rossi – Bianchi"))
+        // Già iniziata (c'è la partita) o già passata: niente.
+        assertTrue(Reminders.due(at(0, 8), false, CoachBook(), listOf(ReceivedCard(card, record = "m1")), emptySet(), names).isEmpty())
+        assertTrue(Reminders.due(at(0, 19), false, CoachBook(), listOf(ReceivedCard(card)), emptySet(), names).isEmpty())
     }
 }
 TSM_EOF
@@ -100280,6 +101461,14 @@ const val CHAT_EDIT_MINUTES = 15
 @Serializable data class SrvOk(val ok: Boolean = true)
 
 /**
+ * Un file lasciato sul server per qualcuno (la casella): scheda partita, risultato, scheda corso, presenze, allievo
+ * proposto, scheda progressi. [kind] dice cos'è; [text] è il file (JSON). Chi lo riceve lo prende e lo toglie.
+ */
+@Serializable data class SrvMail(val id: String, val from: String = "", val fromName: String = "", val kind: String = "", val text: String = "", val at: Long = 0)
+/** Un file da lasciare: [to] è l'id del giocatore (dalla segreteria) e vuoto per la segreteria (dal giocatore). */
+@Serializable data class SrvMailIn(val to: String = "", val kind: String = "", val text: String = "")
+
+/**
  * Il tunnel da internet del server. [state]: OFF, WORKING, LOGIN e ENABLE (la segreteria apre [link]), ON (con [url]),
  * ERROR (con [code]). [available] è falso se sul server manca l'aiutante del tunnel: va aggiornato il kit.
  */
@@ -103106,6 +104295,8 @@ package com.tennis.scoremanager.server
 import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.Cell
 import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.SrvMail
+import com.tennis.scoremanager.data.SrvMailIn
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
@@ -103246,6 +104437,13 @@ class Api(
             r.method == "POST" && p == listOf("admin", "chat", "board") -> { admin(r); chatPost(null, "board", r) }
             r.method == "DELETE" && p.size == 4 && p[0] == "admin" && p[1] == "chat" && p[2] == "msg" -> { admin(r); chatDelete(p[3]) }
             r.method == "GET" && p == listOf("me") -> me(player(r))
+            // La casella dei file (schede partita, risultati, schede corso, presenze, proposte, schede progressi).
+            r.method == "POST" && p == listOf("admin", "mail") -> { admin(r); leaveMail(read(SrvMailIn.serializer(), r), "", "") }
+            r.method == "GET" && p == listOf("admin", "mail") -> { admin(r); takeMail("") }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "mail" -> { admin(r); dropMail("", p[2]) }
+            r.method == "POST" && p == listOf("mail") -> player(r).let { pl -> leaveMail(read(SrvMailIn.serializer(), r).copy(to = ""), pl.id, pl.name) }
+            r.method == "GET" && p == listOf("mail") -> takeMail(player(r).id)
+            r.method == "DELETE" && p.size == 2 && p[0] == "mail" -> dropMail(player(r).id, p[1])
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
@@ -103370,6 +104568,33 @@ class Api(
         if (!backupName.matches(name)) throw ApiError(400, "BAD_REQUEST")
         val f = java.io.File(backupDir, name).takeIf { it.isFile } ?: throw ApiError(404, "NOT_FOUND")
         return ok(SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(f.readBytes())))
+    }
+
+    /** Lascia un file nella casella di [MailItem.to]: la segreteria a un giocatore invitato, un giocatore alla segreteria. */
+    private fun leaveMail(i: SrvMailIn, from: String, fromName: String): Resp {
+        if (i.kind !in MailItem.KINDS || i.text.isBlank() || i.text.length > MailItem.MAX_TEXT) throw ApiError(400, "BAD_REQUEST")
+        val now = store.now()
+        store.update { s ->
+            if (i.to.isNotEmpty() && s.players.none { it.id == i.to }) throw ApiError(404, "NOT_FOUND")
+            val fresh = s.mail.filter { now - it.at < MailItem.KEEP_DAYS * 86_400_000L }
+            val box = fresh.filter { it.to == i.to }
+            val keep = fresh - box.dropLast(MailItem.MAX_PER_BOX - 1).toSet()
+            s.copy(mail = keep + MailItem(Secrets.id("m"), i.to, from, fromName, i.kind, i.text, now)) to Unit
+        }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /** I file della casella di [to] ("" = la segreteria), dal più vecchio. */
+    private fun takeMail(to: String): Resp {
+        val now = store.now()
+        val list = store.state.mail.filter { it.to == to && now - it.at < MailItem.KEEP_DAYS * 86_400_000L }.sortedBy { it.at }
+        return ok(ListSerializer(SrvMail.serializer()), list.map { SrvMail(it.id, it.from, it.fromName, it.kind, it.text, it.at) })
+    }
+
+    /** Preso: il file esce dalla casella (solo dalla propria). */
+    private fun dropMail(to: String, id: String): Resp {
+        store.update { s -> s.copy(mail = s.mail.filterNot { it.id == id && it.to == to }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     /** La segreteria toglie un'attesa o un annuncio (fuori luogo, o già sistemato a voce). */
@@ -104259,7 +105484,20 @@ data class State(
     val seeks: List<com.tennis.scoremanager.data.Seek> = emptyList(),
     /** I messaggi delle chat (bacheca e annunci): restano al massimo [CHAT_DAYS] giorni. */
     val chats: List<ChatMsg> = emptyList(),
+    /** La casella dei file: [MailItem.to] "" = la segreteria, sennò l'id del giocatore. */
+    val mail: List<MailItem> = emptyList(),
 )
+
+/** Un file lasciato per qualcuno; resta finché non lo prende (al massimo [MailItem.KEEP_DAYS] giorni). */
+@Serializable
+data class MailItem(val id: String, val to: String, val from: String, val fromName: String, val kind: String, val text: String, val at: Long) {
+    companion object {
+        const val KEEP_DAYS = 30
+        const val MAX_TEXT = 300_000
+        const val MAX_PER_BOX = 200
+        val KINDS = setOf("card", "result", "course", "attendance", "proposal", "progress")
+    }
+}
 
 object Secrets {
     private val rnd = SecureRandom()
@@ -106910,6 +108148,91 @@ class ChatApiTest {
         assertEquals(DELETED_MARK, msgs("club", luca).single().text)
         // La segreteria lo vede ancora.
         assertTrue(call("GET", "/admin/chat/club", token = admin).body.contains("insulto"))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/MailApiTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/MailApiTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.CourtSettings
+import com.tennis.scoremanager.data.SrvChatMsg
+import com.tennis.scoremanager.data.SrvMe
+import com.tennis.scoremanager.data.SrvSeek
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import java.nio.file.Files
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import com.tennis.scoremanager.data.SrvMail
+
+/** La casella dei file: la segreteria lascia una scheda a un giocatore, il giocatore un risultato alla segreteria. */
+class MailApiTest {
+    private val zone = ZoneId.of("Europe/Rome")
+    private var now = ZonedDateTime.of(2026, 11, 9, 8, 0, 0, 0, zone).toInstant().toEpochMilli()
+    private lateinit var store: Store
+    private lateinit var api: Api
+    private lateinit var admin: String
+    private val json = Json { ignoreUnknownKeys = true }
+
+    @Before fun setUp() {
+        store = Store(Files.createTempDirectory("tsm-mail").toFile()) { now }
+        api = Api(store, Limiter(max = 1000) { now }, pusher = { _, _, _, _ -> 201 }, async = false)
+        admin = field(call("POST", "/admin/pair", """{"code":"${store.ensureSetupCode()}"}""").body, "token")
+    }
+
+    private fun call(method: String, path: String, body: String = "", token: String? = null) = api.handle(Req(method, "/api/v1$path", body = body, token = token, ip = "1.1.1.1"))
+    private fun field(j: String, k: String) = Json.parseToJsonElement(j).jsonObject[k]!!.jsonPrimitive.content
+    private fun mail(path: String, t: String) = json.decodeFromString(ListSerializer(SrvMail.serializer()), call("GET", path, token = t).body)
+    private fun player(id: String, name: String): String {
+        val code = field(call("POST", "/admin/invites", """{"player":"$id","name":"$name"}""", admin).body, "code")
+        return field(call("POST", "/claim", """{"code":"$code"}""").body, "token")
+    }
+
+    @Test fun ogniFileArrivaSoloAlSuoDestinatario() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        assertEquals(200, call("POST", "/admin/mail", """{"to":"p1","kind":"card","text":"{\"x\":1}"}""", admin).status)
+        assertEquals(404, call("POST", "/admin/mail", """{"to":"nessuno","kind":"card","text":"{}"}""", admin).status)
+        assertEquals(400, call("POST", "/admin/mail", """{"to":"p1","kind":"virus","text":"{}"}""", admin).status)
+        assertEquals(1, mail("/mail", mario).size)
+        assertTrue(mail("/mail", luca).isEmpty())
+        // Senza chiave niente; un giocatore non legge la casella della segreteria.
+        assertEquals(401, call("GET", "/mail").status)
+        assertTrue(call("GET", "/admin/mail", token = mario).status in setOf(401, 403))
+        val m = mail("/mail", mario).single()
+        assertEquals("card", m.kind)
+        // Luca non può togliere il file di Mario; Mario sì.
+        call("DELETE", "/mail/${m.id}", token = luca)
+        assertEquals(1, mail("/mail", mario).size)
+        call("DELETE", "/mail/${m.id}", token = mario)
+        assertTrue(mail("/mail", mario).isEmpty())
+    }
+
+    @Test fun ilRisultatoTornaAllaSegreteriaColMittente() {
+        val mario = player("p1", "Mario")
+        assertEquals(200, call("POST", "/mail", """{"to":"p2","kind":"result","text":"{\"r\":1}"}""", mario).status)
+        val got = mail("/admin/mail", admin).single()
+        assertEquals("p1", got.from)
+        assertEquals("Mario", got.fromName)
+        assertEquals("result", got.kind)
+        call("DELETE", "/admin/mail/${got.id}", token = admin)
+        assertTrue(mail("/admin/mail", admin).isEmpty())
+        // Dopo trenta giorni un file non preso sparisce.
+        call("POST", "/mail", """{"kind":"result","text":"{}"}""", mario)
+        now += 31L * 86_400_000L
+        assertTrue(mail("/admin/mail", admin).isEmpty())
     }
 }
 TSM_EOF
@@ -110454,6 +111777,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 352 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 360 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

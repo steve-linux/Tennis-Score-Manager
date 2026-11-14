@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -156,6 +157,9 @@ fun HomeScreen(c: MatchController) {
         onHelp = { c.openHelp(tabHelp(tab)) },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
     ) {
+        // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
+        val inbox by c.inbox.collectAsState()
+        if (inbox.isNotEmpty()) Entry(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint, main = true) { c.openInbox() }
         // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
         if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
         // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
@@ -483,6 +487,8 @@ private fun ProgressTab(c: MatchController) {
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
     ) { c.openProgress() }
+    // La scheda progressi mandata dal proprio allenatore (valutazione, obiettivi, test, lezioni).
+    com.tennis.scoremanager.ui.MyCoachSection(c)
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Le partite riprese: capitoli, highlights e moviola stanno coi propri progressi.
     if (PlayerFeature.VIDEO in pf) Entry(Icons.Filled.VideoLibrary, s.videoLibrary, s.videoLibraryHint) { c.go(Screen.VIDEOS) }

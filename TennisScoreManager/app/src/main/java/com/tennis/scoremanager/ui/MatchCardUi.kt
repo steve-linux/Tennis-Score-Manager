@@ -71,7 +71,19 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
             }
         },
         confirmButton = { if (!busy) TextButton(onClick = { c.prepareCard(card) }) { Text(s.mcPrepare) } },
-        dismissButton = { TextButton(onClick = { c.incomingCard.value = null }) { Text(s.back) } },
+        dismissButton = {
+            androidx.compose.foundation.layout.Row {
+                // La partita convocata nel calendario (giorno, ora, campo).
+                val ctx = androidx.compose.ui.platform.LocalContext.current
+                card.at?.let { at ->
+                    TextButton(onClick = {
+                        val who = card.side1.joinToString(" / ") { it.name } + " – " + card.side2.joinToString(" / ") { it.name }
+                        addToCalendar(ctx, calendarIntent("${card.round.ifBlank { card.event }}: $who", at, 90, listOf(card.club, card.court).filter { it.isNotBlank() }.joinToString(" · "), card.event), s)
+                    }) { Text(s.calShort) }
+                }
+                TextButton(onClick = { c.incomingCard.value = null }) { Text(s.back) }
+            }
+        },
     )
 }
 
@@ -79,7 +91,9 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
  * Manda il risultato della partita della scheda [code] alla segreteria: WhatsApp dritto al suo numero (dalla scheda),
  * o si sceglie a chi se la scheda non ha il numero. Il testo si legge anche senza aprire il file.
  */
-fun sendResult(context: android.content.Context, c: MatchController, code: String) {
+fun sendResult(context: android.content.Context, c: MatchController, code: String) = c.sendResultAuto(code) { sendResultByApp(context, c, code) }
+
+private fun sendResultByApp(context: android.content.Context, c: MatchController, code: String) {
     val (file, text) = c.resultToSend(code) ?: return
     val office = c.receivedCards.value.firstOrNull { it.card.code == code }?.card?.office.orEmpty()
     val wa = com.tennis.scoremanager.data.Notices.waNumber(office)

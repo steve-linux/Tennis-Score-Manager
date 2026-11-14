@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Info
@@ -82,6 +83,12 @@ fun SettingsScreen(c: MatchController) {
         Entry(Icons.Filled.RecordVoiceOver, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
         Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
         Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
+        // I promemoria del telefono: si spengono qui (e con loro il controllo di ogni ora).
+        var reminders by remember { mutableStateOf(c.storage.remindersOn) }
+        com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Alarm, s.rmSetting, s.rmSettingHint, reminders) {
+            reminders = it; c.storage.remindersOn = it
+            com.tennis.scoremanager.service.RemindersJob.schedule(context, it)
+        }
         SectionCard(s.aboutTitle, Icons.Filled.Info) {
             Text("Tennis Score Manager", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(s.aboutVersion(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = TsmColors.Ball, fontWeight = FontWeight.Bold)

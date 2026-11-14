@@ -51,6 +51,8 @@ data class CoachCourse(
     val notes: Map<String, String> = emptyMap(),
     val changedAt: Long = 0,
     val sentAt: Long? = null,
+    /** Arrivata dal server del circolo (il suo indirizzo): le presenze tornano da lì. */
+    val via: String? = null,
 ) {
     /** Il corso con le presenze dell'allenatore sopra quelle della segreteria. */
     val course: Course get() = card.course.copy(

@@ -1343,7 +1343,6 @@ object FrStrings : Strings {
     override val ctGroupsFirst = "Le tableau final se fait une fois les poules terminées."
     override val ctToPlay = "À jouer"
     override val ctPlayed = "Joués"
-    override val ctPlayLive = "Jouer avec le marqueur"
     override val ctWinner = "Vainqueur"
     override val ctScore = "Score (ex. 6-4 3-6 10-8)"
     override val ctWalkoverLong = "Gagné par forfait"
@@ -1903,7 +1902,6 @@ object FrStrings : Strings {
     override val ldVs: (String, String) -> String = { a, b -> "$a défie $b" }
     override val ldBy: (String) -> String = { "à jouer avant le $it" }
     override val ldLate = "En retard : jouez-le ou annulez-le"
-    override val ldPlay = "Jouer avec le marqueur"
     override val ldResult = "Résultat"
     override val ldScore = "Score (côté du challenger)"
     override val ldWinner = "Qui a gagné"
@@ -2560,6 +2558,33 @@ object FrStrings : Strings {
     override val ccDeskReportAll = "Rapport complet (PDF)"
     override val ccDeskSaveAttendance = "Enregistrer les présences"
     override val ccDeskSent = "Les présences s'envoient au secrétariat depuis le téléphone (Mes cours › Envoyer les présences)."
+    override val ccUpload = "Charger un fichier"
+    override val ccUploadHint = "Un fichier reçu sur WhatsApp Web ou par e-mail : résultat du court, présences de l'entraîneur, élève proposé."
+    override val calAdd = "Ajouter à l'agenda"
+    override val calShort = "Agenda"
+    override val calRepeat = "Chaque semaine dans l'agenda"
+    override val calNoApp = "Il n'y a pas d'appli d'agenda sur ce téléphone."
+    override val rmChannel = "Rappels"
+    override val rmSend = "Présences du cours à envoyer"
+    override val rmMatch = "Vous jouez aujourd'hui"
+    override val rmSetting = "Rappels"
+    override val rmSettingHint = "Cours de demain, présences à envoyer, match du jour : notifications sur le téléphone."
+    override val rmTomorrow: (Int) -> String = { if (it == 1) "1 cours demain : prévenez les élèves" else "$it cours demain : prévenez les élèves" }
+    override val pcSend = "Envoyer la fiche de progrès"
+    override val pcTitle = "Fiche de progrès"
+    override val pcHint = "Les progrès que l'entraîneur vous envoie : évaluation, objectifs, tests, classement et prochains cours. Vous les trouvez dans Progrès."
+    override val pcSave = "Enregistrer dans mes progrès"
+    override val pcSection = "De mon entraîneur"
+    override val pcText = "Voici ta fiche de progrès : ouvre-la avec Tennis Score Manager (Partager › TSM) et tu la retrouves dans Progrès."
+    override val pcFrom: (String) -> String = { "de ton entraîneur $it" }
+    override val pcUpdated: (String) -> String = { "mise à jour le $it" }
+    override val pcNext: (String) -> String = { "Prochain cours : $it" }
+    override val pcLessonsLeft: (Int) -> String = { if (it == 1) "Il te reste 1 cours dans le forfait" else "Cours restants dans le forfait : $it" }
+    override val ibHint = "Convocations, fiches et résultats arrivés du serveur du club : touchez pour les ouvrir un par un."
+    override val ibNew = "Nouveau du club"
+    override val ibApplied = "Enregistré depuis le court"
+    override val ibSentServer = "Envoyé au secrétariat par le serveur du club."
+    override val ibTitle: (Int) -> String = { if (it == 1) "Du club : 1 fichier à ouvrir" else "Du club : $it fichiers à ouvrir" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }

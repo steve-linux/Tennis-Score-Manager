@@ -56,6 +56,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.StudentProposal
 import com.tennis.scoremanager.ui.screens.shortDate
 import java.io.File
+import kotlinx.coroutines.launch
 
 /** Un file alla segreteria: WhatsApp dritto al suo numero se lo si sa (dalla scheda corso), sennò si sceglie a chi. */
 fun sendToOffice(context: Context, file: File, text: String, office: String): Boolean {
@@ -107,16 +108,26 @@ fun CoachCourseScreen(c: MatchController) {
     var open by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
     var register by remember { mutableStateOf(false) }
+    var calendar by remember { mutableStateOf(false) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, cc.card.club.ifBlank { null }, "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
         icon = Icons.Filled.School,
-        action = { TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) } },
+        action = {
+            Row {
+                TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
+                TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
+            }
+        },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
-                c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) }
+                val byApp = { c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) } }
+                // Corso arrivato dal server del circolo: le presenze tornano da lì; se non risponde, su WhatsApp.
+                if (cc.via != null) scope.launch { if (c.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
+                else byApp()
             }, Modifier.weight(1f))
         },
     ) {
@@ -163,6 +174,24 @@ fun CoachCourseScreen(c: MatchController) {
         }
     }
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
+    // Le lezioni del corso nel calendario: un evento che si ripete ogni settimana per ogni orario, fino alla fine.
+    if (calendar) AlertDialog(
+        onDismissRequest = { calendar = false },
+        title = { Text(s.calRepeat) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val now = System.currentTimeMillis()
+                for (slot in co.slots) {
+                    val first = Courses.lessons(co).firstOrNull { it.start > now && CourtPlans.weekday(it.start) == slot.weekday && it.court == slot.court } ?: continue
+                    GhostButton(java.text.SimpleDateFormat("EEEE HH:mm", lang.locale).format(java.util.Date(first.start)) + (slot.court.ifBlank { null }?.let { " · $it" } ?: ""),
+                        Icons.Filled.School, {
+                            addToCalendar(context, calendarIntent(co.name, first.start, slot.minutes, listOf(cc.card.club, slot.court).filter { it.isNotBlank() }.joinToString(" · "), weeklyUntil = co.to), s)
+                        }, Modifier.fillMaxWidth())
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { calendar = false }) { Text(s.back) } },
+    )
     if (register) {
         val file = remember { c.registerFile(co.id, coachSide = true) }
         PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = true) }) { register = false }
@@ -300,6 +329,7 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
     val context = LocalContext.current
     var level by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.ccPropose) },
@@ -313,7 +343,10 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
         },
         confirmButton = {
             TextButton(onClick = {
-                c.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) }
+                val byApp = { c.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) } }
+                // Con il server del circolo dei suoi corsi la proposta va da lì; se non risponde, su WhatsApp.
+                if (c.coachVia() != null) scope.launch { if (c.sendProposalServer(st, level, note)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
+                else byApp()
                 onDone()
             }) { Text(s.ccPropose) }
         },

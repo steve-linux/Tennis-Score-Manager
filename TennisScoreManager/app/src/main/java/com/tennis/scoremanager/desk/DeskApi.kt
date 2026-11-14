@@ -112,6 +112,18 @@ interface DeskData {
     fun deleteTeam(t: Team)
     /** Apre sul telefono l'avviso dell'incontro: disponibilità (a tutti o a chi non ha risposto), convocazione, risultato. */
     fun teamNotice(t: Team, f: Fixture, kind: String)
+    /** Apre sul telefono la convocazione con la scheda partita: di una partita del tabellone, di una partita dell'incontro. */
+    fun convokeMatch(t: ClubTournament, matchId: String) {}
+    fun convokeRubber(t: Team, f: Fixture, index: Int) {}
+    /** Apre sul telefono l'invio della scheda corso all'allenatore. */
+    fun sendCourseToCoach(c: Course) {}
+    /** Il registro presenze del corso, in PDF o in Excel (fatto dal telefono). */
+    fun registerPdf(c: Course): ByteArray? = null
+    fun registerXlsx(c: Course): ByteArray? = null
+    /** Un file ricevuto (risultato dal campo, presenze dell'allenatore, allievo proposto): cos'è e se si può registrare. */
+    fun incomingFile(text: String): DeskIncoming? = null
+    /** Lo registra come farebbe il telefono; null se fatto, sennò il codice dell'errore. */
+    fun applyIncoming(text: String, course: String?): String? = "NOT_FOUND"
     /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
     fun setClubName(name: String)
     fun saveCourtSettings(st: CourtSettings)
@@ -175,6 +187,14 @@ interface DeskData {
 @Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
 /** Il QR da disegnare: una stringa di 0 e 1 per riga. */
 @Serializable data class DeskQrOut(val id: String, val rows: List<String>)
+/** Un file ricevuto, letto: cosa è ([kind]), le righe da mostrare, com'è rispetto ai dati e se si può registrare. */
+@Serializable data class DeskIncoming(
+    val kind: String, val title: String, val lines: List<String>, val status: String, val canApply: Boolean,
+    val replace: Boolean = false, val courses: List<DeskIdName> = emptyList(), val course: String? = null,
+)
+@Serializable data class DeskIdName(val id: String, val name: String)
+@Serializable data class DeskFileIn(val text: String = "", val course: String? = null)
+@Serializable data class DeskIndexIn(val index: Int = 0)
 @Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
 @Serializable data class DeskTodayLine(val text: String, val startMin: Int? = null, val court: String = "", val date: String? = null, val cup: String? = null)
@@ -428,6 +448,12 @@ class DeskApi(
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
+                m == "POST" && p == listOf("files", "check") -> ok(DeskIncoming.serializer(), data.incomingFile(read(DeskFileIn.serializer(), r).text) ?: throw Fail(400, "NOT_A_FILE"))
+                m == "POST" && p == listOf("files", "apply") -> {
+                    val i = read(DeskFileIn.serializer(), r)
+                    data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
+                    done()
+                }
                 m == "GET" && p == listOf("people") -> people()
                 m == "POST" && p == listOf("people") -> savePerson(read(DeskPerson.serializer(), r), null)
                 m == "PUT" && p.size == 2 && p[0] == "people" -> savePerson(read(DeskPerson.serializer(), r), p[1])
@@ -1113,6 +1139,12 @@ class DeskApi(
             withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
                 else Teams.setRubber(withPlayers, i.index, score, i.won, walkover = i.walkover))
         }
+        m == "POST" && rest == listOf("rubber-notice") -> {
+            val i = read(DeskIndexIn.serializer(), r).index
+            val ru = f.rubbers.getOrNull(i) ?: throw Fail(404, "NOT_FOUND")
+            if (ru.ours.size != (if (ru.doubles) 2 else 1) || ru.won != null) throw Fail(409, "NOT_READY")
+            data.convokeRubber(t, f, i); done()
+        }
         m == "POST" && rest == listOf("notice") -> {
             val kind = read(DeskNoticeIn.serializer(), r).kind
             if (kind !in setOf("AVAILABILITY", "MISSING", "CALLUP", "RESULT")) throw Fail(400, "BAD_REQUEST")
@@ -1160,6 +1192,9 @@ class DeskApi(
         val rest = p.drop(1)
         return when {
             m == "PUT" && rest.isEmpty() -> saveCourse(c, read(DeskCourseIn.serializer(), r))
+            m == "POST" && rest == listOf("send-coach") -> { if (c.coach == null) throw Fail(409, "NO_COACH"); data.sendCourseToCoach(c); done() }
+            m == "GET" && rest == listOf("register.pdf") -> Resp(200, data.registerPdf(c) ?: throw Fail(404, "NOT_FOUND"), "application/pdf")
+            m == "GET" && rest == listOf("register.xlsx") -> Resp(200, data.registerXlsx(c) ?: throw Fail(404, "NOT_FOUND"), com.tennis.scoremanager.data.Xlsx.MIME)
             m == "DELETE" && rest.isEmpty() -> { data.deleteCourse(c); done() }
             m == "POST" && rest == listOf("students") -> {
                 val people = data.players()
@@ -1286,6 +1321,11 @@ class DeskApi(
             }
             m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "result" -> result(t, rest[1], read(DeskResultIn.serializer(), r))
             m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "schedule" -> schedule(t, rest[1], read(DeskScheduleIn.serializer(), r))
+            m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "convoke" -> {
+                val mt = t.matches.firstOrNull { it.id == rest[1] } ?: throw Fail(404, "NOT_FOUND")
+                if (mt.played || mt.a == null || mt.b == null) throw Fail(409, "NOT_READY")
+                data.convokeMatch(t, mt.id); done()
+            }
             else -> throw Fail(404, "NOT_FOUND")
         }
     }

@@ -106,7 +106,13 @@ data class ReceivedCard(
     val receivedAt: Long = 0,
     val result: MatchResult? = null,
     val sentAt: Long? = null,
+    /** Arrivata dal server del circolo (il suo indirizzo): il risultato torna da lì, da solo. */
+    val via: String? = null,
 )
+
+/** Un file arrivato dalla casella del server del circolo, da aprire (una scheda, un risultato da controllare…). */
+@Serializable
+data class InboxItem(val id: String, val kind: String, val text: String, val from: String = "", val via: String = "", val at: Long = 0)
 
 /** Com'è un risultato arrivato rispetto a quello che c'è nel telefono della segreteria. */
 enum class ResultStatus { READY, SAME, CONFLICT, BAD_CODE, NOT_FOUND }
