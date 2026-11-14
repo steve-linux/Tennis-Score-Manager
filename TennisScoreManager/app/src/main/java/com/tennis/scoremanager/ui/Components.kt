@@ -164,6 +164,8 @@ fun AppRoot(c: MatchController) {
         // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
         val card by c.incomingCard.collectAsState()
         card?.let { IncomingCardDialog(c, it) }
+        val result by c.incomingResult.collectAsState()
+        result?.let { IncomingResultDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }

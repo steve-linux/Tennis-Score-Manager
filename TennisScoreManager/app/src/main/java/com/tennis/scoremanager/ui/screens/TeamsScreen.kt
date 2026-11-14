@@ -291,6 +291,14 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                 if (r.doubles) OutlinedTextField(theirs2, { theirs2 = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmTheirs2) })
                 // Formazione pronta: il punteggio dal campo si tiene nel ruolo Tu (Gioca › Partite del circolo).
                 if (r.ours.size == need && r.won == null) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Convoca i nostri di questa partita con la scheda partita (la formazione si salva prima).
+                if (r.ours.size == need && r.won == null) GhostButton(s.ctConvoke, Icons.Filled.HowToReg, {
+                    val x = current()
+                    c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
+                    onDone()
+                    val tt = c.team(t.id) ?: t
+                    c.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
+                }, Modifier.fillMaxWidth())
                 OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
                 Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it], walkover = false) })

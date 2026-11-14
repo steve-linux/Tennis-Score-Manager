@@ -2494,6 +2494,21 @@ interface Strings {
     val onbRestoreHint: String
     val dataWipeCopies: String
     val dataWipeCopiesHint: String
+    val mrTitle: String
+    val mrFilePrefix: String
+    val mrSend: String
+    val mrSendAgain: String
+    val mrReady: String
+    val mrSame: String
+    val mrBadCode: String
+    val mrNotFound: String
+    val mrApply: String
+    val mrReplace: String
+    val mrApplied: String
+    val mcNoOffice: String
+    val mrWinner: (String) -> String
+    val mrPending: (String) -> String
+    val mrConflict: (String) -> String
 }
 
 object ItStrings : Strings {
@@ -4908,6 +4923,21 @@ object ItStrings : Strings {
     override val onbRestoreHint = "Le copie automatiche restano in Documenti › Tennis Score Manager › Backup anche se disinstalli l'app: scegli la più recente."
     override val dataWipeCopies = "Anche le copie automatiche"
     override val dataWipeCopiesHint = "Le copie in Documenti › Tennis Score Manager › Backup restano anche se disinstalli l'app: accendi per toglierle."
+    override val mrTitle = "Risultato dal campo"
+    override val mrFilePrefix = "Risultato"
+    override val mrSend = "Manda il risultato alla segreteria"
+    override val mrSendAgain = "Rimanda il risultato alla segreteria"
+    override val mrReady = "È la partita convocata: registrandolo, il tabellone si aggiorna."
+    override val mrSame = "Questo risultato è già registrato."
+    override val mrBadCode = "Il codice non è quello della scheda mandata per questa partita: il risultato non si registra."
+    override val mrNotFound = "La partita non c'è più (cancellata o annullata) in questo telefono."
+    override val mrApply = "Registra"
+    override val mrReplace = "Sostituisci"
+    override val mrApplied = "Risultato registrato"
+    override val mcNoOffice = "Manca il telefono della segreteria (Altro › Il circolo): senza, chi gioca dovrà scegliere a chi mandare il risultato."
+    override val mrWinner: (String) -> String = { "Vince $it" }
+    override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
+    override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
 }
 
 object EnStrings : Strings {
@@ -7323,6 +7353,21 @@ object EnStrings : Strings {
     override val onbRestoreHint = "The automatic copies stay in Documents › Tennis Score Manager › Backup even if you uninstall the app: pick the latest one."
     override val dataWipeCopies = "The automatic copies too"
     override val dataWipeCopiesHint = "The copies in Documents › Tennis Score Manager › Backup stay even if you uninstall the app: turn on to remove them."
+    override val mrTitle = "Result from the court"
+    override val mrFilePrefix = "Result"
+    override val mrSend = "Send the result to the club office"
+    override val mrSendAgain = "Send the result again"
+    override val mrReady = "It is the match that was called up: recording it updates the draw."
+    override val mrSame = "This result is already recorded."
+    override val mrBadCode = "The code is not the one of the card sent for this match: the result is not recorded."
+    override val mrNotFound = "The match is no longer on this phone (deleted or cancelled)."
+    override val mrApply = "Record"
+    override val mrReplace = "Replace"
+    override val mrApplied = "Result recorded"
+    override val mcNoOffice = "The club office phone is missing (More › The club): without it, players will have to choose who to send the result to."
+    override val mrWinner: (String) -> String = { "Winner: $it" }
+    override val mrPending: (String) -> String = { "Result to send: $it" }
+    override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

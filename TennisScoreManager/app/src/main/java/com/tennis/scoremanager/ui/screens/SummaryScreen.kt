@@ -243,6 +243,8 @@ fun SummaryScreen(c: MatchController) {
             Modifier.fillMaxWidth().background(TsmColors.Surface).padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Partita di una scheda della segreteria: il risultato da rimandarle.
+            com.tennis.scoremanager.ui.SendResultButton(c, rec.id)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, { shareChoice = true }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)

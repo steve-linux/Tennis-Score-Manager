@@ -2422,4 +2422,19 @@ object DeStrings : Strings {
     override val onbRestoreHint = "Die automatischen Kopien bleiben in Dokumente › Tennis Score Manager › Backup, auch wenn du die App deinstallierst: wähle die neueste."
     override val dataWipeCopies = "Auch die automatischen Kopien"
     override val dataWipeCopiesHint = "Die Kopien in Dokumente › Tennis Score Manager › Backup bleiben auch nach dem Deinstallieren: einschalten, um sie zu löschen."
+    override val mrTitle = "Ergebnis vom Platz"
+    override val mrFilePrefix = "Ergebnis"
+    override val mrSend = "Ergebnis ans Büro schicken"
+    override val mrSendAgain = "Ergebnis erneut schicken"
+    override val mrReady = "Es ist das eingeladene Match: beim Speichern wird das Tableau aktualisiert."
+    override val mrSame = "Dieses Ergebnis ist schon gespeichert."
+    override val mrBadCode = "Der Code passt nicht zur Matchkarte dieses Matches: das Ergebnis wird nicht gespeichert."
+    override val mrNotFound = "Das Match ist auf diesem Telefon nicht mehr vorhanden (gelöscht oder abgesagt)."
+    override val mrApply = "Speichern"
+    override val mrReplace = "Ersetzen"
+    override val mrApplied = "Ergebnis gespeichert"
+    override val mcNoOffice = "Das Telefon des Büros fehlt (Mehr › Der Verein): ohne es müssen die Spieler selbst wählen, an wen sie das Ergebnis schicken."
+    override val mrWinner: (String) -> String = { "Sieger: $it" }
+    override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
+    override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
 }

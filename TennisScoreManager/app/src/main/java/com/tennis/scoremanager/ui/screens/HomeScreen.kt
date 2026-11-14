@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
@@ -371,6 +372,14 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     var clubMatches by remember { mutableStateOf(false) }
     if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
     if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
+    // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
+    val cards by c.receivedCards.collectAsState()
+    for (rc in cards.filter { it.result != null && it.sentAt == null }) {
+        val r = rc.result!!
+        Entry(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ")) {
+            com.tennis.scoremanager.ui.sendResult(context, c, rc.card.code)
+        }
+    }
     history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
         val su = last.record.setup
         if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {

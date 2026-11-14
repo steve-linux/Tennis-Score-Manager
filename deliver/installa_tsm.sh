@@ -8630,7 +8630,7 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
   - **Tableau bearbeiten** (Reiter *Tableau*, auch am PC): Tippe nach der Auslosung auf einen Spieler oder ein *Freilos*, dann auf den anderen Platz, und beide tauschen; in Gruppen tauschen zwei Teilnehmer. Wer sich nach der Auslosung anmeldet, bleibt draußen, bis du ihn bei gewähltem Platz dort einsetzt: Wer ausscheidet, bleibt gemeldet, aber außerhalb des Tableaus. Ändern lässt sich nur, was kein Ergebnis hat, und die Gruppen stehen fest, sobald das Endtableau existiert. Bei FITP-Turnieren nur ändern, wenn der Oberschiedsrichter es erlaubt: Die Zahl der Änderungen bleibt vermerkt.
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Das Büro führt keine Spielstände: auf dem Platz wechselt man in die Rolle **Du**, wo *Spielen › Vereinsmatches* Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt öffnet; am Ende kommt das Ergebnis von selbst ins Tableau. Ein Match hier antippen: das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
-- **Mit der Matchkarte einladen** (ohne Server): ein Match antippen, **Einladen** schickt jedem Spieler per WhatsApp (oder E-Mail) Tag, Uhrzeit und Platz mit einer kleinen angehängten Datei, der *Matchkarte* (z. B. `Finale Rossi - Bianchi.tsm`); *Mitteilungen an die Teilnehmer › Nächstes Match* macht dasselbe. Wer zählt, öffnet sie mit **Teilen › TSM**: das Match erscheint und **Match vorbereiten** öffnet Neues Match mit Spielern (in seiner Liste gefunden oder angelegt), Ranglisten, Turnier, Runde, Platz und Regeln schon eingetragen. Die Regeln legt man unter **Bearbeiten** des Turniers fest (*Spielregeln*: auf dem Platz wählen, 3 Sätze, 2 Sätze + Match-Tiebreak, Pro-Satz; Spiele pro Satz und No-Ad); das **Telefon des Büros** unter *Mehr › Der Verein* kommt in die Karte, um das Ergebnis zurückzuschicken.
+- **Mit der Matchkarte einladen** (ohne Server): ein Match antippen, **Einladen** schickt jedem Spieler per WhatsApp (oder E-Mail) Tag, Uhrzeit und Platz mit einer kleinen angehängten Datei, der *Matchkarte* (z. B. `Finale Rossi - Bianchi.tsm`); *Mitteilungen an die Teilnehmer › Nächstes Match* macht dasselbe. Wer zählt, öffnet sie mit **Teilen › TSM**: das Match erscheint und **Match vorbereiten** öffnet Neues Match mit Spielern (in seiner Liste gefunden oder angelegt), Ranglisten, Turnier, Runde, Platz und Regeln schon eingetragen. Die Regeln legt man unter **Bearbeiten** des Turniers fest (*Spielregeln*: auf dem Platz wählen, 3 Sätze, 2 Sätze + Match-Tiebreak, Pro-Satz; Spiele pro Satz und No-Ad); das **Telefon des Büros** unter *Mehr › Der Verein* kommt in die Karte, um das Ergebnis zurückzuschicken. **Das Ergebnis kommt zurück**: am Ende bietet die Zusammenfassung **Ergebnis ans Büro schicken** (WhatsApp direkt an das Telefon des Büros, mit einer Datei und dem geschriebenen Ergebnis); schickst du es nicht gleich, bleibt es unter *Spielen*, bis du es tust. Das Büro öffnet es mit **Teilen › TSM**: die App prüft, dass es das eingeladene Match ist (der Code der Karte), und **Speichern** aktualisiert das Tableau; ist es schon gespeichert, sagt sie es, gibt es ein anderes Ergebnis, fragt sie, ob es ersetzt werden soll.
 
 - **Auf der TV-Anzeigetafel**: Bei eingeschalteter TV-Anzeigetafel (*Geräte*) legt **Auf der TV-Anzeigetafel zeigen** im Turnier das Turnier über den Spielstand, in Seiten, die alle 15 Sekunden wechseln: **Tableau** (Sieger gelb), **Gruppen** mit Tabelle (wer weiterkommt, hervorgehoben) und **Spielplan** von heute (oder die nächsten angesetzten Matches) mit Platz, Uhrzeit und Ergebnis. Jedes Ergebnis, auch vom Zähler, erscheint sofort. **Von der TV-Anzeigetafel nehmen** zeigt wieder den Spielstand.
 
@@ -8672,7 +8672,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Neue Begegnung**: Gegner, Tag und Uhrzeit, Heim oder auswärts, Spielort, **Treffpunkt**, Notizen. Bei Heimspielen lassen sich **Plätze reservieren** für ein paar Stunden: in der Belegung werden sie nicht buchbar.
 - **Verfügbarkeit**: *Alle nach Verfügbarkeit fragen* schickt die Nachricht (Antwort JA, NEIN oder VIELLEICHT); die Antworten trägt man mit einem Tipp ein, und *Wer nicht geantwortet hat* erinnert nur diese.
 - **Aufgestellt**: zuerst wer ja gesagt hat, dann die Vielleicht; rot, wer an dem Tag nicht in Ordnung ist. **Aufstellung senden** schreibt jedem Tag, Uhrzeit, Ort und Treffpunkt und bereitet für die Gruppe die Liste vor.
-- **Spiele**: für jedes Einzel und Doppel unsere Spieler (aus den Aufgestellten) und ihre, dann das Ergebnis (aus unserer Sicht: die App erkennt den Sieger); um den Spielstand auf dem Platz zu führen, in der Rolle **Du** *Spielen › Vereinsmatches*, und am Ende kommt das Ergebnis von selbst zurück. Oben das Ergebnis der Begegnung (z. B. *4-2 gewonnen*); **Ergebnis senden** bereitet es Spiel für Spiel vor.
+- **Spiele**: für jedes Einzel und Doppel unsere Spieler (aus den Aufgestellten) und ihre, dann das Ergebnis (aus unserer Sicht: die App erkennt den Sieger); um den Spielstand auf dem Platz zu führen, in der Rolle **Du** *Spielen › Vereinsmatches*, und am Ende kommt das Ergebnis von selbst zurück. Oben das Ergebnis der Begegnung (z. B. *4-2 gewonnen*); **Ergebnis senden** bereitet es Spiel für Spiel vor. Ein Spiel mit fertiger Aufstellung antippen: **Einladen** schickt unseren Spielern die Matchkarte, und das Ergebnis kommt wie bei Turnieren zurück.
 
 ### 7.18 Vereinsserver für Buchungen (optional, app 2.6)
 
@@ -8720,7 +8720,7 @@ Mit der Rolle **Verein**, unter **Turniere › Forderungsrangliste**.
 
 - **Neue Rangliste** (gern mehrere: Herren, Damen, Jugend…), dann **Spieler hinzufügen**: Der erste ist die Nummer 1; **Rangliste ordnen** verschiebt sie von Hand oder nimmt sie heraus.
 - **Neue Forderung**: Zuerst wählt man, wer fordert, dann, wer gefordert wird, höchstens *N* Plätze höher (**Regeln**: wie viele Plätze, meist 3, und in wie vielen Tagen gespielt werden muss, meist 14). Jeder hat nur eine offene Forderung. **Benachrichtigen** schickt beiden, wer wen bis wann fordert.
-- **Mit dem Zähler**: in der Rolle **Du**, *Spielen › Vereinsmatches*; der Fordernde ist Spieler 1 und am Ende kommt das Ergebnis von selbst zurück. Oder **Ergebnis** von Hand (aus Sicht des Fordernden: Die App erkennt, wer gewonnen hat).
+- **Mit dem Zähler**: in der Rolle **Du**, *Spielen › Vereinsmatches*; der Fordernde ist Spieler 1 und am Ende kommt das Ergebnis von selbst zurück. Oder **Ergebnis** von Hand (aus Sicht des Fordernden: Die App erkennt, wer gewonnen hat). **Benachrichtigen** schickt den beiden auch die Matchkarte: wer zählt, öffnet sie mit TSM und das Ergebnis kommt wie bei Turnieren ans Büro zurück.
 - **Gewinnt der Fordernde, übernimmt er den Platz** des Geforderten, und wer dazwischen stand, rückt einen Platz nach unten; gewinnt der Geforderte, ändert sich nichts. **Gespielte Forderungen** zeigt den Verlauf mit den Plätzen vorher und nachher.
 
 ### 7.20 Büro am PC
@@ -9227,7 +9227,7 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
   - **Edit draw sheet** (*Draw sheet* tab, also from a PC): after the draw, tap a player or a *bye*, then the other place, and the two swap; in groups, two entries swap. Anyone entering after the draw stays out until, with a place selected, you put them in it: whoever leaves stays entered but out of the draw sheet. Only what has no results can change, and groups freeze once the final draw sheet exists. In FITP tournaments, edit only if the referee allows it: the number of edits stays recorded.
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - The club office does not keep scores: on court switch to the **You** role, where *Play › Club matches* opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Tapping a match here: enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
-- **Call up with the match card** (no server needed): tapping a match, **Call up** sends each player on WhatsApp (or by email) day, time and court with a small file attached, the *match card* (e.g. `Final Rossi - Bianchi.tsm`); *Notices to participants › Next match* does the same. Whoever keeps the score opens it with **Share › TSM**: the match appears and **Prepare the match** opens New match with players (found or created in their list), rankings, tournament, round, court and rules already filled in. The rules are set in the tournament's **Edit** (*Match rules*: chosen on court, 3 sets, 2 sets + match tie-break, pro set; games per set and No-Ad); the **club office phone** in *More › The club* goes into the card, to send the result back.
+- **Call up with the match card** (no server needed): tapping a match, **Call up** sends each player on WhatsApp (or by email) day, time and court with a small file attached, the *match card* (e.g. `Final Rossi - Bianchi.tsm`); *Notices to participants › Next match* does the same. Whoever keeps the score opens it with **Share › TSM**: the match appears and **Prepare the match** opens New match with players (found or created in their list), rankings, tournament, round, court and rules already filled in. The rules are set in the tournament's **Edit** (*Match rules*: chosen on court, 3 sets, 2 sets + match tie-break, pro set; games per set and No-Ad); the **club office phone** in *More › The club* goes into the card, to send the result back. **The result comes back**: at the end the summary has **Send the result to the club office** (WhatsApp straight to the office phone, with a file and the written score); if you don't send it right away, it stays in *Play* until you do. The office opens it with **Share › TSM**: the app checks it is the match that was called up (the card's code) and **Record** updates the draw; if it is already recorded it says so, if there is a different result it asks whether to replace it.
 
 - **On the TV scoreboard**: with the TV scoreboard on (*Devices*), **Show on the TV scoreboard** in the tournament covers the score with the tournament, in pages that alternate every 15 seconds: **draw** (winners in yellow), **groups** with their standings (those going through highlighted) and today's **order of play** (or the next scheduled matches), with court, time and results. Every result, including those from the scorer, shows at once. **Remove from the TV scoreboard** goes back to the score.
 
@@ -9269,7 +9269,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **New fixture**: opponent, day and time, home or away, where it's played, **meeting point**, notes. At home you can **hold courts** for some hours: they become not bookable in the planner.
 - **Availability**: *Ask everyone's availability* sends the message (they reply YES, NO or MAYBE); you mark answers with a tap, and *Ask those who haven't replied* reminds only them.
 - **Called up**: first those who said yes, then the maybes; in red whoever isn't in order that day. **Send the call-up** writes to each player day, time, place and meeting point, and prepares the call-up list for the group.
-- **Rubbers**: for each singles and doubles our players (from those called up) and theirs, then the score (from our side: the app works out who won); to keep the score on court, in the **You** role *Play › Club matches*, and when it ends the result comes back by itself. At the top the fixture result (e.g. *4-2 won*); **Send the result** prepares it rubber by rubber.
+- **Rubbers**: for each singles and doubles our players (from those called up) and theirs, then the score (from our side: the app works out who won); to keep the score on court, in the **You** role *Play › Club matches*, and when it ends the result comes back by itself. At the top the fixture result (e.g. *4-2 won*); **Send the result** prepares it rubber by rubber. Tapping a rubber with the line-up set, **Call up** sends our players the match card, and the result comes back as in tournaments.
 
 ### 7.18 Club server for bookings (optional, app 2.6)
 
@@ -9317,7 +9317,7 @@ With the **Club** role, in **Tournaments › Challenge ladder**.
 
 - **New ladder** (more than one if you like: men, women, juniors…), then **Add players**: the first one added is number 1; **Arrange the ranking** moves them by hand or removes them.
 - **New challenge**: choose who challenges and then who is challenged, at most *N* places above (**Rules**: how many places, usually 3, and within how many days it must be played, usually 14). Everyone has one open challenge at a time. **Notify** tells both who challenges whom and by when.
-- **With the scorer**: in the **You** role, *Play › Club matches*; the challenger is Player 1 and at the end the result comes back by itself. Or **Result** by hand (the score from the challenger's side: the app works out who won).
+- **With the scorer**: in the **You** role, *Play › Club matches*; the challenger is Player 1 and at the end the result comes back by itself. Or **Result** by hand (the score from the challenger's side: the app works out who won). **Notify** also sends the two players the match card: whoever keeps the score opens it with TSM and the result comes back to the office as in tournaments.
 - If the **challenger wins they take the place** of the challenged player and those in between move down one; if the challenged player wins nothing changes. **Challenges played** keeps the history, with the places before and after.
 
 ### 7.20 Office from PC
@@ -9823,7 +9823,7 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
   - **Modificar el cuadro** (pestaña *Cuadro*, también desde el PC): tras el sorteo toca un jugador o un *bye*, luego el otro puesto, y se intercambian; en los grupos se intercambian dos inscritos. Quien se inscribe después del sorteo queda fuera hasta que, elegido un puesto, lo pones en él: quien sale sigue inscrito pero fuera del cuadro. Solo cambia lo que no tiene resultados, y los grupos se fijan cuando existe el cuadro final. En los torneos FITP, modifica solo si lo permite el juez árbitro: el número de cambios queda anotado.
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - La secretaría no lleva marcadores: en la pista se pasa al rol **Tú**, donde *Jugar › Partidos del club* abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. Tocando un partido aquí: el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
-- **Convocar con la ficha de partido** (sin servidor): tocando un partido, **Convocar** envía a cada jugador por WhatsApp (o por correo) día, hora y pista con un pequeño archivo adjunto, la *ficha de partido* (p. ej. `Final Rossi - Bianchi.tsm`); *Avisos a los participantes › Próximo partido* hace lo mismo. Quien lleva el marcador la abre con **Compartir › TSM**: aparece el partido y **Preparar el partido** abre Nuevo partido con jugadores (encontrados o creados en su lista), clasificaciones, torneo, ronda, pista y reglas ya escritos. Las reglas se fijan en **Editar** del torneo (*Reglas de los partidos*: a elegir en la pista, 3 sets, 2 sets + super tie-break, pro set; juegos por set y No-Ad); el **teléfono de la secretaría** en *Más › El club* va en la ficha, para devolver el resultado.
+- **Convocar con la ficha de partido** (sin servidor): tocando un partido, **Convocar** envía a cada jugador por WhatsApp (o por correo) día, hora y pista con un pequeño archivo adjunto, la *ficha de partido* (p. ej. `Final Rossi - Bianchi.tsm`); *Avisos a los participantes › Próximo partido* hace lo mismo. Quien lleva el marcador la abre con **Compartir › TSM**: aparece el partido y **Preparar el partido** abre Nuevo partido con jugadores (encontrados o creados en su lista), clasificaciones, torneo, ronda, pista y reglas ya escritos. Las reglas se fijan en **Editar** del torneo (*Reglas de los partidos*: a elegir en la pista, 3 sets, 2 sets + super tie-break, pro set; juegos por set y No-Ad); el **teléfono de la secretaría** en *Más › El club* va en la ficha, para devolver el resultado. **El resultado vuelve**: al final el resumen tiene **Enviar el resultado a la secretaría** (WhatsApp directo al teléfono de la secretaría, con un archivo y el resultado escrito); si no lo envías enseguida, se queda en *Jugar* hasta que lo hagas. La secretaría lo abre con **Compartir › TSM**: la app comprueba que es el partido convocado (el código de la ficha) y **Registrar** actualiza el cuadro; si ya está registrado lo dice, si hay otro resultado pregunta si sustituirlo.
 
 - **En el marcador de la TV**: con el marcador de la TV encendido (*Dispositivos*), **Mostrar en el marcador de la TV** en el torneo cubre el marcador con el torneo, en páginas que se alternan cada 15 segundos: **cuadro** (ganadores en amarillo), **grupos** con su clasificación (destacados quienes pasan) y **orden de juego** de hoy (o los próximos partidos programados), con pista, hora y resultados. Cada resultado, también el del marcador, se ve al momento. **Quitar del marcador de la TV** vuelve al marcador.
 
@@ -9865,7 +9865,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Nuevo encuentro**: rival, día y hora, en casa o fuera, dónde se juega, **punto de encuentro**, notas. En casa se pueden **reservar pistas** unas horas: en el planning pasan a no reservables.
 - **Disponibilidad**: *Pedir disponibilidad a todos* envía el mensaje (responden SÍ, NO o QUIZÁ); las respuestas se marcan con un toque, y *Pedir a quien no ha respondido* insiste solo con ellos.
 - **Convocados**: primero quien dijo sí, luego los quizá; en rojo quien no está en regla ese día. **Enviar la convocatoria** escribe a cada uno día, hora, lugar y punto de encuentro, y prepara para el grupo la lista de convocados.
-- **Partidos**: para cada individual y doble los nuestros (de los convocados) y los suyos, luego el resultado (desde nuestro lado: la app sabe quién ganó); para llevar el marcador en la pista, en el rol **Tú** *Jugar › Partidos del club*, y al terminar el resultado vuelve solo. Arriba el resultado del encuentro (p. ej. *4-2 ganado*); **Enviar el resultado** lo prepara partido por partido.
+- **Partidos**: para cada individual y doble los nuestros (de los convocados) y los suyos, luego el resultado (desde nuestro lado: la app sabe quién ganó); para llevar el marcador en la pista, en el rol **Tú** *Jugar › Partidos del club*, y al terminar el resultado vuelve solo. Arriba el resultado del encuentro (p. ej. *4-2 ganado*); **Enviar el resultado** lo prepara partido por partido. Tocando un partido con la alineación hecha, **Convocar** envía a los nuestros la ficha de partido, y el resultado vuelve como en los torneos.
 
 ### 7.18 Servidor del club para las reservas (opcional, app 2.6)
 
@@ -9913,7 +9913,7 @@ Con el rol **Club**, en **Torneos › Clasificación por desafíos**.
 
 - **Nueva clasificación** (más de una si quieres: masculina, femenina, juveniles…), luego **Añadir jugadores**: el primero es el número 1; **Ordenar la clasificación** los mueve a mano o los quita.
 - **Nuevo desafío**: se elige quién desafía y luego a quién, como mucho *N* puestos más arriba (**Reglas**: cuántos puestos, normalmente 3, y en cuántos días hay que jugarlo, normalmente 14). Cada uno tiene un solo desafío abierto. **Avisar** manda a los dos quién desafía a quién y antes de cuándo.
-- **Con el marcador**: en el rol **Tú**, *Jugar › Partidos del club*; el retador es el Jugador 1 y al terminar el resultado vuelve solo. O **Resultado** a mano (desde el lado del retador: la app sabe quién ganó).
+- **Con el marcador**: en el rol **Tú**, *Jugar › Partidos del club*; el retador es el Jugador 1 y al terminar el resultado vuelve solo. O **Resultado** a mano (desde el lado del retador: la app sabe quién ganó). **Avisar** envía también a los dos la ficha de partido: quien lleva el marcador la abre con TSM y el resultado vuelve a la secretaría como en los torneos.
 - Si **gana el retador ocupa el puesto** del desafiado y los de en medio bajan uno; si gana el desafiado no cambia nada. **Desafíos jugados** guarda el historial, con los puestos de antes y después.
 
 ### 7.20 Secretaría desde el PC
@@ -10419,7 +10419,7 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
   - **Modifier le tableau** (onglet *Tableau*, aussi depuis le PC) : après le tirage, touchez un joueur ou un *exempt*, puis l'autre place, et ils s'échangent ; dans les poules, deux inscrits s'échangent. Qui s'inscrit après le tirage reste dehors jusqu'à ce que, une place choisie, vous le mettiez à cette place : celui qui sort reste inscrit mais hors du tableau. Seul ce qui n'a pas de résultat peut changer, et les poules se figent dès que le tableau final existe. Dans les tournois FITP, modifiez seulement si le juge-arbitre l'autorise : le nombre de modifications reste noté.
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - Le secrétariat ne tient pas les scores : sur le court on passe au rôle **Vous**, où *Jouer › Matchs du club* ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. En touchant un match ici : le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
-- **Convoquer avec la fiche de match** (sans serveur) : en touchant un match, **Convoquer** envoie à chaque joueur sur WhatsApp (ou par e-mail) jour, heure et court avec en pièce jointe un petit fichier, la *fiche de match* (ex. `Finale Rossi - Bianchi.tsm`) ; *Avis aux participants › Prochain match* fait de même. Celui qui tient le score l'ouvre avec **Partager › TSM** : le match apparaît et **Préparer le match** ouvre Nouveau match avec joueurs (trouvés ou créés dans sa liste), classements, tournoi, tour, court et règles déjà remplis. Les règles se fixent dans **Modifier** du tournoi (*Règles des matchs* : au choix sur le court, 3 sets, 2 sets + super tie-break, pro set ; jeux par set et No-Ad) ; le **téléphone du secrétariat** dans *Plus › Le club* va dans la fiche, pour renvoyer le résultat.
+- **Convoquer avec la fiche de match** (sans serveur) : en touchant un match, **Convoquer** envoie à chaque joueur sur WhatsApp (ou par e-mail) jour, heure et court avec en pièce jointe un petit fichier, la *fiche de match* (ex. `Finale Rossi - Bianchi.tsm`) ; *Avis aux participants › Prochain match* fait de même. Celui qui tient le score l'ouvre avec **Partager › TSM** : le match apparaît et **Préparer le match** ouvre Nouveau match avec joueurs (trouvés ou créés dans sa liste), classements, tournoi, tour, court et règles déjà remplis. Les règles se fixent dans **Modifier** du tournoi (*Règles des matchs* : au choix sur le court, 3 sets, 2 sets + super tie-break, pro set ; jeux par set et No-Ad) ; le **téléphone du secrétariat** dans *Plus › Le club* va dans la fiche, pour renvoyer le résultat. **Le résultat revient** : à la fin le récapitulatif propose **Envoyer le résultat au secrétariat** (WhatsApp directement au téléphone du secrétariat, avec un fichier et le score écrit) ; si vous ne l'envoyez pas tout de suite, il reste dans *Jouer* jusqu'à ce que vous le fassiez. Le secrétariat l'ouvre avec **Partager › TSM** : l'appli vérifie que c'est le match convoqué (le code de la fiche) et **Enregistrer** met à jour le tableau ; s'il est déjà enregistré elle le dit, s'il y a un autre résultat elle demande s'il faut le remplacer.
 
 - **Sur le tableau TV** : avec le tableau TV allumé (*Appareils*), **Afficher sur le tableau TV** dans le tournoi couvre le score avec le tournoi, en pages qui alternent toutes les 15 secondes : **tableau** (vainqueurs en jaune), **poules** avec leur classement (les qualifiés en évidence) et **ordre des matchs** du jour (ou les prochains matchs programmés), avec terrain, heure et résultats. Chaque résultat, même celui du marqueur, s'affiche tout de suite. **Retirer du tableau TV** revient au score.
 
@@ -10461,7 +10461,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Nouvelle rencontre** : adversaire, jour et heure, à domicile ou à l'extérieur, lieu, **rendez-vous**, notes. À domicile on peut **réserver des terrains** pour quelques heures : dans le planning ils deviennent non réservables.
 - **Disponibilités** : *Demander la disponibilité à tous* envoie le message (réponses OUI, NON ou PEUT-ÊTRE) ; on note les réponses d'un toucher, et *Relancer ceux qui n'ont pas répondu* n'écrit qu'à eux.
 - **Convoqués** : d'abord ceux qui ont dit oui, puis les peut-être ; en rouge ceux qui ne sont pas en règle ce jour-là. **Envoyer la convocation** écrit à chacun jour, heure, lieu et rendez-vous, et prépare pour le groupe la liste des convoqués.
-- **Matchs** : pour chaque simple et double nos joueurs (parmi les convoqués) et les leurs, puis le score (de notre côté : l'appli comprend qui a gagné) ; pour tenir le score sur le court, dans le rôle **Vous** *Jouer › Matchs du club*, et à la fin le résultat revient tout seul. En haut le résultat de la rencontre (ex. *4-2 gagnée*) ; **Envoyer le résultat** le prépare match par match.
+- **Matchs** : pour chaque simple et double nos joueurs (parmi les convoqués) et les leurs, puis le score (de notre côté : l'appli comprend qui a gagné) ; pour tenir le score sur le court, dans le rôle **Vous** *Jouer › Matchs du club*, et à la fin le résultat revient tout seul. En haut le résultat de la rencontre (ex. *4-2 gagnée*) ; **Envoyer le résultat** le prépare match par match. En touchant un match avec la composition faite, **Convoquer** envoie à nos joueurs la fiche de match, et le résultat revient comme dans les tournois.
 
 ### 7.18 Serveur du club pour les réservations (facultatif, app 2.6)
 
@@ -10509,7 +10509,7 @@ Avec le rôle **Club**, dans **Tournois › Classement à défis**.
 
 - **Nouveau classement** (plusieurs si besoin : messieurs, dames, jeunes…), puis **Ajouter des joueurs** : le premier ajouté est le numéro 1 ; **Ranger le classement** les déplace à la main ou les retire.
 - **Nouveau défi** : on choisit qui défie puis qui est défié, au plus *N* places au-dessus (**Règles** : combien de places, en général 3, et en combien de jours le jouer, en général 14). Chacun a un seul défi ouvert à la fois. **Prévenir** envoie aux deux qui défie qui et avant quand.
-- **Avec le marqueur** : dans le rôle **Vous**, *Jouer › Matchs du club* ; le challenger est le Joueur 1 et à la fin le résultat revient tout seul. Ou **Résultat** à la main (le score du côté du challenger : l'app comprend qui a gagné).
+- **Avec le marqueur** : dans le rôle **Vous**, *Jouer › Matchs du club* ; le challenger est le Joueur 1 et à la fin le résultat revient tout seul. Ou **Résultat** à la main (le score du côté du challenger : l'app comprend qui a gagné). **Prévenir** envoie aussi aux deux la fiche de match : celui qui tient le score l'ouvre avec TSM et le résultat revient au secrétariat comme dans les tournois.
 - Si le **challenger gagne, il prend la place** du joueur défié et ceux entre les deux descendent d'une place ; si le joueur défié gagne, rien ne change. **Défis joués** garde l'historique, avec les places avant et après.
 
 ### 7.20 Secrétariat sur PC
@@ -11015,7 +11015,7 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
   - **Modifica tabellone** (scheda *Tabellone*, anche dal PC): dopo il sorteggio tocchi un giocatore o un *bye*, poi l'altro posto, e i due si scambiano; nei gironi si scambiano due iscritti. Chi si iscrive dopo il sorteggio resta fuori finché, scelto un posto, non lo metti al posto di un altro: chi esce resta iscritto ma fuori dal tabellone. Si tocca solo ciò che non ha risultati, e i gironi si fermano quando esiste il tabellone finale. Nei tornei FITP modifica solo se lo consente il giudice arbitro: il numero di modifiche resta scritto.
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - La segreteria non segna punteggi: dal campo si passa al ruolo **Tu**, dove *Gioca › Partite del circolo* apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Toccando una partita qui: il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
-- **Convoca con la scheda partita** (senza server): toccando una partita, **Convoca** manda a ciascun giocatore su WhatsApp (o per email) giorno, ora e campo con allegato un piccolo file, la *scheda partita* (es. `Finale Rossi - Bianchi.tsm`); lo stesso fa *Avvisi ai partecipanti › Prossima partita*. Chi tiene il punteggio lo apre con **Condividi › TSM**: compare la partita e **Prepara la partita** apre Nuova partita con giocatori (trovati o creati nel suo elenco), classifiche, torneo, turno, campo e regole già scritti. Le regole si fissano in **Modifica** del torneo (*Regole delle partite*: a scelta in campo, 3 set, 2 set + super tie-break, pro set; game per set e No-Ad); il **telefono della segreteria** in *Altro › Il circolo* va nella scheda, per rimandare il risultato.
+- **Convoca con la scheda partita** (senza server): toccando una partita, **Convoca** manda a ciascun giocatore su WhatsApp (o per email) giorno, ora e campo con allegato un piccolo file, la *scheda partita* (es. `Finale Rossi - Bianchi.tsm`); lo stesso fa *Avvisi ai partecipanti › Prossima partita*. Chi tiene il punteggio lo apre con **Condividi › TSM**: compare la partita e **Prepara la partita** apre Nuova partita con giocatori (trovati o creati nel suo elenco), classifiche, torneo, turno, campo e regole già scritti. Le regole si fissano in **Modifica** del torneo (*Regole delle partite*: a scelta in campo, 3 set, 2 set + super tie-break, pro set; game per set e No-Ad); il **telefono della segreteria** in *Altro › Il circolo* va nella scheda, per rimandare il risultato. **Il risultato torna**: a fine partita il riepilogo ha **Manda il risultato alla segreteria** (WhatsApp dritto al telefono della segreteria, con un file e il punteggio scritto); se non lo mandi subito, resta in *Gioca* finché non lo fai. La segreteria lo apre con **Condividi › TSM**: l'app controlla che sia la partita convocata (il codice della scheda) e con **Registra** aggiorna il tabellone; se è già registrato lo dice, se c'è un risultato diverso chiede se sostituirlo.
 
 - **Sul tabellone TV**: con il tabellone TV acceso (*Dispositivi*), nel torneo **Mostra sul tabellone TV** copre il punteggio con il torneo, in pagine che si alternano ogni 15 secondi: **tabellone** (in giallo chi ha vinto), **gironi** con la classifica (in evidenza chi passa) e **ordine di gioco** di oggi (o le prossime partite in programma), con campo, ora e risultati. Ogni risultato, anche quello che arriva dal segnapunti, si vede subito. **Togli dal tabellone TV** torna al punteggio.
 
@@ -11057,7 +11057,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Nuovo incontro**: avversario, giorno e ora, in casa o in trasferta, dove si gioca, **ritrovo**, note. In casa si possono **tenere dei campi** per qualche ora: nel planning diventano non prenotabili.
 - **Disponibilità**: *Chiedi la disponibilità a tutti* manda il messaggio (rispondono SÌ, NO o FORSE); le risposte si segnano con un tocco, e *Richiedi a chi non ha risposto* insiste solo con loro.
 - **Convocati**: prima chi ha detto sì, poi i forse; in rosso chi non è in regola quel giorno. **Manda la convocazione** scrive a ciascuno giorno, ora, dove e ritrovo, e prepara per il gruppo l'elenco dei convocati.
-- **Partite**: per ogni singolare e doppio i nostri (dai convocati) e i loro, poi il punteggio (dal nostro lato: l'app capisce chi ha vinto); per tenere il punteggio dal campo, nel ruolo **Tu** *Gioca › Partite del circolo*, e a partita finita il risultato torna da solo. In alto il risultato dell'incontro (es. *4-2 vinto*); **Manda il risultato** lo prepara partita per partita.
+- **Partite**: per ogni singolare e doppio i nostri (dai convocati) e i loro, poi il punteggio (dal nostro lato: l'app capisce chi ha vinto); per tenere il punteggio dal campo, nel ruolo **Tu** *Gioca › Partite del circolo*, e a partita finita il risultato torna da solo. In alto il risultato dell'incontro (es. *4-2 vinto*); **Manda il risultato** lo prepara partita per partita. Toccando una partita con la formazione fatta, **Convoca** manda ai nostri la scheda partita, e il risultato torna come nei tornei.
 
 ### 7.18 Server del circolo per le prenotazioni (facoltativo, app 2.6)
 
@@ -11105,7 +11105,7 @@ Col ruolo **Circolo**, in **Tornei › Classifica a sfida**.
 
 - **Nuova classifica** (anche più di una: maschile, femminile, under…), poi **Aggiungi giocatori**: il primo aggiunto è il numero 1; **Sistema la classifica** li sposta a mano o li toglie.
 - **Nuova sfida**: si sceglie chi sfida e poi chi è sfidato, al massimo *N* posti più su (**Regole**: quanti posti, di solito 3, e in quanti giorni va giocata, di solito 14). Ognuno ha una sola sfida aperta per volta. **Avvisa** manda ai due chi sfida chi ed entro quando.
-- **Col segnapunti**: nel ruolo **Tu**, *Gioca › Partite del circolo*; lo sfidante è il Giocatore 1 e a fine partita il risultato torna da solo. Oppure **Risultato** a mano (il punteggio dal lato dello sfidante: l'app capisce chi ha vinto).
+- **Col segnapunti**: nel ruolo **Tu**, *Gioca › Partite del circolo*; lo sfidante è il Giocatore 1 e a fine partita il risultato torna da solo. Oppure **Risultato** a mano (il punteggio dal lato dello sfidante: l'app capisce chi ha vinto). **Avvisa** manda ai due anche la scheda partita: chi tiene il punteggio la apre con TSM e il risultato torna alla segreteria come nei tornei.
 - Se vince lo **sfidante prende il posto** dello sfidato e chi stava in mezzo scende di uno; se vince lo sfidato non cambia niente. In **Sfide giocate** la cronologia, con i posti di prima e di dopo.
 
 ### 7.20 Segreteria da PC
@@ -11611,7 +11611,7 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
   - **Editar a chave** (aba *Chave*, também pelo PC): depois do sorteio, toque em um jogador ou *bye*, depois no outro lugar, e os dois trocam; nos grupos, trocam dois inscritos. Quem se inscreve depois do sorteio fica de fora até que, escolhido um lugar, você o coloque nele: quem sai continua inscrito, mas fora da chave. Só muda o que não tem resultado, e os grupos ficam fixos quando a chave final existe. Em torneios FITP, edite só se o árbitro geral permitir: o número de alterações fica registrado.
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - A secretaria não marca placares: na quadra passa-se ao papel **Você**, onde *Jogar › Partidas do clube* abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Tocando numa partida aqui: o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
-- **Convocar com a ficha de partida** (sem servidor): tocando numa partida, **Convocar** envia a cada jogador por WhatsApp (ou por email) dia, hora e quadra com um pequeno arquivo anexo, a *ficha de partida* (ex. `Final Rossi - Bianchi.tsm`); *Avisos aos participantes › Próxima partida* faz o mesmo. Quem marca o placar abre-a com **Compartilhar › TSM**: aparece a partida e **Preparar a partida** abre Nova partida com jogadores (encontrados ou criados na sua lista), rankings, torneio, rodada, quadra e regras já preenchidos. As regras definem-se em **Editar** do torneio (*Regras das partidas*: à escolha na quadra, 3 sets, 2 sets + super tie-break, pro set; games por set e No-Ad); o **telefone da secretaria** em *Mais › O clube* vai na ficha, para devolver o resultado.
+- **Convocar com a ficha de partida** (sem servidor): tocando numa partida, **Convocar** envia a cada jogador por WhatsApp (ou por email) dia, hora e quadra com um pequeno arquivo anexo, a *ficha de partida* (ex. `Final Rossi - Bianchi.tsm`); *Avisos aos participantes › Próxima partida* faz o mesmo. Quem marca o placar abre-a com **Compartilhar › TSM**: aparece a partida e **Preparar a partida** abre Nova partida com jogadores (encontrados ou criados na sua lista), rankings, torneio, rodada, quadra e regras já preenchidos. As regras definem-se em **Editar** do torneio (*Regras das partidas*: à escolha na quadra, 3 sets, 2 sets + super tie-break, pro set; games por set e No-Ad); o **telefone da secretaria** em *Mais › O clube* vai na ficha, para devolver o resultado. **O resultado volta**: no fim o resumo tem **Enviar o resultado à secretaria** (WhatsApp direto ao telefone da secretaria, com um arquivo e o placar escrito); se não o enviar logo, fica em *Jogar* até o fazer. A secretaria abre-o com **Compartilhar › TSM**: o app verifica que é a partida convocada (o código da ficha) e **Registrar** atualiza a chave; se já está registrado diz isso, se há outro resultado pergunta se quer substituí-lo.
 
 - **No placar da TV**: com o placar da TV ligado (*Dispositivos*), **Mostrar no placar da TV** no torneio cobre o placar com o torneio, em páginas que se alternam a cada 15 segundos: **chave** (vencedores em amarelo), **grupos** com a classificação (em destaque quem passa) e **ordem de jogos** de hoje (ou as próximas partidas programadas), com quadra, hora e resultados. Cada resultado, também o do marcador, aparece na hora. **Tirar do placar da TV** volta ao placar.
 
@@ -11653,7 +11653,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Novo confronto**: adversário, dia e hora, em casa ou fora, onde se joga, **ponto de encontro**, notas. Em casa dá para **reservar quadras** por algumas horas: na agenda ficam não reserváveis.
 - **Disponibilidade**: *Pedir disponibilidade a todos* envia a mensagem (respondem SIM, NÃO ou TALVEZ); as respostas se marcam com um toque, e *Pedir a quem não respondeu* insiste só com eles.
 - **Convocados**: primeiro quem disse sim, depois os talvez; em vermelho quem não está em ordem naquele dia. **Enviar a convocação** escreve a cada um dia, hora, local e ponto de encontro, e prepara para o grupo a lista dos convocados.
-- **Partidas**: para cada simples e dupla os nossos (dos convocados) e os deles, depois o placar (do nosso lado: o app entende quem venceu); para marcar o placar na quadra, no papel **Você** *Jogar › Partidas do clube*, e no fim o resultado volta sozinho. No alto o resultado do confronto (ex. *4-2 vencido*); **Enviar o resultado** prepara partida por partida.
+- **Partidas**: para cada simples e dupla os nossos (dos convocados) e os deles, depois o placar (do nosso lado: o app entende quem venceu); para marcar o placar na quadra, no papel **Você** *Jogar › Partidas do clube*, e no fim o resultado volta sozinho. No alto o resultado do confronto (ex. *4-2 vencido*); **Enviar o resultado** prepara partida por partida. Tocando numa partida com a escalação feita, **Convocar** envia aos nossos a ficha de partida, e o resultado volta como nos torneios.
 
 ### 7.18 Servidor do clube para as reservas (opcional, app 2.6)
 
@@ -11701,7 +11701,7 @@ Com o papel **Clube**, em **Torneios › Classificação por desafios**.
 
 - **Nova classificação** (mais de uma se quiseres: masculina, feminina, jovens…), depois **Adicionar jogadores**: o primeiro é o número 1; **Ordenar a classificação** muda-os à mão ou tira-os.
 - **Novo desafio**: escolhe-se quem desafia e depois quem é desafiado, no máximo *N* lugares acima (**Regras**: quantos lugares, normalmente 3, e em quantos dias tem de ser jogado, normalmente 14). Cada um tem um só desafio aberto. **Avisar** manda aos dois quem desafia quem e até quando.
-- **Com o marcador**: no papel **Você**, *Jogar › Partidas do clube*; o desafiante é o Jogador 1 e no fim o resultado volta sozinho. Ou **Resultado** à mão (do lado do desafiante: a app percebe quem ganhou).
+- **Com o marcador**: no papel **Você**, *Jogar › Partidas do clube*; o desafiante é o Jogador 1 e no fim o resultado volta sozinho. Ou **Resultado** à mão (do lado do desafiante: a app percebe quem ganhou). **Avisar** envia também aos dois a ficha de partida: quem marca o placar abre-a com o TSM e o resultado volta à secretaria como nos torneios.
 - Se **ganha o desafiante fica com o lugar** do desafiado e os que estavam no meio descem um; se ganha o desafiado nada muda. **Desafios jogados** guarda o histórico, com os lugares antes e depois.
 
 ### 7.20 Secretaria no PC
@@ -13932,6 +13932,9 @@ class MatchController(
      * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
      */
     suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
+        // Un'app appena installata non ha niente da salvare: una copia vuota diventerebbe la "più recente" in Documenti
+        // proprio quando si vuole ripristinare quella di prima (dalla prima apertura). Le copie automatiche partono dopo.
+        if (onlyIfChanged && !storage.onboarded) return@withContext null
         val folder = strings.strokeFolderName
         val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
         if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
@@ -14135,12 +14138,97 @@ class MatchController(
     val incomingCard = MutableStateFlow<com.tennis.scoremanager.data.MatchCard?>(null)
     val receivedCards = MutableStateFlow(storage.loadReceivedCards())
     private var pendingCard: com.tennis.scoremanager.data.MatchCard? = null
+    /** Il Giocatore 1 com'era scritto da [prepareCard]: se in campo c'è un altro, la partita non è quella della scheda. */
+    private var pendingCardP1: Pair<String, String> = "" to ""
 
-    /** Il testo di un file aperto con TSM: se è una scheda partita la si mostra, sennò lo si dice. */
+    /** Un risultato arrivato dal campo (segreteria): la finestra dice com'è e chiede se registrarlo. */
+    val incomingResult = MutableStateFlow<com.tennis.scoremanager.data.MatchResult?>(null)
+
+    /** Il testo di un file aperto con TSM: una scheda partita o un risultato; sennò lo si dice. */
     fun receiveCardText(text: String?) {
         val card = text?.let { com.tennis.scoremanager.data.MatchCards.decode(it) }
-        if (card == null) { _toasts.tryEmit(strings.mcNotValid); return }
-        incomingCard.value = card
+        if (card != null) { incomingCard.value = card; return }
+        val result = text?.let { com.tennis.scoremanager.data.MatchCards.decodeResult(it) }
+        if (result != null) { incomingResult.value = result; return }
+        _toasts.tryEmit(strings.mcNotValid)
+    }
+
+    fun resultStatus(r: com.tennis.scoremanager.data.MatchResult): com.tennis.scoremanager.data.ResultStatus =
+        com.tennis.scoremanager.data.MatchCards.check(r, clubTournaments.value, teams.value, ladders.value)
+
+    /** Com'è segnata adesso la partita del risultato (per dire cosa si sostituisce). */
+    fun resultNow(r: com.tennis.scoremanager.data.MatchResult): String = when (r.kind) {
+        com.tennis.scoremanager.data.CardKind.TOURNAMENT -> clubTournament(r.ref)?.matches?.firstOrNull { it.id == r.match }?.let { m ->
+            listOf(entryNameOf(clubTournament(r.ref)!!, m.winner), m.score).filter { it.isNotBlank() }.joinToString(" · ")
+        }.orEmpty()
+        com.tennis.scoremanager.data.CardKind.TEAM -> team(r.ref)?.fixtures?.firstOrNull { it.id == r.match }?.rubbers?.getOrNull(r.index)?.score.orEmpty()
+        com.tennis.scoremanager.data.CardKind.LADDER -> ladder(r.ref)?.challenges?.firstOrNull { it.id == r.match }?.score.orEmpty()
+    }
+
+    /** Registra il risultato arrivato dal campo nel tabellone, nell'incontro o nella classifica. */
+    fun applyResult(r: com.tennis.scoremanager.data.MatchResult) {
+        incomingResult.value = null
+        val status = resultStatus(r)
+        if (status != com.tennis.scoremanager.data.ResultStatus.READY && status != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return
+        val s = strings
+        when (r.kind) {
+            com.tennis.scoremanager.data.CardKind.TOURNAMENT -> {
+                val t = clubTournament(r.ref) ?: return
+                val m = t.matches.firstOrNull { it.id == r.match } ?: return
+                val w = when (r.winner) { 1 -> m.a; 2 -> m.b; else -> null }
+                saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, r.score, walkover = r.walkover, retired = r.retired, disqualified = r.disqualified))
+            }
+            com.tennis.scoremanager.data.CardKind.TEAM -> {
+                val t = team(r.ref) ?: return
+                val f = t.fixtures.firstOrNull { it.id == r.match } ?: return
+                val won = when (r.winner) { 1 -> true; 2 -> false; else -> null }
+                saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, r.index, com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), won, walkover = r.walkover))
+            }
+            com.tennis.scoremanager.data.CardKind.LADDER -> {
+                val l = ladder(r.ref) ?: return
+                val won = when (r.winner) { 1 -> true; 2 -> false; else -> return }
+                saveLadder(com.tennis.scoremanager.data.Ladders.result(l, r.match, com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), won, System.currentTimeMillis()))
+            }
+        }
+        _toasts.tryEmit(s.mrApplied)
+    }
+
+    /** A fine partita, se era quella di una scheda ricevuta: il risultato da rimandare alla segreteria è pronto. */
+    private fun cardMatchFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        val rc = receivedCards.value.firstOrNull { it.record == rec.id } ?: return
+        val winner = when (state.winner) { Side.P1 -> 1; Side.P2 -> 2; else -> null }
+        val wo = com.tennis.scoremanager.data.Reports.isWalkover(state)
+        val result = com.tennis.scoremanager.data.MatchCards.result(
+            rc.card, winner, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1),
+            walkover = wo, retired = state.retired != null && !state.disqualified, disqualified = state.disqualified, now = System.currentTimeMillis(),
+        )
+        val list = receivedCards.value.map { if (it.card.code == rc.card.code) it.copy(result = result, sentAt = null) else it }
+        receivedCards.value = list
+        scope.launch(io) { storage.saveReceivedCards(list) }
+    }
+
+    /** Il file del risultato da mandare e il testo che lo accompagna (si legge anche senza aprire il file). */
+    fun resultToSend(code: String): Pair<File, String>? {
+        val rc = receivedCards.value.firstOrNull { it.card.code == code } ?: return null
+        val r = rc.result ?: return null
+        val s = strings
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.MatchCards.resultFileName(s.mrFilePrefix, r)).apply { writeText(com.tennis.scoremanager.data.MatchCards.encodeResult(r)) } }.getOrNull() ?: return null
+        val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
+        val text = listOfNotNull(
+            s.mrTitle + ": " + listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · "),
+            "${r.side1} – ${r.side2}",
+            com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified),
+            winner?.let { s.mrWinner(it) },
+        ).joinToString("\n")
+        return f to text
+    }
+
+    /** Il risultato è stato mandato (la voce in Gioca sparisce). */
+    fun resultSent(code: String) {
+        val list = receivedCards.value.map { if (it.card.code == code) it.copy(sentAt = System.currentTimeMillis()) else it }
+        receivedCards.value = list
+        scope.launch(io) { storage.saveReceivedCards(list) }
     }
 
     /**
@@ -14150,18 +14238,37 @@ class MatchController(
      */
     fun prepareCard(card: com.tennis.scoremanager.data.MatchCard) {
         incomingCard.value = null
-        val t = clubTournament(card.ref)
-        val m = t?.matches?.firstOrNull { it.id == card.match && it.cardCode == card.code }
-        if (t != null && m != null) { if (!m.played) playClubMatch(t, m); return }
-        // Ogni giocatore della scheda nel database di questo telefono: lo stesso id, o lo stesso nome e cognome, o nuovo.
-        val now0 = System.currentTimeMillis()
-        val local = (card.side1 + card.side2).associate { cp ->
-            cp.id to (playerById(cp.id)
-                ?: com.tennis.scoremanager.data.Players.sameFullName(players.value, cp.firstName, cp.lastName).singleOrNull()?.takeIf { cp.firstName.isNotBlank() && cp.lastName.isNotBlank() }
-                ?: com.tennis.scoremanager.data.PlayerProfile(cp.id, cp.name, cp.firstName, cp.lastName, cp.nickname, createdAt = now0).also { savePlayer(it) })
+        // Sul telefono della segreteria (c'è la partita col codice di questa scheda) si gioca quella, come da Partite del circolo.
+        when (card.kind) {
+            com.tennis.scoremanager.data.CardKind.TOURNAMENT -> {
+                val t = clubTournament(card.ref)
+                val m = t?.matches?.firstOrNull { it.id == card.match && it.cardCode == card.code }
+                if (t != null && m != null) { if (!m.played) playClubMatch(t, m); return }
+            }
+            com.tennis.scoremanager.data.CardKind.TEAM -> {
+                val tm = team(card.ref)
+                val f = tm?.fixtures?.firstOrNull { it.id == card.match }
+                if (tm != null && f != null && f.rubbers.getOrNull(card.index)?.cardCode == card.code) {
+                    if (f.rubbers[card.index].won == null) playTeamRubber(tm, f, card.index); return
+                }
+            }
+            com.tennis.scoremanager.data.CardKind.LADDER -> {
+                val l = ladder(card.ref)
+                val ch = l?.challenges?.firstOrNull { it.id == card.match && it.cardCode == card.code }
+                if (l != null && ch != null) { if (ch.open) playChallenge(l, ch); return }
+            }
         }
-        fun id(p: com.tennis.scoremanager.data.CardPlayer?) = p?.let { local[it.id]?.id }.orEmpty()
-        fun name(p: com.tennis.scoremanager.data.CardPlayer?) = p?.let { local[it.id]?.name ?: it.name }.orEmpty()
+        // Ogni giocatore della scheda nel database di questo telefono: lo stesso id, o lo stesso nome e cognome, o nuovo
+        // (gli avversari di un incontro a squadre arrivano solo col nome: Nuova partita li trova o li crea dal nome).
+        val now0 = System.currentTimeMillis()
+        val local = (card.side1 + card.side2).associateWith { cp ->
+            if (cp.id.isBlank()) null
+            else playerById(cp.id)
+                ?: com.tennis.scoremanager.data.Players.sameFullName(players.value, cp.firstName, cp.lastName).singleOrNull()?.takeIf { cp.firstName.isNotBlank() && cp.lastName.isNotBlank() }
+                ?: com.tennis.scoremanager.data.PlayerProfile(cp.id, cp.name, cp.firstName, cp.lastName, cp.nickname, createdAt = now0).also { savePlayer(it) }
+        }
+        fun id(p: com.tennis.scoremanager.data.CardPlayer?) = p?.let { local[it]?.id }.orEmpty()
+        fun name(p: com.tennis.scoremanager.data.CardPlayer?) = p?.let { local[it]?.name ?: it.name }.orEmpty()
         val (a1, a2) = card.side1.getOrNull(0) to card.side1.getOrNull(1)
         val (b1, b2) = card.side2.getOrNull(0) to card.side2.getOrNull(1)
         updateSetup {
@@ -14182,6 +14289,7 @@ class MatchController(
         receivedCards.value = list
         scope.launch(io) { storage.saveReceivedCards(list) }
         pendingCard = card
+        pendingCardP1 = name(a1) to id(a1)
         go(Screen.SETUP)
     }
 
@@ -14189,8 +14297,8 @@ class MatchController(
     private fun linkCard(recordId: String, su: SetupData) {
         val card = pendingCard ?: return
         pendingCard = null
-        val first = card.side1.firstOrNull() ?: return
-        if (su.p1a != (playerById(first.id)?.name ?: first.name) && su.p1aId != first.id) return
+        val (n, id) = pendingCardP1
+        if (su.p1a != n && (id.isBlank() || su.p1aId != id)) return
         val list = receivedCards.value.map { if (it.card.code == card.code) it.copy(record = recordId) else it }
         receivedCards.value = list
         scope.launch(io) { storage.saveReceivedCards(list) }
@@ -14769,7 +14877,11 @@ class MatchController(
         val now = System.currentTimeMillis()
         val a = playerById(ch.challenger)?.name.orEmpty(); val b = playerById(ch.defender)?.name.orEmpty()
         val text = listOf(l.name, s.ldVs(a, b), s.ldBy(com.tennis.scoremanager.ui.screens.shortDate(ch.deadline, options.value.lang)), storage.clubName).filter { it.isNotBlank() }.joinToString("\n")
-        val rec = listOfNotNull(playerById(ch.challenger), playerById(ch.defender)).map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        // Con la scheda partita: chi tiene il punteggio la apre con TSM e il risultato torna qui.
+        val card = challengeCardFile(l.id, ch.id)
+        val personal = listOfNotNull(l.name, s.ldVs(a, b), s.ldBy(com.tennis.scoremanager.ui.screens.shortDate(ch.deadline, options.value.lang)),
+            s.ntCardHowTo.takeIf { card != null }, storage.clubName).filter { it.isNotBlank() }.joinToString("\n")
+        val rec = listOfNotNull(playerById(ch.challenger), playerById(ch.defender)).map { com.tennis.scoremanager.data.Notices.recipient(it, personal, now).copy(attachment = card) }
         openNotice(com.tennis.scoremanager.data.NoticePlan(s.ldNoticeTitle, l.name, text, rec))
     }
 
@@ -15652,8 +15764,57 @@ class MatchController(
         val card = com.tennis.scoremanager.data.MatchCards.forTournament(
             t, m, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, clubRoundName(t, m),
         ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    private fun writeCardFile(card: com.tennis.scoremanager.data.MatchCard): File? {
+        // Senza il telefono della segreteria il risultato non sa dove tornare: lo si dice a chi convoca.
+        if (card.office.isBlank()) _toasts.tryEmit(strings.mcNoOffice)
         val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
         return runCatching { File(dir, com.tennis.scoremanager.data.MatchCards.fileName(card)).apply { writeText(com.tennis.scoremanager.data.MatchCards.encode(card)) } }.getOrNull()
+    }
+
+    /** La scheda di una partita di un incontro a squadre (codice come per i tornei: nasce alla prima convocazione). */
+    fun rubberCardFile(teamId: String, fixtureId: String, index: Int): File? {
+        val t = team(teamId) ?: return null
+        val f = t.fixtures.firstOrNull { it.id == fixtureId } ?: return null
+        val r = f.rubbers.getOrNull(index) ?: return null
+        val code = r.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            saveFixture(t, f.copy(rubbers = f.rubbers.mapIndexed { k, x -> if (k == index) x.copy(cardCode = code) else x }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forRubber(
+            t, f, index, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, rubberName(t, index),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    /** La scheda di una sfida della classifica. */
+    fun challengeCardFile(ladderId: String, challengeId: String): File? {
+        val l = ladder(ladderId) ?: return null
+        val ch = l.challenges.firstOrNull { it.id == challengeId } ?: return null
+        val code = ch.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            saveLadder(l.copy(challenges = l.challenges.map { if (it.id == challengeId) it.copy(cardCode = code) else it }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forChallenge(
+            l, ch, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, strings.ldPositions(ch.challengerPos, ch.defenderPos),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    /** Convoca i nostri giocatori di una partita dell'incontro, con la scheda partita per chi tiene il punteggio. */
+    fun noticeRubber(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, index: Int) {
+        val s = strings
+        val r = f.rubbers.getOrNull(index) ?: return
+        val card = rubberCardFile(t.id, f.id, index)
+        val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ")
+        val theirs = r.theirs.filter { it.isNotBlank() }.joinToString(" / ").ifBlank { f.opponent }
+        val lines = listOfNotNull(s.ntMatch(rubberName(t, index), "${t.name} – ${f.opponent}"), "$ours – $theirs", fixtureWhen(f), s.ntCardHowTo.takeIf { card != null })
+        val now = System.currentTimeMillis()
+        val rec = r.ours.mapNotNull { playerById(it) }.map { p ->
+            val text = (listOf(s.ntHello(p.firstName.ifBlank { p.name })) + lines + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n")
+            com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ctConvoke, "${rubberName(t, index)}: $ours – $theirs", lines.joinToString("\n"), rec))
     }
 
     /** Il tabellone in un'immagine, per il gruppo e i social; a ciascuno lo stesso testo. */
@@ -16550,6 +16711,7 @@ class MatchController(
         clubMatchFinished(rec, lm.state)
         teamRubberFinished(rec, lm.state)
         ladderMatchFinished(rec, lm.state)
+        cardMatchFinished(rec, lm.state)
         // Prima si salva la partita finita, poi si toglie la sospesa: in mezzo non resta mai senza copia.
         scope.launch(io) {
             storage.saveFinished(rec)
@@ -21982,6 +22144,8 @@ data class Challenge(
     /** I posti prima della partita (1 = primo), per la cronologia. */
     val challengerPos: Int = 0,
     val defenderPos: Int = 0,
+    /** Il codice della scheda partita mandata ai due: il risultato che torna deve averlo. */
+    val cardCode: String? = null,
 ) {
     val open: Boolean get() = challengerWon == null && !cancelled
 }
@@ -22197,9 +22361,9 @@ data class CardPlayer(
     val ranking: String = "",
 )
 
-/** Da dove viene la partita: un torneo del circolo (per ora l'unico; poi incontri a squadre e sfide). */
+/** Da dove viene la partita: un torneo del circolo, un incontro a squadre o una sfida della classifica. */
 @Serializable
-enum class CardKind { TOURNAMENT }
+enum class CardKind { TOURNAMENT, TEAM, LADDER }
 
 /**
  * La scheda partita: la segreteria la manda con la convocazione (un file .tsm su WhatsApp o per email) e chi tiene il
@@ -22220,9 +22384,13 @@ data class MatchCard(
     val event: String,
     val category: String = "",
     val round: String = "",
-    /** Il torneo (ClubTournament.id) e la partita (CTMatch.id) nel telefono della segreteria. */
+    /**
+     * Nel telefono della segreteria: torneo e partita (ClubTournament.id, CTMatch.id), squadra e incontro (Team.id,
+     * Fixture.id, con [index] la partita dell'incontro) o classifica e sfida (Ladder.id, Challenge.id).
+     */
     val ref: String,
     val match: String,
+    val index: Int = 0,
     val court: String = "",
     val at: Long? = null,
     val doubles: Boolean = false,
@@ -22231,12 +22399,51 @@ data class MatchCard(
     val rules: CardRules? = null,
 )
 
-/** Una scheda partita ricevuta e, quando la partita è iniziata, la partita segnata ([record] = MatchRecord.id). */
+/**
+ * Il risultato che torna alla segreteria: la stessa partita della scheda ([kind], [ref], [match], [index], [code]),
+ * chi ha vinto (1 = il primo lato della scheda, 2 = il secondo, null = nessuno), il punteggio dal primo lato e come è
+ * finita. I nomi servono solo a chi lo legge.
+ */
 @Serializable
-data class ReceivedCard(val card: MatchCard, val record: String? = null, val receivedAt: Long = 0)
+data class MatchResult(
+    val tsm: String = MatchCards.RESULT,
+    val v: Int = 1,
+    val kind: CardKind = CardKind.TOURNAMENT,
+    val code: String,
+    val ref: String,
+    val match: String,
+    val index: Int = 0,
+    val event: String = "",
+    val round: String = "",
+    val side1: String = "",
+    val side2: String = "",
+    val winner: Int? = null,
+    val score: String = "",
+    val walkover: Boolean = false,
+    val retired: Boolean = false,
+    val disqualified: Boolean = false,
+    val playedAt: Long = 0,
+)
+
+/**
+ * Una scheda partita ricevuta: quando la partita è iniziata la partita segnata ([record] = MatchRecord.id), a fine
+ * partita il risultato da rimandare e quando è stato mandato.
+ */
+@Serializable
+data class ReceivedCard(
+    val card: MatchCard,
+    val record: String? = null,
+    val receivedAt: Long = 0,
+    val result: MatchResult? = null,
+    val sentAt: Long? = null,
+)
+
+/** Com'è un risultato arrivato rispetto a quello che c'è nel telefono della segreteria. */
+enum class ResultStatus { READY, SAME, CONFLICT, BAD_CODE, NOT_FOUND }
 
 object MatchCards {
     const val KIND = "tsm-match-card"
+    const val RESULT = "tsm-match-result"
     const val EXT = "tsm"
     const val MIME = "application/octet-stream"
 
@@ -22247,6 +22454,74 @@ object MatchCards {
     /** La scheda da un file; null se non è una scheda partita di TSM. */
     fun decode(text: String): MatchCard? =
         runCatching { json.decodeFromString(MatchCard.serializer(), text) }.getOrNull()?.takeIf { it.tsm == KIND }
+
+    fun encodeResult(r: MatchResult): String = json.encodeToString(MatchResult.serializer(), r)
+
+    /** Il risultato da un file; null se non è un risultato di TSM. */
+    fun decodeResult(text: String): MatchResult? =
+        runCatching { json.decodeFromString(MatchResult.serializer(), text) }.getOrNull()?.takeIf { it.tsm == RESULT }
+
+    /** Il risultato della partita della scheda: [winner] 1 o 2 (il lato della scheda), il punteggio dal primo lato. */
+    fun result(card: MatchCard, winner: Int?, score: String, walkover: Boolean, retired: Boolean, disqualified: Boolean, now: Long): MatchResult =
+        MatchResult(
+            kind = card.kind, code = card.code, ref = card.ref, match = card.match, index = card.index,
+            event = card.event, round = card.round,
+            side1 = card.side1.joinToString(" / ") { it.name }, side2 = card.side2.joinToString(" / ") { it.name },
+            winner = winner, score = score, walkover = walkover, retired = retired && !walkover, disqualified = disqualified && !walkover, playedAt = now,
+        )
+
+    /** Il nome del file del risultato: "Risultato Finale Rossi - Bianchi.tsm" ([prefix] nella lingua dell'app). */
+    fun resultFileName(prefix: String, r: MatchResult): String {
+        fun last(n: String) = n.split(" / ").joinToString(" & ") { it.trim().substringAfterLast(' ') }
+        val base = listOf(prefix, r.round, "${last(r.side1)} - ${last(r.side2)}").filter { it.isNotBlank() }.joinToString(" ")
+        return base.replace(Regex("[\\\\/:*?\"<>|\\n]"), "_").take(80).trim() + ".$EXT"
+    }
+
+    /**
+     * Il risultato [r] rispetto ai dati della segreteria: la partita c'è e il codice è quello della scheda mandata?
+     * È già segnata (con lo stesso esito: [ResultStatus.SAME], con un altro: [ResultStatus.CONFLICT])?
+     */
+    fun check(r: MatchResult, tournaments: List<ClubTournament>, teams: List<Team>, ladders: List<Ladder>): ResultStatus = when (r.kind) {
+        CardKind.TOURNAMENT -> {
+            val m = tournaments.firstOrNull { it.id == r.ref }?.matches?.firstOrNull { it.id == r.match }
+            when {
+                m == null -> ResultStatus.NOT_FOUND
+                m.cardCode != r.code -> ResultStatus.BAD_CODE
+                !m.played -> ResultStatus.READY
+                m.winner == (if (r.winner == 1) m.a else if (r.winner == 2) m.b else null) && (m.score == r.score || m.walkover) -> ResultStatus.SAME
+                else -> ResultStatus.CONFLICT
+            }
+        }
+        CardKind.TEAM -> {
+            val rb = teams.firstOrNull { it.id == r.ref }?.fixtures?.firstOrNull { it.id == r.match }?.rubbers?.getOrNull(r.index)
+            when {
+                rb == null -> ResultStatus.NOT_FOUND
+                rb.cardCode != r.code -> ResultStatus.BAD_CODE
+                rb.won == null -> ResultStatus.READY
+                rb.won == (r.winner == 1) -> ResultStatus.SAME
+                else -> ResultStatus.CONFLICT
+            }
+        }
+        CardKind.LADDER -> {
+            val ch = ladders.firstOrNull { it.id == r.ref }?.challenges?.firstOrNull { it.id == r.match }
+            when {
+                ch == null -> ResultStatus.NOT_FOUND
+                ch.cardCode != r.code -> ResultStatus.BAD_CODE
+                ch.cancelled -> ResultStatus.NOT_FOUND
+                ch.open -> ResultStatus.READY
+                ch.challengerWon == (r.winner == 1) -> ResultStatus.SAME
+                else -> ResultStatus.CONFLICT
+            }
+        }
+    }
+
+    /** Il punteggio da leggere nella lingua di chi lo registra: col ritiro "6-3  2-1 rit.", senza giocare "w.o.". */
+    fun resultText(r: MatchResult, walkoverText: String, retiredText: String, disqualifiedText: String): String = when {
+        r.walkover -> walkoverText
+        r.disqualified -> "${r.score} $disqualifiedText".trim()
+        r.retired -> "${r.score} $retiredText".trim()
+        else -> r.score
+    }
 
     /** Un codice da 8 caratteri senza lettere che si confondono (0/O, 1/I/L). */
     fun newCode(): String {
@@ -22275,6 +22550,36 @@ object MatchCards {
             code = code, issuedAt = now, club = club, office = office,
             event = t.name, category = t.category, round = round, ref = t.id, match = m.id,
             court = m.court, at = m.at, doubles = t.doubles, side1 = side(a), side2 = side(b), rules = t.rules,
+        )
+    }
+
+    /** La scheda di una partita di un incontro a squadre, con la formazione fatta e non ancora giocata. */
+    fun forRubber(
+        t: Team, f: Fixture, index: Int, code: String, now: Long, club: String, office: String, round: String,
+        find: (String) -> PlayerProfile?,
+    ): MatchCard? {
+        val r = f.rubbers.getOrNull(index) ?: return null
+        val need = if (r.doubles) 2 else 1
+        if (r.ours.size != need || r.won != null) return null
+        val theirs = r.theirs.filter { it.isNotBlank() }.ifEmpty { listOf(f.opponent) }
+        return MatchCard(
+            kind = CardKind.TEAM, code = code, issuedAt = now, club = club, office = office,
+            event = t.championship.ifBlank { t.name }, category = "${t.name} – ${f.opponent}", round = round,
+            ref = t.id, match = f.id, index = index, court = f.place, at = f.at, doubles = r.doubles,
+            side1 = r.ours.map { player(find(it), it, it) }, side2 = theirs.map { CardPlayer("", it) },
+        )
+    }
+
+    /** La scheda di una sfida della classifica ancora da giocare: lo sfidante è il primo lato. */
+    fun forChallenge(
+        l: Ladder, ch: Challenge, code: String, now: Long, club: String, office: String, round: String,
+        find: (String) -> PlayerProfile?,
+    ): MatchCard? {
+        if (!ch.open) return null
+        return MatchCard(
+            kind = CardKind.LADDER, code = code, issuedAt = now, club = club, office = office,
+            event = l.name, round = round, ref = l.id, match = ch.id,
+            side1 = listOf(player(find(ch.challenger), ch.challenger, "")), side2 = listOf(player(find(ch.defender), ch.defender, "")),
         )
     }
 
@@ -27194,6 +27499,8 @@ data class Rubber(
     val record: String? = null,
     /** Non giocata, vinta a tavolino: il punteggio è quello del regolamento (6-0 6-0). */
     val walkover: Boolean = false,
+    /** Il codice della scheda partita mandata con la convocazione: il risultato che torna deve averlo. */
+    val cardCode: String? = null,
 )
 
 /**
@@ -36399,6 +36706,8 @@ fun AppRoot(c: MatchController) {
         // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
         val card by c.incomingCard.collectAsState()
         card?.let { IncomingCardDialog(c, it) }
+        val result by c.incomingResult.collectAsState()
+        result?.let { IncomingResultDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
@@ -37512,11 +37821,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import androidx.compose.material.icons.automirrored.filled.Send
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.CardRules
 import com.tennis.scoremanager.data.MatchCard
@@ -37565,6 +37878,73 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
         },
         confirmButton = { if (!busy) TextButton(onClick = { c.prepareCard(card) }) { Text(s.mcPrepare) } },
         dismissButton = { TextButton(onClick = { c.incomingCard.value = null }) { Text(s.back) } },
+    )
+}
+
+/**
+ * Manda il risultato della partita della scheda [code] alla segreteria: WhatsApp dritto al suo numero (dalla scheda),
+ * o si sceglie a chi se la scheda non ha il numero. Il testo si legge anche senza aprire il file.
+ */
+fun sendResult(context: android.content.Context, c: MatchController, code: String) {
+    val (file, text) = c.resultToSend(code) ?: return
+    val office = c.receivedCards.value.firstOrNull { it.card.code == code }?.card?.office.orEmpty()
+    val wa = com.tennis.scoremanager.data.Notices.waNumber(office)
+    val intent = if (wa != null) whatsAppFile(context, wa, text, file) else shareFile(context, text, file)
+    runCatching { context.startActivity(intent); c.resultSent(code) }
+}
+
+/** Nel riepilogo di una partita giocata da una scheda: il risultato da mandare alla segreteria. */
+@Composable
+fun SendResultButton(c: MatchController, recordId: String) {
+    val s = LocalStrings.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val cards by c.receivedCards.collectAsState()
+    val rc = cards.firstOrNull { it.record == recordId && it.result != null } ?: return
+    BigButton(if (rc.sentAt == null) s.mrSend else s.mrSendAgain, androidx.compose.material.icons.Icons.AutoMirrored.Filled.Send,
+        { sendResult(context, c, rc.card.code) }, Modifier.fillMaxWidth())
+}
+
+/**
+ * Segreteria: un risultato arrivato dal campo. Dice di che partita è e com'è rispetto al tabellone (da registrare,
+ * già registrato, diverso da quello che c'è, codice sbagliato, partita che non c'è) e, se si può, lo registra.
+ */
+@Composable
+fun IncomingResultDialog(c: MatchController, r: com.tennis.scoremanager.data.MatchResult) {
+    val s = LocalStrings.current
+    val status = remember(r) { c.resultStatus(r) }
+    val now = remember(r) { c.resultNow(r) }
+    val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
+    AlertDialog(
+        onDismissRequest = { c.incomingResult.value = null },
+        icon = { Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.Ball) },
+        title = { Text(s.mrTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
+                Text("${r.side1} – ${r.side2}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                winner?.let { Text(s.mrWinner(it), color = TsmColors.TextMain, fontSize = 14.sp) }
+                val (msg, warn) = when (status) {
+                    com.tennis.scoremanager.data.ResultStatus.READY -> s.mrReady to false
+                    com.tennis.scoremanager.data.ResultStatus.SAME -> s.mrSame to false
+                    com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(now) to true
+                    com.tennis.scoremanager.data.ResultStatus.BAD_CODE -> s.mrBadCode to true
+                    com.tennis.scoremanager.data.ResultStatus.NOT_FOUND -> s.mrNotFound to true
+                }
+                Text(msg, color = if (warn) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+            }
+        },
+        confirmButton = {
+            when (status) {
+                com.tennis.scoremanager.data.ResultStatus.READY -> TextButton(onClick = { c.applyResult(r) }) { Text(s.mrApply) }
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> TextButton(onClick = { c.applyResult(r) }) { Text(s.mrReplace, color = TsmColors.Danger) }
+                else -> TextButton(onClick = { c.incomingResult.value = null }) { Text(s.ok) }
+            }
+        },
+        dismissButton = {
+            if (status == com.tennis.scoremanager.data.ResultStatus.READY || status == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
+                TextButton(onClick = { c.incomingResult.value = null }) { Text(s.back) }
+        },
     )
 }
 TSM_EOF
@@ -40024,6 +40404,63 @@ fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
     GhostButton(s.servePlayAll, Icons.Filled.PlayArrow, { play(sess.serves) }, Modifier.fillMaxWidth())
     if (sess.serves.any { it.inPlay && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.inPlay }) }, Modifier.fillMaxWidth())
     if (sess.serves.any { !it.inPlay && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { !it.inPlay }) }, Modifier.fillMaxWidth())
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ShareIntents.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ShareIntents.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Context
+import android.content.Intent
+
+/**
+ * WhatsApp con un file (la scheda partita) e il testo, dritto nella chat di quel numero ("jid"); senza WhatsApp si
+ * sceglie l'app. Il permesso di leggere il file passa con l'intent.
+ */
+fun whatsAppFile(ctx: Context, number: String, text: String, file: java.io.File): Intent {
+    val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
+    fun send(pkg: String?) = Intent(Intent.ACTION_SEND).apply {
+        type = com.tennis.scoremanager.data.MatchCards.MIME
+        putExtra(Intent.EXTRA_STREAM, uri)
+        putExtra(Intent.EXTRA_TEXT, text)
+        clipData = android.content.ClipData.newRawUri("", uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        if (pkg != null) { setPackage(pkg); putExtra("jid", "$number@s.whatsapp.net") }
+    }
+    val pm = ctx.packageManager
+    val pkg = listOf("com.whatsapp", "com.whatsapp.w4b").firstOrNull { runCatching { pm.getPackageInfo(it, 0) }.isSuccess }
+    return if (pkg != null) send(pkg) else Intent.createChooser(send(null), null)
+}
+
+/** Email col file allegato (la scheda partita): si sceglie l'app di posta. */
+fun emailFile(ctx: Context, to: String, subject: String, text: String, file: java.io.File): Intent {
+    val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
+    return Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+        type = com.tennis.scoremanager.data.MatchCards.MIME
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, text)
+        putExtra(Intent.EXTRA_STREAM, uri)
+        clipData = android.content.ClipData.newRawUri("", uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }, null)
+}
+
+
+/** Il file col testo, a chi si vuole (senza un numero a cui mandarlo dritto): si sceglie l'app. */
+fun shareFile(ctx: Context, text: String, file: java.io.File): Intent {
+    val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
+    return Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+        type = com.tennis.scoremanager.data.MatchCards.MIME
+        putExtra(Intent.EXTRA_STREAM, uri)
+        putExtra(Intent.EXTRA_TEXT, text)
+        clipData = android.content.ClipData.newRawUri("", uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }, null)
 }
 TSM_EOF
 
@@ -42525,6 +42962,21 @@ interface Strings {
     val onbRestoreHint: String
     val dataWipeCopies: String
     val dataWipeCopiesHint: String
+    val mrTitle: String
+    val mrFilePrefix: String
+    val mrSend: String
+    val mrSendAgain: String
+    val mrReady: String
+    val mrSame: String
+    val mrBadCode: String
+    val mrNotFound: String
+    val mrApply: String
+    val mrReplace: String
+    val mrApplied: String
+    val mcNoOffice: String
+    val mrWinner: (String) -> String
+    val mrPending: (String) -> String
+    val mrConflict: (String) -> String
 }
 
 object ItStrings : Strings {
@@ -44939,6 +45391,21 @@ object ItStrings : Strings {
     override val onbRestoreHint = "Le copie automatiche restano in Documenti › Tennis Score Manager › Backup anche se disinstalli l'app: scegli la più recente."
     override val dataWipeCopies = "Anche le copie automatiche"
     override val dataWipeCopiesHint = "Le copie in Documenti › Tennis Score Manager › Backup restano anche se disinstalli l'app: accendi per toglierle."
+    override val mrTitle = "Risultato dal campo"
+    override val mrFilePrefix = "Risultato"
+    override val mrSend = "Manda il risultato alla segreteria"
+    override val mrSendAgain = "Rimanda il risultato alla segreteria"
+    override val mrReady = "È la partita convocata: registrandolo, il tabellone si aggiorna."
+    override val mrSame = "Questo risultato è già registrato."
+    override val mrBadCode = "Il codice non è quello della scheda mandata per questa partita: il risultato non si registra."
+    override val mrNotFound = "La partita non c'è più (cancellata o annullata) in questo telefono."
+    override val mrApply = "Registra"
+    override val mrReplace = "Sostituisci"
+    override val mrApplied = "Risultato registrato"
+    override val mcNoOffice = "Manca il telefono della segreteria (Altro › Il circolo): senza, chi gioca dovrà scegliere a chi mandare il risultato."
+    override val mrWinner: (String) -> String = { "Vince $it" }
+    override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
+    override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
 }
 
 object EnStrings : Strings {
@@ -47354,6 +47821,21 @@ object EnStrings : Strings {
     override val onbRestoreHint = "The automatic copies stay in Documents › Tennis Score Manager › Backup even if you uninstall the app: pick the latest one."
     override val dataWipeCopies = "The automatic copies too"
     override val dataWipeCopiesHint = "The copies in Documents › Tennis Score Manager › Backup stay even if you uninstall the app: turn on to remove them."
+    override val mrTitle = "Result from the court"
+    override val mrFilePrefix = "Result"
+    override val mrSend = "Send the result to the club office"
+    override val mrSendAgain = "Send the result again"
+    override val mrReady = "It is the match that was called up: recording it updates the draw."
+    override val mrSame = "This result is already recorded."
+    override val mrBadCode = "The code is not the one of the card sent for this match: the result is not recorded."
+    override val mrNotFound = "The match is no longer on this phone (deleted or cancelled)."
+    override val mrApply = "Record"
+    override val mrReplace = "Replace"
+    override val mrApplied = "Result recorded"
+    override val mcNoOffice = "The club office phone is missing (More › The club): without it, players will have to choose who to send the result to."
+    override val mrWinner: (String) -> String = { "Winner: $it" }
+    override val mrPending: (String) -> String = { "Result to send: $it" }
+    override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -49794,6 +50276,21 @@ object DeStrings : Strings {
     override val onbRestoreHint = "Die automatischen Kopien bleiben in Dokumente › Tennis Score Manager › Backup, auch wenn du die App deinstallierst: wähle die neueste."
     override val dataWipeCopies = "Auch die automatischen Kopien"
     override val dataWipeCopiesHint = "Die Kopien in Dokumente › Tennis Score Manager › Backup bleiben auch nach dem Deinstallieren: einschalten, um sie zu löschen."
+    override val mrTitle = "Ergebnis vom Platz"
+    override val mrFilePrefix = "Ergebnis"
+    override val mrSend = "Ergebnis ans Büro schicken"
+    override val mrSendAgain = "Ergebnis erneut schicken"
+    override val mrReady = "Es ist das eingeladene Match: beim Speichern wird das Tableau aktualisiert."
+    override val mrSame = "Dieses Ergebnis ist schon gespeichert."
+    override val mrBadCode = "Der Code passt nicht zur Matchkarte dieses Matches: das Ergebnis wird nicht gespeichert."
+    override val mrNotFound = "Das Match ist auf diesem Telefon nicht mehr vorhanden (gelöscht oder abgesagt)."
+    override val mrApply = "Speichern"
+    override val mrReplace = "Ersetzen"
+    override val mrApplied = "Ergebnis gespeichert"
+    override val mcNoOffice = "Das Telefon des Büros fehlt (Mehr › Der Verein): ohne es müssen die Spieler selbst wählen, an wen sie das Ergebnis schicken."
+    override val mrWinner: (String) -> String = { "Sieger: $it" }
+    override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
+    override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
 }
 TSM_EOF
 
@@ -52224,6 +52721,21 @@ object EsStrings : Strings {
     override val onbRestoreHint = "Las copias automáticas se quedan en Documentos › Tennis Score Manager › Backup aunque desinstales la app: elige la más reciente."
     override val dataWipeCopies = "También las copias automáticas"
     override val dataWipeCopiesHint = "Las copias en Documentos › Tennis Score Manager › Backup se quedan aunque desinstales la app: actívalo para borrarlas."
+    override val mrTitle = "Resultado de la pista"
+    override val mrFilePrefix = "Resultado"
+    override val mrSend = "Enviar el resultado a la secretaría"
+    override val mrSendAgain = "Volver a enviar el resultado"
+    override val mrReady = "Es el partido convocado: al registrarlo, el cuadro se actualiza."
+    override val mrSame = "Este resultado ya está registrado."
+    override val mrBadCode = "El código no es el de la ficha enviada para este partido: el resultado no se registra."
+    override val mrNotFound = "El partido ya no está en este teléfono (borrado o anulado)."
+    override val mrApply = "Registrar"
+    override val mrReplace = "Sustituir"
+    override val mrApplied = "Resultado registrado"
+    override val mcNoOffice = "Falta el teléfono de la secretaría (Más › El club): sin él, los jugadores tendrán que elegir a quién enviar el resultado."
+    override val mrWinner: (String) -> String = { "Gana $it" }
+    override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
+    override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
 }
 TSM_EOF
 
@@ -54656,6 +55168,21 @@ object FrStrings : Strings {
     override val onbRestoreHint = "Les copies automatiques restent dans Documents › Tennis Score Manager › Backup même si vous désinstallez l'appli : choisissez la plus récente."
     override val dataWipeCopies = "Aussi les copies automatiques"
     override val dataWipeCopiesHint = "Les copies dans Documents › Tennis Score Manager › Backup restent même si vous désinstallez l'appli : activez pour les supprimer."
+    override val mrTitle = "Résultat du court"
+    override val mrFilePrefix = "Résultat"
+    override val mrSend = "Envoyer le résultat au secrétariat"
+    override val mrSendAgain = "Renvoyer le résultat au secrétariat"
+    override val mrReady = "C'est le match convoqué : en l'enregistrant, le tableau se met à jour."
+    override val mrSame = "Ce résultat est déjà enregistré."
+    override val mrBadCode = "Le code n'est pas celui de la fiche envoyée pour ce match : le résultat n'est pas enregistré."
+    override val mrNotFound = "Le match n'est plus sur ce téléphone (supprimé ou annulé)."
+    override val mrApply = "Enregistrer"
+    override val mrReplace = "Remplacer"
+    override val mrApplied = "Résultat enregistré"
+    override val mcNoOffice = "Le téléphone du secrétariat manque (Plus › Le club) : sans lui, les joueurs devront choisir à qui envoyer le résultat."
+    override val mrWinner: (String) -> String = { "Vainqueur : $it" }
+    override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
+    override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
 }
 TSM_EOF
 
@@ -57089,6 +57616,21 @@ object PtStrings : Strings {
     override val onbRestoreHint = "As cópias automáticas ficam em Documentos › Tennis Score Manager › Backup mesmo se você desinstalar o app: escolha a mais recente."
     override val dataWipeCopies = "Também as cópias automáticas"
     override val dataWipeCopiesHint = "As cópias em Documentos › Tennis Score Manager › Backup ficam mesmo se você desinstalar o app: ative para apagá-las."
+    override val mrTitle = "Resultado da quadra"
+    override val mrFilePrefix = "Resultado"
+    override val mrSend = "Enviar o resultado à secretaria"
+    override val mrSendAgain = "Reenviar o resultado à secretaria"
+    override val mrReady = "É a partida convocada: ao registrá-lo, a chave é atualizada."
+    override val mrSame = "Este resultado já está registrado."
+    override val mrBadCode = "O código não é o da ficha enviada para esta partida: o resultado não é registrado."
+    override val mrNotFound = "A partida já não está neste telefone (apagada ou anulada)."
+    override val mrApply = "Registrar"
+    override val mrReplace = "Substituir"
+    override val mrApplied = "Resultado registrado"
+    override val mcNoOffice = "Falta o telefone da secretaria (Mais › O clube): sem ele, os jogadores terão de escolher a quem enviar o resultado."
+    override val mrWinner: (String) -> String = { "Vence $it" }
+    override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
+    override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
 }
 TSM_EOF
 
@@ -61293,6 +61835,7 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
@@ -61632,6 +62175,14 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     var clubMatches by remember { mutableStateOf(false) }
     if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
     if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
+    // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
+    val cards by c.receivedCards.collectAsState()
+    for (rc in cards.filter { it.result != null && it.sentAt == null }) {
+        val r = rc.result!!
+        Entry(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ")) {
+            com.tennis.scoremanager.ui.sendResult(context, c, rc.card.code)
+        }
+    }
     history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
         val su = last.record.setup
         if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
@@ -64095,39 +64646,6 @@ private fun launch(context: Context, intent: Intent, noApp: String) {
 /** WhatsApp con la chat di quel numero e il messaggio già scritto (si preme Invia). */
 private fun whatsApp(number: String, text: String) = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number?text=" + Uri.encode(text)))
 
-/**
- * WhatsApp con un file (la scheda partita) e il testo, dritto nella chat di quel numero ("jid"); senza WhatsApp si
- * sceglie l'app. Il permesso di leggere il file passa con l'intent.
- */
-private fun whatsAppFile(ctx: Context, number: String, text: String, file: java.io.File): Intent {
-    val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
-    fun send(pkg: String?) = Intent(Intent.ACTION_SEND).apply {
-        type = com.tennis.scoremanager.data.MatchCards.MIME
-        putExtra(Intent.EXTRA_STREAM, uri)
-        putExtra(Intent.EXTRA_TEXT, text)
-        clipData = android.content.ClipData.newRawUri("", uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        if (pkg != null) { setPackage(pkg); putExtra("jid", "$number@s.whatsapp.net") }
-    }
-    val pm = ctx.packageManager
-    val pkg = listOf("com.whatsapp", "com.whatsapp.w4b").firstOrNull { runCatching { pm.getPackageInfo(it, 0) }.isSuccess }
-    return if (pkg != null) send(pkg) else Intent.createChooser(send(null), null)
-}
-
-/** Email col file allegato (la scheda partita): si sceglie l'app di posta. */
-private fun emailFile(ctx: Context, to: String, subject: String, text: String, file: java.io.File): Intent {
-    val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
-    return Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
-        type = com.tennis.scoremanager.data.MatchCards.MIME
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
-        putExtra(Intent.EXTRA_SUBJECT, subject)
-        putExtra(Intent.EXTRA_TEXT, text)
-        putExtra(Intent.EXTRA_STREAM, uri)
-        clipData = android.content.ClipData.newRawUri("", uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }, null)
-}
-
 private fun sms(numbers: List<String>, text: String) =
     Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + numbers.joinToString(";") { Uri.encode(it) })).putExtra("sms_body", text)
 
@@ -64208,11 +64726,11 @@ fun NoticeScreen(c: MatchController) {
                         if (file != null) Text(s.ntCardAttached(file.name), color = TsmColors.Ball, fontSize = 12.sp)
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp", Modifier.weight(1f)) {
-                                mark(r); open(if (file != null) whatsAppFile(context, wa, textOf(r), file) else whatsApp(wa, textOf(r)))
+                                mark(r); open(if (file != null) com.tennis.scoremanager.ui.whatsAppFile(context, wa, textOf(r), file) else whatsApp(wa, textOf(r)))
                             }
                             if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS", Modifier.weight(1f)) { mark(r); open(sms(listOf(r.phone), textOf(r))) }
                             if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail, Modifier.weight(1f)) {
-                                mark(r); open(if (file != null) emailFile(context, r.email, p.subject, textOf(r), file) else email(listOf(r.email), emptyList(), p.subject, textOf(r)))
+                                mark(r); open(if (file != null) com.tennis.scoremanager.ui.emailFile(context, r.email, p.subject, textOf(r), file) else email(listOf(r.email), emptyList(), p.subject, textOf(r)))
                             }
                         }
                     }
@@ -68765,6 +69283,8 @@ fun SummaryScreen(c: MatchController) {
             Modifier.fillMaxWidth().background(TsmColors.Surface).padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Partita di una scheda della segreteria: il risultato da rimandarle.
+            com.tennis.scoremanager.ui.SendResultButton(c, rec.id)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, { shareChoice = true }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
@@ -69457,6 +69977,14 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                 if (r.doubles) OutlinedTextField(theirs2, { theirs2 = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmTheirs2) })
                 // Formazione pronta: il punteggio dal campo si tiene nel ruolo Tu (Gioca › Partite del circolo).
                 if (r.ours.size == need && r.won == null) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Convoca i nostri di questa partita con la scheda partita (la formazione si salva prima).
+                if (r.ours.size == need && r.won == null) GhostButton(s.ctConvoke, Icons.Filled.HowToReg, {
+                    val x = current()
+                    c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
+                    onDone()
+                    val tt = c.team(t.id) ?: t
+                    c.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
+                }, Modifier.fillMaxWidth())
                 OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
                 Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it], walkover = false) })
@@ -89842,6 +90370,54 @@ class MatchCardsTest {
         assertEquals("Semi_finale Rossi - Bianchi.tsm", MatchCards.fileName(card))
         assertNotNull(card.side1.firstOrNull())
     }
+
+    @Test fun resultRoundTripAndCheckAgainstTournament() {
+        val coded = t.copy(matches = t.matches.map { if (it.id == "m1") it.copy(cardCode = "CODE2345") else it })
+        val card = MatchCards.forTournament(coded, coded.matches[0], "CODE2345", 0, "", "", "Finale", find)!!
+        val r = MatchCards.result(card, 2, "4-6  6-7(3)", walkover = false, retired = false, disqualified = false, now = 9)
+        assertEquals(r, MatchCards.decodeResult(MatchCards.encodeResult(r)))
+        assertNull(MatchCards.decodeResult(MatchCards.encode(card)))
+        assertNull(MatchCards.decode(MatchCards.encodeResult(r)))
+        assertEquals(ResultStatus.READY, MatchCards.check(r, listOf(coded), emptyList(), emptyList()))
+        assertEquals(ResultStatus.BAD_CODE, MatchCards.check(r.copy(code = "ALTRO"), listOf(coded), emptyList(), emptyList()))
+        assertEquals(ResultStatus.NOT_FOUND, MatchCards.check(r.copy(match = "zz"), listOf(coded), emptyList(), emptyList()))
+        val played = ClubTournaments.setResult(coded, "m1", "e2", "4-6  6-7(3)")
+        assertEquals(ResultStatus.SAME, MatchCards.check(r, listOf(played), emptyList(), emptyList()))
+        assertEquals(ResultStatus.CONFLICT, MatchCards.check(r.copy(winner = 1), listOf(played), emptyList(), emptyList()))
+    }
+
+    @Test fun teamAndLadderCardsAndChecks() {
+        val team = Team("tm", "Serie C", championship = "Campionato", roster = listOf("p1", "p2"), singles = 1, doubles = 0,
+            fixtures = listOf(Fixture("f1", "TC Ospiti", 5_000, place = "Campo 1", rubbers = listOf(Rubber(ours = listOf("p1"), theirs = listOf("Verdi"), cardCode = "TEAM2345")))))
+        val f = team.fixtures[0]
+        val card = MatchCards.forRubber(team, f, 0, "TEAM2345", 0, "", "", "Singolare 1", find)!!
+        assertEquals(CardKind.TEAM, card.kind)
+        assertEquals("Verdi", card.side2[0].name)
+        assertEquals("", card.side2[0].id)
+        assertEquals("Campo 1", card.court)
+        assertNull(MatchCards.forRubber(team, f.copy(rubbers = listOf(Rubber())), 0, "X", 0, "", "", "", find))
+        val r = MatchCards.result(card, 1, "6-2  6-1", false, false, false, 0)
+        assertEquals(ResultStatus.READY, MatchCards.check(r, emptyList(), listOf(team), emptyList()))
+        val done = team.copy(fixtures = listOf(Teams.setRubber(f, 0, "6-2 6-1", true)))
+        assertEquals(ResultStatus.SAME, MatchCards.check(r, emptyList(), listOf(done), emptyList()))
+
+        val ladder = Ladder("l1", "Classifica", listOf("p2", "p1"), challenges = listOf(Challenge("c1", "p1", "p2", challengerPos = 2, defenderPos = 1, cardCode = "LADR2345")))
+        val lc = MatchCards.forChallenge(ladder, ladder.challenges[0], "LADR2345", 0, "", "", "2° → 1°", find)!!
+        assertEquals("p1", lc.side1[0].id)
+        val lr = MatchCards.result(lc, 1, "6-4  6-4", false, false, false, 0)
+        assertEquals(ResultStatus.READY, MatchCards.check(lr, emptyList(), emptyList(), listOf(ladder)))
+        val after = Ladders.result(ladder, "c1", "6-4 6-4", true, 1)
+        assertEquals(ResultStatus.SAME, MatchCards.check(lr, emptyList(), emptyList(), listOf(after)))
+        assertEquals(ResultStatus.CONFLICT, MatchCards.check(lr.copy(winner = 2), emptyList(), emptyList(), listOf(after)))
+    }
+
+    @Test fun resultTextAndFileName() {
+        val r = MatchResult(code = "x", ref = "t", match = "m", round = "Finale", side1 = "Mario Rossi", side2 = "Luca Bianchi", score = "6-3  2-1")
+        assertEquals("6-3  2-1", MatchCards.resultText(r, "w.o.", "rit.", "squal."))
+        assertEquals("6-3  2-1 rit.", MatchCards.resultText(r.copy(retired = true), "w.o.", "rit.", "squal."))
+        assertEquals("w.o.", MatchCards.resultText(r.copy(walkover = true), "w.o.", "rit.", "squal."))
+        assertEquals("Risultato Finale Rossi - Bianchi.tsm", MatchCards.resultFileName("Risultato", r))
+    }
 }
 TSM_EOF
 
@@ -105433,6 +106009,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 338 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 339 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -2426,4 +2426,19 @@ object PtStrings : Strings {
     override val onbRestoreHint = "As cópias automáticas ficam em Documentos › Tennis Score Manager › Backup mesmo se você desinstalar o app: escolha a mais recente."
     override val dataWipeCopies = "Também as cópias automáticas"
     override val dataWipeCopiesHint = "As cópias em Documentos › Tennis Score Manager › Backup ficam mesmo se você desinstalar o app: ative para apagá-las."
+    override val mrTitle = "Resultado da quadra"
+    override val mrFilePrefix = "Resultado"
+    override val mrSend = "Enviar o resultado à secretaria"
+    override val mrSendAgain = "Reenviar o resultado à secretaria"
+    override val mrReady = "É a partida convocada: ao registrá-lo, a chave é atualizada."
+    override val mrSame = "Este resultado já está registrado."
+    override val mrBadCode = "O código não é o da ficha enviada para esta partida: o resultado não é registrado."
+    override val mrNotFound = "A partida já não está neste telefone (apagada ou anulada)."
+    override val mrApply = "Registrar"
+    override val mrReplace = "Substituir"
+    override val mrApplied = "Resultado registrado"
+    override val mcNoOffice = "Falta o telefone da secretaria (Mais › O clube): sem ele, os jogadores terão de escolher a quem enviar o resultado."
+    override val mrWinner: (String) -> String = { "Vence $it" }
+    override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
+    override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
 }
