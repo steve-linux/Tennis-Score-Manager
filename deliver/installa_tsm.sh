@@ -7599,7 +7599,7 @@ async function showAgendaList(views) {
 async function showCourses() {
   if (coachCourseId) return showCourseRegister(coachCourseId);
   const list = await api('GET', '/coach/courses');
-  put(main(), h('div.head', h('h1', T.ccTitle)),
+  put(main(), h('div.head', h('h1', T.ccTitle), h('button.primary', { onclick: () => editOwnCourse(null) }, T.ccNew)),
     list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:5px solid ' + (c.personal ? OWN : 'var(--accent)'), onclick: () => { coachCourseId = c.id; showCourses(); } },
       h('h2', c.name), c.personal ? h('p', { style: 'color:' + OWN }, T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
       h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
@@ -7614,6 +7614,12 @@ async function showCourseRegister(id) {
   const shortD = (d) => d.slice(8, 10) + '/' + d.slice(5, 7);
   put(main(),
     h('div.head', back, h('h1', c.name),
+      // Un corso suo (azzurro): si cambia e si toglie anche dal PC; quelli della segreteria li cambia lei.
+      c.personal ? h('button', { onclick: () => editOwnCourse(c) }, T.edit) : null,
+      c.personal ? h('button.danger', { onclick: async () => {
+        if (!confirm(T.ccDeleteAsk(c.name))) return;
+        try { await api('DELETE', '/coach/courses/' + encodeURIComponent(id)); toast(T.saved); coachCourseId = null; showCourses(); } catch (e) { toast(errText(e)); }
+      } }, T.remove) : null,
       h('button', { onclick: () => openPdf('/coach/courses/' + encodeURIComponent(id) + '/register.pdf', T.rgTitle + ' ' + c.name) }, T.rgPdf),
       h('button', { onclick: () => downloadFile('/coach/courses/' + encodeURIComponent(id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave),
       printBtn()),
@@ -7624,6 +7630,51 @@ async function showCourseRegister(id) {
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
       h('tbody', r.rows.map((row) => h('tr', h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
+}
+
+/**
+ * Un corso dell'allenatore, nuovo ([c] null) o da cambiare: nome, livello, dal… al…, orari settimanali (giorno, ora,
+ * durata, dove) e allievi. Salvato, si apre il suo registro.
+ */
+async function editOwnCourse(c) {
+  let students = [];
+  try { students = await api('GET', '/coach/students'); } catch (e) { toast(errText(e)); return; }
+  const name = h('input', { value: c ? c.name : '', maxlength: 60, required: true });
+  const level = h('input', { value: c ? c.level : '', maxlength: 40 });
+  const plus = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setMonth(x.getMonth() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+  const from = h('input', { type: 'date', value: c ? c.from : info.today });
+  const to = h('input', { type: 'date', value: c ? c.to : plus(info.today, 6) });
+  let slots = c ? c.slots.slice() : [];
+  const slotList = h('div');
+  const drawSlots = () => put(slotList, slots.length ? slots.map((x, i) => h('div', { style: 'display:flex;gap:8px;align-items:center' },
+    h('span', weekdayName(x.weekday) + ' ' + hhmm(x.startMin) + ' · ' + T.coMinutes(x.minutes) + (x.court ? ' · ' + x.court : '')),
+    h('button', { type: 'button', onclick: () => { slots.splice(i, 1); drawSlots(); } }, '✕'))) : h('p.dim', '—'));
+  const wd = select([1, 2, 3, 4, 5, 6, 7].map((k) => [String(k), weekdayName(k)]), '1');
+  const time = h('input', { type: 'time', value: '17:00', step: 300 });
+  const mins = select([45, 60, 90, 120].map((k) => [String(k), T.coMinutes(k)]), '60');
+  const place = h('input', { maxlength: 30, placeholder: T.coPlace });
+  const add = h('button', { type: 'button', onclick: () => {
+    const [hh, mm] = time.value.split(':').map(Number);
+    if (Number.isNaN(hh)) return;
+    slots.push({ weekday: Number(wd.value), startMin: hh * 60 + (mm || 0), minutes: Number(mins.value), court: place.value.trim() });
+    slots.sort((a, b) => a.weekday - b.weekday || a.startMin - b.startMin);
+    drawSlots();
+  } }, T.ccAddSlot);
+  const chosen = new Set(c ? c.studentIds : []);
+  const boxes = students.map((s) => { const b = h('input', { type: 'checkbox' }); b.checked = chosen.has(s.id); return [s.id, h('label.check', b, s.name), b]; });
+  drawSlots();
+  dialog(c ? c.name : T.ccNew, h('div.form',
+    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), field(T.ctStart, from), field(T.ctEnd, to),
+    h('h3.full', T.ccSlots), h('div.full', slotList),
+    field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
+    h('h3.full', T.ccPickStudents), h('div.full', boxes.map((b) => b[1]))), async () => {
+    if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
+    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]) };
+    const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
+    toast(T.saved);
+    coachView = 'courses'; coachCourseId = out.id;
+    await coachRender();
+  }, { wide: true });
 }
 
 function attendanceDialog(r, l) {
@@ -10193,7 +10244,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
 - **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken. In der Übersicht liefert **Quittungen <Jahr> (Excel)** die Liste der Paketquittungen des Jahres, für den Steuerberater.
-- **Trainer am PC** (*Mehr › Trainer am PC*): wie das Büro am PC (7.20) öffnet der Computer zu Hause eine Seite, die das Telefon im selben Netz bereitstellt, nach der Kopplung per QR oder Code. Es gibt nur die Daten des Trainers: **Schüler** (die Karte mit Tagebuch, Notizen, Bewertung, Tests, Rangliste und Turnieren, Ergebnissen, Paketen mit PDF-Quittungen und dem Bericht), **Stundenplan** (der Kalender für Monat oder Woche mit Privatstunden, Kursstunden und Turnieren der Schüler, oder die Liste mit den noch als erledigt zu markierenden), **Meine Kurse** (die Liste, Anwesenheit per Klick auf eine Stunde, PDF und Excel) und **Monatsübersicht** (mit den Quittungen des Jahres in Excel). Jede Seite lässt sich drucken; die Daten bleiben auf dem Telefon.
+- **Trainer am PC** (*Mehr › Trainer am PC*): wie das Büro am PC (7.20) öffnet der Computer zu Hause eine Seite, die das Telefon im selben Netz bereitstellt, nach der Kopplung per QR oder Code. Es gibt nur die Daten des Trainers: **Schüler** (die Karte mit Tagebuch, Notizen, Bewertung, Tests, Rangliste und Turnieren, Ergebnissen, Paketen mit PDF-Quittungen und dem Bericht), **Stundenplan** (der Kalender für Monat oder Woche mit Privatstunden, Kursstunden und Turnieren der Schüler, oder die Liste mit den noch als erledigt zu markierenden), **Meine Kurse** (die Liste, Anwesenheit per Klick auf eine Stunde, PDF und Excel) und **Monatsübersicht** (mit den Quittungen des Jahres in Excel). Jede Seite lässt sich drucken; die Daten bleiben auf dem Telefon. Unter *Meine Kurse* gibt es auch **Neuer Kurs** und bei deinen eigenen Kursen (blau) **Bearbeiten** und **Entfernen**.
 - **Kalender, Erinnerungen und Fortschrittskarte**: **Zum Kalender hinzufügen** trägt in den Telefonkalender eine Stunde ein (aus der Stunde), die Stunden eines Kurses jede Woche (**Kalender** im Kurs), ein Turnier des Schülers und das Match einer erhaltenen Einladung. Die **Erinnerungen** (Einstellungen, standardmäßig an) melden am Vorabend die Stunden von morgen, noch zu schickende Kursanwesenheit und, wer eingeladen ist, das Match des Tages. **Fortschrittskarte schicken** (Karte des Schülers) schickt ihm Bewertung, Ziele, Tests, Rangliste, nächste Stunden und übrige Stunden: der Schüler öffnet sie mit TSM und findet sie unter *Fortschritte › Von meinem Trainer* (Tagebuch und Notizen bleiben bei dir).
 
 ### 7.7 Spieler: die Datenbank
@@ -10799,7 +10850,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
 - **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office. In the summary, **Receipts <year> (Excel)** gives the list of the year's pack receipts, for the accountant.
-- **Coach from PC** (*More › Coach from PC*): like the Club office from PC (7.20), the home computer opens a page served by the phone, on the same network, after pairing with a QR or code. Only the coach's data is there: **Students** (the card with diary, notes, assessment, tests, ranking and tournaments, results, packs with PDF receipts and the report), **Schedule** (the month or week calendar with private lessons, course lessons and students' tournaments, or the list with those to mark as done), **My courses** (the register, roll call by clicking a lesson, PDF and Excel) and **Monthly summary** (with the year's receipts in Excel). Every page can be printed; the data stays on the phone.
+- **Coach from PC** (*More › Coach from PC*): like the Club office from PC (7.20), the home computer opens a page served by the phone, on the same network, after pairing with a QR or code. Only the coach's data is there: **Students** (the card with diary, notes, assessment, tests, ranking and tournaments, results, packs with PDF receipts and the report), **Schedule** (the month or week calendar with private lessons, course lessons and students' tournaments, or the list with those to mark as done), **My courses** (the register, roll call by clicking a lesson, PDF and Excel) and **Monthly summary** (with the year's receipts in Excel). Every page can be printed; the data stays on the phone. In *My courses* there are also **New course** and, in your own courses (in blue), **Edit** and **Remove**.
 - **Calendar, reminders and progress card**: **Add to calendar** puts in the phone's calendar a lesson (from the lesson), a course's lessons every week (**Calendar** in the course), a student's tournament and the match of a call-up received. **Reminders** (Settings, on by default) tell you the evening before about tomorrow's lessons, a course's attendance still to send and, to whoever is called up, the match of the day. **Send the progress card** (student's card) sends them assessment, goals, tests, ranking, next lessons and lessons left: the student opens it with TSM and finds it in *Progress › From my coach* (diary and notes stay yours).
 
 ### 7.7 Players: the database
@@ -11404,7 +11455,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
 - **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría. En el resumen, **Recibos <año> (Excel)** da la lista de recibos de paquetes del año, para el gestor.
-- **Entrenador desde el PC** (*Más › Entrenador desde el PC*): como la Secretaría desde el PC (7.20), el ordenador de casa abre una página servida por el teléfono, en la misma red, tras emparejar con QR o código. Solo están los datos del entrenador: **Alumnos** (la ficha con diario, notas, evaluación, pruebas, clasificación y torneos, resultados, paquetes con los recibos en PDF y el informe), **Agenda** (el calendario del mes o de la semana con clases particulares, clases de los cursos y torneos de los alumnos, o la lista con las que hay que marcar como hechas), **Mis cursos** (el registro, pasar lista pulsando una clase, PDF y Excel) y **Resumen del mes** (con los recibos del año en Excel). Cada página se imprime; los datos se quedan en el teléfono.
+- **Entrenador desde el PC** (*Más › Entrenador desde el PC*): como la Secretaría desde el PC (7.20), el ordenador de casa abre una página servida por el teléfono, en la misma red, tras emparejar con QR o código. Solo están los datos del entrenador: **Alumnos** (la ficha con diario, notas, evaluación, pruebas, clasificación y torneos, resultados, paquetes con los recibos en PDF y el informe), **Agenda** (el calendario del mes o de la semana con clases particulares, clases de los cursos y torneos de los alumnos, o la lista con las que hay que marcar como hechas), **Mis cursos** (el registro, pasar lista pulsando una clase, PDF y Excel) y **Resumen del mes** (con los recibos del año en Excel). Cada página se imprime; los datos se quedan en el teléfono. En *Mis cursos* están también **Nuevo curso** y, en tus cursos (en azul), **Editar** y **Quitar**.
 - **Calendario, recordatorios y ficha de progresos**: **Añadir al calendario** pone en el calendario del teléfono una clase (desde la clase), las clases de un curso cada semana (**Calendario** en el curso), un torneo del alumno y el partido de una convocatoria recibida. Los **recordatorios** (Ajustes, activados por defecto) avisan la noche antes de las clases de mañana, de la asistencia de un curso por enviar y, a quien está convocado, del partido del día. **Enviar la ficha de progresos** (ficha del alumno) le envía evaluación, objetivos, pruebas, clasificación, próximas clases y clases que quedan: el alumno la abre con TSM y la encuentra en *Progresos › De mi entrenador* (el diario y las notas siguen siendo tuyos).
 
 ### 7.7 Jugadores: la base
@@ -12009,7 +12060,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
 - **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat. Dans le récapitulatif, **Reçus <année> (Excel)** donne la liste des reçus de forfaits de l'année, pour le comptable.
-- **Entraîneur depuis le PC** (*Plus › Entraîneur depuis le PC*) : comme le Secrétariat depuis le PC (7.20), l'ordinateur de la maison ouvre une page servie par le téléphone, sur le même réseau, après l'appairage par QR ou code. Il n'y a que les données de l'entraîneur : **Élèves** (la fiche avec journal, notes, évaluation, tests, classement et tournois, résultats, forfaits avec les reçus PDF et le rapport), **Agenda** (le calendrier du mois ou de la semaine avec cours particuliers, séances des cours et tournois des élèves, ou la liste avec ceux à marquer comme faits), **Mes cours** (le registre, l'appel en cliquant sur une séance, PDF et Excel) et **Récapitulatif du mois** (avec les reçus de l'année en Excel). Chaque page s'imprime ; les données restent sur le téléphone.
+- **Entraîneur depuis le PC** (*Plus › Entraîneur depuis le PC*) : comme le Secrétariat depuis le PC (7.20), l'ordinateur de la maison ouvre une page servie par le téléphone, sur le même réseau, après l'appairage par QR ou code. Il n'y a que les données de l'entraîneur : **Élèves** (la fiche avec journal, notes, évaluation, tests, classement et tournois, résultats, forfaits avec les reçus PDF et le rapport), **Agenda** (le calendrier du mois ou de la semaine avec cours particuliers, séances des cours et tournois des élèves, ou la liste avec ceux à marquer comme faits), **Mes cours** (le registre, l'appel en cliquant sur une séance, PDF et Excel) et **Récapitulatif du mois** (avec les reçus de l'année en Excel). Chaque page s'imprime ; les données restent sur le téléphone. Dans *Mes cours* il y a aussi **Nouveau cours** et, dans vos cours (en bleu), **Modifier** et **Retirer**.
 - **Agenda, rappels et fiche de progrès** : **Ajouter à l'agenda** met dans l'agenda du téléphone un cours (depuis le cours), les séances d'un cours chaque semaine (**Agenda** dans le cours), un tournoi de l'élève et le match d'une convocation reçue. Les **rappels** (Réglages, activés par défaut) préviennent la veille des cours du lendemain, des présences d'un cours encore à envoyer et, pour qui est convoqué, du match du jour. **Envoyer la fiche de progrès** (fiche de l'élève) lui envoie évaluation, objectifs, tests, classement, prochains cours et cours restants : l'élève l'ouvre avec TSM et la trouve dans *Progrès › De mon entraîneur* (le journal et les notes restent à vous).
 
 ### 7.7 Joueurs : la base
@@ -12614,7 +12665,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
 - **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria. Nel riepilogo, **Ricevute <anno> (Excel)** dà l'elenco delle ricevute dei pacchetti dell'anno, per il commercialista.
-- **Allenatore da PC** (*Altro › Allenatore da PC*): come la Segreteria da PC (7.20), il computer di casa apre una pagina servita dal telefono, sulla stessa rete, dopo l'abbinamento con QR o codice. Ci sono solo i dati dell'allenatore: **Allievi** (la scheda con diario, note, valutazione, test, classifica e tornei, risultati, pacchetti con le ricevute in PDF e il report), **Agenda** (il calendario del mese o della settimana con lezioni private, lezioni dei corsi e tornei degli allievi, oppure l'elenco con quelle da segnare come fatte), **I miei corsi** (il registro, l'appello cliccando una lezione, PDF ed Excel) e **Riepilogo del mese** (con le ricevute dell'anno in Excel). Ogni pagina si stampa; i dati restano sul telefono.
+- **Allenatore da PC** (*Altro › Allenatore da PC*): come la Segreteria da PC (7.20), il computer di casa apre una pagina servita dal telefono, sulla stessa rete, dopo l'abbinamento con QR o codice. Ci sono solo i dati dell'allenatore: **Allievi** (la scheda con diario, note, valutazione, test, classifica e tornei, risultati, pacchetti con le ricevute in PDF e il report), **Agenda** (il calendario del mese o della settimana con lezioni private, lezioni dei corsi e tornei degli allievi, oppure l'elenco con quelle da segnare come fatte), **I miei corsi** (il registro, l'appello cliccando una lezione, PDF ed Excel) e **Riepilogo del mese** (con le ricevute dell'anno in Excel). Ogni pagina si stampa; i dati restano sul telefono. In *I miei corsi* ci sono anche **Nuovo corso** e, nei tuoi corsi (in azzurro), **Modifica** e **Togli**.
 - **Calendario, promemoria e scheda progressi**: **Aggiungi al calendario** mette nel calendario del telefono una lezione (dalla lezione), le lezioni di un corso ogni settimana (**Calendario** nel corso), un torneo dell'allievo e la partita di una convocazione ricevuta. I **promemoria** (Impostazioni, accesi di serie) avvisano la sera prima delle lezioni di domani, le presenze di un corso ancora da mandare e, a chi è convocato, la partita del giorno. **Manda la scheda progressi** (scheda dell'allievo) gli manda valutazione, obiettivi, test, classifica, prossime lezioni e lezioni rimaste: l'allievo la apre con TSM e la trova in *Progressi › Dal mio allenatore* (il diario e le note restano tue).
 
 ### 7.7 Giocatori: il database
@@ -13219,7 +13270,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
 - **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria. No resumo, **Recibos <ano> (Excel)** dá a lista dos recibos de pacotes do ano, para o contabilista.
-- **Treinador no PC** (*Mais › Treinador no PC*): como a Secretaria no PC (7.20), o computador de casa abre uma página servida pelo telefone, na mesma rede, depois de emparelhar com QR ou código. Só estão os dados do treinador: **Alunos** (a ficha com diário, notas, avaliação, testes, ranking e torneios, resultados, pacotes com os recibos em PDF e o relatório), **Agenda** (o calendário do mês ou da semana com aulas particulares, aulas dos cursos e torneios dos alunos, ou a lista com as que falta marcar como feitas), **Os meus cursos** (o registo, a chamada clicando numa aula, PDF e Excel) e **Resumo do mês** (com os recibos do ano em Excel). Cada página imprime-se; os dados ficam no telefone.
+- **Treinador no PC** (*Mais › Treinador no PC*): como a Secretaria no PC (7.20), o computador de casa abre uma página servida pelo telefone, na mesma rede, depois de emparelhar com QR ou código. Só estão os dados do treinador: **Alunos** (a ficha com diário, notas, avaliação, testes, ranking e torneios, resultados, pacotes com os recibos em PDF e o relatório), **Agenda** (o calendário do mês ou da semana com aulas particulares, aulas dos cursos e torneios dos alunos, ou a lista com as que falta marcar como feitas), **Os meus cursos** (o registo, a chamada clicando numa aula, PDF e Excel) e **Resumo do mês** (com os recibos do ano em Excel). Cada página imprime-se; os dados ficam no telefone. Em *Os meus cursos* há também **Novo curso** e, nos seus cursos (a azul), **Editar** e **Remover**.
 - **Calendário, lembretes e ficha de progresso**: **Adicionar ao calendário** põe no calendário do telefone uma aula (a partir da aula), as aulas de um curso todas as semanas (**Calendário** no curso), um torneio do aluno e a partida de uma convocação recebida. Os **lembretes** (Configurações, ligados por defeito) avisam na véspera das aulas de amanhã, das presenças de um curso por enviar e, a quem está convocado, da partida do dia. **Enviar a ficha de progresso** (ficha do aluno) envia-lhe avaliação, objetivos, testes, ranking, próximas aulas e aulas restantes: o aluno abre-a com o TSM e encontra-a em *Progresso › Do meu treinador* (o diário e as notas ficam seus).
 
 ### 7.7 Jogadores: o banco
@@ -31056,6 +31107,9 @@ interface CoachData {
     fun markPackPaid(packId: String)
     fun setLessonDone(lessonId: String, done: Boolean)
     fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String)
+    /** Un corso dell'allenatore (non della segreteria): nuovo o cambiato, o tolto. */
+    fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) {}
+    fun deleteOwnCourse(id: String) {}
     fun receiptPdf(packId: String): ByteArray?
     fun reportPdf(student: String, days: Int?): ByteArray?
     fun registerPdf(courseId: String): ByteArray?
@@ -31080,7 +31134,15 @@ interface CoachData {
     val testDate: String? = null, val results: List<CdResult>, val events: List<CdEvent>, val rankings: List<String>, val packs: List<CdPack>, val courses: List<CdCourseLine>,
 )
 @Serializable data class CdLesson(val id: String, val date: String, val startMin: Int, val minutes: Int, val students: List<String>, val place: String, val done: Boolean, val cancelled: Boolean)
-@Serializable data class CdCourse(val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int, val personal: Boolean = false)
+@Serializable data class CdSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
+@Serializable data class CdCourse(
+    val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int,
+    val personal: Boolean = false, val slots: List<CdSlot> = emptyList(), val studentIds: List<String> = emptyList(),
+)
+/** Un corso dell'allenatore da creare o cambiare dal PC. */
+@Serializable data class CdCourseIn(
+    val name: String = "", val level: String = "", val from: String = "", val to: String = "", val slots: List<CdSlot> = emptyList(), val students: List<String> = emptyList(),
+)
 @Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
@@ -31136,6 +31198,13 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         }
         m == "GET" && p == listOf("coach", "courses") -> ok(ListSerializer(CdCourse.serializer()), data.book().courses.map { course(it.card.course.id) }.sortedBy { it.name.lowercase() })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ok(CdRegister.serializer(), register(p[2]))
+        m == "POST" && p == listOf("coach", "courses") -> ownCourse(null, read(CdCourseIn.serializer(), r))
+        m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ownCourse(p[2], read(CdCourseIn.serializer(), r))
+        m == "DELETE" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> {
+            val cc = data.book().courses.firstOrNull { it.card.course.id == p[2] } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+            if (!cc.personal) throw DeskApi.Fail(409, "NOT_OWN")
+            data.deleteOwnCourse(p[2]); done()
+        }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "attendance" -> attendance(p[2], read(CdAttendanceIn.serializer(), r))
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.pdf" -> { course(p[2]); bytes(data.registerPdf(p[2]), "application/pdf") }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.xlsx" -> { course(p[2]); bytes(data.registerXlsx(p[2]), com.tennis.scoremanager.data.Xlsx.MIME) }
@@ -31194,7 +31263,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
         val co = cc.course; val now = data.now()
         return CdCourse(co.id, co.name, co.level, cc.card.club, day(co.from)!!, day(co.to)!!, co.students.size, cc.toSend,
-            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled }, cc.personal)
+            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled }, cc.personal,
+            co.slots.map { CdSlot(it.weekday, it.startMin, it.minutes, it.court) }, co.students)
     }
 
     private fun register(id: String): CdRegister {
@@ -31212,6 +31282,23 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             },
             cc.notes,
         )
+    }
+
+    /** Crea ([id] null) o cambia un corso dell'allenatore; quelli della segreteria non si toccano. */
+    private fun ownCourse(id: String?, i: CdCourseIn): DeskApi.Resp {
+        val name = i.name.trim().take(60)
+        if (name.isEmpty() || i.slots.isEmpty() || i.slots.any { it.weekday !in 1..7 || it.startMin !in 0 until 24 * 60 || it.minutes !in 15..300 }) throw DeskApi.Fail(400, "BAD_REQUEST")
+        val from = dayStart(i.from); val to = dayStart(i.to)
+        if (to < from) throw DeskApi.Fail(400, "BAD_REQUEST")
+        val students = i.students.filter { s -> data.players().any { it.id == s && it.student } }.distinct()
+        val old = id?.let { x -> data.book().courses.firstOrNull { it.card.course.id == x } ?: throw DeskApi.Fail(404, "NOT_FOUND") }
+        if (old != null && !old.personal) throw DeskApi.Fail(409, "NOT_OWN")
+        val base = old?.card?.course ?: com.tennis.scoremanager.data.Course(Coaching.newId("cc"), name, from = from, to = to, createdAt = data.now())
+        val co = base.copy(name = name, level = i.level.trim().take(40), from = from, to = to,
+            slots = i.slots.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court.trim().take(30)) }.distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })),
+            students = students)
+        data.saveOwnCourse(co)
+        return ok(CdCourse.serializer(), course(co.id))
     }
 
     private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {
@@ -33298,6 +33385,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
         c.markCourseLesson(courseId, key, start, present, cancelled, note)
+    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
+    override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
@@ -98057,6 +98146,13 @@ class FakeCoach(var time: Long) : CoachData {
     override fun markPackPaid(packId: String) { paid += packId }
     override fun setLessonDone(lessonId: String, done: Boolean) {}
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) { marked += Triple(courseId, key, present) }
+    val saved = mutableListOf<Course>()
+    override fun saveOwnCourse(c: Course) {
+        saved += c
+        val old = book.courses.firstOrNull { it.card.course.id == c.id }
+        book = book.copy(courses = book.courses.filter { it.card.course.id != c.id } + (old?.copy(card = old.card.copy(course = c)) ?: CoachCourse(CourseCard(code = "", issuedAt = 1, course = c), personal = true)))
+    }
+    override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
     override fun receiptPdf(packId: String) = "%PDF".toByteArray()
     override fun reportPdf(student: String, days: Int?) = "%PDF".toByteArray()
     override fun registerPdf(courseId: String) = "%PDF".toByteArray()
@@ -98130,6 +98226,26 @@ class CoachDeskTest {
         assertTrue("\"kind\":\"course\"" in cal)
         assertTrue("\"kind\":\"lesson\"" in cal)
         assertEquals(30, Regex("\"date\":\"2026-11-").findAll(cal).count())
+    }
+
+    @Test fun ownCoursesFromThePcButNotTheClubOnes() {
+        coach.book = CoachBook(courses = listOf(CoachCourse(CourseCard(code = "X", issuedAt = 1, course = Course("club", "Under 10", from = now, to = now)))))
+        val tk = login()
+        val body = """{"name":"Preagonistica","level":"Base","from":"2026-11-16","to":"2027-05-31","slots":[{"weekday":3,"startMin":1020,"minutes":90,"court":"Campo 2"}],"students":["s1","x","nessuno"]}"""
+        val made = req("POST", "/coach/courses", body, tk)
+        assertEquals(200, made.first)
+        assertTrue(made.second, "\"personal\":true" in made.second)
+        val c = coach.saved.single()
+        assertEquals(listOf("s1"), c.students)
+        assertEquals(90, c.slots.single().minutes)
+        // Senza orari o senza nome no; il corso della segreteria non si cambia né si toglie dal PC.
+        assertEquals(400, req("POST", "/coach/courses", """{"name":"X","from":"2026-11-16","to":"2026-12-01","slots":[]}""", tk).first)
+        assertEquals(409, req("PUT", "/coach/courses/club", body, tk).first)
+        assertEquals(409, req("DELETE", "/coach/courses/club", token = tk).first)
+        assertEquals(200, req("PUT", "/coach/courses/${c.id}", body.replace("Preagonistica", "Agonistica"), tk).first)
+        assertEquals("Agonistica", coach.saved.last().name)
+        assertEquals(200, req("DELETE", "/coach/courses/${c.id}", token = tk).first)
+        assertTrue(coach.book.courses.none { it.card.course.id == c.id })
     }
 }
 TSM_EOF

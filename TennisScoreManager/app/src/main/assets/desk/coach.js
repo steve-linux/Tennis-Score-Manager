@@ -209,7 +209,7 @@ async function showAgendaList(views) {
 async function showCourses() {
   if (coachCourseId) return showCourseRegister(coachCourseId);
   const list = await api('GET', '/coach/courses');
-  put(main(), h('div.head', h('h1', T.ccTitle)),
+  put(main(), h('div.head', h('h1', T.ccTitle), h('button.primary', { onclick: () => editOwnCourse(null) }, T.ccNew)),
     list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:5px solid ' + (c.personal ? OWN : 'var(--accent)'), onclick: () => { coachCourseId = c.id; showCourses(); } },
       h('h2', c.name), c.personal ? h('p', { style: 'color:' + OWN }, T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
       h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
@@ -224,6 +224,12 @@ async function showCourseRegister(id) {
   const shortD = (d) => d.slice(8, 10) + '/' + d.slice(5, 7);
   put(main(),
     h('div.head', back, h('h1', c.name),
+      // Un corso suo (azzurro): si cambia e si toglie anche dal PC; quelli della segreteria li cambia lei.
+      c.personal ? h('button', { onclick: () => editOwnCourse(c) }, T.edit) : null,
+      c.personal ? h('button.danger', { onclick: async () => {
+        if (!confirm(T.ccDeleteAsk(c.name))) return;
+        try { await api('DELETE', '/coach/courses/' + encodeURIComponent(id)); toast(T.saved); coachCourseId = null; showCourses(); } catch (e) { toast(errText(e)); }
+      } }, T.remove) : null,
       h('button', { onclick: () => openPdf('/coach/courses/' + encodeURIComponent(id) + '/register.pdf', T.rgTitle + ' ' + c.name) }, T.rgPdf),
       h('button', { onclick: () => downloadFile('/coach/courses/' + encodeURIComponent(id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave),
       printBtn()),
@@ -234,6 +240,51 @@ async function showCourseRegister(id) {
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
       h('tbody', r.rows.map((row) => h('tr', h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
+}
+
+/**
+ * Un corso dell'allenatore, nuovo ([c] null) o da cambiare: nome, livello, dal… al…, orari settimanali (giorno, ora,
+ * durata, dove) e allievi. Salvato, si apre il suo registro.
+ */
+async function editOwnCourse(c) {
+  let students = [];
+  try { students = await api('GET', '/coach/students'); } catch (e) { toast(errText(e)); return; }
+  const name = h('input', { value: c ? c.name : '', maxlength: 60, required: true });
+  const level = h('input', { value: c ? c.level : '', maxlength: 40 });
+  const plus = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setMonth(x.getMonth() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+  const from = h('input', { type: 'date', value: c ? c.from : info.today });
+  const to = h('input', { type: 'date', value: c ? c.to : plus(info.today, 6) });
+  let slots = c ? c.slots.slice() : [];
+  const slotList = h('div');
+  const drawSlots = () => put(slotList, slots.length ? slots.map((x, i) => h('div', { style: 'display:flex;gap:8px;align-items:center' },
+    h('span', weekdayName(x.weekday) + ' ' + hhmm(x.startMin) + ' · ' + T.coMinutes(x.minutes) + (x.court ? ' · ' + x.court : '')),
+    h('button', { type: 'button', onclick: () => { slots.splice(i, 1); drawSlots(); } }, '✕'))) : h('p.dim', '—'));
+  const wd = select([1, 2, 3, 4, 5, 6, 7].map((k) => [String(k), weekdayName(k)]), '1');
+  const time = h('input', { type: 'time', value: '17:00', step: 300 });
+  const mins = select([45, 60, 90, 120].map((k) => [String(k), T.coMinutes(k)]), '60');
+  const place = h('input', { maxlength: 30, placeholder: T.coPlace });
+  const add = h('button', { type: 'button', onclick: () => {
+    const [hh, mm] = time.value.split(':').map(Number);
+    if (Number.isNaN(hh)) return;
+    slots.push({ weekday: Number(wd.value), startMin: hh * 60 + (mm || 0), minutes: Number(mins.value), court: place.value.trim() });
+    slots.sort((a, b) => a.weekday - b.weekday || a.startMin - b.startMin);
+    drawSlots();
+  } }, T.ccAddSlot);
+  const chosen = new Set(c ? c.studentIds : []);
+  const boxes = students.map((s) => { const b = h('input', { type: 'checkbox' }); b.checked = chosen.has(s.id); return [s.id, h('label.check', b, s.name), b]; });
+  drawSlots();
+  dialog(c ? c.name : T.ccNew, h('div.form',
+    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), field(T.ctStart, from), field(T.ctEnd, to),
+    h('h3.full', T.ccSlots), h('div.full', slotList),
+    field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
+    h('h3.full', T.ccPickStudents), h('div.full', boxes.map((b) => b[1]))), async () => {
+    if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
+    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]) };
+    const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
+    toast(T.saved);
+    coachView = 'courses'; coachCourseId = out.id;
+    await coachRender();
+  }, { wide: true });
 }
 
 function attendanceDialog(r, l) {

@@ -34,6 +34,13 @@ class FakeCoach(var time: Long) : CoachData {
     override fun markPackPaid(packId: String) { paid += packId }
     override fun setLessonDone(lessonId: String, done: Boolean) {}
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) { marked += Triple(courseId, key, present) }
+    val saved = mutableListOf<Course>()
+    override fun saveOwnCourse(c: Course) {
+        saved += c
+        val old = book.courses.firstOrNull { it.card.course.id == c.id }
+        book = book.copy(courses = book.courses.filter { it.card.course.id != c.id } + (old?.copy(card = old.card.copy(course = c)) ?: CoachCourse(CourseCard(code = "", issuedAt = 1, course = c), personal = true)))
+    }
+    override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
     override fun receiptPdf(packId: String) = "%PDF".toByteArray()
     override fun reportPdf(student: String, days: Int?) = "%PDF".toByteArray()
     override fun registerPdf(courseId: String) = "%PDF".toByteArray()
@@ -107,5 +114,25 @@ class CoachDeskTest {
         assertTrue("\"kind\":\"course\"" in cal)
         assertTrue("\"kind\":\"lesson\"" in cal)
         assertEquals(30, Regex("\"date\":\"2026-11-").findAll(cal).count())
+    }
+
+    @Test fun ownCoursesFromThePcButNotTheClubOnes() {
+        coach.book = CoachBook(courses = listOf(CoachCourse(CourseCard(code = "X", issuedAt = 1, course = Course("club", "Under 10", from = now, to = now)))))
+        val tk = login()
+        val body = """{"name":"Preagonistica","level":"Base","from":"2026-11-16","to":"2027-05-31","slots":[{"weekday":3,"startMin":1020,"minutes":90,"court":"Campo 2"}],"students":["s1","x","nessuno"]}"""
+        val made = req("POST", "/coach/courses", body, tk)
+        assertEquals(200, made.first)
+        assertTrue(made.second, "\"personal\":true" in made.second)
+        val c = coach.saved.single()
+        assertEquals(listOf("s1"), c.students)
+        assertEquals(90, c.slots.single().minutes)
+        // Senza orari o senza nome no; il corso della segreteria non si cambia né si toglie dal PC.
+        assertEquals(400, req("POST", "/coach/courses", """{"name":"X","from":"2026-11-16","to":"2026-12-01","slots":[]}""", tk).first)
+        assertEquals(409, req("PUT", "/coach/courses/club", body, tk).first)
+        assertEquals(409, req("DELETE", "/coach/courses/club", token = tk).first)
+        assertEquals(200, req("PUT", "/coach/courses/${c.id}", body.replace("Preagonistica", "Agonistica"), tk).first)
+        assertEquals("Agonistica", coach.saved.last().name)
+        assertEquals(200, req("DELETE", "/coach/courses/${c.id}", token = tk).first)
+        assertTrue(coach.book.courses.none { it.card.course.id == c.id })
     }
 }

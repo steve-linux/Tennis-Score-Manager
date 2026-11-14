@@ -198,6 +198,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
         c.markCourseLesson(courseId, key, start, present, cancelled, note)
+    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
+    override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
