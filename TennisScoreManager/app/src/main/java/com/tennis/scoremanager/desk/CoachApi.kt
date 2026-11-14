@@ -31,6 +31,10 @@ interface CoachData {
     /** Un corso dell'allenatore (non della segreteria): nuovo o cambiato, o tolto. */
     fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) {}
     fun deleteOwnCourse(id: String) {}
+    /** L'etichetta colorata di un corso (uno dei [com.tennis.scoremanager.data.CourseCards.COLORS]). */
+    fun setCourseColor(id: String, color: String) {}
+    /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
+    fun saveStudent(p: PlayerProfile) {}
     fun receiptPdf(packId: String): ByteArray?
     fun reportPdf(student: String, days: Int?): ByteArray?
     fun registerPdf(courseId: String): ByteArray?
@@ -50,7 +54,13 @@ interface CoachData {
 @Serializable data class CdEvent(val date: String, val name: String, val place: String)
 @Serializable data class CdPack(val id: String, val lessons: Int, val cents: Int, val created: String, val paid: String? = null, val receipt: String? = null)
 @Serializable data class CdCourseLine(val name: String, val present: Int, val total: Int)
+/** Un allievo da creare o cambiare dal PC: chi è, i contatti, il genitore (per i minorenni) e il consenso. */
+@Serializable data class CdStudentIn(
+    val firstName: String = "", val lastName: String = "", val nickname: String = "", val phone: String = "", val email: String = "",
+    val guardian: String = "", val guardianPhone: String = "", val consent: Boolean = false,
+)
 @Serializable data class CdStudentDetail(
+    val firstName: String = "", val lastName: String = "", val nickname: String = "",
     val student: CdStudent, val note: String, val consent: String? = null, val diary: List<CdDiary>, val evaluations: List<CdEval>, val tests: List<CdTest>,
     val testDate: String? = null, val results: List<CdResult>, val events: List<CdEvent>, val rankings: List<String>, val packs: List<CdPack>, val courses: List<CdCourseLine>,
 )
@@ -59,10 +69,12 @@ interface CoachData {
 @Serializable data class CdCourse(
     val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int,
     val personal: Boolean = false, val slots: List<CdSlot> = emptyList(), val studentIds: List<String> = emptyList(),
+    val color: String = com.tennis.scoremanager.data.CourseCards.CLUB, val colors: List<String> = com.tennis.scoremanager.data.CourseCards.COLORS,
 )
 /** Un corso dell'allenatore da creare o cambiare dal PC. */
 @Serializable data class CdCourseIn(
     val name: String = "", val level: String = "", val from: String = "", val to: String = "", val slots: List<CdSlot> = emptyList(), val students: List<String> = emptyList(),
+    val color: String? = null,
 )
 @Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
@@ -79,6 +91,8 @@ interface CoachData {
 @Serializable data class CdCalItem(
     val kind: String, val ref: String, val key: String = "", val startMin: Int? = null, val minutes: Int = 0, val title: String, val place: String = "",
     val done: Boolean = false, val cancelled: Boolean = false, val past: Boolean = false,
+    /** Il colore del corso (per le lezioni dei corsi). */
+    val color: String? = null,
 )
 @Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>)
 @Serializable data class CdCal(val first: String, val days: List<CdCalDay>)
@@ -106,6 +120,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p == listOf("info") -> ok(CdInfo.serializer(), CdInfo(club = club, lang = data.lang, today = day(data.now())!!, year = Instant.ofEpochMilli(data.now()).atZone(zone()).year, coach = data.coachName()))
         m == "GET" && p == listOf("coach", "students") -> ok(ListSerializer(CdStudent.serializer()), students().sortedBy { it.name.lowercase() })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
+        m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
+        m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> saveStudent(student(p[2]), read(CdStudentIn.serializer(), r))
         m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "diary" -> { student(p[2]); data.addDiary(p[2], read(CdText.serializer(), r).text); done() }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "note" -> { student(p[2]); data.setNote(p[2], read(CdText.serializer(), r).text); done() }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "report.pdf" ->
@@ -121,6 +137,12 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ok(CdRegister.serializer(), register(p[2]))
         m == "POST" && p == listOf("coach", "courses") -> ownCourse(null, read(CdCourseIn.serializer(), r))
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ownCourse(p[2], read(CdCourseIn.serializer(), r))
+        m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "color" -> {
+            if (data.book().courses.none { it.card.course.id == p[2] }) throw DeskApi.Fail(404, "NOT_FOUND")
+            val color = read(CdText.serializer(), r).text
+            if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) throw DeskApi.Fail(400, "BAD_REQUEST")
+            data.setCourseColor(p[2], color); ok(CdCourse.serializer(), course(p[2]))
+        }
         m == "DELETE" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> {
             val cc = data.book().courses.firstOrNull { it.card.course.id == p[2] } ?: throw DeskApi.Fail(404, "NOT_FOUND")
             if (!cc.personal) throw DeskApi.Fail(409, "NOT_OWN")
@@ -148,6 +170,29 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         )
     }
 
+    /**
+     * Crea ([old] null) o cambia un allievo. Nome e cognome servono; se c'è già un giocatore con lo stesso nome e
+     * cognome diventa allievo lui (niente doppioni), coi contatti nuovi dove mancavano.
+     */
+    private fun saveStudent(old: PlayerProfile?, i: CdStudentIn): DeskApi.Resp {
+        val first = i.firstName.trim().take(40); val last = i.lastName.trim().take(40); val nick = i.nickname.trim().take(40)
+        if (first.isEmpty() || last.isEmpty()) throw DeskApi.Fail(400, "BAD_REQUEST")
+        val now = data.now()
+        val same = if (old == null) com.tennis.scoremanager.data.Players.sameFullName(data.players(), first, last).singleOrNull() else null
+        val base = old ?: same ?: PlayerProfile(com.tennis.scoremanager.data.Players.newId(), PlayerProfile.display(first, last, nick), first, last, nick, createdAt = now)
+        val keep = same != null && old == null
+        val p = base.copy(
+            name = PlayerProfile.display(first, last, nick), firstName = first, lastName = last, nickname = nick, student = true,
+            phone = if (keep) base.phone.ifBlank { i.phone.trim() } else i.phone.trim().take(30),
+            email = if (keep) base.email.ifBlank { i.email.trim() } else i.email.trim().take(80),
+            guardian = if (keep) base.guardian.ifBlank { i.guardian.trim() } else i.guardian.trim().take(60),
+            guardianPhone = if (keep) base.guardianPhone.ifBlank { i.guardianPhone.trim() } else i.guardianPhone.trim().take(30),
+            consentAt = if (i.consent) base.consentAt ?: now else if (keep) base.consentAt else null,
+        )
+        data.saveStudent(p)
+        return ok(CdStudentDetail.serializer(), detail(p.id))
+    }
+
     private fun students(): List<CdStudent> {
         val book = data.book(); val sessions = data.sessions(); val now = data.now()
         return data.players().filter { it.student }.map { studentOut(it, book, sessions, now) }
@@ -158,6 +203,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val book = data.book(); val now = data.now()
         val tests = Coaching.testsOf(book, id)
         return CdStudentDetail(
+            p.firstName, p.lastName, p.nickname,
             studentOut(p, book, data.sessions(), now), p.note, day(p.consentAt),
             Coaching.diaryOf(book, id).take(40).map { CdDiary(day(it.at)!!, it.text) },
             Coaching.evaluationsOf(book, id).takeLast(6).map { CdEval(day(it.at)!!, it.scores, it.note) },
@@ -185,7 +231,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val co = cc.course; val now = data.now()
         return CdCourse(co.id, co.name, co.level, cc.card.club, day(co.from)!!, day(co.to)!!, co.students.size, cc.toSend,
             Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled }, cc.personal,
-            co.slots.map { CdSlot(it.weekday, it.startMin, it.minutes, it.court) }, co.students)
+            co.slots.map { CdSlot(it.weekday, it.startMin, it.minutes, it.court) }, co.students, cc.label)
     }
 
     private fun register(id: String): CdRegister {
@@ -219,6 +265,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             slots = i.slots.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court.trim().take(30)) }.distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })),
             students = students)
         data.saveOwnCourse(co)
+        i.color?.takeIf { it in com.tennis.scoremanager.data.CourseCards.COLORS }?.let { data.setCourseColor(co.id, it) }
         return ok(CdCourse.serializer(), course(co.id))
     }
 
@@ -243,7 +290,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         for (cc in book.courses) {
             val co = cc.course
             for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem(if (cc.personal) "own" else "course", co.id, les.key, minOf(les.start), les.minutes,
-                co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now)
+                co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now, cc.label)
         }
         for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)
         val byDay = items.sortedBy { it.first }.groupBy { day(it.first)!! }

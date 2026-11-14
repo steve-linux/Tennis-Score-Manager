@@ -72,7 +72,7 @@ async function showStudents() {
         h('td', s.guardian ? T.coGuardian + ': ' + s.guardian : s.phone))))) : h('div.empty', T.coNever));
   };
   q.addEventListener('input', draw);
-  put(main(), h('div.head', h('h1', T.studentsTitle), printBtn()), h('div.panel', q, body));
+  put(main(), h('div.head', h('h1', T.studentsTitle), h('button.primary', { onclick: () => studentForm(null) }, T.studentNew), printBtn()), h('div.panel', q, body));
   draw();
 }
 
@@ -87,6 +87,7 @@ async function showStudent(id) {
   const prev = d.evaluations[d.evaluations.length - 2];
   put(main(),
     h('div.head', back, h('h1', s.name),
+      h('button', { onclick: () => studentForm(d) }, T.edit),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf?days=30', T.reportTitle + ' ' + s.name) }, T.ccDeskReport30),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf', T.reportTitle + ' ' + s.name) }, T.ccDeskReportAll),
       printBtn()),
@@ -124,12 +125,40 @@ async function showStudent(id) {
       d.courses.length ? card(T.ccTitle, d.courses.map((c) => h('p', c.name + ' · ' + T.scAttendance(c.present, c.total)))) : null));
 }
 
+/**
+ * Un allievo nuovo ([d] null) o da cambiare: nome, cognome, soprannome, telefono, email, genitore (per i minorenni)
+ * e consenso a riprese e dati. Con lo stesso nome e cognome di un giocatore che c'è già, diventa allievo lui.
+ */
+function studentForm(d) {
+  const s = d ? d.student : {};
+  const inp = (v, max, type) => h('input', { value: v || '', maxlength: max, type: type || 'text' });
+  const first = inp(d && d.firstName, 40), last = inp(d && d.lastName, 40), nick = inp(d && d.nickname, 40);
+  const phone = inp(s.phone, 30, 'tel'), email = inp(s.email, 80, 'email');
+  const guardian = inp(s.guardian, 60), gphone = inp(s.guardianPhone, 30, 'tel');
+  const consent = h('input', { type: 'checkbox' }); consent.checked = !!(d && d.consent);
+  dialog(d ? s.name : T.studentNew, h('div.form',
+    field(T.playerFirstName, first), field(T.playerLastName, last), field(T.playerNickname, nick, 'full'),
+    field(T.memberPhone, phone), field(T.memberEmail, email),
+    field(T.coGuardian, guardian), field(T.coGuardianPhone, gphone),
+    h('label.check.full', consent, T.coConsent), h('p.dim.full', T.coConsentHint)), async () => {
+    if (!first.value.trim() || !last.value.trim()) throw new Error(T.err.BAD_REQUEST);
+    const body = { firstName: first.value, lastName: last.value, nickname: nick.value, phone: phone.value, email: email.value, guardian: guardian.value, guardianPhone: gphone.value, consent: consent.checked };
+    const out = d ? await api('PUT', '/coach/students/' + encodeURIComponent(s.id), body) : await api('POST', '/coach/students', body);
+    toast(T.saved);
+    coachView = 'students'; coachStudent = out.student.id;
+    await coachRender();
+  });
+}
+
 // --- Agenda ---
 
 /** Il colore di una cosa del calendario: lezione privata, lezione di corso, torneo; grigia se annullata. */
 /** I corsi dell'allenatore in azzurro, quelli della segreteria nel verde della pagina. */
 const OWN = '#1e88c8';
-const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'own' ? OWN : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+// Le lezioni dei corsi col colore scelto per il corso (di partenza: verde segreteria, azzurro allenatore).
+const calColor = (x) => (x.cancelled ? 'var(--dim)' : (x.kind === 'course' || x.kind === 'own') ? (x.color || (x.kind === 'own' ? OWN : 'var(--accent)')) : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+/** Un pallino del colore dato, con o senza bordo (scelto). */
+const dot = (color, on, onclick) => h('button', { type: 'button', title: color, onclick, style: `width:${on ? 26 : 22}px;height:${on ? 26 : 22}px;border-radius:50%;padding:0;background:${color};border:${on ? '3px solid var(--text)' : '1px solid var(--line)'};cursor:pointer` });
 const calLine = (x) => (x.startMin != null ? hhmm(x.startMin) + ' ' : '🏆 ') + x.title;
 
 /** Un tocco su una cosa del calendario: la lezione privata passata si segna fatta, il corso apre il registro, il torneo l'allievo. */
@@ -157,9 +186,13 @@ async function showAgenda() {
   const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
   const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
     h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
-  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccClubCourses), '  ', h('span', { style: 'color:' + OWN }, '■ ' + T.ccOwnTag), '  ',
-    h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle));
-  const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;padding:1px 2px;background:none;font-size:12px;color:' + calColor(x) +
+  // La legenda: lezioni private, tornei e ogni corso col suo colore.
+  const legendOf = (items) => {
+    const courses = [...new Map(items.filter((x) => x.kind === 'course' || x.kind === 'own').map((x) => [x.ref, [x.title, calColor({ ...x, cancelled: false })]])).values()];
+    return h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle),
+      courses.map(([n, c]) => ['  ', h('span', { style: 'border-left:12px solid ' + c + ';padding-left:4px;color:var(--text)' }, n)]));
+  };
+  const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;border-left:4px solid ' + calColor(x) + ';padding:1px 4px;margin:1px 0;background:none;font-size:12px;color:' + (x.cancelled ? 'var(--dim)' : 'var(--text)') +
     (x.cancelled ? ';text-decoration:line-through' : '') + (x.done ? ';font-weight:600' : ''), title: [calLine(x), x.place].filter(Boolean).join(' · '),
     onclick: (ev) => { ev.stopPropagation(); calOpen(x); } }, calLine(x) + (x.past && !x.done && !x.cancelled && x.kind !== 'event' ? ' •' : ''));
   if (agendaView === 'month') {
@@ -173,7 +206,7 @@ async function showAgenda() {
         h('b', Number(d.date.slice(8))), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
     }
     put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
-      h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legend);
+      h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legendOf(m.days.flatMap((d) => d.items)));
     return;
   }
   // La settimana (da lunedì): una colonna per giorno, con tutto in ordine d'ora.
@@ -187,7 +220,7 @@ async function showAgenda() {
   const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
   put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
     h('div.panel', h('div.month', days.map((d) => h('div.mhead', long(d, { weekday: 'short', day: 'numeric' }))),
-      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legend);
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
 }
 
 /** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
@@ -210,8 +243,8 @@ async function showCourses() {
   if (coachCourseId) return showCourseRegister(coachCourseId);
   const list = await api('GET', '/coach/courses');
   put(main(), h('div.head', h('h1', T.ccTitle), h('button.primary', { onclick: () => editOwnCourse(null) }, T.ccNew)),
-    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:5px solid ' + (c.personal ? OWN : 'var(--accent)'), onclick: () => { coachCourseId = c.id; showCourses(); } },
-      h('h2', c.name), c.personal ? h('p', { style: 'color:' + OWN }, T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:8px solid ' + (c.color || (c.personal ? OWN : 'var(--accent)')), onclick: () => { coachCourseId = c.id; showCourses(); } },
+      h('h2', c.name), c.personal ? h('p.dim', T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
       h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
 }
 
@@ -223,7 +256,7 @@ async function showCourseRegister(id) {
   const color = (m) => (m === '✓' ? 'var(--ok)' : m === '✗' ? 'var(--warn)' : 'var(--dim)');
   const shortD = (d) => d.slice(8, 10) + '/' + d.slice(5, 7);
   put(main(),
-    h('div.head', back, h('h1', c.name),
+    h('div.head', back, h('h1', h('span', { style: 'display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:8px;background:' + c.color }), c.name),
       // Un corso suo (azzurro): si cambia e si toglie anche dal PC; quelli della segreteria li cambia lei.
       c.personal ? h('button', { onclick: () => editOwnCourse(c) }, T.edit) : null,
       c.personal ? h('button.danger', { onclick: async () => {
@@ -234,6 +267,10 @@ async function showCourseRegister(id) {
       h('button', { onclick: () => downloadFile('/coach/courses/' + encodeURIComponent(id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave),
       printBtn()),
     h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    // L'etichetta colorata del corso: un clic la cambia (anche per i corsi della segreteria, solo per te).
+    h('div.noprint', { style: 'display:flex;gap:8px;align-items:center;margin:6px 0' }, h('span.dim', T.ccColor), c.colors.map((col) => dot(col, col === c.color, async () => {
+      try { await api('PUT', '/coach/courses/' + encodeURIComponent(id) + '/color', { text: col }); showCourseRegister(id); } catch (e) { toast(errText(e)); }
+    }))),
     h('div.printonly.phead', h('b', T.rgTitle + ' · ' + c.name), ' · ', dateText(info.today)),
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
       h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center', onclick: () => { if (l.past) attendanceDialog(r, l); } },
@@ -270,16 +307,21 @@ async function editOwnCourse(c) {
     slots.sort((a, b) => a.weekday - b.weekday || a.startMin - b.startMin);
     drawSlots();
   } }, T.ccAddSlot);
+  let color = c ? c.color : '#29B6F6';
+  const colors = c ? c.colors : ['#C6F432', '#29B6F6', '#FF9800', '#E53935', '#AB47BC', '#26A69A', '#FFD600', '#EC407A'];
+  const colorRow = h('div.full', { style: 'display:flex;gap:8px;align-items:center' });
+  const drawColors = () => put(colorRow, h('span.dim', T.ccColor), colors.map((col) => dot(col, col === color, () => { color = col; drawColors(); })));
+  drawColors();
   const chosen = new Set(c ? c.studentIds : []);
   const boxes = students.map((s) => { const b = h('input', { type: 'checkbox' }); b.checked = chosen.has(s.id); return [s.id, h('label.check', b, s.name), b]; });
   drawSlots();
   dialog(c ? c.name : T.ccNew, h('div.form',
-    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), field(T.ctStart, from), field(T.ctEnd, to),
+    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), colorRow, field(T.ctStart, from), field(T.ctEnd, to),
     h('h3.full', T.ccSlots), h('div.full', slotList),
     field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
     h('h3.full', T.ccPickStudents), h('div.full', boxes.map((b) => b[1]))), async () => {
     if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
-    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]) };
+    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]), color };
     const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
     toast(T.saved);
     coachView = 'courses'; coachCourseId = out.id;

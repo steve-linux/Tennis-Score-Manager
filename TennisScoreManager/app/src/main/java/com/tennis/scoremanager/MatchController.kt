@@ -1770,13 +1770,21 @@ class MatchController(
      * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
      * non si cambiano qui (li cambia lei e li rimanda).
      */
-    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course) {
+    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course, color: String? = null) {
         val b = coachBook.value
         val old = b.courses.firstOrNull { it.card.course.id == co.id }
         if (old != null && !old.personal) return
         val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
             ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
-        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + cc))
+        val withColor = if (color != null && color in com.tennis.scoremanager.data.CourseCards.COLORS) cc.copy(color = color) else cc
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + withColor))
+    }
+
+    /** L'etichetta colorata di un corso dell'allenatore (qualsiasi: anche quelli della segreteria, solo sul suo telefono). */
+    fun setCoachCourseColor(id: String, color: String) {
+        if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) return
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == id) it.copy(color = color) else it }))
     }
 
     /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */

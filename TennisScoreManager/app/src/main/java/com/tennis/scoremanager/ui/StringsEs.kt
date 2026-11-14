@@ -2592,6 +2592,7 @@ object EsStrings : Strings {
     override val ccOwn = "Curso tuyo: la asistencia se queda aquí, no se envía a la secretaría."
     override val ccOwnTag = "Mi curso"
     override val ccClubCourses = "Cursos de la secretaría"
+    override val ccColor = "Color de la etiqueta"
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }

@@ -40,6 +40,9 @@ class FakeCoach(var time: Long) : CoachData {
         val old = book.courses.firstOrNull { it.card.course.id == c.id }
         book = book.copy(courses = book.courses.filter { it.card.course.id != c.id } + (old?.copy(card = old.card.copy(course = c)) ?: CoachCourse(CourseCard(code = "", issuedAt = 1, course = c), personal = true)))
     }
+    override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
+    val colors = mutableMapOf<String, String>()
+    override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
     override fun receiptPdf(packId: String) = "%PDF".toByteArray()
     override fun reportPdf(student: String, days: Int?) = "%PDF".toByteArray()
@@ -132,7 +135,34 @@ class CoachDeskTest {
         assertEquals(409, req("DELETE", "/coach/courses/club", token = tk).first)
         assertEquals(200, req("PUT", "/coach/courses/${c.id}", body.replace("Preagonistica", "Agonistica"), tk).first)
         assertEquals("Agonistica", coach.saved.last().name)
+        // L'etichetta colorata: solo dei colori previsti, per qualsiasi corso.
+        assertEquals(200, req("PUT", "/coach/courses/club/color", """{"text":"#FF9800"}""", tk).first)
+        assertEquals("#FF9800", coach.colors["club"])
+        assertEquals(400, req("PUT", "/coach/courses/club/color", """{"text":"#123456"}""", tk).first)
         assertEquals(200, req("DELETE", "/coach/courses/${c.id}", token = tk).first)
         assertTrue(coach.book.courses.none { it.card.course.id == c.id })
+    }
+
+    @Test fun studentsFromThePcWithoutDuplicates() {
+        val tk = login()
+        val made = req("POST", "/coach/students", """{"firstName":"Giulia","lastName":"Verdi","guardian":"Marta Verdi","guardianPhone":"3331234567","consent":true}""", tk)
+        assertEquals(200, made.first)
+        val g = coach.people.single { it.lastName == "Verdi" }
+        assertTrue(g.student)
+        assertEquals("Marta Verdi", g.guardian)
+        assertEquals(now, g.consentAt)
+        assertEquals(400, req("POST", "/coach/students", """{"firstName":"Solo"}""", tk).first)
+        // Un giocatore che c'è già (stesso nome e cognome) diventa allievo, senza doppioni.
+        coach.people = coach.people + PlayerProfile("q", "Paolo Rossi", "Paolo", "Rossi", phone = "333000")
+        req("POST", "/coach/students", """{"firstName":"Paolo","lastName":"Rossi","phone":"999"}""", tk)
+        val p = coach.people.filter { it.lastName == "Rossi" }
+        assertEquals(1, p.size)
+        assertTrue(p[0].student)
+        assertEquals("333000", p[0].phone)
+        // Modifica: il soprannome cambia il nome che si vede; senza consenso la data si toglie.
+        assertEquals(200, req("PUT", "/coach/students/${g.id}", """{"firstName":"Giulia","lastName":"Verdi","nickname":"Giuly","consent":false}""", tk).first)
+        val g2 = coach.people.single { it.id == g.id }
+        assertEquals("Giuly", g2.name)
+        assertEquals(null, g2.consentAt)
     }
 }

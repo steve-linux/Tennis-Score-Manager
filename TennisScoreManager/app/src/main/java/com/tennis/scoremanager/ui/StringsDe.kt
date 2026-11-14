@@ -2591,6 +2591,7 @@ object DeStrings : Strings {
     override val ccOwn = "Dein Kurs: die Anwesenheit bleibt hier und geht nicht ans Büro."
     override val ccOwnTag = "Mein Kurs"
     override val ccClubCourses = "Kurse des Büros"
+    override val ccColor = "Farbe"
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }

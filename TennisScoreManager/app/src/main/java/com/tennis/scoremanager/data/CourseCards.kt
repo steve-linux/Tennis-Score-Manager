@@ -55,7 +55,12 @@ data class CoachCourse(
     val via: String? = null,
     /** Corso dell'allenatore, fatto da lui e non dalla segreteria: si cambia qui e le presenze non si mandano a nessuno. */
     val personal: Boolean = false,
+    /** L'etichetta colorata scelta dall'allenatore ("#RRGGBB", vedi [CourseCards.COLORS]); null = quella di partenza. */
+    val color: String? = null,
 ) {
+    /** Il colore del corso: quello scelto, o verde per i corsi della segreteria e azzurro per quelli dell'allenatore. */
+    val label: String get() = color ?: if (personal) CourseCards.OWN else CourseCards.CLUB
+
     /** Il corso con le presenze dell'allenatore sopra quelle della segreteria. */
     val course: Course get() = card.course.copy(
         attendance = card.course.attendance + attendance,
@@ -99,6 +104,11 @@ object CourseCards {
     const val CARD = "tsm-course-card"
     const val ATTENDANCE = "tsm-course-attendance"
     const val PROPOSAL = "tsm-student-proposal"
+
+    /** I colori tra cui scegliere l'etichetta di un corso. */
+    const val CLUB = "#C6F432"
+    const val OWN = "#29B6F6"
+    val COLORS = listOf(CLUB, OWN, "#FF9800", "#E53935", "#AB47BC", "#26A69A", "#FFD600", "#EC407A")
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }
 

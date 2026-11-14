@@ -441,6 +441,7 @@ const APP_I18N = {
     ccCardHowTo: "Apri il file con Tennis Score Manager (Condividi › TSM): il corso va tra i tuoi con gli allievi; le presenze le rimandi da lì.",
     ccCardText: (a, b) => `Corso ${a}: ${b} iscritti`,
     ccClubCourses: "Corsi della segreteria",
+    ccColor: "Colore",
     ccDeleteAsk: (it) => `Togliere il corso ${it} e le sue presenze?`,
     ccDeskHint: "Allievi, schede, ricevute e registro dal computer di casa, sulla stessa rete",
     ccDeskNote: "I dati restano sul telefono: la pagina li legge da lì.",
@@ -711,6 +712,8 @@ const APP_I18N = {
     laRecovery: "Lezione di recupero",
     laRecoveryHint: "Non scala dal pacchetto: recupera un'assenza giustificata.",
     laToRecover: (it) => `Da recuperare: ${it}`,
+    memberEmail: "Email",
+    memberPhone: "Telefono",
     mmAdd: "Aggiungi un risultato",
     mmEvent: "Torneo o campionato",
     mmOppRank: "Classifica dell'avversario",
@@ -924,6 +927,9 @@ const APP_I18N = {
     planTitle: "Planning dei campi",
     planToday: "Torna a oggi",
     planTournamentMinutes: "Durata di una partita di torneo",
+    playerFirstName: "Nome *",
+    playerLastName: "Cognome *",
+    playerNickname: "Soprannome (facoltativo)",
     ptAtClub: "in segreteria",
     ptDelete: "Elimina",
     ptDetails: "Link, IBAN o numero (facoltativo)",
@@ -1118,6 +1124,7 @@ const APP_I18N = {
     stTournaments: (it) => `Partite dei tornei: ${it} h`,
     studentLast: (it) => `ultima: ${it}`,
     studentLost: "Persa",
+    studentNew: "Nuovo allievo",
     studentNotes: "Note dell'allenatore",
     studentWon: "Vinta",
     studentsTitle: "Allievi",
@@ -1258,6 +1265,7 @@ const APP_I18N = {
     ccCardHowTo: "Open the file with Tennis Score Manager (Share › TSM): the course goes among yours with the students; you send attendance back from there.",
     ccCardText: (a, b) => `Course ${a}: ${b} participants`,
     ccClubCourses: "Club office courses",
+    ccColor: "Colour",
     ccDeleteAsk: (it) => `Remove the course ${it} and its attendance?`,
     ccDeskHint: "Students, cards, receipts and register from your home computer, on the same network",
     ccDeskNote: "The data stays on the phone: the page reads it from there.",
@@ -1528,6 +1536,8 @@ const APP_I18N = {
     laRecovery: "Make-up lesson",
     laRecoveryHint: "It doesn't count against the pack: it makes up for an excused absence.",
     laToRecover: (it) => `To make up: ${it}`,
+    memberEmail: "Email",
+    memberPhone: "Phone",
     mmAdd: "Add a result",
     mmEvent: "Tournament or league",
     mmOppRank: "Opponent's ranking",
@@ -1741,6 +1751,9 @@ const APP_I18N = {
     planTitle: "Court planner",
     planToday: "Back to today",
     planTournamentMinutes: "Length of a tournament match",
+    playerFirstName: "First name *",
+    playerLastName: "Last name *",
+    playerNickname: "Nickname (optional)",
     ptAtClub: "at the office",
     ptDelete: "Delete",
     ptDetails: "Link, IBAN or number (optional)",
@@ -1935,6 +1948,7 @@ const APP_I18N = {
     stTournaments: (it) => `Tournament matches: ${it} h`,
     studentLast: (it) => `last: ${it}`,
     studentLost: "Lost",
+    studentNew: "New student",
     studentNotes: "Coach's notes",
     studentWon: "Won",
     studentsTitle: "Students",
@@ -2075,6 +2089,7 @@ const APP_I18N = {
     ccCardHowTo: "Ouvrez le fichier avec Tennis Score Manager (Partager › TSM) : le cours rejoint les vôtres avec les élèves ; vous renvoyez les présences de là.",
     ccCardText: (a, b) => `Cours ${a} : ${b} inscrits`,
     ccClubCourses: "Cours du secrétariat",
+    ccColor: "Couleur",
     ccDeleteAsk: (it) => `Supprimer le cours ${it} et ses présences ?`,
     ccDeskHint: "Élèves, fiches, reçus et registre depuis l'ordinateur de la maison, sur le même réseau",
     ccDeskNote: "Les données restent sur le téléphone : la page les lit là.",
@@ -2345,6 +2360,8 @@ const APP_I18N = {
     laRecovery: "Cours de rattrapage",
     laRecoveryHint: "Elle ne compte pas dans le forfait : elle rattrape une absence excusée.",
     laToRecover: (it) => `À rattraper : ${it}`,
+    memberEmail: "E-mail",
+    memberPhone: "Téléphone",
     mmAdd: "Ajouter un résultat",
     mmEvent: "Tournoi ou championnat",
     mmOppRank: "Classement de l'adversaire",
@@ -2558,6 +2575,9 @@ const APP_I18N = {
     planTitle: "Planning des terrains",
     planToday: "Revenir à aujourd'hui",
     planTournamentMinutes: "Durée d'un match de tournoi",
+    playerFirstName: "Prénom *",
+    playerLastName: "Nom *",
+    playerNickname: "Surnom (facultatif)",
     ptAtClub: "au secrétariat",
     ptDelete: "Supprimer",
     ptDetails: "Lien, IBAN ou numéro (facultatif)",
@@ -2752,6 +2772,7 @@ const APP_I18N = {
     stTournaments: (it) => `Matchs des tournois : ${it} h`,
     studentLast: (it) => `dernière : ${it}`,
     studentLost: "Perdu",
+    studentNew: "Nouvel élève",
     studentNotes: "Notes de l'entraîneur",
     studentWon: "Gagné",
     studentsTitle: "Élèves",
@@ -2892,6 +2913,7 @@ const APP_I18N = {
     ccCardHowTo: "Öffne die Datei mit Tennis Score Manager (Teilen › TSM): der Kurs kommt zu deinen, mit den Schülern; die Anwesenheit schickst du von dort zurück.",
     ccCardText: (a, b) => `Kurs ${a}: ${b} Teilnehmer`,
     ccClubCourses: "Kurse des Büros",
+    ccColor: "Farbe",
     ccDeleteAsk: (it) => `Kurs ${it} und seine Anwesenheit entfernen?`,
     ccDeskHint: "Schüler, Karten, Quittungen und Anwesenheitsliste vom Computer zu Hause, im selben Netz",
     ccDeskNote: "Die Daten bleiben auf dem Telefon: die Seite liest sie von dort.",
@@ -3162,6 +3184,8 @@ const APP_I18N = {
     laRecovery: "Nachholstunde",
     laRecoveryHint: "Zählt nicht zum Paket: holt eine entschuldigte Fehlstunde nach.",
     laToRecover: (it) => `Nachzuholen: ${it}`,
+    memberEmail: "E-Mail",
+    memberPhone: "Telefon",
     mmAdd: "Ergebnis hinzufügen",
     mmEvent: "Turnier oder Meisterschaft",
     mmOppRank: "Rangliste des Gegners",
@@ -3375,6 +3399,9 @@ const APP_I18N = {
     planTitle: "Platzbelegung",
     planToday: "Zurück zu heute",
     planTournamentMinutes: "Dauer eines Turniermatches",
+    playerFirstName: "Vorname *",
+    playerLastName: "Nachname *",
+    playerNickname: "Spitzname (freiwillig)",
     ptAtClub: "in der Geschäftsstelle",
     ptDelete: "Löschen",
     ptDetails: "Link, IBAN oder Nummer (optional)",
@@ -3569,6 +3596,7 @@ const APP_I18N = {
     stTournaments: (it) => `Turnierspiele: ${it} Std.`,
     studentLast: (it) => `zuletzt: ${it}`,
     studentLost: "Verloren",
+    studentNew: "Neuer Schüler",
     studentNotes: "Notizen des Trainers",
     studentWon: "Gewonnen",
     studentsTitle: "Schüler",
@@ -3709,6 +3737,7 @@ const APP_I18N = {
     ccCardHowTo: "Abre el archivo con Tennis Score Manager (Compartir › TSM): el curso va con los tuyos y sus alumnos; la asistencia la devuelves desde allí.",
     ccCardText: (a, b) => `Curso ${a}: ${b} inscritos`,
     ccClubCourses: "Cursos de la secretaría",
+    ccColor: "Color de la etiqueta",
     ccDeleteAsk: (it) => `¿Quitar el curso ${it} y su asistencia?`,
     ccDeskHint: "Alumnos, fichas, recibos y registro desde el ordenador de casa, en la misma red",
     ccDeskNote: "Los datos se quedan en el teléfono: la página los lee de allí.",
@@ -3979,6 +4008,8 @@ const APP_I18N = {
     laRecovery: "Clase de recuperación",
     laRecoveryHint: "No descuenta del paquete: recupera una ausencia justificada.",
     laToRecover: (it) => `Por recuperar: ${it}`,
+    memberEmail: "Correo",
+    memberPhone: "Teléfono",
     mmAdd: "Añadir un resultado",
     mmEvent: "Torneo o liga",
     mmOppRank: "Clasificación del rival",
@@ -4192,6 +4223,9 @@ const APP_I18N = {
     planTitle: "Planning de pistas",
     planToday: "Volver a hoy",
     planTournamentMinutes: "Duración de un partido de torneo",
+    playerFirstName: "Nombre *",
+    playerLastName: "Apellido *",
+    playerNickname: "Apodo (opcional)",
     ptAtClub: "en secretaría",
     ptDelete: "Eliminar",
     ptDetails: "Enlace, IBAN o número (opcional)",
@@ -4386,6 +4420,7 @@ const APP_I18N = {
     stTournaments: (it) => `Partidos de torneo: ${it} h`,
     studentLast: (it) => `última: ${it}`,
     studentLost: "Perdido",
+    studentNew: "Nuevo alumno",
     studentNotes: "Notas del entrenador",
     studentWon: "Ganado",
     studentsTitle: "Alumnos",
@@ -4526,6 +4561,7 @@ const APP_I18N = {
     ccCardHowTo: "Abra o arquivo com o Tennis Score Manager (Compartilhar › TSM): o curso junta-se aos seus com os alunos; as presenças devolve-as de lá.",
     ccCardText: (a, b) => `Curso ${a}: ${b} inscritos`,
     ccClubCourses: "Cursos da secretaria",
+    ccColor: "Cor",
     ccDeleteAsk: (it) => `Remover o curso ${it} e as suas presenças?`,
     ccDeskHint: "Alunos, fichas, recibos e registo a partir do computador de casa, na mesma rede",
     ccDeskNote: "Os dados ficam no telefone: a página lê-os de lá.",
@@ -4796,6 +4832,8 @@ const APP_I18N = {
     laRecovery: "Aula de reposição",
     laRecoveryHint: "Não desconta do pacote: repõe uma falta justificada.",
     laToRecover: (it) => `Por repor: ${it}`,
+    memberEmail: "E-mail",
+    memberPhone: "Telefone",
     mmAdd: "Adicionar um resultado",
     mmEvent: "Torneio ou campeonato",
     mmOppRank: "Ranking do adversário",
@@ -5009,6 +5047,9 @@ const APP_I18N = {
     planTitle: "Agenda das quadras",
     planToday: "Voltar para hoje",
     planTournamentMinutes: "Duração de uma partida de torneio",
+    playerFirstName: "Nome *",
+    playerLastName: "Sobrenome *",
+    playerNickname: "Apelido (opcional)",
     ptAtClub: "na secretaria",
     ptDelete: "Excluir",
     ptDetails: "Link, IBAN ou número (opcional)",
@@ -5203,6 +5244,7 @@ const APP_I18N = {
     stTournaments: (it) => `Jogos de torneio: ${it} h`,
     studentLast: (it) => `última: ${it}`,
     studentLost: "Perdida",
+    studentNew: "Novo aluno",
     studentNotes: "Notas do treinador",
     studentWon: "Ganha",
     studentsTitle: "Alunos",
@@ -7462,7 +7504,7 @@ async function showStudents() {
         h('td', s.guardian ? T.coGuardian + ': ' + s.guardian : s.phone))))) : h('div.empty', T.coNever));
   };
   q.addEventListener('input', draw);
-  put(main(), h('div.head', h('h1', T.studentsTitle), printBtn()), h('div.panel', q, body));
+  put(main(), h('div.head', h('h1', T.studentsTitle), h('button.primary', { onclick: () => studentForm(null) }, T.studentNew), printBtn()), h('div.panel', q, body));
   draw();
 }
 
@@ -7477,6 +7519,7 @@ async function showStudent(id) {
   const prev = d.evaluations[d.evaluations.length - 2];
   put(main(),
     h('div.head', back, h('h1', s.name),
+      h('button', { onclick: () => studentForm(d) }, T.edit),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf?days=30', T.reportTitle + ' ' + s.name) }, T.ccDeskReport30),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf', T.reportTitle + ' ' + s.name) }, T.ccDeskReportAll),
       printBtn()),
@@ -7514,12 +7557,40 @@ async function showStudent(id) {
       d.courses.length ? card(T.ccTitle, d.courses.map((c) => h('p', c.name + ' · ' + T.scAttendance(c.present, c.total)))) : null));
 }
 
+/**
+ * Un allievo nuovo ([d] null) o da cambiare: nome, cognome, soprannome, telefono, email, genitore (per i minorenni)
+ * e consenso a riprese e dati. Con lo stesso nome e cognome di un giocatore che c'è già, diventa allievo lui.
+ */
+function studentForm(d) {
+  const s = d ? d.student : {};
+  const inp = (v, max, type) => h('input', { value: v || '', maxlength: max, type: type || 'text' });
+  const first = inp(d && d.firstName, 40), last = inp(d && d.lastName, 40), nick = inp(d && d.nickname, 40);
+  const phone = inp(s.phone, 30, 'tel'), email = inp(s.email, 80, 'email');
+  const guardian = inp(s.guardian, 60), gphone = inp(s.guardianPhone, 30, 'tel');
+  const consent = h('input', { type: 'checkbox' }); consent.checked = !!(d && d.consent);
+  dialog(d ? s.name : T.studentNew, h('div.form',
+    field(T.playerFirstName, first), field(T.playerLastName, last), field(T.playerNickname, nick, 'full'),
+    field(T.memberPhone, phone), field(T.memberEmail, email),
+    field(T.coGuardian, guardian), field(T.coGuardianPhone, gphone),
+    h('label.check.full', consent, T.coConsent), h('p.dim.full', T.coConsentHint)), async () => {
+    if (!first.value.trim() || !last.value.trim()) throw new Error(T.err.BAD_REQUEST);
+    const body = { firstName: first.value, lastName: last.value, nickname: nick.value, phone: phone.value, email: email.value, guardian: guardian.value, guardianPhone: gphone.value, consent: consent.checked };
+    const out = d ? await api('PUT', '/coach/students/' + encodeURIComponent(s.id), body) : await api('POST', '/coach/students', body);
+    toast(T.saved);
+    coachView = 'students'; coachStudent = out.student.id;
+    await coachRender();
+  });
+}
+
 // --- Agenda ---
 
 /** Il colore di una cosa del calendario: lezione privata, lezione di corso, torneo; grigia se annullata. */
 /** I corsi dell'allenatore in azzurro, quelli della segreteria nel verde della pagina. */
 const OWN = '#1e88c8';
-const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'own' ? OWN : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+// Le lezioni dei corsi col colore scelto per il corso (di partenza: verde segreteria, azzurro allenatore).
+const calColor = (x) => (x.cancelled ? 'var(--dim)' : (x.kind === 'course' || x.kind === 'own') ? (x.color || (x.kind === 'own' ? OWN : 'var(--accent)')) : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+/** Un pallino del colore dato, con o senza bordo (scelto). */
+const dot = (color, on, onclick) => h('button', { type: 'button', title: color, onclick, style: `width:${on ? 26 : 22}px;height:${on ? 26 : 22}px;border-radius:50%;padding:0;background:${color};border:${on ? '3px solid var(--text)' : '1px solid var(--line)'};cursor:pointer` });
 const calLine = (x) => (x.startMin != null ? hhmm(x.startMin) + ' ' : '🏆 ') + x.title;
 
 /** Un tocco su una cosa del calendario: la lezione privata passata si segna fatta, il corso apre il registro, il torneo l'allievo. */
@@ -7547,9 +7618,13 @@ async function showAgenda() {
   const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
   const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
     h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
-  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccClubCourses), '  ', h('span', { style: 'color:' + OWN }, '■ ' + T.ccOwnTag), '  ',
-    h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle));
-  const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;padding:1px 2px;background:none;font-size:12px;color:' + calColor(x) +
+  // La legenda: lezioni private, tornei e ogni corso col suo colore.
+  const legendOf = (items) => {
+    const courses = [...new Map(items.filter((x) => x.kind === 'course' || x.kind === 'own').map((x) => [x.ref, [x.title, calColor({ ...x, cancelled: false })]])).values()];
+    return h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle),
+      courses.map(([n, c]) => ['  ', h('span', { style: 'border-left:12px solid ' + c + ';padding-left:4px;color:var(--text)' }, n)]));
+  };
+  const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;border-left:4px solid ' + calColor(x) + ';padding:1px 4px;margin:1px 0;background:none;font-size:12px;color:' + (x.cancelled ? 'var(--dim)' : 'var(--text)') +
     (x.cancelled ? ';text-decoration:line-through' : '') + (x.done ? ';font-weight:600' : ''), title: [calLine(x), x.place].filter(Boolean).join(' · '),
     onclick: (ev) => { ev.stopPropagation(); calOpen(x); } }, calLine(x) + (x.past && !x.done && !x.cancelled && x.kind !== 'event' ? ' •' : ''));
   if (agendaView === 'month') {
@@ -7563,7 +7638,7 @@ async function showAgenda() {
         h('b', Number(d.date.slice(8))), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
     }
     put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
-      h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legend);
+      h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legendOf(m.days.flatMap((d) => d.items)));
     return;
   }
   // La settimana (da lunedì): una colonna per giorno, con tutto in ordine d'ora.
@@ -7577,7 +7652,7 @@ async function showAgenda() {
   const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
   put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
     h('div.panel', h('div.month', days.map((d) => h('div.mhead', long(d, { weekday: 'short', day: 'numeric' }))),
-      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legend);
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
 }
 
 /** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
@@ -7600,8 +7675,8 @@ async function showCourses() {
   if (coachCourseId) return showCourseRegister(coachCourseId);
   const list = await api('GET', '/coach/courses');
   put(main(), h('div.head', h('h1', T.ccTitle), h('button.primary', { onclick: () => editOwnCourse(null) }, T.ccNew)),
-    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:5px solid ' + (c.personal ? OWN : 'var(--accent)'), onclick: () => { coachCourseId = c.id; showCourses(); } },
-      h('h2', c.name), c.personal ? h('p', { style: 'color:' + OWN }, T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:8px solid ' + (c.color || (c.personal ? OWN : 'var(--accent)')), onclick: () => { coachCourseId = c.id; showCourses(); } },
+      h('h2', c.name), c.personal ? h('p.dim', T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
       h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
 }
 
@@ -7613,7 +7688,7 @@ async function showCourseRegister(id) {
   const color = (m) => (m === '✓' ? 'var(--ok)' : m === '✗' ? 'var(--warn)' : 'var(--dim)');
   const shortD = (d) => d.slice(8, 10) + '/' + d.slice(5, 7);
   put(main(),
-    h('div.head', back, h('h1', c.name),
+    h('div.head', back, h('h1', h('span', { style: 'display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:8px;background:' + c.color }), c.name),
       // Un corso suo (azzurro): si cambia e si toglie anche dal PC; quelli della segreteria li cambia lei.
       c.personal ? h('button', { onclick: () => editOwnCourse(c) }, T.edit) : null,
       c.personal ? h('button.danger', { onclick: async () => {
@@ -7624,6 +7699,10 @@ async function showCourseRegister(id) {
       h('button', { onclick: () => downloadFile('/coach/courses/' + encodeURIComponent(id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave),
       printBtn()),
     h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    // L'etichetta colorata del corso: un clic la cambia (anche per i corsi della segreteria, solo per te).
+    h('div.noprint', { style: 'display:flex;gap:8px;align-items:center;margin:6px 0' }, h('span.dim', T.ccColor), c.colors.map((col) => dot(col, col === c.color, async () => {
+      try { await api('PUT', '/coach/courses/' + encodeURIComponent(id) + '/color', { text: col }); showCourseRegister(id); } catch (e) { toast(errText(e)); }
+    }))),
     h('div.printonly.phead', h('b', T.rgTitle + ' · ' + c.name), ' · ', dateText(info.today)),
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
       h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center', onclick: () => { if (l.past) attendanceDialog(r, l); } },
@@ -7660,16 +7739,21 @@ async function editOwnCourse(c) {
     slots.sort((a, b) => a.weekday - b.weekday || a.startMin - b.startMin);
     drawSlots();
   } }, T.ccAddSlot);
+  let color = c ? c.color : '#29B6F6';
+  const colors = c ? c.colors : ['#C6F432', '#29B6F6', '#FF9800', '#E53935', '#AB47BC', '#26A69A', '#FFD600', '#EC407A'];
+  const colorRow = h('div.full', { style: 'display:flex;gap:8px;align-items:center' });
+  const drawColors = () => put(colorRow, h('span.dim', T.ccColor), colors.map((col) => dot(col, col === color, () => { color = col; drawColors(); })));
+  drawColors();
   const chosen = new Set(c ? c.studentIds : []);
   const boxes = students.map((s) => { const b = h('input', { type: 'checkbox' }); b.checked = chosen.has(s.id); return [s.id, h('label.check', b, s.name), b]; });
   drawSlots();
   dialog(c ? c.name : T.ccNew, h('div.form',
-    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), field(T.ctStart, from), field(T.ctEnd, to),
+    field(T.ccName, name, 'full'), field(T.ccLevel, level, 'full'), colorRow, field(T.ctStart, from), field(T.ctEnd, to),
     h('h3.full', T.ccSlots), h('div.full', slotList),
     field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
     h('h3.full', T.ccPickStudents), h('div.full', boxes.map((b) => b[1]))), async () => {
     if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
-    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]) };
+    const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: boxes.filter((b) => b[2].checked).map((b) => b[0]), color };
     const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
     toast(T.saved);
     coachView = 'courses'; coachCourseId = out.id;
@@ -10240,11 +10324,11 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - **Die Schülerliste**: **Schüler suchen** nach Name, sortieren *Nach Name* oder *Nach letztem Mal*, filtern *Alle*, *Lange nicht gesehen* (seit mehr als 2 Wochen) oder eine Gruppe. Unter jedem Namen steht, wann du ihn zuletzt gesehen hast (Einheit oder gemachte Stunde).
 - **Gruppen** (*Gruppen ›* oben in der Liste): *Neue Gruppe* mit Name und Schülern (zum Beispiel „Turnier U14“); eine Gruppe lässt sich filtern, in eine Stunde setzen und mit **Schreiben** auf einmal benachrichtigen.
 - **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers.
-- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*. Mit **Als Excel speichern** wird dieselbe Liste zu einer .xlsx-Tabelle (Excel, Google Tabellen, LibreOffice). Mit **Neuer Kurs** legst du einen eigenen an, nicht vom Büro (Name, Niveau, Daten, Zeiten, Ort, Schüler; ändern mit **Bearbeiten**): Anwesenheit, Liste, Kalender und Erinnerungen wie bei den anderen, aber die Anwesenheit bleibt bei dir. Deine Kurse sind blau, die des Büros in der Farbe der App (auch am PC).
+- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*. Mit **Als Excel speichern** wird dieselbe Liste zu einer .xlsx-Tabelle (Excel, Google Tabellen, LibreOffice). Mit **Neuer Kurs** legst du einen eigenen an, nicht vom Büro (Name, Niveau, Daten, Zeiten, Ort, Schüler; ändern mit **Bearbeiten**): Anwesenheit, Liste, Kalender und Erinnerungen wie bei den anderen, aber die Anwesenheit bleibt bei dir. Deine Kurse sind blau, die des Büros in der Farbe der App (auch am PC). Jeder Kurs hat ein Farbetikett, das du aus acht wählst (**Farbe**, im Kurs oder beim Anlegen): man sieht es in der Liste, der Anwesenheitsliste und im Kalender, auch am PC.
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
 - **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken. In der Übersicht liefert **Quittungen <Jahr> (Excel)** die Liste der Paketquittungen des Jahres, für den Steuerberater.
-- **Trainer am PC** (*Mehr › Trainer am PC*): wie das Büro am PC (7.20) öffnet der Computer zu Hause eine Seite, die das Telefon im selben Netz bereitstellt, nach der Kopplung per QR oder Code. Es gibt nur die Daten des Trainers: **Schüler** (die Karte mit Tagebuch, Notizen, Bewertung, Tests, Rangliste und Turnieren, Ergebnissen, Paketen mit PDF-Quittungen und dem Bericht), **Stundenplan** (der Kalender für Monat oder Woche mit Privatstunden, Kursstunden und Turnieren der Schüler, oder die Liste mit den noch als erledigt zu markierenden), **Meine Kurse** (die Liste, Anwesenheit per Klick auf eine Stunde, PDF und Excel) und **Monatsübersicht** (mit den Quittungen des Jahres in Excel). Jede Seite lässt sich drucken; die Daten bleiben auf dem Telefon. Unter *Meine Kurse* gibt es auch **Neuer Kurs** und bei deinen eigenen Kursen (blau) **Bearbeiten** und **Entfernen**.
+- **Trainer am PC** (*Mehr › Trainer am PC*): wie das Büro am PC (7.20) öffnet der Computer zu Hause eine Seite, die das Telefon im selben Netz bereitstellt, nach der Kopplung per QR oder Code. Es gibt nur die Daten des Trainers: **Schüler** (die Karte mit Tagebuch, Notizen, Bewertung, Tests, Rangliste und Turnieren, Ergebnissen, Paketen mit PDF-Quittungen und dem Bericht), **Stundenplan** (der Kalender für Monat oder Woche mit Privatstunden, Kursstunden und Turnieren der Schüler, oder die Liste mit den noch als erledigt zu markierenden), **Meine Kurse** (die Liste, Anwesenheit per Klick auf eine Stunde, PDF und Excel) und **Monatsübersicht** (mit den Quittungen des Jahres in Excel). Jede Seite lässt sich drucken; die Daten bleiben auf dem Telefon. Unter *Meine Kurse* gibt es auch **Neuer Kurs** und bei deinen eigenen Kursen (blau) **Bearbeiten** und **Entfernen**. Unter *Schüler* gibt es **Neuer Schüler** und in der Karte **Bearbeiten** (Name, Kontakte, Eltern und Einwilligung); mit demselben Vor- und Nachnamen wie ein vorhandener Spieler wird dieser zum Schüler.
 - **Kalender, Erinnerungen und Fortschrittskarte**: **Zum Kalender hinzufügen** trägt in den Telefonkalender eine Stunde ein (aus der Stunde), die Stunden eines Kurses jede Woche (**Kalender** im Kurs), ein Turnier des Schülers und das Match einer erhaltenen Einladung. Die **Erinnerungen** (Einstellungen, standardmäßig an) melden am Vorabend die Stunden von morgen, noch zu schickende Kursanwesenheit und, wer eingeladen ist, das Match des Tages. **Fortschrittskarte schicken** (Karte des Schülers) schickt ihm Bewertung, Ziele, Tests, Rangliste, nächste Stunden und übrige Stunden: der Schüler öffnet sie mit TSM und findet sie unter *Fortschritte › Von meinem Trainer* (Tagebuch und Notizen bleiben bei dir).
 
 ### 7.7 Spieler: die Datenbank
@@ -10846,11 +10930,11 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - **The students list**: **Search a student** by name, sort *By name* or *By last time*, filter *All*, *Not seen lately* (not seen for more than 2 weeks) or a group. Under each name is the last time you saw them (session or lesson done).
 - **Groups** (*Groups ›* at the top of the list): *New group* with a name and students (for example "U14 squad"); a group can be filtered, put in a lesson and notified all together with **Write**.
 - **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack.
-- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*. With **Save as Excel** the same register becomes an .xlsx sheet (Excel, Google Sheets, LibreOffice). With **New course** you make one of your own, not the club office's (name, level, dates, times, place, students; change it with **Edit**): roll call, register, calendar and reminders as for the others, but attendance stays yours. Your courses are in blue, the club office's in the app's colour (on the PC too).
+- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*. With **Save as Excel** the same register becomes an .xlsx sheet (Excel, Google Sheets, LibreOffice). With **New course** you make one of your own, not the club office's (name, level, dates, times, place, students; change it with **Edit**): roll call, register, calendar and reminders as for the others, but attendance stays yours. Your courses are in blue, the club office's in the app's colour (on the PC too). Each course has a colour label you pick from eight (**Colour**, in the course or when you create it): you see it in the list, the register and the calendar, on the PC too.
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
 - **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office. In the summary, **Receipts <year> (Excel)** gives the list of the year's pack receipts, for the accountant.
-- **Coach from PC** (*More › Coach from PC*): like the Club office from PC (7.20), the home computer opens a page served by the phone, on the same network, after pairing with a QR or code. Only the coach's data is there: **Students** (the card with diary, notes, assessment, tests, ranking and tournaments, results, packs with PDF receipts and the report), **Schedule** (the month or week calendar with private lessons, course lessons and students' tournaments, or the list with those to mark as done), **My courses** (the register, roll call by clicking a lesson, PDF and Excel) and **Monthly summary** (with the year's receipts in Excel). Every page can be printed; the data stays on the phone. In *My courses* there are also **New course** and, in your own courses (in blue), **Edit** and **Remove**.
+- **Coach from PC** (*More › Coach from PC*): like the Club office from PC (7.20), the home computer opens a page served by the phone, on the same network, after pairing with a QR or code. Only the coach's data is there: **Students** (the card with diary, notes, assessment, tests, ranking and tournaments, results, packs with PDF receipts and the report), **Schedule** (the month or week calendar with private lessons, course lessons and students' tournaments, or the list with those to mark as done), **My courses** (the register, roll call by clicking a lesson, PDF and Excel) and **Monthly summary** (with the year's receipts in Excel). Every page can be printed; the data stays on the phone. In *My courses* there are also **New course** and, in your own courses (in blue), **Edit** and **Remove**. In *Students* there are **New student** and, on the card, **Edit** (name, contacts, parent and consent); with the same first and last name as an existing player, that player becomes the student.
 - **Calendar, reminders and progress card**: **Add to calendar** puts in the phone's calendar a lesson (from the lesson), a course's lessons every week (**Calendar** in the course), a student's tournament and the match of a call-up received. **Reminders** (Settings, on by default) tell you the evening before about tomorrow's lessons, a course's attendance still to send and, to whoever is called up, the match of the day. **Send the progress card** (student's card) sends them assessment, goals, tests, ranking, next lessons and lessons left: the student opens it with TSM and finds it in *Progress › From my coach* (diary and notes stay yours).
 
 ### 7.7 Players: the database
@@ -11451,11 +11535,11 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **La lista de alumnos**: **Buscar un alumno** por nombre, ordenar *Por nombre* o *Por última vez*, filtrar *Todos*, *Por volver a ver* (no los ves desde hace más de 2 semanas) o un grupo. Bajo cada nombre aparece la última vez que lo viste (sesión o clase hecha).
 - **Grupos** (*Grupos ›* arriba de la lista): *Nuevo grupo* con nombre y alumnos (por ejemplo "Competición U14"); el grupo se filtra, se pone en una clase y se avisa todo junto con **Escribir**.
 - **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno.
-- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*. Con **Guardar en Excel** el mismo registro se convierte en una hoja .xlsx (Excel, Hojas de cálculo de Google, LibreOffice). Con **Nuevo curso** creas uno tuyo, no de la secretaría (nombre, nivel, fechas, horarios, lugar, alumnos; se cambia con **Editar**): pasar lista, registro, calendario y recordatorios como los demás, pero la asistencia es tuya. Tus cursos van en azul, los de la secretaría en el color de la app (también en el PC).
+- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*. Con **Guardar en Excel** el mismo registro se convierte en una hoja .xlsx (Excel, Hojas de cálculo de Google, LibreOffice). Con **Nuevo curso** creas uno tuyo, no de la secretaría (nombre, nivel, fechas, horarios, lugar, alumnos; se cambia con **Editar**): pasar lista, registro, calendario y recordatorios como los demás, pero la asistencia es tuya. Tus cursos van en azul, los de la secretaría en el color de la app (también en el PC). Cada curso tiene una etiqueta de color que eliges entre ocho (**Color de la etiqueta**, en el curso o al crearlo): la ves en la lista, el registro y el calendario, también en el PC.
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
 - **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría. En el resumen, **Recibos <año> (Excel)** da la lista de recibos de paquetes del año, para el gestor.
-- **Entrenador desde el PC** (*Más › Entrenador desde el PC*): como la Secretaría desde el PC (7.20), el ordenador de casa abre una página servida por el teléfono, en la misma red, tras emparejar con QR o código. Solo están los datos del entrenador: **Alumnos** (la ficha con diario, notas, evaluación, pruebas, clasificación y torneos, resultados, paquetes con los recibos en PDF y el informe), **Agenda** (el calendario del mes o de la semana con clases particulares, clases de los cursos y torneos de los alumnos, o la lista con las que hay que marcar como hechas), **Mis cursos** (el registro, pasar lista pulsando una clase, PDF y Excel) y **Resumen del mes** (con los recibos del año en Excel). Cada página se imprime; los datos se quedan en el teléfono. En *Mis cursos* están también **Nuevo curso** y, en tus cursos (en azul), **Editar** y **Quitar**.
+- **Entrenador desde el PC** (*Más › Entrenador desde el PC*): como la Secretaría desde el PC (7.20), el ordenador de casa abre una página servida por el teléfono, en la misma red, tras emparejar con QR o código. Solo están los datos del entrenador: **Alumnos** (la ficha con diario, notas, evaluación, pruebas, clasificación y torneos, resultados, paquetes con los recibos en PDF y el informe), **Agenda** (el calendario del mes o de la semana con clases particulares, clases de los cursos y torneos de los alumnos, o la lista con las que hay que marcar como hechas), **Mis cursos** (el registro, pasar lista pulsando una clase, PDF y Excel) y **Resumen del mes** (con los recibos del año en Excel). Cada página se imprime; los datos se quedan en el teléfono. En *Mis cursos* están también **Nuevo curso** y, en tus cursos (en azul), **Editar** y **Quitar**. En *Alumnos* están **Nuevo alumno** y, en la ficha, **Editar** (nombre, contactos, padre o madre y consentimiento); con el mismo nombre y apellido que un jugador que ya existe, ese pasa a ser alumno.
 - **Calendario, recordatorios y ficha de progresos**: **Añadir al calendario** pone en el calendario del teléfono una clase (desde la clase), las clases de un curso cada semana (**Calendario** en el curso), un torneo del alumno y el partido de una convocatoria recibida. Los **recordatorios** (Ajustes, activados por defecto) avisan la noche antes de las clases de mañana, de la asistencia de un curso por enviar y, a quien está convocado, del partido del día. **Enviar la ficha de progresos** (ficha del alumno) le envía evaluación, objetivos, pruebas, clasificación, próximas clases y clases que quedan: el alumno la abre con TSM y la encuentra en *Progresos › De mi entrenador* (el diario y las notas siguen siendo tuyos).
 
 ### 7.7 Jugadores: la base
@@ -12056,11 +12140,11 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - **La liste des élèves**: **Chercher un élève** par nom, trier *Par nom* ou *Par dernière fois*, filtrer *Tous*, *À revoir* (pas vus depuis plus de 2 semaines) ou un groupe. Sous chaque nom, la dernière fois que vous l'avez vu (séance ou cours fait).
 - **Groupes** (*Groupes ›* en haut de la liste) : *Nouveau groupe* avec un nom et des élèves (par exemple « Compétition U14 ») ; un groupe se filtre, se met dans un cours et se prévient d'un coup avec **Écrire**.
 - **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève.
-- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*. Avec **Enregistrer en Excel**, le même registre devient une feuille .xlsx (Excel, Google Sheets, LibreOffice). Avec **Nouveau cours** vous en créez un à vous, pas du secrétariat (nom, niveau, dates, horaires, lieu, élèves ; il se change avec **Modifier**) : appel, registre, agenda et rappels comme les autres, mais les présences restent à vous. Vos cours sont en bleu, ceux du secrétariat dans la couleur de l'appli (sur le PC aussi).
+- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*. Avec **Enregistrer en Excel**, le même registre devient une feuille .xlsx (Excel, Google Sheets, LibreOffice). Avec **Nouveau cours** vous en créez un à vous, pas du secrétariat (nom, niveau, dates, horaires, lieu, élèves ; il se change avec **Modifier**) : appel, registre, agenda et rappels comme les autres, mais les présences restent à vous. Vos cours sont en bleu, ceux du secrétariat dans la couleur de l'appli (sur le PC aussi). Chaque cours a une étiquette de couleur à choisir parmi huit (**Couleur**, dans le cours ou à sa création) : on la voit dans la liste, le registre et l'agenda, sur le PC aussi.
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
 - **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat. Dans le récapitulatif, **Reçus <année> (Excel)** donne la liste des reçus de forfaits de l'année, pour le comptable.
-- **Entraîneur depuis le PC** (*Plus › Entraîneur depuis le PC*) : comme le Secrétariat depuis le PC (7.20), l'ordinateur de la maison ouvre une page servie par le téléphone, sur le même réseau, après l'appairage par QR ou code. Il n'y a que les données de l'entraîneur : **Élèves** (la fiche avec journal, notes, évaluation, tests, classement et tournois, résultats, forfaits avec les reçus PDF et le rapport), **Agenda** (le calendrier du mois ou de la semaine avec cours particuliers, séances des cours et tournois des élèves, ou la liste avec ceux à marquer comme faits), **Mes cours** (le registre, l'appel en cliquant sur une séance, PDF et Excel) et **Récapitulatif du mois** (avec les reçus de l'année en Excel). Chaque page s'imprime ; les données restent sur le téléphone. Dans *Mes cours* il y a aussi **Nouveau cours** et, dans vos cours (en bleu), **Modifier** et **Retirer**.
+- **Entraîneur depuis le PC** (*Plus › Entraîneur depuis le PC*) : comme le Secrétariat depuis le PC (7.20), l'ordinateur de la maison ouvre une page servie par le téléphone, sur le même réseau, après l'appairage par QR ou code. Il n'y a que les données de l'entraîneur : **Élèves** (la fiche avec journal, notes, évaluation, tests, classement et tournois, résultats, forfaits avec les reçus PDF et le rapport), **Agenda** (le calendrier du mois ou de la semaine avec cours particuliers, séances des cours et tournois des élèves, ou la liste avec ceux à marquer comme faits), **Mes cours** (le registre, l'appel en cliquant sur une séance, PDF et Excel) et **Récapitulatif du mois** (avec les reçus de l'année en Excel). Chaque page s'imprime ; les données restent sur le téléphone. Dans *Mes cours* il y a aussi **Nouveau cours** et, dans vos cours (en bleu), **Modifier** et **Retirer**. Dans *Élèves* il y a **Nouvel élève** et, dans la fiche, **Modifier** (nom, contacts, parent et consentement) ; avec les mêmes nom et prénom qu'un joueur existant, c'est lui qui devient élève.
 - **Agenda, rappels et fiche de progrès** : **Ajouter à l'agenda** met dans l'agenda du téléphone un cours (depuis le cours), les séances d'un cours chaque semaine (**Agenda** dans le cours), un tournoi de l'élève et le match d'une convocation reçue. Les **rappels** (Réglages, activés par défaut) préviennent la veille des cours du lendemain, des présences d'un cours encore à envoyer et, pour qui est convoqué, du match du jour. **Envoyer la fiche de progrès** (fiche de l'élève) lui envoie évaluation, objectifs, tests, classement, prochains cours et cours restants : l'élève l'ouvre avec TSM et la trouve dans *Progrès › De mon entraîneur* (le journal et les notes restent à vous).
 
 ### 7.7 Joueurs : la base
@@ -12661,11 +12745,11 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - **L'elenco degli allievi**: **Cerca un allievo** per nome, ordina *Per nome* o *Per ultima volta*, filtra *Tutti*, *Da rivedere* (non li vedi da più di 2 settimane) o un gruppo. Sotto ogni nome c'è l'ultima volta che l'hai visto (sessione o lezione fatta).
 - **Gruppi** (*Gruppi ›* in cima all'elenco): *Nuovo gruppo* con nome e allievi (per esempio "Agonisti U14"); il gruppo si filtra, si mette in una lezione e con **Scrivi** si avvisa tutto insieme.
 - **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo.
-- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*. Con **Salva in Excel** lo stesso registro diventa un foglio .xlsx (Excel, Fogli Google, LibreOffice). Con **Nuovo corso** ne fai uno tuo, non della segreteria (nome, livello, date, orari, dove, allievi; si cambia con **Modifica**): appello, registro, calendario e promemoria come gli altri, ma le presenze restano tue. I tuoi corsi sono in azzurro, quelli della segreteria nel colore dell'app (anche sul PC).
+- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*. Con **Salva in Excel** lo stesso registro diventa un foglio .xlsx (Excel, Fogli Google, LibreOffice). Con **Nuovo corso** ne fai uno tuo, non della segreteria (nome, livello, date, orari, dove, allievi; si cambia con **Modifica**): appello, registro, calendario e promemoria come gli altri, ma le presenze restano tue. I tuoi corsi sono in azzurro, quelli della segreteria nel colore dell'app (anche sul PC). Ogni corso ha un'etichetta colorata che scegli tra otto (**Colore**, nel corso o quando lo crei): la vedi nell'elenco, nel registro e nel calendario, anche sul PC.
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
 - **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria. Nel riepilogo, **Ricevute <anno> (Excel)** dà l'elenco delle ricevute dei pacchetti dell'anno, per il commercialista.
-- **Allenatore da PC** (*Altro › Allenatore da PC*): come la Segreteria da PC (7.20), il computer di casa apre una pagina servita dal telefono, sulla stessa rete, dopo l'abbinamento con QR o codice. Ci sono solo i dati dell'allenatore: **Allievi** (la scheda con diario, note, valutazione, test, classifica e tornei, risultati, pacchetti con le ricevute in PDF e il report), **Agenda** (il calendario del mese o della settimana con lezioni private, lezioni dei corsi e tornei degli allievi, oppure l'elenco con quelle da segnare come fatte), **I miei corsi** (il registro, l'appello cliccando una lezione, PDF ed Excel) e **Riepilogo del mese** (con le ricevute dell'anno in Excel). Ogni pagina si stampa; i dati restano sul telefono. In *I miei corsi* ci sono anche **Nuovo corso** e, nei tuoi corsi (in azzurro), **Modifica** e **Togli**.
+- **Allenatore da PC** (*Altro › Allenatore da PC*): come la Segreteria da PC (7.20), il computer di casa apre una pagina servita dal telefono, sulla stessa rete, dopo l'abbinamento con QR o codice. Ci sono solo i dati dell'allenatore: **Allievi** (la scheda con diario, note, valutazione, test, classifica e tornei, risultati, pacchetti con le ricevute in PDF e il report), **Agenda** (il calendario del mese o della settimana con lezioni private, lezioni dei corsi e tornei degli allievi, oppure l'elenco con quelle da segnare come fatte), **I miei corsi** (il registro, l'appello cliccando una lezione, PDF ed Excel) e **Riepilogo del mese** (con le ricevute dell'anno in Excel). Ogni pagina si stampa; i dati restano sul telefono. In *I miei corsi* ci sono anche **Nuovo corso** e, nei tuoi corsi (in azzurro), **Modifica** e **Togli**. In *Allievi* ci sono **Nuovo allievo** e, nella scheda, **Modifica** (nome, contatti, genitore e consenso); con lo stesso nome e cognome di un giocatore che c'è già, diventa allievo lui.
 - **Calendario, promemoria e scheda progressi**: **Aggiungi al calendario** mette nel calendario del telefono una lezione (dalla lezione), le lezioni di un corso ogni settimana (**Calendario** nel corso), un torneo dell'allievo e la partita di una convocazione ricevuta. I **promemoria** (Impostazioni, accesi di serie) avvisano la sera prima delle lezioni di domani, le presenze di un corso ancora da mandare e, a chi è convocato, la partita del giorno. **Manda la scheda progressi** (scheda dell'allievo) gli manda valutazione, obiettivi, test, classifica, prossime lezioni e lezioni rimaste: l'allievo la apre con TSM e la trova in *Progressi › Dal mio allenatore* (il diario e le note restano tue).
 
 ### 7.7 Giocatori: il database
@@ -13266,11 +13350,11 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **A lista de alunos**: **Procurar um aluno** pelo nome, ordenar *Por nome* ou *Pela última vez*, filtrar *Todos*, *Por rever* (não os vês há mais de 2 semanas) ou um grupo. Debaixo de cada nome aparece a última vez que o viste (sessão ou aula feita).
 - **Grupos** (*Grupos ›* no topo da lista): *Novo grupo* com nome e alunos (por exemplo "Competição U14"); o grupo filtra-se, põe-se numa aula e avisa-se todo de uma vez com **Escrever**.
 - **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno.
-- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*. Com **Guardar em Excel** o mesmo registo torna-se uma folha .xlsx (Excel, Google Sheets, LibreOffice). Com **Novo curso** cria um seu, não da secretaria (nome, nível, datas, horários, local, alunos; muda-se com **Editar**): chamada, registo, calendário e lembretes como os outros, mas as presenças ficam suas. Os seus cursos ficam a azul, os da secretaria na cor da app (também no PC).
+- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*. Com **Guardar em Excel** o mesmo registo torna-se uma folha .xlsx (Excel, Google Sheets, LibreOffice). Com **Novo curso** cria um seu, não da secretaria (nome, nível, datas, horários, local, alunos; muda-se com **Editar**): chamada, registo, calendário e lembretes como os outros, mas as presenças ficam suas. Os seus cursos ficam a azul, os da secretaria na cor da app (também no PC). Cada curso tem uma etiqueta de cor que escolhe entre oito (**Cor**, no curso ou ao criá-lo): vê-a na lista, no registo e no calendário, também no PC.
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
 - **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria. No resumo, **Recibos <ano> (Excel)** dá a lista dos recibos de pacotes do ano, para o contabilista.
-- **Treinador no PC** (*Mais › Treinador no PC*): como a Secretaria no PC (7.20), o computador de casa abre uma página servida pelo telefone, na mesma rede, depois de emparelhar com QR ou código. Só estão os dados do treinador: **Alunos** (a ficha com diário, notas, avaliação, testes, ranking e torneios, resultados, pacotes com os recibos em PDF e o relatório), **Agenda** (o calendário do mês ou da semana com aulas particulares, aulas dos cursos e torneios dos alunos, ou a lista com as que falta marcar como feitas), **Os meus cursos** (o registo, a chamada clicando numa aula, PDF e Excel) e **Resumo do mês** (com os recibos do ano em Excel). Cada página imprime-se; os dados ficam no telefone. Em *Os meus cursos* há também **Novo curso** e, nos seus cursos (a azul), **Editar** e **Remover**.
+- **Treinador no PC** (*Mais › Treinador no PC*): como a Secretaria no PC (7.20), o computador de casa abre uma página servida pelo telefone, na mesma rede, depois de emparelhar com QR ou código. Só estão os dados do treinador: **Alunos** (a ficha com diário, notas, avaliação, testes, ranking e torneios, resultados, pacotes com os recibos em PDF e o relatório), **Agenda** (o calendário do mês ou da semana com aulas particulares, aulas dos cursos e torneios dos alunos, ou a lista com as que falta marcar como feitas), **Os meus cursos** (o registo, a chamada clicando numa aula, PDF e Excel) e **Resumo do mês** (com os recibos do ano em Excel). Cada página imprime-se; os dados ficam no telefone. Em *Os meus cursos* há também **Novo curso** e, nos seus cursos (a azul), **Editar** e **Remover**. Em *Alunos* há **Novo aluno** e, na ficha, **Editar** (nome, contactos, responsável e consentimento); com o mesmo nome e apelido de um jogador que já existe, é esse que passa a aluno.
 - **Calendário, lembretes e ficha de progresso**: **Adicionar ao calendário** põe no calendário do telefone uma aula (a partir da aula), as aulas de um curso todas as semanas (**Calendário** no curso), um torneio do aluno e a partida de uma convocação recebida. Os **lembretes** (Configurações, ligados por defeito) avisam na véspera das aulas de amanhã, das presenças de um curso por enviar e, a quem está convocado, da partida do dia. **Enviar a ficha de progresso** (ficha do aluno) envia-lhe avaliação, objetivos, testes, ranking, próximas aulas e aulas restantes: o aluno abre-a com o TSM e encontra-a em *Progresso › Do meu treinador* (o diário e as notas ficam seus).
 
 ### 7.7 Jogadores: o banco
@@ -16293,13 +16377,21 @@ class MatchController(
      * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
      * non si cambiano qui (li cambia lei e li rimanda).
      */
-    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course) {
+    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course, color: String? = null) {
         val b = coachBook.value
         val old = b.courses.firstOrNull { it.card.course.id == co.id }
         if (old != null && !old.personal) return
         val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
             ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
-        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + cc))
+        val withColor = if (color != null && color in com.tennis.scoremanager.data.CourseCards.COLORS) cc.copy(color = color) else cc
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + withColor))
+    }
+
+    /** L'etichetta colorata di un corso dell'allenatore (qualsiasi: anche quelli della segreteria, solo sul suo telefono). */
+    fun setCoachCourseColor(id: String, color: String) {
+        if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) return
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == id) it.copy(color = color) else it }))
     }
 
     /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */
@@ -24035,7 +24127,12 @@ data class CoachCourse(
     val via: String? = null,
     /** Corso dell'allenatore, fatto da lui e non dalla segreteria: si cambia qui e le presenze non si mandano a nessuno. */
     val personal: Boolean = false,
+    /** L'etichetta colorata scelta dall'allenatore ("#RRGGBB", vedi [CourseCards.COLORS]); null = quella di partenza. */
+    val color: String? = null,
 ) {
+    /** Il colore del corso: quello scelto, o verde per i corsi della segreteria e azzurro per quelli dell'allenatore. */
+    val label: String get() = color ?: if (personal) CourseCards.OWN else CourseCards.CLUB
+
     /** Il corso con le presenze dell'allenatore sopra quelle della segreteria. */
     val course: Course get() = card.course.copy(
         attendance = card.course.attendance + attendance,
@@ -24079,6 +24176,11 @@ object CourseCards {
     const val CARD = "tsm-course-card"
     const val ATTENDANCE = "tsm-course-attendance"
     const val PROPOSAL = "tsm-student-proposal"
+
+    /** I colori tra cui scegliere l'etichetta di un corso. */
+    const val CLUB = "#C6F432"
+    const val OWN = "#29B6F6"
+    val COLORS = listOf(CLUB, OWN, "#FF9800", "#E53935", "#AB47BC", "#26A69A", "#FFD600", "#EC407A")
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }
 
@@ -31110,6 +31212,10 @@ interface CoachData {
     /** Un corso dell'allenatore (non della segreteria): nuovo o cambiato, o tolto. */
     fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) {}
     fun deleteOwnCourse(id: String) {}
+    /** L'etichetta colorata di un corso (uno dei [com.tennis.scoremanager.data.CourseCards.COLORS]). */
+    fun setCourseColor(id: String, color: String) {}
+    /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
+    fun saveStudent(p: PlayerProfile) {}
     fun receiptPdf(packId: String): ByteArray?
     fun reportPdf(student: String, days: Int?): ByteArray?
     fun registerPdf(courseId: String): ByteArray?
@@ -31129,7 +31235,13 @@ interface CoachData {
 @Serializable data class CdEvent(val date: String, val name: String, val place: String)
 @Serializable data class CdPack(val id: String, val lessons: Int, val cents: Int, val created: String, val paid: String? = null, val receipt: String? = null)
 @Serializable data class CdCourseLine(val name: String, val present: Int, val total: Int)
+/** Un allievo da creare o cambiare dal PC: chi è, i contatti, il genitore (per i minorenni) e il consenso. */
+@Serializable data class CdStudentIn(
+    val firstName: String = "", val lastName: String = "", val nickname: String = "", val phone: String = "", val email: String = "",
+    val guardian: String = "", val guardianPhone: String = "", val consent: Boolean = false,
+)
 @Serializable data class CdStudentDetail(
+    val firstName: String = "", val lastName: String = "", val nickname: String = "",
     val student: CdStudent, val note: String, val consent: String? = null, val diary: List<CdDiary>, val evaluations: List<CdEval>, val tests: List<CdTest>,
     val testDate: String? = null, val results: List<CdResult>, val events: List<CdEvent>, val rankings: List<String>, val packs: List<CdPack>, val courses: List<CdCourseLine>,
 )
@@ -31138,10 +31250,12 @@ interface CoachData {
 @Serializable data class CdCourse(
     val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int,
     val personal: Boolean = false, val slots: List<CdSlot> = emptyList(), val studentIds: List<String> = emptyList(),
+    val color: String = com.tennis.scoremanager.data.CourseCards.CLUB, val colors: List<String> = com.tennis.scoremanager.data.CourseCards.COLORS,
 )
 /** Un corso dell'allenatore da creare o cambiare dal PC. */
 @Serializable data class CdCourseIn(
     val name: String = "", val level: String = "", val from: String = "", val to: String = "", val slots: List<CdSlot> = emptyList(), val students: List<String> = emptyList(),
+    val color: String? = null,
 )
 @Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
@@ -31158,6 +31272,8 @@ interface CoachData {
 @Serializable data class CdCalItem(
     val kind: String, val ref: String, val key: String = "", val startMin: Int? = null, val minutes: Int = 0, val title: String, val place: String = "",
     val done: Boolean = false, val cancelled: Boolean = false, val past: Boolean = false,
+    /** Il colore del corso (per le lezioni dei corsi). */
+    val color: String? = null,
 )
 @Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>)
 @Serializable data class CdCal(val first: String, val days: List<CdCalDay>)
@@ -31185,6 +31301,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p == listOf("info") -> ok(CdInfo.serializer(), CdInfo(club = club, lang = data.lang, today = day(data.now())!!, year = Instant.ofEpochMilli(data.now()).atZone(zone()).year, coach = data.coachName()))
         m == "GET" && p == listOf("coach", "students") -> ok(ListSerializer(CdStudent.serializer()), students().sortedBy { it.name.lowercase() })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
+        m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
+        m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> saveStudent(student(p[2]), read(CdStudentIn.serializer(), r))
         m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "diary" -> { student(p[2]); data.addDiary(p[2], read(CdText.serializer(), r).text); done() }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "note" -> { student(p[2]); data.setNote(p[2], read(CdText.serializer(), r).text); done() }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "report.pdf" ->
@@ -31200,6 +31318,12 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ok(CdRegister.serializer(), register(p[2]))
         m == "POST" && p == listOf("coach", "courses") -> ownCourse(null, read(CdCourseIn.serializer(), r))
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ownCourse(p[2], read(CdCourseIn.serializer(), r))
+        m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "color" -> {
+            if (data.book().courses.none { it.card.course.id == p[2] }) throw DeskApi.Fail(404, "NOT_FOUND")
+            val color = read(CdText.serializer(), r).text
+            if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) throw DeskApi.Fail(400, "BAD_REQUEST")
+            data.setCourseColor(p[2], color); ok(CdCourse.serializer(), course(p[2]))
+        }
         m == "DELETE" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> {
             val cc = data.book().courses.firstOrNull { it.card.course.id == p[2] } ?: throw DeskApi.Fail(404, "NOT_FOUND")
             if (!cc.personal) throw DeskApi.Fail(409, "NOT_OWN")
@@ -31227,6 +31351,29 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         )
     }
 
+    /**
+     * Crea ([old] null) o cambia un allievo. Nome e cognome servono; se c'è già un giocatore con lo stesso nome e
+     * cognome diventa allievo lui (niente doppioni), coi contatti nuovi dove mancavano.
+     */
+    private fun saveStudent(old: PlayerProfile?, i: CdStudentIn): DeskApi.Resp {
+        val first = i.firstName.trim().take(40); val last = i.lastName.trim().take(40); val nick = i.nickname.trim().take(40)
+        if (first.isEmpty() || last.isEmpty()) throw DeskApi.Fail(400, "BAD_REQUEST")
+        val now = data.now()
+        val same = if (old == null) com.tennis.scoremanager.data.Players.sameFullName(data.players(), first, last).singleOrNull() else null
+        val base = old ?: same ?: PlayerProfile(com.tennis.scoremanager.data.Players.newId(), PlayerProfile.display(first, last, nick), first, last, nick, createdAt = now)
+        val keep = same != null && old == null
+        val p = base.copy(
+            name = PlayerProfile.display(first, last, nick), firstName = first, lastName = last, nickname = nick, student = true,
+            phone = if (keep) base.phone.ifBlank { i.phone.trim() } else i.phone.trim().take(30),
+            email = if (keep) base.email.ifBlank { i.email.trim() } else i.email.trim().take(80),
+            guardian = if (keep) base.guardian.ifBlank { i.guardian.trim() } else i.guardian.trim().take(60),
+            guardianPhone = if (keep) base.guardianPhone.ifBlank { i.guardianPhone.trim() } else i.guardianPhone.trim().take(30),
+            consentAt = if (i.consent) base.consentAt ?: now else if (keep) base.consentAt else null,
+        )
+        data.saveStudent(p)
+        return ok(CdStudentDetail.serializer(), detail(p.id))
+    }
+
     private fun students(): List<CdStudent> {
         val book = data.book(); val sessions = data.sessions(); val now = data.now()
         return data.players().filter { it.student }.map { studentOut(it, book, sessions, now) }
@@ -31237,6 +31384,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val book = data.book(); val now = data.now()
         val tests = Coaching.testsOf(book, id)
         return CdStudentDetail(
+            p.firstName, p.lastName, p.nickname,
             studentOut(p, book, data.sessions(), now), p.note, day(p.consentAt),
             Coaching.diaryOf(book, id).take(40).map { CdDiary(day(it.at)!!, it.text) },
             Coaching.evaluationsOf(book, id).takeLast(6).map { CdEval(day(it.at)!!, it.scores, it.note) },
@@ -31264,7 +31412,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val co = cc.course; val now = data.now()
         return CdCourse(co.id, co.name, co.level, cc.card.club, day(co.from)!!, day(co.to)!!, co.students.size, cc.toSend,
             Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled }, cc.personal,
-            co.slots.map { CdSlot(it.weekday, it.startMin, it.minutes, it.court) }, co.students)
+            co.slots.map { CdSlot(it.weekday, it.startMin, it.minutes, it.court) }, co.students, cc.label)
     }
 
     private fun register(id: String): CdRegister {
@@ -31298,6 +31446,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             slots = i.slots.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court.trim().take(30)) }.distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })),
             students = students)
         data.saveOwnCourse(co)
+        i.color?.takeIf { it in com.tennis.scoremanager.data.CourseCards.COLORS }?.let { data.setCourseColor(co.id, it) }
         return ok(CdCourse.serializer(), course(co.id))
     }
 
@@ -31322,7 +31471,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         for (cc in book.courses) {
             val co = cc.course
             for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem(if (cc.personal) "own" else "course", co.id, les.key, minOf(les.start), les.minutes,
-                co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now)
+                co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now, cc.label)
         }
         for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)
         val byDay = items.sortedBy { it.first }.groupBy { day(it.first)!! }
@@ -33387,6 +33536,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
         c.markCourseLesson(courseId, key, start, present, cancelled, note)
     override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
     override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
+    override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
+    override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
@@ -39625,6 +39776,8 @@ package com.tennis.scoremanager.ui
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39678,6 +39831,25 @@ import com.tennis.scoremanager.ui.screens.shortDate
 import java.io.File
 import kotlinx.coroutines.launch
 
+/** Il colore dell'etichetta di un corso ("#RRGGBB"). */
+fun courseColor(hex: String): androidx.compose.ui.graphics.Color =
+    runCatching { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(hex)) }.getOrDefault(TsmColors.Ball)
+
+/** I pallini dei colori tra cui scegliere l'etichetta di un corso; quello scelto ha il bordo. */
+@Composable
+fun CourseColorDots(selected: String, onPick: (String) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (hex in com.tennis.scoremanager.data.CourseCards.COLORS) {
+            val on = hex == selected
+            androidx.compose.foundation.layout.Box(
+                Modifier.size(if (on) 32.dp else 26.dp).clip(androidx.compose.foundation.shape.CircleShape).background(courseColor(hex))
+                    .then(if (on) Modifier.border(3.dp, TsmColors.TextMain, androidx.compose.foundation.shape.CircleShape) else Modifier)
+                    .clickable { onPick(hex) },
+            )
+        }
+    }
+}
+
 /** Un file alla segreteria: WhatsApp dritto al suo numero se lo si sa (dalla scheda corso), sennò si sceglie a chi. */
 fun sendToOffice(context: Context, file: File, text: String, office: String): Boolean {
     val wa = Notices.waNumber(office)
@@ -39707,7 +39879,7 @@ fun CoachCoursesSection(c: MatchController) {
         ).joinToString(" · ")
         // I corsi dell'allenatore in azzurro, quelli della segreteria nel colore dell'app.
         com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, listOfNotNull(s.ccOwnTag.takeIf { cc.personal }, hint.ifBlank { null }).joinToString(" · ").ifBlank { null },
-            tint = if (cc.personal) TsmColors.Cyan else null) { c.openCoachCourse(co.id) }
+            tint = courseColor(cc.label)) { c.openCoachCourse(co.id) }
     }
     // Un corso suo, non della segreteria: gruppi, preagonistica, un camp estivo.
     com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.Add, s.ccNew, s.ccNewHint) { creating = true }
@@ -39729,6 +39901,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     }
     var picking by remember { mutableStateOf(false) }
     var askDelete by remember { mutableStateOf(false) }
+    var color by remember { mutableStateOf(cc?.label ?: com.tennis.scoremanager.data.CourseCards.OWN) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
     var wd by remember { mutableStateOf(1) }
     var startMin by remember { mutableStateOf(17 * 60) }
@@ -39743,6 +39916,8 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 OutlinedTextField(co.name, { co = co.copy(name = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccName) })
                 OutlinedTextField(co.level, { co = co.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccLevel) })
+                Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp)
+                CourseColorDots(color) { color = it }
                 com.tennis.scoremanager.ui.screens.DateButton(s.ctStart, co.from, lang) { d -> co = co.copy(from = d, to = maxOf(co.to, d)) }
                 com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
                 Text(s.ccSlots, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
@@ -39767,7 +39942,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
             }
         },
         confirmButton = {
-            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim())); onDone(co.id) }) { Text(s.save) }
+            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim()), color); onDone(co.id) }) { Text(s.save) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
@@ -39807,13 +39982,6 @@ fun CoachCourseScreen(c: MatchController) {
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, cc.card.club.ifBlank { null }, "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
         icon = Icons.Filled.School,
-        action = {
-            Row {
-                if (cc.personal) TextButton(onClick = { editing = true }) { Text(s.studentEdit, color = TsmColors.Ball) }
-                TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
-                TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
-            }
-        },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             if (!cc.personal) BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
@@ -39824,10 +39992,21 @@ fun CoachCourseScreen(c: MatchController) {
             }, Modifier.weight(1f))
         },
     ) {
+        // Modifica (i corsi suoi), calendario e registro: sotto il titolo, così il nome del corso resta leggibile.
+        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (cc.personal) TextButton(onClick = { editing = true }) { Text(s.studentEdit, color = TsmColors.Ball) }
+            TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
+            TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
+        }
         // Un corso della segreteria dice se le presenze sono da mandare; uno dell'allenatore no (restano qui).
         if (!cc.personal) Text(cc.sentAt?.let { if (cc.toSend) s.ccToSend else s.ccSent(shortDate(it, lang)) } ?: if (cc.toSend) s.ccToSend else s.ccNothingYet,
             color = if (cc.toSend) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
-        else Text(s.ccOwn, color = TsmColors.Cyan, fontSize = 13.sp)
+        else Text(s.ccOwn, color = courseColor(cc.label), fontSize = 13.sp)
+        // L'etichetta colorata del corso: balza all'occhio nell'elenco e nel calendario (anche sul PC).
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(end = 10.dp))
+            CourseColorDots(cc.label) { c.setCoachCourseColor(co.id, it) }
+        }
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
             for (sid in co.students) {
@@ -47637,6 +47816,7 @@ interface Strings {
     val ccOwn: String
     val ccOwnTag: String
     val ccClubCourses: String
+    val ccColor: String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
@@ -50224,6 +50404,7 @@ object ItStrings : Strings {
     override val ccOwn = "Corso tuo: le presenze restano qui, non si mandano alla segreteria."
     override val ccOwnTag = "Corso mio"
     override val ccClubCourses = "Corsi della segreteria"
+    override val ccColor = "Colore"
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
@@ -52812,6 +52993,7 @@ object EnStrings : Strings {
     override val ccOwn = "Your course: attendance stays here, it isn't sent to the club office."
     override val ccOwnTag = "My course"
     override val ccClubCourses = "Club office courses"
+    override val ccColor = "Colour"
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
@@ -55425,6 +55607,7 @@ object DeStrings : Strings {
     override val ccOwn = "Dein Kurs: die Anwesenheit bleibt hier und geht nicht ans Büro."
     override val ccOwnTag = "Mein Kurs"
     override val ccClubCourses = "Kurse des Büros"
+    override val ccColor = "Farbe"
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
@@ -58028,6 +58211,7 @@ object EsStrings : Strings {
     override val ccOwn = "Curso tuyo: la asistencia se queda aquí, no se envía a la secretaría."
     override val ccOwnTag = "Mi curso"
     override val ccClubCourses = "Cursos de la secretaría"
+    override val ccColor = "Color de la etiqueta"
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
@@ -60633,6 +60817,7 @@ object FrStrings : Strings {
     override val ccOwn = "Votre cours : les présences restent ici, elles ne vont pas au secrétariat."
     override val ccOwnTag = "Mon cours"
     override val ccClubCourses = "Cours du secrétariat"
+    override val ccColor = "Couleur"
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
@@ -63239,6 +63424,7 @@ object PtStrings : Strings {
     override val ccOwn = "Curso seu: as presenças ficam aqui, não se enviam à secretaria."
     override val ccOwnTag = "O meu curso"
     override val ccClubCourses = "Cursos da secretaria"
+    override val ccColor = "Cor"
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
@@ -95422,6 +95608,13 @@ class CourseCardsTest {
         assertFalse(own.toSend)
         assertTrue(own.copy(personal = false).toSend)
     }
+
+    @Test fun courseLabelColor() {
+        val club = CoachCourse(CourseCard(code = "", issuedAt = 1, course = course))
+        assertEquals(CourseCards.CLUB, club.label)
+        assertEquals(CourseCards.OWN, club.copy(personal = true).label)
+        assertEquals("#FF9800", club.copy(color = "#FF9800").label)
+    }
 }
 TSM_EOF
 
@@ -98152,6 +98345,9 @@ class FakeCoach(var time: Long) : CoachData {
         val old = book.courses.firstOrNull { it.card.course.id == c.id }
         book = book.copy(courses = book.courses.filter { it.card.course.id != c.id } + (old?.copy(card = old.card.copy(course = c)) ?: CoachCourse(CourseCard(code = "", issuedAt = 1, course = c), personal = true)))
     }
+    override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
+    val colors = mutableMapOf<String, String>()
+    override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
     override fun receiptPdf(packId: String) = "%PDF".toByteArray()
     override fun reportPdf(student: String, days: Int?) = "%PDF".toByteArray()
@@ -98244,8 +98440,35 @@ class CoachDeskTest {
         assertEquals(409, req("DELETE", "/coach/courses/club", token = tk).first)
         assertEquals(200, req("PUT", "/coach/courses/${c.id}", body.replace("Preagonistica", "Agonistica"), tk).first)
         assertEquals("Agonistica", coach.saved.last().name)
+        // L'etichetta colorata: solo dei colori previsti, per qualsiasi corso.
+        assertEquals(200, req("PUT", "/coach/courses/club/color", """{"text":"#FF9800"}""", tk).first)
+        assertEquals("#FF9800", coach.colors["club"])
+        assertEquals(400, req("PUT", "/coach/courses/club/color", """{"text":"#123456"}""", tk).first)
         assertEquals(200, req("DELETE", "/coach/courses/${c.id}", token = tk).first)
         assertTrue(coach.book.courses.none { it.card.course.id == c.id })
+    }
+
+    @Test fun studentsFromThePcWithoutDuplicates() {
+        val tk = login()
+        val made = req("POST", "/coach/students", """{"firstName":"Giulia","lastName":"Verdi","guardian":"Marta Verdi","guardianPhone":"3331234567","consent":true}""", tk)
+        assertEquals(200, made.first)
+        val g = coach.people.single { it.lastName == "Verdi" }
+        assertTrue(g.student)
+        assertEquals("Marta Verdi", g.guardian)
+        assertEquals(now, g.consentAt)
+        assertEquals(400, req("POST", "/coach/students", """{"firstName":"Solo"}""", tk).first)
+        // Un giocatore che c'è già (stesso nome e cognome) diventa allievo, senza doppioni.
+        coach.people = coach.people + PlayerProfile("q", "Paolo Rossi", "Paolo", "Rossi", phone = "333000")
+        req("POST", "/coach/students", """{"firstName":"Paolo","lastName":"Rossi","phone":"999"}""", tk)
+        val p = coach.people.filter { it.lastName == "Rossi" }
+        assertEquals(1, p.size)
+        assertTrue(p[0].student)
+        assertEquals("333000", p[0].phone)
+        // Modifica: il soprannome cambia il nome che si vede; senza consenso la data si toglie.
+        assertEquals(200, req("PUT", "/coach/students/${g.id}", """{"firstName":"Giulia","lastName":"Verdi","nickname":"Giuly","consent":false}""", tk).first)
+        val g2 = coach.people.single { it.id == g.id }
+        assertEquals("Giuly", g2.name)
+        assertEquals(null, g2.consentAt)
     }
 }
 TSM_EOF

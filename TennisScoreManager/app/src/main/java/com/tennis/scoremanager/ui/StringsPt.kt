@@ -2595,6 +2595,7 @@ object PtStrings : Strings {
     override val ccOwn = "Curso seu: as presenças ficam aqui, não se enviam à secretaria."
     override val ccOwnTag = "O meu curso"
     override val ccClubCourses = "Cursos da secretaria"
+    override val ccColor = "Cor"
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }

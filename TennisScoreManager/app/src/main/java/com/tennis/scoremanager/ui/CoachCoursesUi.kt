@@ -6,6 +6,8 @@ package com.tennis.scoremanager.ui
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,6 +61,25 @@ import com.tennis.scoremanager.ui.screens.shortDate
 import java.io.File
 import kotlinx.coroutines.launch
 
+/** Il colore dell'etichetta di un corso ("#RRGGBB"). */
+fun courseColor(hex: String): androidx.compose.ui.graphics.Color =
+    runCatching { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(hex)) }.getOrDefault(TsmColors.Ball)
+
+/** I pallini dei colori tra cui scegliere l'etichetta di un corso; quello scelto ha il bordo. */
+@Composable
+fun CourseColorDots(selected: String, onPick: (String) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (hex in com.tennis.scoremanager.data.CourseCards.COLORS) {
+            val on = hex == selected
+            androidx.compose.foundation.layout.Box(
+                Modifier.size(if (on) 32.dp else 26.dp).clip(androidx.compose.foundation.shape.CircleShape).background(courseColor(hex))
+                    .then(if (on) Modifier.border(3.dp, TsmColors.TextMain, androidx.compose.foundation.shape.CircleShape) else Modifier)
+                    .clickable { onPick(hex) },
+            )
+        }
+    }
+}
+
 /** Un file alla segreteria: WhatsApp dritto al suo numero se lo si sa (dalla scheda corso), sennò si sceglie a chi. */
 fun sendToOffice(context: Context, file: File, text: String, office: String): Boolean {
     val wa = Notices.waNumber(office)
@@ -88,7 +109,7 @@ fun CoachCoursesSection(c: MatchController) {
         ).joinToString(" · ")
         // I corsi dell'allenatore in azzurro, quelli della segreteria nel colore dell'app.
         com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, listOfNotNull(s.ccOwnTag.takeIf { cc.personal }, hint.ifBlank { null }).joinToString(" · ").ifBlank { null },
-            tint = if (cc.personal) TsmColors.Cyan else null) { c.openCoachCourse(co.id) }
+            tint = courseColor(cc.label)) { c.openCoachCourse(co.id) }
     }
     // Un corso suo, non della segreteria: gruppi, preagonistica, un camp estivo.
     com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.Add, s.ccNew, s.ccNewHint) { creating = true }
@@ -110,6 +131,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     }
     var picking by remember { mutableStateOf(false) }
     var askDelete by remember { mutableStateOf(false) }
+    var color by remember { mutableStateOf(cc?.label ?: com.tennis.scoremanager.data.CourseCards.OWN) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
     var wd by remember { mutableStateOf(1) }
     var startMin by remember { mutableStateOf(17 * 60) }
@@ -124,6 +146,8 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 OutlinedTextField(co.name, { co = co.copy(name = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccName) })
                 OutlinedTextField(co.level, { co = co.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccLevel) })
+                Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp)
+                CourseColorDots(color) { color = it }
                 com.tennis.scoremanager.ui.screens.DateButton(s.ctStart, co.from, lang) { d -> co = co.copy(from = d, to = maxOf(co.to, d)) }
                 com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
                 Text(s.ccSlots, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
@@ -148,7 +172,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
             }
         },
         confirmButton = {
-            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim())); onDone(co.id) }) { Text(s.save) }
+            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim()), color); onDone(co.id) }) { Text(s.save) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
@@ -188,13 +212,6 @@ fun CoachCourseScreen(c: MatchController) {
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, cc.card.club.ifBlank { null }, "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
         icon = Icons.Filled.School,
-        action = {
-            Row {
-                if (cc.personal) TextButton(onClick = { editing = true }) { Text(s.studentEdit, color = TsmColors.Ball) }
-                TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
-                TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
-            }
-        },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             if (!cc.personal) BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
@@ -205,10 +222,21 @@ fun CoachCourseScreen(c: MatchController) {
             }, Modifier.weight(1f))
         },
     ) {
+        // Modifica (i corsi suoi), calendario e registro: sotto il titolo, così il nome del corso resta leggibile.
+        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (cc.personal) TextButton(onClick = { editing = true }) { Text(s.studentEdit, color = TsmColors.Ball) }
+            TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
+            TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
+        }
         // Un corso della segreteria dice se le presenze sono da mandare; uno dell'allenatore no (restano qui).
         if (!cc.personal) Text(cc.sentAt?.let { if (cc.toSend) s.ccToSend else s.ccSent(shortDate(it, lang)) } ?: if (cc.toSend) s.ccToSend else s.ccNothingYet,
             color = if (cc.toSend) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
-        else Text(s.ccOwn, color = TsmColors.Cyan, fontSize = 13.sp)
+        else Text(s.ccOwn, color = courseColor(cc.label), fontSize = 13.sp)
+        // L'etichetta colorata del corso: balza all'occhio nell'elenco e nel calendario (anche sul PC).
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(end = 10.dp))
+            CourseColorDots(cc.label) { c.setCoachCourseColor(co.id, it) }
+        }
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
             for (sid in co.students) {

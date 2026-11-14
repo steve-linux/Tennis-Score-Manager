@@ -114,4 +114,11 @@ class CourseCardsTest {
         assertFalse(own.toSend)
         assertTrue(own.copy(personal = false).toSend)
     }
+
+    @Test fun courseLabelColor() {
+        val club = CoachCourse(CourseCard(code = "", issuedAt = 1, course = course))
+        assertEquals(CourseCards.CLUB, club.label)
+        assertEquals(CourseCards.OWN, club.copy(personal = true).label)
+        assertEquals("#FF9800", club.copy(color = "#FF9800").label)
+    }
 }

@@ -2663,6 +2663,7 @@ interface Strings {
     val ccOwn: String
     val ccOwnTag: String
     val ccClubCourses: String
+    val ccColor: String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
@@ -5250,6 +5251,7 @@ object ItStrings : Strings {
     override val ccOwn = "Corso tuo: le presenze restano qui, non si mandano alla segreteria."
     override val ccOwnTag = "Corso mio"
     override val ccClubCourses = "Corsi della segreteria"
+    override val ccColor = "Colore"
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
@@ -7838,6 +7840,7 @@ object EnStrings : Strings {
     override val ccOwn = "Your course: attendance stays here, it isn't sent to the club office."
     override val ccOwnTag = "My course"
     override val ccClubCourses = "Club office courses"
+    override val ccColor = "Colour"
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }

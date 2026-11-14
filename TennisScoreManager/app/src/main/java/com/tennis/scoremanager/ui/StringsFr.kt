@@ -2594,6 +2594,7 @@ object FrStrings : Strings {
     override val ccOwn = "Votre cours : les présences restent ici, elles ne vont pas au secrétariat."
     override val ccOwnTag = "Mon cours"
     override val ccClubCourses = "Cours du secrétariat"
+    override val ccColor = "Couleur"
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
