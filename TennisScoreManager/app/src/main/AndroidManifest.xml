@@ -50,6 +50,10 @@
         <!-- La scheda partita va dritta nella chat del giocatore: serve sapere se WhatsApp c'è. -->
         <package android:name="com.whatsapp" />
         <package android:name="com.whatsapp.w4b" />
+        <!-- La dettatura delle note (diario, lezioni, valutazioni): serve sapere se c'è un'app che la fa. -->
+        <intent>
+            <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
+        </intent>
     </queries>
 
     <application

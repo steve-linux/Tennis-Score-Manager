@@ -2600,6 +2600,11 @@ interface Strings {
     val cmEmpty: String
     val rpAll: String
     val rpText: (String) -> String
+    val dictNote: String
+    val dictPrompt: String
+    val dictNoApp: String
+    val dictAdded: String
+    val dictMic: String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -5123,6 +5128,11 @@ object ItStrings : Strings {
     override val cmEmpty = "Niente in questo mese."
     override val rpAll = "Report a tutti"
     override val rpText: (String) -> String = { "Il report degli ultimi 30 giorni $it, in allegato." }
+    override val dictNote = "Detta una nota"
+    override val dictPrompt = "Parla: cosa ha fatto bene, cosa migliorare"
+    override val dictNoApp = "Su questo telefono non c'è la dettatura vocale (serve l'app di Google o un'altra app di riconoscimento vocale)."
+    override val dictAdded = "Nota aggiunta al diario"
+    override val dictMic = "Detta"
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -7647,6 +7657,11 @@ object EnStrings : Strings {
     override val cmEmpty = "Nothing this month."
     override val rpAll = "Report to everyone"
     override val rpText: (String) -> String = { "The report for the last 30 days $it, attached." }
+    override val dictNote = "Dictate a note"
+    override val dictPrompt = "Speak: what went well, what to improve"
+    override val dictNoApp = "There is no voice dictation on this phone (it needs the Google app or another speech recognition app)."
+    override val dictAdded = "Note added to the diary"
+    override val dictMic = "Dictate"
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }

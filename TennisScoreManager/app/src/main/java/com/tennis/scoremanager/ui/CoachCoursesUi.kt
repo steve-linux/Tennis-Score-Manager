@@ -191,7 +191,8 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
                         val name = c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name ?: continue
                         SwitchRow(Icons.Filled.School, name, null, sid in present) { on -> present = if (on) present + sid else present - sid }
                     }
-                    OutlinedTextField(note, { note = it.take(500) }, Modifier.fillMaxWidth(), label = { Text(s.ccLessonNote) })
+                    OutlinedTextField(note, { note = it.take(500) }, Modifier.fillMaxWidth(), label = { Text(s.ccLessonNote) },
+                        trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(500) } })
                 } else Text(s.ccNotYet, color = TsmColors.TextDim, fontSize = 13.sp)
             }
         },
@@ -300,7 +301,8 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(s.ccProposeHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 OutlinedTextField(level, { level = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccLevel) })
-                OutlinedTextField(note, { note = it.take(300) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) })
+                OutlinedTextField(note, { note = it.take(300) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) },
+                    trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(300) } })
             }
         },
         confirmButton = {

@@ -2531,6 +2531,11 @@ object FrStrings : Strings {
     override val cmEmpty = "Rien ce mois-ci."
     override val rpAll = "Rapport à tous"
     override val rpText: (String) -> String = { "Le rapport des 30 derniers jours $it, en pièce jointe." }
+    override val dictNote = "Dicter une note"
+    override val dictPrompt = "Parlez : ce qui a bien marché, ce qu'il faut améliorer"
+    override val dictNoApp = "Pas de dictée vocale sur ce téléphone (il faut l'appli Google ou une autre appli de reconnaissance vocale)."
+    override val dictAdded = "Note ajoutée au journal"
+    override val dictMic = "Dicter"
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }

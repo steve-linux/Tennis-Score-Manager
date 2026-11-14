@@ -2532,6 +2532,11 @@ object PtStrings : Strings {
     override val cmEmpty = "Nada neste mês."
     override val rpAll = "Relatório a todos"
     override val rpText: (String) -> String = { "O relatório dos últimos 30 dias $it, em anexo." }
+    override val dictNote = "Ditar uma nota"
+    override val dictPrompt = "Fale: o que correu bem, o que melhorar"
+    override val dictNoApp = "Não há ditado por voz neste telefone (é preciso a app Google ou outra app de reconhecimento de voz)."
+    override val dictAdded = "Nota adicionada ao diário"
+    override val dictMic = "Ditar"
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }

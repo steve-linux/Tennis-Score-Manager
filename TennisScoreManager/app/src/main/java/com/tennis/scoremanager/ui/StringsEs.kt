@@ -2529,6 +2529,11 @@ object EsStrings : Strings {
     override val cmEmpty = "Nada este mes."
     override val rpAll = "Informe a todos"
     override val rpText: (String) -> String = { "El informe de los últimos 30 días $it, adjunto." }
+    override val dictNote = "Dictar una nota"
+    override val dictPrompt = "Habla: qué ha ido bien, qué mejorar"
+    override val dictNoApp = "No hay dictado por voz en este teléfono (hace falta la app de Google u otra app de reconocimiento de voz)."
+    override val dictAdded = "Nota añadida al diario"
+    override val dictMic = "Dictar"
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }

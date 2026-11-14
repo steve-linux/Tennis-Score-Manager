@@ -248,6 +248,10 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         <!-- La scheda partita va dritta nella chat del giocatore: serve sapere se WhatsApp c'è. -->
         <package android:name="com.whatsapp" />
         <package android:name="com.whatsapp.w4b" />
+        <!-- La dettatura delle note (diario, lezioni, valutazioni): serve sapere se c'è un'app che la fa. -->
+        <intent>
+            <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
+        </intent>
     </queries>
 
     <application
@@ -8532,7 +8536,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
   - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
-  - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben.
+  - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben. **Per Stimme**: **Notiz diktieren** (oder das 🎤 im Feld) nutzt die Spracheingabe des Telefons, auf neueren Telefonen auch offline: du sprichst und der Text kommt mit Datum ins Tagebuch. Das 🎤 gibt es auch in den Trainernotizen, in der Notiz einer Kursstunde und in der technischen Bewertung.
   - **Ziele**: *Neues Ziel* für einen Schlag, zum Beispiel Vorhand mit 70 % im Feld im Schnitt der letzten 3 Einheiten, mit optionalem Datum. Die Karte zeigt den Stand; wird es erreicht, bekommt das Ziel das Datum von selbst.
   - **Stunden und Pakete**: die nächsten Stunden und mit *Neues Paket* die gekauften Stunden (Anzahl und Preis, bezahlt oder nicht). Der Stand zeigt gekauft, gemacht und übrig und was noch offen ist; *Als bezahlt markieren* schließt das Paket.
   - **Schreiben**: Elternteil oder Vormund und die **Einwilligung zu Aufnahmen und Daten** (in *Bearbeiten* einzutragen, bei Minderjährigen; Mitteilungen gehen an das Telefon der Eltern). **Schreiben** öffnet eine WhatsApp-, SMS- oder E-Mail-Nachricht an den Schüler; **Match mit…** lässt den Gegner unter den Schülern wählen und bereitet das neue Match mit beiden Namen vor.
@@ -9134,7 +9138,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
   - **Coach's notes**: what to work on, goals; they save by themselves.
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
-  - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top.
+  - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top. **By voice**: **Dictate a note** (or the 🎤 in the field) uses the phone's dictation, offline too on recent phones: you speak and the text goes into the diary with the date. The 🎤 is also in the coach's notes, in a course lesson's note and in the technical assessment's note.
   - **Goals**: *New goal* on a stroke, for example forehand at 70% in over the average of the last 3 sessions, with an optional date. The card shows how far they are; when they reach it, the goal takes the date by itself.
   - **Lessons and packs**: their next lessons and, with *New pack*, the lessons bought (number and price, paid or not). The balance shows bought, done and left and how much is due; *Mark as paid* closes the pack.
   - **Write**: the parent or guardian and the **Consent to filming and data** (entered in *Edit*, for minors; notices go to the parent's phone). **Write** opens a WhatsApp, SMS or email message to the student; **Match with…** lets you pick the opponent among the students and prepares the new match with both names.
@@ -9735,7 +9739,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
   - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
-  - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba.
+  - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba. **Por voz**: **Dictar una nota** (o el 🎤 del campo) usa el dictado del teléfono, también sin conexión en los teléfonos recientes: hablas y el texto va al diario con la fecha. El 🎤 está también en las notas del entrenador, en la nota de una clase del curso y en la de la evaluación técnica.
   - **Objetivos**: *Nuevo objetivo* sobre un golpe, por ejemplo derecha al 70 % dentro en la media de las últimas 3 sesiones, con una fecha opcional. La ficha muestra cómo va; cuando lo alcanza, el objetivo toma la fecha solo.
   - **Clases y paquetes**: sus próximas clases y, con *Nuevo paquete*, las clases compradas (número y precio, pagado o no). El saldo indica compradas, hechas y restantes y cuánto falta por pagar; *Marcar pagado* cierra el paquete.
   - **Escribir**: el padre, madre o tutor y el **Consentimiento a grabaciones y datos** (se introducen en *Editar*, para los menores; los avisos van al teléfono del padre o madre). **Escribir** abre un mensaje de WhatsApp, SMS o correo al alumno; **Partido con…** hace elegir el rival entre los alumnos y prepara el partido nuevo con los dos nombres.
@@ -10336,7 +10340,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
   - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
-  - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut.
+  - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut. **À la voix** : **Dicter une note** (ou le 🎤 dans le champ) utilise la dictée du téléphone, même hors ligne sur les téléphones récents : vous parlez et le texte va dans le journal avec la date. Le 🎤 est aussi dans les notes de l'entraîneur, dans la note d'une séance de cours et dans celle de l'évaluation technique.
   - **Objectifs**: *Nouvel objectif* sur un coup, par exemple coup droit à 70 % dedans sur la moyenne des 3 dernières séances, avec une date facultative. La fiche montre où il en est ; quand il l'atteint, l'objectif prend la date tout seul.
   - **Cours et forfaits**: ses prochains cours et, avec *Nouveau forfait*, les cours achetés (nombre et prix, payé ou non). Le solde indique achetés, faits et restants et ce qui reste à payer ; *Marquer payé* clôt le forfait.
   - **Écrire**: le parent ou tuteur et le **Consentement aux vidéos et aux données** (à saisir dans *Modifier*, pour les mineurs ; les avis vont au téléphone du parent). **Écrire** ouvre un message WhatsApp, SMS ou e-mail à l'élève ; **Match avec…** fait choisir l'adversaire parmi les élèves et prépare le nouveau match avec les deux noms.
@@ -10937,7 +10941,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
   - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
-  - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto.
+  - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto. **A voce**: **Detta una nota** (o il 🎤 nel campo) usa la dettatura del telefono, anche senza rete sui telefoni recenti: parli e il testo va nel diario con la data. Il 🎤 c'è anche nelle note dell'allenatore, nella nota della lezione di un corso e in quella della valutazione tecnica.
   - **Obiettivi**: *Nuovo obiettivo* su un colpo, per esempio dritto al 70% dentro sulla media delle ultime 3 sessioni, con una data facoltativa. La scheda mostra a che punto è; quando lo raggiunge, l'obiettivo prende la data da solo.
   - **Lezioni e pacchetti**: le sue prossime lezioni e, con *Nuovo pacchetto*, le lezioni comprate (numero e prezzo, già pagato o no). Il conto dice comprate, fatte e rimaste e quanto è da pagare; *Segna pagato* chiude il pacchetto.
   - **Scrivi**: il genitore o tutore e il **Consenso a riprese e dati** (si inseriscono in *Modifica*, per i minorenni; gli avvisi vanno al telefono del genitore). **Scrivi** apre un messaggio WhatsApp, SMS o email all'allievo; **Partita con…** fa scegliere l'avversario tra gli allievi e prepara la nuova partita con i due nomi.
@@ -11538,7 +11542,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
   - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
-  - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo.
+  - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo. **Por voz**: **Ditar uma nota** (ou o 🎤 no campo) usa o ditado do telefone, também sem rede nos telefones recentes: fala e o texto vai para o diário com a data. O 🎤 está também nas notas do treinador, na nota de uma aula do curso e na da avaliação técnica.
   - **Metas**: *Nova meta* num golpe, por exemplo direita a 70 % dentro na média das últimas 3 sessões, com uma data opcional. A ficha mostra em que ponto está; quando a atinge, a meta fica com a data sozinha.
   - **Aulas e pacotes**: as próximas aulas e, com *Novo pacote*, as aulas compradas (número e preço, pago ou não). O saldo mostra compradas, feitas e restantes e quanto falta pagar; *Marcar como pago* fecha o pacote.
   - **Escrever**: o pai, mãe ou tutor e o **Consentimento para filmagens e dados** (introduzem-se em *Editar*, para menores; os avisos vão para o telefone do responsável). **Escrever** abre uma mensagem de WhatsApp, SMS ou email ao aluno; **Partida com…** faz escolher o adversário entre os alunos e prepara a partida nova com os dois nomes.
@@ -36940,7 +36944,8 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
                         val name = c.playerById(sid)?.name ?: cc.card.students.firstOrNull { it.id == sid }?.name ?: continue
                         SwitchRow(Icons.Filled.School, name, null, sid in present) { on -> present = if (on) present + sid else present - sid }
                     }
-                    OutlinedTextField(note, { note = it.take(500) }, Modifier.fillMaxWidth(), label = { Text(s.ccLessonNote) })
+                    OutlinedTextField(note, { note = it.take(500) }, Modifier.fillMaxWidth(), label = { Text(s.ccLessonNote) },
+                        trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(500) } })
                 } else Text(s.ccNotYet, color = TsmColors.TextDim, fontSize = 13.sp)
             }
         },
@@ -37049,7 +37054,8 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(s.ccProposeHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 OutlinedTextField(level, { level = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccLevel) })
-                OutlinedTextField(note, { note = it.take(300) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) })
+                OutlinedTextField(note, { note = it.take(300) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) },
+                    trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(300) } })
             }
         },
         confirmButton = {
@@ -37291,7 +37297,8 @@ private fun EvaluationDialog(c: MatchController, e0: Evaluation, isNew: Boolean,
                     Text(aspectLabel(s, k), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Segmented((1..5).map { SegOption("$it") }, (e.scores[k] ?: 0) - 1, { i -> e = e.copy(scores = e.scores + (k to i + 1)) }, columns = 5)
                 }
-                OutlinedTextField(e.note, { e = e.copy(note = it.take(500)) }, Modifier.fillMaxWidth(), label = { Text(s.evNote) })
+                OutlinedTextField(e.note, { e = e.copy(note = it.take(500)) }, Modifier.fillMaxWidth(), label = { Text(s.evNote) },
+                    trailingIcon = { DictateIcon(c) { said -> e = e.copy(note = appendDictated(e.note, said).take(500)) } })
                 if (!isNew) TextButton(onClick = { c.deleteEvaluation(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
@@ -37391,6 +37398,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -37447,6 +37455,7 @@ import java.util.Calendar
 @Composable
 fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     val s = LocalStrings.current
+    val context = LocalContext.current
     val book by c.coachBook.collectAsState()
     val sessions by c.serveSessions.collectAsState()
     val lang = c.options.collectAsState().value.lang
@@ -37461,8 +37470,14 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     SectionCard(s.coDiary, Icons.Filled.EditNote) {
         Text(s.coDiaryHint, color = TsmColors.TextDim, fontSize = 13.sp)
         var text by remember(st.id) { mutableStateOf("") }
-        OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2)
-        GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.addDiary(st.id, text); text = "" }, Modifier.fillMaxWidth())
+        OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2,
+            trailingIcon = { DictateIcon(c) { said -> text = appendDictated(text, said).take(2000) } })
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.addDiary(st.id, text); text = "" }, Modifier.weight(1f))
+            // A voce: si parla e la nota va subito nel diario, con la data di oggi.
+            val dictate = rememberDictation(c) { said -> c.addDiary(st.id, appendDictated("", said)); android.widget.Toast.makeText(context, s.dictAdded, android.widget.Toast.LENGTH_SHORT).show() }
+            if (dictate != null) GhostButton(s.dictNote, Icons.Filled.Mic, dictate, Modifier.weight(1f))
+        }
         val diary = Coaching.diaryOf(book, st.id)
         if (diary.isEmpty()) Text(s.coDiaryNone, color = TsmColors.TextDim, fontSize = 13.sp)
         for (d in diary.take(8)) Column(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { deleteEntry = d.id }).padding(vertical = 4.dp)) {
@@ -38213,6 +38228,81 @@ fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, ena
             }
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/DictationUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/DictationUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.tennis.scoremanager.MatchController
+
+/** C'è un'app che fa la dettatura (quella di Google o un'altra)? Senza, il microfono non compare. */
+fun canDictate(context: Context): Boolean =
+    runCatching { context.packageManager.queryIntentActivities(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0).isNotEmpty() }.getOrDefault(false)
+
+/** Aggiunge [add] in fondo a [text], con uno spazio o un a capo se serve. */
+fun appendDictated(text: String, add: String): String {
+    val a = add.trim().replaceFirstChar { it.uppercase() }
+    if (a.isEmpty()) return text
+    return when {
+        text.isBlank() -> a
+        text.endsWith("\n") || text.endsWith(" ") -> text + a
+        text.trimEnd().endsWith(".") || text.trimEnd().endsWith("!") || text.trimEnd().endsWith("?") -> "$text $a"
+        else -> "$text. $a"
+    }
+}
+
+/**
+ * La dettatura di Android (sui telefoni recenti anche senza rete) nella lingua dell'app: si parla e [onText] riceve il
+ * testo. Restituisce la funzione che la avvia, o null se sul telefono non c'è nessuna app di dettatura.
+ */
+@Composable
+fun rememberDictation(c: MatchController, onText: (String) -> Unit): (() -> Unit)? {
+    val context = LocalContext.current
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    val available = remember { canDictate(context) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
+        if (r.resultCode != Activity.RESULT_OK) return@rememberLauncherForActivityResult
+        r.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.takeIf { it.isNotBlank() }?.let(onText)
+    }
+    if (!available) return null
+    return {
+        val i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang.locale.toLanguageTag())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, s.dictPrompt)
+        }
+        runCatching { launcher.launch(i) }.onFailure { Toast.makeText(context, s.dictNoApp, Toast.LENGTH_LONG).show() }
+    }
+}
+
+/** Il microfono nel campo di testo: il testo detto va in fondo a quello che c'è. */
+@Composable
+fun DictateIcon(c: MatchController, modifier: Modifier = Modifier, onText: (String) -> Unit) {
+    val s = LocalStrings.current
+    val start = rememberDictation(c, onText) ?: return
+    IconButton(onClick = start, modifier = modifier) { Icon(Icons.Filled.Mic, s.dictMic, tint = TsmColors.Ball) }
 }
 TSM_EOF
 
@@ -44274,6 +44364,11 @@ interface Strings {
     val cmEmpty: String
     val rpAll: String
     val rpText: (String) -> String
+    val dictNote: String
+    val dictPrompt: String
+    val dictNoApp: String
+    val dictAdded: String
+    val dictMic: String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -46797,6 +46892,11 @@ object ItStrings : Strings {
     override val cmEmpty = "Niente in questo mese."
     override val rpAll = "Report a tutti"
     override val rpText: (String) -> String = { "Il report degli ultimi 30 giorni $it, in allegato." }
+    override val dictNote = "Detta una nota"
+    override val dictPrompt = "Parla: cosa ha fatto bene, cosa migliorare"
+    override val dictNoApp = "Su questo telefono non c'è la dettatura vocale (serve l'app di Google o un'altra app di riconoscimento vocale)."
+    override val dictAdded = "Nota aggiunta al diario"
+    override val dictMic = "Detta"
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -49321,6 +49421,11 @@ object EnStrings : Strings {
     override val cmEmpty = "Nothing this month."
     override val rpAll = "Report to everyone"
     override val rpText: (String) -> String = { "The report for the last 30 days $it, attached." }
+    override val dictNote = "Dictate a note"
+    override val dictPrompt = "Speak: what went well, what to improve"
+    override val dictNoApp = "There is no voice dictation on this phone (it needs the Google app or another speech recognition app)."
+    override val dictAdded = "Note added to the diary"
+    override val dictMic = "Dictate"
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
@@ -51870,6 +51975,11 @@ object DeStrings : Strings {
     override val cmEmpty = "Nichts in diesem Monat."
     override val rpAll = "Bericht an alle"
     override val rpText: (String) -> String = { "Der Bericht der letzten 30 Tage $it, im Anhang." }
+    override val dictNote = "Notiz diktieren"
+    override val dictPrompt = "Sprich: was gut lief, was besser werden soll"
+    override val dictNoApp = "Auf diesem Telefon gibt es keine Spracheingabe (dafür braucht es die Google-App oder eine andere Spracherkennungs-App)."
+    override val dictAdded = "Notiz ins Tagebuch übernommen"
+    override val dictMic = "Diktieren"
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
@@ -54409,6 +54519,11 @@ object EsStrings : Strings {
     override val cmEmpty = "Nada este mes."
     override val rpAll = "Informe a todos"
     override val rpText: (String) -> String = { "El informe de los últimos 30 días $it, adjunto." }
+    override val dictNote = "Dictar una nota"
+    override val dictPrompt = "Habla: qué ha ido bien, qué mejorar"
+    override val dictNoApp = "No hay dictado por voz en este teléfono (hace falta la app de Google u otra app de reconocimiento de voz)."
+    override val dictAdded = "Nota añadida al diario"
+    override val dictMic = "Dictar"
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
@@ -56950,6 +57065,11 @@ object FrStrings : Strings {
     override val cmEmpty = "Rien ce mois-ci."
     override val rpAll = "Rapport à tous"
     override val rpText: (String) -> String = { "Le rapport des 30 derniers jours $it, en pièce jointe." }
+    override val dictNote = "Dicter une note"
+    override val dictPrompt = "Parlez : ce qui a bien marché, ce qu'il faut améliorer"
+    override val dictNoApp = "Pas de dictée vocale sur ce téléphone (il faut l'appli Google ou une autre appli de reconnaissance vocale)."
+    override val dictAdded = "Note ajoutée au journal"
+    override val dictMic = "Dicter"
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
@@ -59492,6 +59612,11 @@ object PtStrings : Strings {
     override val cmEmpty = "Nada neste mês."
     override val rpAll = "Relatório a todos"
     override val rpText: (String) -> String = { "O relatório dos últimos 30 dias $it, em anexo." }
+    override val dictNote = "Ditar uma nota"
+    override val dictPrompt = "Fale: o que correu bem, o que melhorar"
+    override val dictNoApp = "Não há ditado por voz neste telefone (é preciso a app Google ou outra app de reconhecimento de voz)."
+    override val dictAdded = "Nota adicionada ao diário"
+    override val dictMic = "Ditar"
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
@@ -70770,7 +70895,8 @@ fun StudentScreen(c: MatchController) {
                 delay(800)
                 c.savePlayer(st.copy(note = note))
             }
-            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
+            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
+                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
         if (st.student) {
@@ -96389,6 +96515,27 @@ class TvSnapshotTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ui/DictationTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ui/DictationTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class DictationTest {
+    @Test fun dictatedTextJoinsWhatIsThere() {
+        assertEquals("Servizio più sciolto", appendDictated("", "servizio più sciolto"))
+        assertEquals("Bene il dritto. Rovescio da rivedere", appendDictated("Bene il dritto", " rovescio da rivedere "))
+        assertEquals("Bene il dritto. Rovescio", appendDictated("Bene il dritto.", "rovescio"))
+        assertEquals("Riga\nNuova", appendDictated("Riga\n", "nuova"))
+        assertEquals("Testo", appendDictated("Testo", "  "))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ui/StringsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ui/StringsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -107999,6 +108146,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 343 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 345 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

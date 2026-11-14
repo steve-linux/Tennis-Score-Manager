@@ -339,7 +339,8 @@ fun StudentScreen(c: MatchController) {
                 delay(800)
                 c.savePlayer(st.copy(note = note))
             }
-            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
+            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
+                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
         if (st.student) {

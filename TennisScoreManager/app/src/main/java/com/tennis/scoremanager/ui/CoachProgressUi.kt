@@ -181,7 +181,8 @@ private fun EvaluationDialog(c: MatchController, e0: Evaluation, isNew: Boolean,
                     Text(aspectLabel(s, k), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Segmented((1..5).map { SegOption("$it") }, (e.scores[k] ?: 0) - 1, { i -> e = e.copy(scores = e.scores + (k to i + 1)) }, columns = 5)
                 }
-                OutlinedTextField(e.note, { e = e.copy(note = it.take(500)) }, Modifier.fillMaxWidth(), label = { Text(s.evNote) })
+                OutlinedTextField(e.note, { e = e.copy(note = it.take(500)) }, Modifier.fillMaxWidth(), label = { Text(s.evNote) },
+                    trailingIcon = { DictateIcon(c) { said -> e = e.copy(note = appendDictated(e.note, said).take(500)) } })
                 if (!isNew) TextButton(onClick = { c.deleteEvaluation(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },

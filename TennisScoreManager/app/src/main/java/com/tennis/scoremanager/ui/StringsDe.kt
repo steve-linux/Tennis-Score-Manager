@@ -2528,6 +2528,11 @@ object DeStrings : Strings {
     override val cmEmpty = "Nichts in diesem Monat."
     override val rpAll = "Bericht an alle"
     override val rpText: (String) -> String = { "Der Bericht der letzten 30 Tage $it, im Anhang." }
+    override val dictNote = "Notiz diktieren"
+    override val dictPrompt = "Sprich: was gut lief, was besser werden soll"
+    override val dictNoApp = "Auf diesem Telefon gibt es keine Spracheingabe (dafür braucht es die Google-App oder eine andere Spracherkennungs-App)."
+    override val dictAdded = "Notiz ins Tagebuch übernommen"
+    override val dictMic = "Diktieren"
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }

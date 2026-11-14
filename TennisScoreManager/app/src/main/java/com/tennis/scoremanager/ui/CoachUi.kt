@@ -10,6 +10,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -66,6 +67,7 @@ import java.util.Calendar
 @Composable
 fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     val s = LocalStrings.current
+    val context = LocalContext.current
     val book by c.coachBook.collectAsState()
     val sessions by c.serveSessions.collectAsState()
     val lang = c.options.collectAsState().value.lang
@@ -80,8 +82,14 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     SectionCard(s.coDiary, Icons.Filled.EditNote) {
         Text(s.coDiaryHint, color = TsmColors.TextDim, fontSize = 13.sp)
         var text by remember(st.id) { mutableStateOf("") }
-        OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2)
-        GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.addDiary(st.id, text); text = "" }, Modifier.fillMaxWidth())
+        OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2,
+            trailingIcon = { DictateIcon(c) { said -> text = appendDictated(text, said).take(2000) } })
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.addDiary(st.id, text); text = "" }, Modifier.weight(1f))
+            // A voce: si parla e la nota va subito nel diario, con la data di oggi.
+            val dictate = rememberDictation(c) { said -> c.addDiary(st.id, appendDictated("", said)); android.widget.Toast.makeText(context, s.dictAdded, android.widget.Toast.LENGTH_SHORT).show() }
+            if (dictate != null) GhostButton(s.dictNote, Icons.Filled.Mic, dictate, Modifier.weight(1f))
+        }
         val diary = Coaching.diaryOf(book, st.id)
         if (diary.isEmpty()) Text(s.coDiaryNone, color = TsmColors.TextDim, fontSize = 13.sp)
         for (d in diary.take(8)) Column(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { deleteEntry = d.id }).padding(vertical = 4.dp)) {
