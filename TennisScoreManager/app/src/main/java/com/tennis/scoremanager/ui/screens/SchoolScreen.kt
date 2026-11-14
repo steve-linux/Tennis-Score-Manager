@@ -238,7 +238,7 @@ fun CourseScreen(c: MatchController) {
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
     if (register) {
         val file = remember { c.registerFile(co.id, coachSide = false) }
-        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = false) }) { register = false }
     }
 }
 

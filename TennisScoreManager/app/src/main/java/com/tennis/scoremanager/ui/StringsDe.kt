@@ -2545,6 +2545,10 @@ object DeStrings : Strings {
     override val rcPack: (Int) -> String = { "Paket mit $it Stunden" }
     override val rcText: (String) -> String = { "Anbei die Quittung Nr. $it. Danke!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, für $n" }
+    override val xlSave = "Als Excel speichern"
+    override val xlStudent = "Schüler"
+    override val xlNumber = "Nummer"
+    override val xlReceipts = "Quittungen"
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }

@@ -2546,6 +2546,10 @@ object EsStrings : Strings {
     override val rcPack: (Int) -> String = { "Paquete de $it clases" }
     override val rcText: (String) -> String = { "Adjunto el recibo n.º $it. ¡Gracias!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, por $n" }
+    override val xlSave = "Guardar en Excel"
+    override val xlStudent = "Alumno"
+    override val xlNumber = "Número"
+    override val xlReceipts = "Recibos"
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }

@@ -2617,6 +2617,10 @@ interface Strings {
     val rcPack: (Int) -> String
     val rcText: (String) -> String
     val rcFor: (String, String) -> String
+    val xlSave: String
+    val xlStudent: String
+    val xlNumber: String
+    val xlReceipts: String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -5157,6 +5161,10 @@ object ItStrings : Strings {
     override val rcPack: (Int) -> String = { "Pacchetto di $it lezioni" }
     override val rcText: (String) -> String = { "In allegato la ricevuta n. $it. Grazie!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, per $n" }
+    override val xlSave = "Salva in Excel"
+    override val xlStudent = "Allievo"
+    override val xlNumber = "Numero"
+    override val xlReceipts = "Ricevute"
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -7698,6 +7706,10 @@ object EnStrings : Strings {
     override val rcPack: (Int) -> String = { "Pack of $it lessons" }
     override val rcText: (String) -> String = { "Attached is receipt no. $it. Thank you!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, for $n" }
+    override val xlSave = "Save as Excel"
+    override val xlStudent = "Student"
+    override val xlNumber = "Number"
+    override val xlReceipts = "Receipts"
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }

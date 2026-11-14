@@ -8545,10 +8545,10 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - **Die Schülerliste**: **Schüler suchen** nach Name, sortieren *Nach Name* oder *Nach letztem Mal*, filtern *Alle*, *Lange nicht gesehen* (seit mehr als 2 Wochen) oder eine Gruppe. Unter jedem Namen steht, wann du ihn zuletzt gesehen hast (Einheit oder gemachte Stunde).
 - **Gruppen** (*Gruppen ›* oben in der Liste): *Neue Gruppe* mit Name und Schülern (zum Beispiel „Turnier U14“); eine Gruppe lässt sich filtern, in eine Stunde setzen und mit **Schreiben** auf einmal benachrichtigen.
 - **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers.
-- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*.
+- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*. Mit **Als Excel speichern** wird dieselbe Liste zu einer .xlsx-Tabelle (Excel, Google Tabellen, LibreOffice).
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
-- **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken.
+- **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken. In der Übersicht liefert **Quittungen <Jahr> (Excel)** die Liste der Paketquittungen des Jahres, für den Steuerberater.
 
 ### 7.7 Spieler: die Datenbank
 
@@ -9147,10 +9147,10 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - **The students list**: **Search a student** by name, sort *By name* or *By last time*, filter *All*, *Not seen lately* (not seen for more than 2 weeks) or a group. Under each name is the last time you saw them (session or lesson done).
 - **Groups** (*Groups ›* at the top of the list): *New group* with a name and students (for example "U14 squad"); a group can be filtered, put in a lesson and notified all together with **Write**.
 - **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack.
-- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*.
+- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*. With **Save as Excel** the same register becomes an .xlsx sheet (Excel, Google Sheets, LibreOffice).
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
-- **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office.
+- **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office. In the summary, **Receipts <year> (Excel)** gives the list of the year's pack receipts, for the accountant.
 
 ### 7.7 Players: the database
 
@@ -9748,10 +9748,10 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **La lista de alumnos**: **Buscar un alumno** por nombre, ordenar *Por nombre* o *Por última vez*, filtrar *Todos*, *Por volver a ver* (no los ves desde hace más de 2 semanas) o un grupo. Bajo cada nombre aparece la última vez que lo viste (sesión o clase hecha).
 - **Grupos** (*Grupos ›* arriba de la lista): *Nuevo grupo* con nombre y alumnos (por ejemplo "Competición U14"); el grupo se filtra, se pone en una clase y se avisa todo junto con **Escribir**.
 - **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno.
-- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*.
+- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*. Con **Guardar en Excel** el mismo registro se convierte en una hoja .xlsx (Excel, Hojas de cálculo de Google, LibreOffice).
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
-- **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría.
+- **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría. En el resumen, **Recibos <año> (Excel)** da la lista de recibos de paquetes del año, para el gestor.
 
 ### 7.7 Jugadores: la base
 
@@ -10349,10 +10349,10 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - **La liste des élèves**: **Chercher un élève** par nom, trier *Par nom* ou *Par dernière fois*, filtrer *Tous*, *À revoir* (pas vus depuis plus de 2 semaines) ou un groupe. Sous chaque nom, la dernière fois que vous l'avez vu (séance ou cours fait).
 - **Groupes** (*Groupes ›* en haut de la liste) : *Nouveau groupe* avec un nom et des élèves (par exemple « Compétition U14 ») ; un groupe se filtre, se met dans un cours et se prévient d'un coup avec **Écrire**.
 - **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève.
-- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*.
+- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*. Avec **Enregistrer en Excel**, le même registre devient une feuille .xlsx (Excel, Google Sheets, LibreOffice).
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
-- **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat.
+- **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat. Dans le récapitulatif, **Reçus <année> (Excel)** donne la liste des reçus de forfaits de l'année, pour le comptable.
 
 ### 7.7 Joueurs : la base
 
@@ -10950,10 +10950,10 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - **L'elenco degli allievi**: **Cerca un allievo** per nome, ordina *Per nome* o *Per ultima volta*, filtra *Tutti*, *Da rivedere* (non li vedi da più di 2 settimane) o un gruppo. Sotto ogni nome c'è l'ultima volta che l'hai visto (sessione o lezione fatta).
 - **Gruppi** (*Gruppi ›* in cima all'elenco): *Nuovo gruppo* con nome e allievi (per esempio "Agonisti U14"); il gruppo si filtra, si mette in una lezione e con **Scrivi** si avvisa tutto insieme.
 - **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo.
-- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*.
+- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*. Con **Salva in Excel** lo stesso registro diventa un foglio .xlsx (Excel, Fogli Google, LibreOffice).
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
-- **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria.
+- **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria. Nel riepilogo, **Ricevute <anno> (Excel)** dà l'elenco delle ricevute dei pacchetti dell'anno, per il commercialista.
 
 ### 7.7 Giocatori: il database
 
@@ -11551,10 +11551,10 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **A lista de alunos**: **Procurar um aluno** pelo nome, ordenar *Por nome* ou *Pela última vez*, filtrar *Todos*, *Por rever* (não os vês há mais de 2 semanas) ou um grupo. Debaixo de cada nome aparece a última vez que o viste (sessão ou aula feita).
 - **Grupos** (*Grupos ›* no topo da lista): *Novo grupo* com nome e alunos (por exemplo "Competição U14"); o grupo filtra-se, põe-se numa aula e avisa-se todo de uma vez com **Escrever**.
 - **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno.
-- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*.
+- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*. Com **Guardar em Excel** o mesmo registo torna-se uma folha .xlsx (Excel, Google Sheets, LibreOffice).
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
-- **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria.
+- **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria. No resumo, **Recibos <ano> (Excel)** dá a lista dos recibos de pacotes do ano, para o contabilista.
 
 ### 7.7 Jogadores: o banco
 
@@ -14702,6 +14702,33 @@ class MatchController(
             f.outputStream().use { com.tennis.scoremanager.data.AttendancePdf.write(co, names, header, s, options.value.lang, System.currentTimeMillis(), it) }
             f
         }.getOrNull()
+    }
+
+    /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
+    fun registerXlsx(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.xlsx".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write(co.name, rows, it) }; f }.getOrNull()
+    }
+
+    /** Le ricevute dei pacchetti di un anno in Excel: numero, data, da chi, allievo, per cosa, importo. */
+    fun receiptsXlsx(year: Int): File? {
+        val s = strings
+        val cal = java.util.Calendar.getInstance()
+        val packs = coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
+            .sortedBy { it.receipt }
+        val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
+        val rows = listOf(listOf<Any?>(s.xlNumber, s.payDate, s.receiptReceivedFrom, s.xlStudent, s.receiptFor, s.receiptAmount)) + packs.map { p ->
+            val st = playerById(p.student)
+            listOf<Any?>(p.receipt, df.format(java.util.Date(p.paidAt!!)), st?.guardian?.ifBlank { null } ?: st?.name.orEmpty(), st?.name.orEmpty(), s.rcPack(p.lessons), p.cents / 100.0)
+        }
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.xlReceipts} $year.xlsx")
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write("${s.xlReceipts} $year", rows, it) }; f }.getOrNull()
     }
 
     // ---- Obiettivi (Progressi) ----
@@ -28775,6 +28802,80 @@ object WorkoutReport {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Xlsx.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Xlsx.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.io.OutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+/**
+ * Un foglio Excel (.xlsx) minimo, senza librerie: un solo foglio, testi e numeri, la prima riga in grassetto. Si apre
+ * con Excel, Fogli Google, LibreOffice e Numbers.
+ */
+object Xlsx {
+    const val MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    private fun esc(s: String) = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+        .filter { it == '\t' || it == '\n' || it >= ' ' }
+
+    /** "A", "B", … "Z", "AA"… per la colonna [i] (da 0). */
+    fun col(i: Int): String {
+        var n = i + 1
+        val sb = StringBuilder()
+        while (n > 0) { val r = (n - 1) % 26; sb.insert(0, 'A' + r); n = (n - 1) / 26 }
+        return sb.toString()
+    }
+
+    /** Il foglio in XML: ogni cella un testo o un numero (Int, Long, Double). */
+    fun sheetXml(rows: List<List<Any?>>): String = buildString {
+        append("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>""")
+        rows.forEachIndexed { r, row ->
+            append("<row r=\"${r + 1}\">")
+            row.forEachIndexed { c, v ->
+                val ref = col(c) + (r + 1)
+                val style = if (r == 0) " s=\"1\"" else ""
+                when (v) {
+                    null -> {}
+                    is Number -> append("<c r=\"$ref\"$style><v>$v</v></c>")
+                    else -> append("<c r=\"$ref\" t=\"inlineStr\"$style><is><t xml:space=\"preserve\">${esc(v.toString())}</t></is></c>")
+                }
+            }
+            append("</row>")
+        }
+        append("</sheetData></worksheet>")
+    }
+
+    fun write(sheetName: String, rows: List<List<Any?>>, out: OutputStream) {
+        val name = esc(sheetName.replace(Regex("[\\\\/?*\\[\\]:]"), " ").take(31).ifBlank { "Sheet1" })
+        ZipOutputStream(out).use { z ->
+            fun put(path: String, text: String) { z.putNextEntry(ZipEntry(path)); z.write(text.toByteArray(Charsets.UTF_8)); z.closeEntry() }
+            put("[Content_Types].xml", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>""")
+            put("_rels/.rels", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>""")
+            put("xl/workbook.xml", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="$name" sheetId="1" r:id="rId1"/></sheets></workbook>""")
+            put("xl/_rels/workbook.xml.rels", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>""")
+            put("xl/styles.xml", """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs></styleSheet>""")
+            put("xl/worksheets/sheet1.xml", sheetXml(rows))
+        }
+    }
+
+    /** Il registro presenze del corso come righe: allievo, una colonna per lezione passata (✓ ✗ —), presenze, lezioni. */
+    fun registerRows(c: Course, names: (String) -> String, studentLabel: String, presentLabel: String, lessonsLabel: String, now: Long): List<List<Any?>> {
+        val lessons = Courses.lessons(c).filter { it.start <= now }
+        val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
+        val header = listOf<Any?>(studentLabel) + lessons.map { df.format(java.util.Date(it.start)) } + listOf(presentLabel, lessonsLabel)
+        return listOf(header) + c.students.sortedBy { names(it).lowercase() }.map { sid ->
+            val (pres, tot) = Courses.attendanceOf(c, sid, now)
+            listOf<Any?>(names(sid)) + lessons.map { AttendancePdf.mark(c, it.key, sid) } + listOf(pres, tot)
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/YearReview.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/YearReview.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -37082,7 +37183,7 @@ fun CoachCourseScreen(c: MatchController) {
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
     if (register) {
         val file = remember { c.registerFile(co.id, coachSide = true) }
-        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = true) }) { register = false }
     }
 }
 
@@ -37264,6 +37365,9 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
                 }
                 Text(text.lines().drop(1).joinToString("\n"), color = TsmColors.TextMain, fontSize = 14.sp)
                 if (m.paidCents == 0 && m.privateLessons == 0 && m.courseLessons == 0) Text(s.cmEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Le ricevute dei pacchetti dell'anno del mese mostrato, in Excel (per il commercialista).
+                val year = java.util.Calendar.getInstance().apply { timeInMillis = from }.get(java.util.Calendar.YEAR)
+                GhostButton("${s.xlReceipts} $year (Excel)", Icons.Filled.School, { shareXlsx(context, c, c.receiptsXlsx(year)) }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
@@ -39978,6 +40082,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40009,12 +40114,18 @@ fun printPdf(context: Context, file: File, name: String) {
     }
 }
 
+/** Condivide un foglio Excel (salvarlo in Drive o nei File, aprirlo, mandarlo). */
+fun shareXlsx(context: Context, c: MatchController, file: File?) {
+    if (file == null) { android.widget.Toast.makeText(context, c.strings.rcFailed, android.widget.Toast.LENGTH_LONG).show(); return }
+    runCatching { context.startActivity(c.shareFileIntent(file, com.tennis.scoremanager.data.Xlsx.MIME)) }
+}
+
 /**
  * Un PDF appena fatto (ricevuta, registro presenze): [onSend] lo manda a chi riguarda (se c'è), oppure lo si condivide
  * o lo si stampa da qui.
  */
 @Composable
-fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: String?, onSend: (() -> Unit)?, onDone: () -> Unit) {
+fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: String?, onSend: (() -> Unit)?, excel: (() -> File?)? = null, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     AlertDialog(
@@ -40027,6 +40138,8 @@ fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: Strin
                 if (onSend != null) BigButton(s.rcSend, Icons.AutoMirrored.Filled.Send, { onDone(); onSend() }, Modifier.fillMaxWidth())
                 GhostButton(s.share, Icons.Filled.Share, { runCatching { context.startActivity(c.shareFileIntent(file, "application/pdf")) }; onDone() }, Modifier.fillMaxWidth())
                 GhostButton(s.rcPrint, Icons.Filled.Print, { printPdf(context, file, title); onDone() }, Modifier.fillMaxWidth())
+                // Lo stesso in un foglio Excel, da salvare (Drive, File) o aprire.
+                if (excel != null) GhostButton(s.xlSave, Icons.Filled.TableChart, { shareXlsx(context, c, excel()); onDone() }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.back) } },
@@ -44636,6 +44749,10 @@ interface Strings {
     val rcPack: (Int) -> String
     val rcText: (String) -> String
     val rcFor: (String, String) -> String
+    val xlSave: String
+    val xlStudent: String
+    val xlNumber: String
+    val xlReceipts: String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -47176,6 +47293,10 @@ object ItStrings : Strings {
     override val rcPack: (Int) -> String = { "Pacchetto di $it lezioni" }
     override val rcText: (String) -> String = { "In allegato la ricevuta n. $it. Grazie!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, per $n" }
+    override val xlSave = "Salva in Excel"
+    override val xlStudent = "Allievo"
+    override val xlNumber = "Numero"
+    override val xlReceipts = "Ricevute"
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -49717,6 +49838,10 @@ object EnStrings : Strings {
     override val rcPack: (Int) -> String = { "Pack of $it lessons" }
     override val rcText: (String) -> String = { "Attached is receipt no. $it. Thank you!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, for $n" }
+    override val xlSave = "Save as Excel"
+    override val xlStudent = "Student"
+    override val xlNumber = "Number"
+    override val xlReceipts = "Receipts"
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
@@ -52283,6 +52408,10 @@ object DeStrings : Strings {
     override val rcPack: (Int) -> String = { "Paket mit $it Stunden" }
     override val rcText: (String) -> String = { "Anbei die Quittung Nr. $it. Danke!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, für $n" }
+    override val xlSave = "Als Excel speichern"
+    override val xlStudent = "Schüler"
+    override val xlNumber = "Nummer"
+    override val xlReceipts = "Quittungen"
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
@@ -54839,6 +54968,10 @@ object EsStrings : Strings {
     override val rcPack: (Int) -> String = { "Paquete de $it clases" }
     override val rcText: (String) -> String = { "Adjunto el recibo n.º $it. ¡Gracias!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, por $n" }
+    override val xlSave = "Guardar en Excel"
+    override val xlStudent = "Alumno"
+    override val xlNumber = "Número"
+    override val xlReceipts = "Recibos"
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
@@ -57397,6 +57530,10 @@ object FrStrings : Strings {
     override val rcPack: (Int) -> String = { "Forfait de $it cours" }
     override val rcText: (String) -> String = { "Ci-joint le reçu n° $it. Merci !" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, pour $n" }
+    override val xlSave = "Enregistrer en Excel"
+    override val xlStudent = "Élève"
+    override val xlNumber = "Numéro"
+    override val xlReceipts = "Reçus"
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
@@ -59956,6 +60093,10 @@ object PtStrings : Strings {
     override val rcPack: (Int) -> String = { "Pacote de $it aulas" }
     override val rcText: (String) -> String = { "Em anexo o recibo n.º $it. Obrigado!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, para $n" }
+    override val xlSave = "Guardar em Excel"
+    override val xlStudent = "Aluno"
+    override val xlNumber = "Número"
+    override val xlReceipts = "Recibos"
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
@@ -69845,7 +69986,7 @@ fun CourseScreen(c: MatchController) {
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
     if (register) {
         val file = remember { c.registerFile(co.id, coachSide = false) }
-        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = false) }) { register = false }
     }
 }
 
@@ -94665,6 +94806,48 @@ class WorkoutStatsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/XlsxTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/XlsxTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.ByteArrayOutputStream
+import java.util.zip.ZipInputStream
+
+class XlsxTest {
+    @Test fun columnLetters() {
+        assertEquals("A", Xlsx.col(0)); assertEquals("Z", Xlsx.col(25)); assertEquals("AA", Xlsx.col(26)); assertEquals("AZ", Xlsx.col(51)); assertEquals("BA", Xlsx.col(52))
+    }
+
+    @Test fun workbookHasTheSheetWithEscapedTextAndNumbers() {
+        val out = ByteArrayOutputStream()
+        val rows = listOf(listOf<Any?>("Allievo", "Importo"), listOf<Any?>("Neri & <figli>", 250.0), listOf<Any?>("Blu", 3))
+        Xlsx.write("Ricevute 2026", rows, out)
+        // Una copia da aprire a mano (build/xlsx-test.xlsx).
+        java.io.File("build/xlsx-test.xlsx").writeBytes(out.toByteArray())
+        val entries = mutableMapOf<String, String>()
+        ZipInputStream(out.toByteArray().inputStream()).use { z -> while (true) { val e = z.nextEntry ?: break; entries[e.name] = z.readBytes().decodeToString() } }
+        assertTrue(entries.keys.containsAll(listOf("[Content_Types].xml", "_rels/.rels", "xl/workbook.xml", "xl/worksheets/sheet1.xml", "xl/styles.xml")))
+        val sheet = entries["xl/worksheets/sheet1.xml"]!!
+        assertTrue("Neri &amp; &lt;figli&gt;" in sheet)
+        assertTrue("<c r=\"B2\"><v>250.0</v></c>" in sheet)
+        assertTrue("name=\"Ricevute 2026\"" in entries["xl/workbook.xml"]!!)
+    }
+
+    @Test fun registerRowsHaveMarksAndTotals() {
+        val c = Course("c", "U10", students = listOf("b", "a"), from = 0, to = 0)
+        val rows = Xlsx.registerRows(c, { it.uppercase() }, "Allievo", "Presenze", "Lezioni", 0)
+        assertEquals(listOf<Any?>("Allievo", "Presenze", "Lezioni"), rows[0])
+        assertEquals("A", rows[1][0])
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/desk/DeskTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/desk/DeskTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -108508,6 +108691,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 347 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 349 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

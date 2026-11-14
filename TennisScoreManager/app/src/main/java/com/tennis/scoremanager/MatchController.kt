@@ -1909,6 +1909,33 @@ class MatchController(
         }.getOrNull()
     }
 
+    /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
+    fun registerXlsx(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.xlsx".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write(co.name, rows, it) }; f }.getOrNull()
+    }
+
+    /** Le ricevute dei pacchetti di un anno in Excel: numero, data, da chi, allievo, per cosa, importo. */
+    fun receiptsXlsx(year: Int): File? {
+        val s = strings
+        val cal = java.util.Calendar.getInstance()
+        val packs = coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
+            .sortedBy { it.receipt }
+        val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
+        val rows = listOf(listOf<Any?>(s.xlNumber, s.payDate, s.receiptReceivedFrom, s.xlStudent, s.receiptFor, s.receiptAmount)) + packs.map { p ->
+            val st = playerById(p.student)
+            listOf<Any?>(p.receipt, df.format(java.util.Date(p.paidAt!!)), st?.guardian?.ifBlank { null } ?: st?.name.orEmpty(), st?.name.orEmpty(), s.rcPack(p.lessons), p.cents / 100.0)
+        }
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.xlReceipts} $year.xlsx")
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write("${s.xlReceipts} $year", rows, it) }; f }.getOrNull()
+    }
+
     // ---- Obiettivi (Progressi) ----
 
     val goals = MutableStateFlow(storage.loadGoals())

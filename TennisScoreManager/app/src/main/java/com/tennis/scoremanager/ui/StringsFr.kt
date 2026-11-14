@@ -2548,6 +2548,10 @@ object FrStrings : Strings {
     override val rcPack: (Int) -> String = { "Forfait de $it cours" }
     override val rcText: (String) -> String = { "Ci-joint le reçu n° $it. Merci !" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, pour $n" }
+    override val xlSave = "Enregistrer en Excel"
+    override val xlStudent = "Élève"
+    override val xlNumber = "Numéro"
+    override val xlReceipts = "Reçus"
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }

@@ -165,7 +165,7 @@ fun CoachCourseScreen(c: MatchController) {
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
     if (register) {
         val file = remember { c.registerFile(co.id, coachSide = true) }
-        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = true) }) { register = false }
     }
 }
 
@@ -347,6 +347,9 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
                 }
                 Text(text.lines().drop(1).joinToString("\n"), color = TsmColors.TextMain, fontSize = 14.sp)
                 if (m.paidCents == 0 && m.privateLessons == 0 && m.courseLessons == 0) Text(s.cmEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Le ricevute dei pacchetti dell'anno del mese mostrato, in Excel (per il commercialista).
+                val year = java.util.Calendar.getInstance().apply { timeInMillis = from }.get(java.util.Calendar.YEAR)
+                GhostButton("${s.xlReceipts} $year (Excel)", Icons.Filled.School, { shareXlsx(context, c, c.receiptsXlsx(year)) }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {

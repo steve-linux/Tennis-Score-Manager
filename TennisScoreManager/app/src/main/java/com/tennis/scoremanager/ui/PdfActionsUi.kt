@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -50,12 +51,18 @@ fun printPdf(context: Context, file: File, name: String) {
     }
 }
 
+/** Condivide un foglio Excel (salvarlo in Drive o nei File, aprirlo, mandarlo). */
+fun shareXlsx(context: Context, c: MatchController, file: File?) {
+    if (file == null) { android.widget.Toast.makeText(context, c.strings.rcFailed, android.widget.Toast.LENGTH_LONG).show(); return }
+    runCatching { context.startActivity(c.shareFileIntent(file, com.tennis.scoremanager.data.Xlsx.MIME)) }
+}
+
 /**
  * Un PDF appena fatto (ricevuta, registro presenze): [onSend] lo manda a chi riguarda (se c'è), oppure lo si condivide
  * o lo si stampa da qui.
  */
 @Composable
-fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: String?, onSend: (() -> Unit)?, onDone: () -> Unit) {
+fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: String?, onSend: (() -> Unit)?, excel: (() -> File?)? = null, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     AlertDialog(
@@ -68,6 +75,8 @@ fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: Strin
                 if (onSend != null) BigButton(s.rcSend, Icons.AutoMirrored.Filled.Send, { onDone(); onSend() }, Modifier.fillMaxWidth())
                 GhostButton(s.share, Icons.Filled.Share, { runCatching { context.startActivity(c.shareFileIntent(file, "application/pdf")) }; onDone() }, Modifier.fillMaxWidth())
                 GhostButton(s.rcPrint, Icons.Filled.Print, { printPdf(context, file, title); onDone() }, Modifier.fillMaxWidth())
+                // Lo stesso in un foglio Excel, da salvare (Drive, File) o aprire.
+                if (excel != null) GhostButton(s.xlSave, Icons.Filled.TableChart, { shareXlsx(context, c, excel()); onDone() }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.back) } },

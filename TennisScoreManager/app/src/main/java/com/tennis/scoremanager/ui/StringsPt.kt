@@ -2549,6 +2549,10 @@ object PtStrings : Strings {
     override val rcPack: (Int) -> String = { "Pacote de $it aulas" }
     override val rcText: (String) -> String = { "Em anexo o recibo n.º $it. Obrigado!" }
     override val rcFor: (String, String) -> String = { g, n -> "$g, para $n" }
+    override val xlSave = "Guardar em Excel"
+    override val xlStudent = "Aluno"
+    override val xlNumber = "Número"
+    override val xlReceipts = "Recibos"
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
