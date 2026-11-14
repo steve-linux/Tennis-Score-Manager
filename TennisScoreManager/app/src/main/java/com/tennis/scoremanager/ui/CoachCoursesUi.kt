@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.AlertDialog
@@ -72,9 +73,9 @@ private fun lessonText(l: Lesson, lang: com.tennis.scoremanager.model.Lang): Str
 fun CoachCoursesSection(c: MatchController) {
     val s = LocalStrings.current
     val book by c.coachBook.collectAsState()
-    if (book.courses.isEmpty()) return
     val lang = c.options.collectAsState().value.lang
     val now = System.currentTimeMillis()
+    var creating by remember { mutableStateOf(false) }
     com.tennis.scoremanager.ui.screens.SectionLabel(s.ccTitle)
     for (cc in book.courses.sortedBy { it.card.course.name.lowercase() }) {
         val co = cc.course
@@ -85,8 +86,79 @@ fun CoachCoursesSection(c: MatchController) {
             s.ccToMark(toMark).takeIf { toMark > 0 },
             s.ccToSend.takeIf { cc.toSend },
         ).joinToString(" · ")
-        com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, hint.ifBlank { null }) { c.openCoachCourse(co.id) }
+        // I corsi dell'allenatore in azzurro, quelli della segreteria nel colore dell'app.
+        com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, listOfNotNull(s.ccOwnTag.takeIf { cc.personal }, hint.ifBlank { null }).joinToString(" · ").ifBlank { null },
+            tint = if (cc.personal) TsmColors.Cyan else null) { c.openCoachCourse(co.id) }
     }
+    // Un corso suo, non della segreteria: gruppi, preagonistica, un camp estivo.
+    com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.Add, s.ccNew, s.ccNewHint) { creating = true }
+    if (creating) CoachCourseEditDialog(c, null) { id -> creating = false; id?.let { c.openCoachCourse(it) } }
+}
+
+/**
+ * Un corso dell'allenatore, nuovo o da cambiare: nome, livello, dal… al…, orari settimanali (giorno, ora, durata,
+ * dove) e allievi. [onDone] riceve l'id del corso salvato (null = annullato o tolto).
+ */
+@Composable
+fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?) -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.collectAsState().value.lang
+    val today = CourtPlans.dayStart(System.currentTimeMillis())
+    var co by remember {
+        mutableStateOf(cc?.card?.course ?: com.tennis.scoremanager.data.Course(Coaching.newId("cc"), "", from = today, to = CourtPlans.addDays(today, 180), createdAt = System.currentTimeMillis()))
+    }
+    var picking by remember { mutableStateOf(false) }
+    var askDelete by remember { mutableStateOf(false) }
+    // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
+    var wd by remember { mutableStateOf(1) }
+    var startMin by remember { mutableStateOf(17 * 60) }
+    var minutes by remember { mutableStateOf(60) }
+    var place by remember { mutableStateOf("") }
+    fun dayName(d: Int) = java.time.DayOfWeek.of(d).getDisplayName(java.time.format.TextStyle.SHORT, lang.locale)
+    fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (cc == null) s.ccNew else co.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                OutlinedTextField(co.name, { co = co.copy(name = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccName) })
+                OutlinedTextField(co.level, { co = co.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccLevel) })
+                com.tennis.scoremanager.ui.screens.DateButton(s.ctStart, co.from, lang) { d -> co = co.copy(from = d, to = maxOf(co.to, d)) }
+                com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
+                Text(s.ccSlots, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                for (sl in co.slots) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("${dayName(sl.weekday)} ${hm(sl.startMin)} · ${s.coMinutes(sl.minutes)}" + (sl.court.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { co = co.copy(slots = co.slots - sl) }) { Text("✕", color = TsmColors.Danger) }
+                }
+                Segmented((1..7).map { SegOption(dayName(it)) }, wd - 1, { wd = it + 1 }, columns = 7)
+                GhostButton(hm(startMin), Icons.Filled.EventBusy, {
+                    android.app.TimePickerDialog(context, { _, h, m -> startMin = h * 60 + m }, startMin / 60, startMin % 60, true).show()
+                }, Modifier.fillMaxWidth())
+                val lengths = listOf(45, 60, 90, 120)
+                Segmented(lengths.map { SegOption(s.coMinutes(it)) }, lengths.indexOf(minutes), { minutes = lengths[it] }, columns = 4)
+                OutlinedTextField(place, { place = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coPlace) })
+                GhostButton(s.ccAddSlot, Icons.Filled.Add, {
+                    co = co.copy(slots = (co.slots + com.tennis.scoremanager.data.CourseSlot(wd, startMin, minutes, place.trim())).distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })))
+                }, Modifier.fillMaxWidth())
+                Text(s.coGroupCount(co.students.size) + if (co.students.isNotEmpty()) ": " + co.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") else "",
+                    color = TsmColors.TextMain, fontSize = 14.sp)
+                GhostButton(s.ccPickStudents, Icons.Filled.School, { picking = true }, Modifier.fillMaxWidth())
+                if (cc != null) TextButton(onClick = { askDelete = true }) { Text(s.delete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim())); onDone(co.id) }) { Text(s.save) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (picking) StudentPickDialog(c, s.ccPickStudents, exclude = emptySet(), initial = co.students.toSet(), multi = true) { picked -> picking = false; co = co.copy(students = picked) }
+    if (askDelete) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.ccDeleteAsk(co.name)) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCoachCourse(co.id); onDone(null); c.back() }) { Text(s.delete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
 }
 
 /**
@@ -109,6 +181,7 @@ fun CoachCourseScreen(c: MatchController) {
     var showPast by remember { mutableStateOf(false) }
     var register by remember { mutableStateOf(false) }
     var calendar by remember { mutableStateOf(false) }
+    var editing by remember { mutableStateOf(false) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
@@ -117,13 +190,14 @@ fun CoachCourseScreen(c: MatchController) {
         icon = Icons.Filled.School,
         action = {
             Row {
+                if (cc.personal) TextButton(onClick = { editing = true }) { Text(s.studentEdit, color = TsmColors.Ball) }
                 TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
                 TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
             }
         },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
+            if (!cc.personal) BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
                 val byApp = { c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) } }
                 // Corso arrivato dal server del circolo: le presenze tornano da lì; se non risponde, su WhatsApp.
                 if (cc.via != null) scope.launch { if (c.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
@@ -131,8 +205,10 @@ fun CoachCourseScreen(c: MatchController) {
             }, Modifier.weight(1f))
         },
     ) {
-        Text(cc.sentAt?.let { if (cc.toSend) s.ccToSend else s.ccSent(shortDate(it, lang)) } ?: if (cc.toSend) s.ccToSend else s.ccNothingYet,
+        // Un corso della segreteria dice se le presenze sono da mandare; uno dell'allenatore no (restano qui).
+        if (!cc.personal) Text(cc.sentAt?.let { if (cc.toSend) s.ccToSend else s.ccSent(shortDate(it, lang)) } ?: if (cc.toSend) s.ccToSend else s.ccNothingYet,
             color = if (cc.toSend) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+        else Text(s.ccOwn, color = TsmColors.Cyan, fontSize = 13.sp)
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
             for (sid in co.students) {
@@ -174,6 +250,7 @@ fun CoachCourseScreen(c: MatchController) {
         }
     }
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
+    if (editing) CoachCourseEditDialog(c, cc) { editing = false }
     // Le lezioni del corso nel calendario: un evento che si ripete ogni settimana per ogni orario, fino alla fine.
     if (calendar) AlertDialog(
         onDismissRequest = { calendar = false },

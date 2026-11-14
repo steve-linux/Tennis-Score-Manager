@@ -429,6 +429,7 @@ const APP_I18N = {
     blkTo: "Al",
     blkTournament: "Torneo",
     ccAccept: "Aggiungi ai miei corsi",
+    ccAddSlot: "Aggiungi l'orario",
     ccAttBadCode: "Il codice non è quello della scheda corso mandata: le presenze non si registrano.",
     ccAttNotFound: "Il corso non c'è in questo telefono.",
     ccAttReady: "Le presenze si aggiungono al corso: per ogni lezione vale quella dell'allenatore.",
@@ -439,6 +440,8 @@ const APP_I18N = {
     ccAttendanceTitle: "Presenze dall'allenatore",
     ccCardHowTo: "Apri il file con Tennis Score Manager (Condividi › TSM): il corso va tra i tuoi con gli allievi; le presenze le rimandi da lì.",
     ccCardText: (a, b) => `Corso ${a}: ${b} iscritti`,
+    ccClubCourses: "Corsi della segreteria",
+    ccDeleteAsk: (it) => `Togliere il corso ${it} e le sue presenze?`,
     ccDeskHint: "Allievi, schede, ricevute e registro dal computer di casa, sulla stessa rete",
     ccDeskNote: "I dati restano sul telefono: la pagina li legge da lì.",
     ccDeskPrint: "Stampa la pagina",
@@ -456,9 +459,15 @@ const APP_I18N = {
     ccLevel: "Livello",
     ccMatchPrefix: "Partita",
     ccMatchShare: "File della partita (per l'allenatore)",
+    ccName: "Nome del corso",
+    ccNew: "Nuovo corso",
+    ccNewHint: "Un corso tuo, non della segreteria: gruppi, preagonistica, camp",
     ccNoCourse: "Nessun corso per ora",
     ccNotYet: "La lezione non c'è ancora stata.",
     ccNothingYet: "Segna le presenze lezione per lezione, poi mandale alla segreteria.",
+    ccOwn: "Corso tuo: le presenze restano qui, non si mandano alla segreteria.",
+    ccOwnTag: "Corso mio",
+    ccPickStudents: "Allievi del corso",
     ccProposalAdd: "Aggiungi",
     ccProposalApplied: (it) => `${it} aggiunto ai giocatori`,
     ccProposalCourse: "Iscrivilo al corso",
@@ -470,6 +479,7 @@ const APP_I18N = {
     ccSendAttendance: "Manda le presenze",
     ccSendToCoach: "Manda all'allenatore",
     ccSent: (it) => `Presenze mandate il ${it}`,
+    ccSlots: "Orari",
     ccTitle: "I miei corsi",
     ccToMark: (it) => `${it} da segnare`,
     ccToSend: "Presenze da mandare alla segreteria",
@@ -1236,6 +1246,7 @@ const APP_I18N = {
     blkTo: "To",
     blkTournament: "Tournament",
     ccAccept: "Add to my courses",
+    ccAddSlot: "Add the time",
     ccAttBadCode: "The code is not the one of the course card sent: the attendance is not recorded.",
     ccAttNotFound: "The course is not on this phone.",
     ccAttReady: "The attendance is added to the course: for each lesson the coach's version counts.",
@@ -1246,6 +1257,8 @@ const APP_I18N = {
     ccAttendanceTitle: "Attendance from the coach",
     ccCardHowTo: "Open the file with Tennis Score Manager (Share › TSM): the course goes among yours with the students; you send attendance back from there.",
     ccCardText: (a, b) => `Course ${a}: ${b} participants`,
+    ccClubCourses: "Club office courses",
+    ccDeleteAsk: (it) => `Remove the course ${it} and its attendance?`,
     ccDeskHint: "Students, cards, receipts and register from your home computer, on the same network",
     ccDeskNote: "The data stays on the phone: the page reads it from there.",
     ccDeskPrint: "Print the page",
@@ -1263,9 +1276,15 @@ const APP_I18N = {
     ccLevel: "Level",
     ccMatchPrefix: "Match",
     ccMatchShare: "Match file (for the coach)",
+    ccName: "Course name",
+    ccNew: "New course",
+    ccNewHint: "A course of yours, not the club office's: groups, pre-competition, camps",
     ccNoCourse: "No course for now",
     ccNotYet: "The lesson hasn't taken place yet.",
     ccNothingYet: "Mark attendance lesson by lesson, then send it to the club office.",
+    ccOwn: "Your course: attendance stays here, it isn't sent to the club office.",
+    ccOwnTag: "My course",
+    ccPickStudents: "Course students",
     ccProposalAdd: "Add",
     ccProposalApplied: (it) => `${it} added to the players`,
     ccProposalCourse: "Enrol in the course",
@@ -1277,6 +1296,7 @@ const APP_I18N = {
     ccSendAttendance: "Send attendance",
     ccSendToCoach: "Send to the coach",
     ccSent: (it) => `Attendance sent on ${it}`,
+    ccSlots: "Times",
     ccTitle: "My courses",
     ccToMark: (it) => `${it} to mark`,
     ccToSend: "Attendance to send to the club office",
@@ -2043,6 +2063,7 @@ const APP_I18N = {
     blkTo: "Au",
     blkTournament: "Tournoi",
     ccAccept: "Ajouter à mes cours",
+    ccAddSlot: "Ajouter l'horaire",
     ccAttBadCode: "Le code n'est pas celui de la fiche de cours envoyée : les présences ne sont pas enregistrées.",
     ccAttNotFound: "Le cours n'est pas sur ce téléphone.",
     ccAttReady: "Les présences s'ajoutent au cours : pour chaque cours, celle de l'entraîneur fait foi.",
@@ -2053,6 +2074,8 @@ const APP_I18N = {
     ccAttendanceTitle: "Présences de l'entraîneur",
     ccCardHowTo: "Ouvrez le fichier avec Tennis Score Manager (Partager › TSM) : le cours rejoint les vôtres avec les élèves ; vous renvoyez les présences de là.",
     ccCardText: (a, b) => `Cours ${a} : ${b} inscrits`,
+    ccClubCourses: "Cours du secrétariat",
+    ccDeleteAsk: (it) => `Supprimer le cours ${it} et ses présences ?`,
     ccDeskHint: "Élèves, fiches, reçus et registre depuis l'ordinateur de la maison, sur le même réseau",
     ccDeskNote: "Les données restent sur le téléphone : la page les lit là.",
     ccDeskPrint: "Imprimer la page",
@@ -2070,9 +2093,15 @@ const APP_I18N = {
     ccLevel: "Niveau",
     ccMatchPrefix: "Partie",
     ccMatchShare: "Fichier du match (pour l'entraîneur)",
+    ccName: "Nom du cours",
+    ccNew: "Nouveau cours",
+    ccNewHint: "Un cours à vous, pas du secrétariat : groupes, pré-compétition, stages",
     ccNoCourse: "Aucun cours pour l'instant",
     ccNotYet: "Le cours n'a pas encore eu lieu.",
     ccNothingYet: "Notez les présences cours par cours, puis envoyez-les au secrétariat.",
+    ccOwn: "Votre cours : les présences restent ici, elles ne vont pas au secrétariat.",
+    ccOwnTag: "Mon cours",
+    ccPickStudents: "Élèves du cours",
     ccProposalAdd: "Ajouter",
     ccProposalApplied: (it) => `${it} ajouté aux joueurs`,
     ccProposalCourse: "L'inscrire au cours",
@@ -2084,6 +2113,7 @@ const APP_I18N = {
     ccSendAttendance: "Envoyer les présences",
     ccSendToCoach: "Envoyer à l'entraîneur",
     ccSent: (it) => `Présences envoyées le ${it}`,
+    ccSlots: "Horaires",
     ccTitle: "Mes cours",
     ccToMark: (it) => `${it} à noter`,
     ccToSend: "Présences à envoyer au secrétariat",
@@ -2850,6 +2880,7 @@ const APP_I18N = {
     blkTo: "Bis",
     blkTournament: "Turnier",
     ccAccept: "Zu meinen Kursen",
+    ccAddSlot: "Zeit hinzufügen",
     ccAttBadCode: "Der Code passt nicht zur geschickten Kurskarte: die Anwesenheit wird nicht gespeichert.",
     ccAttNotFound: "Der Kurs ist nicht auf diesem Telefon.",
     ccAttReady: "Die Anwesenheit kommt in den Kurs: für jede Stunde gilt die des Trainers.",
@@ -2860,6 +2891,8 @@ const APP_I18N = {
     ccAttendanceTitle: "Anwesenheit vom Trainer",
     ccCardHowTo: "Öffne die Datei mit Tennis Score Manager (Teilen › TSM): der Kurs kommt zu deinen, mit den Schülern; die Anwesenheit schickst du von dort zurück.",
     ccCardText: (a, b) => `Kurs ${a}: ${b} Teilnehmer`,
+    ccClubCourses: "Kurse des Büros",
+    ccDeleteAsk: (it) => `Kurs ${it} und seine Anwesenheit entfernen?`,
     ccDeskHint: "Schüler, Karten, Quittungen und Anwesenheitsliste vom Computer zu Hause, im selben Netz",
     ccDeskNote: "Die Daten bleiben auf dem Telefon: die Seite liest sie von dort.",
     ccDeskPrint: "Seite drucken",
@@ -2877,9 +2910,15 @@ const APP_I18N = {
     ccLevel: "Niveau",
     ccMatchPrefix: "Spiel",
     ccMatchShare: "Spieldatei (für den Trainer)",
+    ccName: "Kursname",
+    ccNew: "Neuer Kurs",
+    ccNewHint: "Ein eigener Kurs, nicht vom Büro: Gruppen, Vorwettkampf, Camps",
     ccNoCourse: "Vorerst kein Kurs",
     ccNotYet: "Die Stunde hat noch nicht stattgefunden.",
     ccNothingYet: "Trage die Anwesenheit Stunde für Stunde ein und schicke sie dann ans Büro.",
+    ccOwn: "Dein Kurs: die Anwesenheit bleibt hier und geht nicht ans Büro.",
+    ccOwnTag: "Mein Kurs",
+    ccPickStudents: "Schüler des Kurses",
     ccProposalAdd: "Hinzufügen",
     ccProposalApplied: (it) => `${it} zu den Spielern hinzugefügt`,
     ccProposalCourse: "In den Kurs einschreiben",
@@ -2891,6 +2930,7 @@ const APP_I18N = {
     ccSendAttendance: "Anwesenheit schicken",
     ccSendToCoach: "An den Trainer schicken",
     ccSent: (it) => `Anwesenheit am ${it} geschickt`,
+    ccSlots: "Zeiten",
     ccTitle: "Meine Kurse",
     ccToMark: (it) => `${it} einzutragen`,
     ccToSend: "Anwesenheit ans Büro zu schicken",
@@ -3657,6 +3697,7 @@ const APP_I18N = {
     blkTo: "Hasta",
     blkTournament: "Torneo",
     ccAccept: "Añadir a mis cursos",
+    ccAddSlot: "Añadir el horario",
     ccAttBadCode: "El código no es el de la ficha de curso enviada: la asistencia no se registra.",
     ccAttNotFound: "El curso no está en este teléfono.",
     ccAttReady: "La asistencia se añade al curso: en cada clase vale la del entrenador.",
@@ -3667,6 +3708,8 @@ const APP_I18N = {
     ccAttendanceTitle: "Asistencia del entrenador",
     ccCardHowTo: "Abre el archivo con Tennis Score Manager (Compartir › TSM): el curso va con los tuyos y sus alumnos; la asistencia la devuelves desde allí.",
     ccCardText: (a, b) => `Curso ${a}: ${b} inscritos`,
+    ccClubCourses: "Cursos de la secretaría",
+    ccDeleteAsk: (it) => `¿Quitar el curso ${it} y su asistencia?`,
     ccDeskHint: "Alumnos, fichas, recibos y registro desde el ordenador de casa, en la misma red",
     ccDeskNote: "Los datos se quedan en el teléfono: la página los lee de allí.",
     ccDeskPrint: "Imprimir la página",
@@ -3684,9 +3727,15 @@ const APP_I18N = {
     ccLevel: "Nivel",
     ccMatchPrefix: "Partido",
     ccMatchShare: "Archivo del partido (para el entrenador)",
+    ccName: "Nombre del curso",
+    ccNew: "Nuevo curso",
+    ccNewHint: "Un curso tuyo, no de la secretaría: grupos, precompetición, campus",
     ccNoCourse: "Ningún curso por ahora",
     ccNotYet: "La clase todavía no se ha dado.",
     ccNothingYet: "Marca la asistencia clase por clase y luego envíala a la secretaría.",
+    ccOwn: "Curso tuyo: la asistencia se queda aquí, no se envía a la secretaría.",
+    ccOwnTag: "Mi curso",
+    ccPickStudents: "Alumnos del curso",
     ccProposalAdd: "Añadir",
     ccProposalApplied: (it) => `${it} añadido a los jugadores`,
     ccProposalCourse: "Inscribirlo en el curso",
@@ -3698,6 +3747,7 @@ const APP_I18N = {
     ccSendAttendance: "Enviar asistencia",
     ccSendToCoach: "Enviar al entrenador",
     ccSent: (it) => `Asistencia enviada el ${it}`,
+    ccSlots: "Horarios",
     ccTitle: "Mis cursos",
     ccToMark: (it) => `${it} por marcar`,
     ccToSend: "Asistencia por enviar a la secretaría",
@@ -4464,6 +4514,7 @@ const APP_I18N = {
     blkTo: "Até",
     blkTournament: "Torneio",
     ccAccept: "Adicionar aos meus cursos",
+    ccAddSlot: "Adicionar o horário",
     ccAttBadCode: "O código não é o da ficha de curso enviada: as presenças não são registadas.",
     ccAttNotFound: "O curso não está neste telefone.",
     ccAttReady: "As presenças juntam-se ao curso: em cada aula vale a do treinador.",
@@ -4474,6 +4525,8 @@ const APP_I18N = {
     ccAttendanceTitle: "Presenças do treinador",
     ccCardHowTo: "Abra o arquivo com o Tennis Score Manager (Compartilhar › TSM): o curso junta-se aos seus com os alunos; as presenças devolve-as de lá.",
     ccCardText: (a, b) => `Curso ${a}: ${b} inscritos`,
+    ccClubCourses: "Cursos da secretaria",
+    ccDeleteAsk: (it) => `Remover o curso ${it} e as suas presenças?`,
     ccDeskHint: "Alunos, fichas, recibos e registo a partir do computador de casa, na mesma rede",
     ccDeskNote: "Os dados ficam no telefone: a página lê-os de lá.",
     ccDeskPrint: "Imprimir a página",
@@ -4491,9 +4544,15 @@ const APP_I18N = {
     ccLevel: "Nível",
     ccMatchPrefix: "Partida",
     ccMatchShare: "Arquivo da partida (para o treinador)",
+    ccName: "Nome do curso",
+    ccNew: "Novo curso",
+    ccNewHint: "Um curso seu, não da secretaria: grupos, pré-competição, campos de férias",
     ccNoCourse: "Nenhum curso por agora",
     ccNotYet: "A aula ainda não aconteceu.",
     ccNothingYet: "Marque as presenças aula a aula e depois envie-as à secretaria.",
+    ccOwn: "Curso seu: as presenças ficam aqui, não se enviam à secretaria.",
+    ccOwnTag: "O meu curso",
+    ccPickStudents: "Alunos do curso",
     ccProposalAdd: "Adicionar",
     ccProposalApplied: (it) => `${it} adicionado aos jogadores`,
     ccProposalCourse: "Inscrevê-lo no curso",
@@ -4505,6 +4564,7 @@ const APP_I18N = {
     ccSendAttendance: "Enviar presenças",
     ccSendToCoach: "Enviar ao treinador",
     ccSent: (it) => `Presenças enviadas em ${it}`,
+    ccSlots: "Horários",
     ccTitle: "Os meus cursos",
     ccToMark: (it) => `${it} por marcar`,
     ccToSend: "Presenças a enviar à secretaria",
@@ -7457,12 +7517,14 @@ async function showStudent(id) {
 // --- Agenda ---
 
 /** Il colore di una cosa del calendario: lezione privata, lezione di corso, torneo; grigia se annullata. */
-const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+/** I corsi dell'allenatore in azzurro, quelli della segreteria nel verde della pagina. */
+const OWN = '#1e88c8';
+const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'own' ? OWN : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
 const calLine = (x) => (x.startMin != null ? hhmm(x.startMin) + ' ' : '🏆 ') + x.title;
 
 /** Un tocco su una cosa del calendario: la lezione privata passata si segna fatta, il corso apre il registro, il torneo l'allievo. */
 async function calOpen(x) {
-  if (x.kind === 'course') { coachView = 'courses'; coachCourseId = x.ref; return coachRender(); }
+  if (x.kind === 'course' || x.kind === 'own') { coachView = 'courses'; coachCourseId = x.ref; return coachRender(); }
   if (x.kind === 'event') { coachView = 'students'; coachStudent = x.ref; return coachRender(); }
   if (x.past && !x.done && !x.cancelled && confirm(T.coDone + '?')) {
     try { await api('PUT', '/coach/lessons/' + encodeURIComponent(x.ref) + '/done', { done: true }); toast(T.saved); } catch (e) { toast(errText(e)); }
@@ -7485,7 +7547,7 @@ async function showAgenda() {
   const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
   const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
     h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
-  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccTitle), '  ',
+  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccClubCourses), '  ', h('span', { style: 'color:' + OWN }, '■ ' + T.ccOwnTag), '  ',
     h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle));
   const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;padding:1px 2px;background:none;font-size:12px;color:' + calColor(x) +
     (x.cancelled ? ';text-decoration:line-through' : '') + (x.done ? ';font-weight:600' : ''), title: [calLine(x), x.place].filter(Boolean).join(' · '),
@@ -7538,8 +7600,8 @@ async function showCourses() {
   if (coachCourseId) return showCourseRegister(coachCourseId);
   const list = await api('GET', '/coach/courses');
   put(main(), h('div.head', h('h1', T.ccTitle)),
-    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', onclick: () => { coachCourseId = c.id; showCourses(); } },
-      h('h2', c.name), h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:5px solid ' + (c.personal ? OWN : 'var(--accent)'), onclick: () => { coachCourseId = c.id; showCourses(); } },
+      h('h2', c.name), c.personal ? h('p', { style: 'color:' + OWN }, T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
       h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
 }
 
@@ -10127,7 +10189,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - **Die Schülerliste**: **Schüler suchen** nach Name, sortieren *Nach Name* oder *Nach letztem Mal*, filtern *Alle*, *Lange nicht gesehen* (seit mehr als 2 Wochen) oder eine Gruppe. Unter jedem Namen steht, wann du ihn zuletzt gesehen hast (Einheit oder gemachte Stunde).
 - **Gruppen** (*Gruppen ›* oben in der Liste): *Neue Gruppe* mit Name und Schülern (zum Beispiel „Turnier U14“); eine Gruppe lässt sich filtern, in eine Stunde setzen und mit **Schreiben** auf einmal benachrichtigen.
 - **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers.
-- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*. Mit **Als Excel speichern** wird dieselbe Liste zu einer .xlsx-Tabelle (Excel, Google Tabellen, LibreOffice).
+- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*. Mit **Als Excel speichern** wird dieselbe Liste zu einer .xlsx-Tabelle (Excel, Google Tabellen, LibreOffice). Mit **Neuer Kurs** legst du einen eigenen an, nicht vom Büro (Name, Niveau, Daten, Zeiten, Ort, Schüler; ändern mit **Bearbeiten**): Anwesenheit, Liste, Kalender und Erinnerungen wie bei den anderen, aber die Anwesenheit bleibt bei dir. Deine Kurse sind blau, die des Büros in der Farbe der App (auch am PC).
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
 - **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken. In der Übersicht liefert **Quittungen <Jahr> (Excel)** die Liste der Paketquittungen des Jahres, für den Steuerberater.
@@ -10733,7 +10795,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - **The students list**: **Search a student** by name, sort *By name* or *By last time*, filter *All*, *Not seen lately* (not seen for more than 2 weeks) or a group. Under each name is the last time you saw them (session or lesson done).
 - **Groups** (*Groups ›* at the top of the list): *New group* with a name and students (for example "U14 squad"); a group can be filtered, put in a lesson and notified all together with **Write**.
 - **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack.
-- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*. With **Save as Excel** the same register becomes an .xlsx sheet (Excel, Google Sheets, LibreOffice).
+- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*. With **Save as Excel** the same register becomes an .xlsx sheet (Excel, Google Sheets, LibreOffice). With **New course** you make one of your own, not the club office's (name, level, dates, times, place, students; change it with **Edit**): roll call, register, calendar and reminders as for the others, but attendance stays yours. Your courses are in blue, the club office's in the app's colour (on the PC too).
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
 - **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office. In the summary, **Receipts <year> (Excel)** gives the list of the year's pack receipts, for the accountant.
@@ -11338,7 +11400,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **La lista de alumnos**: **Buscar un alumno** por nombre, ordenar *Por nombre* o *Por última vez*, filtrar *Todos*, *Por volver a ver* (no los ves desde hace más de 2 semanas) o un grupo. Bajo cada nombre aparece la última vez que lo viste (sesión o clase hecha).
 - **Grupos** (*Grupos ›* arriba de la lista): *Nuevo grupo* con nombre y alumnos (por ejemplo "Competición U14"); el grupo se filtra, se pone en una clase y se avisa todo junto con **Escribir**.
 - **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno.
-- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*. Con **Guardar en Excel** el mismo registro se convierte en una hoja .xlsx (Excel, Hojas de cálculo de Google, LibreOffice).
+- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*. Con **Guardar en Excel** el mismo registro se convierte en una hoja .xlsx (Excel, Hojas de cálculo de Google, LibreOffice). Con **Nuevo curso** creas uno tuyo, no de la secretaría (nombre, nivel, fechas, horarios, lugar, alumnos; se cambia con **Editar**): pasar lista, registro, calendario y recordatorios como los demás, pero la asistencia es tuya. Tus cursos van en azul, los de la secretaría en el color de la app (también en el PC).
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
 - **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría. En el resumen, **Recibos <año> (Excel)** da la lista de recibos de paquetes del año, para el gestor.
@@ -11943,7 +12005,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - **La liste des élèves**: **Chercher un élève** par nom, trier *Par nom* ou *Par dernière fois*, filtrer *Tous*, *À revoir* (pas vus depuis plus de 2 semaines) ou un groupe. Sous chaque nom, la dernière fois que vous l'avez vu (séance ou cours fait).
 - **Groupes** (*Groupes ›* en haut de la liste) : *Nouveau groupe* avec un nom et des élèves (par exemple « Compétition U14 ») ; un groupe se filtre, se met dans un cours et se prévient d'un coup avec **Écrire**.
 - **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève.
-- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*. Avec **Enregistrer en Excel**, le même registre devient une feuille .xlsx (Excel, Google Sheets, LibreOffice).
+- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*. Avec **Enregistrer en Excel**, le même registre devient une feuille .xlsx (Excel, Google Sheets, LibreOffice). Avec **Nouveau cours** vous en créez un à vous, pas du secrétariat (nom, niveau, dates, horaires, lieu, élèves ; il se change avec **Modifier**) : appel, registre, agenda et rappels comme les autres, mais les présences restent à vous. Vos cours sont en bleu, ceux du secrétariat dans la couleur de l'appli (sur le PC aussi).
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
 - **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat. Dans le récapitulatif, **Reçus <année> (Excel)** donne la liste des reçus de forfaits de l'année, pour le comptable.
@@ -12548,7 +12610,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - **L'elenco degli allievi**: **Cerca un allievo** per nome, ordina *Per nome* o *Per ultima volta*, filtra *Tutti*, *Da rivedere* (non li vedi da più di 2 settimane) o un gruppo. Sotto ogni nome c'è l'ultima volta che l'hai visto (sessione o lezione fatta).
 - **Gruppi** (*Gruppi ›* in cima all'elenco): *Nuovo gruppo* con nome e allievi (per esempio "Agonisti U14"); il gruppo si filtra, si mette in una lezione e con **Scrivi** si avvisa tutto insieme.
 - **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo.
-- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*. Con **Salva in Excel** lo stesso registro diventa un foglio .xlsx (Excel, Fogli Google, LibreOffice).
+- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*. Con **Salva in Excel** lo stesso registro diventa un foglio .xlsx (Excel, Fogli Google, LibreOffice). Con **Nuovo corso** ne fai uno tuo, non della segreteria (nome, livello, date, orari, dove, allievi; si cambia con **Modifica**): appello, registro, calendario e promemoria come gli altri, ma le presenze restano tue. I tuoi corsi sono in azzurro, quelli della segreteria nel colore dell'app (anche sul PC).
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
 - **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria. Nel riepilogo, **Ricevute <anno> (Excel)** dà l'elenco delle ricevute dei pacchetti dell'anno, per il commercialista.
@@ -13153,7 +13215,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **A lista de alunos**: **Procurar um aluno** pelo nome, ordenar *Por nome* ou *Pela última vez*, filtrar *Todos*, *Por rever* (não os vês há mais de 2 semanas) ou um grupo. Debaixo de cada nome aparece a última vez que o viste (sessão ou aula feita).
 - **Grupos** (*Grupos ›* no topo da lista): *Novo grupo* com nome e alunos (por exemplo "Competição U14"); o grupo filtra-se, põe-se numa aula e avisa-se todo de uma vez com **Escrever**.
 - **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno.
-- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*. Com **Guardar em Excel** o mesmo registo torna-se uma folha .xlsx (Excel, Google Sheets, LibreOffice).
+- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*. Com **Guardar em Excel** o mesmo registo torna-se uma folha .xlsx (Excel, Google Sheets, LibreOffice). Com **Novo curso** cria um seu, não da secretaria (nome, nível, datas, horários, local, alunos; muda-se com **Editar**): chamada, registo, calendário e lembretes como os outros, mas as presenças ficam suas. Os seus cursos ficam a azul, os da secretaria na cor da app (também no PC).
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
 - **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria. No resumo, **Recibos <ano> (Excel)** dá a lista dos recibos de pacotes do ano, para o contabilista.
@@ -16174,6 +16236,25 @@ class MatchController(
         val diary = if (!cancelled && n.isNotEmpty() && cc.notes[key] != n)
             present.map { com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), it, start, "${cc.card.course.name}: $n") } else emptyList()
         putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) updated else it }, diary = b.diary + diary))
+    }
+
+    /**
+     * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
+     * non si cambiano qui (li cambia lei e li rimanda).
+     */
+    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course) {
+        val b = coachBook.value
+        val old = b.courses.firstOrNull { it.card.course.id == co.id }
+        if (old != null && !old.personal) return
+        val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
+            ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + cc))
+    }
+
+    /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */
+    fun deleteCoachCourse(id: String) {
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != id }))
     }
 
     /** Allenatore: avvisa gli iscritti che la lezione è annullata (a chi è minorenne scrive al genitore). */
@@ -23901,13 +23982,15 @@ data class CoachCourse(
     val sentAt: Long? = null,
     /** Arrivata dal server del circolo (il suo indirizzo): le presenze tornano da lì. */
     val via: String? = null,
+    /** Corso dell'allenatore, fatto da lui e non dalla segreteria: si cambia qui e le presenze non si mandano a nessuno. */
+    val personal: Boolean = false,
 ) {
     /** Il corso con le presenze dell'allenatore sopra quelle della segreteria. */
     val course: Course get() = card.course.copy(
         attendance = card.course.attendance + attendance,
         cancelled = card.course.cancelled + cancelled,
     )
-    val toSend: Boolean get() = changedAt > 0 && (sentAt == null || sentAt < changedAt)
+    val toSend: Boolean get() = !personal && changedAt > 0 && (sentAt == null || sentAt < changedAt)
 }
 
 /** Le presenze che l'allenatore rimanda alla segreteria: lezione per lezione chi c'era, e le lezioni annullate. */
@@ -30997,7 +31080,7 @@ interface CoachData {
     val testDate: String? = null, val results: List<CdResult>, val events: List<CdEvent>, val rankings: List<String>, val packs: List<CdPack>, val courses: List<CdCourseLine>,
 )
 @Serializable data class CdLesson(val id: String, val date: String, val startMin: Int, val minutes: Int, val students: List<String>, val place: String, val done: Boolean, val cancelled: Boolean)
-@Serializable data class CdCourse(val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int)
+@Serializable data class CdCourse(val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int, val personal: Boolean = false)
 @Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
@@ -31111,7 +31194,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
         val co = cc.course; val now = data.now()
         return CdCourse(co.id, co.name, co.level, cc.card.club, day(co.from)!!, day(co.to)!!, co.students.size, cc.toSend,
-            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled })
+            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled }, cc.personal)
     }
 
     private fun register(id: String): CdRegister {
@@ -31151,7 +31234,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             l.students.joinToString(", ") { names[it] ?: "—" }, l.place, l.done, l.cancelled, l.start <= now)
         for (cc in book.courses) {
             val co = cc.course
-            for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem("course", co.id, les.key, minOf(les.start), les.minutes,
+            for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem(if (cc.personal) "own" else "course", co.id, les.key, minOf(les.start), les.minutes,
                 co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now)
         }
         for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)
@@ -39466,6 +39549,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.AlertDialog
@@ -39519,9 +39603,9 @@ private fun lessonText(l: Lesson, lang: com.tennis.scoremanager.model.Lang): Str
 fun CoachCoursesSection(c: MatchController) {
     val s = LocalStrings.current
     val book by c.coachBook.collectAsState()
-    if (book.courses.isEmpty()) return
     val lang = c.options.collectAsState().value.lang
     val now = System.currentTimeMillis()
+    var creating by remember { mutableStateOf(false) }
     com.tennis.scoremanager.ui.screens.SectionLabel(s.ccTitle)
     for (cc in book.courses.sortedBy { it.card.course.name.lowercase() }) {
         val co = cc.course
@@ -39532,8 +39616,79 @@ fun CoachCoursesSection(c: MatchController) {
             s.ccToMark(toMark).takeIf { toMark > 0 },
             s.ccToSend.takeIf { cc.toSend },
         ).joinToString(" · ")
-        com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, hint.ifBlank { null }) { c.openCoachCourse(co.id) }
+        // I corsi dell'allenatore in azzurro, quelli della segreteria nel colore dell'app.
+        com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, listOfNotNull(s.ccOwnTag.takeIf { cc.personal }, hint.ifBlank { null }).joinToString(" · ").ifBlank { null },
+            tint = if (cc.personal) TsmColors.Cyan else null) { c.openCoachCourse(co.id) }
     }
+    // Un corso suo, non della segreteria: gruppi, preagonistica, un camp estivo.
+    com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.Add, s.ccNew, s.ccNewHint) { creating = true }
+    if (creating) CoachCourseEditDialog(c, null) { id -> creating = false; id?.let { c.openCoachCourse(it) } }
+}
+
+/**
+ * Un corso dell'allenatore, nuovo o da cambiare: nome, livello, dal… al…, orari settimanali (giorno, ora, durata,
+ * dove) e allievi. [onDone] riceve l'id del corso salvato (null = annullato o tolto).
+ */
+@Composable
+fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?) -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.collectAsState().value.lang
+    val today = CourtPlans.dayStart(System.currentTimeMillis())
+    var co by remember {
+        mutableStateOf(cc?.card?.course ?: com.tennis.scoremanager.data.Course(Coaching.newId("cc"), "", from = today, to = CourtPlans.addDays(today, 180), createdAt = System.currentTimeMillis()))
+    }
+    var picking by remember { mutableStateOf(false) }
+    var askDelete by remember { mutableStateOf(false) }
+    // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
+    var wd by remember { mutableStateOf(1) }
+    var startMin by remember { mutableStateOf(17 * 60) }
+    var minutes by remember { mutableStateOf(60) }
+    var place by remember { mutableStateOf("") }
+    fun dayName(d: Int) = java.time.DayOfWeek.of(d).getDisplayName(java.time.format.TextStyle.SHORT, lang.locale)
+    fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (cc == null) s.ccNew else co.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                OutlinedTextField(co.name, { co = co.copy(name = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccName) })
+                OutlinedTextField(co.level, { co = co.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ccLevel) })
+                com.tennis.scoremanager.ui.screens.DateButton(s.ctStart, co.from, lang) { d -> co = co.copy(from = d, to = maxOf(co.to, d)) }
+                com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
+                Text(s.ccSlots, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                for (sl in co.slots) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("${dayName(sl.weekday)} ${hm(sl.startMin)} · ${s.coMinutes(sl.minutes)}" + (sl.court.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { co = co.copy(slots = co.slots - sl) }) { Text("✕", color = TsmColors.Danger) }
+                }
+                Segmented((1..7).map { SegOption(dayName(it)) }, wd - 1, { wd = it + 1 }, columns = 7)
+                GhostButton(hm(startMin), Icons.Filled.EventBusy, {
+                    android.app.TimePickerDialog(context, { _, h, m -> startMin = h * 60 + m }, startMin / 60, startMin % 60, true).show()
+                }, Modifier.fillMaxWidth())
+                val lengths = listOf(45, 60, 90, 120)
+                Segmented(lengths.map { SegOption(s.coMinutes(it)) }, lengths.indexOf(minutes), { minutes = lengths[it] }, columns = 4)
+                OutlinedTextField(place, { place = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coPlace) })
+                GhostButton(s.ccAddSlot, Icons.Filled.Add, {
+                    co = co.copy(slots = (co.slots + com.tennis.scoremanager.data.CourseSlot(wd, startMin, minutes, place.trim())).distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })))
+                }, Modifier.fillMaxWidth())
+                Text(s.coGroupCount(co.students.size) + if (co.students.isNotEmpty()) ": " + co.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") else "",
+                    color = TsmColors.TextMain, fontSize = 14.sp)
+                GhostButton(s.ccPickStudents, Icons.Filled.School, { picking = true }, Modifier.fillMaxWidth())
+                if (cc != null) TextButton(onClick = { askDelete = true }) { Text(s.delete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = co.name.isNotBlank() && co.slots.isNotEmpty(), onClick = { c.saveCoachOwnCourse(co.copy(name = co.name.trim(), level = co.level.trim())); onDone(co.id) }) { Text(s.save) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (picking) StudentPickDialog(c, s.ccPickStudents, exclude = emptySet(), initial = co.students.toSet(), multi = true) { picked -> picking = false; co = co.copy(students = picked) }
+    if (askDelete) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.ccDeleteAsk(co.name)) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCoachCourse(co.id); onDone(null); c.back() }) { Text(s.delete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
 }
 
 /**
@@ -39556,6 +39711,7 @@ fun CoachCourseScreen(c: MatchController) {
     var showPast by remember { mutableStateOf(false) }
     var register by remember { mutableStateOf(false) }
     var calendar by remember { mutableStateOf(false) }
+    var editing by remember { mutableStateOf(false) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
@@ -39564,13 +39720,14 @@ fun CoachCourseScreen(c: MatchController) {
         icon = Icons.Filled.School,
         action = {
             Row {
+                if (cc.personal) TextButton(onClick = { editing = true }) { Text(s.studentEdit, color = TsmColors.Ball) }
                 TextButton(onClick = { calendar = true }) { Text(s.calShort, color = TsmColors.Ball) }
                 TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) }
             }
         },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
+            if (!cc.personal) BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
                 val byApp = { c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) } }
                 // Corso arrivato dal server del circolo: le presenze tornano da lì; se non risponde, su WhatsApp.
                 if (cc.via != null) scope.launch { if (c.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
@@ -39578,8 +39735,10 @@ fun CoachCourseScreen(c: MatchController) {
             }, Modifier.weight(1f))
         },
     ) {
-        Text(cc.sentAt?.let { if (cc.toSend) s.ccToSend else s.ccSent(shortDate(it, lang)) } ?: if (cc.toSend) s.ccToSend else s.ccNothingYet,
+        // Un corso della segreteria dice se le presenze sono da mandare; uno dell'allenatore no (restano qui).
+        if (!cc.personal) Text(cc.sentAt?.let { if (cc.toSend) s.ccToSend else s.ccSent(shortDate(it, lang)) } ?: if (cc.toSend) s.ccToSend else s.ccNothingYet,
             color = if (cc.toSend) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+        else Text(s.ccOwn, color = TsmColors.Cyan, fontSize = 13.sp)
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
             for (sid in co.students) {
@@ -39621,6 +39780,7 @@ fun CoachCourseScreen(c: MatchController) {
         }
     }
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
+    if (editing) CoachCourseEditDialog(c, cc) { editing = false }
     // Le lezioni del corso nel calendario: un evento che si ripete ogni settimana per ogni orario, fino alla fine.
     if (calendar) AlertDialog(
         onDismissRequest = { calendar = false },
@@ -47379,6 +47539,16 @@ interface Strings {
     val ibApplied: String
     val ibSentServer: String
     val ibTitle: (Int) -> String
+    val ccNew: String
+    val ccNewHint: String
+    val ccName: String
+    val ccSlots: String
+    val ccAddSlot: String
+    val ccPickStudents: String
+    val ccOwn: String
+    val ccOwnTag: String
+    val ccClubCourses: String
+    val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -49956,6 +50126,16 @@ object ItStrings : Strings {
     override val ibApplied = "Registrato dal campo"
     override val ibSentServer = "Mandato alla segreteria dal server del circolo."
     override val ibTitle: (Int) -> String = { if (it == 1) "Dal circolo: 1 file da aprire" else "Dal circolo: $it file da aprire" }
+    override val ccNew = "Nuovo corso"
+    override val ccNewHint = "Un corso tuo, non della segreteria: gruppi, preagonistica, camp"
+    override val ccName = "Nome del corso"
+    override val ccSlots = "Orari"
+    override val ccAddSlot = "Aggiungi l'orario"
+    override val ccPickStudents = "Allievi del corso"
+    override val ccOwn = "Corso tuo: le presenze restano qui, non si mandano alla segreteria."
+    override val ccOwnTag = "Corso mio"
+    override val ccClubCourses = "Corsi della segreteria"
+    override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -52534,6 +52714,16 @@ object EnStrings : Strings {
     override val ibApplied = "Recorded from the court"
     override val ibSentServer = "Sent to the club office through the club server."
     override val ibTitle: (Int) -> String = { if (it == 1) "From the club: 1 file to open" else "From the club: $it files to open" }
+    override val ccNew = "New course"
+    override val ccNewHint = "A course of yours, not the club office's: groups, pre-competition, camps"
+    override val ccName = "Course name"
+    override val ccSlots = "Times"
+    override val ccAddSlot = "Add the time"
+    override val ccPickStudents = "Course students"
+    override val ccOwn = "Your course: attendance stays here, it isn't sent to the club office."
+    override val ccOwnTag = "My course"
+    override val ccClubCourses = "Club office courses"
+    override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
@@ -55137,6 +55327,16 @@ object DeStrings : Strings {
     override val ibApplied = "Vom Platz gespeichert"
     override val ibSentServer = "Über den Vereinsserver ans Büro geschickt."
     override val ibTitle: (Int) -> String = { if (it == 1) "Vom Verein: 1 Datei zu öffnen" else "Vom Verein: $it Dateien zu öffnen" }
+    override val ccNew = "Neuer Kurs"
+    override val ccNewHint = "Ein eigener Kurs, nicht vom Büro: Gruppen, Vorwettkampf, Camps"
+    override val ccName = "Kursname"
+    override val ccSlots = "Zeiten"
+    override val ccAddSlot = "Zeit hinzufügen"
+    override val ccPickStudents = "Schüler des Kurses"
+    override val ccOwn = "Dein Kurs: die Anwesenheit bleibt hier und geht nicht ans Büro."
+    override val ccOwnTag = "Mein Kurs"
+    override val ccClubCourses = "Kurse des Büros"
+    override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
@@ -57730,6 +57930,16 @@ object EsStrings : Strings {
     override val ibApplied = "Registrado desde la pista"
     override val ibSentServer = "Enviado a la secretaría por el servidor del club."
     override val ibTitle: (Int) -> String = { if (it == 1) "Del club: 1 archivo por abrir" else "Del club: $it archivos por abrir" }
+    override val ccNew = "Nuevo curso"
+    override val ccNewHint = "Un curso tuyo, no de la secretaría: grupos, precompetición, campus"
+    override val ccName = "Nombre del curso"
+    override val ccSlots = "Horarios"
+    override val ccAddSlot = "Añadir el horario"
+    override val ccPickStudents = "Alumnos del curso"
+    override val ccOwn = "Curso tuyo: la asistencia se queda aquí, no se envía a la secretaría."
+    override val ccOwnTag = "Mi curso"
+    override val ccClubCourses = "Cursos de la secretaría"
+    override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
@@ -60325,6 +60535,16 @@ object FrStrings : Strings {
     override val ibApplied = "Enregistré depuis le court"
     override val ibSentServer = "Envoyé au secrétariat par le serveur du club."
     override val ibTitle: (Int) -> String = { if (it == 1) "Du club : 1 fichier à ouvrir" else "Du club : $it fichiers à ouvrir" }
+    override val ccNew = "Nouveau cours"
+    override val ccNewHint = "Un cours à vous, pas du secrétariat : groupes, pré-compétition, stages"
+    override val ccName = "Nom du cours"
+    override val ccSlots = "Horaires"
+    override val ccAddSlot = "Ajouter l'horaire"
+    override val ccPickStudents = "Élèves du cours"
+    override val ccOwn = "Votre cours : les présences restent ici, elles ne vont pas au secrétariat."
+    override val ccOwnTag = "Mon cours"
+    override val ccClubCourses = "Cours du secrétariat"
+    override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
@@ -62921,6 +63141,16 @@ object PtStrings : Strings {
     override val ibApplied = "Registado a partir da quadra"
     override val ibSentServer = "Enviado à secretaria pelo servidor do clube."
     override val ibTitle: (Int) -> String = { if (it == 1) "Do clube: 1 arquivo por abrir" else "Do clube: $it arquivos por abrir" }
+    override val ccNew = "Novo curso"
+    override val ccNewHint = "Um curso seu, não da secretaria: grupos, pré-competição, campos de férias"
+    override val ccName = "Nome do curso"
+    override val ccSlots = "Horários"
+    override val ccAddSlot = "Adicionar o horário"
+    override val ccPickStudents = "Alunos do curso"
+    override val ccOwn = "Curso seu: as presenças ficam aqui, não se enviam à secretaria."
+    override val ccOwnTag = "O meu curso"
+    override val ccClubCourses = "Cursos da secretaria"
+    override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
@@ -62964,7 +63194,7 @@ object TsmColors {
     val Court = Color(0xFF1F7A4D)
     val CourtLine = Color(0xFFE8F5E9)
     val Ok = Color(0xFF4CAF50)
-    /** Il secondo colpo nel confronto dei video. */
+    /** Il secondo colpo nel confronto dei video; i corsi dell'allenatore (quelli della segreteria sono in [Ball]). */
     val Cyan = Color(0xFF29B6F6)
 
     fun player(side: Side) = if (side == Side.P1) Player1 else Player2
@@ -67399,12 +67629,13 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
 /** Una voce della prima schermata: icona, titolo, una riga di spiegazione; [main] = l'azione principale della scheda. */
 @Composable
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-internal fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+internal fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, tint: androidx.compose.ui.graphics.Color? = null, onClick: () -> Unit) {
     // Con [onLongClick] la voce si tiene premuta per un'altra azione (eliminare la partita sospesa).
     Surface(shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface,
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, tint = if (main) TsmColors.OnBall else TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
+            // [tint]: un colore per distinguere la voce (i corsi dell'allenatore da quelli della segreteria).
+            Icon(icon, null, tint = if (main) TsmColors.OnBall else tint ?: TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, color = if (main) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = if (main) 19.sp else 16.sp)
@@ -95095,6 +95326,12 @@ class CourseCardsTest {
         assertEquals("✗", AttendancePdf.mark(c, "k1", "p2"))
         assertEquals("—", AttendancePdf.mark(c, "k2", "p1"))
         assertEquals("", AttendancePdf.mark(c, "k3", "p1"))
+    }
+
+    @Test fun ownCourseIsNeverToSend() {
+        val own = CoachCourse(CourseCard(code = "", issuedAt = 1, course = course), attendance = mapOf("k1" to setOf("p1")), changedAt = 5, personal = true)
+        assertFalse(own.toSend)
+        assertTrue(own.copy(personal = false).toSend)
     }
 }
 TSM_EOF

@@ -2583,6 +2583,16 @@ object EsStrings : Strings {
     override val ibApplied = "Registrado desde la pista"
     override val ibSentServer = "Enviado a la secretaría por el servidor del club."
     override val ibTitle: (Int) -> String = { if (it == 1) "Del club: 1 archivo por abrir" else "Del club: $it archivos por abrir" }
+    override val ccNew = "Nuevo curso"
+    override val ccNewHint = "Un curso tuyo, no de la secretaría: grupos, precompetición, campus"
+    override val ccName = "Nombre del curso"
+    override val ccSlots = "Horarios"
+    override val ccAddSlot = "Añadir el horario"
+    override val ccPickStudents = "Alumnos del curso"
+    override val ccOwn = "Curso tuyo: la asistencia se queda aquí, no se envía a la secretaría."
+    override val ccOwnTag = "Mi curso"
+    override val ccClubCourses = "Cursos de la secretaría"
+    override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }

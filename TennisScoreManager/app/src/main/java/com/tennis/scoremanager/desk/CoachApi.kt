@@ -52,7 +52,7 @@ interface CoachData {
     val testDate: String? = null, val results: List<CdResult>, val events: List<CdEvent>, val rankings: List<String>, val packs: List<CdPack>, val courses: List<CdCourseLine>,
 )
 @Serializable data class CdLesson(val id: String, val date: String, val startMin: Int, val minutes: Int, val students: List<String>, val place: String, val done: Boolean, val cancelled: Boolean)
-@Serializable data class CdCourse(val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int)
+@Serializable data class CdCourse(val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int, val personal: Boolean = false)
 @Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
@@ -166,7 +166,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
         val co = cc.course; val now = data.now()
         return CdCourse(co.id, co.name, co.level, cc.card.club, day(co.from)!!, day(co.to)!!, co.students.size, cc.toSend,
-            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled })
+            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled }, cc.personal)
     }
 
     private fun register(id: String): CdRegister {
@@ -206,7 +206,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             l.students.joinToString(", ") { names[it] ?: "—" }, l.place, l.done, l.cancelled, l.start <= now)
         for (cc in book.courses) {
             val co = cc.course
-            for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem("course", co.id, les.key, minOf(les.start), les.minutes,
+            for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem(if (cc.personal) "own" else "course", co.id, les.key, minOf(les.start), les.minutes,
                 co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now)
         }
         for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)

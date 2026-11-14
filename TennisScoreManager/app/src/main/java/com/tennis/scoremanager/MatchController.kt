@@ -1766,6 +1766,25 @@ class MatchController(
         putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) updated else it }, diary = b.diary + diary))
     }
 
+    /**
+     * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
+     * non si cambiano qui (li cambia lei e li rimanda).
+     */
+    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course) {
+        val b = coachBook.value
+        val old = b.courses.firstOrNull { it.card.course.id == co.id }
+        if (old != null && !old.personal) return
+        val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
+            ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + cc))
+    }
+
+    /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */
+    fun deleteCoachCourse(id: String) {
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != id }))
+    }
+
     /** Allenatore: avvisa gli iscritti che la lezione è annullata (a chi è minorenne scrive al genitore). */
     fun noticeCourseCancelled(courseId: String, lessonStart: Long) {
         val cc = coachCourse(courseId) ?: return

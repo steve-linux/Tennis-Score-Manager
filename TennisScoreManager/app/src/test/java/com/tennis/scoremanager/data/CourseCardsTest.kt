@@ -108,4 +108,10 @@ class CourseCardsTest {
         assertEquals("—", AttendancePdf.mark(c, "k2", "p1"))
         assertEquals("", AttendancePdf.mark(c, "k3", "p1"))
     }
+
+    @Test fun ownCourseIsNeverToSend() {
+        val own = CoachCourse(CourseCard(code = "", issuedAt = 1, course = course), attendance = mapOf("k1" to setOf("p1")), changedAt = 5, personal = true)
+        assertFalse(own.toSend)
+        assertTrue(own.copy(personal = false).toSend)
+    }
 }

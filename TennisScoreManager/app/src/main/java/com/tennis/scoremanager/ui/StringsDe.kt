@@ -2582,6 +2582,16 @@ object DeStrings : Strings {
     override val ibApplied = "Vom Platz gespeichert"
     override val ibSentServer = "Über den Vereinsserver ans Büro geschickt."
     override val ibTitle: (Int) -> String = { if (it == 1) "Vom Verein: 1 Datei zu öffnen" else "Vom Verein: $it Dateien zu öffnen" }
+    override val ccNew = "Neuer Kurs"
+    override val ccNewHint = "Ein eigener Kurs, nicht vom Büro: Gruppen, Vorwettkampf, Camps"
+    override val ccName = "Kursname"
+    override val ccSlots = "Zeiten"
+    override val ccAddSlot = "Zeit hinzufügen"
+    override val ccPickStudents = "Schüler des Kurses"
+    override val ccOwn = "Dein Kurs: die Anwesenheit bleibt hier und geht nicht ans Büro."
+    override val ccOwnTag = "Mein Kurs"
+    override val ccClubCourses = "Kurse des Büros"
+    override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }

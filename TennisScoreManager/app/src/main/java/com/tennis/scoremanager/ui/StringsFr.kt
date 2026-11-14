@@ -2585,6 +2585,16 @@ object FrStrings : Strings {
     override val ibApplied = "Enregistré depuis le court"
     override val ibSentServer = "Envoyé au secrétariat par le serveur du club."
     override val ibTitle: (Int) -> String = { if (it == 1) "Du club : 1 fichier à ouvrir" else "Du club : $it fichiers à ouvrir" }
+    override val ccNew = "Nouveau cours"
+    override val ccNewHint = "Un cours à vous, pas du secrétariat : groupes, pré-compétition, stages"
+    override val ccName = "Nom du cours"
+    override val ccSlots = "Horaires"
+    override val ccAddSlot = "Ajouter l'horaire"
+    override val ccPickStudents = "Élèves du cours"
+    override val ccOwn = "Votre cours : les présences restent ici, elles ne vont pas au secrétariat."
+    override val ccOwnTag = "Mon cours"
+    override val ccClubCourses = "Cours du secrétariat"
+    override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }

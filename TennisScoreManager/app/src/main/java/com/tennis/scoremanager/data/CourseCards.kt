@@ -53,13 +53,15 @@ data class CoachCourse(
     val sentAt: Long? = null,
     /** Arrivata dal server del circolo (il suo indirizzo): le presenze tornano da lì. */
     val via: String? = null,
+    /** Corso dell'allenatore, fatto da lui e non dalla segreteria: si cambia qui e le presenze non si mandano a nessuno. */
+    val personal: Boolean = false,
 ) {
     /** Il corso con le presenze dell'allenatore sopra quelle della segreteria. */
     val course: Course get() = card.course.copy(
         attendance = card.course.attendance + attendance,
         cancelled = card.course.cancelled + cancelled,
     )
-    val toSend: Boolean get() = changedAt > 0 && (sentAt == null || sentAt < changedAt)
+    val toSend: Boolean get() = !personal && changedAt > 0 && (sentAt == null || sentAt < changedAt)
 }
 
 /** Le presenze che l'allenatore rimanda alla segreteria: lezione per lezione chi c'era, e le lezioni annullate. */

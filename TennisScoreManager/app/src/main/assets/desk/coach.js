@@ -127,12 +127,14 @@ async function showStudent(id) {
 // --- Agenda ---
 
 /** Il colore di una cosa del calendario: lezione privata, lezione di corso, torneo; grigia se annullata. */
-const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+/** I corsi dell'allenatore in azzurro, quelli della segreteria nel verde della pagina. */
+const OWN = '#1e88c8';
+const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'own' ? OWN : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
 const calLine = (x) => (x.startMin != null ? hhmm(x.startMin) + ' ' : '🏆 ') + x.title;
 
 /** Un tocco su una cosa del calendario: la lezione privata passata si segna fatta, il corso apre il registro, il torneo l'allievo. */
 async function calOpen(x) {
-  if (x.kind === 'course') { coachView = 'courses'; coachCourseId = x.ref; return coachRender(); }
+  if (x.kind === 'course' || x.kind === 'own') { coachView = 'courses'; coachCourseId = x.ref; return coachRender(); }
   if (x.kind === 'event') { coachView = 'students'; coachStudent = x.ref; return coachRender(); }
   if (x.past && !x.done && !x.cancelled && confirm(T.coDone + '?')) {
     try { await api('PUT', '/coach/lessons/' + encodeURIComponent(x.ref) + '/done', { done: true }); toast(T.saved); } catch (e) { toast(errText(e)); }
@@ -155,7 +157,7 @@ async function showAgenda() {
   const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
   const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
     h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
-  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccTitle), '  ',
+  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccClubCourses), '  ', h('span', { style: 'color:' + OWN }, '■ ' + T.ccOwnTag), '  ',
     h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle));
   const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;padding:1px 2px;background:none;font-size:12px;color:' + calColor(x) +
     (x.cancelled ? ';text-decoration:line-through' : '') + (x.done ? ';font-weight:600' : ''), title: [calLine(x), x.place].filter(Boolean).join(' · '),
@@ -208,8 +210,8 @@ async function showCourses() {
   if (coachCourseId) return showCourseRegister(coachCourseId);
   const list = await api('GET', '/coach/courses');
   put(main(), h('div.head', h('h1', T.ccTitle)),
-    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', onclick: () => { coachCourseId = c.id; showCourses(); } },
-      h('h2', c.name), h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', style: 'border-left:5px solid ' + (c.personal ? OWN : 'var(--accent)'), onclick: () => { coachCourseId = c.id; showCourses(); } },
+      h('h2', c.name), c.personal ? h('p', { style: 'color:' + OWN }, T.ccOwnTag) : null, h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
       h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
 }
 

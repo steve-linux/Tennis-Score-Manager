@@ -2654,6 +2654,16 @@ interface Strings {
     val ibApplied: String
     val ibSentServer: String
     val ibTitle: (Int) -> String
+    val ccNew: String
+    val ccNewHint: String
+    val ccName: String
+    val ccSlots: String
+    val ccAddSlot: String
+    val ccPickStudents: String
+    val ccOwn: String
+    val ccOwnTag: String
+    val ccClubCourses: String
+    val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -5231,6 +5241,16 @@ object ItStrings : Strings {
     override val ibApplied = "Registrato dal campo"
     override val ibSentServer = "Mandato alla segreteria dal server del circolo."
     override val ibTitle: (Int) -> String = { if (it == 1) "Dal circolo: 1 file da aprire" else "Dal circolo: $it file da aprire" }
+    override val ccNew = "Nuovo corso"
+    override val ccNewHint = "Un corso tuo, non della segreteria: gruppi, preagonistica, camp"
+    override val ccName = "Nome del corso"
+    override val ccSlots = "Orari"
+    override val ccAddSlot = "Aggiungi l'orario"
+    override val ccPickStudents = "Allievi del corso"
+    override val ccOwn = "Corso tuo: le presenze restano qui, non si mandano alla segreteria."
+    override val ccOwnTag = "Corso mio"
+    override val ccClubCourses = "Corsi della segreteria"
+    override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -7809,6 +7829,16 @@ object EnStrings : Strings {
     override val ibApplied = "Recorded from the court"
     override val ibSentServer = "Sent to the club office through the club server."
     override val ibTitle: (Int) -> String = { if (it == 1) "From the club: 1 file to open" else "From the club: $it files to open" }
+    override val ccNew = "New course"
+    override val ccNewHint = "A course of yours, not the club office's: groups, pre-competition, camps"
+    override val ccName = "Course name"
+    override val ccSlots = "Times"
+    override val ccAddSlot = "Add the time"
+    override val ccPickStudents = "Course students"
+    override val ccOwn = "Your course: attendance stays here, it isn't sent to the club office."
+    override val ccOwnTag = "My course"
+    override val ccClubCourses = "Club office courses"
+    override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }

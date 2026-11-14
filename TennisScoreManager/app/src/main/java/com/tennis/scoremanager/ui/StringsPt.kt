@@ -2586,6 +2586,16 @@ object PtStrings : Strings {
     override val ibApplied = "Registado a partir da quadra"
     override val ibSentServer = "Enviado à secretaria pelo servidor do clube."
     override val ibTitle: (Int) -> String = { if (it == 1) "Do clube: 1 arquivo por abrir" else "Do clube: $it arquivos por abrir" }
+    override val ccNew = "Novo curso"
+    override val ccNewHint = "Um curso seu, não da secretaria: grupos, pré-competição, campos de férias"
+    override val ccName = "Nome do curso"
+    override val ccSlots = "Horários"
+    override val ccAddSlot = "Adicionar o horário"
+    override val ccPickStudents = "Alunos do curso"
+    override val ccOwn = "Curso seu: as presenças ficam aqui, não se enviam à secretaria."
+    override val ccOwnTag = "O meu curso"
+    override val ccClubCourses = "Cursos da secretaria"
+    override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
