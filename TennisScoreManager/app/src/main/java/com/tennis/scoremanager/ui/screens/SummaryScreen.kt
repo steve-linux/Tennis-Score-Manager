@@ -268,7 +268,16 @@ fun SummaryScreen(c: MatchController) {
             onDismissRequest = { shareChoice = false },
             icon = { Icon(Icons.Filled.Share, null, tint = TsmColors.Orange) },
             title = { Text(s.shareChoose) },
-            text = { Text(s.shareChooseHint) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.shareChooseHint)
+                    // La partita in un file da aprire con TSM (all'allenatore, o su un altro telefono): finisce nel suo storico.
+                    GhostButton(s.ccMatchShare, Icons.Filled.Share, {
+                        shareChoice = false
+                        c.matchFileToShare(rec)?.let { f -> runCatching { context.startActivity(com.tennis.scoremanager.ui.shareFile(context, rec.setup.event, f)) } }
+                    }, Modifier.fillMaxWidth())
+                }
+            },
             confirmButton = {
                 TextButton(onClick = {
                     shareChoice = false

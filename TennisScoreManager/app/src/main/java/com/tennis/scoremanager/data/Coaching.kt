@@ -37,7 +37,44 @@ data class CoachLesson(
     val note: String = "",
     val done: Boolean = false,
     val cancelled: Boolean = false,
+    /** Lezione fatta ma senza qualcuno: assente (la lezione conta lo stesso) o assente giustificato (da recuperare). */
+    val absent: Set<String> = emptySet(),
+    val excused: Set<String> = emptySet(),
+    /** Lezione di recupero: non scala dal pacchetto, recupera un'assenza giustificata di chi c'è. */
+    val recovery: Boolean = false,
+) {
+    fun present(student: String): Boolean = student in students && student !in absent && student !in excused
+}
+
+/** Una partita dell'allievo giocata fuori da questo telefono (un torneo, un campionato), scritta a mano. */
+@Serializable
+data class ManualMatch(
+    val id: String,
+    val student: String,
+    val at: Long,
+    val event: String = "",
+    val opponent: String = "",
+    val opponentRanking: String = "",
+    /** Dal lato dell'allievo: "6-4 3-6 10-7". */
+    val score: String = "",
+    val won: Boolean = true,
 )
+
+/** Un torneo in programma per l'allievo. */
+@Serializable
+data class StudentEvent(val id: String, val student: String, val name: String, val at: Long, val place: String = "", val note: String = "")
+
+/** La classifica dell'allievo da una certa data (4.4, 4.2…): la storia si vede nella scheda. */
+@Serializable
+data class RankingEntry(val id: String, val student: String, val at: Long, val ranking: String)
+
+/** Una valutazione tecnica: un voto da 1 a 5 per aspetto (vedi [Coaching.ASPECTS]) e una nota. */
+@Serializable
+data class Evaluation(val id: String, val student: String, val at: Long, val scores: Map<String, Int> = emptyMap(), val note: String = "")
+
+/** Un giorno di test fisici: i valori per test (vedi [Coaching.TESTS]). */
+@Serializable
+data class FitnessTest(val id: String, val student: String, val at: Long, val values: Map<String, Double> = emptyMap())
 
 /** Un pacchetto di lezioni pagato (o da pagare) da un allievo: [lessons] lezioni per [cents]. */
 @Serializable
@@ -63,6 +100,13 @@ data class CoachBook(
     val lessons: List<CoachLesson> = emptyList(),
     val packs: List<LessonPack> = emptyList(),
     val groups: List<StudentGroup> = emptyList(),
+    /** I corsi della scuola tennis ricevuti dalla segreteria (scheda corso) con le presenze segnate qui. */
+    val courses: List<CoachCourse> = emptyList(),
+    val manualMatches: List<ManualMatch> = emptyList(),
+    val events: List<StudentEvent> = emptyList(),
+    val rankings: List<RankingEntry> = emptyList(),
+    val evaluations: List<Evaluation> = emptyList(),
+    val tests: List<FitnessTest> = emptyList(),
 )
 
 object Coaching {
@@ -77,16 +121,71 @@ object Coaching {
     /** Le prossime lezioni (da [now] in poi, non annullate), in ordine. */
     fun upcoming(lessons: List<CoachLesson>, now: Long): List<CoachLesson> = lessons.filter { !it.cancelled && it.start + it.minutes * 60_000L > now }.sortedBy { it.start }
 
-    /** Lezioni comprate, fatte e rimaste; quante sono da pagare (pacchetti non pagati) e quanto. */
-    data class Balance(val bought: Int, val used: Int, val dueCents: Int, val duePacks: Int) {
+    /**
+     * Lezioni comprate, fatte (contano anche le assenze non giustificate) e rimaste; quante sono da pagare (pacchetti
+     * non pagati) e quanto; assenze e recuperi ancora da fare (assenze giustificate meno recuperi fatti).
+     */
+    data class Balance(val bought: Int, val used: Int, val dueCents: Int, val duePacks: Int, val absences: Int = 0, val toRecover: Int = 0) {
         val left: Int get() = bought - used
     }
 
     fun balance(book: CoachBook, student: String): Balance {
         val packs = book.packs.filter { it.student == student }
-        val used = book.lessons.count { student in it.students && it.done && !it.cancelled }
+        val mine = book.lessons.filter { student in it.students && it.done && !it.cancelled }
+        val used = mine.count { !it.recovery && student !in it.excused }
+        val excused = mine.count { !it.recovery && student in it.excused }
+        val recovered = mine.count { it.recovery && it.present(student) }
         val due = packs.filter { it.paidAt == null }
-        return Balance(packs.sumOf { it.lessons }, used, due.sumOf { it.cents }, due.size)
+        return Balance(packs.sumOf { it.lessons }, used, due.sumOf { it.cents }, due.size,
+            absences = mine.count { student in it.absent || student in it.excused }, toRecover = (excused - recovered).coerceAtLeast(0))
+    }
+
+    /** Gli aspetti della valutazione tecnica, nell'ordine in cui si mostrano. */
+    val ASPECTS = listOf("serve", "forehand", "backhand", "volley", "movement", "tactics", "mental")
+
+    /** I test fisici: chiave e se un valore più basso è meglio (tempi) o più alto (salti, livelli). */
+    val TESTS = listOf("sprint" to true, "spider" to true, "jump" to false, "yoyo" to false)
+
+    /** La classifica di adesso: l'ultima scritta (o arrivata con una scheda corso). */
+    fun ranking(book: CoachBook, student: String): String? = book.rankings.filter { it.student == student }.maxByOrNull { it.at }?.ranking
+
+    fun evaluationsOf(book: CoachBook, student: String): List<Evaluation> = book.evaluations.filter { it.student == student }.sortedBy { it.at }
+
+    fun average(e: Evaluation): Double? = e.scores.values.takeIf { it.isNotEmpty() }?.average()
+
+    /** Come va l'allievo: la media dell'ultima valutazione meno quella di prima (null con meno di due valutazioni). */
+    fun trend(book: CoachBook, student: String): Double? {
+        val ev = evaluationsOf(book, student).mapNotNull { average(it) }
+        return if (ev.size < 2) null else ev.last() - ev[ev.size - 2]
+    }
+
+    fun testsOf(book: CoachBook, student: String): List<FitnessTest> = book.tests.filter { it.student == student }.sortedBy { it.at }
+
+    /** L'ultimo valore di un test e quello di prima (per vedere se migliora). */
+    fun lastTwo(tests: List<FitnessTest>, key: String): Pair<Double?, Double?> {
+        val v = tests.mapNotNull { it.values[key] }
+        return v.lastOrNull() to v.getOrNull(v.size - 2)
+    }
+
+    /** Il riepilogo di un mese ([from], [to)): lezioni private, allievi, incassi, lezioni dei corsi e presenze. */
+    data class Month(
+        val privateLessons: Int, val privateMinutes: Int, val students: Int, val paidCents: Int,
+        val courseLessons: Int, val courseMinutes: Int, val presencePct: Int?,
+    )
+
+    fun month(book: CoachBook, from: Long, to: Long): Month {
+        val priv = book.lessons.filter { it.done && !it.cancelled && it.start in from until to }
+        val paid = book.packs.filter { it.paidAt != null && it.paidAt in from until to }.sumOf { it.cents }
+        var held = 0; var minutes = 0; var present = 0; var expected = 0
+        for (cc in book.courses) {
+            val co = cc.course
+            for (l in Courses.lessons(co).filter { it.start in from until to && it.key !in co.cancelled && it.key in co.attendance }) {
+                held++; minutes += l.minutes
+                present += co.attendance[l.key].orEmpty().size; expected += co.students.size
+            }
+        }
+        return Month(priv.size, priv.sumOf { it.minutes }, priv.flatMap { it.students }.toSet().size, paid, held, minutes,
+            if (expected == 0) null else present * 100 / expected)
     }
 
     /** Dove è un obiettivo: la percentuale di colpi dentro sulle ultime sessioni del colpo (null = ancora niente). */
@@ -110,6 +209,7 @@ object Coaching {
     fun lastSeen(book: CoachBook, sessions: List<ServeSession>, student: String): Long? =
         listOfNotNull(
             sessions.filter { it.student == student }.maxOfOrNull { it.startedAt },
-            book.lessons.filter { student in it.students && it.done }.maxOfOrNull { it.start },
+            book.lessons.filter { it.done && it.present(student) }.maxOfOrNull { it.start },
+            book.courses.flatMap { cc -> Courses.lessons(cc.course).filter { l -> student in cc.course.attendance[l.key].orEmpty() }.map { it.start } }.maxOrNull(),
         ).maxOrNull()
 }

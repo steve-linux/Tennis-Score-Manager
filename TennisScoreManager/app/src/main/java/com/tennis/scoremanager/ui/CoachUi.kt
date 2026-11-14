@@ -73,6 +73,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     var lesson by remember { mutableStateOf<CoachLesson?>(null) }
     var packNew by remember { mutableStateOf(false) }
     var matchPick by remember { mutableStateOf(false) }
+    var propose by remember { mutableStateOf(false) }
     var deleteEntry by remember { mutableStateOf<String?>(null) }
 
     // Diario: una riga per lezione, con la data; tenendo premuto si toglie.
@@ -112,6 +113,8 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         Text(next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coNoLessons, color = TsmColors.TextMain)
         val bal = Coaching.balance(book, st.id)
         if (bal.bought > 0 || bal.used > 0) Text(s.coBalance(bal.bought, bal.used, bal.left), color = if (bal.left < 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+        if (bal.absences > 0 || bal.toRecover > 0) Text(listOfNotNull(s.evAbsences(bal.absences).takeIf { bal.absences > 0 }, s.laToRecover(bal.toRecover).takeIf { bal.toRecover > 0 }).joinToString(" · "),
+            color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
             if (p.paidAt == null) TextButton(onClick = { c.savePack(p.copy(paidAt = System.currentTimeMillis())) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
@@ -134,7 +137,10 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
             GhostButton(s.coWrite, Icons.Filled.Message, { c.noticeStudents(listOf(st.id)) }, Modifier.weight(1f))
             GhostButton(s.coMatchWith, Icons.Filled.SportsTennis, { matchPick = true }, Modifier.weight(1f))
         }
+        // Dopo una lezione di prova: i suoi dati alla segreteria, per iscriverlo a un corso.
+        GhostButton(s.ccPropose, Icons.Filled.Message, { propose = true }, Modifier.fillMaxWidth())
     }
+    if (propose) ProposeStudentDialog(c, st) { propose = false }
 
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }
@@ -212,9 +218,19 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                     c.go(com.tennis.scoremanager.Screen.BOOK_COURT)
                 }, Modifier.fillMaxWidth())
                 OutlinedTextField(l.note, { l = l.copy(note = it.take(300)) }, Modifier.fillMaxWidth(), label = { Text(s.coNote) })
+                SwitchRow(Icons.Filled.Event, s.laRecovery, s.laRecoveryHint, l.recovery) { l = l.copy(recovery = it) }
                 if (!isNew) {
                     SwitchRow(Icons.Filled.Event, s.coDone, null, l.done) { l = l.copy(done = it, cancelled = if (it) false else l.cancelled) }
                     SwitchRow(Icons.Filled.Event, s.coCancelLesson, null, l.cancelled) { l = l.copy(cancelled = it, done = if (it) false else l.done) }
+                    // Fatta: chi c'era, chi era assente (conta lo stesso) e chi giustificato (da recuperare).
+                    if (l.done) for (sid in l.students) {
+                        val name = c.playerById(sid)?.name ?: continue
+                        val state = when (sid) { in l.excused -> 2; in l.absent -> 1; else -> 0 }
+                        Text(name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Segmented(listOf(SegOption(s.laPresent), SegOption(s.laAbsent), SegOption(s.laExcused)), state, { i ->
+                            l = l.copy(absent = if (i == 1) l.absent + sid else l.absent - sid, excused = if (i == 2) l.excused + sid else l.excused - sid)
+                        })
+                    }
                     GhostButton(s.coNotify, Icons.Filled.Message, { c.saveLesson(l); onDone(); c.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
                     TextButton(onClick = { c.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }

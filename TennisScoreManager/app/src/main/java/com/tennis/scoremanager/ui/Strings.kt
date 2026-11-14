@@ -2506,6 +2506,100 @@ interface Strings {
     val mrReplace: String
     val mrApplied: String
     val mcNoOffice: String
+    val asServe: String
+    val asForehand: String
+    val asBackhand: String
+    val asVolley: String
+    val asMovement: String
+    val asTactics: String
+    val asMental: String
+    val evTitle: String
+    val evLast: (String) -> String
+    val evNew: String
+    val evNone: String
+    val evNote: String
+    val evPresence: String
+    val evAbsences: (Int) -> String
+    val evTrendUp: String
+    val evTrendDown: String
+    val ftTitle: String
+    val ftNew: String
+    val ftNone: String
+    val ftSprint: String
+    val ftSpider: String
+    val ftJump: String
+    val ftYoyo: String
+    val rkTitle: String
+    val rkNow: (String) -> String
+    val rkNone: String
+    val rkUpdate: String
+    val rkHint: String
+    val seTitle: String
+    val seAdd: String
+    val seName: String
+    val sePlace: String
+    val seNone: String
+    val mmTitle: String
+    val mmAdd: String
+    val mmEvent: String
+    val mmOpponent: String
+    val mmOppRank: String
+    val mmScore: String
+    val laPresent: String
+    val laAbsent: String
+    val laExcused: String
+    val laRecovery: String
+    val laRecoveryHint: String
+    val laToRecover: (Int) -> String
+    val ccTitle: String
+    val ccToMark: (Int) -> String
+    val ccToSend: String
+    val ccSent: (String) -> String
+    val ccNothingYet: String
+    val ccSendAttendance: String
+    val ccLessonNote: String
+    val ccNotYet: String
+    val ccIncomingTitle: String
+    val ccIncomingHint: String
+    val ccAccept: String
+    val ccUpdate: String
+    val ccAttendanceTitle: String
+    val ccAttReady: String
+    val ccAttSame: String
+    val ccAttBadCode: String
+    val ccAttNotFound: String
+    val ccAttendanceApplied: String
+    val ccLessonsMarked: (Int) -> String
+    val ccFrom: (String) -> String
+    val ccSendToCoach: String
+    val ccCardText: (String, Int) -> String
+    val ccCardHowTo: String
+    val ccFilePrefix: String
+    val ccAttendancePrefix: String
+    val ccAttendanceText: (String, Int) -> String
+    val ccPropose: String
+    val ccProposeHint: String
+    val ccLevel: String
+    val ccProposalPrefix: String
+    val ccProposalText: (String) -> String
+    val ccProposalTitle: String
+    val ccProposalCourse: String
+    val ccNoCourse: String
+    val ccProposalAdd: String
+    val ccProposalApplied: (String) -> String
+    val ccMatchPrefix: String
+    val ccMatchShare: String
+    val cmMonth: String
+    val cmMonthHint: String
+    val cmMonthTitle: (String) -> String
+    val cmPrivate: (Int, String, Int) -> String
+    val cmCourses: (Int, String) -> String
+    val cmPresence: (Int) -> String
+    val cmPaid: (String) -> String
+    val cmSend: String
+    val cmEmpty: String
+    val rpAll: String
+    val rpText: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -4935,6 +5029,100 @@ object ItStrings : Strings {
     override val mrReplace = "Sostituisci"
     override val mrApplied = "Risultato registrato"
     override val mcNoOffice = "Manca il telefono della segreteria (Altro › Il circolo): senza, chi gioca dovrà scegliere a chi mandare il risultato."
+    override val asServe = "Servizio"
+    override val asForehand = "Dritto"
+    override val asBackhand = "Rovescio"
+    override val asVolley = "Gioco a rete"
+    override val asMovement = "Movimento"
+    override val asTactics = "Tattica"
+    override val asMental = "Testa e grinta"
+    override val evTitle = "Valutazione tecnica"
+    override val evLast: (String) -> String = { "Valutazione del $it" }
+    override val evNew = "Nuova valutazione"
+    override val evNone = "Nessuna valutazione: dai un voto da 1 a 5 a ogni aspetto e segui come cambia."
+    override val evNote = "Nota (cosa lavorare)"
+    override val evPresence = "Presenze"
+    override val evAbsences: (Int) -> String = { "Assenze: $it" }
+    override val evTrendUp = "in crescita"
+    override val evTrendDown = "in calo"
+    override val ftTitle = "Test fisici"
+    override val ftNew = "Nuovo test"
+    override val ftNone = "Nessun test: scatto, spider, salto e yo-yo, con la data."
+    override val ftSprint = "Scatto 20 m (s)"
+    override val ftSpider = "Spider test (s)"
+    override val ftJump = "Salto in lungo da fermo (cm)"
+    override val ftYoyo = "Yo-yo test (livello)"
+    override val rkTitle = "Classifica"
+    override val rkNow: (String) -> String = { "Classifica: $it" }
+    override val rkNone = "Classifica non scritta"
+    override val rkUpdate = "Aggiorna la classifica"
+    override val rkHint = "Es. 4.2: le classifiche di prima restano nella storia."
+    override val seTitle = "Classifica e tornei"
+    override val seAdd = "Aggiungi un torneo"
+    override val seName = "Torneo"
+    override val sePlace = "Dove"
+    override val seNone = "Nessun torneo in programma."
+    override val mmTitle = "Risultati da fuori"
+    override val mmAdd = "Aggiungi un risultato"
+    override val mmEvent = "Torneo o campionato"
+    override val mmOpponent = "Avversario"
+    override val mmOppRank = "Classifica dell'avversario"
+    override val mmScore = "Punteggio (dal lato dell'allievo)"
+    override val laPresent = "Presente"
+    override val laAbsent = "Assente"
+    override val laExcused = "Giustificato"
+    override val laRecovery = "Lezione di recupero"
+    override val laRecoveryHint = "Non scala dal pacchetto: recupera un'assenza giustificata."
+    override val laToRecover: (Int) -> String = { "Da recuperare: $it" }
+    override val ccTitle = "I miei corsi"
+    override val ccToMark: (Int) -> String = { "$it da segnare" }
+    override val ccToSend = "Presenze da mandare alla segreteria"
+    override val ccSent: (String) -> String = { "Presenze mandate il $it" }
+    override val ccNothingYet = "Segna le presenze lezione per lezione, poi mandale alla segreteria."
+    override val ccSendAttendance = "Manda le presenze"
+    override val ccLessonNote = "Cosa avete fatto (va nel diario di chi c'era)"
+    override val ccNotYet = "La lezione non c'è ancora stata."
+    override val ccIncomingTitle = "Scheda corso"
+    override val ccIncomingHint = "Il corso va in Allievi › I miei corsi e gli iscritti diventano tuoi allievi, con i contatti dei genitori. Le presenze le segni lì e le rimandi alla segreteria."
+    override val ccAccept = "Aggiungi ai miei corsi"
+    override val ccUpdate = "Aggiorna il corso"
+    override val ccAttendanceTitle = "Presenze dall'allenatore"
+    override val ccAttReady = "Le presenze si aggiungono al corso: per ogni lezione vale quella dell'allenatore."
+    override val ccAttSame = "Queste presenze ci sono già."
+    override val ccAttBadCode = "Il codice non è quello della scheda corso mandata: le presenze non si registrano."
+    override val ccAttNotFound = "Il corso non c'è in questo telefono."
+    override val ccAttendanceApplied = "Presenze registrate"
+    override val ccLessonsMarked: (Int) -> String = { if (it == 1) "1 lezione segnata" else "$it lezioni segnate" }
+    override val ccFrom: (String) -> String = { "da $it" }
+    override val ccSendToCoach = "Manda all'allenatore"
+    override val ccCardText: (String, Int) -> String = { a, b -> "Corso $a: $b iscritti" }
+    override val ccCardHowTo = "Apri il file con Tennis Score Manager (Condividi › TSM): il corso va tra i tuoi con gli allievi; le presenze le rimandi da lì."
+    override val ccFilePrefix = "Corso"
+    override val ccAttendancePrefix = "Presenze"
+    override val ccAttendanceText: (String, Int) -> String = { a, b -> "Presenze del corso $a: $b lezioni segnate" }
+    override val ccPropose = "Proponi alla segreteria"
+    override val ccProposeHint = "Per iscriverlo a un corso: alla segreteria arrivano i suoi dati e i contatti."
+    override val ccLevel = "Livello"
+    override val ccProposalPrefix = "Allievo"
+    override val ccProposalText: (String) -> String = { "Ti propongo un allievo nuovo: $it" }
+    override val ccProposalTitle = "Allievo proposto dall'allenatore"
+    override val ccProposalCourse = "Iscrivilo al corso"
+    override val ccNoCourse = "Nessun corso per ora"
+    override val ccProposalAdd = "Aggiungi"
+    override val ccProposalApplied: (String) -> String = { "$it aggiunto ai giocatori" }
+    override val ccMatchPrefix = "Partita"
+    override val ccMatchShare = "File della partita (per l'allenatore)"
+    override val cmMonth = "Riepilogo del mese"
+    override val cmMonthHint = "Lezioni, ore, corsi e incassi: da mandare alla segreteria"
+    override val cmMonthTitle: (String) -> String = { "Riepilogo $it" }
+    override val cmPrivate: (Int, String, Int) -> String = { a, b, c -> "Lezioni private: $a ($b), $c allievi" }
+    override val cmCourses: (Int, String) -> String = { a, b -> "Lezioni dei corsi: $a ($b)" }
+    override val cmPresence: (Int) -> String = { "presenze $it%" }
+    override val cmPaid: (String) -> String = { "Pacchetti incassati: $it" }
+    override val cmSend = "Manda alla segreteria"
+    override val cmEmpty = "Niente in questo mese."
+    override val rpAll = "Report a tutti"
+    override val rpText: (String) -> String = { "Il report degli ultimi 30 giorni $it, in allegato." }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -7365,6 +7553,100 @@ object EnStrings : Strings {
     override val mrReplace = "Replace"
     override val mrApplied = "Result recorded"
     override val mcNoOffice = "The club office phone is missing (More › The club): without it, players will have to choose who to send the result to."
+    override val asServe = "Serve"
+    override val asForehand = "Forehand"
+    override val asBackhand = "Backhand"
+    override val asVolley = "Net play"
+    override val asMovement = "Movement"
+    override val asTactics = "Tactics"
+    override val asMental = "Mental game"
+    override val evTitle = "Technical assessment"
+    override val evLast: (String) -> String = { "Assessment of $it" }
+    override val evNew = "New assessment"
+    override val evNone = "No assessment yet: give each aspect a mark from 1 to 5 and follow how it changes."
+    override val evNote = "Note (what to work on)"
+    override val evPresence = "Attendance"
+    override val evAbsences: (Int) -> String = { "Absences: $it" }
+    override val evTrendUp = "improving"
+    override val evTrendDown = "slipping"
+    override val ftTitle = "Fitness tests"
+    override val ftNew = "New test"
+    override val ftNone = "No tests yet: sprint, spider, jump and yo-yo, with the date."
+    override val ftSprint = "20 m sprint (s)"
+    override val ftSpider = "Spider drill (s)"
+    override val ftJump = "Standing long jump (cm)"
+    override val ftYoyo = "Yo-yo test (level)"
+    override val rkTitle = "Ranking"
+    override val rkNow: (String) -> String = { "Ranking: $it" }
+    override val rkNone = "No ranking written"
+    override val rkUpdate = "Update the ranking"
+    override val rkHint = "E.g. 4.2: the previous rankings stay in the history."
+    override val seTitle = "Ranking and tournaments"
+    override val seAdd = "Add a tournament"
+    override val seName = "Tournament"
+    override val sePlace = "Where"
+    override val seNone = "No tournaments planned."
+    override val mmTitle = "Results from elsewhere"
+    override val mmAdd = "Add a result"
+    override val mmEvent = "Tournament or league"
+    override val mmOpponent = "Opponent"
+    override val mmOppRank = "Opponent's ranking"
+    override val mmScore = "Score (from the student's side)"
+    override val laPresent = "Present"
+    override val laAbsent = "Absent"
+    override val laExcused = "Excused"
+    override val laRecovery = "Make-up lesson"
+    override val laRecoveryHint = "It doesn't count against the pack: it makes up for an excused absence."
+    override val laToRecover: (Int) -> String = { "To make up: $it" }
+    override val ccTitle = "My courses"
+    override val ccToMark: (Int) -> String = { "$it to mark" }
+    override val ccToSend = "Attendance to send to the club office"
+    override val ccSent: (String) -> String = { "Attendance sent on $it" }
+    override val ccNothingYet = "Mark attendance lesson by lesson, then send it to the club office."
+    override val ccSendAttendance = "Send attendance"
+    override val ccLessonNote = "What you did (goes in the diary of those present)"
+    override val ccNotYet = "The lesson hasn't taken place yet."
+    override val ccIncomingTitle = "Course card"
+    override val ccIncomingHint = "The course goes to Students › My courses and the participants become your students, with their parents' contacts. You mark attendance there and send it back to the office."
+    override val ccAccept = "Add to my courses"
+    override val ccUpdate = "Update the course"
+    override val ccAttendanceTitle = "Attendance from the coach"
+    override val ccAttReady = "The attendance is added to the course: for each lesson the coach's version counts."
+    override val ccAttSame = "This attendance is already there."
+    override val ccAttBadCode = "The code is not the one of the course card sent: the attendance is not recorded."
+    override val ccAttNotFound = "The course is not on this phone."
+    override val ccAttendanceApplied = "Attendance recorded"
+    override val ccLessonsMarked: (Int) -> String = { if (it == 1) "1 lesson marked" else "$it lessons marked" }
+    override val ccFrom: (String) -> String = { "from $it" }
+    override val ccSendToCoach = "Send to the coach"
+    override val ccCardText: (String, Int) -> String = { a, b -> "Course $a: $b participants" }
+    override val ccCardHowTo = "Open the file with Tennis Score Manager (Share › TSM): the course goes among yours with the students; you send attendance back from there."
+    override val ccFilePrefix = "Course"
+    override val ccAttendancePrefix = "Attendance"
+    override val ccAttendanceText: (String, Int) -> String = { a, b -> "Attendance for course $a: $b lessons marked" }
+    override val ccPropose = "Propose to the club office"
+    override val ccProposeHint = "To enrol them in a course: the club office receives their details and contacts."
+    override val ccLevel = "Level"
+    override val ccProposalPrefix = "Student"
+    override val ccProposalText: (String) -> String = { "I'm proposing a new student: $it" }
+    override val ccProposalTitle = "Student proposed by the coach"
+    override val ccProposalCourse = "Enrol in the course"
+    override val ccNoCourse = "No course for now"
+    override val ccProposalAdd = "Add"
+    override val ccProposalApplied: (String) -> String = { "$it added to the players" }
+    override val ccMatchPrefix = "Match"
+    override val ccMatchShare = "Match file (for the coach)"
+    override val cmMonth = "Monthly summary"
+    override val cmMonthHint = "Lessons, hours, courses and takings: to send to the club office"
+    override val cmMonthTitle: (String) -> String = { "Summary $it" }
+    override val cmPrivate: (Int, String, Int) -> String = { a, b, c -> "Private lessons: $a ($b), $c students" }
+    override val cmCourses: (Int, String) -> String = { a, b -> "Course lessons: $a ($b)" }
+    override val cmPresence: (Int) -> String = { "attendance $it%" }
+    override val cmPaid: (String) -> String = { "Packs paid: $it" }
+    override val cmSend = "Send to the club office"
+    override val cmEmpty = "Nothing this month."
+    override val rpAll = "Report to everyone"
+    override val rpText: (String) -> String = { "The report for the last 30 days $it, attached." }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }

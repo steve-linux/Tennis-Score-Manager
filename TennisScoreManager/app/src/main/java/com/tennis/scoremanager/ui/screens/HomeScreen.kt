@@ -237,6 +237,11 @@ private fun CoachTab(c: MatchController) {
     val book by c.coachBook.collectAsState()
     val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
     Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coAgendaHint) { c.openLessons() }
+    // I corsi della scuola ricevuti dalla segreteria (scheda corso), con le presenze da mandare.
+    com.tennis.scoremanager.ui.CoachCoursesSection(c)
+    var month by remember { mutableStateOf(false) }
+    Entry(Icons.Filled.EventNote, s.cmMonth, s.cmMonthHint) { month = true }
+    if (month) com.tennis.scoremanager.ui.MonthSummaryDialog(c) { month = false }
     // Gli esercizi si scelgono e si gestiscono dentro l'allenamento (Esercizio › Gestisci), una strada sola.
     ServeTrainingCard(c, coach = true)
 }

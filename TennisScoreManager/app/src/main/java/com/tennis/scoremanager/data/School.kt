@@ -38,6 +38,8 @@ data class Course(
     val attendance: Map<String, Set<String>> = emptyMap(),
     val cancelled: Set<String> = emptySet(),
     val createdAt: Long = 0,
+    /** Il codice della scheda corso mandata all'allenatore: le presenze che tornano devono averlo. */
+    val cardCode: String? = null,
 )
 
 /** Una lezione del calendario del corso. */

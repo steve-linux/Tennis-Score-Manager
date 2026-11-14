@@ -33,8 +33,10 @@ object StudentReport {
         val name: String, val fullName: String, val coach: String?, val club: String?, val from: Long?, val to: Long,
         val strokes: List<StrokeBlock>, val movement: List<Pair<TrainedStroke, List<Students.Change>>>,
         val examples: List<Example>, val won: Int, val lost: Int, val rating: Int?, val matches: List<Match>, val note: String,
+        /** Le parti dell'allenatore (valutazione tecnica, test fisici, classifica, presenze): titolo e righe. */
+        val extra: List<Pair<String, List<String>>> = emptyList(),
     ) {
-        val empty: Boolean get() = strokes.isEmpty() && matches.isEmpty() && note.isBlank()
+        val empty: Boolean get() = strokes.isEmpty() && matches.isEmpty() && note.isBlank() && extra.isEmpty()
     }
 
     /** Le righe del riepilogo di un colpo: bersaglio e lato col servizio, direzione con gli altri, dritto/rovescio con la volée. */
@@ -50,7 +52,7 @@ object StudentReport {
      */
     fun build(
         storage: Storage, s: Strings, p: PlayerProfile, sessions: List<ServeSession>, matches: List<PlayerStats.MatchLine>,
-        rating: Int?, coach: String?, club: String?, from: Long?, now: Long,
+        rating: Int?, coach: String?, club: String?, from: Long?, now: Long, extra: List<Pair<String, List<String>>> = emptyList(),
     ): Report {
         val mine = sessions.filter { it.student == p.id && (from == null || it.startedAt >= from) && it.serves.isNotEmpty() }.sortedBy { it.startedAt }
         val strokes = TrainedStroke.entries.mapNotNull { t ->
@@ -90,6 +92,7 @@ object StudentReport {
             from = from ?: (mine.map { it.startedAt } + inPeriod.map { it.rec.endedAt ?: it.rec.updatedAt }).minOrNull(), to = now,
             strokes = strokes, movement = movement, examples = examples,
             won = inPeriod.count { it.won }, lost = inPeriod.count { !it.won }, rating = rating, matches = list, note = p.note,
+            extra = extra.filter { it.second.isNotEmpty() },
         )
     }
 

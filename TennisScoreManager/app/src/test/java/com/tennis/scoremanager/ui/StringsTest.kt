@@ -35,7 +35,7 @@ class StringsTest {
                     )
                     is Function3<*, *, *, *> -> call(
                         { (v as Function3<Any?, Any?, Any?, Any?>)(it[0], it[1], it[2]) },
-                        listOf(listOf("Rossi", "6-4", false), listOf(2, 3, 4)),
+                        listOf(listOf("Rossi", "6-4", false), listOf(2, 3, 4), listOf(2, "1 h", 3)),
                     )
                     is Function4<*, *, *, *, *> -> call(
                         { (v as Function4<Any?, Any?, Any?, Any?, Any?>)(it[0], it[1], it[2], it[3]) },

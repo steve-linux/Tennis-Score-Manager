@@ -110,7 +110,7 @@ fun StudentsScreen(c: MatchController) {
             OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
             com.tennis.scoremanager.ui.Segmented(listOf(com.tennis.scoremanager.ui.SegOption(s.coSortName), com.tennis.scoremanager.ui.SegOption(s.coSortLast)), if (byLast) 1 else 0, { byLast = it == 1 })
             androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                for ((key, label) in listOf("" to s.coAll, "away" to s.coAway) + book.groups.map { it.id to it.name }) TextButton(onClick = { filter = key }) {
+                for ((key, label) in listOf("" to s.coAll, "away" to s.coAway, "down" to s.evTrendDown) + book.groups.map { it.id to it.name }) TextButton(onClick = { filter = key }) {
                     Text(label, color = if (filter == key) TsmColors.Ball else TsmColors.TextDim, fontWeight = if (filter == key) FontWeight.Bold else FontWeight.Normal)
                 }
                 TextButton(onClick = { groups = true }) { Text(s.coGroups + " ›", color = TsmColors.Ball) }
@@ -118,12 +118,15 @@ fun StudentsScreen(c: MatchController) {
             if (filter == "away") Text(s.coAwayHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val group = book.groups.firstOrNull { it.id == filter }
             if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.noticeStudents(group.students) }, Modifier.fillMaxWidth())
+            // Il report di ciascuno (ultimi 30 giorni) al genitore o all'allievo, uno per uno: dell'elenco che si vede.
+            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
         }
         val shown = students
             .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }
             .filter { st -> when (filter) {
                 "" -> true
                 "away" -> (seen[st.id] ?: 0L) < now - 14L * 24 * 3600 * 1000
+                "down" -> (com.tennis.scoremanager.data.Coaching.trend(book, st.id) ?: 0.0) < 0
                 else -> book.groups.firstOrNull { it.id == filter }?.students?.contains(st.id) == true
             } }
             .let { l -> if (byLast) l.sortedByDescending { seen[it.id] ?: 0L } else l.sortedBy { it.name.lowercase() } }
@@ -143,6 +146,11 @@ fun StudentsScreen(c: MatchController) {
                         color = TsmColors.TextDim, fontSize = 13.sp,
                     )
                     st.racket?.let { c.racketById(it) }?.label?.takeIf { it.isNotBlank() }?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
+                    // Come va dall'ultima valutazione tecnica, e la classifica.
+                    val tr = com.tennis.scoremanager.data.Coaching.trend(book, st.id)
+                    val rk = com.tennis.scoremanager.data.Coaching.ranking(book, st.id)
+                    if (tr != null || rk != null) Text(listOfNotNull(rk, tr?.let { if (it >= 0) "▲ " + s.evTrendUp else "▼ " + s.evTrendDown }).joinToString(" · "),
+                        color = if ((tr ?: 0.0) < 0) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp)
                 }
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
             }
@@ -334,7 +342,10 @@ fun StudentScreen(c: MatchController) {
             OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
-        if (st.student) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
+        if (st.student) {
+            com.tennis.scoremanager.ui.StudentCoachSections(c, st)
+            com.tennis.scoremanager.ui.StudentProgressSections(c, st)
+        }
         // Il report da dare all'allievo (PDF o immagine per WhatsApp).
         if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
         GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
