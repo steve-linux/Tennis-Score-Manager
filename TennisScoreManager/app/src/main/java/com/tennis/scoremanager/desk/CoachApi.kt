@@ -61,6 +61,16 @@ interface CoachData {
     val courseLessons: Int, val courseMinutes: Int, val presencePct: Int? = null, val receipts: List<CdReceipt>,
 )
 @Serializable data class CdReceipt(val packId: String, val number: String, val date: String, val name: String, val lessons: Int, val cents: Int)
+/**
+ * Una cosa nel calendario dell'allenatore: [kind] "lesson" (lezione privata, [ref] = id), "course" (lezione di un corso,
+ * [ref] = id del corso, [key] la lezione), "event" (torneo di un allievo, [ref] = id dell'allievo).
+ */
+@Serializable data class CdCalItem(
+    val kind: String, val ref: String, val key: String = "", val startMin: Int? = null, val minutes: Int = 0, val title: String, val place: String = "",
+    val done: Boolean = false, val cancelled: Boolean = false, val past: Boolean = false,
+)
+@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>)
+@Serializable data class CdCal(val first: String, val days: List<CdCalDay>)
 @Serializable data class CdText(val text: String = "")
 @Serializable data class CdAttendanceIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean = false, val note: String = "")
 @Serializable data class CdDoneIn(val done: Boolean = true)
@@ -102,6 +112,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.pdf" -> { course(p[2]); bytes(data.registerPdf(p[2]), "application/pdf") }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.xlsx" -> { course(p[2]); bytes(data.registerXlsx(p[2]), com.tennis.scoremanager.data.Xlsx.MIME) }
         m == "GET" && p == listOf("coach", "month") -> ok(CdMonth.serializer(), month(r.query["date"]))
+        m == "GET" && p == listOf("coach", "calendar") -> ok(CdCal.serializer(), calendar(r.query["date"]))
         m == "GET" && p == listOf("coach", "receipts.xlsx") -> bytes(data.receiptsXlsx(r.query["year"]?.toIntOrNull() ?: throw DeskApi.Fail(400, "BAD_REQUEST")), com.tennis.scoremanager.data.Xlsx.MIME)
         else -> throw DeskApi.Fail(404, "NOT_FOUND")
     }
@@ -181,6 +192,28 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         if (!a.cancelled && l.start > data.now() + 3_600_000L) throw DeskApi.Fail(400, "BAD_REQUEST")
         data.markCourseLesson(id, a.key, l.start, a.present.filter { it in cc.card.course.students }.toSet(), a.cancelled, a.note)
         return ok(CdRegister.serializer(), register(id))
+    }
+
+    /** Il mese di [date], giorno per giorno: lezioni private, lezioni dei corsi e tornei degli allievi, in ordine d'ora. */
+    private fun calendar(date: String?): CdCal {
+        val start = Instant.ofEpochMilli(dayStart(date)).atZone(zone()).toLocalDate().withDayOfMonth(1)
+        val f = start.atStartOfDay(zone()).toInstant().toEpochMilli()
+        val t = start.plusMonths(1).atStartOfDay(zone()).toInstant().toEpochMilli()
+        val book = data.book(); val now = data.now()
+        val names = data.players().associate { it.id to it.name }
+        val items = mutableListOf<Pair<Long, CdCalItem>>()
+        for (l in book.lessons.filter { it.start in f until t }) items += l.start to CdCalItem("lesson", l.id, "", minOf(l.start), l.minutes,
+            l.students.joinToString(", ") { names[it] ?: "—" }, l.place, l.done, l.cancelled, l.start <= now)
+        for (cc in book.courses) {
+            val co = cc.course
+            for (les in Courses.lessons(co).filter { it.start in f until t }) items += les.start to CdCalItem("course", co.id, les.key, minOf(les.start), les.minutes,
+                co.name, les.court, les.key in co.attendance, les.key in co.cancelled, les.start <= now)
+        }
+        for (e in book.events.filter { it.at in f until t }) items += e.at to CdCalItem("event", e.student, "", null, 0, "${e.name} · ${names[e.student] ?: ""}", e.place)
+        val byDay = items.sortedBy { it.first }.groupBy { day(it.first)!! }
+        val days = generateSequence(start) { it.plusDays(1) }.takeWhile { it.isBefore(start.plusMonths(1)) }
+            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }) }.toList()
+        return CdCal(start.toString(), days)
     }
 
     private fun month(date: String?): CdMonth {

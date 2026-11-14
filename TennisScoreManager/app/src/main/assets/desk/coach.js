@@ -8,6 +8,9 @@ let coachView = 'students';
 let coachStudent = null;
 let coachCourseId = null;
 let coachMonth = null;
+/** Agenda: 'month', 'week' o 'list'; e il giorno a cui si guarda. */
+let agendaView = 'month';
+let agendaDate = null;
 
 const ASPECTS = ['serve', 'forehand', 'backhand', 'volley', 'movement', 'tactics', 'mental'];
 const aspectName = (k) => ({ serve: T.asServe, forehand: T.asForehand, backhand: T.asBackhand, volley: T.asVolley, movement: T.asMovement, tactics: T.asTactics, mental: T.asMental })[k] || k;
@@ -123,7 +126,70 @@ async function showStudent(id) {
 
 // --- Agenda ---
 
+/** Il colore di una cosa del calendario: lezione privata, lezione di corso, torneo; grigia se annullata. */
+const calColor = (x) => (x.cancelled ? 'var(--dim)' : x.kind === 'course' ? 'var(--accent)' : x.kind === 'event' ? 'var(--warn)' : 'var(--text)');
+const calLine = (x) => (x.startMin != null ? hhmm(x.startMin) + ' ' : '🏆 ') + x.title;
+
+/** Un tocco su una cosa del calendario: la lezione privata passata si segna fatta, il corso apre il registro, il torneo l'allievo. */
+async function calOpen(x) {
+  if (x.kind === 'course') { coachView = 'courses'; coachCourseId = x.ref; return coachRender(); }
+  if (x.kind === 'event') { coachView = 'students'; coachStudent = x.ref; return coachRender(); }
+  if (x.past && !x.done && !x.cancelled && confirm(T.coDone + '?')) {
+    try { await api('PUT', '/coach/lessons/' + encodeURIComponent(x.ref) + '/done', { done: true }); toast(T.saved); } catch (e) { toast(errText(e)); }
+    showAgenda();
+  }
+}
+
+/** Agenda: il mese (o la settimana) con lezioni private, lezioni dei corsi e tornei degli allievi; o l'elenco. */
 async function showAgenda() {
+  if (!agendaDate) agendaDate = info.today;
+  const views = h('div.seg', { role: 'group' }, [['month', T.viewMonth], ['week', T.viewWeek], ['list', T.coUpcoming]].map(([v, l]) =>
+    h('button' + (v === agendaView ? '.on' : ''), { type: 'button', 'aria-pressed': v === agendaView ? 'true' : 'false', onclick: () => { agendaView = v; showAgenda(); } }, l)));
+  if (agendaView === 'list') return showAgendaList(views);
+  const shift = (n) => {
+    const d = new Date(agendaDate + 'T12:00:00');
+    if (agendaView === 'month') { d.setDate(1); d.setMonth(d.getMonth() + n); } else d.setDate(d.getDate() + 7 * n);
+    agendaDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    showAgenda();
+  };
+  const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
+  const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
+    h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
+  const legend = h('p.dim', h('span', { style: 'color:var(--text)' }, '■ ' + T.coLessons), '  ', h('span', { style: 'color:var(--accent)' }, '■ ' + T.ccTitle), '  ',
+    h('span', { style: 'color:var(--warn)' }, '■ ' + T.seTitle));
+  const item = (x) => h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;border:0;padding:1px 2px;background:none;font-size:12px;color:' + calColor(x) +
+    (x.cancelled ? ';text-decoration:line-through' : '') + (x.done ? ';font-weight:600' : ''), title: [calLine(x), x.place].filter(Boolean).join(' · '),
+    onclick: (ev) => { ev.stopPropagation(); calOpen(x); } }, calLine(x) + (x.past && !x.done && !x.cancelled && x.kind !== 'event' ? ' •' : ''));
+  if (agendaView === 'month') {
+    const m = await api('GET', '/coach/calendar?date=' + agendaDate);
+    const title = long(m.first, { month: 'long', year: 'numeric' });
+    const lead = (new Date(m.first + 'T12:00:00').getDay() + 6) % 7;
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
+    for (const d of m.days) {
+      cells.push(h('div.mday' + (d.date === info.today ? '.now' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) },
+        h('b', Number(d.date.slice(8))), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
+    }
+    put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
+      h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legend);
+    return;
+  }
+  // La settimana (da lunedì): una colonna per giorno, con tutto in ordine d'ora.
+  const d0 = new Date(agendaDate + 'T12:00:00');
+  d0.setDate(d0.getDate() - ((d0.getDay() + 6) % 7));
+  const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const days = [...Array(7)].map((_, i) => { const d = new Date(d0); d.setDate(d0.getDate() + i); return iso(d); });
+  const months = [...new Set(days.map((x) => x.slice(0, 8) + '01'))];
+  const cals = await Promise.all(months.map((x) => api('GET', '/coach/calendar?date=' + x)));
+  const byDay = Object.fromEntries(cals.flatMap((c) => c.days).map((d) => [d.date, d.items]));
+  const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
+  put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
+    h('div.panel', h('div.month', days.map((d) => h('div.mhead', long(d, { weekday: 'short', day: 'numeric' }))),
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : ''), { style: 'min-height:240px' }, (byDay[d] || []).map(item))))), legend);
+}
+
+/** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
+async function showAgendaList(views) {
   const list = await api('GET', '/coach/lessons');
   const now = info.today;
   const next = list.filter((l) => !l.cancelled && l.date >= now);
@@ -131,7 +197,7 @@ async function showAgenda() {
   const row = (l, mark) => h('tr',
     h('td', dateText(l.date) + ' ' + hhmm(l.startMin)), h('td', T.coMinutes(l.minutes)), h('td', l.students.join(', ')), h('td', l.place),
     h('td', mark ? h('button', { onclick: async () => { try { await api('PUT', '/coach/lessons/' + encodeURIComponent(l.id) + '/done', { done: true }); toast(T.saved); showAgenda(); } catch (e) { toast(errText(e)); } } }, T.coDone) : (l.done ? T.coDone : '')));
-  put(main(), h('div.head', h('h1', T.coAgenda), printBtn()),
+  put(main(), h('div.head', h('h1', T.coAgenda), views, printBtn()),
     h('div.panel', h('h2', T.coUpcoming), next.length ? h('table', h('tbody', next.map((l) => row(l, false)))) : h('p.dim', T.coNoLessons)),
     past.length ? h('div.panel', h('h2', T.coToMark), h('table', h('tbody', past.map((l) => row(l, true))))) : null);
 }

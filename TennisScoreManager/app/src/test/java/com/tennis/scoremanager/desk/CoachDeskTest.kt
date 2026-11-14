@@ -101,5 +101,11 @@ class CoachDeskTest {
         assertTrue("Under 10" in req("GET", "/coach/courses", token = tk).second)
         assertTrue("\"from\":\"2026-11-01\"" in req("GET", "/coach/month", token = tk, q = mapOf("date" to "2026-11-14")).second)
         assertTrue(req("GET", "/coach/lessons", token = tk).second.contains("l1"))
+        // Il calendario del mese: lezioni del corso e lezione privata, giorno per giorno.
+        val cal = req("GET", "/coach/calendar", token = tk, q = mapOf("date" to "2026-11-14")).second
+        assertTrue(cal, "\"first\":\"2026-11-01\"" in cal)
+        assertTrue("\"kind\":\"course\"" in cal)
+        assertTrue("\"kind\":\"lesson\"" in cal)
+        assertEquals(30, Regex("\"date\":\"2026-11-").findAll(cal).count())
     }
 }
