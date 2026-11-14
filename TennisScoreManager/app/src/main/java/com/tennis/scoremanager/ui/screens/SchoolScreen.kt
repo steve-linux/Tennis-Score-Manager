@@ -147,6 +147,7 @@ fun CourseScreen(c: MatchController) {
     var adding by remember { mutableStateOf(false) }
     var openLesson by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
+    var register by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.16") },
         title = co.name,
@@ -187,6 +188,8 @@ fun CourseScreen(c: MatchController) {
                 val past = all.filter { it.start <= now }.reversed()
                 val next = all.filter { it.start > now }
                 if (all.isEmpty()) Text(s.scNoLessons, color = TsmColors.TextDim)
+                // Il registro presenze da stampare o mandare (lezioni passate, ✓ ✗ —).
+                if (past.isNotEmpty()) GhostButton(s.rgPdf, Icons.Filled.Campaign, { register = true }, Modifier.fillMaxWidth())
                 @Composable fun row(l: Lesson) {
                     val cancelled = l.key in co.cancelled
                     val marked = co.attendance[l.key]
@@ -233,6 +236,10 @@ fun CourseScreen(c: MatchController) {
     if (edit) CourseEditDialog(c, co) { edit = false }
     if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.saveCourse(co.copy(students = co.students + it.id)) } }
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
+    if (register) {
+        val file = remember { c.registerFile(co.id, coachSide = false) }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+    }
 }
 
 /** L'appello di una lezione: chi c'era; oppure lezione annullata (e si avvisano gli allievi). */

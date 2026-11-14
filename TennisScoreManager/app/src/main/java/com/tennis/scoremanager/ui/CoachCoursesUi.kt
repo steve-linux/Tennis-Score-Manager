@@ -106,11 +106,13 @@ fun CoachCourseScreen(c: MatchController) {
     var tab by rememberSaveable { mutableStateOf(1) }
     var open by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
+    var register by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, cc.card.club.ifBlank { null }, "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
         icon = Icons.Filled.School,
+        action = { TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) } },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
@@ -161,6 +163,10 @@ fun CoachCourseScreen(c: MatchController) {
         }
     }
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
+    if (register) {
+        val file = remember { c.registerFile(co.id, coachSide = true) }
+        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+    }
 }
 
 /** L'appello di una lezione del corso: chi c'era e cosa si è fatto; oppure lezione annullata (e si avvisano gli iscritti). */

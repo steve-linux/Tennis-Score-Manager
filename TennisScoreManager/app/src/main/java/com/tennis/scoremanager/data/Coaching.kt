@@ -86,6 +86,8 @@ data class LessonPack(
     val createdAt: Long = 0,
     /** Quando è stato pagato; null = da pagare. */
     val paidAt: Long? = null,
+    /** Il numero della ricevuta ("2026/003"), dato quando lo si segna pagato. */
+    val receipt: String? = null,
 )
 
 /** Un gruppo di allievi (es. "Agonisti U14"): si allena, si avvisa e si mette in agenda insieme. */
@@ -138,6 +140,13 @@ object Coaching {
         val due = packs.filter { it.paidAt == null }
         return Balance(packs.sumOf { it.lessons }, used, due.sumOf { it.cents }, due.size,
             absences = mine.count { student in it.absent || student in it.excused }, toRecover = (excused - recovered).coerceAtLeast(0))
+    }
+
+    /** Il numero della prossima ricevuta dell'anno di [at]: "2026/001", "2026/002"… (una serie per anno). */
+    fun nextReceipt(book: CoachBook, at: Long): String {
+        val year = java.util.Calendar.getInstance().apply { timeInMillis = at }.get(java.util.Calendar.YEAR)
+        val n = book.packs.mapNotNull { it.receipt }.filter { it.startsWith("$year/") }.mapNotNull { it.substringAfter('/').toIntOrNull() }.maxOrNull() ?: 0
+        return "$year/" + (n + 1).toString().padStart(3, '0')
     }
 
     /** Gli aspetti della valutazione tecnica, nell'ordine in cui si mostrano. */

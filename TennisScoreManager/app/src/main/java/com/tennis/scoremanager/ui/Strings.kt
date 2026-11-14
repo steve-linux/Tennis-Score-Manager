@@ -2605,6 +2605,18 @@ interface Strings {
     val dictNoApp: String
     val dictAdded: String
     val dictMic: String
+    val rcReceipt: String
+    val rcSend: String
+    val rcPrint: String
+    val rcFailed: String
+    val rgTitle: String
+    val rgShort: String
+    val rgPdf: String
+    val rgTotal: String
+    val rgLegend: String
+    val rcPack: (Int) -> String
+    val rcText: (String) -> String
+    val rcFor: (String, String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -5133,6 +5145,18 @@ object ItStrings : Strings {
     override val dictNoApp = "Su questo telefono non c'è la dettatura vocale (serve l'app di Google o un'altra app di riconoscimento vocale)."
     override val dictAdded = "Nota aggiunta al diario"
     override val dictMic = "Detta"
+    override val rcReceipt = "Ricevuta"
+    override val rcSend = "Manda all'allievo"
+    override val rcPrint = "Stampa"
+    override val rcFailed = "Il PDF non si è potuto fare."
+    override val rgTitle = "Registro presenze"
+    override val rgShort = "Registro"
+    override val rgPdf = "Registro presenze (PDF)"
+    override val rgTotal = "Totale"
+    override val rgLegend = "✓ presente · ✗ assente · — lezione annullata · vuoto: da segnare"
+    override val rcPack: (Int) -> String = { "Pacchetto di $it lezioni" }
+    override val rcText: (String) -> String = { "In allegato la ricevuta n. $it. Grazie!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, per $n" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -7662,6 +7686,18 @@ object EnStrings : Strings {
     override val dictNoApp = "There is no voice dictation on this phone (it needs the Google app or another speech recognition app)."
     override val dictAdded = "Note added to the diary"
     override val dictMic = "Dictate"
+    override val rcReceipt = "Receipt"
+    override val rcSend = "Send to the student"
+    override val rcPrint = "Print"
+    override val rcFailed = "The PDF could not be made."
+    override val rgTitle = "Attendance register"
+    override val rgShort = "Register"
+    override val rgPdf = "Attendance register (PDF)"
+    override val rgTotal = "Total"
+    override val rgLegend = "✓ present · ✗ absent · — lesson cancelled · blank: to be marked"
+    override val rcPack: (Int) -> String = { "Pack of $it lessons" }
+    override val rcText: (String) -> String = { "Attached is receipt no. $it. Thank you!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, for $n" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }

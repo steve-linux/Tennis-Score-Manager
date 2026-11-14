@@ -20,7 +20,15 @@ object ReceiptPdf {
     private const val H = 595
     private const val M = 36f
 
-    fun write(c: Charge, p: Payment, club: String, s: Strings, lang: Lang, out: OutputStream) {
+    fun write(c: Charge, p: Payment, club: String, s: Strings, lang: Lang, out: OutputStream) =
+        write(club.ifBlank { s.receiptTitle }, p.receipt, p.at, c.name, c.label, listOf(p.methodName.ifBlank { payMethodName(s, p.method) }, p.ref).filter { it.isNotBlank() }.joinToString(" · "),
+            p.cents, s, lang, out)
+
+    /**
+     * La ricevuta con i suoi campi: [header] in alto (il circolo, o l'allenatore per i pacchetti di lezioni), numero,
+     * data, da chi, per cosa, come (può essere vuoto) e importo.
+     */
+    fun write(header: String, number: String, at: Long, from: String, what: String, method: String, cents: Int, s: Strings, lang: Lang, out: OutputStream) {
         val doc = PdfDocument()
         val page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, 1).create())
         val cv = page.canvas
@@ -31,10 +39,10 @@ object ReceiptPdf {
         val grey = 0xFF6B7280.toInt()
         val rule = Paint().apply { color = 0xFFD1D5DB.toInt(); strokeWidth = 1f }
         var y = M + 20f
-        cv.drawText(club.ifBlank { s.receiptTitle }, M, y, paint(18f, bold = true))
+        cv.drawText(header, M, y, paint(18f, bold = true))
         y += 26f
-        cv.drawText(s.payReceiptNo(p.receipt), M, y, paint(12f, bold = true))
-        cv.drawText(Reports.date(p.at, lang), W - M, y, paint(10f, grey, align = Paint.Align.RIGHT))
+        cv.drawText(s.payReceiptNo(number), M, y, paint(12f, bold = true))
+        cv.drawText(Reports.date(at, lang), W - M, y, paint(10f, grey, align = Paint.Align.RIGHT))
         y += 12f
         cv.drawLine(M, y, W - M, y, rule)
         y += 28f
@@ -46,12 +54,12 @@ object ReceiptPdf {
             cv.drawText(value, M, y, paint(12f))
             y += 24f
         }
-        field(s.receiptReceivedFrom, c.name)
-        field(s.receiptFor, c.label)
-        field(s.receiptMethod, listOf(p.methodName.ifBlank { payMethodName(s, p.method) }, p.ref).filter { it.isNotBlank() }.joinToString(" · "))
+        field(s.receiptReceivedFrom, from)
+        field(s.receiptFor, what)
+        field(s.receiptMethod, method)
         cv.drawText(s.receiptAmount, M, y, paint(9f, grey))
         y += 26f
-        cv.drawText(Fees.money(p.cents, lang.locale), M, y, paint(24f, bold = true))
+        cv.drawText(Fees.money(cents, lang.locale), M, y, paint(24f, bold = true))
         y += 40f
         // Firma di chi incassa.
         val sx = W - M - 150f

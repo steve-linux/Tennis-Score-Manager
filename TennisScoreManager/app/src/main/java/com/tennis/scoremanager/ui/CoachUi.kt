@@ -76,6 +76,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     var packNew by remember { mutableStateOf(false) }
     var matchPick by remember { mutableStateOf(false) }
     var propose by remember { mutableStateOf(false) }
+    var receipt by remember { mutableStateOf<String?>(null) }
     var deleteEntry by remember { mutableStateOf<String?>(null) }
 
     // Diario: una riga per lezione, con la data; tenendo premuto si toglie.
@@ -125,8 +126,9 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.savePack(p.copy(paidAt = System.currentTimeMillis())) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
-            else Text(s.coPaid, color = TsmColors.Ok, fontSize = 13.sp)
+            if (p.paidAt == null) TextButton(onClick = { c.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
+            else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
         if (bal.dueCents > 0) Text(s.coDue(Fees.money(bal.dueCents, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -149,6 +151,10 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         GhostButton(s.ccPropose, Icons.Filled.Message, { propose = true }, Modifier.fillMaxWidth())
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
+    receipt?.let { id ->
+        val file = remember(id) { c.packReceiptFile(id) }
+        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.noticePackReceipt(id) }) { receipt = null }
+    }
 
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }

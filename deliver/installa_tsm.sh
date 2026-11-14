@@ -8538,14 +8538,14 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
   - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben. **Per Stimme**: **Notiz diktieren** (oder das 🎤 im Feld) nutzt die Spracheingabe des Telefons, auf neueren Telefonen auch offline: du sprichst und der Text kommt mit Datum ins Tagebuch. Das 🎤 gibt es auch in den Trainernotizen, in der Notiz einer Kursstunde und in der technischen Bewertung.
   - **Ziele**: *Neues Ziel* für einen Schlag, zum Beispiel Vorhand mit 70 % im Feld im Schnitt der letzten 3 Einheiten, mit optionalem Datum. Die Karte zeigt den Stand; wird es erreicht, bekommt das Ziel das Datum von selbst.
-  - **Stunden und Pakete**: die nächsten Stunden und mit *Neues Paket* die gekauften Stunden (Anzahl und Preis, bezahlt oder nicht). Der Stand zeigt gekauft, gemacht und übrig und was noch offen ist; *Als bezahlt markieren* schließt das Paket.
+  - **Stunden und Pakete**: die nächsten Stunden und mit *Neues Paket* die gekauften Stunden (Anzahl und Preis, bezahlt oder nicht). Der Stand zeigt gekauft, gemacht und übrig und was noch offen ist; *Als bezahlt markieren* schließt das Paket. Als bezahlt markiert bekommt das Paket eine **Quittungs**nummer (2026/001…, eine Reihe pro Jahr): antippen, und die PDF-Quittung (keine Steuerquittung, bei Minderjährigen auf die Eltern ausgestellt) lässt sich **an den Schüler schicken**, teilen oder vom Telefon **drucken**.
   - **Schreiben**: Elternteil oder Vormund und die **Einwilligung zu Aufnahmen und Daten** (in *Bearbeiten* einzutragen, bei Minderjährigen; Mitteilungen gehen an das Telefon der Eltern). **Schreiben** öffnet eine WhatsApp-, SMS- oder E-Mail-Nachricht an den Schüler; **Match mit…** lässt den Gegner unter den Schülern wählen und bereitet das neue Match mit beiden Namen vor.
   - **Bericht für den Schüler**: *Letzte 30 Tage* oder *Alles* wählen, dann **Vollständiges PDF** (Schläge mit dem Anteil im Feld und dem Verlauf, Bewegung, für jeden Schlag einer im Feld und einer daneben mit den drei Bildern der Schlüsselmomente, Matches, Rating und deine Notizen) oder **Bild für WhatsApp** (eine Seite mit den Zahlen der Schläge und dem Treffpunkt eines Schlags). Das Teilen öffnet sich sofort: WhatsApp, E-Mail oder anders. Der Bericht trägt deinen Namen als Trainer (aus *Du*) und den Verein (aus *Verein › Plätze*).
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
 - **Die Schülerliste**: **Schüler suchen** nach Name, sortieren *Nach Name* oder *Nach letztem Mal*, filtern *Alle*, *Lange nicht gesehen* (seit mehr als 2 Wochen) oder eine Gruppe. Unter jedem Namen steht, wann du ihn zuletzt gesehen hast (Einheit oder gemachte Stunde).
 - **Gruppen** (*Gruppen ›* oben in der Liste): *Neue Gruppe* mit Name und Schülern (zum Beispiel „Turnier U14“); eine Gruppe lässt sich filtern, in eine Stunde setzen und mit **Schreiben** auf einmal benachrichtigen.
 - **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers.
-- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt.
+- **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*.
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
 - **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken.
@@ -9140,14 +9140,14 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
   - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top. **By voice**: **Dictate a note** (or the 🎤 in the field) uses the phone's dictation, offline too on recent phones: you speak and the text goes into the diary with the date. The 🎤 is also in the coach's notes, in a course lesson's note and in the technical assessment's note.
   - **Goals**: *New goal* on a stroke, for example forehand at 70% in over the average of the last 3 sessions, with an optional date. The card shows how far they are; when they reach it, the goal takes the date by itself.
-  - **Lessons and packs**: their next lessons and, with *New pack*, the lessons bought (number and price, paid or not). The balance shows bought, done and left and how much is due; *Mark as paid* closes the pack.
+  - **Lessons and packs**: their next lessons and, with *New pack*, the lessons bought (number and price, paid or not). The balance shows bought, done and left and how much is due; *Mark as paid* closes the pack. Once marked paid, the pack gets a **receipt** number (2026/001…, one series per year): tapping it, the PDF receipt (not a tax receipt, made out to the parent for minors) can be **sent to the student**, shared or **printed** from the phone.
   - **Write**: the parent or guardian and the **Consent to filming and data** (entered in *Edit*, for minors; notices go to the parent's phone). **Write** opens a WhatsApp, SMS or email message to the student; **Match with…** lets you pick the opponent among the students and prepares the new match with both names.
   - **Report for the student**: pick *Last 30 days* or *Everything*, then **Full PDF** (strokes with the percentage in and its trend, movement, for each stroke one shot in and one out with the three key-moment pictures, matches, rating and your notes) or **Image for WhatsApp** (a single page with the stroke numbers and the contact of one shot). Sharing opens straight away: WhatsApp, email or wherever you like. The report carries your name as coach (from *You*) and the club (from *Club › Courts*).
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
 - **The students list**: **Search a student** by name, sort *By name* or *By last time*, filter *All*, *Not seen lately* (not seen for more than 2 weeks) or a group. Under each name is the last time you saw them (session or lesson done).
 - **Groups** (*Groups ›* at the top of the list): *New group* with a name and students (for example "U14 squad"); a group can be filtered, put in a lesson and notified all together with **Write**.
 - **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack.
-- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays.
+- **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*.
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
 - **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office.
@@ -9741,14 +9741,14 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
   - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba. **Por voz**: **Dictar una nota** (o el 🎤 del campo) usa el dictado del teléfono, también sin conexión en los teléfonos recientes: hablas y el texto va al diario con la fecha. El 🎤 está también en las notas del entrenador, en la nota de una clase del curso y en la de la evaluación técnica.
   - **Objetivos**: *Nuevo objetivo* sobre un golpe, por ejemplo derecha al 70 % dentro en la media de las últimas 3 sesiones, con una fecha opcional. La ficha muestra cómo va; cuando lo alcanza, el objetivo toma la fecha solo.
-  - **Clases y paquetes**: sus próximas clases y, con *Nuevo paquete*, las clases compradas (número y precio, pagado o no). El saldo indica compradas, hechas y restantes y cuánto falta por pagar; *Marcar pagado* cierra el paquete.
+  - **Clases y paquetes**: sus próximas clases y, con *Nuevo paquete*, las clases compradas (número y precio, pagado o no). El saldo indica compradas, hechas y restantes y cuánto falta por pagar; *Marcar pagado* cierra el paquete. Marcado como pagado, el paquete recibe un número de **recibo** (2026/001…, una serie por año): al tocarlo, el recibo en PDF (no fiscal, a nombre del padre o madre para los menores) se puede **enviar al alumno**, compartir o **imprimir** desde el teléfono.
   - **Escribir**: el padre, madre o tutor y el **Consentimiento a grabaciones y datos** (se introducen en *Editar*, para los menores; los avisos van al teléfono del padre o madre). **Escribir** abre un mensaje de WhatsApp, SMS o correo al alumno; **Partido con…** hace elegir el rival entre los alumnos y prepara el partido nuevo con los dos nombres.
   - **Informe para el alumno**: elige *Últimos 30 días* o *Todo*, luego **PDF completo** (golpes con el porcentaje dentro y su evolución, movimiento, de cada golpe uno dentro y uno fuera con las tres imágenes de los momentos clave, partidos, rating y tus notas) o **Imagen para WhatsApp** (una sola página con los números de los golpes y el impacto de un golpe). Se abre enseguida el compartir: WhatsApp, correo o donde quieras. El informe lleva tu nombre como entrenador (de *Tú*) y el club (de *Club › Pistas*).
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 - **La lista de alumnos**: **Buscar un alumno** por nombre, ordenar *Por nombre* o *Por última vez*, filtrar *Todos*, *Por volver a ver* (no los ves desde hace más de 2 semanas) o un grupo. Bajo cada nombre aparece la última vez que lo viste (sesión o clase hecha).
 - **Grupos** (*Grupos ›* arriba de la lista): *Nuevo grupo* con nombre y alumnos (por ejemplo "Competición U14"); el grupo se filtra, se pone en una clase y se avisa todo junto con **Escribir**.
 - **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno.
-- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda.
+- **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*.
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
 - **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría.
@@ -10342,14 +10342,14 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
   - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut. **À la voix** : **Dicter une note** (ou le 🎤 dans le champ) utilise la dictée du téléphone, même hors ligne sur les téléphones récents : vous parlez et le texte va dans le journal avec la date. Le 🎤 est aussi dans les notes de l'entraîneur, dans la note d'une séance de cours et dans celle de l'évaluation technique.
   - **Objectifs**: *Nouvel objectif* sur un coup, par exemple coup droit à 70 % dedans sur la moyenne des 3 dernières séances, avec une date facultative. La fiche montre où il en est ; quand il l'atteint, l'objectif prend la date tout seul.
-  - **Cours et forfaits**: ses prochains cours et, avec *Nouveau forfait*, les cours achetés (nombre et prix, payé ou non). Le solde indique achetés, faits et restants et ce qui reste à payer ; *Marquer payé* clôt le forfait.
+  - **Cours et forfaits**: ses prochains cours et, avec *Nouveau forfait*, les cours achetés (nombre et prix, payé ou non). Le solde indique achetés, faits et restants et ce qui reste à payer ; *Marquer payé* clôt le forfait. Marqué payé, le forfait reçoit un numéro de **reçu** (2026/001…, une série par an) : en le touchant, le reçu PDF (non fiscal, au nom du parent pour les mineurs) peut être **envoyé à l'élève**, partagé ou **imprimé** depuis le téléphone.
   - **Écrire**: le parent ou tuteur et le **Consentement aux vidéos et aux données** (à saisir dans *Modifier*, pour les mineurs ; les avis vont au téléphone du parent). **Écrire** ouvre un message WhatsApp, SMS ou e-mail à l'élève ; **Match avec…** fait choisir l'adversaire parmi les élèves et prépare le nouveau match avec les deux noms.
   - **Bilan pour l'élève** : choisissez *30 derniers jours* ou *Tout*, puis **PDF complet** (coups avec le pourcentage dedans et son évolution, mouvement, pour chaque coup un dedans et un dehors avec les trois images des moments clés, matchs, classement et vos notes) ou **Image pour WhatsApp** (une seule page avec les chiffres des coups et l'impact d'un coup). Le partage s'ouvre tout de suite : WhatsApp, e-mail ou ailleurs. Le bilan porte votre nom comme entraîneur (depuis *Vous*) et le club (depuis *Club › Terrains*).
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
 - **La liste des élèves**: **Chercher un élève** par nom, trier *Par nom* ou *Par dernière fois*, filtrer *Tous*, *À revoir* (pas vus depuis plus de 2 semaines) ou un groupe. Sous chaque nom, la dernière fois que vous l'avez vu (séance ou cours fait).
 - **Groupes** (*Groupes ›* en haut de la liste) : *Nouveau groupe* avec un nom et des élèves (par exemple « Compétition U14 ») ; un groupe se filtre, se met dans un cours et se prévient d'un coup avec **Écrire**.
 - **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève.
-- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent.
+- **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*.
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
 - **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat.
@@ -10943,14 +10943,14 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
   - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto. **A voce**: **Detta una nota** (o il 🎤 nel campo) usa la dettatura del telefono, anche senza rete sui telefoni recenti: parli e il testo va nel diario con la data. Il 🎤 c'è anche nelle note dell'allenatore, nella nota della lezione di un corso e in quella della valutazione tecnica.
   - **Obiettivi**: *Nuovo obiettivo* su un colpo, per esempio dritto al 70% dentro sulla media delle ultime 3 sessioni, con una data facoltativa. La scheda mostra a che punto è; quando lo raggiunge, l'obiettivo prende la data da solo.
-  - **Lezioni e pacchetti**: le sue prossime lezioni e, con *Nuovo pacchetto*, le lezioni comprate (numero e prezzo, già pagato o no). Il conto dice comprate, fatte e rimaste e quanto è da pagare; *Segna pagato* chiude il pacchetto.
+  - **Lezioni e pacchetti**: le sue prossime lezioni e, con *Nuovo pacchetto*, le lezioni comprate (numero e prezzo, già pagato o no). Il conto dice comprate, fatte e rimaste e quanto è da pagare; *Segna pagato* chiude il pacchetto. Segnato pagato, il pacchetto prende il numero di **ricevuta** (2026/001…, una serie per anno): toccandolo la ricevuta in PDF (non fiscale, intestata al genitore per i minorenni) si **manda all'allievo**, si condivide o si **stampa** dal telefono.
   - **Scrivi**: il genitore o tutore e il **Consenso a riprese e dati** (si inseriscono in *Modifica*, per i minorenni; gli avvisi vanno al telefono del genitore). **Scrivi** apre un messaggio WhatsApp, SMS o email all'allievo; **Partita con…** fa scegliere l'avversario tra gli allievi e prepara la nuova partita con i due nomi.
   - **Report per l'allievo**: scegli *Ultimi 30 giorni* o *Tutto*, poi **PDF completo** (colpi con la percentuale dentro e l'andamento, il movimento, per ogni colpo uno dentro e uno fuori con le tre immagini dei momenti chiave, partite, rating e le tue note) o **Immagine per WhatsApp** (una pagina sola con i numeri dei colpi e l'impatto di un colpo). Si apre subito la condivisione: WhatsApp, email o dove vuoi. Il report porta il tuo nome come allenatore (da *Tu*) e il circolo (da *Circolo › Campi*).
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
 - **L'elenco degli allievi**: **Cerca un allievo** per nome, ordina *Per nome* o *Per ultima volta*, filtra *Tutti*, *Da rivedere* (non li vedi da più di 2 settimane) o un gruppo. Sotto ogni nome c'è l'ultima volta che l'hai visto (sessione o lezione fatta).
 - **Gruppi** (*Gruppi ›* in cima all'elenco): *Nuovo gruppo* con nome e allievi (per esempio "Agonisti U14"); il gruppo si filtra, si mette in una lezione e con **Scrivi** si avvisa tutto insieme.
 - **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo.
-- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano.
+- **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*.
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
 - **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria.
@@ -11544,14 +11544,14 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
   - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo. **Por voz**: **Ditar uma nota** (ou o 🎤 no campo) usa o ditado do telefone, também sem rede nos telefones recentes: fala e o texto vai para o diário com a data. O 🎤 está também nas notas do treinador, na nota de uma aula do curso e na da avaliação técnica.
   - **Metas**: *Nova meta* num golpe, por exemplo direita a 70 % dentro na média das últimas 3 sessões, com uma data opcional. A ficha mostra em que ponto está; quando a atinge, a meta fica com a data sozinha.
-  - **Aulas e pacotes**: as próximas aulas e, com *Novo pacote*, as aulas compradas (número e preço, pago ou não). O saldo mostra compradas, feitas e restantes e quanto falta pagar; *Marcar como pago* fecha o pacote.
+  - **Aulas e pacotes**: as próximas aulas e, com *Novo pacote*, as aulas compradas (número e preço, pago ou não). O saldo mostra compradas, feitas e restantes e quanto falta pagar; *Marcar como pago* fecha o pacote. Marcado como pago, o pacote recebe um número de **recibo** (2026/001…, uma série por ano): ao tocá-lo, o recibo em PDF (não fiscal, em nome do responsável para menores) pode ser **enviado ao aluno**, partilhado ou **impresso** a partir do telefone.
   - **Escrever**: o pai, mãe ou tutor e o **Consentimento para filmagens e dados** (introduzem-se em *Editar*, para menores; os avisos vão para o telefone do responsável). **Escrever** abre uma mensagem de WhatsApp, SMS ou email ao aluno; **Partida com…** faz escolher o adversário entre os alunos e prepara a partida nova com os dois nomes.
   - **Relatório para o aluno**: escolha *Últimos 30 dias* ou *Tudo*, depois **PDF completo** (golpes com a porcentagem dentro e a evolução, movimento, de cada golpe um dentro e um fora com as três imagens dos momentos-chave, partidas, rating e suas notas) ou **Imagem para WhatsApp** (uma página só com os números dos golpes e o impacto de um golpe). O compartilhamento abre na hora: WhatsApp, e-mail ou onde quiser. O relatório leva seu nome como treinador (de *Você*) e o clube (de *Clube › Quadras*).
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 - **A lista de alunos**: **Procurar um aluno** pelo nome, ordenar *Por nome* ou *Pela última vez*, filtrar *Todos*, *Por rever* (não os vês há mais de 2 semanas) ou um grupo. Debaixo de cada nome aparece a última vez que o viste (sessão ou aula feita).
 - **Grupos** (*Grupos ›* no topo da lista): *Novo grupo* com nome e alunos (por exemplo "Competição U14"); o grupo filtra-se, põe-se numa aula e avisa-se todo de uma vez com **Escrever**.
 - **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno.
-- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam.
+- **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*.
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
 - **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria.
@@ -14648,6 +14648,61 @@ class MatchController(
 
     /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
     fun coachOffice(): String = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+
+    // ---- Allenatore: ricevute dei pacchetti e registro presenze ----
+
+    /** Segna pagato il pacchetto e gli dà il numero di ricevuta (una serie per anno). */
+    fun markPackPaid(p: com.tennis.scoremanager.data.LessonPack) {
+        val now = System.currentTimeMillis()
+        savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
+    }
+
+    /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
+    fun packReceiptFile(packId: String): File? {
+        val p0 = coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
+        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, p0.paidAt!!)).also { savePack(it) } else p0
+        val s = strings
+        val st = playerById(p.student)
+        val coach = me()?.name ?: storage.myName
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val header = listOf(coach, club).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { s.receiptTitle }
+        // Il minorenne non paga da sé: la ricevuta è intestata al genitore, per l'allievo.
+        val from = st?.let { x -> x.guardian.takeIf { it.isNotBlank() }?.let { g -> s.rcFor(g, x.name) } ?: x.name }.orEmpty()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt!!.replace('/', '-')} ${st?.name.orEmpty()}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(header, p.receipt, p.paidAt!!, from, s.rcPack(p.lessons), "", p.cents, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** Manda la ricevuta all'allievo (al genitore se è minorenne), con il PDF allegato. */
+    fun noticePackReceipt(packId: String) {
+        val p = coachBook.value.packs.firstOrNull { it.id == packId } ?: return
+        val st = playerById(p.student) ?: return
+        val f = packReceiptFile(packId) ?: return
+        val now = System.currentTimeMillis()
+        val number = coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.rcText(number)).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.receiptTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
+    fun registerFile(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
+        val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
+        val club = if (coachSide) coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
+        val header = listOf(club, coach.takeIf { it.isNotBlank() }?.let { s.scCoachLine(it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.AttendancePdf.write(co, names, header, s, options.value.lang, System.currentTimeMillis(), it) }
+            f
+        }.getOrNull()
+    }
 
     // ---- Obiettivi (Progressi) ----
 
@@ -20285,6 +20340,98 @@ object ActivityCalendar {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/AttendancePdf.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/AttendancePdf.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import java.io.OutputStream
+
+/**
+ * Il registro presenze di un corso su fogli A4 orizzontali: gli allievi sulle righe, le lezioni già passate sulle
+ * colonne (✓ presente, ✗ assente, — annullata, vuoto da segnare) e in fondo il totale di ciascuno. Con tante lezioni o
+ * tanti allievi continua sui fogli dopo.
+ */
+object AttendancePdf {
+    private const val W = 842
+    private const val H = 595
+    private const val M = 32f
+    private const val NAME_W = 170f
+    private const val TOT_W = 60f
+    private const val COLS = 18
+    private const val ROWS = 24
+
+    /** Il segno di una casella: ✓, ✗, — o vuoto. */
+    fun mark(c: Course, key: String, student: String): String = when {
+        key in c.cancelled -> "—"
+        key !in c.attendance -> ""
+        student in c.attendance[key].orEmpty() -> "✓"
+        else -> "✗"
+    }
+
+    fun write(c: Course, names: (String) -> String, header: String, s: Strings, lang: Lang, now: Long, out: OutputStream) {
+        val doc = PdfDocument()
+        val lessons = Courses.lessons(c).filter { it.start <= now }
+        val students = c.students.sortedBy { names(it).lowercase() }
+        fun paint(size: Float, color: Int = 0xFF111827.toInt(), bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+            isAntiAlias = true; textSize = size; this.color = color; textAlign = align
+            typeface = Typeface.create(Typeface.SANS_SERIF, if (bold) Typeface.BOLD else Typeface.NORMAL)
+        }
+        val grey = 0xFF6B7280.toInt()
+        val rule = Paint().apply { color = 0xFFD1D5DB.toInt(); strokeWidth = 0.8f }
+        val colChunks = lessons.chunked(COLS).ifEmpty { listOf(emptyList()) }
+        val rowChunks = students.chunked(ROWS).ifEmpty { listOf(emptyList()) }
+        var pageNo = 0
+        for (cols in colChunks) for (rows in rowChunks) {
+            pageNo++
+            val page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, pageNo).create())
+            val cv = page.canvas
+            var y = M + 16f
+            cv.drawText("${s.rgTitle} · ${c.name}", M, y, paint(16f, bold = true))
+            cv.drawText(header, W - M, y, paint(10f, grey, align = Paint.Align.RIGHT))
+            y += 16f
+            cv.drawText(listOf(c.level, "${Reports.date(c.from, lang)} – ${Reports.date(c.to, lang)}").filter { it.isNotBlank() }.joinToString(" · "), M, y, paint(9.5f, grey))
+            y += 22f
+            val cw = if (cols.isEmpty()) 0f else minOf(34f, (W - 2 * M - NAME_W - TOT_W) / cols.size)
+            // Intestazione: il giorno di ogni lezione.
+            for ((i, l) in cols.withIndex()) {
+                val x = M + NAME_W + i * cw + cw / 2
+                val cal = java.util.Calendar.getInstance().apply { timeInMillis = l.start }
+                cv.drawText("%02d/%02d".format(cal.get(java.util.Calendar.DAY_OF_MONTH), cal.get(java.util.Calendar.MONTH) + 1), x, y, paint(7.5f, grey, align = Paint.Align.CENTER))
+            }
+            cv.drawText(s.rgTotal, W - M - TOT_W / 2, y, paint(8f, grey, bold = true, align = Paint.Align.CENTER))
+            y += 6f
+            cv.drawLine(M, y, W - M, y, rule)
+            for (sid in rows) {
+                y += 18f
+                cv.drawText(names(sid).take(28), M, y, paint(10f))
+                for ((i, l) in cols.withIndex()) {
+                    val m = mark(c, l.key, sid)
+                    cv.drawText(m, M + NAME_W + i * cw + cw / 2, y, paint(10f, if (m == "✗") 0xFFDC2626.toInt() else if (m == "✓") 0xFF15803D.toInt() else grey, bold = true, align = Paint.Align.CENTER))
+                }
+                val (pres, tot) = Courses.attendanceOf(c, sid, now)
+                cv.drawText("$pres/$tot", W - M - TOT_W / 2, y, paint(10f, bold = true, align = Paint.Align.CENTER))
+                y += 5f
+                cv.drawLine(M, y, W - M, y, rule)
+            }
+            cv.drawText(s.rgLegend, M, H - M - 12f, paint(8.5f, grey))
+            cv.drawText("${s.generatedWith} · ${Reports.date(now, lang)}" + if (colChunks.size * rowChunks.size > 1) " · $pageNo/${colChunks.size * rowChunks.size}" else "",
+                M, H - M, paint(8f, grey))
+            doc.finishPage(page)
+        }
+        doc.writeTo(out)
+        doc.close()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Backup.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Backup.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -21756,6 +21903,8 @@ data class LessonPack(
     val createdAt: Long = 0,
     /** Quando è stato pagato; null = da pagare. */
     val paidAt: Long? = null,
+    /** Il numero della ricevuta ("2026/003"), dato quando lo si segna pagato. */
+    val receipt: String? = null,
 )
 
 /** Un gruppo di allievi (es. "Agonisti U14"): si allena, si avvisa e si mette in agenda insieme. */
@@ -21808,6 +21957,13 @@ object Coaching {
         val due = packs.filter { it.paidAt == null }
         return Balance(packs.sumOf { it.lessons }, used, due.sumOf { it.cents }, due.size,
             absences = mine.count { student in it.absent || student in it.excused }, toRecover = (excused - recovered).coerceAtLeast(0))
+    }
+
+    /** Il numero della prossima ricevuta dell'anno di [at]: "2026/001", "2026/002"… (una serie per anno). */
+    fun nextReceipt(book: CoachBook, at: Long): String {
+        val year = java.util.Calendar.getInstance().apply { timeInMillis = at }.get(java.util.Calendar.YEAR)
+        val n = book.packs.mapNotNull { it.receipt }.filter { it.startsWith("$year/") }.mapNotNull { it.substringAfter('/').toIntOrNull() }.maxOrNull() ?: 0
+        return "$year/" + (n + 1).toString().padStart(3, '0')
     }
 
     /** Gli aspetti della valutazione tecnica, nell'ordine in cui si mostrano. */
@@ -25288,7 +25444,15 @@ object ReceiptPdf {
     private const val H = 595
     private const val M = 36f
 
-    fun write(c: Charge, p: Payment, club: String, s: Strings, lang: Lang, out: OutputStream) {
+    fun write(c: Charge, p: Payment, club: String, s: Strings, lang: Lang, out: OutputStream) =
+        write(club.ifBlank { s.receiptTitle }, p.receipt, p.at, c.name, c.label, listOf(p.methodName.ifBlank { payMethodName(s, p.method) }, p.ref).filter { it.isNotBlank() }.joinToString(" · "),
+            p.cents, s, lang, out)
+
+    /**
+     * La ricevuta con i suoi campi: [header] in alto (il circolo, o l'allenatore per i pacchetti di lezioni), numero,
+     * data, da chi, per cosa, come (può essere vuoto) e importo.
+     */
+    fun write(header: String, number: String, at: Long, from: String, what: String, method: String, cents: Int, s: Strings, lang: Lang, out: OutputStream) {
         val doc = PdfDocument()
         val page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, 1).create())
         val cv = page.canvas
@@ -25299,10 +25463,10 @@ object ReceiptPdf {
         val grey = 0xFF6B7280.toInt()
         val rule = Paint().apply { color = 0xFFD1D5DB.toInt(); strokeWidth = 1f }
         var y = M + 20f
-        cv.drawText(club.ifBlank { s.receiptTitle }, M, y, paint(18f, bold = true))
+        cv.drawText(header, M, y, paint(18f, bold = true))
         y += 26f
-        cv.drawText(s.payReceiptNo(p.receipt), M, y, paint(12f, bold = true))
-        cv.drawText(Reports.date(p.at, lang), W - M, y, paint(10f, grey, align = Paint.Align.RIGHT))
+        cv.drawText(s.payReceiptNo(number), M, y, paint(12f, bold = true))
+        cv.drawText(Reports.date(at, lang), W - M, y, paint(10f, grey, align = Paint.Align.RIGHT))
         y += 12f
         cv.drawLine(M, y, W - M, y, rule)
         y += 28f
@@ -25314,12 +25478,12 @@ object ReceiptPdf {
             cv.drawText(value, M, y, paint(12f))
             y += 24f
         }
-        field(s.receiptReceivedFrom, c.name)
-        field(s.receiptFor, c.label)
-        field(s.receiptMethod, listOf(p.methodName.ifBlank { payMethodName(s, p.method) }, p.ref).filter { it.isNotBlank() }.joinToString(" · "))
+        field(s.receiptReceivedFrom, from)
+        field(s.receiptFor, what)
+        field(s.receiptMethod, method)
         cv.drawText(s.receiptAmount, M, y, paint(9f, grey))
         y += 26f
-        cv.drawText(Fees.money(p.cents, lang.locale), M, y, paint(24f, bold = true))
+        cv.drawText(Fees.money(cents, lang.locale), M, y, paint(24f, bold = true))
         y += 40f
         // Firma di chi incassa.
         val sx = W - M - 150f
@@ -36859,11 +37023,13 @@ fun CoachCourseScreen(c: MatchController) {
     var tab by rememberSaveable { mutableStateOf(1) }
     var open by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
+    var register by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, cc.card.club.ifBlank { null }, "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
         icon = Icons.Filled.School,
+        action = { TextButton(onClick = { register = true }) { Text(s.rgShort, color = TsmColors.Ball) } },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
@@ -36914,6 +37080,10 @@ fun CoachCourseScreen(c: MatchController) {
         }
     }
     open?.let { l -> CourseLessonDialog(c, cc, l) { open = null } }
+    if (register) {
+        val file = remember { c.registerFile(co.id, coachSide = true) }
+        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+    }
 }
 
 /** L'appello di una lezione del corso: chi c'era e cosa si è fatto; oppure lezione annullata (e si avvisano gli iscritti). */
@@ -37464,6 +37634,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     var packNew by remember { mutableStateOf(false) }
     var matchPick by remember { mutableStateOf(false) }
     var propose by remember { mutableStateOf(false) }
+    var receipt by remember { mutableStateOf<String?>(null) }
     var deleteEntry by remember { mutableStateOf<String?>(null) }
 
     // Diario: una riga per lezione, con la data; tenendo premuto si toglie.
@@ -37513,8 +37684,9 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.savePack(p.copy(paidAt = System.currentTimeMillis())) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
-            else Text(s.coPaid, color = TsmColors.Ok, fontSize = 13.sp)
+            if (p.paidAt == null) TextButton(onClick = { c.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
+            else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
         if (bal.dueCents > 0) Text(s.coDue(Fees.money(bal.dueCents, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -37537,6 +37709,10 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         GhostButton(s.ccPropose, Icons.Filled.Message, { propose = true }, Modifier.fillMaxWidth())
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
+    receipt?.let { id ->
+        val file = remember(id) { c.packReceiptFile(id) }
+        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.noticePackReceipt(id) }) { receipt = null }
+    }
 
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }
@@ -39775,6 +39951,85 @@ fun ProfileDialog(c: MatchController, onDone: () -> Unit) {
         },
         confirmButton = { TextButton(onClick = { create = true }) { Text(s.meNew) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/PdfActionsUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/PdfActionsUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Context
+import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.print.PrintManager
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import java.io.File
+
+/** Stampa un PDF con la stampa di Android (stampante di casa, Wi-Fi, o "Salva come PDF"): niente PC. */
+fun printPdf(context: Context, file: File, name: String) {
+    val pm = context.getSystemService(Context.PRINT_SERVICE) as? PrintManager ?: return
+    runCatching {
+        pm.print(name, object : PrintDocumentAdapter() {
+            override fun onLayout(old: PrintAttributes?, new: PrintAttributes?, cancel: CancellationSignal?, cb: LayoutResultCallback, extras: Bundle?) {
+                if (cancel?.isCanceled == true) { cb.onLayoutCancelled(); return }
+                cb.onLayoutFinished(PrintDocumentInfo.Builder(file.name).setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build(), true)
+            }
+
+            override fun onWrite(pages: Array<out PageRange>?, dest: ParcelFileDescriptor, cancel: CancellationSignal?, cb: WriteResultCallback) {
+                runCatching {
+                    file.inputStream().use { i -> java.io.FileOutputStream(dest.fileDescriptor).use { o -> i.copyTo(o) } }
+                    cb.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
+                }.onFailure { cb.onWriteFailed(it.message) }
+            }
+        }, null)
+    }
+}
+
+/**
+ * Un PDF appena fatto (ricevuta, registro presenze): [onSend] lo manda a chi riguarda (se c'è), oppure lo si condivide
+ * o lo si stampa da qui.
+ */
+@Composable
+fun PdfActionsDialog(c: MatchController, file: File?, title: String, hint: String?, onSend: (() -> Unit)?, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(title) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (file == null) { Text(s.rcFailed, color = TsmColors.Orange); return@Column }
+                hint?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
+                if (onSend != null) BigButton(s.rcSend, Icons.AutoMirrored.Filled.Send, { onDone(); onSend() }, Modifier.fillMaxWidth())
+                GhostButton(s.share, Icons.Filled.Share, { runCatching { context.startActivity(c.shareFileIntent(file, "application/pdf")) }; onDone() }, Modifier.fillMaxWidth())
+                GhostButton(s.rcPrint, Icons.Filled.Print, { printPdf(context, file, title); onDone() }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
 TSM_EOF
@@ -44369,6 +44624,18 @@ interface Strings {
     val dictNoApp: String
     val dictAdded: String
     val dictMic: String
+    val rcReceipt: String
+    val rcSend: String
+    val rcPrint: String
+    val rcFailed: String
+    val rgTitle: String
+    val rgShort: String
+    val rgPdf: String
+    val rgTotal: String
+    val rgLegend: String
+    val rcPack: (Int) -> String
+    val rcText: (String) -> String
+    val rcFor: (String, String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -46897,6 +47164,18 @@ object ItStrings : Strings {
     override val dictNoApp = "Su questo telefono non c'è la dettatura vocale (serve l'app di Google o un'altra app di riconoscimento vocale)."
     override val dictAdded = "Nota aggiunta al diario"
     override val dictMic = "Detta"
+    override val rcReceipt = "Ricevuta"
+    override val rcSend = "Manda all'allievo"
+    override val rcPrint = "Stampa"
+    override val rcFailed = "Il PDF non si è potuto fare."
+    override val rgTitle = "Registro presenze"
+    override val rgShort = "Registro"
+    override val rgPdf = "Registro presenze (PDF)"
+    override val rgTotal = "Totale"
+    override val rgLegend = "✓ presente · ✗ assente · — lezione annullata · vuoto: da segnare"
+    override val rcPack: (Int) -> String = { "Pacchetto di $it lezioni" }
+    override val rcText: (String) -> String = { "In allegato la ricevuta n. $it. Grazie!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, per $n" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -49426,6 +49705,18 @@ object EnStrings : Strings {
     override val dictNoApp = "There is no voice dictation on this phone (it needs the Google app or another speech recognition app)."
     override val dictAdded = "Note added to the diary"
     override val dictMic = "Dictate"
+    override val rcReceipt = "Receipt"
+    override val rcSend = "Send to the student"
+    override val rcPrint = "Print"
+    override val rcFailed = "The PDF could not be made."
+    override val rgTitle = "Attendance register"
+    override val rgShort = "Register"
+    override val rgPdf = "Attendance register (PDF)"
+    override val rgTotal = "Total"
+    override val rgLegend = "✓ present · ✗ absent · — lesson cancelled · blank: to be marked"
+    override val rcPack: (Int) -> String = { "Pack of $it lessons" }
+    override val rcText: (String) -> String = { "Attached is receipt no. $it. Thank you!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, for $n" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
@@ -51980,6 +52271,18 @@ object DeStrings : Strings {
     override val dictNoApp = "Auf diesem Telefon gibt es keine Spracheingabe (dafür braucht es die Google-App oder eine andere Spracherkennungs-App)."
     override val dictAdded = "Notiz ins Tagebuch übernommen"
     override val dictMic = "Diktieren"
+    override val rcReceipt = "Quittung"
+    override val rcSend = "An den Schüler schicken"
+    override val rcPrint = "Drucken"
+    override val rcFailed = "Das PDF konnte nicht erstellt werden."
+    override val rgTitle = "Anwesenheitsliste"
+    override val rgShort = "Liste"
+    override val rgPdf = "Anwesenheitsliste (PDF)"
+    override val rgTotal = "Gesamt"
+    override val rgLegend = "✓ da · ✗ gefehlt · — Stunde abgesagt · leer: einzutragen"
+    override val rcPack: (Int) -> String = { "Paket mit $it Stunden" }
+    override val rcText: (String) -> String = { "Anbei die Quittung Nr. $it. Danke!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, für $n" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
@@ -54524,6 +54827,18 @@ object EsStrings : Strings {
     override val dictNoApp = "No hay dictado por voz en este teléfono (hace falta la app de Google u otra app de reconocimiento de voz)."
     override val dictAdded = "Nota añadida al diario"
     override val dictMic = "Dictar"
+    override val rcReceipt = "Recibo"
+    override val rcSend = "Enviar al alumno"
+    override val rcPrint = "Imprimir"
+    override val rcFailed = "No se ha podido crear el PDF."
+    override val rgTitle = "Registro de asistencia"
+    override val rgShort = "Registro"
+    override val rgPdf = "Registro de asistencia (PDF)"
+    override val rgTotal = "Total"
+    override val rgLegend = "✓ presente · ✗ ausente · — clase anulada · vacío: por marcar"
+    override val rcPack: (Int) -> String = { "Paquete de $it clases" }
+    override val rcText: (String) -> String = { "Adjunto el recibo n.º $it. ¡Gracias!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, por $n" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
@@ -57070,6 +57385,18 @@ object FrStrings : Strings {
     override val dictNoApp = "Pas de dictée vocale sur ce téléphone (il faut l'appli Google ou une autre appli de reconnaissance vocale)."
     override val dictAdded = "Note ajoutée au journal"
     override val dictMic = "Dicter"
+    override val rcReceipt = "Reçu"
+    override val rcSend = "Envoyer à l'élève"
+    override val rcPrint = "Imprimer"
+    override val rcFailed = "Le PDF n'a pas pu être créé."
+    override val rgTitle = "Registre des présences"
+    override val rgShort = "Registre"
+    override val rgPdf = "Registre des présences (PDF)"
+    override val rgTotal = "Présences"
+    override val rgLegend = "✓ présent · ✗ absent · — séance annulée · vide : à noter"
+    override val rcPack: (Int) -> String = { "Forfait de $it cours" }
+    override val rcText: (String) -> String = { "Ci-joint le reçu n° $it. Merci !" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, pour $n" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
@@ -59541,8 +59868,8 @@ object PtStrings : Strings {
     override val ftSpider = "Teste spider (s)"
     override val ftJump = "Salto em comprimento parado (cm)"
     override val ftYoyo = "Teste yo-yo (nível)"
-    override val rkTitle = "Ranking"
-    override val rkNow: (String) -> String = { "Ranking: $it" }
+    override val rkTitle = "Classificação"
+    override val rkNow: (String) -> String = { "Classificação: $it" }
     override val rkNone = "Ranking não indicado"
     override val rkUpdate = "Atualizar o ranking"
     override val rkHint = "Ex. 4.2: os rankings anteriores ficam no histórico."
@@ -59617,6 +59944,18 @@ object PtStrings : Strings {
     override val dictNoApp = "Não há ditado por voz neste telefone (é preciso a app Google ou outra app de reconhecimento de voz)."
     override val dictAdded = "Nota adicionada ao diário"
     override val dictMic = "Ditar"
+    override val rcReceipt = "Recibo"
+    override val rcSend = "Enviar ao aluno"
+    override val rcPrint = "Imprimir"
+    override val rcFailed = "Não foi possível criar o PDF."
+    override val rgTitle = "Registo de presenças"
+    override val rgShort = "Registo"
+    override val rgPdf = "Registo de presenças (PDF)"
+    override val rgTotal = "Presenças"
+    override val rgLegend = "✓ presente · ✗ faltou · — aula anulada · vazio: por marcar"
+    override val rcPack: (Int) -> String = { "Pacote de $it aulas" }
+    override val rcText: (String) -> String = { "Em anexo o recibo n.º $it. Obrigado!" }
+    override val rcFor: (String, String) -> String = { g, n -> "$g, para $n" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
@@ -69415,6 +69754,7 @@ fun CourseScreen(c: MatchController) {
     var adding by remember { mutableStateOf(false) }
     var openLesson by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
+    var register by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.16") },
         title = co.name,
@@ -69455,6 +69795,8 @@ fun CourseScreen(c: MatchController) {
                 val past = all.filter { it.start <= now }.reversed()
                 val next = all.filter { it.start > now }
                 if (all.isEmpty()) Text(s.scNoLessons, color = TsmColors.TextDim)
+                // Il registro presenze da stampare o mandare (lezioni passate, ✓ ✗ —).
+                if (past.isNotEmpty()) GhostButton(s.rgPdf, Icons.Filled.Campaign, { register = true }, Modifier.fillMaxWidth())
                 @Composable fun row(l: Lesson) {
                     val cancelled = l.key in co.cancelled
                     val marked = co.attendance[l.key]
@@ -69501,6 +69843,10 @@ fun CourseScreen(c: MatchController) {
     if (edit) CourseEditDialog(c, co) { edit = false }
     if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.saveCourse(co.copy(students = co.students + it.id)) } }
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
+    if (register) {
+        val file = remember { c.registerFile(co.id, coachSide = false) }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null) { register = false }
+    }
 }
 
 /** L'appello di una lezione: chi c'era; oppure lezione annullata (e si avvisano gli allievi). */
@@ -91752,6 +92098,22 @@ class CourseCardsTest {
         assertEquals(15000, m.paidCents)
         assertNull(m.presencePct)
     }
+
+    @Test fun receiptNumbersRunPerYear() {
+        val y2026 = java.util.Calendar.getInstance().apply { set(2026, 5, 1) }.timeInMillis
+        val y2027 = java.util.Calendar.getInstance().apply { set(2027, 0, 10) }.timeInMillis
+        val book = CoachBook(packs = listOf(LessonPack("a", "s", 5, receipt = "2026/001"), LessonPack("b", "s", 5, receipt = "2026/007"), LessonPack("c", "s", 5)))
+        assertEquals("2026/008", Coaching.nextReceipt(book, y2026))
+        assertEquals("2027/001", Coaching.nextReceipt(book, y2027))
+    }
+
+    @Test fun registerMarks() {
+        val c = course.copy(attendance = mapOf("k1" to setOf("p1")), cancelled = setOf("k2"))
+        assertEquals("✓", AttendancePdf.mark(c, "k1", "p1"))
+        assertEquals("✗", AttendancePdf.mark(c, "k1", "p2"))
+        assertEquals("—", AttendancePdf.mark(c, "k2", "p1"))
+        assertEquals("", AttendancePdf.mark(c, "k3", "p1"))
+    }
 }
 TSM_EOF
 
@@ -108146,6 +108508,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 345 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 347 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -1854,6 +1854,61 @@ class MatchController(
     /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
     fun coachOffice(): String = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
 
+    // ---- Allenatore: ricevute dei pacchetti e registro presenze ----
+
+    /** Segna pagato il pacchetto e gli dà il numero di ricevuta (una serie per anno). */
+    fun markPackPaid(p: com.tennis.scoremanager.data.LessonPack) {
+        val now = System.currentTimeMillis()
+        savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
+    }
+
+    /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
+    fun packReceiptFile(packId: String): File? {
+        val p0 = coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
+        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, p0.paidAt!!)).also { savePack(it) } else p0
+        val s = strings
+        val st = playerById(p.student)
+        val coach = me()?.name ?: storage.myName
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val header = listOf(coach, club).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { s.receiptTitle }
+        // Il minorenne non paga da sé: la ricevuta è intestata al genitore, per l'allievo.
+        val from = st?.let { x -> x.guardian.takeIf { it.isNotBlank() }?.let { g -> s.rcFor(g, x.name) } ?: x.name }.orEmpty()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt!!.replace('/', '-')} ${st?.name.orEmpty()}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(header, p.receipt, p.paidAt!!, from, s.rcPack(p.lessons), "", p.cents, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** Manda la ricevuta all'allievo (al genitore se è minorenne), con il PDF allegato. */
+    fun noticePackReceipt(packId: String) {
+        val p = coachBook.value.packs.firstOrNull { it.id == packId } ?: return
+        val st = playerById(p.student) ?: return
+        val f = packReceiptFile(packId) ?: return
+        val now = System.currentTimeMillis()
+        val number = coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.rcText(number)).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.receiptTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
+    fun registerFile(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
+        val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
+        val club = if (coachSide) coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
+        val header = listOf(club, coach.takeIf { it.isNotBlank() }?.let { s.scCoachLine(it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.AttendancePdf.write(co, names, header, s, options.value.lang, System.currentTimeMillis(), it) }
+            f
+        }.getOrNull()
+    }
+
     // ---- Obiettivi (Progressi) ----
 
     val goals = MutableStateFlow(storage.loadGoals())

@@ -92,4 +92,20 @@ class CourseCardsTest {
         assertEquals(15000, m.paidCents)
         assertNull(m.presencePct)
     }
+
+    @Test fun receiptNumbersRunPerYear() {
+        val y2026 = java.util.Calendar.getInstance().apply { set(2026, 5, 1) }.timeInMillis
+        val y2027 = java.util.Calendar.getInstance().apply { set(2027, 0, 10) }.timeInMillis
+        val book = CoachBook(packs = listOf(LessonPack("a", "s", 5, receipt = "2026/001"), LessonPack("b", "s", 5, receipt = "2026/007"), LessonPack("c", "s", 5)))
+        assertEquals("2026/008", Coaching.nextReceipt(book, y2026))
+        assertEquals("2027/001", Coaching.nextReceipt(book, y2027))
+    }
+
+    @Test fun registerMarks() {
+        val c = course.copy(attendance = mapOf("k1" to setOf("p1")), cancelled = setOf("k2"))
+        assertEquals("✓", AttendancePdf.mark(c, "k1", "p1"))
+        assertEquals("✗", AttendancePdf.mark(c, "k1", "p2"))
+        assertEquals("—", AttendancePdf.mark(c, "k2", "p1"))
+        assertEquals("", AttendancePdf.mark(c, "k3", "p1"))
+    }
 }
