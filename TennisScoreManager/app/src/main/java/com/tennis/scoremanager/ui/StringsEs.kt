@@ -2550,6 +2550,14 @@ object EsStrings : Strings {
     override val xlStudent = "Alumno"
     override val xlNumber = "Número"
     override val xlReceipts = "Recibos"
+    override val ccDeskTitle = "Entrenador desde el PC"
+    override val ccDeskHint = "Alumnos, fichas, recibos y registro desde el ordenador de casa, en la misma red"
+    override val ccDeskNote = "Los datos se quedan en el teléfono: la página los lee de allí."
+    override val ccDeskPrint = "Imprimir la página"
+    override val ccDeskReport30 = "Informe 30 días (PDF)"
+    override val ccDeskReportAll = "Informe completo (PDF)"
+    override val ccDeskSaveAttendance = "Guardar asistencia"
+    override val ccDeskSent = "La asistencia se envía a la secretaría desde el teléfono (Mis cursos › Enviar asistencia)."
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }

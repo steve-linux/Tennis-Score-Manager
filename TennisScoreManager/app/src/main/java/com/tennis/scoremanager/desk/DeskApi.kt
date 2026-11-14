@@ -389,11 +389,13 @@ class DeskApi(
     private val data: DeskData, private val auth: DeskAuth, private val zone: () -> ZoneId = ZoneId::systemDefault,
     /** Il testo come QR, riga per riga. */
     private val qr: (String) -> List<String> = { listOf(it) },
+    /** Allenatore da PC: con questa, il PC vede solo i dati dell'allenatore e niente della segreteria. */
+    private val coach: CoachApi? = null,
 ) {
 
     data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
     class Resp(val status: Int, val body: ByteArray, val type: String = JSON)
-    private class Fail(val status: Int, val code: String) : Exception(code)
+    class Fail(val status: Int, val code: String) : Exception(code)
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
@@ -419,6 +421,7 @@ class DeskApi(
         if (m == "GET" && p.size == 2 && p[0] == "pair") return pairState(p[1], r.ip)
         if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
+        if (coach != null) return data.tx { coach.route(m, p, r, data.club) }
         // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
         if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p, r)
         if (p.firstOrNull() == "backup") return backup(m, p.drop(1), r)

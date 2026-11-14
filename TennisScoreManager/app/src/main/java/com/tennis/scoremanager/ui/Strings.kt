@@ -2621,6 +2621,14 @@ interface Strings {
     val xlStudent: String
     val xlNumber: String
     val xlReceipts: String
+    val ccDeskTitle: String
+    val ccDeskHint: String
+    val ccDeskNote: String
+    val ccDeskPrint: String
+    val ccDeskReport30: String
+    val ccDeskReportAll: String
+    val ccDeskSaveAttendance: String
+    val ccDeskSent: String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -5165,6 +5173,14 @@ object ItStrings : Strings {
     override val xlStudent = "Allievo"
     override val xlNumber = "Numero"
     override val xlReceipts = "Ricevute"
+    override val ccDeskTitle = "Allenatore da PC"
+    override val ccDeskHint = "Allievi, schede, ricevute e registro dal computer di casa, sulla stessa rete"
+    override val ccDeskNote = "I dati restano sul telefono: la pagina li legge da lì."
+    override val ccDeskPrint = "Stampa la pagina"
+    override val ccDeskReport30 = "Report 30 giorni (PDF)"
+    override val ccDeskReportAll = "Report completo (PDF)"
+    override val ccDeskSaveAttendance = "Salva le presenze"
+    override val ccDeskSent = "Le presenze si mandano alla segreteria dal telefono (I miei corsi › Manda le presenze)."
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -7710,6 +7726,14 @@ object EnStrings : Strings {
     override val xlStudent = "Student"
     override val xlNumber = "Number"
     override val xlReceipts = "Receipts"
+    override val ccDeskTitle = "Coach from PC"
+    override val ccDeskHint = "Students, cards, receipts and register from your home computer, on the same network"
+    override val ccDeskNote = "The data stays on the phone: the page reads it from there."
+    override val ccDeskPrint = "Print the page"
+    override val ccDeskReport30 = "30-day report (PDF)"
+    override val ccDeskReportAll = "Full report (PDF)"
+    override val ccDeskSaveAttendance = "Save attendance"
+    override val ccDeskSent = "Attendance is sent to the club office from the phone (My courses › Send attendance)."
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }

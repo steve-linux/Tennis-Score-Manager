@@ -126,15 +126,39 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
 }
 
+/** I dati veri dell'app per l'Allenatore da PC: allievi, agenda, corsi, PDF ed Excel fatti dal telefono. */
+class CoachBridge(private val c: MatchController) : CoachData {
+    override fun now(): Long = System.currentTimeMillis()
+    override val lang: String get() = c.options.value.lang.code
+    override fun coachName(): String = c.me()?.name ?: c.storage.myName
+    override fun book() = c.coachBook.value
+    override fun players(): List<PlayerProfile> = c.players.value
+    override fun sessions() = c.serveSessions.value
+    override fun addDiary(student: String, text: String) = c.addDiary(student, text)
+    override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
+    override fun markPackPaid(packId: String) { c.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
+    override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
+        c.markCourseLesson(courseId, key, start, present, cancelled, note)
+    private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
+    override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
+    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.registerFile(courseId, coachSide = true))
+    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.registerXlsx(courseId, coachSide = true))
+    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.receiptsXlsx(year))
+}
+
 /**
  * La Segreteria da PC sul telefono: acceso solo quando serve. Si spegne da solo dopo mezz'ora senza nessuno collegato.
  * Il certificato sta nella cartella esclusa dai backup: la chiave privata non esce mai dal telefono.
  */
-class DeskManager(context: Context, private val data: DeskData) {
+class DeskManager(context: Context, private val data: DeskData, private val coachData: CoachData? = null) {
 
     data class Ui(
         val running: Boolean = false, val urls: List<String> = emptyList(), val code: String = "", val waitingIp: String? = null,
         val connectedIp: String? = null, val fingerprint: String = "", val failed: Boolean = false,
+        /** Acceso come Allenatore da PC (solo i dati dell'allenatore) o come Segreteria da PC. */
+        val coach: Boolean = false,
     )
 
     private val app = context.applicationContext
@@ -148,16 +172,19 @@ class DeskManager(context: Context, private val data: DeskData) {
 
     private fun asset(name: String): ByteArray? = files[name] ?: runCatching { app.assets.open("desk/$name").use { it.readBytes() } }.getOrNull()?.also { files[name] = it }
 
-    fun start() {
+    /** Accende il server; [coach] = Allenatore da PC. Acceso nell'altro modo, si spegne e riparte in questo. */
+    fun start(coach: Boolean = false) {
+        if (server != null && _ui.value.coach != coach) stop()
         scope.launch {
             synchronized(this@DeskManager) {
                 if (server != null) return@launch
                 try {
                     val cert = DeskCert.loadOrCreate(app.noBackupFilesDir)
-                    val s = DeskServer(cert, DeskApi(data, auth, qr = ::qrRows), ::asset, { TvServer.isLocalPeer(it) })
+                    val api = DeskApi(data, auth, qr = ::qrRows, coach = if (coach) coachData?.let { CoachApi(it) } else null)
+                    val s = DeskServer(cert, api, ::asset, { TvServer.isLocalPeer(it) })
                     s.start()
                     server = s
-                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint)
+                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint, coach = coach)
                 } catch (e: Exception) {
                     Log.w(TAG, "Avvio non riuscito", e)
                     _ui.value = Ui(failed = true)

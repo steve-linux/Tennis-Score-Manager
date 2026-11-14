@@ -1213,7 +1213,7 @@ class MatchController(
     }
 
     /** La Segreteria da PC: spenta finché non la si accende dall'app. */
-    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this)) }
+    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this), com.tennis.scoremanager.desk.CoachBridge(this)) }
 
     fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
 

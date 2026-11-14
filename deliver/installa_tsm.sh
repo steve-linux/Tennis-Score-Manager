@@ -393,6 +393,13 @@ cat > "$DEST/app/src/main/assets/desk/app-i18n.js" << 'TSM_EOF'
 
 const APP_I18N = {
   it: {
+    asBackhand: "Rovescio",
+    asForehand: "Dritto",
+    asMental: "Testa e grinta",
+    asMovement: "Movimento",
+    asServe: "Servizio",
+    asTactics: "Tattica",
+    asVolley: "Gioco a rete",
     bkOther: "Altro",
     blkAllCourts: "Tutti i campi",
     blkAllDay: "Tutto il giorno",
@@ -415,6 +422,125 @@ const APP_I18N = {
     blkTitle: "Campi non prenotabili",
     blkTo: "Al",
     blkTournament: "Torneo",
+    ccAccept: "Aggiungi ai miei corsi",
+    ccAttBadCode: "Il codice non è quello della scheda corso mandata: le presenze non si registrano.",
+    ccAttNotFound: "Il corso non c'è in questo telefono.",
+    ccAttReady: "Le presenze si aggiungono al corso: per ogni lezione vale quella dell'allenatore.",
+    ccAttSame: "Queste presenze ci sono già.",
+    ccAttendanceApplied: "Presenze registrate",
+    ccAttendancePrefix: "Presenze",
+    ccAttendanceText: (a, b) => `Presenze del corso ${a}: ${b} lezioni segnate`,
+    ccAttendanceTitle: "Presenze dall'allenatore",
+    ccCardHowTo: "Apri il file con Tennis Score Manager (Condividi › TSM): il corso va tra i tuoi con gli allievi; le presenze le rimandi da lì.",
+    ccCardText: (a, b) => `Corso ${a}: ${b} iscritti`,
+    ccDeskHint: "Allievi, schede, ricevute e registro dal computer di casa, sulla stessa rete",
+    ccDeskNote: "I dati restano sul telefono: la pagina li legge da lì.",
+    ccDeskPrint: "Stampa la pagina",
+    ccDeskReport30: "Report 30 giorni (PDF)",
+    ccDeskReportAll: "Report completo (PDF)",
+    ccDeskSaveAttendance: "Salva le presenze",
+    ccDeskSent: "Le presenze si mandano alla segreteria dal telefono (I miei corsi › Manda le presenze).",
+    ccDeskTitle: "Allenatore da PC",
+    ccFilePrefix: "Corso",
+    ccFrom: (it) => `da ${it}`,
+    ccIncomingHint: "Il corso va in Allievi › I miei corsi e gli iscritti diventano tuoi allievi, con i contatti dei genitori. Le presenze le segni lì e le rimandi alla segreteria.",
+    ccIncomingTitle: "Scheda corso",
+    ccLessonNote: "Cosa avete fatto (va nel diario di chi c'era)",
+    ccLessonsMarked: (it) => it === 1 ? `1 lezione segnata` : `${it} lezioni segnate`,
+    ccLevel: "Livello",
+    ccMatchPrefix: "Partita",
+    ccMatchShare: "File della partita (per l'allenatore)",
+    ccNoCourse: "Nessun corso per ora",
+    ccNotYet: "La lezione non c'è ancora stata.",
+    ccNothingYet: "Segna le presenze lezione per lezione, poi mandale alla segreteria.",
+    ccProposalAdd: "Aggiungi",
+    ccProposalApplied: (it) => `${it} aggiunto ai giocatori`,
+    ccProposalCourse: "Iscrivilo al corso",
+    ccProposalPrefix: "Allievo",
+    ccProposalText: (it) => `Ti propongo un allievo nuovo: ${it}`,
+    ccProposalTitle: "Allievo proposto dall'allenatore",
+    ccPropose: "Proponi alla segreteria",
+    ccProposeHint: "Per iscriverlo a un corso: alla segreteria arrivano i suoi dati e i contatti.",
+    ccSendAttendance: "Manda le presenze",
+    ccSendToCoach: "Manda all'allenatore",
+    ccSent: (it) => `Presenze mandate il ${it}`,
+    ccTitle: "I miei corsi",
+    ccToMark: (it) => `${it} da segnare`,
+    ccToSend: "Presenze da mandare alla segreteria",
+    ccUpdate: "Aggiorna il corso",
+    cmCourses: (a, b) => `Lezioni dei corsi: ${a} (${b})`,
+    cmEmpty: "Niente in questo mese.",
+    cmHint: (it) => it === 1 ? `1 partita di torneo, squadra o sfida da giocare` : `${it} partite di tornei, squadre e sfide da giocare`,
+    cmMonth: "Riepilogo del mese",
+    cmMonthHint: "Lezioni, ore, corsi e incassi: da mandare alla segreteria",
+    cmMonthTitle: (it) => `Riepilogo ${it}`,
+    cmPaid: (it) => `Pacchetti incassati: ${it}`,
+    cmPick: "Tocca una partita: Nuova partita si apre con giocatori, torneo e turno già scritti e a fine partita il risultato torna nel circolo.",
+    cmPresence: (it) => `presenze ${it}%`,
+    cmSend: "Manda alla segreteria",
+    cmTitle: "Partite del circolo",
+    coAgenda: "Agenda delle lezioni",
+    coAgendaHint: "Lezioni in calendario, promemoria e lezioni rimaste",
+    coAll: "Tutti",
+    coAway: "Da rivedere",
+    coAwayHint: "Non li vedi da più di 2 settimane",
+    coBookCourt: "Prenota il campo",
+    coCancelLesson: "Annulla la lezione",
+    coCancelled: "Annullata",
+    coConsent: "Consenso a riprese e dati",
+    coConsentGiven: (it) => `Consenso dato il ${it}`,
+    coConsentHint: "Segna quando l'allievo (o il genitore, se è minorenne) ha accettato di essere ripreso e che i suoi dati restino qui.",
+    coConsentMissing: "Consenso a riprese e dati non segnato",
+    coDiary: "Diario delle lezioni",
+    coDiaryAdd: "Aggiungi al diario",
+    coDiaryHint: "Cosa avete fatto e cosa resta da fare: una riga per lezione, con la data.",
+    coDiaryNone: "Ancora niente nel diario.",
+    coDone: "Fatta",
+    coDue: (it) => `Da pagare: ${it}`,
+    coGoalLine: (k, p) => `${k}: ${p}% dentro`,
+    coGoalNew: "Nuovo obiettivo",
+    coGoalNoData: "Ancora nessuna sessione di questo colpo",
+    coGoalNow: (p, n) => `ora ${p}% nelle ultime ${n} sessioni`,
+    coGoalReached: (it) => `Raggiunto il ${it}`,
+    coGoalTarget: "Colpi dentro (%)",
+    coGoalWindow: "Sulla media delle ultime sessioni",
+    coGoals: "Obiettivi",
+    coGoalsNone: "Nessun obiettivo: fissane uno su un colpo.",
+    coGroupCount: (it) => it === 1 ? `1 allievo` : `${it} allievi`,
+    coGroupName: "Nome del gruppo",
+    coGroupNew: "Nuovo gruppo",
+    coGroups: "Gruppi",
+    coGuardian: "Genitore o tutore",
+    coGuardianPhone: "Telefono del genitore",
+    coLessonNew: "Nuova lezione",
+    coLessons: "Lezioni",
+    coMarkPaid: "Segna pagato",
+    coMatchWith: "Partita con…",
+    coMinutes: (it) => `${it} min`,
+    coNever: "mai visto",
+    coNextLesson: (it) => `Prossima: ${it}`,
+    coNoLessons: "Nessuna lezione in programma.",
+    coNote: "Nota",
+    coNotify: "Avvisa",
+    coPackLessons: "Numero di lezioni",
+    coPackLine: (n, p) => `${n} lezioni · ${p}`,
+    coPackNew: "Nuovo pacchetto",
+    coPackPaidNow: "Già pagato",
+    coPackPrice: "Prezzo del pacchetto",
+    coPacks: "Pacchetti di lezioni",
+    coPaid: "Pagato",
+    coPlace: "Dove (campo, circolo)",
+    coRemind: (it) => `Ti ricordo la lezione: ${it}.`,
+    coRemindTomorrow: (it) => `Ricorda le lezioni di domani (${it})`,
+    coSearch: "Cerca un allievo",
+    coSortLast: "Per ultima volta",
+    coSortName: "Per nome",
+    coToMark: "Passate, da segnare",
+    coUpcoming: "In programma",
+    coWhen: "Quando",
+    coWho: "Chi",
+    coWrite: "Scrivi",
+    coWriteTitle: "Messaggio agli allievi",
     crtClay: "Terra",
     crtCovered: "coperto",
     crtDelete: "Elimina il campo",
@@ -546,6 +672,34 @@ const APP_I18N = {
     ctWalkoverLong: "Vinta a tavolino (w.o.)",
     ctWhere: "Dove e quando",
     ctWinner: "Chi ha vinto",
+    evAbsences: (it) => `Assenze: ${it}`,
+    evLast: (it) => `Valutazione del ${it}`,
+    evNew: "Nuova valutazione",
+    evNone: "Nessuna valutazione: dai un voto da 1 a 5 a ogni aspetto e segui come cambia.",
+    evNote: "Nota (cosa lavorare)",
+    evPresence: "Presenze",
+    evTitle: "Valutazione tecnica",
+    evTrendDown: "in calo",
+    evTrendUp: "in crescita",
+    ftJump: "Salto in lungo da fermo (cm)",
+    ftNew: "Nuovo test",
+    ftNone: "Nessun test: scatto, spider, salto e yo-yo, con la data.",
+    ftSpider: "Spider test (s)",
+    ftSprint: "Scatto 20 m (s)",
+    ftTitle: "Test fisici",
+    ftYoyo: "Yo-yo test (livello)",
+    laAbsent: "Assente",
+    laExcused: "Giustificato",
+    laPresent: "Presente",
+    laRecovery: "Lezione di recupero",
+    laRecoveryHint: "Non scala dal pacchetto: recupera un'assenza giustificata.",
+    laToRecover: (it) => `Da recuperare: ${it}`,
+    mmAdd: "Aggiungi un risultato",
+    mmEvent: "Torneo o campionato",
+    mmOppRank: "Classifica dell'avversario",
+    mmOpponent: "Avversario",
+    mmScore: "Punteggio (dal lato dell'allievo)",
+    mmTitle: "Risultati da fuori",
     pbAddCancel: "Annulla",
     pbAddClub: "Aggiungi un circolo",
     pbAlertChannel: "Le tue prenotazioni",
@@ -749,6 +903,26 @@ const APP_I18N = {
     ptOnlineHint: "Va negli avvisi e nei solleciti, con il link, l'IBAN o il numero.",
     ptOnlineShort: "a distanza",
     ptTitle: "Modi di pagamento",
+    rcFailed: "Il PDF non si è potuto fare.",
+    rcFor: (g, n) => `${g}, per ${n}`,
+    rcPack: (it) => `Pacchetto di ${it} lezioni`,
+    rcPrint: "Stampa",
+    rcReceipt: "Ricevuta",
+    rcSend: "Manda all'allievo",
+    rcText: (it) => `In allegato la ricevuta n. ${it}. Grazie!`,
+    receiptNotFiscal: "Documento non fiscale",
+    receiptTitle: "Ricevuta",
+    reportTitle: "Report per l'allievo",
+    rgLegend: "✓ presente · ✗ assente · — lezione annullata · vuoto: da segnare",
+    rgPdf: "Registro presenze (PDF)",
+    rgShort: "Registro",
+    rgTitle: "Registro presenze",
+    rgTotal: "Totale",
+    rkHint: "Es. 4.2: le classifiche di prima restano nella storia.",
+    rkNone: "Classifica non scritta",
+    rkNow: (it) => `Classifica: ${it}`,
+    rkTitle: "Classifica",
+    rkUpdate: "Aggiorna la classifica",
     scAddSlot: "Aggiungi un orario",
     scAddStudent: "Aggiungi allievo",
     scAttendance: (p, t) => `presente ${p} su ${t}`,
@@ -793,6 +967,11 @@ const APP_I18N = {
     scToMark: "da segnare",
     scUpcoming: "Prossime",
     scWhoWasThere: "Chi c'era",
+    seAdd: "Aggiungi un torneo",
+    seName: "Torneo",
+    seNone: "Nessun torneo in programma.",
+    sePlace: "Dove",
+    seTitle: "Classifica e tornei",
     srvAddress: "Indirizzo del server",
     srvAddressHint: "Come lo scrive il server all'avvio, es. http://192.168.1.50:8080 (o https://… da internet)",
     srvAlertChannel: "Prenotazioni online",
@@ -906,6 +1085,11 @@ const APP_I18N = {
     stTitle: "Statistiche dei campi",
     stTop: "Chi prenota di più",
     stTournaments: (it) => `Partite dei tornei: ${it} h`,
+    studentLast: (it) => `ultima: ${it}`,
+    studentLost: "Persa",
+    studentNotes: "Note dell'allenatore",
+    studentWon: "Vinta",
+    studentsTitle: "Allievi",
     tdBlocking: (it) => it === 1 ? `1 non può giocare (certificato o tessera)` : `${it} non possono giocare (certificato o tessera)`,
     tdChallenges: (it) => `Sfide da giocare: ${it}`,
     tdCourts: (it) => `Oggi in campo: ${it}`,
@@ -995,8 +1179,19 @@ const APP_I18N = {
     tmWeWon: "Vinta",
     tmWon: "vinto",
     tmYes: "Sì",
+    xlNumber: "Numero",
+    xlReceipts: "Ricevute",
+    xlSave: "Salva in Excel",
+    xlStudent: "Allievo",
   },
   en: {
+    asBackhand: "Backhand",
+    asForehand: "Forehand",
+    asMental: "Mental game",
+    asMovement: "Movement",
+    asServe: "Serve",
+    asTactics: "Tactics",
+    asVolley: "Net play",
     bkOther: "Other",
     blkAllCourts: "All courts",
     blkAllDay: "All day",
@@ -1019,6 +1214,125 @@ const APP_I18N = {
     blkTitle: "Non-bookable courts",
     blkTo: "To",
     blkTournament: "Tournament",
+    ccAccept: "Add to my courses",
+    ccAttBadCode: "The code is not the one of the course card sent: the attendance is not recorded.",
+    ccAttNotFound: "The course is not on this phone.",
+    ccAttReady: "The attendance is added to the course: for each lesson the coach's version counts.",
+    ccAttSame: "This attendance is already there.",
+    ccAttendanceApplied: "Attendance recorded",
+    ccAttendancePrefix: "Attendance",
+    ccAttendanceText: (a, b) => `Attendance for course ${a}: ${b} lessons marked`,
+    ccAttendanceTitle: "Attendance from the coach",
+    ccCardHowTo: "Open the file with Tennis Score Manager (Share › TSM): the course goes among yours with the students; you send attendance back from there.",
+    ccCardText: (a, b) => `Course ${a}: ${b} participants`,
+    ccDeskHint: "Students, cards, receipts and register from your home computer, on the same network",
+    ccDeskNote: "The data stays on the phone: the page reads it from there.",
+    ccDeskPrint: "Print the page",
+    ccDeskReport30: "30-day report (PDF)",
+    ccDeskReportAll: "Full report (PDF)",
+    ccDeskSaveAttendance: "Save attendance",
+    ccDeskSent: "Attendance is sent to the club office from the phone (My courses › Send attendance).",
+    ccDeskTitle: "Coach from PC",
+    ccFilePrefix: "Course",
+    ccFrom: (it) => `from ${it}`,
+    ccIncomingHint: "The course goes to Students › My courses and the participants become your students, with their parents' contacts. You mark attendance there and send it back to the office.",
+    ccIncomingTitle: "Course card",
+    ccLessonNote: "What you did (goes in the diary of those present)",
+    ccLessonsMarked: (it) => it === 1 ? `1 lesson marked` : `${it} lessons marked`,
+    ccLevel: "Level",
+    ccMatchPrefix: "Match",
+    ccMatchShare: "Match file (for the coach)",
+    ccNoCourse: "No course for now",
+    ccNotYet: "The lesson hasn't taken place yet.",
+    ccNothingYet: "Mark attendance lesson by lesson, then send it to the club office.",
+    ccProposalAdd: "Add",
+    ccProposalApplied: (it) => `${it} added to the players`,
+    ccProposalCourse: "Enrol in the course",
+    ccProposalPrefix: "Student",
+    ccProposalText: (it) => `I'm proposing a new student: ${it}`,
+    ccProposalTitle: "Student proposed by the coach",
+    ccPropose: "Propose to the club office",
+    ccProposeHint: "To enrol them in a course: the club office receives their details and contacts.",
+    ccSendAttendance: "Send attendance",
+    ccSendToCoach: "Send to the coach",
+    ccSent: (it) => `Attendance sent on ${it}`,
+    ccTitle: "My courses",
+    ccToMark: (it) => `${it} to mark`,
+    ccToSend: "Attendance to send to the club office",
+    ccUpdate: "Update the course",
+    cmCourses: (a, b) => `Course lessons: ${a} (${b})`,
+    cmEmpty: "Nothing this month.",
+    cmHint: (it) => it === 1 ? `1 tournament, team or challenge match to play` : `${it} tournament, team and challenge matches to play`,
+    cmMonth: "Monthly summary",
+    cmMonthHint: "Lessons, hours, courses and takings: to send to the club office",
+    cmMonthTitle: (it) => `Summary ${it}`,
+    cmPaid: (it) => `Packs paid: ${it}`,
+    cmPick: "Tap a match: New match opens with players, event and round already filled in, and at the end the result goes back to the club.",
+    cmPresence: (it) => `attendance ${it}%`,
+    cmSend: "Send to the club office",
+    cmTitle: "Club matches",
+    coAgenda: "Lesson schedule",
+    coAgendaHint: "Lessons on the calendar, reminders and lessons left",
+    coAll: "All",
+    coAway: "Not seen lately",
+    coAwayHint: "Not seen for more than 2 weeks",
+    coBookCourt: "Book the court",
+    coCancelLesson: "Cancel the lesson",
+    coCancelled: "Cancelled",
+    coConsent: "Consent to filming and data",
+    coConsentGiven: (it) => `Consent given on ${it}`,
+    coConsentHint: "Mark it when the student (or the parent, for a minor) agreed to be filmed and to have their data kept here.",
+    coConsentMissing: "Consent to filming and data not marked",
+    coDiary: "Lesson diary",
+    coDiaryAdd: "Add to the diary",
+    coDiaryHint: "What you did and what is left to do: one line per lesson, with the date.",
+    coDiaryNone: "Nothing in the diary yet.",
+    coDone: "Done",
+    coDue: (it) => `To pay: ${it}`,
+    coGoalLine: (k, p) => `${k}: ${p}% in`,
+    coGoalNew: "New goal",
+    coGoalNoData: "No sessions of this stroke yet",
+    coGoalNow: (p, n) => `now ${p}% over the last ${n} sessions`,
+    coGoalReached: (it) => `Reached on ${it}`,
+    coGoalTarget: "Shots in (%)",
+    coGoalWindow: "On the average of the last sessions",
+    coGoals: "Goals",
+    coGoalsNone: "No goals: set one on a stroke.",
+    coGroupCount: (it) => it === 1 ? `1 student` : `${it} students`,
+    coGroupName: "Group name",
+    coGroupNew: "New group",
+    coGroups: "Groups",
+    coGuardian: "Parent or guardian",
+    coGuardianPhone: "Parent's phone",
+    coLessonNew: "New lesson",
+    coLessons: "Lessons",
+    coMarkPaid: "Mark as paid",
+    coMatchWith: "Match with…",
+    coMinutes: (it) => `${it} min`,
+    coNever: "never seen",
+    coNextLesson: (it) => `Next: ${it}`,
+    coNoLessons: "No lessons scheduled.",
+    coNote: "Note",
+    coNotify: "Notify",
+    coPackLessons: "Number of lessons",
+    coPackLine: (n, p) => `${n} lessons · ${p}`,
+    coPackNew: "New pack",
+    coPackPaidNow: "Already paid",
+    coPackPrice: "Pack price",
+    coPacks: "Lesson packs",
+    coPaid: "Paid",
+    coPlace: "Where (court, club)",
+    coRemind: (it) => `A reminder of your lesson: ${it}.`,
+    coRemindTomorrow: (it) => `Remind tomorrow's lessons (${it})`,
+    coSearch: "Search a student",
+    coSortLast: "By last time",
+    coSortName: "By name",
+    coToMark: "Past, to be marked",
+    coUpcoming: "Scheduled",
+    coWhen: "When",
+    coWho: "Who",
+    coWrite: "Write",
+    coWriteTitle: "Message to students",
     crtClay: "Clay",
     crtCovered: "indoor",
     crtDelete: "Delete the court",
@@ -1150,6 +1464,34 @@ const APP_I18N = {
     ctWalkoverLong: "Won by walkover (w/o)",
     ctWhere: "Where and when",
     ctWinner: "Winner",
+    evAbsences: (it) => `Absences: ${it}`,
+    evLast: (it) => `Assessment of ${it}`,
+    evNew: "New assessment",
+    evNone: "No assessment yet: give each aspect a mark from 1 to 5 and follow how it changes.",
+    evNote: "Note (what to work on)",
+    evPresence: "Attendance",
+    evTitle: "Technical assessment",
+    evTrendDown: "slipping",
+    evTrendUp: "improving",
+    ftJump: "Standing long jump (cm)",
+    ftNew: "New test",
+    ftNone: "No tests yet: sprint, spider, jump and yo-yo, with the date.",
+    ftSpider: "Spider drill (s)",
+    ftSprint: "20 m sprint (s)",
+    ftTitle: "Fitness tests",
+    ftYoyo: "Yo-yo test (level)",
+    laAbsent: "Absent",
+    laExcused: "Excused",
+    laPresent: "Present",
+    laRecovery: "Make-up lesson",
+    laRecoveryHint: "It doesn't count against the pack: it makes up for an excused absence.",
+    laToRecover: (it) => `To make up: ${it}`,
+    mmAdd: "Add a result",
+    mmEvent: "Tournament or league",
+    mmOppRank: "Opponent's ranking",
+    mmOpponent: "Opponent",
+    mmScore: "Score (from the student's side)",
+    mmTitle: "Results from elsewhere",
     pbAddCancel: "Cancel",
     pbAddClub: "Add a club",
     pbAlertChannel: "Your bookings",
@@ -1353,6 +1695,26 @@ const APP_I18N = {
     ptOnlineHint: "It goes into notices and reminders, with the link, IBAN or number.",
     ptOnlineShort: "remote",
     ptTitle: "Payment methods",
+    rcFailed: "The PDF could not be made.",
+    rcFor: (g, n) => `${g}, for ${n}`,
+    rcPack: (it) => `Pack of ${it} lessons`,
+    rcPrint: "Print",
+    rcReceipt: "Receipt",
+    rcSend: "Send to the student",
+    rcText: (it) => `Attached is receipt no. ${it}. Thank you!`,
+    receiptNotFiscal: "Non-fiscal document",
+    receiptTitle: "Receipt",
+    reportTitle: "Report for the student",
+    rgLegend: "✓ present · ✗ absent · — lesson cancelled · blank: to be marked",
+    rgPdf: "Attendance register (PDF)",
+    rgShort: "Register",
+    rgTitle: "Attendance register",
+    rgTotal: "Total",
+    rkHint: "E.g. 4.2: the previous rankings stay in the history.",
+    rkNone: "No ranking written",
+    rkNow: (it) => `Ranking: ${it}`,
+    rkTitle: "Ranking",
+    rkUpdate: "Update the ranking",
     scAddSlot: "Add a time",
     scAddStudent: "Add student",
     scAttendance: (p, t) => `attended ${p} of ${t}`,
@@ -1397,6 +1759,11 @@ const APP_I18N = {
     scToMark: "to mark",
     scUpcoming: "Upcoming",
     scWhoWasThere: "Who was there",
+    seAdd: "Add a tournament",
+    seName: "Tournament",
+    seNone: "No tournaments planned.",
+    sePlace: "Where",
+    seTitle: "Ranking and tournaments",
     srvAddress: "Server address",
     srvAddressHint: "As the server prints it at start-up, e.g. http://192.168.1.50:8080 (or https://… from the internet)",
     srvAlertChannel: "Online bookings",
@@ -1510,6 +1877,11 @@ const APP_I18N = {
     stTitle: "Court statistics",
     stTop: "Who books most",
     stTournaments: (it) => `Tournament matches: ${it} h`,
+    studentLast: (it) => `last: ${it}`,
+    studentLost: "Lost",
+    studentNotes: "Coach's notes",
+    studentWon: "Won",
+    studentsTitle: "Students",
     tdBlocking: (it) => `${it} cannot play (certificate or card)`,
     tdChallenges: (it) => `Challenges to play: ${it}`,
     tdCourts: (it) => `On court today: ${it}`,
@@ -1599,8 +1971,19 @@ const APP_I18N = {
     tmWeWon: "Won",
     tmWon: "won",
     tmYes: "Yes",
+    xlNumber: "Number",
+    xlReceipts: "Receipts",
+    xlSave: "Save as Excel",
+    xlStudent: "Student",
   },
   fr: {
+    asBackhand: "Revers",
+    asForehand: "Coup droit",
+    asMental: "Mental et combativité",
+    asMovement: "Déplacement",
+    asServe: "Service",
+    asTactics: "Tactique",
+    asVolley: "Jeu au filet",
     bkOther: "Autre",
     blkAllCourts: "Tous les terrains",
     blkAllDay: "Toute la journée",
@@ -1623,6 +2006,125 @@ const APP_I18N = {
     blkTitle: "Terrains non réservables",
     blkTo: "Au",
     blkTournament: "Tournoi",
+    ccAccept: "Ajouter à mes cours",
+    ccAttBadCode: "Le code n'est pas celui de la fiche de cours envoyée : les présences ne sont pas enregistrées.",
+    ccAttNotFound: "Le cours n'est pas sur ce téléphone.",
+    ccAttReady: "Les présences s'ajoutent au cours : pour chaque cours, celle de l'entraîneur fait foi.",
+    ccAttSame: "Ces présences y sont déjà.",
+    ccAttendanceApplied: "Présences enregistrées",
+    ccAttendancePrefix: "Présences",
+    ccAttendanceText: (a, b) => `Présences du cours ${a} : ${b} cours notés`,
+    ccAttendanceTitle: "Présences de l'entraîneur",
+    ccCardHowTo: "Ouvrez le fichier avec Tennis Score Manager (Partager › TSM) : le cours rejoint les vôtres avec les élèves ; vous renvoyez les présences de là.",
+    ccCardText: (a, b) => `Cours ${a} : ${b} inscrits`,
+    ccDeskHint: "Élèves, fiches, reçus et registre depuis l'ordinateur de la maison, sur le même réseau",
+    ccDeskNote: "Les données restent sur le téléphone : la page les lit là.",
+    ccDeskPrint: "Imprimer la page",
+    ccDeskReport30: "Rapport 30 jours (PDF)",
+    ccDeskReportAll: "Rapport complet (PDF)",
+    ccDeskSaveAttendance: "Enregistrer les présences",
+    ccDeskSent: "Les présences s'envoient au secrétariat depuis le téléphone (Mes cours › Envoyer les présences).",
+    ccDeskTitle: "Entraîneur depuis le PC",
+    ccFilePrefix: "Cours",
+    ccFrom: (it) => `de ${it}`,
+    ccIncomingHint: "Le cours va dans Élèves › Mes cours et les inscrits deviennent vos élèves, avec les contacts des parents. Vous notez les présences là et les renvoyez au secrétariat.",
+    ccIncomingTitle: "Fiche de cours",
+    ccLessonNote: "Ce que vous avez fait (va dans le journal des présents)",
+    ccLessonsMarked: (it) => it === 1 ? `1 cours noté` : `${it} cours notés`,
+    ccLevel: "Niveau",
+    ccMatchPrefix: "Partie",
+    ccMatchShare: "Fichier du match (pour l'entraîneur)",
+    ccNoCourse: "Aucun cours pour l'instant",
+    ccNotYet: "Le cours n'a pas encore eu lieu.",
+    ccNothingYet: "Notez les présences cours par cours, puis envoyez-les au secrétariat.",
+    ccProposalAdd: "Ajouter",
+    ccProposalApplied: (it) => `${it} ajouté aux joueurs`,
+    ccProposalCourse: "L'inscrire au cours",
+    ccProposalPrefix: "Élève",
+    ccProposalText: (it) => `Je vous propose un nouvel élève : ${it}`,
+    ccProposalTitle: "Élève proposé par l'entraîneur",
+    ccPropose: "Proposer au secrétariat",
+    ccProposeHint: "Pour l'inscrire à un cours : le secrétariat reçoit ses données et ses contacts.",
+    ccSendAttendance: "Envoyer les présences",
+    ccSendToCoach: "Envoyer à l'entraîneur",
+    ccSent: (it) => `Présences envoyées le ${it}`,
+    ccTitle: "Mes cours",
+    ccToMark: (it) => `${it} à noter`,
+    ccToSend: "Présences à envoyer au secrétariat",
+    ccUpdate: "Mettre à jour le cours",
+    cmCourses: (a, b) => `Cours collectifs : ${a} (${b})`,
+    cmEmpty: "Rien ce mois-ci.",
+    cmHint: (it) => it === 1 ? `1 match de tournoi, d'équipe ou de défi à jouer` : `${it} matchs de tournois, d'équipes et de défis à jouer`,
+    cmMonth: "Récapitulatif du mois",
+    cmMonthHint: "Cours, heures, cours collectifs et encaissements : à envoyer au secrétariat",
+    cmMonthTitle: (it) => `Récapitulatif ${it}`,
+    cmPaid: (it) => `Forfaits encaissés : ${it}`,
+    cmPick: "Touchez un match : Nouveau match s'ouvre avec joueurs, tournoi et tour déjà remplis, et à la fin le résultat retourne au club.",
+    cmPresence: (it) => `présences ${it}%`,
+    cmSend: "Envoyer au secrétariat",
+    cmTitle: "Matchs du club",
+    coAgenda: "Agenda des cours",
+    coAgendaHint: "Cours au calendrier, rappels et cours restants",
+    coAll: "Tous",
+    coAway: "À revoir",
+    coAwayHint: "Pas vus depuis plus de 2 semaines",
+    coBookCourt: "Réserver le court",
+    coCancelLesson: "Annuler le cours",
+    coCancelled: "Annulé",
+    coConsent: "Consentement aux vidéos et aux données",
+    coConsentGiven: (it) => `Consentement donné le ${it}`,
+    coConsentHint: "Cochez-le quand l'élève (ou le parent, s'il est mineur) a accepté d'être filmé et que ses données restent ici.",
+    coConsentMissing: "Consentement aux vidéos et aux données non indiqué",
+    coDiary: "Journal des cours",
+    coDiaryAdd: "Ajouter au journal",
+    coDiaryHint: "Ce que vous avez fait et ce qui reste à faire : une ligne par cours, avec la date.",
+    coDiaryNone: "Rien dans le journal pour l'instant.",
+    coDone: "Fait",
+    coDue: (it) => `À payer : ${it}`,
+    coGoalLine: (k, p) => `${k} : ${p} % dans le court`,
+    coGoalNew: "Nouvel objectif",
+    coGoalNoData: "Encore aucune séance de ce coup",
+    coGoalNow: (p, n) => `maintenant ${p} % sur les ${n} dernières séances`,
+    coGoalReached: (it) => `Atteint le ${it}`,
+    coGoalTarget: "Coups dans le court (%)",
+    coGoalWindow: "Sur la moyenne des dernières séances",
+    coGoals: "Objectifs",
+    coGoalsNone: "Aucun objectif : fixez-en un sur un coup.",
+    coGroupCount: (it) => it === 1 ? `1 élève` : `${it} élèves`,
+    coGroupName: "Nom du groupe",
+    coGroupNew: "Nouveau groupe",
+    coGroups: "Groupes",
+    coGuardian: "Parent ou tuteur",
+    coGuardianPhone: "Téléphone du parent",
+    coLessonNew: "Nouveau cours",
+    coLessons: "Cours",
+    coMarkPaid: "Marquer payé",
+    coMatchWith: "Match avec…",
+    coMinutes: (it) => `${it} min`,
+    coNever: "jamais vu",
+    coNextLesson: (it) => `Prochain : ${it}`,
+    coNoLessons: "Aucun cours prévu.",
+    coNote: "Note",
+    coNotify: "Prévenir",
+    coPackLessons: "Nombre de cours",
+    coPackLine: (n, p) => `${n} cours · ${p}`,
+    coPackNew: "Nouveau forfait",
+    coPackPaidNow: "Déjà payé",
+    coPackPrice: "Prix du forfait",
+    coPacks: "Forfaits de cours",
+    coPaid: "Payé",
+    coPlace: "Où (terrain, club)",
+    coRemind: (it) => `Je vous rappelle le cours : ${it}.`,
+    coRemindTomorrow: (it) => `Rappeler les cours de demain (${it})`,
+    coSearch: "Chercher un élève",
+    coSortLast: "Par dernière fois",
+    coSortName: "Par nom",
+    coToMark: "Passés, à marquer",
+    coUpcoming: "Prévus",
+    coWhen: "Quand",
+    coWho: "Qui",
+    coWrite: "Écrire",
+    coWriteTitle: "Message aux élèves",
     crtClay: "Terre battue",
     crtCovered: "couvert",
     crtDelete: "Supprimer le terrain",
@@ -1754,6 +2256,34 @@ const APP_I18N = {
     ctWalkoverLong: "Gagné par forfait",
     ctWhere: "Où et quand",
     ctWinner: "Vainqueur",
+    evAbsences: (it) => `Absences : ${it}`,
+    evLast: (it) => `Évaluation du ${it}`,
+    evNew: "Nouvelle évaluation",
+    evNone: "Aucune évaluation : donnez une note de 1 à 5 à chaque aspect et suivez son évolution.",
+    evNote: "Note (à travailler)",
+    evPresence: "Présences",
+    evTitle: "Évaluation technique",
+    evTrendDown: "en baisse",
+    evTrendUp: "en progrès",
+    ftJump: "Saut en longueur sans élan (cm)",
+    ftNew: "Nouveau test",
+    ftNone: "Aucun test : sprint, spider, saut et yo-yo, avec la date.",
+    ftSpider: "Test spider (s)",
+    ftSprint: "Sprint 20 m (s)",
+    ftTitle: "Tests physiques",
+    ftYoyo: "Test yo-yo (palier)",
+    laAbsent: "Absent(e)",
+    laExcused: "Excusé",
+    laPresent: "Présent",
+    laRecovery: "Cours de rattrapage",
+    laRecoveryHint: "Elle ne compte pas dans le forfait : elle rattrape une absence excusée.",
+    laToRecover: (it) => `À rattraper : ${it}`,
+    mmAdd: "Ajouter un résultat",
+    mmEvent: "Tournoi ou championnat",
+    mmOppRank: "Classement de l'adversaire",
+    mmOpponent: "Adversaire",
+    mmScore: "Score (du côté de l'élève)",
+    mmTitle: "Résultats d'ailleurs",
     pbAddCancel: "Annuler",
     pbAddClub: "Ajouter un club",
     pbAlertChannel: "Vos réservations",
@@ -1957,6 +2487,26 @@ const APP_I18N = {
     ptOnlineHint: "Il figure dans les avis et les relances, avec le lien, l'IBAN ou le numéro.",
     ptOnlineShort: "à distance",
     ptTitle: "Moyens de paiement",
+    rcFailed: "Le PDF n'a pas pu être créé.",
+    rcFor: (g, n) => `${g}, pour ${n}`,
+    rcPack: (it) => `Forfait de ${it} cours`,
+    rcPrint: "Imprimer",
+    rcReceipt: "Reçu",
+    rcSend: "Envoyer à l'élève",
+    rcText: (it) => `Ci-joint le reçu n° ${it}. Merci !`,
+    receiptNotFiscal: "Document non fiscal",
+    receiptTitle: "Reçu",
+    reportTitle: "Bilan pour l'élève",
+    rgLegend: "✓ présent · ✗ absent · — séance annulée · vide : à noter",
+    rgPdf: "Registre des présences (PDF)",
+    rgShort: "Registre",
+    rgTitle: "Registre des présences",
+    rgTotal: "Présences",
+    rkHint: "Ex. 15/4 : les classements précédents restent dans l'historique.",
+    rkNone: "Classement non indiqué",
+    rkNow: (it) => `Classement : ${it}`,
+    rkTitle: "Classement",
+    rkUpdate: "Mettre à jour le classement",
     scAddSlot: "Ajouter un horaire",
     scAddStudent: "Ajouter un élève",
     scAttendance: (p, t) => `présent ${p} sur ${t}`,
@@ -2001,6 +2551,11 @@ const APP_I18N = {
     scToMark: "à pointer",
     scUpcoming: "À venir",
     scWhoWasThere: "Qui était là",
+    seAdd: "Ajouter un tournoi",
+    seName: "Tournoi",
+    seNone: "Aucun tournoi prévu.",
+    sePlace: "Où",
+    seTitle: "Classement et tournois",
     srvAddress: "Adresse du serveur",
     srvAddressHint: "Comme l'affiche le serveur au démarrage, ex. http://192.168.1.50:8080 (ou https://… depuis internet)",
     srvAlertChannel: "Réservations en ligne",
@@ -2114,6 +2669,11 @@ const APP_I18N = {
     stTitle: "Statistiques des terrains",
     stTop: "Qui réserve le plus",
     stTournaments: (it) => `Matchs des tournois : ${it} h`,
+    studentLast: (it) => `dernière : ${it}`,
+    studentLost: "Perdu",
+    studentNotes: "Notes de l'entraîneur",
+    studentWon: "Gagné",
+    studentsTitle: "Élèves",
     tdBlocking: (it) => it === 1 ? `1 ne peut pas jouer (certificat ou licence)` : `${it} ne peuvent pas jouer (certificat ou licence)`,
     tdChallenges: (it) => `Défis à jouer : ${it}`,
     tdCourts: (it) => `Sur les terrains aujourd'hui : ${it}`,
@@ -2203,8 +2763,19 @@ const APP_I18N = {
     tmWeWon: "Gagné",
     tmWon: "gagnée",
     tmYes: "Oui",
+    xlNumber: "Numéro",
+    xlReceipts: "Reçus",
+    xlSave: "Enregistrer en Excel",
+    xlStudent: "Élève",
   },
   de: {
+    asBackhand: "Rückhand",
+    asForehand: "Vorhand",
+    asMental: "Mentale Stärke",
+    asMovement: "Beinarbeit",
+    asServe: "Aufschlag",
+    asTactics: "Taktik",
+    asVolley: "Netzspiel",
     bkOther: "Sonstiges",
     blkAllCourts: "Alle Plätze",
     blkAllDay: "Ganzer Tag",
@@ -2227,6 +2798,125 @@ const APP_I18N = {
     blkTitle: "Nicht buchbare Plätze",
     blkTo: "Bis",
     blkTournament: "Turnier",
+    ccAccept: "Zu meinen Kursen",
+    ccAttBadCode: "Der Code passt nicht zur geschickten Kurskarte: die Anwesenheit wird nicht gespeichert.",
+    ccAttNotFound: "Der Kurs ist nicht auf diesem Telefon.",
+    ccAttReady: "Die Anwesenheit kommt in den Kurs: für jede Stunde gilt die des Trainers.",
+    ccAttSame: "Diese Anwesenheit ist schon eingetragen.",
+    ccAttendanceApplied: "Anwesenheit gespeichert",
+    ccAttendancePrefix: "Anwesenheit",
+    ccAttendanceText: (a, b) => `Anwesenheit Kurs ${a}: ${b} Stunden eingetragen`,
+    ccAttendanceTitle: "Anwesenheit vom Trainer",
+    ccCardHowTo: "Öffne die Datei mit Tennis Score Manager (Teilen › TSM): der Kurs kommt zu deinen, mit den Schülern; die Anwesenheit schickst du von dort zurück.",
+    ccCardText: (a, b) => `Kurs ${a}: ${b} Teilnehmer`,
+    ccDeskHint: "Schüler, Karten, Quittungen und Anwesenheitsliste vom Computer zu Hause, im selben Netz",
+    ccDeskNote: "Die Daten bleiben auf dem Telefon: die Seite liest sie von dort.",
+    ccDeskPrint: "Seite drucken",
+    ccDeskReport30: "Bericht 30 Tage (PDF)",
+    ccDeskReportAll: "Vollständiger Bericht (PDF)",
+    ccDeskSaveAttendance: "Anwesenheit speichern",
+    ccDeskSent: "Die Anwesenheit schickst du vom Telefon ans Büro (Meine Kurse › Anwesenheit schicken).",
+    ccDeskTitle: "Trainer am PC",
+    ccFilePrefix: "Kurs",
+    ccFrom: (it) => `von ${it}`,
+    ccIncomingHint: "Der Kurs kommt unter Schüler › Meine Kurse und die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern. Die Anwesenheit trägst du dort ein und schickst sie ans Büro.",
+    ccIncomingTitle: "Kurskarte",
+    ccLessonNote: "Was ihr gemacht habt (kommt ins Tagebuch der Anwesenden)",
+    ccLessonsMarked: (it) => it === 1 ? `1 Stunde eingetragen` : `${it} Stunden eingetragen`,
+    ccLevel: "Niveau",
+    ccMatchPrefix: "Spiel",
+    ccMatchShare: "Spieldatei (für den Trainer)",
+    ccNoCourse: "Vorerst kein Kurs",
+    ccNotYet: "Die Stunde hat noch nicht stattgefunden.",
+    ccNothingYet: "Trage die Anwesenheit Stunde für Stunde ein und schicke sie dann ans Büro.",
+    ccProposalAdd: "Hinzufügen",
+    ccProposalApplied: (it) => `${it} zu den Spielern hinzugefügt`,
+    ccProposalCourse: "In den Kurs einschreiben",
+    ccProposalPrefix: "Schüler",
+    ccProposalText: (it) => `Ich schlage einen neuen Schüler vor: ${it}`,
+    ccProposalTitle: "Vom Trainer vorgeschlagener Schüler",
+    ccPropose: "Dem Büro vorschlagen",
+    ccProposeHint: "Um ihn in einen Kurs einzuschreiben: das Büro bekommt seine Daten und Kontakte.",
+    ccSendAttendance: "Anwesenheit schicken",
+    ccSendToCoach: "An den Trainer schicken",
+    ccSent: (it) => `Anwesenheit am ${it} geschickt`,
+    ccTitle: "Meine Kurse",
+    ccToMark: (it) => `${it} einzutragen`,
+    ccToSend: "Anwesenheit ans Büro zu schicken",
+    ccUpdate: "Kurs aktualisieren",
+    cmCourses: (a, b) => `Kursstunden: ${a} (${b})`,
+    cmEmpty: "Nichts in diesem Monat.",
+    cmHint: (it) => it === 1 ? `1 Turnier-, Mannschafts- oder Forderungsmatch zu spielen` : `${it} Turnier-, Mannschafts- und Forderungsmatches zu spielen`,
+    cmMonth: "Monatsübersicht",
+    cmMonthHint: "Stunden, Kurse und Einnahmen: ans Büro zu schicken",
+    cmMonthTitle: (it) => `Übersicht ${it}`,
+    cmPaid: (it) => `Bezahlte Pakete: ${it}`,
+    cmPick: "Tippe auf ein Match: Neues Match öffnet sich mit Spielern, Turnier und Runde schon eingetragen, und am Ende geht das Ergebnis an den Verein zurück.",
+    cmPresence: (it) => `Anwesenheit ${it}%`,
+    cmSend: "Ans Büro schicken",
+    cmTitle: "Vereinsmatches",
+    coAgenda: "Stundenplan",
+    coAgendaHint: "Stunden im Kalender, Erinnerungen und verbleibende Stunden",
+    coAll: "Alle",
+    coAway: "Lange nicht gesehen",
+    coAwayHint: "Seit mehr als 2 Wochen nicht gesehen",
+    coBookCourt: "Platz buchen",
+    coCancelLesson: "Stunde absagen",
+    coCancelled: "Abgesagt",
+    coConsent: "Einwilligung zu Aufnahmen und Daten",
+    coConsentGiven: (it) => `Einwilligung am ${it}`,
+    coConsentHint: "Markiere es, wenn der Schüler (oder bei Minderjährigen die Eltern) zugestimmt hat, gefilmt zu werden und dass seine Daten hier bleiben.",
+    coConsentMissing: "Einwilligung zu Aufnahmen und Daten nicht vermerkt",
+    coDiary: "Stundentagebuch",
+    coDiaryAdd: "Ins Tagebuch",
+    coDiaryHint: "Was ihr gemacht habt und was noch zu tun ist: eine Zeile pro Stunde, mit Datum.",
+    coDiaryNone: "Noch nichts im Tagebuch.",
+    coDone: "Erledigt",
+    coDue: (it) => `Zu zahlen: ${it}`,
+    coGoalLine: (k, p) => `${k}: ${p} % im Feld`,
+    coGoalNew: "Neues Ziel",
+    coGoalNoData: "Noch keine Einheit mit diesem Schlag",
+    coGoalNow: (p, n) => `jetzt ${p} % in den letzten ${n} Einheiten`,
+    coGoalReached: (it) => `Erreicht am ${it}`,
+    coGoalTarget: "Schläge im Feld (%)",
+    coGoalWindow: "Im Schnitt der letzten Einheiten",
+    coGoals: "Ziele",
+    coGoalsNone: "Keine Ziele: setze eines für einen Schlag.",
+    coGroupCount: (it) => it === 1 ? `1 Schüler` : `${it} Schüler`,
+    coGroupName: "Gruppenname",
+    coGroupNew: "Neue Gruppe",
+    coGroups: "Gruppen",
+    coGuardian: "Elternteil oder Vormund",
+    coGuardianPhone: "Telefon der Eltern",
+    coLessonNew: "Neue Stunde",
+    coLessons: "Stunden",
+    coMarkPaid: "Als bezahlt markieren",
+    coMatchWith: "Match mit…",
+    coMinutes: (it) => `${it} Min.`,
+    coNever: "nie gesehen",
+    coNextLesson: (it) => `Nächste: ${it}`,
+    coNoLessons: "Keine Stunden geplant.",
+    coNote: "Notiz",
+    coNotify: "Benachrichtigen",
+    coPackLessons: "Anzahl Stunden",
+    coPackLine: (n, p) => `${n} Stunden · ${p}`,
+    coPackNew: "Neues Paket",
+    coPackPaidNow: "Schon bezahlt",
+    coPackPrice: "Paketpreis",
+    coPacks: "Stundenpakete",
+    coPaid: "Bezahlt",
+    coPlace: "Wo (Platz, Verein)",
+    coRemind: (it) => `Ich erinnere dich an die Stunde: ${it}.`,
+    coRemindTomorrow: (it) => `An die Stunden von morgen erinnern (${it})`,
+    coSearch: "Schüler suchen",
+    coSortLast: "Nach letztem Mal",
+    coSortName: "Nach Name",
+    coToMark: "Vergangen, zu markieren",
+    coUpcoming: "Geplant",
+    coWhen: "Wann",
+    coWho: "Wer",
+    coWrite: "Schreiben",
+    coWriteTitle: "Nachricht an die Schüler",
     crtClay: "Sand",
     crtCovered: "Halle",
     crtDelete: "Platz löschen",
@@ -2358,6 +3048,34 @@ const APP_I18N = {
     ctWalkoverLong: "Kampflos gewonnen",
     ctWhere: "Wo und wann",
     ctWinner: "Sieger",
+    evAbsences: (it) => `Fehlzeiten: ${it}`,
+    evLast: (it) => `Bewertung vom ${it}`,
+    evNew: "Neue Bewertung",
+    evNone: "Noch keine Bewertung: gib jedem Bereich eine Note von 1 bis 5 und verfolge die Entwicklung.",
+    evNote: "Notiz (woran arbeiten)",
+    evPresence: "Anwesenheit",
+    evTitle: "Technische Bewertung",
+    evTrendDown: "nachlassend",
+    evTrendUp: "im Aufwind",
+    ftJump: "Standweitsprung (cm)",
+    ftNew: "Neuer Test",
+    ftNone: "Noch keine Tests: Sprint, Spider, Sprung und Yo-Yo, mit Datum.",
+    ftSpider: "Spider-Test (s)",
+    ftSprint: "20-m-Sprint (s)",
+    ftTitle: "Fitnesstests",
+    ftYoyo: "Yo-Yo-Test (Stufe)",
+    laAbsent: "Gefehlt",
+    laExcused: "Entschuldigt",
+    laPresent: "Da",
+    laRecovery: "Nachholstunde",
+    laRecoveryHint: "Zählt nicht zum Paket: holt eine entschuldigte Fehlstunde nach.",
+    laToRecover: (it) => `Nachzuholen: ${it}`,
+    mmAdd: "Ergebnis hinzufügen",
+    mmEvent: "Turnier oder Meisterschaft",
+    mmOppRank: "Rangliste des Gegners",
+    mmOpponent: "Gegner",
+    mmScore: "Ergebnis (aus Sicht des Schülers)",
+    mmTitle: "Ergebnisse von außerhalb",
     pbAddCancel: "Abbrechen",
     pbAddClub: "Verein hinzufügen",
     pbAlertChannel: "Deine Buchungen",
@@ -2561,6 +3279,26 @@ const APP_I18N = {
     ptOnlineHint: "Steht in Nachrichten und Erinnerungen, mit Link, IBAN oder Nummer.",
     ptOnlineShort: "aus der Ferne",
     ptTitle: "Zahlungsarten",
+    rcFailed: "Das PDF konnte nicht erstellt werden.",
+    rcFor: (g, n) => `${g}, für ${n}`,
+    rcPack: (it) => `Paket mit ${it} Stunden`,
+    rcPrint: "Drucken",
+    rcReceipt: "Quittung",
+    rcSend: "An den Schüler schicken",
+    rcText: (it) => `Anbei die Quittung Nr. ${it}. Danke!`,
+    receiptNotFiscal: "Kein Steuerbeleg",
+    receiptTitle: "Quittung",
+    reportTitle: "Bericht für den Schüler",
+    rgLegend: "✓ da · ✗ gefehlt · — Stunde abgesagt · leer: einzutragen",
+    rgPdf: "Anwesenheitsliste (PDF)",
+    rgShort: "Liste",
+    rgTitle: "Anwesenheitsliste",
+    rgTotal: "Gesamt",
+    rkHint: "Z. B. LK 18: frühere Einstufungen bleiben im Verlauf.",
+    rkNone: "Keine Rangliste eingetragen",
+    rkNow: (it) => `Rangliste: ${it}`,
+    rkTitle: "Rangliste",
+    rkUpdate: "Rangliste aktualisieren",
     scAddSlot: "Zeit hinzufügen",
     scAddStudent: "Schüler hinzufügen",
     scAttendance: (p, t) => `anwesend ${p} von ${t}`,
@@ -2605,6 +3343,11 @@ const APP_I18N = {
     scToMark: "einzutragen",
     scUpcoming: "Kommende",
     scWhoWasThere: "Wer da war",
+    seAdd: "Turnier hinzufügen",
+    seName: "Turnier",
+    seNone: "Keine Turniere geplant.",
+    sePlace: "Wo",
+    seTitle: "Rangliste und Turniere",
     srvAddress: "Serveradresse",
     srvAddressHint: "Wie der Server sie beim Start anzeigt, z. B. http://192.168.1.50:8080 (oder https://… aus dem Internet)",
     srvAlertChannel: "Online-Buchungen",
@@ -2718,6 +3461,11 @@ const APP_I18N = {
     stTitle: "Platzstatistik",
     stTop: "Wer am meisten bucht",
     stTournaments: (it) => `Turnierspiele: ${it} Std.`,
+    studentLast: (it) => `zuletzt: ${it}`,
+    studentLost: "Verloren",
+    studentNotes: "Notizen des Trainers",
+    studentWon: "Gewonnen",
+    studentsTitle: "Schüler",
     tdBlocking: (it) => it === 1 ? `1 darf nicht spielen (Attest oder Ausweis)` : `${it} dürfen nicht spielen (Attest oder Ausweis)`,
     tdChallenges: (it) => `Offene Forderungen: ${it}`,
     tdCourts: (it) => `Heute auf den Plätzen: ${it}`,
@@ -2807,8 +3555,19 @@ const APP_I18N = {
     tmWeWon: "Gewonnen",
     tmWon: "gewonnen",
     tmYes: "Ja",
+    xlNumber: "Nummer",
+    xlReceipts: "Quittungen",
+    xlSave: "Als Excel speichern",
+    xlStudent: "Schüler",
   },
   es: {
+    asBackhand: "Revés",
+    asForehand: "Derecha",
+    asMental: "Mentalidad",
+    asMovement: "Movimiento",
+    asServe: "Saque",
+    asTactics: "Táctica",
+    asVolley: "Juego de red",
     bkOther: "Otro",
     blkAllCourts: "Todas las pistas",
     blkAllDay: "Todo el día",
@@ -2831,6 +3590,125 @@ const APP_I18N = {
     blkTitle: "Pistas no reservables",
     blkTo: "Hasta",
     blkTournament: "Torneo",
+    ccAccept: "Añadir a mis cursos",
+    ccAttBadCode: "El código no es el de la ficha de curso enviada: la asistencia no se registra.",
+    ccAttNotFound: "El curso no está en este teléfono.",
+    ccAttReady: "La asistencia se añade al curso: en cada clase vale la del entrenador.",
+    ccAttSame: "Esta asistencia ya está.",
+    ccAttendanceApplied: "Asistencia registrada",
+    ccAttendancePrefix: "Asistencia",
+    ccAttendanceText: (a, b) => `Asistencia del curso ${a}: ${b} clases marcadas`,
+    ccAttendanceTitle: "Asistencia del entrenador",
+    ccCardHowTo: "Abre el archivo con Tennis Score Manager (Compartir › TSM): el curso va con los tuyos y sus alumnos; la asistencia la devuelves desde allí.",
+    ccCardText: (a, b) => `Curso ${a}: ${b} inscritos`,
+    ccDeskHint: "Alumnos, fichas, recibos y registro desde el ordenador de casa, en la misma red",
+    ccDeskNote: "Los datos se quedan en el teléfono: la página los lee de allí.",
+    ccDeskPrint: "Imprimir la página",
+    ccDeskReport30: "Informe 30 días (PDF)",
+    ccDeskReportAll: "Informe completo (PDF)",
+    ccDeskSaveAttendance: "Guardar asistencia",
+    ccDeskSent: "La asistencia se envía a la secretaría desde el teléfono (Mis cursos › Enviar asistencia).",
+    ccDeskTitle: "Entrenador desde el PC",
+    ccFilePrefix: "Curso",
+    ccFrom: (it) => `de ${it}`,
+    ccIncomingHint: "El curso va a Alumnos › Mis cursos y los inscritos pasan a ser tus alumnos, con los contactos de los padres. La asistencia la marcas allí y la devuelves a la secretaría.",
+    ccIncomingTitle: "Ficha de curso",
+    ccLessonNote: "Qué habéis hecho (va al diario de los presentes)",
+    ccLessonsMarked: (it) => it === 1 ? `1 clase marcada` : `${it} clases marcadas`,
+    ccLevel: "Nivel",
+    ccMatchPrefix: "Partido",
+    ccMatchShare: "Archivo del partido (para el entrenador)",
+    ccNoCourse: "Ningún curso por ahora",
+    ccNotYet: "La clase todavía no se ha dado.",
+    ccNothingYet: "Marca la asistencia clase por clase y luego envíala a la secretaría.",
+    ccProposalAdd: "Añadir",
+    ccProposalApplied: (it) => `${it} añadido a los jugadores`,
+    ccProposalCourse: "Inscribirlo en el curso",
+    ccProposalPrefix: "Alumno",
+    ccProposalText: (it) => `Te propongo un alumno nuevo: ${it}`,
+    ccProposalTitle: "Alumno propuesto por el entrenador",
+    ccPropose: "Proponer a la secretaría",
+    ccProposeHint: "Para inscribirlo en un curso: a la secretaría le llegan sus datos y contactos.",
+    ccSendAttendance: "Enviar asistencia",
+    ccSendToCoach: "Enviar al entrenador",
+    ccSent: (it) => `Asistencia enviada el ${it}`,
+    ccTitle: "Mis cursos",
+    ccToMark: (it) => `${it} por marcar`,
+    ccToSend: "Asistencia por enviar a la secretaría",
+    ccUpdate: "Actualizar el curso",
+    cmCourses: (a, b) => `Clases de los cursos: ${a} (${b})`,
+    cmEmpty: "Nada este mes.",
+    cmHint: (it) => it === 1 ? `1 partido de torneo, equipo o desafío por jugar` : `${it} partidos de torneos, equipos y desafíos por jugar`,
+    cmMonth: "Resumen del mes",
+    cmMonthHint: "Clases, horas, cursos e ingresos: para enviar a la secretaría",
+    cmMonthTitle: (it) => `Resumen ${it}`,
+    cmPaid: (it) => `Paquetes cobrados: ${it}`,
+    cmPick: "Toca un partido: Nuevo partido se abre con jugadores, torneo y ronda ya escritos y al final el resultado vuelve al club.",
+    cmPresence: (it) => `asistencia ${it}%`,
+    cmSend: "Enviar a la secretaría",
+    cmTitle: "Partidos del club",
+    coAgenda: "Agenda de clases",
+    coAgendaHint: "Clases en el calendario, recordatorios y clases restantes",
+    coAll: "Todos",
+    coAway: "Por volver a ver",
+    coAwayHint: "No los ves desde hace más de 2 semanas",
+    coBookCourt: "Reservar la pista",
+    coCancelLesson: "Anular la clase",
+    coCancelled: "Anulada",
+    coConsent: "Consentimiento a grabaciones y datos",
+    coConsentGiven: (it) => `Consentimiento dado el ${it}`,
+    coConsentHint: "Márcalo cuando el alumno (o el padre o la madre, si es menor) haya aceptado ser grabado y que sus datos se queden aquí.",
+    coConsentMissing: "Consentimiento a grabaciones y datos sin marcar",
+    coDiary: "Diario de clases",
+    coDiaryAdd: "Añadir al diario",
+    coDiaryHint: "Lo que habéis hecho y lo que queda por hacer: una línea por clase, con la fecha.",
+    coDiaryNone: "Todavía nada en el diario.",
+    coDone: "Hecha",
+    coDue: (it) => `Por pagar: ${it}`,
+    coGoalLine: (k, p) => `${k}: ${p} % dentro`,
+    coGoalNew: "Nuevo objetivo",
+    coGoalNoData: "Todavía ninguna sesión de este golpe",
+    coGoalNow: (p, n) => `ahora ${p} % en las últimas ${n} sesiones`,
+    coGoalReached: (it) => `Alcanzado el ${it}`,
+    coGoalTarget: "Golpes dentro (%)",
+    coGoalWindow: "Sobre la media de las últimas sesiones",
+    coGoals: "Objetivos",
+    coGoalsNone: "Ningún objetivo: fija uno para un golpe.",
+    coGroupCount: (it) => it === 1 ? `1 alumno` : `${it} alumnos`,
+    coGroupName: "Nombre del grupo",
+    coGroupNew: "Nuevo grupo",
+    coGroups: "Grupos",
+    coGuardian: "Padre, madre o tutor",
+    coGuardianPhone: "Teléfono del padre o madre",
+    coLessonNew: "Nueva clase",
+    coLessons: "Clases",
+    coMarkPaid: "Marcar pagado",
+    coMatchWith: "Partido con…",
+    coMinutes: (it) => `${it} min`,
+    coNever: "nunca visto",
+    coNextLesson: (it) => `Próxima: ${it}`,
+    coNoLessons: "Ninguna clase programada.",
+    coNote: "Nota",
+    coNotify: "Avisar",
+    coPackLessons: "Número de clases",
+    coPackLine: (n, p) => `${n} clases · ${p}`,
+    coPackNew: "Nuevo paquete",
+    coPackPaidNow: "Ya pagado",
+    coPackPrice: "Precio del paquete",
+    coPacks: "Paquetes de clases",
+    coPaid: "Pagado",
+    coPlace: "Dónde (pista, club)",
+    coRemind: (it) => `Te recuerdo la clase: ${it}.`,
+    coRemindTomorrow: (it) => `Recordar las clases de mañana (${it})`,
+    coSearch: "Buscar un alumno",
+    coSortLast: "Por última vez",
+    coSortName: "Por nombre",
+    coToMark: "Pasadas, por marcar",
+    coUpcoming: "Programadas",
+    coWhen: "Cuándo",
+    coWho: "Quién",
+    coWrite: "Escribir",
+    coWriteTitle: "Mensaje a los alumnos",
     crtClay: "Tierra batida",
     crtCovered: "cubierta",
     crtDelete: "Eliminar la pista",
@@ -2962,6 +3840,34 @@ const APP_I18N = {
     ctWalkoverLong: "Ganado por w.o.",
     ctWhere: "Dónde y cuándo",
     ctWinner: "Ganador",
+    evAbsences: (it) => `Ausencias: ${it}`,
+    evLast: (it) => `Evaluación del ${it}`,
+    evNew: "Nueva evaluación",
+    evNone: "Ninguna evaluación: pon una nota de 1 a 5 a cada aspecto y sigue cómo cambia.",
+    evNote: "Nota (qué trabajar)",
+    evPresence: "Asistencia",
+    evTitle: "Evaluación técnica",
+    evTrendDown: "empeorando",
+    evTrendUp: "mejorando",
+    ftJump: "Salto de longitud sin impulso (cm)",
+    ftNew: "Nueva prueba",
+    ftNone: "Ninguna prueba: sprint, spider, salto y yo-yo, con la fecha.",
+    ftSpider: "Prueba spider (s)",
+    ftSprint: "Sprint 20 m (s)",
+    ftTitle: "Pruebas físicas",
+    ftYoyo: "Test yo-yo (nivel)",
+    laAbsent: "Ausente",
+    laExcused: "Justificado",
+    laPresent: "Presente",
+    laRecovery: "Clase de recuperación",
+    laRecoveryHint: "No descuenta del paquete: recupera una ausencia justificada.",
+    laToRecover: (it) => `Por recuperar: ${it}`,
+    mmAdd: "Añadir un resultado",
+    mmEvent: "Torneo o liga",
+    mmOppRank: "Clasificación del rival",
+    mmOpponent: "Rival",
+    mmScore: "Resultado (desde el lado del alumno)",
+    mmTitle: "Resultados de fuera",
     pbAddCancel: "Cancelar",
     pbAddClub: "Añadir un club",
     pbAlertChannel: "Tus reservas",
@@ -3165,6 +4071,26 @@ const APP_I18N = {
     ptOnlineHint: "Va en los avisos y recordatorios, con el enlace, el IBAN o el número.",
     ptOnlineShort: "a distancia",
     ptTitle: "Medios de pago",
+    rcFailed: "No se ha podido crear el PDF.",
+    rcFor: (g, n) => `${g}, por ${n}`,
+    rcPack: (it) => `Paquete de ${it} clases`,
+    rcPrint: "Imprimir",
+    rcReceipt: "Recibo",
+    rcSend: "Enviar al alumno",
+    rcText: (it) => `Adjunto el recibo n.º ${it}. ¡Gracias!`,
+    receiptNotFiscal: "Documento no fiscal",
+    receiptTitle: "Recibo",
+    reportTitle: "Informe para el alumno",
+    rgLegend: "✓ presente · ✗ ausente · — clase anulada · vacío: por marcar",
+    rgPdf: "Registro de asistencia (PDF)",
+    rgShort: "Registro",
+    rgTitle: "Registro de asistencia",
+    rgTotal: "Total",
+    rkHint: "Ej. 4.2: las clasificaciones anteriores quedan en el historial.",
+    rkNone: "Clasificación no indicada",
+    rkNow: (it) => `Clasificación: ${it}`,
+    rkTitle: "Clasificación",
+    rkUpdate: "Actualizar la clasificación",
     scAddSlot: "Añadir un horario",
     scAddStudent: "Añadir alumno",
     scAttendance: (p, t) => `asistió a ${p} de ${t}`,
@@ -3209,6 +4135,11 @@ const APP_I18N = {
     scToMark: "por pasar lista",
     scUpcoming: "Próximas",
     scWhoWasThere: "Quién estuvo",
+    seAdd: "Añadir un torneo",
+    seName: "Torneo",
+    seNone: "Ningún torneo previsto.",
+    sePlace: "Dónde",
+    seTitle: "Clasificación y torneos",
     srvAddress: "Dirección del servidor",
     srvAddressHint: "Como la muestra el servidor al arrancar, p. ej. http://192.168.1.50:8080 (o https://… desde internet)",
     srvAlertChannel: "Reservas en línea",
@@ -3322,6 +4253,11 @@ const APP_I18N = {
     stTitle: "Estadísticas de las pistas",
     stTop: "Quién reserva más",
     stTournaments: (it) => `Partidos de torneo: ${it} h`,
+    studentLast: (it) => `última: ${it}`,
+    studentLost: "Perdido",
+    studentNotes: "Notas del entrenador",
+    studentWon: "Ganado",
+    studentsTitle: "Alumnos",
     tdBlocking: (it) => it === 1 ? `1 no puede jugar (certificado o licencia)` : `${it} no pueden jugar (certificado o licencia)`,
     tdChallenges: (it) => `Desafíos por jugar: ${it}`,
     tdCourts: (it) => `Hoy en pista: ${it}`,
@@ -3411,8 +4347,19 @@ const APP_I18N = {
     tmWeWon: "Ganado",
     tmWon: "ganado",
     tmYes: "Sí",
+    xlNumber: "Número",
+    xlReceipts: "Recibos",
+    xlSave: "Guardar en Excel",
+    xlStudent: "Alumno",
   },
   pt: {
+    asBackhand: "Esquerda",
+    asForehand: "Direita",
+    asMental: "Mentalidade",
+    asMovement: "Movimentação",
+    asServe: "Saque",
+    asTactics: "Tática",
+    asVolley: "Jogo de rede",
     bkOther: "Outro",
     blkAllCourts: "Todas as quadras",
     blkAllDay: "O dia todo",
@@ -3435,6 +4382,125 @@ const APP_I18N = {
     blkTitle: "Quadras não reserváveis",
     blkTo: "Até",
     blkTournament: "Torneio",
+    ccAccept: "Adicionar aos meus cursos",
+    ccAttBadCode: "O código não é o da ficha de curso enviada: as presenças não são registadas.",
+    ccAttNotFound: "O curso não está neste telefone.",
+    ccAttReady: "As presenças juntam-se ao curso: em cada aula vale a do treinador.",
+    ccAttSame: "Estas presenças já lá estão.",
+    ccAttendanceApplied: "Presenças registadas",
+    ccAttendancePrefix: "Presenças",
+    ccAttendanceText: (a, b) => `Presenças do curso ${a}: ${b} aulas marcadas`,
+    ccAttendanceTitle: "Presenças do treinador",
+    ccCardHowTo: "Abra o arquivo com o Tennis Score Manager (Compartilhar › TSM): o curso junta-se aos seus com os alunos; as presenças devolve-as de lá.",
+    ccCardText: (a, b) => `Curso ${a}: ${b} inscritos`,
+    ccDeskHint: "Alunos, fichas, recibos e registo a partir do computador de casa, na mesma rede",
+    ccDeskNote: "Os dados ficam no telefone: a página lê-os de lá.",
+    ccDeskPrint: "Imprimir a página",
+    ccDeskReport30: "Relatório 30 dias (PDF)",
+    ccDeskReportAll: "Relatório completo (PDF)",
+    ccDeskSaveAttendance: "Guardar presenças",
+    ccDeskSent: "As presenças enviam-se à secretaria a partir do telefone (Os meus cursos › Enviar presenças).",
+    ccDeskTitle: "Treinador no PC",
+    ccFilePrefix: "Curso",
+    ccFrom: (it) => `de ${it}`,
+    ccIncomingHint: "O curso vai para Alunos › Os meus cursos e os inscritos passam a ser seus alunos, com os contactos dos pais. As presenças marca-as lá e devolve-as à secretaria.",
+    ccIncomingTitle: "Ficha de curso",
+    ccLessonNote: "O que fizeram (vai para o diário de quem esteve)",
+    ccLessonsMarked: (it) => it === 1 ? `1 aula marcada` : `${it} aulas marcadas`,
+    ccLevel: "Nível",
+    ccMatchPrefix: "Partida",
+    ccMatchShare: "Arquivo da partida (para o treinador)",
+    ccNoCourse: "Nenhum curso por agora",
+    ccNotYet: "A aula ainda não aconteceu.",
+    ccNothingYet: "Marque as presenças aula a aula e depois envie-as à secretaria.",
+    ccProposalAdd: "Adicionar",
+    ccProposalApplied: (it) => `${it} adicionado aos jogadores`,
+    ccProposalCourse: "Inscrevê-lo no curso",
+    ccProposalPrefix: "Aluno",
+    ccProposalText: (it) => `Proponho um aluno novo: ${it}`,
+    ccProposalTitle: "Aluno proposto pelo treinador",
+    ccPropose: "Propor à secretaria",
+    ccProposeHint: "Para o inscrever num curso: a secretaria recebe os seus dados e contactos.",
+    ccSendAttendance: "Enviar presenças",
+    ccSendToCoach: "Enviar ao treinador",
+    ccSent: (it) => `Presenças enviadas em ${it}`,
+    ccTitle: "Os meus cursos",
+    ccToMark: (it) => `${it} por marcar`,
+    ccToSend: "Presenças a enviar à secretaria",
+    ccUpdate: "Atualizar o curso",
+    cmCourses: (a, b) => `Aulas dos cursos: ${a} (${b})`,
+    cmEmpty: "Nada neste mês.",
+    cmHint: (it) => it === 1 ? `1 partida de torneio, equipe ou desafio para jogar` : `${it} partidas de torneios, equipes e desafios para jogar`,
+    cmMonth: "Resumo do mês",
+    cmMonthHint: "Aulas, horas, cursos e receitas: para enviar à secretaria",
+    cmMonthTitle: (it) => `Resumo ${it}`,
+    cmPaid: (it) => `Pacotes recebidos: ${it}`,
+    cmPick: "Toque numa partida: Nova partida abre com jogadores, torneio e rodada já preenchidos e no fim o resultado volta ao clube.",
+    cmPresence: (it) => `presenças ${it}%`,
+    cmSend: "Enviar à secretaria",
+    cmTitle: "Partidas do clube",
+    coAgenda: "Agenda das aulas",
+    coAgendaHint: "Aulas no calendário, lembretes e aulas restantes",
+    coAll: "Todos",
+    coAway: "Por rever",
+    coAwayHint: "Não os vê há mais de 2 semanas",
+    coBookCourt: "Reservar a quadra",
+    coCancelLesson: "Cancelar a aula",
+    coCancelled: "Cancelada",
+    coConsent: "Consentimento para filmagens e dados",
+    coConsentGiven: (it) => `Consentimento dado em ${it}`,
+    coConsentHint: "Marque quando o aluno (ou o responsável, se for menor) aceitou ser filmado e que os seus dados fiquem aqui.",
+    coConsentMissing: "Consentimento para filmagens e dados não marcado",
+    coDiary: "Diário das aulas",
+    coDiaryAdd: "Adicionar ao diário",
+    coDiaryHint: "O que fizeram e o que falta fazer: uma linha por aula, com a data.",
+    coDiaryNone: "Ainda nada no diário.",
+    coDone: "Feita",
+    coDue: (it) => `A pagar: ${it}`,
+    coGoalLine: (k, p) => `${k}: ${p}% dentro`,
+    coGoalNew: "Nova meta",
+    coGoalNoData: "Ainda nenhuma sessão deste golpe",
+    coGoalNow: (p, n) => `agora ${p}% nas últimas ${n} sessões`,
+    coGoalReached: (it) => `Alcançada em ${it}`,
+    coGoalTarget: "Golpes dentro (%)",
+    coGoalWindow: "Na média das últimas sessões",
+    coGoals: "Metas",
+    coGoalsNone: "Nenhuma meta: defina uma para um golpe.",
+    coGroupCount: (it) => it === 1 ? `1 aluno` : `${it} alunos`,
+    coGroupName: "Nome do grupo",
+    coGroupNew: "Novo grupo",
+    coGroups: "Grupos",
+    coGuardian: "Pai, mãe ou tutor",
+    coGuardianPhone: "Telefone do responsável",
+    coLessonNew: "Nova aula",
+    coLessons: "Aulas",
+    coMarkPaid: "Marcar como pago",
+    coMatchWith: "Partida com…",
+    coMinutes: (it) => `${it} min`,
+    coNever: "nunca visto",
+    coNextLesson: (it) => `Próxima: ${it}`,
+    coNoLessons: "Nenhuma aula programada.",
+    coNote: "Nota",
+    coNotify: "Avisar",
+    coPackLessons: "Número de aulas",
+    coPackLine: (n, p) => `${n} aulas · ${p}`,
+    coPackNew: "Novo pacote",
+    coPackPaidNow: "Já pago",
+    coPackPrice: "Preço do pacote",
+    coPacks: "Pacotes de aulas",
+    coPaid: "Pago",
+    coPlace: "Onde (quadra, clube)",
+    coRemind: (it) => `Lembro-te a aula: ${it}.`,
+    coRemindTomorrow: (it) => `Lembrar as aulas de amanhã (${it})`,
+    coSearch: "Procurar um aluno",
+    coSortLast: "Pela última vez",
+    coSortName: "Por nome",
+    coToMark: "Passadas, por marcar",
+    coUpcoming: "Programadas",
+    coWhen: "Quando",
+    coWho: "Quem",
+    coWrite: "Escrever",
+    coWriteTitle: "Mensagem aos alunos",
     crtClay: "Saibro",
     crtCovered: "coberta",
     crtDelete: "Excluir a quadra",
@@ -3566,6 +4632,34 @@ const APP_I18N = {
     ctWalkoverLong: "Vitória por W.O.",
     ctWhere: "Onde e quando",
     ctWinner: "Vencedor",
+    evAbsences: (it) => `Faltas: ${it}`,
+    evLast: (it) => `Avaliação de ${it}`,
+    evNew: "Nova avaliação",
+    evNone: "Nenhuma avaliação: dê uma nota de 1 a 5 a cada aspeto e acompanhe a evolução.",
+    evNote: "Nota (o que trabalhar)",
+    evPresence: "Presenças",
+    evTitle: "Avaliação técnica",
+    evTrendDown: "em queda",
+    evTrendUp: "a melhorar",
+    ftJump: "Salto em comprimento parado (cm)",
+    ftNew: "Novo teste",
+    ftNone: "Nenhum teste: sprint, spider, salto e yo-yo, com a data.",
+    ftSpider: "Teste spider (s)",
+    ftSprint: "Sprint 20 m (s)",
+    ftTitle: "Testes físicos",
+    ftYoyo: "Teste yo-yo (nível)",
+    laAbsent: "Faltou",
+    laExcused: "Justificado",
+    laPresent: "Presente",
+    laRecovery: "Aula de reposição",
+    laRecoveryHint: "Não desconta do pacote: repõe uma falta justificada.",
+    laToRecover: (it) => `Por repor: ${it}`,
+    mmAdd: "Adicionar um resultado",
+    mmEvent: "Torneio ou campeonato",
+    mmOppRank: "Ranking do adversário",
+    mmOpponent: "Adversário",
+    mmScore: "Placar (do lado do aluno)",
+    mmTitle: "Resultados de fora",
     pbAddCancel: "Cancelar",
     pbAddClub: "Adicionar um clube",
     pbAlertChannel: "As tuas reservas",
@@ -3769,6 +4863,26 @@ const APP_I18N = {
     ptOnlineHint: "Vai nos avisos e lembretes, com o link, o IBAN ou o número.",
     ptOnlineShort: "a distância",
     ptTitle: "Meios de pagamento",
+    rcFailed: "Não foi possível criar o PDF.",
+    rcFor: (g, n) => `${g}, para ${n}`,
+    rcPack: (it) => `Pacote de ${it} aulas`,
+    rcPrint: "Imprimir",
+    rcReceipt: "Recibo",
+    rcSend: "Enviar ao aluno",
+    rcText: (it) => `Em anexo o recibo n.º ${it}. Obrigado!`,
+    receiptNotFiscal: "Documento não fiscal",
+    receiptTitle: "Recibo",
+    reportTitle: "Relatório para o aluno",
+    rgLegend: "✓ presente · ✗ faltou · — aula anulada · vazio: por marcar",
+    rgPdf: "Registo de presenças (PDF)",
+    rgShort: "Registo",
+    rgTitle: "Registo de presenças",
+    rgTotal: "Presenças",
+    rkHint: "Ex. 4.2: os rankings anteriores ficam no histórico.",
+    rkNone: "Ranking não indicado",
+    rkNow: (it) => `Classificação: ${it}`,
+    rkTitle: "Classificação",
+    rkUpdate: "Atualizar o ranking",
     scAddSlot: "Adicionar um horário",
     scAddStudent: "Adicionar aluno",
     scAttendance: (p, t) => `presente em ${p} de ${t}`,
@@ -3813,6 +4927,11 @@ const APP_I18N = {
     scToMark: "a marcar",
     scUpcoming: "Próximas",
     scWhoWasThere: "Quem estava",
+    seAdd: "Adicionar um torneio",
+    seName: "Torneio",
+    seNone: "Nenhum torneio previsto.",
+    sePlace: "Onde",
+    seTitle: "Ranking e torneios",
     srvAddress: "Endereço do servidor",
     srvAddressHint: "Como o servidor o mostra ao arrancar, ex. http://192.168.1.50:8080 (ou https://… pela internet)",
     srvAlertChannel: "Reservas online",
@@ -3926,6 +5045,11 @@ const APP_I18N = {
     stTitle: "Estatísticas das quadras",
     stTop: "Quem reserva mais",
     stTournaments: (it) => `Jogos de torneio: ${it} h`,
+    studentLast: (it) => `última: ${it}`,
+    studentLost: "Perdida",
+    studentNotes: "Notas do treinador",
+    studentWon: "Ganha",
+    studentsTitle: "Alunos",
     tdBlocking: (it) => it === 1 ? `1 não pode jogar (atestado ou cartão)` : `${it} não podem jogar (atestado ou cartão)`,
     tdChallenges: (it) => `Desafios por jogar: ${it}`,
     tdCourts: (it) => `Hoje em quadra: ${it}`,
@@ -4015,6 +5139,10 @@ const APP_I18N = {
     tmWeWon: "Vencida",
     tmWon: "vencido",
     tmYes: "Sim",
+    xlNumber: "Número",
+    xlReceipts: "Recibos",
+    xlSave: "Guardar em Excel",
+    xlStudent: "Aluno",
   },
 };
 for (const l in APP_I18N) Object.assign(DESK_I18N[l], APP_I18N[l]);
@@ -4219,6 +5347,8 @@ async function start() {
   info = await api('GET', '/info');
   T = pick(info.lang);
   document.documentElement.lang = T.lang;
+  // Acceso dal ruolo Allenatore: solo le sue pagine (coach.js).
+  if (info.mode === 'coach') return coachStart();
   document.title = T.title + ' · ' + info.club;
   planDate = info.today;
   await render();
@@ -6044,6 +7174,230 @@ function notifyNews(n) {
       go('plan', () => { planDate = n.date; planView = 'day'; });
     };
   } catch (_) { /* il browser non la mostra: resta il numero */ }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/desk/coach.js
+cat > "$DEST/app/src/main/assets/desk/coach.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+// L'Allenatore da PC: allievi con la loro scheda, agenda delle lezioni, corsi col registro, riepilogo del mese e
+// ricevute. Usa gli strumenti della Segreteria da PC (app.js): h, put, api, toast, eur, dateText, hhmm, openPdf.
+'use strict';
+
+let coachView = 'students';
+let coachStudent = null;
+let coachCourseId = null;
+let coachMonth = null;
+
+const ASPECTS = ['serve', 'forehand', 'backhand', 'volley', 'movement', 'tactics', 'mental'];
+const aspectName = (k) => ({ serve: T.asServe, forehand: T.asForehand, backhand: T.asBackhand, volley: T.asVolley, movement: T.asMovement, tactics: T.asTactics, mental: T.asMental })[k] || k;
+const testName = (k) => ({ sprint: T.ftSprint, spider: T.ftSpider, jump: T.ftJump, yoyo: T.ftYoyo })[k] || k;
+const testValue = (k, v) => (k === 'sprint' || k === 'spider') ? v.toFixed(2) : (Number.isInteger(v) ? String(v) : v.toFixed(1));
+const coachHours = (min) => (min % 60 === 0 ? `${min / 60} h` : `${Math.floor(min / 60)} h ${min % 60}′`);
+
+async function coachStart() {
+  document.title = T.ccDeskTitle + (info.coach ? ' · ' + info.coach : '');
+  await coachRender();
+}
+
+const COACH_VIEWS = () => [['students', T.studentsTitle], ['agenda', T.coAgenda], ['courses', T.ccTitle], ['month', T.cmMonth]];
+
+async function coachRender() {
+  put(root, h('div.shell',
+    h('nav.side', { 'aria-label': T.ccDeskTitle },
+      h('div.brand', info.coach || T.ccDeskTitle, h('small', T.ccDeskTitle)),
+      COACH_VIEWS().map(([v, l]) => h('button' + (v === coachView ? '.on' : ''), { 'aria-current': v === coachView ? 'page' : null, onclick: () => { coachView = v; coachStudent = null; coachCourseId = null; coachRender(); } }, l)),
+      h('div.spacer'),
+      h('div.note', T.ccDeskNote),
+      h('button', { onclick: logout }, T.logout)),
+    h('main')));
+  try { await ({ students: showStudents, agenda: showAgenda, courses: showCourses, month: showMonth })[coachView](); }
+  catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
+}
+
+/** Scarica un file del telefono (Excel) col suo nome. */
+async function downloadFile(path, name) {
+  try {
+    const blob = await api('GET', path, undefined, true);
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name }); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { toast(errText(e)); }
+}
+
+const printBtn = () => h('button', { onclick: () => window.print() }, T.ccDeskPrint);
+const balanceText = (b) => (b.bought || b.used) ? `${b.bought} / ${b.used} / ${b.left}` : '';
+
+// --- Allievi ---
+
+async function showStudents() {
+  if (coachStudent) return showStudent(coachStudent);
+  const list = await api('GET', '/coach/students');
+  const q = h('input', { type: 'search', placeholder: T.coSearch });
+  const body = h('div');
+  const draw = () => {
+    const t = q.value.trim().toLowerCase();
+    const rows = list.filter((s) => !t || s.name.toLowerCase().includes(t));
+    put(body, rows.length ? h('table',
+      h('thead', h('tr', h('th', T.studentsTitle), h('th', T.rkTitle), h('th', T.evTitle), h('th', T.coPacks), h('th', T.coUpcoming), h('th', ''))),
+      h('tbody', rows.map((s) => h('tr', { onclick: () => { coachStudent = s.id; showStudents(); }, style: 'cursor:pointer' },
+        h('td', h('b', s.name), h('div.dim', s.lastSeen ? T.studentLast(dateText(s.lastSeen)) : T.coNever)),
+        h('td', s.ranking || ''),
+        h('td', s.trend == null ? '' : (s.trend >= 0 ? '▲ ' + T.evTrendUp : '▼ ' + T.evTrendDown)),
+        h('td', balanceText(s.balance), s.balance.dueCents ? h('div', { style: 'color:var(--warn)' }, T.coDue(eur(s.balance.dueCents))) : null),
+        h('td', s.next ? dateText(s.next) + ' ' + hhmm(s.nextMin) : ''),
+        h('td', s.guardian ? T.coGuardian + ': ' + s.guardian : s.phone))))) : h('div.empty', T.coNever));
+  };
+  q.addEventListener('input', draw);
+  put(main(), h('div.head', h('h1', T.studentsTitle), printBtn()), h('div.panel', q, body));
+  draw();
+}
+
+async function showStudent(id) {
+  const d = await api('GET', '/coach/students/' + encodeURIComponent(id));
+  const s = d.student;
+  const back = h('button', { onclick: () => { coachStudent = null; showStudents(); }, 'aria-label': T.studentsTitle }, '←');
+  const card = (title, ...kids) => h('div.card', h('h2', title), ...kids);
+  const diaryIn = h('textarea', { rows: 3, style: 'width:100%' });
+  const noteIn = h('textarea', { rows: 4, style: 'width:100%' }); noteIn.value = d.note || '';
+  const last = d.evaluations[d.evaluations.length - 1];
+  const prev = d.evaluations[d.evaluations.length - 2];
+  put(main(),
+    h('div.head', back, h('h1', s.name),
+      h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf?days=30', T.reportTitle + ' ' + s.name) }, T.ccDeskReport30),
+      h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf', T.reportTitle + ' ' + s.name) }, T.ccDeskReportAll),
+      printBtn()),
+    h('div.printonly.phead', h('b', s.name), ' · ', dateText(info.today)),
+    h('p.dim', [s.phone, s.email, s.guardian ? T.coGuardian + ': ' + s.guardian + ' ' + s.guardianPhone : '', d.consent ? T.coConsentGiven(dateText(d.consent)) : T.coConsentMissing].filter(Boolean).join(' · ')),
+    h('div.cards',
+      card(T.coDiary,
+        diaryIn,
+        h('div.actions', h('button.primary', { onclick: async () => {
+          if (!diaryIn.value.trim()) return;
+          try { await api('POST', '/coach/students/' + encodeURIComponent(id) + '/diary', { text: diaryIn.value }); toast(T.saved); showStudent(id); } catch (e) { toast(errText(e)); }
+        } }, T.coDiaryAdd)),
+        d.diary.length ? d.diary.map((x) => h('p', h('b', dateText(x.date) + ' '), x.text)) : h('p.dim', T.coDiaryNone)),
+      card(T.studentNotes, noteIn, h('div.actions', h('button.primary', { onclick: async () => {
+        try { await api('PUT', '/coach/students/' + encodeURIComponent(id) + '/note', { text: noteIn.value }); toast(T.saved); } catch (e) { toast(errText(e)); }
+      } }, T.save))),
+      card(T.evTitle, last ? [h('p.dim', T.evLast(dateText(last.date))), h('table', h('tbody', ASPECTS.filter((k) => last.scores[k]).map((k) => {
+        const v = last.scores[k]; const p = prev && prev.scores[k]; const diff = p ? v - p : 0;
+        return h('tr', h('td', aspectName(k)), h('td', '●'.repeat(v) + '○'.repeat(5 - v)), h('td', diff ? (diff > 0 ? '+' + diff : String(diff)) : ''));
+      }))), last.note ? h('p', last.note) : null] : h('p.dim', T.evNone)),
+      card(T.ftTitle, d.tests.length ? [h('table', h('tbody', d.tests.map((x) => h('tr', h('td', testName(x.key)), h('td', h('b', testValue(x.key, x.value))),
+        h('td.dim', x.previous != null && x.previous !== x.value ? '(' + testValue(x.key, x.previous) + ')' : ''))))), d.testDate ? h('p.dim', dateText(d.testDate)) : null] : h('p.dim', T.ftNone)),
+      card(T.seTitle,
+        h('p', d.rankings.length ? T.rkNow(d.rankings[d.rankings.length - 1].split(' ').slice(1).join(' ')) : T.rkNone),
+        d.rankings.length > 1 ? h('p.dim', d.rankings.map((r) => r.split(' ').slice(1).join(' ')).join(' → ')) : null,
+        d.events.length ? d.events.map((e) => h('p', h('b', dateText(e.date) + ' '), e.name, e.place ? ' · ' + e.place : '')) : h('p.dim', T.seNone)),
+      card(T.mmTitle, d.results.length ? h('table', h('tbody', d.results.map((r) => h('tr', h('td', dateText(r.date)), h('td', r.event), h('td', r.opponent + (r.opponentRanking ? ' (' + r.opponentRanking + ')' : '')),
+        h('td', r.score), h('td', { style: 'color:' + (r.won ? 'var(--ok)' : 'var(--warn)') }, r.won ? T.studentWon : T.studentLost))))) : h('p.dim', '—')),
+      card(T.coPacks,
+        h('p.dim', [balanceText(s.balance), s.balance.absences ? T.evAbsences(s.balance.absences) : '', s.balance.toRecover ? T.laToRecover(s.balance.toRecover) : ''].filter(Boolean).join(' · ')),
+        d.packs.length ? h('table', h('tbody', d.packs.map((p) => h('tr',
+          h('td', T.coPackLine(p.lessons, eur(p.cents))), h('td.dim', dateText(p.created)),
+          h('td', p.paid ? h('button', { onclick: () => openPdf('/coach/packs/' + encodeURIComponent(p.id) + '/receipt.pdf', T.receiptTitle + ' ' + (p.receipt || '')) }, T.rcReceipt + (p.receipt ? ' ' + p.receipt : ''))
+            : h('button', { onclick: async () => { try { await api('POST', '/coach/packs/' + encodeURIComponent(p.id) + '/paid', {}); toast(T.saved); showStudent(id); } catch (e) { toast(errText(e)); } } }, T.coMarkPaid)))))) : null),
+      d.courses.length ? card(T.ccTitle, d.courses.map((c) => h('p', c.name + ' · ' + T.scAttendance(c.present, c.total)))) : null));
+}
+
+// --- Agenda ---
+
+async function showAgenda() {
+  const list = await api('GET', '/coach/lessons');
+  const now = info.today;
+  const next = list.filter((l) => !l.cancelled && l.date >= now);
+  const past = list.filter((l) => !l.cancelled && !l.done && l.date < now).reverse();
+  const row = (l, mark) => h('tr',
+    h('td', dateText(l.date) + ' ' + hhmm(l.startMin)), h('td', T.coMinutes(l.minutes)), h('td', l.students.join(', ')), h('td', l.place),
+    h('td', mark ? h('button', { onclick: async () => { try { await api('PUT', '/coach/lessons/' + encodeURIComponent(l.id) + '/done', { done: true }); toast(T.saved); showAgenda(); } catch (e) { toast(errText(e)); } } }, T.coDone) : (l.done ? T.coDone : '')));
+  put(main(), h('div.head', h('h1', T.coAgenda), printBtn()),
+    h('div.panel', h('h2', T.coUpcoming), next.length ? h('table', h('tbody', next.map((l) => row(l, false)))) : h('p.dim', T.coNoLessons)),
+    past.length ? h('div.panel', h('h2', T.coToMark), h('table', h('tbody', past.map((l) => row(l, true))))) : null);
+}
+
+// --- Corsi ---
+
+async function showCourses() {
+  if (coachCourseId) return showCourseRegister(coachCourseId);
+  const list = await api('GET', '/coach/courses');
+  put(main(), h('div.head', h('h1', T.ccTitle)),
+    list.length ? h('div.cards', list.map((c) => h('button.card', { type: 'button', onclick: () => { coachCourseId = c.id; showCourses(); } },
+      h('h2', c.name), h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+      h('p', T.coGroupCount(c.students)), c.toMark ? h('p', { style: 'color:var(--warn)' }, T.ccToMark(c.toMark)) : null, c.toSend ? h('p.dim', T.ccToSend) : null))) : h('div.panel', h('div.empty', T.ccNothingYet)));
+}
+
+/** Il registro del corso: una colonna per lezione; un clic su una lezione passata apre l'appello. */
+async function showCourseRegister(id) {
+  const r = await api('GET', '/coach/courses/' + encodeURIComponent(id));
+  const c = r.course;
+  const back = h('button', { onclick: () => { coachCourseId = null; showCourses(); }, 'aria-label': T.ccTitle }, '←');
+  const color = (m) => (m === '✓' ? 'var(--ok)' : m === '✗' ? 'var(--warn)' : 'var(--dim)');
+  const shortD = (d) => d.slice(8, 10) + '/' + d.slice(5, 7);
+  put(main(),
+    h('div.head', back, h('h1', c.name),
+      h('button', { onclick: () => openPdf('/coach/courses/' + encodeURIComponent(id) + '/register.pdf', T.rgTitle + ' ' + c.name) }, T.rgPdf),
+      h('button', { onclick: () => downloadFile('/coach/courses/' + encodeURIComponent(id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave),
+      printBtn()),
+    h('p.dim', [c.level, c.club, dateText(c.from) + ' – ' + dateText(c.to)].filter(Boolean).join(' · ')),
+    h('div.printonly.phead', h('b', T.rgTitle + ' · ' + c.name), ' · ', dateText(info.today)),
+    h('div.panel', { style: 'overflow-x:auto' }, h('table',
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center', onclick: () => { if (l.past) attendanceDialog(r, l); } },
+        shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
+      h('tbody', r.rows.map((row) => h('tr', h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
+    h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
+}
+
+function attendanceDialog(r, l) {
+  const boxes = r.rows.map((row, i) => {
+    const idx = r.lessons.indexOf(l);
+    const cb = h('input', { type: 'checkbox' });
+    cb.checked = l.marked ? row.marks[idx] === '✓' : true;
+    return [row.id, cb, h('label', { style: 'display:flex;gap:8px;align-items:center' }, cb, row.name)];
+  });
+  const cancelled = h('input', { type: 'checkbox' }); cancelled.checked = l.cancelled;
+  const note = h('textarea', { rows: 3, style: 'width:100%' }); note.value = r.notes[l.key] || '';
+  const dlg = h('dialog', h('form', { method: 'dialog', style: 'min-width:320px' },
+    h('h2', dateText(l.date) + ' ' + hhmm(l.startMin)),
+    h('label', { style: 'display:flex;gap:8px;align-items:center' }, cancelled, T.scCancelLesson),
+    h('p.dim', T.scWhoWasThere), boxes.map((b) => b[2]),
+    h('label', T.ccLessonNote, note),
+    h('div.actions',
+      h('button', { type: 'button', onclick: () => dlg.close() }, '✕'),
+      h('button.primary', { type: 'button', onclick: async () => {
+        try {
+          await api('PUT', '/coach/courses/' + encodeURIComponent(r.course.id) + '/attendance',
+            { key: l.key, present: boxes.filter((b) => b[1].checked).map((b) => b[0]), cancelled: cancelled.checked, note: note.value });
+          dlg.close(); dlg.remove(); toast(T.saved); showCourseRegister(r.course.id);
+        } catch (e) { toast(errText(e)); }
+      } }, T.ccDeskSaveAttendance))));
+  document.body.append(dlg);
+  dlg.showModal();
+}
+
+// --- Riepilogo del mese e ricevute ---
+
+async function showMonth() {
+  if (!coachMonth) coachMonth = info.today.slice(0, 8) + '01';
+  const m = await api('GET', '/coach/month?date=' + coachMonth);
+  const shift = (n) => { const d = new Date(coachMonth + 'T12:00:00'); d.setMonth(d.getMonth() + n); coachMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-01'; showMonth(); };
+  const label = new Date(m.from + 'T12:00:00').toLocaleDateString(locale(), { month: 'long', year: 'numeric' });
+  const year = m.from.slice(0, 4);
+  const lines = [
+    `${T.coLessons}: ${m.privateLessons} (${coachHours(m.privateMinutes)}) · ${T.coGroupCount(m.students)}`,
+    T.cmCourses(m.courseLessons, coachHours(m.courseMinutes)) + (m.presencePct != null ? ' · ' + T.cmPresence(m.presencePct) : ''),
+    m.paidCents ? T.cmPaid(eur(m.paidCents)) : '',
+  ].filter(Boolean);
+  put(main(),
+    h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', T.cmMonthTitle(label)), h('button', { onclick: () => shift(1) }, '›'), printBtn()),
+    h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.cmMonthTitle(label)),
+    h('div.panel', lines.map((l) => h('p', l)), (!m.privateLessons && !m.courseLessons && !m.paidCents) ? h('p.dim', T.cmEmpty) : null),
+    h('div.panel',
+      h('div.head', h('h2', T.xlReceipts + ' ' + year), h('button', { onclick: () => downloadFile('/coach/receipts.xlsx?year=' + year, T.xlReceipts + ' ' + year + '.xlsx') }, T.xlSave)),
+      m.receipts.length ? h('table', h('tbody', m.receipts.map((x) => h('tr',
+        h('td', x.number), h('td', dateText(x.date)), h('td', x.name), h('td', T.coPackLine(x.lessons, eur(x.cents))),
+        h('td', h('button', { onclick: () => openPdf('/coach/packs/' + encodeURIComponent(x.packId) + '/receipt.pdf', T.receiptTitle + ' ' + x.number) }, 'PDF')))))) : h('p.dim', '—')));
 }
 TSM_EOF
 
@@ -8003,6 +9357,7 @@ cat > "$DEST/app/src/main/assets/desk/index.html" << 'TSM_EOF'
 <script src="i18n.js"></script>
 <script src="app-i18n.js"></script>
 <script src="app.js"></script>
+<script src="coach.js"></script>
 </body>
 </html>
 TSM_EOF
@@ -8549,6 +9904,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
 - **Matches der Schüler und Büro**: wer ein Match mit seinem Telefon zählt, schickt es mit *Teilen › Spieldatei (für den Trainer)*; mit TSM geöffnet kommt es in den Verlauf und in die Karte des Schülers. **Dem Büro vorschlagen** (Karte des Schülers) schickt seine Daten, um ihn in einen Kurs einzuschreiben. **Monatsübersicht** (Reiter Schüler): Privatstunden und Stunden, Kursstunden und Anwesenheit, bezahlte Pakete, ans Büro zu schicken. In der Übersicht liefert **Quittungen <Jahr> (Excel)** die Liste der Paketquittungen des Jahres, für den Steuerberater.
+- **Trainer am PC** (*Mehr › Trainer am PC*): wie das Büro am PC (7.20) öffnet der Computer zu Hause eine Seite, die das Telefon im selben Netz bereitstellt, nach der Kopplung per QR oder Code. Es gibt nur die Daten des Trainers: **Schüler** (die Karte mit Tagebuch, Notizen, Bewertung, Tests, Rangliste und Turnieren, Ergebnissen, Paketen mit PDF-Quittungen und dem Bericht), **Stundenplan** (die Stunden und die noch als erledigt zu markierenden), **Meine Kurse** (die Liste, Anwesenheit per Klick auf eine Stunde, PDF und Excel) und **Monatsübersicht** (mit den Quittungen des Jahres in Excel). Jede Seite lässt sich drucken; die Daten bleiben auf dem Telefon.
 
 ### 7.7 Spieler: die Datenbank
 
@@ -9151,6 +10507,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
 - **Students' matches and the office**: whoever scores a match on their phone sends it with *Share › Match file (for the coach)*; opening it with TSM puts it in the history and in the student's card. **Propose to the club office** (student's card) sends their details to enrol them in a course. **Monthly summary** (Students tab): private lessons and hours, course lessons and attendance, packs paid, to send to the office. In the summary, **Receipts <year> (Excel)** gives the list of the year's pack receipts, for the accountant.
+- **Coach from PC** (*More › Coach from PC*): like the Club office from PC (7.20), the home computer opens a page served by the phone, on the same network, after pairing with a QR or code. Only the coach's data is there: **Students** (the card with diary, notes, assessment, tests, ranking and tournaments, results, packs with PDF receipts and the report), **Schedule** (lessons and those to mark as done), **My courses** (the register, roll call by clicking a lesson, PDF and Excel) and **Monthly summary** (with the year's receipts in Excel). Every page can be printed; the data stays on the phone.
 
 ### 7.7 Players: the database
 
@@ -9752,6 +11109,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
 - **Partidos de los alumnos y secretaría**: quien marca un partido con su teléfono lo envía con *Compartir › Archivo del partido (para el entrenador)*; al abrirlo con TSM entra en el historial y en la ficha del alumno. **Proponer a la secretaría** (ficha del alumno) envía sus datos para inscribirlo en un curso. **Resumen del mes** (pestaña Alumnos): clases particulares y horas, clases de los cursos y asistencia, paquetes cobrados, para enviar a la secretaría. En el resumen, **Recibos <año> (Excel)** da la lista de recibos de paquetes del año, para el gestor.
+- **Entrenador desde el PC** (*Más › Entrenador desde el PC*): como la Secretaría desde el PC (7.20), el ordenador de casa abre una página servida por el teléfono, en la misma red, tras emparejar con QR o código. Solo están los datos del entrenador: **Alumnos** (la ficha con diario, notas, evaluación, pruebas, clasificación y torneos, resultados, paquetes con los recibos en PDF y el informe), **Agenda** (las clases y las que hay que marcar como hechas), **Mis cursos** (el registro, pasar lista pulsando una clase, PDF y Excel) y **Resumen del mes** (con los recibos del año en Excel). Cada página se imprime; los datos se quedan en el teléfono.
 
 ### 7.7 Jugadores: la base
 
@@ -10353,6 +11711,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
 - **Matchs des élèves et secrétariat** : qui compte un match sur son téléphone l'envoie avec *Partager › Fichier du match (pour l'entraîneur)* ; en l'ouvrant avec TSM il entre dans l'historique et la fiche de l'élève. **Proposer au secrétariat** (fiche de l'élève) envoie ses données pour l'inscrire à un cours. **Récapitulatif du mois** (onglet Élèves) : cours particuliers et heures, cours collectifs et présences, forfaits encaissés, à envoyer au secrétariat. Dans le récapitulatif, **Reçus <année> (Excel)** donne la liste des reçus de forfaits de l'année, pour le comptable.
+- **Entraîneur depuis le PC** (*Plus › Entraîneur depuis le PC*) : comme le Secrétariat depuis le PC (7.20), l'ordinateur de la maison ouvre une page servie par le téléphone, sur le même réseau, après l'appairage par QR ou code. Il n'y a que les données de l'entraîneur : **Élèves** (la fiche avec journal, notes, évaluation, tests, classement et tournois, résultats, forfaits avec les reçus PDF et le rapport), **Agenda** (les cours et ceux à marquer comme faits), **Mes cours** (le registre, l'appel en cliquant sur une séance, PDF et Excel) et **Récapitulatif du mois** (avec les reçus de l'année en Excel). Chaque page s'imprime ; les données restent sur le téléphone.
 
 ### 7.7 Joueurs : la base
 
@@ -10954,6 +12313,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
 - **Partite degli allievi e segreteria**: chi segna una partita col suo telefono la manda con *Condividi › File della partita (per l'allenatore)*; aprendola con TSM entra nello storico e nella scheda dell'allievo. **Proponi alla segreteria** (scheda dell'allievo) manda i suoi dati per iscriverlo a un corso. **Riepilogo del mese** (scheda Allievi): lezioni private e ore, lezioni dei corsi e presenze, pacchetti incassati, da mandare alla segreteria. Nel riepilogo, **Ricevute <anno> (Excel)** dà l'elenco delle ricevute dei pacchetti dell'anno, per il commercialista.
+- **Allenatore da PC** (*Altro › Allenatore da PC*): come la Segreteria da PC (7.20), il computer di casa apre una pagina servita dal telefono, sulla stessa rete, dopo l'abbinamento con QR o codice. Ci sono solo i dati dell'allenatore: **Allievi** (la scheda con diario, note, valutazione, test, classifica e tornei, risultati, pacchetti con le ricevute in PDF e il report), **Agenda** (le lezioni e quelle da segnare come fatte), **I miei corsi** (il registro, l'appello cliccando una lezione, PDF ed Excel) e **Riepilogo del mese** (con le ricevute dell'anno in Excel). Ogni pagina si stampa; i dati restano sul telefono.
 
 ### 7.7 Giocatori: il database
 
@@ -11555,6 +12915,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
 - **Partidas dos alunos e secretaria**: quem marca uma partida com o seu telefone envia-a com *Compartilhar › Arquivo da partida (para o treinador)*; ao abri-la com o TSM entra no histórico e na ficha do aluno. **Propor à secretaria** (ficha do aluno) envia os seus dados para o inscrever num curso. **Resumo do mês** (separador Alunos): aulas particulares e horas, aulas dos cursos e presenças, pacotes recebidos, para enviar à secretaria. No resumo, **Recibos <ano> (Excel)** dá a lista dos recibos de pacotes do ano, para o contabilista.
+- **Treinador no PC** (*Mais › Treinador no PC*): como a Secretaria no PC (7.20), o computador de casa abre uma página servida pelo telefone, na mesma rede, depois de emparelhar com QR ou código. Só estão os dados do treinador: **Alunos** (a ficha com diário, notas, avaliação, testes, ranking e torneios, resultados, pacotes com os recibos em PDF e o relatório), **Agenda** (as aulas e as que falta marcar como feitas), **Os meus cursos** (o registo, a chamada clicando numa aula, PDF e Excel) e **Resumo do mês** (com os recibos do ano em Excel). Cada página imprime-se; os dados ficam no telefone.
 
 ### 7.7 Jogadores: o banco
 
@@ -14008,7 +15369,7 @@ class MatchController(
     }
 
     /** La Segreteria da PC: spenta finché non la si accende dall'app. */
-    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this)) }
+    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this), com.tennis.scoremanager.desk.CoachBridge(this)) }
 
     fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
 
@@ -29010,6 +30371,209 @@ object YearReviewImage {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/CoachApi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/CoachApi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import com.tennis.scoremanager.data.CoachBook
+import com.tennis.scoremanager.data.Coaching
+import com.tennis.scoremanager.data.Courses
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.ServeSession
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import java.time.Instant
+import java.time.ZoneId
+
+/** Quello che l'Allenatore da PC legge e cambia: i dati veri dell'app (vedi CoachBridge). */
+interface CoachData {
+    fun now(): Long
+    val lang: String
+    fun coachName(): String
+    fun book(): CoachBook
+    fun players(): List<PlayerProfile>
+    fun sessions(): List<ServeSession>
+    fun addDiary(student: String, text: String)
+    fun setNote(student: String, text: String)
+    fun markPackPaid(packId: String)
+    fun setLessonDone(lessonId: String, done: Boolean)
+    fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String)
+    fun receiptPdf(packId: String): ByteArray?
+    fun reportPdf(student: String, days: Int?): ByteArray?
+    fun registerPdf(courseId: String): ByteArray?
+    fun registerXlsx(courseId: String): ByteArray?
+    fun receiptsXlsx(year: Int): ByteArray?
+}
+
+@Serializable data class CdBalance(val bought: Int, val used: Int, val left: Int, val dueCents: Int, val absences: Int, val toRecover: Int)
+@Serializable data class CdStudent(
+    val id: String, val name: String, val phone: String = "", val email: String = "", val guardian: String = "", val guardianPhone: String = "",
+    val lastSeen: String? = null, val ranking: String? = null, val trend: Double? = null, val balance: CdBalance, val next: String? = null, val nextMin: Int? = null,
+)
+@Serializable data class CdDiary(val date: String, val text: String)
+@Serializable data class CdEval(val date: String, val scores: Map<String, Int>, val note: String = "")
+@Serializable data class CdTest(val key: String, val value: Double, val previous: Double? = null, val lowerBetter: Boolean)
+@Serializable data class CdResult(val date: String, val event: String, val opponent: String, val opponentRanking: String, val score: String, val won: Boolean)
+@Serializable data class CdEvent(val date: String, val name: String, val place: String)
+@Serializable data class CdPack(val id: String, val lessons: Int, val cents: Int, val created: String, val paid: String? = null, val receipt: String? = null)
+@Serializable data class CdCourseLine(val name: String, val present: Int, val total: Int)
+@Serializable data class CdStudentDetail(
+    val student: CdStudent, val note: String, val consent: String? = null, val diary: List<CdDiary>, val evaluations: List<CdEval>, val tests: List<CdTest>,
+    val testDate: String? = null, val results: List<CdResult>, val events: List<CdEvent>, val rankings: List<String>, val packs: List<CdPack>, val courses: List<CdCourseLine>,
+)
+@Serializable data class CdLesson(val id: String, val date: String, val startMin: Int, val minutes: Int, val students: List<String>, val place: String, val done: Boolean, val cancelled: Boolean)
+@Serializable data class CdCourse(val id: String, val name: String, val level: String, val club: String, val from: String, val to: String, val students: Int, val toSend: Boolean, val toMark: Int)
+@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean)
+@Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
+@Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
+@Serializable data class CdMonth(
+    val from: String, val privateLessons: Int, val privateMinutes: Int, val students: Int, val paidCents: Int,
+    val courseLessons: Int, val courseMinutes: Int, val presencePct: Int? = null, val receipts: List<CdReceipt>,
+)
+@Serializable data class CdReceipt(val packId: String, val number: String, val date: String, val name: String, val lessons: Int, val cents: Int)
+@Serializable data class CdText(val text: String = "")
+@Serializable data class CdAttendanceIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean = false, val note: String = "")
+@Serializable data class CdDoneIn(val done: Boolean = true)
+@Serializable data class CdInfo(val mode: String = "coach", val club: String, val lang: String, val today: String, val year: Int, val coach: String)
+
+/**
+ * L'API dell'Allenatore da PC (sotto /api/, dopo l'abbinamento come per la segreteria): allievi con la loro scheda,
+ * agenda, corsi col registro, riepilogo del mese; PDF ed Excel fatti dal telefono. Nessun dato della segreteria.
+ */
+class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = ZoneId::systemDefault) {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
+    private fun <T> ok(ser: KSerializer<T>, v: T) = DeskApi.Resp(200, json.encodeToString(ser, v).toByteArray())
+    private fun done() = DeskApi.Resp(200, "{}".toByteArray())
+    private fun <T> read(ser: KSerializer<T>, r: DeskApi.Req): T = try { json.decodeFromString(ser, r.body) } catch (_: Exception) { throw DeskApi.Fail(400, "BAD_REQUEST") }
+    private fun bytes(b: ByteArray?, type: String) = DeskApi.Resp(200, b ?: throw DeskApi.Fail(404, "NOT_FOUND"), type)
+
+    private fun day(t: Long?): String? = t?.let { Instant.ofEpochMilli(it).atZone(zone()).toLocalDate().toString() }
+    private fun minOf(t: Long): Int = Instant.ofEpochMilli(t).atZone(zone()).let { it.hour * 60 + it.minute }
+    private fun dayStart(d: String?): Long = try { java.time.LocalDate.parse(d).atStartOfDay(zone()).toInstant().toEpochMilli() } catch (_: Exception) { throw DeskApi.Fail(400, "BAD_REQUEST") }
+
+    fun route(m: String, p: List<String>, r: DeskApi.Req, club: String): DeskApi.Resp = when {
+        m == "GET" && p == listOf("info") -> ok(CdInfo.serializer(), CdInfo(club = club, lang = data.lang, today = day(data.now())!!, year = Instant.ofEpochMilli(data.now()).atZone(zone()).year, coach = data.coachName()))
+        m == "GET" && p == listOf("coach", "students") -> ok(ListSerializer(CdStudent.serializer()), students().sortedBy { it.name.lowercase() })
+        m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
+        m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "diary" -> { student(p[2]); data.addDiary(p[2], read(CdText.serializer(), r).text); done() }
+        m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "note" -> { student(p[2]); data.setNote(p[2], read(CdText.serializer(), r).text); done() }
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "report.pdf" ->
+            bytes(data.reportPdf(student(p[2]).id, r.query["days"]?.toIntOrNull()), "application/pdf")
+        m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "paid" -> { pack(p[2]); data.markPackPaid(p[2]); done() }
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "receipt.pdf" -> { pack(p[2]); bytes(data.receiptPdf(p[2]), "application/pdf") }
+        m == "GET" && p == listOf("coach", "lessons") -> ok(ListSerializer(CdLesson.serializer()), lessons())
+        m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "lessons" && p[3] == "done" -> {
+            if (data.book().lessons.none { it.id == p[2] }) throw DeskApi.Fail(404, "NOT_FOUND")
+            data.setLessonDone(p[2], read(CdDoneIn.serializer(), r).done); done()
+        }
+        m == "GET" && p == listOf("coach", "courses") -> ok(ListSerializer(CdCourse.serializer()), data.book().courses.map { course(it.card.course.id) }.sortedBy { it.name.lowercase() })
+        m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "courses" -> ok(CdRegister.serializer(), register(p[2]))
+        m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "attendance" -> attendance(p[2], read(CdAttendanceIn.serializer(), r))
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.pdf" -> { course(p[2]); bytes(data.registerPdf(p[2]), "application/pdf") }
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.xlsx" -> { course(p[2]); bytes(data.registerXlsx(p[2]), com.tennis.scoremanager.data.Xlsx.MIME) }
+        m == "GET" && p == listOf("coach", "month") -> ok(CdMonth.serializer(), month(r.query["date"]))
+        m == "GET" && p == listOf("coach", "receipts.xlsx") -> bytes(data.receiptsXlsx(r.query["year"]?.toIntOrNull() ?: throw DeskApi.Fail(400, "BAD_REQUEST")), com.tennis.scoremanager.data.Xlsx.MIME)
+        else -> throw DeskApi.Fail(404, "NOT_FOUND")
+    }
+
+    private fun student(id: String): PlayerProfile = data.players().firstOrNull { it.id == id && it.student } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+    private fun pack(id: String) = data.book().packs.firstOrNull { it.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+
+    private fun studentOut(p: PlayerProfile, book: CoachBook, sessions: List<ServeSession>, now: Long): CdStudent {
+        val b = Coaching.balance(book, p.id)
+        val next = Coaching.upcoming(Coaching.lessonsOf(book, p.id), now).firstOrNull()
+        return CdStudent(
+            p.id, p.name, p.phone, p.email, p.guardian.ifBlank { p.member?.guardian.orEmpty() }, p.guardianPhone.ifBlank { p.member?.guardianPhone.orEmpty() },
+            day(Coaching.lastSeen(book, sessions, p.id)), Coaching.ranking(book, p.id), Coaching.trend(book, p.id),
+            CdBalance(b.bought, b.used, b.left, b.dueCents, b.absences, b.toRecover), day(next?.start), next?.let { minOf(it.start) },
+        )
+    }
+
+    private fun students(): List<CdStudent> {
+        val book = data.book(); val sessions = data.sessions(); val now = data.now()
+        return data.players().filter { it.student }.map { studentOut(it, book, sessions, now) }
+    }
+
+    private fun detail(id: String): CdStudentDetail {
+        val p = student(id)
+        val book = data.book(); val now = data.now()
+        val tests = Coaching.testsOf(book, id)
+        return CdStudentDetail(
+            studentOut(p, book, data.sessions(), now), p.note, day(p.consentAt),
+            Coaching.diaryOf(book, id).take(40).map { CdDiary(day(it.at)!!, it.text) },
+            Coaching.evaluationsOf(book, id).takeLast(6).map { CdEval(day(it.at)!!, it.scores, it.note) },
+            Coaching.TESTS.mapNotNull { (k, lower) -> Coaching.lastTwo(tests, k).let { (v, prev) -> v?.let { CdTest(k, it, prev, lower) } } },
+            day(tests.lastOrNull()?.at),
+            book.manualMatches.filter { it.student == id }.sortedByDescending { it.at }.map { CdResult(day(it.at)!!, it.event, it.opponent, it.opponentRanking, it.score, it.won) },
+            book.events.filter { it.student == id && it.at >= now - 86_400_000L }.sortedBy { it.at }.map { CdEvent(day(it.at)!!, it.name, it.place) },
+            book.rankings.filter { it.student == id }.sortedBy { it.at }.map { "${day(it.at)} ${it.ranking}" },
+            book.packs.filter { it.student == id }.sortedByDescending { it.createdAt }.map { CdPack(it.id, it.lessons, it.cents, day(it.createdAt)!!, day(it.paidAt), it.receipt) },
+            book.courses.filter { id in it.card.course.students }.map { cc -> Courses.attendanceOf(cc.course, id, now).let { (a, t) -> CdCourseLine(cc.card.course.name, a, t) } },
+        )
+    }
+
+    private fun lessons(): List<CdLesson> {
+        val book = data.book(); val now = data.now()
+        val names = data.players().associate { it.id to it.name }
+        // Le prossime e quelle passate da 60 giorni in qua (le passate non fatte sono da segnare).
+        return book.lessons.filter { it.start >= now - 60L * 86_400_000L }.sortedBy { it.start }.map { l ->
+            CdLesson(l.id, day(l.start)!!, minOf(l.start), l.minutes, l.students.map { names[it] ?: "—" }, l.place, l.done, l.cancelled)
+        }
+    }
+
+    private fun course(id: String): CdCourse {
+        val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        val co = cc.course; val now = data.now()
+        return CdCourse(co.id, co.name, co.level, cc.card.club, day(co.from)!!, day(co.to)!!, co.students.size, cc.toSend,
+            Courses.held(co, now).count { it.key !in co.attendance && it.key !in co.cancelled })
+    }
+
+    private fun register(id: String): CdRegister {
+        val head = course(id)
+        val cc = data.book().courses.first { it.card.course.id == id }
+        val co = cc.course; val now = data.now()
+        val names = data.players().associate { it.id to it.name } + cc.card.students.associate { it.id to it.name }.filterKeys { k -> data.players().none { it.id == k } }
+        val lessons = Courses.lessons(co).filter { it.start <= now + 7L * 86_400_000L }
+        return CdRegister(
+            head,
+            lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L) },
+            co.students.sortedBy { (names[it] ?: "").lowercase() }.map { sid ->
+                val (a, t) = Courses.attendanceOf(co, sid, now)
+                CdRegRow(sid, names[sid] ?: "—", lessons.map { com.tennis.scoremanager.data.AttendancePdf.mark(co, it.key, sid) }, a, t)
+            },
+            cc.notes,
+        )
+    }
+
+    private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {
+        val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        val l = Courses.lessons(cc.course).firstOrNull { it.key == a.key } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        if (!a.cancelled && l.start > data.now() + 3_600_000L) throw DeskApi.Fail(400, "BAD_REQUEST")
+        data.markCourseLesson(id, a.key, l.start, a.present.filter { it in cc.card.course.students }.toSet(), a.cancelled, a.note)
+        return ok(CdRegister.serializer(), register(id))
+    }
+
+    private fun month(date: String?): CdMonth {
+        val from = dayStart(date)
+        val start = Instant.ofEpochMilli(from).atZone(zone()).toLocalDate().withDayOfMonth(1)
+        val f = start.atStartOfDay(zone()).toInstant().toEpochMilli()
+        val t = start.plusMonths(1).atStartOfDay(zone()).toInstant().toEpochMilli()
+        val book = data.book()
+        val m = Coaching.month(book, f, t)
+        val names = data.players().associate { it.id to it.name }
+        val year = start.year
+        val receipts = book.packs.filter { it.receipt != null && it.paidAt != null && Instant.ofEpochMilli(it.paidAt).atZone(zone()).year == year }.sortedBy { it.receipt }
+            .map { CdReceipt(it.id, it.receipt!!, day(it.paidAt)!!, names[it.student] ?: "—", it.lessons, it.cents) }
+        return CdMonth(start.toString(), m.privateLessons, m.privateMinutes, m.students, m.paidCents, m.courseLessons, m.courseMinutes, m.presencePct, receipts)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/desk/DeskApi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/desk/DeskApi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -29403,11 +30967,13 @@ class DeskApi(
     private val data: DeskData, private val auth: DeskAuth, private val zone: () -> ZoneId = ZoneId::systemDefault,
     /** Il testo come QR, riga per riga. */
     private val qr: (String) -> List<String> = { listOf(it) },
+    /** Allenatore da PC: con questa, il PC vede solo i dati dell'allenatore e niente della segreteria. */
+    private val coach: CoachApi? = null,
 ) {
 
     data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
     class Resp(val status: Int, val body: ByteArray, val type: String = JSON)
-    private class Fail(val status: Int, val code: String) : Exception(code)
+    class Fail(val status: Int, val code: String) : Exception(code)
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
@@ -29433,6 +30999,7 @@ class DeskApi(
         if (m == "GET" && p.size == 2 && p[0] == "pair") return pairState(p[1], r.ip)
         if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
+        if (coach != null) return data.tx { coach.route(m, p, r, data.club) }
         // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
         if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p, r)
         if (p.firstOrNull() == "backup") return backup(m, p.drop(1), r)
@@ -30933,15 +32500,39 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
 }
 
+/** I dati veri dell'app per l'Allenatore da PC: allievi, agenda, corsi, PDF ed Excel fatti dal telefono. */
+class CoachBridge(private val c: MatchController) : CoachData {
+    override fun now(): Long = System.currentTimeMillis()
+    override val lang: String get() = c.options.value.lang.code
+    override fun coachName(): String = c.me()?.name ?: c.storage.myName
+    override fun book() = c.coachBook.value
+    override fun players(): List<PlayerProfile> = c.players.value
+    override fun sessions() = c.serveSessions.value
+    override fun addDiary(student: String, text: String) = c.addDiary(student, text)
+    override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
+    override fun markPackPaid(packId: String) { c.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
+    override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
+        c.markCourseLesson(courseId, key, start, present, cancelled, note)
+    private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
+    override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
+    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.registerFile(courseId, coachSide = true))
+    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.registerXlsx(courseId, coachSide = true))
+    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.receiptsXlsx(year))
+}
+
 /**
  * La Segreteria da PC sul telefono: acceso solo quando serve. Si spegne da solo dopo mezz'ora senza nessuno collegato.
  * Il certificato sta nella cartella esclusa dai backup: la chiave privata non esce mai dal telefono.
  */
-class DeskManager(context: Context, private val data: DeskData) {
+class DeskManager(context: Context, private val data: DeskData, private val coachData: CoachData? = null) {
 
     data class Ui(
         val running: Boolean = false, val urls: List<String> = emptyList(), val code: String = "", val waitingIp: String? = null,
         val connectedIp: String? = null, val fingerprint: String = "", val failed: Boolean = false,
+        /** Acceso come Allenatore da PC (solo i dati dell'allenatore) o come Segreteria da PC. */
+        val coach: Boolean = false,
     )
 
     private val app = context.applicationContext
@@ -30955,16 +32546,19 @@ class DeskManager(context: Context, private val data: DeskData) {
 
     private fun asset(name: String): ByteArray? = files[name] ?: runCatching { app.assets.open("desk/$name").use { it.readBytes() } }.getOrNull()?.also { files[name] = it }
 
-    fun start() {
+    /** Accende il server; [coach] = Allenatore da PC. Acceso nell'altro modo, si spegne e riparte in questo. */
+    fun start(coach: Boolean = false) {
+        if (server != null && _ui.value.coach != coach) stop()
         scope.launch {
             synchronized(this@DeskManager) {
                 if (server != null) return@launch
                 try {
                     val cert = DeskCert.loadOrCreate(app.noBackupFilesDir)
-                    val s = DeskServer(cert, DeskApi(data, auth, qr = ::qrRows), ::asset, { TvServer.isLocalPeer(it) })
+                    val api = DeskApi(data, auth, qr = ::qrRows, coach = if (coach) coachData?.let { CoachApi(it) } else null)
+                    val s = DeskServer(cert, api, ::asset, { TvServer.isLocalPeer(it) })
                     s.start()
                     server = s
-                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint)
+                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint, coach = coach)
                 } catch (e: Exception) {
                     Log.w(TAG, "Avvio non riuscito", e)
                     _ui.value = Ui(failed = true)
@@ -44753,6 +46347,14 @@ interface Strings {
     val xlStudent: String
     val xlNumber: String
     val xlReceipts: String
+    val ccDeskTitle: String
+    val ccDeskHint: String
+    val ccDeskNote: String
+    val ccDeskPrint: String
+    val ccDeskReport30: String
+    val ccDeskReportAll: String
+    val ccDeskSaveAttendance: String
+    val ccDeskSent: String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
@@ -47297,6 +48899,14 @@ object ItStrings : Strings {
     override val xlStudent = "Allievo"
     override val xlNumber = "Numero"
     override val xlReceipts = "Ricevute"
+    override val ccDeskTitle = "Allenatore da PC"
+    override val ccDeskHint = "Allievi, schede, ricevute e registro dal computer di casa, sulla stessa rete"
+    override val ccDeskNote = "I dati restano sul telefono: la pagina li legge da lì."
+    override val ccDeskPrint = "Stampa la pagina"
+    override val ccDeskReport30 = "Report 30 giorni (PDF)"
+    override val ccDeskReportAll = "Report completo (PDF)"
+    override val ccDeskSaveAttendance = "Salva le presenze"
+    override val ccDeskSent = "Le presenze si mandano alla segreteria dal telefono (I miei corsi › Manda le presenze)."
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
@@ -49842,6 +51452,14 @@ object EnStrings : Strings {
     override val xlStudent = "Student"
     override val xlNumber = "Number"
     override val xlReceipts = "Receipts"
+    override val ccDeskTitle = "Coach from PC"
+    override val ccDeskHint = "Students, cards, receipts and register from your home computer, on the same network"
+    override val ccDeskNote = "The data stays on the phone: the page reads it from there."
+    override val ccDeskPrint = "Print the page"
+    override val ccDeskReport30 = "30-day report (PDF)"
+    override val ccDeskReportAll = "Full report (PDF)"
+    override val ccDeskSaveAttendance = "Save attendance"
+    override val ccDeskSent = "Attendance is sent to the club office from the phone (My courses › Send attendance)."
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
@@ -52412,6 +54030,14 @@ object DeStrings : Strings {
     override val xlStudent = "Schüler"
     override val xlNumber = "Nummer"
     override val xlReceipts = "Quittungen"
+    override val ccDeskTitle = "Trainer am PC"
+    override val ccDeskHint = "Schüler, Karten, Quittungen und Anwesenheitsliste vom Computer zu Hause, im selben Netz"
+    override val ccDeskNote = "Die Daten bleiben auf dem Telefon: die Seite liest sie von dort."
+    override val ccDeskPrint = "Seite drucken"
+    override val ccDeskReport30 = "Bericht 30 Tage (PDF)"
+    override val ccDeskReportAll = "Vollständiger Bericht (PDF)"
+    override val ccDeskSaveAttendance = "Anwesenheit speichern"
+    override val ccDeskSent = "Die Anwesenheit schickst du vom Telefon ans Büro (Meine Kurse › Anwesenheit schicken)."
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
@@ -54972,6 +56598,14 @@ object EsStrings : Strings {
     override val xlStudent = "Alumno"
     override val xlNumber = "Número"
     override val xlReceipts = "Recibos"
+    override val ccDeskTitle = "Entrenador desde el PC"
+    override val ccDeskHint = "Alumnos, fichas, recibos y registro desde el ordenador de casa, en la misma red"
+    override val ccDeskNote = "Los datos se quedan en el teléfono: la página los lee de allí."
+    override val ccDeskPrint = "Imprimir la página"
+    override val ccDeskReport30 = "Informe 30 días (PDF)"
+    override val ccDeskReportAll = "Informe completo (PDF)"
+    override val ccDeskSaveAttendance = "Guardar asistencia"
+    override val ccDeskSent = "La asistencia se envía a la secretaría desde el teléfono (Mis cursos › Enviar asistencia)."
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
@@ -57534,6 +59168,14 @@ object FrStrings : Strings {
     override val xlStudent = "Élève"
     override val xlNumber = "Numéro"
     override val xlReceipts = "Reçus"
+    override val ccDeskTitle = "Entraîneur depuis le PC"
+    override val ccDeskHint = "Élèves, fiches, reçus et registre depuis l'ordinateur de la maison, sur le même réseau"
+    override val ccDeskNote = "Les données restent sur le téléphone : la page les lit là."
+    override val ccDeskPrint = "Imprimer la page"
+    override val ccDeskReport30 = "Rapport 30 jours (PDF)"
+    override val ccDeskReportAll = "Rapport complet (PDF)"
+    override val ccDeskSaveAttendance = "Enregistrer les présences"
+    override val ccDeskSent = "Les présences s'envoient au secrétariat depuis le téléphone (Mes cours › Envoyer les présences)."
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
@@ -60097,6 +61739,14 @@ object PtStrings : Strings {
     override val xlStudent = "Aluno"
     override val xlNumber = "Número"
     override val xlReceipts = "Recibos"
+    override val ccDeskTitle = "Treinador no PC"
+    override val ccDeskHint = "Alunos, fichas, recibos e registo a partir do computador de casa, na mesma rede"
+    override val ccDeskNote = "Os dados ficam no telefone: a página lê-os de lá."
+    override val ccDeskPrint = "Imprimir a página"
+    override val ccDeskReport30 = "Relatório 30 dias (PDF)"
+    override val ccDeskReportAll = "Relatório completo (PDF)"
+    override val ccDeskSaveAttendance = "Guardar presenças"
+    override val ccDeskSent = "As presenças enviam-se à secretaria a partir do telefone (Os meus cursos › Enviar presenças)."
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
@@ -63467,10 +65117,12 @@ fun DeskScreen(c: MatchController) {
     val context = LocalContext.current
     var scanBad by remember { mutableStateOf(false) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { scanBad = !c.desk.scan(it) } }
+    // Dal ruolo Allenatore è l'Allenatore da PC: solo i suoi dati (allievi, agenda, corsi, ricevute).
+    val coach = c.activeRole.collectAsState().value == com.tennis.scoremanager.Role.COACH
     ScreenScaffold(
-        onHelp = { c.openHelp("7.20") },
-        title = s.deskTitle,
-        subtitle = s.deskHint,
+        onHelp = { c.openHelp(if (coach) "7.6" else "7.20") },
+        title = if (coach) s.ccDeskTitle else s.deskTitle,
+        subtitle = if (coach) s.ccDeskHint else s.deskHint,
         icon = Icons.Filled.Computer,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
@@ -63483,7 +65135,7 @@ fun DeskScreen(c: MatchController) {
         if (!ui.running) {
             Text(s.deskIntro, color = TsmColors.TextDim)
             if (ui.failed) Text(s.deskFailed, color = TsmColors.Orange)
-            GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start() }, Modifier.fillMaxWidth())
+            GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start(coach) }, Modifier.fillMaxWidth())
             firstTime()
             return@ScreenScaffold
         }
@@ -64808,6 +66460,8 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
             }
             if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
             Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+            // L'allenatore dal computer di casa: schede, ricevute, registro, da stampare.
+            if (role == com.tennis.scoremanager.Role.COACH) Entry(Icons.Filled.Computer, s.ccDeskTitle, s.ccDeskHint) { c.go(Screen.DESK) }
             // L'allenatore non ha Progressi: le racchette (sue e degli allievi) stanno qui.
             if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.playerFeatures.collectAsState().value) {
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
@@ -94848,6 +96502,115 @@ class XlsxTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/desk/CoachDeskTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/desk/CoachDeskTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.desk
+
+import com.tennis.scoremanager.data.CoachBook
+import com.tennis.scoremanager.data.CoachCourse
+import com.tennis.scoremanager.data.CoachLesson
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.CourseCard
+import com.tennis.scoremanager.data.CourseSlot
+import com.tennis.scoremanager.data.LessonPack
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.ServeSession
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.time.ZoneId
+
+class FakeCoach(var time: Long) : CoachData {
+    var book = CoachBook()
+    var people = listOf(PlayerProfile("s1", "Anna Neri", "Anna", "Neri", student = true), PlayerProfile("x", "Socio Qualunque"))
+    val diary = mutableListOf<Pair<String, String>>()
+    val marked = mutableListOf<Triple<String, String, Set<String>>>()
+    val paid = mutableListOf<String>()
+    override fun now() = time
+    override val lang = "it"
+    override fun coachName() = "Marco"
+    override fun book() = book
+    override fun players() = people
+    override fun sessions() = emptyList<ServeSession>()
+    override fun addDiary(student: String, text: String) { diary += student to text }
+    override fun setNote(student: String, text: String) {}
+    override fun markPackPaid(packId: String) { paid += packId }
+    override fun setLessonDone(lessonId: String, done: Boolean) {}
+    override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) { marked += Triple(courseId, key, present) }
+    override fun receiptPdf(packId: String) = "%PDF".toByteArray()
+    override fun reportPdf(student: String, days: Int?) = "%PDF".toByteArray()
+    override fun registerPdf(courseId: String) = "%PDF".toByteArray()
+    override fun registerXlsx(courseId: String) = "PK".toByteArray()
+    override fun receiptsXlsx(year: Int) = "PK".toByteArray()
+}
+
+class CoachDeskTest {
+    private var t = 1_000_000L
+    private val zone = ZoneId.of("Europe/Rome")
+    private val now = java.time.LocalDate.of(2026, 11, 14).atTime(20, 0).atZone(zone).toInstant().toEpochMilli()
+    private val auth = DeskAuth({ t })
+    private val coach = FakeCoach(now)
+    private val api = DeskApi(FakeDesk(now), auth, zone = { zone }, coach = CoachApi(coach) { zone })
+    private val ip = "192.168.1.40"
+
+    private fun req(m: String, p: String, body: String = "", token: String? = null, q: Map<String, String> = emptyMap()) =
+        api.handle(DeskApi.Req(m, p, q, body, token, ip)).let { it.status to it.body.toString(Charsets.UTF_8) }
+    private fun field(json: String, k: String) = Regex("\"$k\":\"([^\"]+)\"").find(json)?.groupValues?.get(1)
+    private fun login(): String {
+        val id = field(req("POST", "/pair", """{"code":"${auth.shownCode}"}""").second, "id")!!
+        auth.answer(true)
+        return field(req("GET", "/pair/$id").second, "token")!!
+    }
+
+    @Test fun needsPairingAndHidesTheClubOffice() {
+        assertEquals(401, req("GET", "/coach/students").first)
+        val tk = login()
+        val info = req("GET", "/info", token = tk)
+        assertTrue(info.second, "\"mode\":\"coach\"" in info.second)
+        assertTrue("\"coach\":\"Marco\"" in info.second)
+        // Le pagine della segreteria non esistono per l'allenatore.
+        assertEquals(404, req("GET", "/people", token = tk).first)
+        assertEquals(404, req("GET", "/money", token = tk).first)
+    }
+
+    @Test fun studentsOnlyAndTheirCard() {
+        coach.book = CoachBook(packs = listOf(LessonPack("pk", "s1", 10, 25000, createdAt = now)))
+        val tk = login()
+        val list = req("GET", "/coach/students", token = tk).second
+        assertTrue("Anna Neri" in list)
+        assertTrue("Socio Qualunque" !in list)
+        assertEquals(404, req("GET", "/coach/students/x", token = tk).first)
+        assertEquals(200, req("POST", "/coach/students/s1/diary", """{"text":"Bene il dritto"}""", tk).first)
+        assertEquals("s1" to "Bene il dritto", coach.diary.single())
+        assertEquals(200, req("POST", "/coach/packs/pk/paid", "{}", tk).first)
+        assertEquals(listOf("pk"), coach.paid)
+        assertEquals(404, req("POST", "/coach/packs/zz/paid", "{}", tk).first)
+        val pdf = api.handle(DeskApi.Req("GET", "/coach/packs/pk/receipt.pdf", emptyMap(), "", tk, ip))
+        assertEquals("application/pdf", pdf.type)
+    }
+
+    @Test fun courseRegisterAndAttendanceOnlyForPastLessons() {
+        val start = now - 3L * 86_400_000L
+        val course = Course("c1", "Under 10", students = listOf("s1"), slots = (1..7).map { CourseSlot(it, 17 * 60) }, from = start, to = now + 10L * 86_400_000L)
+        coach.book = CoachBook(courses = listOf(CoachCourse(CourseCard(code = "X", issuedAt = 1, course = course))), lessons = listOf(CoachLesson("l1", now + 86_400_000L, students = listOf("s1"))))
+        val tk = login()
+        val reg = req("GET", "/coach/courses/c1", token = tk).second
+        val keys = Regex("\"key\":\"([^\"]+)\"").findAll(reg).map { it.groupValues[1] }.toList()
+        assertTrue(keys.size >= 4)
+        assertEquals(200, req("PUT", "/coach/courses/c1/attendance", """{"key":"${keys.first()}","present":["s1","intruso"]}""", tk).first)
+        assertEquals(setOf("s1"), coach.marked.single().third)
+        // Una lezione futura non si segna (si può solo annullare).
+        assertEquals(400, req("PUT", "/coach/courses/c1/attendance", """{"key":"${keys.last()}","present":["s1"]}""", tk).first)
+        assertTrue("Under 10" in req("GET", "/coach/courses", token = tk).second)
+        assertTrue("\"from\":\"2026-11-01\"" in req("GET", "/coach/month", token = tk, q = mapOf("date" to "2026-11-14")).second)
+        assertTrue(req("GET", "/coach/lessons", token = tk).second.contains("l1"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/desk/DeskTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/desk/DeskTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -108691,6 +110454,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 349 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 352 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

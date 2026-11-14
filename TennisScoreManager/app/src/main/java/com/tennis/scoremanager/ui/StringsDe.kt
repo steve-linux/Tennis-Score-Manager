@@ -2549,6 +2549,14 @@ object DeStrings : Strings {
     override val xlStudent = "Schüler"
     override val xlNumber = "Nummer"
     override val xlReceipts = "Quittungen"
+    override val ccDeskTitle = "Trainer am PC"
+    override val ccDeskHint = "Schüler, Karten, Quittungen und Anwesenheitsliste vom Computer zu Hause, im selben Netz"
+    override val ccDeskNote = "Die Daten bleiben auf dem Telefon: die Seite liest sie von dort."
+    override val ccDeskPrint = "Seite drucken"
+    override val ccDeskReport30 = "Bericht 30 Tage (PDF)"
+    override val ccDeskReportAll = "Vollständiger Bericht (PDF)"
+    override val ccDeskSaveAttendance = "Anwesenheit speichern"
+    override val ccDeskSent = "Die Anwesenheit schickst du vom Telefon ans Büro (Meine Kurse › Anwesenheit schicken)."
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }

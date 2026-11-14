@@ -195,6 +195,8 @@ async function start() {
   info = await api('GET', '/info');
   T = pick(info.lang);
   document.documentElement.lang = T.lang;
+  // Acceso dal ruolo Allenatore: solo le sue pagine (coach.js).
+  if (info.mode === 'coach') return coachStart();
   document.title = T.title + ' · ' + info.club;
   planDate = info.today;
   await render();

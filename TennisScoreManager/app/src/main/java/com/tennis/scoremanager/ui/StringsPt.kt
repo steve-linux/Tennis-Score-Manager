@@ -2553,6 +2553,14 @@ object PtStrings : Strings {
     override val xlStudent = "Aluno"
     override val xlNumber = "Número"
     override val xlReceipts = "Recibos"
+    override val ccDeskTitle = "Treinador no PC"
+    override val ccDeskHint = "Alunos, fichas, recibos e registo a partir do computador de casa, na mesma rede"
+    override val ccDeskNote = "Os dados ficam no telefone: a página lê-os de lá."
+    override val ccDeskPrint = "Imprimir a página"
+    override val ccDeskReport30 = "Relatório 30 dias (PDF)"
+    override val ccDeskReportAll = "Relatório completo (PDF)"
+    override val ccDeskSaveAttendance = "Guardar presenças"
+    override val ccDeskSent = "As presenças enviam-se à secretaria a partir do telefone (Os meus cursos › Enviar presenças)."
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }

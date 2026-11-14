@@ -2,7 +2,8 @@
 # SPDX-FileCopyrightText: 2026 Stefano Spagnolo
 # SPDX-License-Identifier: GPL-3.0-or-later
 """
-Genera i testi dell'app che usa anche la Segreteria da PC (tornei, Oggi, campi non prenotabili, statistiche, scuola tennis, squadre, impostazioni, server), presi da
+Genera i testi dell'app che usa anche la Segreteria da PC (tornei, Oggi, campi non prenotabili, statistiche, scuola tennis, squadre, impostazioni, server)
+e l'Allenatore da PC (allievi, corsi, ricevute), presi da
 Strings*.kt nelle sei lingue: TennisScoreManager/app/src/main/assets/desk/app-i18n.js. Così sul PC si leggono le
 stesse parole del telefono. Si lancia da solo con make_installer.py; a mano: python3 deliver/make_desk_texts.py
 """
@@ -14,10 +15,12 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 UI = ROOT / "TennisScoreManager" / "app" / "src" / "main" / "java" / "com" / "tennis" / "scoremanager" / "ui"
 OUT = ROOT / "TennisScoreManager" / "app" / "src" / "main" / "assets" / "desk" / "app-i18n.js"
 # I testi che servono: per prefisso, più qualcuno preso da solo.
-PREFIXES = ("ct", "blk", "td", "st", "sc", "tm", "plan", "crt", "pt", "srv", "pb")
-SINGLE = {"bkOther"}
+PREFIXES = ("ct", "blk", "td", "st", "sc", "tm", "plan", "crt", "pt", "srv", "pb",
+            # Allenatore da PC: allievi, valutazioni, test, classifica, risultati, corsi, mese, ricevute, registro, Excel.
+            "co", "ev", "ft", "rk", "mm", "se", "la", "cc", "cm", "rc", "rg", "xl", "as")
+SINGLE = {"bkOther", "reportTitle", "receiptTitle", "receiptNotFiscal", "studentsTitle", "studentLast", "studentNotes", "studentWon", "studentLost"}
 # Troppo complicati da tradurre in JavaScript da soli: li ha i18n.js, scritti a mano.
-SKIP = {"scStudentsCount", "crtDeleteAsk"}
+SKIP = {"scStudentsCount", "crtDeleteAsk", "coBalance", "cmPrivate"}
 LANGS = ("it", "en", "fr", "de", "es", "pt")
 
 

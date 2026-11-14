@@ -536,6 +536,8 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
             }
             if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
             Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+            // L'allenatore dal computer di casa: schede, ricevute, registro, da stampare.
+            if (role == com.tennis.scoremanager.Role.COACH) Entry(Icons.Filled.Computer, s.ccDeskTitle, s.ccDeskHint) { c.go(Screen.DESK) }
             // L'allenatore non ha Progressi: le racchette (sue e degli allievi) stanno qui.
             if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.playerFeatures.collectAsState().value) {
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }

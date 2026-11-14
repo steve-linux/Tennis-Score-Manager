@@ -2552,6 +2552,14 @@ object FrStrings : Strings {
     override val xlStudent = "Élève"
     override val xlNumber = "Numéro"
     override val xlReceipts = "Reçus"
+    override val ccDeskTitle = "Entraîneur depuis le PC"
+    override val ccDeskHint = "Élèves, fiches, reçus et registre depuis l'ordinateur de la maison, sur le même réseau"
+    override val ccDeskNote = "Les données restent sur le téléphone : la page les lit là."
+    override val ccDeskPrint = "Imprimer la page"
+    override val ccDeskReport30 = "Rapport 30 jours (PDF)"
+    override val ccDeskReportAll = "Rapport complet (PDF)"
+    override val ccDeskSaveAttendance = "Enregistrer les présences"
+    override val ccDeskSent = "Les présences s'envoient au secrétariat depuis le téléphone (Mes cours › Envoyer les présences)."
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
