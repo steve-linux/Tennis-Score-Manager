@@ -107,6 +107,8 @@ data class CourtBlock(
     val team: String? = null,
     /** I giorni (inizio del giorno) in cui il blocco non vale: per esempio la lezione del corso spostata altrove. */
     val except: Set<Long> = emptySet(),
+    /** Si ripete ogni anno negli stessi giorni (festa del patrono, chiusura estiva), dal primo anno in poi. */
+    val yearly: Boolean = false,
 )
 
 @Serializable

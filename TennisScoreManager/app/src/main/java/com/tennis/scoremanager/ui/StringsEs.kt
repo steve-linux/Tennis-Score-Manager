@@ -2667,6 +2667,15 @@ object EsStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Recuperación: $it" }
     override val scMovedFrom: (String) -> String = { "Movida del $it" }
     override val scMovedNotice: (String) -> String = { "La clase del curso $it se ha movido:" }
+    override val blkYearly = "Cada año"
+    override val blkYearlyHint = "Se repite cada año en los mismos días: fiesta patronal, cierre de verano."
+    override val blkPatron = "Fiesta patronal"
+    override val clClosed = "Club cerrado"
+    override val scSkipDays = "Saltar festivos y cierres"
+    override val scSkipDaysHint = "Las clases en festivos nacionales y en días de cierre del club (No reservable en todas las pistas todo el día) no cuentan y quedan anuladas."
+    override val clCancelThem = "Anular esas clases"
+    override val clKeepThem = "Dejarlas"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 clase de los cursos cae en estos días" else "$it clases de los cursos caen en estos días" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

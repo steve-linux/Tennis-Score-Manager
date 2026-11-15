@@ -140,6 +140,7 @@ fun CourseScreen(c: MatchController) {
     val co = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
+    val plan by c.courtPlan.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var tab by rememberSaveable { mutableStateOf(0) }
@@ -200,6 +201,7 @@ fun CourseScreen(c: MatchController) {
                             com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let {
                                 Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             }
+                            CourtPlans.closedOn(plan, l.start)?.let { Text("${s.clClosed}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
                             com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                         }
                         Text(
@@ -320,7 +322,9 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     var lessonsText by remember { mutableStateOf(co?.let { y -> Courses.lessons(y).count { it.key !in y.cancelled }.toString() } ?: "") }
     var skipHolidays by remember { mutableStateOf(true) }
     val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
-    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
+    // Feste nazionali e chiusure del circolo (Non prenotabili su tutti i campi per tutto il giorno).
+    val plan by c.courtPlan.collectAsState()
+    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null || CourtPlans.closedOn(plan, t) != null }
     val skip = { t: Long -> skipHolidays && isHoliday(t) }
     AlertDialog(
         onDismissRequest = { onDone(null) },
@@ -349,7 +353,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 // Il numero di lezioni dà la fine; senza numero la fine si sceglie a mano.
                 OutlinedTextField(lessonsText, { v -> lessonsText = v.filter { it.isDigit() }.take(3) }, Modifier.fillMaxWidth(), singleLine = true,
                     label = { Text(s.ccLessonsCount) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
-                SwitchRow(Icons.Filled.Schedule, s.ccSkipHolidays, s.ccSkipHolidaysHint, skipHolidays) { skipHolidays = it }
+                SwitchRow(Icons.Filled.Schedule, s.scSkipDays, s.scSkipDaysHint, skipHolidays) { skipHolidays = it }
                 val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) }
                 if (autoEnd != null) Text(s.ccEndAuto(com.tennis.scoremanager.data.Reports.date(autoEnd, lang)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
                 else DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }

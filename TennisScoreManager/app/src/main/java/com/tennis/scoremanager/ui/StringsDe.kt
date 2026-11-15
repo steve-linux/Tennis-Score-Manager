@@ -2666,6 +2666,15 @@ object DeStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Nachholen: $it" }
     override val scMovedFrom: (String) -> String = { "Verschoben vom $it" }
     override val scMovedNotice: (String) -> String = { "Die Stunde des Kurses $it ist verschoben:" }
+    override val blkYearly = "Jedes Jahr"
+    override val blkYearlyHint = "Wiederholt sich jedes Jahr an denselben Tagen: Patronatsfest, Sommerpause."
+    override val blkPatron = "Patronatsfest"
+    override val clClosed = "Verein geschlossen"
+    override val scSkipDays = "Feiertage und Schließtage überspringen"
+    override val scSkipDaysHint = "Stunden an gesetzlichen Feiertagen und an Schließtagen des Vereins (Nicht buchbar auf allen Plätzen den ganzen Tag) zählen nicht und gelten als abgesagt."
+    override val clCancelThem = "Diese Stunden absagen"
+    override val clKeepThem = "Behalten"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 Kursstunde fällt auf diese Tage" else "$it Kursstunden fallen auf diese Tage" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

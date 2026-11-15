@@ -188,6 +188,9 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
         com.tennis.scoremanager.data.Holidays.on(day + 12 * 3_600_000L, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { name ->
             Text("${s.hdHoliday}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
+        CourtPlans.closedOn(plan, day + 12 * 3_600_000L)?.let { name ->
+            Text("${s.clClosed}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
@@ -664,6 +667,7 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
     val courts = c.storage.clubCourts
     val tournaments by c.clubTournaments.collectAsState()
     var b by remember { mutableStateOf(b0) }
+    var hit by remember { mutableStateOf<List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>>(emptyList()) }
     fun time(min: Int, onPick: (Int) -> Unit) = TimePickerDialog(context, { _, h, m -> onPick(h * 60 + m) }, (min / 60).coerceAtMost(23), min % 60, true).show()
     AlertDialog(
         onDismissRequest = onDone,
@@ -671,6 +675,10 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(b.label, { b = b.copy(label = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.blkLabel) })
+                // La festa del patrono in un tocco: tutti i campi, tutto il giorno, ogni anno (resta da scegliere il giorno).
+                if (isNew) GhostButton(s.blkPatron, Icons.Filled.CalendarMonth, {
+                    b = b.copy(label = s.blkPatron, courts = emptyList(), startMin = 0, endMin = 24 * 60, weekdays = emptySet(), yearly = true, reason = com.tennis.scoremanager.data.BlockReason.OTHER)
+                }, Modifier.fillMaxWidth())
                 val reasons = com.tennis.scoremanager.data.BlockReason.entries
                 Segmented(reasons.map { SegOption(blockReasonName(s, it)) }, reasons.indexOf(b.reason), { b = b.copy(reason = reasons[it]) }, columns = 2)
                 // Dal torneo: nome e date già pronti.
@@ -704,10 +712,25 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
                     GhostButton("${s.blkStart}: %02d:%02d".format(b.startMin / 60, b.startMin % 60), Icons.Filled.Schedule, { time(b.startMin) { m -> b = b.copy(startMin = m, endMin = maxOf(b.endMin, m + 30)) } }, Modifier.fillMaxWidth())
                     GhostButton("${s.blkEnd}: %02d:%02d".format(b.endMin / 60, b.endMin % 60), Icons.Filled.Schedule, { time(b.endMin) { m -> b = b.copy(endMin = maxOf(m, b.startMin + 30)) } }, Modifier.fillMaxWidth())
                 }
+                // Ogni anno negli stessi giorni (festa del patrono, chiusura estiva).
+                SwitchRow(Icons.Filled.CalendarMonth, s.blkYearly, s.blkYearlyHint, b.yearly) { b = b.copy(yearly = it) }
                 if (!isNew) TextButton(onClick = { c.saveCourtBlock(b0, delete = true); onDone() }) { Text(s.blkDelete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(onClick = { c.saveCourtBlock(b.copy(label = b.label.trim())); onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = {
+            val saved = b.copy(label = b.label.trim())
+            c.saveCourtBlock(saved)
+            // Una chiusura su lezioni dei corsi già in calendario: si propone di annullarle.
+            hit = c.courseLessonsClosedBy(saved)
+            if (hit.isEmpty()) onDone()
+        }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (hit.isNotEmpty()) AlertDialog(
+        onDismissRequest = { hit = emptyList(); onDone() },
+        title = { Text(s.clLessonsHit(hit.size)) },
+        text = { Text(hit.take(8).joinToString("\n") { (co, l) -> co.name + " · " + com.tennis.scoremanager.data.Notices.day(l.start, lang) }, color = TsmColors.TextMain, fontSize = 14.sp) },
+        confirmButton = { TextButton(onClick = { c.cancelCourseLessons(hit); hit = emptyList(); onDone() }) { Text(s.clCancelThem, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { hit = emptyList(); onDone() }) { Text(s.clKeepThem) } },
     )
 }

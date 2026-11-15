@@ -424,11 +424,14 @@ const APP_I18N = {
     blkMaintenance: "Manutenzione",
     blkNew: "Nuovo periodo non prenotabile",
     blkNone: "Nessun periodo non prenotabile.",
+    blkPatron: "Festa del patrono",
     blkShort: "Non prenotabili",
     blkStart: "Dalle",
     blkTitle: "Campi non prenotabili",
     blkTo: "Al",
     blkTournament: "Torneo",
+    blkYearly: "Ogni anno",
+    blkYearlyHint: "Si ripete ogni anno negli stessi giorni: festa del patrono, chiusura estiva.",
     bzBusy: "Occupato",
     bzClash: (it) => it === 1 ? `1 lezione cade nei tuoi impegni` : `${it} lezioni cadono nei tuoi impegni`,
     bzClashHint: "Le lezioni dei corsi si annullano dall'appello, quelle private dall'agenda.",
@@ -508,6 +511,7 @@ const APP_I18N = {
     ccUpdate: "Aggiorna il corso",
     ccUpload: "Carica un file",
     ccUploadHint: "Un file ricevuto su WhatsApp Web o per email: risultato dal campo, presenze dell'allenatore, allievo proposto.",
+    clClosed: "Circolo chiuso",
     cmCourses: (a, b) => `Lezioni dei corsi: ${a} (${b})`,
     cmEmpty: "Niente in questo mese.",
     cmHint: (it) => it === 1 ? `1 partita di torneo, squadra o sfida da giocare` : `${it} partite di tornei, squadre e sfide da giocare`,
@@ -1038,6 +1042,8 @@ const APP_I18N = {
     scSeason: "stagione",
     scSeasonFee: "per la stagione",
     scShowAll: (it) => `Mostra tutte (${it})`,
+    scSkipDays: "Salta feste e chiusure",
+    scSkipDaysHint: "Le lezioni nelle feste nazionali e nei giorni di chiusura del circolo (Non prenotabili su tutti i campi per tutto il giorno) non contano e risultano annullate.",
     scSoon: "Da iniziare",
     scTabFees: "Quote",
     scTabLessons: "Lezioni",
@@ -1290,11 +1296,14 @@ const APP_I18N = {
     blkMaintenance: "Maintenance",
     blkNew: "New non-bookable period",
     blkNone: "No non-bookable periods.",
+    blkPatron: "Patron saint's day",
     blkShort: "Not bookable",
     blkStart: "From",
     blkTitle: "Non-bookable courts",
     blkTo: "To",
     blkTournament: "Tournament",
+    blkYearly: "Every year",
+    blkYearlyHint: "Repeats every year on the same days: patron saint's day, summer closure.",
     bzBusy: "Busy",
     bzClash: (it) => it === 1 ? `1 lesson falls on your commitments` : `${it} lessons fall on your commitments`,
     bzClashHint: "Course lessons are cancelled from the roll call, private ones from the agenda.",
@@ -1374,6 +1383,7 @@ const APP_I18N = {
     ccUpdate: "Update the course",
     ccUpload: "Upload a file",
     ccUploadHint: "A file received on WhatsApp Web or by email: result from the court, coach's attendance, proposed student.",
+    clClosed: "Club closed",
     cmCourses: (a, b) => `Course lessons: ${a} (${b})`,
     cmEmpty: "Nothing this month.",
     cmHint: (it) => it === 1 ? `1 tournament, team or challenge match to play` : `${it} tournament, team and challenge matches to play`,
@@ -1904,6 +1914,8 @@ const APP_I18N = {
     scSeason: "season",
     scSeasonFee: "for the season",
     scShowAll: (it) => `Show all (${it})`,
+    scSkipDays: "Skip holidays and closures",
+    scSkipDaysHint: "Lessons on national holidays and on club closure days (Not bookable on all courts all day) don't count and are marked cancelled.",
     scSoon: "Starting soon",
     scTabFees: "Fees",
     scTabLessons: "Lessons",
@@ -2156,11 +2168,14 @@ const APP_I18N = {
     blkMaintenance: "Entretien",
     blkNew: "Nouvelle période non réservable",
     blkNone: "Aucune période non réservable.",
+    blkPatron: "Fête patronale",
     blkShort: "Non réservables",
     blkStart: "De",
     blkTitle: "Terrains non réservables",
     blkTo: "Au",
     blkTournament: "Tournoi",
+    blkYearly: "Chaque année",
+    blkYearlyHint: "Se répète chaque année aux mêmes dates : fête patronale, fermeture estivale.",
     bzBusy: "Occupé",
     bzClash: (it) => it === 1 ? `1 séance tombe pendant tes indisponibilités` : `${it} séances tombent pendant tes indisponibilités`,
     bzClashHint: "Les séances des cours s'annulent depuis l'appel, les leçons privées depuis l'agenda.",
@@ -2240,6 +2255,7 @@ const APP_I18N = {
     ccUpdate: "Mettre à jour le cours",
     ccUpload: "Charger un fichier",
     ccUploadHint: "Un fichier reçu sur WhatsApp Web ou par e-mail : résultat du court, présences de l'entraîneur, élève proposé.",
+    clClosed: "Club fermé",
     cmCourses: (a, b) => `Cours collectifs : ${a} (${b})`,
     cmEmpty: "Rien ce mois-ci.",
     cmHint: (it) => it === 1 ? `1 match de tournoi, d'équipe ou de défi à jouer` : `${it} matchs de tournois, d'équipes et de défis à jouer`,
@@ -2770,6 +2786,8 @@ const APP_I18N = {
     scSeason: "saison",
     scSeasonFee: "pour la saison",
     scShowAll: (it) => `Tout afficher (${it})`,
+    scSkipDays: "Sauter fériés et fermetures",
+    scSkipDaysHint: "Les séances des jours fériés nationaux et des jours de fermeture du club (Non réservable sur tous les terrains toute la journée) ne comptent pas et sont annulées.",
     scSoon: "Bientôt",
     scTabFees: "Cotisations",
     scTabLessons: "Leçons",
@@ -3022,11 +3040,14 @@ const APP_I18N = {
     blkMaintenance: "Platzpflege",
     blkNew: "Neuer nicht buchbarer Zeitraum",
     blkNone: "Keine nicht buchbaren Zeiträume.",
+    blkPatron: "Patronatsfest",
     blkShort: "Nicht buchbar",
     blkStart: "Von",
     blkTitle: "Nicht buchbare Plätze",
     blkTo: "Bis",
     blkTournament: "Turnier",
+    blkYearly: "Jedes Jahr",
+    blkYearlyHint: "Wiederholt sich jedes Jahr an denselben Tagen: Patronatsfest, Sommerpause.",
     bzBusy: "Belegt",
     bzClash: (it) => it === 1 ? `1 Stunde fällt auf deine Termine` : `${it} Stunden fallen auf deine Termine`,
     bzClashHint: "Kursstunden sagst du über die Anwesenheit ab, Privatstunden im Kalender.",
@@ -3106,6 +3127,7 @@ const APP_I18N = {
     ccUpdate: "Kurs aktualisieren",
     ccUpload: "Datei hochladen",
     ccUploadHint: "Eine per WhatsApp Web oder E-Mail erhaltene Datei: Ergebnis vom Platz, Anwesenheit vom Trainer, vorgeschlagener Schüler.",
+    clClosed: "Verein geschlossen",
     cmCourses: (a, b) => `Kursstunden: ${a} (${b})`,
     cmEmpty: "Nichts in diesem Monat.",
     cmHint: (it) => it === 1 ? `1 Turnier-, Mannschafts- oder Forderungsmatch zu spielen` : `${it} Turnier-, Mannschafts- und Forderungsmatches zu spielen`,
@@ -3636,6 +3658,8 @@ const APP_I18N = {
     scSeason: "Saison",
     scSeasonFee: "für die Saison",
     scShowAll: (it) => `Alle zeigen (${it})`,
+    scSkipDays: "Feiertage und Schließtage überspringen",
+    scSkipDaysHint: "Stunden an gesetzlichen Feiertagen und an Schließtagen des Vereins (Nicht buchbar auf allen Plätzen den ganzen Tag) zählen nicht und gelten als abgesagt.",
     scSoon: "Demnächst",
     scTabFees: "Beiträge",
     scTabLessons: "Stunden",
@@ -3888,11 +3912,14 @@ const APP_I18N = {
     blkMaintenance: "Mantenimiento",
     blkNew: "Nuevo periodo no reservable",
     blkNone: "Ningún periodo no reservable.",
+    blkPatron: "Fiesta patronal",
     blkShort: "No reservables",
     blkStart: "De",
     blkTitle: "Pistas no reservables",
     blkTo: "Hasta",
     blkTournament: "Torneo",
+    blkYearly: "Cada año",
+    blkYearlyHint: "Se repite cada año en los mismos días: fiesta patronal, cierre de verano.",
     bzBusy: "Ocupado",
     bzClash: (it) => it === 1 ? `1 clase cae en tus compromisos` : `${it} clases caen en tus compromisos`,
     bzClashHint: "Las clases de los cursos se anulan desde la lista, las privadas desde la agenda.",
@@ -3972,6 +3999,7 @@ const APP_I18N = {
     ccUpdate: "Actualizar el curso",
     ccUpload: "Subir un archivo",
     ccUploadHint: "Un archivo recibido por WhatsApp Web o por correo: resultado de la pista, asistencia del entrenador, alumno propuesto.",
+    clClosed: "Club cerrado",
     cmCourses: (a, b) => `Clases de los cursos: ${a} (${b})`,
     cmEmpty: "Nada este mes.",
     cmHint: (it) => it === 1 ? `1 partido de torneo, equipo o desafío por jugar` : `${it} partidos de torneos, equipos y desafíos por jugar`,
@@ -4502,6 +4530,8 @@ const APP_I18N = {
     scSeason: "temporada",
     scSeasonFee: "por temporada",
     scShowAll: (it) => `Mostrar todas (${it})`,
+    scSkipDays: "Saltar festivos y cierres",
+    scSkipDaysHint: "Las clases en festivos nacionales y en días de cierre del club (No reservable en todas las pistas todo el día) no cuentan y quedan anuladas.",
     scSoon: "Por empezar",
     scTabFees: "Cuotas",
     scTabLessons: "Clases",
@@ -4754,11 +4784,14 @@ const APP_I18N = {
     blkMaintenance: "Manutenção",
     blkNew: "Novo período não reservável",
     blkNone: "Nenhum período não reservável.",
+    blkPatron: "Festa do padroeiro",
     blkShort: "Não reserváveis",
     blkStart: "Das",
     blkTitle: "Quadras não reserváveis",
     blkTo: "Até",
     blkTournament: "Torneio",
+    blkYearly: "Todos os anos",
+    blkYearlyHint: "Repete-se todos os anos nos mesmos dias: festa do padroeiro, fecho de verão.",
     bzBusy: "Ocupado",
     bzClash: (it) => it === 1 ? `1 aula calha nos teus compromissos` : `${it} aulas calham nos teus compromissos`,
     bzClashHint: "As aulas dos cursos cancelam-se na chamada, as privadas na agenda.",
@@ -4838,6 +4871,7 @@ const APP_I18N = {
     ccUpdate: "Atualizar o curso",
     ccUpload: "Carregar um arquivo",
     ccUploadHint: "Um arquivo recebido no WhatsApp Web ou por email: resultado da quadra, presenças do treinador, aluno proposto.",
+    clClosed: "Clube fechado",
     cmCourses: (a, b) => `Aulas dos cursos: ${a} (${b})`,
     cmEmpty: "Nada neste mês.",
     cmHint: (it) => it === 1 ? `1 partida de torneio, equipe ou desafio para jogar` : `${it} partidas de torneios, equipes e desafios para jogar`,
@@ -5368,6 +5402,8 @@ const APP_I18N = {
     scSeason: "temporada",
     scSeasonFee: "pela temporada",
     scShowAll: (it) => `Mostrar todas (${it})`,
+    scSkipDays: "Saltar feriados e fechos",
+    scSkipDaysHint: "As aulas nos feriados nacionais e nos dias de fecho do clube (Não reservável em todos os campos o dia inteiro) não contam e ficam canceladas.",
     scSoon: "A começar",
     scTabFees: "Mensalidades",
     scTabLessons: "Aulas",
@@ -6466,7 +6502,7 @@ async function editBlock(d, id) {
 }
 
 function blockDialog(d, b) {
-  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440 };
+  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440, yearly: false };
   const label = h('input', { maxlength: 40, value: v.label });
   const reason = select([['MAINTENANCE', T.blkMaintenance], ['TOURNAMENT', T.blkTournament], ['OTHER', T.bkOther]], v.reason);
   const all = h('input', { type: 'checkbox', checked: !v.courts.length });
@@ -6475,6 +6511,11 @@ function blockDialog(d, b) {
   const from = h('input', { type: 'date', value: v.from, required: true }), to = h('input', { type: 'date', value: v.to, required: true });
   const days = [1, 2, 3, 4, 5, 6, 7].map((n) => [n, h('input', { type: 'checkbox', checked: v.weekdays.includes(n) })]);
   const allDay = h('input', { type: 'checkbox', checked: v.startMin === 0 && v.endMin === 1440 });
+  const yearly = h('input', { type: 'checkbox', checked: !!v.yearly });
+  // La festa del patrono in un clic: tutti i campi, tutto il giorno, ogni anno (resta da scegliere il giorno).
+  const patron = b ? null : h('button', { type: 'button', onclick: () => {
+    label.value = T.blkPatron; reason.value = 'OTHER'; all.checked = true; allDay.checked = true; yearly.checked = true; days.forEach(([, x]) => { x.checked = false; }); update();
+  } }, T.blkPatron);
   const t1 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 15 * 60 : v.startMin), step: 300 });
   const t2 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 18 * 60 : Math.min(v.endMin, 1439)), step: 300 });
   const f1 = field(T.blkStart, t1), f2 = field(T.blkEnd, t2);
@@ -6484,16 +6525,18 @@ function blockDialog(d, b) {
     try { await api('DELETE', '/blocks/' + encodeURIComponent(b.id)); dlg.close(); toast(T.saved); await showPlan(); } catch (e) { toast(errText(e)); }
   } }, T.blkDelete);
   const dlg = dialog(b ? b.label || T.blkTitle : T.blkNew, h('div.form',
+    patron ? h('div.full', patron) : null,
     field(T.blkLabel, label, 'full'), field(T.kind, reason), h('span'),
     h('label.check.full', all, T.blkAllCourts), courtBox,
     field(T.blkFrom, from), field(T.blkTo, to),
     h('h3', T.blkDays), h('div.full.checks', days.map(([n, x]) => h('label.check', x, weekdayName(n)))), h('p.full.dim', T.blkDaysHint),
-    h('label.check.full', allDay, T.blkAllDay), f1, f2), async () => {
+    h('label.check.full', allDay, T.blkAllDay), f1, f2,
+    h('label.check.full', { title: T.blkYearlyHint }, yearly, T.blkYearly), h('p.full.dim', T.blkYearlyHint)), async () => {
     const pick = courts.filter(([, x]) => x.checked).map(([c]) => c);
     const body = {
       id: b ? b.id : '', label: label.value, reason: reason.value, courts: all.checked ? [] : pick, from: from.value, to: to.value,
       weekdays: days.filter(([, x]) => x.checked).map(([n]) => n),
-      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'),
+      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'), yearly: yearly.checked,
     };
     if (!all.checked && !pick.length) throw new Error(T.blkPickCourt);
     await api('POST', '/blocks', body);
@@ -7631,7 +7674,7 @@ function editCourse(c) {
     field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
     h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint),
     field(T.blkFrom, from), field(T.ccLessonsCount, count),
-    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox), async () => {
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.scSkipDaysHint }, skipHol, T.scSkipDays), endBox), async () => {
     const fc = fee.value.trim() ? cents(fee.value) : 0;
     if (fc === null) throw new Error(T.err.BAD_AMOUNT);
     const n = Number(count.value);
@@ -10850,7 +10893,7 @@ Mit der Rolle **Verein**, im Reiter **Belegung**: hier sind die Plätze und *Zei
 - **Plätze**: einen Platz anlegen (**Neuer Platz**), sortieren und antippen, um ihn zu ändern: Name (beim Umbenennen folgen Buchungen, Zeiträume und Turniermatches), Belag (**Sand, Rasen, Hartplatz**, sonstiger), **Halle oder Freiplatz**, **Licht**, **Heizung**, eigene **Preise** (pro Stunde, mit Licht, Heizungszuschlag pro Stunde; leer = die allgemeinen) und **ein oder mehrere Fotos** aus der Galerie. **Platz löschen** entfernt auch seine Buchungen ab heute.
 - **Platzbelegung**: der Tag mit einem Platz pro Spalte und einer Stunde pro Zeile (◀ ▶ und der Kalender zum Tageswechsel). Ein freies Feld antippen zum Buchen: Platz, Tag, Uhrzeit und Dauer, Art (Spiel, Stunde, gesperrt, sonstiges), Spieler aus der Datenbank und Gäste, Notiz. Der **Preis** rechnet sich selbst (Licht ab der eingestellten Uhrzeit, Heizung auf Wunsch) und lässt sich ändern; **Den Spielern berechnen** teilt ihn gleichmäßig und trägt ihn in *Beiträge und Zahlungen* ein. **Wie bezahlt wird**: *am Platz* oder *online*; ist die Buchung berechnet, markiert **Bezahlt: …** sie mit einer der Zahlungsarten des Vereins als bezahlt. **Jede Woche, N Wochen lang** wiederholt die Buchung (Tage mit belegtem Platz werden übersprungen und die App sagt welche). **Spieler benachrichtigen** schickt Platz, Tag, Uhrzeit und Zahlungsweise. **Gesetzliche Feiertage** stehen rot unter dem Tag, auch in der Platzbelegung des Büros am PC (Monat, Woche und Tag).
 - **Turniermatches** mit Platz und Uhrzeit erscheinen von selbst; die App lässt nicht über eine andere Buchung oder ein Match buchen.
-- **Nicht buchbar**: Zeiträume, in denen Plätze nicht buchbar sind, für **Kurse**, **Turniere**, **Platzpflege** oder anderes: Plätze (oder alle), von Tag bis Tag, Wochentage, Zeitfenster oder ganzer Tag; bei einem Turnier kommen Name und Daten vom Turnier. In Kurszeiträume kommen die Kursstunden (Feld antippen öffnet eine fertige Stunde).
+- **Nicht buchbar**: Zeiträume, in denen Plätze nicht buchbar sind, für **Kurse**, **Turniere**, **Platzpflege** oder anderes: Plätze (oder alle), von Tag bis Tag, Wochentage, Zeitfenster oder ganzer Tag; bei einem Turnier kommen Name und Daten vom Turnier. In Kurszeiträume kommen die Kursstunden (Feld antippen öffnet eine fertige Stunde). Mit **Jedes Jahr** wiederholt sich der Zeitraum jedes Jahr an denselben Tagen; **Patronatsfest** bereitet eine eintägige Schließung auf allen Plätzen vor, jedes Jahr (nur der Tag wird gewählt). Ein Zeitraum auf allen Plätzen den ganzen Tag ist eine **Schließung des Vereins**: Sie erscheint rot in der Platzbelegung und in den Kursstunden, neue Kurse überspringen sie wie Feiertage, und fällt sie auf bereits geplante Stunden, schlägt die App vor, sie abzusagen.
 - **Platzstatistik** (in der Platzbelegung): für die letzten 4 Wochen, den laufenden oder den letzten Monat die **Auslastung** jedes Platzes (gebuchte von buchbaren Stunden: nicht buchbare Zeiten zählen nicht), die **Einnahmen** (Preis der Spiel- und Stundenbuchungen, bezahlt oder nicht), wie viele Buchungen und wie viele online, die Turnierstunden, eine Karte **Tag × Stunde**, wann am meisten gespielt wird, und wer am meisten bucht.
 - **Zeiten und Preise**: Öffnung und Schließung, Länge eines Feldes (30, 60, 90 Minuten), allgemeiner Preis pro Stunde und mit Licht, ab wann Licht nötig ist, wie lange ein Turniermatch in der Belegung dauert.
 - **Zahlungsarten** (unter *Beiträge und Zahlungen*): legt die Vereinsverwaltung fest. Vorgegeben sind bar, Karte, Überweisung und Satispay; weitere lassen sich hinzufügen (PayPal, Revolut, Bancomat Pay, ein SumUp-Link…): Name, Link/IBAN/Nummer und ob es eine Fernzahlung ist. Man wählt eine beim Erfassen einer Zahlung (der Name steht auf Quittung und CSV); Fernzahlungen mit ihren Angaben stehen in Nachrichten und Erinnerungen. Die App kassiert nicht: sie erfasst und verschickt die Hinweise.
@@ -10859,7 +10902,7 @@ Mit der Rolle **Verein**, im Reiter **Belegung**: hier sind die Plätze und *Zei
 
 Mit der Rolle **Verein**, unter **Mitglieder › Tennisschule**.
 
-- **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung. Statt des Enddatums kannst du die **Anzahl der Stunden** eintragen: Das Ende ergibt sich aus Beginn und Zeiten; mit **Feiertage überspringen** (an) zählen Stunden an gesetzlichen Feiertagen nicht und gelten als abgesagt (über die Anwesenheit wieder einsetzbar). Feiertage stehen rot in den Kursstunden, auch im Büro am PC.
+- **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung. Statt des Enddatums kannst du die **Anzahl der Stunden** eintragen: Das Ende ergibt sich aus Beginn und Zeiten; mit **Feiertage und Schließtage überspringen** (an) zählen Stunden an gesetzlichen Feiertagen und Schließtagen des Vereins nicht und gelten als abgesagt (über die Anwesenheit wieder einsetzbar). Feiertage stehen rot in den Kursstunden, auch im Büro am PC.
 - **Schüler**: aus der Datenbank hinzufügen (Mitglieder oder nicht) bis zur Platzzahl; für jeden die **Anwesenheit** (anwesend 3 von 4, unter 75 % orange) und was offen ist. Die Spielerkarte zeigt seine Kurse.
 - **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern. **Verschieben** (in der Stunde) legt sie auf einen anderen Tag, eine andere Uhrzeit oder einen anderen Platz, oder als **Nachholstunde am Kursende** (der erste freie Termin nach der letzten Stunde, Feiertage übersprungen); im Anwesenheitsbuch bleibt es dieselbe Stunde, mit *Verschoben vom…* in Orange, und **Verschieben und Teilnehmer benachrichtigen** bereitet die Nachricht vor. In der Platzbelegung wird die alte Zeit frei und die neue belegt; **Zurücksetzen** legt sie zurück. Auch im Büro am PC, und der Trainer in seinen eigenen Kursen (Telefon und PC).
 - **Mit dem Trainer**: in einem Kurs mit einem Trainer aus der Datenbank schickt **An den Trainer schicken** ihm die Kurskarte (Zeiten, Teilnehmer mit Kontakten). Er trägt die Anwesenheit ein und schickt sie zurück: beim Öffnen der Datei mit **Teilen › TSM** prüft die App, dass sie zu diesem Kurs gehört, und **Speichern** fügt sie hinzu. Schlägt der Trainer einen neuen Schüler vor, fügt man ihn beim Öffnen seiner Datei zu den Spielern und wahlweise zu einem Kurs hinzu.
@@ -11457,7 +11500,7 @@ With the **Club** role, on the **Planner** tab: courts and *Hours and prices* ar
 - **Courts**: create a court (**New court**), put them in order and tap one to change it: name (renaming it, bookings, periods and tournament matches follow), surface (**clay, grass, hard**, other), **indoor or outdoor**, **lights**, **heating**, its own **prices** (per hour, with lights, heating supplement per hour; empty = the general ones) and **one or more photos** from the gallery. **Delete the court** also removes its bookings from today on.
 - **Court planner**: the day with one court per column and one hour per row (◀ ▶ and the calendar to change day). Tap a free slot to book: court, day, time and length, type (play, lesson, closed, other), players from the database and guests, a note. The **price** is worked out by itself (lights from the set time, heating if asked) and can be changed; **Charge the players** splits it equally and puts it into *Fees and payments*. **How it's paid**: *at the court* or *online*; once charged, **Paid: …** marks it paid with one of the club's payment methods. **Every week for N weeks** repeats the booking (dates when the court is taken are skipped and the app tells you). **Notify the players** sends court, day, time and how to pay. **National holidays** are written in red under the day, and also in the Club office from PC planner (month, week and day).
 - **Tournament matches** with a court and a time appear by themselves; the app won't let you book over another booking or a match.
-- **Not bookable**: periods when courts can't be booked, for **courses**, **tournaments**, **maintenance** or other: courts (or all), from day to day, days of the week, time slot or all day; for a tournament the name and dates come from it. Course lessons can go into course periods (tapping the slot opens a ready lesson).
+- **Not bookable**: periods when courts can't be booked, for **courses**, **tournaments**, **maintenance** or other: courts (or all), from day to day, days of the week, time slot or all day; for a tournament the name and dates come from it. Course lessons can go into course periods (tapping the slot opens a ready lesson). With **Every year** the period repeats on the same days each year; **Patron saint's day** prepares a one-day closure on all courts, every year (you only pick the day). A period on all courts all day is a **club closure**: it shows in red in the planner and in course lessons, new courses skip it like holidays, and if it falls on lessons already in the calendar the app offers to cancel them.
 - **Court statistics** (in the planner): for the last 4 weeks, this month or last month, the **occupancy** of each court (hours booked out of bookable ones: non-bookable periods do not count), the **revenue** (price of play and lesson bookings, paid or not), how many bookings and how many came online, tournament hours, a **day × hour** map showing when people play most, and who books most.
 - **Hours and prices**: opening and closing, slot length (30, 60, 90 minutes), general price per hour and with lights, from what time lights are needed, how long a tournament match lasts in the planner.
 - **Payment methods** (in *Fees and payments*): chosen by whoever runs the club. It starts with cash, card, bank transfer and Satispay and you can add others (PayPal, Revolut, Bancomat Pay, a SumUp link…): name, link/IBAN/number and whether it's paid remotely. You pick one when recording a payment (the name goes on receipts and the CSV); remote ones, with their details, go into notices and reminders. The app doesn't collect money: it records and sends the instructions.
@@ -11466,7 +11509,7 @@ With the **Club** role, on the **Planner** tab: courts and *Hours and prices* ar
 
 With the **Club** role, under **Members › Tennis school**.
 
-- **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner. Instead of the end date you can write the **number of lessons**: the end is worked out from the start and the times; with **Skip holidays** (on) lessons on national holidays don't count and are marked cancelled (you can put them back from the roll call). Holidays are in red in the course lessons, also from the Club office from PC.
+- **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner. Instead of the end date you can write the **number of lessons**: the end is worked out from the start and the times; with **Skip holidays and closures** (on) lessons on national holidays and club closure days don't count and are marked cancelled (you can put them back from the roll call). Holidays are in red in the course lessons, also from the Club office from PC.
 - **Students**: added from the database (members or not) up to the places; for each, **attendance** (attended 3 of 4, orange under 75 %) and what they owe. A player's card shows their courses.
 - **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent. **Move** (in the lesson) puts it on another day, time or court, or at the **Make-up at the end of the course** (the first free slot after the last lesson, skipping holidays); it stays the same lesson in the register, with *Moved from…* in orange, and **Move and notify the students** prepares the message. In the planner the old hour is freed and the new one taken; **Put it back** returns it to its place. Also from the Club office from PC, and coaches in their own courses (phone and PC).
 - **With the coach**: in a course with a coach from the database, **Send to the coach** sends them the course card (times, participants with contacts). They mark attendance and send it back: opening the file with **Share › TSM** the app checks it belongs to this course and **Record** adds it. If the coach proposes a new student, opening their file adds them to the players and, if you like, to a course.
@@ -12063,7 +12106,7 @@ Con el rol **Club**, en la pestaña **Reservas**: aquí están las pistas y *Hor
 - **Las pistas**: se crea una pista (**Nueva pista**), se ordenan y se toca una para cambiarla: nombre (al renombrarla, reservas, periodos y partidos de los torneos la siguen), superficie (**tierra batida, hierba, cemento**, otra), **cubierta o descubierta**, **luz**, **calefacción**, sus **precios** (por hora, con luz, suplemento de calefacción por hora; vacíos = los generales) y **una o varias fotos** de la galería. **Eliminar la pista** quita también sus reservas desde hoy.
 - **Planning de pistas**: el día con una pista por columna y una hora por fila (◀ ▶ y el calendario para cambiar de día). Toca una casilla libre para reservar: pista, día, hora y duración, tipo (juego, clase, cerrada, otro), jugadores de la base de datos e invitados, nota. El **precio** se calcula solo (luz desde la hora fijada, calefacción si se pide) y se puede cambiar; **Cargar a los jugadores** lo divide a partes iguales y lo lleva a *Cuotas y pagos*. **Cómo se paga**: *en la pista* u *online*; con la reserva cargada, **Pagado: …** la marca pagada con uno de los medios de pago del club. **Cada semana durante N semanas** repite la reserva (las fechas con la pista ocupada se saltan y la app lo dice). **Avisar a los jugadores** envía pista, día, hora y cómo pagar. Los **festivos nacionales** aparecen en rojo bajo el día, también en el planning de la Secretaría desde el PC (mes, semana y día).
 - Los **partidos de los torneos** con pista y horario aparecen solos; la app no deja reservar encima de otra reserva o de un partido.
-- **No reservables**: periodos en que las pistas no se reservan, por **cursos**, **torneos**, **mantenimiento** u otro: pistas (o todas), de un día a otro, días de la semana, franja horaria o todo el día; para un torneo, nombre y fechas vienen del torneo. En los periodos de los cursos van sus clases (tocando la casilla se abre una clase ya preparada).
+- **No reservables**: periodos en que las pistas no se reservan, por **cursos**, **torneos**, **mantenimiento** u otro: pistas (o todas), de un día a otro, días de la semana, franja horaria o todo el día; para un torneo, nombre y fechas vienen del torneo. En los periodos de los cursos van sus clases (tocando la casilla se abre una clase ya preparada). Con **Cada año** el periodo se repite en los mismos días cada año; **Fiesta patronal** prepara un cierre de un día en todas las pistas, cada año (solo se elige el día). Un periodo en todas las pistas todo el día es un **cierre del club**: sale en rojo en el planning y en las clases de los cursos, los cursos nuevos lo saltan como los festivos, y si cae en clases ya en el calendario la app propone anularlas.
 - **Estadísticas de las pistas** (en el planning): para las últimas 4 semanas, el mes en curso o el pasado, la **ocupación** de cada pista (horas reservadas sobre las reservables: los periodos no reservables no cuentan), los **ingresos** (precio de las reservas de juego y clase, pagadas o no), cuántas reservas y cuántas en línea, las horas de torneo, un mapa **día × hora** que muestra cuándo se juega más y quién reserva más.
 - **Horarios y precios**: apertura y cierre, duración de una casilla (30, 60, 90 minutos), precio por hora general y con luz, desde qué hora hace falta la luz, cuánto dura un partido de torneo en el planning.
 - **Medios de pago** (en *Cuotas y pagos*): los decide quien gestiona el club. Se parte de efectivo, tarjeta, transferencia y Satispay y se añaden otros (PayPal, Revolut, Bancomat Pay, un enlace SumUp…): nombre, enlace/IBAN/número y si se paga a distancia. Se elige uno al registrar un pago (el nombre va en recibos y CSV); los de pago a distancia, con sus datos, van en avisos y recordatorios. La app no cobra: registra y envía las instrucciones.
@@ -12072,7 +12115,7 @@ Con el rol **Club**, en la pestaña **Reservas**: aquí están las pistas y *Hor
 
 Con el rol **Club**, en **Socios › Escuela de tenis**.
 
-- **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza. En lugar de la fecha de fin puedes escribir el **número de clases**: el fin se calcula solo según el inicio y los horarios; con **Saltar los festivos** (activado) las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde la lista). Los festivos salen en rojo en las clases del curso, también desde la Secretaría en el PC.
+- **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza. En lugar de la fecha de fin puedes escribir el **número de clases**: el fin se calcula solo según el inicio y los horarios; con **Saltar festivos y cierres** (activado) las clases en festivos nacionales y en días de cierre del club no cuentan y quedan anuladas (se recuperan desde la lista). Los festivos salen en rojo en las clases del curso, también desde la Secretaría en el PC.
 - **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
 - **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre. **Mover** (en la clase) la pasa a otro día, hora o pista, o a la **Recuperación al final del curso** (el primer horario libre tras la última clase, saltando los festivos); sigue siendo la misma clase en el registro, con *Movida del…* en naranja, y **Mover y avisar a los inscritos** prepara el mensaje. En el planning la hora de antes se libera y la nueva se ocupa; **Dejarla como estaba** la devuelve a su sitio. También desde la Secretaría en el PC, y el entrenador en sus cursos (teléfono y PC).
 - **Con el entrenador**: en un curso con un entrenador de la base de datos, **Enviar al entrenador** le manda la ficha de curso (horarios, inscritos con contactos). Él marca la asistencia y la devuelve: al abrir el archivo con **Compartir › TSM** la app comprueba que es de este curso y **Registrar** la añade. Si el entrenador propone un alumno nuevo, al abrir su archivo se añade a los jugadores y, si quieres, a un curso.
@@ -12669,7 +12712,7 @@ Avec le rôle **Club**, dans l'onglet **Planning** : ici se trouvent les terrain
 - **Les terrains** : on crée un terrain (**Nouveau terrain**), on les met en ordre et on en touche un pour le modifier : nom (en le renommant, réservations, périodes et matchs des tournois suivent), surface (**terre battue, gazon, dur**, autre), **couvert ou extérieur**, **éclairage**, **chauffage**, ses **tarifs** (à l'heure, avec éclairage, supplément chauffage à l'heure ; vides = les tarifs généraux) et **une ou plusieurs photos** de la galerie. **Supprimer le terrain** retire aussi ses réservations à partir d'aujourd'hui.
 - **Planning des terrains** : la journée avec un terrain par colonne et une heure par ligne (◀ ▶ et le calendrier pour changer de jour). Touchez une case libre pour réserver : terrain, jour, heure et durée, type (jeu, leçon, fermé, autre), joueurs de la base et invités, remarque. Le **tarif** se calcule tout seul (éclairage à partir de l'heure choisie, chauffage si on le demande) et peut être modifié ; **Facturer aux joueurs** le divise en parts égales et le met dans *Cotisations et paiements*. **Comment on paie** : *au terrain* ou *en ligne* ; une fois facturée, **Payé : …** la marque payée avec un des moyens de paiement du club. **Chaque semaine pendant N semaines** répète la réservation (les dates où le terrain est pris sont sautées et l'appli les indique). **Prévenir les joueurs** envoie terrain, jour, heure et comment payer. Les **jours fériés nationaux** sont écrits en rouge sous la date, et aussi dans le planning du Secrétariat depuis le PC (mois, semaine et jour).
 - Les **matchs des tournois** avec terrain et horaire apparaissent tout seuls ; l'appli ne laisse pas réserver par-dessus une autre réservation ou un match.
-- **Non réservables** : périodes où les terrains ne se réservent pas, pour **cours**, **tournois**, **entretien** ou autre : terrains (ou tous), du jour au jour, jours de la semaine, plage horaire ou toute la journée ; pour un tournoi, nom et dates viennent du tournoi. Les leçons des cours vont dans leurs périodes (toucher la case ouvre une leçon prête).
+- **Non réservables** : périodes où les terrains ne se réservent pas, pour **cours**, **tournois**, **entretien** ou autre : terrains (ou tous), du jour au jour, jours de la semaine, plage horaire ou toute la journée ; pour un tournoi, nom et dates viennent du tournoi. Les leçons des cours vont dans leurs périodes (toucher la case ouvre une leçon prête). Avec **Chaque année** la période se répète aux mêmes dates chaque année ; **Fête patronale** prépare une fermeture d'un jour sur tous les terrains, chaque année (on choisit seulement le jour). Une période sur tous les terrains toute la journée est une **fermeture du club** : elle apparaît en rouge dans le planning et les séances des cours, les nouveaux cours la sautent comme les jours fériés, et si elle tombe sur des séances déjà au calendrier l'app propose de les annuler.
 - **Statistiques des terrains** (dans le planning) : sur les 4 dernières semaines, le mois en cours ou le mois dernier, l'**occupation** de chaque terrain (heures réservées sur les heures réservables : les périodes non réservables ne comptent pas), les **recettes** (prix des réservations de jeu et de leçon, payées ou non), combien de réservations et combien en ligne, les heures de tournoi, une carte **jour × heure** qui montre quand on joue le plus, et qui réserve le plus.
 - **Horaires et tarifs** : ouverture et fermeture, durée d'une case (30, 60, 90 minutes), tarif horaire général et avec éclairage, heure à partir de laquelle il faut l'éclairage, durée d'un match de tournoi dans le planning.
 - **Moyens de paiement** (dans *Cotisations et paiements*) : c'est qui gère le club qui les choisit. On part d'espèces, carte, virement et Satispay et on en ajoute d'autres (PayPal, Revolut, Bancomat Pay, un lien SumUp…) : nom, lien/IBAN/numéro et s'il se paie à distance. On en choisit un en enregistrant un paiement (le nom figure sur les reçus et le CSV) ; ceux à distance, avec leurs détails, vont dans les avis et les relances. L'appli n'encaisse pas : elle enregistre et envoie les instructions.
@@ -12678,7 +12721,7 @@ Avec le rôle **Club**, dans l'onglet **Planning** : ici se trouvent les terrain
 
 Avec le rôle **Club**, dans **Adhérents › École de tennis**.
 
-- **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour. Au lieu de la date de fin, tu peux écrire le **nombre de séances** : la fin se calcule d'après le début et les horaires ; avec **Sauter les jours fériés** (activé), les séances des jours fériés nationaux ne comptent pas et sont annulées (on les remet depuis l'appel). Les jours fériés sont en rouge dans les séances du cours, aussi depuis le Secrétariat depuis le PC.
+- **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour. Au lieu de la date de fin, tu peux écrire le **nombre de séances** : la fin se calcule d'après le début et les horaires ; avec **Sauter fériés et fermetures** (activé), les séances des jours fériés nationaux et des jours de fermeture du club ne comptent pas et sont annulées (on les remet depuis l'appel). Les jours fériés sont en rouge dans les séances du cours, aussi depuis le Secrétariat depuis le PC.
 - **Élèves** : on les ajoute depuis la base (adhérents ou non) jusqu'aux places ; pour chacun la **présence** (présent 3 sur 4, en orange sous 75 %) et ce qu'il doit. La fiche du joueur montre ses cours.
 - **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent. **Déplacer** (dans la séance) la met un autre jour, à une autre heure ou sur un autre terrain, ou au **Rattrapage à la fin du cours** (le premier créneau libre après la dernière séance, en sautant les jours fériés) ; elle reste la même séance dans le registre, avec *Déplacée du…* en orange, et **Déplacer et prévenir les inscrits** prépare le message. Dans le planning l'ancienne heure se libère et la nouvelle s'occupe ; **Remettre comme avant** la remet à sa place. Aussi depuis le Secrétariat depuis le PC, et l'entraîneur dans ses cours (téléphone et PC).
 - **Avec l'entraîneur** : dans un cours avec un entraîneur de la base, **Envoyer à l'entraîneur** lui envoie la fiche de cours (horaires, inscrits avec contacts). Il note les présences et les renvoie : en ouvrant le fichier avec **Partager › TSM** l'appli vérifie qu'il est de ce cours et **Enregistrer** les ajoute. Si l'entraîneur propose un nouvel élève, en ouvrant son fichier on l'ajoute aux joueurs et, au choix, à un cours.
@@ -13275,7 +13318,7 @@ Col ruolo **Circolo**, nella scheda **Planning**: qui ci sono i campi e *Orari e
 - **I campi**: si crea un campo (**Nuovo campo**), lo si mette in ordine e lo si tocca per cambiarlo: nome (rinominandolo, prenotazioni, periodi e partite dei tornei lo seguono), superficie (**terra, erba, cemento**, altro), **coperto o scoperto**, **luci**, **riscaldamento**, i **prezzi** suoi (all'ora, con le luci, supplemento riscaldamento all'ora; vuoti = quelli generali) e **una o più foto** dalla galleria. **Elimina il campo** toglie anche le sue prenotazioni da oggi in poi.
 - **Planning dei campi**: il giorno con un campo per colonna e un'ora per riga (◀ ▶ e il calendario per cambiare giorno). Tocca una casella libera per prenotare: campo, giorno, ora e durata, tipo (gioco, lezione, chiuso, altro), giocatori dal database e ospiti, nota. Il **prezzo** si calcola da solo (luci dall'ora scelta, riscaldamento se lo si chiede) e si può cambiare; **Addebita ai giocatori** lo divide in parti uguali e lo mette in *Quote e pagamenti*. **Come si paga**: *al campo* o *online*; a prenotazione addebitata, **Pagato: …** la segna pagata con uno dei modi di pagamento del circolo. **Ogni settimana per N settimane** ripete la prenotazione (le date col campo occupato si saltano e l'app le dice). **Avvisa i giocatori** manda campo, giorno, ora e come si paga. Le **feste nazionali** sono scritte in rosso sotto il giorno, e anche nel Planning della Segreteria da PC (mese, settimana e giorno).
 - Le **partite dei tornei** con campo e orario compaiono da sole; l'app non lascia prenotare sopra un'altra prenotazione o una partita.
-- **Non prenotabili**: periodi in cui i campi non si prenotano, per **corsi**, **tornei**, **manutenzione** o altro: campi (o tutti), dal giorno al giorno, giorni della settimana, fascia oraria o tutto il giorno; per un torneo si prendono nome e date dal torneo. Nei periodi dei corsi si mettono le loro lezioni (toccando la casella si apre una lezione già pronta).
+- **Non prenotabili**: periodi in cui i campi non si prenotano, per **corsi**, **tornei**, **manutenzione** o altro: campi (o tutti), dal giorno al giorno, giorni della settimana, fascia oraria o tutto il giorno; per un torneo si prendono nome e date dal torneo. Nei periodi dei corsi si mettono le loro lezioni (toccando la casella si apre una lezione già pronta). Con **Ogni anno** il periodo si ripete negli stessi giorni ogni anno; **Festa del patrono** prepara la chiusura di un giorno su tutti i campi, ogni anno (si sceglie solo il giorno). Un periodo su tutti i campi per tutto il giorno è una **chiusura del circolo**: compare in rosso nel planning e nelle lezioni dei corsi, i corsi nuovi la saltano come le feste, e se cade su lezioni già in calendario l'app propone di annullarle.
 - **Statistiche dei campi** (nel planning): per le ultime 4 settimane, il mese in corso o quello scorso, l'**occupazione** di ogni campo (ore prenotate su quelle prenotabili: i periodi non prenotabili non contano), gli **incassi** (prezzo delle prenotazioni di gioco e lezione, pagate o no), quante prenotazioni e quante arrivate online, le ore dei tornei, una mappa **giorno × ora** che mostra quando si gioca di più e chi prenota di più.
 - **Orari e prezzi**: apertura e chiusura, durata di una casella (30, 60, 90 minuti), prezzo all'ora generale e con le luci, da che ora servono le luci, quanto dura nel planning una partita di torneo.
 - **Modi di pagamento** (in *Quote e pagamenti*): li decide chi gestisce il circolo. Si parte da contanti, POS, bonifico e Satispay e se ne aggiungono altri (PayPal, Revolut, Bancomat Pay, un link SumUp…): nome, link/IBAN/numero e se si paga a distanza. Si scelgono quando si registra un pagamento (il nome va su ricevute e CSV); quelli a distanza, con i loro dettagli, vanno negli avvisi e nei solleciti. L'app non incassa: registra e manda le istruzioni.
@@ -13284,7 +13327,7 @@ Col ruolo **Circolo**, nella scheda **Planning**: qui ci sono i campi e *Orari e
 
 Col ruolo **Circolo**, in **Soci › Scuola tennis**.
 
-- **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna. Al posto della data di fine puoi scrivere il **numero di lezioni**: la fine si calcola da sola da inizio e orari; con **Salta le feste** (acceso) le lezioni nelle festività nazionali non contano e risultano annullate (si rimettono dall'appello). Le feste sono in rosso nelle lezioni del corso, anche dalla Segreteria da PC.
+- **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna. Al posto della data di fine puoi scrivere il **numero di lezioni**: la fine si calcola da sola da inizio e orari; con **Salta feste e chiusure** (acceso) le lezioni nelle festività nazionali e nei giorni di chiusura del circolo non contano e risultano annullate (si rimettono dall'appello). Le feste sono in rosso nelle lezioni del corso, anche dalla Segreteria da PC.
 - **Allievi**: si aggiungono dal database (soci o no) fino ai posti; per ciascuno la **presenza** (presente 3 su 4, in arancione sotto il 75 %) e cosa deve pagare. Nella scheda del giocatore ci sono i suoi corsi.
 - **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore. **Sposta** (nella lezione) la mette in un altro giorno, ora o campo, oppure al **Recupero in fondo al corso** (il primo orario libero dopo l'ultima lezione, saltando le feste); resta la stessa lezione nel registro, con *Spostata dal…* in arancione, e **Sposta e avvisa gli iscritti** prepara il messaggio. Nel planning l'ora di prima si libera e quella nuova si occupa; **Rimetti com'era** la riporta al suo posto. Anche dalla Segreteria da PC, e l'allenatore nei suoi corsi (telefono e PC).
 - **Con l'allenatore**: nel corso con un istruttore del database, **Manda all'allenatore** gli manda la scheda corso (orari, iscritti con i contatti). Lui segna le presenze e le rimanda: aprendo il file con **Condividi › TSM** l'app controlla che sia di questo corso e con **Registra** le aggiunge. Se l'allenatore propone un allievo nuovo, aprendo il suo file lo si aggiunge ai giocatori e, a scelta, a un corso.
@@ -13881,7 +13924,7 @@ Com o papel **Clube**, na aba **Agenda**: aqui ficam as quadras e *Horários e p
 - **As quadras**: crie uma quadra (**Nova quadra**), ordene e toque numa para mudá-la: nome (ao renomear, reservas, períodos e partidas dos torneios acompanham), piso (**saibro, grama, rápida**, outro), **coberta ou descoberta**, **iluminação**, **aquecimento**, os **preços** dela (por hora, com iluminação, adicional de aquecimento por hora; vazios = os gerais) e **uma ou mais fotos** da galeria. **Excluir a quadra** remove também as reservas dela a partir de hoje.
 - **Agenda das quadras**: o dia com uma quadra por coluna e uma hora por linha (◀ ▶ e o calendário para mudar de dia). Toque num horário livre para reservar: quadra, dia, hora e duração, tipo (jogo, aula, fechada, outro), jogadores do banco de dados e convidados, nota. O **preço** se calcula sozinho (iluminação a partir da hora definida, aquecimento se pedido) e pode ser alterado; **Cobrar dos jogadores** divide em partes iguais e leva para *Mensalidades e pagamentos*. **Como se paga**: *na quadra* ou *online*; com a reserva cobrada, **Pago: …** marca como paga com um dos meios de pagamento do clube. **Toda semana por N semanas** repete a reserva (as datas com a quadra ocupada são puladas e o app avisa). **Avisar os jogadores** envia quadra, dia, hora e como pagar. Os **feriados nacionais** aparecem a vermelho por baixo do dia, também na agenda da Secretaria no PC (mês, semana e dia).
 - As **partidas dos torneios** com quadra e horário aparecem sozinhas; o app não deixa reservar por cima de outra reserva ou de uma partida.
-- **Não reserváveis**: períodos em que as quadras não se reservam, para **cursos**, **torneios**, **manutenção** ou outro: quadras (ou todas), de um dia a outro, dias da semana, faixa de horário ou o dia todo; para um torneio, nome e datas vêm do torneio. Nos períodos dos cursos entram as aulas deles (tocando o horário abre uma aula já pronta).
+- **Não reserváveis**: períodos em que as quadras não se reservam, para **cursos**, **torneios**, **manutenção** ou outro: quadras (ou todas), de um dia a outro, dias da semana, faixa de horário ou o dia todo; para um torneio, nome e datas vêm do torneio. Nos períodos dos cursos entram as aulas deles (tocando o horário abre uma aula já pronta). Com **Todos os anos** o período repete-se nos mesmos dias todos os anos; **Festa do padroeiro** prepara um fecho de um dia em todos os campos, todos os anos (só se escolhe o dia). Um período em todos os campos o dia inteiro é um **fecho do clube**: aparece a vermelho na agenda e nas aulas dos cursos, os cursos novos saltam-no como os feriados, e se calhar em aulas já no calendário a app propõe cancelá-las.
 - **Estatísticas das quadras** (na agenda): para as últimas 4 semanas, o mês em curso ou o passado, a **ocupação** de cada quadra (horas reservadas sobre as reserváveis: os períodos não reserváveis não contam), as **receitas** (preço das reservas de jogo e aula, pagas ou não), quantas reservas e quantas online, as horas de torneio, um mapa **dia × hora** que mostra quando se joga mais e quem reserva mais.
 - **Horários e preços**: abertura e fechamento, duração de um horário (30, 60, 90 minutos), preço por hora geral e com iluminação, a partir de que hora precisa de iluminação, quanto dura uma partida de torneio na agenda.
 - **Meios de pagamento** (em *Mensalidades e pagamentos*): quem administra o clube decide. Começa com dinheiro, cartão, transferência e Satispay e dá para adicionar outros (PayPal, Revolut, Bancomat Pay, um link SumUp…): nome, link/IBAN/número e se é pago a distância. Escolhe-se um ao registrar um pagamento (o nome vai nos recibos e no CSV); os a distância, com os dados, vão nos avisos e lembretes. O app não recebe: registra e envia as instruções.
@@ -13890,7 +13933,7 @@ Com o papel **Clube**, na aba **Agenda**: aqui ficam as quadras e *Horários e p
 
 Com o papel **Clube**, em **Sócios › Escola de tênis**.
 
-- **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza. Em vez da data de fim podes escrever o **número de aulas**: o fim calcula-se sozinho pelo início e pelos horários; com **Saltar os feriados** (ligado) as aulas nos feriados nacionais não contam e ficam canceladas (repõem-se na chamada). Os feriados aparecem a vermelho nas aulas do curso, também na Secretaria no PC.
+- **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza. Em vez da data de fim podes escrever o **número de aulas**: o fim calcula-se sozinho pelo início e pelos horários; com **Saltar feriados e fechos** (ligado) as aulas nos feriados nacionais e nos dias de fecho do clube não contam e ficam canceladas (repõem-se na chamada). Os feriados aparecem a vermelho nas aulas do curso, também na Secretaria no PC.
 - **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
 - **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável. **Mudar** (na aula) põe-na noutro dia, hora ou campo, ou na **Reposição no fim do curso** (o primeiro horário livre depois da última aula, saltando os feriados); continua a ser a mesma aula no registo, com *Mudada de…* a laranja, e **Mudar e avisar os inscritos** prepara a mensagem. Na agenda a hora de antes fica livre e a nova ocupada; **Repor como estava** volta a pô-la no lugar. Também na Secretaria no PC, e o treinador nos seus cursos (telefone e PC).
 - **Com o treinador**: num curso com um treinador da base de dados, **Enviar ao treinador** envia-lhe a ficha de curso (horários, inscritos com contactos). Ele marca as presenças e devolve-as: ao abrir o arquivo com **Compartilhar › TSM** o app verifica que é deste curso e **Registrar** junta-as. Se o treinador propõe um aluno novo, ao abrir o arquivo dele adiciona-se aos jogadores e, à escolha, a um curso.
@@ -17740,6 +17783,23 @@ class MatchController(
     }
 
     /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    /** Le lezioni future (non annullate) dei corsi che cadono nella chiusura [b] del circolo; vuoto se [b] non chiude il circolo. */
+    fun courseLessonsClosedBy(b: com.tennis.scoremanager.data.CourtBlock): List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>> {
+        val only = courtPlan.value.copy(blocks = listOf(b))
+        val now = System.currentTimeMillis()
+        return courses.value.flatMap { co ->
+            com.tennis.scoremanager.data.Courses.lessons(co).filter { it.start >= now && it.key !in co.cancelled && com.tennis.scoremanager.data.CourtPlans.closedOn(only, it.start) != null }.map { co to it }
+        }.sortedBy { it.second.start }
+    }
+
+    /** Annulla quelle lezioni (si rimettono dall'appello o si spostano). */
+    fun cancelCourseLessons(list: List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>) {
+        for ((id, ls) in list.groupBy { it.first.id }) {
+            val co = course(id) ?: continue
+            saveCourse(co.copy(cancelled = co.cancelled + ls.map { it.second.key }))
+        }
+    }
+
     /** Agli iscritti: la lezione [key] del corso [c] (già spostata) da quando a quando. */
     fun noticeCourseMoved(c: com.tennis.scoremanager.data.Course, key: String) {
         val l = com.tennis.scoremanager.data.Courses.lessons(c).firstOrNull { it.key == key } ?: return
@@ -24802,6 +24862,8 @@ object CourtPlans {
     fun weekday(t: Long): Int = CourtTime.weekday(t)
 
     fun blockActive(b: CourtBlock, day: Long): Boolean = CourtTime.blockActive(b, day)
+    /** Il nome della chiusura del circolo quel giorno (blocco su tutti i campi per tutto il giorno); null = aperto. */
+    fun closedOn(plan: CourtPlan, day: Long): String? = CourtTime.closedOn(plan, day)
 
     /** I blocchi del giorno, campo per campo ([courts] = i campi del circolo, per i blocchi "tutti i campi"). */
     fun blocksOn(plan: CourtPlan, day: Long, courts: List<String>?): List<Occupied> = plan.blocks.filter { blockActive(it, day) }.flatMap { b ->
@@ -32770,6 +32832,8 @@ interface DeskData {
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
+    /** Ogni anno negli stessi giorni (festa del patrono, chiusura estiva). */
+    val yearly: Boolean = false,
 )
 @Serializable data class DeskQuote(val cents: Int, val lights: Boolean)
 
@@ -33127,7 +33191,7 @@ class DeskApi(
             }
         }
         val s = plan.settings
-        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, com.tennis.scoremanager.data.Holidays.on(start + 12 * 3_600_000L, data.country(), zone()))
+        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, dayOff(start + 12 * 3_600_000L))
     }
 
     private fun localDay(date: String?): LocalDate = runCatching { LocalDate.parse(date.orEmpty()) }.getOrElse { throw Fail(400, "BAD_DATE") }
@@ -33155,7 +33219,7 @@ class DeskApi(
             val used = occ.filter { it.block == null }.sumOf(::minutes)
             val closed = occ.filter { it.block != null }.sumOf { o -> minutes(o) * (if (o.court == CourtPlans.ALL) courts.size else 1) }
             val cap = (open * courts.size).coerceAtLeast(1)
-            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d])
+            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d] ?: CourtPlans.closedOn(plan, start + 12 * 3_600_000L))
         }
         return ok(DeskMonth.serializer(), DeskMonth(first.toString(), courts, days))
     }
@@ -33206,7 +33270,7 @@ class DeskApi(
     }
 
     private fun blocks(): Resp = ok(ListSerializer(DeskBlock.serializer()), data.plan().blocks.sortedBy { it.from }.map { b ->
-        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b))
+        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b), b.yearly)
     })
 
     private fun saveBlock(i: DeskBlock): Resp {
@@ -33220,7 +33284,7 @@ class DeskApi(
         if (i.reason == BlockReason.COURSE) throw Fail(400, "BAD_REQUEST")
         val b = (old ?: CourtBlock(CourtPlans.newId("k"), "", from = from, to = to)).copy(
             label = text(i.label, 40), reason = i.reason, courts = i.courts.distinct(), from = from, to = to,
-            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin,
+            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin, yearly = i.yearly,
         )
         data.saveBlock(b, delete = false)
         return done()
@@ -33586,7 +33650,7 @@ class DeskApi(
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
             DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
-                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()),
+                dayOff(l.start),
                 l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() })
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
@@ -33656,12 +33720,15 @@ class DeskApi(
 
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
 
+    /** La festa nazionale o la chiusura del circolo del giorno di [t] (il nome); null = giorno normale. */
+    private fun dayOff(t: Long): String? = com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) ?: CourtPlans.closedOn(data.plan(), t)
+
     /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
     private fun courseEnd(i: DeskCourseIn): Long? {
         val n = i.lessons ?: return null
         val from = noon(i.from)?.let { CourtPlans.dayStart(it) } ?: return null
         val slots = i.slots.filter { it.weekday in 1..7 }.map { CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
-        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
+        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && dayOff(t) != null }
     }
 
     private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
@@ -33684,7 +33751,7 @@ class DeskApi(
             maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
         )
         // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
-        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else c
+        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> dayOff(t) != null }) else c
         data.saveCourse(saved)
         return ok(DeskId.serializer(), DeskId(c.id))
     }
@@ -49333,6 +49400,15 @@ interface Strings {
     val scMakeupOn: (String) -> String
     val scMovedFrom: (String) -> String
     val scMovedNotice: (String) -> String
+    val blkYearly: String
+    val blkYearlyHint: String
+    val blkPatron: String
+    val clClosed: String
+    val scSkipDays: String
+    val scSkipDaysHint: String
+    val clCancelThem: String
+    val clKeepThem: String
+    val clLessonsHit: (Int) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -51996,6 +52072,15 @@ object ItStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Recupero: $it" }
     override val scMovedFrom: (String) -> String = { "Spostata dal $it" }
     override val scMovedNotice: (String) -> String = { "La lezione del corso $it è spostata:" }
+    override val blkYearly = "Ogni anno"
+    override val blkYearlyHint = "Si ripete ogni anno negli stessi giorni: festa del patrono, chiusura estiva."
+    override val blkPatron = "Festa del patrono"
+    override val clClosed = "Circolo chiuso"
+    override val scSkipDays = "Salta feste e chiusure"
+    override val scSkipDaysHint = "Le lezioni nelle feste nazionali e nei giorni di chiusura del circolo (Non prenotabili su tutti i campi per tutto il giorno) non contano e risultano annullate."
+    override val clCancelThem = "Annulla quelle lezioni"
+    override val clKeepThem = "Lasciale"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 lezione dei corsi cade in questi giorni" else "$it lezioni dei corsi cadono in questi giorni" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -54660,6 +54745,15 @@ object EnStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Make-up: $it" }
     override val scMovedFrom: (String) -> String = { "Moved from $it" }
     override val scMovedNotice: (String) -> String = { "The $it lesson has been moved:" }
+    override val blkYearly = "Every year"
+    override val blkYearlyHint = "Repeats every year on the same days: patron saint's day, summer closure."
+    override val blkPatron = "Patron saint's day"
+    override val clClosed = "Club closed"
+    override val scSkipDays = "Skip holidays and closures"
+    override val scSkipDaysHint = "Lessons on national holidays and on club closure days (Not bookable on all courts all day) don't count and are marked cancelled."
+    override val clCancelThem = "Cancel those lessons"
+    override val clKeepThem = "Keep them"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 course lesson falls on these days" else "$it course lessons fall on these days" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -57349,6 +57443,15 @@ object DeStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Nachholen: $it" }
     override val scMovedFrom: (String) -> String = { "Verschoben vom $it" }
     override val scMovedNotice: (String) -> String = { "Die Stunde des Kurses $it ist verschoben:" }
+    override val blkYearly = "Jedes Jahr"
+    override val blkYearlyHint = "Wiederholt sich jedes Jahr an denselben Tagen: Patronatsfest, Sommerpause."
+    override val blkPatron = "Patronatsfest"
+    override val clClosed = "Verein geschlossen"
+    override val scSkipDays = "Feiertage und Schließtage überspringen"
+    override val scSkipDaysHint = "Stunden an gesetzlichen Feiertagen und an Schließtagen des Vereins (Nicht buchbar auf allen Plätzen den ganzen Tag) zählen nicht und gelten als abgesagt."
+    override val clCancelThem = "Diese Stunden absagen"
+    override val clKeepThem = "Behalten"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 Kursstunde fällt auf diese Tage" else "$it Kursstunden fallen auf diese Tage" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -60028,6 +60131,15 @@ object EsStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Recuperación: $it" }
     override val scMovedFrom: (String) -> String = { "Movida del $it" }
     override val scMovedNotice: (String) -> String = { "La clase del curso $it se ha movido:" }
+    override val blkYearly = "Cada año"
+    override val blkYearlyHint = "Se repite cada año en los mismos días: fiesta patronal, cierre de verano."
+    override val blkPatron = "Fiesta patronal"
+    override val clClosed = "Club cerrado"
+    override val scSkipDays = "Saltar festivos y cierres"
+    override val scSkipDaysHint = "Las clases en festivos nacionales y en días de cierre del club (No reservable en todas las pistas todo el día) no cuentan y quedan anuladas."
+    override val clCancelThem = "Anular esas clases"
+    override val clKeepThem = "Dejarlas"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 clase de los cursos cae en estos días" else "$it clases de los cursos caen en estos días" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -62709,6 +62821,15 @@ object FrStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Rattrapage : $it" }
     override val scMovedFrom: (String) -> String = { "Déplacée du $it" }
     override val scMovedNotice: (String) -> String = { "La séance du cours $it est déplacée :" }
+    override val blkYearly = "Chaque année"
+    override val blkYearlyHint = "Se répète chaque année aux mêmes dates : fête patronale, fermeture estivale."
+    override val blkPatron = "Fête patronale"
+    override val clClosed = "Club fermé"
+    override val scSkipDays = "Sauter fériés et fermetures"
+    override val scSkipDaysHint = "Les séances des jours fériés nationaux et des jours de fermeture du club (Non réservable sur tous les terrains toute la journée) ne comptent pas et sont annulées."
+    override val clCancelThem = "Annuler ces séances"
+    override val clKeepThem = "Les garder"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 séance de cours tombe ces jours-là" else "$it séances de cours tombent ces jours-là" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -65391,6 +65512,15 @@ object PtStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Reposição: $it" }
     override val scMovedFrom: (String) -> String = { "Mudada de $it" }
     override val scMovedNotice: (String) -> String = { "A aula do curso $it foi mudada:" }
+    override val blkYearly = "Todos os anos"
+    override val blkYearlyHint = "Repete-se todos os anos nos mesmos dias: festa do padroeiro, fecho de verão."
+    override val blkPatron = "Festa do padroeiro"
+    override val clClosed = "Clube fechado"
+    override val scSkipDays = "Saltar feriados e fechos"
+    override val scSkipDaysHint = "As aulas nos feriados nacionais e nos dias de fecho do clube (Não reservável em todos os campos o dia inteiro) não contam e ficam canceladas."
+    override val clCancelThem = "Cancelar essas aulas"
+    override val clKeepThem = "Deixá-las"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 aula dos cursos calha nestes dias" else "$it aulas dos cursos calham nestes dias" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -67970,6 +68100,9 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
         com.tennis.scoremanager.data.Holidays.on(day + 12 * 3_600_000L, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { name ->
             Text("${s.hdHoliday}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
+        CourtPlans.closedOn(plan, day + 12 * 3_600_000L)?.let { name ->
+            Text("${s.clClosed}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
@@ -68446,6 +68579,7 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
     val courts = c.storage.clubCourts
     val tournaments by c.clubTournaments.collectAsState()
     var b by remember { mutableStateOf(b0) }
+    var hit by remember { mutableStateOf<List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>>(emptyList()) }
     fun time(min: Int, onPick: (Int) -> Unit) = TimePickerDialog(context, { _, h, m -> onPick(h * 60 + m) }, (min / 60).coerceAtMost(23), min % 60, true).show()
     AlertDialog(
         onDismissRequest = onDone,
@@ -68453,6 +68587,10 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(b.label, { b = b.copy(label = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.blkLabel) })
+                // La festa del patrono in un tocco: tutti i campi, tutto il giorno, ogni anno (resta da scegliere il giorno).
+                if (isNew) GhostButton(s.blkPatron, Icons.Filled.CalendarMonth, {
+                    b = b.copy(label = s.blkPatron, courts = emptyList(), startMin = 0, endMin = 24 * 60, weekdays = emptySet(), yearly = true, reason = com.tennis.scoremanager.data.BlockReason.OTHER)
+                }, Modifier.fillMaxWidth())
                 val reasons = com.tennis.scoremanager.data.BlockReason.entries
                 Segmented(reasons.map { SegOption(blockReasonName(s, it)) }, reasons.indexOf(b.reason), { b = b.copy(reason = reasons[it]) }, columns = 2)
                 // Dal torneo: nome e date già pronti.
@@ -68486,11 +68624,26 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
                     GhostButton("${s.blkStart}: %02d:%02d".format(b.startMin / 60, b.startMin % 60), Icons.Filled.Schedule, { time(b.startMin) { m -> b = b.copy(startMin = m, endMin = maxOf(b.endMin, m + 30)) } }, Modifier.fillMaxWidth())
                     GhostButton("${s.blkEnd}: %02d:%02d".format(b.endMin / 60, b.endMin % 60), Icons.Filled.Schedule, { time(b.endMin) { m -> b = b.copy(endMin = maxOf(m, b.startMin + 30)) } }, Modifier.fillMaxWidth())
                 }
+                // Ogni anno negli stessi giorni (festa del patrono, chiusura estiva).
+                SwitchRow(Icons.Filled.CalendarMonth, s.blkYearly, s.blkYearlyHint, b.yearly) { b = b.copy(yearly = it) }
                 if (!isNew) TextButton(onClick = { c.saveCourtBlock(b0, delete = true); onDone() }) { Text(s.blkDelete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(onClick = { c.saveCourtBlock(b.copy(label = b.label.trim())); onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = {
+            val saved = b.copy(label = b.label.trim())
+            c.saveCourtBlock(saved)
+            // Una chiusura su lezioni dei corsi già in calendario: si propone di annullarle.
+            hit = c.courseLessonsClosedBy(saved)
+            if (hit.isEmpty()) onDone()
+        }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (hit.isNotEmpty()) AlertDialog(
+        onDismissRequest = { hit = emptyList(); onDone() },
+        title = { Text(s.clLessonsHit(hit.size)) },
+        text = { Text(hit.take(8).joinToString("\n") { (co, l) -> co.name + " · " + com.tennis.scoremanager.data.Notices.day(l.start, lang) }, color = TsmColors.TextMain, fontSize = 14.sp) },
+        confirmButton = { TextButton(onClick = { c.cancelCourseLessons(hit); hit = emptyList(); onDone() }) { Text(s.clCancelThem, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { hit = emptyList(); onDone() }) { Text(s.clKeepThem) } },
     )
 }
 TSM_EOF
@@ -75213,6 +75366,7 @@ fun CourseScreen(c: MatchController) {
     val co = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
+    val plan by c.courtPlan.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var tab by rememberSaveable { mutableStateOf(0) }
@@ -75273,6 +75427,7 @@ fun CourseScreen(c: MatchController) {
                             com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let {
                                 Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             }
+                            CourtPlans.closedOn(plan, l.start)?.let { Text("${s.clClosed}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
                             com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                         }
                         Text(
@@ -75393,7 +75548,9 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     var lessonsText by remember { mutableStateOf(co?.let { y -> Courses.lessons(y).count { it.key !in y.cancelled }.toString() } ?: "") }
     var skipHolidays by remember { mutableStateOf(true) }
     val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
-    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
+    // Feste nazionali e chiusure del circolo (Non prenotabili su tutti i campi per tutto il giorno).
+    val plan by c.courtPlan.collectAsState()
+    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null || CourtPlans.closedOn(plan, t) != null }
     val skip = { t: Long -> skipHolidays && isHoliday(t) }
     AlertDialog(
         onDismissRequest = { onDone(null) },
@@ -75422,7 +75579,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 // Il numero di lezioni dà la fine; senza numero la fine si sceglie a mano.
                 OutlinedTextField(lessonsText, { v -> lessonsText = v.filter { it.isDigit() }.take(3) }, Modifier.fillMaxWidth(), singleLine = true,
                     label = { Text(s.ccLessonsCount) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
-                SwitchRow(Icons.Filled.Schedule, s.ccSkipHolidays, s.ccSkipHolidaysHint, skipHolidays) { skipHolidays = it }
+                SwitchRow(Icons.Filled.Schedule, s.scSkipDays, s.scSkipDaysHint, skipHolidays) { skipHolidays = it }
                 val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) }
                 if (autoEnd != null) Text(s.ccEndAuto(com.tennis.scoremanager.data.Reports.date(autoEnd, lang)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
                 else DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }
@@ -96808,6 +96965,54 @@ class ActivityCalendarTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClosureTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClosureTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.time.LocalDate
+import java.time.ZoneId
+
+class ClosureTest {
+    private fun day(y: Int, m: Int, d: Int) = LocalDate.of(y, m, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    private val patron = CourtBlock("p", "Festa del patrono", BlockReason.OTHER, from = day(2026, 12, 15), to = day(2026, 12, 15), yearly = true)
+
+    @Test fun yearlyBlockRepeatsEveryYearFromTheFirst() {
+        assertTrue(CourtPlans.blockActive(patron, day(2026, 12, 15)))
+        assertTrue(CourtPlans.blockActive(patron, day(2027, 12, 15)))
+        assertFalse(CourtPlans.blockActive(patron, day(2027, 12, 16)))
+        assertFalse(CourtPlans.blockActive(patron, day(2025, 12, 15)))   // non prima del primo anno
+        // A cavallo di capodanno.
+        val xmas = CourtBlock("x", "Chiusura", from = day(2026, 12, 24), to = day(2027, 1, 6), yearly = true)
+        assertTrue(CourtPlans.blockActive(xmas, day(2028, 1, 3)))
+        assertFalse(CourtPlans.blockActive(xmas, day(2028, 1, 7)))
+    }
+
+    @Test fun closedOnlyWithAllCourtsAllDay() {
+        val plan = CourtPlan(blocks = listOf(patron))
+        assertEquals("Festa del patrono", CourtPlans.closedOn(plan, day(2027, 12, 15) + 3_600_000L * 12))
+        assertNull(CourtPlans.closedOn(plan, day(2027, 12, 14)))
+        // Un campo solo o qualche ora: il circolo non è chiuso.
+        assertNull(CourtPlans.closedOn(CourtPlan(blocks = listOf(patron.copy(courts = listOf("Campo 1")))), day(2026, 12, 15)))
+        assertNull(CourtPlans.closedOn(CourtPlan(blocks = listOf(patron.copy(startMin = 15 * 60, endMin = 18 * 60))), day(2026, 12, 15)))
+    }
+
+    @Test fun courseSkipsTheClosure() {
+        val plan = CourtPlan(blocks = listOf(patron))
+        // Martedì dal 1° dicembre 2026: l'8 è festa, il 15 il circolo è chiuso.
+        val end = Courses.endAfter(day(2026, 12, 1), listOf(CourseSlot(2, 17 * 60)), 2) { t -> Holidays.on(t, "IT") != null || CourtPlans.closedOn(plan, t) != null }
+        assertEquals(day(2026, 12, 22), end)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubBookTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubBookTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -101156,7 +101361,7 @@ class DeskTest {
         assertEquals(30, Regex("\"date\":").findAll(m).count())
         // Un'ora su un campo, con due campi aperti 15 ore: 3%. La domenica chiusa tutta.
         assertTrue(m, "{\"date\":\"2026-11-11\",\"bookings\":1,\"matches\":0,\"busy\":3,\"blocked\":0}" in m)
-        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100}" in m)
+        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100,\"holiday\":\"Chiuso\"}" in m)
         assertEquals(400, req("GET", "/week", token = k, q = mapOf("date" to "boh")).first)
     }
 
@@ -104798,8 +105003,24 @@ object CourtTime {
     /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
     fun blockActive(b: CourtBlock, day: Long): Boolean {
         val d = dayStart(day)
-        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays) && d !in b.except
+        val inDates = if (!b.yearly) d >= dayStart(b.from) && d <= dayStart(b.to) else d >= dayStart(b.from) && monthDayIn(d, b.from, b.to)
+        return inDates && (b.weekdays.isEmpty() || weekday(d) in b.weekdays) && d !in b.except
     }
+
+    /** Il giorno [d] cade, in qualunque anno, tra il giorno-mese di [from] e quello di [to] (anche a cavallo di capodanno). */
+    private fun monthDayIn(d: Long, from: Long, to: Long): Boolean {
+        fun md(t: Long) = Calendar.getInstance().apply { timeInMillis = t }.let { (it.get(Calendar.MONTH) + 1) * 100 + it.get(Calendar.DAY_OF_MONTH) }
+        val x = md(d); val a = md(from); val b = md(to)
+        return if (a <= b) x in a..b else x >= a || x <= b
+    }
+
+    /**
+     * Il circolo è chiuso quel giorno: un blocco (non di un corso) su tutti i campi per tutto l'orario di apertura. Il
+     * nome è quello del blocco ("Festa del patrono", "Chiusura estiva"); null = aperto.
+     */
+    fun closedOn(plan: CourtPlan, day: Long): String? = plan.blocks.firstOrNull { b ->
+        b.reason != BlockReason.COURSE && b.courts.isEmpty() && b.startMin <= plan.settings.openHour * 60 && b.endMin >= plan.settings.closeHour * 60 && blockActive(b, day)
+    }?.let { it.label.ifBlank { "—" } }
 
     /** Inizio e fine del blocco nel giorno [day]. */
     fun blockSpan(b: CourtBlock, day: Long): Pair<Long, Long> = at(day, b.startMin / 60, b.startMin % 60) to at(day, 0) + b.endMin * 60_000L
@@ -104957,6 +105178,8 @@ data class CourtBlock(
     val team: String? = null,
     /** I giorni (inizio del giorno) in cui il blocco non vale: per esempio la lezione del corso spostata altrove. */
     val except: Set<Long> = emptySet(),
+    /** Si ripete ogni anno negli stessi giorni (festa del patrono, chiusura estiva), dal primo anno in poi. */
+    val yearly: Boolean = false,
 )
 
 @Serializable
@@ -114825,6 +115048,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 369 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 370 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

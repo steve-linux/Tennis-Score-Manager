@@ -2669,6 +2669,15 @@ object FrStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Rattrapage : $it" }
     override val scMovedFrom: (String) -> String = { "Déplacée du $it" }
     override val scMovedNotice: (String) -> String = { "La séance du cours $it est déplacée :" }
+    override val blkYearly = "Chaque année"
+    override val blkYearlyHint = "Se répète chaque année aux mêmes dates : fête patronale, fermeture estivale."
+    override val blkPatron = "Fête patronale"
+    override val clClosed = "Club fermé"
+    override val scSkipDays = "Sauter fériés et fermetures"
+    override val scSkipDaysHint = "Les séances des jours fériés nationaux et des jours de fermeture du club (Non réservable sur tous les terrains toute la journée) ne comptent pas et sont annulées."
+    override val clCancelThem = "Annuler ces séances"
+    override val clKeepThem = "Les garder"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 séance de cours tombe ces jours-là" else "$it séances de cours tombent ces jours-là" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

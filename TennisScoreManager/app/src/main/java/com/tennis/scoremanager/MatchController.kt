@@ -2718,6 +2718,23 @@ class MatchController(
     }
 
     /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    /** Le lezioni future (non annullate) dei corsi che cadono nella chiusura [b] del circolo; vuoto se [b] non chiude il circolo. */
+    fun courseLessonsClosedBy(b: com.tennis.scoremanager.data.CourtBlock): List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>> {
+        val only = courtPlan.value.copy(blocks = listOf(b))
+        val now = System.currentTimeMillis()
+        return courses.value.flatMap { co ->
+            com.tennis.scoremanager.data.Courses.lessons(co).filter { it.start >= now && it.key !in co.cancelled && com.tennis.scoremanager.data.CourtPlans.closedOn(only, it.start) != null }.map { co to it }
+        }.sortedBy { it.second.start }
+    }
+
+    /** Annulla quelle lezioni (si rimettono dall'appello o si spostano). */
+    fun cancelCourseLessons(list: List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>) {
+        for ((id, ls) in list.groupBy { it.first.id }) {
+            val co = course(id) ?: continue
+            saveCourse(co.copy(cancelled = co.cancelled + ls.map { it.second.key }))
+        }
+    }
+
     /** Agli iscritti: la lezione [key] del corso [c] (già spostata) da quando a quando. */
     fun noticeCourseMoved(c: com.tennis.scoremanager.data.Course, key: String) {
         val l = com.tennis.scoremanager.data.Courses.lessons(c).firstOrNull { it.key == key } ?: return

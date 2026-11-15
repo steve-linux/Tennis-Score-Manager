@@ -2670,6 +2670,15 @@ object PtStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Reposição: $it" }
     override val scMovedFrom: (String) -> String = { "Mudada de $it" }
     override val scMovedNotice: (String) -> String = { "A aula do curso $it foi mudada:" }
+    override val blkYearly = "Todos os anos"
+    override val blkYearlyHint = "Repete-se todos os anos nos mesmos dias: festa do padroeiro, fecho de verão."
+    override val blkPatron = "Festa do padroeiro"
+    override val clClosed = "Clube fechado"
+    override val scSkipDays = "Saltar feriados e fechos"
+    override val scSkipDaysHint = "As aulas nos feriados nacionais e nos dias de fecho do clube (Não reservável em todos os campos o dia inteiro) não contam e ficam canceladas."
+    override val clCancelThem = "Cancelar essas aulas"
+    override val clKeepThem = "Deixá-las"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 aula dos cursos calha nestes dias" else "$it aulas dos cursos calham nestes dias" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }

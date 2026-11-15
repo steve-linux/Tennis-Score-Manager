@@ -864,7 +864,7 @@ async function editBlock(d, id) {
 }
 
 function blockDialog(d, b) {
-  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440 };
+  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440, yearly: false };
   const label = h('input', { maxlength: 40, value: v.label });
   const reason = select([['MAINTENANCE', T.blkMaintenance], ['TOURNAMENT', T.blkTournament], ['OTHER', T.bkOther]], v.reason);
   const all = h('input', { type: 'checkbox', checked: !v.courts.length });
@@ -873,6 +873,11 @@ function blockDialog(d, b) {
   const from = h('input', { type: 'date', value: v.from, required: true }), to = h('input', { type: 'date', value: v.to, required: true });
   const days = [1, 2, 3, 4, 5, 6, 7].map((n) => [n, h('input', { type: 'checkbox', checked: v.weekdays.includes(n) })]);
   const allDay = h('input', { type: 'checkbox', checked: v.startMin === 0 && v.endMin === 1440 });
+  const yearly = h('input', { type: 'checkbox', checked: !!v.yearly });
+  // La festa del patrono in un clic: tutti i campi, tutto il giorno, ogni anno (resta da scegliere il giorno).
+  const patron = b ? null : h('button', { type: 'button', onclick: () => {
+    label.value = T.blkPatron; reason.value = 'OTHER'; all.checked = true; allDay.checked = true; yearly.checked = true; days.forEach(([, x]) => { x.checked = false; }); update();
+  } }, T.blkPatron);
   const t1 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 15 * 60 : v.startMin), step: 300 });
   const t2 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 18 * 60 : Math.min(v.endMin, 1439)), step: 300 });
   const f1 = field(T.blkStart, t1), f2 = field(T.blkEnd, t2);
@@ -882,16 +887,18 @@ function blockDialog(d, b) {
     try { await api('DELETE', '/blocks/' + encodeURIComponent(b.id)); dlg.close(); toast(T.saved); await showPlan(); } catch (e) { toast(errText(e)); }
   } }, T.blkDelete);
   const dlg = dialog(b ? b.label || T.blkTitle : T.blkNew, h('div.form',
+    patron ? h('div.full', patron) : null,
     field(T.blkLabel, label, 'full'), field(T.kind, reason), h('span'),
     h('label.check.full', all, T.blkAllCourts), courtBox,
     field(T.blkFrom, from), field(T.blkTo, to),
     h('h3', T.blkDays), h('div.full.checks', days.map(([n, x]) => h('label.check', x, weekdayName(n)))), h('p.full.dim', T.blkDaysHint),
-    h('label.check.full', allDay, T.blkAllDay), f1, f2), async () => {
+    h('label.check.full', allDay, T.blkAllDay), f1, f2,
+    h('label.check.full', { title: T.blkYearlyHint }, yearly, T.blkYearly), h('p.full.dim', T.blkYearlyHint)), async () => {
     const pick = courts.filter(([, x]) => x.checked).map(([c]) => c);
     const body = {
       id: b ? b.id : '', label: label.value, reason: reason.value, courts: all.checked ? [] : pick, from: from.value, to: to.value,
       weekdays: days.filter(([, x]) => x.checked).map(([n]) => n),
-      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'),
+      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'), yearly: yearly.checked,
     };
     if (!all.checked && !pick.length) throw new Error(T.blkPickCourt);
     await api('POST', '/blocks', body);
@@ -2029,7 +2036,7 @@ function editCourse(c) {
     field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
     h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint),
     field(T.blkFrom, from), field(T.ccLessonsCount, count),
-    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox), async () => {
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.scSkipDaysHint }, skipHol, T.scSkipDays), endBox), async () => {
     const fc = fee.value.trim() ? cents(fee.value) : 0;
     if (fc === null) throw new Error(T.err.BAD_AMOUNT);
     const n = Number(count.value);

@@ -2738,6 +2738,15 @@ interface Strings {
     val scMakeupOn: (String) -> String
     val scMovedFrom: (String) -> String
     val scMovedNotice: (String) -> String
+    val blkYearly: String
+    val blkYearlyHint: String
+    val blkPatron: String
+    val clClosed: String
+    val scSkipDays: String
+    val scSkipDaysHint: String
+    val clCancelThem: String
+    val clKeepThem: String
+    val clLessonsHit: (Int) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5401,6 +5410,15 @@ object ItStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Recupero: $it" }
     override val scMovedFrom: (String) -> String = { "Spostata dal $it" }
     override val scMovedNotice: (String) -> String = { "La lezione del corso $it è spostata:" }
+    override val blkYearly = "Ogni anno"
+    override val blkYearlyHint = "Si ripete ogni anno negli stessi giorni: festa del patrono, chiusura estiva."
+    override val blkPatron = "Festa del patrono"
+    override val clClosed = "Circolo chiuso"
+    override val scSkipDays = "Salta feste e chiusure"
+    override val scSkipDaysHint = "Le lezioni nelle feste nazionali e nei giorni di chiusura del circolo (Non prenotabili su tutti i campi per tutto il giorno) non contano e risultano annullate."
+    override val clCancelThem = "Annulla quelle lezioni"
+    override val clKeepThem = "Lasciale"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 lezione dei corsi cade in questi giorni" else "$it lezioni dei corsi cadono in questi giorni" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8065,6 +8083,15 @@ object EnStrings : Strings {
     override val scMakeupOn: (String) -> String = { "Make-up: $it" }
     override val scMovedFrom: (String) -> String = { "Moved from $it" }
     override val scMovedNotice: (String) -> String = { "The $it lesson has been moved:" }
+    override val blkYearly = "Every year"
+    override val blkYearlyHint = "Repeats every year on the same days: patron saint's day, summer closure."
+    override val blkPatron = "Patron saint's day"
+    override val clClosed = "Club closed"
+    override val scSkipDays = "Skip holidays and closures"
+    override val scSkipDaysHint = "Lessons on national holidays and on club closure days (Not bookable on all courts all day) don't count and are marked cancelled."
+    override val clCancelThem = "Cancel those lessons"
+    override val clKeepThem = "Keep them"
+    override val clLessonsHit: (Int) -> String = { if (it == 1) "1 course lesson falls on these days" else "$it course lessons fall on these days" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

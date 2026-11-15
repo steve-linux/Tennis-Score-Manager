@@ -421,7 +421,7 @@ class DeskTest {
         assertEquals(30, Regex("\"date\":").findAll(m).count())
         // Un'ora su un campo, con due campi aperti 15 ore: 3%. La domenica chiusa tutta.
         assertTrue(m, "{\"date\":\"2026-11-11\",\"bookings\":1,\"matches\":0,\"busy\":3,\"blocked\":0}" in m)
-        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100}" in m)
+        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100,\"holiday\":\"Chiuso\"}" in m)
         assertEquals(400, req("GET", "/week", token = k, q = mapOf("date" to "boh")).first)
     }
 

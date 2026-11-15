@@ -372,6 +372,8 @@ interface DeskData {
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
+    /** Ogni anno negli stessi giorni (festa del patrono, chiusura estiva). */
+    val yearly: Boolean = false,
 )
 @Serializable data class DeskQuote(val cents: Int, val lights: Boolean)
 
@@ -729,7 +731,7 @@ class DeskApi(
             }
         }
         val s = plan.settings
-        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, com.tennis.scoremanager.data.Holidays.on(start + 12 * 3_600_000L, data.country(), zone()))
+        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, dayOff(start + 12 * 3_600_000L))
     }
 
     private fun localDay(date: String?): LocalDate = runCatching { LocalDate.parse(date.orEmpty()) }.getOrElse { throw Fail(400, "BAD_DATE") }
@@ -757,7 +759,7 @@ class DeskApi(
             val used = occ.filter { it.block == null }.sumOf(::minutes)
             val closed = occ.filter { it.block != null }.sumOf { o -> minutes(o) * (if (o.court == CourtPlans.ALL) courts.size else 1) }
             val cap = (open * courts.size).coerceAtLeast(1)
-            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d])
+            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d] ?: CourtPlans.closedOn(plan, start + 12 * 3_600_000L))
         }
         return ok(DeskMonth.serializer(), DeskMonth(first.toString(), courts, days))
     }
@@ -808,7 +810,7 @@ class DeskApi(
     }
 
     private fun blocks(): Resp = ok(ListSerializer(DeskBlock.serializer()), data.plan().blocks.sortedBy { it.from }.map { b ->
-        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b))
+        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b), b.yearly)
     })
 
     private fun saveBlock(i: DeskBlock): Resp {
@@ -822,7 +824,7 @@ class DeskApi(
         if (i.reason == BlockReason.COURSE) throw Fail(400, "BAD_REQUEST")
         val b = (old ?: CourtBlock(CourtPlans.newId("k"), "", from = from, to = to)).copy(
             label = text(i.label, 40), reason = i.reason, courts = i.courts.distinct(), from = from, to = to,
-            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin,
+            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin, yearly = i.yearly,
         )
         data.saveBlock(b, delete = false)
         return done()
@@ -1188,7 +1190,7 @@ class DeskApi(
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
             DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
-                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()),
+                dayOff(l.start),
                 l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() })
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
@@ -1258,12 +1260,15 @@ class DeskApi(
 
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
 
+    /** La festa nazionale o la chiusura del circolo del giorno di [t] (il nome); null = giorno normale. */
+    private fun dayOff(t: Long): String? = com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) ?: CourtPlans.closedOn(data.plan(), t)
+
     /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
     private fun courseEnd(i: DeskCourseIn): Long? {
         val n = i.lessons ?: return null
         val from = noon(i.from)?.let { CourtPlans.dayStart(it) } ?: return null
         val slots = i.slots.filter { it.weekday in 1..7 }.map { CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
-        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
+        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && dayOff(t) != null }
     }
 
     private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
@@ -1286,7 +1291,7 @@ class DeskApi(
             maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
         )
         // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
-        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else c
+        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> dayOff(t) != null }) else c
         data.saveCourse(saved)
         return ok(DeskId.serializer(), DeskId(c.id))
     }
