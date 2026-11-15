@@ -42,6 +42,8 @@ class FakeCoach(var time: Long) : CoachData {
     }
     override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
     override fun country() = "IT"
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) { book = book.copy(busy = book.busy.filter { it.id != b.id } + b) }
+    override fun deleteBusy(id: String) { book = book.copy(busy = book.busy.filter { it.id != id }) }
     val colors = mutableMapOf<String, String>()
     override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
@@ -159,6 +161,27 @@ class CoachDeskTest {
         coach.time = java.time.LocalDate.of(2026, 12, 9).atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
         val reg = req("GET", "/coach/courses/${c.id}", token = tk).second
         assertTrue(reg, "Immacolata" in reg)
+    }
+
+    @Test fun busyDaysShowAndAreSkipped() {
+        val tk = login()
+        // Occupato dal 15 al 16 dicembre 2026 (un martedì e un mercoledì).
+        val made = req("POST", "/coach/busy", """{"from":"2026-12-16","to":"2026-12-15","kind":"VACATION","note":"Campo estivo"}""", tk)
+        assertEquals(200, made.first)
+        val b = coach.book.busy.single()
+        assertEquals(java.time.LocalDate.of(2026, 12, 15), java.time.Instant.ofEpochMilli(b.from).atZone(zone).toLocalDate())
+        val base = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60,"court":""}],"lessons":2"""
+        // L'8 è festa, il 15 occupato: con entrambi la seconda lezione è il 22.
+        assertTrue(req("POST", "/coach/courses/end", "$base,\"skipBusy\":true}", tk).second.contains("2026-12-22"))
+        assertTrue(req("POST", "/coach/courses/end", "$base}", tk).second.contains("2026-12-15"))
+        assertEquals(200, req("POST", "/coach/courses", "$base}", tk).first)
+        val list = req("GET", "/coach/busy", token = tk).second
+        assertTrue(list, "\"clashes\":[{\"date\":\"2026-12-15\"" in list)
+        val cal = req("GET", "/coach/calendar", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(cal, "Campo estivo" in cal)
+        assertEquals(200, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
+        assertTrue(coach.book.busy.isEmpty())
+        assertEquals(404, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
     }
 
     @Test fun studentsFromThePcWithoutDuplicates() {

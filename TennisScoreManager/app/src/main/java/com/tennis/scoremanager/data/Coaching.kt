@@ -94,6 +94,16 @@ data class LessonPack(
 @Serializable
 data class StudentGroup(val id: String, val name: String, val students: List<String> = emptyList())
 
+/** Perché l'allenatore non c'è in quei giorni. */
+enum class BusyKind { BUSY, VACATION, TOURNAMENT, SICK, OTHER }
+
+/** Un impegno dell'allenatore: dal giorno [from] al giorno [to] compresi (inizio del giorno), per vedere se le lezioni ci cadono. */
+@Serializable
+data class CoachBusy(val id: String, val from: Long, val to: Long, val kind: BusyKind = BusyKind.BUSY, val note: String = "")
+
+/** Una lezione (privata o di un corso) che cade in un giorno occupato. */
+data class BusyClash(val start: Long, val title: String, val busy: CoachBusy, val courseId: String? = null, val lessonId: String? = null)
+
 /** Tutto quello che l'allenatore tiene dei suoi allievi oltre alle sessioni: un file solo (coach_book.json). */
 @Serializable
 data class CoachBook(
@@ -109,6 +119,8 @@ data class CoachBook(
     val rankings: List<RankingEntry> = emptyList(),
     val evaluations: List<Evaluation> = emptyList(),
     val tests: List<FitnessTest> = emptyList(),
+    /** I giorni in cui l'allenatore è occupato (impegni, ferie, tornei…). */
+    val busy: List<CoachBusy> = emptyList(),
 )
 
 object Coaching {
@@ -121,6 +133,25 @@ object Coaching {
     fun lessonsOf(book: CoachBook, student: String): List<CoachLesson> = book.lessons.filter { student in it.students }.sortedBy { it.start }
 
     /** Le prossime lezioni (da [now] in poi, non annullate), in ordine. */
+    /** L'impegno del giorno di [t], se c'è. */
+    fun busyOn(busy: List<CoachBusy>, t: Long): CoachBusy? {
+        val d = CourtPlans.dayStart(t)
+        return busy.firstOrNull { d >= CourtPlans.dayStart(it.from) && d <= CourtPlans.dayStart(it.to) }
+    }
+
+    /** Le lezioni da adesso in poi (private e dei corsi, non annullate) che cadono in un giorno occupato, in ordine. */
+    fun busyClashes(book: CoachBook, now: Long, names: (List<String>) -> String = { it.joinToString(", ") }): List<BusyClash> {
+        if (book.busy.isEmpty()) return emptyList()
+        val out = mutableListOf<BusyClash>()
+        for (l in book.lessons) if (!l.cancelled && !l.done && l.start >= now) busyOn(book.busy, l.start)?.let { out += BusyClash(l.start, names(l.students), it, lessonId = l.id) }
+        for (cc in book.courses) {
+            val co = cc.course
+            for (les in Courses.lessons(co)) if (les.start >= now && les.key !in co.cancelled && les.key !in co.attendance)
+                busyOn(book.busy, les.start)?.let { out += BusyClash(les.start, co.name, it, courseId = co.id) }
+        }
+        return out.sortedBy { it.start }
+    }
+
     fun upcoming(lessons: List<CoachLesson>, now: Long): List<CoachLesson> = lessons.filter { !it.cancelled && it.start + it.minutes * 60_000L > now }.sortedBy { it.start }
 
     /**

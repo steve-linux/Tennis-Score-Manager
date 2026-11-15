@@ -2605,6 +2605,22 @@ object DeStrings : Strings {
     override val ccSkipHolidaysHint = "Stunden an gesetzlichen Feiertagen zählen nicht und gelten als abgesagt (in der Anwesenheit wiederherstellbar)."
     override val hdHoliday = "Feiertag"
     override val ccEndAuto: (String) -> String = { "Ende: $it (berechnet)" }
+    override val bzTitle = "Meine Termine"
+    override val bzNew = "Termin"
+    override val bzHint = "Tage, an denen du nicht kannst: orange im Kalender, mit Warnung, wenn eine Stunde darauf fällt."
+    override val bzBusy = "Belegt"
+    override val bzVacation = "Urlaub"
+    override val bzTournament = "Turnier"
+    override val bzSick = "Krank"
+    override val bzOther = "Sonstiges"
+    override val bzNote = "Notiz (optional)"
+    override val bzNone = "Keine Termine geplant."
+    override val bzFrom = "Von"
+    override val bzTo = "Bis"
+    override val bzClashHint = "Kursstunden sagst du über die Anwesenheit ab, Privatstunden im Kalender."
+    override val ccSkipBusy = "Meine Termine überspringen"
+    override val ccSkipBusyHint = "Auch Stunden an deinen belegten Tagen zählen nicht und gelten als abgesagt."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }

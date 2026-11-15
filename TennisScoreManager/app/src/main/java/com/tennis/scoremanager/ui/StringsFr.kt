@@ -2608,6 +2608,22 @@ object FrStrings : Strings {
     override val ccSkipHolidaysHint = "Les séances des jours fériés ne comptent pas et sont annulées (on les rétablit depuis l'appel)."
     override val hdHoliday = "Jour férié"
     override val ccEndAuto: (String) -> String = { "Fin : $it (calculée)" }
+    override val bzTitle = "Mes indisponibilités"
+    override val bzNew = "Indisponibilité"
+    override val bzHint = "Les jours où tu n'es pas là : en orange dans le calendrier, avec un avertissement si une séance tombe dessus."
+    override val bzBusy = "Occupé"
+    override val bzVacation = "Congés"
+    override val bzTournament = "Tournoi"
+    override val bzSick = "Malade"
+    override val bzOther = "Autre"
+    override val bzNote = "Note (facultative)"
+    override val bzNone = "Aucune indisponibilité prévue."
+    override val bzFrom = "Du"
+    override val bzTo = "Au"
+    override val bzClashHint = "Les séances des cours s'annulent depuis l'appel, les leçons privées depuis l'agenda."
+    override val ccSkipBusy = "Sauter mes indisponibilités"
+    override val ccSkipBusyHint = "Les séances de tes jours occupés ne comptent pas non plus et sont annulées."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }

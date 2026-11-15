@@ -2609,6 +2609,22 @@ object PtStrings : Strings {
     override val ccSkipHolidaysHint = "As aulas em feriados nacionais não contam e ficam anuladas (repõem-se na chamada)."
     override val hdHoliday = "Feriado"
     override val ccEndAuto: (String) -> String = { "Fim: $it (calculado)" }
+    override val bzTitle = "Os meus compromissos"
+    override val bzNew = "Compromisso"
+    override val bzHint = "Os dias em que não estás: aparecem a laranja no calendário e és avisado se uma aula calhar neles."
+    override val bzBusy = "Ocupado"
+    override val bzVacation = "Férias"
+    override val bzTournament = "Torneio"
+    override val bzSick = "Doente"
+    override val bzOther = "Outro"
+    override val bzNote = "Nota (opcional)"
+    override val bzNone = "Nenhum compromisso previsto."
+    override val bzFrom = "De"
+    override val bzTo = "Até"
+    override val bzClashHint = "As aulas dos cursos cancelam-se na chamada, as privadas na agenda."
+    override val ccSkipBusy = "Saltar os meus compromissos"
+    override val ccSkipBusyHint = "As aulas nos teus dias ocupados também não contam e ficam canceladas."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }

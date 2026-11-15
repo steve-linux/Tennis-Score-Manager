@@ -1859,6 +1859,13 @@ class MatchController(
     // Partite, tornei, classifica, valutazioni e test degli allievi.
     fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
     fun deleteManualMatch(id: String) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
+    /** Gli impegni dell'allenatore (giorni occupati). */
+    fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
+        val b = coachBook.value
+        val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
+        putCoach(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from }))
+    }
+    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(b.copy(busy = b.busy.filter { it.id != id })) }
     fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
     fun deleteStudentEvent(id: String) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != id })) }
     fun addRanking(student: String, ranking: String) {

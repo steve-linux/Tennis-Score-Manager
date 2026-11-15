@@ -201,6 +201,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
     override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
     override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
+    override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }

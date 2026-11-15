@@ -2677,6 +2677,22 @@ interface Strings {
     val ccSkipHolidaysHint: String
     val hdHoliday: String
     val ccEndAuto: (String) -> String
+    val bzTitle: String
+    val bzNew: String
+    val bzHint: String
+    val bzBusy: String
+    val bzVacation: String
+    val bzTournament: String
+    val bzSick: String
+    val bzOther: String
+    val bzNote: String
+    val bzNone: String
+    val bzFrom: String
+    val bzTo: String
+    val bzClashHint: String
+    val ccSkipBusy: String
+    val ccSkipBusyHint: String
+    val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
@@ -5278,6 +5294,22 @@ object ItStrings : Strings {
     override val ccSkipHolidaysHint = "Le lezioni nei giorni di festa nazionale non contano e risultano annullate (si rimettono dall'appello)."
     override val hdHoliday = "Festa"
     override val ccEndAuto: (String) -> String = { "Fine: $it (calcolata)" }
+    override val bzTitle = "I miei impegni"
+    override val bzNew = "Impegno"
+    override val bzHint = "I giorni in cui non ci sei: sono in arancione nel calendario e ti avvisano se una lezione ci cade."
+    override val bzBusy = "Occupato"
+    override val bzVacation = "Ferie"
+    override val bzTournament = "Torneo"
+    override val bzSick = "Malattia"
+    override val bzOther = "Altro"
+    override val bzNote = "Nota (facoltativa)"
+    override val bzNone = "Nessun impegno in programma."
+    override val bzFrom = "Dal"
+    override val bzTo = "Al"
+    override val bzClashHint = "Le lezioni dei corsi si annullano dall'appello, quelle private dall'agenda."
+    override val ccSkipBusy = "Salta i miei impegni"
+    override val ccSkipBusyHint = "Anche le lezioni nei tuoi giorni occupati non contano e risultano annullate."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
@@ -7880,6 +7912,22 @@ object EnStrings : Strings {
     override val ccSkipHolidaysHint = "Lessons on national holidays don't count and are marked cancelled (you can restore them from the roll call)."
     override val hdHoliday = "Holiday"
     override val ccEndAuto: (String) -> String = { "End: $it (calculated)" }
+    override val bzTitle = "My commitments"
+    override val bzNew = "Commitment"
+    override val bzHint = "Days you're not available: they show in orange in the calendar and you're warned if a lesson falls on them."
+    override val bzBusy = "Busy"
+    override val bzVacation = "Holiday"
+    override val bzTournament = "Tournament"
+    override val bzSick = "Sick"
+    override val bzOther = "Other"
+    override val bzNote = "Note (optional)"
+    override val bzNone = "No commitments planned."
+    override val bzFrom = "From"
+    override val bzTo = "To"
+    override val bzClashHint = "Course lessons are cancelled from the roll call, private ones from the agenda."
+    override val ccSkipBusy = "Skip my commitments"
+    override val ccSkipBusyHint = "Lessons on your busy days don't count either and are marked cancelled."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }

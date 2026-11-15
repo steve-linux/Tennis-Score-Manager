@@ -428,6 +428,20 @@ const APP_I18N = {
     blkTitle: "Campi non prenotabili",
     blkTo: "Al",
     blkTournament: "Torneo",
+    bzBusy: "Occupato",
+    bzClash: (it) => it === 1 ? `1 lezione cade nei tuoi impegni` : `${it} lezioni cadono nei tuoi impegni`,
+    bzClashHint: "Le lezioni dei corsi si annullano dall'appello, quelle private dall'agenda.",
+    bzFrom: "Dal",
+    bzHint: "I giorni in cui non ci sei: sono in arancione nel calendario e ti avvisano se una lezione ci cade.",
+    bzNew: "Impegno",
+    bzNone: "Nessun impegno in programma.",
+    bzNote: "Nota (facoltativa)",
+    bzOther: "Altro",
+    bzSick: "Malattia",
+    bzTitle: "I miei impegni",
+    bzTo: "Al",
+    bzTournament: "Torneo",
+    bzVacation: "Ferie",
     ccAccept: "Aggiungi ai miei corsi",
     ccAddSlot: "Aggiungi l'orario",
     ccAttBadCode: "Il codice non è quello della scheda corso mandata: le presenze non si registrano.",
@@ -482,6 +496,8 @@ const APP_I18N = {
     ccSendAttendance: "Manda le presenze",
     ccSendToCoach: "Manda all'allenatore",
     ccSent: (it) => `Presenze mandate il ${it}`,
+    ccSkipBusy: "Salta i miei impegni",
+    ccSkipBusyHint: "Anche le lezioni nei tuoi giorni occupati non contano e risultano annullate.",
     ccSkipHolidays: "Salta le feste",
     ccSkipHolidaysHint: "Le lezioni nei giorni di festa nazionale non contano e risultano annullate (si rimettono dall'appello).",
     ccSlots: "Orari",
@@ -1265,6 +1281,20 @@ const APP_I18N = {
     blkTitle: "Non-bookable courts",
     blkTo: "To",
     blkTournament: "Tournament",
+    bzBusy: "Busy",
+    bzClash: (it) => it === 1 ? `1 lesson falls on your commitments` : `${it} lessons fall on your commitments`,
+    bzClashHint: "Course lessons are cancelled from the roll call, private ones from the agenda.",
+    bzFrom: "From",
+    bzHint: "Days you're not available: they show in orange in the calendar and you're warned if a lesson falls on them.",
+    bzNew: "Commitment",
+    bzNone: "No commitments planned.",
+    bzNote: "Note (optional)",
+    bzOther: "Other",
+    bzSick: "Sick",
+    bzTitle: "My commitments",
+    bzTo: "To",
+    bzTournament: "Tournament",
+    bzVacation: "Holiday",
     ccAccept: "Add to my courses",
     ccAddSlot: "Add the time",
     ccAttBadCode: "The code is not the one of the course card sent: the attendance is not recorded.",
@@ -1319,6 +1349,8 @@ const APP_I18N = {
     ccSendAttendance: "Send attendance",
     ccSendToCoach: "Send to the coach",
     ccSent: (it) => `Attendance sent on ${it}`,
+    ccSkipBusy: "Skip my commitments",
+    ccSkipBusyHint: "Lessons on your busy days don't count either and are marked cancelled.",
     ccSkipHolidays: "Skip holidays",
     ccSkipHolidaysHint: "Lessons on national holidays don't count and are marked cancelled (you can restore them from the roll call).",
     ccSlots: "Times",
@@ -2102,6 +2134,20 @@ const APP_I18N = {
     blkTitle: "Terrains non réservables",
     blkTo: "Au",
     blkTournament: "Tournoi",
+    bzBusy: "Occupé",
+    bzClash: (it) => it === 1 ? `1 séance tombe pendant tes indisponibilités` : `${it} séances tombent pendant tes indisponibilités`,
+    bzClashHint: "Les séances des cours s'annulent depuis l'appel, les leçons privées depuis l'agenda.",
+    bzFrom: "Du",
+    bzHint: "Les jours où tu n'es pas là : en orange dans le calendrier, avec un avertissement si une séance tombe dessus.",
+    bzNew: "Indisponibilité",
+    bzNone: "Aucune indisponibilité prévue.",
+    bzNote: "Note (facultative)",
+    bzOther: "Autre",
+    bzSick: "Malade",
+    bzTitle: "Mes indisponibilités",
+    bzTo: "Au",
+    bzTournament: "Tournoi",
+    bzVacation: "Congés",
     ccAccept: "Ajouter à mes cours",
     ccAddSlot: "Ajouter l'horaire",
     ccAttBadCode: "Le code n'est pas celui de la fiche de cours envoyée : les présences ne sont pas enregistrées.",
@@ -2156,6 +2202,8 @@ const APP_I18N = {
     ccSendAttendance: "Envoyer les présences",
     ccSendToCoach: "Envoyer à l'entraîneur",
     ccSent: (it) => `Présences envoyées le ${it}`,
+    ccSkipBusy: "Sauter mes indisponibilités",
+    ccSkipBusyHint: "Les séances de tes jours occupés ne comptent pas non plus et sont annulées.",
     ccSkipHolidays: "Sauter les jours fériés",
     ccSkipHolidaysHint: "Les séances des jours fériés ne comptent pas et sont annulées (on les rétablit depuis l'appel).",
     ccSlots: "Horaires",
@@ -2939,6 +2987,20 @@ const APP_I18N = {
     blkTitle: "Nicht buchbare Plätze",
     blkTo: "Bis",
     blkTournament: "Turnier",
+    bzBusy: "Belegt",
+    bzClash: (it) => it === 1 ? `1 Stunde fällt auf deine Termine` : `${it} Stunden fallen auf deine Termine`,
+    bzClashHint: "Kursstunden sagst du über die Anwesenheit ab, Privatstunden im Kalender.",
+    bzFrom: "Von",
+    bzHint: "Tage, an denen du nicht kannst: orange im Kalender, mit Warnung, wenn eine Stunde darauf fällt.",
+    bzNew: "Termin",
+    bzNone: "Keine Termine geplant.",
+    bzNote: "Notiz (optional)",
+    bzOther: "Sonstiges",
+    bzSick: "Krank",
+    bzTitle: "Meine Termine",
+    bzTo: "Bis",
+    bzTournament: "Turnier",
+    bzVacation: "Urlaub",
     ccAccept: "Zu meinen Kursen",
     ccAddSlot: "Zeit hinzufügen",
     ccAttBadCode: "Der Code passt nicht zur geschickten Kurskarte: die Anwesenheit wird nicht gespeichert.",
@@ -2993,6 +3055,8 @@ const APP_I18N = {
     ccSendAttendance: "Anwesenheit schicken",
     ccSendToCoach: "An den Trainer schicken",
     ccSent: (it) => `Anwesenheit am ${it} geschickt`,
+    ccSkipBusy: "Meine Termine überspringen",
+    ccSkipBusyHint: "Auch Stunden an deinen belegten Tagen zählen nicht und gelten als abgesagt.",
     ccSkipHolidays: "Feiertage überspringen",
     ccSkipHolidaysHint: "Stunden an gesetzlichen Feiertagen zählen nicht und gelten als abgesagt (in der Anwesenheit wiederherstellbar).",
     ccSlots: "Zeiten",
@@ -3776,6 +3840,20 @@ const APP_I18N = {
     blkTitle: "Pistas no reservables",
     blkTo: "Hasta",
     blkTournament: "Torneo",
+    bzBusy: "Ocupado",
+    bzClash: (it) => it === 1 ? `1 clase cae en tus compromisos` : `${it} clases caen en tus compromisos`,
+    bzClashHint: "Las clases de los cursos se anulan desde la lista, las privadas desde la agenda.",
+    bzFrom: "Del",
+    bzHint: "Los días en que no estás: salen en naranja en el calendario y te avisan si una clase cae en ellos.",
+    bzNew: "Compromiso",
+    bzNone: "Ningún compromiso previsto.",
+    bzNote: "Nota (opcional)",
+    bzOther: "Otro",
+    bzSick: "Enfermo",
+    bzTitle: "Mis compromisos",
+    bzTo: "Al",
+    bzTournament: "Torneo",
+    bzVacation: "Vacaciones",
     ccAccept: "Añadir a mis cursos",
     ccAddSlot: "Añadir el horario",
     ccAttBadCode: "El código no es el de la ficha de curso enviada: la asistencia no se registra.",
@@ -3830,6 +3908,8 @@ const APP_I18N = {
     ccSendAttendance: "Enviar asistencia",
     ccSendToCoach: "Enviar al entrenador",
     ccSent: (it) => `Asistencia enviada el ${it}`,
+    ccSkipBusy: "Saltar mis compromisos",
+    ccSkipBusyHint: "Las clases en tus días ocupados tampoco cuentan y quedan anuladas.",
     ccSkipHolidays: "Saltar los festivos",
     ccSkipHolidaysHint: "Las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde pasar lista).",
     ccSlots: "Horarios",
@@ -4613,6 +4693,20 @@ const APP_I18N = {
     blkTitle: "Quadras não reserváveis",
     blkTo: "Até",
     blkTournament: "Torneio",
+    bzBusy: "Ocupado",
+    bzClash: (it) => it === 1 ? `1 aula calha nos teus compromissos` : `${it} aulas calham nos teus compromissos`,
+    bzClashHint: "As aulas dos cursos cancelam-se na chamada, as privadas na agenda.",
+    bzFrom: "De",
+    bzHint: "Os dias em que não estás: aparecem a laranja no calendário e és avisado se uma aula calhar neles.",
+    bzNew: "Compromisso",
+    bzNone: "Nenhum compromisso previsto.",
+    bzNote: "Nota (opcional)",
+    bzOther: "Outro",
+    bzSick: "Doente",
+    bzTitle: "Os meus compromissos",
+    bzTo: "Até",
+    bzTournament: "Torneio",
+    bzVacation: "Férias",
     ccAccept: "Adicionar aos meus cursos",
     ccAddSlot: "Adicionar o horário",
     ccAttBadCode: "O código não é o da ficha de curso enviada: as presenças não são registadas.",
@@ -4667,6 +4761,8 @@ const APP_I18N = {
     ccSendAttendance: "Enviar presenças",
     ccSendToCoach: "Enviar ao treinador",
     ccSent: (it) => `Presenças enviadas em ${it}`,
+    ccSkipBusy: "Saltar os meus compromissos",
+    ccSkipBusyHint: "As aulas nos teus dias ocupados também não contam e ficam canceladas.",
     ccSkipHolidays: "Saltar os feriados",
     ccSkipHolidaysHint: "As aulas em feriados nacionais não contam e ficam anuladas (repõem-se na chamada).",
     ccSlots: "Horários",
@@ -7681,6 +7777,31 @@ async function calOpen(x) {
   }
 }
 
+// --- Impegni (giorni occupati) ---
+
+const BUSY_KINDS = ['BUSY', 'VACATION', 'TOURNAMENT', 'SICK', 'OTHER'];
+const busyKindName = (k) => ({ BUSY: T.bzBusy, VACATION: T.bzVacation, TOURNAMENT: T.bzTournament, SICK: T.bzSick, OTHER: T.bzOther })[k] || k;
+const busyLabel = (b) => [busyKindName(b.kind), b.note].filter(Boolean).join(' · ');
+const busyDays = (b) => (b.from === b.to ? dateText(b.from) : dateText(b.from) + ' – ' + dateText(b.to));
+
+/** Un impegno: dal… al…, il motivo e una nota ([b] null = nuovo). */
+function busyDialog(b, day) {
+  const from = h('input', { type: 'date', value: b ? b.from : (day || info.today), required: true });
+  const to = h('input', { type: 'date', value: b ? b.to : (day || info.today), required: true });
+  from.onchange = () => { if (to.value < from.value) to.value = from.value; };
+  const kind = select(BUSY_KINDS.map((k) => [k, busyKindName(k)]), b ? b.kind : 'BUSY');
+  const note = h('input', { maxlength: 200, value: b ? b.note : '' });
+  const del = b ? h('button.danger', { type: 'button', onclick: async () => {
+    try { await api('DELETE', '/coach/busy/' + encodeURIComponent(b.id)); dlg.close(); toast(T.saved); showAgenda(); } catch (e) { toast(errText(e)); }
+  } }, T.remove) : null;
+  const dlg = dialog(T.bzNew, h('div.form', h('p.dim.full', T.bzHint), field(T.bzFrom, from), field(T.bzTo, to), field('', kind, 'full'), field(T.bzNote, note, 'full')), async () => {
+    const body = { from: from.value, to: to.value, kind: kind.value, note: note.value };
+    if (b) await api('PUT', '/coach/busy/' + encodeURIComponent(b.id), body); else await api('POST', '/coach/busy', body);
+    toast(T.saved);
+    showAgenda();
+  }, { left: del });
+}
+
 /** Agenda: il mese (o la settimana) con lezioni private, lezioni dei corsi e tornei degli allievi; o l'elenco. */
 async function showAgenda() {
   if (!agendaDate) agendaDate = info.today;
@@ -7695,7 +7816,9 @@ async function showAgenda() {
   };
   const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
   const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
-    h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
+    h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, h('button', { onclick: () => busyDialog(null) }, T.bzNew), printBtn());
+  // L'impegno del giorno, in arancione: un clic per cambiarlo.
+  const busyTag = (b) => (b ? h('button.busyname', { type: 'button', title: busyDays(b), onclick: (ev) => { ev.stopPropagation(); busyDialog(b); } }, busyLabel(b)) : null);
   // La legenda: lezioni private, tornei e ogni corso col suo colore.
   const legendOf = (items) => {
     const courses = [...new Map(items.filter((x) => x.kind === 'course' || x.kind === 'own').map((x) => [x.ref, [x.title, calColor({ ...x, cancelled: false })]])).values()];
@@ -7712,8 +7835,8 @@ async function showAgenda() {
     const cells = [];
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const d of m.days) {
-      cells.push(h('div.mday' + (d.date === info.today ? '.now' : '') + (d.holiday ? '.hol' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (d.holiday ? ' · ' + d.holiday : '') },
-        h('b', Number(d.date.slice(8))), d.holiday ? h('span.holname', d.holiday) : null, d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
+      cells.push(h('div.mday' + (d.date === info.today ? '.now' : '') + (d.holiday ? '.hol' : '') + (d.busy ? '.busy' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (d.holiday ? ' · ' + d.holiday : '') },
+        h('b', Number(d.date.slice(8))), d.holiday ? h('span.holname', d.holiday) : null, busyTag(d.busy), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
     }
     put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
       h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legendOf(m.days.flatMap((d) => d.items)));
@@ -7728,22 +7851,29 @@ async function showAgenda() {
   const cals = await Promise.all(months.map((x) => api('GET', '/coach/calendar?date=' + x)));
   const byDay = Object.fromEntries(cals.flatMap((c) => c.days).map((d) => [d.date, d.items]));
   const hol = Object.fromEntries(cals.flatMap((c) => c.days).filter((d) => d.holiday).map((d) => [d.date, d.holiday]));
+  const busyOf = Object.fromEntries(cals.flatMap((c) => c.days).filter((d) => d.busy).map((d) => [d.date, d.busy]));
   const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
   put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
     h('div.panel', h('div.month', days.map((d) => h('div.mhead' + (hol[d] ? '.hol' : ''), { title: hol[d] || '' }, long(d, { weekday: 'short', day: 'numeric' }))),
-      days.map((d) => h('div.mday' + (d === info.today ? '.now' : '') + (hol[d] ? '.hol' : ''), { style: 'min-height:240px' }, hol[d] ? h('span.holname', hol[d]) : null, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : '') + (hol[d] ? '.hol' : '') + (busyOf[d] ? '.busy' : ''), { style: 'min-height:240px' }, hol[d] ? h('span.holname', hol[d]) : null, busyTag(busyOf[d]), (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
 }
 
 /** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
 async function showAgendaList(views) {
-  const list = await api('GET', '/coach/lessons');
+  const [list, busy] = await Promise.all([api('GET', '/coach/lessons'), api('GET', '/coach/busy')]);
   const now = info.today;
   const next = list.filter((l) => !l.cancelled && l.date >= now);
   const past = list.filter((l) => !l.cancelled && !l.done && l.date < now).reverse();
   const row = (l, mark) => h('tr',
     h('td', dateText(l.date) + ' ' + hhmm(l.startMin)), h('td', T.coMinutes(l.minutes)), h('td', l.students.join(', ')), h('td', l.place),
     h('td', mark ? h('button', { onclick: async () => { try { await api('PUT', '/coach/lessons/' + encodeURIComponent(l.id) + '/done', { done: true }); toast(T.saved); showAgenda(); } catch (e) { toast(errText(e)); } } }, T.coDone) : (l.done ? T.coDone : '')));
-  put(main(), h('div.head', h('h1', T.coAgenda), views, printBtn()),
+  const byId = Object.fromEntries(busy.items.map((b) => [b.id, b]));
+  put(main(), h('div.head', h('h1', T.coAgenda), views, h('button', { onclick: () => busyDialog(null) }, T.bzNew), printBtn()),
+    busy.clashes.length ? h('div.panel', h('h2', { style: 'color:var(--warn)' }, T.bzClash(busy.clashes.length)),
+      h('table', h('tbody', busy.clashes.map((x) => h('tr', h('td', dateText(x.date) + ' ' + hhmm(x.startMin)), h('td', x.title), h('td', { style: 'color:var(--warn)' }, byId[x.busyId] ? busyLabel(byId[x.busyId]) : ''))))),
+      h('p.dim', T.bzClashHint)) : null,
+    h('div.panel', h('h2', T.bzTitle), busy.items.length ? h('table', h('tbody', busy.items.map((b) => h('tr', { style: 'cursor:pointer', onclick: () => busyDialog(b) },
+      h('td', { style: 'color:var(--warn);font-weight:600' }, busyDays(b)), h('td', busyLabel(b)))))) : h('p.dim', T.bzNone)),
     h('div.panel', h('h2', T.coUpcoming), next.length ? h('table', h('tbody', next.map((l) => row(l, false)))) : h('p.dim', T.coNoLessons)),
     past.length ? h('div.panel', h('h2', T.coToMark), h('table', h('tbody', past.map((l) => row(l, true))))) : null);
 }
@@ -7789,7 +7919,7 @@ async function showCourseRegister(id) {
       document.querySelectorAll('tr[data-name]').forEach((tr) => { tr.hidden = !!q && !tr.dataset.name.includes(q); });
     } }) : null,
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
-      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : '') + (l.busy ? ' · ' + busyLabel(l.busy) : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : l.busy ? ';color:var(--warn)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
       h('tbody', r.rows.map((row) => h('tr', { 'data-name': row.name.toLowerCase() }, h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
@@ -7829,8 +7959,8 @@ function studentPicker(students, groups, chosen) {
  * durata, dove) e allievi. Salvato, si apre il suo registro.
  */
 async function editOwnCourse(c) {
-  let students = [], groups = [];
-  try { [students, groups] = await Promise.all([api('GET', '/coach/students'), api('GET', '/coach/groups')]); } catch (e) { toast(errText(e)); return; }
+  let students = [], groups = [], busy = { items: [] };
+  try { [students, groups, busy] = await Promise.all([api('GET', '/coach/students'), api('GET', '/coach/groups'), api('GET', '/coach/busy')]); } catch (e) { toast(errText(e)); return; }
   const name = h('input', { value: c ? c.name : '', maxlength: 60, required: true });
   const level = h('input', { value: c ? c.level : '', maxlength: 40 });
   const plus = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setMonth(x.getMonth() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
@@ -7839,6 +7969,7 @@ async function editOwnCourse(c) {
   // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
   const count = h('input', { type: 'number', min: 1, max: 200, value: c ? '' : '10', placeholder: '—' });
   const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const skipBusy = h('input', { type: 'checkbox' }); skipBusy.checked = busy.items.length > 0;
   const endBox = h('div.full');
   let endSeq = 0;
   const drawEnd = async () => {
@@ -7846,11 +7977,11 @@ async function editOwnCourse(c) {
     if (!count.value || !(n > 0)) { put(endBox, field(T.ctEnd, to)); return; }
     const my = ++endSeq;
     let out = null;
-    try { out = await api('POST', '/coach/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    try { out = await api('POST', '/coach/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked, skipBusy: skipBusy.checked }); } catch (e) { /* senza orari non c'è fine */ }
     if (my !== endSeq) return;
     put(endBox, h('p', out && out.to ? T.ccEndAuto(dateText(out.to)) : h('span.dim', T.ccSlots + ' —')));
   };
-  count.oninput = drawEnd; from.onchange = drawEnd; skipHol.onchange = drawEnd;
+  count.oninput = drawEnd; from.onchange = drawEnd; skipHol.onchange = drawEnd; skipBusy.onchange = drawEnd;
   let slots = c ? c.slots.slice() : [];
   const slotList = h('div');
   const drawSlots = () => put(slotList, slots.length ? slots.map((x, i) => h('div', { style: 'display:flex;gap:8px;align-items:center' },
@@ -7880,12 +8011,13 @@ async function editOwnCourse(c) {
     h('h3.full', T.ccSlots), h('div.full', slotList),
     field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
     field(T.ctStart, from), field(T.ccLessonsCount, count),
-    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox,
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays),
+    busy.items.length ? h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipBusyHint }, skipBusy, T.ccSkipBusy) : null, endBox,
     h('h3.full', T.ccPickStudents), h('div.full', picker)), async () => {
     if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
     const n = Number(count.value);
     const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: [...chosen], color,
-      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked, skipBusy: skipBusy.checked };
     const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
     toast(T.saved);
     coachView = 'courses'; coachCourseId = out.id;
@@ -10137,6 +10269,10 @@ a.button:hover { background: var(--hover); }
 /* Festività nazionali: il giorno in rosso, col nome. */
 .mday.hol b, .mhead.hol, .gday.hol { color: var(--bad); }
 .holname { color: var(--bad); font-size: 11px; font-weight: 600; }
+/* Impegni dell'allenatore: il giorno in arancione, col motivo (un clic per cambiarlo). */
+.mday.busy { box-shadow: inset 0 3px 0 var(--warn); }
+.mday.busy:not(.hol) b { color: var(--warn); }
+.busyname { color: var(--warn); font-size: 11px; font-weight: 600; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/help/de.md
@@ -16607,6 +16743,13 @@ class MatchController(
     // Partite, tornei, classifica, valutazioni e test degli allievi.
     fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
     fun deleteManualMatch(id: String) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
+    /** Gli impegni dell'allenatore (giorni occupati). */
+    fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
+        val b = coachBook.value
+        val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
+        putCoach(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from }))
+    }
+    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(b.copy(busy = b.busy.filter { it.id != id })) }
     fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
     fun deleteStudentEvent(id: String) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != id })) }
     fun addRanking(student: String, ranking: String) {
@@ -24079,6 +24222,16 @@ data class LessonPack(
 @Serializable
 data class StudentGroup(val id: String, val name: String, val students: List<String> = emptyList())
 
+/** Perché l'allenatore non c'è in quei giorni. */
+enum class BusyKind { BUSY, VACATION, TOURNAMENT, SICK, OTHER }
+
+/** Un impegno dell'allenatore: dal giorno [from] al giorno [to] compresi (inizio del giorno), per vedere se le lezioni ci cadono. */
+@Serializable
+data class CoachBusy(val id: String, val from: Long, val to: Long, val kind: BusyKind = BusyKind.BUSY, val note: String = "")
+
+/** Una lezione (privata o di un corso) che cade in un giorno occupato. */
+data class BusyClash(val start: Long, val title: String, val busy: CoachBusy, val courseId: String? = null, val lessonId: String? = null)
+
 /** Tutto quello che l'allenatore tiene dei suoi allievi oltre alle sessioni: un file solo (coach_book.json). */
 @Serializable
 data class CoachBook(
@@ -24094,6 +24247,8 @@ data class CoachBook(
     val rankings: List<RankingEntry> = emptyList(),
     val evaluations: List<Evaluation> = emptyList(),
     val tests: List<FitnessTest> = emptyList(),
+    /** I giorni in cui l'allenatore è occupato (impegni, ferie, tornei…). */
+    val busy: List<CoachBusy> = emptyList(),
 )
 
 object Coaching {
@@ -24106,6 +24261,25 @@ object Coaching {
     fun lessonsOf(book: CoachBook, student: String): List<CoachLesson> = book.lessons.filter { student in it.students }.sortedBy { it.start }
 
     /** Le prossime lezioni (da [now] in poi, non annullate), in ordine. */
+    /** L'impegno del giorno di [t], se c'è. */
+    fun busyOn(busy: List<CoachBusy>, t: Long): CoachBusy? {
+        val d = CourtPlans.dayStart(t)
+        return busy.firstOrNull { d >= CourtPlans.dayStart(it.from) && d <= CourtPlans.dayStart(it.to) }
+    }
+
+    /** Le lezioni da adesso in poi (private e dei corsi, non annullate) che cadono in un giorno occupato, in ordine. */
+    fun busyClashes(book: CoachBook, now: Long, names: (List<String>) -> String = { it.joinToString(", ") }): List<BusyClash> {
+        if (book.busy.isEmpty()) return emptyList()
+        val out = mutableListOf<BusyClash>()
+        for (l in book.lessons) if (!l.cancelled && !l.done && l.start >= now) busyOn(book.busy, l.start)?.let { out += BusyClash(l.start, names(l.students), it, lessonId = l.id) }
+        for (cc in book.courses) {
+            val co = cc.course
+            for (les in Courses.lessons(co)) if (les.start >= now && les.key !in co.cancelled && les.key !in co.attendance)
+                busyOn(book.busy, les.start)?.let { out += BusyClash(les.start, co.name, it, courseId = co.id) }
+        }
+        return out.sortedBy { it.start }
+    }
+
     fun upcoming(lessons: List<CoachLesson>, now: Long): List<CoachLesson> = lessons.filter { !it.cancelled && it.start + it.minutes * 60_000L > now }.sortedBy { it.start }
 
     /**
@@ -31444,6 +31618,8 @@ interface CoachData {
     fun deleteOwnCourse(id: String) {}
     /** L'etichetta colorata di un corso (uno dei [com.tennis.scoremanager.data.CourseCards.COLORS]). */
     fun setCourseColor(id: String, color: String) {}
+    fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) {}
+    fun deleteBusy(id: String) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
     /** Il Paese per le festività nazionali (quello del telefono). */
@@ -31489,10 +31665,10 @@ interface CoachData {
     val name: String = "", val level: String = "", val from: String = "", val to: String = "", val slots: List<CdSlot> = emptyList(), val students: List<String> = emptyList(),
     val color: String? = null,
     /** Quante lezioni (la fine si calcola da inizio e orari) e se le feste nazionali non contano (e risultano annullate). */
-    val lessons: Int? = null, val skipHolidays: Boolean = true,
+    val lessons: Int? = null, val skipHolidays: Boolean = true, val skipBusy: Boolean = false,
 )
 @Serializable data class CdEnd(val to: String? = null)
-@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null)
+@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null, val busy: CdBusy? = null)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
 @Serializable data class CdMonth(
@@ -31510,11 +31686,16 @@ interface CoachData {
     /** Il colore del corso (per le lezioni dei corsi). */
     val color: String? = null,
 )
-@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>, val holiday: String? = null)
+@Serializable data class CdCalDay(val date: String, val items: List<CdCalItem>, val holiday: String? = null, val busy: CdBusy? = null)
 @Serializable data class CdCal(val first: String, val days: List<CdCalDay>)
 @Serializable data class CdText(val text: String = "")
 /** Un gruppo di allievi dell'allenatore (per aggiungerli tutti insieme a un corso). */
 @Serializable data class CdGroup(val id: String, val name: String, val students: List<String>)
+/** Un impegno dell'allenatore (giorni occupati) e le lezioni che ci cadono. */
+@Serializable data class CdBusy(val id: String, val from: String, val to: String, val kind: com.tennis.scoremanager.data.BusyKind, val note: String = "")
+@Serializable data class CdBusyIn(val from: String = "", val to: String = "", val kind: com.tennis.scoremanager.data.BusyKind = com.tennis.scoremanager.data.BusyKind.BUSY, val note: String = "")
+@Serializable data class CdClash(val date: String, val startMin: Int, val title: String, val busyId: String, val courseId: String? = null)
+@Serializable data class CdBusyList(val items: List<CdBusy>, val clashes: List<CdClash>)
 @Serializable data class CdAttendanceIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean = false, val note: String = "")
 @Serializable data class CdDoneIn(val done: Boolean = true)
 @Serializable data class CdInfo(val mode: String = "coach", val club: String, val lang: String, val today: String, val year: Int, val coach: String)
@@ -31537,6 +31718,13 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
     fun route(m: String, p: List<String>, r: DeskApi.Req, club: String): DeskApi.Resp = when {
         m == "GET" && p == listOf("info") -> ok(CdInfo.serializer(), CdInfo(club = club, lang = data.lang, today = day(data.now())!!, year = Instant.ofEpochMilli(data.now()).atZone(zone()).year, coach = data.coachName()))
         m == "GET" && p == listOf("coach", "students") -> ok(ListSerializer(CdStudent.serializer()), students().sortedBy { it.name.lowercase() })
+        m == "GET" && p == listOf("coach", "busy") -> ok(CdBusyList.serializer(), busyList())
+        m == "POST" && p == listOf("coach", "busy") -> saveBusy(null, read(CdBusyIn.serializer(), r))
+        m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "busy" -> saveBusy(p[2], read(CdBusyIn.serializer(), r))
+        m == "DELETE" && p.size == 3 && p[0] == "coach" && p[1] == "busy" -> {
+            if (data.book().busy.none { it.id == p[2] }) throw DeskApi.Fail(404, "NOT_FOUND")
+            data.deleteBusy(p[2]); ok(CdBusyList.serializer(), busyList())
+        }
         m == "GET" && p == listOf("coach", "groups") -> ok(ListSerializer(CdGroup.serializer()), data.book().groups.sortedBy { it.name.lowercase() }.map { CdGroup(it.id, it.name, it.students) })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
         m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
@@ -31663,7 +31851,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         return CdRegister(
             head,
             lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L,
-                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone())) },
+                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone()), Coaching.busyOn(data.book().busy, it.start)?.let(::busyOut)) },
             co.students.sortedBy { (names[it] ?: "").lowercase() }.map { sid ->
                 val (a, t) = Courses.attendanceOf(co, sid, now)
                 CdRegRow(sid, names[sid] ?: "—", lessons.map { com.tennis.scoremanager.data.AttendancePdf.mark(co, it.key, sid) }, a, t)
@@ -31687,7 +31875,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             slots = i.slots.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court.trim().take(30)) }.distinct().sortedWith(compareBy({ it.weekday }, { it.startMin })),
             students = students)
         // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
-        val co = if (i.skipHolidays) co0.copy(cancelled = co0.cancelled + Courses.skipped(co0) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else co0
+        val co = co0.copy(cancelled = co0.cancelled + Courses.skipped(co0) { t -> skipDay(i, t) })
         data.saveOwnCourse(co)
         i.color?.takeIf { it in com.tennis.scoremanager.data.CourseCards.COLORS }?.let { data.setCourseColor(co.id, it) }
         return ok(CdCourse.serializer(), course(co.id))
@@ -31698,7 +31886,31 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val n = i.lessons ?: return null
         val from = runCatching { dayStart(i.from) }.getOrNull() ?: return null
         val slots = i.slots.filter { it.weekday in 1..7 }.map { com.tennis.scoremanager.data.CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
-        return Courses.endAfter(from, slots, n) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
+        return Courses.endAfter(from, slots, n) { t -> skipDay(i, t) }
+    }
+
+    /** Il giorno di [t] non conta per il corso: festa nazionale o impegno dell'allenatore, come chiesto. */
+    private fun skipDay(i: CdCourseIn, t: Long): Boolean =
+        (i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null) || (i.skipBusy && Coaching.busyOn(data.book().busy, t) != null)
+
+    private fun busyOut(b: com.tennis.scoremanager.data.CoachBusy) = CdBusy(b.id, day(b.from)!!, day(b.to)!!, b.kind, b.note)
+
+    /** Gli impegni da oggi in poi e le lezioni che ci cadono. */
+    private fun busyList(): CdBusyList {
+        val book = data.book(); val today = dayStart(day(data.now()))
+        val names = data.players().associate { it.id to it.name }
+        return CdBusyList(
+            book.busy.filter { it.to >= today }.sortedBy { it.from }.map(::busyOut),
+            Coaching.busyClashes(book, data.now()) { ids -> ids.joinToString(", ") { names[it] ?: "—" } }
+                .map { CdClash(day(it.start)!!, minOf(it.start), it.title, it.busy.id, it.courseId) },
+        )
+    }
+
+    private fun saveBusy(id: String?, i: CdBusyIn): DeskApi.Resp {
+        val from = dayStart(i.from); val to = if (i.to.isBlank()) from else dayStart(i.to)
+        if (id != null && data.book().busy.none { it.id == id }) throw DeskApi.Fail(404, "NOT_FOUND")
+        data.saveBusy(com.tennis.scoremanager.data.CoachBusy(id ?: Coaching.newId("bz"), minOf(from, to), maxOf(from, to), i.kind, i.note.trim().take(200)))
+        return ok(CdBusyList.serializer(), busyList())
     }
 
     private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {
@@ -31728,7 +31940,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         val byDay = items.sortedBy { it.first }.groupBy { day(it.first)!! }
         val holidays = com.tennis.scoremanager.data.Holidays.of(start.year, data.country())
         val days = generateSequence(start) { it.plusDays(1) }.takeWhile { it.isBefore(start.plusMonths(1)) }
-            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }, holidays[d]) }.toList()
+            .map { d -> CdCalDay(d.toString(), byDay[d.toString()].orEmpty().map { it.second }, holidays[d],
+                Coaching.busyOn(book.busy, d.atTime(12, 0).atZone(zone()).toInstant().toEpochMilli())?.let(::busyOut)) }.toList()
         return CdCal(start.toString(), days)
     }
 
@@ -33792,6 +34005,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
     override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
     override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
+    override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
@@ -40022,6 +40237,120 @@ fun chargeStatusColor(st: Fees.Status) = when (st) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CoachBusyUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CoachBusyUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.BusyKind
+import com.tennis.scoremanager.data.CoachBusy
+import com.tennis.scoremanager.data.Coaching
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.screens.DateButton
+
+fun busyKindName(s: Strings, k: BusyKind): String = when (k) {
+    BusyKind.BUSY -> s.bzBusy
+    BusyKind.VACATION -> s.bzVacation
+    BusyKind.TOURNAMENT -> s.bzTournament
+    BusyKind.SICK -> s.bzSick
+    BusyKind.OTHER -> s.bzOther
+}
+
+/** "Ferie · campo estivo": il motivo e la nota. */
+fun busyLabel(s: Strings, b: CoachBusy): String = listOf(busyKindName(s, b.kind), b.note).filter { it.isNotBlank() }.joinToString(" · ")
+
+/** I giorni dell'impegno: "12 dic" o "12 dic – 20 dic". */
+fun busyDays(b: CoachBusy, lang: com.tennis.scoremanager.model.Lang): String =
+    if (CourtPlans.dayStart(b.from) == CourtPlans.dayStart(b.to)) Reports.date(b.from, lang) else Reports.date(b.from, lang) + " – " + Reports.date(b.to, lang)
+
+/**
+ * I miei impegni (nell'Agenda delle lezioni): i giorni occupati da oggi in poi, le lezioni che ci cadono e
+ * il pulsante per aggiungerne uno.
+ */
+@Composable
+fun BusySection(c: MatchController) {
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    val book by c.coachBook.collectAsState()
+    var open by remember { mutableStateOf<CoachBusy?>(null) }
+    var isNew by remember { mutableStateOf(false) }
+    val today = CourtPlans.dayStart(System.currentTimeMillis())
+    val clashes = Coaching.busyClashes(book, System.currentTimeMillis()) { ids -> ids.mapNotNull { c.playerById(it)?.name }.joinToString(", ") }
+    if (clashes.isNotEmpty()) SectionCard(s.bzClash(clashes.size), Icons.Filled.Warning) {
+        for (x in clashes.take(20)) Text("${c.lessonWhen(com.tennis.scoremanager.data.CoachLesson("", x.start))} · ${x.title} — ${busyLabel(s, x.busy)}",
+            color = TsmColors.Orange, fontSize = 14.sp)
+        if (clashes.size > 20) Text("+${clashes.size - 20}", color = TsmColors.TextDim)
+        Text(s.bzClashHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+    SectionCard(s.bzTitle, Icons.Filled.EventBusy) {
+        Text(s.bzHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        val next = book.busy.filter { CourtPlans.dayStart(it.to) >= today }.sortedBy { it.from }
+        if (next.isEmpty()) Text(s.bzNone, color = TsmColors.TextDim)
+        for (b in next) Column(Modifier.fillMaxWidth().clickable { isNew = false; open = b }.padding(vertical = 6.dp)) {
+            Text(busyDays(b, lang), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
+            Text(busyLabel(s, b), color = TsmColors.TextMain, fontSize = 14.sp)
+        }
+        GhostButton(s.bzNew, Icons.Filled.EventBusy, {
+            isNew = true
+            open = CoachBusy(Coaching.newId("bz"), CourtPlans.addDays(today, 1), CourtPlans.addDays(today, 1))
+        }, Modifier.fillMaxWidth())
+    }
+    open?.let { b -> BusyDialog(c, b, isNew) { open = null } }
+}
+
+/** Un impegno: dal… al…, il motivo e una nota. */
+@Composable
+fun BusyDialog(c: MatchController, b0: CoachBusy, isNew: Boolean, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    var b by remember(b0.id) { mutableStateOf(b0) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.bzNew) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DateButton(s.bzFrom, b.from, lang) { d -> val x = CourtPlans.dayStart(d); b = b.copy(from = x, to = maxOf(x, b.to)) }
+                DateButton(s.bzTo, b.to, lang) { d -> val x = CourtPlans.dayStart(d); b = b.copy(to = x, from = minOf(x, b.from)) }
+                val kinds = BusyKind.entries
+                Segmented(kinds.map { SegOption(busyKindName(s, it)) }, kinds.indexOf(b.kind), { b = b.copy(kind = kinds[it]) }, columns = 3)
+                OutlinedTextField(b.note, { b = b.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bzNote) })
+                if (!isNew) TextButton(onClick = { c.deleteCoachBusy(b.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.saveCoachBusy(b); onDone() }) { Text(s.save) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CoachCoursesUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CoachCoursesUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -40163,7 +40492,11 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     var skipHolidays by remember { mutableStateOf(true) }
     val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
     val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
-    val skip = { t: Long -> skipHolidays && isHoliday(t) }
+    // Anche i giorni occupati dell'allenatore, se lo si chiede (e solo se ne ha).
+    val busyList = c.coachBook.collectAsState().value.busy
+    var skipBusy by remember { mutableStateOf(busyList.isNotEmpty()) }
+    val isBusy = { t: Long -> Coaching.busyOn(busyList, t) != null }
+    val skip = { t: Long -> (skipHolidays && isHoliday(t)) || (skipBusy && isBusy(t)) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
     var wd by remember { mutableStateOf(1) }
     var startMin by remember { mutableStateOf(17 * 60) }
@@ -40200,6 +40533,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 OutlinedTextField(lessonsText, { v -> lessonsText = v.filter(Char::isDigit).take(3) }, Modifier.fillMaxWidth(), singleLine = true,
                     label = { Text(s.ccLessonsCount) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
                 SwitchRow(Icons.Filled.EventBusy, s.ccSkipHolidays, s.ccSkipHolidaysHint, skipHolidays) { skipHolidays = it }
+                if (busyList.isNotEmpty()) SwitchRow(Icons.Filled.EventBusy, s.ccSkipBusy, s.ccSkipBusyHint, skipBusy) { skipBusy = it }
                 val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) }
                 if (autoEnd != null) Text(s.ccEndAuto(shortDate(autoEnd, lang)), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 else com.tennis.scoremanager.ui.screens.DateButton(s.ctEnd, co.to, lang) { d -> co = co.copy(to = maxOf(d, co.from)) }
@@ -40214,7 +40548,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) } ?: co.to
                 val x = co.copy(name = co.name.trim(), level = co.level.trim(), to = end)
                 // Le lezioni nei giorni di festa risultano annullate (si possono sempre rimettere dall'appello).
-                c.saveCoachOwnCourse(if (skipHolidays) x.copy(cancelled = x.cancelled + Courses.skipped(x, isHoliday)) else x, color); onDone(co.id)
+                c.saveCoachOwnCourse(x.copy(cancelled = x.cancelled + Courses.skipped(x, skip)), color); onDone(co.id)
             }) { Text(s.save) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -40309,6 +40643,7 @@ fun CoachCourseScreen(c: MatchController) {
                         Text(lessonText(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp)
                         // Lezione in un giorno di festa: in rosso, si vede subito.
                         com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                        Coaching.busyOn(book.busy, l.start)?.let { Text(busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
                     }
                     Text(
                         when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
@@ -48134,6 +48469,22 @@ interface Strings {
     val ccSkipHolidaysHint: String
     val hdHoliday: String
     val ccEndAuto: (String) -> String
+    val bzTitle: String
+    val bzNew: String
+    val bzHint: String
+    val bzBusy: String
+    val bzVacation: String
+    val bzTournament: String
+    val bzSick: String
+    val bzOther: String
+    val bzNote: String
+    val bzNone: String
+    val bzFrom: String
+    val bzTo: String
+    val bzClashHint: String
+    val ccSkipBusy: String
+    val ccSkipBusyHint: String
+    val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
@@ -50735,6 +51086,22 @@ object ItStrings : Strings {
     override val ccSkipHolidaysHint = "Le lezioni nei giorni di festa nazionale non contano e risultano annullate (si rimettono dall'appello)."
     override val hdHoliday = "Festa"
     override val ccEndAuto: (String) -> String = { "Fine: $it (calcolata)" }
+    override val bzTitle = "I miei impegni"
+    override val bzNew = "Impegno"
+    override val bzHint = "I giorni in cui non ci sei: sono in arancione nel calendario e ti avvisano se una lezione ci cade."
+    override val bzBusy = "Occupato"
+    override val bzVacation = "Ferie"
+    override val bzTournament = "Torneo"
+    override val bzSick = "Malattia"
+    override val bzOther = "Altro"
+    override val bzNote = "Nota (facoltativa)"
+    override val bzNone = "Nessun impegno in programma."
+    override val bzFrom = "Dal"
+    override val bzTo = "Al"
+    override val bzClashHint = "Le lezioni dei corsi si annullano dall'appello, quelle private dall'agenda."
+    override val ccSkipBusy = "Salta i miei impegni"
+    override val ccSkipBusyHint = "Anche le lezioni nei tuoi giorni occupati non contano e risultano annullate."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
@@ -53337,6 +53704,22 @@ object EnStrings : Strings {
     override val ccSkipHolidaysHint = "Lessons on national holidays don't count and are marked cancelled (you can restore them from the roll call)."
     override val hdHoliday = "Holiday"
     override val ccEndAuto: (String) -> String = { "End: $it (calculated)" }
+    override val bzTitle = "My commitments"
+    override val bzNew = "Commitment"
+    override val bzHint = "Days you're not available: they show in orange in the calendar and you're warned if a lesson falls on them."
+    override val bzBusy = "Busy"
+    override val bzVacation = "Holiday"
+    override val bzTournament = "Tournament"
+    override val bzSick = "Sick"
+    override val bzOther = "Other"
+    override val bzNote = "Note (optional)"
+    override val bzNone = "No commitments planned."
+    override val bzFrom = "From"
+    override val bzTo = "To"
+    override val bzClashHint = "Course lessons are cancelled from the roll call, private ones from the agenda."
+    override val ccSkipBusy = "Skip my commitments"
+    override val ccSkipBusyHint = "Lessons on your busy days don't count either and are marked cancelled."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
@@ -55964,6 +56347,22 @@ object DeStrings : Strings {
     override val ccSkipHolidaysHint = "Stunden an gesetzlichen Feiertagen zählen nicht und gelten als abgesagt (in der Anwesenheit wiederherstellbar)."
     override val hdHoliday = "Feiertag"
     override val ccEndAuto: (String) -> String = { "Ende: $it (berechnet)" }
+    override val bzTitle = "Meine Termine"
+    override val bzNew = "Termin"
+    override val bzHint = "Tage, an denen du nicht kannst: orange im Kalender, mit Warnung, wenn eine Stunde darauf fällt."
+    override val bzBusy = "Belegt"
+    override val bzVacation = "Urlaub"
+    override val bzTournament = "Turnier"
+    override val bzSick = "Krank"
+    override val bzOther = "Sonstiges"
+    override val bzNote = "Notiz (optional)"
+    override val bzNone = "Keine Termine geplant."
+    override val bzFrom = "Von"
+    override val bzTo = "Bis"
+    override val bzClashHint = "Kursstunden sagst du über die Anwesenheit ab, Privatstunden im Kalender."
+    override val ccSkipBusy = "Meine Termine überspringen"
+    override val ccSkipBusyHint = "Auch Stunden an deinen belegten Tagen zählen nicht und gelten als abgesagt."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
@@ -58581,6 +58980,22 @@ object EsStrings : Strings {
     override val ccSkipHolidaysHint = "Las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde pasar lista)."
     override val hdHoliday = "Festivo"
     override val ccEndAuto: (String) -> String = { "Fin: $it (calculado)" }
+    override val bzTitle = "Mis compromisos"
+    override val bzNew = "Compromiso"
+    override val bzHint = "Los días en que no estás: salen en naranja en el calendario y te avisan si una clase cae en ellos."
+    override val bzBusy = "Ocupado"
+    override val bzVacation = "Vacaciones"
+    override val bzTournament = "Torneo"
+    override val bzSick = "Enfermo"
+    override val bzOther = "Otro"
+    override val bzNote = "Nota (opcional)"
+    override val bzNone = "Ningún compromiso previsto."
+    override val bzFrom = "Del"
+    override val bzTo = "Al"
+    override val bzClashHint = "Las clases de los cursos se anulan desde la lista, las privadas desde la agenda."
+    override val ccSkipBusy = "Saltar mis compromisos"
+    override val ccSkipBusyHint = "Las clases en tus días ocupados tampoco cuentan y quedan anuladas."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
@@ -61200,6 +61615,22 @@ object FrStrings : Strings {
     override val ccSkipHolidaysHint = "Les séances des jours fériés ne comptent pas et sont annulées (on les rétablit depuis l'appel)."
     override val hdHoliday = "Jour férié"
     override val ccEndAuto: (String) -> String = { "Fin : $it (calculée)" }
+    override val bzTitle = "Mes indisponibilités"
+    override val bzNew = "Indisponibilité"
+    override val bzHint = "Les jours où tu n'es pas là : en orange dans le calendrier, avec un avertissement si une séance tombe dessus."
+    override val bzBusy = "Occupé"
+    override val bzVacation = "Congés"
+    override val bzTournament = "Tournoi"
+    override val bzSick = "Malade"
+    override val bzOther = "Autre"
+    override val bzNote = "Note (facultative)"
+    override val bzNone = "Aucune indisponibilité prévue."
+    override val bzFrom = "Du"
+    override val bzTo = "Au"
+    override val bzClashHint = "Les séances des cours s'annulent depuis l'appel, les leçons privées depuis l'agenda."
+    override val ccSkipBusy = "Sauter mes indisponibilités"
+    override val ccSkipBusyHint = "Les séances de tes jours occupés ne comptent pas non plus et sont annulées."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
@@ -63820,6 +64251,22 @@ object PtStrings : Strings {
     override val ccSkipHolidaysHint = "As aulas em feriados nacionais não contam e ficam anuladas (repõem-se na chamada)."
     override val hdHoliday = "Feriado"
     override val ccEndAuto: (String) -> String = { "Fim: $it (calculado)" }
+    override val bzTitle = "Os meus compromissos"
+    override val bzNew = "Compromisso"
+    override val bzHint = "Os dias em que não estás: aparecem a laranja no calendário e és avisado se uma aula calhar neles."
+    override val bzBusy = "Ocupado"
+    override val bzVacation = "Férias"
+    override val bzTournament = "Torneio"
+    override val bzSick = "Doente"
+    override val bzOther = "Outro"
+    override val bzNote = "Nota (opcional)"
+    override val bzNone = "Nenhum compromisso previsto."
+    override val bzFrom = "De"
+    override val bzTo = "Até"
+    override val bzClashHint = "As aulas dos cursos cancelam-se na chamada, as privadas na agenda."
+    override val ccSkipBusy = "Saltar os meus compromissos"
+    override val ccSkipBusyHint = "As aulas nos teus dias ocupados também não contam e ficam canceladas."
+    override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
@@ -69028,6 +69475,8 @@ fun LessonsScreen(c: MatchController) {
                 TextButton(onClick = { c.saveLesson(l.copy(done = true)) }) { Text(s.coDone, color = TsmColors.Ok) }
             }
         }
+        // I giorni in cui l'allenatore non c'è, e le lezioni che ci cadono.
+        com.tennis.scoremanager.ui.BusySection(c)
     }
     open?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { open = null } }
 }
@@ -69038,8 +69487,12 @@ private fun LessonRow(c: MatchController, l: CoachLesson, onClick: () -> Unit) {
     Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp)) {
         Text(c.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
         // Lezione in un giorno di festa: in rosso.
-        com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code))?.let {
+        com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.collectAsState().value.lang.code))?.let {
             Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+        // In un giorno occupato: in arancione.
+        Coaching.busyOn(c.coachBook.collectAsState().value.busy, l.start)?.let {
+            Text(com.tennis.scoremanager.ui.busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         Text(l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") + if (l.cancelled) " · ${s.coCancelled}" else if (l.done) " · ${s.coDone}" else "",
             color = if (l.cancelled) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
@@ -98791,6 +99244,8 @@ class FakeCoach(var time: Long) : CoachData {
     }
     override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
     override fun country() = "IT"
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) { book = book.copy(busy = book.busy.filter { it.id != b.id } + b) }
+    override fun deleteBusy(id: String) { book = book.copy(busy = book.busy.filter { it.id != id }) }
     val colors = mutableMapOf<String, String>()
     override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
@@ -98905,8 +99360,30 @@ class CoachDeskTest {
         assertEquals(1, c.cancelled.size)
         val cal = req("GET", "/coach/calendar", token = tk, q = mapOf("date" to "2026-12-01")).second
         assertTrue(cal, "\"holiday\":\"Immacolata Concezione\"" in cal)
+        coach.time = java.time.LocalDate.of(2026, 12, 9).atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
         val reg = req("GET", "/coach/courses/${c.id}", token = tk).second
         assertTrue(reg, "Immacolata" in reg)
+    }
+
+    @Test fun busyDaysShowAndAreSkipped() {
+        val tk = login()
+        // Occupato dal 15 al 16 dicembre 2026 (un martedì e un mercoledì).
+        val made = req("POST", "/coach/busy", """{"from":"2026-12-16","to":"2026-12-15","kind":"VACATION","note":"Campo estivo"}""", tk)
+        assertEquals(200, made.first)
+        val b = coach.book.busy.single()
+        assertEquals(java.time.LocalDate.of(2026, 12, 15), java.time.Instant.ofEpochMilli(b.from).atZone(zone).toLocalDate())
+        val base = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60,"court":""}],"lessons":2"""
+        // L'8 è festa, il 15 occupato: con entrambi la seconda lezione è il 22.
+        assertTrue(req("POST", "/coach/courses/end", "$base,\"skipBusy\":true}", tk).second.contains("2026-12-22"))
+        assertTrue(req("POST", "/coach/courses/end", "$base}", tk).second.contains("2026-12-15"))
+        assertEquals(200, req("POST", "/coach/courses", "$base}", tk).first)
+        val list = req("GET", "/coach/busy", token = tk).second
+        assertTrue(list, "\"clashes\":[{\"date\":\"2026-12-15\"" in list)
+        val cal = req("GET", "/coach/calendar", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(cal, "Campo estivo" in cal)
+        assertEquals(200, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
+        assertTrue(coach.book.busy.isEmpty())
+        assertEquals(404, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
     }
 
     @Test fun studentsFromThePcWithoutDuplicates() {
@@ -112927,6 +113404,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 362 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 363 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

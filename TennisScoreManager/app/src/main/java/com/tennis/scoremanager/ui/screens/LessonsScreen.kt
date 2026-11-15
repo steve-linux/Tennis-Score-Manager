@@ -76,6 +76,8 @@ fun LessonsScreen(c: MatchController) {
                 TextButton(onClick = { c.saveLesson(l.copy(done = true)) }) { Text(s.coDone, color = TsmColors.Ok) }
             }
         }
+        // I giorni in cui l'allenatore non c'è, e le lezioni che ci cadono.
+        com.tennis.scoremanager.ui.BusySection(c)
     }
     open?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { open = null } }
 }
@@ -88,6 +90,10 @@ private fun LessonRow(c: MatchController, l: CoachLesson, onClick: () -> Unit) {
         // Lezione in un giorno di festa: in rosso.
         com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.collectAsState().value.lang.code))?.let {
             Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+        // In un giorno occupato: in arancione.
+        Coaching.busyOn(c.coachBook.collectAsState().value.busy, l.start)?.let {
+            Text(com.tennis.scoremanager.ui.busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         Text(l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") + if (l.cancelled) " · ${s.coCancelled}" else if (l.done) " · ${s.coDone}" else "",
             color = if (l.cancelled) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)

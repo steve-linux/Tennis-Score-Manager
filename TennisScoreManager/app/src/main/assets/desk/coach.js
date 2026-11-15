@@ -171,6 +171,31 @@ async function calOpen(x) {
   }
 }
 
+// --- Impegni (giorni occupati) ---
+
+const BUSY_KINDS = ['BUSY', 'VACATION', 'TOURNAMENT', 'SICK', 'OTHER'];
+const busyKindName = (k) => ({ BUSY: T.bzBusy, VACATION: T.bzVacation, TOURNAMENT: T.bzTournament, SICK: T.bzSick, OTHER: T.bzOther })[k] || k;
+const busyLabel = (b) => [busyKindName(b.kind), b.note].filter(Boolean).join(' · ');
+const busyDays = (b) => (b.from === b.to ? dateText(b.from) : dateText(b.from) + ' – ' + dateText(b.to));
+
+/** Un impegno: dal… al…, il motivo e una nota ([b] null = nuovo). */
+function busyDialog(b, day) {
+  const from = h('input', { type: 'date', value: b ? b.from : (day || info.today), required: true });
+  const to = h('input', { type: 'date', value: b ? b.to : (day || info.today), required: true });
+  from.onchange = () => { if (to.value < from.value) to.value = from.value; };
+  const kind = select(BUSY_KINDS.map((k) => [k, busyKindName(k)]), b ? b.kind : 'BUSY');
+  const note = h('input', { maxlength: 200, value: b ? b.note : '' });
+  const del = b ? h('button.danger', { type: 'button', onclick: async () => {
+    try { await api('DELETE', '/coach/busy/' + encodeURIComponent(b.id)); dlg.close(); toast(T.saved); showAgenda(); } catch (e) { toast(errText(e)); }
+  } }, T.remove) : null;
+  const dlg = dialog(T.bzNew, h('div.form', h('p.dim.full', T.bzHint), field(T.bzFrom, from), field(T.bzTo, to), field('', kind, 'full'), field(T.bzNote, note, 'full')), async () => {
+    const body = { from: from.value, to: to.value, kind: kind.value, note: note.value };
+    if (b) await api('PUT', '/coach/busy/' + encodeURIComponent(b.id), body); else await api('POST', '/coach/busy', body);
+    toast(T.saved);
+    showAgenda();
+  }, { left: del });
+}
+
 /** Agenda: il mese (o la settimana) con lezioni private, lezioni dei corsi e tornei degli allievi; o l'elenco. */
 async function showAgenda() {
   if (!agendaDate) agendaDate = info.today;
@@ -185,7 +210,9 @@ async function showAgenda() {
   };
   const long = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString(locale(), o);
   const nav = (title) => h('div.head', h('button', { onclick: () => shift(-1) }, '‹'), h('h1', title), h('button', { onclick: () => shift(1) }, '›'),
-    h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, printBtn());
+    h('button', { onclick: () => { agendaDate = info.today; showAgenda(); } }, '•'), views, h('button', { onclick: () => busyDialog(null) }, T.bzNew), printBtn());
+  // L'impegno del giorno, in arancione: un clic per cambiarlo.
+  const busyTag = (b) => (b ? h('button.busyname', { type: 'button', title: busyDays(b), onclick: (ev) => { ev.stopPropagation(); busyDialog(b); } }, busyLabel(b)) : null);
   // La legenda: lezioni private, tornei e ogni corso col suo colore.
   const legendOf = (items) => {
     const courses = [...new Map(items.filter((x) => x.kind === 'course' || x.kind === 'own').map((x) => [x.ref, [x.title, calColor({ ...x, cancelled: false })]])).values()];
@@ -202,8 +229,8 @@ async function showAgenda() {
     const cells = [];
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const d of m.days) {
-      cells.push(h('div.mday' + (d.date === info.today ? '.now' : '') + (d.holiday ? '.hol' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (d.holiday ? ' · ' + d.holiday : '') },
-        h('b', Number(d.date.slice(8))), d.holiday ? h('span.holname', d.holiday) : null, d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
+      cells.push(h('div.mday' + (d.date === info.today ? '.now' : '') + (d.holiday ? '.hol' : '') + (d.busy ? '.busy' : ''), { title: long(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (d.holiday ? ' · ' + d.holiday : '') },
+        h('b', Number(d.date.slice(8))), d.holiday ? h('span.holname', d.holiday) : null, busyTag(d.busy), d.items.slice(0, 4).map(item), d.items.length > 4 ? h('span.dim', '+' + (d.items.length - 4)) : null));
     }
     put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
       h('div.panel', h('div.month', [1, 2, 3, 4, 5, 6, 7].map((k) => h('div.mhead', weekdayName(k))), cells)), legendOf(m.days.flatMap((d) => d.items)));
@@ -218,22 +245,29 @@ async function showAgenda() {
   const cals = await Promise.all(months.map((x) => api('GET', '/coach/calendar?date=' + x)));
   const byDay = Object.fromEntries(cals.flatMap((c) => c.days).map((d) => [d.date, d.items]));
   const hol = Object.fromEntries(cals.flatMap((c) => c.days).filter((d) => d.holiday).map((d) => [d.date, d.holiday]));
+  const busyOf = Object.fromEntries(cals.flatMap((c) => c.days).filter((d) => d.busy).map((d) => [d.date, d.busy]));
   const title = long(days[0], { day: 'numeric', month: 'short' }) + ' – ' + long(days[6], { day: 'numeric', month: 'short', year: 'numeric' });
   put(main(), nav(title), h('div.printonly.phead', h('b', info.coach || T.ccDeskTitle), ' · ', T.coAgenda + ' · ' + title),
     h('div.panel', h('div.month', days.map((d) => h('div.mhead' + (hol[d] ? '.hol' : ''), { title: hol[d] || '' }, long(d, { weekday: 'short', day: 'numeric' }))),
-      days.map((d) => h('div.mday' + (d === info.today ? '.now' : '') + (hol[d] ? '.hol' : ''), { style: 'min-height:240px' }, hol[d] ? h('span.holname', hol[d]) : null, (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
+      days.map((d) => h('div.mday' + (d === info.today ? '.now' : '') + (hol[d] ? '.hol' : '') + (busyOf[d] ? '.busy' : ''), { style: 'min-height:240px' }, hol[d] ? h('span.holname', hol[d]) : null, busyTag(busyOf[d]), (byDay[d] || []).map(item))))), legendOf(days.flatMap((d) => byDay[d] || [])));
 }
 
 /** L'elenco: le prossime lezioni private e quelle passate da segnare come fatte. */
 async function showAgendaList(views) {
-  const list = await api('GET', '/coach/lessons');
+  const [list, busy] = await Promise.all([api('GET', '/coach/lessons'), api('GET', '/coach/busy')]);
   const now = info.today;
   const next = list.filter((l) => !l.cancelled && l.date >= now);
   const past = list.filter((l) => !l.cancelled && !l.done && l.date < now).reverse();
   const row = (l, mark) => h('tr',
     h('td', dateText(l.date) + ' ' + hhmm(l.startMin)), h('td', T.coMinutes(l.minutes)), h('td', l.students.join(', ')), h('td', l.place),
     h('td', mark ? h('button', { onclick: async () => { try { await api('PUT', '/coach/lessons/' + encodeURIComponent(l.id) + '/done', { done: true }); toast(T.saved); showAgenda(); } catch (e) { toast(errText(e)); } } }, T.coDone) : (l.done ? T.coDone : '')));
-  put(main(), h('div.head', h('h1', T.coAgenda), views, printBtn()),
+  const byId = Object.fromEntries(busy.items.map((b) => [b.id, b]));
+  put(main(), h('div.head', h('h1', T.coAgenda), views, h('button', { onclick: () => busyDialog(null) }, T.bzNew), printBtn()),
+    busy.clashes.length ? h('div.panel', h('h2', { style: 'color:var(--warn)' }, T.bzClash(busy.clashes.length)),
+      h('table', h('tbody', busy.clashes.map((x) => h('tr', h('td', dateText(x.date) + ' ' + hhmm(x.startMin)), h('td', x.title), h('td', { style: 'color:var(--warn)' }, byId[x.busyId] ? busyLabel(byId[x.busyId]) : ''))))),
+      h('p.dim', T.bzClashHint)) : null,
+    h('div.panel', h('h2', T.bzTitle), busy.items.length ? h('table', h('tbody', busy.items.map((b) => h('tr', { style: 'cursor:pointer', onclick: () => busyDialog(b) },
+      h('td', { style: 'color:var(--warn);font-weight:600' }, busyDays(b)), h('td', busyLabel(b)))))) : h('p.dim', T.bzNone)),
     h('div.panel', h('h2', T.coUpcoming), next.length ? h('table', h('tbody', next.map((l) => row(l, false)))) : h('p.dim', T.coNoLessons)),
     past.length ? h('div.panel', h('h2', T.coToMark), h('table', h('tbody', past.map((l) => row(l, true))))) : null);
 }
@@ -279,7 +313,7 @@ async function showCourseRegister(id) {
       document.querySelectorAll('tr[data-name]').forEach((tr) => { tr.hidden = !!q && !tr.dataset.name.includes(q); });
     } }) : null,
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
-      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : '') + (l.busy ? ' · ' + busyLabel(l.busy) : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : l.busy ? ';color:var(--warn)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
       h('tbody', r.rows.map((row) => h('tr', { 'data-name': row.name.toLowerCase() }, h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
@@ -319,8 +353,8 @@ function studentPicker(students, groups, chosen) {
  * durata, dove) e allievi. Salvato, si apre il suo registro.
  */
 async function editOwnCourse(c) {
-  let students = [], groups = [];
-  try { [students, groups] = await Promise.all([api('GET', '/coach/students'), api('GET', '/coach/groups')]); } catch (e) { toast(errText(e)); return; }
+  let students = [], groups = [], busy = { items: [] };
+  try { [students, groups, busy] = await Promise.all([api('GET', '/coach/students'), api('GET', '/coach/groups'), api('GET', '/coach/busy')]); } catch (e) { toast(errText(e)); return; }
   const name = h('input', { value: c ? c.name : '', maxlength: 60, required: true });
   const level = h('input', { value: c ? c.level : '', maxlength: 40 });
   const plus = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setMonth(x.getMonth() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
@@ -329,6 +363,7 @@ async function editOwnCourse(c) {
   // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
   const count = h('input', { type: 'number', min: 1, max: 200, value: c ? '' : '10', placeholder: '—' });
   const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const skipBusy = h('input', { type: 'checkbox' }); skipBusy.checked = busy.items.length > 0;
   const endBox = h('div.full');
   let endSeq = 0;
   const drawEnd = async () => {
@@ -336,11 +371,11 @@ async function editOwnCourse(c) {
     if (!count.value || !(n > 0)) { put(endBox, field(T.ctEnd, to)); return; }
     const my = ++endSeq;
     let out = null;
-    try { out = await api('POST', '/coach/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    try { out = await api('POST', '/coach/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked, skipBusy: skipBusy.checked }); } catch (e) { /* senza orari non c'è fine */ }
     if (my !== endSeq) return;
     put(endBox, h('p', out && out.to ? T.ccEndAuto(dateText(out.to)) : h('span.dim', T.ccSlots + ' —')));
   };
-  count.oninput = drawEnd; from.onchange = drawEnd; skipHol.onchange = drawEnd;
+  count.oninput = drawEnd; from.onchange = drawEnd; skipHol.onchange = drawEnd; skipBusy.onchange = drawEnd;
   let slots = c ? c.slots.slice() : [];
   const slotList = h('div');
   const drawSlots = () => put(slotList, slots.length ? slots.map((x, i) => h('div', { style: 'display:flex;gap:8px;align-items:center' },
@@ -370,12 +405,13 @@ async function editOwnCourse(c) {
     h('h3.full', T.ccSlots), h('div.full', slotList),
     field('', wd), field('', time), field('', mins), field('', place), h('div.full', add),
     field(T.ctStart, from), field(T.ccLessonsCount, count),
-    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox,
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays),
+    busy.items.length ? h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipBusyHint }, skipBusy, T.ccSkipBusy) : null, endBox,
     h('h3.full', T.ccPickStudents), h('div.full', picker)), async () => {
     if (!name.value.trim() || !slots.length) throw new Error(T.err.BAD_REQUEST || '');
     const n = Number(count.value);
     const body = { name: name.value, level: level.value, from: from.value, to: to.value, slots, students: [...chosen], color,
-      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked, skipBusy: skipBusy.checked };
     const out = c ? await api('PUT', '/coach/courses/' + encodeURIComponent(c.id), body) : await api('POST', '/coach/courses', body);
     toast(T.saved);
     coachView = 'courses'; coachCourseId = out.id;
