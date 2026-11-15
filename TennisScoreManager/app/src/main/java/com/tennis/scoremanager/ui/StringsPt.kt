@@ -2682,6 +2682,8 @@ object PtStrings : Strings {
     override val agMonth = "Mês"
     override val agList = "Lista"
     override val agDayEmpty = "Nada previsto."
+    override val scCoachAway: (String) -> String = { "Professor ausente: $it" }
+    override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 aula com o professor ausente" else "$it aulas com o professor ausente" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }

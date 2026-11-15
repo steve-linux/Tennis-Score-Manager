@@ -1810,7 +1810,7 @@ class MatchController(
     fun attendanceToSend(courseId: String): Triple<File, String, String>? {
         val cc = coachCourse(courseId) ?: return null
         val now = System.currentTimeMillis()
-        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, now)
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, now, coachBook.value.busy)
         val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
         val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccAttendancePrefix, cc.card.course.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeReport(r)) } }.getOrNull() ?: return null
         val co = cc.course
@@ -1912,9 +1912,15 @@ class MatchController(
     fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
         val b = coachBook.value
         val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
-        putCoach(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from }))
+        putCoach(busyChanged(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from })))
     }
-    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(b.copy(busy = b.busy.filter { it.id != id })) }
+    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(busyChanged(b.copy(busy = b.busy.filter { it.id != id }))) }
+
+    /** Gli impegni sono cambiati: i corsi della segreteria hanno qualcosa da mandarle (vanno con le presenze). */
+    private fun busyChanged(b: com.tennis.scoremanager.data.CoachBook): com.tennis.scoremanager.data.CoachBook {
+        val now = System.currentTimeMillis()
+        return b.copy(courses = b.courses.map { if (!it.personal && it.card.course.to >= now) it.copy(changedAt = now) else it })
+    }
     fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
     fun deleteStudentEvent(id: String) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != id })) }
     fun addRanking(student: String, ranking: String) {
@@ -2030,7 +2036,7 @@ class MatchController(
     suspend fun sendAttendanceServer(courseId: String): Boolean {
         val cc = coachCourse(courseId) ?: return false
         val url = cc.via ?: return false
-        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis())
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis(), coachBook.value.busy)
         val ok = postToOffice(url, "attendance", com.tennis.scoremanager.data.CourseCards.encodeReport(r))
         if (ok) attendanceSent(courseId)
         return ok

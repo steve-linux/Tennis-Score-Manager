@@ -2681,6 +2681,8 @@ object FrStrings : Strings {
     override val agMonth = "Mois"
     override val agList = "Liste"
     override val agDayEmpty = "Rien de prévu."
+    override val scCoachAway: (String) -> String = { "Moniteur absent : $it" }
+    override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 séance avec le moniteur absent" else "$it séances avec le moniteur absent" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

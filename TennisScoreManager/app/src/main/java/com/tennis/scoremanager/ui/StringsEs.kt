@@ -2679,6 +2679,8 @@ object EsStrings : Strings {
     override val agMonth = "Mes"
     override val agList = "Lista"
     override val agDayEmpty = "Nada previsto."
+    override val scCoachAway: (String) -> String = { "Monitor ausente: $it" }
+    override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 clase con el monitor ausente" else "$it clases con el monitor ausente" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

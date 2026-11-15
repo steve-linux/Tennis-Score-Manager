@@ -115,6 +115,21 @@ class CourseCardsTest {
         assertTrue(own.copy(personal = false).toSend)
     }
 
+    @Test fun coachBusyTravelsWithAttendanceWithoutNotes() {
+        val cc = CoachCourse(CourseCards.card(course, "CRS23456", 5, "", "", find))
+        val busy = listOf(CoachBusy("b1", 100, 200, BusyKind.VACATION, "visita dal dentista"), CoachBusy("b0", -5 * 86_400_000L, -3 * 86_400_000L))
+        val r = CourseCards.report(cc, "Coach", 0, busy)
+        assertEquals(listOf("b1"), r.busy!!.map { it.id })   // quelli passati no
+        assertEquals("", r.busy!!.single().note)           // la nota resta all'allenatore
+        // Solo gli impegni cambiati: il file va registrato lo stesso.
+        assertEquals(AttendanceStatus.READY, CourseCards.check(r, listOf(course)))
+        val applied = CourseCards.apply(course, r)
+        assertEquals(BusyKind.VACATION, applied.coachAway.single().kind)
+        // Un file di una versione vecchia (senza impegni) non li cancella.
+        assertEquals(applied.coachAway, CourseCards.apply(applied, r.copy(busy = null)).coachAway)
+        assertEquals(BusyKind.VACATION, Coaching.busyOn(applied.coachAway, 150)!!.kind)
+    }
+
     @Test fun courseLabelColor() {
         val club = CoachCourse(CourseCard(code = "", issuedAt = 1, course = course))
         assertEquals(CourseCards.CLUB, club.label)

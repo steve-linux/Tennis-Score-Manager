@@ -189,6 +189,9 @@ fun CourseScreen(c: MatchController) {
                 val past = all.filter { it.start <= now }.reversed()
                 val next = all.filter { it.start > now }
                 if (all.isEmpty()) Text(s.scNoLessons, color = TsmColors.TextDim)
+                // Le prossime lezioni (non annullate) nei giorni in cui l'istruttore non c'è: da annullare, spostare o coprire.
+                val away = next.count { it.key !in co.cancelled && com.tennis.scoremanager.data.Coaching.busyOn(co.coachAway, it.start) != null }
+                if (away > 0) Text(s.scCoachAwayCount(away), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
                 // Il registro presenze da stampare o mandare (lezioni passate, ✓ ✗ —).
                 if (past.isNotEmpty()) GhostButton(s.rgPdf, Icons.Filled.Campaign, { register = true }, Modifier.fillMaxWidth())
                 @Composable fun row(l: Lesson) {
@@ -202,6 +205,10 @@ fun CourseScreen(c: MatchController) {
                                 Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             }
                             CourtPlans.closedOn(plan, l.start)?.let { Text("${s.clClosed}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                            // L'istruttore ha detto che quel giorno non c'è (arriva con le sue presenze).
+                            com.tennis.scoremanager.data.Coaching.busyOn(co.coachAway, l.start)?.let {
+                                Text(s.scCoachAway(com.tennis.scoremanager.ui.busyKindName(s, it.kind)), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            }
                             com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                         }
                         Text(

@@ -2678,6 +2678,8 @@ object DeStrings : Strings {
     override val agMonth = "Monat"
     override val agList = "Liste"
     override val agDayEmpty = "Nichts geplant."
+    override val scCoachAway: (String) -> String = { "Trainer abwesend: $it" }
+    override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 Stunde ohne Trainer" else "$it Stunden ohne Trainer" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

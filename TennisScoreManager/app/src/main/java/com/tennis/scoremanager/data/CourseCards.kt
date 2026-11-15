@@ -81,6 +81,8 @@ data class AttendanceReport(
     val attendance: Map<String, Set<String>> = emptyMap(),
     val cancelled: Set<String> = emptySet(),
     val sentAt: Long = 0,
+    /** I giorni occupati dell'allenatore da oggi in poi (solo il motivo); null = file di una versione che non li manda. */
+    val busy: List<CoachBusy>? = null,
 )
 
 /** Un allievo nuovo che l'allenatore propone alla segreteria (dopo una lezione di prova): i dati per iscriverlo. */
@@ -144,9 +146,11 @@ object CourseCards {
     }
 
     /** Le presenze da rimandare: tutte quelle segnate dall'allenatore (la segreteria tiene l'ultima per ogni lezione). */
-    fun report(cc: CoachCourse, coach: String, now: Long): AttendanceReport =
+    fun report(cc: CoachCourse, coach: String, now: Long, busy: List<CoachBusy> = emptyList()): AttendanceReport =
         AttendanceReport(code = cc.card.code, course = cc.card.course.id, courseName = cc.card.course.name, coach = coach,
-            attendance = cc.attendance, cancelled = cc.cancelled, sentAt = now)
+            attendance = cc.attendance, cancelled = cc.cancelled, sentAt = now,
+            // Solo da oggi in poi e senza note: alla segreteria basta sapere che non c'è e perché.
+            busy = busy.filter { CourtPlans.dayStart(it.to) >= CourtPlans.dayStart(now) }.map { it.copy(note = "") })
 
     /** Il file di presenze rispetto ai corsi della segreteria. */
     fun check(r: AttendanceReport, courses: List<Course>): AttendanceStatus {
@@ -161,7 +165,7 @@ object CourseCards {
      */
     fun apply(c: Course, r: AttendanceReport): Course {
         val att = r.attendance.mapValues { (_, v) -> v.filter { it in c.students }.toSet() }
-        return c.copy(attendance = c.attendance + att, cancelled = (c.cancelled + r.cancelled) - att.keys)
+        return c.copy(attendance = c.attendance + att, cancelled = (c.cancelled + r.cancelled) - att.keys, coachAway = r.busy ?: c.coachAway)
     }
 
     fun fileName(prefix: String, name: String): String =

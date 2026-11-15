@@ -1916,17 +1916,23 @@ function courseLessons(c, body) {
   const rows = c.lessons.filter((l) => ({ next: l.date >= info.today, past: l.date < info.today, all: true })[lessonShow]);
   if (lessonShow === 'past') rows.reverse();
   const names = Object.fromEntries(c.students.map((x) => [x.id, x.name]));
+  // Le prossime lezioni (non annullate) nei giorni in cui l'istruttore non c'è.
+  const away = c.lessons.filter((l) => l.away && !l.cancelled && l.date >= info.today).length;
   put(body,
     h('div.tools.noprint', show, h('span.dim', T.lessonHint)),
+    away ? h('p', { style: 'color:var(--warn);font-weight:600' }, T.scCoachAwayCount(away)) : null,
     rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
       h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
         h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null,
-          l.movedFrom ? h('div', { style: 'color:var(--warn);font-size:12px' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+          l.movedFrom ? h('div', { style: 'color:var(--warn);font-size:12px' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+          l.away ? h('div', { style: 'color:var(--warn);font-size:12px;font-weight:600' }, T.scCoachAway(awayName(l.away))) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
         h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
           : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
       : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
 }
+
+const awayName = (k) => ({ BUSY: T.bzBusy, VACATION: T.bzVacation, TOURNAMENT: T.bzTournament, SICK: T.bzSick, OTHER: T.bzOther })[k] || k;
 
 function openLesson(c, l) {
   const boxes = c.students.map((x) => [x.id, h('input', { type: 'checkbox', checked: l.marked ? l.present.includes(x.id) : false })]);

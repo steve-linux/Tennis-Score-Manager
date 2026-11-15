@@ -2750,6 +2750,8 @@ interface Strings {
     val agMonth: String
     val agList: String
     val agDayEmpty: String
+    val scCoachAway: (String) -> String
+    val scCoachAwayCount: (Int) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5425,6 +5427,8 @@ object ItStrings : Strings {
     override val agMonth = "Mese"
     override val agList = "Elenco"
     override val agDayEmpty = "Niente in programma."
+    override val scCoachAway: (String) -> String = { "Istruttore assente: $it" }
+    override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 lezione con l'istruttore assente" else "$it lezioni con l'istruttore assente" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8101,6 +8105,8 @@ object EnStrings : Strings {
     override val agMonth = "Month"
     override val agList = "List"
     override val agDayEmpty = "Nothing planned."
+    override val scCoachAway: (String) -> String = { "Coach away: $it" }
+    override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 lesson with the coach away" else "$it lessons with the coach away" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

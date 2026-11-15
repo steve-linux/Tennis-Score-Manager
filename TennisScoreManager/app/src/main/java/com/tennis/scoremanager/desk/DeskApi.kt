@@ -289,7 +289,9 @@ interface DeskData {
 @Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
 @Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null,
     /** Spostata: il giorno e l'ora che aveva. */
-    val movedFrom: String? = null, val movedFromMin: Int? = null)
+    val movedFrom: String? = null, val movedFromMin: Int? = null,
+    /** L'istruttore non c'è quel giorno (il motivo, dalle sue presenze). */
+    val away: com.tennis.scoremanager.data.BusyKind? = null)
 /** Spostare una lezione: un altro giorno, ora, durata o campo; [makeup] = il recupero in fondo al corso; [reset] = com'era. */
 @Serializable data class DeskLessonMoveIn(val key: String, val date: String = "", val startMin: Int = 0, val minutes: Int? = null, val court: String? = null,
     val makeup: Boolean = false, val reset: Boolean = false, val notify: Boolean = false)
@@ -1191,7 +1193,8 @@ class DeskApi(
             val start = CourtPlans.dayStart(l.start)
             DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
                 dayOff(l.start),
-                l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() })
+                l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() },
+                com.tennis.scoremanager.data.Coaching.busyOn(c.coachAway, l.start)?.kind)
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
         val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->

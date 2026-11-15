@@ -46,6 +46,8 @@ data class Course(
     val cardCode: String? = null,
     /** Le lezioni spostate (chiave della lezione → dove è finita): tengono la chiave, quindi presenze e registro restano. */
     val moved: Map<String, LessonMove> = emptyMap(),
+    /** I giorni in cui l'istruttore non c'è, arrivati con le sue presenze (solo il motivo, senza note). */
+    val coachAway: List<CoachBusy> = emptyList(),
 )
 
 /** Una lezione del calendario del corso; [movedFrom]: l'inizio che aveva, se è stata spostata. */
