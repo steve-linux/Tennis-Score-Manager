@@ -107,3 +107,12 @@ Para saber si la línea tiene dirección pública: comparad la dirección WAN de
 - Para parar las reservas un tiempo (mantenimiento, cierre), desactivad **Reservas en línea abiertas**: los jugadores ven el planning pero no reservan.
 - Un jugador que ya no debe reservar: en su ficha, **Quitar el acceso en línea**.
 - Un aviso para todos (pistas cerradas, un torneo, una fiesta): **Servidor del club › Tablón del club**, o **Reservas online** desde el PC. Llega a los jugadores con una notificación y se queda 30 días. Desde **Chats y avisos** podéis quitar los mensajes fuera de lugar en el chat del club, en los de Busco compañero y en los mensajes privados señalados.
+
+## 7. Actualizar el servidor
+
+Cuando sale un servidor nuevo (por ejemplo con el **buzón de archivos**: fichas de los cursos a los entrenadores, asistencias y resultados que vuelven a la secretaría sin WhatsApp), pedid al técnico que lo actualice. **Los datos se quedan**: jugadores, reservas, teléfono de la secretaría emparejado.
+
+- **Raspberry Pi o PC con Debian/Ubuntu**: se copia el kit nuevo (`tsm-server-kit.tar.gz`) y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`.
+- **Memoria TSM-SERVER**: se apaga el PC del club, se saca la memoria y, desde un PC Linux, se lanza `tar xzf tsm-server-kit.tar.gz && sudo tsm-server/update-usb.sh /dev/sdX` (`lsblk` dice cuál es la memoria). Se vuelve a poner la memoria y se enciende: arranca el servidor nuevo. No hace falta rehacer la memoria (rehacerla borraría los datos).
+
+Mientras el servidor no esté actualizado la app funciona igual: fichas y asistencias pasan como antes, con el archivo por WhatsApp.

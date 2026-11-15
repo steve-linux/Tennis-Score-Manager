@@ -107,3 +107,12 @@ To find out whether the line has a public address: compare the WAN address shown
 - To stop bookings for a while (maintenance, closure), switch off **Online booking open**: players see the schedule but cannot book.
 - A player who should no longer book: on their card, **Remove online access**.
 - A notice for everyone (courts closed, a tournament, a party): **Club server › Club notice board**, or **Online bookings** from the PC. It reaches players with a notification and stays 30 days. From **Chats and reports** you can remove out-of-place messages in the club chat, the Looking for a partner chats and reported private messages.
+
+## 7. Updating the server
+
+When a new server comes out (for example with the **file mailbox**: course cards to coaches, attendance and results coming back to the office without WhatsApp), ask your technician to update it. **The data stays**: players, bookings, the paired office phone.
+
+- **Raspberry Pi or PC with Debian/Ubuntu**: copy the new kit (`tsm-server-kit.tar.gz`) and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`.
+- **TSM-SERVER stick**: switch off the club PC, take out the stick and, from a Linux PC, run `tar xzf tsm-server-kit.tar.gz && sudo tsm-server/update-usb.sh /dev/sdX` (`lsblk` tells which one is the stick). Put the stick back and switch on: the new server starts. There's no need to remake the stick (remaking it would erase the data).
+
+Until the server is updated the app works anyway: cards and attendance travel as before, as a file on WhatsApp.

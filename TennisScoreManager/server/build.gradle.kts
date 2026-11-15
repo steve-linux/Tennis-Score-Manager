@@ -56,6 +56,10 @@ val serverKit by tasks.registering(Tar::class) {
             include("install.sh", "reset-admin.sh", "setup-https.sh", "tsm-duckdns", "tsm-tunnel")
             filePermissions { unix("rwxr-xr-x") }
         }
+        from("deploy/iso") {
+            include("update-usb.sh")
+            filePermissions { unix("rwxr-xr-x") }
+        }
         from("deploy") { include("tsm-server.service", "tsm-server.default", "tsm-duckdns.service", "tsm-duckdns.timer", "tsm-tunnel.service", "tsm-tunnel.path", "tsm-tunnel.timer") }
     }
 }

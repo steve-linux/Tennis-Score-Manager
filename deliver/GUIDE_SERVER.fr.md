@@ -107,3 +107,12 @@ Pour savoir si la ligne a une adresse publique : comparez l'adresse WAN affiché
 - Pour arrêter les réservations un moment (entretien, fermeture), désactivez **Réservations en ligne ouvertes** : les joueurs voient le planning mais ne réservent pas.
 - Un joueur qui ne doit plus réserver : dans sa fiche, **Retirer l'accès en ligne**.
 - Une annonce pour tous (terrains fermés, un tournoi, une fête) : **Serveur du club › Tableau du club**, ou **Réservations en ligne** depuis le PC. Elle arrive aux joueurs avec une notification et reste 30 jours. Depuis **Discussions et signalements** vous pouvez retirer les messages déplacés de la discussion du club, de celles de Je cherche un partenaire et des messages privés signalés.
+
+## 7. Mettre le serveur à jour
+
+Quand un nouveau serveur sort (par exemple avec la **boîte aux lettres des fichiers** : fiches de cours aux entraîneurs, présences et résultats qui reviennent au secrétariat sans WhatsApp), demandez au technicien de le mettre à jour. **Les données restent** : joueurs, réservations, téléphone du secrétariat appairé.
+
+- **Raspberry Pi ou PC sous Debian/Ubuntu** : copiez le nouveau kit (`tsm-server-kit.tar.gz`) et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`.
+- **Clé TSM-SERVER** : éteignez le PC du club, retirez la clé et, depuis un PC Linux, lancez `tar xzf tsm-server-kit.tar.gz && sudo tsm-server/update-usb.sh /dev/sdX` (`lsblk` indique quelle est la clé). Remettez la clé et rallumez : le nouveau serveur démarre. Inutile de refaire la clé (la refaire effacerait les données).
+
+Tant que le serveur n'est pas à jour, l'application fonctionne quand même : fiches et présences passent comme avant, en fichier sur WhatsApp.

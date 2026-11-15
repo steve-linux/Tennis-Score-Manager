@@ -107,3 +107,12 @@ Per sapere se la linea ha un indirizzo pubblico: confrontate l'indirizzo WAN mos
 - Se volete fermare le prenotazioni per un po' (manutenzione, chiusura), spegnete **Prenotazioni online aperte**: i giocatori vedono il planning ma non prenotano.
 - Un giocatore che non deve più prenotare: nella sua scheda, **Togli l'accesso online**.
 - Un avviso per tutti (campi chiusi, un torneo, una festa): **Server del circolo › Bacheca del circolo**, o **Prenotazioni online** dal PC. Arriva ai giocatori con una notifica e resta 30 giorni. Da **Chat e segnalazioni** potete togliere i messaggi fuori luogo nella chat del circolo, in quelle di Cerco compagno e nei messaggi privati segnalati.
+
+## 7. Aggiornare il server
+
+Quando esce un server nuovo (per esempio con la **casella dei file**: le schede dei corsi agli allenatori, le presenze e i risultati che tornano alla segreteria senza WhatsApp), chiedete al tecnico di aggiornarlo. **I dati restano**: giocatori, prenotazioni, telefono della segreteria abbinato.
+
+- **Raspberry Pi o PC con Debian/Ubuntu**: si copia il kit nuovo (`tsm-server-kit.tar.gz`) e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`.
+- **Chiavetta TSM-SERVER**: si spegne il PC del circolo, si toglie la chiavetta e, da un PC Linux, si lancia `tar xzf tsm-server-kit.tar.gz && sudo tsm-server/update-usb.sh /dev/sdX` (`lsblk` dice qual è la chiavetta). Si rimette la chiavetta e si riaccende: parte il server nuovo. Non serve rifare la chiavetta (rifarla cancellerebbe i dati).
+
+Finché il server non è aggiornato l'app funziona lo stesso: schede e presenze passano come prima, col file su WhatsApp.
