@@ -72,7 +72,26 @@ async function showStudents() {
         h('td', s.guardian ? T.coGuardian + ': ' + s.guardian : s.phone))))) : h('div.empty', T.coNever));
   };
   q.addEventListener('input', draw);
-  put(main(), h('div.head', h('h1', T.studentsTitle), h('button.primary', { onclick: () => studentForm(null) }, T.studentNew), printBtn()), h('div.panel', q, body));
+  put(main(), h('div.head', h('h1', T.studentsTitle), h('button.primary', { onclick: () => studentForm(null) }, T.studentNew), h('button', { onclick: receiveProfile }, T.pfReceiveFile), printBtn()), h('div.panel', q, body));
+}
+
+/** Un allievo nuovo che porta il suo profilo (file .tsm): anteprima, poi entra tra gli allievi (o completa chi c'è già). */
+function receiveProfile() {
+  const input = h('input', { type: 'file', accept: '.tsm,.json,application/json,application/octet-stream' });
+  input.addEventListener('change', async () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    if (f.size > 1024 * 1024) { toast(T.err.NOT_A_FILE); return; }
+    const text = await f.text();
+    let x;
+    try { x = await api('POST', '/coach/profile/check', { text }); } catch (e) { toast(errText(e)); return; }
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p.dim', x.status)), async () => {
+      const out = await api('POST', '/coach/profile/apply', { text });
+      toast(T.saved);
+      showStudent(out.id);
+    }, { saveText: T.pfAdd });
+  });
+  input.click();
   draw();
 }
 
@@ -88,6 +107,7 @@ async function showStudent(id) {
   put(main(),
     h('div.head', back, h('h1', s.name),
       h('button', { onclick: () => studentForm(d) }, T.edit),
+      h('button', { onclick: () => profileExport('/coach/students/', id, s.name) }, T.pfSend),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf?days=30', T.reportTitle + ' ' + s.name) }, T.ccDeskReport30),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf', T.reportTitle + ' ' + s.name) }, T.ccDeskReportAll),
       printBtn()),

@@ -2683,6 +2683,10 @@ object FrStrings : Strings {
     override val agDayEmpty = "Rien de prévu."
     override val scCoachAway: (String) -> String = { "Moniteur absent : $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 séance avec le moniteur absent" else "$it séances avec le moniteur absent" }
+    override val pfOfficeSent = "Profil arrivé au secrétariat."
+    override val pfOfficeFailed = "Pas arrivé : vérifie la connexion ou envoie le fichier."
+    override val pfToOffice: (String) -> String = { "Envoyer au secrétariat de $it" }
+    override val pfReceiveFile = "Recevoir un profil (fichier)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

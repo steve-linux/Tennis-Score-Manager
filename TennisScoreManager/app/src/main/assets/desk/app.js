@@ -319,14 +319,36 @@ function uploadFile() {
     let x;
     try { x = await api('POST', '/files/check', { text }); } catch (e) { toast(errText(e)); return; }
     const course = x.kind === 'PROPOSAL' ? select([['', T.ccNoCourse]].concat(x.courses.map((c) => [c.id, c.name])), x.course || '') : null;
-    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null),
+    // Un profilo: si aggiunge (o completa chi c'è già) e, a scelta, diventa socio.
+    const asMember = x.kind === 'PROFILE' ? h('input', { type: 'checkbox', checked: true }) : null;
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null,
+      asMember ? h('label.check', asMember, T.pfAsMember) : null),
       x.canApply ? async () => {
-        await api('POST', '/files/apply', { text, course: course ? course.value || null : null });
+        await api('POST', '/files/apply', { text, course: course ? course.value || null : null, asMember: asMember ? asMember.checked : true });
         toast(T.saved);
         await render();
-      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : T.mrApply) });
+      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : x.kind === 'PROFILE' ? T.pfAdd : T.mrApply) });
   });
   input.click();
+}
+
+const PROFILE_FIELDS = { PHOTO: () => T.pfPhoto, CONTACTS: () => T.pfContacts, BIRTH: () => T.pfBirth, PLAY: () => T.pfPlay, BODY: () => T.pfBody, GUARDIAN: () => T.pfGuardian, FITP: () => T.pfFitp, MEDICAL: () => T.pfMedical };
+
+/**
+ * Passa il profilo: si scelgono i dati (il certificato medico solo a mano) e si scarica il file .tsm, da mandare al
+ * nuovo circolo o allenatore (che lo apre con TSM). [base]: '/people/' o '/coach/students/'.
+ */
+async function profileExport(base, id, name) {
+  let f;
+  try { f = await api('GET', base + encodeURIComponent(id) + '/profile'); } catch (e) { toast(errText(e)); return; }
+  const boxes = f.available.map((k) => [k, h('input', { type: 'checkbox', checked: f.defaults.includes(k) })]);
+  dialog(T.pfSend + ' · ' + name, h('div',
+    h('p.dim', T.pfSendHint), h('p.dim', T.pfAlways),
+    boxes.length ? h('div.checks', boxes.map(([k, x]) => h('label.check', { title: k === 'MEDICAL' ? T.pfMedicalHint : '' }, x, PROFILE_FIELDS[k]()))) : h('p.dim', T.pfNothing),
+    h('p.dim', T.pfAsFileHint)), async () => {
+    const fields = boxes.filter(([, x]) => x.checked).map(([k]) => k).join(',');
+    await deskDownload(base + encodeURIComponent(id) + '/profile.tsm?fields=' + encodeURIComponent(fields), T.pfFilePrefix + ' ' + name + '.tsm');
+  }, { saveText: T.pfAsFile });
 }
 
 /** Apre un PDF del telefono in una scheda nuova (o lo scarica, se il browser blocca la scheda). */
@@ -413,15 +435,15 @@ function editPerson(p) {
     field(T.note, f.note, 'full'));
   // Col server delle prenotazioni: l'invito per prenotare online e, per chi prenota già, il modo di togliere l'accesso.
   const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
-  const online = server ? [
-    h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+  const online = [p ? h('button.left', { type: 'button', onclick: () => profileExport('/people/', p.id, p.name) }, T.pfSend) : null].concat(server ? [
+    h('button', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
     p.pin ? h('button', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id) + '/pin'); toast(T.srvPinResetDone); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvPinReset) : null,
     p.online ? h('button.danger', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvRevoke) : null,
-  ] : null;
+  ] : []);
   dialog(p ? p.name : T.newMember, body, async () => {
     const out = { firstName: f.firstName.value, lastName: f.lastName.value, nickname: f.nickname.value, phone: f.phone.value, email: f.email.value, birth: f.birth.value || null, note: f.note.value,
       member: member.checked, since: f.since.value || null, number: f.number.value, fitpNumber: f.fitpNumber.value, fitpCard: card.value || null, fitpYear: f.fitpYear.value ? Number(f.fitpYear.value) : null,

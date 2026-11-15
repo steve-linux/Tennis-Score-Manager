@@ -23,6 +23,8 @@ class ProfileCardsTest {
         assertFalse(ProfileField.PHOTO in ProfileCards.available(luca, false))
         val card = ProfileCards.card(luca, setOf(ProfileField.CONTACTS), byteArrayOf(1, 2, 3), "Circolo A", 10)
         val text = ProfileCards.encode(card)
+        assertTrue(text, "\"tsm-profile\"" in text)                       // il file si riconosce
+        assertTrue("\"tsm-profile\"" in ProfileCards.encodeQr(card))
         assertFalse("segreto" in text)
         assertFalse("4.2" in text)
         assertFalse("consent" in text)

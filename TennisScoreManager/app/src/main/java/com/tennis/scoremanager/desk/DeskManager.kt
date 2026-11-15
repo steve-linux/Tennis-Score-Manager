@@ -89,8 +89,18 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
     /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
+    override fun profileFields(id: String) = fieldsOf(id)
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, asMember, false) }
+
+    private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
+        val photo = c.photoBytes(p.name) != null
+        DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
+    }
+
     override fun incomingFile(text: String): DeskIncoming? {
         val s = c.strings
+        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profilePreview(it) }
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
             val st = c.resultStatus(r)
             val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
@@ -206,6 +216,15 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
+    override fun profileFields(id: String) = fieldsOf(id)
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
+    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profilePreview(it) }
+    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, false, true) }
+
+    private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
+        val photo = c.photoBytes(p.name) != null
+        DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
+    }
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))

@@ -128,6 +128,11 @@ interface DeskData {
     fun incomingFile(text: String): DeskIncoming? = null
     /** Lo registra come farebbe il telefono; null se fatto, sennò il codice dell'errore. */
     fun applyIncoming(text: String, course: String?): String? = "NOT_FOUND"
+    /** Il profilo da passare: quali dati ci sono e quali si propongono, e il file coi dati scelti (null = giocatore che non c'è). */
+    fun profileFields(id: String): DeskProfileFields? = null
+    fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = null
+    /** Un profilo caricato dal PC: entra tra i giocatori (socio se [asMember]); null = non è un profilo. */
+    fun applyProfile(text: String, asMember: Boolean): String? = null
     /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
     fun setClubName(name: String)
     fun saveCourtSettings(st: CourtSettings)
@@ -197,7 +202,8 @@ interface DeskData {
     val replace: Boolean = false, val courses: List<DeskIdName> = emptyList(), val course: String? = null,
 )
 @Serializable data class DeskIdName(val id: String, val name: String)
-@Serializable data class DeskFileIn(val text: String = "", val course: String? = null)
+@Serializable data class DeskFileIn(val text: String = "", val course: String? = null, val asMember: Boolean = true)
+@Serializable data class DeskProfileFields(val available: List<com.tennis.scoremanager.data.ProfileField>, val defaults: List<com.tennis.scoremanager.data.ProfileField>)
 @Serializable data class DeskIndexIn(val index: Int = 0)
 @Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
@@ -467,12 +473,15 @@ class DeskApi(
                 m == "POST" && p == listOf("files", "check") -> ok(DeskIncoming.serializer(), data.incomingFile(read(DeskFileIn.serializer(), r).text) ?: throw Fail(400, "NOT_A_FILE"))
                 m == "POST" && p == listOf("files", "apply") -> {
                     val i = read(DeskFileIn.serializer(), r)
-                    data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
+                    if (data.applyProfile(i.text, i.asMember) == null) data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
                     done()
                 }
                 m == "GET" && p == listOf("people") -> people()
                 m == "POST" && p == listOf("people") -> savePerson(read(DeskPerson.serializer(), r), null)
                 m == "PUT" && p.size == 2 && p[0] == "people" -> savePerson(read(DeskPerson.serializer(), r), p[1])
+                m == "GET" && p.size == 3 && p[0] == "people" && p[2] == "profile" -> ok(DeskProfileFields.serializer(), data.profileFields(p[1]) ?: throw Fail(404, "NOT_FOUND"))
+                m == "GET" && p.size == 3 && p[0] == "people" && p[2] == "profile.tsm" ->
+                    Resp(200, (data.profileFile(p[1], profileFieldsOf(r.query["fields"])) ?: throw Fail(404, "NOT_FOUND")).toByteArray(), "application/octet-stream")
                 m == "POST" && p == listOf("people", "import", "preview") -> importCsv(read(DeskCsvIn.serializer(), r), false)
                 m == "POST" && p == listOf("people", "import") -> importCsv(read(DeskCsvIn.serializer(), r), true)
                 m == "GET" && p == listOf("money") -> money(r.query["year"]?.toIntOrNull())
@@ -1260,6 +1269,10 @@ class DeskApi(
             else -> throw Fail(404, "NOT_FOUND")
         }
     }
+
+    /** "PHOTO,CONTACTS" → i gruppi di dati (null = quelli proposti). */
+    private fun profileFieldsOf(q: String?): Set<com.tennis.scoremanager.data.ProfileField>? =
+        q?.split(',')?.mapNotNull { x -> runCatching { com.tennis.scoremanager.data.ProfileField.valueOf(x.trim()) }.getOrNull() }?.toSet()
 
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
 

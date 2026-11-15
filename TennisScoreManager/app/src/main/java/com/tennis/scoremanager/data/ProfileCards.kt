@@ -56,8 +56,11 @@ enum class ProfileField { PHOTO, CONTACTS, BIRTH, PLAY, BODY, GUARDIAN, FITP, ME
 object ProfileCards {
     const val TYPE = "tsm-profile"
 
-    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; prettyPrint = true }
-    private val compact = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+    // Il tipo e la versione si scrivono sempre (si riconosce il file); i dati vuoti no, così il QR resta piccolo.
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false; prettyPrint = true }
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    private val compact = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
     fun encode(c: ProfileCard): String = json.encodeToString(ProfileCard.serializer(), c)
     /** Per il QR: senza foto e senza spazi. */

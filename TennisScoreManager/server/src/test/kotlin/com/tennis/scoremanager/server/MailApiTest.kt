@@ -64,6 +64,12 @@ class MailApiTest {
         assertTrue(mail("/mail", mario).isEmpty())
     }
 
+    @Test fun ilProfiloArrivaInSegreteria() {
+        val mario = player("p1", "Mario")
+        assertEquals(200, call("POST", "/mail", """{"kind":"profile","text":"{\"tsm\":\"tsm-profile\"}"}""", mario).status)
+        assertEquals("profile", mail("/admin/mail", admin).single().kind)
+    }
+
     @Test fun ilRisultatoTornaAllaSegreteriaColMittente() {
         val mario = player("p1", "Mario")
         assertEquals(200, call("POST", "/mail", """{"to":"p2","kind":"result","text":"{\"r\":1}"}""", mario).status)

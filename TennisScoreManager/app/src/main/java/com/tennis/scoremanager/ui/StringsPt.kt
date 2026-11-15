@@ -2684,6 +2684,10 @@ object PtStrings : Strings {
     override val agDayEmpty = "Nada previsto."
     override val scCoachAway: (String) -> String = { "Professor ausente: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 aula com o professor ausente" else "$it aulas com o professor ausente" }
+    override val pfOfficeSent = "Perfil entregue à secretaria."
+    override val pfOfficeFailed = "Não chegou: verifica a ligação ou envia o ficheiro."
+    override val pfToOffice: (String) -> String = { "Enviar à secretaria de $it" }
+    override val pfReceiveFile = "Receber um perfil (ficheiro)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }

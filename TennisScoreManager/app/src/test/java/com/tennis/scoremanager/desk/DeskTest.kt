@@ -75,6 +75,23 @@ class DeskTest {
         assertEquals(404, req("POST", "/courses/${c.id}/move", """{"key":"nessuna","date":"2026-12-10","startMin":1080}""", k).first)
     }
 
+    @Test fun profiloDalPc() {
+        val k = login()
+        val (_, made) = req("POST", "/people", """{"firstName":"Luca","lastName":"Verdi","phone":"333","email":"luca@example.org","member":false}""", k)
+        val id = Regex("\"id\":\"([^\"]+)\"").find(made)!!.groupValues[1]
+        assertTrue(req("GET", "/people/$id/profile", token = k).second.contains("CONTACTS"))
+        // Solo i contatti scelti: niente altro nel file.
+        val file = req("GET", "/people/$id/profile.tsm", token = k, q = mapOf("fields" to "CONTACTS")).second
+        assertTrue(file, "\"tsm-profile\"" in file && "luca@example.org" in file)
+        // Un profilo che arriva: anteprima e poi socio nuovo.
+        val other = file.replace("Luca", "Marta").replace("luca@example.org", "marta@example.org").replace("333", "444")
+        val chk = req("POST", "/files/check", "{\"text\":${kotlinx.serialization.json.JsonPrimitive(other)}}", k).second
+        assertTrue(chk, "\"kind\":\"PROFILE\"" in chk)
+        assertEquals(200, req("POST", "/files/apply", "{\"text\":${kotlinx.serialization.json.JsonPrimitive(other)},\"asMember\":true}", k).first)
+        assertTrue(data.list.any { it.firstName == "Marta" && it.member != null })
+        assertEquals(404, req("GET", "/people/nessuno/profile", token = k).first)
+    }
+
     @Test fun ilPlanningMostraLeFeste() {
         val tk = login()
         val m = req("GET", "/month", token = tk, q = mapOf("date" to "2026-12-01")).second

@@ -2680,6 +2680,10 @@ object DeStrings : Strings {
     override val agDayEmpty = "Nichts geplant."
     override val scCoachAway: (String) -> String = { "Trainer abwesend: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 Stunde ohne Trainer" else "$it Stunden ohne Trainer" }
+    override val pfOfficeSent = "Profil ist beim Büro angekommen."
+    override val pfOfficeFailed = "Nicht angekommen: Verbindung prüfen oder die Datei senden."
+    override val pfToOffice: (String) -> String = { "An das Büro von $it senden" }
+    override val pfReceiveFile = "Profil empfangen (Datei)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

@@ -940,6 +940,62 @@ const APP_I18N = {
     pbWaitText: "Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo.",
     pbWaiting: "In attesa",
     pbYesterday: "Ieri",
+    pfAdd: "Aggiungi",
+    pfAddAsNew: "Aggiungi come nuovo",
+    pfAdded: (it) => `${it} aggiunto ai giocatori`,
+    pfAlways: "Nome, cognome e soprannome vanno sempre.",
+    pfAsFile: "Manda il file",
+    pfAsFileHint: "WhatsApp, email, Telegram…: si apre con Condividi › TSM. Con la foto.",
+    pfAsMember: "Iscrivi come socio",
+    pfAsQr: "Mostra il QR",
+    pfAsQrHint: "Telefono contro telefono, senza foto: l'altro lo legge con Ricevi un profilo.",
+    pfAsStudent: "Tra i miei allievi",
+    pfAsk: "Usi solo una parte dell'app? Scegli cosa usi: il resto sparisce dai menu.",
+    pfBands: "Braccialetti e telecomandi",
+    pfBandsHint: "I giocatori segnano il punto dal polso o da un telecomando; spento, si segna solo da arbitro",
+    pfBirth: "Data di nascita e sesso",
+    pfBody: "Altezza e peso",
+    pfChoose: "Scegli cosa usi",
+    pfComplete: "Completa",
+    pfCompleted: (it) => `Scheda di ${it} completata`,
+    pfContacts: "Telefono ed email",
+    pfEntryHint: "Tieni solo quello che ti serve: il resto non compare",
+    pfExisting: (it) => `C'è già ${it}: si completa con i dati che mancano, niente si cancella.`,
+    pfFilePrefix: "Profilo",
+    pfFitp: "Tessera FITP e classifica",
+    pfFrom: (it) => `Da: ${it}`,
+    pfGuardian: "Genitore o tutore",
+    pfHeart: "Fasce cardio",
+    pfHeartHint: "Battito nella partita e allenamento con la fascia",
+    pfHint: "Quello che spegni non compare nei menu e nelle schermate. Puoi cambiarlo quando vuoi, i dati restano.",
+    pfIncomingTitle: "Profilo arrivato",
+    pfMedical: "Certificato medico",
+    pfMedicalHint: "È un dato sanitario: mandalo solo se la persona è d'accordo.",
+    pfNew: "Giocatore nuovo",
+    pfNotProfile: "Questo QR non è un profilo TSM.",
+    pfNothing: "Solo il nome: non c'è altro da mandare.",
+    pfOfficeFailed: "Non arrivato: controlla la rete o manda il file.",
+    pfOfficeSent: "Profilo arrivato alla segreteria.",
+    pfPadelHint: "La scelta tennis o padel nella nuova partita",
+    pfPhoto: "Foto",
+    pfPlay: "Mano, rovescio e circolo",
+    pfProgress: "Progressi e rating",
+    pfProgressHint: "Il tuo andamento partita dopo partita; lo storico resta comunque",
+    pfQrTitle: (it) => `Profilo di ${it}`,
+    pfRackets: "Racchette",
+    pfRacketsHint: "Le tue racchette, le corde e la racchetta virtuale",
+    pfReceive: "Ricevi un profilo (QR)",
+    pfReceiveFile: "Ricevi un profilo (file)",
+    pfScanPrompt: "Inquadra il QR del profilo",
+    pfSend: "Passa il profilo",
+    pfSendHint: "A un nuovo circolo o allenatore: scegli i dati da mandare. Note, diario, valutazioni e pagamenti restano qui.",
+    pfShareText: (it) => `Il profilo di ${it} per Tennis Score Manager: aprilo con TSM (Condividi › TSM).`,
+    pfTitle: "Cosa usi",
+    pfToOffice: (it) => `Manda alla segreteria di ${it}`,
+    pfTraining: "Allenamento dei colpi e allievi",
+    pfTrainingHint: "Servizio, dritto, rovescio e volée col braccialetto; gli allievi per chi allena",
+    pfVideo: "Video e telecamera",
+    pfVideoHint: "Il telefono che riprende la partita, gli highlights e la moviola",
     pkAddGroup: "Aggiungi un gruppo…",
     pkAll: "Tutti",
     pkAllShown: "Scegli quelli mostrati",
@@ -1814,6 +1870,62 @@ const APP_I18N = {
     pbWaitText: "This slot is taken. If it becomes free we tell you right away: whoever books first gets it.",
     pbWaiting: "Waiting",
     pbYesterday: "Yesterday",
+    pfAdd: "Add",
+    pfAddAsNew: "Add as new",
+    pfAdded: (it) => `${it} added to players`,
+    pfAlways: "First name, last name and nickname always go.",
+    pfAsFile: "Send the file",
+    pfAsFileHint: "WhatsApp, email, Telegram…: it opens with Share › TSM. With the photo.",
+    pfAsMember: "Enrol as member",
+    pfAsQr: "Show the QR code",
+    pfAsQrHint: "Phone to phone, without photo: the other one reads it with Receive a profile.",
+    pfAsStudent: "Among my students",
+    pfAsk: "Do you use only part of the app? Choose what you use: the rest disappears from the menus.",
+    pfBands: "Wristbands and remotes",
+    pfBandsHint: "Players score from the wrist or a remote; off, you score as umpire only",
+    pfBirth: "Date of birth and sex",
+    pfBody: "Height and weight",
+    pfChoose: "Choose what you use",
+    pfComplete: "Complete",
+    pfCompleted: (it) => `${it}'s card completed`,
+    pfContacts: "Phone and email",
+    pfEntryHint: "Keep only what you need: the rest does not appear",
+    pfExisting: (it) => `${it} is already here: missing data is filled in, nothing is deleted.`,
+    pfFilePrefix: "Profile",
+    pfFitp: "FITP card and ranking",
+    pfFrom: (it) => `From: ${it}`,
+    pfGuardian: "Parent or guardian",
+    pfHeart: "Heart rate straps",
+    pfHeartHint: "Heart rate in the match and training with the strap",
+    pfHint: "What you turn off does not appear in menus and screens. You can change it any time, the data stays.",
+    pfIncomingTitle: "Profile received",
+    pfMedical: "Medical certificate",
+    pfMedicalHint: "It's health data: send it only if the person agrees.",
+    pfNew: "New player",
+    pfNotProfile: "This QR code is not a TSM profile.",
+    pfNothing: "Name only: nothing else to send.",
+    pfOfficeFailed: "Not delivered: check the connection or send the file.",
+    pfOfficeSent: "Profile delivered to the club office.",
+    pfPadelHint: "The tennis or padel choice in a new match",
+    pfPhoto: "Photo",
+    pfPlay: "Hand, backhand and club",
+    pfProgress: "Progress and rating",
+    pfProgressHint: "Your trend match after match; the history stays anyway",
+    pfQrTitle: (it) => `${it}'s profile`,
+    pfRackets: "Rackets",
+    pfRacketsHint: "Your rackets, strings and the virtual racket",
+    pfReceive: "Receive a profile (QR)",
+    pfReceiveFile: "Receive a profile (file)",
+    pfScanPrompt: "Frame the profile QR code",
+    pfSend: "Pass on the profile",
+    pfSendHint: "To a new club or coach: choose the data to send. Notes, diary, evaluations and payments stay here.",
+    pfShareText: (it) => `${it}'s profile for Tennis Score Manager: open it with TSM (Share › TSM).`,
+    pfTitle: "What you use",
+    pfToOffice: (it) => `Send to the ${it} office`,
+    pfTraining: "Stroke training and students",
+    pfTrainingHint: "Serve, forehand, backhand and volley with the wristband; students for coaches",
+    pfVideo: "Video and camera",
+    pfVideoHint: "The phone filming the match, highlights and replay",
     pkAddGroup: "Add a group…",
     pkAll: "All",
     pkAllShown: "Pick those shown",
@@ -2688,6 +2800,62 @@ const APP_I18N = {
     pbWaitText: "Ce créneau est occupé. S'il se libère, nous vous prévenons tout de suite : le premier qui réserve l'obtient.",
     pbWaiting: "En attente",
     pbYesterday: "Hier",
+    pfAdd: "Ajouter",
+    pfAddAsNew: "Ajouter comme nouveau",
+    pfAdded: (it) => `${it} ajouté aux joueurs`,
+    pfAlways: "Prénom, nom et surnom sont toujours envoyés.",
+    pfAsFile: "Envoyer le fichier",
+    pfAsFileHint: "WhatsApp, e-mail, Telegram… : il s'ouvre avec Partager › TSM. Avec la photo.",
+    pfAsMember: "Inscrire comme membre",
+    pfAsQr: "Afficher le QR code",
+    pfAsQrHint: "Téléphone contre téléphone, sans photo : l'autre le lit avec Recevoir un profil.",
+    pfAsStudent: "Parmi mes élèves",
+    pfAsk: "Vous n'utilisez qu'une partie de l'app ? Choisissez ce que vous utilisez : le reste disparaît des menus.",
+    pfBands: "Bracelets et télécommandes",
+    pfBandsHint: "Les joueurs marquent depuis le poignet ou une télécommande ; désactivé, on marque seulement en arbitre",
+    pfBirth: "Date de naissance et sexe",
+    pfBody: "Taille et poids",
+    pfChoose: "Choisir",
+    pfComplete: "Compléter",
+    pfCompleted: (it) => `Fiche de ${it} complétée`,
+    pfContacts: "Téléphone et e-mail",
+    pfEntryHint: "Gardez seulement ce qui vous sert : le reste n'apparaît pas",
+    pfExisting: (it) => `${it} existe déjà : on complète les données manquantes, rien n'est effacé.`,
+    pfFilePrefix: "Profil",
+    pfFitp: "Licence et classement",
+    pfFrom: (it) => `De : ${it}`,
+    pfGuardian: "Parent ou tuteur",
+    pfHeart: "Ceintures cardio",
+    pfHeartHint: "Fréquence cardiaque pendant le match et entraînement avec la ceinture",
+    pfHint: "Ce que vous désactivez n'apparaît pas dans les menus et les écrans. Vous pouvez le changer quand vous voulez, les données restent.",
+    pfIncomingTitle: "Profil reçu",
+    pfMedical: "Certificat médical",
+    pfMedicalHint: "C'est une donnée de santé : envoie-la seulement si la personne est d'accord.",
+    pfNew: "Nouveau joueur",
+    pfNotProfile: "Ce QR code n'est pas un profil TSM.",
+    pfNothing: "Seulement le nom : rien d'autre à envoyer.",
+    pfOfficeFailed: "Pas arrivé : vérifie la connexion ou envoie le fichier.",
+    pfOfficeSent: "Profil arrivé au secrétariat.",
+    pfPadelHint: "Le choix tennis ou padel dans un nouveau match",
+    pfPhoto: "Photo de profil",
+    pfPlay: "Main, revers et club",
+    pfProgress: "Progrès et classement",
+    pfProgressHint: "Votre évolution match après match ; l'historique reste de toute façon",
+    pfQrTitle: (it) => `Profil de ${it}`,
+    pfRackets: "Raquettes",
+    pfRacketsHint: "Vos raquettes, les cordages et la raquette virtuelle",
+    pfReceive: "Recevoir un profil (QR)",
+    pfReceiveFile: "Recevoir un profil (fichier)",
+    pfScanPrompt: "Cadre le QR code du profil",
+    pfSend: "Transmettre le profil",
+    pfSendHint: "À un nouveau club ou entraîneur : choisis les données à envoyer. Notes, journal, évaluations et paiements restent ici.",
+    pfShareText: (it) => `Le profil de ${it} pour Tennis Score Manager : ouvre-le avec TSM (Partager › TSM).`,
+    pfTitle: "Ce que vous utilisez",
+    pfToOffice: (it) => `Envoyer au secrétariat de ${it}`,
+    pfTraining: "Entraînement des coups et élèves",
+    pfTrainingHint: "Service, coup droit, revers et volée avec le bracelet ; les élèves pour qui entraîne",
+    pfVideo: "Vidéo et caméra",
+    pfVideoHint: "Le téléphone qui filme le match, les meilleurs moments et le ralenti",
     pkAddGroup: "Ajouter un groupe…",
     pkAll: "Tous",
     pkAllShown: "Choisir ceux affichés",
@@ -3562,6 +3730,62 @@ const APP_I18N = {
     pbWaitText: "Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es.",
     pbWaiting: "Wartend",
     pbYesterday: "Gestern",
+    pfAdd: "Hinzufügen",
+    pfAddAsNew: "Als neu hinzufügen",
+    pfAdded: (it) => `${it} zu den Spielern hinzugefügt`,
+    pfAlways: "Vorname, Nachname und Spitzname gehen immer mit.",
+    pfAsFile: "Datei senden",
+    pfAsFileHint: "WhatsApp, E-Mail, Telegram…: öffnet sich mit Teilen › TSM. Mit Foto.",
+    pfAsMember: "Als Mitglied aufnehmen",
+    pfAsQr: "QR-Code zeigen",
+    pfAsQrHint: "Telefon an Telefon, ohne Foto: das andere liest ihn mit Profil empfangen.",
+    pfAsStudent: "Zu meinen Schülern",
+    pfAsk: "Nutzt du nur einen Teil der App? Wähle, was du nutzt: Der Rest verschwindet aus den Menüs.",
+    pfBands: "Armbänder und Fernbedienungen",
+    pfBandsHint: "Die Spieler zählen am Handgelenk oder mit einer Fernbedienung; aus, zählt man nur als Schiedsrichter",
+    pfBirth: "Geburtsdatum und Geschlecht",
+    pfBody: "Größe und Gewicht",
+    pfChoose: "Auswählen",
+    pfComplete: "Ergänzen",
+    pfCompleted: (it) => `Karte von ${it} ergänzt`,
+    pfContacts: "Telefon und E-Mail",
+    pfEntryHint: "Behalte nur, was du brauchst: Der Rest erscheint nicht",
+    pfExisting: (it) => `${it} gibt es schon: fehlende Daten werden ergänzt, nichts wird gelöscht.`,
+    pfFilePrefix: "Profil",
+    pfFitp: "Spielerpass und Ranking",
+    pfFrom: (it) => `Von: ${it}`,
+    pfGuardian: "Elternteil oder Vormund",
+    pfHeart: "Herzfrequenzgurte",
+    pfHeartHint: "Puls im Match und Training mit dem Gurt",
+    pfHint: "Was du ausschaltest, erscheint nicht in Menüs und Bildschirmen. Du kannst es jederzeit ändern, die Daten bleiben.",
+    pfIncomingTitle: "Profil erhalten",
+    pfMedical: "Ärztliches Attest",
+    pfMedicalHint: "Das sind Gesundheitsdaten: nur senden, wenn die Person einverstanden ist.",
+    pfNew: "Neuer Spieler",
+    pfNotProfile: "Dieser QR-Code ist kein TSM-Profil.",
+    pfNothing: "Nur der Name: sonst gibt es nichts zu senden.",
+    pfOfficeFailed: "Nicht angekommen: Verbindung prüfen oder die Datei senden.",
+    pfOfficeSent: "Profil ist beim Büro angekommen.",
+    pfPadelHint: "Die Wahl Tennis oder Padel im neuen Match",
+    pfPhoto: "Foto",
+    pfPlay: "Hand, Rückhand und Verein",
+    pfProgress: "Fortschritte und Rating",
+    pfProgressHint: "Dein Verlauf Match für Match; der Verlauf der Matches bleibt trotzdem",
+    pfQrTitle: (it) => `Profil von ${it}`,
+    pfRackets: "Schläger",
+    pfRacketsHint: "Deine Schläger, Saiten und der virtuelle Schläger",
+    pfReceive: "Profil empfangen (QR)",
+    pfReceiveFile: "Profil empfangen (Datei)",
+    pfScanPrompt: "Profil-QR-Code erfassen",
+    pfSend: "Profil weitergeben",
+    pfSendHint: "An einen neuen Verein oder Trainer: wähle die Daten aus. Notizen, Tagebuch, Bewertungen und Zahlungen bleiben hier.",
+    pfShareText: (it) => `Profil von ${it} für Tennis Score Manager: mit TSM öffnen (Teilen › TSM).`,
+    pfTitle: "Was du nutzt",
+    pfToOffice: (it) => `An das Büro von ${it} senden`,
+    pfTraining: "Schlagtraining und Schüler",
+    pfTrainingHint: "Aufschlag, Vorhand, Rückhand und Volley mit dem Armband; Schüler für Trainer",
+    pfVideo: "Video und Kamera",
+    pfVideoHint: "Das Handy, das das Match filmt, Highlights und Zeitlupe",
     pkAddGroup: "Gruppe hinzufügen…",
     pkAll: "Alle",
     pkAllShown: "Angezeigte wählen",
@@ -4436,6 +4660,62 @@ const APP_I18N = {
     pbWaitText: "Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero.",
     pbWaiting: "En espera",
     pbYesterday: "Ayer",
+    pfAdd: "Añadir",
+    pfAddAsNew: "Añadir como nuevo",
+    pfAdded: (it) => `${it} añadido a los jugadores`,
+    pfAlways: "Nombre, apellidos y apodo van siempre.",
+    pfAsFile: "Enviar el archivo",
+    pfAsFileHint: "WhatsApp, email, Telegram…: se abre con Compartir › TSM. Con la foto.",
+    pfAsMember: "Inscribir como socio",
+    pfAsQr: "Mostrar el QR",
+    pfAsQrHint: "Teléfono con teléfono, sin foto: el otro lo lee con Recibir un perfil.",
+    pfAsStudent: "Entre mis alumnos",
+    pfAsk: "¿Usas solo una parte de la app? Elige lo que usas: el resto desaparece de los menús.",
+    pfBands: "Pulseras y mandos",
+    pfBandsHint: "Los jugadores marcan desde la muñeca o con un mando; apagado, solo se marca como árbitro",
+    pfBirth: "Fecha de nacimiento y sexo",
+    pfBody: "Altura y peso",
+    pfChoose: "Elegir lo que usas",
+    pfComplete: "Completar",
+    pfCompleted: (it) => `Ficha de ${it} completada`,
+    pfContacts: "Teléfono y email",
+    pfEntryHint: "Quédate solo con lo que necesitas: el resto no aparece",
+    pfExisting: (it) => `${it} ya existe: se completan los datos que faltan, no se borra nada.`,
+    pfFilePrefix: "Perfil",
+    pfFitp: "Licencia y clasificación",
+    pfFrom: (it) => `De: ${it}`,
+    pfGuardian: "Padre, madre o tutor",
+    pfHeart: "Bandas de pulso",
+    pfHeartHint: "Pulso en el partido y entrenamiento con la banda",
+    pfHint: "Lo que apagas no aparece en los menús ni en las pantallas. Puedes cambiarlo cuando quieras, los datos se quedan.",
+    pfIncomingTitle: "Perfil recibido",
+    pfMedical: "Certificado médico",
+    pfMedicalHint: "Es un dato de salud: envíalo solo si la persona está de acuerdo.",
+    pfNew: "Jugador nuevo",
+    pfNotProfile: "Este QR no es un perfil de TSM.",
+    pfNothing: "Solo el nombre: no hay nada más que enviar.",
+    pfOfficeFailed: "No ha llegado: revisa la conexión o envía el archivo.",
+    pfOfficeSent: "Perfil entregado a la secretaría.",
+    pfPadelHint: "La elección tenis o pádel en el nuevo partido",
+    pfPhoto: "Foto",
+    pfPlay: "Mano, revés y club",
+    pfProgress: "Progresos y rating",
+    pfProgressHint: "Tu evolución partido a partido; el historial se queda igualmente",
+    pfQrTitle: (it) => `Perfil de ${it}`,
+    pfRackets: "Raquetas",
+    pfRacketsHint: "Tus raquetas, los cordajes y la raqueta virtual",
+    pfReceive: "Recibir un perfil (QR)",
+    pfReceiveFile: "Recibir un perfil (archivo)",
+    pfScanPrompt: "Encuadra el QR del perfil",
+    pfSend: "Pasar el perfil",
+    pfSendHint: "A un nuevo club o entrenador: elige los datos que enviar. Notas, diario, evaluaciones y pagos se quedan aquí.",
+    pfShareText: (it) => `El perfil de ${it} para Tennis Score Manager: ábrelo con TSM (Compartir › TSM).`,
+    pfTitle: "Lo que usas",
+    pfToOffice: (it) => `Enviar a la secretaría de ${it}`,
+    pfTraining: "Entrenamiento de golpes y alumnos",
+    pfTrainingHint: "Saque, derecha, revés y volea con la pulsera; los alumnos para quien entrena",
+    pfVideo: "Vídeo y cámara",
+    pfVideoHint: "El teléfono que graba el partido, los mejores momentos y la moviola",
     pkAddGroup: "Añadir un grupo…",
     pkAll: "Todos",
     pkAllShown: "Elegir los mostrados",
@@ -5310,6 +5590,62 @@ const APP_I18N = {
     pbWaitText: "Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro.",
     pbWaiting: "Em espera",
     pbYesterday: "Ontem",
+    pfAdd: "Juntar",
+    pfAddAsNew: "Juntar como novo",
+    pfAdded: (it) => `${it} juntado aos jogadores`,
+    pfAlways: "Nome, apelido e alcunha vão sempre.",
+    pfAsFile: "Enviar o ficheiro",
+    pfAsFileHint: "WhatsApp, email, Telegram…: abre-se com Partilhar › TSM. Com a foto.",
+    pfAsMember: "Inscrever como sócio",
+    pfAsQr: "Mostrar o QR",
+    pfAsQrHint: "Telefone com telefone, sem foto: o outro lê-o com Receber um perfil.",
+    pfAsStudent: "Entre os meus alunos",
+    pfAsk: "Usas só uma parte da app? Escolhe o que usas: o resto desaparece dos menus.",
+    pfBands: "Pulseiras e comandos",
+    pfBandsHint: "Os jogadores marcam pelo pulso ou por um comando; desligado, marca-se só como árbitro",
+    pfBirth: "Data de nascimento e sexo",
+    pfBody: "Altura e peso",
+    pfChoose: "Escolher o que usas",
+    pfComplete: "Completar",
+    pfCompleted: (it) => `Ficha de ${it} completada`,
+    pfContacts: "Telefone e email",
+    pfEntryHint: "Fica só com o que precisas: o resto não aparece",
+    pfExisting: (it) => `${it} já existe: completam-se os dados em falta, nada se apaga.`,
+    pfFilePrefix: "Perfil",
+    pfFitp: "Licença e classificação",
+    pfFrom: (it) => `De: ${it}`,
+    pfGuardian: "Pai, mãe ou tutor",
+    pfHeart: "Cintas cardíacas",
+    pfHeartHint: "Batimento no jogo e treino com a cinta",
+    pfHint: "O que desligas não aparece nos menus nem nos ecrãs. Podes mudar quando quiseres, os dados ficam.",
+    pfIncomingTitle: "Perfil recebido",
+    pfMedical: "Atestado médico",
+    pfMedicalHint: "É um dado de saúde: envia-o só se a pessoa concordar.",
+    pfNew: "Jogador novo",
+    pfNotProfile: "Este QR não é um perfil TSM.",
+    pfNothing: "Só o nome: não há mais nada a enviar.",
+    pfOfficeFailed: "Não chegou: verifica a ligação ou envia o ficheiro.",
+    pfOfficeSent: "Perfil entregue à secretaria.",
+    pfPadelHint: "A escolha ténis ou padel no novo jogo",
+    pfPhoto: "Foto",
+    pfPlay: "Mão, esquerda e clube",
+    pfProgress: "Progressos e rating",
+    pfProgressHint: "A tua evolução jogo a jogo; o histórico fica na mesma",
+    pfQrTitle: (it) => `Perfil de ${it}`,
+    pfRackets: "Raquetes",
+    pfRacketsHint: "As tuas raquetes, as cordas e a raquete virtual",
+    pfReceive: "Receber um perfil (QR)",
+    pfReceiveFile: "Receber um perfil (ficheiro)",
+    pfScanPrompt: "Enquadra o QR do perfil",
+    pfSend: "Passar o perfil",
+    pfSendHint: "Para um novo clube ou treinador: escolhe os dados a enviar. Notas, diário, avaliações e pagamentos ficam aqui.",
+    pfShareText: (it) => `O perfil de ${it} para o Tennis Score Manager: abre-o com o TSM (Partilhar › TSM).`,
+    pfTitle: "O que usas",
+    pfToOffice: (it) => `Enviar à secretaria de ${it}`,
+    pfTraining: "Treino de pancadas e alunos",
+    pfTrainingHint: "Serviço, direita, esquerda e vólei com a pulseira; os alunos para quem treina",
+    pfVideo: "Vídeo e câmara",
+    pfVideoHint: "O telemóvel que filma o jogo, os melhores momentos e a repetição",
     pkAddGroup: "Adicionar um grupo…",
     pkAll: "Todos",
     pkAllShown: "Escolher os mostrados",
@@ -5969,14 +6305,36 @@ function uploadFile() {
     let x;
     try { x = await api('POST', '/files/check', { text }); } catch (e) { toast(errText(e)); return; }
     const course = x.kind === 'PROPOSAL' ? select([['', T.ccNoCourse]].concat(x.courses.map((c) => [c.id, c.name])), x.course || '') : null;
-    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null),
+    // Un profilo: si aggiunge (o completa chi c'è già) e, a scelta, diventa socio.
+    const asMember = x.kind === 'PROFILE' ? h('input', { type: 'checkbox', checked: true }) : null;
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null,
+      asMember ? h('label.check', asMember, T.pfAsMember) : null),
       x.canApply ? async () => {
-        await api('POST', '/files/apply', { text, course: course ? course.value || null : null });
+        await api('POST', '/files/apply', { text, course: course ? course.value || null : null, asMember: asMember ? asMember.checked : true });
         toast(T.saved);
         await render();
-      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : T.mrApply) });
+      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : x.kind === 'PROFILE' ? T.pfAdd : T.mrApply) });
   });
   input.click();
+}
+
+const PROFILE_FIELDS = { PHOTO: () => T.pfPhoto, CONTACTS: () => T.pfContacts, BIRTH: () => T.pfBirth, PLAY: () => T.pfPlay, BODY: () => T.pfBody, GUARDIAN: () => T.pfGuardian, FITP: () => T.pfFitp, MEDICAL: () => T.pfMedical };
+
+/**
+ * Passa il profilo: si scelgono i dati (il certificato medico solo a mano) e si scarica il file .tsm, da mandare al
+ * nuovo circolo o allenatore (che lo apre con TSM). [base]: '/people/' o '/coach/students/'.
+ */
+async function profileExport(base, id, name) {
+  let f;
+  try { f = await api('GET', base + encodeURIComponent(id) + '/profile'); } catch (e) { toast(errText(e)); return; }
+  const boxes = f.available.map((k) => [k, h('input', { type: 'checkbox', checked: f.defaults.includes(k) })]);
+  dialog(T.pfSend + ' · ' + name, h('div',
+    h('p.dim', T.pfSendHint), h('p.dim', T.pfAlways),
+    boxes.length ? h('div.checks', boxes.map(([k, x]) => h('label.check', { title: k === 'MEDICAL' ? T.pfMedicalHint : '' }, x, PROFILE_FIELDS[k]()))) : h('p.dim', T.pfNothing),
+    h('p.dim', T.pfAsFileHint)), async () => {
+    const fields = boxes.filter(([, x]) => x.checked).map(([k]) => k).join(',');
+    await deskDownload(base + encodeURIComponent(id) + '/profile.tsm?fields=' + encodeURIComponent(fields), T.pfFilePrefix + ' ' + name + '.tsm');
+  }, { saveText: T.pfAsFile });
 }
 
 /** Apre un PDF del telefono in una scheda nuova (o lo scarica, se il browser blocca la scheda). */
@@ -6063,15 +6421,15 @@ function editPerson(p) {
     field(T.note, f.note, 'full'));
   // Col server delle prenotazioni: l'invito per prenotare online e, per chi prenota già, il modo di togliere l'accesso.
   const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
-  const online = server ? [
-    h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+  const online = [p ? h('button.left', { type: 'button', onclick: () => profileExport('/people/', p.id, p.name) }, T.pfSend) : null].concat(server ? [
+    h('button', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
     p.pin ? h('button', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id) + '/pin'); toast(T.srvPinResetDone); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvPinReset) : null,
     p.online ? h('button.danger', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvRevoke) : null,
-  ] : null;
+  ] : []);
   dialog(p ? p.name : T.newMember, body, async () => {
     const out = { firstName: f.firstName.value, lastName: f.lastName.value, nickname: f.nickname.value, phone: f.phone.value, email: f.email.value, birth: f.birth.value || null, note: f.note.value,
       member: member.checked, since: f.since.value || null, number: f.number.value, fitpNumber: f.fitpNumber.value, fitpCard: card.value || null, fitpYear: f.fitpYear.value ? Number(f.fitpYear.value) : null,
@@ -7862,7 +8220,26 @@ async function showStudents() {
         h('td', s.guardian ? T.coGuardian + ': ' + s.guardian : s.phone))))) : h('div.empty', T.coNever));
   };
   q.addEventListener('input', draw);
-  put(main(), h('div.head', h('h1', T.studentsTitle), h('button.primary', { onclick: () => studentForm(null) }, T.studentNew), printBtn()), h('div.panel', q, body));
+  put(main(), h('div.head', h('h1', T.studentsTitle), h('button.primary', { onclick: () => studentForm(null) }, T.studentNew), h('button', { onclick: receiveProfile }, T.pfReceiveFile), printBtn()), h('div.panel', q, body));
+}
+
+/** Un allievo nuovo che porta il suo profilo (file .tsm): anteprima, poi entra tra gli allievi (o completa chi c'è già). */
+function receiveProfile() {
+  const input = h('input', { type: 'file', accept: '.tsm,.json,application/json,application/octet-stream' });
+  input.addEventListener('change', async () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    if (f.size > 1024 * 1024) { toast(T.err.NOT_A_FILE); return; }
+    const text = await f.text();
+    let x;
+    try { x = await api('POST', '/coach/profile/check', { text }); } catch (e) { toast(errText(e)); return; }
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p.dim', x.status)), async () => {
+      const out = await api('POST', '/coach/profile/apply', { text });
+      toast(T.saved);
+      showStudent(out.id);
+    }, { saveText: T.pfAdd });
+  });
+  input.click();
   draw();
 }
 
@@ -7878,6 +8255,7 @@ async function showStudent(id) {
   put(main(),
     h('div.head', back, h('h1', s.name),
       h('button', { onclick: () => studentForm(d) }, T.edit),
+      h('button', { onclick: () => profileExport('/coach/students/', id, s.name) }, T.pfSend),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf?days=30', T.reportTitle + ' ' + s.name) }, T.ccDeskReport30),
       h('button', { onclick: () => openPdf('/coach/students/' + encodeURIComponent(id) + '/report.pdf', T.reportTitle + ' ' + s.name) }, T.ccDeskReportAll),
       printBtn()),
@@ -10819,7 +11197,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - Rangliste, Ausweise und Attest stehen nicht hier, sondern in den *Mitgliedsdaten*, weil sie für Turniere und Beiträge gebraucht werden.
 - **Neues Match**: auf den Platz kommen Spieler aus der Datenbank. Jeder Platz hat **Spieler wählen**, das die Liste mit Suche öffnet (zuerst Mitglieder und Schüler; wer schon auf dem Platz ist, fehlt) und oben **Neuer Spieler**, das Vorname, Nachname und den Rest abfragt und ihn dann aufstellt; darunter die letzten Spieler zum Antippen. Gewählt zeigt der Platz Foto und Namen mit **Ändern** und dem **X**; die Rangliste eines Mitglieds trägt sich selbst ein. Ein alter Name ohne Karte (Revanchen, alte Matches) muss vor *Weiter* aus der Liste gewählt oder angelegt werden.
 - **Beim ersten Start** legt die App für jeden Namen der bisherigen Matches einen Spieler an.
-- **Profil weitergeben** (in der Karte jedes Spielers, auch deiner): wenn ein Spieler oder Schüler Verein oder Trainer wechselt, nimmt er seine wichtigsten Daten mit. Wähle, was gesendet wird: Foto, Telefon und E-Mail, Geburtsdatum, Hand und Rückhand, Größe und Gewicht, Elternteil, Spielerpass und Ranking; das ärztliche Attest nur, wenn du es einschaltest. Vorname, Nachname und Spitzname gehen immer mit; Notizen, Tagebuch, Bewertungen, Zahlungen und Einwilligungen bleiben hier. **Datei senden** (mit Foto) schickt sie per WhatsApp, E-Mail, Telegram…: der Empfänger öffnet sie mit **Teilen › TSM**. **QR-Code zeigen** (ohne Foto) ist für Telefon an Telefon: das andere tippt **Profil empfangen (QR)** in *Spieler*, *Schüler* oder *Mitglieder*. Beim Eintreffen siehst du, wer es ist und was es mitbringt; gibt es schon einen Spieler mit gleichem Vor- und Nachnamen (oder gleichem Telefon oder E-Mail), wird nur Fehlendes ergänzt, nichts gelöscht. Der Trainer nimmt ihn zu seinen Schülern (mit Ranking), das Büro nimmt ihn als Mitglied auf.
+- **Profil weitergeben** (in der Karte jedes Spielers, auch deiner): wenn ein Spieler oder Schüler Verein oder Trainer wechselt, nimmt er seine wichtigsten Daten mit. Wähle, was gesendet wird: Foto, Telefon und E-Mail, Geburtsdatum, Hand und Rückhand, Größe und Gewicht, Elternteil, Spielerpass und Ranking; das ärztliche Attest nur, wenn du es einschaltest. Vorname, Nachname und Spitzname gehen immer mit; Notizen, Tagebuch, Bewertungen, Zahlungen und Einwilligungen bleiben hier. **Datei senden** (mit Foto) schickt sie per WhatsApp, E-Mail, Telegram…: der Empfänger öffnet sie mit **Teilen › TSM**. **QR-Code zeigen** (ohne Foto) ist für Telefon an Telefon: das andere tippt **Profil empfangen (QR)** in *Spieler*, *Schüler* oder *Mitglieder*. Beim Eintreffen siehst du, wer es ist und was es mitbringt; gibt es schon einen Spieler mit gleichem Vor- und Nachnamen (oder gleichem Telefon oder E-Mail), wird nur Fehlendes ergänzt, nichts gelöscht. Der Trainer nimmt ihn zu seinen Schülern (mit Ranking), das Büro nimmt ihn als Mitglied auf. Bist du schon auf dem Server des neuen Vereins angemeldet, gibt es auch **An das Büro von … senden**: Das Profil (mit Foto) landet in dessen Postfach, ohne WhatsApp. Am PC: Im Büro am PC hat die Mitgliederkarte **Profil weitergeben** (lädt die .tsm-Datei mit den gewählten Daten herunter), und **Datei hochladen** erkennt eingehende Profile (Vorschau, dann **Hinzufügen**, mit *Als Mitglied aufnehmen*); im Trainer am PC hat die Schülerkarte **Profil weitergeben** und die Schülerliste **Profil empfangen (Datei)**.
 - **Mehr › Spieler**: alle, mit Suche; **Neuer Spieler** legt einen mit seinen Daten an (auch einen Schüler: dann in der Karte *Schüler* einschalten); *gleicher Name* in Orange, wo zwei Spieler denselben Namen haben. Die Karte ist die der Schüler (7.6), dazu:
   - **Schüler**: nimmt ihn unter die Schüler auf (oder wieder heraus).
   - **Mit einem anderen Spieler zusammenführen**: dieselbe Person auf zwei Arten geschrieben („Rossi“ und „Mario Rossi“) oder zweimal angelegt; Matches und Einheiten gehen auf ihn über.
@@ -11426,7 +11804,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - Ranking, cards and certificate aren't here: they're in the *Member details*, because they're used for tournaments and fees.
 - **New match**: the players on court come from the database. Each place has **Pick the player**, which opens the list with search (members and students first; whoever is already on court isn't there) and at the top **New player**, which asks for first name, last name and the rest and then puts them on court; below, recent players to tap. Once picked, the place shows photo and name with **Change** and the **X**; a member's ranking fills itself in. An old name without a card (rematches, old matches) must be picked from the list or created before *Next*.
 - **At the first start** the app creates a player for every name in the matches already played.
-- **Pass on the profile** (on every player's card, yours too): when a player or student changes club or coach, you take their main data along. Choose what to send: photo, phone and email, date of birth, hand and backhand, height and weight, parent, FITP card and ranking; the medical certificate only if you switch it on. First name, last name and nickname always go; notes, diary, evaluations, payments and consents stay here. **Send the file** (with the photo) sends it by WhatsApp, email, Telegram…: the receiver opens it with **Share › TSM**. **Show the QR code** (no photo) is for phone to phone: the other taps **Receive a profile (QR)** in *Players*, *Students* or *Members*. On arrival you see who it is and what it brings; if a player with the same first and last name (or the same phone or email) is already there, only what's missing is filled in and nothing is deleted. A coach adds them to their students (with the ranking), the club office enrols them as a member.
+- **Pass on the profile** (on every player's card, yours too): when a player or student changes club or coach, you take their main data along. Choose what to send: photo, phone and email, date of birth, hand and backhand, height and weight, parent, FITP card and ranking; the medical certificate only if you switch it on. First name, last name and nickname always go; notes, diary, evaluations, payments and consents stay here. **Send the file** (with the photo) sends it by WhatsApp, email, Telegram…: the receiver opens it with **Share › TSM**. **Show the QR code** (no photo) is for phone to phone: the other taps **Receive a profile (QR)** in *Players*, *Students* or *Members*. On arrival you see who it is and what it brings; if a player with the same first and last name (or the same phone or email) is already there, only what's missing is filled in and nothing is deleted. A coach adds them to their students (with the ranking), the club office enrols them as a member. If you're already registered on the new club's server there's also **Send to the … office**: the profile (with the photo) goes into its mailbox, without WhatsApp. From the PC: in the Club office from PC the member card has **Pass on the profile** (downloads the .tsm file with the chosen data) and **Upload a file** recognises incoming profiles (preview, then **Add**, with *Enrol as member*); in Coach from PC the student card has **Pass on the profile** and the student list **Receive a profile (file)**.
 - **More › Players**: everyone, with search; **New player** creates one with their details (a student too: then switch on *Student* on the card); *same name* in orange where two players share a name. The card is the students' one (7.6) plus:
   - **Student**: puts them among the students (or takes them off).
   - **Merge with another player**: the same person written two ways ("Rossi" and "Mario Rossi") or created twice; matches and sessions move to them.
@@ -12032,7 +12410,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - Clasificación, licencias y certificado no están aquí: están en los *Datos del socio*, porque sirven para torneos y cuotas.
 - **Nuevo partido**: en la pista van jugadores de la base de datos. Cada puesto tiene **Elegir el jugador**, que abre la lista con búsqueda (primero socios y alumnos; quien ya está en pista no aparece) y arriba **Jugador nuevo**, que pide nombre, apellido y lo demás y luego lo pone en pista; debajo, los jugadores recientes para tocar. Elegido, el puesto muestra foto y nombre con **Cambiar** y la **X**; la clasificación de un socio se rellena sola. Un nombre antiguo sin ficha (revanchas, partidos viejos) hay que elegirlo de la lista o crearlo antes de *Siguiente*.
 - **En el primer arranque** la app crea un jugador por cada nombre de los partidos ya jugados.
-- **Pasar el perfil** (en la ficha de cada jugador, también la tuya): cuando un jugador o alumno cambia de club o de entrenador, se lleva sus datos principales. Elige qué enviar: foto, teléfono y email, fecha de nacimiento, mano y revés, altura y peso, padre o madre, licencia y clasificación; el certificado médico solo si lo activas. Nombre, apellidos y apodo van siempre; notas, diario, evaluaciones, pagos y consentimientos se quedan aquí. **Enviar el archivo** (con la foto) lo manda por WhatsApp, email, Telegram…: quien lo recibe lo abre con **Compartir › TSM**. **Mostrar el QR** (sin foto) es de teléfono a teléfono: el otro toca **Recibir un perfil (QR)** en *Jugadores*, *Alumnos* o *Socios*. Al llegar se ve quién es y qué trae; si ya hay un jugador con el mismo nombre y apellidos (o el mismo teléfono o email) solo se completa lo que falta, sin borrar nada. El entrenador lo añade a sus alumnos (con la clasificación), la secretaría lo inscribe como socio.
+- **Pasar el perfil** (en la ficha de cada jugador, también la tuya): cuando un jugador o alumno cambia de club o de entrenador, se lleva sus datos principales. Elige qué enviar: foto, teléfono y email, fecha de nacimiento, mano y revés, altura y peso, padre o madre, licencia y clasificación; el certificado médico solo si lo activas. Nombre, apellidos y apodo van siempre; notas, diario, evaluaciones, pagos y consentimientos se quedan aquí. **Enviar el archivo** (con la foto) lo manda por WhatsApp, email, Telegram…: quien lo recibe lo abre con **Compartir › TSM**. **Mostrar el QR** (sin foto) es de teléfono a teléfono: el otro toca **Recibir un perfil (QR)** en *Jugadores*, *Alumnos* o *Socios*. Al llegar se ve quién es y qué trae; si ya hay un jugador con el mismo nombre y apellidos (o el mismo teléfono o email) solo se completa lo que falta, sin borrar nada. El entrenador lo añade a sus alumnos (con la clasificación), la secretaría lo inscribe como socio. Si ya estás inscrito en el servidor del nuevo club, también está **Enviar a la secretaría de …**: el perfil (con la foto) llega a su buzón, sin WhatsApp. Desde el PC: en la Secretaría en el PC la ficha del socio tiene **Pasar el perfil** (descarga el archivo .tsm con los datos elegidos) y **Subir un archivo** reconoce los perfiles recibidos (vista previa, luego **Añadir**, con *Inscribir como socio*); en el Entrenador desde el PC la ficha del alumno tiene **Pasar el perfil** y la lista de alumnos **Recibir un perfil (archivo)**.
 - **Más › Jugadores**: todos, con búsqueda; **Nuevo jugador** crea uno con sus datos (también un alumno: luego activa *Alumno* en la ficha); *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:
   - **Alumno**: lo pone (o lo quita) entre los alumnos.
   - **Unir con otro jugador**: la misma persona escrita de dos formas («Rossi» y «Mario Rossi») o creada dos veces; partidos y sesiones pasan a él.
@@ -12638,7 +13016,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - Classement, licences et certificat ne sont pas ici : ils sont dans les *Données de l'adhérent*, car ils servent aux tournois et aux cotisations.
 - **Nouveau match** : sur le terrain vont les joueurs de la base. Chaque place a **Choisir le joueur**, qui ouvre la liste avec la recherche (d'abord adhérents et élèves ; ceux déjà sur le terrain n'y sont pas) et en haut **Nouveau joueur**, qui demande prénom, nom et le reste puis le met sur le terrain ; dessous, les joueurs récents à toucher. Une fois choisi, la place montre photo et nom avec **Changer** et la **X** ; le classement d'un adhérent se remplit tout seul. Un ancien nom sans fiche (revanches, vieux matchs) doit être choisi dans la liste ou créé avant *Suivant*.
 - **Au premier démarrage** l'appli crée un joueur pour chaque nom des matchs déjà joués.
-- **Transmettre le profil** (sur la fiche de chaque joueur, la tienne aussi) : quand un joueur ou un élève change de club ou d'entraîneur, ses données principales le suivent. Choisis quoi envoyer : photo, téléphone et e-mail, date de naissance, main et revers, taille et poids, parent, licence et classement ; le certificat médical seulement si tu l'actives. Prénom, nom et surnom partent toujours ; notes, journal, évaluations, paiements et consentements restent ici. **Envoyer le fichier** (avec la photo) l'envoie par WhatsApp, e-mail, Telegram… : le destinataire l'ouvre avec **Partager › TSM**. **Afficher le QR code** (sans photo) sert de téléphone à téléphone : l'autre touche **Recevoir un profil (QR)** dans *Joueurs*, *Élèves* ou *Membres*. À l'arrivée on voit qui c'est et ce qu'il apporte ; si un joueur avec les mêmes prénom et nom (ou le même téléphone ou e-mail) existe déjà, on complète seulement ce qui manque, sans rien effacer. L'entraîneur l'ajoute à ses élèves (avec le classement), le secrétariat l'inscrit comme membre.
+- **Transmettre le profil** (sur la fiche de chaque joueur, la tienne aussi) : quand un joueur ou un élève change de club ou d'entraîneur, ses données principales le suivent. Choisis quoi envoyer : photo, téléphone et e-mail, date de naissance, main et revers, taille et poids, parent, licence et classement ; le certificat médical seulement si tu l'actives. Prénom, nom et surnom partent toujours ; notes, journal, évaluations, paiements et consentements restent ici. **Envoyer le fichier** (avec la photo) l'envoie par WhatsApp, e-mail, Telegram… : le destinataire l'ouvre avec **Partager › TSM**. **Afficher le QR code** (sans photo) sert de téléphone à téléphone : l'autre touche **Recevoir un profil (QR)** dans *Joueurs*, *Élèves* ou *Membres*. À l'arrivée on voit qui c'est et ce qu'il apporte ; si un joueur avec les mêmes prénom et nom (ou le même téléphone ou e-mail) existe déjà, on complète seulement ce qui manque, sans rien effacer. L'entraîneur l'ajoute à ses élèves (avec le classement), le secrétariat l'inscrit comme membre. Si tu es déjà inscrit sur le serveur du nouveau club, il y a aussi **Envoyer au secrétariat de …** : le profil (avec la photo) arrive dans sa boîte, sans WhatsApp. Depuis le PC : dans le Secrétariat depuis le PC la fiche du membre a **Transmettre le profil** (télécharge le fichier .tsm avec les données choisies) et **Charger un fichier** reconnaît les profils reçus (aperçu, puis **Ajouter**, avec *Inscrire comme membre*) ; dans l'Entraîneur depuis le PC la fiche de l'élève a **Transmettre le profil** et la liste des élèves **Recevoir un profil (fichier)**.
 - **Plus › Joueurs** : tous, avec la recherche ; **Nouveau joueur** en crée un avec ses données (un élève aussi : activez ensuite *Élève* dans la fiche) ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :
   - **Élève** : le met (ou le retire) parmi les élèves.
   - **Fusionner avec un autre joueur** : la même personne écrite de deux façons (« Rossi » et « Mario Rossi ») ou créée deux fois ; matchs et séances passent à lui.
@@ -13244,7 +13622,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - Classifica, tessere e certificato non sono qui: sono nei *Dati del socio*, perché servono ai tornei e alle quote.
 - **Nuova partita**: in campo vanno i giocatori del database. Ogni posto ha **Scegli il giocatore**, che apre l'elenco con la ricerca (prima soci e allievi; chi è già in campo non c'è) e in cima **Giocatore nuovo**, che chiede nome, cognome e il resto e poi lo mette in campo; sotto, i giocatori recenti da toccare al volo. Scelto, il posto mostra foto e nome con **Cambia** e la **X**; la classifica di un socio si scrive da sola. Un nome di prima senza scheda (rivincite, partite vecchie) va scelto dall'elenco o creato prima di *Avanti*.
 - **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
-- **Passa il profilo** (nella scheda di ogni giocatore, anche la tua): quando un giocatore o un allievo cambia circolo o allenatore, gli porti i suoi dati principali. Scegli cosa mandare: foto, telefono ed email, data di nascita, mano e rovescio, altezza e peso, genitore, tessera FITP e classifica; il certificato medico solo se lo accendi tu. Nome, cognome e soprannome vanno sempre; note, diario, valutazioni, pagamenti e consensi restano qui. **Manda il file** (con la foto) lo spedisce su WhatsApp, email, Telegram…: chi lo riceve lo apre con **Condividi › TSM**. **Mostra il QR** (senza foto) è per telefono contro telefono: l'altro tocca **Ricevi un profilo (QR)** in *Giocatori*, *Allievi* o *Soci*. All'arrivo si vede chi è e cosa porta; se c'è già un giocatore con lo stesso nome e cognome (o lo stesso telefono o email) si completa solo quello che manca, senza cancellare niente. L'allenatore lo mette tra i suoi allievi (con la classifica), la segreteria lo iscrive come socio.
+- **Passa il profilo** (nella scheda di ogni giocatore, anche la tua): quando un giocatore o un allievo cambia circolo o allenatore, gli porti i suoi dati principali. Scegli cosa mandare: foto, telefono ed email, data di nascita, mano e rovescio, altezza e peso, genitore, tessera FITP e classifica; il certificato medico solo se lo accendi tu. Nome, cognome e soprannome vanno sempre; note, diario, valutazioni, pagamenti e consensi restano qui. **Manda il file** (con la foto) lo spedisce su WhatsApp, email, Telegram…: chi lo riceve lo apre con **Condividi › TSM**. **Mostra il QR** (senza foto) è per telefono contro telefono: l'altro tocca **Ricevi un profilo (QR)** in *Giocatori*, *Allievi* o *Soci*. All'arrivo si vede chi è e cosa porta; se c'è già un giocatore con lo stesso nome e cognome (o lo stesso telefono o email) si completa solo quello che manca, senza cancellare niente. L'allenatore lo mette tra i suoi allievi (con la classifica), la segreteria lo iscrive come socio. Se sei già iscritto al server del nuovo circolo c'è anche **Manda alla segreteria di …**: il profilo (con la foto) arriva nella sua casella, senza WhatsApp. Dal PC: nella Segreteria da PC la scheda del socio ha **Passa il profilo** (scarica il file .tsm coi dati scelti) e **Carica un file** riconosce i profili arrivati (anteprima, poi **Aggiungi**, con *Iscrivi come socio*); nell'Allenatore da PC la scheda dell'allievo ha **Passa il profilo** e l'elenco degli allievi **Ricevi un profilo (file)**.
 - **Altro › Giocatori**: tutti, con la ricerca; **Nuovo giocatore** ne crea uno coi suoi dati (anche un allievo: poi nella scheda si accende *Allievo*); *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
   - **Allievo**: lo mette (o lo toglie) tra gli allievi.
   - **Unisci con un altro giocatore**: la stessa persona scritta in due modi ("Rossi" e "Mario Rossi") o creata due volte; partite e sessioni passano a lui.
@@ -13850,7 +14228,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - Ranking, cartões e atestado não ficam aqui: ficam nos *Dados do sócio*, porque servem para torneios e mensalidades.
 - **Nova partida**: em quadra vão jogadores do banco de dados. Cada posição tem **Escolher o jogador**, que abre a lista com pesquisa (primeiro sócios e alunos; quem já está em quadra não aparece) e no alto **Jogador novo**, que pede nome, sobrenome e o resto e depois o coloca em quadra; embaixo, os jogadores recentes para tocar. Escolhido, a posição mostra foto e nome com **Trocar** e o **X**; o ranking de um sócio se preenche sozinho. Um nome antigo sem ficha (revanches, partidas velhas) precisa ser escolhido na lista ou criado antes de *Avançar*.
 - **Na primeira abertura** o app cria um jogador para cada nome das partidas já jogadas.
-- **Passar o perfil** (na ficha de cada jogador, também a tua): quando um jogador ou aluno muda de clube ou de treinador, leva os seus dados principais. Escolhe o que enviar: foto, telefone e email, data de nascimento, mão e esquerda, altura e peso, pai ou mãe, licença e classificação; o atestado médico só se o ligares. Nome, apelido e alcunha vão sempre; notas, diário, avaliações, pagamentos e consentimentos ficam aqui. **Enviar o ficheiro** (com a foto) envia-o por WhatsApp, email, Telegram…: quem o recebe abre-o com **Partilhar › TSM**. **Mostrar o QR** (sem foto) é de telefone para telefone: o outro toca em **Receber um perfil (QR)** em *Jogadores*, *Alunos* ou *Sócios*. À chegada vê-se quem é e o que traz; se já houver um jogador com o mesmo nome e apelido (ou o mesmo telefone ou email) só se completa o que falta, sem apagar nada. O treinador junta-o aos seus alunos (com a classificação), a secretaria inscreve-o como sócio.
+- **Passar o perfil** (na ficha de cada jogador, também a tua): quando um jogador ou aluno muda de clube ou de treinador, leva os seus dados principais. Escolhe o que enviar: foto, telefone e email, data de nascimento, mão e esquerda, altura e peso, pai ou mãe, licença e classificação; o atestado médico só se o ligares. Nome, apelido e alcunha vão sempre; notas, diário, avaliações, pagamentos e consentimentos ficam aqui. **Enviar o ficheiro** (com a foto) envia-o por WhatsApp, email, Telegram…: quem o recebe abre-o com **Partilhar › TSM**. **Mostrar o QR** (sem foto) é de telefone para telefone: o outro toca em **Receber um perfil (QR)** em *Jogadores*, *Alunos* ou *Sócios*. À chegada vê-se quem é e o que traz; se já houver um jogador com o mesmo nome e apelido (ou o mesmo telefone ou email) só se completa o que falta, sem apagar nada. O treinador junta-o aos seus alunos (com a classificação), a secretaria inscreve-o como sócio. Se já estás inscrito no servidor do novo clube, há também **Enviar à secretaria de …**: o perfil (com a foto) chega à caixa dela, sem WhatsApp. No PC: na Secretaria no PC a ficha do sócio tem **Passar o perfil** (descarrega o ficheiro .tsm com os dados escolhidos) e **Carregar um arquivo** reconhece os perfis recebidos (pré-visualização, depois **Juntar**, com *Inscrever como sócio*); no Treinador no PC a ficha do aluno tem **Passar o perfil** e a lista de alunos **Receber um perfil (ficheiro)**.
 - **Mais › Jogadores**: todos, com pesquisa; **Novo jogador** cria um com os dados dele (também um aluno: depois ative *Aluno* na ficha); *homônimo* em laranja onde dois jogadores têm o mesmo nome. A ficha é a dos alunos (7.6) com mais:
   - **Aluno**: coloca (ou tira) entre os alunos.
   - **Juntar com outro jogador**: a mesma pessoa escrita de dois jeitos ("Rossi" e "Mario Rossi") ou criada duas vezes; partidas e sessões passam para ele.
@@ -16943,6 +17321,33 @@ class MatchController(
         val f = runCatching { File(dir, com.tennis.scoremanager.data.ProfileCards.fileName(strings.pfFilePrefix, p.name)).apply { writeText(com.tennis.scoremanager.data.ProfileCards.encode(card)) } }.getOrNull() ?: return null
         return f to strings.pfShareText(p.name)
     }
+
+    /** Il profilo di [p] (con la foto, se scelta) nella casella della segreteria sul server [url]; avvisa com'è andata. */
+    fun profileToOffice(url: String, p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>) {
+        val text = profileText(p, fields)
+        scope.launch { _toasts.tryEmit(if (postToOffice(url, "profile", text)) strings.pfOfficeSent else strings.pfOfficeFailed) }
+    }
+
+    /** Il file del profilo di [p] coi dati [fields] (null = quelli proposti), con la foto se scelta. */
+    fun profileText(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>? = null): String =
+        com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(p, fields ?: com.tennis.scoremanager.data.ProfileCards.defaults(p, photoBytes(p.name) != null), photoBytes(p.name), profileSender(), System.currentTimeMillis()))
+
+    /** Il profilo arrivato al PC, come lo si mostra prima di aggiungerlo: chi è, cosa porta, se c'è già. */
+    fun profilePreview(card: com.tennis.scoremanager.data.ProfileCard): com.tennis.scoremanager.desk.DeskIncoming {
+        val s = strings; val lang = options.value.lang; val sp = card.profile
+        val match = com.tennis.scoremanager.data.ProfileCards.find(players.value, sp)
+        val lines = listOfNotNull(sp.name, card.from.ifBlank { null }?.let { s.pfFrom(it) },
+            listOf(sp.phone, sp.email).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
+            sp.birth?.let { "${s.memberBirth}: ${com.tennis.scoremanager.data.Reports.date(it, lang)}" }, sp.club.ifBlank { null },
+            listOf(sp.guardian, sp.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.coGuardian}: $it" },
+            listOf(sp.fitpNumber, sp.ranking).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.pfFitp}: $it" },
+            if (card.photo != null) s.pfPhoto else null)
+        return com.tennis.scoremanager.desk.DeskIncoming("PROFILE", s.pfIncomingTitle, lines, match?.let { s.pfExisting(it.name) } ?: s.pfNew, true)
+    }
+
+    /** Dal PC: il profilo entra tra i giocatori (completa quello che c'è già); l'id del giocatore. */
+    fun applyProfileFromDesk(card: com.tennis.scoremanager.data.ProfileCard, asMember: Boolean, asStudent: Boolean): String =
+        applyProfile(card, com.tennis.scoremanager.data.ProfileCards.find(players.value, card.profile)?.id, asMember, asStudent).id
 
     /** Il profilo di [p] per il QR (senza foto). */
     fun profileQr(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): String =
@@ -27457,8 +27862,11 @@ enum class ProfileField { PHOTO, CONTACTS, BIRTH, PLAY, BODY, GUARDIAN, FITP, ME
 object ProfileCards {
     const val TYPE = "tsm-profile"
 
-    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; prettyPrint = true }
-    private val compact = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+    // Il tipo e la versione si scrivono sempre (si riconosce il file); i dati vuoti no, così il QR resta piccolo.
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false; prettyPrint = true }
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    private val compact = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
     fun encode(c: ProfileCard): String = json.encodeToString(ProfileCard.serializer(), c)
     /** Per il QR: senza foto e senza spazi. */
@@ -32124,6 +32532,11 @@ interface CoachData {
     fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
+    /** Il profilo dell'allievo da passare (vedi [DeskData.profileFields]) e quello caricato dal PC. */
+    fun profileFields(id: String): DeskProfileFields? = null
+    fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = null
+    fun profilePreview(text: String): DeskIncoming? = null
+    fun applyProfile(text: String): String? = null
     /** Il Paese per le festività nazionali (quello del telefono). */
     fun country(): String = com.tennis.scoremanager.data.Holidays.country()
     fun receiptPdf(packId: String): ByteArray?
@@ -32232,6 +32645,17 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p == listOf("coach", "groups") -> ok(ListSerializer(CdGroup.serializer()), data.book().groups.sortedBy { it.name.lowercase() }.map { CdGroup(it.id, it.name, it.students) })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
         m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "profile" -> {
+            if (data.players().none { it.id == p[2] && it.student }) throw DeskApi.Fail(404, "NOT_FOUND")
+            ok(DeskProfileFields.serializer(), data.profileFields(p[2]) ?: throw DeskApi.Fail(404, "NOT_FOUND"))
+        }
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "profile.tsm" -> {
+            if (data.players().none { it.id == p[2] && it.student }) throw DeskApi.Fail(404, "NOT_FOUND")
+            val f = r.query["fields"]?.split(',')?.mapNotNull { x -> runCatching { com.tennis.scoremanager.data.ProfileField.valueOf(x.trim()) }.getOrNull() }?.toSet()
+            DeskApi.Resp(200, (data.profileFile(p[2], f) ?: throw DeskApi.Fail(404, "NOT_FOUND")).toByteArray(), "application/octet-stream")
+        }
+        m == "POST" && p == listOf("coach", "profile", "check") -> ok(DeskIncoming.serializer(), data.profilePreview(read(DeskFileIn.serializer(), r).text) ?: throw DeskApi.Fail(400, "NOT_A_FILE"))
+        m == "POST" && p == listOf("coach", "profile", "apply") -> ok(DeskId.serializer(), DeskId(data.applyProfile(read(DeskFileIn.serializer(), r).text) ?: throw DeskApi.Fail(400, "NOT_A_FILE")))
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> saveStudent(student(p[2]), read(CdStudentIn.serializer(), r))
         m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "diary" -> { student(p[2]); data.addDiary(p[2], read(CdText.serializer(), r).text); done() }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "note" -> { student(p[2]); data.setNote(p[2], read(CdText.serializer(), r).text); done() }
@@ -32618,6 +33042,11 @@ interface DeskData {
     fun incomingFile(text: String): DeskIncoming? = null
     /** Lo registra come farebbe il telefono; null se fatto, sennò il codice dell'errore. */
     fun applyIncoming(text: String, course: String?): String? = "NOT_FOUND"
+    /** Il profilo da passare: quali dati ci sono e quali si propongono, e il file coi dati scelti (null = giocatore che non c'è). */
+    fun profileFields(id: String): DeskProfileFields? = null
+    fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = null
+    /** Un profilo caricato dal PC: entra tra i giocatori (socio se [asMember]); null = non è un profilo. */
+    fun applyProfile(text: String, asMember: Boolean): String? = null
     /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
     fun setClubName(name: String)
     fun saveCourtSettings(st: CourtSettings)
@@ -32687,7 +33116,8 @@ interface DeskData {
     val replace: Boolean = false, val courses: List<DeskIdName> = emptyList(), val course: String? = null,
 )
 @Serializable data class DeskIdName(val id: String, val name: String)
-@Serializable data class DeskFileIn(val text: String = "", val course: String? = null)
+@Serializable data class DeskFileIn(val text: String = "", val course: String? = null, val asMember: Boolean = true)
+@Serializable data class DeskProfileFields(val available: List<com.tennis.scoremanager.data.ProfileField>, val defaults: List<com.tennis.scoremanager.data.ProfileField>)
 @Serializable data class DeskIndexIn(val index: Int = 0)
 @Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
@@ -32957,12 +33387,15 @@ class DeskApi(
                 m == "POST" && p == listOf("files", "check") -> ok(DeskIncoming.serializer(), data.incomingFile(read(DeskFileIn.serializer(), r).text) ?: throw Fail(400, "NOT_A_FILE"))
                 m == "POST" && p == listOf("files", "apply") -> {
                     val i = read(DeskFileIn.serializer(), r)
-                    data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
+                    if (data.applyProfile(i.text, i.asMember) == null) data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
                     done()
                 }
                 m == "GET" && p == listOf("people") -> people()
                 m == "POST" && p == listOf("people") -> savePerson(read(DeskPerson.serializer(), r), null)
                 m == "PUT" && p.size == 2 && p[0] == "people" -> savePerson(read(DeskPerson.serializer(), r), p[1])
+                m == "GET" && p.size == 3 && p[0] == "people" && p[2] == "profile" -> ok(DeskProfileFields.serializer(), data.profileFields(p[1]) ?: throw Fail(404, "NOT_FOUND"))
+                m == "GET" && p.size == 3 && p[0] == "people" && p[2] == "profile.tsm" ->
+                    Resp(200, (data.profileFile(p[1], profileFieldsOf(r.query["fields"])) ?: throw Fail(404, "NOT_FOUND")).toByteArray(), "application/octet-stream")
                 m == "POST" && p == listOf("people", "import", "preview") -> importCsv(read(DeskCsvIn.serializer(), r), false)
                 m == "POST" && p == listOf("people", "import") -> importCsv(read(DeskCsvIn.serializer(), r), true)
                 m == "GET" && p == listOf("money") -> money(r.query["year"]?.toIntOrNull())
@@ -33751,6 +34184,10 @@ class DeskApi(
         }
     }
 
+    /** "PHOTO,CONTACTS" → i gruppi di dati (null = quelli proposti). */
+    private fun profileFieldsOf(q: String?): Set<com.tennis.scoremanager.data.ProfileField>? =
+        q?.split(',')?.mapNotNull { x -> runCatching { com.tennis.scoremanager.data.ProfileField.valueOf(x.trim()) }.getOrNull() }?.toSet()
+
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
 
     /** La festa nazionale o la chiusura del circolo del giorno di [t] (il nome); null = giorno normale. */
@@ -34470,8 +34907,18 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
     /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
+    override fun profileFields(id: String) = fieldsOf(id)
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, asMember, false) }
+
+    private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
+        val photo = c.photoBytes(p.name) != null
+        DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
+    }
+
     override fun incomingFile(text: String): DeskIncoming? {
         val s = c.strings
+        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profilePreview(it) }
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
             val st = c.resultStatus(r)
             val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
@@ -34587,6 +35034,15 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
+    override fun profileFields(id: String) = fieldsOf(id)
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
+    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profilePreview(it) }
+    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, false, true) }
+
+    private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
+        val photo = c.photoBytes(p.name) != null
+        DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
+    }
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
@@ -44886,6 +45342,9 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
                 Text(s.pfAsFileHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profileQr(p, fields) }, Modifier.fillMaxWidth())
                 Text(s.pfAsQrHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                // Col server del circolo (il giocatore è già iscritto): dritto nella casella della segreteria, con la foto.
+                for (a in c.bookingAccounts.collectAsState().value.filter { it.joined })
+                    GhostButton(s.pfToOffice(a.club.ifBlank { a.url }), Icons.Filled.Share, { c.profileToOffice(a.url, p, fields); onDone() }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
@@ -49603,6 +50062,10 @@ interface Strings {
     val agDayEmpty: String
     val scCoachAway: (String) -> String
     val scCoachAwayCount: (Int) -> String
+    val pfOfficeSent: String
+    val pfOfficeFailed: String
+    val pfToOffice: (String) -> String
+    val pfReceiveFile: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -52280,6 +52743,10 @@ object ItStrings : Strings {
     override val agDayEmpty = "Niente in programma."
     override val scCoachAway: (String) -> String = { "Istruttore assente: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 lezione con l'istruttore assente" else "$it lezioni con l'istruttore assente" }
+    override val pfOfficeSent = "Profilo arrivato alla segreteria."
+    override val pfOfficeFailed = "Non arrivato: controlla la rete o manda il file."
+    override val pfToOffice: (String) -> String = { "Manda alla segreteria di $it" }
+    override val pfReceiveFile = "Ricevi un profilo (file)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -54958,6 +55425,10 @@ object EnStrings : Strings {
     override val agDayEmpty = "Nothing planned."
     override val scCoachAway: (String) -> String = { "Coach away: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 lesson with the coach away" else "$it lessons with the coach away" }
+    override val pfOfficeSent = "Profile delivered to the club office."
+    override val pfOfficeFailed = "Not delivered: check the connection or send the file."
+    override val pfToOffice: (String) -> String = { "Send to the $it office" }
+    override val pfReceiveFile = "Receive a profile (file)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -57661,6 +58132,10 @@ object DeStrings : Strings {
     override val agDayEmpty = "Nichts geplant."
     override val scCoachAway: (String) -> String = { "Trainer abwesend: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 Stunde ohne Trainer" else "$it Stunden ohne Trainer" }
+    override val pfOfficeSent = "Profil ist beim Büro angekommen."
+    override val pfOfficeFailed = "Nicht angekommen: Verbindung prüfen oder die Datei senden."
+    override val pfToOffice: (String) -> String = { "An das Büro von $it senden" }
+    override val pfReceiveFile = "Profil empfangen (Datei)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -60354,6 +60829,10 @@ object EsStrings : Strings {
     override val agDayEmpty = "Nada previsto."
     override val scCoachAway: (String) -> String = { "Monitor ausente: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 clase con el monitor ausente" else "$it clases con el monitor ausente" }
+    override val pfOfficeSent = "Perfil entregado a la secretaría."
+    override val pfOfficeFailed = "No ha llegado: revisa la conexión o envía el archivo."
+    override val pfToOffice: (String) -> String = { "Enviar a la secretaría de $it" }
+    override val pfReceiveFile = "Recibir un perfil (archivo)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -63049,6 +63528,10 @@ object FrStrings : Strings {
     override val agDayEmpty = "Rien de prévu."
     override val scCoachAway: (String) -> String = { "Moniteur absent : $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 séance avec le moniteur absent" else "$it séances avec le moniteur absent" }
+    override val pfOfficeSent = "Profil arrivé au secrétariat."
+    override val pfOfficeFailed = "Pas arrivé : vérifie la connexion ou envoie le fichier."
+    override val pfToOffice: (String) -> String = { "Envoyer au secrétariat de $it" }
+    override val pfReceiveFile = "Recevoir un profil (fichier)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -65745,6 +66228,10 @@ object PtStrings : Strings {
     override val agDayEmpty = "Nada previsto."
     override val scCoachAway: (String) -> String = { "Professor ausente: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 aula com o professor ausente" else "$it aulas com o professor ausente" }
+    override val pfOfficeSent = "Perfil entregue à secretaria."
+    override val pfOfficeFailed = "Não chegou: verifica a ligação ou envia o ficheiro."
+    override val pfToOffice: (String) -> String = { "Enviar à secretaria de $it" }
+    override val pfReceiveFile = "Receber um perfil (ficheiro)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -99596,6 +100083,8 @@ class ProfileCardsTest {
         assertFalse(ProfileField.PHOTO in ProfileCards.available(luca, false))
         val card = ProfileCards.card(luca, setOf(ProfileField.CONTACTS), byteArrayOf(1, 2, 3), "Circolo A", 10)
         val text = ProfileCards.encode(card)
+        assertTrue(text, "\"tsm-profile\"" in text)                       // il file si riconosce
+        assertTrue("\"tsm-profile\"" in ProfileCards.encodeQr(card))
         assertFalse("segreto" in text)
         assertFalse("4.2" in text)
         assertFalse("consent" in text)
@@ -101004,6 +101493,10 @@ class FakeCoach(var time: Long) : CoachData {
     }
     override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
     override fun country() = "IT"
+    override fun profileFields(id: String) = people.firstOrNull { it.id == id }?.let { p -> DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, false), com.tennis.scoremanager.data.ProfileCards.defaults(p, false).toList()) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?) = people.firstOrNull { it.id == id }?.let { com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(it, fields ?: emptySet(), null, "Marco", time)) }
+    override fun profilePreview(text: String) = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { DeskIncoming("PROFILE", "Profilo", listOf(it.profile.name), "", true) }
+    override fun applyProfile(text: String) = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c -> val p = com.tennis.scoremanager.data.ProfileCards.merge(null, c.profile, "nuovo", time, asStudent = true); people = people + p; p.id }
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) { book = book.copy(busy = book.busy.filter { it.id != b.id } + b) }
     override fun deleteBusy(id: String) { book = book.copy(busy = book.busy.filter { it.id != id }) }
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {
@@ -101161,6 +101654,17 @@ class CoachDeskTest {
         assertEquals(409, req("POST", "/coach/courses/club/move", """{"key":"${first.key}","makeup":true}""", tk).first)
     }
 
+    @Test fun studentProfileFromAndToThePc() {
+        val tk = login()
+        val file = req("GET", "/coach/students/s1/profile.tsm", token = tk).second
+        assertTrue(file, "Anna" in file)
+        assertEquals(404, req("GET", "/coach/students/x/profile.tsm", token = tk).first)   // non è un allievo
+        val other = kotlinx.serialization.json.JsonPrimitive(file.replace("Anna", "Bea")).toString()
+        assertTrue(req("POST", "/coach/profile/check", "{\"text\":$other}", tk).second.contains("PROFILE"))
+        assertEquals(200, req("POST", "/coach/profile/apply", "{\"text\":$other}", tk).first)
+        assertTrue(coach.people.any { it.firstName == "Bea" && it.student })
+    }
+
     @Test fun studentsFromThePcWithoutDuplicates() {
         val tk = login()
         val made = req("POST", "/coach/students", """{"firstName":"Giulia","lastName":"Verdi","guardian":"Marta Verdi","guardianPhone":"3331234567","consent":true}""", tk)
@@ -101263,6 +101767,23 @@ class DeskTest {
         req("POST", "/courses/${c.id}/move", """{"key":"$key8","reset":true}""", k)
         assertTrue(data.school.single { it.name == "Mini" }.moved.isEmpty())
         assertEquals(404, req("POST", "/courses/${c.id}/move", """{"key":"nessuna","date":"2026-12-10","startMin":1080}""", k).first)
+    }
+
+    @Test fun profiloDalPc() {
+        val k = login()
+        val (_, made) = req("POST", "/people", """{"firstName":"Luca","lastName":"Verdi","phone":"333","email":"luca@example.org","member":false}""", k)
+        val id = Regex("\"id\":\"([^\"]+)\"").find(made)!!.groupValues[1]
+        assertTrue(req("GET", "/people/$id/profile", token = k).second.contains("CONTACTS"))
+        // Solo i contatti scelti: niente altro nel file.
+        val file = req("GET", "/people/$id/profile.tsm", token = k, q = mapOf("fields" to "CONTACTS")).second
+        assertTrue(file, "\"tsm-profile\"" in file && "luca@example.org" in file)
+        // Un profilo che arriva: anteprima e poi socio nuovo.
+        val other = file.replace("Luca", "Marta").replace("luca@example.org", "marta@example.org").replace("333", "444")
+        val chk = req("POST", "/files/check", "{\"text\":${kotlinx.serialization.json.JsonPrimitive(other)}}", k).second
+        assertTrue(chk, "\"kind\":\"PROFILE\"" in chk)
+        assertEquals(200, req("POST", "/files/apply", "{\"text\":${kotlinx.serialization.json.JsonPrimitive(other)},\"asMember\":true}", k).first)
+        assertTrue(data.list.any { it.firstName == "Marta" && it.member != null })
+        assertEquals(404, req("GET", "/people/nessuno/profile", token = k).first)
     }
 
     @Test fun ilPlanningMostraLeFeste() {
@@ -101998,6 +102519,14 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override var club = "TC Prova"
     override var lang = "it"
     override fun country() = "IT"
+    override fun profileFields(id: String) = list.firstOrNull { it.id == id }?.let { p -> DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, false), com.tennis.scoremanager.data.ProfileCards.defaults(p, false).toList()) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?) =
+        list.firstOrNull { it.id == id }?.let { p -> com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(p, fields ?: com.tennis.scoremanager.data.ProfileCards.defaults(p, false), null, club, time)) }
+    override fun incomingFile(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { DeskIncoming("PROFILE", "Profilo", listOf(it.profile.name), "", true) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { card ->
+        val p = com.tennis.scoremanager.data.ProfileCards.merge(com.tennis.scoremanager.data.ProfileCards.find(list, card.profile), card.profile, "nuovo", time, asMember)
+        savePlayers(listOf(p)); p.id
+    }
     override fun now() = time
     override fun players() = list
     override fun savePlayers(list: List<PlayerProfile>) { val ids = list.map { it.id }.toSet(); this.list = this.list.filter { it.id !in ids } + list }
@@ -109016,7 +109545,7 @@ data class MailItem(val id: String, val to: String, val from: String, val fromNa
         const val KEEP_DAYS = 30
         const val MAX_TEXT = 300_000
         const val MAX_PER_BOX = 200
-        val KINDS = setOf("card", "result", "course", "attendance", "proposal", "progress")
+        val KINDS = setOf("card", "result", "course", "attendance", "proposal", "progress", "profile")
     }
 }
 
@@ -111739,6 +112268,12 @@ class MailApiTest {
         assertEquals(1, mail("/mail", mario).size)
         call("DELETE", "/mail/${m.id}", token = mario)
         assertTrue(mail("/mail", mario).isEmpty())
+    }
+
+    @Test fun ilProfiloArrivaInSegreteria() {
+        val mario = player("p1", "Mario")
+        assertEquals(200, call("POST", "/mail", """{"kind":"profile","text":"{\"tsm\":\"tsm-profile\"}"}""", mario).status)
+        assertEquals("profile", mail("/admin/mail", admin).single().kind)
     }
 
     @Test fun ilRisultatoTornaAllaSegreteriaColMittente() {

@@ -89,7 +89,7 @@ data class MailItem(val id: String, val to: String, val from: String, val fromNa
         const val KEEP_DAYS = 30
         const val MAX_TEXT = 300_000
         const val MAX_PER_BOX = 200
-        val KINDS = setOf("card", "result", "course", "attendance", "proposal", "progress")
+        val KINDS = setOf("card", "result", "course", "attendance", "proposal", "progress", "profile")
     }
 }
 

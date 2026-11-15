@@ -42,6 +42,10 @@ class FakeCoach(var time: Long) : CoachData {
     }
     override fun saveStudent(p: PlayerProfile) { people = people.filter { it.id != p.id } + p }
     override fun country() = "IT"
+    override fun profileFields(id: String) = people.firstOrNull { it.id == id }?.let { p -> DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, false), com.tennis.scoremanager.data.ProfileCards.defaults(p, false).toList()) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?) = people.firstOrNull { it.id == id }?.let { com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(it, fields ?: emptySet(), null, "Marco", time)) }
+    override fun profilePreview(text: String) = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { DeskIncoming("PROFILE", "Profilo", listOf(it.profile.name), "", true) }
+    override fun applyProfile(text: String) = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c -> val p = com.tennis.scoremanager.data.ProfileCards.merge(null, c.profile, "nuovo", time, asStudent = true); people = people + p; p.id }
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) { book = book.copy(busy = book.busy.filter { it.id != b.id } + b) }
     override fun deleteBusy(id: String) { book = book.copy(busy = book.busy.filter { it.id != id }) }
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {
@@ -197,6 +201,17 @@ class CoachDeskTest {
         // Quelli della segreteria no.
         coach.book = coach.book.copy(courses = coach.book.courses + CoachCourse(CourseCard(code = "X", issuedAt = 1, course = Course("club", "Under 10", slots = c.slots, from = c.from, to = c.to))))
         assertEquals(409, req("POST", "/coach/courses/club/move", """{"key":"${first.key}","makeup":true}""", tk).first)
+    }
+
+    @Test fun studentProfileFromAndToThePc() {
+        val tk = login()
+        val file = req("GET", "/coach/students/s1/profile.tsm", token = tk).second
+        assertTrue(file, "Anna" in file)
+        assertEquals(404, req("GET", "/coach/students/x/profile.tsm", token = tk).first)   // non è un allievo
+        val other = kotlinx.serialization.json.JsonPrimitive(file.replace("Anna", "Bea")).toString()
+        assertTrue(req("POST", "/coach/profile/check", "{\"text\":$other}", tk).second.contains("PROFILE"))
+        assertEquals(200, req("POST", "/coach/profile/apply", "{\"text\":$other}", tk).first)
+        assertTrue(coach.people.any { it.firstName == "Bea" && it.student })
     }
 
     @Test fun studentsFromThePcWithoutDuplicates() {

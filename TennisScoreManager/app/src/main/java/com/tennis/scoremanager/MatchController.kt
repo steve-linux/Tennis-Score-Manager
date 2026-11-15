@@ -1861,6 +1861,33 @@ class MatchController(
         return f to strings.pfShareText(p.name)
     }
 
+    /** Il profilo di [p] (con la foto, se scelta) nella casella della segreteria sul server [url]; avvisa com'è andata. */
+    fun profileToOffice(url: String, p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>) {
+        val text = profileText(p, fields)
+        scope.launch { _toasts.tryEmit(if (postToOffice(url, "profile", text)) strings.pfOfficeSent else strings.pfOfficeFailed) }
+    }
+
+    /** Il file del profilo di [p] coi dati [fields] (null = quelli proposti), con la foto se scelta. */
+    fun profileText(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>? = null): String =
+        com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(p, fields ?: com.tennis.scoremanager.data.ProfileCards.defaults(p, photoBytes(p.name) != null), photoBytes(p.name), profileSender(), System.currentTimeMillis()))
+
+    /** Il profilo arrivato al PC, come lo si mostra prima di aggiungerlo: chi è, cosa porta, se c'è già. */
+    fun profilePreview(card: com.tennis.scoremanager.data.ProfileCard): com.tennis.scoremanager.desk.DeskIncoming {
+        val s = strings; val lang = options.value.lang; val sp = card.profile
+        val match = com.tennis.scoremanager.data.ProfileCards.find(players.value, sp)
+        val lines = listOfNotNull(sp.name, card.from.ifBlank { null }?.let { s.pfFrom(it) },
+            listOf(sp.phone, sp.email).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
+            sp.birth?.let { "${s.memberBirth}: ${com.tennis.scoremanager.data.Reports.date(it, lang)}" }, sp.club.ifBlank { null },
+            listOf(sp.guardian, sp.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.coGuardian}: $it" },
+            listOf(sp.fitpNumber, sp.ranking).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.pfFitp}: $it" },
+            if (card.photo != null) s.pfPhoto else null)
+        return com.tennis.scoremanager.desk.DeskIncoming("PROFILE", s.pfIncomingTitle, lines, match?.let { s.pfExisting(it.name) } ?: s.pfNew, true)
+    }
+
+    /** Dal PC: il profilo entra tra i giocatori (completa quello che c'è già); l'id del giocatore. */
+    fun applyProfileFromDesk(card: com.tennis.scoremanager.data.ProfileCard, asMember: Boolean, asStudent: Boolean): String =
+        applyProfile(card, com.tennis.scoremanager.data.ProfileCards.find(players.value, card.profile)?.id, asMember, asStudent).id
+
     /** Il profilo di [p] per il QR (senza foto). */
     fun profileQr(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): String =
         com.tennis.scoremanager.data.ProfileCards.encodeQr(com.tennis.scoremanager.data.ProfileCards.card(p, fields, null, profileSender(), System.currentTimeMillis()))

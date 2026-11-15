@@ -2681,6 +2681,10 @@ object EsStrings : Strings {
     override val agDayEmpty = "Nada previsto."
     override val scCoachAway: (String) -> String = { "Monitor ausente: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 clase con el monitor ausente" else "$it clases con el monitor ausente" }
+    override val pfOfficeSent = "Perfil entregado a la secretaría."
+    override val pfOfficeFailed = "No ha llegado: revisa la conexión o envía el archivo."
+    override val pfToOffice: (String) -> String = { "Enviar a la secretaría de $it" }
+    override val pfReceiveFile = "Recibir un perfil (archivo)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

@@ -39,6 +39,11 @@ interface CoachData {
     fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
+    /** Il profilo dell'allievo da passare (vedi [DeskData.profileFields]) e quello caricato dal PC. */
+    fun profileFields(id: String): DeskProfileFields? = null
+    fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = null
+    fun profilePreview(text: String): DeskIncoming? = null
+    fun applyProfile(text: String): String? = null
     /** Il Paese per le festività nazionali (quello del telefono). */
     fun country(): String = com.tennis.scoremanager.data.Holidays.country()
     fun receiptPdf(packId: String): ByteArray?
@@ -147,6 +152,17 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p == listOf("coach", "groups") -> ok(ListSerializer(CdGroup.serializer()), data.book().groups.sortedBy { it.name.lowercase() }.map { CdGroup(it.id, it.name, it.students) })
         m == "GET" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> ok(CdStudentDetail.serializer(), detail(p[2]))
         m == "POST" && p == listOf("coach", "students") -> saveStudent(null, read(CdStudentIn.serializer(), r))
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "profile" -> {
+            if (data.players().none { it.id == p[2] && it.student }) throw DeskApi.Fail(404, "NOT_FOUND")
+            ok(DeskProfileFields.serializer(), data.profileFields(p[2]) ?: throw DeskApi.Fail(404, "NOT_FOUND"))
+        }
+        m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "profile.tsm" -> {
+            if (data.players().none { it.id == p[2] && it.student }) throw DeskApi.Fail(404, "NOT_FOUND")
+            val f = r.query["fields"]?.split(',')?.mapNotNull { x -> runCatching { com.tennis.scoremanager.data.ProfileField.valueOf(x.trim()) }.getOrNull() }?.toSet()
+            DeskApi.Resp(200, (data.profileFile(p[2], f) ?: throw DeskApi.Fail(404, "NOT_FOUND")).toByteArray(), "application/octet-stream")
+        }
+        m == "POST" && p == listOf("coach", "profile", "check") -> ok(DeskIncoming.serializer(), data.profilePreview(read(DeskFileIn.serializer(), r).text) ?: throw DeskApi.Fail(400, "NOT_A_FILE"))
+        m == "POST" && p == listOf("coach", "profile", "apply") -> ok(DeskId.serializer(), DeskId(data.applyProfile(read(DeskFileIn.serializer(), r).text) ?: throw DeskApi.Fail(400, "NOT_A_FILE")))
         m == "PUT" && p.size == 3 && p[0] == "coach" && p[1] == "students" -> saveStudent(student(p[2]), read(CdStudentIn.serializer(), r))
         m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "diary" -> { student(p[2]); data.addDiary(p[2], read(CdText.serializer(), r).text); done() }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "note" -> { student(p[2]); data.setNote(p[2], read(CdText.serializer(), r).text); done() }

@@ -2752,6 +2752,10 @@ interface Strings {
     val agDayEmpty: String
     val scCoachAway: (String) -> String
     val scCoachAwayCount: (Int) -> String
+    val pfOfficeSent: String
+    val pfOfficeFailed: String
+    val pfToOffice: (String) -> String
+    val pfReceiveFile: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5429,6 +5433,10 @@ object ItStrings : Strings {
     override val agDayEmpty = "Niente in programma."
     override val scCoachAway: (String) -> String = { "Istruttore assente: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 lezione con l'istruttore assente" else "$it lezioni con l'istruttore assente" }
+    override val pfOfficeSent = "Profilo arrivato alla segreteria."
+    override val pfOfficeFailed = "Non arrivato: controlla la rete o manda il file."
+    override val pfToOffice: (String) -> String = { "Manda alla segreteria di $it" }
+    override val pfReceiveFile = "Ricevi un profilo (file)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8107,6 +8115,10 @@ object EnStrings : Strings {
     override val agDayEmpty = "Nothing planned."
     override val scCoachAway: (String) -> String = { "Coach away: $it" }
     override val scCoachAwayCount: (Int) -> String = { if (it == 1) "1 lesson with the coach away" else "$it lessons with the coach away" }
+    override val pfOfficeSent = "Profile delivered to the club office."
+    override val pfOfficeFailed = "Not delivered: check the connection or send the file."
+    override val pfToOffice: (String) -> String = { "Send to the $it office" }
+    override val pfReceiveFile = "Receive a profile (file)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
