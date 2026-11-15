@@ -1914,7 +1914,7 @@ function courseLessons(c, body) {
     rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
       h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
-        h('td', shortDay(l.date)), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
         h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
           : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
       : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
@@ -1956,7 +1956,22 @@ function editCourse(c) {
   const level = h('input', { maxlength: 60, value: v.level });
   const coach = select([['', '—']].concat(people.map((p) => [p.id, p.name])), v.coach || '');
   const coachName = h('input', { maxlength: 80, value: v.coachName, placeholder: T.scCoach });
-  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', required: true, value: v.to });
+  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', value: v.to });
+  // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
+  const count = h('input', { type: 'number', min: 1, max: 300, value: c ? c.lessons.filter((l) => !l.cancelled).length || '' : '', placeholder: '—' });
+  const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const endBox = h('div.full');
+  let endSeq = 0;
+  async function drawEnd() {
+    const n = Number(count.value);
+    if (!count.value || !(n > 0)) { put(endBox, field(T.blkTo, to)); return; }
+    const my = ++endSeq;
+    let out = null;
+    try { out = await api('POST', '/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    if (my !== endSeq) return;
+    put(endBox, h('p', out && out.to ? T.ccEndAuto(shortDay(out.to)) : h('span.dim', T.scSchedule + ' —')));
+  }
+  count.addEventListener('input', drawEnd); from.addEventListener('change', drawEnd); skipHol.addEventListener('change', drawEnd);
   const fee = h('input', { inputmode: 'decimal', value: v.feeCents ? (v.feeCents / 100).toFixed(2).replace('.', ',') : '' });
   const kind = select([['MONTHLY', T.scMonthly], ['SEASON', T.scSeasonFee]], v.feeKind);
   const max = h('input', { type: 'number', min: 0, max: 200, value: v.maxStudents || '', placeholder: T.scNoMax });
@@ -1967,16 +1982,16 @@ function editCourse(c) {
   function draw() {
     put(box, slots.map((x, i) => {
       const wd = select([1, 2, 3, 4, 5, 6, 7].map((n) => [String(n), weekdayName(n)]), String(x.weekday));
-      wd.addEventListener('change', () => { x.weekday = Number(wd.value); });
-      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); } });
+      wd.addEventListener('change', () => { x.weekday = Number(wd.value); drawEnd(); });
+      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); drawEnd(); } });
       const len = select((minutes.includes(x.minutes) ? minutes : minutes.concat([x.minutes]).sort((a, b) => a - b)).map((m) => [String(m), m + ' min']), String(x.minutes));
       len.addEventListener('change', () => { x.minutes = Number(len.value); });
       const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), x.court);
       ct.addEventListener('change', () => { x.court = ct.value; });
-      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); } }, '×'));
-    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); } }, T.scAddSlot));
+      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); drawEnd(); } }, '×'));
+    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); drawEnd(); } }, T.scAddSlot));
   }
-  draw();
+  draw(); drawEnd();
   const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
     if (!confirm(T.scDeleteAsk(c.name))) return;
     try { await api('DELETE', '/courses/' + encodeURIComponent(c.id)); dlg.close(); courseId = null; toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
@@ -1984,13 +1999,16 @@ function editCourse(c) {
   const dlg = dialog(c ? c.name : T.scNew, h('div.form',
     field(T.scName, name, 'full'), field(T.scLevel, level, 'full'),
     field(T.scCoach, coach), field(T.scCoachFree, coachName),
-    field(T.blkFrom, from), field(T.blkTo, to),
     field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
-    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint)), async () => {
+    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint),
+    field(T.blkFrom, from), field(T.ccLessonsCount, count),
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox), async () => {
     const fc = fee.value.trim() ? cents(fee.value) : 0;
     if (fc === null) throw new Error(T.err.BAD_AMOUNT);
+    const n = Number(count.value);
     const body = { name: name.value, level: level.value, coach: coach.value || null, coachName: coach.value ? '' : coachName.value, from: from.value, to: to.value,
-      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots };
+      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots,
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
     if (c) await api('PUT', '/courses/' + encodeURIComponent(c.id), body);
     else { const out = await api('POST', '/courses', body); courseId = out.id; courseTab = 'students'; }
     toast(T.saved);

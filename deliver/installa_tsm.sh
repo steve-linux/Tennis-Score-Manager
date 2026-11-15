@@ -7438,7 +7438,7 @@ function courseLessons(c, body) {
     rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
       h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
-        h('td', shortDay(l.date)), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
         h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
           : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
       : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
@@ -7480,7 +7480,22 @@ function editCourse(c) {
   const level = h('input', { maxlength: 60, value: v.level });
   const coach = select([['', '—']].concat(people.map((p) => [p.id, p.name])), v.coach || '');
   const coachName = h('input', { maxlength: 80, value: v.coachName, placeholder: T.scCoach });
-  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', required: true, value: v.to });
+  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', value: v.to });
+  // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
+  const count = h('input', { type: 'number', min: 1, max: 300, value: c ? c.lessons.filter((l) => !l.cancelled).length || '' : '', placeholder: '—' });
+  const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const endBox = h('div.full');
+  let endSeq = 0;
+  async function drawEnd() {
+    const n = Number(count.value);
+    if (!count.value || !(n > 0)) { put(endBox, field(T.blkTo, to)); return; }
+    const my = ++endSeq;
+    let out = null;
+    try { out = await api('POST', '/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    if (my !== endSeq) return;
+    put(endBox, h('p', out && out.to ? T.ccEndAuto(shortDay(out.to)) : h('span.dim', T.scSchedule + ' —')));
+  }
+  count.addEventListener('input', drawEnd); from.addEventListener('change', drawEnd); skipHol.addEventListener('change', drawEnd);
   const fee = h('input', { inputmode: 'decimal', value: v.feeCents ? (v.feeCents / 100).toFixed(2).replace('.', ',') : '' });
   const kind = select([['MONTHLY', T.scMonthly], ['SEASON', T.scSeasonFee]], v.feeKind);
   const max = h('input', { type: 'number', min: 0, max: 200, value: v.maxStudents || '', placeholder: T.scNoMax });
@@ -7491,16 +7506,16 @@ function editCourse(c) {
   function draw() {
     put(box, slots.map((x, i) => {
       const wd = select([1, 2, 3, 4, 5, 6, 7].map((n) => [String(n), weekdayName(n)]), String(x.weekday));
-      wd.addEventListener('change', () => { x.weekday = Number(wd.value); });
-      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); } });
+      wd.addEventListener('change', () => { x.weekday = Number(wd.value); drawEnd(); });
+      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); drawEnd(); } });
       const len = select((minutes.includes(x.minutes) ? minutes : minutes.concat([x.minutes]).sort((a, b) => a - b)).map((m) => [String(m), m + ' min']), String(x.minutes));
       len.addEventListener('change', () => { x.minutes = Number(len.value); });
       const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), x.court);
       ct.addEventListener('change', () => { x.court = ct.value; });
-      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); } }, '×'));
-    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); } }, T.scAddSlot));
+      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); drawEnd(); } }, '×'));
+    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); drawEnd(); } }, T.scAddSlot));
   }
-  draw();
+  draw(); drawEnd();
   const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
     if (!confirm(T.scDeleteAsk(c.name))) return;
     try { await api('DELETE', '/courses/' + encodeURIComponent(c.id)); dlg.close(); courseId = null; toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
@@ -7508,13 +7523,16 @@ function editCourse(c) {
   const dlg = dialog(c ? c.name : T.scNew, h('div.form',
     field(T.scName, name, 'full'), field(T.scLevel, level, 'full'),
     field(T.scCoach, coach), field(T.scCoachFree, coachName),
-    field(T.blkFrom, from), field(T.blkTo, to),
     field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
-    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint)), async () => {
+    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint),
+    field(T.blkFrom, from), field(T.ccLessonsCount, count),
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.ccSkipHolidaysHint }, skipHol, T.ccSkipHolidays), endBox), async () => {
     const fc = fee.value.trim() ? cents(fee.value) : 0;
     if (fc === null) throw new Error(T.err.BAD_AMOUNT);
+    const n = Number(count.value);
     const body = { name: name.value, level: level.value, coach: coach.value || null, coachName: coach.value ? '' : coachName.value, from: from.value, to: to.value,
-      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots };
+      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots,
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
     if (c) await api('PUT', '/courses/' + encodeURIComponent(c.id), body);
     else { const out = await api('POST', '/courses', body); courseId = out.id; courseTab = 'students'; }
     toast(T.saved);
@@ -10727,7 +10745,7 @@ Mit der Rolle **Verein**, im Reiter **Belegung**: hier sind die Plätze und *Zei
 
 Mit der Rolle **Verein**, unter **Mitglieder › Tennisschule**.
 
-- **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung.
+- **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung. Statt des Enddatums kannst du die **Anzahl der Stunden** eintragen: Das Ende ergibt sich aus Beginn und Zeiten; mit **Feiertage überspringen** (an) zählen Stunden an gesetzlichen Feiertagen nicht und gelten als abgesagt (über die Anwesenheit wieder einsetzbar). Feiertage stehen rot in den Kursstunden, auch im Büro am PC.
 - **Schüler**: aus der Datenbank hinzufügen (Mitglieder oder nicht) bis zur Platzzahl; für jeden die **Anwesenheit** (anwesend 3 von 4, unter 75 % orange) und was offen ist. Die Spielerkarte zeigt seine Kurse.
 - **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern.
 - **Mit dem Trainer**: in einem Kurs mit einem Trainer aus der Datenbank schickt **An den Trainer schicken** ihm die Kurskarte (Zeiten, Teilnehmer mit Kontakten). Er trägt die Anwesenheit ein und schickt sie zurück: beim Öffnen der Datei mit **Teilen › TSM** prüft die App, dass sie zu diesem Kurs gehört, und **Speichern** fügt sie hinzu. Schlägt der Trainer einen neuen Schüler vor, fügt man ihn beim Öffnen seiner Datei zu den Spielern und wahlweise zu einem Kurs hinzu.
@@ -11334,7 +11352,7 @@ With the **Club** role, on the **Planner** tab: courts and *Hours and prices* ar
 
 With the **Club** role, under **Members › Tennis school**.
 
-- **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner.
+- **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner. Instead of the end date you can write the **number of lessons**: the end is worked out from the start and the times; with **Skip holidays** (on) lessons on national holidays don't count and are marked cancelled (you can put them back from the roll call). Holidays are in red in the course lessons, also from the Club office from PC.
 - **Students**: added from the database (members or not) up to the places; for each, **attendance** (attended 3 of 4, orange under 75 %) and what they owe. A player's card shows their courses.
 - **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent.
 - **With the coach**: in a course with a coach from the database, **Send to the coach** sends them the course card (times, participants with contacts). They mark attendance and send it back: opening the file with **Share › TSM** the app checks it belongs to this course and **Record** adds it. If the coach proposes a new student, opening their file adds them to the players and, if you like, to a course.
@@ -11940,7 +11958,7 @@ Con el rol **Club**, en la pestaña **Reservas**: aquí están las pistas y *Hor
 
 Con el rol **Club**, en **Socios › Escuela de tenis**.
 
-- **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza.
+- **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza. En lugar de la fecha de fin puedes escribir el **número de clases**: el fin se calcula solo según el inicio y los horarios; con **Saltar los festivos** (activado) las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde la lista). Los festivos salen en rojo en las clases del curso, también desde la Secretaría en el PC.
 - **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
 - **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre.
 - **Con el entrenador**: en un curso con un entrenador de la base de datos, **Enviar al entrenador** le manda la ficha de curso (horarios, inscritos con contactos). Él marca la asistencia y la devuelve: al abrir el archivo con **Compartir › TSM** la app comprueba que es de este curso y **Registrar** la añade. Si el entrenador propone un alumno nuevo, al abrir su archivo se añade a los jugadores y, si quieres, a un curso.
@@ -12546,7 +12564,7 @@ Avec le rôle **Club**, dans l'onglet **Planning** : ici se trouvent les terrain
 
 Avec le rôle **Club**, dans **Adhérents › École de tennis**.
 
-- **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour.
+- **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour. Au lieu de la date de fin, tu peux écrire le **nombre de séances** : la fin se calcule d'après le début et les horaires ; avec **Sauter les jours fériés** (activé), les séances des jours fériés nationaux ne comptent pas et sont annulées (on les remet depuis l'appel). Les jours fériés sont en rouge dans les séances du cours, aussi depuis le Secrétariat depuis le PC.
 - **Élèves** : on les ajoute depuis la base (adhérents ou non) jusqu'aux places ; pour chacun la **présence** (présent 3 sur 4, en orange sous 75 %) et ce qu'il doit. La fiche du joueur montre ses cours.
 - **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent.
 - **Avec l'entraîneur** : dans un cours avec un entraîneur de la base, **Envoyer à l'entraîneur** lui envoie la fiche de cours (horaires, inscrits avec contacts). Il note les présences et les renvoie : en ouvrant le fichier avec **Partager › TSM** l'appli vérifie qu'il est de ce cours et **Enregistrer** les ajoute. Si l'entraîneur propose un nouvel élève, en ouvrant son fichier on l'ajoute aux joueurs et, au choix, à un cours.
@@ -13152,7 +13170,7 @@ Col ruolo **Circolo**, nella scheda **Planning**: qui ci sono i campi e *Orari e
 
 Col ruolo **Circolo**, in **Soci › Scuola tennis**.
 
-- **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna.
+- **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna. Al posto della data di fine puoi scrivere il **numero di lezioni**: la fine si calcola da sola da inizio e orari; con **Salta le feste** (acceso) le lezioni nelle festività nazionali non contano e risultano annullate (si rimettono dall'appello). Le feste sono in rosso nelle lezioni del corso, anche dalla Segreteria da PC.
 - **Allievi**: si aggiungono dal database (soci o no) fino ai posti; per ciascuno la **presenza** (presente 3 su 4, in arancione sotto il 75 %) e cosa deve pagare. Nella scheda del giocatore ci sono i suoi corsi.
 - **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore.
 - **Con l'allenatore**: nel corso con un istruttore del database, **Manda all'allenatore** gli manda la scheda corso (orari, iscritti con i contatti). Lui segna le presenze e le rimanda: aprendo il file con **Condividi › TSM** l'app controlla che sia di questo corso e con **Registra** le aggiunge. Se l'allenatore propone un allievo nuovo, aprendo il suo file lo si aggiunge ai giocatori e, a scelta, a un corso.
@@ -13758,7 +13776,7 @@ Com o papel **Clube**, na aba **Agenda**: aqui ficam as quadras e *Horários e p
 
 Com o papel **Clube**, em **Sócios › Escola de tênis**.
 
-- **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza.
+- **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza. Em vez da data de fim podes escrever o **número de aulas**: o fim calcula-se sozinho pelo início e pelos horários; com **Saltar os feriados** (ligado) as aulas nos feriados nacionais não contam e ficam canceladas (repõem-se na chamada). Os feriados aparecem a vermelho nas aulas do curso, também na Secretaria no PC.
 - **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
 - **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável.
 - **Com o treinador**: num curso com um treinador da base de dados, **Enviar ao treinador** envia-lhe a ficha de curso (horários, inscritos com contactos). Ele marca as presenças e devolve-as: ao abrir o arquivo com **Compartilhar › TSM** o app verifica que é deste curso e **Registrar** junta-as. Se o treinador propõe um aluno novo, ao abrir o arquivo dele adiciona-se aos jogadores e, à escolha, a um curso.
@@ -32461,7 +32479,7 @@ interface DeskData {
 @Serializable data class DeskTop(val name: String, val count: Int)
 @Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
 @Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
-@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null)
 /** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
 @Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
 @Serializable data class DeskCourse(
@@ -32470,9 +32488,12 @@ interface DeskData {
     val students: List<DeskStudent>, val lessons: List<DeskLesson>, val fees: List<DeskCourseFee>,
 )
 @Serializable data class DeskCourseIn(
-    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String,
+    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String = "",
     val maxStudents: Int = 0, val feeCents: Int = 0, val feeKind: CourseFee = CourseFee.MONTHLY, val note: String = "", val slots: List<DeskSlot> = emptyList(),
+    /** Quante lezioni (la fine si calcola da inizio e orari) e se le feste nazionali non contano (e risultano annullate). */
+    val lessons: Int? = null, val skipHolidays: Boolean = true,
 )
+@Serializable data class DeskEnd(val to: String? = null)
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
 @Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?, val walkover: Boolean = false)
@@ -32689,6 +32710,7 @@ class DeskApi(
                 p.size >= 2 && p[0] == "teams" -> teamRoute(m, p.drop(1), r)
                 m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
                 m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
+                m == "POST" && p == listOf("courses", "end") -> read(DeskCourseIn.serializer(), r).let { i -> ok(DeskEnd.serializer(), DeskEnd(courseEnd(i)?.let { day(it) })) }
                 p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
                 m == "POST" && p == listOf("blocks") -> saveBlock(read(DeskBlock.serializer(), r))
                 m == "DELETE" && p.size == 2 && p[0] == "blocks" -> {
@@ -33352,7 +33374,8 @@ class DeskApi(
         }
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
-            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList())
+            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
+                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()))
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
         val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
@@ -33401,10 +33424,19 @@ class DeskApi(
 
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
 
+    /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
+    private fun courseEnd(i: DeskCourseIn): Long? {
+        val n = i.lessons ?: return null
+        val from = noon(i.from)?.let { CourtPlans.dayStart(it) } ?: return null
+        val slots = i.slots.filter { it.weekday in 1..7 }.map { CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
+        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
+    }
+
     private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
         val name = text(i.name, 80)
         if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
-        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE"); val to = noon(i.to) ?: throw Fail(400, "BAD_DATE")
+        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE")
+        val to = courseEnd(i)?.let { it + 12 * 3_600_000L } ?: noon(i.to) ?: throw Fail(400, "BAD_DATE")
         if (to < from || to - from > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
         if (i.feeCents != 0) cents(i.feeCents)
         val courts = data.courts()
@@ -33419,7 +33451,9 @@ class DeskApi(
             name = name, level = text(i.level, 60), coach = coach, coachName = if (coach != null) "" else text(i.coachName, 80), from = from, to = to,
             maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
         )
-        data.saveCourse(c)
+        // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
+        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else c
+        data.saveCourse(saved)
         return ok(DeskId.serializer(), DeskId(c.id))
     }
 
@@ -74792,7 +74826,13 @@ fun CourseScreen(c: MatchController) {
                     val cancelled = l.key in co.cancelled
                     val marked = co.attendance[l.key]
                     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { openLesson = l }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(lessonLine(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                        Column(Modifier.weight(1f)) {
+                            Text(lessonLine(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp)
+                            // Festa nazionale: in rosso, così si vede subito.
+                            com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let {
+                                Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
                         Text(
                             when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
                             color = when { cancelled -> TsmColors.Danger; marked != null -> TsmColors.Ok; l.start <= now -> TsmColors.Orange; else -> TsmColors.TextDim }, fontSize = 13.sp,
@@ -74892,6 +74932,12 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     var pickCoach by remember { mutableStateOf(false) }
     var newSlot by remember { mutableStateOf<CourseSlot?>(null) }
     var askDelete by remember { mutableStateOf(false) }
+    // Quante lezioni: dalla data d'inizio e dagli orari la fine si calcola da sola; le feste (se le si salta) non contano.
+    var lessonsText by remember { mutableStateOf(co?.let { y -> Courses.lessons(y).count { it.key !in y.cancelled }.toString() } ?: "") }
+    var skipHolidays by remember { mutableStateOf(true) }
+    val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
+    val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
+    val skip = { t: Long -> skipHolidays && isHoliday(t) }
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (co == null) s.scNew else co.name) },
@@ -74909,7 +74955,6 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                     GhostButton(s.scCoachPick, Icons.Filled.PersonAdd, { pickCoach = true }, Modifier.fillMaxWidth())
                 }
                 DateButton(s.blkFrom, x.from, lang) { d -> x = x.copy(from = CourtPlans.dayStart(d), to = maxOf(x.to, CourtPlans.dayStart(d))) }
-                DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }
                 Text(s.scSchedule, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 for (sl in x.slots) Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(slotLine(s, sl, lang), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
@@ -74917,6 +74962,13 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 }
                 GhostButton(s.scAddSlot, Icons.Filled.Schedule, { newSlot = CourseSlot(1, 17 * 60, 60, courts.firstOrNull().orEmpty()) }, Modifier.fillMaxWidth())
                 Text(s.scScheduleHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                // Il numero di lezioni dà la fine; senza numero la fine si sceglie a mano.
+                OutlinedTextField(lessonsText, { v -> lessonsText = v.filter { it.isDigit() }.take(3) }, Modifier.fillMaxWidth(), singleLine = true,
+                    label = { Text(s.ccLessonsCount) }, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                SwitchRow(Icons.Filled.Schedule, s.ccSkipHolidays, s.ccSkipHolidaysHint, skipHolidays) { skipHolidays = it }
+                val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) }
+                if (autoEnd != null) Text(s.ccEndAuto(com.tennis.scoremanager.data.Reports.date(autoEnd, lang)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
+                else DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(if (x.maxStudents == 0) s.scNoMax else s.scMax(x.maxStudents), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
                     IconButton(onClick = { x = x.copy(maxStudents = (x.maxStudents - 1).coerceAtLeast(0)) }) { Icon(Icons.Filled.Remove, null) }
@@ -74930,7 +74982,10 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
         },
         confirmButton = {
             TextButton(enabled = x.name.isNotBlank() && (fee.isBlank() || Fees.parse(fee) != null), onClick = {
-                val saved = x.copy(name = x.name.trim(), feeCents = Fees.parse(fee.ifBlank { "0" }) ?: 0)
+                val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) } ?: x.to
+                val y = x.copy(name = x.name.trim(), feeCents = Fees.parse(fee.ifBlank { "0" }) ?: 0, to = end)
+                // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
+                val saved = if (skipHolidays) y.copy(cancelled = y.cancelled + Courses.skipped(y, isHoliday)) else y
                 c.saveCourse(saved)
                 onDone(saved.id)
             }) { Text(s.ok) }
@@ -100187,6 +100242,19 @@ class DeskTest {
         val id = field(req("POST", "/pair", """{"code":"${auth.shownCode}"}""").second, "id")!!
         auth.answer(true)
         return field(req("GET", "/pair/$id").second, "token")!!
+    }
+
+    @Test fun corsoColNumeroDiLezioniCheSaltaLeFeste() {
+        val k = login()
+        // Il martedì dal 1° dicembre 2026: l'8 è l'Immacolata, quindi la seconda lezione è il 15.
+        val body = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60}],"lessons":2}"""
+        assertTrue(req("POST", "/courses/end", body, k).second.contains("2026-12-15"))
+        assertTrue(req("POST", "/courses/end", body.replace("}]", "}],\"skipHolidays\":false").replace(",\"lessons\":2", ",\"lessons\":2"), k).second.contains("2026-12-08"))
+        assertEquals(200, req("POST", "/courses", body, k).first)
+        val c = data.school.single { it.name == "Mini" }
+        assertEquals(1, c.cancelled.size)
+        val list = req("GET", "/courses", token = k).second
+        assertTrue(list, "\"holiday\":\"Immacolata Concezione\"" in list)
     }
 
     @Test fun ilPlanningMostraLeFeste() {

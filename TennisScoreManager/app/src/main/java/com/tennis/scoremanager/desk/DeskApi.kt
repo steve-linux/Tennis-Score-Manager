@@ -285,7 +285,7 @@ interface DeskData {
 @Serializable data class DeskTop(val name: String, val count: Int)
 @Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
 @Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
-@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null)
 /** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
 @Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
 @Serializable data class DeskCourse(
@@ -294,9 +294,12 @@ interface DeskData {
     val students: List<DeskStudent>, val lessons: List<DeskLesson>, val fees: List<DeskCourseFee>,
 )
 @Serializable data class DeskCourseIn(
-    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String,
+    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String = "",
     val maxStudents: Int = 0, val feeCents: Int = 0, val feeKind: CourseFee = CourseFee.MONTHLY, val note: String = "", val slots: List<DeskSlot> = emptyList(),
+    /** Quante lezioni (la fine si calcola da inizio e orari) e se le feste nazionali non contano (e risultano annullate). */
+    val lessons: Int? = null, val skipHolidays: Boolean = true,
 )
+@Serializable data class DeskEnd(val to: String? = null)
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
 @Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?, val walkover: Boolean = false)
@@ -513,6 +516,7 @@ class DeskApi(
                 p.size >= 2 && p[0] == "teams" -> teamRoute(m, p.drop(1), r)
                 m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
                 m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
+                m == "POST" && p == listOf("courses", "end") -> read(DeskCourseIn.serializer(), r).let { i -> ok(DeskEnd.serializer(), DeskEnd(courseEnd(i)?.let { day(it) })) }
                 p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
                 m == "POST" && p == listOf("blocks") -> saveBlock(read(DeskBlock.serializer(), r))
                 m == "DELETE" && p.size == 2 && p[0] == "blocks" -> {
@@ -1176,7 +1180,8 @@ class DeskApi(
         }
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
-            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList())
+            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
+                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()))
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
         val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
@@ -1225,10 +1230,19 @@ class DeskApi(
 
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
 
+    /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
+    private fun courseEnd(i: DeskCourseIn): Long? {
+        val n = i.lessons ?: return null
+        val from = noon(i.from)?.let { CourtPlans.dayStart(it) } ?: return null
+        val slots = i.slots.filter { it.weekday in 1..7 }.map { CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
+        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }
+    }
+
     private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
         val name = text(i.name, 80)
         if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
-        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE"); val to = noon(i.to) ?: throw Fail(400, "BAD_DATE")
+        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE")
+        val to = courseEnd(i)?.let { it + 12 * 3_600_000L } ?: noon(i.to) ?: throw Fail(400, "BAD_DATE")
         if (to < from || to - from > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
         if (i.feeCents != 0) cents(i.feeCents)
         val courts = data.courts()
@@ -1243,7 +1257,9 @@ class DeskApi(
             name = name, level = text(i.level, 60), coach = coach, coachName = if (coach != null) "" else text(i.coachName, 80), from = from, to = to,
             maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
         )
-        data.saveCourse(c)
+        // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
+        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null }) else c
+        data.saveCourse(saved)
         return ok(DeskId.serializer(), DeskId(c.id))
     }
 

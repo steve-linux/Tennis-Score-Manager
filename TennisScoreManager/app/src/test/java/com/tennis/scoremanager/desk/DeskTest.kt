@@ -42,6 +42,19 @@ class DeskTest {
         return field(req("GET", "/pair/$id").second, "token")!!
     }
 
+    @Test fun corsoColNumeroDiLezioniCheSaltaLeFeste() {
+        val k = login()
+        // Il martedì dal 1° dicembre 2026: l'8 è l'Immacolata, quindi la seconda lezione è il 15.
+        val body = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60}],"lessons":2}"""
+        assertTrue(req("POST", "/courses/end", body, k).second.contains("2026-12-15"))
+        assertTrue(req("POST", "/courses/end", body.replace("}]", "}],\"skipHolidays\":false").replace(",\"lessons\":2", ",\"lessons\":2"), k).second.contains("2026-12-08"))
+        assertEquals(200, req("POST", "/courses", body, k).first)
+        val c = data.school.single { it.name == "Mini" }
+        assertEquals(1, c.cancelled.size)
+        val list = req("GET", "/courses", token = k).second
+        assertTrue(list, "\"holiday\":\"Immacolata Concezione\"" in list)
+    }
+
     @Test fun ilPlanningMostraLeFeste() {
         val tk = login()
         val m = req("GET", "/month", token = tk, q = mapOf("date" to "2026-12-01")).second
