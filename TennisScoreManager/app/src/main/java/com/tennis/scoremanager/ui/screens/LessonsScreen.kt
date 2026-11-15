@@ -63,7 +63,11 @@ fun LessonsScreen(c: MatchController) {
     ) {
         val tomorrow = tomorrowLessons(book, now)
         if (tomorrow.isNotEmpty()) BigButton(s.coRemindTomorrow(tomorrow.size), Icons.Filled.NotificationsActive, { c.noticeLessons(tomorrow) }, Modifier.fillMaxWidth())
-        SectionCard(s.coUpcoming, Icons.Filled.Event) {
+        // Il mese (lezioni private, corsi, tornei, feste e impegni) o l'elenco delle prossime.
+        var asList by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        com.tennis.scoremanager.ui.Segmented(listOf(com.tennis.scoremanager.ui.SegOption(s.agMonth), com.tennis.scoremanager.ui.SegOption(s.agList)), if (asList) 1 else 0, { asList = it == 1 })
+        if (!asList) SectionCard(s.coAgenda, Icons.Filled.Event) { com.tennis.scoremanager.ui.CoachMonthCalendar(c, book) { open = it } }
+        else SectionCard(s.coUpcoming, Icons.Filled.Event) {
             val next = Coaching.upcoming(book.lessons, now)
             if (next.isEmpty()) Text(s.coNoLessons, color = TsmColors.TextDim)
             for (l in next.take(30)) LessonRow(c, l) { open = l }

@@ -2675,6 +2675,9 @@ object DeStrings : Strings {
     override val clCancelThem = "Diese Stunden absagen"
     override val clKeepThem = "Behalten"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 Kursstunde fällt auf diese Tage" else "$it Kursstunden fallen auf diese Tage" }
+    override val agMonth = "Monat"
+    override val agList = "Liste"
+    override val agDayEmpty = "Nichts geplant."
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

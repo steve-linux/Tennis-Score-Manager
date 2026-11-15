@@ -2676,6 +2676,9 @@ object EsStrings : Strings {
     override val clCancelThem = "Anular esas clases"
     override val clKeepThem = "Dejarlas"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 clase de los cursos cae en estos días" else "$it clases de los cursos caen en estos días" }
+    override val agMonth = "Mes"
+    override val agList = "Lista"
+    override val agDayEmpty = "Nada previsto."
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

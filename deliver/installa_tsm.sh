@@ -10775,7 +10775,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
 - **Die Schülerliste**: **Schüler suchen** nach Name, sortieren *Nach Name* oder *Nach letztem Mal*, filtern *Alle*, *Lange nicht gesehen* (seit mehr als 2 Wochen) oder eine Gruppe. Unter jedem Namen steht, wann du ihn zuletzt gesehen hast (Einheit oder gemachte Stunde).
 - **Gruppen** (*Gruppen ›* oben in der Liste): *Neue Gruppe* mit Name und Schülern (zum Beispiel „Turnier U14“); eine Gruppe lässt sich filtern, in eine Stunde setzen und mit **Schreiben** auf einmal benachrichtigen.
-- **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers. **Meine Termine** (unten im Stundenplan): **Termin** markiert die Tage, an denen du nicht kannst (von… bis…, belegt, Urlaub, Turnier, krank, Sonstiges und eine Notiz). Sie erscheinen orange in den Stunden und im Kalender; fällt eine Privat- oder Kursstunde darauf, erscheint oben eine Warnung mit der Liste. Beim Anlegen eines Kurses zählt **Meine Termine überspringen** diese Stunden nicht, wie Feiertage.
+- **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers. **Meine Termine** (unten im Stundenplan): **Termin** markiert die Tage, an denen du nicht kannst (von… bis…, belegt, Urlaub, Turnier, krank, Sonstiges und eine Notiz). Sie erscheinen orange in den Stunden und im Kalender; fällt eine Privat- oder Kursstunde darauf, erscheint oben eine Warnung mit der Liste. Beim Anlegen eines Kurses zählt **Meine Termine überspringen** diese Stunden nicht, wie Feiertage. Oben wählst du **Monat** oder **Liste**: Der Monat zeigt einen Punkt für jede Privatstunde (weiß), Kursstunde (in der Kursfarbe) und jedes Schülerturnier (lila), Feiertage mit roter Zahl und deine Termine in Orange; tippe auf einen Tag, um seine Einträge zu sehen, und auf einen Eintrag, um ihn zu öffnen (‹ › wechseln den Monat, der Titel springt zu heute).
 - **Meine Kurse** (Reiter Schüler): die Kurse der Tennisschule, die das Büro dir mit **An den Trainer schicken** sendet (eine Datei per WhatsApp, zu öffnen mit **Teilen › TSM**). Die Teilnehmer werden deine Schüler, mit den Kontakten der Eltern und der Einwilligung. Im Kurs eine Stunde antippen für die **Anwesenheit** (wer da war und was ihr gemacht habt: kommt ins Tagebuch der Anwesenden) oder um sie abzusagen und die Teilnehmer zu benachrichtigen; dann schickt **Anwesenheit schicken** sie ans Büro, das sie im Kurs speichert. Eine neue Karte desselben Kurses aktualisiert Teilnehmer und Zeiten, die Anwesenheit bleibt. Im Kurs erstellt **Liste** die Anwesenheitsliste als PDF (Schüler pro Stunde: ✓ da, ✗ gefehlt, — abgesagt, und die Summe) zum Teilen oder Drucken; das Büro findet sie unter *Stunden › Anwesenheitsliste (PDF)*. Mit **Als Excel speichern** wird dieselbe Liste zu einer .xlsx-Tabelle (Excel, Google Tabellen, LibreOffice). Mit **Neuer Kurs** legst du einen eigenen an, nicht vom Büro (Name, Niveau, Daten, Zeiten, Ort, Schüler; ändern mit **Bearbeiten**): Anwesenheit, Liste, Kalender und Erinnerungen wie bei den anderen, aber die Anwesenheit bleibt bei dir. Deine Kurse sind blau, die des Büros in der Farbe der App (auch am PC). Jeder Kurs hat ein Farbetikett, das du aus acht wählst (**Farbe**, im Kurs oder beim Anlegen): man sieht es in der Liste, der Anwesenheitsliste und im Kalender, auch am PC. Beim Anlegen eines Kurses wählst du das Startdatum und die **Anzahl der Stunden**: Das Enddatum ergibt sich aus den Zeiten; mit **Feiertage überspringen** (an) zählen Stunden an einem gesetzlichen Feiertag nicht und gelten als abgesagt (über die Anwesenheit wieder einsetzbar). Feiertage erscheinen rot in den Kursstunden und im Kalender. Bei vielen Teilnehmern haben Schülerauswahl und Anwesenheit eine **Suche**, ganze Gruppen lassen sich hinzufügen, **Alle**/**Keiner** und *Nur ausgewählte*.
 - **Anwesenheit in Privatstunden**: in einer gemachten Stunde für jeden Schüler *Da*, *Gefehlt* (zählt zum Paket) oder *Entschuldigt* (nachzuholen); eine **Nachholstunde** zählt nicht zum Paket. Die Karte des Schülers zeigt Fehlzeiten und nachzuholende Stunden.
 - **Fortschritte in der Karte des Schülers**: **Technische Bewertung** (1 bis 5 für Aufschlag, Vorhand, Rückhand, Netzspiel, Beinarbeit, Taktik und mentale Stärke, mit der Änderung seit dem letzten Mal), **Fitnesstests** (Sprint, Spider, Sprung, Yo-Yo), **Rangliste und Turniere** (die Rangliste mit Verlauf und geplante Turniere) und **Ergebnisse von außerhalb** (anderswo gespielte Matches, von Hand eingetragen). Alles kommt in den Bericht; **Bericht an alle** (Schülerliste) schickt jedem sein PDF, bei Minderjährigen an die Eltern. In der Liste zeigt *nachlassend*, wer sich in der letzten Bewertung verschlechtert hat.
@@ -11382,7 +11382,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
 - **The students list**: **Search a student** by name, sort *By name* or *By last time*, filter *All*, *Not seen lately* (not seen for more than 2 weeks) or a group. Under each name is the last time you saw them (session or lesson done).
 - **Groups** (*Groups ›* at the top of the list): *New group* with a name and students (for example "U14 squad"); a group can be filtered, put in a lesson and notified all together with **Write**.
-- **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack. **My commitments** (at the bottom of the Agenda): **Commitment** marks the days you're not available (from… to…, busy, holiday, tournament, sick, other and a note). They show in orange in the lessons and the calendar; if a private or course lesson falls on them, a warning with the list appears at the top. When creating a course, **Skip my commitments** doesn't count those lessons, like holidays.
+- **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack. **My commitments** (at the bottom of the Agenda): **Commitment** marks the days you're not available (from… to…, busy, holiday, tournament, sick, other and a note). They show in orange in the lessons and the calendar; if a private or course lesson falls on them, a warning with the list appears at the top. When creating a course, **Skip my commitments** doesn't count those lessons, like holidays. At the top choose **Month** or **List**: the month shows a dot for each private lesson (white), course lesson (in the course colour) and student tournament (purple), holidays with the number in red and your commitments in orange; tap a day to see its items and one to open it (‹ › change month, the title goes back to today).
 - **My courses** (Students tab): the tennis school courses the club office sends you with **Send to the coach** (a file on WhatsApp, to open with **Share › TSM**). The participants become your students with their parents' contacts and consent. In the course tap a lesson for the **roll call** (who was there and what you did: it goes in the diary of those present) or to cancel it and notify the participants; then **Send attendance** sends it to the office, which records it in the course. A new card for the same course updates participants and times, attendance stays. In the course **Register** makes the attendance register as a PDF (students by lesson: ✓ present, ✗ absent, — cancelled, and the total) to share or print; the club office finds it in *Lessons › Attendance register (PDF)*. With **Save as Excel** the same register becomes an .xlsx sheet (Excel, Google Sheets, LibreOffice). With **New course** you make one of your own, not the club office's (name, level, dates, times, place, students; change it with **Edit**): roll call, register, calendar and reminders as for the others, but attendance stays yours. Your courses are in blue, the club office's in the app's colour (on the PC too). Each course has a colour label you pick from eight (**Colour**, in the course or when you create it): you see it in the list, the register and the calendar, on the PC too. When creating a course you pick the start date and the **number of lessons**: the end date is worked out from the times; with **Skip holidays** (on) lessons falling on a national holiday don't count and are marked cancelled (you can put them back from the roll call). Holidays show in red in the course lessons and in the agenda. With many students, picking students and the roll call have a **search**, whole groups can be added, **All**/**None** and *Chosen only*.
 - **Attendance in private lessons**: in a lesson done, for each student *Present*, *Absent* (counts against the pack) or *Excused* (to make up); a **Make-up lesson** doesn't count against the pack. The student's card shows absences and lessons to make up.
 - **Progress in the student's card**: **Technical assessment** (1 to 5 for serve, forehand, backhand, net play, movement, tactics and mental game, with the change since last time), **Fitness tests** (sprint, spider, jump, yo-yo), **Ranking and tournaments** (the ranking with its history and planned tournaments) and **Results from elsewhere** (matches played elsewhere, written by hand). It all goes into the report; **Report to everyone** (students list) sends each one their PDF, to the parent for minors. In the list *slipping* shows who went down in the last assessment.
@@ -11988,7 +11988,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 - **La lista de alumnos**: **Buscar un alumno** por nombre, ordenar *Por nombre* o *Por última vez*, filtrar *Todos*, *Por volver a ver* (no los ves desde hace más de 2 semanas) o un grupo. Bajo cada nombre aparece la última vez que lo viste (sesión o clase hecha).
 - **Grupos** (*Grupos ›* arriba de la lista): *Nuevo grupo* con nombre y alumnos (por ejemplo "Competición U14"); el grupo se filtra, se pone en una clase y se avisa todo junto con **Escribir**.
-- **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno. **Mis compromisos** (al final de la Agenda): **Compromiso** marca los días en que no estás (del… al…, ocupado, vacaciones, torneo, enfermo, otro y una nota). Salen en naranja en las clases y en el calendario; si una clase privada o de un curso cae en ellos, arriba aparece el aviso con la lista. Al crear un curso, **Saltar mis compromisos** no cuenta esas clases, como los festivos.
+- **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno. **Mis compromisos** (al final de la Agenda): **Compromiso** marca los días en que no estás (del… al…, ocupado, vacaciones, torneo, enfermo, otro y una nota). Salen en naranja en las clases y en el calendario; si una clase privada o de un curso cae en ellos, arriba aparece el aviso con la lista. Al crear un curso, **Saltar mis compromisos** no cuenta esas clases, como los festivos. Arriba eliges **Mes** o **Lista**: el mes muestra un punto por cada clase privada (blanco), clase de curso (en el color del curso) y torneo de un alumno (morado), los festivos con el número en rojo y tus compromisos en naranja; toca un día para ver lo que tiene y una cosa para abrirla (‹ › cambian de mes, el título vuelve a hoy).
 - **Mis cursos** (pestaña Alumnos): los cursos de la escuela de tenis que la secretaría te envía con **Enviar al entrenador** (un archivo por WhatsApp, para abrir con **Compartir › TSM**). Los inscritos pasan a ser tus alumnos con los contactos de los padres y el consentimiento. En el curso toca una clase para **pasar lista** (quién estaba y qué habéis hecho: va al diario de los presentes) o para anularla y avisar a los inscritos; luego **Enviar asistencia** la manda a la secretaría, que la registra en el curso. Una ficha nueva del mismo curso actualiza inscritos y horarios, la asistencia se queda. En el curso, **Registro** crea el registro de asistencia en PDF (alumnos por clase: ✓ presente, ✗ ausente, — anulada, y el total) para compartir o imprimir; la secretaría lo encuentra en *Clases › Registro de asistencia (PDF)*. Con **Guardar en Excel** el mismo registro se convierte en una hoja .xlsx (Excel, Hojas de cálculo de Google, LibreOffice). Con **Nuevo curso** creas uno tuyo, no de la secretaría (nombre, nivel, fechas, horarios, lugar, alumnos; se cambia con **Editar**): pasar lista, registro, calendario y recordatorios como los demás, pero la asistencia es tuya. Tus cursos van en azul, los de la secretaría en el color de la app (también en el PC). Cada curso tiene una etiqueta de color que eliges entre ocho (**Color de la etiqueta**, en el curso o al crearlo): la ves en la lista, el registro y el calendario, también en el PC. Al crear un curso eliges la fecha de inicio y el **número de clases**: la fecha de fin se calcula sola según los horarios; con **Saltar los festivos** (activado) las clases que caen en un festivo nacional no cuentan y quedan anuladas (se recuperan desde la lista). Los festivos aparecen en rojo en las clases del curso y en la agenda. Con muchos inscritos, la elección de alumnos y la lista tienen **búsqueda**, se añaden grupos enteros, **Todos**/**Ninguno** y *Solo los elegidos*.
 - **Asistencia en las clases particulares**: en una clase hecha, para cada alumno *Presente*, *Ausente* (cuenta en el paquete) o *Justificado* (por recuperar); una **Clase de recuperación** no descuenta del paquete. La ficha del alumno muestra ausencias y clases por recuperar.
 - **Progresos en la ficha del alumno**: **Evaluación técnica** (de 1 a 5 en saque, derecha, revés, red, movimiento, táctica y mentalidad, con la diferencia desde la vez anterior), **Pruebas físicas** (sprint, spider, salto, yo-yo), **Clasificación y torneos** (la clasificación con su historial y los torneos previstos) y **Resultados de fuera** (partidos jugados en otro sitio, escritos a mano). Todo entra en el informe; **Informe a todos** (lista de alumnos) envía a cada uno su PDF, al padre o madre si es menor. En la lista *empeorando* muestra quién bajó en la última evaluación.
@@ -12594,7 +12594,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
 - **La liste des élèves**: **Chercher un élève** par nom, trier *Par nom* ou *Par dernière fois*, filtrer *Tous*, *À revoir* (pas vus depuis plus de 2 semaines) ou un groupe. Sous chaque nom, la dernière fois que vous l'avez vu (séance ou cours fait).
 - **Groupes** (*Groupes ›* en haut de la liste) : *Nouveau groupe* avec un nom et des élèves (par exemple « Compétition U14 ») ; un groupe se filtre, se met dans un cours et se prévient d'un coup avec **Écrire**.
-- **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève. **Mes indisponibilités** (en bas de l'Agenda) : **Indisponibilité** marque les jours où tu n'es pas là (du… au…, occupé, congés, tournoi, malade, autre et une note). Elles sont en orange dans les leçons et le calendrier ; si une leçon privée ou une séance de cours tombe dessus, un avertissement avec la liste apparaît en haut. En créant un cours, **Sauter mes indisponibilités** ne compte pas ces séances, comme les jours fériés.
+- **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève. **Mes indisponibilités** (en bas de l'Agenda) : **Indisponibilité** marque les jours où tu n'es pas là (du… au…, occupé, congés, tournoi, malade, autre et une note). Elles sont en orange dans les leçons et le calendrier ; si une leçon privée ou une séance de cours tombe dessus, un avertissement avec la liste apparaît en haut. En créant un cours, **Sauter mes indisponibilités** ne compte pas ces séances, comme les jours fériés. En haut, choisis **Mois** ou **Liste** : le mois montre un point pour chaque leçon privée (blanc), séance de cours (dans la couleur du cours) et tournoi d'un élève (violet), les jours fériés avec le numéro en rouge et tes indisponibilités en orange ; touche un jour pour voir son contenu et un élément pour l'ouvrir (‹ › changent de mois, le titre revient à aujourd'hui).
 - **Mes cours** (onglet Élèves) : les cours de l'école de tennis que le secrétariat vous envoie avec **Envoyer à l'entraîneur** (un fichier sur WhatsApp, à ouvrir avec **Partager › TSM**). Les inscrits deviennent vos élèves avec les contacts des parents et le consentement. Dans le cours, touchez une séance pour l'**appel** (qui était là et ce que vous avez fait : ça va dans le journal des présents) ou pour l'annuler et prévenir les inscrits ; puis **Envoyer les présences** les envoie au secrétariat, qui les enregistre dans le cours. Une nouvelle fiche du même cours met à jour inscrits et horaires, les présences restent. Dans le cours, **Registre** crée le registre des présences en PDF (élèves par séance : ✓ présent, ✗ absent, — annulée, et le total) à partager ou imprimer ; le secrétariat le trouve dans *Leçons › Registre des présences (PDF)*. Avec **Enregistrer en Excel**, le même registre devient une feuille .xlsx (Excel, Google Sheets, LibreOffice). Avec **Nouveau cours** vous en créez un à vous, pas du secrétariat (nom, niveau, dates, horaires, lieu, élèves ; il se change avec **Modifier**) : appel, registre, agenda et rappels comme les autres, mais les présences restent à vous. Vos cours sont en bleu, ceux du secrétariat dans la couleur de l'appli (sur le PC aussi). Chaque cours a une étiquette de couleur à choisir parmi huit (**Couleur**, dans le cours ou à sa création) : on la voit dans la liste, le registre et l'agenda, sur le PC aussi. En créant un cours, tu choisis la date de début et le **nombre de séances** : la date de fin se calcule toute seule d'après les horaires ; avec **Sauter les jours fériés** (activé), les séances qui tombent un jour férié national ne comptent pas et sont annulées (on les remet depuis l'appel). Les jours fériés apparaissent en rouge dans les leçons du cours et dans l'agenda. Avec beaucoup d'inscrits, le choix des élèves et l'appel ont une **recherche**, on ajoute des groupes entiers, **Tous**/**Aucun** et *Seulement les choisis*.
 - **Présences aux cours particuliers** : dans un cours fait, pour chaque élève *Présent*, *Absent(e)* (compte dans le forfait) ou *Excusé* (à rattraper) ; un **Cours de rattrapage** ne compte pas dans le forfait. La fiche de l'élève montre absences et cours à rattraper.
 - **Progrès dans la fiche de l'élève** : **Évaluation technique** (de 1 à 5 pour service, coup droit, revers, filet, déplacement, tactique et mental, avec l'écart depuis la dernière fois), **Tests physiques** (sprint, spider, saut, yo-yo), **Classement et tournois** (le classement avec son historique et les tournois prévus) et **Résultats d'ailleurs** (matchs joués ailleurs, saisis à la main). Tout entre dans le rapport ; **Rapport à tous** (liste des élèves) envoie à chacun son PDF, au parent s'il est mineur. Dans la liste, *en baisse* montre qui a baissé à la dernière évaluation.
@@ -13200,7 +13200,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
 - **L'elenco degli allievi**: **Cerca un allievo** per nome, ordina *Per nome* o *Per ultima volta*, filtra *Tutti*, *Da rivedere* (non li vedi da più di 2 settimane) o un gruppo. Sotto ogni nome c'è l'ultima volta che l'hai visto (sessione o lezione fatta).
 - **Gruppi** (*Gruppi ›* in cima all'elenco): *Nuovo gruppo* con nome e allievi (per esempio "Agonisti U14"); il gruppo si filtra, si mette in una lezione e con **Scrivi** si avvisa tutto insieme.
-- **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo. **I miei impegni** (in fondo all'Agenda): **Impegno** segna i giorni in cui non ci sei (dal… al…, occupato, ferie, torneo, malattia, altro e una nota). Sono in arancione nelle lezioni e nel calendario; se una lezione privata o di un corso ci cade, in cima compare l'avviso con l'elenco. Creando un corso, **Salta i miei impegni** non conta quelle lezioni, come le feste.
+- **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo. **I miei impegni** (in fondo all'Agenda): **Impegno** segna i giorni in cui non ci sei (dal… al…, occupato, ferie, torneo, malattia, altro e una nota). Sono in arancione nelle lezioni e nel calendario; se una lezione privata o di un corso ci cade, in cima compare l'avviso con l'elenco. Creando un corso, **Salta i miei impegni** non conta quelle lezioni, come le feste. In cima scegli **Mese** o **Elenco**: il mese mostra un pallino per ogni lezione privata (bianco), lezione di corso (nel colore del corso) e torneo di un allievo (viola), le feste col numero in rosso e i tuoi impegni in arancione; tocca un giorno per vederne le cose e una per aprirla (‹ › cambiano mese, il titolo torna a oggi).
 - **I miei corsi** (scheda Allievi): i corsi della scuola tennis che la segreteria ti manda con **Manda all'allenatore** (un file su WhatsApp, da aprire con **Condividi › TSM**). Gli iscritti diventano tuoi allievi con i contatti dei genitori e il consenso. Nel corso tocca una lezione per l'**appello** (chi c'era e cosa avete fatto: va nel diario di chi c'era) o per annullarla e avvisare gli iscritti; poi **Manda le presenze** le spedisce alla segreteria, che le registra nel corso. Una scheda nuova dello stesso corso aggiorna iscritti e orari, le presenze restano. Nel corso **Registro** fa il registro presenze in PDF (allievi per lezione: ✓ presente, ✗ assente, — annullata, e il totale) da condividere o stampare; la segreteria lo trova in *Lezioni › Registro presenze (PDF)*. Con **Salva in Excel** lo stesso registro diventa un foglio .xlsx (Excel, Fogli Google, LibreOffice). Con **Nuovo corso** ne fai uno tuo, non della segreteria (nome, livello, date, orari, dove, allievi; si cambia con **Modifica**): appello, registro, calendario e promemoria come gli altri, ma le presenze restano tue. I tuoi corsi sono in azzurro, quelli della segreteria nel colore dell'app (anche sul PC). Ogni corso ha un'etichetta colorata che scegli tra otto (**Colore**, nel corso o quando lo crei): la vedi nell'elenco, nel registro e nel calendario, anche sul PC. Creando un corso scegli la data d'inizio e il **numero di lezioni**: la data di fine si calcola da sola dagli orari; con **Salta le feste** (acceso) le lezioni che cadono in una festività nazionale non contano e risultano annullate (si rimettono dall'appello). Le feste compaiono in rosso nelle lezioni del corso e nell'agenda. Con tanti iscritti, nella scelta degli allievi e nell'appello c'è la **ricerca**, si aggiungono interi gruppi, **Tutti**/**Nessuno** e *Solo i selezionati*.
 - **Presenze nelle lezioni private**: in una lezione fatta, per ogni allievo *Presente*, *Assente* (conta nel pacchetto) o *Giustificato* (da recuperare); una **Lezione di recupero** non scala dal pacchetto. La scheda dell'allievo mostra assenze e lezioni da recuperare.
 - **Progressi nella scheda dell'allievo**: **Valutazione tecnica** (da 1 a 5 per servizio, dritto, rovescio, rete, movimento, tattica e testa, con la differenza dalla volta prima), **Test fisici** (scatto, spider, salto, yo-yo), **Classifica e tornei** (la classifica con la sua storia e i tornei in programma) e **Risultati da fuori** (partite giocate altrove, scritte a mano). Tutto entra nel report; **Report a tutti** (elenco degli allievi) manda a ciascuno il suo PDF, al genitore se è minorenne. Nell'elenco *In calo* mostra chi è sceso nell'ultima valutazione.
@@ -13806,7 +13806,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 - **A lista de alunos**: **Procurar um aluno** pelo nome, ordenar *Por nome* ou *Pela última vez*, filtrar *Todos*, *Por rever* (não os vês há mais de 2 semanas) ou um grupo. Debaixo de cada nome aparece a última vez que o viste (sessão ou aula feita).
 - **Grupos** (*Grupos ›* no topo da lista): *Novo grupo* com nome e alunos (por exemplo "Competição U14"); o grupo filtra-se, põe-se numa aula e avisa-se todo de uma vez com **Escrever**.
-- **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno. **Os meus compromissos** (no fim da Agenda): **Compromisso** marca os dias em que não estás (de… até…, ocupado, férias, torneio, doente, outro e uma nota). Aparecem a laranja nas aulas e no calendário; se uma aula privada ou de um curso calhar neles, no topo aparece o aviso com a lista. Ao criar um curso, **Saltar os meus compromissos** não conta essas aulas, como os feriados.
+- **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno. **Os meus compromissos** (no fim da Agenda): **Compromisso** marca os dias em que não estás (de… até…, ocupado, férias, torneio, doente, outro e uma nota). Aparecem a laranja nas aulas e no calendário; se uma aula privada ou de um curso calhar neles, no topo aparece o aviso com a lista. Ao criar um curso, **Saltar os meus compromissos** não conta essas aulas, como os feriados. Em cima escolhes **Mês** ou **Lista**: o mês mostra um ponto por cada aula privada (branco), aula de curso (na cor do curso) e torneio de um aluno (roxo), os feriados com o número a vermelho e os teus compromissos a laranja; toca num dia para ver o que tem e numa coisa para a abrir (‹ › mudam de mês, o título volta a hoje).
 - **Os meus cursos** (separador Alunos): os cursos da escola de ténis que a secretaria lhe envia com **Enviar ao treinador** (um arquivo por WhatsApp, para abrir com **Compartilhar › TSM**). Os inscritos passam a ser seus alunos com os contactos dos pais e o consentimento. No curso toque numa aula para a **chamada** (quem esteve e o que fizeram: vai para o diário de quem esteve) ou para a anular e avisar os inscritos; depois **Enviar presenças** envia-as à secretaria, que as regista no curso. Uma ficha nova do mesmo curso atualiza inscritos e horários, as presenças ficam. No curso, **Registo** cria o registo de presenças em PDF (alunos por aula: ✓ presente, ✗ faltou, — anulada, e o total) para partilhar ou imprimir; a secretaria encontra-o em *Aulas › Registo de presenças (PDF)*. Com **Guardar em Excel** o mesmo registo torna-se uma folha .xlsx (Excel, Google Sheets, LibreOffice). Com **Novo curso** cria um seu, não da secretaria (nome, nível, datas, horários, local, alunos; muda-se com **Editar**): chamada, registo, calendário e lembretes como os outros, mas as presenças ficam suas. Os seus cursos ficam a azul, os da secretaria na cor da app (também no PC). Cada curso tem uma etiqueta de cor que escolhe entre oito (**Cor**, no curso ou ao criá-lo): vê-a na lista, no registo e no calendário, também no PC. Ao criar um curso escolhes a data de início e o **número de aulas**: a data de fim calcula-se sozinha pelos horários; com **Saltar os feriados** (ligado) as aulas que calham num feriado nacional não contam e ficam canceladas (repõem-se na chamada). Os feriados aparecem a vermelho nas aulas do curso e na agenda. Com muitos inscritos, a escolha de alunos e a chamada têm **pesquisa**, juntam-se grupos inteiros, **Todos**/**Nenhum** e *Só os escolhidos*.
 - **Presenças nas aulas particulares**: numa aula feita, para cada aluno *Presente*, *Faltou* (conta no pacote) ou *Justificado* (por repor); uma **Aula de reposição** não desconta do pacote. A ficha do aluno mostra faltas e aulas por repor.
 - **Progressos na ficha do aluno**: **Avaliação técnica** (de 1 a 5 em saque, direita, esquerda, rede, movimentação, tática e mentalidade, com a diferença desde a vez anterior), **Testes físicos** (sprint, spider, salto, yo-yo), **Ranking e torneios** (o ranking com o histórico e os torneios previstos) e **Resultados de fora** (partidas jogadas noutro lado, escritas à mão). Tudo entra no relatório; **Relatório a todos** (lista de alunos) envia a cada um o seu PDF, ao responsável se for menor. Na lista *em queda* mostra quem desceu na última avaliação.
@@ -40897,6 +40897,162 @@ fun BusyDialog(c: MatchController, b0: CoachBusy, isNew: Boolean, onDone: () -> 
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CoachCalendarUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CoachCalendarUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.CoachBook
+import com.tennis.scoremanager.data.CoachLesson
+import com.tennis.scoremanager.data.Coaching
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Courses
+import com.tennis.scoremanager.data.Holidays
+import com.tennis.scoremanager.data.Reports
+import java.util.Calendar
+
+/** I tornei degli allievi nel calendario (viola: non si confonde con feste, impegni e corsi). */
+private val EventColor = Color(0xFFAB47BC)
+
+/** Una cosa del calendario dell'allenatore: lezione privata, lezione di un corso o torneo di un allievo. */
+private data class CalEntry(val start: Long, val minutes: Int, val title: String, val color: Color, val cancelled: Boolean, val open: () -> Unit)
+
+/** Il primo giorno del mese di [t] (inizio del giorno). */
+private fun monthStart(t: Long): Long = Calendar.getInstance().apply {
+    timeInMillis = CourtPlans.dayStart(t); set(Calendar.DAY_OF_MONTH, 1)
+}.timeInMillis
+
+private fun addMonths(t: Long, n: Int): Long = Calendar.getInstance().apply { timeInMillis = t; add(Calendar.MONTH, n) }.timeInMillis
+
+/**
+ * Il mese dell'allenatore: lezioni private, lezioni dei corsi (nel colore del corso) e tornei degli allievi; le feste
+ * in rosso, i giorni occupati in arancione. Tocca un giorno per vederne le cose, e una cosa per aprirla.
+ */
+@Composable
+fun CoachMonthCalendar(c: MatchController, book: CoachBook, onLesson: (CoachLesson) -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    val country = remember(lang) { Holidays.country(lang.code) }
+    val today = CourtPlans.dayStart(System.currentTimeMillis())
+    var month by rememberSaveable { mutableLongStateOf(monthStart(today)) }
+    var picked by rememberSaveable { mutableLongStateOf(today) }
+    val next = addMonths(month, 1)
+    val names = { ids: List<String> -> ids.mapNotNull { c.playerById(it)?.name }.joinToString(", ") }
+    // Tutto il mese, giorno per giorno.
+    val byDay = remember(book, month) {
+        val out = mutableListOf<CalEntry>()
+        for (l in book.lessons.filter { it.start in month until next }) out += CalEntry(l.start, l.minutes, names(l.students).ifBlank { "—" }, TsmColors.TextMain, l.cancelled) { onLesson(l) }
+        for (cc in book.courses) {
+            val co = cc.course
+            for (les in Courses.lessons(co).filter { it.start in month until next })
+                out += CalEntry(les.start, les.minutes, co.name, courseColor(cc.label), les.key in co.cancelled) { c.openCoachCourse(co.id) }
+        }
+        for (e in book.events.filter { it.at in month until next }) out += CalEntry(e.at, 0, "${e.name} · ${c.playerById(e.student)?.name.orEmpty()}", EventColor, false) { c.openStudent(e.student) }
+        out.sortedBy { it.start }.groupBy { CourtPlans.dayStart(it.start) }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { month = addMonths(month, -1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null, tint = TsmColors.TextMain) }
+            Text(java.text.SimpleDateFormat("LLLL yyyy", lang.locale).format(month).replaceFirstChar { it.titlecase(lang.locale) },
+                color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp, textAlign = TextAlign.Center, modifier = Modifier.weight(1f)
+                    .clickable { month = monthStart(today); picked = today })
+            IconButton(onClick = { month = addMonths(month, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
+        }
+        // Le intestazioni da lunedì e le settimane del mese.
+        Row(Modifier.fillMaxWidth()) {
+            for (d in 1..7) Text(java.time.DayOfWeek.of(d).getDisplayName(java.time.format.TextStyle.SHORT, lang.locale).take(3),
+                color = TsmColors.TextDim, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
+        }
+        val lead = CourtPlans.weekday(month) - 1
+        val days = generateSequence(month) { CourtPlans.addDays(it, 1) }.takeWhile { it < next }.toList()
+        val cells: List<Long?> = List(lead) { null } + days
+        for (week in cells.chunked(7)) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            for (i in 0 until 7) {
+                val d = week.getOrNull(i)
+                Box(Modifier.weight(1f).aspectRatio(0.9f)) {
+                    if (d != null) {
+                        val holiday = Holidays.on(d + 12 * 3_600_000L, country)
+                        val busy = Coaching.busyOn(book.busy, d + 12 * 3_600_000L)
+                        val items = byDay[d].orEmpty()
+                        Column(
+                            Modifier.fillMaxWidth().aspectRatio(0.9f).clip(RoundedCornerShape(8.dp))
+                                .background(if (busy != null) TsmColors.Orange.copy(alpha = 0.22f) else TsmColors.Surface)
+                                .then(if (d == picked) Modifier.border(2.dp, TsmColors.Ball, RoundedCornerShape(8.dp)) else Modifier)
+                                .clickable { picked = d }.padding(3.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(Calendar.getInstance().apply { timeInMillis = d }.get(Calendar.DAY_OF_MONTH).toString(),
+                                color = when { holiday != null -> TsmColors.Danger; d == today -> TsmColors.Ball; else -> TsmColors.TextMain },
+                                fontWeight = if (d == today || holiday != null) FontWeight.Bold else FontWeight.Normal, fontSize = 14.sp)
+                            // Un pallino per cosa (al massimo quattro), nel suo colore.
+                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                for (e in items.take(4)) Box(Modifier.size(6.dp).clip(CircleShape).background(if (e.cancelled) TsmColors.TextDim else e.color))
+                            }
+                            if (items.size > 4) Text("+${items.size - 4}", color = TsmColors.TextDim, fontSize = 9.sp)
+                        }
+                    }
+                }
+            }
+        }
+        // Il giorno scelto: feste, impegni e le sue cose da aprire.
+        Text(com.tennis.scoremanager.data.Notices.day(picked, lang).replaceFirstChar { it.titlecase(lang.locale) }, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 6.dp))
+        Holidays.on(picked + 12 * 3_600_000L, country)?.let { Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+        Coaching.busyOn(book.busy, picked + 12 * 3_600_000L)?.let { Text(busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+        val items = byDay[picked].orEmpty()
+        if (items.isEmpty()) Text(s.agDayEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
+        for (e in items) Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { e.open() }.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.width(5.dp).size(5.dp, 30.dp).clip(RoundedCornerShape(3.dp)).background(e.color))
+            Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                Text(Reports.time(e.start, lang) + if (e.minutes > 0) " · " + s.coMinutes(e.minutes) else "", color = TsmColors.TextDim, fontSize = 12.sp)
+                Text(e.title, color = if (e.cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                if (e.cancelled) Text(s.coCancelled, color = TsmColors.Orange, fontSize = 12.sp)
+            }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CoachCoursesUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CoachCoursesUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -49409,6 +49565,9 @@ interface Strings {
     val clCancelThem: String
     val clKeepThem: String
     val clLessonsHit: (Int) -> String
+    val agMonth: String
+    val agList: String
+    val agDayEmpty: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -52081,6 +52240,9 @@ object ItStrings : Strings {
     override val clCancelThem = "Annulla quelle lezioni"
     override val clKeepThem = "Lasciale"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 lezione dei corsi cade in questi giorni" else "$it lezioni dei corsi cadono in questi giorni" }
+    override val agMonth = "Mese"
+    override val agList = "Elenco"
+    override val agDayEmpty = "Niente in programma."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -54754,6 +54916,9 @@ object EnStrings : Strings {
     override val clCancelThem = "Cancel those lessons"
     override val clKeepThem = "Keep them"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 course lesson falls on these days" else "$it course lessons fall on these days" }
+    override val agMonth = "Month"
+    override val agList = "List"
+    override val agDayEmpty = "Nothing planned."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -57452,6 +57617,9 @@ object DeStrings : Strings {
     override val clCancelThem = "Diese Stunden absagen"
     override val clKeepThem = "Behalten"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 Kursstunde fällt auf diese Tage" else "$it Kursstunden fallen auf diese Tage" }
+    override val agMonth = "Monat"
+    override val agList = "Liste"
+    override val agDayEmpty = "Nichts geplant."
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -60140,6 +60308,9 @@ object EsStrings : Strings {
     override val clCancelThem = "Anular esas clases"
     override val clKeepThem = "Dejarlas"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 clase de los cursos cae en estos días" else "$it clases de los cursos caen en estos días" }
+    override val agMonth = "Mes"
+    override val agList = "Lista"
+    override val agDayEmpty = "Nada previsto."
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -62830,6 +63001,9 @@ object FrStrings : Strings {
     override val clCancelThem = "Annuler ces séances"
     override val clKeepThem = "Les garder"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 séance de cours tombe ces jours-là" else "$it séances de cours tombent ces jours-là" }
+    override val agMonth = "Mois"
+    override val agList = "Liste"
+    override val agDayEmpty = "Rien de prévu."
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -65521,6 +65695,9 @@ object PtStrings : Strings {
     override val clCancelThem = "Cancelar essas aulas"
     override val clKeepThem = "Deixá-las"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 aula dos cursos calha nestes dias" else "$it aulas dos cursos calham nestes dias" }
+    override val agMonth = "Mês"
+    override val agList = "Lista"
+    override val agDayEmpty = "Nada previsto."
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -70740,7 +70917,11 @@ fun LessonsScreen(c: MatchController) {
     ) {
         val tomorrow = tomorrowLessons(book, now)
         if (tomorrow.isNotEmpty()) BigButton(s.coRemindTomorrow(tomorrow.size), Icons.Filled.NotificationsActive, { c.noticeLessons(tomorrow) }, Modifier.fillMaxWidth())
-        SectionCard(s.coUpcoming, Icons.Filled.Event) {
+        // Il mese (lezioni private, corsi, tornei, feste e impegni) o l'elenco delle prossime.
+        var asList by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        com.tennis.scoremanager.ui.Segmented(listOf(com.tennis.scoremanager.ui.SegOption(s.agMonth), com.tennis.scoremanager.ui.SegOption(s.agList)), if (asList) 1 else 0, { asList = it == 1 })
+        if (!asList) SectionCard(s.coAgenda, Icons.Filled.Event) { com.tennis.scoremanager.ui.CoachMonthCalendar(c, book) { open = it } }
+        else SectionCard(s.coUpcoming, Icons.Filled.Event) {
             val next = Coaching.upcoming(book.lessons, now)
             if (next.isEmpty()) Text(s.coNoLessons, color = TsmColors.TextDim)
             for (l in next.take(30)) LessonRow(c, l) { open = l }
@@ -115048,6 +115229,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 370 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 371 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

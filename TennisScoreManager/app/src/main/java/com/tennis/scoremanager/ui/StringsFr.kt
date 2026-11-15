@@ -2678,6 +2678,9 @@ object FrStrings : Strings {
     override val clCancelThem = "Annuler ces séances"
     override val clKeepThem = "Les garder"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 séance de cours tombe ces jours-là" else "$it séances de cours tombent ces jours-là" }
+    override val agMonth = "Mois"
+    override val agList = "Liste"
+    override val agDayEmpty = "Rien de prévu."
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

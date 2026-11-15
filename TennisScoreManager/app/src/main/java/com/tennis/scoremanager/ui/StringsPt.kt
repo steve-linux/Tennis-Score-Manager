@@ -2679,6 +2679,9 @@ object PtStrings : Strings {
     override val clCancelThem = "Cancelar essas aulas"
     override val clKeepThem = "Deixá-las"
     override val clLessonsHit: (Int) -> String = { if (it == 1) "1 aula dos cursos calha nestes dias" else "$it aulas dos cursos calham nestes dias" }
+    override val agMonth = "Mês"
+    override val agList = "Lista"
+    override val agDayEmpty = "Nada previsto."
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
