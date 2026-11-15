@@ -2726,6 +2726,18 @@ interface Strings {
     val pfFrom: (String) -> String
     val pfExisting: (String) -> String
     val pfQrTitle: (String) -> String
+    val scMove: String
+    val scMoveTitle: String
+    val scMoveHint: String
+    val scMoveTo: String
+    val scMakeup: String
+    val scMoveBack: String
+    val scMovedTitle: String
+    val scNotifyMoved: String
+    val scMoveHoliday: String
+    val scMakeupOn: (String) -> String
+    val scMovedFrom: (String) -> String
+    val scMovedNotice: (String) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5377,6 +5389,18 @@ object ItStrings : Strings {
     override val pfFrom: (String) -> String = { "Da: $it" }
     override val pfExisting: (String) -> String = { "C'è già $it: si completa con i dati che mancano, niente si cancella." }
     override val pfQrTitle: (String) -> String = { "Profilo di $it" }
+    override val scMove = "Sposta"
+    override val scMoveTitle = "Sposta la lezione"
+    override val scMoveHint = "Resta la stessa lezione nel registro: cambiano solo giorno, ora o campo."
+    override val scMoveTo = "Nuovo giorno"
+    override val scMakeup = "Recupero in fondo al corso"
+    override val scMoveBack = "Rimetti com'era"
+    override val scMovedTitle = "Lezione spostata"
+    override val scNotifyMoved = "Sposta e avvisa gli iscritti"
+    override val scMoveHoliday = "Quel giorno è festa"
+    override val scMakeupOn: (String) -> String = { "Recupero: $it" }
+    override val scMovedFrom: (String) -> String = { "Spostata dal $it" }
+    override val scMovedNotice: (String) -> String = { "La lezione del corso $it è spostata:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8029,6 +8053,18 @@ object EnStrings : Strings {
     override val pfFrom: (String) -> String = { "From: $it" }
     override val pfExisting: (String) -> String = { "$it is already here: missing data is filled in, nothing is deleted." }
     override val pfQrTitle: (String) -> String = { "$it's profile" }
+    override val scMove = "Move"
+    override val scMoveTitle = "Move the lesson"
+    override val scMoveHint = "It stays the same lesson in the register: only the day, time or court change."
+    override val scMoveTo = "New day"
+    override val scMakeup = "Make-up at the end of the course"
+    override val scMoveBack = "Put it back"
+    override val scMovedTitle = "Lesson moved"
+    override val scNotifyMoved = "Move and notify the students"
+    override val scMoveHoliday = "That day is a holiday"
+    override val scMakeupOn: (String) -> String = { "Make-up: $it" }
+    override val scMovedFrom: (String) -> String = { "Moved from $it" }
+    override val scMovedNotice: (String) -> String = { "The $it lesson has been moved:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

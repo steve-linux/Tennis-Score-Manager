@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -289,6 +290,7 @@ fun CoachCourseScreen(c: MatchController) {
                         // Lezione in un giorno di festa: in rosso, si vede subito.
                         com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
                         Coaching.busyOn(book.busy, l.start)?.let { Text(busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                        movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                     }
                     Text(
                         when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
@@ -344,11 +346,24 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
     var note by remember { mutableStateOf(cc.notes[l.key].orEmpty()) }
     var query by remember { mutableStateOf("") }
     val canMark = l.start <= System.currentTimeMillis() + 3_600_000L
+    var moving by remember { mutableStateOf(false) }
+    if (moving) {
+        MoveLessonDialog(c, co, l, emptyList(), { start, minutes, court, notify ->
+            val x = c.moveCoachLesson(co.id, l.key, start, minutes, court)
+            moving = false
+            onDone()
+            if (notify && x != null) c.noticeCourseMoved(x, l.key)
+        }) { moving = false }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(lessonText(l, lang)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                // Solo nei suoi corsi: l'orario di quelli della segreteria lo decide lei.
+                if (cc.personal) GhostButton(s.scMove, Icons.Filled.EventRepeat, { moving = true }, Modifier.fillMaxWidth())
                 SwitchRow(Icons.Filled.EventBusy, s.scCancelLesson, null, cancelled) { cancelled = it }
                 if (cancelled) {
                     if (co.students.isNotEmpty()) GhostButton(s.scNotifyCancelled, Icons.Filled.Campaign, {

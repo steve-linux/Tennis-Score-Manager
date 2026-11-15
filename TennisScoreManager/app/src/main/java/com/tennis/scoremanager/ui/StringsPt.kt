@@ -2658,6 +2658,18 @@ object PtStrings : Strings {
     override val pfFrom: (String) -> String = { "De: $it" }
     override val pfExisting: (String) -> String = { "$it já existe: completam-se os dados em falta, nada se apaga." }
     override val pfQrTitle: (String) -> String = { "Perfil de $it" }
+    override val scMove = "Mudar"
+    override val scMoveTitle = "Mudar a aula"
+    override val scMoveHint = "Continua a ser a mesma aula no registo: só mudam o dia, a hora ou o campo."
+    override val scMoveTo = "Novo dia"
+    override val scMakeup = "Reposição no fim do curso"
+    override val scMoveBack = "Repor como estava"
+    override val scMovedTitle = "Aula mudada"
+    override val scNotifyMoved = "Mudar e avisar os inscritos"
+    override val scMoveHoliday = "Esse dia é feriado"
+    override val scMakeupOn: (String) -> String = { "Reposição: $it" }
+    override val scMovedFrom: (String) -> String = { "Mudada de $it" }
+    override val scMovedNotice: (String) -> String = { "A aula do curso $it foi mudada:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }

@@ -36,7 +36,7 @@ object CourtTime {
     /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
     fun blockActive(b: CourtBlock, day: Long): Boolean {
         val d = dayStart(day)
-        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays)
+        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays) && d !in b.except
     }
 
     /** Inizio e fine del blocco nel giorno [day]. */

@@ -44,6 +44,9 @@ class FakeCoach(var time: Long) : CoachData {
     override fun country() = "IT"
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) { book = book.copy(busy = book.busy.filter { it.id != b.id } + b) }
     override fun deleteBusy(id: String) { book = book.copy(busy = book.busy.filter { it.id != id }) }
+    override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {
+        book = book.copy(courses = book.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = com.tennis.scoremanager.data.Courses.move(it.card.course, key, start, minutes, court))) else it })
+    }
     val colors = mutableMapOf<String, String>()
     override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
@@ -182,6 +185,18 @@ class CoachDeskTest {
         assertEquals(200, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
         assertTrue(coach.book.busy.isEmpty())
         assertEquals(404, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
+    }
+
+    @Test fun ownCourseLessonMovesFromThePc() {
+        val tk = login()
+        assertEquals(200, req("POST", "/coach/courses", """{"name":"Mini","from":"2026-11-17","slots":[{"weekday":2,"startMin":1020,"minutes":60,"court":""}],"lessons":3,"skipHolidays":false}""", tk).first)
+        val c = coach.book.courses.single { it.card.course.name == "Mini" }.card.course
+        val first = com.tennis.scoremanager.data.Courses.lessons(c).first()
+        val out = req("POST", "/coach/courses/${c.id}/move", """{"key":"${first.key}","date":"2026-11-19","startMin":1080}""", tk).second
+        assertTrue(out, "\"movedFrom\":\"2026-11-17\"" in out)
+        // Quelli della segreteria no.
+        coach.book = coach.book.copy(courses = coach.book.courses + CoachCourse(CourseCard(code = "X", issuedAt = 1, course = Course("club", "Under 10", slots = c.slots, from = c.from, to = c.to))))
+        assertEquals(409, req("POST", "/coach/courses/club/move", """{"key":"${first.key}","makeup":true}""", tk).first)
     }
 
     @Test fun studentsFromThePcWithoutDuplicates() {

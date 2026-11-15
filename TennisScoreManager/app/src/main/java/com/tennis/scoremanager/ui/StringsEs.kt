@@ -2655,6 +2655,18 @@ object EsStrings : Strings {
     override val pfFrom: (String) -> String = { "De: $it" }
     override val pfExisting: (String) -> String = { "$it ya existe: se completan los datos que faltan, no se borra nada." }
     override val pfQrTitle: (String) -> String = { "Perfil de $it" }
+    override val scMove = "Mover"
+    override val scMoveTitle = "Mover la clase"
+    override val scMoveHint = "Sigue siendo la misma clase en el registro: solo cambian el día, la hora o la pista."
+    override val scMoveTo = "Nuevo día"
+    override val scMakeup = "Recuperación al final del curso"
+    override val scMoveBack = "Dejarla como estaba"
+    override val scMovedTitle = "Clase movida"
+    override val scNotifyMoved = "Mover y avisar a los inscritos"
+    override val scMoveHoliday = "Ese día es festivo"
+    override val scMakeupOn: (String) -> String = { "Recuperación: $it" }
+    override val scMovedFrom: (String) -> String = { "Movida del $it" }
+    override val scMovedNotice: (String) -> String = { "La clase del curso $it se ha movido:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

@@ -84,6 +84,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun noticeCourseMoved(c: Course, key: String) = this.c.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
@@ -203,6 +204,7 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
     override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
+    override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }

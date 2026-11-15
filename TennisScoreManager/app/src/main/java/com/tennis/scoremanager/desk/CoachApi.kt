@@ -35,6 +35,8 @@ interface CoachData {
     fun setCourseColor(id: String, color: String) {}
     fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) {}
     fun deleteBusy(id: String) {}
+    /** Sposta una lezione di un corso dell'allenatore (solo i suoi). */
+    fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
     /** Il Paese per le festività nazionali (quello del telefono). */
@@ -83,7 +85,9 @@ interface CoachData {
     val lessons: Int? = null, val skipHolidays: Boolean = true, val skipBusy: Boolean = false,
 )
 @Serializable data class CdEnd(val to: String? = null)
-@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null, val busy: CdBusy? = null)
+@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null, val busy: CdBusy? = null,
+    val movedFrom: String? = null, val movedFromMin: Int? = null)
+@Serializable data class CdMoveIn(val key: String, val date: String = "", val startMin: Int = 0, val makeup: Boolean = false, val reset: Boolean = false)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
 @Serializable data class CdMonth(
@@ -172,6 +176,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             data.deleteOwnCourse(p[2]); done()
         }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "attendance" -> attendance(p[2], read(CdAttendanceIn.serializer(), r))
+        m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "move" -> moveLesson(p[2], read(CdMoveIn.serializer(), r))
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.pdf" -> { course(p[2]); bytes(data.registerPdf(p[2]), "application/pdf") }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.xlsx" -> { course(p[2]); bytes(data.registerXlsx(p[2]), com.tennis.scoremanager.data.Xlsx.MIME) }
         m == "GET" && p == listOf("coach", "month") -> ok(CdMonth.serializer(), month(r.query["date"]))
@@ -266,7 +271,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         return CdRegister(
             head,
             lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L,
-                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone()), Coaching.busyOn(data.book().busy, it.start)?.let(::busyOut)) },
+                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone()), Coaching.busyOn(data.book().busy, it.start)?.let(::busyOut),
+                it.movedFrom?.let { f -> day(f) }, it.movedFrom?.let { f -> minOf(f) }) },
             co.students.sortedBy { (names[it] ?: "").lowercase() }.map { sid ->
                 val (a, t) = Courses.attendanceOf(co, sid, now)
                 CdRegRow(sid, names[sid] ?: "—", lessons.map { com.tennis.scoremanager.data.AttendancePdf.mark(co, it.key, sid) }, a, t)
@@ -326,6 +332,25 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         if (id != null && data.book().busy.none { it.id == id }) throw DeskApi.Fail(404, "NOT_FOUND")
         data.saveBusy(com.tennis.scoremanager.data.CoachBusy(id ?: Coaching.newId("bz"), minOf(from, to), maxOf(from, to), i.kind, i.note.trim().take(200)))
         return ok(CdBusyList.serializer(), busyList())
+    }
+
+    private fun moveLesson(id: String, i: CdMoveIn): DeskApi.Resp {
+        val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        if (!cc.personal) throw DeskApi.Fail(409, "NOT_OWN")
+        val co = cc.card.course
+        val l = Courses.lessons(co).firstOrNull { it.key == i.key } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        when {
+            i.reset -> l.movedFrom?.let { data.moveLesson(id, l.key, it, null, null) }
+            i.makeup -> {
+                val mk = Courses.makeup(co.copy(moved = co.moved - l.key)) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null } ?: throw DeskApi.Fail(409, "BAD_REQUEST")
+                data.moveLesson(id, l.key, mk.start, mk.minutes, mk.court)
+            }
+            else -> {
+                if (i.startMin !in 0 until 24 * 60) throw DeskApi.Fail(400, "BAD_REQUEST")
+                data.moveLesson(id, l.key, dayStart(i.date) + i.startMin * 60_000L, null, null)
+            }
+        }
+        return ok(CdRegister.serializer(), register(id))
     }
 
     private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {

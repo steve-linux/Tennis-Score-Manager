@@ -1914,7 +1914,8 @@ function courseLessons(c, body) {
     rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
       h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
-        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null,
+          l.movedFrom ? h('div', { style: 'color:var(--warn);font-size:12px' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
         h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
           : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
       : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
@@ -1927,7 +1928,10 @@ function openLesson(c, l) {
   };
   const left = h('button.danger.left', { type: 'button', onclick: () => act({ key: l.key, cancelled: !l.cancelled }) }, l.cancelled ? T.restoreLesson : T.cancelLessonBtn);
   const all = h('button', { type: 'button', onclick: () => boxes.forEach(([, x]) => { x.checked = true; }) }, T.allPresent);
+  const move = h('button', { type: 'button', onclick: () => { dlg.close(); moveLesson(c, l); } }, T.scMove);
   const dlg = dialog(c.name + ' · ' + shortDay(l.date) + ' ' + hhmm(l.startMin), h('div.form',
+    l.movedFrom ? h('p.full', { style: 'color:var(--warn)' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+    h('div.full', move),
     l.cancelled ? h('p.full', h('span.tag.bad', T.scCancelled)) : null,
     h('h3', T.scWhoWasThere), c.students.length ? h('div.full.checks', boxes.map(([id, x]) => h('label.check', x, c.students.find((s) => s.id === id).name)), all) : h('p.full.dim', T.noResults),
     h('p.full.dim', T.cancelLessonHint)), l.cancelled ? null : async () => {
@@ -1935,6 +1939,29 @@ function openLesson(c, l) {
     toast(T.saved);
     await showSchool();
   }, { left });
+}
+
+/** Sposta la lezione: un altro giorno, ora, durata o campo; il recupero in fondo al corso; o com'era. */
+function moveLesson(c, l) {
+  const date = h('input', { type: 'date', required: true, value: l.date });
+  const at = h('input', { type: 'time', required: true, step: 300, value: hhmm(l.startMin) });
+  const mins = h('input', { type: 'number', min: 15, max: 480, step: 15, value: l.minutes });
+  const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), l.court);
+  const notify = h('input', { type: 'checkbox' });
+  const send = async (body) => {
+    await api('POST', '/courses/' + encodeURIComponent(c.id) + '/move', { key: l.key, notify: notify.checked, ...body });
+    toast(notify.checked && !body.reset ? T.noticeOpened : T.saved);
+    await showSchool();
+  };
+  const quick = async (body) => { try { await send(body); dlg.close(); } catch (e) { toast(errText(e)); } };
+  const left = l.movedFrom ? h('button.left', { type: 'button', onclick: () => quick({ reset: true }) }, T.scMoveBack) : null;
+  const dlg = dialog(T.scMoveTitle + ' · ' + c.name, h('div.form',
+    h('p.full.dim', T.scMoveHint),
+    h('div.full', h('button', { type: 'button', onclick: () => quick({ makeup: true }) }, T.scMakeup)),
+    field(T.scMoveTo, date), field(T.ctTime, at), field(T.bkDuration, mins), field(T.ctCourt, ct),
+    c.students.length ? h('label.full', { style: 'display:flex;gap:8px;align-items:center' }, notify, T.scNotifyMoved) : null), async () => {
+    await send({ date: date.value, startMin: toMin(at.value), minutes: Number(mins.value) || null, court: ct.value });
+  }, { left, saveText: T.scMove });
 }
 
 function courseFees(c, body) {

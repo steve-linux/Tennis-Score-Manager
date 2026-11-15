@@ -55,6 +55,26 @@ class DeskTest {
         assertTrue(list, "\"holiday\":\"Immacolata Concezione\"" in list)
     }
 
+    @Test fun lezioneSpostataERecupero() {
+        val k = login()
+        val body = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60}],"lessons":3,"skipHolidays":false}"""
+        assertEquals(200, req("POST", "/courses", body, k).first)
+        val c = data.school.single { it.name == "Mini" }
+        val key8 = com.tennis.scoremanager.data.Courses.lessons(c)[1].key
+        // Giovedì 10 alle 18.
+        val (st, out) = req("POST", "/courses/${c.id}/move", """{"key":"$key8","date":"2026-12-10","startMin":1080}""", k)
+        assertEquals(200, st)
+        assertTrue(out, "\"movedFrom\":\"2026-12-08\"" in out)
+        assertTrue(out, "\"date\":\"2026-12-10\",\"startMin\":1080" in out)
+        // Il recupero: dopo l'ultima (il 15), il 22.
+        val mk = req("POST", "/courses/${c.id}/move", """{"key":"$key8","makeup":true}""", k).second
+        assertTrue(mk, "\"date\":\"2026-12-22\"" in mk)
+        // Com'era.
+        req("POST", "/courses/${c.id}/move", """{"key":"$key8","reset":true}""", k)
+        assertTrue(data.school.single { it.name == "Mini" }.moved.isEmpty())
+        assertEquals(404, req("POST", "/courses/${c.id}/move", """{"key":"nessuna","date":"2026-12-10","startMin":1080}""", k).first)
+    }
+
     @Test fun ilPlanningMostraLeFeste() {
         val tk = login()
         val m = req("GET", "/month", token = tk, q = mapOf("date" to "2026-12-01")).second

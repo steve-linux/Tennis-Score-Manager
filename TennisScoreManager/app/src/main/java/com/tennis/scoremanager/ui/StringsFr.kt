@@ -2657,6 +2657,18 @@ object FrStrings : Strings {
     override val pfFrom: (String) -> String = { "De : $it" }
     override val pfExisting: (String) -> String = { "$it existe déjà : on complète les données manquantes, rien n'est effacé." }
     override val pfQrTitle: (String) -> String = { "Profil de $it" }
+    override val scMove = "Déplacer"
+    override val scMoveTitle = "Déplacer la séance"
+    override val scMoveHint = "C'est la même séance dans le registre : seuls le jour, l'heure ou le terrain changent."
+    override val scMoveTo = "Nouveau jour"
+    override val scMakeup = "Rattrapage à la fin du cours"
+    override val scMoveBack = "Remettre comme avant"
+    override val scMovedTitle = "Séance déplacée"
+    override val scNotifyMoved = "Déplacer et prévenir les inscrits"
+    override val scMoveHoliday = "Ce jour est férié"
+    override val scMakeupOn: (String) -> String = { "Rattrapage : $it" }
+    override val scMovedFrom: (String) -> String = { "Déplacée du $it" }
+    override val scMovedNotice: (String) -> String = { "La séance du cours $it est déplacée :" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

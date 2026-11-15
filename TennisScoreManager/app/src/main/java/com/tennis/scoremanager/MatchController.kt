@@ -2718,6 +2718,26 @@ class MatchController(
     }
 
     /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    /** Agli iscritti: la lezione [key] del corso [c] (già spostata) da quando a quando. */
+    fun noticeCourseMoved(c: com.tennis.scoremanager.data.Course, key: String) {
+        val l = com.tennis.scoremanager.data.Courses.lessons(c).firstOrNull { it.key == key } ?: return
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        fun at(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + com.tennis.scoremanager.data.Reports.time(t, lang)
+        val text = (listOfNotNull(s.scMovedNotice(c.name), l.movedFrom?.let { at(it) + " →" }, at(l.start) + listOf(l.court).filter { it.isNotBlank() }.joinToString { " · $it" })
+            + listOfNotNull(clubSign.ifBlank { null }.takeIf { activeRole.value == Role.CLUB })).joinToString("\n")
+        val rec = c.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scMovedTitle, c.name, text, rec))
+    }
+
+    /** Allenatore: sposta una lezione di un suo corso (non di quelli della segreteria: l'orario lo decide lei). */
+    fun moveCoachLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?): com.tennis.scoremanager.data.Course? {
+        val b = coachBook.value
+        val cc = b.courses.firstOrNull { it.card.course.id == courseId }?.takeIf { it.personal } ?: return null
+        val moved = com.tennis.scoremanager.data.Courses.move(cc.card.course, key, start, minutes, court)
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = moved), cancelled = it.cancelled - key, changedAt = System.currentTimeMillis()) else it }))
+        return moved
+    }
+
     fun noticeCourse(c: com.tennis.scoremanager.data.Course, lesson: com.tennis.scoremanager.data.Lesson?) {
         val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
         val people = c.students.mapNotNull { playerById(it) }

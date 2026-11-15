@@ -406,6 +406,7 @@ const APP_I18N = {
     asServe: "Servizio",
     asTactics: "Tattica",
     asVolley: "Gioco a rete",
+    bkDuration: "Durata",
     bkOther: "Altro",
     blkAllCourts: "Tutti i campi",
     blkAllDay: "Tutto il giorno",
@@ -1006,8 +1007,19 @@ const APP_I18N = {
     scFee: "Quota",
     scHint: "Corsi, allievi, orari, presenze e quote; i campi dei corsi non si prenotano",
     scLevel: "Livello (es. Principianti, Agonisti)",
+    scMakeup: "Recupero in fondo al corso",
+    scMakeupOn: (it) => `Recupero: ${it}`,
     scMax: (it) => `Al massimo ${it} allievi`,
     scMonthly: "al mese",
+    scMove: "Sposta",
+    scMoveBack: "Rimetti com'era",
+    scMoveHint: "Resta la stessa lezione nel registro: cambiano solo giorno, ora o campo.",
+    scMoveHoliday: "Quel giorno è festa",
+    scMoveTitle: "Sposta la lezione",
+    scMoveTo: "Nuovo giorno",
+    scMovedFrom: (it) => `Spostata dal ${it}`,
+    scMovedNotice: (it) => `La lezione del corso ${it} è spostata:`,
+    scMovedTitle: "Lezione spostata",
     scName: "Nome del corso (es. SAT Under 10 · Gruppo A)",
     scNew: "Nuovo corso",
     scNext: (it) => `prossima: ${it}`,
@@ -1017,6 +1029,7 @@ const APP_I18N = {
     scNone: "Nessun corso: crealo con Nuovo corso.",
     scNotify: "Avvisa gli allievi",
     scNotifyCancelled: "Annulla e avvisa gli allievi",
+    scNotifyMoved: "Sposta e avvisa gli iscritti",
     scPast: "Fatte",
     scPresent: (p, t) => `${p} su ${t}`,
     scRemoveStudent: "Togli dal corso",
@@ -1259,6 +1272,7 @@ const APP_I18N = {
     asServe: "Serve",
     asTactics: "Tactics",
     asVolley: "Net play",
+    bkDuration: "Duration",
     bkOther: "Other",
     blkAllCourts: "All courts",
     blkAllDay: "All day",
@@ -1859,8 +1873,19 @@ const APP_I18N = {
     scFee: "Fee",
     scHint: "Courses, students, times, attendance and fees; course courts can't be booked",
     scLevel: "Level (e.g. Beginners, Competitive)",
+    scMakeup: "Make-up at the end of the course",
+    scMakeupOn: (it) => `Make-up: ${it}`,
     scMax: (it) => `At most ${it} students`,
     scMonthly: "per month",
+    scMove: "Move",
+    scMoveBack: "Put it back",
+    scMoveHint: "It stays the same lesson in the register: only the day, time or court change.",
+    scMoveHoliday: "That day is a holiday",
+    scMoveTitle: "Move the lesson",
+    scMoveTo: "New day",
+    scMovedFrom: (it) => `Moved from ${it}`,
+    scMovedNotice: (it) => `The ${it} lesson has been moved:`,
+    scMovedTitle: "Lesson moved",
     scName: "Course name (e.g. Juniors U10 · Group A)",
     scNew: "New course",
     scNext: (it) => `next: ${it}`,
@@ -1870,6 +1895,7 @@ const APP_I18N = {
     scNone: "No courses: create one with New course.",
     scNotify: "Notify the students",
     scNotifyCancelled: "Cancel and notify the students",
+    scNotifyMoved: "Move and notify the students",
     scPast: "Held",
     scPresent: (p, t) => `${p} of ${t}`,
     scRemoveStudent: "Remove from the course",
@@ -2112,6 +2138,7 @@ const APP_I18N = {
     asServe: "Service",
     asTactics: "Tactique",
     asVolley: "Jeu au filet",
+    bkDuration: "Durée",
     bkOther: "Autre",
     blkAllCourts: "Tous les terrains",
     blkAllDay: "Toute la journée",
@@ -2712,8 +2739,19 @@ const APP_I18N = {
     scFee: "Cotisation",
     scHint: "Cours, élèves, horaires, présences et cotisations ; les terrains des cours ne se réservent pas",
     scLevel: "Niveau (ex. Débutants, Compétition)",
+    scMakeup: "Rattrapage à la fin du cours",
+    scMakeupOn: (it) => `Rattrapage : ${it}`,
     scMax: (it) => `Au plus ${it} élèves`,
     scMonthly: "par mois",
+    scMove: "Déplacer",
+    scMoveBack: "Remettre comme avant",
+    scMoveHint: "C'est la même séance dans le registre : seuls le jour, l'heure ou le terrain changent.",
+    scMoveHoliday: "Ce jour est férié",
+    scMoveTitle: "Déplacer la séance",
+    scMoveTo: "Nouveau jour",
+    scMovedFrom: (it) => `Déplacée du ${it}`,
+    scMovedNotice: (it) => `La séance du cours ${it} est déplacée :`,
+    scMovedTitle: "Séance déplacée",
     scName: "Nom du cours (ex. Mini-tennis · Groupe A)",
     scNew: "Nouveau cours",
     scNext: (it) => `prochaine : ${it}`,
@@ -2723,6 +2761,7 @@ const APP_I18N = {
     scNone: "Aucun cours : créez-en un avec Nouveau cours.",
     scNotify: "Prévenir les élèves",
     scNotifyCancelled: "Annuler et prévenir les élèves",
+    scNotifyMoved: "Déplacer et prévenir les inscrits",
     scPast: "Faites",
     scPresent: (p, t) => `${p} sur ${t}`,
     scRemoveStudent: "Retirer du cours",
@@ -2965,6 +3004,7 @@ const APP_I18N = {
     asServe: "Aufschlag",
     asTactics: "Taktik",
     asVolley: "Netzspiel",
+    bkDuration: "Dauer",
     bkOther: "Sonstiges",
     blkAllCourts: "Alle Plätze",
     blkAllDay: "Ganzer Tag",
@@ -3565,8 +3605,19 @@ const APP_I18N = {
     scFee: "Beitrag",
     scHint: "Kurse, Schüler, Zeiten, Anwesenheit und Beiträge; Kursplätze sind nicht buchbar",
     scLevel: "Niveau (z. B. Anfänger, Wettkampf)",
+    scMakeup: "Nachholstunde am Kursende",
+    scMakeupOn: (it) => `Nachholen: ${it}`,
     scMax: (it) => `Höchstens ${it} Schüler`,
     scMonthly: "pro Monat",
+    scMove: "Verschieben",
+    scMoveBack: "Zurücksetzen",
+    scMoveHint: "Im Anwesenheitsbuch bleibt es dieselbe Stunde: nur Tag, Uhrzeit oder Platz ändern sich.",
+    scMoveHoliday: "An diesem Tag ist Feiertag",
+    scMoveTitle: "Stunde verschieben",
+    scMoveTo: "Neuer Tag",
+    scMovedFrom: (it) => `Verschoben vom ${it}`,
+    scMovedNotice: (it) => `Die Stunde des Kurses ${it} ist verschoben:`,
+    scMovedTitle: "Stunde verschoben",
     scName: "Kursname (z. B. Kinder U10 · Gruppe A)",
     scNew: "Neuer Kurs",
     scNext: (it) => `nächste: ${it}`,
@@ -3576,6 +3627,7 @@ const APP_I18N = {
     scNone: "Keine Kurse: mit Neuer Kurs anlegen.",
     scNotify: "Schüler benachrichtigen",
     scNotifyCancelled: "Absagen und Schüler benachrichtigen",
+    scNotifyMoved: "Verschieben und Teilnehmer benachrichtigen",
     scPast: "Gehalten",
     scPresent: (p, t) => `${p} von ${t}`,
     scRemoveStudent: "Aus dem Kurs nehmen",
@@ -3818,6 +3870,7 @@ const APP_I18N = {
     asServe: "Saque",
     asTactics: "Táctica",
     asVolley: "Juego de red",
+    bkDuration: "Duración",
     bkOther: "Otro",
     blkAllCourts: "Todas las pistas",
     blkAllDay: "Todo el día",
@@ -4418,8 +4471,19 @@ const APP_I18N = {
     scFee: "Cuota",
     scHint: "Cursos, alumnos, horarios, asistencia y cuotas; las pistas de los cursos no se reservan",
     scLevel: "Nivel (p. ej. Iniciación, Competición)",
+    scMakeup: "Recuperación al final del curso",
+    scMakeupOn: (it) => `Recuperación: ${it}`,
     scMax: (it) => `Como máximo ${it} alumnos`,
     scMonthly: "al mes",
+    scMove: "Mover",
+    scMoveBack: "Dejarla como estaba",
+    scMoveHint: "Sigue siendo la misma clase en el registro: solo cambian el día, la hora o la pista.",
+    scMoveHoliday: "Ese día es festivo",
+    scMoveTitle: "Mover la clase",
+    scMoveTo: "Nuevo día",
+    scMovedFrom: (it) => `Movida del ${it}`,
+    scMovedNotice: (it) => `La clase del curso ${it} se ha movido:`,
+    scMovedTitle: "Clase movida",
     scName: "Nombre del curso (p. ej. Escuela Sub-10 · Grupo A)",
     scNew: "Nuevo curso",
     scNext: (it) => `próxima: ${it}`,
@@ -4429,6 +4493,7 @@ const APP_I18N = {
     scNone: "Ningún curso: crea uno con Nuevo curso.",
     scNotify: "Avisar a los alumnos",
     scNotifyCancelled: "Anular y avisar a los alumnos",
+    scNotifyMoved: "Mover y avisar a los inscritos",
     scPast: "Hechas",
     scPresent: (p, t) => `${p} de ${t}`,
     scRemoveStudent: "Quitar del curso",
@@ -4671,6 +4736,7 @@ const APP_I18N = {
     asServe: "Saque",
     asTactics: "Tática",
     asVolley: "Jogo de rede",
+    bkDuration: "Duração",
     bkOther: "Outro",
     blkAllCourts: "Todas as quadras",
     blkAllDay: "O dia todo",
@@ -5271,8 +5337,19 @@ const APP_I18N = {
     scFee: "Mensalidade",
     scHint: "Cursos, alunos, horários, presenças e mensalidades; as quadras dos cursos não se reservam",
     scLevel: "Nível (ex. Iniciantes, Competição)",
+    scMakeup: "Reposição no fim do curso",
+    scMakeupOn: (it) => `Reposição: ${it}`,
     scMax: (it) => `No máximo ${it} alunos`,
     scMonthly: "por mês",
+    scMove: "Mudar",
+    scMoveBack: "Repor como estava",
+    scMoveHint: "Continua a ser a mesma aula no registo: só mudam o dia, a hora ou o campo.",
+    scMoveHoliday: "Esse dia é feriado",
+    scMoveTitle: "Mudar a aula",
+    scMoveTo: "Novo dia",
+    scMovedFrom: (it) => `Mudada de ${it}`,
+    scMovedNotice: (it) => `A aula do curso ${it} foi mudada:`,
+    scMovedTitle: "Aula mudada",
     scName: "Nome do curso (ex. Escolinha Sub-10 · Turma A)",
     scNew: "Novo curso",
     scNext: (it) => `próxima: ${it}`,
@@ -5282,6 +5359,7 @@ const APP_I18N = {
     scNone: "Nenhum curso: crie um com Novo curso.",
     scNotify: "Avisar os alunos",
     scNotifyCancelled: "Cancelar e avisar os alunos",
+    scNotifyMoved: "Mudar e avisar os inscritos",
     scPast: "Feitas",
     scPresent: (p, t) => `${p} de ${t}`,
     scRemoveStudent: "Tirar do curso",
@@ -7438,7 +7516,8 @@ function courseLessons(c, body) {
     rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
       h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
-        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null,
+          l.movedFrom ? h('div', { style: 'color:var(--warn);font-size:12px' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
         h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
           : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
       : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
@@ -7451,7 +7530,10 @@ function openLesson(c, l) {
   };
   const left = h('button.danger.left', { type: 'button', onclick: () => act({ key: l.key, cancelled: !l.cancelled }) }, l.cancelled ? T.restoreLesson : T.cancelLessonBtn);
   const all = h('button', { type: 'button', onclick: () => boxes.forEach(([, x]) => { x.checked = true; }) }, T.allPresent);
+  const move = h('button', { type: 'button', onclick: () => { dlg.close(); moveLesson(c, l); } }, T.scMove);
   const dlg = dialog(c.name + ' · ' + shortDay(l.date) + ' ' + hhmm(l.startMin), h('div.form',
+    l.movedFrom ? h('p.full', { style: 'color:var(--warn)' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+    h('div.full', move),
     l.cancelled ? h('p.full', h('span.tag.bad', T.scCancelled)) : null,
     h('h3', T.scWhoWasThere), c.students.length ? h('div.full.checks', boxes.map(([id, x]) => h('label.check', x, c.students.find((s) => s.id === id).name)), all) : h('p.full.dim', T.noResults),
     h('p.full.dim', T.cancelLessonHint)), l.cancelled ? null : async () => {
@@ -7459,6 +7541,29 @@ function openLesson(c, l) {
     toast(T.saved);
     await showSchool();
   }, { left });
+}
+
+/** Sposta la lezione: un altro giorno, ora, durata o campo; il recupero in fondo al corso; o com'era. */
+function moveLesson(c, l) {
+  const date = h('input', { type: 'date', required: true, value: l.date });
+  const at = h('input', { type: 'time', required: true, step: 300, value: hhmm(l.startMin) });
+  const mins = h('input', { type: 'number', min: 15, max: 480, step: 15, value: l.minutes });
+  const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), l.court);
+  const notify = h('input', { type: 'checkbox' });
+  const send = async (body) => {
+    await api('POST', '/courses/' + encodeURIComponent(c.id) + '/move', { key: l.key, notify: notify.checked, ...body });
+    toast(notify.checked && !body.reset ? T.noticeOpened : T.saved);
+    await showSchool();
+  };
+  const quick = async (body) => { try { await send(body); dlg.close(); } catch (e) { toast(errText(e)); } };
+  const left = l.movedFrom ? h('button.left', { type: 'button', onclick: () => quick({ reset: true }) }, T.scMoveBack) : null;
+  const dlg = dialog(T.scMoveTitle + ' · ' + c.name, h('div.form',
+    h('p.full.dim', T.scMoveHint),
+    h('div.full', h('button', { type: 'button', onclick: () => quick({ makeup: true }) }, T.scMakeup)),
+    field(T.scMoveTo, date), field(T.ctTime, at), field(T.bkDuration, mins), field(T.ctCourt, ct),
+    c.students.length ? h('label.full', { style: 'display:flex;gap:8px;align-items:center' }, notify, T.scNotifyMoved) : null), async () => {
+    await send({ date: date.value, startMin: toMin(at.value), minutes: Number(mins.value) || null, court: ct.value });
+  }, { left, saveText: T.scMove });
 }
 
 function courseFees(c, body) {
@@ -7937,7 +8042,7 @@ async function showCourseRegister(id) {
       document.querySelectorAll('tr[data-name]').forEach((tr) => { tr.hidden = !!q && !tr.dataset.name.includes(q); });
     } }) : null,
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
-      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : '') + (l.busy ? ' · ' + busyLabel(l.busy) : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : l.busy ? ';color:var(--warn)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : '') + (l.busy ? ' · ' + busyLabel(l.busy) : ''), style: 'cursor:' + (l.past || c.personal ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : l.busy ? ';color:var(--warn)' : l.movedFrom ? ';color:var(--warn)' : ''), onclick: () => { if (l.past || c.personal) attendanceDialog(r, l); } },
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
       h('tbody', r.rows.map((row) => h('tr', { 'data-name': row.name.toLowerCase() }, h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
@@ -8055,17 +8160,26 @@ function attendanceDialog(r, l) {
   const dlg = h('dialog', h('form', { method: 'dialog', style: 'min-width:320px' },
     h('h2', dateText(l.date) + ' ' + hhmm(l.startMin)),
     h('label', { style: 'display:flex;gap:8px;align-items:center' }, cancelled, T.scCancelLesson),
-    h('p.dim', T.scWhoWasThere),
+    // Le presenze solo per le lezioni già fatte; le future si annullano o (nei corsi suoi) si spostano.
+    l.past ? [h('p.dim', T.scWhoWasThere),
     // Con tanti iscritti: cerca, tutti presenti o nessuno (poi si tolgono o aggiungono gli altri).
     h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' },
       boxes.length > 12 ? h('input', { type: 'search', placeholder: T.coSearch, oninput: (ev) => { const q = ev.target.value.trim().toLowerCase(); boxes.forEach((b) => { b[2].hidden = !!q && !b[3].includes(q); }); } }) : null,
       h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = true; }) }, T.pkAll),
       h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = false; }) }, T.pkNone)),
     h('div', { style: 'max-height:50vh;overflow:auto' }, boxes.map((b) => b[2])),
-    h('label', T.ccLessonNote, note),
+    h('label', T.ccLessonNote, note)] : null,
+    l.movedFrom ? h('p', { style: 'color:var(--warn)' }, T.scMovedFrom(dateText(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+    // Solo nei corsi suoi: un altro giorno o ora, il recupero in fondo al corso, o com'era.
+    r.course.personal ? h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' },
+      h('span.dim', T.scMove + ':'), (() => { const d = h('input', { type: 'date', value: l.date }); const t = h('input', { type: 'time', step: 300, value: hhmm(l.startMin) });
+        const go = async (body) => { try { await api('POST', '/coach/courses/' + encodeURIComponent(r.course.id) + '/move', { key: l.key, ...body }); dlg.close(); dlg.remove(); toast(T.saved); showCourseRegister(r.course.id); } catch (e) { toast(errText(e)); } };
+        return [d, t, h('button', { type: 'button', onclick: () => { const [hh, mm] = t.value.split(':').map(Number); go({ date: d.value, startMin: hh * 60 + (mm || 0) }); } }, T.scMove),
+          h('button', { type: 'button', onclick: () => go({ makeup: true }) }, T.scMakeup), l.movedFrom ? h('button', { type: 'button', onclick: () => go({ reset: true }) }, T.scMoveBack) : null]; })()) : null,
     h('div.actions',
       h('button', { type: 'button', onclick: () => dlg.close() }, '✕'),
       h('button.primary', { type: 'button', onclick: async () => {
+        if (!l.past && !cancelled.checked && !l.cancelled) { dlg.close(); dlg.remove(); return; }
         try {
           await api('PUT', '/coach/courses/' + encodeURIComponent(r.course.id) + '/attendance',
             { key: l.key, present: boxes.filter((b) => b[1].checked).map((b) => b[0]), cancelled: cancelled.checked, note: note.value });
@@ -10747,7 +10861,7 @@ Mit der Rolle **Verein**, unter **Mitglieder › Tennisschule**.
 
 - **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung. Statt des Enddatums kannst du die **Anzahl der Stunden** eintragen: Das Ende ergibt sich aus Beginn und Zeiten; mit **Feiertage überspringen** (an) zählen Stunden an gesetzlichen Feiertagen nicht und gelten als abgesagt (über die Anwesenheit wieder einsetzbar). Feiertage stehen rot in den Kursstunden, auch im Büro am PC.
 - **Schüler**: aus der Datenbank hinzufügen (Mitglieder oder nicht) bis zur Platzzahl; für jeden die **Anwesenheit** (anwesend 3 von 4, unter 75 % orange) und was offen ist. Die Spielerkarte zeigt seine Kurse.
-- **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern.
+- **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern. **Verschieben** (in der Stunde) legt sie auf einen anderen Tag, eine andere Uhrzeit oder einen anderen Platz, oder als **Nachholstunde am Kursende** (der erste freie Termin nach der letzten Stunde, Feiertage übersprungen); im Anwesenheitsbuch bleibt es dieselbe Stunde, mit *Verschoben vom…* in Orange, und **Verschieben und Teilnehmer benachrichtigen** bereitet die Nachricht vor. In der Platzbelegung wird die alte Zeit frei und die neue belegt; **Zurücksetzen** legt sie zurück. Auch im Büro am PC, und der Trainer in seinen eigenen Kursen (Telefon und PC).
 - **Mit dem Trainer**: in einem Kurs mit einem Trainer aus der Datenbank schickt **An den Trainer schicken** ihm die Kurskarte (Zeiten, Teilnehmer mit Kontakten). Er trägt die Anwesenheit ein und schickt sie zurück: beim Öffnen der Datei mit **Teilen › TSM** prüft die App, dass sie zu diesem Kurs gehört, und **Speichern** fügt sie hinzu. Schlägt der Trainer einen neuen Schüler vor, fügt man ihn beim Öffnen seiner Datei zu den Spielern und wahlweise zu einem Kurs hinzu.
 - **Beiträge**: Für jeden Monat der Saison (oder die Saison) gibt **Den Schülern berechnen** den Beitrag allen, die ihn noch nicht haben; man sieht, wie viele bezahlt haben, und kassiert wie bei den anderen Beiträgen, mit Quittung.
 
@@ -11354,7 +11468,7 @@ With the **Club** role, under **Members › Tennis school**.
 
 - **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner. Instead of the end date you can write the **number of lessons**: the end is worked out from the start and the times; with **Skip holidays** (on) lessons on national holidays don't count and are marked cancelled (you can put them back from the roll call). Holidays are in red in the course lessons, also from the Club office from PC.
 - **Students**: added from the database (members or not) up to the places; for each, **attendance** (attended 3 of 4, orange under 75 %) and what they owe. A player's card shows their courses.
-- **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent.
+- **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent. **Move** (in the lesson) puts it on another day, time or court, or at the **Make-up at the end of the course** (the first free slot after the last lesson, skipping holidays); it stays the same lesson in the register, with *Moved from…* in orange, and **Move and notify the students** prepares the message. In the planner the old hour is freed and the new one taken; **Put it back** returns it to its place. Also from the Club office from PC, and coaches in their own courses (phone and PC).
 - **With the coach**: in a course with a coach from the database, **Send to the coach** sends them the course card (times, participants with contacts). They mark attendance and send it back: opening the file with **Share › TSM** the app checks it belongs to this course and **Record** adds it. If the coach proposes a new student, opening their file adds them to the players and, if you like, to a course.
 - **Fees**: for each month of the season (or the season) **Charge the students** gives the fee to whoever doesn't have it yet; you see how many paid and collect it like the other fees, with a receipt.
 
@@ -11960,7 +12074,7 @@ Con el rol **Club**, en **Socios › Escuela de tenis**.
 
 - **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza. En lugar de la fecha de fin puedes escribir el **número de clases**: el fin se calcula solo según el inicio y los horarios; con **Saltar los festivos** (activado) las clases en festivos nacionales no cuentan y quedan anuladas (se recuperan desde la lista). Los festivos salen en rojo en las clases del curso, también desde la Secretaría en el PC.
 - **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
-- **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre.
+- **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre. **Mover** (en la clase) la pasa a otro día, hora o pista, o a la **Recuperación al final del curso** (el primer horario libre tras la última clase, saltando los festivos); sigue siendo la misma clase en el registro, con *Movida del…* en naranja, y **Mover y avisar a los inscritos** prepara el mensaje. En el planning la hora de antes se libera y la nueva se ocupa; **Dejarla como estaba** la devuelve a su sitio. También desde la Secretaría en el PC, y el entrenador en sus cursos (teléfono y PC).
 - **Con el entrenador**: en un curso con un entrenador de la base de datos, **Enviar al entrenador** le manda la ficha de curso (horarios, inscritos con contactos). Él marca la asistencia y la devuelve: al abrir el archivo con **Compartir › TSM** la app comprueba que es de este curso y **Registrar** la añade. Si el entrenador propone un alumno nuevo, al abrir su archivo se añade a los jugadores y, si quieres, a un curso.
 - **Cuotas**: para cada mes de la temporada (o la temporada) **Cargar a los alumnos** asigna la cuota a quien aún no la tiene; se ve cuántos han pagado y se cobra como las demás cuotas, con recibo.
 
@@ -12566,7 +12680,7 @@ Avec le rôle **Club**, dans **Adhérents › École de tennis**.
 
 - **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour. Au lieu de la date de fin, tu peux écrire le **nombre de séances** : la fin se calcule d'après le début et les horaires ; avec **Sauter les jours fériés** (activé), les séances des jours fériés nationaux ne comptent pas et sont annulées (on les remet depuis l'appel). Les jours fériés sont en rouge dans les séances du cours, aussi depuis le Secrétariat depuis le PC.
 - **Élèves** : on les ajoute depuis la base (adhérents ou non) jusqu'aux places ; pour chacun la **présence** (présent 3 sur 4, en orange sous 75 %) et ce qu'il doit. La fiche du joueur montre ses cours.
-- **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent.
+- **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent. **Déplacer** (dans la séance) la met un autre jour, à une autre heure ou sur un autre terrain, ou au **Rattrapage à la fin du cours** (le premier créneau libre après la dernière séance, en sautant les jours fériés) ; elle reste la même séance dans le registre, avec *Déplacée du…* en orange, et **Déplacer et prévenir les inscrits** prépare le message. Dans le planning l'ancienne heure se libère et la nouvelle s'occupe ; **Remettre comme avant** la remet à sa place. Aussi depuis le Secrétariat depuis le PC, et l'entraîneur dans ses cours (téléphone et PC).
 - **Avec l'entraîneur** : dans un cours avec un entraîneur de la base, **Envoyer à l'entraîneur** lui envoie la fiche de cours (horaires, inscrits avec contacts). Il note les présences et les renvoie : en ouvrant le fichier avec **Partager › TSM** l'appli vérifie qu'il est de ce cours et **Enregistrer** les ajoute. Si l'entraîneur propose un nouvel élève, en ouvrant son fichier on l'ajoute aux joueurs et, au choix, à un cours.
 - **Cotisations** : pour chaque mois de la saison (ou la saison) **Facturer aux élèves** attribue la cotisation à qui ne l'a pas encore ; on voit combien ont payé et on encaisse comme les autres cotisations, avec reçu.
 
@@ -13172,7 +13286,7 @@ Col ruolo **Circolo**, in **Soci › Scuola tennis**.
 
 - **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna. Al posto della data di fine puoi scrivere il **numero di lezioni**: la fine si calcola da sola da inizio e orari; con **Salta le feste** (acceso) le lezioni nelle festività nazionali non contano e risultano annullate (si rimettono dall'appello). Le feste sono in rosso nelle lezioni del corso, anche dalla Segreteria da PC.
 - **Allievi**: si aggiungono dal database (soci o no) fino ai posti; per ciascuno la **presenza** (presente 3 su 4, in arancione sotto il 75 %) e cosa deve pagare. Nella scheda del giocatore ci sono i suoi corsi.
-- **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore.
+- **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore. **Sposta** (nella lezione) la mette in un altro giorno, ora o campo, oppure al **Recupero in fondo al corso** (il primo orario libero dopo l'ultima lezione, saltando le feste); resta la stessa lezione nel registro, con *Spostata dal…* in arancione, e **Sposta e avvisa gli iscritti** prepara il messaggio. Nel planning l'ora di prima si libera e quella nuova si occupa; **Rimetti com'era** la riporta al suo posto. Anche dalla Segreteria da PC, e l'allenatore nei suoi corsi (telefono e PC).
 - **Con l'allenatore**: nel corso con un istruttore del database, **Manda all'allenatore** gli manda la scheda corso (orari, iscritti con i contatti). Lui segna le presenze e le rimanda: aprendo il file con **Condividi › TSM** l'app controlla che sia di questo corso e con **Registra** le aggiunge. Se l'allenatore propone un allievo nuovo, aprendo il suo file lo si aggiunge ai giocatori e, a scelta, a un corso.
 - **Quote**: per ogni mese della stagione (o per la stagione) **Addebita agli allievi** mette la quota a chi non l'ha ancora; si vede quanti hanno pagato e si incassa come le altre quote, con la ricevuta.
 
@@ -13778,7 +13892,7 @@ Com o papel **Clube**, em **Sócios › Escola de tênis**.
 
 - **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza. Em vez da data de fim podes escrever o **número de aulas**: o fim calcula-se sozinho pelo início e pelos horários; com **Saltar os feriados** (ligado) as aulas nos feriados nacionais não contam e ficam canceladas (repõem-se na chamada). Os feriados aparecem a vermelho nas aulas do curso, também na Secretaria no PC.
 - **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
-- **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável.
+- **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável. **Mudar** (na aula) põe-na noutro dia, hora ou campo, ou na **Reposição no fim do curso** (o primeiro horário livre depois da última aula, saltando os feriados); continua a ser a mesma aula no registo, com *Mudada de…* a laranja, e **Mudar e avisar os inscritos** prepara a mensagem. Na agenda a hora de antes fica livre e a nova ocupada; **Repor como estava** volta a pô-la no lugar. Também na Secretaria no PC, e o treinador nos seus cursos (telefone e PC).
 - **Com o treinador**: num curso com um treinador da base de dados, **Enviar ao treinador** envia-lhe a ficha de curso (horários, inscritos com contactos). Ele marca as presenças e devolve-as: ao abrir o arquivo com **Compartilhar › TSM** o app verifica que é deste curso e **Registrar** junta-as. Se o treinador propõe um aluno novo, ao abrir o arquivo dele adiciona-se aos jogadores e, à escolha, a um curso.
 - **Mensalidades**: para cada mês da temporada (ou a temporada) **Cobrar dos alunos** atribui a mensalidade a quem ainda não tem; vê-se quantos pagaram e recebe-se como as outras mensalidades, com recibo.
 
@@ -17626,6 +17740,26 @@ class MatchController(
     }
 
     /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    /** Agli iscritti: la lezione [key] del corso [c] (già spostata) da quando a quando. */
+    fun noticeCourseMoved(c: com.tennis.scoremanager.data.Course, key: String) {
+        val l = com.tennis.scoremanager.data.Courses.lessons(c).firstOrNull { it.key == key } ?: return
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        fun at(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + com.tennis.scoremanager.data.Reports.time(t, lang)
+        val text = (listOfNotNull(s.scMovedNotice(c.name), l.movedFrom?.let { at(it) + " →" }, at(l.start) + listOf(l.court).filter { it.isNotBlank() }.joinToString { " · $it" })
+            + listOfNotNull(clubSign.ifBlank { null }.takeIf { activeRole.value == Role.CLUB })).joinToString("\n")
+        val rec = c.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scMovedTitle, c.name, text, rec))
+    }
+
+    /** Allenatore: sposta una lezione di un suo corso (non di quelli della segreteria: l'orario lo decide lei). */
+    fun moveCoachLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?): com.tennis.scoremanager.data.Course? {
+        val b = coachBook.value
+        val cc = b.courses.firstOrNull { it.card.course.id == courseId }?.takeIf { it.personal } ?: return null
+        val moved = com.tennis.scoremanager.data.Courses.move(cc.card.course, key, start, minutes, court)
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = moved), cancelled = it.cancelled - key, changedAt = System.currentTimeMillis()) else it }))
+        return moved
+    }
+
     fun noticeCourse(c: com.tennis.scoremanager.data.Course, lesson: com.tennis.scoremanager.data.Lesson?) {
         val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
         val people = c.students.mapNotNull { playerById(it) }
@@ -28749,6 +28883,10 @@ data class CourseSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60
 @Serializable
 enum class CourseFee { SEASON, MONTHLY }
 
+/** Dove è finita una lezione spostata: il nuovo inizio e, se cambiano, durata e campo. */
+@Serializable
+data class LessonMove(val start: Long, val minutes: Int? = null, val court: String? = null)
+
 /**
  * Un corso della scuola tennis: allievi (giocatori del database), istruttore, orari settimanali nella stagione
  * [from]–[to], quota. [attendance]: per ogni lezione (chiave [Courses.key]) chi c'era; [cancelled]: le lezioni
@@ -28775,10 +28913,12 @@ data class Course(
     val createdAt: Long = 0,
     /** Il codice della scheda corso mandata all'allenatore: le presenze che tornano devono averlo. */
     val cardCode: String? = null,
+    /** Le lezioni spostate (chiave della lezione → dove è finita): tengono la chiave, quindi presenze e registro restano. */
+    val moved: Map<String, LessonMove> = emptyMap(),
 )
 
-/** Una lezione del calendario del corso. */
-data class Lesson(val key: String, val start: Long, val minutes: Int, val court: String) {
+/** Una lezione del calendario del corso; [movedFrom]: l'inizio che aveva, se è stata spostata. */
+data class Lesson(val key: String, val start: Long, val minutes: Int, val court: String, val movedFrom: Long? = null) {
     val end: Long get() = start + minutes * 60_000L
 }
 
@@ -28791,8 +28931,33 @@ object Courses {
         return "%04d-%02d-%02d@%02d%02d@%s".format(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), court)
     }
 
-    /** Tutte le lezioni della stagione, in ordine, dagli orari settimanali. */
+    /** Tutte le lezioni della stagione, in ordine, dagli orari settimanali; quelle spostate dove sono finite. */
     fun lessons(c: Course): List<Lesson> {
+        val plain = plainLessons(c)
+        if (c.moved.isEmpty()) return plain
+        return plain.map { l -> c.moved[l.key]?.let { m -> Lesson(l.key, m.start, m.minutes ?: l.minutes, m.court ?: l.court, l.start) } ?: l }.sortedBy { it.start }
+    }
+
+    /** Sposta la lezione [key] (non è più annullata); rimessa al suo posto, non risulta spostata. */
+    fun move(c: Course, key: String, start: Long, minutes: Int? = null, court: String? = null): Course {
+        val orig = plainLessons(c).firstOrNull { it.key == key } ?: return c
+        val same = start == orig.start && (minutes ?: orig.minutes) == orig.minutes && (court ?: orig.court) == orig.court
+        return c.copy(moved = if (same) c.moved - key else c.moved + (key to LessonMove(start, minutes?.takeIf { it != orig.minutes }, court?.takeIf { it != orig.court })), cancelled = c.cancelled - key)
+    }
+
+    /**
+     * Il recupero: il primo orario del corso dopo l'ultima lezione, in un giorno che non è da saltare ([skip]: le
+     * feste); null senza orari.
+     */
+    fun makeup(c: Course, skip: (Long) -> Boolean = { false }): Lesson? {
+        if (c.slots.isEmpty()) return null
+        val last = lessons(c).maxOfOrNull { it.start } ?: c.to
+        val probe = c.copy(from = CourtPlans.addDays(CourtPlans.dayStart(last), 1), to = CourtPlans.addDays(CourtPlans.dayStart(last), 120), moved = emptyMap())
+        return plainLessons(probe).firstOrNull { !skip(it.start) }
+    }
+
+    /** Le lezioni dagli orari settimanali, senza gli spostamenti. */
+    private fun plainLessons(c: Course): List<Lesson> {
         val out = mutableListOf<Lesson>()
         var day = CourtPlans.dayStart(c.from)
         val last = CourtPlans.dayStart(c.to)
@@ -28859,15 +29024,28 @@ object Courses {
      * I periodi non prenotabili del corso, uno per orario: il campo, il giorno della settimana e le ore, per tutta
      * la stagione. Così nel planning nessuno prenota sopra il corso (le sue lezioni sì).
      */
-    fun blocks(c: Course): List<CourtBlock> = c.slots.filter { it.court.isNotBlank() }.mapIndexed { i, s ->
-        CourtBlock(
-            id = "course-${c.id}-$i", label = c.name, reason = BlockReason.COURSE, courts = listOf(s.court),
-            from = CourtPlans.dayStart(c.from), to = CourtPlans.dayStart(c.to), weekdays = setOf(s.weekday),
-            startMin = s.startMin, endMin = (s.startMin + s.minutes).coerceAtMost(24 * 60), course = c.id,
-        )
+    fun blocks(c: Course): List<CourtBlock> {
+        // Le lezioni spostate: il giorno di prima l'orario si libera, quello nuovo si occupa.
+        val away = plainLessons(c).filter { it.key in c.moved }
+        val weekly = c.slots.filter { it.court.isNotBlank() }.mapIndexed { i, s ->
+            val except = away.filter { CourtPlans.weekday(it.start) == s.weekday && it.court == s.court && minuteOf(it.start) == s.startMin }.map { CourtPlans.dayStart(it.start) }.toSet()
+            CourtBlock(
+                id = "course-${c.id}-$i", label = c.name, reason = BlockReason.COURSE, courts = listOf(s.court),
+                from = CourtPlans.dayStart(c.from), to = CourtPlans.dayStart(c.to), weekdays = setOf(s.weekday),
+                startMin = s.startMin, endMin = (s.startMin + s.minutes).coerceAtMost(24 * 60), course = c.id, except = except,
+            )
+        }
+        val moved = lessons(c).filter { it.movedFrom != null && it.court.isNotBlank() && it.key !in c.cancelled }.map { l ->
+            val m = minuteOf(l.start)
+            CourtBlock(
+                id = "course-${c.id}-m-${l.key}", label = c.name, reason = BlockReason.COURSE, courts = listOf(l.court),
+                from = CourtPlans.dayStart(l.start), to = CourtPlans.dayStart(l.start), startMin = m, endMin = (m + l.minutes).coerceAtMost(24 * 60), course = c.id,
+            )
+        }
+        return weekly + moved
     }
 
-    /** Il corso è pieno (con un massimo di allievi). */
+    private fun minuteOf(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
     /**
      * Il giorno dell'[n]-esima lezione partendo da [from] con quegli orari, saltando i giorni [skip] (le feste); null
      * senza orari o con [n] < 1. Serve a calcolare la fine del corso dal numero di lezioni.
@@ -28881,6 +29059,7 @@ object Courses {
     /** Le lezioni del corso che cadono in un giorno [skip] (le feste): da segnare annullate. */
     fun skipped(c: Course, skip: (Long) -> Boolean): Set<String> = lessons(c).filter { skip(it.start) }.map { it.key }.toSet()
 
+    /** Il corso è pieno (con un massimo di allievi). */
     fun full(c: Course): Boolean = c.maxStudents > 0 && c.students.size >= c.maxStudents
 }
 TSM_EOF
@@ -31849,6 +32028,8 @@ interface CoachData {
     fun setCourseColor(id: String, color: String) {}
     fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) {}
     fun deleteBusy(id: String) {}
+    /** Sposta una lezione di un corso dell'allenatore (solo i suoi). */
+    fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {}
     /** Salva un allievo (nuovo o cambiato) nel database dei giocatori. */
     fun saveStudent(p: PlayerProfile) {}
     /** Il Paese per le festività nazionali (quello del telefono). */
@@ -31897,7 +32078,9 @@ interface CoachData {
     val lessons: Int? = null, val skipHolidays: Boolean = true, val skipBusy: Boolean = false,
 )
 @Serializable data class CdEnd(val to: String? = null)
-@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null, val busy: CdBusy? = null)
+@Serializable data class CdRegLesson(val key: String, val date: String, val startMin: Int, val cancelled: Boolean, val marked: Boolean, val past: Boolean, val holiday: String? = null, val busy: CdBusy? = null,
+    val movedFrom: String? = null, val movedFromMin: Int? = null)
+@Serializable data class CdMoveIn(val key: String, val date: String = "", val startMin: Int = 0, val makeup: Boolean = false, val reset: Boolean = false)
 @Serializable data class CdRegRow(val id: String, val name: String, val marks: List<String>, val present: Int, val total: Int)
 @Serializable data class CdRegister(val course: CdCourse, val lessons: List<CdRegLesson>, val rows: List<CdRegRow>, val notes: Map<String, String>)
 @Serializable data class CdMonth(
@@ -31986,6 +32169,7 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
             data.deleteOwnCourse(p[2]); done()
         }
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "attendance" -> attendance(p[2], read(CdAttendanceIn.serializer(), r))
+        m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "move" -> moveLesson(p[2], read(CdMoveIn.serializer(), r))
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.pdf" -> { course(p[2]); bytes(data.registerPdf(p[2]), "application/pdf") }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "courses" && p[3] == "register.xlsx" -> { course(p[2]); bytes(data.registerXlsx(p[2]), com.tennis.scoremanager.data.Xlsx.MIME) }
         m == "GET" && p == listOf("coach", "month") -> ok(CdMonth.serializer(), month(r.query["date"]))
@@ -32080,7 +32264,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         return CdRegister(
             head,
             lessons.map { CdRegLesson(it.key, day(it.start)!!, minOf(it.start), it.key in co.cancelled, it.key in co.attendance, it.start <= now + 3_600_000L,
-                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone()), Coaching.busyOn(data.book().busy, it.start)?.let(::busyOut)) },
+                com.tennis.scoremanager.data.Holidays.on(it.start, data.country(), zone()), Coaching.busyOn(data.book().busy, it.start)?.let(::busyOut),
+                it.movedFrom?.let { f -> day(f) }, it.movedFrom?.let { f -> minOf(f) }) },
             co.students.sortedBy { (names[it] ?: "").lowercase() }.map { sid ->
                 val (a, t) = Courses.attendanceOf(co, sid, now)
                 CdRegRow(sid, names[sid] ?: "—", lessons.map { com.tennis.scoremanager.data.AttendancePdf.mark(co, it.key, sid) }, a, t)
@@ -32140,6 +32325,25 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         if (id != null && data.book().busy.none { it.id == id }) throw DeskApi.Fail(404, "NOT_FOUND")
         data.saveBusy(com.tennis.scoremanager.data.CoachBusy(id ?: Coaching.newId("bz"), minOf(from, to), maxOf(from, to), i.kind, i.note.trim().take(200)))
         return ok(CdBusyList.serializer(), busyList())
+    }
+
+    private fun moveLesson(id: String, i: CdMoveIn): DeskApi.Resp {
+        val cc = data.book().courses.firstOrNull { it.card.course.id == id } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        if (!cc.personal) throw DeskApi.Fail(409, "NOT_OWN")
+        val co = cc.card.course
+        val l = Courses.lessons(co).firstOrNull { it.key == i.key } ?: throw DeskApi.Fail(404, "NOT_FOUND")
+        when {
+            i.reset -> l.movedFrom?.let { data.moveLesson(id, l.key, it, null, null) }
+            i.makeup -> {
+                val mk = Courses.makeup(co.copy(moved = co.moved - l.key)) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null } ?: throw DeskApi.Fail(409, "BAD_REQUEST")
+                data.moveLesson(id, l.key, mk.start, mk.minutes, mk.court)
+            }
+            else -> {
+                if (i.startMin !in 0 until 24 * 60) throw DeskApi.Fail(400, "BAD_REQUEST")
+                data.moveLesson(id, l.key, dayStart(i.date) + i.startMin * 60_000L, null, null)
+            }
+        }
+        return ok(CdRegister.serializer(), register(id))
     }
 
     private fun attendance(id: String, a: CdAttendanceIn): DeskApi.Resp {
@@ -32313,6 +32517,8 @@ interface DeskData {
     fun convokeRubber(t: Team, f: Fixture, index: Int) {}
     /** Apre sul telefono l'invio della scheda corso all'allenatore. */
     fun sendCourseToCoach(c: Course) {}
+    /** Sul telefono: l'avviso agli iscritti che la lezione [key] è stata spostata. */
+    fun noticeCourseMoved(c: Course, key: String) {}
     /** Il registro presenze del corso, in PDF o in Excel (fatto dal telefono). */
     fun registerPdf(c: Course): ByteArray? = null
     fun registerXlsx(c: Course): ByteArray? = null
@@ -32479,7 +32685,12 @@ interface DeskData {
 @Serializable data class DeskTop(val name: String, val count: Int)
 @Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
 @Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
-@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null,
+    /** Spostata: il giorno e l'ora che aveva. */
+    val movedFrom: String? = null, val movedFromMin: Int? = null)
+/** Spostare una lezione: un altro giorno, ora, durata o campo; [makeup] = il recupero in fondo al corso; [reset] = com'era. */
+@Serializable data class DeskLessonMoveIn(val key: String, val date: String = "", val startMin: Int = 0, val minutes: Int? = null, val court: String? = null,
+    val makeup: Boolean = false, val reset: Boolean = false, val notify: Boolean = false)
 /** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
 @Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
 @Serializable data class DeskCourse(
@@ -33375,7 +33586,8 @@ class DeskApi(
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
             DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
-                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()))
+                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()),
+                l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() })
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
         val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
@@ -33411,6 +33623,26 @@ class DeskApi(
                 var n = if (i.cancelled != null) Courses.setCancelled(c, i.key, i.cancelled) else c
                 if (i.cancelled == null) n = Courses.mark(n, i.key, i.present.filter { it in c.students }.toSet())
                 courseSaved(n)
+            }
+            m == "POST" && rest == listOf("move") -> {
+                val i = read(DeskLessonMoveIn.serializer(), r)
+                val l = Courses.lessons(c).firstOrNull { it.key == i.key } ?: throw Fail(404, "NOT_FOUND")
+                val n = when {
+                    i.reset -> l.movedFrom?.let { Courses.move(c, l.key, it) } ?: c
+                    i.makeup -> {
+                        val mk = Courses.makeup(c.copy(moved = c.moved - l.key)) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null } ?: throw Fail(409, "BAD_TIME")
+                        Courses.move(c, l.key, mk.start, mk.minutes, mk.court)
+                    }
+                    else -> {
+                        val d = noon(i.date) ?: throw Fail(400, "BAD_DATE")
+                        if (i.startMin !in 0 until 24 * 60 || (i.minutes != null && i.minutes !in 15..8 * 60)) throw Fail(400, "BAD_TIME")
+                        if (!i.court.isNullOrEmpty() && i.court !in data.courts()) throw Fail(404, "NOT_FOUND")
+                        Courses.move(c, l.key, CourtPlans.at(CourtPlans.dayStart(d), i.startMin / 60, i.startMin % 60), i.minutes, i.court)
+                    }
+                }
+                val out = courseSaved(n)
+                if (i.notify && !i.reset) data.noticeCourseMoved(n, l.key)
+                out
             }
             m == "POST" && rest == listOf("charge") -> {
                 if (c.feeCents <= 0) throw Fail(409, "NO_FEE")
@@ -34133,6 +34365,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun noticeCourseMoved(c: Course, key: String) = this.c.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
@@ -34252,6 +34485,7 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
     override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
+    override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
@@ -40623,6 +40857,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -40889,6 +41124,7 @@ fun CoachCourseScreen(c: MatchController) {
                         // Lezione in un giorno di festa: in rosso, si vede subito.
                         com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
                         Coaching.busyOn(book.busy, l.start)?.let { Text(busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                        movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                     }
                     Text(
                         when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
@@ -40944,11 +41180,24 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
     var note by remember { mutableStateOf(cc.notes[l.key].orEmpty()) }
     var query by remember { mutableStateOf("") }
     val canMark = l.start <= System.currentTimeMillis() + 3_600_000L
+    var moving by remember { mutableStateOf(false) }
+    if (moving) {
+        MoveLessonDialog(c, co, l, emptyList(), { start, minutes, court, notify ->
+            val x = c.moveCoachLesson(co.id, l.key, start, minutes, court)
+            moving = false
+            onDone()
+            if (notify && x != null) c.noticeCourseMoved(x, l.key)
+        }) { moving = false }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(lessonText(l, lang)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                // Solo nei suoi corsi: l'orario di quelli della segreteria lo decide lei.
+                if (cc.personal) GhostButton(s.scMove, Icons.Filled.EventRepeat, { moving = true }, Modifier.fillMaxWidth())
                 SwitchRow(Icons.Filled.EventBusy, s.scCancelLesson, null, cancelled) { cancelled = it }
                 if (cancelled) {
                     if (co.students.isNotEmpty()) GhostButton(s.scNotifyCancelled, Icons.Filled.Campaign, {
@@ -42299,6 +42548,114 @@ fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, ena
             }
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CourseMoveUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CourseMoveUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.app.TimePickerDialog
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.EventRepeat
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Courses
+import com.tennis.scoremanager.data.Holidays
+import com.tennis.scoremanager.data.Lesson
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.screens.DateButton
+
+/** "Spostata dal martedì 8 dicembre, 17:00": per le righe delle lezioni. */
+fun movedLine(s: Strings, l: Lesson, lang: com.tennis.scoremanager.model.Lang): String? =
+    l.movedFrom?.let { s.scMovedFrom(com.tennis.scoremanager.data.Notices.day(it, lang) + ", " + Reports.time(it, lang)) }
+
+/**
+ * Sposta una lezione del corso: un altro giorno, un'altra ora, un altro campo, o il recupero in fondo al corso
+ * (il primo orario libero dopo l'ultima lezione, saltando le feste). La lezione tiene la sua chiave: presenze e
+ * registro restano. [onMove] riceve inizio, durata, campo (null = come prima) e se avvisare gli iscritti.
+ */
+@Composable
+fun MoveLessonDialog(c: MatchController, co: Course, l: Lesson, courts: List<String>, onMove: (Long, Int?, String?, Boolean) -> Unit, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.collectAsState().value.lang
+    val country = remember { Holidays.country(lang.code) }
+    var start by remember { mutableStateOf(l.start) }
+    var minutes by remember { mutableStateOf(l.minutes) }
+    var court by remember { mutableStateOf(l.court) }
+    val makeup = remember(co, l.key) { Courses.makeup(co.copy(moved = co.moved - l.key)) { t -> Holidays.on(t, country) != null } }
+    fun when_(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + Reports.time(t, lang)
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { Icon(Icons.Filled.EventRepeat, null, tint = TsmColors.Ball) },
+        title = { Text(s.scMoveTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(co.name + " · " + when_(l.movedFrom ?: l.start), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                Text(s.scMoveHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                movedLine(s, l, lang)?.let {
+                    Text(it, color = TsmColors.Orange, fontSize = 13.sp)
+                    GhostButton(s.scMoveBack, Icons.Filled.Undo, { onMove(l.movedFrom!!, null, null, false) }, Modifier.fillMaxWidth())
+                }
+                makeup?.let { mk ->
+                    GhostButton(s.scMakeupOn(when_(mk.start)), Icons.Filled.EventRepeat, { start = mk.start; minutes = mk.minutes; court = mk.court }, Modifier.fillMaxWidth())
+                }
+                DateButton(s.scMoveTo, start, lang) { d ->
+                    val cal = java.util.Calendar.getInstance().apply { timeInMillis = start }
+                    start = CourtPlans.at(CourtPlans.dayStart(d), cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
+                }
+                GhostButton("${s.ctTime}: ${Reports.time(start, lang)}", Icons.Filled.Schedule, {
+                    val cal = java.util.Calendar.getInstance().apply { timeInMillis = start }
+                    TimePickerDialog(context, { _, h, m -> start = CourtPlans.at(CourtPlans.dayStart(start), h, m) }, cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), true).show()
+                }, Modifier.fillMaxWidth())
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.bkDuration, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { minutes = (minutes - 15).coerceAtLeast(15) }) { Icon(Icons.Filled.Remove, null) }
+                    Text(s.bkMinutes(minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = { minutes = (minutes + 15).coerceAtMost(300) }) { Icon(Icons.Filled.Add, null) }
+                }
+                val opts = (listOf("") + courts + listOf(l.court)).distinct()
+                if (opts.size > 1) Segmented(opts.map { SegOption(it.ifBlank { "—" }) }, opts.indexOf(court).coerceAtLeast(0), { court = opts[it] }, columns = minOf(3, opts.size))
+                Holidays.on(start, country)?.let { Text("${s.scMoveHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                if (co.students.isNotEmpty()) GhostButton(s.scNotifyMoved, Icons.Filled.Campaign, { onMove(start, minutes, court, true) }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = { onMove(start, minutes, court, false) }) { Text(s.scMove) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 TSM_EOF
 
@@ -48964,6 +49321,18 @@ interface Strings {
     val pfFrom: (String) -> String
     val pfExisting: (String) -> String
     val pfQrTitle: (String) -> String
+    val scMove: String
+    val scMoveTitle: String
+    val scMoveHint: String
+    val scMoveTo: String
+    val scMakeup: String
+    val scMoveBack: String
+    val scMovedTitle: String
+    val scNotifyMoved: String
+    val scMoveHoliday: String
+    val scMakeupOn: (String) -> String
+    val scMovedFrom: (String) -> String
+    val scMovedNotice: (String) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -51615,6 +51984,18 @@ object ItStrings : Strings {
     override val pfFrom: (String) -> String = { "Da: $it" }
     override val pfExisting: (String) -> String = { "C'è già $it: si completa con i dati che mancano, niente si cancella." }
     override val pfQrTitle: (String) -> String = { "Profilo di $it" }
+    override val scMove = "Sposta"
+    override val scMoveTitle = "Sposta la lezione"
+    override val scMoveHint = "Resta la stessa lezione nel registro: cambiano solo giorno, ora o campo."
+    override val scMoveTo = "Nuovo giorno"
+    override val scMakeup = "Recupero in fondo al corso"
+    override val scMoveBack = "Rimetti com'era"
+    override val scMovedTitle = "Lezione spostata"
+    override val scNotifyMoved = "Sposta e avvisa gli iscritti"
+    override val scMoveHoliday = "Quel giorno è festa"
+    override val scMakeupOn: (String) -> String = { "Recupero: $it" }
+    override val scMovedFrom: (String) -> String = { "Spostata dal $it" }
+    override val scMovedNotice: (String) -> String = { "La lezione del corso $it è spostata:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -54267,6 +54648,18 @@ object EnStrings : Strings {
     override val pfFrom: (String) -> String = { "From: $it" }
     override val pfExisting: (String) -> String = { "$it is already here: missing data is filled in, nothing is deleted." }
     override val pfQrTitle: (String) -> String = { "$it's profile" }
+    override val scMove = "Move"
+    override val scMoveTitle = "Move the lesson"
+    override val scMoveHint = "It stays the same lesson in the register: only the day, time or court change."
+    override val scMoveTo = "New day"
+    override val scMakeup = "Make-up at the end of the course"
+    override val scMoveBack = "Put it back"
+    override val scMovedTitle = "Lesson moved"
+    override val scNotifyMoved = "Move and notify the students"
+    override val scMoveHoliday = "That day is a holiday"
+    override val scMakeupOn: (String) -> String = { "Make-up: $it" }
+    override val scMovedFrom: (String) -> String = { "Moved from $it" }
+    override val scMovedNotice: (String) -> String = { "The $it lesson has been moved:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -56944,6 +57337,18 @@ object DeStrings : Strings {
     override val pfFrom: (String) -> String = { "Von: $it" }
     override val pfExisting: (String) -> String = { "$it gibt es schon: fehlende Daten werden ergänzt, nichts wird gelöscht." }
     override val pfQrTitle: (String) -> String = { "Profil von $it" }
+    override val scMove = "Verschieben"
+    override val scMoveTitle = "Stunde verschieben"
+    override val scMoveHint = "Im Anwesenheitsbuch bleibt es dieselbe Stunde: nur Tag, Uhrzeit oder Platz ändern sich."
+    override val scMoveTo = "Neuer Tag"
+    override val scMakeup = "Nachholstunde am Kursende"
+    override val scMoveBack = "Zurücksetzen"
+    override val scMovedTitle = "Stunde verschoben"
+    override val scNotifyMoved = "Verschieben und Teilnehmer benachrichtigen"
+    override val scMoveHoliday = "An diesem Tag ist Feiertag"
+    override val scMakeupOn: (String) -> String = { "Nachholen: $it" }
+    override val scMovedFrom: (String) -> String = { "Verschoben vom $it" }
+    override val scMovedNotice: (String) -> String = { "Die Stunde des Kurses $it ist verschoben:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -59611,6 +60016,18 @@ object EsStrings : Strings {
     override val pfFrom: (String) -> String = { "De: $it" }
     override val pfExisting: (String) -> String = { "$it ya existe: se completan los datos que faltan, no se borra nada." }
     override val pfQrTitle: (String) -> String = { "Perfil de $it" }
+    override val scMove = "Mover"
+    override val scMoveTitle = "Mover la clase"
+    override val scMoveHint = "Sigue siendo la misma clase en el registro: solo cambian el día, la hora o la pista."
+    override val scMoveTo = "Nuevo día"
+    override val scMakeup = "Recuperación al final del curso"
+    override val scMoveBack = "Dejarla como estaba"
+    override val scMovedTitle = "Clase movida"
+    override val scNotifyMoved = "Mover y avisar a los inscritos"
+    override val scMoveHoliday = "Ese día es festivo"
+    override val scMakeupOn: (String) -> String = { "Recuperación: $it" }
+    override val scMovedFrom: (String) -> String = { "Movida del $it" }
+    override val scMovedNotice: (String) -> String = { "La clase del curso $it se ha movido:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -62280,6 +62697,18 @@ object FrStrings : Strings {
     override val pfFrom: (String) -> String = { "De : $it" }
     override val pfExisting: (String) -> String = { "$it existe déjà : on complète les données manquantes, rien n'est effacé." }
     override val pfQrTitle: (String) -> String = { "Profil de $it" }
+    override val scMove = "Déplacer"
+    override val scMoveTitle = "Déplacer la séance"
+    override val scMoveHint = "C'est la même séance dans le registre : seuls le jour, l'heure ou le terrain changent."
+    override val scMoveTo = "Nouveau jour"
+    override val scMakeup = "Rattrapage à la fin du cours"
+    override val scMoveBack = "Remettre comme avant"
+    override val scMovedTitle = "Séance déplacée"
+    override val scNotifyMoved = "Déplacer et prévenir les inscrits"
+    override val scMoveHoliday = "Ce jour est férié"
+    override val scMakeupOn: (String) -> String = { "Rattrapage : $it" }
+    override val scMovedFrom: (String) -> String = { "Déplacée du $it" }
+    override val scMovedNotice: (String) -> String = { "La séance du cours $it est déplacée :" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -64950,6 +65379,18 @@ object PtStrings : Strings {
     override val pfFrom: (String) -> String = { "De: $it" }
     override val pfExisting: (String) -> String = { "$it já existe: completam-se os dados em falta, nada se apaga." }
     override val pfQrTitle: (String) -> String = { "Perfil de $it" }
+    override val scMove = "Mudar"
+    override val scMoveTitle = "Mudar a aula"
+    override val scMoveHint = "Continua a ser a mesma aula no registo: só mudam o dia, a hora ou o campo."
+    override val scMoveTo = "Novo dia"
+    override val scMakeup = "Reposição no fim do curso"
+    override val scMoveBack = "Repor como estava"
+    override val scMovedTitle = "Aula mudada"
+    override val scNotifyMoved = "Mudar e avisar os inscritos"
+    override val scMoveHoliday = "Esse dia é feriado"
+    override val scMakeupOn: (String) -> String = { "Reposição: $it" }
+    override val scMovedFrom: (String) -> String = { "Mudada de $it" }
+    override val scMovedNotice: (String) -> String = { "A aula do curso $it foi mudada:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -74832,6 +75273,7 @@ fun CourseScreen(c: MatchController) {
                             com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let {
                                 Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             }
+                            com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                         }
                         Text(
                             when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
@@ -74887,11 +75329,26 @@ private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -
     val lang = c.options.collectAsState().value.lang
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
+    var moving by remember { mutableStateOf(false) }
+    val courts by c.clubCourts.collectAsState()
+    if (moving) {
+        com.tennis.scoremanager.ui.MoveLessonDialog(c, c.course(co.id) ?: co, l, courts, { start, minutes, court, notify ->
+            val x = Courses.move(c.course(co.id) ?: co, l.key, start, minutes, court)
+            c.saveCourse(x)
+            moving = false
+            onDone()
+            if (notify) c.noticeCourseMoved(x, l.key)
+        }) { moving = false }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(lessonLine(l, lang)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                // Un altro giorno, ora o campo; o il recupero in fondo al corso.
+                GhostButton(s.scMove, Icons.Filled.Schedule, { moving = true }, Modifier.fillMaxWidth())
                 SwitchRow(Icons.Filled.EventBusy, s.scCancelLesson, null, cancelled) { cancelled = it }
                 if (!cancelled) {
                     Text(s.scWhoWasThere, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -97190,6 +97647,67 @@ class CourseCardsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/CourseMoveTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/CourseMoveTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.time.LocalDate
+import java.time.ZoneId
+
+class CourseMoveTest {
+    private fun day(y: Int, m: Int, d: Int) = LocalDate.of(y, m, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    // Martedì alle 17 sul Campo 1, dal 1° al 22 dicembre 2026: 1, 8, 15, 22.
+    private val course = Course("k", "Mini", slots = listOf(CourseSlot(2, 17 * 60, 60, "Campo 1")), from = day(2026, 12, 1), to = day(2026, 12, 22))
+
+    @Test fun movedLessonKeepsItsKeyAndAttendance() {
+        val l8 = Courses.lessons(course)[1]
+        val c = Courses.mark(Courses.setCancelled(course, l8.key, true), l8.key, setOf("a"))
+        val thursday = CourtPlans.at(day(2026, 12, 10), 18, 0)
+        val m = Courses.move(c, l8.key, thursday, court = "Campo 2")
+        assertFalse(l8.key in m.cancelled)            // spostata, non più annullata
+        val after = Courses.lessons(m)
+        assertEquals(4, after.size)
+        val moved = after.single { it.key == l8.key }
+        assertEquals(thursday, moved.start)
+        assertEquals("Campo 2", moved.court)
+        assertEquals(l8.start, moved.movedFrom)
+        assertEquals(setOf("a"), m.attendance[l8.key])   // le presenze restano sulla stessa chiave
+        // Rimessa al suo posto non risulta più spostata.
+        assertTrue(Courses.move(m, l8.key, l8.start, court = "Campo 1").moved.isEmpty())
+    }
+
+    @Test fun makeupIsTheFirstFreeSlotAfterTheLastLessonSkippingHolidays() {
+        // L'ultima è il 22: il 29 dicembre è libero.
+        assertEquals(CourtPlans.at(day(2026, 12, 29), 17, 0), Courses.makeup(course)!!.start)
+        // Se il 29 fosse da saltare, il 5 gennaio.
+        assertEquals(CourtPlans.at(day(2027, 1, 5), 17, 0), Courses.makeup(course) { CourtPlans.dayStart(it) == day(2026, 12, 29) }!!.start)
+        assertNull(Courses.makeup(course.copy(slots = emptyList())))
+    }
+
+    @Test fun planningFreesTheOldHourAndBlocksTheNewOne() {
+        val l8 = Courses.lessons(course)[1]
+        val m = Courses.move(course, l8.key, CourtPlans.at(day(2026, 12, 10), 18, 0), court = "Campo 2")
+        val blocks = Courses.blocks(m)
+        val weekly = blocks.single { it.weekdays == setOf(2) }
+        assertFalse(CourtPlans.blockActive(weekly, day(2026, 12, 8)))   // l'8 il Campo 1 è libero
+        assertTrue(CourtPlans.blockActive(weekly, day(2026, 12, 15)))
+        val one = blocks.single { it.id.contains("-m-") }
+        assertEquals(listOf("Campo 2"), one.courts)
+        assertTrue(CourtPlans.blockActive(one, day(2026, 12, 10)))
+        assertFalse(CourtPlans.blockActive(one, day(2026, 12, 17)))
+        assertEquals(18 * 60, one.startMin)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/CourtPlanTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/CourtPlanTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -100033,6 +100551,9 @@ class FakeCoach(var time: Long) : CoachData {
     override fun country() = "IT"
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) { book = book.copy(busy = book.busy.filter { it.id != b.id } + b) }
     override fun deleteBusy(id: String) { book = book.copy(busy = book.busy.filter { it.id != id }) }
+    override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) {
+        book = book.copy(courses = book.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = com.tennis.scoremanager.data.Courses.move(it.card.course, key, start, minutes, court))) else it })
+    }
     val colors = mutableMapOf<String, String>()
     override fun setCourseColor(id: String, color: String) { colors[id] = color }
     override fun deleteOwnCourse(id: String) { book = book.copy(courses = book.courses.filter { it.card.course.id != id }) }
@@ -100173,6 +100694,18 @@ class CoachDeskTest {
         assertEquals(404, req("DELETE", "/coach/busy/${b.id}", token = tk).first)
     }
 
+    @Test fun ownCourseLessonMovesFromThePc() {
+        val tk = login()
+        assertEquals(200, req("POST", "/coach/courses", """{"name":"Mini","from":"2026-11-17","slots":[{"weekday":2,"startMin":1020,"minutes":60,"court":""}],"lessons":3,"skipHolidays":false}""", tk).first)
+        val c = coach.book.courses.single { it.card.course.name == "Mini" }.card.course
+        val first = com.tennis.scoremanager.data.Courses.lessons(c).first()
+        val out = req("POST", "/coach/courses/${c.id}/move", """{"key":"${first.key}","date":"2026-11-19","startMin":1080}""", tk).second
+        assertTrue(out, "\"movedFrom\":\"2026-11-17\"" in out)
+        // Quelli della segreteria no.
+        coach.book = coach.book.copy(courses = coach.book.courses + CoachCourse(CourseCard(code = "X", issuedAt = 1, course = Course("club", "Under 10", slots = c.slots, from = c.from, to = c.to))))
+        assertEquals(409, req("POST", "/coach/courses/club/move", """{"key":"${first.key}","makeup":true}""", tk).first)
+    }
+
     @Test fun studentsFromThePcWithoutDuplicates() {
         val tk = login()
         val made = req("POST", "/coach/students", """{"firstName":"Giulia","lastName":"Verdi","guardian":"Marta Verdi","guardianPhone":"3331234567","consent":true}""", tk)
@@ -100255,6 +100788,26 @@ class DeskTest {
         assertEquals(1, c.cancelled.size)
         val list = req("GET", "/courses", token = k).second
         assertTrue(list, "\"holiday\":\"Immacolata Concezione\"" in list)
+    }
+
+    @Test fun lezioneSpostataERecupero() {
+        val k = login()
+        val body = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60}],"lessons":3,"skipHolidays":false}"""
+        assertEquals(200, req("POST", "/courses", body, k).first)
+        val c = data.school.single { it.name == "Mini" }
+        val key8 = com.tennis.scoremanager.data.Courses.lessons(c)[1].key
+        // Giovedì 10 alle 18.
+        val (st, out) = req("POST", "/courses/${c.id}/move", """{"key":"$key8","date":"2026-12-10","startMin":1080}""", k)
+        assertEquals(200, st)
+        assertTrue(out, "\"movedFrom\":\"2026-12-08\"" in out)
+        assertTrue(out, "\"date\":\"2026-12-10\",\"startMin\":1080" in out)
+        // Il recupero: dopo l'ultima (il 15), il 22.
+        val mk = req("POST", "/courses/${c.id}/move", """{"key":"$key8","makeup":true}""", k).second
+        assertTrue(mk, "\"date\":\"2026-12-22\"" in mk)
+        // Com'era.
+        req("POST", "/courses/${c.id}/move", """{"key":"$key8","reset":true}""", k)
+        assertTrue(data.school.single { it.name == "Mini" }.moved.isEmpty())
+        assertEquals(404, req("POST", "/courses/${c.id}/move", """{"key":"nessuna","date":"2026-12-10","startMin":1080}""", k).first)
     }
 
     @Test fun ilPlanningMostraLeFeste() {
@@ -104245,7 +104798,7 @@ object CourtTime {
     /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
     fun blockActive(b: CourtBlock, day: Long): Boolean {
         val d = dayStart(day)
-        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays)
+        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays) && d !in b.except
     }
 
     /** Inizio e fine del blocco nel giorno [day]. */
@@ -104402,6 +104955,8 @@ data class CourtBlock(
     val course: String? = null,
     /** La squadra il cui incontro in casa l'ha creato. */
     val team: String? = null,
+    /** I giorni (inizio del giorno) in cui il blocco non vale: per esempio la lezione del corso spostata altrove. */
+    val except: Set<Long> = emptySet(),
 )
 
 @Serializable
@@ -114270,6 +114825,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 367 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 369 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

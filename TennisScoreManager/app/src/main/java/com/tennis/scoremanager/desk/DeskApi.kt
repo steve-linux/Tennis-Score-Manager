@@ -119,6 +119,8 @@ interface DeskData {
     fun convokeRubber(t: Team, f: Fixture, index: Int) {}
     /** Apre sul telefono l'invio della scheda corso all'allenatore. */
     fun sendCourseToCoach(c: Course) {}
+    /** Sul telefono: l'avviso agli iscritti che la lezione [key] è stata spostata. */
+    fun noticeCourseMoved(c: Course, key: String) {}
     /** Il registro presenze del corso, in PDF o in Excel (fatto dal telefono). */
     fun registerPdf(c: Course): ByteArray? = null
     fun registerXlsx(c: Course): ByteArray? = null
@@ -285,7 +287,12 @@ interface DeskData {
 @Serializable data class DeskTop(val name: String, val count: Int)
 @Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
 @Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
-@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null,
+    /** Spostata: il giorno e l'ora che aveva. */
+    val movedFrom: String? = null, val movedFromMin: Int? = null)
+/** Spostare una lezione: un altro giorno, ora, durata o campo; [makeup] = il recupero in fondo al corso; [reset] = com'era. */
+@Serializable data class DeskLessonMoveIn(val key: String, val date: String = "", val startMin: Int = 0, val minutes: Int? = null, val court: String? = null,
+    val makeup: Boolean = false, val reset: Boolean = false, val notify: Boolean = false)
 /** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
 @Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
 @Serializable data class DeskCourse(
@@ -1181,7 +1188,8 @@ class DeskApi(
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
             DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
-                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()))
+                com.tennis.scoremanager.data.Holidays.on(l.start, data.country(), zone()),
+                l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() })
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
         val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
@@ -1217,6 +1225,26 @@ class DeskApi(
                 var n = if (i.cancelled != null) Courses.setCancelled(c, i.key, i.cancelled) else c
                 if (i.cancelled == null) n = Courses.mark(n, i.key, i.present.filter { it in c.students }.toSet())
                 courseSaved(n)
+            }
+            m == "POST" && rest == listOf("move") -> {
+                val i = read(DeskLessonMoveIn.serializer(), r)
+                val l = Courses.lessons(c).firstOrNull { it.key == i.key } ?: throw Fail(404, "NOT_FOUND")
+                val n = when {
+                    i.reset -> l.movedFrom?.let { Courses.move(c, l.key, it) } ?: c
+                    i.makeup -> {
+                        val mk = Courses.makeup(c.copy(moved = c.moved - l.key)) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null } ?: throw Fail(409, "BAD_TIME")
+                        Courses.move(c, l.key, mk.start, mk.minutes, mk.court)
+                    }
+                    else -> {
+                        val d = noon(i.date) ?: throw Fail(400, "BAD_DATE")
+                        if (i.startMin !in 0 until 24 * 60 || (i.minutes != null && i.minutes !in 15..8 * 60)) throw Fail(400, "BAD_TIME")
+                        if (!i.court.isNullOrEmpty() && i.court !in data.courts()) throw Fail(404, "NOT_FOUND")
+                        Courses.move(c, l.key, CourtPlans.at(CourtPlans.dayStart(d), i.startMin / 60, i.startMin % 60), i.minutes, i.court)
+                    }
+                }
+                val out = courseSaved(n)
+                if (i.notify && !i.reset) data.noticeCourseMoved(n, l.key)
+                out
             }
             m == "POST" && rest == listOf("charge") -> {
                 if (c.feeCents <= 0) throw Fail(409, "NO_FEE")

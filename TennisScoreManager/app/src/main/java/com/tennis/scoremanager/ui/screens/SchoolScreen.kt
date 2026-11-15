@@ -200,6 +200,7 @@ fun CourseScreen(c: MatchController) {
                             com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let {
                                 Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             }
+                            com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                         }
                         Text(
                             when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
@@ -255,11 +256,26 @@ private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -
     val lang = c.options.collectAsState().value.lang
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
+    var moving by remember { mutableStateOf(false) }
+    val courts by c.clubCourts.collectAsState()
+    if (moving) {
+        com.tennis.scoremanager.ui.MoveLessonDialog(c, c.course(co.id) ?: co, l, courts, { start, minutes, court, notify ->
+            val x = Courses.move(c.course(co.id) ?: co, l.key, start, minutes, court)
+            c.saveCourse(x)
+            moving = false
+            onDone()
+            if (notify) c.noticeCourseMoved(x, l.key)
+        }) { moving = false }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(lessonLine(l, lang)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                com.tennis.scoremanager.ui.movedLine(s, l, lang)?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                // Un altro giorno, ora o campo; o il recupero in fondo al corso.
+                GhostButton(s.scMove, Icons.Filled.Schedule, { moving = true }, Modifier.fillMaxWidth())
                 SwitchRow(Icons.Filled.EventBusy, s.scCancelLesson, null, cancelled) { cancelled = it }
                 if (!cancelled) {
                     Text(s.scWhoWasThere, color = TsmColors.TextDim, fontSize = 13.sp)

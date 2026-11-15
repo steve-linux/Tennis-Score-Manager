@@ -2654,6 +2654,18 @@ object DeStrings : Strings {
     override val pfFrom: (String) -> String = { "Von: $it" }
     override val pfExisting: (String) -> String = { "$it gibt es schon: fehlende Daten werden ergänzt, nichts wird gelöscht." }
     override val pfQrTitle: (String) -> String = { "Profil von $it" }
+    override val scMove = "Verschieben"
+    override val scMoveTitle = "Stunde verschieben"
+    override val scMoveHint = "Im Anwesenheitsbuch bleibt es dieselbe Stunde: nur Tag, Uhrzeit oder Platz ändern sich."
+    override val scMoveTo = "Neuer Tag"
+    override val scMakeup = "Nachholstunde am Kursende"
+    override val scMoveBack = "Zurücksetzen"
+    override val scMovedTitle = "Stunde verschoben"
+    override val scNotifyMoved = "Verschieben und Teilnehmer benachrichtigen"
+    override val scMoveHoliday = "An diesem Tag ist Feiertag"
+    override val scMakeupOn: (String) -> String = { "Nachholen: $it" }
+    override val scMovedFrom: (String) -> String = { "Verschoben vom $it" }
+    override val scMovedNotice: (String) -> String = { "Die Stunde des Kurses $it ist verschoben:" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

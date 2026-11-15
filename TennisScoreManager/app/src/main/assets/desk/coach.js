@@ -313,7 +313,7 @@ async function showCourseRegister(id) {
       document.querySelectorAll('tr[data-name]').forEach((tr) => { tr.hidden = !!q && !tr.dataset.name.includes(q); });
     } }) : null,
     h('div.panel', { style: 'overflow-x:auto' }, h('table',
-      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : '') + (l.busy ? ' · ' + busyLabel(l.busy) : ''), style: 'cursor:' + (l.past ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : l.busy ? ';color:var(--warn)' : ''), onclick: () => { if (l.past) attendanceDialog(r, l); } },
+      h('thead', h('tr', h('th', T.studentsTitle), r.lessons.map((l) => h('th', { title: dateText(l.date) + ' ' + hhmm(l.startMin) + (l.holiday ? ' · ' + T.hdHoliday + ': ' + l.holiday : '') + (l.busy ? ' · ' + busyLabel(l.busy) : ''), style: 'cursor:' + (l.past || c.personal ? 'pointer' : 'default') + ';text-align:center' + (l.holiday ? ';color:var(--bad)' : l.busy ? ';color:var(--warn)' : l.movedFrom ? ';color:var(--warn)' : ''), onclick: () => { if (l.past || c.personal) attendanceDialog(r, l); } },
         shortD(l.date), l.past && !l.marked && !l.cancelled ? h('div', { style: 'color:var(--warn)' }, '•') : null)), h('th', T.rgTotal))),
       h('tbody', r.rows.map((row) => h('tr', { 'data-name': row.name.toLowerCase() }, h('td', row.name), row.marks.map((m) => h('td', { style: 'text-align:center;font-weight:bold;color:' + color(m) }, m)), h('td', h('b', row.present + '/' + row.total))))))),
     h('p.dim', T.rgLegend), c.toSend ? h('p', { style: 'color:var(--warn)' }, T.ccDeskSent) : null);
@@ -431,17 +431,26 @@ function attendanceDialog(r, l) {
   const dlg = h('dialog', h('form', { method: 'dialog', style: 'min-width:320px' },
     h('h2', dateText(l.date) + ' ' + hhmm(l.startMin)),
     h('label', { style: 'display:flex;gap:8px;align-items:center' }, cancelled, T.scCancelLesson),
-    h('p.dim', T.scWhoWasThere),
+    // Le presenze solo per le lezioni già fatte; le future si annullano o (nei corsi suoi) si spostano.
+    l.past ? [h('p.dim', T.scWhoWasThere),
     // Con tanti iscritti: cerca, tutti presenti o nessuno (poi si tolgono o aggiungono gli altri).
     h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' },
       boxes.length > 12 ? h('input', { type: 'search', placeholder: T.coSearch, oninput: (ev) => { const q = ev.target.value.trim().toLowerCase(); boxes.forEach((b) => { b[2].hidden = !!q && !b[3].includes(q); }); } }) : null,
       h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = true; }) }, T.pkAll),
       h('button', { type: 'button', onclick: () => boxes.forEach((b) => { if (!b[2].hidden) b[1].checked = false; }) }, T.pkNone)),
     h('div', { style: 'max-height:50vh;overflow:auto' }, boxes.map((b) => b[2])),
-    h('label', T.ccLessonNote, note),
+    h('label', T.ccLessonNote, note)] : null,
+    l.movedFrom ? h('p', { style: 'color:var(--warn)' }, T.scMovedFrom(dateText(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+    // Solo nei corsi suoi: un altro giorno o ora, il recupero in fondo al corso, o com'era.
+    r.course.personal ? h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' },
+      h('span.dim', T.scMove + ':'), (() => { const d = h('input', { type: 'date', value: l.date }); const t = h('input', { type: 'time', step: 300, value: hhmm(l.startMin) });
+        const go = async (body) => { try { await api('POST', '/coach/courses/' + encodeURIComponent(r.course.id) + '/move', { key: l.key, ...body }); dlg.close(); dlg.remove(); toast(T.saved); showCourseRegister(r.course.id); } catch (e) { toast(errText(e)); } };
+        return [d, t, h('button', { type: 'button', onclick: () => { const [hh, mm] = t.value.split(':').map(Number); go({ date: d.value, startMin: hh * 60 + (mm || 0) }); } }, T.scMove),
+          h('button', { type: 'button', onclick: () => go({ makeup: true }) }, T.scMakeup), l.movedFrom ? h('button', { type: 'button', onclick: () => go({ reset: true }) }, T.scMoveBack) : null]; })()) : null,
     h('div.actions',
       h('button', { type: 'button', onclick: () => dlg.close() }, '✕'),
       h('button.primary', { type: 'button', onclick: async () => {
+        if (!l.past && !cancelled.checked && !l.cancelled) { dlg.close(); dlg.remove(); return; }
         try {
           await api('PUT', '/coach/courses/' + encodeURIComponent(r.course.id) + '/attendance',
             { key: l.key, present: boxes.filter((b) => b[1].checked).map((b) => b[0]), cancelled: cancelled.checked, note: note.value });
