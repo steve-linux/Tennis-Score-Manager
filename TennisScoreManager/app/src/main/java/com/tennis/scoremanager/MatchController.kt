@@ -1397,6 +1397,7 @@ class MatchController(
         text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { incomingProgress.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { incomingAttendance.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { incomingProposal.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }?.let { incomingProfile.value = it; return }
         // Una partita (da "File della partita" di un altro telefono): nello storico.
         text?.let { runCatching { storage.json.decodeFromString(MatchRecord.serializer(), it) }.getOrNull() }?.takeIf { it.events.isNotEmpty() }?.let { receiveMatchRecord(it); return }
         _toasts.tryEmit(strings.mcNotValid)
@@ -1712,6 +1713,8 @@ class MatchController(
     val incomingAttendance = MutableStateFlow<com.tennis.scoremanager.data.AttendanceReport?>(null)
     /** Segreteria: l'allenatore propone un allievo nuovo. */
     val incomingProposal = MutableStateFlow<com.tennis.scoremanager.data.StudentProposal?>(null)
+    /** Un profilo arrivato (file o QR): la persona da aggiungere o da completare tra i giocatori. */
+    val incomingProfile = MutableStateFlow<com.tennis.scoremanager.data.ProfileCard?>(null)
 
     /**
      * Allenatore: il corso tra i suoi; gli iscritti diventano suoi allievi col loro id della segreteria (così le
@@ -1840,6 +1843,52 @@ class MatchController(
         val office = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
         val text = listOf(strings.ccProposalText(st.name), level.trim(), note.trim()).filter { it.isNotBlank() }.joinToString("\n")
         return Triple(f, text, office)
+    }
+
+    // ---------------------------------------------------------------- passaggio del profilo
+
+    /** La foto del giocatore (JPEG), se c'è. */
+    fun photoBytes(name: String): ByteArray? = PlayerStats.key(name).takeIf { it.isNotEmpty() }?.let { storage.photoFile(it) }?.takeIf { it.exists() }?.let { runCatching { it.readBytes() }.getOrNull() }
+
+    /** Chi manda un profilo: il circolo, o il nome di chi usa l'app. */
+    private fun profileSender(): String = if (activeRole.value == Role.CLUB) storage.clubName.ifBlank { strings.roleClub } else (me()?.name ?: storage.myName)
+
+    /** Il profilo di [p] coi dati scelti: il file da mandare e il testo che lo accompagna. */
+    fun profileToSend(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): Pair<File, String>? {
+        val card = com.tennis.scoremanager.data.ProfileCards.card(p, fields, photoBytes(p.name), profileSender(), System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.ProfileCards.fileName(strings.pfFilePrefix, p.name)).apply { writeText(com.tennis.scoremanager.data.ProfileCards.encode(card)) } }.getOrNull() ?: return null
+        return f to strings.pfShareText(p.name)
+    }
+
+    /** Il profilo di [p] per il QR (senza foto). */
+    fun profileQr(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): String =
+        com.tennis.scoremanager.data.ProfileCards.encodeQr(com.tennis.scoremanager.data.ProfileCards.card(p, fields, null, profileSender(), System.currentTimeMillis()))
+
+    /** Il testo letto da un QR: se è un profilo si apre, se no si dice che non lo è. */
+    fun receiveProfileQr(text: String?) {
+        val card = text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }
+        if (card == null) _toasts.tryEmit(strings.pfNotProfile) else incomingProfile.value = card
+    }
+
+    /**
+     * Il profilo arrivato entra tra i giocatori: nuovo, o a completare [intoId] (solo quello che manca). La foto si
+     * mette se non ce n'è già una; all'allenatore la classifica va anche nello storico delle classifiche.
+     */
+    fun applyProfile(card: com.tennis.scoremanager.data.ProfileCard, intoId: String?, asMember: Boolean, asStudent: Boolean): com.tennis.scoremanager.data.PlayerProfile {
+        incomingProfile.value = null
+        val old = intoId?.let { playerById(it) }
+        val pl = com.tennis.scoremanager.data.ProfileCards.merge(old, card.profile, com.tennis.scoremanager.data.Players.newId(), System.currentTimeMillis(), asMember, asStudent)
+        savePlayer(pl)
+        card.photo?.let { b64 ->
+            val key = PlayerStats.key(pl.name)
+            if (key.isNotEmpty() && !storage.photoFile(key).exists()) runCatching { java.util.Base64.getDecoder().decode(b64) }.getOrNull()
+                ?.takeIf { it.size in 100..2_000_000 && BitmapFactory.decodeByteArray(it, 0, it.size) != null }
+                ?.let { storage.savePhoto(key, it); photosVersion.value++ }
+        }
+        if (pl.student && card.profile.ranking.isNotBlank() && coachBook.value.rankings.none { it.student == pl.id }) addRanking(pl.id, card.profile.ranking)
+        _toasts.tryEmit(if (old == null) strings.pfAdded(pl.name) else strings.pfCompleted(pl.name))
+        return pl
     }
 
     /** Segreteria: l'allievo proposto entra tra i giocatori (e nel corso scelto). */

@@ -16281,6 +16281,7 @@ class MatchController(
         text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { incomingProgress.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { incomingAttendance.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { incomingProposal.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }?.let { incomingProfile.value = it; return }
         // Una partita (da "File della partita" di un altro telefono): nello storico.
         text?.let { runCatching { storage.json.decodeFromString(MatchRecord.serializer(), it) }.getOrNull() }?.takeIf { it.events.isNotEmpty() }?.let { receiveMatchRecord(it); return }
         _toasts.tryEmit(strings.mcNotValid)
@@ -16596,6 +16597,8 @@ class MatchController(
     val incomingAttendance = MutableStateFlow<com.tennis.scoremanager.data.AttendanceReport?>(null)
     /** Segreteria: l'allenatore propone un allievo nuovo. */
     val incomingProposal = MutableStateFlow<com.tennis.scoremanager.data.StudentProposal?>(null)
+    /** Un profilo arrivato (file o QR): la persona da aggiungere o da completare tra i giocatori. */
+    val incomingProfile = MutableStateFlow<com.tennis.scoremanager.data.ProfileCard?>(null)
 
     /**
      * Allenatore: il corso tra i suoi; gli iscritti diventano suoi allievi col loro id della segreteria (così le
@@ -16724,6 +16727,52 @@ class MatchController(
         val office = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
         val text = listOf(strings.ccProposalText(st.name), level.trim(), note.trim()).filter { it.isNotBlank() }.joinToString("\n")
         return Triple(f, text, office)
+    }
+
+    // ---------------------------------------------------------------- passaggio del profilo
+
+    /** La foto del giocatore (JPEG), se c'è. */
+    fun photoBytes(name: String): ByteArray? = PlayerStats.key(name).takeIf { it.isNotEmpty() }?.let { storage.photoFile(it) }?.takeIf { it.exists() }?.let { runCatching { it.readBytes() }.getOrNull() }
+
+    /** Chi manda un profilo: il circolo, o il nome di chi usa l'app. */
+    private fun profileSender(): String = if (activeRole.value == Role.CLUB) storage.clubName.ifBlank { strings.roleClub } else (me()?.name ?: storage.myName)
+
+    /** Il profilo di [p] coi dati scelti: il file da mandare e il testo che lo accompagna. */
+    fun profileToSend(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): Pair<File, String>? {
+        val card = com.tennis.scoremanager.data.ProfileCards.card(p, fields, photoBytes(p.name), profileSender(), System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.ProfileCards.fileName(strings.pfFilePrefix, p.name)).apply { writeText(com.tennis.scoremanager.data.ProfileCards.encode(card)) } }.getOrNull() ?: return null
+        return f to strings.pfShareText(p.name)
+    }
+
+    /** Il profilo di [p] per il QR (senza foto). */
+    fun profileQr(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): String =
+        com.tennis.scoremanager.data.ProfileCards.encodeQr(com.tennis.scoremanager.data.ProfileCards.card(p, fields, null, profileSender(), System.currentTimeMillis()))
+
+    /** Il testo letto da un QR: se è un profilo si apre, se no si dice che non lo è. */
+    fun receiveProfileQr(text: String?) {
+        val card = text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }
+        if (card == null) _toasts.tryEmit(strings.pfNotProfile) else incomingProfile.value = card
+    }
+
+    /**
+     * Il profilo arrivato entra tra i giocatori: nuovo, o a completare [intoId] (solo quello che manca). La foto si
+     * mette se non ce n'è già una; all'allenatore la classifica va anche nello storico delle classifiche.
+     */
+    fun applyProfile(card: com.tennis.scoremanager.data.ProfileCard, intoId: String?, asMember: Boolean, asStudent: Boolean): com.tennis.scoremanager.data.PlayerProfile {
+        incomingProfile.value = null
+        val old = intoId?.let { playerById(it) }
+        val pl = com.tennis.scoremanager.data.ProfileCards.merge(old, card.profile, com.tennis.scoremanager.data.Players.newId(), System.currentTimeMillis(), asMember, asStudent)
+        savePlayer(pl)
+        card.photo?.let { b64 ->
+            val key = PlayerStats.key(pl.name)
+            if (key.isNotEmpty() && !storage.photoFile(key).exists()) runCatching { java.util.Base64.getDecoder().decode(b64) }.getOrNull()
+                ?.takeIf { it.size in 100..2_000_000 && BitmapFactory.decodeByteArray(it, 0, it.size) != null }
+                ?.let { storage.savePhoto(key, it); photosVersion.value++ }
+        }
+        if (pl.student && card.profile.ranking.isNotBlank() && coachBook.value.rankings.none { it.student == pl.id }) addRanking(pl.id, card.profile.ranking)
+        _toasts.tryEmit(if (old == null) strings.pfAdded(pl.name) else strings.pfCompleted(pl.name))
+        return pl
     }
 
     /** Segreteria: l'allievo proposto entra tra i giocatori (e nel corso scelto). */
@@ -27097,6 +27146,162 @@ object PlayerStats {
         }
         return out.values.sortedWith(compareByDescending<Rival> { it.won + it.lost }.thenBy { it.name.lowercase(Locale.ROOT) })
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ProfileCards.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ProfileCards.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+/**
+ * I dati di una persona da passare a un nuovo circolo o allenatore: solo quelli scelti da chi la manda (vedi
+ * [ProfileField]). Note, diario, valutazioni, pagamenti e consensi dati ad altri non passano mai.
+ */
+@Serializable
+data class SharedProfile(
+    val firstName: String = "",
+    val lastName: String = "",
+    val nickname: String = "",
+    val phone: String = "",
+    val email: String = "",
+    val birth: Long? = null,
+    val sex: String = "",
+    val hand: Hand? = null,
+    val backhand: Backhand? = null,
+    val club: String = "",
+    val heightCm: Int? = null,
+    val weightKg: Int? = null,
+    val guardian: String = "",
+    val guardianPhone: String = "",
+    val fitpNumber: String = "",
+    val fitpCard: FitpCard? = null,
+    val fitpYear: Int? = null,
+    val ranking: String = "",
+    val medical: MedicalKind? = null,
+    val medicalUntil: Long? = null,
+) {
+    val name: String get() = PlayerProfile.display(firstName, lastName, nickname)
+    val hasFitp: Boolean get() = fitpNumber.isNotBlank() || fitpCard != null || ranking.isNotBlank()
+}
+
+/** Il profilo da passare: un file .tsm (anche con la foto) o un QR (senza foto). */
+@Serializable
+data class ProfileCard(
+    val tsm: String = ProfileCards.TYPE,
+    val v: Int = 1,
+    val sentAt: Long = 0,
+    /** Chi lo manda: la persona stessa, o il circolo / l'allenatore di prima. */
+    val from: String = "",
+    val profile: SharedProfile,
+    /** La foto, JPEG in base64 (solo nel file). */
+    val photo: String? = null,
+)
+
+/** I gruppi di dati che chi manda il profilo può scegliere (nome, cognome e soprannome vanno sempre). */
+enum class ProfileField { PHOTO, CONTACTS, BIRTH, PLAY, BODY, GUARDIAN, FITP, MEDICAL }
+
+object ProfileCards {
+    const val TYPE = "tsm-profile"
+
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; prettyPrint = true }
+    private val compact = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+
+    fun encode(c: ProfileCard): String = json.encodeToString(ProfileCard.serializer(), c)
+    /** Per il QR: senza foto e senza spazi. */
+    fun encodeQr(c: ProfileCard): String = compact.encodeToString(ProfileCard.serializer(), c.copy(photo = null))
+    fun decode(text: String): ProfileCard? = runCatching { json.decodeFromString(ProfileCard.serializer(), text.trim()) }.getOrNull()
+        ?.takeIf { it.tsm == TYPE && (it.profile.firstName.isNotBlank() || it.profile.lastName.isNotBlank() || it.profile.nickname.isNotBlank()) }
+
+    /** Quello che si propone di mandare: tutto quello che c'è, tranne il certificato medico (si sceglie a mano). */
+    fun defaults(p: PlayerProfile, hasPhoto: Boolean): Set<ProfileField> = buildSet {
+        if (hasPhoto) add(ProfileField.PHOTO)
+        if (p.phone.isNotBlank() || p.email.isNotBlank()) add(ProfileField.CONTACTS)
+        if (p.birth != null || p.sex.isNotBlank()) add(ProfileField.BIRTH)
+        if (p.hand != null || p.backhand != null || p.club.isNotBlank()) add(ProfileField.PLAY)
+        if (guardianOf(p).first.isNotBlank() || guardianOf(p).second.isNotBlank()) add(ProfileField.GUARDIAN)
+        val m = p.member
+        if (m != null && (m.fitpNumber.isNotBlank() || m.ranking.isNotBlank() || m.fitpCard != null)) add(ProfileField.FITP)
+    }
+
+    /** I gruppi che hanno qualcosa da mandare (gli altri non si propongono neanche). */
+    fun available(p: PlayerProfile, hasPhoto: Boolean): List<ProfileField> = ProfileField.entries.filter { f ->
+        when (f) {
+            ProfileField.PHOTO -> hasPhoto
+            ProfileField.CONTACTS -> p.phone.isNotBlank() || p.email.isNotBlank()
+            ProfileField.BIRTH -> p.birth != null || p.sex.isNotBlank()
+            ProfileField.PLAY -> p.hand != null || p.backhand != null || p.club.isNotBlank()
+            ProfileField.BODY -> p.heightCm != null || p.weightKg != null
+            ProfileField.GUARDIAN -> guardianOf(p).let { it.first.isNotBlank() || it.second.isNotBlank() }
+            ProfileField.FITP -> p.member?.let { it.fitpNumber.isNotBlank() || it.ranking.isNotBlank() || it.fitpCard != null } == true
+            ProfileField.MEDICAL -> p.member?.medical != null || p.member?.medicalUntil != null
+        }
+    }
+
+    private fun guardianOf(p: PlayerProfile) = p.guardian.ifBlank { p.member?.guardian.orEmpty() } to p.guardianPhone.ifBlank { p.member?.guardianPhone.orEmpty() }
+
+    /** Il profilo di [p] con solo i gruppi [fields]. */
+    fun card(p: PlayerProfile, fields: Set<ProfileField>, photo: ByteArray?, from: String, now: Long): ProfileCard {
+        val m = p.member
+        val (g, gp) = guardianOf(p)
+        fun <T> on(f: ProfileField, v: T, none: T): T = if (f in fields) v else none
+        val sp = SharedProfile(
+            firstName = p.firstName.ifBlank { if (p.complete) "" else p.name }, lastName = p.lastName, nickname = p.nickname,
+            phone = on(ProfileField.CONTACTS, p.phone, ""), email = on(ProfileField.CONTACTS, p.email, ""),
+            birth = on(ProfileField.BIRTH, p.birth, null), sex = on(ProfileField.BIRTH, p.sex, ""),
+            hand = on(ProfileField.PLAY, p.hand, null), backhand = on(ProfileField.PLAY, p.backhand, null), club = on(ProfileField.PLAY, p.club, ""),
+            heightCm = on(ProfileField.BODY, p.heightCm, null), weightKg = on(ProfileField.BODY, p.weightKg, null),
+            guardian = on(ProfileField.GUARDIAN, g, ""), guardianPhone = on(ProfileField.GUARDIAN, gp, ""),
+            fitpNumber = on(ProfileField.FITP, m?.fitpNumber.orEmpty(), ""), fitpCard = on(ProfileField.FITP, m?.fitpCard, null),
+            fitpYear = on(ProfileField.FITP, m?.fitpYear, null), ranking = on(ProfileField.FITP, m?.ranking.orEmpty(), ""),
+            medical = on(ProfileField.MEDICAL, m?.medical, null), medicalUntil = on(ProfileField.MEDICAL, m?.medicalUntil, null),
+        )
+        val pic = photo?.takeIf { ProfileField.PHOTO in fields }?.let { java.util.Base64.getEncoder().encodeToString(it) }
+        return ProfileCard(sentAt = now, from = from.trim(), profile = sp, photo = pic)
+    }
+
+    /** Il giocatore che c'è già: stesso nome e cognome, o (se il nome non basta) stesso telefono o email. */
+    fun find(players: List<PlayerProfile>, sp: SharedProfile): PlayerProfile? {
+        if (sp.firstName.isNotBlank() && sp.lastName.isNotBlank()) Players.sameFullName(players, sp.firstName, sp.lastName).firstOrNull()?.let { return it }
+        fun norm(x: String) = x.filter { it.isDigit() }.takeLast(9)
+        if (sp.phone.isNotBlank()) players.firstOrNull { it.phone.isNotBlank() && norm(it.phone) == norm(sp.phone) }?.let { return it }
+        if (sp.email.isNotBlank()) players.firstOrNull { it.email.equals(sp.email, ignoreCase = true) }?.let { return it }
+        return null
+    }
+
+    /**
+     * Il giocatore col profilo arrivato: uno nuovo, o [old] completato (si riempie solo quello che manca, niente si
+     * cancella). Tessera, classifica e certificato vanno nei dati da socio se lo è (o se lo diventa con [asMember]).
+     */
+    fun merge(old: PlayerProfile?, sp: SharedProfile, newId: String, now: Long, asMember: Boolean = false, asStudent: Boolean = false): PlayerProfile {
+        val base = old ?: PlayerProfile(newId, sp.name, sp.firstName.trim(), sp.lastName.trim(), sp.nickname.trim(), createdAt = now)
+        val p = base.copy(
+            firstName = base.firstName.ifBlank { sp.firstName.trim() }, lastName = base.lastName.ifBlank { sp.lastName.trim() },
+            nickname = base.nickname.ifBlank { sp.nickname.trim() },
+            phone = base.phone.ifBlank { sp.phone.trim() }, email = base.email.ifBlank { sp.email.trim() },
+            birth = base.birth ?: sp.birth, sex = base.sex.ifBlank { sp.sex },
+            hand = base.hand ?: sp.hand, backhand = base.backhand ?: sp.backhand, club = base.club.ifBlank { sp.club.trim() },
+            heightCm = base.heightCm ?: sp.heightCm, weightKg = base.weightKg ?: sp.weightKg,
+            guardian = base.guardian.ifBlank { sp.guardian.trim() }, guardianPhone = base.guardianPhone.ifBlank { sp.guardianPhone.trim() },
+            student = base.student || asStudent,
+        )
+        val m0 = p.member ?: if (asMember) Membership(since = now) else null
+        val m = m0?.copy(
+            fitpNumber = m0.fitpNumber.ifBlank { sp.fitpNumber.trim() }, fitpCard = m0.fitpCard ?: sp.fitpCard, fitpYear = m0.fitpYear ?: sp.fitpYear,
+            ranking = m0.ranking.ifBlank { sp.ranking.trim() }, medical = m0.medical ?: sp.medical, medicalUntil = m0.medicalUntil ?: sp.medicalUntil,
+            guardian = m0.guardian.ifBlank { sp.guardian.trim() }, guardianPhone = m0.guardianPhone.ifBlank { sp.guardianPhone.trim() },
+        )
+        val named = p.copy(member = m)
+        // Il nome che si vede segue nome, cognome e soprannome se il giocatore è nuovo o non era completo.
+        return if (old == null || !old.complete) named.copy(name = PlayerProfile.display(named.firstName, named.lastName, named.nickname).ifBlank { named.name }) else named
+    }
+
+    fun fileName(prefix: String, name: String): String = CourseCards.fileName(prefix, name)
 }
 TSM_EOF
 
@@ -41754,6 +41959,7 @@ fun AppRoot(c: MatchController) {
         c.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
         c.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
         c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
+        c.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
@@ -43910,6 +44116,206 @@ fun EditablePlayerAvatar(c: MatchController, name: String, color: Color, size: D
             confirmButton = { TextButton(onClick = { needName = false }) { Text(s.ok) } },
         )
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ProfileShareUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ProfileShareUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.FamilyRestroom
+import androidx.compose.material.icons.filled.Height
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Role
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.ProfileCard
+import com.tennis.scoremanager.data.ProfileCards
+import com.tennis.scoremanager.data.ProfileField
+import com.tennis.scoremanager.data.Reports
+
+fun profileFieldName(s: Strings, f: ProfileField): String = when (f) {
+    ProfileField.PHOTO -> s.pfPhoto
+    ProfileField.CONTACTS -> s.pfContacts
+    ProfileField.BIRTH -> s.pfBirth
+    ProfileField.PLAY -> s.pfPlay
+    ProfileField.BODY -> s.pfBody
+    ProfileField.GUARDIAN -> s.pfGuardian
+    ProfileField.FITP -> s.pfFitp
+    ProfileField.MEDICAL -> s.pfMedical
+}
+
+private fun profileFieldIcon(f: ProfileField) = when (f) {
+    ProfileField.PHOTO -> Icons.Filled.PhotoCamera
+    ProfileField.CONTACTS -> Icons.Filled.Phone
+    ProfileField.BIRTH -> Icons.Filled.Cake
+    ProfileField.PLAY -> Icons.Filled.SportsTennis
+    ProfileField.BODY -> Icons.Filled.Height
+    ProfileField.GUARDIAN -> Icons.Filled.FamilyRestroom
+    ProfileField.FITP -> Icons.Filled.Badge
+    ProfileField.MEDICAL -> Icons.Filled.LocalHospital
+}
+
+/**
+ * Passa il profilo: chi manda sceglie i dati (il certificato medico solo a mano), poi il file (con la foto, da
+ * WhatsApp, email…) o il QR da far leggere all'altro telefono (senza foto).
+ */
+@Composable
+fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val hasPhoto = remember(p.name) { c.photoBytes(p.name) != null }
+    val available = remember(p) { ProfileCards.available(p, hasPhoto) }
+    var fields by remember(p) { mutableStateOf(ProfileCards.defaults(p, hasPhoto)) }
+    var qr by remember { mutableStateOf<String?>(null) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { Icon(Icons.Filled.SwapHoriz, null, tint = TsmColors.Ball) },
+        title = { Text(s.pfSend) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(s.pfSendHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                Text(s.pfAlways, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (available.isEmpty()) Text(s.pfNothing, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (f in available) SwitchRow(profileFieldIcon(f), profileFieldName(s, f), if (f == ProfileField.MEDICAL) s.pfMedicalHint else null, f in fields) { on ->
+                    fields = if (on) fields + f else fields - f
+                }
+                BigButton(s.pfAsFile, Icons.Filled.Share, {
+                    c.profileToSend(p, fields)?.let { (file, text) -> context.startActivity(shareFile(context, text, file)) }
+                    onDone()
+                }, Modifier.fillMaxWidth())
+                Text(s.pfAsFileHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profileQr(p, fields) }, Modifier.fillMaxWidth())
+                Text(s.pfAsQrHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+    qr?.let { text ->
+        AlertDialog(
+            onDismissRequest = { qr = null },
+            title = { Text(s.pfQrTitle(p.name)) },
+            text = { Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) { QrCode(text, 280.dp) } },
+            confirmButton = { TextButton(onClick = { qr = null }) { Text(s.ok) } },
+        )
+    }
+}
+
+/** Ricevi un profilo: legge il QR mostrato dall'altro telefono (il file invece si apre con Condividi › TSM). */
+@Composable
+fun ReceiveProfileButton(c: MatchController, modifier: Modifier = Modifier.fillMaxWidth()) {
+    val s = LocalStrings.current
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.receiveProfileQr(it) } }
+    GhostButton(s.pfReceive, Icons.Filled.QrCodeScanner, {
+        scanner.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.pfScanPrompt).setBeepEnabled(false).setOrientationLocked(true))
+    }, modifier)
+}
+
+/**
+ * Un profilo arrivato: chi è, cosa porta, e se c'è già (si completa senza cancellare niente) o è nuovo. L'allenatore
+ * lo mette tra i suoi allievi, la segreteria può iscriverlo come socio.
+ */
+@Composable
+fun IncomingProfileDialog(c: MatchController, card: ProfileCard) {
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    val role by c.activeRole.collectAsState()
+    val players by c.players.collectAsState()
+    val sp = card.profile
+    val match = remember(card, players) { ProfileCards.find(players, sp) }
+    var intoExisting by remember { mutableStateOf(true) }
+    var asStudent by remember { mutableStateOf(role == Role.COACH) }
+    var asMember by remember { mutableStateOf(role == Role.CLUB) }
+    val photo = remember(card.photo) {
+        card.photo?.let { runCatching { java.util.Base64.getDecoder().decode(it) }.getOrNull() }?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }?.asImageBitmap()
+    }
+    val close = { c.incomingProfile.value = null }
+    AlertDialog(
+        onDismissRequest = close,
+        icon = { Icon(Icons.Filled.SwapHoriz, null, tint = TsmColors.Ball) },
+        title = { Text(s.pfIncomingTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    photo?.let { Image(it, null, Modifier.size(64.dp).clip(CircleShape)) }
+                    Column {
+                        Text(sp.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                        val full = listOf(sp.firstName, sp.lastName).filter { it.isNotBlank() }.joinToString(" ")
+                        if (full.isNotBlank() && full != sp.name) Text(full, color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                }
+                if (card.from.isNotBlank()) Text(s.pfFrom(card.from), color = TsmColors.TextDim, fontSize = 13.sp)
+                val lines = listOfNotNull(
+                    listOf(sp.phone, sp.email).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
+                    sp.birth?.let { "${s.memberBirth}: ${Reports.date(it, lang)}" },
+                    sp.club.ifBlank { null },
+                    listOf(sp.guardian, sp.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.coGuardian}: $it" },
+                    listOf(sp.fitpNumber, sp.ranking).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.pfFitp}: $it" },
+                    sp.medicalUntil?.let { "${s.pfMedical}: ${Reports.date(it, lang)}" },
+                )
+                if (lines.isNotEmpty()) Text(lines.joinToString("\n"), color = TsmColors.TextMain, fontSize = 14.sp)
+                if (match != null) {
+                    SwitchRow(Icons.Filled.SwapHoriz, s.pfExisting(match.name), null, intoExisting) { intoExisting = it }
+                } else Text(s.pfNew, color = TsmColors.Ok, fontSize = 13.sp)
+                if (role == Role.COACH) SwitchRow(Icons.Filled.School, s.pfAsStudent, null, asStudent) { asStudent = it }
+                if (role == Role.CLUB && (match?.member == null || !intoExisting)) SwitchRow(Icons.Filled.Badge, s.pfAsMember, null, asMember) { asMember = it }
+            }
+        },
+        confirmButton = {
+            val into = match?.id?.takeIf { intoExisting }
+            TextButton(onClick = {
+                val pl = c.applyProfile(card, into, asMember, asStudent)
+                c.openStudent(pl.id)
+            }) { Text(if (into != null) s.pfComplete else s.pfAdd) }
+        },
+        dismissButton = { TextButton(onClick = close) { Text(s.cancel) } },
+    )
 }
 TSM_EOF
 
@@ -48484,6 +48890,40 @@ interface Strings {
     val bzClashHint: String
     val ccSkipBusy: String
     val ccSkipBusyHint: String
+    val pfFilePrefix: String
+    val pfNotProfile: String
+    val pfSend: String
+    val pfSendHint: String
+    val pfAlways: String
+    val pfPhoto: String
+    val pfContacts: String
+    val pfBirth: String
+    val pfPlay: String
+    val pfBody: String
+    val pfGuardian: String
+    val pfFitp: String
+    val pfMedical: String
+    val pfMedicalHint: String
+    val pfAsFile: String
+    val pfAsFileHint: String
+    val pfAsQr: String
+    val pfAsQrHint: String
+    val pfReceive: String
+    val pfScanPrompt: String
+    val pfIncomingTitle: String
+    val pfNew: String
+    val pfAddAsNew: String
+    val pfAsStudent: String
+    val pfAsMember: String
+    val pfAdd: String
+    val pfComplete: String
+    val pfNothing: String
+    val pfShareText: (String) -> String
+    val pfAdded: (String) -> String
+    val pfCompleted: (String) -> String
+    val pfFrom: (String) -> String
+    val pfExisting: (String) -> String
+    val pfQrTitle: (String) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -51101,6 +51541,40 @@ object ItStrings : Strings {
     override val bzClashHint = "Le lezioni dei corsi si annullano dall'appello, quelle private dall'agenda."
     override val ccSkipBusy = "Salta i miei impegni"
     override val ccSkipBusyHint = "Anche le lezioni nei tuoi giorni occupati non contano e risultano annullate."
+    override val pfFilePrefix = "Profilo"
+    override val pfNotProfile = "Questo QR non è un profilo TSM."
+    override val pfSend = "Passa il profilo"
+    override val pfSendHint = "A un nuovo circolo o allenatore: scegli i dati da mandare. Note, diario, valutazioni e pagamenti restano qui."
+    override val pfAlways = "Nome, cognome e soprannome vanno sempre."
+    override val pfPhoto = "Foto"
+    override val pfContacts = "Telefono ed email"
+    override val pfBirth = "Data di nascita e sesso"
+    override val pfPlay = "Mano, rovescio e circolo"
+    override val pfBody = "Altezza e peso"
+    override val pfGuardian = "Genitore o tutore"
+    override val pfFitp = "Tessera FITP e classifica"
+    override val pfMedical = "Certificato medico"
+    override val pfMedicalHint = "È un dato sanitario: mandalo solo se la persona è d'accordo."
+    override val pfAsFile = "Manda il file"
+    override val pfAsFileHint = "WhatsApp, email, Telegram…: si apre con Condividi › TSM. Con la foto."
+    override val pfAsQr = "Mostra il QR"
+    override val pfAsQrHint = "Telefono contro telefono, senza foto: l'altro lo legge con Ricevi un profilo."
+    override val pfReceive = "Ricevi un profilo (QR)"
+    override val pfScanPrompt = "Inquadra il QR del profilo"
+    override val pfIncomingTitle = "Profilo arrivato"
+    override val pfNew = "Giocatore nuovo"
+    override val pfAddAsNew = "Aggiungi come nuovo"
+    override val pfAsStudent = "Tra i miei allievi"
+    override val pfAsMember = "Iscrivi come socio"
+    override val pfAdd = "Aggiungi"
+    override val pfComplete = "Completa"
+    override val pfNothing = "Solo il nome: non c'è altro da mandare."
+    override val pfShareText: (String) -> String = { "Il profilo di $it per Tennis Score Manager: aprilo con TSM (Condividi › TSM)." }
+    override val pfAdded: (String) -> String = { "$it aggiunto ai giocatori" }
+    override val pfCompleted: (String) -> String = { "Scheda di $it completata" }
+    override val pfFrom: (String) -> String = { "Da: $it" }
+    override val pfExisting: (String) -> String = { "C'è già $it: si completa con i dati che mancano, niente si cancella." }
+    override val pfQrTitle: (String) -> String = { "Profilo di $it" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -53719,6 +54193,40 @@ object EnStrings : Strings {
     override val bzClashHint = "Course lessons are cancelled from the roll call, private ones from the agenda."
     override val ccSkipBusy = "Skip my commitments"
     override val ccSkipBusyHint = "Lessons on your busy days don't count either and are marked cancelled."
+    override val pfFilePrefix = "Profile"
+    override val pfNotProfile = "This QR code is not a TSM profile."
+    override val pfSend = "Pass on the profile"
+    override val pfSendHint = "To a new club or coach: choose the data to send. Notes, diary, evaluations and payments stay here."
+    override val pfAlways = "First name, last name and nickname always go."
+    override val pfPhoto = "Photo"
+    override val pfContacts = "Phone and email"
+    override val pfBirth = "Date of birth and sex"
+    override val pfPlay = "Hand, backhand and club"
+    override val pfBody = "Height and weight"
+    override val pfGuardian = "Parent or guardian"
+    override val pfFitp = "FITP card and ranking"
+    override val pfMedical = "Medical certificate"
+    override val pfMedicalHint = "It's health data: send it only if the person agrees."
+    override val pfAsFile = "Send the file"
+    override val pfAsFileHint = "WhatsApp, email, Telegram…: it opens with Share › TSM. With the photo."
+    override val pfAsQr = "Show the QR code"
+    override val pfAsQrHint = "Phone to phone, without photo: the other one reads it with Receive a profile."
+    override val pfReceive = "Receive a profile (QR)"
+    override val pfScanPrompt = "Frame the profile QR code"
+    override val pfIncomingTitle = "Profile received"
+    override val pfNew = "New player"
+    override val pfAddAsNew = "Add as new"
+    override val pfAsStudent = "Among my students"
+    override val pfAsMember = "Enrol as member"
+    override val pfAdd = "Add"
+    override val pfComplete = "Complete"
+    override val pfNothing = "Name only: nothing else to send."
+    override val pfShareText: (String) -> String = { "$it's profile for Tennis Score Manager: open it with TSM (Share › TSM)." }
+    override val pfAdded: (String) -> String = { "$it added to players" }
+    override val pfCompleted: (String) -> String = { "$it's card completed" }
+    override val pfFrom: (String) -> String = { "From: $it" }
+    override val pfExisting: (String) -> String = { "$it is already here: missing data is filled in, nothing is deleted." }
+    override val pfQrTitle: (String) -> String = { "$it's profile" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -56362,6 +56870,40 @@ object DeStrings : Strings {
     override val bzClashHint = "Kursstunden sagst du über die Anwesenheit ab, Privatstunden im Kalender."
     override val ccSkipBusy = "Meine Termine überspringen"
     override val ccSkipBusyHint = "Auch Stunden an deinen belegten Tagen zählen nicht und gelten als abgesagt."
+    override val pfFilePrefix = "Profil"
+    override val pfNotProfile = "Dieser QR-Code ist kein TSM-Profil."
+    override val pfSend = "Profil weitergeben"
+    override val pfSendHint = "An einen neuen Verein oder Trainer: wähle die Daten aus. Notizen, Tagebuch, Bewertungen und Zahlungen bleiben hier."
+    override val pfAlways = "Vorname, Nachname und Spitzname gehen immer mit."
+    override val pfPhoto = "Foto"
+    override val pfContacts = "Telefon und E-Mail"
+    override val pfBirth = "Geburtsdatum und Geschlecht"
+    override val pfPlay = "Hand, Rückhand und Verein"
+    override val pfBody = "Größe und Gewicht"
+    override val pfGuardian = "Elternteil oder Vormund"
+    override val pfFitp = "Spielerpass und Ranking"
+    override val pfMedical = "Ärztliches Attest"
+    override val pfMedicalHint = "Das sind Gesundheitsdaten: nur senden, wenn die Person einverstanden ist."
+    override val pfAsFile = "Datei senden"
+    override val pfAsFileHint = "WhatsApp, E-Mail, Telegram…: öffnet sich mit Teilen › TSM. Mit Foto."
+    override val pfAsQr = "QR-Code zeigen"
+    override val pfAsQrHint = "Telefon an Telefon, ohne Foto: das andere liest ihn mit Profil empfangen."
+    override val pfReceive = "Profil empfangen (QR)"
+    override val pfScanPrompt = "Profil-QR-Code erfassen"
+    override val pfIncomingTitle = "Profil erhalten"
+    override val pfNew = "Neuer Spieler"
+    override val pfAddAsNew = "Als neu hinzufügen"
+    override val pfAsStudent = "Zu meinen Schülern"
+    override val pfAsMember = "Als Mitglied aufnehmen"
+    override val pfAdd = "Hinzufügen"
+    override val pfComplete = "Ergänzen"
+    override val pfNothing = "Nur der Name: sonst gibt es nichts zu senden."
+    override val pfShareText: (String) -> String = { "Profil von $it für Tennis Score Manager: mit TSM öffnen (Teilen › TSM)." }
+    override val pfAdded: (String) -> String = { "$it zu den Spielern hinzugefügt" }
+    override val pfCompleted: (String) -> String = { "Karte von $it ergänzt" }
+    override val pfFrom: (String) -> String = { "Von: $it" }
+    override val pfExisting: (String) -> String = { "$it gibt es schon: fehlende Daten werden ergänzt, nichts wird gelöscht." }
+    override val pfQrTitle: (String) -> String = { "Profil von $it" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -58995,6 +59537,40 @@ object EsStrings : Strings {
     override val bzClashHint = "Las clases de los cursos se anulan desde la lista, las privadas desde la agenda."
     override val ccSkipBusy = "Saltar mis compromisos"
     override val ccSkipBusyHint = "Las clases en tus días ocupados tampoco cuentan y quedan anuladas."
+    override val pfFilePrefix = "Perfil"
+    override val pfNotProfile = "Este QR no es un perfil de TSM."
+    override val pfSend = "Pasar el perfil"
+    override val pfSendHint = "A un nuevo club o entrenador: elige los datos que enviar. Notas, diario, evaluaciones y pagos se quedan aquí."
+    override val pfAlways = "Nombre, apellidos y apodo van siempre."
+    override val pfPhoto = "Foto"
+    override val pfContacts = "Teléfono y email"
+    override val pfBirth = "Fecha de nacimiento y sexo"
+    override val pfPlay = "Mano, revés y club"
+    override val pfBody = "Altura y peso"
+    override val pfGuardian = "Padre, madre o tutor"
+    override val pfFitp = "Licencia y clasificación"
+    override val pfMedical = "Certificado médico"
+    override val pfMedicalHint = "Es un dato de salud: envíalo solo si la persona está de acuerdo."
+    override val pfAsFile = "Enviar el archivo"
+    override val pfAsFileHint = "WhatsApp, email, Telegram…: se abre con Compartir › TSM. Con la foto."
+    override val pfAsQr = "Mostrar el QR"
+    override val pfAsQrHint = "Teléfono con teléfono, sin foto: el otro lo lee con Recibir un perfil."
+    override val pfReceive = "Recibir un perfil (QR)"
+    override val pfScanPrompt = "Encuadra el QR del perfil"
+    override val pfIncomingTitle = "Perfil recibido"
+    override val pfNew = "Jugador nuevo"
+    override val pfAddAsNew = "Añadir como nuevo"
+    override val pfAsStudent = "Entre mis alumnos"
+    override val pfAsMember = "Inscribir como socio"
+    override val pfAdd = "Añadir"
+    override val pfComplete = "Completar"
+    override val pfNothing = "Solo el nombre: no hay nada más que enviar."
+    override val pfShareText: (String) -> String = { "El perfil de $it para Tennis Score Manager: ábrelo con TSM (Compartir › TSM)." }
+    override val pfAdded: (String) -> String = { "$it añadido a los jugadores" }
+    override val pfCompleted: (String) -> String = { "Ficha de $it completada" }
+    override val pfFrom: (String) -> String = { "De: $it" }
+    override val pfExisting: (String) -> String = { "$it ya existe: se completan los datos que faltan, no se borra nada." }
+    override val pfQrTitle: (String) -> String = { "Perfil de $it" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -61630,6 +62206,40 @@ object FrStrings : Strings {
     override val bzClashHint = "Les séances des cours s'annulent depuis l'appel, les leçons privées depuis l'agenda."
     override val ccSkipBusy = "Sauter mes indisponibilités"
     override val ccSkipBusyHint = "Les séances de tes jours occupés ne comptent pas non plus et sont annulées."
+    override val pfFilePrefix = "Profil"
+    override val pfNotProfile = "Ce QR code n'est pas un profil TSM."
+    override val pfSend = "Transmettre le profil"
+    override val pfSendHint = "À un nouveau club ou entraîneur : choisis les données à envoyer. Notes, journal, évaluations et paiements restent ici."
+    override val pfAlways = "Prénom, nom et surnom sont toujours envoyés."
+    override val pfPhoto = "Photo de profil"
+    override val pfContacts = "Téléphone et e-mail"
+    override val pfBirth = "Date de naissance et sexe"
+    override val pfPlay = "Main, revers et club"
+    override val pfBody = "Taille et poids"
+    override val pfGuardian = "Parent ou tuteur"
+    override val pfFitp = "Licence et classement"
+    override val pfMedical = "Certificat médical"
+    override val pfMedicalHint = "C'est une donnée de santé : envoie-la seulement si la personne est d'accord."
+    override val pfAsFile = "Envoyer le fichier"
+    override val pfAsFileHint = "WhatsApp, e-mail, Telegram… : il s'ouvre avec Partager › TSM. Avec la photo."
+    override val pfAsQr = "Afficher le QR code"
+    override val pfAsQrHint = "Téléphone contre téléphone, sans photo : l'autre le lit avec Recevoir un profil."
+    override val pfReceive = "Recevoir un profil (QR)"
+    override val pfScanPrompt = "Cadre le QR code du profil"
+    override val pfIncomingTitle = "Profil reçu"
+    override val pfNew = "Nouveau joueur"
+    override val pfAddAsNew = "Ajouter comme nouveau"
+    override val pfAsStudent = "Parmi mes élèves"
+    override val pfAsMember = "Inscrire comme membre"
+    override val pfAdd = "Ajouter"
+    override val pfComplete = "Compléter"
+    override val pfNothing = "Seulement le nom : rien d'autre à envoyer."
+    override val pfShareText: (String) -> String = { "Le profil de $it pour Tennis Score Manager : ouvre-le avec TSM (Partager › TSM)." }
+    override val pfAdded: (String) -> String = { "$it ajouté aux joueurs" }
+    override val pfCompleted: (String) -> String = { "Fiche de $it complétée" }
+    override val pfFrom: (String) -> String = { "De : $it" }
+    override val pfExisting: (String) -> String = { "$it existe déjà : on complète les données manquantes, rien n'est effacé." }
+    override val pfQrTitle: (String) -> String = { "Profil de $it" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -64266,6 +64876,40 @@ object PtStrings : Strings {
     override val bzClashHint = "As aulas dos cursos cancelam-se na chamada, as privadas na agenda."
     override val ccSkipBusy = "Saltar os meus compromissos"
     override val ccSkipBusyHint = "As aulas nos teus dias ocupados também não contam e ficam canceladas."
+    override val pfFilePrefix = "Perfil"
+    override val pfNotProfile = "Este QR não é um perfil TSM."
+    override val pfSend = "Passar o perfil"
+    override val pfSendHint = "Para um novo clube ou treinador: escolhe os dados a enviar. Notas, diário, avaliações e pagamentos ficam aqui."
+    override val pfAlways = "Nome, apelido e alcunha vão sempre."
+    override val pfPhoto = "Foto"
+    override val pfContacts = "Telefone e email"
+    override val pfBirth = "Data de nascimento e sexo"
+    override val pfPlay = "Mão, esquerda e clube"
+    override val pfBody = "Altura e peso"
+    override val pfGuardian = "Pai, mãe ou tutor"
+    override val pfFitp = "Licença e classificação"
+    override val pfMedical = "Atestado médico"
+    override val pfMedicalHint = "É um dado de saúde: envia-o só se a pessoa concordar."
+    override val pfAsFile = "Enviar o ficheiro"
+    override val pfAsFileHint = "WhatsApp, email, Telegram…: abre-se com Partilhar › TSM. Com a foto."
+    override val pfAsQr = "Mostrar o QR"
+    override val pfAsQrHint = "Telefone com telefone, sem foto: o outro lê-o com Receber um perfil."
+    override val pfReceive = "Receber um perfil (QR)"
+    override val pfScanPrompt = "Enquadra o QR do perfil"
+    override val pfIncomingTitle = "Perfil recebido"
+    override val pfNew = "Jogador novo"
+    override val pfAddAsNew = "Juntar como novo"
+    override val pfAsStudent = "Entre os meus alunos"
+    override val pfAsMember = "Inscrever como sócio"
+    override val pfAdd = "Juntar"
+    override val pfComplete = "Completar"
+    override val pfNothing = "Só o nome: não há mais nada a enviar."
+    override val pfShareText: (String) -> String = { "O perfil de $it para o Tennis Score Manager: abre-o com o TSM (Partilhar › TSM)." }
+    override val pfAdded: (String) -> String = { "$it juntado aos jogadores" }
+    override val pfCompleted: (String) -> String = { "Ficha de $it completada" }
+    override val pfFrom: (String) -> String = { "De: $it" }
+    override val pfExisting: (String) -> String = { "$it já existe: completam-se os dados em falta, nada se apaga." }
+    override val pfQrTitle: (String) -> String = { "Perfil de $it" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -71025,6 +71669,8 @@ fun MembersScreen(c: MatchController) {
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
             GhostButton(s.ntMembersButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
             OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+            // Un socio nuovo che arriva da un altro circolo: il QR del suo profilo.
+            com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         }
         for (p in shown) {
             val m = p.member ?: continue
@@ -73040,6 +73686,8 @@ fun PlayersScreen(c: MatchController) {
         },
     ) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+        // Un giocatore che arriva da un altro circolo o allenatore: il QR del suo profilo.
+        com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         if (players.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim)
         for (p in list) {
             Row(Modifier.fillMaxWidth().clickable { c.openStudent(p.id) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -75264,6 +75912,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -75344,6 +75993,8 @@ fun StudentsScreen(c: MatchController) {
         },
     ) {
         if (students.isEmpty()) Text(s.studentNone, color = TsmColors.TextDim)
+        // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
+        com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
         val book by c.coachBook.collectAsState()
         var query by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
@@ -75431,6 +76082,8 @@ fun StudentScreen(c: MatchController) {
     var merge by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
+    var sendProfile by remember { mutableStateOf(false) }
+    if (sendProfile) com.tennis.scoremanager.ui.SendProfileDialog(c, st) { sendProfile = false }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = st.name,
@@ -75595,6 +76248,8 @@ fun StudentScreen(c: MatchController) {
         }
         // Il report da dare all'allievo (PDF o immagine per WhatsApp).
         if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
+        // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
+        GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
         GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
         if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
         // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
@@ -97880,6 +98535,77 @@ class PlayersTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ProfileCardsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ProfileCardsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class ProfileCardsTest {
+    private val luca = PlayerProfile(
+        "p1", "Luca Verdi", "Luca", "Verdi", phone = "+39 333 1234567", email = "luca@example.org", birth = 1_000, hand = Hand.LEFT,
+        note = "segreto", student = true, guardian = "Anna Verdi", guardianPhone = "3330000000", consentAt = 5,
+        member = Membership(fitpNumber = "123", ranking = "4.2", medical = MedicalKind.AGONISTIC, medicalUntil = 9_000, number = "77"),
+    )
+
+    @Test fun onlyChosenDataTravelAndNeverNotesOrConsent() {
+        assertEquals(setOf(ProfileField.CONTACTS, ProfileField.BIRTH, ProfileField.PLAY, ProfileField.GUARDIAN, ProfileField.FITP), ProfileCards.defaults(luca, false))
+        assertTrue(ProfileField.MEDICAL in ProfileCards.available(luca, false))
+        assertFalse(ProfileField.PHOTO in ProfileCards.available(luca, false))
+        val card = ProfileCards.card(luca, setOf(ProfileField.CONTACTS), byteArrayOf(1, 2, 3), "Circolo A", 10)
+        val text = ProfileCards.encode(card)
+        assertFalse("segreto" in text)
+        assertFalse("4.2" in text)
+        assertFalse("consent" in text)
+        assertNull(card.photo)   // la foto non era tra i dati scelti
+        val back = ProfileCards.decode(text)!!
+        assertEquals("Luca", back.profile.firstName)
+        assertEquals("+39 333 1234567", back.profile.phone)
+        assertNull(back.profile.birth)
+        assertNull(ProfileCards.decode("""{"tsm":"tsm-course-card"}"""))
+    }
+
+    @Test fun qrHasNoPhotoAndStaysSmall() {
+        val all = ProfileField.entries.toSet()
+        val card = ProfileCards.card(luca, all, ByteArray(3000) { 7 }, "Circolo A", 10)
+        assertNotNull(card.photo)
+        val qr = ProfileCards.encodeQr(card)
+        assertFalse("photo" in qr)
+        assertTrue(qr.length.toString(), qr.length < 800)
+        assertEquals(9_000L, ProfileCards.decode(qr)!!.profile.medicalUntil)
+    }
+
+    @Test fun mergeFillsOnlyWhatIsMissing() {
+        val sp = ProfileCards.card(luca, ProfileField.entries.toSet(), null, "", 0).profile
+        val old = PlayerProfile("x", "Luca Verdi", "Luca", "Verdi", phone = "999", note = "mia nota")
+        assertEquals(old, ProfileCards.find(listOf(old), sp))
+        val m = ProfileCards.merge(old, sp, "new", 1, asStudent = true)
+        assertEquals("x", m.id)
+        assertEquals("999", m.phone)                 // c'era già: non si tocca
+        assertEquals("luca@example.org", m.email)    // mancava: arriva
+        assertEquals("mia nota", m.note)
+        assertTrue(m.student)
+        assertNull(m.member)                         // non socio: tessera e certificato non si inventano un socio
+        val club = ProfileCards.merge(null, sp, "new", 1, asMember = true)
+        assertEquals("new", club.id)
+        assertEquals("Luca Verdi", club.name)
+        assertEquals("4.2", club.member!!.ranking)
+        assertEquals("", club.member!!.number)       // il numero di tessera del vecchio circolo non passa
+        // Per telefono, se il nome non c'è.
+        val byPhone = PlayerProfile("y", "Luchino", phone = "333 1234567")
+        assertEquals(byPhone, ProfileCards.find(listOf(byPhone), sp.copy(lastName = "Rossi")))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ProgressCardsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ProgressCardsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -113404,6 +114130,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 363 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 366 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

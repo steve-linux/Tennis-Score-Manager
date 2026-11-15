@@ -126,6 +126,8 @@ fun MembersScreen(c: MatchController) {
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
             GhostButton(s.ntMembersButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
             OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+            // Un socio nuovo che arriva da un altro circolo: il QR del suo profilo.
+            com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         }
         for (p in shown) {
             val m = p.member ?: continue

@@ -2692,6 +2692,40 @@ interface Strings {
     val bzClashHint: String
     val ccSkipBusy: String
     val ccSkipBusyHint: String
+    val pfFilePrefix: String
+    val pfNotProfile: String
+    val pfSend: String
+    val pfSendHint: String
+    val pfAlways: String
+    val pfPhoto: String
+    val pfContacts: String
+    val pfBirth: String
+    val pfPlay: String
+    val pfBody: String
+    val pfGuardian: String
+    val pfFitp: String
+    val pfMedical: String
+    val pfMedicalHint: String
+    val pfAsFile: String
+    val pfAsFileHint: String
+    val pfAsQr: String
+    val pfAsQrHint: String
+    val pfReceive: String
+    val pfScanPrompt: String
+    val pfIncomingTitle: String
+    val pfNew: String
+    val pfAddAsNew: String
+    val pfAsStudent: String
+    val pfAsMember: String
+    val pfAdd: String
+    val pfComplete: String
+    val pfNothing: String
+    val pfShareText: (String) -> String
+    val pfAdded: (String) -> String
+    val pfCompleted: (String) -> String
+    val pfFrom: (String) -> String
+    val pfExisting: (String) -> String
+    val pfQrTitle: (String) -> String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5309,6 +5343,40 @@ object ItStrings : Strings {
     override val bzClashHint = "Le lezioni dei corsi si annullano dall'appello, quelle private dall'agenda."
     override val ccSkipBusy = "Salta i miei impegni"
     override val ccSkipBusyHint = "Anche le lezioni nei tuoi giorni occupati non contano e risultano annullate."
+    override val pfFilePrefix = "Profilo"
+    override val pfNotProfile = "Questo QR non è un profilo TSM."
+    override val pfSend = "Passa il profilo"
+    override val pfSendHint = "A un nuovo circolo o allenatore: scegli i dati da mandare. Note, diario, valutazioni e pagamenti restano qui."
+    override val pfAlways = "Nome, cognome e soprannome vanno sempre."
+    override val pfPhoto = "Foto"
+    override val pfContacts = "Telefono ed email"
+    override val pfBirth = "Data di nascita e sesso"
+    override val pfPlay = "Mano, rovescio e circolo"
+    override val pfBody = "Altezza e peso"
+    override val pfGuardian = "Genitore o tutore"
+    override val pfFitp = "Tessera FITP e classifica"
+    override val pfMedical = "Certificato medico"
+    override val pfMedicalHint = "È un dato sanitario: mandalo solo se la persona è d'accordo."
+    override val pfAsFile = "Manda il file"
+    override val pfAsFileHint = "WhatsApp, email, Telegram…: si apre con Condividi › TSM. Con la foto."
+    override val pfAsQr = "Mostra il QR"
+    override val pfAsQrHint = "Telefono contro telefono, senza foto: l'altro lo legge con Ricevi un profilo."
+    override val pfReceive = "Ricevi un profilo (QR)"
+    override val pfScanPrompt = "Inquadra il QR del profilo"
+    override val pfIncomingTitle = "Profilo arrivato"
+    override val pfNew = "Giocatore nuovo"
+    override val pfAddAsNew = "Aggiungi come nuovo"
+    override val pfAsStudent = "Tra i miei allievi"
+    override val pfAsMember = "Iscrivi come socio"
+    override val pfAdd = "Aggiungi"
+    override val pfComplete = "Completa"
+    override val pfNothing = "Solo il nome: non c'è altro da mandare."
+    override val pfShareText: (String) -> String = { "Il profilo di $it per Tennis Score Manager: aprilo con TSM (Condividi › TSM)." }
+    override val pfAdded: (String) -> String = { "$it aggiunto ai giocatori" }
+    override val pfCompleted: (String) -> String = { "Scheda di $it completata" }
+    override val pfFrom: (String) -> String = { "Da: $it" }
+    override val pfExisting: (String) -> String = { "C'è già $it: si completa con i dati che mancano, niente si cancella." }
+    override val pfQrTitle: (String) -> String = { "Profilo di $it" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -7927,6 +7995,40 @@ object EnStrings : Strings {
     override val bzClashHint = "Course lessons are cancelled from the roll call, private ones from the agenda."
     override val ccSkipBusy = "Skip my commitments"
     override val ccSkipBusyHint = "Lessons on your busy days don't count either and are marked cancelled."
+    override val pfFilePrefix = "Profile"
+    override val pfNotProfile = "This QR code is not a TSM profile."
+    override val pfSend = "Pass on the profile"
+    override val pfSendHint = "To a new club or coach: choose the data to send. Notes, diary, evaluations and payments stay here."
+    override val pfAlways = "First name, last name and nickname always go."
+    override val pfPhoto = "Photo"
+    override val pfContacts = "Phone and email"
+    override val pfBirth = "Date of birth and sex"
+    override val pfPlay = "Hand, backhand and club"
+    override val pfBody = "Height and weight"
+    override val pfGuardian = "Parent or guardian"
+    override val pfFitp = "FITP card and ranking"
+    override val pfMedical = "Medical certificate"
+    override val pfMedicalHint = "It's health data: send it only if the person agrees."
+    override val pfAsFile = "Send the file"
+    override val pfAsFileHint = "WhatsApp, email, Telegram…: it opens with Share › TSM. With the photo."
+    override val pfAsQr = "Show the QR code"
+    override val pfAsQrHint = "Phone to phone, without photo: the other one reads it with Receive a profile."
+    override val pfReceive = "Receive a profile (QR)"
+    override val pfScanPrompt = "Frame the profile QR code"
+    override val pfIncomingTitle = "Profile received"
+    override val pfNew = "New player"
+    override val pfAddAsNew = "Add as new"
+    override val pfAsStudent = "Among my students"
+    override val pfAsMember = "Enrol as member"
+    override val pfAdd = "Add"
+    override val pfComplete = "Complete"
+    override val pfNothing = "Name only: nothing else to send."
+    override val pfShareText: (String) -> String = { "$it's profile for Tennis Score Manager: open it with TSM (Share › TSM)." }
+    override val pfAdded: (String) -> String = { "$it added to players" }
+    override val pfCompleted: (String) -> String = { "$it's card completed" }
+    override val pfFrom: (String) -> String = { "From: $it" }
+    override val pfExisting: (String) -> String = { "$it is already here: missing data is filled in, nothing is deleted." }
+    override val pfQrTitle: (String) -> String = { "$it's profile" }
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

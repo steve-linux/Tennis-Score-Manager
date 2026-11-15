@@ -67,6 +67,8 @@ fun PlayersScreen(c: MatchController) {
         },
     ) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+        // Un giocatore che arriva da un altro circolo o allenatore: il QR del suo profilo.
+        com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         if (players.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim)
         for (p in list) {
             Row(Modifier.fillMaxWidth().clickable { c.openStudent(p.id) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {

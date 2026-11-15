@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -98,6 +99,8 @@ fun StudentsScreen(c: MatchController) {
         },
     ) {
         if (students.isEmpty()) Text(s.studentNone, color = TsmColors.TextDim)
+        // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
+        com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
         val book by c.coachBook.collectAsState()
         var query by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
@@ -185,6 +188,8 @@ fun StudentScreen(c: MatchController) {
     var merge by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
+    var sendProfile by remember { mutableStateOf(false) }
+    if (sendProfile) com.tennis.scoremanager.ui.SendProfileDialog(c, st) { sendProfile = false }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = st.name,
@@ -349,6 +354,8 @@ fun StudentScreen(c: MatchController) {
         }
         // Il report da dare all'allievo (PDF o immagine per WhatsApp).
         if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
+        // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
+        GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
         GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
         if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
         // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
