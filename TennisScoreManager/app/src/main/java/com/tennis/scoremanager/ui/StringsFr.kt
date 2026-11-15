@@ -2687,6 +2687,17 @@ object FrStrings : Strings {
     override val pfOfficeFailed = "Pas arrivé : vérifie la connexion ou envoie le fichier."
     override val pfToOffice: (String) -> String = { "Envoyer au secrétariat de $it" }
     override val pfReceiveFile = "Recevoir un profil (fichier)"
+    override val bpTitle = "Protéger les sauvegardes par un mot de passe"
+    override val bpHint = "Les sauvegardes (y compris les copies automatiques dans Documents) ne s'ouvrent qu'avec le mot de passe : si elles finissent sur Drive ou dans d'autres mains, les données restent fermées. Si tu l'oublies, elles ne s'ouvrent plus. Les anciennes copies automatiques sans mot de passe sont remplacées par une copie protégée."
+    override val bpNew = "Mot de passe (au moins 6 caractères)"
+    override val bpAgain = "Répète le mot de passe"
+    override val bpMismatch = "Les deux mots de passe ne sont pas identiques, ou font moins de 6 caractères."
+    override val bpChange = "Changer le mot de passe des sauvegardes"
+    override val bpAsk = "Cette sauvegarde est protégée : écris le mot de passe."
+    override val bpWrong = "Mot de passe incorrect."
+    override val bpSet = "Mot de passe mis : les sauvegardes sont protégées."
+    override val bpRemoved = "Mot de passe retiré : les prochaines sauvegardes ne sont pas protégées."
+    override val bpLocked = "protégée"
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

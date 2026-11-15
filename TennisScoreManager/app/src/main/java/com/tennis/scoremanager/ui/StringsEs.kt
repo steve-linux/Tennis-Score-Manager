@@ -2685,6 +2685,17 @@ object EsStrings : Strings {
     override val pfOfficeFailed = "No ha llegado: revisa la conexión o envía el archivo."
     override val pfToOffice: (String) -> String = { "Enviar a la secretaría de $it" }
     override val pfReceiveFile = "Recibir un perfil (archivo)"
+    override val bpTitle = "Proteger las copias con una contraseña"
+    override val bpHint = "Las copias (también las automáticas en Documentos) solo se abren con la contraseña: si acaban en Drive o en otras manos, los datos quedan cerrados. Si la olvidas, no se abren más. Las copias automáticas anteriores sin contraseña se sustituyen por una protegida."
+    override val bpNew = "Contraseña (al menos 6 caracteres)"
+    override val bpAgain = "Repite la contraseña"
+    override val bpMismatch = "Las dos contraseñas no coinciden o tienen menos de 6 caracteres."
+    override val bpChange = "Cambiar la contraseña de las copias"
+    override val bpAsk = "Esta copia está protegida: escribe la contraseña."
+    override val bpWrong = "Contraseña incorrecta."
+    override val bpSet = "Contraseña puesta: las copias están protegidas."
+    override val bpRemoved = "Contraseña quitada: las próximas copias no están protegidas."
+    override val bpLocked = "protegida"
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

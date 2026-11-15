@@ -1170,6 +1170,18 @@ class MatchController(
      * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
      * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
      */
+    /**
+     * Mette (o toglie, con null) la password dei backup. Con la password nuova fa subito una copia protetta e, se
+     * riesce, toglie le copie automatiche di prima senza password (avevano gli stessi dati in chiaro).
+     */
+    suspend fun setBackupPassword(pw: String?): Boolean {
+        storage.backupPassword = pw
+        if (pw == null) return true
+        val made = personalBackupNow(onlyIfChanged = false) ?: return false
+        withContext(io) { personalBackups().filter { it != made && !it.name.endsWith(com.tennis.scoremanager.data.Backup.LOCKED_EXT) }.forEach { it.delete() } }
+        return true
+    }
+
     suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
         // Un'app appena installata non ha niente da salvare: una copia vuota diventerebbe la "più recente" in Documenti
         // proprio quando si vuole ripristinare quella di prima (dalla prima apertura). Le copie automatiche partono dopo.
@@ -1178,7 +1190,7 @@ class MatchController(
         val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
         if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
         val now = System.currentTimeMillis()
-        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now) }.getOrNull()?.also {
+        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now, storage.backupPassword?.toCharArray()) }.getOrNull()?.also {
             storage.personalBackupPrint = print
             storage.lastBackupAt = now
         }

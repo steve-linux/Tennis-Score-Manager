@@ -2756,6 +2756,17 @@ interface Strings {
     val pfOfficeFailed: String
     val pfToOffice: (String) -> String
     val pfReceiveFile: String
+    val bpTitle: String
+    val bpHint: String
+    val bpNew: String
+    val bpAgain: String
+    val bpMismatch: String
+    val bpChange: String
+    val bpAsk: String
+    val bpWrong: String
+    val bpSet: String
+    val bpRemoved: String
+    val bpLocked: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5437,6 +5448,17 @@ object ItStrings : Strings {
     override val pfOfficeFailed = "Non arrivato: controlla la rete o manda il file."
     override val pfToOffice: (String) -> String = { "Manda alla segreteria di $it" }
     override val pfReceiveFile = "Ricevi un profilo (file)"
+    override val bpTitle = "Proteggi i backup con una password"
+    override val bpHint = "I backup (anche le copie automatiche in Documenti) si aprono solo con la password: se finiscono su Drive o in altre mani, i dati restano chiusi. Se la dimentichi non si aprono più. Le copie automatiche di prima, senza password, vengono sostituite da una protetta."
+    override val bpNew = "Password (almeno 6 caratteri)"
+    override val bpAgain = "Ripeti la password"
+    override val bpMismatch = "Le due password non sono uguali, o sono più corte di 6 caratteri."
+    override val bpChange = "Cambia la password dei backup"
+    override val bpAsk = "Questo backup è protetto: scrivi la password."
+    override val bpWrong = "Password sbagliata."
+    override val bpSet = "Password messa: i backup sono protetti."
+    override val bpRemoved = "Password tolta: i prossimi backup non sono protetti."
+    override val bpLocked = "protetto"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8119,6 +8141,17 @@ object EnStrings : Strings {
     override val pfOfficeFailed = "Not delivered: check the connection or send the file."
     override val pfToOffice: (String) -> String = { "Send to the $it office" }
     override val pfReceiveFile = "Receive a profile (file)"
+    override val bpTitle = "Protect backups with a password"
+    override val bpHint = "Backups (including the automatic copies in Documents) open only with the password: if they end up on Drive or in other hands, the data stays locked. If you forget it they can't be opened. The previous automatic copies without a password are replaced by a protected one."
+    override val bpNew = "Password (at least 6 characters)"
+    override val bpAgain = "Repeat the password"
+    override val bpMismatch = "The two passwords don't match, or are shorter than 6 characters."
+    override val bpChange = "Change the backup password"
+    override val bpAsk = "This backup is protected: type the password."
+    override val bpWrong = "Wrong password."
+    override val bpSet = "Password set: backups are protected."
+    override val bpRemoved = "Password removed: the next backups aren't protected."
+    override val bpLocked = "protected"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

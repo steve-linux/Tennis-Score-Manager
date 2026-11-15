@@ -56,20 +56,20 @@ fun FirstStartRestore(c: MatchController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val lang = c.options.collectAsState().value.lang
-    var ask by remember { mutableStateOf<Pair<Uri, Backup.Manifest>?>(null) }
+    var ask by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
     var busy by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var done by remember { mutableStateOf(false) }
+    // In chiaro o protetto da password (allora la si chiede prima).
+    val opener = remember { BackupOpener({ input, m -> ask = input to m }) { message = it } }
+    BackupOpenerDialog(opener)
     val open = rememberLauncherForActivityResult(OpenBackup()) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        scope.launch {
-            val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
-            if (m == null) message = s.dataNotBackup else ask = uri to m
-        }
+        scope.launch { opener.pick({ context.contentResolver.openInputStream(uri) }, s) }
     }
     GhostButton(s.onbRestore, Icons.Filled.Restore, { open.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, Modifier.fillMaxWidth())
     Text(s.onbRestoreHint, color = TsmColors.TextDim, fontSize = 13.sp)
-    ask?.let { (uri, m) ->
+    ask?.let { (input, m) ->
         AlertDialog(
             onDismissRequest = { ask = null },
             title = { Text(s.dataRestore) },
@@ -80,7 +80,7 @@ fun FirstStartRestore(c: MatchController) {
                     busy = true
                     scope.launch {
                         val ok = withContext(Dispatchers.IO) {
-                            runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
+                            runCatching { input()?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
                         }
                         busy = false
                         done = ok

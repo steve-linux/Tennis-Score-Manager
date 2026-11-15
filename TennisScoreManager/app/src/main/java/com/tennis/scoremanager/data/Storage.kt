@@ -666,6 +666,15 @@ class Storage(context: Context) {
         get() = prefs.getBoolean("auto_backup_notice_seen", false)
         set(v) = prefs.edit().putBoolean("auto_backup_notice_seen", v).apply()
 
+    /**
+     * La password dei backup (null = senza): in un file di impostazioni a parte, che non entra nei backup. Serve alle
+     * copie automatiche; per ripristinare la si riscrive.
+     */
+    private val secret = app.getSharedPreferences("tsm_secret", Context.MODE_PRIVATE)
+    var backupPassword: String?
+        get() = secret.getString("backup_password", null)?.takeIf { it.isNotEmpty() }
+        set(v) = secret.edit().apply { if (v.isNullOrEmpty()) remove("backup_password") else putString("backup_password", v) }.apply()
+
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
         set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()

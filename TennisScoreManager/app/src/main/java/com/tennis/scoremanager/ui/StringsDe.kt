@@ -2684,6 +2684,17 @@ object DeStrings : Strings {
     override val pfOfficeFailed = "Nicht angekommen: Verbindung prüfen oder die Datei senden."
     override val pfToOffice: (String) -> String = { "An das Büro von $it senden" }
     override val pfReceiveFile = "Profil empfangen (Datei)"
+    override val bpTitle = "Sicherungen mit Passwort schützen"
+    override val bpHint = "Sicherungen (auch die automatischen Kopien in Dokumente) öffnen sich nur mit dem Passwort: Landen sie auf Drive oder in fremden Händen, bleiben die Daten verschlossen. Vergisst du es, lassen sie sich nicht mehr öffnen. Die bisherigen automatischen Kopien ohne Passwort werden durch eine geschützte ersetzt."
+    override val bpNew = "Passwort (mindestens 6 Zeichen)"
+    override val bpAgain = "Passwort wiederholen"
+    override val bpMismatch = "Die beiden Passwörter stimmen nicht überein oder sind kürzer als 6 Zeichen."
+    override val bpChange = "Passwort der Sicherungen ändern"
+    override val bpAsk = "Diese Sicherung ist geschützt: gib das Passwort ein."
+    override val bpWrong = "Falsches Passwort."
+    override val bpSet = "Passwort gesetzt: Sicherungen sind geschützt."
+    override val bpRemoved = "Passwort entfernt: die nächsten Sicherungen sind nicht geschützt."
+    override val bpLocked = "geschützt"
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

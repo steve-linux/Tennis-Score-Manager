@@ -11210,6 +11210,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - **Du** ist dein Spieler in der Datenbank: Fortschritt und Rating gehen von ihm aus. Beim ersten Start reichen Vor- und Nachname (und Spitzname); danach öffnet **Mehr › Du** deine Karte. Hast du ihn noch nicht gewählt, bietet *Wer bist du?* die vorhandenen Spieler an (du hast schon Matches gespielt) oder **Ich bin neu**. Auf der Karte eines anderen Spielers macht **Das bin ich** ihn zu deinem.
 - **Mehr › Einstellungen › Sicherung und Daten**:
   - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
+  - **Sicherungen mit Passwort schützen**: Ab dann sind Sicherungen, auch die automatischen Kopien in Dokumente (*.tsmbak*-Dateien), verschlüsselt und öffnen sich nur mit dem Passwort, das die App beim Wiederherstellen abfragt (auch beim ersten Start nach einer Neuinstallation). Landen sie auf Drive oder in falschen Händen, bleiben die Daten verschlossen; vergisst du das Passwort, kannst auch du sie nicht mehr öffnen. Beim Einschalten ersetzt sofort eine geschützte Kopie die bisherigen unverschlüsselten; **Passwort der Sicherungen ändern** gilt für die nächsten. Frühere unverschlüsselte Sicherungen öffnen sich wie immer.
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
   - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben. Mit **Auch die automatischen Kopien** verschwinden auch die in Dokumente › Tennis Score Manager › Backup, die sonst auch nach dem Deinstallieren bleiben.
   - **Deinstallieren und neu installieren**: beim Deinstallieren fragt Android, ob die Daten der App behalten werden sollen: behältst du sie, sind sie nach der Neuinstallation wieder da. Sonst öffnet beim ersten Start **Hattest du die App schon? Daten wiederherstellen** den Ordner der automatischen Kopien: wähle die neueste und die App startet mit deinen Daten.
@@ -11817,6 +11818,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - **You** is your player in the database: Progress and rating start from them. At the first start first and last name (and nickname) are enough; then **More › You** opens your card. If you haven't chosen it yet, *Who are you?* offers the existing players (you have already played matches) or **I'm new**. On another player's card, **This is me** makes it yours.
 - **More › Settings › Backup and data**:
   - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
+  - **Protect backups with a password**: from then on backups, including the automatic copies in Documents (*.tsmbak* files), are encrypted and open only with the password, which the app asks for when you restore (also at the first start after reinstalling). If they end up on Drive or in the wrong hands the data stays locked; if you forget the password, not even you can open them. Switching it on makes a protected copy right away in place of the previous unprotected ones; **Change the backup password** applies to the next ones. Earlier unprotected backups open as always.
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
   - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay. With **The automatic copies too** the ones in Documents › Tennis Score Manager › Backup go as well, otherwise they stay even after uninstalling.
   - **Uninstalling and reinstalling**: when you uninstall the app, Android asks whether to keep its data: if you keep it, reinstalling brings it back as it was. If you didn't, at the first start **Had the app before? Restore your data** opens the folder of the automatic copies: pick the latest one and the app starts again with your data.
@@ -12423,6 +12425,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - **Tú** es tu jugador de la base: Progresos y rating parten de él. En el primer arranque bastan nombre y apellido (y apodo); luego **Más › Tú** abre tu ficha. Si aún no lo has elegido, *¿Quién eres?* propone los jugadores que hay (ya has jugado partidos) o **Soy nuevo**. En la ficha de otro jugador, **Soy yo** lo hace tuyo.
 - **Más › Ajustes › Copia de seguridad y datos**:
   - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
+  - **Proteger las copias con una contraseña**: desde entonces las copias, también las automáticas en Documentos (archivos *.tsmbak*), van cifradas y solo se abren con la contraseña, que la app pide al restaurar (también al primer inicio tras reinstalar). Si acaban en Drive o en malas manos, los datos quedan cerrados; si olvidas la contraseña, ni tú podrás abrirlas. Al activarla se hace enseguida una copia protegida en lugar de las anteriores sin cifrar; **Cambiar la contraseña de las copias** vale para las siguientes. Las copias anteriores sin cifrar se abren como siempre.
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
   - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan. Con **También las copias automáticas** se borran también las de Documentos › Tennis Score Manager › Backup, que si no se quedan incluso tras desinstalar.
   - **Desinstalar y reinstalar**: al desinstalar la app, Android pregunta si conservar sus datos: si los conservas, al reinstalarla los encuentras como estaban. Si no, en el primer arranque **¿Ya tenías la app? Restaura tus datos** abre la carpeta de las copias automáticas: elige la más reciente y la app vuelve a empezar con tus datos.
@@ -13029,6 +13032,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - **Vous** est votre joueur de la base : Progrès et classement partent de lui. Au premier démarrage prénom et nom (et surnom) suffisent ; ensuite **Plus › Vous** ouvre votre fiche. Si vous ne l'avez pas encore choisi, *Qui êtes-vous ?* propose les joueurs existants (vous avez déjà joué des matchs) ou **Je suis nouveau**. Sur la fiche d'un autre joueur, **C'est moi** le rend vôtre.
 - **Plus › Réglages › Sauvegarde et données** :
   - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
+  - **Protéger les sauvegardes par un mot de passe** : dès lors les sauvegardes, y compris les copies automatiques dans Documents (fichiers *.tsmbak*), sont chiffrées et ne s'ouvrent qu'avec le mot de passe, que l'app demande à la restauration (aussi au premier lancement après une réinstallation). Si elles finissent sur Drive ou dans de mauvaises mains, les données restent fermées ; si tu oublies le mot de passe, même toi ne pourras plus les ouvrir. En l'activant, une copie protégée remplace tout de suite les anciennes en clair ; **Changer le mot de passe des sauvegardes** vaut pour les suivantes. Les anciennes sauvegardes en clair s'ouvrent comme toujours.
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
   - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent. Avec **Aussi les copies automatiques** celles de Documents › Tennis Score Manager › Backup partent aussi, sinon elles restent même après la désinstallation.
   - **Désinstaller et réinstaller** : quand vous désinstallez l'appli, Android demande s'il faut garder ses données : si vous les gardez, en la réinstallant vous les retrouvez telles quelles. Sinon, au premier démarrage **Vous aviez déjà l'appli ? Restaurez vos données** ouvre le dossier des copies automatiques : choisissez la plus récente et l'appli repart avec vos données.
@@ -13635,6 +13639,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - **Tu** è il tuo giocatore del database: Progressi e rating partono da lui. Alla prima apertura bastano nome e cognome (e il soprannome); poi **Altro › Tu** apre la tua scheda. Se non l'hai ancora scelto, *Chi sei?* propone i giocatori che ci sono (hai già giocato partite) o **Sono nuovo**. Nella scheda di un altro giocatore, **Sono io** lo rende tuo.
 - **Altro › Impostazioni › Backup e dati**:
   - **Crea il backup**: un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce; con **Includi i video** anche clip dei colpi, moviola e highlights (il file diventa grande). Lo salvi dove vuoi (Download, un PC, una chiavetta): niente cloud. Non entrano il modello dell'analisi del movimento (si riscarica) e i file che hai salvato tu in Documenti.
+  - **Proteggi i backup con una password**: da quel momento i backup, anche le copie automatiche in Documenti (file *.tsmbak*), sono cifrati e si aprono solo con la password, che l'app chiede quando ripristini (anche alla prima apertura dopo una reinstallazione). Se finiscono su Drive o in mani sbagliate i dati restano chiusi; se dimentichi la password, nemmeno tu li apri più. Accendendola si fa subito una copia protetta al posto di quelle di prima in chiaro; **Cambia la password dei backup** vale per i prossimi. I backup in chiaro di prima si aprono come sempre.
   - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
   - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano. Con **Anche le copie automatiche** si tolgono pure quelle in Documenti › Tennis Score Manager › Backup, che altrimenti restano anche dopo la disinstallazione.
   - **Disinstallare e reinstallare**: quando disinstalli l'app, Android chiede se tenerne i dati: se li tieni, reinstallandola li ritrovi com'erano. Se non li hai tenuti, alla prima apertura **Avevi già l'app? Ripristina i tuoi dati** apre la cartella delle copie automatiche: scegli la più recente e l'app riparte con i tuoi dati.
@@ -14241,6 +14246,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - **Você** é o seu jogador do banco: Progresso e rating partem dele. Na primeira abertura bastam nome e sobrenome (e apelido); depois **Mais › Você** abre a sua ficha. Se ainda não escolheu, *Quem é você?* oferece os jogadores que existem (você já jogou partidas) ou **Sou novo**. Na ficha de outro jogador, **Sou eu** faz dele o seu.
 - **Mais › Configurações › Backup e dados**:
   - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
+  - **Proteger as cópias com uma palavra-passe**: a partir daí as cópias, também as automáticas em Documentos (ficheiros *.tsmbak*), ficam cifradas e só se abrem com a palavra-passe, que a app pede ao restaurar (também no primeiro arranque depois de reinstalar). Se forem parar ao Drive ou a más mãos, os dados ficam fechados; se esqueceres a palavra-passe, nem tu as abres. Ao ligá-la faz-se logo uma cópia protegida em vez das anteriores sem cifra; **Mudar a palavra-passe das cópias** vale para as seguintes. As cópias anteriores sem cifra abrem-se como sempre.
   - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
   - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam. Com **Também as cópias automáticas** apagam-se também as de Documentos › Tennis Score Manager › Backup, que senão ficam mesmo depois de desinstalar.
   - **Desinstalar e reinstalar**: ao desinstalar o app, o Android pergunta se quer manter os dados: se os mantiver, ao reinstalar você os encontra como estavam. Se não, na primeira abertura **Já tinha o app? Restaure seus dados** abre a pasta das cópias automáticas: escolha a mais recente e o app recomeça com os seus dados.
@@ -16631,6 +16637,18 @@ class MatchController(
      * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
      * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
      */
+    /**
+     * Mette (o toglie, con null) la password dei backup. Con la password nuova fa subito una copia protetta e, se
+     * riesce, toglie le copie automatiche di prima senza password (avevano gli stessi dati in chiaro).
+     */
+    suspend fun setBackupPassword(pw: String?): Boolean {
+        storage.backupPassword = pw
+        if (pw == null) return true
+        val made = personalBackupNow(onlyIfChanged = false) ?: return false
+        withContext(io) { personalBackups().filter { it != made && !it.name.endsWith(com.tennis.scoremanager.data.Backup.LOCKED_EXT) }.forEach { it.delete() } }
+        return true
+    }
+
     suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
         // Un'app appena installata non ha niente da salvare: una copia vuota diventerebbe la "più recente" in Documenti
         // proprio quando si vuole ripristinare quella di prima (dalla prima apertura). Le copie automatiche partono dopo.
@@ -16639,7 +16657,7 @@ class MatchController(
         val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
         if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
         val now = System.currentTimeMillis()
-        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now) }.getOrNull()?.also {
+        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now, storage.backupPassword?.toCharArray()) }.getOrNull()?.also {
             storage.personalBackupPrint = print
             storage.lastBackupAt = now
         }
@@ -23483,9 +23501,11 @@ object Backup {
             .sumOf { d -> d.walkTopDown().filter { it.isFile && isVideo(it) }.sumOf { it.length() } }
 
     /** Scrive il backup in [out]; [onProgress] riceve i file scritti. */
-    fun write(c: Context, storage: Storage, out: OutputStream, videos: Boolean, version: String, strokesFolder: String, onProgress: (Int) -> Unit = {}) {
+    fun write(c: Context, storage: Storage, out: OutputStream, videos: Boolean, version: String, strokesFolder: String, password: CharArray? = null, onProgress: (Int) -> Unit = {}) {
         var n = 0
-        ZipOutputStream(out.buffered()).use { zip ->
+        // Con la password il file si cifra mentre si scrive (vedi BackupCrypt).
+        val sink = if (password != null && password.isNotEmpty()) BackupCrypt.encrypting(out, password) else out
+        ZipOutputStream(sink.buffered()).use { zip ->
             fun put(name: String, f: File) {
                 zip.putNextEntry(ZipEntry(name).apply { time = f.lastModified() })
                 f.inputStream().use { it.copyTo(zip) }
@@ -23522,11 +23542,14 @@ object Backup {
 
     fun autoDir(storage: Storage) = File(storage.documentsRoot, AUTO_DIR)
 
-    /** "TSM backup 2026-11-05 2130.zip". */
-    fun autoName(at: Long): String = AUTO_PREFIX + java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at)) + ".zip"
+    /** Estensione dei backup protetti da password (non sono ZIP leggibili senza la password). */
+    const val LOCKED_EXT = ".tsmbak"
+
+    /** "TSM backup 2026-11-05 2130.zip" (o ".tsmbak", protetto da password). */
+    fun autoName(at: Long, locked: Boolean = false): String = AUTO_PREFIX + java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at)) + if (locked) LOCKED_EXT else ".zip"
 
     /** Le copie automatiche, dalla più nuova. */
-    fun autoList(storage: Storage): List<File> = autoDir(storage).listFiles { f -> f.isFile && f.name.startsWith(AUTO_PREFIX) && f.name.endsWith(".zip") }
+    fun autoList(storage: Storage): List<File> = autoDir(storage).listFiles { f -> f.isFile && f.name.startsWith(AUTO_PREFIX) && (f.name.endsWith(".zip") || f.name.endsWith(LOCKED_EXT)) }
         .orEmpty().sortedByDescending { it.lastModified() }
 
     /**
@@ -23547,14 +23570,28 @@ object Backup {
     }
 
     /** Scrive una copia automatica (senza video) e tiene le ultime [AUTO_KEEP]. */
-    fun writeAuto(c: Context, storage: Storage, version: String, strokesFolder: String, at: Long): File {
+    fun writeAuto(c: Context, storage: Storage, version: String, strokesFolder: String, at: Long, password: CharArray? = null): File {
         val dir = autoDir(storage).apply { mkdirs() }
-        val f = File(dir, autoName(at))
+        val f = File(dir, autoName(at, locked = password != null && password.isNotEmpty()))
         val tmp = File(dir, ".${f.name}.tmp")
-        tmp.outputStream().use { write(c, storage, it, videos = false, version = version, strokesFolder = strokesFolder) }
+        tmp.outputStream().use { write(c, storage, it, videos = false, version = version, strokesFolder = strokesFolder, password = password) }
         if (!tmp.renameTo(f)) { tmp.copyTo(f, overwrite = true); tmp.delete() }
         autoList(storage).drop(AUTO_KEEP).forEach { it.delete() }
         return f
+    }
+
+    /** Il backup che si apre con [open] è protetto da password. */
+    fun isLocked(open: () -> InputStream?): Boolean = runCatching { open()?.use { BackupCrypt.isEncrypted(it) } == true }.getOrDefault(false)
+
+    /**
+     * Il backup in chiaro: così com'è, o decifrato con [password] se è protetto ([BackupCrypt.WrongPassword] se la
+     * password manca o è sbagliata).
+     */
+    fun openPlain(open: () -> InputStream?, password: CharArray?): InputStream? {
+        if (!isLocked(open)) return open()
+        val s = open() ?: return null
+        if (password == null) { s.close(); throw BackupCrypt.WrongPassword() }
+        return try { BackupCrypt.decrypting(s, password) } catch (e: Exception) { s.close(); throw e }
     }
 
     /** Legge solo il manifest (per chiedere conferma prima di ripristinare); null se non è un backup dell'app. */
@@ -23572,7 +23609,8 @@ object Backup {
     fun restore(c: Context, storage: Storage, input: InputStream): Boolean {
         val stage = File(c.cacheDir, "restore").apply { deleteRecursively(); mkdirs() }
         var manifest: Manifest? = null
-        ZipInputStream(input.buffered()).use { zip ->
+        val src = input.buffered()
+        ZipInputStream(src).use { zip ->
             while (true) {
                 val e = zip.nextEntry ?: break
                 if (e.isDirectory) continue
@@ -23586,6 +23624,9 @@ object Backup {
                 f.parentFile?.mkdirs()
                 f.outputStream().use { zip.copyTo(it) }
             }
+            // Fino in fondo: in un backup protetto il sigillo è alla fine e si controlla lì (file toccato = errore,
+            // prima di cancellare i dati di adesso).
+            try { val buf = ByteArray(8192); while (src.read(buf) >= 0) Unit } catch (e: java.io.IOException) { stage.deleteRecursively(); throw e }
         }
         if (manifest == null || manifest!!.version > VERSION) {
             stage.deleteRecursively()
@@ -23627,6 +23668,156 @@ object Backup {
             val d = strokes(storage, name)
             if (videos) d.deleteRecursively()
             else d.walkTopDown().filter { it.isFile && !isVideo(it) }.toList().forEach { it.delete() }
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/BackupCrypt.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/BackupCrypt.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.io.FilterOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.io.PushbackInputStream
+import java.security.MessageDigest
+import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.Mac
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
+
+/**
+ * Backup protetto da password: AES-256 (CTR) e un sigillo HMAC-SHA256 su tutto il file, con le chiavi ricavate dalla
+ * password (PBKDF2, sale casuale per ogni file). Si cifra e decifra a flusso, così anche i backup coi video non
+ * riempiono la memoria. Nel file: [MAGIC], sale, giri, IV, verifica della password, dati cifrati, sigillo (32 byte).
+ */
+object BackupCrypt {
+    private val MAGIC = "TSMENC1\n".toByteArray()
+    private const val ITERATIONS = 200_000
+    private const val SALT = 16
+    private const val IV = 16
+    private const val CHECK = 16
+    private const val TAG = 32
+
+    /** La password è sbagliata (o il file non è un backup protetto). */
+    class WrongPassword : IOException("wrong password")
+
+    /** Il file comincia come un backup protetto. Legge solo l'inizio di [peek] (che va riaperto dopo). */
+    fun isEncrypted(peek: InputStream): Boolean {
+        val head = ByteArray(MAGIC.size)
+        var n = 0
+        while (n < head.size) { val r = peek.read(head, n, head.size - n); if (r < 0) break; n += r }
+        return n == MAGIC.size && head.contentEquals(MAGIC)
+    }
+
+    private fun keys(password: CharArray, salt: ByteArray, iterations: Int): Pair<ByteArray, ByteArray> {
+        val bits = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(PBEKeySpec(password, salt, iterations, 512)).encoded
+        return bits.copyOfRange(0, 32) to bits.copyOfRange(32, 64)
+    }
+
+    /** "La password è giusta" senza decifrare niente: un riassunto della chiave del sigillo. */
+    private fun check(macKey: ByteArray): ByteArray = MessageDigest.getInstance("SHA-256").digest(macKey + "check".toByteArray()).copyOf(CHECK)
+
+    /** Scrive in [out] il backup cifrato con [password]: quello che si scrive nel flusso restituito. */
+    fun encrypting(out: OutputStream, password: CharArray, iterations: Int = ITERATIONS): OutputStream {
+        val rnd = SecureRandom()
+        val salt = ByteArray(SALT).also(rnd::nextBytes)
+        val iv = ByteArray(IV).also(rnd::nextBytes)
+        val (encKey, macKey) = keys(password, salt, iterations)
+        val cipher = Cipher.getInstance("AES/CTR/NoPadding").apply { init(Cipher.ENCRYPT_MODE, SecretKeySpec(encKey, "AES"), IvParameterSpec(iv)) }
+        val mac = Mac.getInstance("HmacSHA256").apply { init(SecretKeySpec(macKey, "HmacSHA256")) }
+        val header = MAGIC + salt + java.nio.ByteBuffer.allocate(4).putInt(iterations).array() + iv + check(macKey)
+        out.write(header)
+        mac.update(header)
+        return object : FilterOutputStream(out) {
+            private var closed = false
+            override fun write(b: Int) = write(byteArrayOf(b.toByte()), 0, 1)
+            override fun write(b: ByteArray, off: Int, len: Int) {
+                val enc = cipher.update(b, off, len) ?: return
+                mac.update(enc)
+                out.write(enc)
+            }
+            override fun close() {
+                if (closed) return
+                closed = true
+                cipher.doFinal()?.takeIf { it.isNotEmpty() }?.let { mac.update(it); out.write(it) }
+                out.write(mac.doFinal())
+                out.close()
+            }
+        }
+    }
+
+    /**
+     * Il backup in chiaro da [input] (che comincia col [MAGIC]); [WrongPassword] subito se la password non va. Il
+     * sigillo si controlla alla fine: se il file è stato toccato, l'ultima lettura dà errore.
+     */
+    fun decrypting(input: InputStream, password: CharArray): InputStream {
+        fun readFully(n: Int): ByteArray {
+            val b = ByteArray(n); var got = 0
+            while (got < n) { val r = input.read(b, got, n - got); if (r < 0) throw WrongPassword(); got += r }
+            return b
+        }
+        val magic = readFully(MAGIC.size)
+        if (!magic.contentEquals(MAGIC)) throw WrongPassword()
+        val salt = readFully(SALT)
+        val itBytes = readFully(4)
+        val iterations = java.nio.ByteBuffer.wrap(itBytes).int
+        if (iterations !in 1_000..10_000_000) throw WrongPassword()
+        val iv = readFully(IV)
+        val chk = readFully(CHECK)
+        val (encKey, macKey) = keys(password, salt, iterations)
+        if (!MessageDigest.isEqual(chk, check(macKey))) throw WrongPassword()
+        val cipher = Cipher.getInstance("AES/CTR/NoPadding").apply { init(Cipher.DECRYPT_MODE, SecretKeySpec(encKey, "AES"), IvParameterSpec(iv)) }
+        val mac = Mac.getInstance("HmacSHA256").apply { init(SecretKeySpec(macKey, "HmacSHA256")); update(magic + salt + itBytes + iv + chk) }
+        val src = PushbackInputStream(input, TAG + 8192)
+        return object : InputStream() {
+            private var pending = ByteArray(0)
+            private var pos = 0
+            private var done = false
+            /** Legge un pezzo cifrato tenendo sempre da parte gli ultimi [TAG] byte (il sigillo). */
+            private fun fill(): Boolean {
+                if (done) return false
+                val buf = ByteArray(8192 + TAG)
+                var n = 0
+                while (n < buf.size) { val r = src.read(buf, n, buf.size - n); if (r < 0) break; n += r }
+                if (n < buf.size) {
+                    // Fine del file: gli ultimi 32 byte sono il sigillo.
+                    if (n < TAG) throw IOException("truncated")
+                    val body = buf.copyOf(n - TAG)
+                    val tag = buf.copyOfRange(n - TAG, n)
+                    mac.update(body)
+                    if (!MessageDigest.isEqual(mac.doFinal(), tag)) throw IOException("backup damaged")
+                    pending = (cipher.update(body) ?: ByteArray(0)) + (cipher.doFinal() ?: ByteArray(0))
+                    pos = 0; done = true
+                    return pending.isNotEmpty()
+                }
+                // Pieno: gli ultimi TAG byte tornano indietro, potrebbero essere il sigillo.
+                src.unread(buf, buf.size - TAG, TAG)
+                val body = buf.copyOf(buf.size - TAG)
+                mac.update(body)
+                pending = cipher.update(body) ?: ByteArray(0); pos = 0
+                return true
+            }
+            override fun read(): Int {
+                while (pos >= pending.size) if (!fill()) return -1
+                return pending[pos++].toInt() and 0xff
+            }
+            override fun read(b: ByteArray, off: Int, len: Int): Int {
+                if (len == 0) return 0
+                while (pos >= pending.size) if (!fill()) return -1
+                val n = minOf(len, pending.size - pos)
+                System.arraycopy(pending, pos, b, off, n); pos += n
+                return n
+            }
+            override fun close() = input.close()
         }
     }
 }
@@ -30884,6 +31075,15 @@ class Storage(context: Context) {
     var autoBackupNoticeSeen: Boolean
         get() = prefs.getBoolean("auto_backup_notice_seen", false)
         set(v) = prefs.edit().putBoolean("auto_backup_notice_seen", v).apply()
+
+    /**
+     * La password dei backup (null = senza): in un file di impostazioni a parte, che non entra nei backup. Serve alle
+     * copie automatiche; per ripristinare la si riscrive.
+     */
+    private val secret = app.getSharedPreferences("tsm_secret", Context.MODE_PRIVATE)
+    var backupPassword: String?
+        get() = secret.getString("backup_password", null)?.takeIf { it.isNotEmpty() }
+        set(v) = secret.edit().apply { if (v.isNullOrEmpty()) remove("backup_password") else putString("backup_password", v) }.apply()
 
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
@@ -40003,6 +40203,148 @@ class TvServer(context: Context) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/BackupPasswordUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/BackupPasswordUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Backup
+import com.tennis.scoremanager.data.BackupCrypt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+
+/** La password di un backup protetto, per aprirlo. */
+@Composable
+fun BackupPasswordAsk(onOk: (String) -> Unit, onDismiss: () -> Unit) {
+    val s = LocalStrings.current
+    var pw by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Filled.Lock, null, tint = TsmColors.Ball) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.bpAsk, color = TsmColors.TextMain)
+                OutlinedTextField(pw, { pw = it }, Modifier.fillMaxWidth(), singleLine = true, visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+            }
+        },
+        confirmButton = { TextButton(enabled = pw.isNotEmpty(), onClick = { onOk(pw) }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(s.back) } },
+    )
+}
+
+/**
+ * Apre un backup scelto (in chiaro o protetto): se serve chiede la password, poi legge il manifest. [onReady] riceve
+ * come riaprirlo in chiaro e il manifest; [onError] il messaggio (non è un backup, password sbagliata).
+ */
+class BackupOpener(private val onReady: (() -> InputStream?, Backup.Manifest) -> Unit, private val onError: (String) -> Unit) {
+    var asking by mutableStateOf<(() -> InputStream?)?>(null)
+
+    suspend fun pick(open: () -> InputStream?, s: Strings) {
+        if (withContext(Dispatchers.IO) { Backup.isLocked(open) }) { asking = open; return }
+        val m = withContext(Dispatchers.IO) { runCatching { open()?.use { Backup.peek(it) } }.getOrNull() }
+        if (m == null) onError(s.dataNotBackup) else onReady(open, m)
+    }
+
+    suspend fun withPassword(pw: String, s: Strings) {
+        val open = asking ?: return
+        asking = null
+        val r = withContext(Dispatchers.IO) { runCatching { Backup.openPlain(open, pw.toCharArray())?.use { Backup.peek(it) } } }
+        val m = r.getOrNull()
+        when {
+            r.exceptionOrNull() is BackupCrypt.WrongPassword -> onError(s.bpWrong)
+            m == null -> onError(s.dataNotBackup)
+            else -> onReady({ Backup.openPlain(open, pw.toCharArray()) }, m)
+        }
+    }
+}
+
+/** La richiesta della password, quando l'[opener] ne ha bisogno. */
+@Composable
+fun BackupOpenerDialog(opener: BackupOpener) {
+    val s = LocalStrings.current
+    val scope = rememberCoroutineScope()
+    if (opener.asking != null) BackupPasswordAsk({ pw -> scope.launch { opener.withPassword(pw, s) } }) { opener.asking = null }
+}
+
+/**
+ * Backup e dati: proteggere i backup con una password (la si scrive due volte), cambiarla o toglierla. Con la
+ * password nuova si fa subito una copia protetta al posto di quelle di prima in chiaro.
+ */
+@Composable
+fun BackupPasswordRow(c: MatchController, onMessage: (String) -> Unit, onChanged: () -> Unit) {
+    val s = LocalStrings.current
+    val scope = rememberCoroutineScope()
+    var on by remember { mutableStateOf(c.storage.backupPassword != null) }
+    var setting by remember { mutableStateOf(false) }
+    SwitchRow(Icons.Filled.Lock, s.bpTitle, s.bpHint, on) { want ->
+        if (want) setting = true
+        else scope.launch { c.setBackupPassword(null); on = false; onMessage(s.bpRemoved); onChanged() }
+    }
+    if (on) GhostButton(s.bpChange, Icons.Filled.Key, { setting = true }, Modifier.fillMaxWidth())
+    if (setting) {
+        var a by remember { mutableStateOf("") }
+        var b by remember { mutableStateOf("") }
+        val ok = a.length >= 6 && a == b
+        AlertDialog(
+            onDismissRequest = { setting = false },
+            icon = { Icon(Icons.Filled.Lock, null, tint = TsmColors.Ball) },
+            title = { Text(s.bpTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.bpHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    OutlinedTextField(a, { a = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bpNew) }, visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+                    OutlinedTextField(b, { b = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bpAgain) }, visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+                    if (b.isNotEmpty() && !ok) Text(s.bpMismatch, color = TsmColors.Danger, fontSize = 13.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = ok, onClick = {
+                    setting = false
+                    scope.launch {
+                        val done = c.setBackupPassword(a)
+                        on = true
+                        onMessage(if (done) s.bpSet else s.dataBackupFailed)
+                        onChanged()
+                    }
+                }) { Text(s.ok) }
+            },
+            dismissButton = { TextButton(onClick = { setting = false }) { Text(s.back) } },
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/BandSettingsPanel.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/BandSettingsPanel.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -46295,20 +46637,20 @@ fun FirstStartRestore(c: MatchController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val lang = c.options.collectAsState().value.lang
-    var ask by remember { mutableStateOf<Pair<Uri, Backup.Manifest>?>(null) }
+    var ask by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
     var busy by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var done by remember { mutableStateOf(false) }
+    // In chiaro o protetto da password (allora la si chiede prima).
+    val opener = remember { BackupOpener({ input, m -> ask = input to m }) { message = it } }
+    BackupOpenerDialog(opener)
     val open = rememberLauncherForActivityResult(OpenBackup()) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        scope.launch {
-            val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
-            if (m == null) message = s.dataNotBackup else ask = uri to m
-        }
+        scope.launch { opener.pick({ context.contentResolver.openInputStream(uri) }, s) }
     }
     GhostButton(s.onbRestore, Icons.Filled.Restore, { open.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, Modifier.fillMaxWidth())
     Text(s.onbRestoreHint, color = TsmColors.TextDim, fontSize = 13.sp)
-    ask?.let { (uri, m) ->
+    ask?.let { (input, m) ->
         AlertDialog(
             onDismissRequest = { ask = null },
             title = { Text(s.dataRestore) },
@@ -46319,7 +46661,7 @@ fun FirstStartRestore(c: MatchController) {
                     busy = true
                     scope.launch {
                         val ok = withContext(Dispatchers.IO) {
-                            runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
+                            runCatching { input()?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
                         }
                         busy = false
                         done = ok
@@ -50066,6 +50408,17 @@ interface Strings {
     val pfOfficeFailed: String
     val pfToOffice: (String) -> String
     val pfReceiveFile: String
+    val bpTitle: String
+    val bpHint: String
+    val bpNew: String
+    val bpAgain: String
+    val bpMismatch: String
+    val bpChange: String
+    val bpAsk: String
+    val bpWrong: String
+    val bpSet: String
+    val bpRemoved: String
+    val bpLocked: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -52747,6 +53100,17 @@ object ItStrings : Strings {
     override val pfOfficeFailed = "Non arrivato: controlla la rete o manda il file."
     override val pfToOffice: (String) -> String = { "Manda alla segreteria di $it" }
     override val pfReceiveFile = "Ricevi un profilo (file)"
+    override val bpTitle = "Proteggi i backup con una password"
+    override val bpHint = "I backup (anche le copie automatiche in Documenti) si aprono solo con la password: se finiscono su Drive o in altre mani, i dati restano chiusi. Se la dimentichi non si aprono più. Le copie automatiche di prima, senza password, vengono sostituite da una protetta."
+    override val bpNew = "Password (almeno 6 caratteri)"
+    override val bpAgain = "Ripeti la password"
+    override val bpMismatch = "Le due password non sono uguali, o sono più corte di 6 caratteri."
+    override val bpChange = "Cambia la password dei backup"
+    override val bpAsk = "Questo backup è protetto: scrivi la password."
+    override val bpWrong = "Password sbagliata."
+    override val bpSet = "Password messa: i backup sono protetti."
+    override val bpRemoved = "Password tolta: i prossimi backup non sono protetti."
+    override val bpLocked = "protetto"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -55429,6 +55793,17 @@ object EnStrings : Strings {
     override val pfOfficeFailed = "Not delivered: check the connection or send the file."
     override val pfToOffice: (String) -> String = { "Send to the $it office" }
     override val pfReceiveFile = "Receive a profile (file)"
+    override val bpTitle = "Protect backups with a password"
+    override val bpHint = "Backups (including the automatic copies in Documents) open only with the password: if they end up on Drive or in other hands, the data stays locked. If you forget it they can't be opened. The previous automatic copies without a password are replaced by a protected one."
+    override val bpNew = "Password (at least 6 characters)"
+    override val bpAgain = "Repeat the password"
+    override val bpMismatch = "The two passwords don't match, or are shorter than 6 characters."
+    override val bpChange = "Change the backup password"
+    override val bpAsk = "This backup is protected: type the password."
+    override val bpWrong = "Wrong password."
+    override val bpSet = "Password set: backups are protected."
+    override val bpRemoved = "Password removed: the next backups aren't protected."
+    override val bpLocked = "protected"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -58136,6 +58511,17 @@ object DeStrings : Strings {
     override val pfOfficeFailed = "Nicht angekommen: Verbindung prüfen oder die Datei senden."
     override val pfToOffice: (String) -> String = { "An das Büro von $it senden" }
     override val pfReceiveFile = "Profil empfangen (Datei)"
+    override val bpTitle = "Sicherungen mit Passwort schützen"
+    override val bpHint = "Sicherungen (auch die automatischen Kopien in Dokumente) öffnen sich nur mit dem Passwort: Landen sie auf Drive oder in fremden Händen, bleiben die Daten verschlossen. Vergisst du es, lassen sie sich nicht mehr öffnen. Die bisherigen automatischen Kopien ohne Passwort werden durch eine geschützte ersetzt."
+    override val bpNew = "Passwort (mindestens 6 Zeichen)"
+    override val bpAgain = "Passwort wiederholen"
+    override val bpMismatch = "Die beiden Passwörter stimmen nicht überein oder sind kürzer als 6 Zeichen."
+    override val bpChange = "Passwort der Sicherungen ändern"
+    override val bpAsk = "Diese Sicherung ist geschützt: gib das Passwort ein."
+    override val bpWrong = "Falsches Passwort."
+    override val bpSet = "Passwort gesetzt: Sicherungen sind geschützt."
+    override val bpRemoved = "Passwort entfernt: die nächsten Sicherungen sind nicht geschützt."
+    override val bpLocked = "geschützt"
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -60833,6 +61219,17 @@ object EsStrings : Strings {
     override val pfOfficeFailed = "No ha llegado: revisa la conexión o envía el archivo."
     override val pfToOffice: (String) -> String = { "Enviar a la secretaría de $it" }
     override val pfReceiveFile = "Recibir un perfil (archivo)"
+    override val bpTitle = "Proteger las copias con una contraseña"
+    override val bpHint = "Las copias (también las automáticas en Documentos) solo se abren con la contraseña: si acaban en Drive o en otras manos, los datos quedan cerrados. Si la olvidas, no se abren más. Las copias automáticas anteriores sin contraseña se sustituyen por una protegida."
+    override val bpNew = "Contraseña (al menos 6 caracteres)"
+    override val bpAgain = "Repite la contraseña"
+    override val bpMismatch = "Las dos contraseñas no coinciden o tienen menos de 6 caracteres."
+    override val bpChange = "Cambiar la contraseña de las copias"
+    override val bpAsk = "Esta copia está protegida: escribe la contraseña."
+    override val bpWrong = "Contraseña incorrecta."
+    override val bpSet = "Contraseña puesta: las copias están protegidas."
+    override val bpRemoved = "Contraseña quitada: las próximas copias no están protegidas."
+    override val bpLocked = "protegida"
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -63532,6 +63929,17 @@ object FrStrings : Strings {
     override val pfOfficeFailed = "Pas arrivé : vérifie la connexion ou envoie le fichier."
     override val pfToOffice: (String) -> String = { "Envoyer au secrétariat de $it" }
     override val pfReceiveFile = "Recevoir un profil (fichier)"
+    override val bpTitle = "Protéger les sauvegardes par un mot de passe"
+    override val bpHint = "Les sauvegardes (y compris les copies automatiques dans Documents) ne s'ouvrent qu'avec le mot de passe : si elles finissent sur Drive ou dans d'autres mains, les données restent fermées. Si tu l'oublies, elles ne s'ouvrent plus. Les anciennes copies automatiques sans mot de passe sont remplacées par une copie protégée."
+    override val bpNew = "Mot de passe (au moins 6 caractères)"
+    override val bpAgain = "Répète le mot de passe"
+    override val bpMismatch = "Les deux mots de passe ne sont pas identiques, ou font moins de 6 caractères."
+    override val bpChange = "Changer le mot de passe des sauvegardes"
+    override val bpAsk = "Cette sauvegarde est protégée : écris le mot de passe."
+    override val bpWrong = "Mot de passe incorrect."
+    override val bpSet = "Mot de passe mis : les sauvegardes sont protégées."
+    override val bpRemoved = "Mot de passe retiré : les prochaines sauvegardes ne sont pas protégées."
+    override val bpLocked = "protégée"
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -66232,6 +66640,17 @@ object PtStrings : Strings {
     override val pfOfficeFailed = "Não chegou: verifica a ligação ou envia o ficheiro."
     override val pfToOffice: (String) -> String = { "Enviar à secretaria de $it" }
     override val pfReceiveFile = "Receber um perfil (ficheiro)"
+    override val bpTitle = "Proteger as cópias com uma palavra-passe"
+    override val bpHint = "As cópias (também as automáticas em Documentos) só se abrem com a palavra-passe: se forem parar ao Drive ou a outras mãos, os dados ficam fechados. Se a esqueceres, não se abrem mais. As cópias automáticas anteriores sem palavra-passe são substituídas por uma protegida."
+    override val bpNew = "Palavra-passe (pelo menos 6 caracteres)"
+    override val bpAgain = "Repete a palavra-passe"
+    override val bpMismatch = "As duas palavras-passe não são iguais ou têm menos de 6 caracteres."
+    override val bpChange = "Mudar a palavra-passe das cópias"
+    override val bpAsk = "Esta cópia está protegida: escreve a palavra-passe."
+    override val bpWrong = "Palavra-passe errada."
+    override val bpSet = "Palavra-passe definida: as cópias estão protegidas."
+    override val bpRemoved = "Palavra-passe retirada: as próximas cópias não estão protegidas."
+    override val bpLocked = "protegida"
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -69439,26 +69858,30 @@ fun DataScreen(c: MatchController) {
     val videoMb by produceState(0L) {
         value = withContext(Dispatchers.IO) { Backup.videoBytes(context, c.storage, s.strokeFolderName) / 1_048_576 }
     }
-    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        busy = s.dataBusy
-        scope.launch {
-            val ok = withContext(Dispatchers.IO) {
-                runCatching {
-                    context.contentResolver.openOutputStream(uri)?.use { Backup.write(context, c.storage, it, videos, BuildConfig.VERSION_NAME, s.strokeFolderName) } ?: error("open")
-                }.isSuccess
+    // Con la password i backup si cifrano (e il file non è più uno ZIP: .tsmbak).
+    val writeTo: (android.net.Uri?) -> Unit = { uri ->
+        if (uri != null) {
+            busy = s.dataBusy
+            scope.launch {
+                val ok = withContext(Dispatchers.IO) {
+                    runCatching {
+                        context.contentResolver.openOutputStream(uri)?.use { Backup.write(context, c.storage, it, videos, BuildConfig.VERSION_NAME, s.strokeFolderName, c.storage.backupPassword?.toCharArray()) } ?: error("open")
+                    }.isSuccess
+                }
+                busy = null
+                if (ok) c.storage.lastBackupAt = System.currentTimeMillis()
+                message = if (ok) s.dataBackupDone else s.dataBackupFailed
             }
-            busy = null
-            if (ok) c.storage.lastBackupAt = System.currentTimeMillis()
-            message = if (ok) s.dataBackupDone else s.dataBackupFailed
         }
     }
+    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip"), writeTo)
+    val createLocked = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream"), writeTo)
+    // Un backup scelto: in chiaro o protetto (allora prima la password).
+    val opener = remember { com.tennis.scoremanager.ui.BackupOpener({ input, m -> restoreAsk = input to m }) { message = it } }
+    com.tennis.scoremanager.ui.BackupOpenerDialog(opener)
     val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        scope.launch {
-            val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
-            if (m == null) message = s.dataNotBackup else restoreAsk = { context.contentResolver.openInputStream(uri) } to m
-        }
+        scope.launch { opener.pick({ context.contentResolver.openInputStream(uri) }, s) }
     }
     ScreenScaffold(
         onHelp = { c.openHelp("7.8") },
@@ -69475,9 +69898,11 @@ fun DataScreen(c: MatchController) {
             var auto by remember { mutableStateOf(c.storage.personalBackupAuto) }
             SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.setPersonalBackupAuto(it) }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
+            com.tennis.scoremanager.ui.BackupPasswordRow(c, { message = it }) { copies = c.personalBackups() }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-                create.launch("TennisScoreManager-backup-$stamp.zip")
+                if (c.storage.backupPassword != null) createLocked.launch("TennisScoreManager-backup-$stamp${Backup.LOCKED_EXT}")
+                else create.launch("TennisScoreManager-backup-$stamp.zip")
             }, Modifier.fillMaxWidth())
         }
         SectionCard(s.autoBackupCopies, Icons.Filled.Schedule) {
@@ -69486,20 +69911,17 @@ fun DataScreen(c: MatchController) {
             Text(copies.firstOrNull()?.let { s.autoBackupLast(short.format(Date(it.lastModified()))) } ?: s.autoBackupNone,
                 color = TsmColors.TextDim, fontSize = 13.sp)
             for (f in copies) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("${short.format(Date(f.lastModified()))} · ${(f.length() + 524_287) / 1_048_576} MB",
+                Text("${short.format(Date(f.lastModified()))} · ${(f.length() + 524_287) / 1_048_576} MB" + if (f.name.endsWith(Backup.LOCKED_EXT)) " · ${s.bpLocked}" else "",
                     color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
                 TextButton(onClick = {
                     // Si condivide una copia nella cartella "share": il FileProvider dà solo quella.
                     scope.launch {
                         val out = withContext(Dispatchers.IO) { java.io.File(java.io.File(context.cacheDir, "share").apply { mkdirs() }, f.name).also { f.copyTo(it, overwrite = true) } }
-                        context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(out, "application/zip"), s.autoBackupShare))
+                        context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(out, if (f.name.endsWith(Backup.LOCKED_EXT)) "application/octet-stream" else "application/zip"), s.autoBackupShare))
                     }
                 }) { Text(s.autoBackupShare) }
                 TextButton(onClick = {
-                    scope.launch {
-                        val m = withContext(Dispatchers.IO) { runCatching { f.inputStream().use { Backup.peek(it) } }.getOrNull() }
-                        if (m == null) message = s.dataNotBackup else restoreAsk = { f.inputStream() } to m
-                    }
+                    scope.launch { opener.pick({ f.inputStream() }, s) }
                 }) { Text(s.dataRestoreDo) }
             }
             GhostButton(s.autoBackupNow, Icons.Filled.Backup, {
@@ -97687,6 +98109,73 @@ class ActivityCalendarTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/BackupCryptTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/BackupCryptTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
+import org.junit.Test
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+
+class BackupCryptTest {
+    private val plain = ByteArray(300_123) { (it * 31 + 7).toByte() }
+    private fun sealed(pw: String = "segreta1", data: ByteArray = plain): ByteArray {
+        val out = ByteArrayOutputStream()
+        BackupCrypt.encrypting(out, pw.toCharArray(), iterations = 1_000).use { it.write(data) }
+        return out.toByteArray()
+    }
+
+    @Test fun roundTripAndRecognised() {
+        val enc = sealed()
+        assertTrue(BackupCrypt.isEncrypted(ByteArrayInputStream(enc)))
+        assertFalse(BackupCrypt.isEncrypted(ByteArrayInputStream("PK\u0003\u0004zip".toByteArray())))
+        assertFalse(enc.copyOfRange(100, 200).contentEquals(plain.copyOfRange(0, 100)))
+        assertArrayEquals(plain, BackupCrypt.decrypting(ByteArrayInputStream(enc), "segreta1".toCharArray()).readBytes())
+        // Anche vuoto e a pezzi piccoli.
+        assertArrayEquals(ByteArray(0), BackupCrypt.decrypting(ByteArrayInputStream(sealed(data = ByteArray(0))), "segreta1".toCharArray()).readBytes())
+        val one = BackupCrypt.decrypting(ByteArrayInputStream(enc), "segreta1".toCharArray())
+        val got = ByteArrayOutputStream(); while (true) { val b = one.read(); if (b < 0) break; got.write(b) }
+        assertArrayEquals(plain, got.toByteArray())
+    }
+
+    @Test fun lockedBackupOpensOnlyWithThePassword() {
+        // Un backup minimo (il manifest), cifrato come lo fa Backup.write.
+        val zip = ByteArrayOutputStream().also { o ->
+            java.util.zip.ZipOutputStream(o).use { z -> z.putNextEntry(java.util.zip.ZipEntry("manifest.json")); z.write("""{"version":1,"app":"2.6","createdAt":5}""".toByteArray()); z.closeEntry() }
+        }.toByteArray()
+        val locked = sealed(data = zip)
+        val open = { ByteArrayInputStream(locked) }
+        assertTrue(Backup.isLocked(open))
+        assertFalse(Backup.isLocked { ByteArrayInputStream(zip) })
+        try { Backup.openPlain(open, null); fail() } catch (_: BackupCrypt.WrongPassword) {}
+        try { Backup.openPlain(open, "no".toCharArray()); fail() } catch (_: BackupCrypt.WrongPassword) {}
+        assertTrue(Backup.openPlain(open, "segreta1".toCharArray())!!.use { Backup.peek(it) }!!.app == "2.6")
+        // In chiaro si apre come prima, password o no.
+        assertTrue(Backup.openPlain({ ByteArrayInputStream(zip) }, null)!!.use { Backup.peek(it) }!!.createdAt == 5L)
+    }
+
+    @Test fun wrongPasswordIsCaughtAtOnce() {
+        try { BackupCrypt.decrypting(ByteArrayInputStream(sealed()), "sbagliata".toCharArray()); fail() } catch (_: BackupCrypt.WrongPassword) {}
+    }
+
+    @Test fun tamperedFileIsRefused() {
+        val enc = sealed()
+        enc[enc.size / 2] = (enc[enc.size / 2].toInt() xor 1).toByte()
+        try { BackupCrypt.decrypting(ByteArrayInputStream(enc), "segreta1".toCharArray()).readBytes(); fail() } catch (e: IOException) { assertFalse(e is BackupCrypt.WrongPassword) }
+        // Troncato.
+        try { BackupCrypt.decrypting(ByteArrayInputStream(sealed().copyOf(1000)), "segreta1".toCharArray()).readBytes(); fail() } catch (_: IOException) {}
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClosureTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClosureTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -115833,6 +116322,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 371 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 374 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

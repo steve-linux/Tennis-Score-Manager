@@ -2688,6 +2688,17 @@ object PtStrings : Strings {
     override val pfOfficeFailed = "Não chegou: verifica a ligação ou envia o ficheiro."
     override val pfToOffice: (String) -> String = { "Enviar à secretaria de $it" }
     override val pfReceiveFile = "Receber um perfil (ficheiro)"
+    override val bpTitle = "Proteger as cópias com uma palavra-passe"
+    override val bpHint = "As cópias (também as automáticas em Documentos) só se abrem com a palavra-passe: se forem parar ao Drive ou a outras mãos, os dados ficam fechados. Se a esqueceres, não se abrem mais. As cópias automáticas anteriores sem palavra-passe são substituídas por uma protegida."
+    override val bpNew = "Palavra-passe (pelo menos 6 caracteres)"
+    override val bpAgain = "Repete a palavra-passe"
+    override val bpMismatch = "As duas palavras-passe não são iguais ou têm menos de 6 caracteres."
+    override val bpChange = "Mudar a palavra-passe das cópias"
+    override val bpAsk = "Esta cópia está protegida: escreve a palavra-passe."
+    override val bpWrong = "Palavra-passe errada."
+    override val bpSet = "Palavra-passe definida: as cópias estão protegidas."
+    override val bpRemoved = "Palavra-passe retirada: as próximas cópias não estão protegidas."
+    override val bpLocked = "protegida"
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
