@@ -22,6 +22,7 @@ import java.util.UUID
  *   C|<colpo> oppure C|                                          calibra quel colpo / fine calibrazione (firmware 2.4)
  *   U|                                                           annulla l'ultimo esempio di calibrazione (firmware 2.4)
  *   X|<colpo>                                                    cancella gli esempi di quel colpo (firmware 2.4)
+ *   A|1 oppure A|0                                               TSM Arena accesa/spenta: SWING e connessione veloce (firmware 2.5)
  * "mio" è sempre il giocatore che indossa il braccialetto; servizio 1 = serve lui, 2 = serve l'avversario.
  * I firmware vecchi ignorano i tipi che non conoscono.
  *
@@ -41,6 +42,8 @@ object BandProtocol {
     val CONFIG: UUID = UUID.fromString("7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     /** Colpo riconosciuto (notify): vedi [parseStroke]. Dal firmware 2.4. */
     val STROKE: UUID = UUID.fromString("7a1e0006-5c3b-4f6e-9d2a-3e7b1c9a0f10")
+    /** Inizio di un colpo in TSM Arena (notify): vedi [parseSwing]. Dal firmware 2.5. */
+    val SWING: UUID = UUID.fromString("7a1e0007-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val BATTERY_SERVICE: UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
     val BATTERY_LEVEL: UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
@@ -101,6 +104,25 @@ object BandProtocol {
     /** Cancella gli esempi di un colpo, per rifarli. */
     fun clearExamples(stroke: Int) = "X|$stroke"
 
+    /** TSM Arena: il braccialetto manda SWING appena comincia un colpo e chiede una connessione veloce. */
+    fun arena(on: Boolean) = if (on) "A|1" else "A|0"
+
+    /**
+     * Inizio colpo da SWING: [sequenza, picco giroscopio °/s (2 byte), picco accelerazione in centesimi di g (2 byte),
+     * ms dalla soglia, id di accensione (4 byte)], little endian. Null se troppo corto.
+     */
+    fun parseSwing(b: ByteArray): RawSwing? {
+        if (b.size < 10) return null
+        fun u(i: Int) = b[i].toInt() and 0xFF
+        return RawSwing(
+            seq = u(0),
+            peakGyroDps = u(1) or (u(2) shl 8),
+            peakAccelG = (u(3) or (u(4) shl 8)) / 100.0,
+            afterMs = u(5),
+            boot = u(6).toLong() or (u(7).toLong() shl 8) or (u(8).toLong() shl 16) or (u(9).toLong() shl 24),
+        )
+    }
+
     /**
      * Colpo da STROKE: [indice (2 byte), colpo, confidenza %, picco giroscopio °/s (2 byte),
      * picco accelerazione in centesimi di g (2 byte), id di accensione (4 byte)], little endian. Null se troppo corto.
@@ -141,6 +163,15 @@ data class RawBandEvent(val type: Int, val seq: Int, val extra: Int?, val boot: 
 
 /** Colpo riconosciuto dal braccialetto. [stroke]: BandProtocol.STROKE_*; [confidence] 0-100. */
 @kotlinx.serialization.Serializable
+/** Inizio di un colpo (TSM Arena): picchi dei primi [afterMs] ms dopo la soglia. */
+data class RawSwing(
+    val seq: Int,
+    val peakGyroDps: Int,
+    val peakAccelG: Double,
+    val afterMs: Int,
+    val boot: Long,
+)
+
 data class RawStroke(
     val index: Int,
     val stroke: Int,
@@ -205,6 +236,17 @@ data class BandSettings(
     val calibrating: Int = -1,
 ) {
     val supportsStrokes: Boolean get() = strokeExamples != null
+
+    /** TSM Arena (SWING e "A|"): dal firmware 2.5. */
+    val supportsArena: Boolean get() = firmwareAtLeast(2, 5)
+
+    /** Versione del firmware almeno [major].[minor] ("2.4.1" vale come 2.4); vuota o illeggibile = no. */
+    fun firmwareAtLeast(major: Int, minor: Int): Boolean {
+        val v = firmware.split('.').map { it.trim().toIntOrNull() ?: return false }
+        val ma = v.getOrElse(0) { return false }
+        val mi = v.getOrElse(1) { 0 }
+        return ma > major || (ma == major && mi >= minor)
+    }
 
     /** Come nel firmware (StrokeClassifier::ready): almeno due colpi con [MIN_EXAMPLES] esempi. */
     val strokesReady: Boolean get() = (strokeExamples ?: emptyList()).count { it >= MIN_EXAMPLES } >= 2

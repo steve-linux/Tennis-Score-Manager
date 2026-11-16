@@ -51,6 +51,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Today
@@ -223,6 +224,8 @@ private fun CoachTab(c: MatchController) {
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
     Entry(Icons.Filled.FormatListNumbered, s.drillsTitle, s.drillsHint) { c.go(Screen.DRILLS) }
     ServeTrainingCard(c)
+    // TSM Arena: tennis sulla TV coi braccialetti, da casa tra una lezione e l'altra.
+    Entry(Icons.Filled.SportsEsports, s.arenaTitle, s.arenaHint) { c.openArena() }
 }
 
 /** Circolo: i tornei, una partita, un telefono come tabellone. */
@@ -448,6 +451,8 @@ private fun TrainTab(c: MatchController) {
         // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
         Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
     }
+    // TSM Arena: tennis sulla TV coi braccialetti come racchette.
+    if (PlayerFeature.BANDS in pf || PlayerFeature.TRAINING in pf) Entry(Icons.Filled.SportsEsports, s.arenaTitle, s.arenaHint) { c.openArena() }
 }
 
 @Composable

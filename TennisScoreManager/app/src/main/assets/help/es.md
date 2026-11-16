@@ -552,6 +552,24 @@ Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LIST
 **Desde un navegador** (portátil, TV box): escanea el QR o escribe la dirección y toca **PANTALLA COMPLETA** (aparece al mover el ratón o al tocar la pantalla). Configura el apagado de la pantalla en *nunca*: en una página http el navegador no puede mantenerla encendida por sí solo. Tras un corte la página se reconecta sola; demasiados marcadores abiertos ya no bloquean uno nuevo (se cierra el más antiguo).
 
 
+### 8.4 TSM Arena: tenis en la tele con las pulseras
+
+Un juego de tenis en la tele, como los de las consolas, en el que **la pulsera es la raqueta**: útil en casa entre una clase y otra para entrenar el momento del golpe y la elección entre derecha y revés. El jugador de la pantalla corre solo: solo hay que pensar **cuándo** golpear. Anticipado la bola va cruzada, tarde va paralela; cuanto más rápida la muñeca, más fuerte el golpe.
+
+Las pulseras necesitan el **firmware 2.5** (5): con el juego abierto, la pulsera manda el inicio de cada golpe en pocas centésimas de segundo y pide una conexión Bluetooth rápida (gasta más solo mientras se juega).
+
+1. **Entrenar** (o **Alumnos**, para el entrenador) › **TSM Arena**. La pantalla del teléfono queda encendida mientras la página está abierta.
+2. **En la tele**: abre la dirección mostrada (p. ej. `192.168.43.1:8080/arena`) en el navegador de la tele, de un TV box o de un portátil conectado, en la misma red o en el punto de acceso del teléfono; o escanea el QR. No hace falta internet. Pulsa **OK** una vez en la página para activar el sonido.
+3. **Jugadores**: *Contra el teléfono* (Jugador 1 contra la CPU, tres niveles) o *Dos jugadores*, una pulsera cada uno. Toca el nombre para elegir quién juega (tú o un alumno). Debajo está el estado de cada pulsera.
+4. **Partido**: juegos para ganar (1, 3 o 5), **Solo cuenta el golpe correcto** (con la calibración de golpes, 6.4, una derecha en lugar de un revés pierde el punto), **Voz del árbitro** en la tele, **Retraso de la tele**: si siempre llegas tarde aunque te parezca bien, súbelo (bajo para monitores y teles en modo juego).
+5. Haz un **swing** (o pulsa la **tecla grande** de la pulsera) para empezar. Un swing basta para sacar. La **tecla pequeña** pone en pausa. Al final la tele muestra golpes, perfectos, anticipados, tarde, golpes equivocados, velocidad máxima de la muñeca y peloteo más largo; un swing empieza la revancha.
+6. Para salir: **Atrás**. La pulsera vuelve a bajo consumo y la tele indica que el juego está cerrado.
+
+- Lleva la pulsera bien ajustada y deja **espacio a tu alrededor**: se juega con la raqueta en la mano (mejor sin bola) o incluso con la mano vacía.
+- **Vista**: solo se juega **en primera persona** (raqueta y pulsera en primer plano, la bola viene hacia ti); entre dos la vista es desde atrás, como en la tele. La tecla **V** de un teclado cambia la vista. Un **anillo** en el punto de impacto se cierra mientras llega la bola y se pone verde cuando hay que golpear; tras cada golpe aparece la velocidad de la bola.
+- **Gráficos** (en *Partido*): **3D realista** (jugadores con cuerpo de verdad, sombras, luces del estadio, público), **3D sencillo** (low-poly, más ligero) o **2D**. Si la tele va a tirones o no tiene 3D (WebGL), el juego pasa solo al más ligero. Para el 3D conviene un PC, un TV box o un stick reciente; las teles baratas a menudo solo aguantan el 2D. El modelo del jugador es «3D Male Base Mesh» (CC0); los movimientos de tenis los calcula el juego.
+- Durante el juego las teclas de la pulsera no marcan puntos en los partidos.
+
 ## 9. Reglas aplicadas (ITF) y decisiones acordadas
 
 - **Juego**: 0-15-30-40, iguales, ventaja, juego. **Sin ventaja** (No-Ad): con 40-40, punto decisivo («iguales, punto decisivo»).

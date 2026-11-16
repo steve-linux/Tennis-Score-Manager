@@ -666,6 +666,25 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 
 **Aperçu sans téléphone** : `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` dans un navigateur (aussi `&lang=en`, `fr`, `de`, `es`, `pt` et `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) affiche le tableau avec des données de test.
 
+### 8.4 TSM Arena : le tennis sur la télé avec les bracelets (app 2.7, firmware 2.5)
+
+Un jeu de tennis sur la télé, comme ceux des consoles, où **le bracelet est la raquette** : utile à la maison entre deux leçons pour travailler le timing et le choix entre coup droit et revers. Le joueur à l'écran court tout seul : on ne pense qu'au **moment** de frapper. En avance la balle part croisée, en retard le long de la ligne ; plus le poignet est rapide, plus le coup est fort.
+
+Les bracelets doivent avoir le **firmware 2.5** (5) : quand le jeu est ouvert, le bracelet envoie le début de chaque coup en quelques centièmes de seconde et demande une connexion Bluetooth rapide (il consomme plus seulement pendant le jeu).
+
+1. **S'entraîner** (ou **Élèves**, pour l'entraîneur) › **TSM Arena**. L'écran du téléphone reste allumé tant que la page est ouverte.
+2. **Sur la télé** : ouvre l'adresse affichée (p. ex. `192.168.43.1:8080/arena`) dans le navigateur de la télé, d'un boîtier TV ou d'un portable branché, sur le même réseau ou sur le point d'accès du téléphone ; ou scanne le QR. Pas besoin d'internet. Appuie une fois sur **OK** sur la page pour activer le son.
+3. **Joueurs** : *Contre le téléphone* (Joueur 1 contre l'ordinateur, trois niveaux) ou *Deux joueurs*, un bracelet chacun. Touche le nom pour choisir qui joue (toi ou un élève). En dessous, l'état de chaque bracelet.
+4. **Match** : jeux pour gagner (1, 3 ou 5), **Seul le bon coup compte** (avec l'étalonnage des coups, 6.4, un coup droit à la place d'un revers fait perdre le point), **Voix de l'arbitre** sur la télé, **Retard de la télé** : si tu frappes toujours en retard même quand ça te semble juste, augmente-le (faible pour les moniteurs et les télés en mode jeu).
+5. Fais un **swing** (ou appuie sur la **grande touche** du bracelet) pour commencer. Un swing suffit pour servir. La **petite touche** met en pause. À la fin, la télé affiche coups, parfaits, en avance, en retard, mauvais coups, vitesse max du poignet et plus long échange ; un swing lance la revanche.
+6. Pour sortir : **Retour**. Le bracelet repasse en basse consommation et la télé indique que le jeu est fermé.
+
+- Serre bien le bracelet et garde de **l'espace autour de toi** : on joue raquette en main (plutôt sans balle) ou même à main vide.
+- **Vue** : seul, on joue **à la première personne** (raquette et bracelet au premier plan, la balle arrive vers toi) ; à deux, la vue est de derrière, comme à la télé. La touche **V** d'un clavier change de vue. Un **anneau** sur le point d'impact se resserre pendant que la balle arrive et devient vert quand il faut frapper ; après chaque coup, la vitesse de la balle s'affiche.
+- **Graphismes** (sous *Match*) : **3D réaliste** (joueurs avec un vrai corps, ombres, éclairage du stade, public), **3D simple** (low-poly, plus légère) ou **2D**. Si la télé saccade ou n'a pas la 3D (WebGL), le jeu passe tout seul à la plus légère. Pour la 3D, mieux vaut un PC, un boîtier TV ou une clé récente ; les télés bon marché ne tiennent souvent que la 2D. Le modèle du joueur est « 3D Male Base Mesh » (CC0) ; les gestes de tennis sont calculés par le jeu.
+- Pendant le jeu, les touches du bracelet ne marquent pas de points dans les matchs.
+- **Aperçu sans téléphone ni bracelets** : `TennisScoreManager/app/src/main/assets/arena.html?demo=1` dans un navigateur (aussi `&lang=en`, `it`, `de`, `es`, `pt`) ; la barre d'espace fait le swing.
+
 ## 9. Règles appliquées (ITF) et choix convenus
 
 - **Jeu** : 0-15-30-40, égalité, avantage, jeu. **No-Ad** : à 40-40, point décisif (« égalité, point décisif »).

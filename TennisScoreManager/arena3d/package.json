@@ -1,0 +1,8 @@
+{
+  "name": "tsm-arena3d",
+  "private": true,
+  "description": "TSM Arena 3D: sorgente del gioco in three.js, compilato in app/src/main/assets/arena/arena3d.js",
+  "license": "GPL-3.0-or-later",
+  "scripts": { "build": "sh build.sh" },
+  "devDependencies": { "esbuild": "0.28.2", "three": "0.187.0" }
+}

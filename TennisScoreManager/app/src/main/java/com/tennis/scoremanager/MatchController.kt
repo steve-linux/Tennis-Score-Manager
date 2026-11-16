@@ -131,7 +131,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK, ARENA }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -735,6 +735,10 @@ class MatchController(
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.BOOK_COURT -> Screen.HOME
             Screen.DESK -> Screen.HOME
+            Screen.ARENA -> {
+                closeArena()
+                Screen.HOME
+            }
             Screen.COURT_STATS -> statsBack
             Screen.LADDERS -> Screen.HOME
             Screen.LADDER -> Screen.LADDERS
@@ -773,7 +777,7 @@ class MatchController(
     @Volatile private var devicesOpen = false
 
     /** I braccialetti servono: partita in modalità braccialetti, allenamento dei colpi o pagina Dispositivi. */
-    private fun bandsWanted() = options.value.mode == PlayMode.BANDS || serveTraining || devicesOpen
+    private fun bandsWanted() = options.value.mode == PlayMode.BANDS || serveTraining || devicesOpen || arenaActive
 
     /** Collega i braccialetti salvati quando servono, altrimenti li stacca (consumano meno e non segnano punti per sbaglio). */
     private fun updateBandLinks() {
@@ -1368,6 +1372,91 @@ class MatchController(
     fun setTrainStudent(id: String?) {
         trainStudent.value = id
         storage.trainStudent = id.orEmpty()
+    }
+
+    // ---------------------------------------------------------------- TSM Arena
+
+    /**
+     * TSM Arena aperta: i braccialetti mandano l'inizio dei colpi (SWING) e i loro tasti al gioco sulla TV. Un Boolean
+     * semplice (e non un flusso) perché [bandsWanted] lo legge anche mentre il controller si sta ancora costruendo.
+     */
+    @Volatile var arenaActive = false
+        private set
+
+    /** Impostazioni di TSM Arena (giocatori, livello, opzioni). */
+    val arena = MutableStateFlow(storage.arena)
+
+    init {
+        scope.launch {
+            ble.swings.collect {
+                if (arenaActive && !relay.isSatellite) tvServer.publishArena(com.tennis.scoremanager.arena.Arena.swing(it.side.ordinal + 1, it.swing))
+            }
+        }
+        scope.launch {
+            ble.strokes.collect {
+                if (arenaActive && !relay.isSatellite) tvServer.publishArena(com.tennis.scoremanager.arena.Arena.stroke(it.side.ordinal + 1, it.stroke))
+            }
+        }
+        // Braccialetti che si collegano o si staccano: la TV mostra chi c'è.
+        scope.launch { ble.bands.collect { if (arenaActive) publishArena() } }
+    }
+
+    fun openArena() {
+        refreshPlayers()
+        arenaActive = true
+        updateBandLinks()
+        for (side in Side.entries) ble.setArena(side, true)
+        // Il gioco usa il server del tabellone anche con il tabellone spento.
+        tvServer.start()
+        publishArena()
+        go(Screen.ARENA)
+    }
+
+    /** Uscita da TSM Arena: braccialetti di nuovo a basso consumo, server spento se il tabellone non serve. */
+    fun closeArena() {
+        if (!arenaActive) return
+        arenaActive = false
+        for (side in Side.entries) ble.setArena(side, false)
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.closed(), keep = true)
+        scope.launch {
+            delay(1_500)  // il tempo di mandare "A|0" ai braccialetti e "chiusa" alla TV
+            if (arenaActive) return@launch
+            updateBandLinks()
+            if (!tv.value.enabled && relay.ui.value.role != RelayRole.MAIN) tvServer.stop()
+        }
+    }
+
+    fun updateArena(transform: (com.tennis.scoremanager.arena.ArenaSettings) -> com.tennis.scoremanager.arena.ArenaSettings) {
+        val v = transform(arena.value)
+        arena.value = v
+        storage.arena = v
+        publishArena()
+    }
+
+    /** Indirizzo del gioco da aprire sulla TV (null = nessuna rete locale). */
+    fun arenaUrl(address: String? = tvServer.addresses.value.firstOrNull()): String? = tvServer.url(address)?.let { it + "arena" }
+
+    /** Nome sulla TV del giocatore di un lato. */
+    fun arenaName(side: Side): String {
+        val a = arena.value
+        val s = strings
+        return if (side == Side.P1) {
+            (playerById(a.p1) ?: me())?.name?.takeIf { it.isNotBlank() } ?: storage.myName.ifBlank { s.player1 }
+        } else {
+            playerById(a.p2)?.name?.takeIf { it.isNotBlank() } ?: s.player2
+        }
+    }
+
+    private fun publishArena() {
+        if (!arenaActive) return
+        val bands = ble.bands.value
+        fun ready(side: Side) = bands[side]?.state == LinkState.READY
+        tvServer.publishArena(
+            com.tennis.scoremanager.arena.Arena.config(
+                arena.value, options.value.lang.code, arenaName(Side.P1), arenaName(Side.P2), ready(Side.P1), ready(Side.P2),
+            ),
+            keep = true,
+        )
     }
 
     fun openStudents() {
@@ -2863,6 +2952,13 @@ class MatchController(
     }
 
     private fun onBandEvent(e: BandEvent) {
+        // TSM Arena: i tasti vanno al gioco sulla TV (KEY1 avvia, KEY2 pausa), mai alla partita.
+        if (arenaActive) {
+            if (e.type == BandProtocol.EVT_POINT || e.type == BandProtocol.EVT_UNDO) {
+                tvServer.publishArena(com.tennis.scoremanager.arena.Arena.key(e.side.ordinal + 1, e.type))
+            }
+            return
+        }
         if (serveTraining) return
         when (e.type) {
             BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {

@@ -552,6 +552,24 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 **Da un browser** (portatile, TV box): inquadra il QR o scrivi l'indirizzo, poi tocca **SCHERMO INTERO** (compare muovendo il mouse o toccando lo schermo). Imposta lo spegnimento dello schermo su *mai*: in una pagina http il browser non può tenerlo acceso da solo. Dopo un'interruzione la pagina si ricollega da sola; troppi tabelloni aperti non bloccano più quello nuovo (si chiude il più vecchio).
 
 
+### 8.4 TSM Arena: tennis sulla TV coi braccialetti
+
+Un gioco di tennis sulla TV, come quelli delle console, in cui **il braccialetto è la racchetta**: utile a casa, tra una lezione e l'altra, per allenare il tempo sulla palla e la scelta tra dritto e rovescio. Il giocatore sullo schermo corre da solo: si pensa solo a **quando** colpire. In anticipo la palla va incrociata, in ritardo lungolinea; più il polso è veloce, più il colpo è forte.
+
+Serve il **firmware 2.5** sui braccialetti (5): quando il gioco è aperto il braccialetto manda l'inizio di ogni colpo in pochi centesimi di secondo e chiede una connessione Bluetooth veloce (consuma di più solo mentre si gioca).
+
+1. **Allenati** (o **Allievi**, per l'allenatore) › **TSM Arena**. Lo schermo del telefono resta acceso finché la pagina è aperta.
+2. **Sulla TV**: apri l'indirizzo mostrato (es. `192.168.43.1:8080/arena`) nel browser della TV, di una TV box o di un portatile collegato, sulla stessa rete o sull'hotspot del telefono; oppure inquadra il QR. Non serve internet. Premi **OK** una volta sulla pagina per attivare l'audio.
+3. **Giocatori**: *Contro il telefono* (Giocatore 1 contro la CPU, coi tre livelli) oppure *Due giocatori*, un braccialetto ciascuno. Tocca il nome per scegliere chi gioca (tu o uno degli allievi). Sotto c'è lo stato di ogni braccialetto.
+4. **Partita**: game per vincere (1, 3 o 5), **Conta solo il colpo giusto** (con la calibrazione dei colpi, 6.4, un dritto al posto del rovescio è punto perso), **Voce dell'arbitro** sulla TV, **Ritardo della TV**: se colpisci sempre in ritardo anche quando ti sembra giusto, alzalo (basso per monitor e TV in modalità gioco).
+5. Fai uno **swing** (o premi il **tasto grande** del braccialetto) per iniziare. Per servire basta uno swing. Il **tasto piccolo** mette in pausa. A fine partita la TV mostra colpi, perfetti, in anticipo, in ritardo, colpi sbagliati, velocità massima del polso e scambio più lungo; uno swing fa partire la rivincita.
+6. Per uscire: **Indietro**. Il braccialetto torna a basso consumo e la TV mostra che il gioco è chiuso.
+
+- Tieni il braccialetto ben stretto e lascia **spazio intorno**: si gioca con la racchetta in mano (meglio senza palla) o anche a mano vuota.
+- **Visuale**: da soli si gioca **in prima persona** (racchetta e braccialetto in primo piano, la palla ti viene incontro); in due la visuale è da dietro, come in TV. Il tasto **V** della tastiera cambia visuale. Un **anello** sul punto d'impatto si stringe mentre la palla arriva e diventa verde quando è il momento di colpire; dopo ogni colpo compare la velocità della palla.
+- **Grafica** (sotto *Partita*): **3D realistica** (giocatori con corpo vero, ombre, luci dello stadio, pubblico), **3D semplice** (low-poly, più leggera) o **2D**. Se la TV va a scatti o non ha la grafica 3D (WebGL), il gioco passa da solo a quella più leggera. Per la 3D conviene un PC, una TV box o una chiavetta recente; le TV economiche spesso reggono solo la 2D. Il modello del giocatore è "3D Male Base Mesh" (CC0); le mosse da tennis le calcola il gioco.
+- Durante il gioco i tasti del braccialetto non segnano punti nelle partite.
+
 ## 9. Regole applicate (ITF) e scelte concordate
 
 - **Game**: 0-15-30-40, parità, vantaggio, gioco. **No-Ad**: sul 40-40 punto decisivo ("parità, punto decisivo").

@@ -552,6 +552,24 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 **Num navegador** (computador portátil, TV box): leia o QR ou digite o endereço, depois toque em **TELA CHEIA** (aparece ao mover o mouse ou tocar na tela). Configure o tempo limite da tela para *nunca*: numa página http o navegador não consegue mantê-la acesa sozinho. Depois de uma queda a página reconecta sozinha; placares demais abertos não bloqueiam mais um novo (o mais antigo é fechado).
 
 
+### 8.4 TSM Arena: tênis na TV com as pulseiras
+
+Um jogo de tênis na TV, como os dos consoles, em que **a pulseira é a raquete**: útil em casa entre uma aula e outra para treinar o tempo de bola e a escolha entre forehand e backhand. O jogador na tela corre sozinho: você só pensa em **quando** bater. Adiantado a bola vai cruzada, atrasado vai na paralela; quanto mais rápido o pulso, mais forte o golpe.
+
+As pulseiras precisam do **firmware 2.5** (5): com o jogo aberto, a pulseira manda o início de cada golpe em poucos centésimos de segundo e pede uma conexão Bluetooth rápida (gasta mais só enquanto se joga).
+
+1. **Treinar** (ou **Alunos**, para o treinador) › **TSM Arena**. A tela do celular fica acesa enquanto a página está aberta.
+2. **Na TV**: abra o endereço mostrado (ex. `192.168.43.1:8080/arena`) no navegador da TV, de um TV box ou de um notebook conectado, na mesma rede ou no ponto de acesso do celular; ou leia o QR. Não precisa de internet. Aperte **OK** uma vez na página para ligar o som.
+3. **Jogadores**: *Contra o celular* (Jogador 1 contra a CPU, três níveis) ou *Dois jogadores*, uma pulseira cada. Toque no nome para escolher quem joga (você ou um aluno). Embaixo aparece o estado de cada pulseira.
+4. **Partida**: games para vencer (1, 3 ou 5), **Só conta o golpe certo** (com a calibração de golpes, 6.4, um forehand no lugar de um backhand perde o ponto), **Voz do árbitro** na TV, **Atraso da TV**: se você sempre bate atrasado mesmo quando parece certo, aumente (baixo para monitores e TVs no modo de jogo).
+5. Faça um **swing** (ou aperte a **tecla grande** da pulseira) para começar. Um swing basta para sacar. A **tecla pequena** pausa. No fim a TV mostra golpes, perfeitos, adiantados, atrasados, golpes errados, velocidade máxima do pulso e troca mais longa; um swing começa a revanche.
+6. Para sair: **Voltar**. A pulseira volta ao baixo consumo e a TV mostra que o jogo foi fechado.
+
+- Use a pulseira bem presa e deixe **espaço à sua volta**: joga-se com a raquete na mão (melhor sem bola) ou até de mão vazia.
+- **Visão**: sozinho você joga **em primeira pessoa** (raquete e pulseira em primeiro plano, a bola vem na sua direção); a dois a visão é de trás, como na TV. A tecla **V** de um teclado muda a visão. Um **anel** no ponto de impacto se fecha enquanto a bola chega e fica verde na hora de bater; depois de cada golpe aparece a velocidade da bola.
+- **Gráficos** (em *Partida*): **3D realista** (jogadores com corpo de verdade, sombras, luzes do estádio, público), **3D simples** (low-poly, mais leve) ou **2D**. Se a TV travar ou não tiver 3D (WebGL), o jogo passa sozinho para o mais leve. Para o 3D, o ideal é um PC, um TV box ou um stick recente; TVs baratas muitas vezes só aguentam o 2D. O modelo do jogador é "3D Male Base Mesh" (CC0); os movimentos de tênis são calculados pelo jogo.
+- Durante o jogo as teclas da pulseira não marcam pontos nas partidas.
+
 ## 9. Regras aplicadas (ITF) e escolhas combinadas
 
 - **Jogo**: 0-15-30-40, iguais, vantagem, jogo. **Sem vantagem** (No-Ad): no 40-40, ponto decisivo ("iguais, ponto decisivo").

@@ -47,6 +47,8 @@ import kotlinx.coroutines.launch
  *   /        la pagina del tabellone (assets/scoreboard.html)
  *   /events  aggiornamenti in diretta (Server-Sent Events): un JSON a ogni punto e ogni 5 secondi
  *   /state   l'ultimo JSON (serve anche alla ricerca automatica del telefono-tabellone)
+ *   /arena         il gioco TSM Arena (assets/arena.html), coi braccialetti come racchette
+ *   /arena/events  colpi e impostazioni del gioco (Server-Sent Events), separati da quelli del tabellone
  * Solo lettura: dal tabellone non si può cambiare niente, e risponde solo alla rete locale (non ai dati mobili).
  * Si annuncia sulla rete come "_tsm._tcp" e tiene agganciata la rete Wi-Fi anche se non ha internet
  * (hotspot dell'altro telefono).
@@ -74,6 +76,8 @@ class TvServer(context: Context) {
         private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
         private val REPLAY_PATH = Regex("^/replay/([0-9a-z]+)/(\\d+)\\.mp4$")
+        /** File del gioco TSM Arena (grafica 3D e modello del giocatore), da assets/arena/. */
+        private val ARENA_FILE = Regex("^/arena/([a-z0-9_-]+\\.(js|glb))$")
         private val RANGE = Regex("bytes=(\\d*)-(\\d*)")
 
         /**
@@ -130,6 +134,9 @@ class TvServer(context: Context) {
     private val _clients = MutableStateFlow(0)
     /** Tabelloni collegati in questo momento. */
     val clients: StateFlow<Int> = _clients
+    private val _arenaClients = MutableStateFlow(0)
+    /** Schermi collegati al gioco TSM Arena in questo momento. */
+    val arenaClients: StateFlow<Int> = _arenaClients
     private val _addresses = MutableStateFlow<List<String>>(emptyList())
     val addresses: StateFlow<List<String>> = _addresses
 
@@ -149,6 +156,13 @@ class TvServer(context: Context) {
     @Volatile private var server: ServerSocket? = null
     /** Modifiche ed elenco dei collegati sotto synchronized(streams), così il numero mostrato resta giusto. */
     private val streams = CopyOnWriteArrayList<Stream>()
+    /** Schermi del gioco TSM Arena (/arena/events), sotto synchronized(arenaStreams). */
+    private val arenaStreams = CopyOnWriteArrayList<Stream>()
+    /** Impostazioni del gioco: le riceve per prime ogni schermo che si collega. */
+    @Volatile private var arenaLatest: String = "{}"
+    private val arenaPage: ByteArray by lazy { app.assets.open("arena.html").use { it.readBytes() } }
+    /** File di assets/arena/ già letti (grafica 3D ~0,7 MB): si leggono una volta sola. */
+    private val arenaFiles = java.util.concurrent.ConcurrentHashMap<String, ByteArray>()
     private var addressJob: Job? = null
     private var watchdogJob: Job? = null
     private var nsdListener: NsdManager.RegistrationListener? = null
@@ -191,7 +205,7 @@ class TvServer(context: Context) {
             while (isActive) {
                 delay(5_000)
                 val now = SystemClock.elapsedRealtime()
-                streams.filter { it.writingSince != 0L && now - it.writingSince > WRITE_TIMEOUT_MS }.forEach {
+                (streams + arenaStreams).filter { it.writingSince != 0L && now - it.writingSince > WRITE_TIMEOUT_MS }.forEach {
                     Log.d(TAG, "tabellone fermo da ${WRITE_TIMEOUT_MS / 1000}\": chiuso")
                     it.close()
                 }
@@ -210,6 +224,11 @@ class TvServer(context: Context) {
             streams.clear()
             _clients.value = 0
         }
+        synchronized(arenaStreams) {
+            arenaStreams.forEach { it.close() }
+            arenaStreams.clear()
+            _arenaClients.value = 0
+        }
         _running.value = false
         _port.value = null
         addressJob?.cancel()
@@ -225,6 +244,18 @@ class TvServer(context: Context) {
         latest = json
         for (st in streams) {
             if (st.queue.size > 16) st.queue.clear()  // tabellone bloccato: meglio perdere i vecchi che riempire la memoria
+            st.queue.offer(json)
+        }
+    }
+
+    /**
+     * TSM Arena: impostazioni del gioco ([keep] = le ricevono anche gli schermi che si collegano dopo) o un colpo,
+     * che va solo a chi è collegato adesso. Niente coda lunga: un colpo vecchio non serve più a nessuno.
+     */
+    fun publishArena(json: String, keep: Boolean = false) {
+        if (keep) arenaLatest = json
+        for (st in arenaStreams) {
+            if (st.queue.size > 8) st.queue.clear()
             st.queue.offer(json)
         }
     }
@@ -279,7 +310,18 @@ class TvServer(context: Context) {
                 "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
-                else -> if (path.startsWith("/replay/")) {
+                "/arena", "/arena/" -> respond(out, "200 OK", "text/html; charset=utf-8", arenaPage, head)
+                "/arena/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out, arena = true)
+                else -> if (ARENA_FILE.matches(path)) {
+                    val m = ARENA_FILE.matchEntire(path)!!
+                    val bytes = arenaFiles.getOrPut(m.groupValues[1]) {
+                        runCatching { app.assets.open("arena/" + m.groupValues[1]).use { it.readBytes() } }.getOrDefault(ByteArray(0))
+                    }
+                    if (bytes.isEmpty()) respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+                    else respond(
+                        out, "200 OK", if (m.groupValues[2] == "js") "text/javascript; charset=utf-8" else "model/gltf-binary", bytes, head,
+                    )
+                } else if (path.startsWith("/replay/")) {
                     serveReplay(out, path, range, head)
                 } else if (path.startsWith("/avatar/")) {
                     val img = avatars[path.removePrefix("/avatar/").removeSuffix(".webp")]?.takeIf { it.isNotEmpty() }
@@ -369,12 +411,14 @@ class TvServer(context: Context) {
      * TCP_USER_TIMEOUT fanno fallire presto la scrittura, il controllo chiude chi resta fermo, e a posti esauriti
      * si libera il collegamento più vecchio invece di rifiutare il nuovo.
      */
-    private fun stream(s: Socket, out: OutputStream) {
+    private fun stream(s: Socket, out: OutputStream, arena: Boolean = false) {
         val st = Stream(s)
-        synchronized(streams) {
-            while (streams.size >= MAX_STREAMS) streams.removeAt(0).close()
-            streams += st
-            _clients.value = streams.size
+        val list = if (arena) arenaStreams else streams
+        val count = if (arena) _arenaClients else _clients
+        synchronized(list) {
+            while (list.size >= MAX_STREAMS) list.removeAt(0).close()
+            list += st
+            count.value = list.size
         }
         try {
             s.soTimeout = 0
@@ -390,7 +434,7 @@ class TvServer(context: Context) {
                     "Access-Control-Allow-Origin: *\r\n" +
                     "Connection: keep-alive\r\n\r\n" +
                     "retry: 2000\n\n" +
-                    "data: $latest\n\n",
+                    "data: ${if (arena) arenaLatest else latest}\n\n",
             )
             while (server != null) {
                 val msg = st.queue.poll(15, TimeUnit.SECONDS)
@@ -400,9 +444,9 @@ class TvServer(context: Context) {
         } catch (e: IOException) {
             // tabellone chiuso o fuori portata: se ne va da solo
         } finally {
-            synchronized(streams) {
-                streams -= st
-                _clients.value = streams.size
+            synchronized(list) {
+                list -= st
+                count.value = list.size
             }
         }
     }
