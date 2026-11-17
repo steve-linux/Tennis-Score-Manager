@@ -4,13 +4,16 @@
 package com.tennis.scoremanager.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -30,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ServeSession
@@ -67,7 +71,9 @@ fun StrokeSessionsScreen(c: MatchController) {
     val list = all.filter { it.stroke == stroke && it.student == trainee }
     val who = c.studentById(trainee)?.name
     val lang = c.options.collectAsState().value.lang
-    val disk by produceState(emptyMap<String, Disk>(), list) {
+    // Si ricalcola anche dopo "Solo i video" (le sessioni restano uguali, lo spazio no).
+    val diskVersion by c.serveDiskVersion.collectAsState()
+    val disk by produceState(emptyMap<String, Disk>(), list, diskVersion) {
         value = withContext(Dispatchers.IO) {
             list.associate { sess ->
                 val dir = c.storage.serveClipsDir(sess)
@@ -117,6 +123,31 @@ fun StrokeSessionsScreen(c: MatchController) {
             Text(s.strokeSpace(mb(disk.values.sumOf { it.bytes }), list.size), color = TsmColors.TextMain)
             StrokeTrend(list)
             Text(s.strokeSelectHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        // I migliori colpi (con la stella), dal più recente: si rivedono al rallentatore, con lo scheletro se analizzati.
+        val best = list.flatMap { sess -> sess.serves.mapIndexedNotNull { i, a -> if (a.starred && a.clip != null) Triple(sess, i, a) else null } }.sortedByDescending { it.third.at }
+        if (best.isNotEmpty()) SectionCard(s.strokeBest, Icons.Filled.Star) {
+            Text(s.strokeBestHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val when_ = SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "dMMMyyyyHHmm"), lang.locale)
+            for ((sess, i, a) in best) {
+                Text("★ ${name} ${i + 1} · ${when_.format(Date(a.at))} · ${if (a.inPlay) s.serveIn else s.serveOut}",
+                    color = TsmColors.TextMain, fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        val dir = File(c.storage.serveClipsDir(sess), a.clip!!)
+                        val files = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+                        if (files.isEmpty()) return@clickable
+                        val intent = android.content.Intent(context, com.tennis.scoremanager.video.ReplayActivity::class.java)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray())
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_STAR_SESSION, sess.id)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_STAR_AT, a.at)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_STAR_ON, true)
+                        // Analizzato: col corpo disegnato sopra.
+                        if (File(dir, ServeClipAnalysis.RESULT).exists()) intent.putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_POSE_DIR, dir.absolutePath)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_POSE_AT, a.at)
+                        context.startActivity(intent)
+                    }.padding(vertical = 6.dp))
+            }
         }
         // Per mese, dalla più recente.
         val month = SimpleDateFormat("LLLL yyyy", lang.locale)

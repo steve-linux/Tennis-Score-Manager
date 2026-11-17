@@ -11141,12 +11141,12 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 3. **Seite** (Einstand/Vorteil), **erster oder zweiter** und bei Bedarf das **Ziel** (durch die Mitte, auf den Körper, nach außen) wählen: Sie gelten für die folgenden Aufschläge.
 4. Aufschlagen und **KEY1 = drin** oder **KEY2 = aus** drücken; **KEY1 gedrückt halten** macht den letzten rückgängig. Die Stimme sagt den Stand (*Drin. 8 von 12*), das Armband zeigt ihn. Hat das Armband den Aufschlag erkannt, zählt dieser Moment, sonst einige Sekunden vor dem Tastendruck. Deshalb **schaltet die App beim Start die Schlagerkennung** am Armband von selbst ein (Firmware 2.4; keine Kalibrierung nötig, nur der Zeitpunkt zählt) und stellt sie am Ende wieder zurück; *Schlagerkennung an* auf dem Bildschirm bestätigt es. Mit älterer Firmware wird der Zeitpunkt aus der Taste geschätzt.
    - **Der Bildschirm**: oben eine einzige Zeile (drin von Versuchen, der letzte Schlag und drei Symbole: Armband, Schlagerkennung, Speicher mit Zahl der Clips und Platz); die Erklärungen erscheinen ein paar Sekunden am Anfang und beim Antippen von **i**, damit der Bildausschnitt frei bleibt. Die Kamera hält die letzten zwei Minuten im **Speicher** und speichert **nur die markierten Schläge** (einige Sekunden davor und danach): keine langen Videos zum Schneiden.
-   - **Anhalten** schaltet Kamera und Speicher aus (Akku, Wärme), während du Bälle aufsammelst: die Tasten des Armbands zählen nichts, KEY1 oder **Weiter** setzen fort. Nach **5 Minuten ohne Schlag** pausiert das Training von selbst (die Stimme sagt es) und läuft dann auch beim ersten erkannten Schlag weiter.
-5. Zu jedem Aufschlag wird ein **Clip** von einigen Sekunden gespeichert. **Fertig** zeigt die Übersicht: drin von Versuchen, nach Seite, erster und zweiter, Ziel und, wenn das Armband die Aufschläge erkannt hat, die mittlere Drehung des Handgelenks bei guten Aufschlägen und bei Fehlern. **Alle ansehen / Nur die guten / Nur die Fehler** öffnet die Clips in der Zeitlupe (Pause, Zeitlupe, Bild für Bild).
+   - **Anhalten** schaltet Kamera und Speicher aus (Akku, Wärme), während du Bälle aufsammelst: die Tasten des Armbands zählen nichts, KEY1 oder **Weiter** setzen fort. Nach **5 Minuten ohne Schlag** pausiert das Training von selbst (die Stimme sagt es) und läuft dann auch beim ersten erkannten Schlag weiter. **Letzten ansehen** pausiert und öffnet sofort den letzten Schlag in der Zeitlupe (Zeitlupe, Bild für Bild, Stern): danach **Weiter** oder KEY1.
+5. Zu jedem Aufschlag wird ein **Clip** von einigen Sekunden gespeichert. **Fertig** zeigt die Übersicht: drin von Versuchen, nach Seite, erster und zweiter, Ziel und, wenn das Armband die Aufschläge erkannt hat, die mittlere Drehung des Handgelenks bei guten Aufschlägen und bei Fehlern. **Alle ansehen / Nur die guten / Nur die Fehler** öffnet die Clips in der Zeitlupe (Pause, Zeitlupe, Bild für Bild). Der **Stern** (in der Zeitlupe oder in der Zeile des Schlags in der Analyse) nimmt den Schlag in die **Besten Schläge** auf: *Alle Einheiten* listet sie zum Ansehen in Zeitlupe (mit Skelett, wenn analysiert), und ihr Video bleibt auch bei *Nur Videos*.
 6. Unter **Starten** stehen die letzten 3 Einheiten **des gewählten Schlags** (die Schlag-Tasten zeigen die Zahl der Einheiten, z. B. *Rückhand · 4*) und die Linie der **Schläge im Feld, Einheit für Einheit**. **Alle Einheiten** öffnet die des gewählten Schlags, nach Monaten, mit dem Platz der Videos und ob sie schon analysiert sind. Eine Einheit antippen für Übersicht und Clips; **gedrückt halten**, um sie auszuwählen (das Symbol oben wählt alle), dann **Löschen** (Einheit und Videos) oder **Nur Videos** (schafft Platz: Zählungen, Messwerte der Analyse und Bilder der Schlüsselmomente bleiben). **Fortschritt** zeigt den Verlauf jedes Schlags.
    - **Wo die Videos liegen**: in **Dokumente/Tennis Score Manager/Schlagtraining**, mit den Ordnern **Aufschlag**, **Vorhand**, **Rückhand** und **Volley** (beim Start angelegt), darin ein Ordner pro Einheit (Datum und Uhrzeit) und einer pro Schlag, mit `video.mp4` (lässt sich in jeder App öffnen und teilen), der Analyse und den drei Bildern. Jeder Dateimanager zeigt sie, und sie bleiben auch beim Deinstallieren der App (als Archiv: eine neu installierte App übernimmt die Einheiten nicht). Unter Android 8-10 liegt dieselbe Struktur im App-Ordner. Clips von Einheiten vor 2.5 werden beim ersten Start von selbst dorthin verschoben.
 7. **Bewegungsanalyse** (aus der gespeicherten Einheit): **Aufschläge analysieren** erkennt die Körperhaltung in den Clips (Modell MoveNet: Beim ersten Mal bietet die App an, es herunterzuladen, 7 MB, von der Projektseite auf GitHub; danach bleibt alles auf dem Telefon, ohne Internet, ein paar Sekunden pro Aufschlag; löschen lässt es sich unten auf der Seite. Nicht verfügbar auf Geräten mit x86-Prozessor) und misst drei Momente: **Ausholen** (Wurfarm oben), stärkste **Kniebeuge** und **Treffpunkt**. Für jeden Aufschlag: die drei Bilder mit eingezeichnetem Skelett und die Messwerte (stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts im Verhältnis zur Körpergröße, Wurfarm, Schultern beim Ausholen, Zeit vom Ausholen zum Treffpunkt); oben **gute und Fehler** im Vergleich. Es sind Schätzungen aus einer Seitenansicht: Sie dienen vor allem dem Vergleich deiner Aufschläge untereinander. Der Körper wird gut erkannt, wenn die ganze Person im Bild ist, von der Seite und bei gutem Licht; Schläger und Ball werden nicht gemessen.
-   Einen Aufschlag antippen, um ihn zu öffnen: **Video mit Skelett ansehen** öffnet den Clip in der Zeitlupe mit dem darübergezeichneten Körper, verlangsamt, mit Tasten zum Springen zu **Ausholen**, **Knie** und **Treffpunkt** und einer zum Aus- und Einblenden des Skeletts; zwei Finger vergrößern Video und Skelett zusammen (bis 6×), doppelt tippen setzt zurück. **Mit einem anderen Schlag vergleichen** stellt denselben Schlag von einem anderen Tag oder aus derselben Einheit daneben (nur analysierte mit Video, von derselben Person): die zwei Videos mit Skelett, übereinander (nebeneinander mit dem Telefon quer), am Treffpunkt ausgerichtet und in Schleife über denselben Abschnitt, mit Tempo, Bild für Bild und den Schlüsselmomenten; **Überlagern** zeichnet im ersten auch das Skelett des zweiten (blau), Hüften an derselben Stelle und Oberkörper gleich lang, so sieht man, wo sich die Bewegung ändert. Auch die drei Bilder lassen sich antippen, um sie bildschirmfüllend zu sehen und zu zoomen. Bei **mehreren Personen** im Bild folgt die App dem Aufschläger (wer den Arm am höchsten hebt) und deckt die anderen ab; das steht unter dem Aufschlag: in den Bildern prüfen. **Erneut analysieren** beginnt von vorn (die Clips bleiben), nützlich nach einem App-Update.
+   Einen Aufschlag antippen, um ihn zu öffnen: **Video mit Skelett ansehen** öffnet den Clip in der Zeitlupe mit dem darübergezeichneten Körper, verlangsamt, mit Tasten zum Springen zu **Ausholen**, **Knie** und **Treffpunkt** und einer zum Aus- und Einblenden des Skeletts; zwei Finger vergrößern Video und Skelett zusammen (bis 6×), doppelt tippen setzt zurück. **Mit einem anderen Schlag vergleichen** stellt denselben Schlag von einem anderen Tag oder aus derselben Einheit daneben (nur analysierte mit Video, von derselben Person): die zwei Videos mit Skelett, übereinander (nebeneinander mit dem Telefon quer), am Treffpunkt ausgerichtet und in Schleife über denselben Abschnitt, mit Tempo, Bild für Bild und den Schlüsselmomenten; **Überlagern** zeichnet im ersten auch das Skelett des zweiten (blau), Hüften an derselben Stelle und Oberkörper gleich lang, so sieht man, wo sich die Bewegung ändert. Auch die drei Bilder lassen sich antippen, um sie bildschirmfüllend zu sehen und zu zoomen. Bei **mehreren Personen** im Bild folgt die App dem Aufschläger (wer den Arm am höchsten hebt) und deckt die anderen ab; das steht unter dem Aufschlag: in den Bildern prüfen. **Erneut analysieren** beginnt von vorn (die Clips bleiben), nützlich nach einem App-Update. Bei der Wahl des Vergleichsschlags stehen die besten Schläge oben, mit ★: dein eigenes Vorbild.
 
 **Vorhand, Rückhand und Volley** funktionieren genauso (KEY1 drin, KEY2 aus, ein Clip pro Schlag, Übersicht und Analyse), mit diesen Unterschieden:
 - **Wo das Telefon hinkommt**: neben dem Spieler, rechtwinklig zur Schlagrichtung, 4-5 m entfernt und außerhalb des Doppelkorridors, auf Höhe des Treffpunkts; Objektiv etwa 1 m hoch; der ganze Schwung im Bild (das Handgelenk bewegt sich etwa 2 m vor und zurück). Beim Volley: neben dem Netzspieler, 3-4 m entfernt, auf seiner Höhe. Immer auf derselben Seite für die ganze Einheit und nie in der Flugbahn des Balls.
@@ -11749,12 +11749,12 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 3. Choose the **side** (deuce/ad), **first or second** and, if you like, the **target** (down the T, body, wide): they apply to the following serves.
 4. Serve and press **KEY1 = in** or **KEY2 = out**; **KEY1 held down** undoes the last one. The voice says the count (*In. 8 of 12*) and the wristband shows it. If the wristband recognised the serve, that moment is used; otherwise a few seconds before the button press. That is why at start-up the app **turns stroke recognition on** on the wristband by itself (firmware 2.4; no calibration needed, only the moment counts) and puts it back as it was at the end; *Stroke recognition on* on the screen confirms it. With older firmware the moment is guessed from the key.
    - **The screen**: a single row at the top (in out of attempts, the last shot and three icons: wristband, stroke recognition, memory with the number of clips and the space); the explanations show for a few seconds at the start and when you tap **i**, so the frame stays clear. The camera keeps the last two minutes in **memory** and saves **only the marked shots** (a few seconds before and after): no long videos to trim.
-   - **Pause** turns camera and memory off (battery, heat) while you pick up balls: the wristband keys mark nothing, KEY1 or **Resume** start again. After **5 minutes without shots** it pauses by itself (the voice says so) and then also restarts at the first recognised shot.
-5. For every serve a **clip** of a few seconds around the shot is saved. **Done** shows the summary: ins out of attempts, by side, first and second, target and, if the wristband recognised the serves, the average wrist rotation on serves in and out. **Watch all / only the ins / only the outs** opens the clips in the replay (pause, slow motion, frame by frame).
+   - **Pause** turns camera and memory off (battery, heat) while you pick up balls: the wristband keys mark nothing, KEY1 or **Resume** start again. After **5 minutes without shots** it pauses by itself (the voice says so) and then also restarts at the first recognised shot. **Replay last** pauses and opens the last shot right away in the replay (slow motion, frame by frame, star): when you're done, **Resume** or KEY1.
+5. For every serve a **clip** of a few seconds around the shot is saved. **Done** shows the summary: ins out of attempts, by side, first and second, target and, if the wristband recognised the serves, the average wrist rotation on serves in and out. **Watch all / only the ins / only the outs** opens the clips in the replay (pause, slow motion, frame by frame). The **star** (in the replay or on the shot's row in the analysis) adds the shot to **Best shots**: *All sessions* lists them, to watch in slow motion (with the skeleton if analysed), and their video stays even with *Videos only*.
 6. Under **Start** you find the last 3 sessions **of the chosen stroke** (the stroke buttons show how many sessions each has, e.g. *Backhand · 4*) and the line of **shots in, session after session**. **All sessions** opens those of the chosen stroke, by month, with the space their videos take and whether they have been analysed. Tap a session for its summary and clips; **press and hold** to select it (the icon at the top selects them all), then **Delete** (session and videos) or **Videos only** (frees space: counts, analysis measurements and key-moment pictures stay). **Progress** shows the trend of each stroke.
    - **Where the videos are**: in **Documents/Tennis Score Manager/Stroke practice**, with the folders **Serve**, **Forehand**, **Backhand** and **Volley** (created at start-up) and inside them a folder per session (date and time) and one per shot, with `video.mp4` (opens and shares from any app), the analysis and the three pictures. Any file manager shows them and they stay even if you uninstall the app (keep them as an archive: a reinstalled app does not pick its sessions up again). On Android 8-10 the same structure is in the app folder. Clips of sessions from before 2.5 move there by themselves at the first start.
 7. **Movement analysis** (from the saved session): **Analyse the serves** finds the body position in the clips (MoveNet model: the first time the app asks to download it, 7 MB, from the project's GitHub page; then everything stays on the phone, no internet, a few seconds per serve; it can be deleted at the bottom of the screen. Not available on devices with an x86 processor) and measures three moments: **loading** (tossing arm up), deepest **knee** bend and **contact**. For each serve: the three images with the skeleton drawn and the measurements (deepest knee bend, elbow at contact, contact height relative to body height, tossing arm, shoulders at loading, time from loading to contact); at the top, **ins and outs** compared. They are estimates from a side view: they are most useful to compare your serves with each other. The body is recognised well with the whole person in the frame, from the side and in good light; racket and ball are not measured.
-   Tap a serve to open it: **Watch the video with the skeleton** opens the clip in the replay with the body drawn on top, in slow motion, with buttons to jump to **Loading**, **Knees** and **Contact** and one to hide or show the skeleton; two fingers zoom video and skeleton together (up to 6×), double tap to go back. **Compare with another shot** puts the same stroke from another day or the same session next to it (only analysed ones with their video, of the same person): the two videos with the skeleton, one above the other (side by side with the phone in landscape), lined up on contact and looping over the same stretch, with speed, frame by frame and the key moments; **Overlay** also draws the second skeleton (in blue) on the first, with the hips in the same place and the torso the same length, so you see where the movement changes. The three images can also be tapped to see them full screen and zoom in. With **several people** in the frame the app follows the server (whoever raises the arm highest) and covers the others; it says so under the serve: check in the images. **Analyse again** starts over (the clips stay), useful after an app update.
+   Tap a serve to open it: **Watch the video with the skeleton** opens the clip in the replay with the body drawn on top, in slow motion, with buttons to jump to **Loading**, **Knees** and **Contact** and one to hide or show the skeleton; two fingers zoom video and skeleton together (up to 6×), double tap to go back. **Compare with another shot** puts the same stroke from another day or the same session next to it (only analysed ones with their video, of the same person): the two videos with the skeleton, one above the other (side by side with the phone in landscape), lined up on contact and looping over the same stretch, with speed, frame by frame and the key moments; **Overlay** also draws the second skeleton (in blue) on the first, with the hips in the same place and the torso the same length, so you see where the movement changes. The three images can also be tapped to see them full screen and zoom in. With **several people** in the frame the app follows the server (whoever raises the arm highest) and covers the others; it says so under the serve: check in the images. **Analyse again** starts over (the clips stay), useful after an app update. When picking the shot to compare, best shots come first, with the ★: your own reference model.
 
 **Forehand, backhand and volley** work the same way (KEY1 in, KEY2 out, a clip for every shot, summary and analysis), with these differences:
 - **Where to put the phone**: beside the hitter, at right angles to the direction of the shots, 4-5 m away and outside the alley, level with the contact point; lens about 1 m high; the whole swing in the frame (the wrist moves about 2 m back and forth). For the volley: beside the net player, 3-4 m away, level with the player. Always on the same side for the whole session, and never in the ball's path.
@@ -12356,12 +12356,12 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 3. Elige el **lado** (derecho/izquierdo), **primero o segundo** y, si quieres, el **objetivo** (a la T, al cuerpo, abierto): valen para los saques siguientes.
 4. Saca y pulsa **KEY1 = dentro** o **KEY2 = fuera**; **KEY1 mantenido** anula el último. La voz dice el recuento (*Dentro. 8 de 12*) y la pulsera lo muestra. Si la pulsera reconoció el saque, se usa ese instante; si no, unos segundos antes de pulsar. Por eso al empezar la app **activa sola el reconocimiento de golpes** en la pulsera (firmware 2.4; no hace falta calibrar, solo cuenta el instante) y al final lo deja como estaba; *Reconocimiento de golpes activado* en pantalla lo confirma. Con un firmware más antiguo el instante se estima por la tecla.
    - **La pantalla**: arriba una sola línea (dentro sobre intentos, el último golpe y tres iconos: pulsera, reconocimiento de golpes, memoria con el número de clips y el espacio); las explicaciones aparecen unos segundos al principio y al tocar **i**, para dejar libre el encuadre. La cámara guarda en **memoria** los dos últimos minutos y graba **solo los golpes marcados** (unos segundos antes y después): nada de vídeos largos que recortar.
-   - **Pausa** apaga cámara y memoria (batería, calor) mientras recoges las bolas: las teclas de la pulsera no marcan nada, KEY1 o **Seguir** vuelven a empezar. Tras **5 minutos sin golpes** se pone en pausa sola (lo dice la voz) y entonces también sigue con el primer golpe reconocido.
-5. De cada saque se guarda un **clip** de unos segundos alrededor del golpe. **Fin** muestra el resumen: dentro sobre intentos, por lado, primero y segundo, objetivo y, si la pulsera reconoció los saques, la rotación media de la muñeca en los saques dentro y en los de fuera. **Ver todos / solo los buenos / solo los fuera** abre los clips en la repetición (pausa, cámara lenta, fotograma a fotograma).
+   - **Pausa** apaga cámara y memoria (batería, calor) mientras recoges las bolas: las teclas de la pulsera no marcan nada, KEY1 o **Seguir** vuelven a empezar. Tras **5 minutos sin golpes** se pone en pausa sola (lo dice la voz) y entonces también sigue con el primer golpe reconocido. **Ver el último** pone en pausa y abre enseguida el último golpe en la moviola (cámara lenta, fotograma a fotograma, estrella): al terminar, **Seguir** o KEY1.
+5. De cada saque se guarda un **clip** de unos segundos alrededor del golpe. **Fin** muestra el resumen: dentro sobre intentos, por lado, primero y segundo, objetivo y, si la pulsera reconoció los saques, la rotación media de la muñeca en los saques dentro y en los de fuera. **Ver todos / solo los buenos / solo los fuera** abre los clips en la repetición (pausa, cámara lenta, fotograma a fotograma). La **estrella** (en la moviola o en la fila del golpe en el análisis) pone el golpe entre los **Mejores golpes**: *Todas las sesiones* los lista, para verlos a cámara lenta (con el esqueleto si están analizados), y su vídeo se queda también con *Solo los vídeos*.
 6. Debajo de **Empezar** están las 3 últimas sesiones **del golpe elegido** (los botones de los golpes muestran cuántas sesiones tiene cada uno, p. ej. *Revés · 4*) y la línea de **golpes dentro, sesión tras sesión**. **Todas las sesiones** abre las del golpe elegido, por mes, con el espacio de los vídeos y si ya están analizadas. Toca una sesión para el resumen y los clips; **mantenla pulsada** para seleccionarla (el icono de arriba las selecciona todas) y luego **Borrar** (sesión y vídeos) o **Solo los vídeos** (libera espacio: quedan los recuentos, las medidas del análisis y las imágenes de los momentos clave). **Progresos** muestra la evolución de cada golpe.
    - **Dónde están los vídeos**: en **Documentos/Tennis Score Manager/Entrenamiento de golpes**, con las carpetas **Saque**, **Derecha**, **Revés** y **Volea** (creadas al arrancar) y dentro una carpeta por sesión (fecha y hora) y una por golpe, con `video.mp4` (se abre y se comparte desde cualquier app), el análisis y las tres imágenes. Se ven con cualquier gestor de archivos y se quedan aunque desinstales la app (guárdalos como archivo: una app reinstalada no recupera sus sesiones). En Android 8-10 la misma estructura está en la carpeta de la app. Los clips de las sesiones anteriores a la 2.5 se mueven allí solos en el primer arranque.
 7. **Análisis del movimiento** (desde la sesión guardada): **Analizar los saques** encuentra la posición del cuerpo en los clips (modelo MoveNet: la primera vez la app ofrece descargarlo, 7 MB, desde la página del proyecto en GitHub; después todo se queda en el teléfono, sin internet, unos segundos por saque; se puede eliminar al final de la pantalla. No está disponible en dispositivos con procesador x86) y mide tres momentos: **armado** (brazo del lanzamiento arriba), **rodillas** más flexionadas e **impacto**. Para cada saque: las tres imágenes con el esqueleto dibujado y las medidas (rodilla más flexionada, codo en el impacto, altura del impacto respecto a la estatura, brazo del lanzamiento, hombros en el armado, tiempo del armado al impacto); arriba, **dentro y fuera** comparados. Son estimaciones a partir de un vídeo de lado: sirven sobre todo para comparar tus saques entre sí. El cuerpo se reconoce bien con toda la persona en el encuadre, de lado y con buena luz; raqueta y pelota no se miden.
-   Toca un saque para abrirlo: **Ver el vídeo con el esqueleto** abre el clip en la repetición con el cuerpo dibujado encima, a cámara lenta, con botones para saltar a **Armado**, **Rodillas** e **Impacto** y otro para quitar o poner el esqueleto; dos dedos amplían vídeo y esqueleto juntos (hasta 6×), doble toque para volver. **Comparar con otro golpe** pone al lado el mismo golpe de otro día o de la misma sesión (solo los analizados y con vídeo, de la misma persona): los dos vídeos con el esqueleto, uno encima del otro (uno al lado del otro con el teléfono en horizontal), alineados en el impacto y en bucle sobre el mismo tramo, con velocidad, fotograma a fotograma y los momentos clave; **Superponer** dibuja en el primero también el esqueleto del segundo (en azul), con las caderas en el mismo punto y el tronco de la misma longitud, para ver dónde cambia el movimiento. Las tres imágenes también se tocan para verlas a pantalla completa y ampliarlas. Con **varias personas** en el encuadre la app sigue a quien saca (quien más levanta el brazo) y tapa a las demás; lo indica debajo del saque: compruébalo en las imágenes. **Repetir el análisis** empieza de nuevo (los clips se quedan), útil tras una actualización de la app.
+   Toca un saque para abrirlo: **Ver el vídeo con el esqueleto** abre el clip en la repetición con el cuerpo dibujado encima, a cámara lenta, con botones para saltar a **Armado**, **Rodillas** e **Impacto** y otro para quitar o poner el esqueleto; dos dedos amplían vídeo y esqueleto juntos (hasta 6×), doble toque para volver. **Comparar con otro golpe** pone al lado el mismo golpe de otro día o de la misma sesión (solo los analizados y con vídeo, de la misma persona): los dos vídeos con el esqueleto, uno encima del otro (uno al lado del otro con el teléfono en horizontal), alineados en el impacto y en bucle sobre el mismo tramo, con velocidad, fotograma a fotograma y los momentos clave; **Superponer** dibuja en el primero también el esqueleto del segundo (en azul), con las caderas en el mismo punto y el tronco de la misma longitud, para ver dónde cambia el movimiento. Las tres imágenes también se tocan para verlas a pantalla completa y ampliarlas. Con **varias personas** en el encuadre la app sigue a quien saca (quien más levanta el brazo) y tapa a las demás; lo indica debajo del saque: compruébalo en las imágenes. **Repetir el análisis** empieza de nuevo (los clips se quedan), útil tras una actualización de la app. Al elegir el golpe para comparar, los mejores golpes salen primero, con la ★: tu propio modelo.
 
 **Derecha, revés y volea** funcionan igual (KEY1 dentro, KEY2 fuera, un clip por golpe, resumen y análisis), con estas diferencias:
 - **Dónde poner el teléfono**: al lado de quien golpea, perpendicular a la dirección de los golpes, a 4-5 m y fuera del pasillo, a la altura del punto de impacto; objetivo a 1 m; todo el swing en el encuadre (la muñeca se mueve unos 2 m adelante y atrás). Para la volea: al lado de quien juega en la red, a 3-4 m, a su altura. Siempre del mismo lado toda la sesión, y nunca en la trayectoria de la pelota.
@@ -12963,12 +12963,12 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 3. Choisissez le **côté** (droit/gauche), **premier ou second** et, si vous voulez, la **cible** (au T, au corps, extérieur) : ils valent pour les services suivants.
 4. Servez et appuyez sur **KEY1 = bon** ou **KEY2 = faute** ; **KEY1 maintenu** annule le dernier. La voix donne le compte (*Bon. 8 sur 12*) et le bracelet l'affiche. Si le bracelet a reconnu le service, c'est cet instant qui compte ; sinon quelques secondes avant l'appui. C'est pourquoi au démarrage l'appli **active d'elle-même la reconnaissance des coups** sur le bracelet (firmware 2.4 ; pas besoin de calibrage, seul l'instant compte) et la remet comme avant à la fin ; *Reconnaissance des coups activée* à l'écran le confirme. Avec un firmware plus ancien, l'instant est estimé d'après la touche.
    - **L'écran** : une seule ligne en haut (bons sur tentatives, le dernier coup et trois icônes : bracelet, reconnaissance des coups, mémoire avec le nombre de clips et la place) ; les explications s'affichent quelques secondes au début et en touchant **i**, pour laisser le cadre libre. La caméra garde en **mémoire** les deux dernières minutes et n'enregistre **que les coups marqués** (quelques secondes avant et après) : pas de longues vidéos à couper.
-   - **Mettre en pause** éteint caméra et mémoire (batterie, chaleur) pendant que vous ramassez les balles : les touches du bracelet ne marquent rien, KEY1 ou **Reprendre** relancent. Après **5 minutes sans coup**, la pause se met toute seule (la voix le dit) et repart aussi au premier coup reconnu.
-5. Pour chaque service, un **clip** de quelques secondes autour du coup est enregistré. **Terminé** affiche le bilan : bons sur tentatives, par côté, premier et second, cible et, si le bracelet a reconnu les services, la rotation moyenne du poignet sur les bons et sur les fautes. **Tout revoir / Revoir les bons / Revoir les fautes** ouvre les clips dans le ralenti (pause, ralenti, image par image).
+   - **Mettre en pause** éteint caméra et mémoire (batterie, chaleur) pendant que vous ramassez les balles : les touches du bracelet ne marquent rien, KEY1 ou **Reprendre** relancent. Après **5 minutes sans coup**, la pause se met toute seule (la voix le dit) et repart aussi au premier coup reconnu. **Revoir le dernier** met en pause et ouvre tout de suite le dernier coup dans le ralenti (ralenti, image par image, étoile) : quand tu as fini, **Reprendre** ou KEY1.
+5. Pour chaque service, un **clip** de quelques secondes autour du coup est enregistré. **Terminé** affiche le bilan : bons sur tentatives, par côté, premier et second, cible et, si le bracelet a reconnu les services, la rotation moyenne du poignet sur les bons et sur les fautes. **Tout revoir / Revoir les bons / Revoir les fautes** ouvre les clips dans le ralenti (pause, ralenti, image par image). L'**étoile** (dans le ralenti ou sur la ligne du coup dans l'analyse) met le coup parmi les **Meilleurs coups** : *Toutes les séances* en donne la liste, à revoir au ralenti (avec le squelette s'ils sont analysés), et leur vidéo reste même avec *Vidéos seules*.
 6. Sous **Commencer** se trouvent les 3 dernières séances **du coup choisi** (les boutons des coups indiquent le nombre de séances, p. ex. *Revers · 4*) et la courbe des **coups dedans, séance après séance**. **Toutes les séances** ouvre celles du coup choisi, par mois, avec la place prise par les vidéos et si elles sont déjà analysées. Touchez une séance pour son bilan et ses clips ; **appuyez longuement** pour la sélectionner (l'icône en haut les sélectionne toutes), puis **Supprimer** (séance et vidéos) ou **Vidéos seules** (libère de la place : restent les décomptes, les mesures de l'analyse et les images des moments clés). **Progrès** montre l'évolution de chaque coup.
    - **Où sont les vidéos** : dans **Documents/Tennis Score Manager/Entraînement des coups**, avec les dossiers **Service**, **Coup droit**, **Revers** et **Volée** (créés au démarrage) et dedans un dossier par séance (date et heure) et un par coup, avec `video.mp4` (s'ouvre et se partage depuis n'importe quelle appli), l'analyse et les trois images. Tout gestionnaire de fichiers les montre et ils restent même si vous désinstallez l'appli (gardez-les comme archive : une appli réinstallée ne reprend pas ses séances). Sur Android 8-10, la même structure est dans le dossier de l'appli. Les clips des séances d'avant la 2.5 y sont déplacés tout seuls au premier démarrage.
 7. **Analyse du mouvement** (depuis la séance enregistrée) : **Analyser les services** trouve la position du corps dans les clips (modèle MoveNet : la première fois, l'appli propose de le télécharger, 7 Mo, depuis la page du projet sur GitHub ; ensuite tout reste sur le téléphone, sans internet, quelques secondes par service ; il se supprime en bas de l'écran. Non disponible sur les appareils à processeur x86) et mesure trois moments : **armé** (bras de lancer en haut), **genoux** le plus fléchis et **impact**. Pour chaque service : les trois images avec le squelette dessiné et les mesures (genou le plus fléchi, coude à l'impact, hauteur de l'impact par rapport à la taille, bras de lancer, épaules à l'armé, temps de l'armé à l'impact) ; en haut, **bons et fautes** comparés. Ce sont des estimations à partir d'une vue de côté : elles servent surtout à comparer vos services entre eux. Le corps est bien reconnu avec toute la personne dans le cadre, de côté et avec une bonne lumière ; raquette et balle ne sont pas mesurées.
-   Touchez un service pour l'ouvrir : **Voir la vidéo avec le squelette** ouvre le clip dans le ralenti avec le corps dessiné par-dessus, au ralenti, avec des boutons pour aller à **Armé**, **Genoux** et **Impact** et un pour masquer ou remettre le squelette ; deux doigts agrandissent vidéo et squelette ensemble (jusqu'à 6×), double toucher pour revenir. **Comparer avec un autre coup** place à côté le même coup d'un autre jour ou de la même séance (seulement ceux analysés et avec leur vidéo, de la même personne) : les deux vidéos avec le squelette, l'une au-dessus de l'autre (côte à côte avec le téléphone à l'horizontale), alignées sur l'impact et en boucle sur le même passage, avec vitesse, image par image et les moments clés ; **Superposer** dessine aussi dans la première le squelette de la seconde (en bleu), hanches au même endroit et buste de même longueur, pour voir où le mouvement change. Les trois images se touchent aussi pour les voir en plein écran et zoomer. Avec **plusieurs personnes** dans le cadre, l'appli suit le serveur (celui qui lève le plus le bras) et masque les autres ; c'est indiqué sous le service : vérifiez sur les images. **Refaire l'analyse** recommence (les clips restent), utile après une mise à jour de l'appli.
+   Touchez un service pour l'ouvrir : **Voir la vidéo avec le squelette** ouvre le clip dans le ralenti avec le corps dessiné par-dessus, au ralenti, avec des boutons pour aller à **Armé**, **Genoux** et **Impact** et un pour masquer ou remettre le squelette ; deux doigts agrandissent vidéo et squelette ensemble (jusqu'à 6×), double toucher pour revenir. **Comparer avec un autre coup** place à côté le même coup d'un autre jour ou de la même séance (seulement ceux analysés et avec leur vidéo, de la même personne) : les deux vidéos avec le squelette, l'une au-dessus de l'autre (côte à côte avec le téléphone à l'horizontale), alignées sur l'impact et en boucle sur le même passage, avec vitesse, image par image et les moments clés ; **Superposer** dessine aussi dans la première le squelette de la seconde (en bleu), hanches au même endroit et buste de même longueur, pour voir où le mouvement change. Les trois images se touchent aussi pour les voir en plein écran et zoomer. Avec **plusieurs personnes** dans le cadre, l'appli suit le serveur (celui qui lève le plus le bras) et masque les autres ; c'est indiqué sous le service : vérifiez sur les images. **Refaire l'analyse** recommence (les clips restent), utile après une mise à jour de l'appli. Dans le choix du coup à comparer, les meilleurs coups viennent en premier, avec l'★ : ton modèle de référence.
 
 **Coup droit, revers et volée** fonctionnent de la même façon (KEY1 bon, KEY2 faute, un clip par coup, bilan et analyse), avec ces différences :
 - **Où placer le téléphone** : à côté du joueur, perpendiculaire à la direction des coups, à 4-5 m et hors du couloir, au niveau du point de frappe ; objectif à environ 1 m ; tout le geste dans le cadre (le poignet se déplace d'environ 2 m d'avant en arrière). Pour la volée : à côté du joueur au filet, à 3-4 m, à son niveau. Toujours du même côté pendant la séance, et jamais sur la trajectoire de la balle.
@@ -13570,12 +13570,12 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 3. Scegli **lato** (destra/sinistra), **prima o seconda** e, se vuoi, il **bersaglio** (al T, al corpo, esterno): valgono per i servizi seguenti.
 4. Servi e premi **KEY1 = dentro** o **KEY2 = fuori**; **KEY1 tenuto premuto** annulla l'ultimo. La voce dice il conteggio (*Dentro. 8 su 12*) e il braccialetto lo mostra. Se il braccialetto ha riconosciuto il servizio, l'istante è quello; altrimenti si prende qualche secondo prima del tasto. Per questo, all'avvio l'app **accende da sola il riconoscimento dei colpi** sul braccialetto (firmware 2.4; non serve la calibrazione, conta solo l'istante) e alla fine lo rimette com'era; sullo schermo *Riconoscimento colpi acceso* lo conferma. Con un firmware più vecchio l'istante si stima dal tasto.
    - **Lo schermo**: in alto una riga sola (dentro su tentativi, l'ultimo colpo e tre icone: braccialetto, riconoscimento dei colpi, memoria col numero di clip e lo spazio); le spiegazioni compaiono per qualche secondo all'inizio e toccando **i**, così l'inquadratura resta libera. La telecamera tiene in **memoria** gli ultimi due minuti e salva **solo i colpi segnati** (qualche secondo prima e dopo): niente video lunghi da tagliare.
-   - **Pausa** spegne telecamera e memoria (batteria, calore) mentre raccogli le palline: i tasti del braccialetto non segnano niente, KEY1 o **Riprendi** fanno ripartire. Dopo **5 minuti senza colpi** la pausa si mette da sola (la voce lo dice) e allora riparte anche al primo colpo riconosciuto.
-5. Per ogni servizio si salva una **clip** di qualche secondo intorno al colpo. **Fine** mostra il riepilogo: dentro su tentativi, per lato, per prima e seconda, per bersaglio e, se il braccialetto ha riconosciuto i servizi, la rotazione media del polso sui servizi dentro e su quelli fuori. **Rivedi tutti / solo i dentro / solo i fuori** apre le clip nella moviola (pausa, rallentatore, fotogramma per fotogramma).
+   - **Pausa** spegne telecamera e memoria (batteria, calore) mentre raccogli le palline: i tasti del braccialetto non segnano niente, KEY1 o **Riprendi** fanno ripartire. Dopo **5 minuti senza colpi** la pausa si mette da sola (la voce lo dice) e allora riparte anche al primo colpo riconosciuto. **Rivedi l'ultimo** mette in pausa e apre subito l'ultimo colpo nella moviola (rallentatore, fotogramma per fotogramma, stella): quando hai finito, **Riprendi** o KEY1.
+5. Per ogni servizio si salva una **clip** di qualche secondo intorno al colpo. **Fine** mostra il riepilogo: dentro su tentativi, per lato, per prima e seconda, per bersaglio e, se il braccialetto ha riconosciuto i servizi, la rotazione media del polso sui servizi dentro e su quelli fuori. **Rivedi tutti / solo i dentro / solo i fuori** apre le clip nella moviola (pausa, rallentatore, fotogramma per fotogramma). La **stella** (nella moviola o sulla riga del colpo nell'analisi) mette il colpo tra **I migliori colpi**: in *Tutte le sessioni* c'è il loro elenco, da rivedere al rallentatore (con lo scheletro se analizzati), e il loro video resta anche con *Solo i video*.
 6. Sotto **Inizia** ci sono le ultime 3 sessioni **del colpo scelto** (sui tasti dei colpi il numero delle sessioni, es. *Rovescio · 4*) e la linea dei **colpi dentro, sessione dopo sessione**. **Tutte le sessioni** apre quelle del colpo scelto, divise per mese, con lo spazio occupato dai video e se sono già analizzate. Tocca una sessione per il riepilogo e le clip; **tienila premuta** per selezionarla (l'icona in alto le seleziona tutte), poi **Elimina** (sessione e video) o **Solo i video** (libera spazio: restano conteggi, misure dell'analisi e immagini dei momenti chiave). In **Progressi** c'è l'andamento di ogni colpo.
    - **Dove stanno i video**: in **Documenti/Tennis Score Manager/Allenamento colpi**, con le cartelle **Servizio**, **Dritto**, **Rovescio** e **Volée** (create all'avvio) e dentro una cartella per sessione (data e ora) e una per colpo, con `video.mp4` (si apre e si condivide da qualsiasi app), l'analisi e le tre immagini. Si vedono con qualsiasi file manager e restano anche disinstallando l'app (come archivio: reinstallandola, le sessioni nell'app non tornano). Su Android 8-10 la stessa struttura sta nella cartella dell'app. Le clip delle sessioni di prima della 2.5 si spostano lì da sole al primo avvio.
 7. **Analisi del movimento** (dalla sessione salvata): **Analizza i servizi** trova la posizione del corpo nelle clip (modello MoveNet: la prima volta l'app chiede di scaricarlo, 7 MB, dalla pagina del progetto su GitHub; poi tutto sul telefono, niente internet, qualche secondo per servizio; si può eliminare in fondo alla schermata. Non c'è sui dispositivi con processore x86) e misura tre momenti: **caricamento** (braccio del lancio in alto), **ginocchia** più piegate e **impatto**. Per ogni servizio: le tre immagini con lo scheletro disegnato e le misure (ginocchio più piegato, gomito all'impatto, altezza dell'impatto rispetto alla statura, braccio del lancio, spalle al caricamento, tempo dal caricamento all'impatto); in alto il confronto **dentro e fuori**. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi servizi tra loro. Il corpo si riconosce bene con tutta la persona nell'inquadratura, di lato e con buona luce; racchetta e palla non si misurano.
-   Tocca un servizio per aprirlo: **Guarda il video con lo scheletro** apre la clip nella moviola col corpo disegnato sopra, al rallentatore, con i tasti per saltare a **Caricamento**, **Ginocchia** e **Impatto** e quello per togliere o rimettere lo scheletro; due dita ingrandiscono video e scheletro insieme (fino a 6×), doppio tocco per tornare normale. **Confronta con un altro colpo** mette accanto lo stesso colpo di un altro giorno o della stessa sessione (solo quelli analizzati e col video, della stessa persona): i due video con lo scheletro, uno sopra l'altro (affiancati col telefono in orizzontale), allineati sull'impatto e in loop sullo stesso tratto, con velocità, fotogramma per fotogramma e i momenti chiave; **Sovrapponi** disegna nel primo anche lo scheletro del secondo (in azzurro), con le anche nello stesso punto e il busto della stessa lunghezza, così si vede dove il movimento cambia. Anche le tre immagini si toccano per vederle a tutto schermo e ingrandirle. Con **più persone** nell'inquadratura l'app segue chi serve (chi alza di più il braccio) e copre le altre; lo dice sotto il servizio: controlla nelle immagini. **Rifai l'analisi** la ripete da capo (le clip restano), utile dopo un aggiornamento dell'app.
+   Tocca un servizio per aprirlo: **Guarda il video con lo scheletro** apre la clip nella moviola col corpo disegnato sopra, al rallentatore, con i tasti per saltare a **Caricamento**, **Ginocchia** e **Impatto** e quello per togliere o rimettere lo scheletro; due dita ingrandiscono video e scheletro insieme (fino a 6×), doppio tocco per tornare normale. **Confronta con un altro colpo** mette accanto lo stesso colpo di un altro giorno o della stessa sessione (solo quelli analizzati e col video, della stessa persona): i due video con lo scheletro, uno sopra l'altro (affiancati col telefono in orizzontale), allineati sull'impatto e in loop sullo stesso tratto, con velocità, fotogramma per fotogramma e i momenti chiave; **Sovrapponi** disegna nel primo anche lo scheletro del secondo (in azzurro), con le anche nello stesso punto e il busto della stessa lunghezza, così si vede dove il movimento cambia. Anche le tre immagini si toccano per vederle a tutto schermo e ingrandirle. Con **più persone** nell'inquadratura l'app segue chi serve (chi alza di più il braccio) e copre le altre; lo dice sotto il servizio: controlla nelle immagini. **Rifai l'analisi** la ripete da capo (le clip restano), utile dopo un aggiornamento dell'app. Nella scelta del colpo da confrontare i migliori colpi vengono per primi, con la ★: il tuo modello di riferimento.
 
 **Dritto, rovescio e volée** funzionano allo stesso modo (KEY1 dentro, KEY2 fuori, clip per ogni colpo, riepilogo e analisi), con queste differenze:
 - **Dove mettere il telefono**: di lato a chi colpisce, perpendicolare alla direzione dei colpi, a 4-5 m e fuori dal corridoio, all'altezza del punto d'impatto; obiettivo a circa 1 m; tutto lo swing nell'inquadratura (il polso si muove di circa 2 m avanti e indietro). Per la volée: di lato a chi gioca a rete, a 3-4 m, all'altezza del giocatore. Sempre dallo stesso lato per tutta la sessione, e mai sulla traiettoria della palla.
@@ -14177,12 +14177,12 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 3. Escolha o **lado** (direito/esquerdo), **primeiro ou segundo** e, se quiser, o **alvo** (no T, no corpo, aberto): valem para os saques seguintes.
 4. Saque e aperte **KEY1 = dentro** ou **KEY2 = fora**; **KEY1 pressionado** desfaz o último. A voz diz a contagem (*Dentro. 8 de 12*) e a pulseira mostra. Se a pulseira reconheceu o saque, vale esse instante; senão, alguns segundos antes do botão. Por isso, ao começar, o app **liga sozinho o reconhecimento de golpes** na pulseira (firmware 2.4; não precisa calibrar, só conta o instante) e no fim deixa como estava; *Reconhecimento de golpes ligado* na tela confirma. Com um firmware mais antigo o instante é estimado pela tecla.
    - **A tela**: no alto uma linha só (dentro sobre tentativas, o último golpe e três ícones: pulseira, reconhecimento de golpes, memória com o número de clipes e o espaço); as explicações aparecem por alguns segundos no começo e ao tocar em **i**, para deixar o enquadramento livre. A câmera guarda na **memória** os dois últimos minutos e salva **só os golpes marcados** (alguns segundos antes e depois): nada de vídeos longos para cortar.
-   - **Pausa** desliga câmera e memória (bateria, calor) enquanto você recolhe as bolas: as teclas da pulseira não marcam nada, KEY1 ou **Retomar** recomeçam. Depois de **5 minutos sem golpes** a pausa entra sozinha (a voz avisa) e aí também recomeça no primeiro golpe reconhecido.
-5. De cada saque é salvo um **clipe** de alguns segundos em volta do golpe. **Fim** mostra o resumo: dentro sobre tentativas, por lado, primeiro e segundo, alvo e, se a pulseira reconheceu os saques, a rotação média do pulso nos saques dentro e nos de fora. **Rever todos / só os dentro / só os fora** abre os clipes no replay (pausa, câmera lenta, quadro a quadro).
+   - **Pausa** desliga câmera e memória (bateria, calor) enquanto você recolhe as bolas: as teclas da pulseira não marcam nada, KEY1 ou **Retomar** recomeçam. Depois de **5 minutos sem golpes** a pausa entra sozinha (a voz avisa) e aí também recomeça no primeiro golpe reconhecido. **Rever o último** põe em pausa e abre logo o último golpe na moviola (câmara lenta, fotograma a fotograma, estrela): quando acabares, **Retomar** ou KEY1.
+5. De cada saque é salvo um **clipe** de alguns segundos em volta do golpe. **Fim** mostra o resumo: dentro sobre tentativas, por lado, primeiro e segundo, alvo e, se a pulseira reconheceu os saques, a rotação média do pulso nos saques dentro e nos de fora. **Rever todos / só os dentro / só os fora** abre os clipes no replay (pausa, câmera lenta, quadro a quadro). A **estrela** (na moviola ou na linha do golpe na análise) põe o golpe entre os **Melhores golpes**: *Todas as sessões* lista-os, para rever em câmara lenta (com o esqueleto se analisados), e o vídeo deles fica mesmo com *Só os vídeos*.
 6. Embaixo de **Começar** ficam as 3 últimas sessões **do golpe escolhido** (os botões dos golpes mostram quantas sessões cada um tem, ex. *Backhand · 4*) e a linha dos **golpes dentro, sessão após sessão**. **Todas as sessões** abre as do golpe escolhido, por mês, com o espaço dos vídeos e se já foram analisadas. Toque numa sessão para o resumo e os clipes; **segure** para selecioná-la (o ícone no alto seleciona todas) e depois **Apagar** (sessão e vídeos) ou **Só os vídeos** (libera espaço: ficam as contagens, as medidas da análise e as imagens dos momentos-chave). **Progresso** mostra a evolução de cada golpe.
    - **Onde ficam os vídeos**: em **Documentos/Tennis Score Manager/Treino de golpes**, com as pastas **Saque**, **Forehand**, **Backhand** e **Voleio** (criadas ao abrir o app) e dentro uma pasta por sessão (data e hora) e uma por golpe, com `video.mp4` (abre e compartilha de qualquer app), a análise e as três imagens. Aparecem em qualquer gerenciador de arquivos e ficam mesmo desinstalando o app (guarde como arquivo: um app reinstalado não recupera as sessões). No Android 8-10 a mesma estrutura fica na pasta do app. Os clipes das sessões de antes da 2.5 vão para lá sozinhos na primeira abertura.
 7. **Análise do movimento** (a partir da sessão salva): **Analisar os saques** encontra a posição do corpo nos clipes (modelo MoveNet: na primeira vez o app oferece baixá-lo, 7 MB, da página do projeto no GitHub; depois tudo fica no telefone, sem internet, alguns segundos por saque; pode ser excluído no fim da tela. Não está disponível em aparelhos com processador x86) e mede três momentos: **preparação** (braço do lançamento no alto), **joelhos** mais flexionados e **impacto**. Para cada saque: as três imagens com o esqueleto desenhado e as medidas (joelho mais flexionado, cotovelo no impacto, altura do impacto em relação à altura, braço do lançamento, ombros na preparação, tempo da preparação ao impacto); no alto, **dentro e fora** comparados. São estimativas a partir de um vídeo de lado: servem sobretudo para comparar os seus saques entre si. O corpo é bem reconhecido com a pessoa inteira no enquadramento, de lado e com boa luz; raquete e bola não são medidas.
-   Toque num saque para abri-lo: **Ver o vídeo com o esqueleto** abre o clipe no replay com o corpo desenhado por cima, em câmera lenta, com botões para saltar para **Preparação**, **Joelhos** e **Impacto** e outro para tirar ou pôr o esqueleto; dois dedos ampliam vídeo e esqueleto juntos (até 6×), toque duplo para voltar. **Comparar com outro golpe** coloca ao lado o mesmo golpe de outro dia ou da mesma sessão (só os analisados e com vídeo, da mesma pessoa): os dois vídeos com o esqueleto, um em cima do outro (lado a lado com o telefone na horizontal), alinhados no impacto e em loop no mesmo trecho, com velocidade, quadro a quadro e os momentos-chave; **Sobrepor** desenha no primeiro também o esqueleto do segundo (em azul), com os quadris no mesmo ponto e o tronco do mesmo comprimento, para ver onde o movimento muda. As três imagens também se tocam para vê-las em tela cheia e ampliá-las. Com **várias pessoas** no enquadramento o app segue quem saca (quem mais levanta o braço) e cobre as outras; isso aparece embaixo do saque: confira nas imagens. **Refazer a análise** começa de novo (os clipes ficam), útil depois de uma atualização do app.
+   Toque num saque para abri-lo: **Ver o vídeo com o esqueleto** abre o clipe no replay com o corpo desenhado por cima, em câmera lenta, com botões para saltar para **Preparação**, **Joelhos** e **Impacto** e outro para tirar ou pôr o esqueleto; dois dedos ampliam vídeo e esqueleto juntos (até 6×), toque duplo para voltar. **Comparar com outro golpe** coloca ao lado o mesmo golpe de outro dia ou da mesma sessão (só os analisados e com vídeo, da mesma pessoa): os dois vídeos com o esqueleto, um em cima do outro (lado a lado com o telefone na horizontal), alinhados no impacto e em loop no mesmo trecho, com velocidade, quadro a quadro e os momentos-chave; **Sobrepor** desenha no primeiro também o esqueleto do segundo (em azul), com os quadris no mesmo ponto e o tronco do mesmo comprimento, para ver onde o movimento muda. As três imagens também se tocam para vê-las em tela cheia e ampliá-las. Com **várias pessoas** no enquadramento o app segue quem saca (quem mais levanta o braço) e cobre as outras; isso aparece embaixo do saque: confira nas imagens. **Refazer a análise** começa de novo (os clipes ficam), útil depois de uma atualização do app. Ao escolher o golpe para comparar, os melhores golpes aparecem primeiro, com a ★: o teu modelo de referência.
 
 **Forehand, backhand e voleio** funcionam do mesmo jeito (KEY1 dentro, KEY2 fora, um clipe por golpe, resumo e análise), com estas diferenças:
 - **Onde colocar o telefone**: ao lado de quem bate, perpendicular à direção dos golpes, a 4-5 m e fora do corredor, na altura do ponto de impacto; lente a cerca de 1 m; o swing inteiro no enquadramento (o pulso se move uns 2 m para a frente e para trás). Para o voleio: ao lado de quem joga na rede, a 3-4 m, na altura dele. Sempre do mesmo lado durante a sessão, e nunca na trajetória da bola.
@@ -16520,13 +16520,26 @@ class MatchController(
 
     fun deleteServeSession(sess: com.tennis.scoremanager.data.ServeSession) = deleteServeSessions(listOf(sess))
 
+    /** Mette o toglie la stella (migliori colpi) al colpo [at] della sessione salvata [sessionId]; la sessione aggiornata. */
+    fun setServeStar(sessionId: String, at: Long, on: Boolean): com.tennis.scoremanager.data.ServeSession? {
+        val sess = storage.loadServeSessions().firstOrNull { it.id == sessionId } ?: return null
+        val updated = sess.copy(serves = sess.serves.map { if (it.at == at) it.copy(starred = on) else it })
+        storage.saveServeSession(updated)
+        refreshServeSessions()
+        return updated
+    }
+
     /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
     fun deleteServeSessions(list: List<com.tennis.scoremanager.data.ServeSession>, videosOnly: Boolean = false) {
         scope.launch {
             withContext(io) { list.forEach { if (videosOnly) storage.deleteServeVideos(it) else storage.deleteServeSession(it) } }
             refreshServeSessions()
+            serveDiskVersion.value++
         }
     }
+
+    /** Cresce quando si tolgono video: le pagine che mostrano lo spazio occupato lo ricalcolano. */
+    val serveDiskVersion = MutableStateFlow(0)
 
     /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
     val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)
@@ -30321,6 +30334,8 @@ data class ServeAttempt(
     /** Dritto, rovescio e volée: direzione voluta e, per la volée, se di dritto o di rovescio. */
     val direction: ShotDirection? = null,
     val wing: Wing? = null,
+    /** Tra i migliori colpi: un esempio da rivedere e da confrontare (la clip resta anche con "Solo i video"). */
+    val starred: Boolean = false,
 )
 
 @Serializable
@@ -30611,7 +30626,9 @@ class Storage(context: Context) {
 
     /** Cancella solo i video di una sessione: restano i conteggi, le misure dell'analisi e le immagini dei momenti. */
     fun deleteServeVideos(sess: ServeSession) {
-        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" }.toList().forEach { it.delete() }
+        // I migliori colpi (con la stella) tengono il loro video.
+        val keep = sess.serves.filter { it.starred }.mapNotNull { it.clip }.toSet()
+        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" && it.parentFile?.name !in keep }.toList().forEach { it.delete() }
     }
 
     @Synchronized
@@ -50419,6 +50436,12 @@ interface Strings {
     val bpSet: String
     val bpRemoved: String
     val bpLocked: String
+    val strokeStar: String
+    val strokeUnstar: String
+    val strokeBest: String
+    val strokeBestHint: String
+    val trainReplayLast: String
+    val trainReplayPaused: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -53111,6 +53134,12 @@ object ItStrings : Strings {
     override val bpSet = "Password messa: i backup sono protetti."
     override val bpRemoved = "Password tolta: i prossimi backup non sono protetti."
     override val bpLocked = "protetto"
+    override val strokeStar = "Metti tra i migliori colpi"
+    override val strokeUnstar = "Togli dai migliori colpi"
+    override val strokeBest = "I migliori colpi"
+    override val strokeBestHint = "I colpi con la stella: esempi da rivedere e da confrontare. Il loro video resta anche con «Solo i video»."
+    override val trainReplayLast = "Rivedi l'ultimo"
+    override val trainReplayPaused = "Allenamento in pausa: Riprendi (o KEY1) quando hai finito di rivedere."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -55804,6 +55833,12 @@ object EnStrings : Strings {
     override val bpSet = "Password set: backups are protected."
     override val bpRemoved = "Password removed: the next backups aren't protected."
     override val bpLocked = "protected"
+    override val strokeStar = "Add to best shots"
+    override val strokeUnstar = "Remove from best shots"
+    override val strokeBest = "Best shots"
+    override val strokeBestHint = "Starred shots: examples to watch again and compare. Their video stays even with “Videos only”."
+    override val trainReplayLast = "Replay last"
+    override val trainReplayPaused = "Training paused: Resume (or KEY1) when you're done watching."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -58522,6 +58557,12 @@ object DeStrings : Strings {
     override val bpSet = "Passwort gesetzt: Sicherungen sind geschützt."
     override val bpRemoved = "Passwort entfernt: die nächsten Sicherungen sind nicht geschützt."
     override val bpLocked = "geschützt"
+    override val strokeStar = "Zu den besten Schlägen"
+    override val strokeUnstar = "Aus den besten Schlägen entfernen"
+    override val strokeBest = "Beste Schläge"
+    override val strokeBestHint = "Schläge mit Stern: Beispiele zum Wiederansehen und Vergleichen. Ihr Video bleibt auch bei „Nur Videos“."
+    override val trainReplayLast = "Letzten ansehen"
+    override val trainReplayPaused = "Training pausiert: Weiter (oder KEY1), wenn du fertig bist."
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -61230,6 +61271,12 @@ object EsStrings : Strings {
     override val bpSet = "Contraseña puesta: las copias están protegidas."
     override val bpRemoved = "Contraseña quitada: las próximas copias no están protegidas."
     override val bpLocked = "protegida"
+    override val strokeStar = "Añadir a los mejores golpes"
+    override val strokeUnstar = "Quitar de los mejores golpes"
+    override val strokeBest = "Mejores golpes"
+    override val strokeBestHint = "Los golpes con estrella: ejemplos para volver a ver y comparar. Su vídeo se queda también con «Solo los vídeos»."
+    override val trainReplayLast = "Ver el último"
+    override val trainReplayPaused = "Entrenamiento en pausa: Seguir (o KEY1) cuando termines de verlo."
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -63940,6 +63987,12 @@ object FrStrings : Strings {
     override val bpSet = "Mot de passe mis : les sauvegardes sont protégées."
     override val bpRemoved = "Mot de passe retiré : les prochaines sauvegardes ne sont pas protégées."
     override val bpLocked = "protégée"
+    override val strokeStar = "Ajouter aux meilleurs coups"
+    override val strokeUnstar = "Retirer des meilleurs coups"
+    override val strokeBest = "Meilleurs coups"
+    override val strokeBestHint = "Les coups étoilés : des exemples à revoir et à comparer. Leur vidéo reste même avec « Vidéos seules »."
+    override val trainReplayLast = "Revoir le dernier"
+    override val trainReplayPaused = "Entraînement en pause : Reprendre (ou KEY1) quand tu as fini de revoir."
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -66651,6 +66704,12 @@ object PtStrings : Strings {
     override val bpSet = "Palavra-passe definida: as cópias estão protegidas."
     override val bpRemoved = "Palavra-passe retirada: as próximas cópias não estão protegidas."
     override val bpLocked = "protegida"
+    override val strokeStar = "Juntar aos melhores golpes"
+    override val strokeUnstar = "Tirar dos melhores golpes"
+    override val strokeBest = "Melhores golpes"
+    override val strokeBestHint = "Os golpes com estrela: exemplos para rever e comparar. O vídeo deles fica mesmo com «Só os vídeos»."
+    override val trainReplayLast = "Rever o último"
+    override val trainReplayPaused = "Treino em pausa: Retomar (ou KEY1) quando acabares de rever."
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -77553,13 +77612,16 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/StrokeSessions
 package com.tennis.scoremanager.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -77579,6 +77641,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.ServeSession
@@ -77616,7 +77679,9 @@ fun StrokeSessionsScreen(c: MatchController) {
     val list = all.filter { it.stroke == stroke && it.student == trainee }
     val who = c.studentById(trainee)?.name
     val lang = c.options.collectAsState().value.lang
-    val disk by produceState(emptyMap<String, Disk>(), list) {
+    // Si ricalcola anche dopo "Solo i video" (le sessioni restano uguali, lo spazio no).
+    val diskVersion by c.serveDiskVersion.collectAsState()
+    val disk by produceState(emptyMap<String, Disk>(), list, diskVersion) {
         value = withContext(Dispatchers.IO) {
             list.associate { sess ->
                 val dir = c.storage.serveClipsDir(sess)
@@ -77666,6 +77731,31 @@ fun StrokeSessionsScreen(c: MatchController) {
             Text(s.strokeSpace(mb(disk.values.sumOf { it.bytes }), list.size), color = TsmColors.TextMain)
             StrokeTrend(list)
             Text(s.strokeSelectHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        // I migliori colpi (con la stella), dal più recente: si rivedono al rallentatore, con lo scheletro se analizzati.
+        val best = list.flatMap { sess -> sess.serves.mapIndexedNotNull { i, a -> if (a.starred && a.clip != null) Triple(sess, i, a) else null } }.sortedByDescending { it.third.at }
+        if (best.isNotEmpty()) SectionCard(s.strokeBest, Icons.Filled.Star) {
+            Text(s.strokeBestHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val when_ = SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "dMMMyyyyHHmm"), lang.locale)
+            for ((sess, i, a) in best) {
+                Text("★ ${name} ${i + 1} · ${when_.format(Date(a.at))} · ${if (a.inPlay) s.serveIn else s.serveOut}",
+                    color = TsmColors.TextMain, fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        val dir = File(c.storage.serveClipsDir(sess), a.clip!!)
+                        val files = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+                        if (files.isEmpty()) return@clickable
+                        val intent = android.content.Intent(context, com.tennis.scoremanager.video.ReplayActivity::class.java)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray())
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_STAR_SESSION, sess.id)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_STAR_AT, a.at)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_STAR_ON, true)
+                        // Analizzato: col corpo disegnato sopra.
+                        if (File(dir, ServeClipAnalysis.RESULT).exists()) intent.putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_POSE_DIR, dir.absolutePath)
+                            .putExtra(com.tennis.scoremanager.video.ReplayActivity.EXTRA_POSE_AT, a.at)
+                        context.startActivity(intent)
+                    }.padding(vertical = 6.dp))
+            }
         }
         // Per mese, dalla più recente.
         val month = SimpleDateFormat("LLLL yyyy", lang.locale)
@@ -80355,6 +80445,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
 import android.widget.Toast
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -80389,6 +80480,7 @@ import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.HelpOutline
@@ -80785,6 +80877,35 @@ class CameraActivity : ComponentActivity() {
      * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
      */
     /** Spegne telecamera e memoria; i tasti del braccialetto non segnano finché non si riprende. */
+    /** Rivedi l'ultimo: la stella data nella moviola torna qui e va nella sessione in corso. */
+    private val replayLast = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
+        val d = r.data
+        if (r.resultCode == RESULT_OK && d != null && d.hasExtra(ReplayActivity.EXTRA_STAR_AT)) {
+            val at = d.getLongExtra(ReplayActivity.EXTRA_STAR_AT, 0L)
+            val on = d.getBooleanExtra(ReplayActivity.EXTRA_STAR_ON, false)
+            saveServes { list -> list.map { if (it.at == at) it.copy(starred = on) else it } }
+        }
+    }
+
+    /**
+     * Rivedi l'ultimo colpo senza chiudere l'allenamento: pausa (telecamera e memoria si fermano), la sua clip nella
+     * moviola (rallentatore, fotogramma per fotogramma, stella); al ritorno Riprendi o KEY1.
+     */
+    private fun replayLastShot() {
+        val sess = serveSession.value
+        val last = sess.serves.lastOrNull { it.clip != null } ?: return
+        val files = controller.serveClipFiles(sess, listOf(last))
+        if (files.isEmpty()) return
+        lastTrainActivity = System.currentTimeMillis()
+        pauseTraining()
+        android.widget.Toast.makeText(this, s.trainReplayPaused, android.widget.Toast.LENGTH_LONG).show()
+        replayLast.launch(
+            Intent(this, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray())
+                .putExtra(ReplayActivity.EXTRA_STAR_SESSION, sess.id).putExtra(ReplayActivity.EXTRA_STAR_AT, last.at)
+                .putExtra(ReplayActivity.EXTRA_STAR_ON, last.starred).putExtra(ReplayActivity.EXTRA_STAR_LIVE, true),
+        )
+    }
+
     private fun pauseTraining(auto: Boolean = false) {
         if (trainPaused.value) return
         trainPaused.value = true
@@ -81390,6 +81511,8 @@ class CameraActivity : ComponentActivity() {
                     Btn(Icons.Filled.Pause, str.trainPause, TsmColors.SurfaceHigh) { pauseTraining() }
                 }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
+                // L'ultimo colpo subito, al rallentatore, senza chiudere l'allenamento.
+                if (sess.serves.any { it.clip != null }) Btn(Icons.Filled.Replay, str.trainReplayLast, TsmColors.SurfaceHigh) { replayLastShot() }
                 if (sess.stroke == TrainedStroke.SERVE) {
                     Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
                         serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
@@ -83788,6 +83911,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
@@ -83978,6 +84103,16 @@ class ReplayActivity : ComponentActivity() {
                 }
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            // Tra i migliori colpi (si toglie con un altro tocco).
+            intent.getStringExtra(EXTRA_STAR_SESSION)?.let { sid ->
+                var star by remember { mutableStateOf(intent.getBooleanExtra(EXTRA_STAR_ON, false)) }
+                Btn(if (star) Icons.Filled.Star else Icons.Filled.StarBorder, null, star, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(12.dp)) {
+                    star = !star
+                    val at = intent.getLongExtra(EXTRA_STAR_AT, 0L)
+                    if (intent.getBooleanExtra(EXTRA_STAR_LIVE, false)) setResult(RESULT_OK, android.content.Intent().putExtra(EXTRA_STAR_AT, at).putExtra(EXTRA_STAR_ON, star))
+                    else controller.setServeStar(sid, at, star)
+                }
+            }
             // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
             if (controller.canShowReplayOnTv) {
                 Btn(Icons.Filled.Tv, s.replayOnBoard, onTv, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(12.dp)) {
@@ -84073,6 +84208,14 @@ class ReplayActivity : ComponentActivity() {
         /** Cartella della clip di un servizio analizzato (pose.json e starts.txt) e istante del servizio (ms). */
         const val EXTRA_POSE_DIR = "pose_dir"
         const val EXTRA_POSE_AT = "pose_at"
+        /**
+         * La stella dei migliori colpi: sessione e istante del colpo e se ce l'ha già. Con [EXTRA_STAR_LIVE] (sessione
+         * ancora in corso) la stella torna come risultato ([EXTRA_STAR_ON]) e la salva l'allenamento.
+         */
+        const val EXTRA_STAR_SESSION = "star_session"
+        const val EXTRA_STAR_AT = "star_at"
+        const val EXTRA_STAR_ON = "star_on"
+        const val EXTRA_STAR_LIVE = "star_live"
         private const val MAX_ZOOM = 6f
     }
 }
@@ -84414,6 +84557,8 @@ import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -84716,6 +84861,12 @@ class ServeAnalysisActivity : ComponentActivity() {
             Row(Modifier.fillMaxWidth()) {
                 val title = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
                 Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                // La stella dei migliori colpi: esempi da rivedere e confrontare.
+                if (a.clip != null) androidx.compose.material3.Icon(
+                    if (a.starred) Icons.Filled.Star else Icons.Filled.StarBorder, if (a.starred) str.strokeUnstar else str.strokeStar,
+                    tint = if (a.starred) TsmColors.Ball else TsmColors.TextDim,
+                    modifier = Modifier.padding(end = 10.dp).clickable { controller.setServeStar(sess.id, a.at, !a.starred)?.let { session.value = it } },
+                )
                 Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
             }
             when {
@@ -84744,7 +84895,8 @@ class ServeAnalysisActivity : ComponentActivity() {
                 android.content.Intent(this, ReplayActivity::class.java)
                     .putExtra(ReplayActivity.EXTRA_FILES, parts.map { it.absolutePath }.toTypedArray())
                     .putExtra(ReplayActivity.EXTRA_POSE_DIR, d.absolutePath)
-                    .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at),
+                    .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at)
+                    .putExtra(ReplayActivity.EXTRA_STAR_SESSION, sess.id).putExtra(ReplayActivity.EXTRA_STAR_AT, a.at).putExtra(ReplayActivity.EXTRA_STAR_ON, a.starred),
             )
         }, Modifier.fillMaxWidth())
         // Lo stesso colpo di un altro giorno (o di questa sessione) accanto, allineato sull'impatto.
@@ -84778,7 +84930,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                 if (!File(d, ServeClipAnalysis.RESULT).exists() || !hasVideo(o, b)) return@mapIndexedNotNull null
                 Candidate(o, i, b, d)
             }
-        }.sortedByDescending { it.a.at }.take(80)
+        }.sortedWith(compareByDescending<Candidate> { it.a.starred }.thenByDescending { it.a.at }).take(80)
 
     /** "Dritto 3 · 29 ott 22:26 · Dentro": corto, sta in una riga sopra il video. */
     private fun label(sess: ServeSession, index: Int, a: ServeAttempt): String {
@@ -84818,7 +84970,8 @@ class ServeAnalysisActivity : ComponentActivity() {
                                     onDone()
                                 }.padding(10.dp),
                             ) {
-                                Text(label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
+                                // I migliori colpi per primi, con la stella: il modello con cui confrontarsi.
+                                Text((if (c.a.starred) "★ " else "") + label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
                                 if (c.sess.id == sess.id) Text(str.compareThisSession, color = TsmColors.TextDim, fontSize = 12.sp)
                             }
                         }

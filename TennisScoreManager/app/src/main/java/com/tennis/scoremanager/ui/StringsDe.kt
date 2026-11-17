@@ -2695,6 +2695,12 @@ object DeStrings : Strings {
     override val bpSet = "Passwort gesetzt: Sicherungen sind geschützt."
     override val bpRemoved = "Passwort entfernt: die nächsten Sicherungen sind nicht geschützt."
     override val bpLocked = "geschützt"
+    override val strokeStar = "Zu den besten Schlägen"
+    override val strokeUnstar = "Aus den besten Schlägen entfernen"
+    override val strokeBest = "Beste Schläge"
+    override val strokeBestHint = "Schläge mit Stern: Beispiele zum Wiederansehen und Vergleichen. Ihr Video bleibt auch bei „Nur Videos“."
+    override val trainReplayLast = "Letzten ansehen"
+    override val trainReplayPaused = "Training pausiert: Weiter (oder KEY1), wenn du fertig bist."
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

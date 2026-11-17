@@ -1053,13 +1053,26 @@ class MatchController(
 
     fun deleteServeSession(sess: com.tennis.scoremanager.data.ServeSession) = deleteServeSessions(listOf(sess))
 
+    /** Mette o toglie la stella (migliori colpi) al colpo [at] della sessione salvata [sessionId]; la sessione aggiornata. */
+    fun setServeStar(sessionId: String, at: Long, on: Boolean): com.tennis.scoremanager.data.ServeSession? {
+        val sess = storage.loadServeSessions().firstOrNull { it.id == sessionId } ?: return null
+        val updated = sess.copy(serves = sess.serves.map { if (it.at == at) it.copy(starred = on) else it })
+        storage.saveServeSession(updated)
+        refreshServeSessions()
+        return updated
+    }
+
     /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
     fun deleteServeSessions(list: List<com.tennis.scoremanager.data.ServeSession>, videosOnly: Boolean = false) {
         scope.launch {
             withContext(io) { list.forEach { if (videosOnly) storage.deleteServeVideos(it) else storage.deleteServeSession(it) } }
             refreshServeSessions()
+            serveDiskVersion.value++
         }
     }
+
+    /** Cresce quando si tolgono video: le pagine che mostrano lo spazio occupato lo ricalcolano. */
+    val serveDiskVersion = MutableStateFlow(0)
 
     /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
     val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)

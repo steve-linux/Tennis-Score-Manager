@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -330,6 +332,12 @@ class ServeAnalysisActivity : ComponentActivity() {
             Row(Modifier.fillMaxWidth()) {
                 val title = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
                 Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                // La stella dei migliori colpi: esempi da rivedere e confrontare.
+                if (a.clip != null) androidx.compose.material3.Icon(
+                    if (a.starred) Icons.Filled.Star else Icons.Filled.StarBorder, if (a.starred) str.strokeUnstar else str.strokeStar,
+                    tint = if (a.starred) TsmColors.Ball else TsmColors.TextDim,
+                    modifier = Modifier.padding(end = 10.dp).clickable { controller.setServeStar(sess.id, a.at, !a.starred)?.let { session.value = it } },
+                )
                 Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
             }
             when {
@@ -358,7 +366,8 @@ class ServeAnalysisActivity : ComponentActivity() {
                 android.content.Intent(this, ReplayActivity::class.java)
                     .putExtra(ReplayActivity.EXTRA_FILES, parts.map { it.absolutePath }.toTypedArray())
                     .putExtra(ReplayActivity.EXTRA_POSE_DIR, d.absolutePath)
-                    .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at),
+                    .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at)
+                    .putExtra(ReplayActivity.EXTRA_STAR_SESSION, sess.id).putExtra(ReplayActivity.EXTRA_STAR_AT, a.at).putExtra(ReplayActivity.EXTRA_STAR_ON, a.starred),
             )
         }, Modifier.fillMaxWidth())
         // Lo stesso colpo di un altro giorno (o di questa sessione) accanto, allineato sull'impatto.
@@ -392,7 +401,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                 if (!File(d, ServeClipAnalysis.RESULT).exists() || !hasVideo(o, b)) return@mapIndexedNotNull null
                 Candidate(o, i, b, d)
             }
-        }.sortedByDescending { it.a.at }.take(80)
+        }.sortedWith(compareByDescending<Candidate> { it.a.starred }.thenByDescending { it.a.at }).take(80)
 
     /** "Dritto 3 · 29 ott 22:26 · Dentro": corto, sta in una riga sopra il video. */
     private fun label(sess: ServeSession, index: Int, a: ServeAttempt): String {
@@ -432,7 +441,8 @@ class ServeAnalysisActivity : ComponentActivity() {
                                     onDone()
                                 }.padding(10.dp),
                             ) {
-                                Text(label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
+                                // I migliori colpi per primi, con la stella: il modello con cui confrontarsi.
+                                Text((if (c.a.starred) "★ " else "") + label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
                                 if (c.sess.id == sess.id) Text(str.compareThisSession, color = TsmColors.TextDim, fontSize = 12.sp)
                             }
                         }

@@ -17,6 +17,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
 import android.widget.Toast
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,6 +52,7 @@ import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.HelpOutline
@@ -447,6 +449,35 @@ class CameraActivity : ComponentActivity() {
      * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
      */
     /** Spegne telecamera e memoria; i tasti del braccialetto non segnano finché non si riprende. */
+    /** Rivedi l'ultimo: la stella data nella moviola torna qui e va nella sessione in corso. */
+    private val replayLast = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
+        val d = r.data
+        if (r.resultCode == RESULT_OK && d != null && d.hasExtra(ReplayActivity.EXTRA_STAR_AT)) {
+            val at = d.getLongExtra(ReplayActivity.EXTRA_STAR_AT, 0L)
+            val on = d.getBooleanExtra(ReplayActivity.EXTRA_STAR_ON, false)
+            saveServes { list -> list.map { if (it.at == at) it.copy(starred = on) else it } }
+        }
+    }
+
+    /**
+     * Rivedi l'ultimo colpo senza chiudere l'allenamento: pausa (telecamera e memoria si fermano), la sua clip nella
+     * moviola (rallentatore, fotogramma per fotogramma, stella); al ritorno Riprendi o KEY1.
+     */
+    private fun replayLastShot() {
+        val sess = serveSession.value
+        val last = sess.serves.lastOrNull { it.clip != null } ?: return
+        val files = controller.serveClipFiles(sess, listOf(last))
+        if (files.isEmpty()) return
+        lastTrainActivity = System.currentTimeMillis()
+        pauseTraining()
+        android.widget.Toast.makeText(this, s.trainReplayPaused, android.widget.Toast.LENGTH_LONG).show()
+        replayLast.launch(
+            Intent(this, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray())
+                .putExtra(ReplayActivity.EXTRA_STAR_SESSION, sess.id).putExtra(ReplayActivity.EXTRA_STAR_AT, last.at)
+                .putExtra(ReplayActivity.EXTRA_STAR_ON, last.starred).putExtra(ReplayActivity.EXTRA_STAR_LIVE, true),
+        )
+    }
+
     private fun pauseTraining(auto: Boolean = false) {
         if (trainPaused.value) return
         trainPaused.value = true
@@ -1052,6 +1083,8 @@ class CameraActivity : ComponentActivity() {
                     Btn(Icons.Filled.Pause, str.trainPause, TsmColors.SurfaceHigh) { pauseTraining() }
                 }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
+                // L'ultimo colpo subito, al rallentatore, senza chiudere l'allenamento.
+                if (sess.serves.any { it.clip != null }) Btn(Icons.Filled.Replay, str.trainReplayLast, TsmColors.SurfaceHigh) { replayLastShot() }
                 if (sess.stroke == TrainedStroke.SERVE) {
                     Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
                         serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE

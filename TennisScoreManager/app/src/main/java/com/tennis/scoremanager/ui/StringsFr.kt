@@ -2698,6 +2698,12 @@ object FrStrings : Strings {
     override val bpSet = "Mot de passe mis : les sauvegardes sont protégées."
     override val bpRemoved = "Mot de passe retiré : les prochaines sauvegardes ne sont pas protégées."
     override val bpLocked = "protégée"
+    override val strokeStar = "Ajouter aux meilleurs coups"
+    override val strokeUnstar = "Retirer des meilleurs coups"
+    override val strokeBest = "Meilleurs coups"
+    override val strokeBestHint = "Les coups étoilés : des exemples à revoir et à comparer. Leur vidéo reste même avec « Vidéos seules »."
+    override val trainReplayLast = "Revoir le dernier"
+    override val trainReplayPaused = "Entraînement en pause : Reprendre (ou KEY1) quand tu as fini de revoir."
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }

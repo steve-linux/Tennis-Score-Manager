@@ -201,7 +201,9 @@ class Storage(context: Context) {
 
     /** Cancella solo i video di una sessione: restano i conteggi, le misure dell'analisi e le immagini dei momenti. */
     fun deleteServeVideos(sess: ServeSession) {
-        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" }.toList().forEach { it.delete() }
+        // I migliori colpi (con la stella) tengono il loro video.
+        val keep = sess.serves.filter { it.starred }.mapNotNull { it.clip }.toSet()
+        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" && it.parentFile?.name !in keep }.toList().forEach { it.delete() }
     }
 
     @Synchronized

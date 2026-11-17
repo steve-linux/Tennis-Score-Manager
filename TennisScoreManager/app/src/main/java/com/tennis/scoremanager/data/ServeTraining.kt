@@ -47,6 +47,8 @@ data class ServeAttempt(
     /** Dritto, rovescio e volée: direzione voluta e, per la volée, se di dritto o di rovescio. */
     val direction: ShotDirection? = null,
     val wing: Wing? = null,
+    /** Tra i migliori colpi: un esempio da rivedere e da confrontare (la clip resta anche con "Solo i video"). */
+    val starred: Boolean = false,
 )
 
 @Serializable

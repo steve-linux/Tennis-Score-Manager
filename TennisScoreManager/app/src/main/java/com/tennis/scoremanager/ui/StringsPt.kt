@@ -2699,6 +2699,12 @@ object PtStrings : Strings {
     override val bpSet = "Palavra-passe definida: as cópias estão protegidas."
     override val bpRemoved = "Palavra-passe retirada: as próximas cópias não estão protegidas."
     override val bpLocked = "protegida"
+    override val strokeStar = "Juntar aos melhores golpes"
+    override val strokeUnstar = "Tirar dos melhores golpes"
+    override val strokeBest = "Melhores golpes"
+    override val strokeBestHint = "Os golpes com estrela: exemplos para rever e comparar. O vídeo deles fica mesmo com «Só os vídeos»."
+    override val trainReplayLast = "Rever o último"
+    override val trainReplayPaused = "Treino em pausa: Retomar (ou KEY1) quando acabares de rever."
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }

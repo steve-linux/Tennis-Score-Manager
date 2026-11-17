@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
@@ -216,6 +218,16 @@ class ReplayActivity : ComponentActivity() {
                 }
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            // Tra i migliori colpi (si toglie con un altro tocco).
+            intent.getStringExtra(EXTRA_STAR_SESSION)?.let { sid ->
+                var star by remember { mutableStateOf(intent.getBooleanExtra(EXTRA_STAR_ON, false)) }
+                Btn(if (star) Icons.Filled.Star else Icons.Filled.StarBorder, null, star, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(12.dp)) {
+                    star = !star
+                    val at = intent.getLongExtra(EXTRA_STAR_AT, 0L)
+                    if (intent.getBooleanExtra(EXTRA_STAR_LIVE, false)) setResult(RESULT_OK, android.content.Intent().putExtra(EXTRA_STAR_AT, at).putExtra(EXTRA_STAR_ON, star))
+                    else controller.setServeStar(sid, at, star)
+                }
+            }
             // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
             if (controller.canShowReplayOnTv) {
                 Btn(Icons.Filled.Tv, s.replayOnBoard, onTv, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(12.dp)) {
@@ -311,6 +323,14 @@ class ReplayActivity : ComponentActivity() {
         /** Cartella della clip di un servizio analizzato (pose.json e starts.txt) e istante del servizio (ms). */
         const val EXTRA_POSE_DIR = "pose_dir"
         const val EXTRA_POSE_AT = "pose_at"
+        /**
+         * La stella dei migliori colpi: sessione e istante del colpo e se ce l'ha già. Con [EXTRA_STAR_LIVE] (sessione
+         * ancora in corso) la stella torna come risultato ([EXTRA_STAR_ON]) e la salva l'allenamento.
+         */
+        const val EXTRA_STAR_SESSION = "star_session"
+        const val EXTRA_STAR_AT = "star_at"
+        const val EXTRA_STAR_ON = "star_on"
+        const val EXTRA_STAR_LIVE = "star_live"
         private const val MAX_ZOOM = 6f
     }
 }

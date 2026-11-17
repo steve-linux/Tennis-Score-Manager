@@ -2696,6 +2696,12 @@ object EsStrings : Strings {
     override val bpSet = "Contraseña puesta: las copias están protegidas."
     override val bpRemoved = "Contraseña quitada: las próximas copias no están protegidas."
     override val bpLocked = "protegida"
+    override val strokeStar = "Añadir a los mejores golpes"
+    override val strokeUnstar = "Quitar de los mejores golpes"
+    override val strokeBest = "Mejores golpes"
+    override val strokeBestHint = "Los golpes con estrella: ejemplos para volver a ver y comparar. Su vídeo se queda también con «Solo los vídeos»."
+    override val trainReplayLast = "Ver el último"
+    override val trainReplayPaused = "Entrenamiento en pausa: Seguir (o KEY1) cuando termines de verlo."
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }

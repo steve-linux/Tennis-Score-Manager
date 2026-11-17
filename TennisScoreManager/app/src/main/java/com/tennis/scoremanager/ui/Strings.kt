@@ -2767,6 +2767,12 @@ interface Strings {
     val bpSet: String
     val bpRemoved: String
     val bpLocked: String
+    val strokeStar: String
+    val strokeUnstar: String
+    val strokeBest: String
+    val strokeBestHint: String
+    val trainReplayLast: String
+    val trainReplayPaused: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5459,6 +5465,12 @@ object ItStrings : Strings {
     override val bpSet = "Password messa: i backup sono protetti."
     override val bpRemoved = "Password tolta: i prossimi backup non sono protetti."
     override val bpLocked = "protetto"
+    override val strokeStar = "Metti tra i migliori colpi"
+    override val strokeUnstar = "Togli dai migliori colpi"
+    override val strokeBest = "I migliori colpi"
+    override val strokeBestHint = "I colpi con la stella: esempi da rivedere e da confrontare. Il loro video resta anche con «Solo i video»."
+    override val trainReplayLast = "Rivedi l'ultimo"
+    override val trainReplayPaused = "Allenamento in pausa: Riprendi (o KEY1) quando hai finito di rivedere."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8152,6 +8164,12 @@ object EnStrings : Strings {
     override val bpSet = "Password set: backups are protected."
     override val bpRemoved = "Password removed: the next backups aren't protected."
     override val bpLocked = "protected"
+    override val strokeStar = "Add to best shots"
+    override val strokeUnstar = "Remove from best shots"
+    override val strokeBest = "Best shots"
+    override val strokeBestHint = "Starred shots: examples to watch again and compare. Their video stays even with “Videos only”."
+    override val trainReplayLast = "Replay last"
+    override val trainReplayPaused = "Training paused: Resume (or KEY1) when you're done watching."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
