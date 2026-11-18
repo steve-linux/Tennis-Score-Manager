@@ -705,6 +705,11 @@ class Storage(context: Context) {
         get() = prefs.getString("my_player", null) ?: ""
         set(v) = prefs.edit().putString("my_player", v).apply()
 
+    /** Allenamento dei colpi: video a 60 fotogrammi al secondo (solo se tutti gli obiettivi ce la fanno). */
+    var trainFps60: Boolean
+        get() = prefs.getBoolean("train_fps60", false)
+        set(v) = prefs.edit().putBoolean("train_fps60", v).apply()
+
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
         get() = prefs.getString("camera_lens", null)

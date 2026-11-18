@@ -41,6 +41,18 @@ object CameraLenses {
             .sortedBy { it.hFov }
             .fold(mutableListOf<Framing.Lens>()) { acc, l -> if (acc.none { abs(it.hFov - l.hFov) < 3f }) acc += l; acc }
     }
+
+    /**
+     * Si può registrare a 60 fotogrammi al secondo con tutti gli obiettivi usati (per cambiarli a metà senza sorprese).
+     * Molti telefoni arrivano a 30 nella registrazione normale: i 120 dei "rallentatori" sono un modo a parte.
+     */
+    fun supports60(context: Context): Boolean {
+        val cm = context.getSystemService(CameraManager::class.java) ?: return false
+        val ids = list(context).map { it.id }
+        return ids.isNotEmpty() && ids.all { id ->
+            runCatching { cm.getCameraCharacteristics(id).get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)?.any { it.upper >= 60 } == true }.getOrDefault(false)
+        }
+    }
 }
 
 /**

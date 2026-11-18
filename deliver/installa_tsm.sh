@@ -11155,6 +11155,9 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 
 **Stunde aufnehmen** (unter Starten): das Handy fest **hinter der Grundlinie**, hinter dem Spieler, und das Armband an seinem Handgelenk mit Schlagerkennung. Nichts zu drücken: **jeder erkannte Schlag** wird ein Clip und landet von selbst bei **Vorhand, Rückhand, Aufschlag und Volley** (erkennt das Armband ihn nicht, kommt er zur Vorhand). Direkt nach einem Schlag markieren KEY1 oder KEY2 ihn als **im Feld** oder **aus** (freiwillig); Schläge ohne Markierung zählen nicht in den Prozenten. Läuft im Kalender des Trainers gerade eine Stunde, gehört die Aufnahme zu ihr (und zum Schüler, wenn es nur einer ist). Am Ende hat jeder Schlag seine Einheit, markiert mit **Trainerstunde**, im Ordner **Schlagtraining/Trainerstunden**.
 - **Der Schlag aus dem Video**: Sieht der Schlag in der Bewegungsanalyse laut Video nach einem anderen aus (z. B. *Laut Video wohl: Rückhand*), legt **Verschieben zu: Rückhand** ihn zum richtigen Schlag und die Analyse wird neu gemacht. Die Hinweise sind einfach (beide Arme über dem Kopf beim Aufschlag, wenig Weg des Handgelenks beim Volley, Hände nah beieinander bei der Rückhand): Verschieben wird nur angeboten, wenn sie klar sind oder das Armband ihn nicht erkannt hatte.
+- **Kommentieren** (der Stift in der Zeitlupe der Clips): Das Standbild, mit Skelett wenn eingeschaltet, lässt sich mit **Pfeilen**, **Kreisen** und **Freihand**-Strichen in drei Farben markieren, dazu eine **Sprachnotiz** (beim ersten Mal fragt die App nach dem Mikrofon). **Speichern** legt sie zum Clip, **Teilen** verschickt sie (Bild und Stimme). In der Analyse, beim Öffnen des Schlags, lassen sich die **Notizen zum Clip** ansehen, anhören, teilen oder löschen; sie bleiben auch mit *Nur Videos*.
+- **Kinetische Kette (Test)**: Beim Öffnen eines analysierten Schlags, wann Beine, Hüfte, Schultern, Ellbogen und Handgelenk ihre Höchstgeschwindigkeit bezogen auf den Treffpunkt erreichen und ob die Reihenfolge von den Beinen zum Handgelenk geht. Aus einem seitlichen Video mit wenigen Bildern pro Sekunde ist das eine grobe Schätzung: ein Bild Unterschied wird toleriert.
+- **Video mit 60 Bildern pro Sekunde**: unter Starten, nur auf Handys, die das bei normaler Aufnahme schaffen (viele bleiben bei 30). Schärfere Bewegungen in Zeitlupe, Videos fast doppelt so groß.
 
 ### 7.6 Schüler: der Teil für den Trainer
 
@@ -11766,6 +11769,9 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 
 **Record the lesson** (under Start): the phone fixed **behind the baseline**, behind the player, and the band on their wrist with shot recognition. Nothing to press: **every recognized shot** becomes a clip and is filed on its own among **forehands, backhands, serves and volleys** (if the band does not recognize it, it goes with the forehands). Right after a shot, KEY1 or KEY2 marks it **in** or **out** (optional); shots without in/out do not count in the percentages. If the Coach agenda has a lesson going on, the recording belongs to it (and to the student, if there is only one). At the end each stroke has its own session, marked **Lesson**, in the **Stroke practice/Lessons** folder.
 - **The stroke from the video**: in the movement analysis, when from the video the shot looks like another one (e.g. *From the video it looks like: Backhand*), **Move to: Backhand** puts it under the right stroke and the analysis is redone. The clues are simple (both arms above the head in the serve, little wrist travel in the volley, hands close together in the backhand): moving is only offered when they are clear, or when the band had not recognized it.
+- **Annotate** (the pencil in the clip replay): the still frame, with the skeleton if it is on, can be marked with **arrows**, **circles** and **freehand** strokes in three colours, plus a **voice note** (the first time the app asks for the microphone). **Save** keeps it with the clip, **Share** sends it (picture and voice). In the analysis, opening the shot, the **Notes on the clip** can be viewed, played, shared or deleted; they stay even with *Videos only*.
+- **Kinetic chain (trial)**: opening an analysed shot, when legs, hips, shoulders, elbow and wrist reach their top speed relative to contact, and whether the order goes from the legs to the wrist. From a side video with few frames per second it is a rough estimate: one frame of difference is tolerated.
+- **Video at 60 frames per second**: under Start, only on phones that reach it in normal recording (many stop at 30). Sharper movements in slow motion, videos almost twice as large.
 
 ### 7.6 Students: the coach's part
 
@@ -12376,6 +12382,9 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 
 **Grabar la clase** (debajo de Empezar): el teléfono fijo **al fondo de la pista**, detrás de quien juega, y la pulsera en su muñeca con el reconocimiento de golpes. No hay que pulsar nada: **cada golpe reconocido** se convierte en un clip y se coloca solo entre **derechas, reveses, saques y voleas** (si la pulsera no lo reconoce, va con las derechas). Justo después de un golpe, KEY1 o KEY2 lo marcan **dentro** o **fuera** (opcional); los golpes sin dentro/fuera no cuentan en los porcentajes. Si en la agenda del Entrenador hay una clase en curso, la grabación es suya (y del alumno, si es uno solo). Al final cada golpe tiene su sesión, marcada **Clase**, en la carpeta **Entrenamiento de golpes/Clases**.
 - **El golpe por el vídeo**: en el análisis del movimiento, cuando por el vídeo el golpe parece otro (por ejemplo *Por el vídeo parece: Revés*), **Mover a: Revés** lo pone en el golpe correcto y el análisis se rehace. Los indicios son sencillos (los dos brazos por encima de la cabeza en el saque, poco recorrido de la muñeca en la volea, las manos juntas en el revés): solo se propone moverlo cuando son claros, o cuando la pulsera no lo había reconocido.
+- **Anotar** (el lápiz en la cámara lenta de los clips): el fotograma parado, con el esqueleto si está activado, se anota con **flechas**, **círculos** y trazos **a mano alzada** en tres colores, más una **nota de voz** (la primera vez la app pide el micrófono). **Guardar** la deja con el clip, **Compartir** la envía (imagen y voz). En el análisis, abriendo el golpe, las **Notas del clip** se vuelven a ver, se escuchan, se comparten o se eliminan; se quedan también con *Solo los vídeos*.
+- **Cadena cinética (de prueba)**: abriendo un golpe analizado, cuándo piernas, caderas, hombros, codo y muñeca llegan a su velocidad máxima respecto al impacto, y si el orden va de las piernas a la muñeca. Desde un vídeo de lado y con pocos fotogramas por segundo es una estimación aproximada: se tolera un fotograma de diferencia.
+- **Vídeo a 60 fotogramas por segundo**: debajo de Empezar, solo en los teléfonos que llegan en la grabación normal (muchos se quedan en 30). Movimientos más nítidos a cámara lenta, vídeos casi el doble de grandes.
 
 ### 7.6 Alumnos: la parte del entrenador
 
@@ -12986,6 +12995,9 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 
 **Enregistrer la leçon** (sous Commencer) : le téléphone fixe **au fond du court**, derrière le joueur, et le bracelet à son poignet avec la reconnaissance des coups. Rien à appuyer : **chaque coup reconnu** devient un clip et se range tout seul parmi **coups droits, revers, services et volées** (si le bracelet ne le reconnaît pas, il va avec les coups droits). Juste après un coup, KEY1 ou KEY2 le marque **bon** ou **faute** (facultatif) ; les coups sans bon/faute ne comptent pas dans les pourcentages. Si l'agenda de l'Entraîneur a une leçon en cours, l'enregistrement lui appartient (et à l'élève, s'il est seul). À la fin, chaque coup a sa séance, marquée **Leçon**, dans le dossier **Entraînement des coups/Leçons**.
 - **Le coup d'après la vidéo** : dans l'analyse du mouvement, quand d'après la vidéo le coup semble être un autre (par exemple *D'après la vidéo, on dirait : Revers*), **Déplacer vers : Revers** le range dans le bon coup et l'analyse est refaite. Les indices sont simples (les deux bras au-dessus de la tête au service, peu de trajet du poignet à la volée, les mains proches au revers) : on ne propose de le déplacer que s'ils sont clairs, ou si le bracelet ne l'avait pas reconnu.
+- **Annoter** (le crayon dans le ralenti des clips) : l'image figée, avec le squelette s'il est affiché, s'annote avec des **flèches**, des **cercles** et des traits **à main levée** en trois couleurs, plus une **note vocale** (la première fois l'appli demande le micro). **Enregistrer** la garde avec le clip, **Partager** l'envoie (image et voix). Dans l'analyse, en ouvrant le coup, les **Notes sur le clip** se revoient, s'écoutent, se partagent ou se suppriment ; elles restent même avec *Vidéos seules*.
+- **Chaîne cinétique (à l'essai)** : en ouvrant un coup analysé, quand jambes, hanches, épaules, coude et poignet atteignent leur vitesse maximale par rapport à l'impact, et si l'ordre va des jambes au poignet. D'une vidéo de côté avec peu d'images par seconde, c'est une estimation grossière : une image d'écart est tolérée.
+- **Vidéo à 60 images par seconde** : sous Commencer, seulement sur les téléphones qui y arrivent en enregistrement normal (beaucoup s'arrêtent à 30). Mouvements plus nets au ralenti, vidéos presque deux fois plus lourdes.
 
 ### 7.6 Élèves : la partie pour l'entraîneur
 
@@ -13596,6 +13608,9 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 
 **Registra la lezione** (sotto Inizia): il telefono fisso **a fondo campo**, dietro a chi gioca, e il braccialetto al suo polso con il riconoscimento dei colpi. Non si preme niente: **ogni colpo riconosciuto** diventa una clip e va da solo tra **dritti, rovesci, servizi e volée** (se il braccialetto non lo riconosce va tra i dritti). Subito dopo un colpo, KEY1 o KEY2 lo segnano **dentro** o **fuori** (facoltativo); i colpi senza dentro/fuori non contano nelle percentuali. Se nell'agenda dell'Allenatore c'è una lezione in corso, la registrazione è sua (e dell'allievo, se è uno solo). A fine lezione ogni colpo ha la sua sessione, segnata **Lezione**, nella cartella **Allenamento colpi/Lezioni**.
 - **Il colpo dal video**: nell'analisi del movimento, quando dal video il colpo sembra un altro (per esempio *Dal video sembra: Rovescio*), **Sposta tra: Rovescio** lo mette nel colpo giusto e l'analisi si rifà. Gli indizi sono semplici (le due braccia sopra la testa nel servizio, poca strada del polso nella volée, le mani vicine nel rovescio): si propone di spostarlo solo quando sono chiari, o quando il braccialetto non l'aveva riconosciuto.
+- **Annota** (la matita nella moviola delle clip): il fotogramma fermo, con lo scheletro se è acceso, si annota con **frecce**, **cerchi** e segni **a mano** in tre colori, più una **nota vocale** (la prima volta l'app chiede il microfono). **Salva** la mette con la clip, **Condividi** la manda (immagine e voce). Nell'analisi, aprendo il colpo, le **Note sulla clip** si riguardano, si ascoltano, si condividono o si eliminano; restano anche con *Solo i video*.
+- **Catena cinetica (in prova)**: aprendo un colpo analizzato, quando gambe, anche, spalle, gomito e polso arrivano alla loro velocità massima rispetto all'impatto, e se l'ordine va dalle gambe al polso. Da un video di lato e con pochi fotogrammi al secondo è una stima grossolana: un fotogramma di differenza si tollera.
+- **Video a 60 fotogrammi al secondo**: sotto Inizia, solo sui telefoni che ci arrivano nella registrazione normale (molti si fermano a 30). Movimenti più nitidi al rallentatore, video quasi doppi.
 
 ### 7.6 Allievi: la parte per l'allenatore
 
@@ -14206,6 +14221,9 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 
 **Gravar a aula** (embaixo de Começar): o telefone fixo **no fundo da quadra**, atrás de quem joga, e a pulseira no pulso dele com o reconhecimento de golpes. Não é preciso apertar nada: **cada golpe reconhecido** vira um clipe e vai sozinho para **forehands, backhands, saques e voleios** (se a pulseira não o reconhece, vai para os forehands). Logo após um golpe, KEY1 ou KEY2 o marcam **dentro** ou **fora** (opcional); os golpes sem dentro/fora não contam nas porcentagens. Se na agenda do Treinador há uma aula em andamento, a gravação é dela (e do aluno, se for um só). No fim cada golpe tem sua sessão, marcada **Aula**, na pasta **Treino de golpes/Aulas**.
 - **O golpe pelo vídeo**: na análise do movimento, quando pelo vídeo o golpe parece outro (por exemplo *Pelo vídeo parece: Backhand*), **Mover para: Backhand** o coloca no golpe certo e a análise é refeita. Os indícios são simples (os dois braços acima da cabeça no saque, pouco caminho do pulso no voleio, as mãos juntas no backhand): só se propõe mover quando são claros, ou quando a pulseira não o tinha reconhecido.
+- **Anotar** (o lápis na câmera lenta dos clipes): o quadro parado, com o esqueleto se estiver ligado, é anotado com **setas**, **círculos** e traços **à mão livre** em três cores, mais uma **nota de voz** (na primeira vez o app pede o microfone). **Salvar** a guarda com o clipe, **Compartilhar** a envia (imagem e voz). Na análise, abrindo o golpe, as **Notas do clipe** podem ser vistas, ouvidas, compartilhadas ou apagadas; ficam também com *Só os vídeos*.
+- **Cadeia cinética (em teste)**: abrindo um golpe analisado, quando pernas, quadris, ombros, cotovelo e pulso chegam à sua velocidade máxima em relação ao impacto, e se a ordem vai das pernas ao pulso. A partir de um vídeo de lado com poucos quadros por segundo é uma estimativa grosseira: um quadro de diferença é tolerado.
+- **Vídeo a 60 quadros por segundo**: embaixo de Começar, só nos telefones que chegam lá na gravação normal (muitos param em 30). Movimentos mais nítidos em câmera lenta, vídeos quase do dobro do tamanho.
 
 ### 7.6 Alunos: a parte do treinador
 
@@ -26218,6 +26236,95 @@ object Holidays {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/KineticChain.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/KineticChain.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlin.math.abs
+import kotlin.math.hypot
+
+/**
+ * Catena cinetica, in prova: quando ogni parte del corpo arriva alla sua velocità massima prima dell'impatto. Nel colpo
+ * ideale l'ordine va dalle gambe al polso (gambe, anche, spalle, gomito, polso), ognuna un po' dopo la precedente. Da un
+ * video di lato le rotazioni si vedono male: anche e spalle si stimano da quanto cambia la loro larghezza nell'immagine
+ * (girando, la linea si allarga o si stringe). Con 15 fotogrammi al secondo le differenze sotto un fotogramma non si
+ * vedono: si tollera un fotogramma.
+ */
+object KineticChain {
+    enum class Segment { LEGS, HIPS, SHOULDERS, ELBOW, WRIST }
+
+    /** [peaks]: ms dall'impatto (negativo = prima) per ogni parte trovata; [outOfOrder]: la prima coppia fuori ordine (dopo, prima). */
+    data class Result(val peaks: Map<Segment, Long>, val stepMs: Long, val outOfOrder: Pair<Segment, Segment>?) {
+        val inOrder: Boolean get() = outOfOrder == null
+    }
+
+    private const val SCORE = ServePose.MIN_SCORE
+    private const val BEFORE_MS = 700L
+    private const val AFTER_MS = 60L
+
+    fun compute(frames: List<PoseFrame>, contactT: Long, rightHanded: Boolean): Result? {
+        val win = frames.filter { it.t in (contactT - BEFORE_MS)..(contactT + AFTER_MS) }.sortedBy { it.t }
+        if (win.size < 4) return null
+        val stature = StrokeVision.stature(frames) ?: return null
+        fun ok(f: PoseFrame, vararg i: Int) = i.all { f.s[it] >= SCORE }
+        val sh = if (rightHanded) ServePose.R_SHOULDER else ServePose.L_SHOULDER
+        val el = if (rightHanded) ServePose.R_ELBOW else ServePose.L_ELBOW
+        val wr = if (rightHanded) ServePose.R_WRIST else ServePose.L_WRIST
+        // Una misura per fotogramma (null se non si vede), poi il picco della sua velocità tra due fotogrammi.
+        fun knee(f: PoseFrame): Float? = listOfNotNull(
+            ServePose.angle(f, ServePose.L_HIP, ServePose.L_KNEE, ServePose.L_ANKLE).takeIf { ok(f, ServePose.L_HIP, ServePose.L_KNEE, ServePose.L_ANKLE) },
+            ServePose.angle(f, ServePose.R_HIP, ServePose.R_KNEE, ServePose.R_ANKLE).takeIf { ok(f, ServePose.R_HIP, ServePose.R_KNEE, ServePose.R_ANKLE) },
+        ).takeIf { it.isNotEmpty() }?.average()?.toFloat()
+        fun width(f: PoseFrame, a: Int, b: Int): Float? = if (ok(f, a, b)) hypot(f.x[a] - f.x[b], f.y[a] - f.y[b]) / stature else null
+        fun elbow(f: PoseFrame): Float? = if (ok(f, sh, el, wr)) ServePose.angle(f, sh, el, wr) else null
+        /** Picco di velocità: [signed] = conta solo l'aumento (le gambe che si distendono), altrimenti in valore assoluto. */
+        fun peak(value: (PoseFrame) -> Float?, signed: Boolean = false): Long? {
+            var best = 0f; var at: Long? = null
+            for (k in 1 until win.size) {
+                val a = win[k - 1]; val b = win[k]
+                val va = value(a) ?: continue; val vb = value(b) ?: continue
+                val d = (vb - va) / (b.t - a.t).coerceAtLeast(1L)
+                val v = if (signed) d else abs(d)
+                if (v > best) { best = v; at = (a.t + b.t) / 2 - contactT }
+            }
+            return at
+        }
+        fun wristPeak(): Long? {
+            var best = 0f; var at: Long? = null
+            for (k in 1 until win.size) {
+                val a = win[k - 1]; val b = win[k]
+                if (!ok(a, wr) || !ok(b, wr)) continue
+                val v = hypot(b.x[wr] - a.x[wr], b.y[wr] - a.y[wr]) / (b.t - a.t).coerceAtLeast(1L)
+                if (v > best) { best = v; at = (a.t + b.t) / 2 - contactT }
+            }
+            return at
+        }
+        val peaks = linkedMapOf<Segment, Long>()
+        peak(::knee, signed = true)?.let { peaks[Segment.LEGS] = it }
+        peak({ width(it, ServePose.L_HIP, ServePose.R_HIP) })?.let { peaks[Segment.HIPS] = it }
+        peak({ width(it, ServePose.L_SHOULDER, ServePose.R_SHOULDER) })?.let { peaks[Segment.SHOULDERS] = it }
+        peak(::elbow)?.let { peaks[Segment.ELBOW] = it }
+        wristPeak()?.let { peaks[Segment.WRIST] = it }
+        if (peaks.size < 4) return null
+        val steps = win.zipWithNext { a, b -> b.t - a.t }.sorted()
+        val step = steps[steps.size / 2].coerceAtLeast(1L)
+        return Result(peaks, step, outOfOrder(peaks, step))
+    }
+
+    /** La prima parte che arriva prima di una che dovrebbe precederla (oltre [tolerance] ms): (questa, quella). */
+    fun outOfOrder(peaks: Map<Segment, Long>, tolerance: Long): Pair<Segment, Segment>? {
+        val seen = Segment.entries.filter { it in peaks }
+        for (i in seen.indices) for (j in i + 1 until seen.size) {
+            if (peaks.getValue(seen[j]) < peaks.getValue(seen[i]) - tolerance) return seen[j] to seen[i]
+        }
+        return null
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Ladder.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Ladder.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -31237,6 +31344,11 @@ class Storage(context: Context) {
     var myPlayerId: String
         get() = prefs.getString("my_player", null) ?: ""
         set(v) = prefs.edit().putString("my_player", v).apply()
+
+    /** Allenamento dei colpi: video a 60 fotogrammi al secondo (solo se tutti gli obiettivi ce la fanno). */
+    var trainFps60: Boolean
+        get() = prefs.getBoolean("train_fps60", false)
+        set(v) = prefs.edit().putBoolean("train_fps60", v).apply()
 
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
@@ -47325,6 +47437,7 @@ import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -47470,6 +47583,12 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+        // 60 fotogrammi al secondo: solo sui telefoni che ce la fanno (molti si fermano a 30).
+        val can60 = remember { com.tennis.scoremanager.video.CameraLenses.supports60(context) }
+        if (can60) {
+            var fps60 by remember { mutableStateOf(c.storage.trainFps60) }
+            SwitchRow(Icons.Filled.Speed, s.fps60Title, s.fps60Hint, fps60) { fps60 = it; c.storage.trainFps60 = it }
+        }
         // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
         GhostButton(s.lessonRecord, Icons.Filled.School, {
             context.startActivity(
@@ -50803,6 +50922,30 @@ interface Strings {
     val vsMoved: String
     val vsUnknown: String
     val lessonFolder: String
+    val lessonNoBand: String
+    val fps60Title: String
+    val fps60Hint: String
+    val kcTitle: String
+    val kcHint: String
+    val kcLegs: String
+    val kcHips: String
+    val kcShoulders: String
+    val kcElbow: String
+    val kcWrist: String
+    val kcInOrder: String
+    val kcOutOfOrder: (String, String) -> String
+    val anAnnotate: String
+    val anArrow: String
+    val anCircle: String
+    val anDraw: String
+    val anUndo: String
+    val anVoice: String
+    val anVoiceStop: String
+    val anVoicePlay: String
+    val anSaved: String
+    val anNotes: String
+    val anNoMic: String
+    val anHint: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -53526,7 +53669,7 @@ object ItStrings : Strings {
     override val lessonShot = "Lezione"
     override val lessonRecord = "Registra la lezione"
     override val lessonRecordHint = "Telefono fisso a fondo campo e braccialetto al polso di chi gioca: ogni colpo riconosciuto diventa una clip, messa da sola tra dritti, rovesci, servizi e volée. Non serve premere niente; KEY1 o KEY2 subito dopo un colpo lo segnano dentro o fuori."
-    override val lessonCount: (Int) -> String = { n -> "Lezione · $n colpi" }
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Lezione · 1 colpo" else "Lezione · $n colpi" }
     override val lessonWaiting = "Lezione · ogni colpo riconosciuto diventa una clip"
     override val lessonAgenda: (String) -> String = { t -> "Lezione dell'agenda: $t" }
     override val lessonMarkHint = "Dentro o fuori (facoltativo): subito dopo il colpo"
@@ -53535,6 +53678,30 @@ object ItStrings : Strings {
     override val vsMoved = "Colpo spostato: l'analisi si rifà nel colpo giusto"
     override val vsUnknown = "Il braccialetto non l'ha riconosciuto"
     override val lessonFolder = "Lezioni"
+    override val lessonNoBand = "Nessun braccialetto collegato: senza, la lezione non registra i colpi."
+    override val fps60Title = "Video a 60 fotogrammi al secondo"
+    override val fps60Hint = "Movimenti più nitidi al rallentatore; i video occupano quasi il doppio."
+    override val kcTitle = "Catena cinetica (in prova)"
+    override val kcHint = "Quando ogni parte arriva alla sua velocità massima, rispetto all'impatto: nel colpo ideale dalle gambe al polso. Stima da un video di lato e con pochi fotogrammi al secondo: da prendere con cautela."
+    override val kcLegs = "Gambe"
+    override val kcHips = "Anche"
+    override val kcShoulders = "Spalle"
+    override val kcElbow = "Gomito"
+    override val kcWrist = "Polso"
+    override val kcInOrder = "In ordine: dalle gambe al polso"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Fuori ordine: $a prima di $b" }
+    override val anAnnotate = "Annota"
+    override val anArrow = "Freccia"
+    override val anCircle = "Cerchio"
+    override val anDraw = "A mano"
+    override val anUndo = "Togli l'ultimo"
+    override val anVoice = "Nota vocale"
+    override val anVoiceStop = "Ferma"
+    override val anVoicePlay = "Ascolta"
+    override val anSaved = "Nota salvata con la clip"
+    override val anNotes = "Note sulla clip"
+    override val anNoMic = "Per la nota vocale serve il permesso del microfono"
+    override val anHint = "Trascina sull'immagine per disegnare; la nota vocale si registra e si ascolta qui."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -56259,7 +56426,7 @@ object EnStrings : Strings {
     override val lessonShot = "Lesson"
     override val lessonRecord = "Record the lesson"
     override val lessonRecordHint = "Phone fixed behind the baseline and band on the player's wrist: every recognized shot becomes a clip, filed on its own among forehands, backhands, serves and volleys. Nothing to press; KEY1 or KEY2 right after a shot marks it in or out."
-    override val lessonCount: (Int) -> String = { n -> "Lesson · $n shots" }
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Lesson · 1 shot" else "Lesson · $n shots" }
     override val lessonWaiting = "Lesson · every recognized shot becomes a clip"
     override val lessonAgenda: (String) -> String = { t -> "Agenda lesson: $t" }
     override val lessonMarkHint = "In or out (optional): right after the shot"
@@ -56268,6 +56435,30 @@ object EnStrings : Strings {
     override val vsMoved = "Shot moved: the analysis is redone under the right stroke"
     override val vsUnknown = "The band did not recognize it"
     override val lessonFolder = "Lessons"
+    override val lessonNoBand = "No band connected: without it the lesson does not record any shots."
+    override val fps60Title = "Video at 60 frames per second"
+    override val fps60Hint = "Sharper movements in slow motion; videos take almost twice the space."
+    override val kcTitle = "Kinetic chain (trial)"
+    override val kcHint = "When each body part reaches its top speed, relative to contact: in the ideal stroke from the legs to the wrist. Estimated from a side video with few frames per second: take it with caution."
+    override val kcLegs = "Legs"
+    override val kcHips = "Hips"
+    override val kcShoulders = "Shoulders"
+    override val kcElbow = "Elbow"
+    override val kcWrist = "Wrist"
+    override val kcInOrder = "In order: from the legs to the wrist"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Out of order: $a before $b" }
+    override val anAnnotate = "Annotate"
+    override val anArrow = "Arrow"
+    override val anCircle = "Circle"
+    override val anDraw = "Freehand"
+    override val anUndo = "Remove the last"
+    override val anVoice = "Voice note"
+    override val anVoiceStop = "Stop"
+    override val anVoicePlay = "Listen"
+    override val anSaved = "Note saved with the clip"
+    override val anNotes = "Notes on the clip"
+    override val anNoMic = "The voice note needs the microphone permission"
+    override val anHint = "Drag on the picture to draw; the voice note is recorded and played here."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -59017,7 +59208,7 @@ object DeStrings : Strings {
     override val lessonShot = "Trainerstunde"
     override val lessonRecord = "Stunde aufnehmen"
     override val lessonRecordHint = "Handy fest hinter der Grundlinie, Armband am Handgelenk des Spielers: Jeder erkannte Schlag wird ein Clip und landet von selbst bei Vorhand, Rückhand, Aufschlag oder Volley. Nichts zu drücken; KEY1 oder KEY2 direkt nach einem Schlag markiert ihn als im Feld oder aus."
-    override val lessonCount: (Int) -> String = { n -> "Stunde · $n Schläge" }
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Stunde · 1 Schlag" else "Stunde · $n Schläge" }
     override val lessonWaiting = "Stunde · jeder erkannte Schlag wird ein Clip"
     override val lessonAgenda: (String) -> String = { t -> "Stunde aus dem Kalender: $t" }
     override val lessonMarkHint = "Im Feld oder aus (freiwillig): direkt nach dem Schlag"
@@ -59026,6 +59217,30 @@ object DeStrings : Strings {
     override val vsMoved = "Schlag verschoben: die Analyse wird beim richtigen Schlag neu gemacht"
     override val vsUnknown = "Das Armband hat ihn nicht erkannt"
     override val lessonFolder = "Trainerstunden"
+    override val lessonNoBand = "Kein Armband verbunden: ohne es nimmt die Stunde keine Schläge auf."
+    override val fps60Title = "Video mit 60 Bildern pro Sekunde"
+    override val fps60Hint = "Schärfere Bewegungen in Zeitlupe; die Videos brauchen fast doppelt so viel Platz."
+    override val kcTitle = "Kinetische Kette (Test)"
+    override val kcHint = "Wann jeder Körperteil seine Höchstgeschwindigkeit erreicht, bezogen auf den Treffpunkt: beim idealen Schlag von den Beinen bis zum Handgelenk. Schätzung aus einem seitlichen Video mit wenigen Bildern pro Sekunde: mit Vorsicht zu nehmen."
+    override val kcLegs = "Beine"
+    override val kcHips = "Hüfte"
+    override val kcShoulders = "Schultern"
+    override val kcElbow = "Ellbogen"
+    override val kcWrist = "Handgelenk"
+    override val kcInOrder = "In Reihenfolge: von den Beinen zum Handgelenk"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Nicht in Reihenfolge: $a vor $b" }
+    override val anAnnotate = "Kommentieren"
+    override val anArrow = "Pfeil"
+    override val anCircle = "Kreis"
+    override val anDraw = "Freihand"
+    override val anUndo = "Letztes entfernen"
+    override val anVoice = "Sprachnotiz"
+    override val anVoiceStop = "Stopp"
+    override val anVoicePlay = "Anhören"
+    override val anSaved = "Notiz beim Clip gespeichert"
+    override val anNotes = "Notizen zum Clip"
+    override val anNoMic = "Für die Sprachnotiz braucht es die Mikrofonberechtigung"
+    override val anHint = "Zum Zeichnen über das Bild ziehen; die Sprachnotiz wird hier aufgenommen und abgespielt."
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -61765,7 +61980,7 @@ object EsStrings : Strings {
     override val lessonShot = "Clase"
     override val lessonRecord = "Grabar la clase"
     override val lessonRecordHint = "Teléfono fijo al fondo de la pista y pulsera en la muñeca de quien juega: cada golpe reconocido se convierte en un clip, colocado solo entre derechas, reveses, saques y voleas. No hay que pulsar nada; KEY1 o KEY2 justo después de un golpe lo marca dentro o fuera."
-    override val lessonCount: (Int) -> String = { n -> "Clase · $n golpes" }
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Clase · 1 golpe" else "Clase · $n golpes" }
     override val lessonWaiting = "Clase · cada golpe reconocido se convierte en un clip"
     override val lessonAgenda: (String) -> String = { t -> "Clase de la agenda: $t" }
     override val lessonMarkHint = "Dentro o fuera (opcional): justo después del golpe"
@@ -61774,6 +61989,30 @@ object EsStrings : Strings {
     override val vsMoved = "Golpe movido: el análisis se rehace en el golpe correcto"
     override val vsUnknown = "La pulsera no lo ha reconocido"
     override val lessonFolder = "Clases"
+    override val lessonNoBand = "Ninguna pulsera conectada: sin ella, la clase no graba los golpes."
+    override val fps60Title = "Vídeo a 60 fotogramas por segundo"
+    override val fps60Hint = "Movimientos más nítidos a cámara lenta; los vídeos ocupan casi el doble."
+    override val kcTitle = "Cadena cinética (de prueba)"
+    override val kcHint = "Cuándo cada parte del cuerpo llega a su velocidad máxima, respecto al impacto: en el golpe ideal de las piernas a la muñeca. Estimación de un vídeo de lado con pocos fotogramas por segundo: tomar con cautela."
+    override val kcLegs = "Piernas"
+    override val kcHips = "Caderas"
+    override val kcShoulders = "Hombros"
+    override val kcElbow = "Codo"
+    override val kcWrist = "Muñeca"
+    override val kcInOrder = "En orden: de las piernas a la muñeca"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Fuera de orden: $a antes que $b" }
+    override val anAnnotate = "Anotar"
+    override val anArrow = "Flecha"
+    override val anCircle = "Círculo"
+    override val anDraw = "A mano alzada"
+    override val anUndo = "Quitar el último"
+    override val anVoice = "Nota de voz"
+    override val anVoiceStop = "Parar"
+    override val anVoicePlay = "Escuchar"
+    override val anSaved = "Nota guardada con el clip"
+    override val anNotes = "Notas del clip"
+    override val anNoMic = "La nota de voz necesita el permiso del micrófono"
+    override val anHint = "Arrastra sobre la imagen para dibujar; la nota de voz se graba y se escucha aquí."
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -64515,7 +64754,7 @@ object FrStrings : Strings {
     override val lessonShot = "Leçon"
     override val lessonRecord = "Enregistrer la leçon"
     override val lessonRecordHint = "Téléphone fixe au fond du court et bracelet au poignet du joueur : chaque coup reconnu devient un clip, rangé tout seul parmi coups droits, revers, services et volées. Rien à appuyer ; KEY1 ou KEY2 juste après un coup le marque bon ou faute."
-    override val lessonCount: (Int) -> String = { n -> "Leçon · $n coups" }
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Leçon · 1 coup" else "Leçon · $n coups" }
     override val lessonWaiting = "Leçon · chaque coup reconnu devient un clip"
     override val lessonAgenda: (String) -> String = { t -> "Leçon de l'agenda : $t" }
     override val lessonMarkHint = "Bon ou faute (facultatif) : juste après le coup"
@@ -64524,6 +64763,30 @@ object FrStrings : Strings {
     override val vsMoved = "Coup déplacé : l'analyse est refaite dans le bon coup"
     override val vsUnknown = "Le bracelet ne l'a pas reconnu"
     override val lessonFolder = "Leçons"
+    override val lessonNoBand = "Aucun bracelet connecté : sans lui, la leçon n'enregistre pas les coups."
+    override val fps60Title = "Vidéo à 60 images par seconde"
+    override val fps60Hint = "Mouvements plus nets au ralenti ; les vidéos prennent presque le double de place."
+    override val kcTitle = "Chaîne cinétique (à l'essai)"
+    override val kcHint = "Quand chaque partie du corps atteint sa vitesse maximale, par rapport à l'impact : dans le coup idéal des jambes au poignet. Estimation d'une vidéo de côté avec peu d'images par seconde : à prendre avec prudence."
+    override val kcLegs = "Jambes"
+    override val kcHips = "Hanches"
+    override val kcShoulders = "Épaules"
+    override val kcElbow = "Coude"
+    override val kcWrist = "Poignet"
+    override val kcInOrder = "Dans l'ordre : des jambes au poignet"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Hors d'ordre : $a avant $b" }
+    override val anAnnotate = "Annoter"
+    override val anArrow = "Flèche"
+    override val anCircle = "Cercle"
+    override val anDraw = "À main levée"
+    override val anUndo = "Retirer le dernier"
+    override val anVoice = "Note vocale"
+    override val anVoiceStop = "Arrêter"
+    override val anVoicePlay = "Écouter"
+    override val anSaved = "Note enregistrée avec le clip"
+    override val anNotes = "Notes sur le clip"
+    override val anNoMic = "La note vocale demande l'autorisation du micro"
+    override val anHint = "Glissez sur l'image pour dessiner ; la note vocale s'enregistre et s'écoute ici."
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -67266,7 +67529,7 @@ object PtStrings : Strings {
     override val lessonShot = "Aula"
     override val lessonRecord = "Gravar a aula"
     override val lessonRecordHint = "Telefone fixo no fundo da quadra e pulseira no pulso de quem joga: cada golpe reconhecido vira um clipe, colocado sozinho entre forehands, backhands, saques e voleios. Não é preciso apertar nada; KEY1 ou KEY2 logo após um golpe marca-o dentro ou fora."
-    override val lessonCount: (Int) -> String = { n -> "Aula · $n golpes" }
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Aula · 1 golpe" else "Aula · $n golpes" }
     override val lessonWaiting = "Aula · cada golpe reconhecido vira um clipe"
     override val lessonAgenda: (String) -> String = { t -> "Aula da agenda: $t" }
     override val lessonMarkHint = "Dentro ou fora (opcional): logo após o golpe"
@@ -67275,6 +67538,30 @@ object PtStrings : Strings {
     override val vsMoved = "Golpe movido: a análise é refeita no golpe certo"
     override val vsUnknown = "A pulseira não o reconheceu"
     override val lessonFolder = "Aulas"
+    override val lessonNoBand = "Nenhuma pulseira conectada: sem ela, a aula não grava os golpes."
+    override val fps60Title = "Vídeo a 60 quadros por segundo"
+    override val fps60Hint = "Movimentos mais nítidos em câmera lenta; os vídeos ocupam quase o dobro."
+    override val kcTitle = "Cadeia cinética (em teste)"
+    override val kcHint = "Quando cada parte do corpo chega à sua velocidade máxima, em relação ao impacto: no golpe ideal das pernas ao pulso. Estimativa de um vídeo de lado com poucos quadros por segundo: considerar com cautela."
+    override val kcLegs = "Pernas"
+    override val kcHips = "Quadris"
+    override val kcShoulders = "Ombros"
+    override val kcElbow = "Cotovelo"
+    override val kcWrist = "Pulso"
+    override val kcInOrder = "Em ordem: das pernas ao pulso"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Fora de ordem: $a antes de $b" }
+    override val anAnnotate = "Anotar"
+    override val anArrow = "Seta"
+    override val anCircle = "Círculo"
+    override val anDraw = "À mão livre"
+    override val anUndo = "Tirar o último"
+    override val anVoice = "Nota de voz"
+    override val anVoiceStop = "Parar"
+    override val anVoicePlay = "Ouvir"
+    override val anSaved = "Nota salva com o clipe"
+    override val anNotes = "Notas do clipe"
+    override val anNoMic = "A nota de voz precisa da permissão do microfone"
+    override val anHint = "Arraste sobre a imagem para desenhar; a nota de voz é gravada e ouvida aqui."
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -81412,7 +81699,10 @@ class CameraActivity : ComponentActivity() {
         if (prepared) return true
         val st = stream()
         val rotation = CameraHelper.getCameraOrientation(this)
-        prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
+        // Allenamento dei colpi a 60 fotogrammi, se scelto e se il telefono ce la fa: il doppio dei dati, bitrate più alto.
+        val fps60 = serveMode && controller.storage.trainFps60 && CameraLenses.supports60(this)
+        prepared = st.prepareVideo(WIDTH, HEIGHT, if (fps60) VIDEO_BITRATE_60 else VIDEO_BITRATE, fps = if (fps60) 60 else 30, rotation = rotation) &&
+            st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
     }
@@ -82138,7 +82428,7 @@ class CameraActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         @Composable fun line(t: String) = Text(t, color = TsmColors.TextMain, fontSize = 13.sp)
-                        line(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand)
+                        line(band?.let { str.serveBandOk(it.name) } ?: if (lessonMode) str.lessonNoBand else str.serveNoBand)
                         if (lessonMode) {
                             line(str.lessonWaiting)
                             line(str.lessonMarkHint)
@@ -82359,6 +82649,8 @@ class CameraActivity : ComponentActivity() {
         private const val HEIGHT = 1080
         /** 6 Mbit/s: quanto chiede YouTube per il 1080p a 30 fotogrammi. */
         private const val VIDEO_BITRATE = 6_000_000
+        /** A 60 fotogrammi: 10 Mbit/s, come chiede YouTube per il 1080p60. */
+        private const val VIDEO_BITRATE_60 = 10_000_000
         /** Inquadratura per l'arbitro: larghezza dei fotogrammi e ogni quanto. */
         private const val PREVIEW_W = 640
         private const val PREVIEW_EVERY_MS = 330L
@@ -82582,6 +82874,296 @@ object ClipJoin {
         }
         true
     }.onFailure { Log.w(TAG, "copia della clip non riuscita", it) }.getOrDefault(false)
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ClipNotes.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ClipNotes.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Paint
+import android.graphics.Path
+import android.media.MediaPlayer
+import android.media.MediaRecorder
+import android.os.Build
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Draw
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.NorthEast
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+import java.io.File
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.sin
+
+/**
+ * Note su una clip: un fotogramma con frecce, cerchi e segni a mano ("nota_<ora>.png") e, se c'è, la nota vocale
+ * con lo stesso nome ("nota_<ora>.m4a"). Stanno nella cartella della clip, accanto al video, e restano anche con
+ * "Solo i video" (si cancellano solo gli mp4).
+ */
+object ClipNotes {
+    data class Note(val image: File, val voice: File?, val at: Long)
+
+    fun list(dir: File): List<Note> = dir.listFiles { f -> f.name.startsWith("nota_") && f.extension == "png" }.orEmpty()
+        .map { png -> Note(png, File(dir, png.nameWithoutExtension + ".m4a").takeIf { it.exists() }, png.nameWithoutExtension.removePrefix("nota_").toLongOrNull() ?: png.lastModified()) }
+        .sortedByDescending { it.at }
+
+    fun delete(n: Note) { n.image.delete(); n.voice?.delete() }
+
+    /** Immagine piccola per l'elenco (non serve intera). */
+    fun thumbnail(f: File, maxWidth: Int = 900): Bitmap? = runCatching {
+        val o = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(f.absolutePath, o)
+        var sample = 1
+        while (o.outWidth / (sample * 2) >= maxWidth) sample *= 2
+        BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample })
+    }.getOrNull()
+
+    /** Condivide la nota (immagine ed eventuale voce): copie nella cartella "share" che il FileProvider dà. */
+    fun share(ctx: Context, n: Note) {
+        val dir = File(ctx.cacheDir, "share").apply { mkdirs() }
+        val files = listOfNotNull(n.image, n.voice).map { f -> File(dir, f.name).also { f.copyTo(it, overwrite = true) } }
+        val uris = ArrayList(files.map { androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", it) })
+        val send = if (uris.size == 1) Intent(Intent.ACTION_SEND).apply { type = "image/png"; putExtra(Intent.EXTRA_STREAM, uris[0]) }
+        else Intent(Intent.ACTION_SEND_MULTIPLE).apply { type = "*/*"; putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris) }
+        send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        ctx.startActivity(Intent.createChooser(send, null))
+    }
+
+    /** I segni, in frazioni della larghezza e dell'altezza dell'immagine (così valgono a ogni dimensione). */
+    sealed class Mark(val color: Int) {
+        class Arrow(color: Int, val a: Offset, val b: Offset) : Mark(color)
+        class Ring(color: Int, val center: Offset, val edge: Offset) : Mark(color)
+        class Free(color: Int, val points: List<Offset>) : Mark(color)
+    }
+
+    /** L'immagine coi segni, alla risoluzione del fotogramma. */
+    fun render(frame: Bitmap, marks: List<Mark>): Bitmap {
+        val out = frame.copy(Bitmap.Config.ARGB_8888, true)
+        val c = android.graphics.Canvas(out)
+        val w = out.width.toFloat(); val h = out.height.toFloat()
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = h / 90; strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND }
+        fun px(o: Offset) = Offset(o.x * w, o.y * h)
+        for (m in marks) {
+            p.color = m.color
+            when (m) {
+                is Mark.Arrow -> {
+                    val a = px(m.a); val b = px(m.b)
+                    c.drawLine(a.x, a.y, b.x, b.y, p)
+                    for (seg in arrowHead(a, b, h / 25)) c.drawLine(seg[0], seg[1], seg[2], seg[3], p)
+                }
+                is Mark.Ring -> { val o = px(m.center); val e = px(m.edge); c.drawCircle(o.x, o.y, hypot(e.x - o.x, e.y - o.y), p) }
+                is Mark.Free -> if (m.points.size > 1) {
+                    val path = Path()
+                    m.points.map(::px).forEachIndexed { i, o -> if (i == 0) path.moveTo(o.x, o.y) else path.lineTo(o.x, o.y) }
+                    c.drawPath(path, p)
+                }
+            }
+        }
+        return out
+    }
+
+    /** Le due alette della freccia che arriva in [b]. */
+    private fun arrowHead(a: Offset, b: Offset, len: Float): List<FloatArray> {
+        val ang = atan2(b.y - a.y, b.x - a.x)
+        return listOf(0.5f, -0.5f).map { d ->
+            floatArrayOf(b.x, b.y, b.x - len * cos(ang + d), b.y - len * sin(ang + d))
+        }
+    }
+
+    fun drawMarks(scope: DrawScope, marks: List<Mark>) = with(scope) {
+        val w = size.width; val h = size.height
+        val sw = h / 90
+        fun px(o: Offset) = Offset(o.x * w, o.y * h)
+        for (m in marks) {
+            val col = Color(m.color)
+            when (m) {
+                is Mark.Arrow -> {
+                    val a = px(m.a); val b = px(m.b)
+                    drawLine(col, a, b, sw, StrokeCap.Round)
+                    for (seg in arrowHead(a, b, h / 25)) drawLine(col, Offset(seg[0], seg[1]), Offset(seg[2], seg[3]), sw, StrokeCap.Round)
+                }
+                is Mark.Ring -> { val o = px(m.center); val e = px(m.edge); drawCircle(col, hypot(e.x - o.x, e.y - o.y), o, style = Stroke(sw)) }
+                is Mark.Free -> m.points.map(::px).zipWithNext { p, q -> drawLine(col, p, q, sw, StrokeCap.Round) }
+            }
+        }
+    }
+}
+
+private enum class Tool { ARROW, RING, FREE }
+
+/**
+ * Annotare un fotogramma: frecce, cerchi e segni a mano in tre colori, la nota vocale, poi Salva (nella cartella della
+ * clip) o Condividi. [askMic] chiede il permesso del microfono e risponde se c'è.
+ */
+@Composable
+fun AnnotateScreen(frame: Bitmap, dir: File, s: Strings, askMic: ((Boolean) -> Unit) -> Unit, onClose: () -> Unit) {
+    val ctx = LocalContext.current
+    val stem = remember { "nota_${System.currentTimeMillis()}" }
+    val voice = remember { File(dir, "$stem.m4a") }
+    val marks = remember { mutableStateListOf<ClipNotes.Mark>() }
+    var tool by remember { mutableStateOf(Tool.ARROW) }
+    val colors = listOf(TsmColors.Ball, TsmColors.Danger, Color.White)
+    var color by remember { mutableStateOf(colors[0]) }
+    var draft by remember { mutableStateOf<ClipNotes.Mark?>(null) }
+    var recorder by remember { mutableStateOf<MediaRecorder?>(null) }
+    var hasVoice by remember { mutableStateOf(false) }
+    var player by remember { mutableStateOf<MediaPlayer?>(null) }
+    var saved by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf<String?>(null) }
+    fun stopRec() { recorder?.let { r -> runCatching { r.stop() }.onFailure { voice.delete() }; r.release() }; recorder = null; hasVoice = voice.exists() && voice.length() > 0 }
+    fun startRec() {
+        runCatching {
+            @Suppress("DEPRECATION")
+            val r = if (Build.VERSION.SDK_INT >= 31) MediaRecorder(ctx) else MediaRecorder()
+            r.setAudioSource(MediaRecorder.AudioSource.MIC)
+            r.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            r.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            r.setAudioEncodingBitRate(64_000)
+            r.setAudioSamplingRate(44_100)
+            r.setOutputFile(voice.absolutePath)
+            r.prepare(); r.start()
+            recorder = r
+        }.onFailure { voice.delete(); message = s.anNoMic }
+    }
+    fun save(): ClipNotes.Note? {
+        stopRec()
+        val png = File(dir, "$stem.png")
+        val ok = runCatching { png.outputStream().use { ClipNotes.render(frame, marks).compress(Bitmap.CompressFormat.PNG, 100, it) } }.isSuccess
+        if (!ok) return null
+        saved = true
+        return ClipNotes.Note(png, voice.takeIf { it.exists() }, System.currentTimeMillis())
+    }
+    // Chiusa senza salvare: la voce registrata non resta da sola.
+    DisposableEffect(Unit) { onDispose { stopRec(); player?.release(); if (!saved) voice.delete() } }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).statusBarsPadding().navigationBarsPadding()) {
+        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(message ?: s.anHint, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.weight(1f))
+            NoteBtn(Icons.Filled.Close, null, false) { onClose() }
+        }
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(Modifier.aspectRatio(frame.width / frame.height.toFloat())) {
+                Image(frame.asImageBitmap(), null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
+                Canvas(
+                    Modifier.fillMaxSize().pointerInput(tool, color) {
+                        fun norm(o: Offset) = Offset((o.x / size.width).coerceIn(0f, 1f), (o.y / size.height).coerceIn(0f, 1f))
+                        var start = Offset.Zero
+                        val pts = ArrayList<Offset>()
+                        detectDragGestures(
+                            onDragStart = { o -> start = norm(o); pts.clear(); pts += start },
+                            onDragEnd = { draft?.let { marks += it }; draft = null },
+                            onDragCancel = { draft = null },
+                        ) { change, _ ->
+                            val p = norm(change.position)
+                            val c = color.toArgb()
+                            draft = when (tool) {
+                                Tool.ARROW -> ClipNotes.Mark.Arrow(c, start, p)
+                                Tool.RING -> ClipNotes.Mark.Ring(c, start, p)
+                                Tool.FREE -> { pts += p; ClipNotes.Mark.Free(c, pts.toList()) }
+                            }
+                        }
+                    },
+                ) { ClipNotes.drawMarks(this, marks + listOfNotNull(draft)) }
+            }
+        }
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+            NoteBtn(Icons.Filled.NorthEast, s.anArrow, tool == Tool.ARROW) { tool = Tool.ARROW }
+            NoteBtn(Icons.Filled.Circle, s.anCircle, tool == Tool.RING) { tool = Tool.RING }
+            NoteBtn(Icons.Filled.Draw, s.anDraw, tool == Tool.FREE) { tool = Tool.FREE }
+            for (col in colors) Box(
+                Modifier.size(32.dp).clip(CircleShape).background(col)
+                    .border(3.dp, if (col == color) TsmColors.Orange else Color.Transparent, CircleShape).clickable { color = col },
+            )
+            NoteBtn(Icons.AutoMirrored.Filled.Undo, s.anUndo, false) { if (marks.isNotEmpty()) marks.removeAt(marks.lastIndex) }
+        }
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (recorder != null) NoteBtn(Icons.Filled.Stop, s.anVoiceStop, true) { stopRec() }
+            else NoteBtn(Icons.Filled.Mic, s.anVoice, false) { player?.release(); player = null; askMic { ok -> if (ok) startRec() else message = s.anNoMic } }
+            if (hasVoice && recorder == null) NoteBtn(Icons.Filled.PlayArrow, s.anVoicePlay, false) {
+                player?.release()
+                player = runCatching { MediaPlayer().apply { setDataSource(voice.absolutePath); prepare(); start() } }.getOrNull()
+            }
+            NoteBtn(Icons.Filled.Save, s.save, false) {
+                if (save() != null) { android.widget.Toast.makeText(ctx, s.anSaved, android.widget.Toast.LENGTH_SHORT).show(); onClose() }
+            }
+            NoteBtn(Icons.Filled.Share, s.share, false) { save()?.let { ClipNotes.share(ctx, it); onClose() } }
+        }
+    }
+}
+
+@Composable
+private fun NoteBtn(icon: ImageVector?, label: String?, on: Boolean, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = if (on) TsmColors.Orange else TsmColors.SurfaceHigh) {
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            icon?.let { Icon(it, null, tint = if (on) TsmColors.OnOrange else TsmColors.TextMain) }
+            label?.let { Text(if (icon != null) " $it" else it, color = if (on) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1) }
+        }
+    }
 }
 TSM_EOF
 
@@ -83213,6 +83795,18 @@ object CameraLenses {
         return all.filter { it.hFov >= main.hFov - 1f }
             .sortedBy { it.hFov }
             .fold(mutableListOf<Framing.Lens>()) { acc, l -> if (acc.none { abs(it.hFov - l.hFov) < 3f }) acc += l; acc }
+    }
+
+    /**
+     * Si può registrare a 60 fotogrammi al secondo con tutti gli obiettivi usati (per cambiarli a metà senza sorprese).
+     * Molti telefoni arrivano a 30 nella registrazione normale: i 120 dei "rallentatori" sono un modo a parte.
+     */
+    fun supports60(context: Context): Boolean {
+        val cm = context.getSystemService(CameraManager::class.java) ?: return false
+        val ids = list(context).map { it.id }
+        return ids.isNotEmpty() && ids.all { id ->
+            runCatching { cm.getCameraCharacteristics(id).get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)?.any { it.upper >= 60 } == true }.getOrDefault(false)
+        }
     }
 }
 
@@ -84573,6 +85167,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Pause
@@ -84595,6 +85190,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -84635,6 +85231,40 @@ class ReplayActivity : ComponentActivity() {
     private var pose: ServePoseResult? = null
     private var poseStarts: List<Long> = emptyList()
     private var poseAt = 0L
+    /** Il video, per prenderne il fotogramma da annotare; il fotogramma in annotazione (null = moviola). */
+    private var texture: TextureView? = null
+    private var annotating by mutableStateOf<android.graphics.Bitmap?>(null)
+    /** La cartella della clip (allenamento dei colpi): lì si salvano le note. null = moviola della partita. */
+    private val notesDir: File? by lazy {
+        intent.getStringExtra(EXTRA_POSE_DIR)?.let(::File) ?: files.firstOrNull()?.parentFile?.takeIf { intent.getStringExtra(EXTRA_STAR_SESSION) != null }
+    }
+    private var micAnswer: ((Boolean) -> Unit)? = null
+    private val micPermission = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
+        micAnswer?.invoke(ok); micAnswer = null
+    }
+
+    private fun askMic(answer: (Boolean) -> Unit) {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) answer(true)
+        else { micAnswer = answer; micPermission.launch(android.Manifest.permission.RECORD_AUDIO) }
+    }
+
+    /** Il fotogramma fermo, con lo scheletro se è acceso, da annotare. */
+    private fun grabFrame(p: ExoPlayer, skeleton: Boolean): android.graphics.Bitmap? {
+        val bmp = texture?.bitmap ?: return null
+        if (!skeleton) return bmp
+        val abs = (poseStarts.getOrNull(p.currentMediaItemIndex) ?: return bmp) + p.currentPosition
+        val f = poseAt(abs - poseAt) ?: return bmp
+        val out = bmp.copy(android.graphics.Bitmap.Config.ARGB_8888, true)
+        val img = out.asImageBitmap()
+        androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+            androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(img),
+            androidx.compose.ui.geometry.Size(out.width.toFloat(), out.height.toFloat()),
+        ) { drawSkeleton(f, TsmColors.Ball) }
+        return out
+    }
+
+    /** Un fotogramma, in ms: dal video (60 fotogrammi = 17 ms), altrimenti 33 come a 30. */
+    private fun frameMs(p: ExoPlayer): Long = p.videoFormat?.frameRate?.takeIf { it > 1f }?.let { Math.round(1000f / it).toLong() } ?: 33L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84760,7 +85390,7 @@ class ReplayActivity : ComponentActivity() {
                             translationY = pan.y
                         },
                 ) {
-                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
+                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it); texture = it } }, modifier = Modifier.fillMaxSize())
                     if (skeleton) SkeletonOverlay(p)
                 }
             }
@@ -84824,7 +85454,7 @@ class ReplayActivity : ComponentActivity() {
                 Btn(Icons.Filled.SkipPrevious, null, false) {
                     p.pause()
                     playing = false
-                    p.seekTo(maxOf(0, p.currentPosition - 33))
+                    p.seekTo(maxOf(0, p.currentPosition - frameMs(p)))
                     syncBoard(p, true)
                 }
                 Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
@@ -84835,11 +85465,20 @@ class ReplayActivity : ComponentActivity() {
                 Btn(Icons.Filled.SkipNext, null, false) {
                     p.pause()
                     playing = false
-                    p.seekTo(p.currentPosition + 33)
+                    p.seekTo(p.currentPosition + frameMs(p))
                     syncBoard(p, true)
+                }
+                // Annota il fotogramma fermo (frecce, cerchi, voce): solo per le clip dell'allenamento.
+                if (notesDir != null) Btn(Icons.Filled.Draw, null, false) {
+                    p.pause()
+                    playing = false
+                    syncBoard(p, true)
+                    annotating = grabFrame(p, skeleton)
                 }
             }
         }
+        // L'annotazione copre la moviola; chiusa, si torna al fotogramma fermo.
+        annotating?.let { bmp -> notesDir?.let { d -> AnnotateScreen(bmp, d, s, ::askMic) { annotating = null } } }
     }
 
     /** Il tabellone fa quello che fa la moviola dell'arbitro: stesso pezzo, stesso istante, fermo o in movimento. */
@@ -85222,6 +85861,8 @@ import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85251,6 +85892,7 @@ import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.StrokeCheck
 import com.tennis.scoremanager.data.StrokeFlag
 import com.tennis.scoremanager.data.StrokeVision
+import com.tennis.scoremanager.data.KineticChain
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
@@ -85653,6 +86295,64 @@ class ServeAnalysisActivity : ComponentActivity() {
             if (fl.any { it.ref != null } && ref != null) Text(if (ref.fromBest) str.fxVsBest else str.fxVsIn, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(str.fxHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
+        Chain(r)
+        Notes(d)
+    }
+
+    /** Le note sulla clip (annotate nella moviola): immagine, voce, condividi, elimina. Si rileggono tornando qui. */
+    @Composable
+    private fun Notes(d: File) {
+        val str = s
+        var version by remember { mutableStateOf(0) }
+        val resumed = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState().value
+        val notes by androidx.compose.runtime.produceState(emptyList<Pair<ClipNotes.Note, Bitmap?>>(), d, version, resumed) {
+            value = withContext(Dispatchers.IO) { ClipNotes.list(d).map { it to ClipNotes.thumbnail(it.image) } }
+        }
+        if (notes.isEmpty()) return
+        var zoomed by remember { mutableStateOf<Bitmap?>(null) }
+        var player by remember { mutableStateOf<android.media.MediaPlayer?>(null) }
+        androidx.compose.runtime.DisposableEffect(Unit) { onDispose { player?.release() } }
+        Text(str.anNotes, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        for ((n, bmp) in notes) {
+            bmp?.let { b -> KeyImage(b) { zoomed = ClipNotes.thumbnail(n.image, 2000) ?: b } }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                n.voice?.let { v ->
+                    GhostButton(str.anVoicePlay, Icons.Filled.PlayCircle, {
+                        player?.release()
+                        player = runCatching { android.media.MediaPlayer().apply { setDataSource(v.absolutePath); prepare(); start() } }.getOrNull()
+                    }, Modifier.weight(1f))
+                }
+                GhostButton(str.share, Icons.Filled.Share, { ClipNotes.share(this@ServeAnalysisActivity, n) }, Modifier.weight(1f))
+                GhostButton(str.delete, Icons.Filled.Delete, { ClipNotes.delete(n); version++ }, Modifier.weight(1f))
+            }
+        }
+        zoomed?.let { ZoomDialog(it) { zoomed = null } }
+    }
+
+    /** Catena cinetica (in prova): il picco di ogni parte rispetto all'impatto, e se l'ordine è dalle gambe al polso. */
+    @Composable
+    private fun Chain(r: ServePoseResult) {
+        val str = s
+        val (contact, right) = r.metrics?.let { it.contactT to it.rightHanded } ?: r.ground?.let { it.contactT to it.rightHanded } ?: return
+        val kc = remember(r) { KineticChain.compute(r.frames, contact, right) } ?: return
+        fun name(x: KineticChain.Segment) = when (x) {
+            KineticChain.Segment.LEGS -> str.kcLegs
+            KineticChain.Segment.HIPS -> str.kcHips
+            KineticChain.Segment.SHOULDERS -> str.kcShoulders
+            KineticChain.Segment.ELBOW -> str.kcElbow
+            KineticChain.Segment.WRIST -> str.kcWrist
+        }
+        Text(str.kcTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        for (seg in KineticChain.Segment.entries) {
+            val t = kc.peaks[seg] ?: continue
+            Row(Modifier.fillMaxWidth()) {
+                Text(name(seg), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text((if (t > 0) "+" else if (t < 0) "−" else "") + "${kotlin.math.abs(t)} ms", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            }
+        }
+        val out = kc.outOfOrder
+        Text(if (out == null) str.kcInOrder else str.kcOutOfOrder(name(out.first), name(out.second)), color = if (out == null) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
+        Text(str.kcHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 
     /** Un colpo analizzato da confrontare: sessione, colpo, cartella della clip. */
@@ -100702,6 +101402,57 @@ class HolidaysTest {
         assertNull(Courses.endAfter(from, emptyList(), 3))
         val co = Course("c", "x", slots = slots, from = from, to = LocalDate.of(2026, 12, 31).atStartOfDay(zone).toInstant().toEpochMilli())
         assertEquals(1, Courses.skipped(co, skip).size)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/KineticChainTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/KineticChainTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.data.KineticChain.Segment
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class KineticChainTest {
+    @Test fun orderWithTolerance() {
+        val good = mapOf(Segment.LEGS to -300L, Segment.HIPS to -230L, Segment.SHOULDERS to -160L, Segment.ELBOW to -90L, Segment.WRIST to -20L)
+        assertNull(KineticChain.outOfOrder(good, 66))
+        // Le spalle un fotogramma prima delle anche: tollerato.
+        assertNull(KineticChain.outOfOrder(good + (Segment.SHOULDERS to -280L), 66))
+        // Il polso molto prima del gomito: fuori ordine (la prima parte superata è la spalla).
+        assertEquals(Segment.WRIST to Segment.SHOULDERS, KineticChain.outOfOrder(good + (Segment.WRIST to -250L), 66))
+    }
+
+    @Test fun peaksFromFrames() {
+        // Ogni parte si muove in un fotogramma diverso: gambe (t 1-2), anche (2-3), spalle (3-4), gomito (4-5), polso (5-6).
+        val n = 8
+        val frames = (0 until n).map { k ->
+            val x = MutableList(17) { 0.5f }; val y = MutableList(17) { 0.5f }
+            y[ServePose.NOSE] = 0.1f
+            // Gambe: ginocchio piegato poi disteso tra 1 e 2.
+            val kneeOut = if (k >= 2) 0.0f else 0.08f
+            x[ServePose.L_HIP] = 0.48f; y[ServePose.L_HIP] = 0.5f; x[ServePose.L_KNEE] = 0.48f + kneeOut; y[ServePose.L_KNEE] = 0.7f; x[ServePose.L_ANKLE] = 0.48f; y[ServePose.L_ANKLE] = 0.9f
+            // Anche e spalle: larghezza che cambia.
+            x[ServePose.R_HIP] = if (k >= 3) 0.6f else 0.52f; y[ServePose.R_HIP] = 0.5f
+            x[ServePose.R_KNEE] = 0.55f; y[ServePose.R_KNEE] = 0.7f; x[ServePose.R_ANKLE] = 0.55f; y[ServePose.R_ANKLE] = 0.9f
+            x[ServePose.L_SHOULDER] = 0.46f; y[ServePose.L_SHOULDER] = 0.25f
+            x[ServePose.R_SHOULDER] = if (k >= 4) 0.62f else 0.54f; y[ServePose.R_SHOULDER] = 0.25f
+            // Gomito: si distende tra 4 e 5; polso: scatta tra 5 e 6.
+            x[ServePose.R_ELBOW] = 0.62f; y[ServePose.R_ELBOW] = 0.35f
+            val wx = if (k >= 6) 0.9f else if (k >= 5) 0.62f else 0.70f
+            x[ServePose.R_WRIST] = wx; y[ServePose.R_WRIST] = if (k >= 5) 0.45f else 0.35f
+            PoseFrame(k * 66L, x, y, List(17) { 0.9f })
+        }
+        val r = KineticChain.compute(frames, contactT = 6 * 66L, rightHanded = true)!!
+        assertEquals(setOf(Segment.LEGS, Segment.HIPS, Segment.SHOULDERS, Segment.ELBOW, Segment.WRIST), r.peaks.keys)
+        assertTrue(r.peaks.getValue(Segment.LEGS) < r.peaks.getValue(Segment.WRIST))
+        assertTrue(r.inOrder)
     }
 }
 TSM_EOF
@@ -117399,6 +118150,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 378 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 381 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

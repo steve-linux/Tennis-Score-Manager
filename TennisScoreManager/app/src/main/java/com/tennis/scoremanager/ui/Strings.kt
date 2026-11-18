@@ -2808,6 +2808,29 @@ interface Strings {
     val vsUnknown: String
     val lessonFolder: String
     val lessonNoBand: String
+    val fps60Title: String
+    val fps60Hint: String
+    val kcTitle: String
+    val kcHint: String
+    val kcLegs: String
+    val kcHips: String
+    val kcShoulders: String
+    val kcElbow: String
+    val kcWrist: String
+    val kcInOrder: String
+    val kcOutOfOrder: (String, String) -> String
+    val anAnnotate: String
+    val anArrow: String
+    val anCircle: String
+    val anDraw: String
+    val anUndo: String
+    val anVoice: String
+    val anVoiceStop: String
+    val anVoicePlay: String
+    val anSaved: String
+    val anNotes: String
+    val anNoMic: String
+    val anHint: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5541,6 +5564,29 @@ object ItStrings : Strings {
     override val vsUnknown = "Il braccialetto non l'ha riconosciuto"
     override val lessonFolder = "Lezioni"
     override val lessonNoBand = "Nessun braccialetto collegato: senza, la lezione non registra i colpi."
+    override val fps60Title = "Video a 60 fotogrammi al secondo"
+    override val fps60Hint = "Movimenti più nitidi al rallentatore; i video occupano quasi il doppio."
+    override val kcTitle = "Catena cinetica (in prova)"
+    override val kcHint = "Quando ogni parte arriva alla sua velocità massima, rispetto all'impatto: nel colpo ideale dalle gambe al polso. Stima da un video di lato e con pochi fotogrammi al secondo: da prendere con cautela."
+    override val kcLegs = "Gambe"
+    override val kcHips = "Anche"
+    override val kcShoulders = "Spalle"
+    override val kcElbow = "Gomito"
+    override val kcWrist = "Polso"
+    override val kcInOrder = "In ordine: dalle gambe al polso"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Fuori ordine: $a prima di $b" }
+    override val anAnnotate = "Annota"
+    override val anArrow = "Freccia"
+    override val anCircle = "Cerchio"
+    override val anDraw = "A mano"
+    override val anUndo = "Togli l'ultimo"
+    override val anVoice = "Nota vocale"
+    override val anVoiceStop = "Ferma"
+    override val anVoicePlay = "Ascolta"
+    override val anSaved = "Nota salvata con la clip"
+    override val anNotes = "Note sulla clip"
+    override val anNoMic = "Per la nota vocale serve il permesso del microfono"
+    override val anHint = "Trascina sull'immagine per disegnare; la nota vocale si registra e si ascolta qui."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8275,6 +8321,29 @@ object EnStrings : Strings {
     override val vsUnknown = "The band did not recognize it"
     override val lessonFolder = "Lessons"
     override val lessonNoBand = "No band connected: without it the lesson does not record any shots."
+    override val fps60Title = "Video at 60 frames per second"
+    override val fps60Hint = "Sharper movements in slow motion; videos take almost twice the space."
+    override val kcTitle = "Kinetic chain (trial)"
+    override val kcHint = "When each body part reaches its top speed, relative to contact: in the ideal stroke from the legs to the wrist. Estimated from a side video with few frames per second: take it with caution."
+    override val kcLegs = "Legs"
+    override val kcHips = "Hips"
+    override val kcShoulders = "Shoulders"
+    override val kcElbow = "Elbow"
+    override val kcWrist = "Wrist"
+    override val kcInOrder = "In order: from the legs to the wrist"
+    override val kcOutOfOrder: (String, String) -> String = { a, b -> "Out of order: $a before $b" }
+    override val anAnnotate = "Annotate"
+    override val anArrow = "Arrow"
+    override val anCircle = "Circle"
+    override val anDraw = "Freehand"
+    override val anUndo = "Remove the last"
+    override val anVoice = "Voice note"
+    override val anVoiceStop = "Stop"
+    override val anVoicePlay = "Listen"
+    override val anSaved = "Note saved with the clip"
+    override val anNotes = "Notes on the clip"
+    override val anNoMic = "The voice note needs the microphone permission"
+    override val anHint = "Drag on the picture to draw; the voice note is recorded and played here."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

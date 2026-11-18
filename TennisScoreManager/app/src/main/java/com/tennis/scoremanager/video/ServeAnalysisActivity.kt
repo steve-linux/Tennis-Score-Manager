@@ -31,6 +31,8 @@ import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +62,7 @@ import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.StrokeCheck
 import com.tennis.scoremanager.data.StrokeFlag
 import com.tennis.scoremanager.data.StrokeVision
+import com.tennis.scoremanager.data.KineticChain
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
@@ -462,6 +465,64 @@ class ServeAnalysisActivity : ComponentActivity() {
             if (fl.any { it.ref != null } && ref != null) Text(if (ref.fromBest) str.fxVsBest else str.fxVsIn, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(str.fxHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
+        Chain(r)
+        Notes(d)
+    }
+
+    /** Le note sulla clip (annotate nella moviola): immagine, voce, condividi, elimina. Si rileggono tornando qui. */
+    @Composable
+    private fun Notes(d: File) {
+        val str = s
+        var version by remember { mutableStateOf(0) }
+        val resumed = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState().value
+        val notes by androidx.compose.runtime.produceState(emptyList<Pair<ClipNotes.Note, Bitmap?>>(), d, version, resumed) {
+            value = withContext(Dispatchers.IO) { ClipNotes.list(d).map { it to ClipNotes.thumbnail(it.image) } }
+        }
+        if (notes.isEmpty()) return
+        var zoomed by remember { mutableStateOf<Bitmap?>(null) }
+        var player by remember { mutableStateOf<android.media.MediaPlayer?>(null) }
+        androidx.compose.runtime.DisposableEffect(Unit) { onDispose { player?.release() } }
+        Text(str.anNotes, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        for ((n, bmp) in notes) {
+            bmp?.let { b -> KeyImage(b) { zoomed = ClipNotes.thumbnail(n.image, 2000) ?: b } }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                n.voice?.let { v ->
+                    GhostButton(str.anVoicePlay, Icons.Filled.PlayCircle, {
+                        player?.release()
+                        player = runCatching { android.media.MediaPlayer().apply { setDataSource(v.absolutePath); prepare(); start() } }.getOrNull()
+                    }, Modifier.weight(1f))
+                }
+                GhostButton(str.share, Icons.Filled.Share, { ClipNotes.share(this@ServeAnalysisActivity, n) }, Modifier.weight(1f))
+                GhostButton(str.delete, Icons.Filled.Delete, { ClipNotes.delete(n); version++ }, Modifier.weight(1f))
+            }
+        }
+        zoomed?.let { ZoomDialog(it) { zoomed = null } }
+    }
+
+    /** Catena cinetica (in prova): il picco di ogni parte rispetto all'impatto, e se l'ordine è dalle gambe al polso. */
+    @Composable
+    private fun Chain(r: ServePoseResult) {
+        val str = s
+        val (contact, right) = r.metrics?.let { it.contactT to it.rightHanded } ?: r.ground?.let { it.contactT to it.rightHanded } ?: return
+        val kc = remember(r) { KineticChain.compute(r.frames, contact, right) } ?: return
+        fun name(x: KineticChain.Segment) = when (x) {
+            KineticChain.Segment.LEGS -> str.kcLegs
+            KineticChain.Segment.HIPS -> str.kcHips
+            KineticChain.Segment.SHOULDERS -> str.kcShoulders
+            KineticChain.Segment.ELBOW -> str.kcElbow
+            KineticChain.Segment.WRIST -> str.kcWrist
+        }
+        Text(str.kcTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        for (seg in KineticChain.Segment.entries) {
+            val t = kc.peaks[seg] ?: continue
+            Row(Modifier.fillMaxWidth()) {
+                Text(name(seg), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text((if (t > 0) "+" else if (t < 0) "−" else "") + "${kotlin.math.abs(t)} ms", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            }
+        }
+        val out = kc.outOfOrder
+        Text(if (out == null) str.kcInOrder else str.kcOutOfOrder(name(out.first), name(out.second)), color = if (out == null) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
+        Text(str.kcHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 
     /** Un colpo analizzato da confrontare: sessione, colpo, cartella della clip. */

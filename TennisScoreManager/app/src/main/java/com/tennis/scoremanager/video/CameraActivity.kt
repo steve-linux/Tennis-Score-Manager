@@ -419,7 +419,10 @@ class CameraActivity : ComponentActivity() {
         if (prepared) return true
         val st = stream()
         val rotation = CameraHelper.getCameraOrientation(this)
-        prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
+        // Allenamento dei colpi a 60 fotogrammi, se scelto e se il telefono ce la fa: il doppio dei dati, bitrate più alto.
+        val fps60 = serveMode && controller.storage.trainFps60 && CameraLenses.supports60(this)
+        prepared = st.prepareVideo(WIDTH, HEIGHT, if (fps60) VIDEO_BITRATE_60 else VIDEO_BITRATE, fps = if (fps60) 60 else 30, rotation = rotation) &&
+            st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
     }
@@ -1366,6 +1369,8 @@ class CameraActivity : ComponentActivity() {
         private const val HEIGHT = 1080
         /** 6 Mbit/s: quanto chiede YouTube per il 1080p a 30 fotogrammi. */
         private const val VIDEO_BITRATE = 6_000_000
+        /** A 60 fotogrammi: 10 Mbit/s, come chiede YouTube per il 1080p60. */
+        private const val VIDEO_BITRATE_60 = 10_000_000
         /** Inquadratura per l'arbitro: larghezza dei fotogrammi e ogni quanto. */
         private const val PREVIEW_W = 640
         private const val PREVIEW_EVERY_MS = 330L

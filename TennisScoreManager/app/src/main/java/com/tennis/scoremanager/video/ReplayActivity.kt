@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Pause
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -88,6 +90,40 @@ class ReplayActivity : ComponentActivity() {
     private var pose: ServePoseResult? = null
     private var poseStarts: List<Long> = emptyList()
     private var poseAt = 0L
+    /** Il video, per prenderne il fotogramma da annotare; il fotogramma in annotazione (null = moviola). */
+    private var texture: TextureView? = null
+    private var annotating by mutableStateOf<android.graphics.Bitmap?>(null)
+    /** La cartella della clip (allenamento dei colpi): lì si salvano le note. null = moviola della partita. */
+    private val notesDir: File? by lazy {
+        intent.getStringExtra(EXTRA_POSE_DIR)?.let(::File) ?: files.firstOrNull()?.parentFile?.takeIf { intent.getStringExtra(EXTRA_STAR_SESSION) != null }
+    }
+    private var micAnswer: ((Boolean) -> Unit)? = null
+    private val micPermission = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
+        micAnswer?.invoke(ok); micAnswer = null
+    }
+
+    private fun askMic(answer: (Boolean) -> Unit) {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) answer(true)
+        else { micAnswer = answer; micPermission.launch(android.Manifest.permission.RECORD_AUDIO) }
+    }
+
+    /** Il fotogramma fermo, con lo scheletro se è acceso, da annotare. */
+    private fun grabFrame(p: ExoPlayer, skeleton: Boolean): android.graphics.Bitmap? {
+        val bmp = texture?.bitmap ?: return null
+        if (!skeleton) return bmp
+        val abs = (poseStarts.getOrNull(p.currentMediaItemIndex) ?: return bmp) + p.currentPosition
+        val f = poseAt(abs - poseAt) ?: return bmp
+        val out = bmp.copy(android.graphics.Bitmap.Config.ARGB_8888, true)
+        val img = out.asImageBitmap()
+        androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+            androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(img),
+            androidx.compose.ui.geometry.Size(out.width.toFloat(), out.height.toFloat()),
+        ) { drawSkeleton(f, TsmColors.Ball) }
+        return out
+    }
+
+    /** Un fotogramma, in ms: dal video (60 fotogrammi = 17 ms), altrimenti 33 come a 30. */
+    private fun frameMs(p: ExoPlayer): Long = p.videoFormat?.frameRate?.takeIf { it > 1f }?.let { Math.round(1000f / it).toLong() } ?: 33L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -213,7 +249,7 @@ class ReplayActivity : ComponentActivity() {
                             translationY = pan.y
                         },
                 ) {
-                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
+                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it); texture = it } }, modifier = Modifier.fillMaxSize())
                     if (skeleton) SkeletonOverlay(p)
                 }
             }
@@ -277,7 +313,7 @@ class ReplayActivity : ComponentActivity() {
                 Btn(Icons.Filled.SkipPrevious, null, false) {
                     p.pause()
                     playing = false
-                    p.seekTo(maxOf(0, p.currentPosition - 33))
+                    p.seekTo(maxOf(0, p.currentPosition - frameMs(p)))
                     syncBoard(p, true)
                 }
                 Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
@@ -288,11 +324,20 @@ class ReplayActivity : ComponentActivity() {
                 Btn(Icons.Filled.SkipNext, null, false) {
                     p.pause()
                     playing = false
-                    p.seekTo(p.currentPosition + 33)
+                    p.seekTo(p.currentPosition + frameMs(p))
                     syncBoard(p, true)
+                }
+                // Annota il fotogramma fermo (frecce, cerchi, voce): solo per le clip dell'allenamento.
+                if (notesDir != null) Btn(Icons.Filled.Draw, null, false) {
+                    p.pause()
+                    playing = false
+                    syncBoard(p, true)
+                    annotating = grabFrame(p, skeleton)
                 }
             }
         }
+        // L'annotazione copre la moviola; chiusa, si torna al fotogramma fermo.
+        annotating?.let { bmp -> notesDir?.let { d -> AnnotateScreen(bmp, d, s, ::askMic) { annotating = null } } }
     }
 
     /** Il tabellone fa quello che fa la moviola dell'arbitro: stesso pezzo, stesso istante, fermo o in movimento. */

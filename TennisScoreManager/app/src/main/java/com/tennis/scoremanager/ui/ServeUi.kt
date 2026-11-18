@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -175,6 +176,12 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+        // 60 fotogrammi al secondo: solo sui telefoni che ce la fanno (molti si fermano a 30).
+        val can60 = remember { com.tennis.scoremanager.video.CameraLenses.supports60(context) }
+        if (can60) {
+            var fps60 by remember { mutableStateOf(c.storage.trainFps60) }
+            SwitchRow(Icons.Filled.Speed, s.fps60Title, s.fps60Hint, fps60) { fps60 = it; c.storage.trainFps60 = it }
+        }
         // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
         GhostButton(s.lessonRecord, Icons.Filled.School, {
             context.startActivity(
