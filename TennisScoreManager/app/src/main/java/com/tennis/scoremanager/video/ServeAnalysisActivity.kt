@@ -57,6 +57,8 @@ import com.tennis.scoremanager.data.ServeMetrics
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.StrokeCheck
+import com.tennis.scoremanager.data.StrokeFlag
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
@@ -111,6 +113,51 @@ class ServeAnalysisActivity : ComponentActivity() {
 
     /** Clip col video ancora sul telefono (i video si possono cancellare tenendo l'analisi). */
     private fun hasVideo(sess: ServeSession, a: ServeAttempt): Boolean = dir(sess, a)?.listFiles { f -> f.extension == "mp4" }?.isNotEmpty() == true
+
+    /** Il riferimento per le segnalazioni: le medie dei migliori colpi (stella) o, senza, dei colpi dentro della sessione. */
+    private class Reference(val serve: ServePose.Mean?, val ground: ServePose.GroundMean?, val fromBest: Boolean)
+
+    private fun reference(sess: ServeSession, res: Map<String, ServePoseResult>): Reference? {
+        // I migliori colpi della stessa persona e dello stesso colpo, in tutte le sessioni.
+        val best = controller.storage.loadServeSessions().filter { it.stroke == sess.stroke && it.student == sess.student }.flatMap { o ->
+            val loaded = if (o.id == sess.id) res else loadResults(o)
+            o.serves.filter { it.starred }.mapNotNull { a -> a.clip?.let { loaded[it] } }
+        }
+        val ins = sess.serves.filter { it.inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        fun of(list: List<ServePoseResult>) = if (sess.stroke == TrainedStroke.SERVE) ServePose.mean(list.mapNotNull { it.metrics })?.let { Reference(it, null, false) }
+            else ServePose.groundMean(list.mapNotNull { it.ground })?.let { Reference(null, it, false) }
+        of(best)?.let { return Reference(it.serve, it.ground, true) }
+        // Coi colpi dentro solo se sono almeno tre (uno o due non fanno "il solito").
+        return of(ins)?.takeIf { (it.serve?.n ?: it.ground?.n ?: 0) >= 3 }
+    }
+
+    private fun flags(stroke: TrainedStroke, r: ServePoseResult, ref: Reference?): List<StrokeFlag> =
+        if (stroke == TrainedStroke.SERVE) r.metrics?.let { StrokeCheck.serve(it, ref?.serve) }.orEmpty()
+        else r.ground?.let { StrokeCheck.ground(it, ref?.ground, volley = stroke == TrainedStroke.VOLLEY) }.orEmpty()
+
+    private fun flagLabel(k: StrokeFlag.Kind): String = when (k) {
+        StrokeFlag.Kind.ELBOW_BENT -> s.fxElbowBent
+        StrokeFlag.Kind.KNEES_STIFF -> s.fxKneesStiff
+        StrokeFlag.Kind.CONTACT_LOW -> s.fxContactLow
+        StrokeFlag.Kind.TOSS_TILTED -> s.fxTossTilted
+        StrokeFlag.Kind.CONTACT_BEHIND -> s.fxContactBehind
+        StrokeFlag.Kind.PREP_SHORT -> s.fxPrepShort
+        StrokeFlag.Kind.FINISH_LOW -> s.fxFinishLow
+        StrokeFlag.Kind.ELBOW_LESS -> s.fxElbowLess
+        StrokeFlag.Kind.KNEES_LESS -> s.fxKneesLess
+        StrokeFlag.Kind.CONTACT_LOWER -> s.fxContactLower
+        StrokeFlag.Kind.CONTACT_LATER -> s.fxContactLater
+        StrokeFlag.Kind.PREP_SHORTER -> s.fxPrepShorter
+        StrokeFlag.Kind.FINISH_LOWER -> s.fxFinishLower
+    }
+
+    /** "Impatto più indietro del solito (0,10 · di solito 0,25)": angoli in gradi, il resto in rapporto alla statura. */
+    private fun flagText(f: StrokeFlag): String {
+        val angle = f.kind in setOf(StrokeFlag.Kind.ELBOW_BENT, StrokeFlag.Kind.KNEES_STIFF, StrokeFlag.Kind.TOSS_TILTED, StrokeFlag.Kind.ELBOW_LESS, StrokeFlag.Kind.KNEES_LESS)
+        fun v(x: Float) = if (angle) "%.0f°".format(x) else "%.2f".format(x)
+        val tail = listOfNotNull(f.value?.let(::v), f.ref?.let { "${s.fxUsual} ${v(it)}" }).joinToString(" · ")
+        return flagLabel(f.kind) + if (tail.isNotEmpty()) " ($tail)" else ""
+    }
 
     private fun loadResults(sess: ServeSession): Map<String, ServePoseResult> = sess.serves.mapNotNull { a ->
         val f = dir(sess, a)?.let { File(it, ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
@@ -221,9 +268,10 @@ class ServeAnalysisActivity : ComponentActivity() {
                 // Dopo un aggiornamento dell'app l'analisi può venire meglio: si rifà da capo.
                 GhostButton(str.poseRedo, Icons.Filled.Insights, { redoAll() }, Modifier.fillMaxWidth())
             }
-            Comparison(current, res)
+            val ref by androidx.compose.runtime.produceState<Reference?>(null, current, res) { value = withContext(Dispatchers.IO) { reference(current, res) } }
+            Comparison(current, res, ref)
             current.serves.forEachIndexed { i, a ->
-                ServeRow(current, i, a, a.clip?.let { res[it] }, open == a.clip) { open = if (open == a.clip) null else a.clip }
+                ServeRow(current, i, a, a.clip?.let { res[it] }, open == a.clip, ref) { open = if (open == a.clip) null else a.clip }
             }
             GhostButton(str.back, Icons.AutoMirrored.Filled.ArrowBack, { finish() }, Modifier.fillMaxWidth())
             if (ready && p == null) {
@@ -272,7 +320,7 @@ class ServeAnalysisActivity : ComponentActivity() {
 
     /** Medie dei colpi dentro e di quelli fuori, misura per misura (solo quelli con misure affidabili). */
     @Composable
-    private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>) {
+    private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>, ref: Reference?) {
         val str = s
         fun of(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
         val rows: List<Triple<String, String, String>>
@@ -317,12 +365,19 @@ class ServeAnalysisActivity : ComponentActivity() {
                     Text(b, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
                 }
             }
+            // Quello che torna nei colpi fuori più che in quelli dentro: dove guardare col maestro.
+            fun flagsOf(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }.map { flags(sess.stroke, it, ref) }
+            val rec = StrokeCheck.recurring(flagsOf(false), flagsOf(true))
+            if (rec.isNotEmpty()) {
+                Text(str.fxOutsRecurring, color = TsmColors.Orange, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                for ((k, n, tot) in rec) Text("• ${flagLabel(k)} ($n/$tot)", color = TsmColors.Orange, fontSize = 13.sp)
+            }
         }
     }
 
     /** Un colpo: esito e misure in breve; aperto, le tre immagini con lo scheletro e tutte le misure. */
     @Composable
-    private fun ServeRow(sess: ServeSession, index: Int, a: ServeAttempt, r: ServePoseResult?, expanded: Boolean, onToggle: () -> Unit) {
+    private fun ServeRow(sess: ServeSession, index: Int, a: ServeAttempt, r: ServePoseResult?, expanded: Boolean, ref: Reference?, onToggle: () -> Unit) {
         val str = s
         val v = r?.let { shown(sess.stroke, it) }
         Column(
@@ -348,14 +403,17 @@ class ServeAnalysisActivity : ComponentActivity() {
                     if (!v.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
                     if (r.people > 1) Text(str.poseManyPeople(r.people), color = TsmColors.Orange, fontSize = 13.sp)
                     Text(v.brief, color = TsmColors.TextDim, fontSize = 13.sp)
-                    if (expanded) Details(sess, a, v)
+                    // I possibili problemi in breve (aperto, coi valori).
+                    val fl = flags(sess.stroke, r, ref)
+                    if (fl.isNotEmpty() && !expanded) Text("⚠ " + fl.take(3).joinToString(" · ") { flagLabel(it.kind) }, color = TsmColors.Orange, fontSize = 13.sp)
+                    if (expanded) Details(sess, a, v, r, fl, ref)
                 }
             }
         }
     }
 
     @Composable
-    private fun Details(sess: ServeSession, a: ServeAttempt, v: Shown) {
+    private fun Details(sess: ServeSession, a: ServeAttempt, v: Shown, r: ServePoseResult, fl: List<StrokeFlag>, ref: Reference?) {
         val str = s
         val d = dir(sess, a) ?: return
         val images = remember(d) { v.images.map { (label, name) -> label to ServeClipAnalysis.keyImage(d, name) } }
@@ -381,11 +439,26 @@ class ServeAnalysisActivity : ComponentActivity() {
             bmp?.let { b -> KeyImage(b) { zoomed = b } }
         }
         zoomed?.let { ZoomDialog(it) { zoomed = null } }
-        for ((label, value) in v.rows) {
+        // La postura all'impatto: busto, spalle e base, dai punti del corpo già salvati.
+        val contactT = r.metrics?.contactT ?: r.ground?.contactT
+        val posture = remember(r) { contactT?.let { StrokeCheck.posture(r.frames, it) } }
+        val rows = v.rows + listOfNotNull(
+            posture?.trunkDeg?.let { str.psTrunk to deg(it) },
+            posture?.shouldersDeg?.let { str.psShoulders to deg(it) },
+            posture?.stance?.let { str.psStance to str.poseHeightValue("%.2f".format(it)) },
+        )
+        for ((label, value) in rows) {
             Row(Modifier.fillMaxWidth()) {
                 Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
                 Text(value, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
+        }
+        // Da guardare col maestro: i possibili problemi coi valori, e rispetto a cosa.
+        if (fl.isNotEmpty()) {
+            Text(str.fxTitle, color = TsmColors.Orange, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            for (f in fl) Text("• " + flagText(f), color = TsmColors.Orange, fontSize = 13.sp)
+            if (fl.any { it.ref != null } && ref != null) Text(if (ref.fromBest) str.fxVsBest else str.fxVsIn, color = TsmColors.TextDim, fontSize = 12.sp)
+            Text(str.fxHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
     }
 

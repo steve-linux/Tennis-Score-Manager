@@ -2773,6 +2773,28 @@ interface Strings {
     val strokeBestHint: String
     val trainReplayLast: String
     val trainReplayPaused: String
+    val fxTitle: String
+    val fxHint: String
+    val fxVsBest: String
+    val fxVsIn: String
+    val fxUsual: String
+    val fxOutsRecurring: String
+    val fxElbowBent: String
+    val fxKneesStiff: String
+    val fxContactLow: String
+    val fxTossTilted: String
+    val fxContactBehind: String
+    val fxPrepShort: String
+    val fxFinishLow: String
+    val fxElbowLess: String
+    val fxKneesLess: String
+    val fxContactLower: String
+    val fxContactLater: String
+    val fxPrepShorter: String
+    val fxFinishLower: String
+    val psTrunk: String
+    val psShoulders: String
+    val psStance: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5471,6 +5493,28 @@ object ItStrings : Strings {
     override val strokeBestHint = "I colpi con la stella: esempi da rivedere e da confrontare. Il loro video resta anche con «Solo i video»."
     override val trainReplayLast = "Rivedi l'ultimo"
     override val trainReplayPaused = "Allenamento in pausa: Riprendi (o KEY1) quando hai finito di rivedere."
+    override val fxTitle = "Da guardare col maestro"
+    override val fxHint = "Possibili problemi trovati dalle misure: sono stime da un video di lato, da confermare col maestro."
+    override val fxVsBest = "Confronto coi tuoi migliori colpi"
+    override val fxVsIn = "Confronto coi colpi dentro di questa sessione"
+    override val fxUsual = "di solito"
+    override val fxOutsRecurring = "Nei colpi fuori torna spesso"
+    override val fxElbowBent = "Gomito piegato all'impatto"
+    override val fxKneesStiff = "Gambe poco piegate"
+    override val fxContactLow = "Impatto basso"
+    override val fxTossTilted = "Braccio del lancio inclinato"
+    override val fxContactBehind = "Impatto dietro al corpo"
+    override val fxPrepShort = "Preparazione corta"
+    override val fxFinishLow = "Finale basso"
+    override val fxElbowLess = "Gomito più piegato del solito"
+    override val fxKneesLess = "Gambe meno piegate del solito"
+    override val fxContactLower = "Impatto più basso del solito"
+    override val fxContactLater = "Impatto più indietro del solito"
+    override val fxPrepShorter = "Preparazione più corta del solito"
+    override val fxFinishLower = "Finale più basso del solito"
+    override val psTrunk = "Busto (dalla verticale)"
+    override val psShoulders = "Linea delle spalle"
+    override val psStance = "Base (distanza dei piedi)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8170,6 +8214,28 @@ object EnStrings : Strings {
     override val strokeBestHint = "Starred shots: examples to watch again and compare. Their video stays even with “Videos only”."
     override val trainReplayLast = "Replay last"
     override val trainReplayPaused = "Training paused: Resume (or KEY1) when you're done watching."
+    override val fxTitle = "Check with the coach"
+    override val fxHint = "Possible issues found from the measurements: estimates from a side video, to be confirmed with the coach."
+    override val fxVsBest = "Compared with your best shots"
+    override val fxVsIn = "Compared with the shots in this session"
+    override val fxUsual = "usually"
+    override val fxOutsRecurring = "Often in the shots out"
+    override val fxElbowBent = "Bent elbow at contact"
+    override val fxKneesStiff = "Legs barely bent"
+    override val fxContactLow = "Low contact"
+    override val fxTossTilted = "Tilted toss arm"
+    override val fxContactBehind = "Contact behind the body"
+    override val fxPrepShort = "Short backswing"
+    override val fxFinishLow = "Low finish"
+    override val fxElbowLess = "Elbow more bent than usual"
+    override val fxKneesLess = "Legs less bent than usual"
+    override val fxContactLower = "Contact lower than usual"
+    override val fxContactLater = "Contact later than usual"
+    override val fxPrepShorter = "Backswing shorter than usual"
+    override val fxFinishLower = "Finish lower than usual"
+    override val psTrunk = "Trunk (from vertical)"
+    override val psShoulders = "Shoulder line"
+    override val psStance = "Stance (feet apart)"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
