@@ -131,25 +131,27 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
+enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, LESSONS, COACH_COURSE, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
  * ([Role.tabs]).
  */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
+enum class HomeTab { PLAY, BOOKING, TRAIN, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
 
 /**
- * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
- * Il tabellone c'è in tutti: l'allenatore arbitra le partite tra allievi, il circolo quelle dei tornei.
+ * Chi usa l'app, un ruolo solo per volta (si cambia dalle Impostazioni, i dati restano): ogni funzione sta in un ruolo
+ * solo. Tu gioca (segnapunti, video, storico); l'Allenatore segue gli allievi e li fa giocare con "Partita con…"; il
+ * Circolo gestisce (segreteria, planning, soci, tornei). Altro, con impostazioni e aiuto, è di tutti. La scheda Circolo
+ * di chi gioca o allena ([HomeTab.BOOKING]) compare solo dopo l'invito della segreteria.
  */
 enum class Role(val tabs: List<HomeTab>) {
-    /** Tu: giochi, ti alleni, i tuoi video e progressi (l'app di sempre). */
-    PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
-    /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
-    COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
-    /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
-    CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+    /** Tu: giochi (segnapunti, tabellone, video), il tuo circolo, ti alleni, i tuoi progressi. */
+    PLAYER(listOf(HomeTab.PLAY, HomeTab.BOOKING, HomeTab.TRAIN, HomeTab.PROGRESS, HomeTab.MORE)),
+    /** Allenatore: gli allievi (allenamenti, agenda, partite), il circolo dove prenota i campi. */
+    COACH(listOf(HomeTab.STUDENTS, HomeTab.BOOKING, HomeTab.MORE)),
+    /** Circolo: oggi (cosa serve adesso), il planning, i soci, i tornei; il circolo e i suoi strumenti in Altro. */
+    CLUB(listOf(HomeTab.TODAY, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.TOURNAMENTS, HomeTab.MORE)),
 }
 
 /** Cosa usa chi gioca (ruoli Tu e Allenatore): quello che non usa non compare (i dati restano). */
@@ -231,14 +233,16 @@ class MatchController(
     /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
     val remotes = RemoteInput(app, storage, scope)
 
-    val screen = MutableStateFlow(Screen.HOME)
+    /** Le schermate e la strada fatta: Indietro torna da dove si è arrivati (vedi [Navigator]). */
+    val nav = Navigator()
+    val screen = nav.screen
     /** Scheda della prima schermata: resta quella da cui si è partiti, così "Indietro" ci torna. */
     val homeTab = MutableStateFlow(HomeTab.PLAY)
 
     /** Torna alla prima schermata ([tab] se dato, altrimenti la scheda di prima). */
     fun home(tab: HomeTab? = null) {
         tab?.let { homeTab.value = it }
-        screen.value = Screen.HOME
+        nav.home()
     }
     val setup = MutableStateFlow(storage.setup)
     val options = MutableStateFlow(storage.options)
@@ -708,54 +712,20 @@ class MatchController(
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
         if (to == Screen.START && needsService()) MatchService.start(app)
-        screen.value = to
+        nav.push(to)
     }
 
+    /** Indietro: la schermata da cui si è arrivati (la partita si lascia col suo menu, il riepilogo con "Fatto"). */
     fun back() {
-        screen.value = when (screen.value) {
-            Screen.OPTIONS -> Screen.SETUP
-            Screen.SETUP -> Screen.HOME
-            Screen.PROGRESS -> Screen.HOME
-            Screen.RACKETS -> Screen.HOME
-            Screen.VIDEOS -> Screen.HOME
-            Screen.DEVICES -> Screen.HOME
-            Screen.VOICE -> Screen.HOME
-            Screen.STROKE_SESSIONS -> strokeSessionsBack
-            Screen.HELP -> helpBack.also { helpBack = Screen.HOME }
-            Screen.STUDENTS -> Screen.HOME
-            Screen.STUDENT -> studentBack
-            Screen.PLAYERS -> Screen.HOME
-            Screen.DATA -> Screen.HOME
-            Screen.DRILLS -> Screen.HOME
-            Screen.MEMBERS -> Screen.HOME
-            Screen.PAYMENTS -> Screen.HOME
-            Screen.CLUB_TOURNAMENTS -> Screen.HOME
-            Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
-            Screen.NOTICE -> noticeBack
-            Screen.COURTS_PLAN -> Screen.HOME
-            Screen.BOOK_COURT -> Screen.HOME
-            Screen.DESK -> Screen.HOME
-            Screen.COURT_STATS -> statsBack
-            Screen.LADDERS -> Screen.HOME
-            Screen.LADDER -> Screen.LADDERS
-            Screen.SCHOOL -> Screen.HOME
-            Screen.COURSE -> Screen.SCHOOL
-            Screen.TEAMS -> Screen.HOME
-            Screen.TEAM -> Screen.TEAMS
-            Screen.FIXTURE -> Screen.TEAM
+        when (screen.value) {
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
-            Screen.WORKOUT -> if (workoutDetail.value != null) {
-                workoutDetail.value = null
-                Screen.WORKOUT
-            } else {
-                Screen.HOME
-            }
-            Screen.START -> {
-                if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
-                Screen.OPTIONS
-            }
-            else -> screen.value
+            Screen.WORKOUT -> if (workoutDetail.value != null) { workoutDetail.value = null; return }
+            Screen.START -> if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
+            Screen.MATCH -> return
+            Screen.SUMMARY -> { closeSummary(); return }
+            else -> {}
         }
+        nav.back()
     }
 
     // ---------------------------------------------------------------- braccialetti
@@ -1055,7 +1025,11 @@ class MatchController(
     val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
 
     fun refreshServeSessions() {
-        scope.launch { serveSessions.value = withContext(io) { storage.loadServeSessions() } }
+        scope.launch {
+            serveSessions.value = withContext(io) { storage.loadServeSessions() }
+            // Gli obiettivi degli allievi si controllano sulle sessioni nuove.
+            checkStudentGoals()
+        }
     }
 
     /**
@@ -1079,13 +1053,66 @@ class MatchController(
 
     fun deleteServeSession(sess: com.tennis.scoremanager.data.ServeSession) = deleteServeSessions(listOf(sess))
 
+    /** Mette o toglie la stella (migliori colpi) al colpo [at] della sessione salvata [sessionId]; la sessione aggiornata. */
+    fun setServeStar(sessionId: String, at: Long, on: Boolean): com.tennis.scoremanager.data.ServeSession? {
+        val sess = storage.loadServeSessions().firstOrNull { it.id == sessionId } ?: return null
+        val updated = sess.copy(serves = sess.serves.map { if (it.at == at) it.copy(starred = on) else it })
+        storage.saveServeSession(updated)
+        refreshServeSessions()
+        return updated
+    }
+
+    /**
+     * Sposta un colpo nella sessione di un altro colpo (riconosciuto dal video): nella stessa lezione, o in una sessione
+     * nuova della stessa ora. La clip va nella cartella giusta e, se c'è ancora il video, l'analisi si rifà per quel
+     * colpo. Restituisce la sessione di partenza aggiornata (null se è rimasta vuota e non c'è più).
+     */
+    fun moveServeShot(sessionId: String, at: Long, to: com.tennis.scoremanager.data.TrainedStroke, s: com.tennis.scoremanager.ui.Strings): com.tennis.scoremanager.data.ServeSession? {
+        val all = storage.loadServeSessions()
+        val src = all.firstOrNull { it.id == sessionId } ?: return null
+        val a = src.serves.firstOrNull { it.at == at } ?: return src
+        if (src.stroke == to) return src
+        val lesson = src.lesson
+        val targetId = if (lesson != null) com.tennis.scoremanager.data.Lessons.sessionId(lesson, to) else "${src.id}-${to.name.lowercase()}"
+        val target = all.firstOrNull { it.id == targetId } ?: src.copy(
+            id = targetId, stroke = to, serves = emptyList(), drillName = null,
+            folder = if (lesson != null) src.folder?.substringBeforeLast('/')?.let { "$it/${s.strokeName(to.band)}" }
+            else storage.newServeFolder(to, src.startedAt, s.strokeFolderName, s.strokeName, src.studentName),
+        )
+        a.clip?.let { clip ->
+            val from = File(storage.serveClipsDir(src), clip)
+            val dest = File(storage.serveClipsDir(target), clip)
+            if (from.isDirectory && !from.renameTo(dest)) {
+                if (runCatching { from.copyRecursively(dest, overwrite = true) }.getOrDefault(false)) from.deleteRecursively()
+            }
+            // Col video l'analisi si rifà (finestra e misure cambiano col colpo); senza, resta quella che c'è.
+            if (dest.listFiles { f -> f.extension == "mp4" }?.isNotEmpty() == true) {
+                for (n in listOf(
+                    com.tennis.scoremanager.video.ServeClipAnalysis.RESULT, com.tennis.scoremanager.video.ServeClipAnalysis.TROPHY,
+                    com.tennis.scoremanager.video.ServeClipAnalysis.KNEE, com.tennis.scoremanager.video.ServeClipAnalysis.CONTACT,
+                    com.tennis.scoremanager.video.ServeClipAnalysis.PREP, com.tennis.scoremanager.video.ServeClipAnalysis.FINISH,
+                )) File(dest, n).delete()
+            }
+        }
+        storage.saveServeSession(target.copy(serves = (target.serves + a.copy(stroke = if (lesson != null) to else a.stroke)).sortedBy { it.at }))
+        val rest = src.copy(serves = src.serves.filter { it.at != at })
+        val out = if (rest.serves.isEmpty()) { storage.deleteServeSession(rest); null } else { storage.saveServeSession(rest); rest }
+        refreshServeSessions()
+        serveDiskVersion.value++
+        return out
+    }
+
     /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
     fun deleteServeSessions(list: List<com.tennis.scoremanager.data.ServeSession>, videosOnly: Boolean = false) {
         scope.launch {
             withContext(io) { list.forEach { if (videosOnly) storage.deleteServeVideos(it) else storage.deleteServeSession(it) } }
             refreshServeSessions()
+            serveDiskVersion.value++
         }
     }
+
+    /** Cresce quando si tolgono video: le pagine che mostrano lo spazio occupato lo ricalcolano. */
+    val serveDiskVersion = MutableStateFlow(0)
 
     /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
     val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)
@@ -1093,11 +1120,8 @@ class MatchController(
     /** Apre tutte le sessioni del colpo [stroke] (dell'allievo scelto); Indietro torna da dove si è partiti. */
     fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
         trainStroke.value = stroke
-        strokeSessionsBack = if (screen.value == Screen.STUDENT) Screen.STUDENT else Screen.HOME
-        screen.value = Screen.STROKE_SESSIONS
+        nav.push(Screen.STROKE_SESSIONS)
     }
-
-    private var strokeSessionsBack = Screen.HOME
 
     // ---------------------------------------------------------------- giocatori e allievi
 
@@ -1199,12 +1223,27 @@ class MatchController(
      * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
      * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
      */
+    /**
+     * Mette (o toglie, con null) la password dei backup. Con la password nuova fa subito una copia protetta e, se
+     * riesce, toglie le copie automatiche di prima senza password (avevano gli stessi dati in chiaro).
+     */
+    suspend fun setBackupPassword(pw: String?): Boolean {
+        storage.backupPassword = pw
+        if (pw == null) return true
+        val made = personalBackupNow(onlyIfChanged = false) ?: return false
+        withContext(io) { personalBackups().filter { it != made && !it.name.endsWith(com.tennis.scoremanager.data.Backup.LOCKED_EXT) }.forEach { it.delete() } }
+        return true
+    }
+
     suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
+        // Un'app appena installata non ha niente da salvare: una copia vuota diventerebbe la "più recente" in Documenti
+        // proprio quando si vuole ripristinare quella di prima (dalla prima apertura). Le copie automatiche partono dopo.
+        if (onlyIfChanged && !storage.onboarded) return@withContext null
         val folder = strings.strokeFolderName
         val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
         if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
         val now = System.currentTimeMillis()
-        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now) }.getOrNull()?.also {
+        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now, storage.backupPassword?.toCharArray()) }.getOrNull()?.also {
             storage.personalBackupPrint = print
             storage.lastBackupAt = now
         }
@@ -1239,7 +1278,7 @@ class MatchController(
     }
 
     /** La Segreteria da PC: spenta finché non la si accende dall'app. */
-    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this)) }
+    val desk by lazy { com.tennis.scoremanager.desk.DeskManager(app, com.tennis.scoremanager.desk.DeskBridge(this), com.tennis.scoremanager.desk.CoachBridge(this)) }
 
     fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
 
@@ -1368,21 +1407,860 @@ class MatchController(
     fun setTrainStudent(id: String?) {
         trainStudent.value = id
         storage.trainStudent = id.orEmpty()
+        // L'allenatore ritrova il suo allievo anche dopo essersi allenato da solo (nel profilo Tu non c'è allievo).
+        if (id != null) storage.coachStudent = id
+    }
+
+    /** Tornando al profilo Allenatore senza nessuno scelto: l'allievo dell'ultima volta, se c'è ancora. */
+    fun restoreCoachStudent() {
+        if (trainStudent.value != null) return
+        storage.coachStudent.takeIf { id -> students.value.any { it.id == id } }?.let { setTrainStudent(it) }
+    }
+
+    /** "Allena ora" dalla scheda di un allievo (ruolo Allenatore): lui scelto, pronto per Inizia. */
+    fun coachNow(id: String) {
+        setTrainStudent(id)
+        home(HomeTab.STUDENTS)
     }
 
     fun openStudents() {
         refreshPlayers()
-        screen.value = Screen.STUDENTS
+        nav.push(Screen.STUDENTS)
     }
 
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE, Screen.TEAM, Screen.FIXTURE) } ?: Screen.STUDENTS
-        screen.value = Screen.STUDENT
+        nav.push(Screen.STUDENT)
     }
 
-    private var studentBack = Screen.STUDENTS
+    // ---- Allenatore: diario, obiettivi, agenda, pacchetti di lezioni, gruppi ----
+
+    // ---- Scheda partita ricevuta (convocazione della segreteria) ----
+
+    /** La scheda appena aperta da WhatsApp o dai file: la finestra chiede se preparare la partita. */
+    val incomingCard = MutableStateFlow<com.tennis.scoremanager.data.MatchCard?>(null)
+    val receivedCards = MutableStateFlow(storage.loadReceivedCards())
+    private var pendingCard: com.tennis.scoremanager.data.MatchCard? = null
+    /** Il Giocatore 1 com'era scritto da [prepareCard]: se in campo c'è un altro, la partita non è quella della scheda. */
+    private var pendingCardP1: Pair<String, String> = "" to ""
+
+    /** Un risultato arrivato dal campo (segreteria): la finestra dice com'è e chiede se registrarlo. */
+    val incomingResult = MutableStateFlow<com.tennis.scoremanager.data.MatchResult?>(null)
+
+    /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
+    private var incomingVia: String? = null
+
+    /** Il testo di un file aperto con TSM: una scheda partita o un risultato; sennò lo si dice. */
+    fun receiveCardText(text: String?, via: String? = null) {
+        incomingVia = via
+        val card = text?.let { com.tennis.scoremanager.data.MatchCards.decode(it) }
+        if (card != null) { incomingCard.value = card; return }
+        val result = text?.let { com.tennis.scoremanager.data.MatchCards.decodeResult(it) }
+        if (result != null) { incomingResult.value = result; return }
+        text?.let { com.tennis.scoremanager.data.CourseCards.decode(it) }?.let { incomingCourse.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { incomingProgress.value = it; return }
+        text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { incomingAttendance.value = it; return }
+        text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { incomingProposal.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }?.let { incomingProfile.value = it; return }
+        // Una partita (da "File della partita" di un altro telefono): nello storico.
+        text?.let { runCatching { storage.json.decodeFromString(MatchRecord.serializer(), it) }.getOrNull() }?.takeIf { it.events.isNotEmpty() }?.let { receiveMatchRecord(it); return }
+        _toasts.tryEmit(strings.mcNotValid)
+    }
+
+    fun resultStatus(r: com.tennis.scoremanager.data.MatchResult): com.tennis.scoremanager.data.ResultStatus =
+        com.tennis.scoremanager.data.MatchCards.check(r, clubTournaments.value, teams.value, ladders.value)
+
+    /** Com'è segnata adesso la partita del risultato (per dire cosa si sostituisce). */
+    fun resultNow(r: com.tennis.scoremanager.data.MatchResult): String = when (r.kind) {
+        com.tennis.scoremanager.data.CardKind.TOURNAMENT -> clubTournament(r.ref)?.matches?.firstOrNull { it.id == r.match }?.let { m ->
+            listOf(entryNameOf(clubTournament(r.ref)!!, m.winner), m.score).filter { it.isNotBlank() }.joinToString(" · ")
+        }.orEmpty()
+        com.tennis.scoremanager.data.CardKind.TEAM -> team(r.ref)?.fixtures?.firstOrNull { it.id == r.match }?.rubbers?.getOrNull(r.index)?.score.orEmpty()
+        com.tennis.scoremanager.data.CardKind.LADDER -> ladder(r.ref)?.challenges?.firstOrNull { it.id == r.match }?.score.orEmpty()
+    }
+
+    /** Registra il risultato arrivato dal campo nel tabellone, nell'incontro o nella classifica. */
+    fun applyResult(r: com.tennis.scoremanager.data.MatchResult) {
+        incomingResult.value = null
+        val status = resultStatus(r)
+        if (status != com.tennis.scoremanager.data.ResultStatus.READY && status != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return
+        val s = strings
+        when (r.kind) {
+            com.tennis.scoremanager.data.CardKind.TOURNAMENT -> {
+                val t = clubTournament(r.ref) ?: return
+                val m = t.matches.firstOrNull { it.id == r.match } ?: return
+                val w = when (r.winner) { 1 -> m.a; 2 -> m.b; else -> null }
+                saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, r.score, walkover = r.walkover, retired = r.retired, disqualified = r.disqualified))
+            }
+            com.tennis.scoremanager.data.CardKind.TEAM -> {
+                val t = team(r.ref) ?: return
+                val f = t.fixtures.firstOrNull { it.id == r.match } ?: return
+                val won = when (r.winner) { 1 -> true; 2 -> false; else -> null }
+                saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, r.index, com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), won, walkover = r.walkover))
+            }
+            com.tennis.scoremanager.data.CardKind.LADDER -> {
+                val l = ladder(r.ref) ?: return
+                val won = when (r.winner) { 1 -> true; 2 -> false; else -> return }
+                saveLadder(com.tennis.scoremanager.data.Ladders.result(l, r.match, com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), won, System.currentTimeMillis()))
+            }
+        }
+        _toasts.tryEmit(s.mrApplied)
+    }
+
+    /** A fine partita, se era quella di una scheda ricevuta: il risultato da rimandare alla segreteria è pronto. */
+    private fun cardMatchFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        val rc = receivedCards.value.firstOrNull { it.record == rec.id } ?: return
+        val winner = when (state.winner) { Side.P1 -> 1; Side.P2 -> 2; else -> null }
+        val wo = com.tennis.scoremanager.data.Reports.isWalkover(state)
+        val result = com.tennis.scoremanager.data.MatchCards.result(
+            rc.card, winner, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1),
+            walkover = wo, retired = state.retired != null && !state.disqualified, disqualified = state.disqualified, now = System.currentTimeMillis(),
+        )
+        val list = receivedCards.value.map { if (it.card.code == rc.card.code) it.copy(result = result, sentAt = null) else it }
+        receivedCards.value = list
+        scope.launch(io) { storage.saveReceivedCards(list) }
+        // Arrivata dal server del circolo: il risultato torna da lì, da solo (se non c'è rete, resta il pulsante).
+        rc.via?.let { url -> scope.launch { if (postToOffice(url, "result", com.tennis.scoremanager.data.MatchCards.encodeResult(result))) resultSent(rc.card.code) } }
+    }
+
+    /** Il file del risultato da mandare e il testo che lo accompagna (si legge anche senza aprire il file). */
+    fun resultToSend(code: String): Pair<File, String>? {
+        val rc = receivedCards.value.firstOrNull { it.card.code == code } ?: return null
+        val r = rc.result ?: return null
+        val s = strings
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.MatchCards.resultFileName(s.mrFilePrefix, r)).apply { writeText(com.tennis.scoremanager.data.MatchCards.encodeResult(r)) } }.getOrNull() ?: return null
+        val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
+        val text = listOfNotNull(
+            s.mrTitle + ": " + listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · "),
+            "${r.side1} – ${r.side2}",
+            com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified),
+            winner?.let { s.mrWinner(it) },
+        ).joinToString("\n")
+        return f to text
+    }
+
+    /**
+     * Manda il risultato della scheda [code]: arrivata dal server del circolo, da lì (senza WhatsApp); sennò, o se il
+     * server non risponde, [fallback] (WhatsApp o condivisione).
+     */
+    fun sendResultAuto(code: String, fallback: () -> Unit) {
+        val rc = receivedCards.value.firstOrNull { it.card.code == code } ?: return
+        val r = rc.result ?: return
+        val url = rc.via ?: return fallback()
+        scope.launch {
+            if (postToOffice(url, "result", com.tennis.scoremanager.data.MatchCards.encodeResult(r))) { resultSent(code); _toasts.tryEmit(strings.ibSentServer) }
+            else fallback()
+        }
+    }
+
+    /** Il risultato è stato mandato (la voce in Gioca sparisce). */
+    fun resultSent(code: String) {
+        val list = receivedCards.value.map { if (it.card.code == code) it.copy(sentAt = System.currentTimeMillis()) else it }
+        receivedCards.value = list
+        scope.launch(io) { storage.saveReceivedCards(list) }
+    }
+
+    /**
+     * Prepara la partita della scheda: Nuova partita con giocatori, classifiche, torneo, turno, campo e regole. Sul
+     * telefono della segreteria (il torneo c'è e il codice è quello) è la partita del tabellone, come da Partite del
+     * circolo. Il giocatore del database si usa se c'è già (stesso id), sennò lo trova o lo crea Nuova partita dal nome.
+     */
+    fun prepareCard(card: com.tennis.scoremanager.data.MatchCard) {
+        incomingCard.value = null
+        // Sul telefono della segreteria (c'è la partita col codice di questa scheda) si gioca quella, come da Partite del circolo.
+        when (card.kind) {
+            com.tennis.scoremanager.data.CardKind.TOURNAMENT -> {
+                val t = clubTournament(card.ref)
+                val m = t?.matches?.firstOrNull { it.id == card.match && it.cardCode == card.code }
+                if (t != null && m != null) { if (!m.played) playClubMatch(t, m); return }
+            }
+            com.tennis.scoremanager.data.CardKind.TEAM -> {
+                val tm = team(card.ref)
+                val f = tm?.fixtures?.firstOrNull { it.id == card.match }
+                if (tm != null && f != null && f.rubbers.getOrNull(card.index)?.cardCode == card.code) {
+                    if (f.rubbers[card.index].won == null) playTeamRubber(tm, f, card.index); return
+                }
+            }
+            com.tennis.scoremanager.data.CardKind.LADDER -> {
+                val l = ladder(card.ref)
+                val ch = l?.challenges?.firstOrNull { it.id == card.match && it.cardCode == card.code }
+                if (l != null && ch != null) { if (ch.open) playChallenge(l, ch); return }
+            }
+        }
+        // Ogni giocatore della scheda nel database di questo telefono: lo stesso id, o lo stesso nome e cognome, o nuovo
+        // (gli avversari di un incontro a squadre arrivano solo col nome: Nuova partita li trova o li crea dal nome).
+        val now0 = System.currentTimeMillis()
+        val local = (card.side1 + card.side2).associateWith { cp ->
+            if (cp.id.isBlank()) null
+            else playerById(cp.id)
+                ?: com.tennis.scoremanager.data.Players.sameFullName(players.value, cp.firstName, cp.lastName).singleOrNull()?.takeIf { cp.firstName.isNotBlank() && cp.lastName.isNotBlank() }
+                ?: com.tennis.scoremanager.data.PlayerProfile(cp.id, cp.name, cp.firstName, cp.lastName, cp.nickname, createdAt = now0).also { savePlayer(it) }
+        }
+        fun id(p: com.tennis.scoremanager.data.CardPlayer?) = p?.let { local[it]?.id }.orEmpty()
+        fun name(p: com.tennis.scoremanager.data.CardPlayer?) = p?.let { local[it]?.name ?: it.name }.orEmpty()
+        val (a1, a2) = card.side1.getOrNull(0) to card.side1.getOrNull(1)
+        val (b1, b2) = card.side2.getOrNull(0) to card.side2.getOrNull(1)
+        updateSetup {
+            it.copy(
+                club = card.club.ifBlank { it.club }, court = card.court.ifBlank { it.court }, doubles = card.doubles,
+                p1a = name(a1), p1b = if (card.doubles) name(a2) else "", p2a = name(b1), p2b = if (card.doubles) name(b2) else "",
+                p1aId = id(a1), p1bId = if (card.doubles) id(a2) else "", p2aId = id(b1), p2bId = if (card.doubles) id(b2) else "",
+                p1aRank = a1?.ranking.orEmpty(), p1bRank = if (card.doubles) a2?.ranking.orEmpty() else "",
+                p2aRank = b1?.ranking.orEmpty(), p2bRank = if (card.doubles) b2?.ranking.orEmpty() else "",
+                event = card.event, category = card.category, round = card.round,
+            )
+        }
+        card.rules?.let { r -> updateOptions { it.copy(format = r.format, gamesPerSet = r.gamesPerSet, setTiebreak = r.setTiebreak, noAd = r.noAd) } }
+        // La scheda resta tra le ricevute (l'ultima convocazione della partita sostituisce le altre).
+        val now = System.currentTimeMillis()
+        val list = receivedCards.value.filter { it.card.code != card.code } +
+            com.tennis.scoremanager.data.ReceivedCard(card, receivedCards.value.firstOrNull { it.card.code == card.code }?.record, now, via = incomingVia)
+        receivedCards.value = list
+        scope.launch(io) { storage.saveReceivedCards(list) }
+        pendingCard = card
+        pendingCardP1 = name(a1) to id(a1)
+        go(Screen.SETUP)
+    }
+
+    /** La partita appena iniziata è quella della scheda (se in campo ci sono ancora quei giocatori). */
+    private fun linkCard(recordId: String, su: SetupData) {
+        val card = pendingCard ?: return
+        pendingCard = null
+        val (n, id) = pendingCardP1
+        if (su.p1a != n && (id.isBlank() || su.p1aId != id)) return
+        val list = receivedCards.value.map { if (it.card.code == card.code) it.copy(record = recordId) else it }
+        receivedCards.value = list
+        scope.launch(io) { storage.saveReceivedCards(list) }
+    }
+
+    val coachBook = MutableStateFlow(storage.loadCoachBook())
+
+    private fun putCoach(b: com.tennis.scoremanager.data.CoachBook) {
+        coachBook.value = b
+        scope.launch(io) { storage.saveCoachBook(b) }
+    }
+
+    fun addDiary(student: String, text: String, at: Long = System.currentTimeMillis()) {
+        val t = text.trim().take(2000)
+        if (t.isEmpty()) return
+        val b = coachBook.value
+        putCoach(b.copy(diary = b.diary + com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), student, at, t)))
+    }
+
+    fun deleteDiary(id: String) = coachBook.value.let { b -> putCoach(b.copy(diary = b.diary.filter { it.id != id })) }
+
+    /** Un obiettivo nuovo; se è già raggiunto lo si sa subito. */
+    fun addStudentGoal(student: String, stroke: com.tennis.scoremanager.data.TrainedStroke, targetPct: Int, window: Int) {
+        val now = System.currentTimeMillis()
+        val g = com.tennis.scoremanager.data.StudentGoal(com.tennis.scoremanager.data.Coaching.newId("g"), student, stroke, targetPct, window, createdAt = now)
+        val reached = com.tennis.scoremanager.data.Coaching.goalStatus(g, serveSessions.value).reached(g)
+        coachBook.value.let { b -> putCoach(b.copy(goals = b.goals + g.copy(reachedAt = if (reached) now else null))) }
+    }
+
+    fun deleteStudentGoal(id: String) = coachBook.value.let { b -> putCoach(b.copy(goals = b.goals.filter { it.id != id })) }
+
+    /** Dopo un allenamento: gli obiettivi raggiunti adesso prendono la data. */
+    private fun checkStudentGoals() {
+        val b = coachBook.value
+        if (b.goals.none { it.reachedAt == null }) return
+        val next = com.tennis.scoremanager.data.Coaching.markReached(b, serveSessions.value, System.currentTimeMillis())
+        if (next != b) putCoach(next)
+    }
+
+    fun saveLesson(l: com.tennis.scoremanager.data.CoachLesson) = coachBook.value.let { b ->
+        putCoach(b.copy(lessons = b.lessons.filter { it.id != l.id } + l))
+    }
+
+    fun deleteLesson(id: String) = coachBook.value.let { b -> putCoach(b.copy(lessons = b.lessons.filter { it.id != id })) }
+
+    fun savePack(p: com.tennis.scoremanager.data.LessonPack) = coachBook.value.let { b ->
+        putCoach(b.copy(packs = b.packs.filter { it.id != p.id } + p))
+    }
+
+    fun deletePack(id: String) = coachBook.value.let { b -> putCoach(b.copy(packs = b.packs.filter { it.id != id })) }
+
+    fun saveGroup(g: com.tennis.scoremanager.data.StudentGroup) = coachBook.value.let { b ->
+        putCoach(b.copy(groups = b.groups.filter { it.id != g.id } + g))
+    }
+
+    fun deleteGroup(id: String) = coachBook.value.let { b -> putCoach(b.copy(groups = b.groups.filter { it.id != id })) }
+
+    fun openLessons() {
+        refreshPlayers()
+        nav.push(Screen.LESSONS)
+    }
+
+    /** "lunedì 16 novembre, 18:00 · Campo 2". */
+    fun lessonWhen(l: com.tennis.scoremanager.data.CoachLesson): String {
+        val lang = options.value.lang
+        return listOfNotNull("${com.tennis.scoremanager.data.Notices.day(l.start, lang)}, ${Reports.time(l.start, lang)}", l.place.ifBlank { null }).joinToString(" · ")
+    }
+
+    /** Un messaggio libero agli allievi (a chi è minorenne arriva al genitore): WhatsApp, SMS o email dall'app degli avvisi. */
+    /**
+     * Il report degli ultimi 30 giorni a ciascuno (al genitore se è minorenne), uno per uno con il PDF allegato.
+     * Si fanno i PDF di tutti prima di aprire gli avvisi.
+     */
+    fun noticeReports(ids: List<String>) {
+        val s = strings
+        scope.launch {
+            val now = System.currentTimeMillis()
+            val rec = withContext(io) {
+                ids.mapNotNull { playerById(it) }.map { p ->
+                    val f = studentReportFile(p, 30, pdf = true)
+                    val text = listOf(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.rpText(p.name), clubSign).filter { it.isNotBlank() }.joinToString("\n")
+                    com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = f)
+                }
+            }
+            openNotice(com.tennis.scoremanager.data.NoticePlan(s.rpAll, s.studentsTitle, s.rpText(""), rec))
+        }
+    }
+
+    fun noticeStudents(ids: List<String>) {
+        val now = System.currentTimeMillis()
+        val rec = ids.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.coWriteTitle, strings.studentsTitle, "", rec, editable = true))
+    }
+
+    /** Il promemoria delle lezioni [lessons]: a ogni allievo la sua (giorno, ora, dove). */
+    fun noticeLessons(lessons: List<com.tennis.scoremanager.data.CoachLesson>) {
+        val s = strings; val now = System.currentTimeMillis()
+        val rec = lessons.sortedBy { it.start }.flatMap { l ->
+            l.students.mapNotNull { playerById(it) }.map { p ->
+                val text = listOfNotNull(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.coRemind(lessonWhen(l)), l.note.ifBlank { null }).joinToString("\n")
+                com.tennis.scoremanager.data.Notices.recipient(p, text, now)
+            }
+        }.distinctBy { it.id }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.coLessons, s.coLessons, lessons.firstOrNull()?.let { s.coRemind(lessonWhen(it)) }.orEmpty(), rec))
+    }
+
+    /** Partita tra due allievi dalla scheda: i due in campo, e si va in Nuova partita (Indietro torna alla scheda). */
+    fun matchWith(a: String, b: String) {
+        val pa = playerById(a) ?: return
+        val pb = playerById(b) ?: return
+        updateSetup { it.copy(doubles = false, p1a = pa.name, p1aId = pa.id, p2a = pb.name, p2aId = pb.id, p1b = "", p1bId = "", p2b = "", p2bId = "") }
+        go(Screen.SETUP)
+    }
+
+    // ---- Allenatore: corsi della scuola (scheda corso), presenze, proposte, partite e progressi degli allievi ----
+
+    val openCoachCourseId = MutableStateFlow<String?>(null)
+    fun openCoachCourse(id: String) { openCoachCourseId.value = id; nav.push(Screen.COACH_COURSE) }
+    fun coachCourse(id: String?): com.tennis.scoremanager.data.CoachCourse? = coachBook.value.courses.firstOrNull { it.card.course.id == id }
+
+    /** Segreteria: la scheda del corso in un file (il codice nasce al primo invio e resta). */
+    fun courseCardFile(courseId: String): File? {
+        val co = course(courseId) ?: return null
+        val code = co.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { saveCourse(co.copy(cardCode = it)) }
+        val card = com.tennis.scoremanager.data.CourseCards.card(course(courseId) ?: co, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone) { playerById(it) }
+        if (card.office.isBlank()) _toasts.tryEmit(strings.mcNoOffice)
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccFilePrefix, co.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encode(card)) } }.getOrNull()
+    }
+
+    /** Segreteria: manda la scheda del corso all'allenatore (WhatsApp col file). */
+    fun sendCourseToCoach(co: com.tennis.scoremanager.data.Course) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val file = courseCardFile(co.id)
+        val coach = co.coach?.let { playerById(it) }
+        val text = listOf(s.ccCardText(co.name, co.students.size), "${com.tennis.scoremanager.ui.screens.shortDate(co.from, lang)} – ${com.tennis.scoremanager.ui.screens.shortDate(co.to, lang)}",
+            s.ccCardHowTo, clubSign).filter { it.isNotBlank() }.joinToString("\n")
+        val rec = listOfNotNull(coach?.let { com.tennis.scoremanager.data.Notices.recipient(it, text, now).copy(attachment = file) })
+        if (coach != null && file != null) serverMail(coach.id, "course", file)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ccSendToCoach, co.name, text, rec))
+    }
+
+    /** Allenatore: è arrivata una scheda corso (finestra di conferma). */
+    val incomingCourse = MutableStateFlow<com.tennis.scoremanager.data.CourseCard?>(null)
+    /** Segreteria: sono arrivate le presenze di un corso. */
+    val incomingAttendance = MutableStateFlow<com.tennis.scoremanager.data.AttendanceReport?>(null)
+    /** Segreteria: l'allenatore propone un allievo nuovo. */
+    val incomingProposal = MutableStateFlow<com.tennis.scoremanager.data.StudentProposal?>(null)
+    /** Un profilo arrivato (file o QR): la persona da aggiungere o da completare tra i giocatori. */
+    val incomingProfile = MutableStateFlow<com.tennis.scoremanager.data.ProfileCard?>(null)
+
+    /**
+     * Allenatore: il corso tra i suoi; gli iscritti diventano suoi allievi col loro id della segreteria (così le
+     * presenze tornano alla persona giusta), con contatti, genitore e consenso dove qui mancano.
+     */
+    fun acceptCourse(card: com.tennis.scoremanager.data.CourseCard) {
+        incomingCourse.value = null
+        val now = System.currentTimeMillis()
+        val changed = card.students.map { cs ->
+            val old = playerById(cs.id)
+            (old ?: com.tennis.scoremanager.data.PlayerProfile(cs.id, cs.name, cs.firstName, cs.lastName, cs.nickname, createdAt = now)).let { p ->
+                p.copy(
+                    student = true,
+                    phone = p.phone.ifBlank { cs.phone }, email = p.email.ifBlank { cs.email },
+                    guardian = p.guardian.ifBlank { cs.guardian }, guardianPhone = p.guardianPhone.ifBlank { cs.guardianPhone },
+                    consentAt = p.consentAt ?: cs.consentAt,
+                )
+            }
+        }
+        if (changed.isNotEmpty()) savePlayers(changed)
+        cs_ranking(card.students, now)
+        val b = coachBook.value
+        val via = incomingVia
+        putCoach(b.copy(courses = com.tennis.scoremanager.data.CourseCards.receive(b.courses, card).map { if (it.card.course.id == card.course.id && via != null) it.copy(via = via) else it }))
+        openCoachCourse(card.course.id)
+    }
+
+    /** La classifica arrivata con la scheda entra nella storia dell'allievo se è nuova. */
+    private fun cs_ranking(list: List<com.tennis.scoremanager.data.CourseStudent>, now: Long) {
+        val b = coachBook.value
+        val add = list.filter { it.ranking.isNotBlank() && com.tennis.scoremanager.data.Coaching.ranking(b, it.id) != it.ranking }
+            .map { com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), it.id, now, it.ranking) }
+        if (add.isNotEmpty()) putCoach(b.copy(rankings = b.rankings + add))
+    }
+
+    /**
+     * Allenatore: l'appello di una lezione del corso. [note] va anche nel diario di chi c'era (una volta: se la nota
+     * cambia, si aggiunge la nuova).
+     */
+    fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) {
+        val b = coachBook.value
+        val cc = b.courses.firstOrNull { it.card.course.id == courseId } ?: return
+        val n = note.trim()
+        val updated = cc.copy(
+            attendance = if (cancelled) cc.attendance - key else cc.attendance + (key to present),
+            cancelled = if (cancelled) cc.cancelled + key else cc.cancelled - key,
+            notes = if (n.isEmpty()) cc.notes - key else cc.notes + (key to n),
+            changedAt = System.currentTimeMillis(),
+        )
+        val diary = if (!cancelled && n.isNotEmpty() && cc.notes[key] != n)
+            present.map { com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), it, start, "${cc.card.course.name}: $n") } else emptyList()
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) updated else it }, diary = b.diary + diary))
+    }
+
+    /**
+     * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
+     * non si cambiano qui (li cambia lei e li rimanda).
+     */
+    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course, color: String? = null) {
+        val b = coachBook.value
+        val old = b.courses.firstOrNull { it.card.course.id == co.id }
+        if (old != null && !old.personal) return
+        val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
+            ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
+        val withColor = if (color != null && color in com.tennis.scoremanager.data.CourseCards.COLORS) cc.copy(color = color) else cc
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + withColor))
+    }
+
+    /** L'etichetta colorata di un corso dell'allenatore (qualsiasi: anche quelli della segreteria, solo sul suo telefono). */
+    fun setCoachCourseColor(id: String, color: String) {
+        if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) return
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == id) it.copy(color = color) else it }))
+    }
+
+    /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */
+    fun deleteCoachCourse(id: String) {
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != id }))
+    }
+
+    /** Allenatore: avvisa gli iscritti che la lezione è annullata (a chi è minorenne scrive al genitore). */
+    fun noticeCourseCancelled(courseId: String, lessonStart: Long) {
+        val cc = coachCourse(courseId) ?: return
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val text = listOf(s.scCancelledNotice(cc.card.course.name), com.tennis.scoremanager.data.Notices.day(lessonStart, lang) + ", " + com.tennis.scoremanager.data.Reports.time(lessonStart, lang))
+            .joinToString("\n")
+        val rec = cc.card.course.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scCancelledTitle, cc.card.course.name, text, rec))
+    }
+
+    /** Allenatore: il file delle presenze da mandare, il testo e il numero della segreteria (dalla scheda). */
+    fun attendanceToSend(courseId: String): Triple<File, String, String>? {
+        val cc = coachCourse(courseId) ?: return null
+        val now = System.currentTimeMillis()
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, now, coachBook.value.busy)
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccAttendancePrefix, cc.card.course.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeReport(r)) } }.getOrNull() ?: return null
+        val co = cc.course
+        val held = com.tennis.scoremanager.data.Courses.lessons(co).count { it.key in cc.attendance }
+        val text = listOf(strings.ccAttendanceText(cc.card.course.name, held), cc.card.club).filter { it.isNotBlank() }.joinToString("\n")
+        return Triple(f, text, cc.card.office)
+    }
+
+    fun attendanceSent(courseId: String) {
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(sentAt = System.currentTimeMillis()) else it }))
+    }
+
+    fun attendanceStatus(r: com.tennis.scoremanager.data.AttendanceReport): com.tennis.scoremanager.data.AttendanceStatus = com.tennis.scoremanager.data.CourseCards.check(r, courses.value)
+
+    /** Segreteria: le presenze dell'allenatore nel corso. */
+    fun applyAttendance(r: com.tennis.scoremanager.data.AttendanceReport) {
+        incomingAttendance.value = null
+        val co = course(r.course) ?: return
+        if (co.cardCode != r.code) return
+        saveCourse(com.tennis.scoremanager.data.CourseCards.apply(co, r))
+        _toasts.tryEmit(strings.ccAttendanceApplied)
+    }
+
+    /** Allenatore: propone alla segreteria un allievo nuovo (file + testo; WhatsApp alla segreteria se se ne sa il numero). */
+    fun proposalToSend(st: com.tennis.scoremanager.data.PlayerProfile, level: String, note: String, courseId: String?): Triple<File, String, String>? {
+        val p = com.tennis.scoremanager.data.StudentProposal(student = com.tennis.scoremanager.data.CourseCards.student(st, st.id), coach = me()?.name ?: storage.myName, course = courseId, level = level.trim(), note = note.trim(), sentAt = System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccProposalPrefix, st.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeProposal(p)) } }.getOrNull() ?: return null
+        val office = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+        val text = listOf(strings.ccProposalText(st.name), level.trim(), note.trim()).filter { it.isNotBlank() }.joinToString("\n")
+        return Triple(f, text, office)
+    }
+
+    // ---------------------------------------------------------------- passaggio del profilo
+
+    /** La foto del giocatore (JPEG), se c'è. */
+    fun photoBytes(name: String): ByteArray? = PlayerStats.key(name).takeIf { it.isNotEmpty() }?.let { storage.photoFile(it) }?.takeIf { it.exists() }?.let { runCatching { it.readBytes() }.getOrNull() }
+
+    /** Chi manda un profilo: il circolo, o il nome di chi usa l'app. */
+    private fun profileSender(): String = if (activeRole.value == Role.CLUB) storage.clubName.ifBlank { strings.roleClub } else (me()?.name ?: storage.myName)
+
+    /** Il profilo di [p] coi dati scelti: il file da mandare e il testo che lo accompagna. */
+    fun profileToSend(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): Pair<File, String>? {
+        val card = com.tennis.scoremanager.data.ProfileCards.card(p, fields, photoBytes(p.name), profileSender(), System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.ProfileCards.fileName(strings.pfFilePrefix, p.name)).apply { writeText(com.tennis.scoremanager.data.ProfileCards.encode(card)) } }.getOrNull() ?: return null
+        return f to strings.pfShareText(p.name)
+    }
+
+    /** Il profilo di [p] (con la foto, se scelta) nella casella della segreteria sul server [url]; avvisa com'è andata. */
+    fun profileToOffice(url: String, p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>) {
+        val text = profileText(p, fields)
+        scope.launch { _toasts.tryEmit(if (postToOffice(url, "profile", text)) strings.pfOfficeSent else strings.pfOfficeFailed) }
+    }
+
+    /** Il file del profilo di [p] coi dati [fields] (null = quelli proposti), con la foto se scelta. */
+    fun profileText(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>? = null): String =
+        com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(p, fields ?: com.tennis.scoremanager.data.ProfileCards.defaults(p, photoBytes(p.name) != null), photoBytes(p.name), profileSender(), System.currentTimeMillis()))
+
+    /** Il profilo arrivato al PC, come lo si mostra prima di aggiungerlo: chi è, cosa porta, se c'è già. */
+    fun profilePreview(card: com.tennis.scoremanager.data.ProfileCard): com.tennis.scoremanager.desk.DeskIncoming {
+        val s = strings; val lang = options.value.lang; val sp = card.profile
+        val match = com.tennis.scoremanager.data.ProfileCards.find(players.value, sp)
+        val lines = listOfNotNull(sp.name, card.from.ifBlank { null }?.let { s.pfFrom(it) },
+            listOf(sp.phone, sp.email).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
+            sp.birth?.let { "${s.memberBirth}: ${com.tennis.scoremanager.data.Reports.date(it, lang)}" }, sp.club.ifBlank { null },
+            listOf(sp.guardian, sp.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.coGuardian}: $it" },
+            listOf(sp.fitpNumber, sp.ranking).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }?.let { "${s.pfFitp}: $it" },
+            if (card.photo != null) s.pfPhoto else null)
+        return com.tennis.scoremanager.desk.DeskIncoming("PROFILE", s.pfIncomingTitle, lines, match?.let { s.pfExisting(it.name) } ?: s.pfNew, true)
+    }
+
+    /** Dal PC: il profilo entra tra i giocatori (completa quello che c'è già); l'id del giocatore. */
+    fun applyProfileFromDesk(card: com.tennis.scoremanager.data.ProfileCard, asMember: Boolean, asStudent: Boolean): String =
+        applyProfile(card, com.tennis.scoremanager.data.ProfileCards.find(players.value, card.profile)?.id, asMember, asStudent).id
+
+    /** Il profilo di [p] per il QR (senza foto). */
+    fun profileQr(p: com.tennis.scoremanager.data.PlayerProfile, fields: Set<com.tennis.scoremanager.data.ProfileField>): String =
+        com.tennis.scoremanager.data.ProfileCards.encodeQr(com.tennis.scoremanager.data.ProfileCards.card(p, fields, null, profileSender(), System.currentTimeMillis()))
+
+    /** Il testo letto da un QR: se è un profilo si apre, se no si dice che non lo è. */
+    fun receiveProfileQr(text: String?) {
+        val card = text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }
+        if (card == null) _toasts.tryEmit(strings.pfNotProfile) else incomingProfile.value = card
+    }
+
+    /**
+     * Il profilo arrivato entra tra i giocatori: nuovo, o a completare [intoId] (solo quello che manca). La foto si
+     * mette se non ce n'è già una; all'allenatore la classifica va anche nello storico delle classifiche.
+     */
+    fun applyProfile(card: com.tennis.scoremanager.data.ProfileCard, intoId: String?, asMember: Boolean, asStudent: Boolean): com.tennis.scoremanager.data.PlayerProfile {
+        incomingProfile.value = null
+        val old = intoId?.let { playerById(it) }
+        val pl = com.tennis.scoremanager.data.ProfileCards.merge(old, card.profile, com.tennis.scoremanager.data.Players.newId(), System.currentTimeMillis(), asMember, asStudent)
+        savePlayer(pl)
+        card.photo?.let { b64 ->
+            val key = PlayerStats.key(pl.name)
+            if (key.isNotEmpty() && !storage.photoFile(key).exists()) runCatching { java.util.Base64.getDecoder().decode(b64) }.getOrNull()
+                ?.takeIf { it.size in 100..2_000_000 && BitmapFactory.decodeByteArray(it, 0, it.size) != null }
+                ?.let { storage.savePhoto(key, it); photosVersion.value++ }
+        }
+        if (pl.student && card.profile.ranking.isNotBlank() && coachBook.value.rankings.none { it.student == pl.id }) addRanking(pl.id, card.profile.ranking)
+        _toasts.tryEmit(if (old == null) strings.pfAdded(pl.name) else strings.pfCompleted(pl.name))
+        return pl
+    }
+
+    /** Segreteria: l'allievo proposto entra tra i giocatori (e nel corso scelto). */
+    fun applyProposal(p: com.tennis.scoremanager.data.StudentProposal, courseId: String?) {
+        incomingProposal.value = null
+        val cs = p.student
+        val existing = playerById(cs.id) ?: com.tennis.scoremanager.data.Players.sameFullName(players.value, cs.firstName, cs.lastName).singleOrNull()
+        val pl = (existing ?: com.tennis.scoremanager.data.PlayerProfile(cs.id, cs.name, cs.firstName, cs.lastName, cs.nickname, createdAt = System.currentTimeMillis())).let {
+            it.copy(phone = it.phone.ifBlank { cs.phone }, email = it.email.ifBlank { cs.email },
+                guardian = it.guardian.ifBlank { cs.guardian }, guardianPhone = it.guardianPhone.ifBlank { cs.guardianPhone }, consentAt = it.consentAt ?: cs.consentAt)
+        }
+        savePlayer(pl)
+        courseId?.let { course(it) }?.let { co -> if (pl.id !in co.students) saveCourse(co.copy(students = co.students + pl.id)) }
+        _toasts.tryEmit(strings.ccProposalApplied(pl.name))
+    }
+
+    // Partite, tornei, classifica, valutazioni e test degli allievi.
+    fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
+    fun deleteManualMatch(id: String) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
+    /** Gli impegni dell'allenatore (giorni occupati). */
+    fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
+        val b = coachBook.value
+        val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
+        putCoach(busyChanged(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from })))
+    }
+    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(busyChanged(b.copy(busy = b.busy.filter { it.id != id }))) }
+
+    /** Gli impegni sono cambiati: i corsi della segreteria hanno qualcosa da mandarle (vanno con le presenze). */
+    private fun busyChanged(b: com.tennis.scoremanager.data.CoachBook): com.tennis.scoremanager.data.CoachBook {
+        val now = System.currentTimeMillis()
+        return b.copy(courses = b.courses.map { if (!it.personal && it.card.course.to >= now) it.copy(changedAt = now) else it })
+    }
+    fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
+    fun deleteStudentEvent(id: String) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != id })) }
+    fun addRanking(student: String, ranking: String) {
+        val r = ranking.trim().uppercase().take(10)
+        if (r.isEmpty()) return
+        val b = coachBook.value
+        putCoach(b.copy(rankings = b.rankings + com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), student, System.currentTimeMillis(), r)))
+    }
+    fun saveEvaluation(e: com.tennis.scoremanager.data.Evaluation) { val b = coachBook.value; putCoach(b.copy(evaluations = b.evaluations.filter { it.id != e.id } + e)) }
+    fun deleteEvaluation(id: String) { val b = coachBook.value; putCoach(b.copy(evaluations = b.evaluations.filter { it.id != id })) }
+    fun saveFitnessTest(x: com.tennis.scoremanager.data.FitnessTest) { val b = coachBook.value; putCoach(b.copy(tests = b.tests.filter { it.id != x.id } + x)) }
+    fun deleteFitnessTest(id: String) { val b = coachBook.value; putCoach(b.copy(tests = b.tests.filter { it.id != id })) }
+
+    /** La partita finita in un file, da mandare all'allenatore (o a un altro telefono): la apre con TSM. */
+    fun matchFileToShare(rec: MatchRecord): File? {
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val names = Side.entries.joinToString(" - ") { PlayerStats.names(rec.setup, it).joinToString(" & ") }
+        return runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccMatchPrefix, names)).apply { writeText(storage.json.encodeToString(MatchRecord.serializer(), rec)) } }.getOrNull()
+    }
+
+    /** Una partita arrivata come file (da un allievo): nello storico, coi giocatori agganciati come nell'import. */
+    private fun receiveMatchRecord(rec: MatchRecord) {
+        scope.launch {
+            val (done, open) = withContext(io) { importRecords(listOf(rec)) }
+            _toasts.tryEmit(if (done + open == 0) strings.historyImportFailed else strings.historyImported(done, open))
+            refreshHistory(); refreshSaved()
+        }
+    }
+
+    /** Il riepilogo del mese per la segreteria, in un testo (lezioni, ore, allievi, incassi, corsi, presenze). */
+    fun monthText(m: com.tennis.scoremanager.data.Coaching.Month, label: String): String {
+        val s = strings; val lang = options.value.lang
+        return listOfNotNull(
+            s.cmMonthTitle(label) + (me()?.name ?: storage.myName).ifBlank { null }?.let { " · $it" }.orEmpty(),
+            s.cmPrivate(m.privateLessons, hoursText(m.privateMinutes), m.students),
+            s.cmCourses(m.courseLessons, hoursText(m.courseMinutes)) + (m.presencePct?.let { " · " + s.cmPresence(it) } ?: ""),
+            m.paidCents.takeIf { it > 0 }?.let { s.cmPaid(com.tennis.scoremanager.data.Fees.money(it, lang.locale)) },
+        ).joinToString("\n")
+    }
+
+    private fun hoursText(minutes: Int): String = if (minutes % 60 == 0) "${minutes / 60} h" else "${minutes / 60} h ${minutes % 60}′"
+
+    /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
+    fun coachOffice(): String = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+
+    // ---- Scheda progressi: l'allenatore la manda, l'allievo la tiene in Progressi ----
+
+    val incomingProgress = MutableStateFlow<com.tennis.scoremanager.data.ProgressCard?>(null)
+    val myProgress = MutableStateFlow(storage.loadMyProgress())
+
+    /** Allenatore: la scheda progressi dell'allievo in un file da mandargli. */
+    fun progressCardFile(studentId: String): File? {
+        val st = playerById(studentId) ?: return null
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val card = com.tennis.scoremanager.data.ProgressCards.build(coachBook.value, serveSessions.value, st.id, st.name, me()?.name ?: storage.myName, club, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.ProgressCards.fileName(strings.pcTitle, st.name)).apply { writeText(com.tennis.scoremanager.data.ProgressCards.encode(card)) } }.getOrNull()
+    }
+
+    /** Allenatore: manda la scheda progressi all'allievo (al genitore se è minorenne), col file allegato. */
+    fun noticeProgressCard(studentId: String) {
+        val st = playerById(studentId) ?: return
+        val f = progressCardFile(studentId) ?: return
+        val now = System.currentTimeMillis()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.pcText).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.pcTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Allievo: la scheda arrivata va nei suoi progressi (una più vecchia di quella che c'è non la sostituisce). */
+    fun acceptProgress(card: com.tennis.scoremanager.data.ProgressCard) {
+        incomingProgress.value = null
+        val old = myProgress.value
+        if (old != null && old.issuedAt > card.issuedAt) return
+        myProgress.value = card
+        scope.launch(io) { storage.saveMyProgress(card) }
+    }
+
+    // ---- Casella del server del circolo (facoltativo): schede, risultati, presenze viaggiano da soli ----
+
+    /** I file arrivati dal server e non ancora aperti (Dal circolo, nella prima schermata). */
+    val inbox = MutableStateFlow(storage.loadInbox())
+
+    private fun putInbox(list: List<com.tennis.scoremanager.data.InboxItem>) {
+        inbox.value = list
+        scope.launch(io) { storage.saveInbox(list) }
+    }
+
+    /** Apre il primo file della casella come se arrivasse da WhatsApp (ma ricordando che viene dal server). */
+    fun openInbox() {
+        val first = inbox.value.firstOrNull() ?: return
+        putInbox(inbox.value.drop(1))
+        receiveCardText(first.text, first.via.ifBlank { null })
+    }
+
+    /** Segreteria: lascia un file nella casella del giocatore sul server (se c'è il server e lui è iscritto). */
+    private fun serverMail(to: String, kind: String, file: File) {
+        val conf = clubServer.value
+        if (!conf.paired) return
+        val text = runCatching { file.readText() }.getOrNull() ?: return
+        scope.launch(io) { runCatching { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.sendMail(to, kind, text) } } }
+    }
+
+    /** Giocatore o allenatore: lascia un file alla segreteria sul server [url]; true se è arrivato. */
+    suspend fun postToOffice(url: String, kind: String, text: String): Boolean {
+        val a = bookingAccounts.value.firstOrNull { it.url == url && it.joined } ?: return false
+        return bookingWith(a) { it.postMail(kind, text) }.isSuccess
+    }
+
+    /** Il server del circolo da cui sono arrivati i corsi dell'allenatore (per mandare presenze e proposte da lì). */
+    fun coachVia(): String? = coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> bookingAccounts.value.any { it.url == url && it.joined } }
+
+    /** Allenatore: le presenze del corso alla segreteria dal server; true se arrivate. */
+    suspend fun sendAttendanceServer(courseId: String): Boolean {
+        val cc = coachCourse(courseId) ?: return false
+        val url = cc.via ?: return false
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis(), coachBook.value.busy)
+        val ok = postToOffice(url, "attendance", com.tennis.scoremanager.data.CourseCards.encodeReport(r))
+        if (ok) attendanceSent(courseId)
+        return ok
+    }
+
+    /** Allenatore: l'allievo proposto alla segreteria dal server; true se arrivato. */
+    suspend fun sendProposalServer(st: com.tennis.scoremanager.data.PlayerProfile, level: String, note: String): Boolean {
+        val url = coachVia() ?: return false
+        val p = com.tennis.scoremanager.data.StudentProposal(student = com.tennis.scoremanager.data.CourseCards.student(st, st.id), coach = me()?.name ?: storage.myName,
+            level = level.trim(), note = note.trim(), sentAt = System.currentTimeMillis())
+        return postToOffice(url, "proposal", com.tennis.scoremanager.data.CourseCards.encodeProposal(p))
+    }
+
+    /** Giocatore/allenatore: prende i file della sua casella su quel server, li tiene da aprire e li toglie dal server. */
+    private suspend fun fetchMyMail(a: com.tennis.scoremanager.data.BookingAccount) {
+        val mail = bookingWith(a) { it.myMail() }.getOrNull().orEmpty()
+        if (mail.isEmpty()) return
+        val have = inbox.value.map { it.id }.toSet()
+        val fresh = mail.filter { it.id !in have }.map { com.tennis.scoremanager.data.InboxItem(it.id, it.kind, it.text, it.fromName, a.url, it.at) }
+        putInbox(inbox.value + fresh)
+        mail.forEach { m -> bookingWith(a) { it.dropMyMail(m.id) } }
+        if (fresh.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
+    }
+
+    /**
+     * Segreteria: prende i file della sua casella. Risultati e presenze col codice giusto si registrano subito (come
+     * con Registra); gli altri (diversi da quello che c'è, allievi proposti) restano da aprire.
+     */
+    private suspend fun fetchOfficeMail(conf: com.tennis.scoremanager.data.ClubServerConf) {
+        val mail = runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.adminMail() } } }.getOrNull().orEmpty()
+        if (mail.isEmpty()) return
+        val keep = mutableListOf<com.tennis.scoremanager.data.InboxItem>()
+        val done = mutableListOf<String>()
+        for (m in mail) {
+            val r = com.tennis.scoremanager.data.MatchCards.decodeResult(m.text)
+            val a = com.tennis.scoremanager.data.CourseCards.decodeReport(m.text)
+            when {
+                r != null && resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.READY -> { applyResult(r); done += "${r.side1} – ${r.side2} ${r.score}" }
+                r != null && resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.SAME -> {}
+                a != null && attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.READY -> { applyAttendance(a); done += a.courseName }
+                a != null && attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.SAME -> {}
+                else -> keep += com.tennis.scoremanager.data.InboxItem(m.id, m.kind, m.text, m.fromName, "", m.at)
+            }
+        }
+        val have = inbox.value.map { it.id }.toSet()
+        putInbox(inbox.value + keep.filter { it.id !in have })
+        mail.forEach { m -> runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.dropAdminMail(m.id) } } } }
+        if (done.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibApplied, done.joinToString(" · "))
+        if (keep.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
+    }
+
+    // ---- Allenatore: ricevute dei pacchetti e registro presenze ----
+
+    /** Segna pagato il pacchetto e gli dà il numero di ricevuta (una serie per anno). */
+    fun markPackPaid(p: com.tennis.scoremanager.data.LessonPack) {
+        val now = System.currentTimeMillis()
+        savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
+    }
+
+    /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
+    fun packReceiptFile(packId: String): File? {
+        val p0 = coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
+        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, p0.paidAt!!)).also { savePack(it) } else p0
+        val s = strings
+        val st = playerById(p.student)
+        val coach = me()?.name ?: storage.myName
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val header = listOf(coach, club).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { s.receiptTitle }
+        // Il minorenne non paga da sé: la ricevuta è intestata al genitore, per l'allievo.
+        val from = st?.let { x -> x.guardian.takeIf { it.isNotBlank() }?.let { g -> s.rcFor(g, x.name) } ?: x.name }.orEmpty()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt!!.replace('/', '-')} ${st?.name.orEmpty()}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(header, p.receipt, p.paidAt!!, from, s.rcPack(p.lessons), "", p.cents, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** Manda la ricevuta all'allievo (al genitore se è minorenne), con il PDF allegato. */
+    fun noticePackReceipt(packId: String) {
+        val p = coachBook.value.packs.firstOrNull { it.id == packId } ?: return
+        val st = playerById(p.student) ?: return
+        val f = packReceiptFile(packId) ?: return
+        val now = System.currentTimeMillis()
+        val number = coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.rcText(number)).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.receiptTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
+    fun registerFile(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
+        val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
+        val club = if (coachSide) coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
+        val header = listOf(club, coach.takeIf { it.isNotBlank() }?.let { s.scCoachLine(it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.AttendancePdf.write(co, names, header, s, options.value.lang, System.currentTimeMillis(), it) }
+            f
+        }.getOrNull()
+    }
+
+    /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
+    fun registerXlsx(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.xlsx".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write(co.name, rows, it) }; f }.getOrNull()
+    }
+
+    /** Le ricevute dei pacchetti di un anno in Excel: numero, data, da chi, allievo, per cosa, importo. */
+    fun receiptsXlsx(year: Int): File? {
+        val s = strings
+        val cal = java.util.Calendar.getInstance()
+        val packs = coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
+            .sortedBy { it.receipt }
+        val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
+        val rows = listOf(listOf<Any?>(s.xlNumber, s.payDate, s.receiptReceivedFrom, s.xlStudent, s.receiptFor, s.receiptAmount)) + packs.map { p ->
+            val st = playerById(p.student)
+            listOf<Any?>(p.receipt, df.format(java.util.Date(p.paidAt!!)), st?.guardian?.ifBlank { null } ?: st?.name.orEmpty(), st?.name.orEmpty(), s.rcPack(p.lessons), p.cents / 100.0)
+        }
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.xlReceipts} $year.xlsx")
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write("${s.xlReceipts} $year", rows, it) }; f }.getOrNull()
+    }
 
     // ---- Obiettivi (Progressi) ----
 
@@ -1423,20 +2301,20 @@ class MatchController(
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
         refreshPlayers()
-        screen.value = Screen.MEMBERS
+        nav.push(Screen.MEMBERS)
     }
 
     /** Circolo › Quote e pagamenti. */
     fun openPayments() {
         refreshPlayers()
-        screen.value = Screen.PAYMENTS
+        nav.push(Screen.PAYMENTS)
     }
 
     /** Altro › Giocatori: tutto il database. */
     fun openPlayers() {
         refreshPlayers()
         refreshHistory()
-        screen.value = Screen.PLAYERS
+        nav.push(Screen.PLAYERS)
     }
 
     /** Chi è il giocatore nelle statistiche: il suo identificativo e quelli che sono lui (alias). */
@@ -1491,12 +2369,12 @@ class MatchController(
 
     fun openClubTournaments() {
         refreshPlayers()
-        screen.value = Screen.CLUB_TOURNAMENTS
+        nav.push(Screen.CLUB_TOURNAMENTS)
     }
 
     fun openClubTournament(id: String) {
         openClubTournamentId.value = id
-        screen.value = Screen.CLUB_TOURNAMENT
+        nav.push(Screen.CLUB_TOURNAMENT)
     }
 
     fun clubTournament(id: String?): com.tennis.scoremanager.data.ClubTournament? = id?.let { i -> clubTournaments.value.firstOrNull { it.id == i } }
@@ -1613,6 +2491,8 @@ class MatchController(
                 event = t.name, category = t.category, round = clubRoundName(t, m),
             )
         }
+        // Le regole del torneo (se la segreteria le ha fissate), come nella scheda partita.
+        t.rules?.let { r -> updateOptions { it.copy(format = r.format, gamesPerSet = r.gamesPerSet, setTiebreak = r.setTiebreak, noAd = r.noAd) } }
         pendingClubMatch = t.id to m.id
         go(Screen.SETUP)
     }
@@ -1649,18 +2529,18 @@ class MatchController(
 
     fun openTeams() {
         refreshPlayers()
-        screen.value = Screen.TEAMS
+        nav.push(Screen.TEAMS)
     }
 
     fun openTeam(id: String) {
         openTeamId.value = id
-        screen.value = Screen.TEAM
+        nav.push(Screen.TEAM)
     }
 
     fun openFixture(teamId: String, fixtureId: String) {
         openTeamId.value = teamId
         openFixtureId.value = fixtureId
-        screen.value = Screen.FIXTURE
+        nav.push(Screen.FIXTURE)
     }
 
     fun team(id: String?): com.tennis.scoremanager.data.Team? = id?.let { i -> teams.value.firstOrNull { it.id == i } }
@@ -1784,25 +2664,20 @@ class MatchController(
         }
     }
 
-    // ---- Statistiche dei campi (dal planning o dalla scheda Campi: Indietro torna lì) ----
-
-    private var statsBack = Screen.COURTS_PLAN
+    // ---- Statistiche dei campi (dal planning o dalla scheda Planning: Indietro torna lì) ----
 
     fun openCourtStats() {
-        statsBack = if (screen.value == Screen.COURTS_PLAN) Screen.COURTS_PLAN else Screen.HOME
-        screen.value = Screen.COURT_STATS
+        nav.push(Screen.COURT_STATS)
     }
 
     // ---- Aiuto al punto giusto ----
 
     /** La sezione della guida da aprire (dal "?" di una schermata), e dove si torna. */
     val helpSection = MutableStateFlow<String?>(null)
-    private var helpBack = Screen.HOME
 
     fun openHelp(section: String) {
         helpSection.value = section
-        helpBack = screen.value
-        screen.value = Screen.HELP
+        nav.push(Screen.HELP)
     }
 
     // ---- Classifica a sfida ----
@@ -1811,9 +2686,9 @@ class MatchController(
     val openLadderId = MutableStateFlow<String?>(null)
     private var pendingLadder: Pair<String, String>? = null
 
-    fun openLadders() { refreshPlayers(); screen.value = Screen.LADDERS }
+    fun openLadders() { refreshPlayers(); nav.push(Screen.LADDERS) }
 
-    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); screen.value = Screen.LADDER }
+    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); nav.push(Screen.LADDER) }
 
     fun ladder(id: String?): com.tennis.scoremanager.data.Ladder? = ladders.value.firstOrNull { it.id == id }
 
@@ -1870,7 +2745,12 @@ class MatchController(
         val now = System.currentTimeMillis()
         val a = playerById(ch.challenger)?.name.orEmpty(); val b = playerById(ch.defender)?.name.orEmpty()
         val text = listOf(l.name, s.ldVs(a, b), s.ldBy(com.tennis.scoremanager.ui.screens.shortDate(ch.deadline, options.value.lang)), storage.clubName).filter { it.isNotBlank() }.joinToString("\n")
-        val rec = listOfNotNull(playerById(ch.challenger), playerById(ch.defender)).map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        // Con la scheda partita: chi tiene il punteggio la apre con TSM e il risultato torna qui.
+        val card = challengeCardFile(l.id, ch.id)
+        val personal = listOfNotNull(l.name, s.ldVs(a, b), s.ldBy(com.tennis.scoremanager.ui.screens.shortDate(ch.deadline, options.value.lang)),
+            s.ntCardHowTo.takeIf { card != null }, storage.clubName).filter { it.isNotBlank() }.joinToString("\n")
+        card?.let { f -> listOf(ch.challenger, ch.defender).forEach { serverMail(it, "card", f) } }
+        val rec = listOfNotNull(playerById(ch.challenger), playerById(ch.defender)).map { com.tennis.scoremanager.data.Notices.recipient(it, personal, now).copy(attachment = card) }
         openNotice(com.tennis.scoremanager.data.NoticePlan(s.ldNoticeTitle, l.name, text, rec))
     }
 
@@ -1881,12 +2761,12 @@ class MatchController(
 
     fun openSchool() {
         refreshPlayers()
-        screen.value = Screen.SCHOOL
+        nav.push(Screen.SCHOOL)
     }
 
     fun openCourse(id: String) {
         openCourseId.value = id
-        screen.value = Screen.COURSE
+        nav.push(Screen.COURSE)
     }
 
     fun course(id: String?): com.tennis.scoremanager.data.Course? = id?.let { i -> courses.value.firstOrNull { it.id == i } }
@@ -1936,6 +2816,43 @@ class MatchController(
     }
 
     /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    /** Le lezioni future (non annullate) dei corsi che cadono nella chiusura [b] del circolo; vuoto se [b] non chiude il circolo. */
+    fun courseLessonsClosedBy(b: com.tennis.scoremanager.data.CourtBlock): List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>> {
+        val only = courtPlan.value.copy(blocks = listOf(b))
+        val now = System.currentTimeMillis()
+        return courses.value.flatMap { co ->
+            com.tennis.scoremanager.data.Courses.lessons(co).filter { it.start >= now && it.key !in co.cancelled && com.tennis.scoremanager.data.CourtPlans.closedOn(only, it.start) != null }.map { co to it }
+        }.sortedBy { it.second.start }
+    }
+
+    /** Annulla quelle lezioni (si rimettono dall'appello o si spostano). */
+    fun cancelCourseLessons(list: List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>) {
+        for ((id, ls) in list.groupBy { it.first.id }) {
+            val co = course(id) ?: continue
+            saveCourse(co.copy(cancelled = co.cancelled + ls.map { it.second.key }))
+        }
+    }
+
+    /** Agli iscritti: la lezione [key] del corso [c] (già spostata) da quando a quando. */
+    fun noticeCourseMoved(c: com.tennis.scoremanager.data.Course, key: String) {
+        val l = com.tennis.scoremanager.data.Courses.lessons(c).firstOrNull { it.key == key } ?: return
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        fun at(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + com.tennis.scoremanager.data.Reports.time(t, lang)
+        val text = (listOfNotNull(s.scMovedNotice(c.name), l.movedFrom?.let { at(it) + " →" }, at(l.start) + listOf(l.court).filter { it.isNotBlank() }.joinToString { " · $it" })
+            + listOfNotNull(clubSign.ifBlank { null }.takeIf { activeRole.value == Role.CLUB })).joinToString("\n")
+        val rec = c.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scMovedTitle, c.name, text, rec))
+    }
+
+    /** Allenatore: sposta una lezione di un suo corso (non di quelli della segreteria: l'orario lo decide lei). */
+    fun moveCoachLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?): com.tennis.scoremanager.data.Course? {
+        val b = coachBook.value
+        val cc = b.courses.firstOrNull { it.card.course.id == courseId }?.takeIf { it.personal } ?: return null
+        val moved = com.tennis.scoremanager.data.Courses.move(cc.card.course, key, start, minutes, court)
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = moved), cancelled = it.cancelled - key, changedAt = System.currentTimeMillis()) else it }))
+        return moved
+    }
+
     fun noticeCourse(c: com.tennis.scoremanager.data.Course, lesson: com.tennis.scoremanager.data.Lesson?) {
         val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
         val people = c.students.mapNotNull { playerById(it) }
@@ -1951,7 +2868,7 @@ class MatchController(
 
     fun openCourtsPlan() {
         refreshPlayers()
-        screen.value = Screen.COURTS_PLAN
+        nav.push(Screen.COURTS_PLAN)
     }
 
     fun saveCourtSettings(st: com.tennis.scoremanager.data.CourtSettings) {
@@ -2195,6 +3112,8 @@ class MatchController(
             }
             val sync = srv.buildSync(conf, courtPlan.value, clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
             val st = withContext(Dispatchers.IO) { srv.withServer(conf) { it.sync(sync) } }
+            // La casella: risultati dal campo, presenze e proposte degli allenatori.
+            runCatching { fetchOfficeMail(conf) }
             val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
             gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
             if (added.isNotEmpty()) putBookings(added)
@@ -2479,6 +3398,8 @@ class MatchController(
     private suspend fun checkMyBookings(a: com.tennis.scoremanager.data.BookingAccount, many: Boolean) {
         if (!a.joined) return
         val me = bookingWith(a) { it.me() }.getOrNull() ?: return
+        // La casella dei file (convocazioni, schede corso) da questo circolo.
+        runCatching { fetchMyMail(a) }
         val now = System.currentTimeMillis()
         val club = if (many) me.club.ifBlank { a.club }.ifBlank { null } else null
         fun label(court: String, start: Long) = listOfNotNull(club, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", court, start))).joinToString(" · ")
@@ -2679,15 +3600,13 @@ class MatchController(
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
 
     val notice = MutableStateFlow<com.tennis.scoremanager.data.NoticePlan?>(null)
-    private var noticeBack = Screen.HOME
 
     private fun openNotice(plan: com.tennis.scoremanager.data.NoticePlan) {
         notice.value = plan
-        noticeBack = screen.value
-        screen.value = Screen.NOTICE
+        nav.push(Screen.NOTICE)
     }
 
-    private fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
+    fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
         t.entries.firstOrNull { it.id == id }?.let { e -> e.players.mapIndexed { i, p -> playerById(p)?.name ?: e.names.getOrNull(i).orEmpty() }.joinToString(" / ") } ?: "—"
 
     private fun peopleOf(t: com.tennis.scoremanager.data.ClubTournament, entryIds: Collection<String?>): List<com.tennis.scoremanager.data.PlayerProfile> =
@@ -2714,14 +3633,100 @@ class MatchController(
         val open = t.matches.filter { !it.played && it.a != null && it.b != null }
         val ms = if (day != null) com.tennis.scoremanager.data.Notices.onDay(open, day) else open
         val names = { id: String? -> entryNameOf(t, id) }
-        val rec = ms.flatMap { m ->
-            peopleOf(t, listOf(m.a, m.b)).map { p ->
-                com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.matchText(s, t, m, clubRoundName(t, m), names, p, clubSign, lang, now), now)
-            }
-        }
         val title = if (day != null) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(day, lang)) else s.ntOrderAll(t.name)
         val common = com.tennis.scoremanager.data.Notices.orderOfPlay(s, t, ms, { clubRoundName(t, it) }, names, title, lang, clubSign)
-        openNotice(com.tennis.scoremanager.data.NoticePlan(if (day != null) s.ntKindOrder else s.ntKindNext, title, common, rec))
+        openNotice(com.tennis.scoremanager.data.NoticePlan(if (day != null) s.ntKindOrder else s.ntKindNext, title, common, convocations(t, ms)))
+    }
+
+    /** Convoca i giocatori di una partita sola, con la sua scheda partita. */
+    fun noticeMatch(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch) {
+        val title = "${clubRoundName(t, m)}: ${entryNameOf(t, m.a)} – ${entryNameOf(t, m.b)}"
+        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(strings, t, listOf(m), { clubRoundName(t, it) }, { entryNameOf(t, it) },
+            listOfNotNull(t.name, m.at?.let { com.tennis.scoremanager.data.Notices.day(it, options.value.lang) }).joinToString(" · "), options.value.lang, clubSign)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ctConvoke, title, common, convocations(t, listOf(m))))
+    }
+
+    /** A ciascun giocatore la sua partita (turno, avversario, giorno, ora, campo) con la scheda partita allegata. */
+    private fun convocations(t: com.tennis.scoremanager.data.ClubTournament, ms: List<com.tennis.scoremanager.data.CTMatch>): List<com.tennis.scoremanager.data.NoticeRecipient> {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val names = { id: String? -> entryNameOf(t, id) }
+        return ms.flatMap { m ->
+            val card = matchCardFile(t.id, m.id)
+            card?.let { f -> peopleOf(t, listOf(m.a, m.b)).forEach { p -> serverMail(p.id, "card", f) } }
+            peopleOf(t, listOf(m.a, m.b)).map { p ->
+                val text = com.tennis.scoremanager.data.Notices.matchText(s, t, m, clubRoundName(t, m), names, p, clubSign, lang, now, card = card != null)
+                com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
+            }
+        }
+    }
+
+    /**
+     * La scheda partita (vedi [com.tennis.scoremanager.data.MatchCard]) in un file da allegare. Il codice nasce alla
+     * prima convocazione e resta lo stesso nelle successive (un risultato tornato vale anche dopo uno spostamento).
+     * Null se la partita è già giocata o non ha ancora i due giocatori.
+     */
+    fun matchCardFile(tournamentId: String, matchId: String): File? {
+        val t = clubTournament(tournamentId) ?: return null
+        val m = t.matches.firstOrNull { it.id == matchId } ?: return null
+        if (m.played || m.a == null || m.b == null) return null
+        val code = m.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(cardCode = code) else it }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forTournament(
+            t, m, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, clubRoundName(t, m),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    private fun writeCardFile(card: com.tennis.scoremanager.data.MatchCard): File? {
+        // Senza il telefono della segreteria il risultato non sa dove tornare: lo si dice a chi convoca.
+        if (card.office.isBlank()) _toasts.tryEmit(strings.mcNoOffice)
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.MatchCards.fileName(card)).apply { writeText(com.tennis.scoremanager.data.MatchCards.encode(card)) } }.getOrNull()
+    }
+
+    /** La scheda di una partita di un incontro a squadre (codice come per i tornei: nasce alla prima convocazione). */
+    fun rubberCardFile(teamId: String, fixtureId: String, index: Int): File? {
+        val t = team(teamId) ?: return null
+        val f = t.fixtures.firstOrNull { it.id == fixtureId } ?: return null
+        val r = f.rubbers.getOrNull(index) ?: return null
+        val code = r.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            saveFixture(t, f.copy(rubbers = f.rubbers.mapIndexed { k, x -> if (k == index) x.copy(cardCode = code) else x }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forRubber(
+            t, f, index, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, rubberName(t, index),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    /** La scheda di una sfida della classifica. */
+    fun challengeCardFile(ladderId: String, challengeId: String): File? {
+        val l = ladder(ladderId) ?: return null
+        val ch = l.challenges.firstOrNull { it.id == challengeId } ?: return null
+        val code = ch.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            saveLadder(l.copy(challenges = l.challenges.map { if (it.id == challengeId) it.copy(cardCode = code) else it }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forChallenge(
+            l, ch, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, strings.ldPositions(ch.challengerPos, ch.defenderPos),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    /** Convoca i nostri giocatori di una partita dell'incontro, con la scheda partita per chi tiene il punteggio. */
+    fun noticeRubber(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, index: Int) {
+        val s = strings
+        val r = f.rubbers.getOrNull(index) ?: return
+        val card = rubberCardFile(t.id, f.id, index)
+        val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ")
+        val theirs = r.theirs.filter { it.isNotBlank() }.joinToString(" / ").ifBlank { f.opponent }
+        val lines = listOfNotNull(s.ntMatch(rubberName(t, index), "${t.name} – ${f.opponent}"), "$ours – $theirs", fixtureWhen(f), s.ntCardHowTo.takeIf { card != null })
+        val now = System.currentTimeMillis()
+        card?.let { f -> r.ours.forEach { serverMail(it, "card", f) } }
+        val rec = r.ours.mapNotNull { playerById(it) }.map { p ->
+            val text = (listOf(s.ntHello(p.firstName.ifBlank { p.name })) + lines + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n")
+            com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ctConvoke, "${rubberName(t, index)}: $ours – $theirs", lines.joinToString("\n"), rec))
     }
 
     /** Il tabellone in un'immagine, per il gruppo e i social; a ciascuno lo stesso testo. */
@@ -2824,22 +3829,30 @@ class MatchController(
 
     // ---------------------------------------------------------------- ruoli
 
-    /** I ruoli scelti (almeno uno) e quello attivo, che decide le schede della prima schermata. */
-    val roles = MutableStateFlow(storage.roles.mapNotNull { r -> Role.entries.firstOrNull { it.name == r } }.toSet().ifEmpty { setOf(Role.PLAYER) })
-    val activeRole = MutableStateFlow(Role.entries.firstOrNull { it.name == storage.activeRole }?.takeIf { it in roles.value } ?: roles.value.first())
+    /**
+     * Il ruolo, uno solo: decide le schede della prima schermata e cosa c'è in Altro. I dati sono gli stessi per tutti e
+     * cambiando ruolo (Impostazioni) non si perde niente. Chi aveva più ruoli accesi resta in quello che stava usando.
+     */
+    val activeRole = MutableStateFlow(
+        Role.entries.firstOrNull { it.name == storage.activeRole && it.name in storage.roles }
+            ?: Role.entries.firstOrNull { it.name in storage.roles } ?: Role.PLAYER,
+    )
 
-    /** Cambia i ruoli; se quello attivo non c'è più si passa al primo rimasto. Almeno uno resta sempre. */
-    fun setRoles(set: Set<Role>) {
-        val v = set.ifEmpty { setOf(Role.PLAYER) }
-        roles.value = Role.entries.filter { it in v }.toSet()
-        storage.roles = roles.value.map { it.name }.toSet()
-        if (activeRole.value !in roles.value) setActiveRole(roles.value.first())
-    }
+    /** Il ruolo come insieme (sempre di uno solo), per chi chiede "c'è il Circolo?". */
+    val roles = MutableStateFlow(setOf(activeRole.value))
 
-    /** Passa a un ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
-    fun setActiveRole(r: Role) {
+    /** La partita [id] è di una competizione del circolo (torneo, incontro di squadra, sfida)? Si riprende da lì. */
+    fun isClubRecord(id: String): Boolean =
+        clubTournaments.value.any { t -> t.matches.any { it.record == id } } ||
+            teams.value.any { t -> t.fixtures.any { f -> f.rubbers.any { it.record == id } } } ||
+            ladders.value.any { l -> l.challenges.any { it.record == id } }
+
+    /** Sceglie il ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
+    fun setRole(r: Role) {
         activeRole.value = r
+        roles.value = setOf(r)
         storage.activeRole = r.name
+        storage.roles = setOf(r.name)
         homeTab.value = r.tabs.first()
     }
 
@@ -3156,6 +4169,7 @@ class MatchController(
         linkClubMatch(rec.id, withIds)
         linkTeamRubber(rec.id, withIds)
         linkLadderMatch(rec.id, withIds)
+        linkCard(rec.id, withIds)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -3167,7 +4181,7 @@ class MatchController(
         lastPointAt = 0
         rallyStrokes = 0
         faultPending.value = false
-        screen.value = Screen.MATCH
+        nav.play(Screen.MATCH)
         persist()
         if (needsService()) MatchService.start(app)
         batteryWarned.clear()
@@ -3351,16 +4365,12 @@ class MatchController(
             showMessage(strings.msgFaultUndone)
             return
         }
-        val events = lm.record.events.toMutableList()
-        // Dopo un ritiro o un richiamo si annulla quello, non l'ultimo punto.
-        val last = events.lastOrNull()
-        if (last is MatchEvent.Retired || last is MatchEvent.Penalty || last is MatchEvent.Break || last is MatchEvent.ServerFix || last is MatchEvent.EndsFix) events.removeAt(events.lastIndex)
-        else {
-            while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
-            if (events.isEmpty()) return
-            // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
-            rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
-        }
+        // Dopo un ritiro, un richiamo o una correzione si annulla quello, non l'ultimo punto.
+        val events = ScoreEngine.undo(lm.state, lm.record.events) ?: return
+        // Il primo evento tolto: il punto annullato (con le scelte del set nuovo venute dopo) o la correzione.
+        val removed = lm.record.events[events.size]
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        if (removed is MatchEvent.Point) rallyStrokes += removed.strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -3375,12 +4385,13 @@ class MatchController(
         if (!rec.suspended) startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
-        showMessage(when (last) {
+        showMessage(when (removed) {
+            is MatchEvent.Point -> strings.msgPointUndone
             is MatchEvent.Penalty -> strings.penaltyUndone
-            is MatchEvent.Retired -> if (last.disqualified) strings.disqualifyUndone else strings.retireUndone
+            is MatchEvent.Retired -> if (removed.disqualified) strings.disqualifyUndone else strings.retireUndone
             is MatchEvent.Break -> strings.breakUndone
-            is MatchEvent.ServerFix, is MatchEvent.EndsFix -> strings.fixUndone
-            else -> strings.msgPointUndone
+            // Chi serve, lati, punteggio messo a mano, ordine di risposta.
+            else -> strings.fixUndone
         })
         showTvMessage(null)
     }
@@ -3612,10 +4623,12 @@ class MatchController(
         clubMatchFinished(rec, lm.state)
         teamRubberFinished(rec, lm.state)
         ladderMatchFinished(rec, lm.state)
+        cardMatchFinished(rec, lm.state)
+        // Prima si salva la partita finita, poi si toglie la sospesa: in mezzo non resta mai senza copia.
         scope.launch(io) {
-            storage.deleteMatch(rec.id)
             storage.saveFinished(rec)
             storage.saveLastFinished(rec)
+            storage.deleteMatch(rec.id)
         }
         // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
         storage.summaryOpen = rec.id
@@ -3624,7 +4637,7 @@ class MatchController(
         live.value = null
         endDialog.value = false
         stopCountdown()
-        screen.value = Screen.SUMMARY
+        nav.replace(Screen.SUMMARY)
         // Col tabellone acceso il servizio resta (il risultato è ancora sul tabellone): si riavvia solo per il testo della notifica.
         if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
@@ -3634,8 +4647,35 @@ class MatchController(
         }
     }
 
-    /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
+    /** Una partita nuova. Quella di adesso, se non è finita, resta salvata tra le sospese. */
     fun newMatch() {
+        val from = screen.value
+        closeMatch()
+        // Dalla partita o dal suo riepilogo la partita nuova ne prende il posto: Indietro torna da dove era partita.
+        if (from == Screen.MATCH || from == Screen.SUMMARY) nav.replace(Screen.SETUP) else nav.push(Screen.SETUP)
+    }
+
+    /** Lascia la partita (resta tra le sospese, la si riprende da Gioca) e torna da dove era partita. */
+    fun leaveMatch() {
+        closeMatch()
+        nav.back()
+    }
+
+    /** "Fatto" nel riepilogo (anche Indietro): si torna da dove era partita la partita, o allo storico. */
+    fun closeSummary() {
+        val fromHistory = summaryFromHistory.value
+        if (fromHistory) {
+            summary.value = null
+            summaryFromHistory.value = false
+            refreshHistory()
+        } else {
+            closeMatch()
+        }
+        nav.back()
+    }
+
+    /** Chiude la partita in corso (sospesa, se non è finita) e il riepilogo: tempi, voce e servizio a riposo. */
+    private fun closeMatch() {
         live.value?.let { lm ->
             val total = currentClock()
             runningSince = null
@@ -3656,7 +4696,6 @@ class MatchController(
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
         quickStart.value = false
-        screen.value = Screen.SETUP
     }
 
     fun resumeSaved(rec: MatchRecord) {
@@ -3680,7 +4719,7 @@ class MatchController(
         faultPending.value = false
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
-        screen.value = Screen.MATCH
+        nav.play(Screen.MATCH)
         if (!state.isFinished) showMessage(strings.msgSuspended)
         if (rec.location == null) fetchLocation()
         if (o.mode == PlayMode.BANDS) ble.reconnectAll()
@@ -3711,7 +4750,7 @@ class MatchController(
 
     fun openHistory() {
         refreshHistory()
-        screen.value = Screen.HISTORY
+        nav.push(Screen.HISTORY)
     }
 
     // ---------------------------------------------------------------- racchetta virtuale
@@ -3732,7 +4771,7 @@ class MatchController(
     fun openRackets() {
         refreshHistory()
         refreshWorkouts()
-        screen.value = Screen.RACKETS
+        nav.push(Screen.RACKETS)
     }
 
     private fun storeRackets(list: List<Racket>) {
@@ -3833,7 +4872,7 @@ class MatchController(
     fun openProgress() {
         refreshHistory()
         refreshWorkouts()
-        screen.value = Screen.PROGRESS
+        nav.push(Screen.PROGRESS)
     }
 
     private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
@@ -3912,7 +4951,7 @@ class MatchController(
         val r = com.tennis.scoremanager.data.StudentReport.build(
             storage, s, p, storage.loadServeSessions(), studentMatches(p), studentRating(p)?.rating,
             coach = me()?.takeIf { it.id != p.id }?.name, club = storage.clubName.ifBlank { null },
-            from = days?.let { now - it * 24L * 3600 * 1000 }, now = now,
+            from = days?.let { now - it * 24L * 3600 * 1000 }, now = now, extra = coachReportExtra(p, days?.let { now - it * 24L * 3600 * 1000 }),
         )
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
         val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\\\/:*?\"<>|]"), "_")
@@ -3925,6 +4964,41 @@ class MatchController(
                 b.recycle()
             }
         }.getOrNull()
+    }
+
+    /**
+     * Le parti dell'allenatore nel report dell'allievo: valutazione tecnica (ultima, con la differenza dalla prima del
+     * periodo), test fisici, classifica, presenze a lezioni e corsi, risultati scritti a mano.
+     */
+    private fun coachReportExtra(p: com.tennis.scoremanager.data.PlayerProfile, from: Long?): List<Pair<String, List<String>>> {
+        val s = strings; val lang = options.value.lang
+        val b = coachBook.value
+        val C = com.tennis.scoremanager.data.Coaching
+        fun d(at: Long) = com.tennis.scoremanager.ui.screens.shortDate(at, lang)
+        val ev = C.evaluationsOf(b, p.id)
+        val last = ev.lastOrNull()
+        val first = ev.firstOrNull { from == null || it.at >= from }?.takeIf { it != last }
+        val evalLines = last?.let { e ->
+            listOf(s.evLast(d(e.at))) + C.ASPECTS.mapNotNull { k -> e.scores[k]?.let { v ->
+                val before = first?.scores?.get(k)
+                "${com.tennis.scoremanager.ui.aspectLabel(s, k)}: $v/5" + (before?.takeIf { it != v }?.let { " (${if (v > it) "+" else ""}${v - it})" } ?: "")
+            } } + listOfNotNull(e.note.ifBlank { null })
+        }.orEmpty()
+        val tests = C.testsOf(b, p.id)
+        val testLines = C.TESTS.mapNotNull { (k, _) -> C.lastTwo(tests, k).first?.let { v -> "${com.tennis.scoremanager.ui.testLabel(s, k)}: ${com.tennis.scoremanager.ui.testValue(k, v)}" } }
+        val rk = b.rankings.filter { it.student == p.id }.sortedBy { it.at }
+        val rankLines = rk.takeLast(4).map { "${d(it.at)}: ${it.ranking}" }
+        val inPeriod = { at: Long -> from == null || at >= from }
+        val bal = C.balance(b, p.id)
+        val courseLines = b.courses.filter { p.id in it.card.course.students }.map { cc ->
+            val (pres, tot) = com.tennis.scoremanager.data.Courses.attendanceOf(cc.course, p.id, System.currentTimeMillis())
+            "${cc.card.course.name}: " + s.scAttendance(pres, tot)
+        } + listOfNotNull(s.evAbsences(bal.absences).takeIf { bal.absences > 0 })
+        val manual = b.manualMatches.filter { it.student == p.id && inPeriod(it.at) }.sortedByDescending { it.at }.take(8).map {
+            listOf(d(it.at), it.event, it.opponent + (it.opponentRanking.ifBlank { null }?.let { r -> " ($r)" } ?: ""), it.score, if (it.won) s.studentWon else s.studentLost)
+                .filter { x -> x.isNotBlank() }.joinToString(" · ")
+        }
+        return listOf(s.evTitle to evalLines, s.ftTitle to testLines, s.rkTitle to rankLines, s.evPresence to courseLines, s.mmTitle to manual)
     }
 
     /** Condivide un file; [text] va con il file (la didascalia su WhatsApp, il testo del post). */
@@ -3946,7 +5020,7 @@ class MatchController(
     fun openWorkouts() {
         workoutDetail.value = null
         refreshWorkouts()
-        screen.value = Screen.WORKOUT
+        nav.push(Screen.WORKOUT)
     }
 
     private fun refreshWorkouts() {
@@ -4019,21 +5093,11 @@ class MatchController(
         }
     }
 
-    /** Il riepilogo di una partita dello storico; Indietro torna a [back] (lo storico, o Progressi dal calendario). */
-    fun openFromHistory(m: LiveMatch, back: Screen = Screen.HISTORY) {
+    /** Il riepilogo di una partita dello storico (o del calendario, di un torneo...); Indietro torna lì. */
+    fun openFromHistory(m: LiveMatch) {
         summary.value = m
         summaryFromHistory.value = true
-        summaryBack = back
-        screen.value = Screen.SUMMARY
-    }
-
-    private var summaryBack = Screen.HISTORY
-
-    /** "Indietro" dal riepilogo aperto dallo storico. */
-    fun backToHistory() {
-        summary.value = null
-        summaryFromHistory.value = false
-        if (summaryBack == Screen.PROGRESS) { summaryBack = Screen.HISTORY; screen.value = Screen.PROGRESS } else openHistory()
+        nav.push(Screen.SUMMARY)
     }
 
     fun deleteFromHistory(id: String) {
@@ -4044,7 +5108,7 @@ class MatchController(
                 // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
                 if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
             }
-            if (summary.value?.record?.id == id) backToHistory() else refreshHistory()
+            if (summary.value?.record?.id == id && screen.value == Screen.SUMMARY) closeSummary() else refreshHistory()
         }
     }
 
@@ -4106,112 +5170,9 @@ class MatchController(
 
     // ---------------------------------------------------------------- tornei Americano e Mexicano
 
-    /** Tutti i tornei salvati, dal più recente. */
-    val tournaments = MutableStateFlow<List<Tournament>>(emptyList())
-    /** Torneo aperto; null = elenco dei tornei e creazione di uno nuovo. */
-    val tournament = MutableStateFlow<Tournament?>(null)
-
-    fun openTournaments() {
-        refreshTournaments()
-        // Si riapre da solo l'ultimo torneo non concluso.
-        if (tournament.value == null) {
-            scope.launch {
-                withContext(io) { storage.loadTournaments() }.firstOrNull { !it.finished }?.let { tournament.value = it }
-            }
-        }
-        screen.value = Screen.TOURNAMENT
-    }
-
-    private fun refreshTournaments() {
-        scope.launch { tournaments.value = withContext(io) { storage.loadTournaments() } }
-    }
-
-    private fun saveTournament(t: Tournament) {
-        tournament.value = t
-        scope.launch {
-            withContext(io) { storage.saveTournament(t) }
-            refreshTournaments()
-        }
-    }
-
-    fun createTournament(
-        name: String, kind: TournamentKind, players: List<String>, courts: Int,
-        scoring: TournamentScoring, pointsPerMatch: Int, minutes: Int,
-    ) {
-        val now = System.currentTimeMillis()
-        val t = Tournament(
-            id = "t$now", name = name.trim(), kind = kind, players = players.map { it.trim() },
-            courts = courts, scoring = scoring, pointsPerMatch = pointsPerMatch, minutes = minutes, createdAt = now,
-        )
-        saveTournament(t.copy(rounds = listOf(Tournaments.nextRound(t))))
-    }
-
-    fun openTournament(t: Tournament) {
-        tournament.value = t
-    }
-
-    /** Torna all'elenco dei tornei (quello aperto resta salvato). */
-    fun closeTournament() {
-        tournament.value = null
-        refreshTournaments()
-    }
-
-    /** Risultato di una partita del turno [round]; null = ancora da giocare. */
-    fun setTournamentResult(round: Int, court: Int, a: Int?, b: Int?) {
-        val t = tournament.value ?: return
-        val rounds = t.rounds.map { r ->
-            if (r.number != round) r
-            else r.copy(matches = r.matches.map { if (it.court == court) it.copy(scoreA = a, scoreB = b) else it })
-        }
-        saveTournament(t.copy(rounds = rounds))
-    }
-
-    /** Turno successivo, solo se tutte le partite del turno in corso hanno il risultato. */
-    fun nextTournamentRound(): Boolean {
-        val t = tournament.value ?: return false
-        if (t.current?.complete == false) return false
-        saveTournament(t.copy(rounds = t.rounds + Tournaments.nextRound(t)))
-        return true
-    }
-
-    /** Conclude il torneo. L'ultimo turno, se non è stato giocato per niente, si toglie. */
-    fun finishTournament() {
-        val t = tournament.value ?: return
-        val rounds = t.rounds.filterIndexed { i, r -> i < t.rounds.size - 1 || r.matches.any { it.played } }
-        saveTournament(t.copy(rounds = rounds, finished = true))
-    }
-
-    fun deleteTournament(id: String) {
-        if (tournament.value?.id == id) tournament.value = null
-        scope.launch {
-            withContext(io) { storage.deleteTournament(id) }
-            refreshTournaments()
-        }
-    }
-
-    /** La voce dice il punteggio di una partita contata punto per punto (se la voce è accesa). */
-    fun announceCounter(a: Int, b: Int) {
+    /** Il torneo tra amici (Americano e Mexicano), per conto suo: elenco, turni, classifica. */
+    val friends = FriendsTournaments(storage, scope, io, nav, { strings }, { options.value.lang }) { a, b ->
         if (options.value.audio) announcer.announce(calls().counterScore(a, b))
-    }
-
-    /** Classifica del torneo come testo da condividere. */
-    fun tournamentShareIntent(): Intent? {
-        val t = tournament.value ?: return null
-        val s = strings
-        val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
-        val text = buildString {
-            appendLine(listOf(t.name.ifBlank { kind }, kind).distinct().joinToString(" · "))
-            appendLine(s.tournamentRoundsPlayed(t.rounds.count { r -> r.matches.any { it.played } }))
-            Tournaments.standings(t).forEachIndexed { i, st ->
-                appendLine("${i + 1}. ${st.name} – ${st.points} (${s.tournamentWonShort} ${st.won}, ${st.diff.let { if (it > 0) "+$it" else "$it" }})")
-            }
-            append("Tennis Score Manager · ${Reports.siteUrl(options.value.lang)}")
-        }
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, text)
-        }
-        return Intent.createChooser(send, s.tournamentShare)
     }
 
     // ---------------------------------------------------------------- foto dei giocatori
@@ -4324,11 +5285,14 @@ class MatchController(
     /** Nuova partita più corta: le regole si vedono in una riga e si va dritti al sorteggio (finché non si tocca Cambia). */
     val quickStart = MutableStateFlow(false)
 
-    /** Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio. Indietro porta ai giocatori. */
+    /**
+     * Come l'ultima volta: stessi giocatori, campo e regole, e subito al sorteggio (coi braccialetti o i telecomandi
+     * prima la pagina dove si collegano). Indietro porta ai giocatori.
+     */
     fun startLikeLast(rec: MatchRecord) {
         prepareRematch(rec)
         quickStart.value = true
-        screen.value = Screen.OPTIONS
+        go(if (options.value.mode == PlayMode.REFEREE) Screen.TOSS else Screen.OPTIONS)
     }
 
     fun prepareRematch(rec: MatchRecord) {
@@ -4593,7 +5557,16 @@ class MatchController(
         scope.launch(io) { storage.saveMatch(snapshot) }
     }
 
+    /** Il luogo della partita nel riepilogo (Nuova partita › Altri dettagli): spento, la posizione non si chiede. */
+    val matchPlace = MutableStateFlow(storage.matchPlace)
+
+    fun setMatchPlace(on: Boolean) {
+        storage.matchPlace = on
+        matchPlace.value = on
+    }
+
     private fun fetchLocation() {
+        if (!storage.matchPlace) return
         val id = (live.value ?: summary.value)?.record?.id ?: return
         if (locationJob?.isActive == true && locationFor == id) return
         locationJob?.cancel()
@@ -4884,7 +5857,7 @@ class MatchController(
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
         summaryFromHistory.value = false
-        screen.value = Screen.SUMMARY
+        nav.replace(Screen.SUMMARY)
     }
 
     /**

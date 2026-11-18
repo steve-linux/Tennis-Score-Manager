@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -86,7 +87,7 @@ fun StudentsScreen(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     var create by remember { mutableStateOf(false) }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = s.studentsTitle,
@@ -98,7 +99,42 @@ fun StudentsScreen(c: MatchController) {
         },
     ) {
         if (students.isEmpty()) Text(s.studentNone, color = TsmColors.TextDim)
-        for (st in students) {
+        // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
+        com.tennis.scoremanager.ui.ReceiveProfileButton(c)
+        // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
+        val book by c.coachBook.collectAsState()
+        var query by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
+        var byLast by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        var filter by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
+        var groups by remember { mutableStateOf(false) }
+        val now = remember { System.currentTimeMillis() }
+        val seen = remember(students, sessions, book) { students.associate { it.id to com.tennis.scoremanager.data.Coaching.lastSeen(book, sessions, it.id) } }
+        if (students.size > 1) {
+            OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, placeholder = { Text(s.coSearch) })
+            com.tennis.scoremanager.ui.Segmented(listOf(com.tennis.scoremanager.ui.SegOption(s.coSortName), com.tennis.scoremanager.ui.SegOption(s.coSortLast)), if (byLast) 1 else 0, { byLast = it == 1 })
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                for ((key, label) in listOf("" to s.coAll, "away" to s.coAway, "down" to s.evTrendDown) + book.groups.map { it.id to it.name }) TextButton(onClick = { filter = key }) {
+                    Text(label, color = if (filter == key) TsmColors.Ball else TsmColors.TextDim, fontWeight = if (filter == key) FontWeight.Bold else FontWeight.Normal)
+                }
+                TextButton(onClick = { groups = true }) { Text(s.coGroups + " ›", color = TsmColors.Ball) }
+            }
+            if (filter == "away") Text(s.coAwayHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            val group = book.groups.firstOrNull { it.id == filter }
+            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.noticeStudents(group.students) }, Modifier.fillMaxWidth())
+            // Il report di ciascuno (ultimi 30 giorni) al genitore o all'allievo, uno per uno: dell'elenco che si vede.
+            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
+        }
+        val shown = students
+            .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }
+            .filter { st -> when (filter) {
+                "" -> true
+                "away" -> (seen[st.id] ?: 0L) < now - 14L * 24 * 3600 * 1000
+                "down" -> (com.tennis.scoremanager.data.Coaching.trend(book, st.id) ?: 0.0) < 0
+                else -> book.groups.firstOrNull { it.id == filter }?.students?.contains(st.id) == true
+            } }
+            .let { l -> if (byLast) l.sortedByDescending { seen[it.id] ?: 0L } else l.sortedBy { it.name.lowercase() } }
+        if (groups) com.tennis.scoremanager.ui.GroupsDialog(c) { groups = false }
+        for (st in shown) {
             val mine = Students.sessionsOf(sessions, st.id)
             Row(
                 Modifier.fillMaxWidth().clickable { c.openStudent(st.id) }.padding(vertical = 8.dp),
@@ -107,12 +143,17 @@ fun StudentsScreen(c: MatchController) {
                 PlayerAvatar(c, st.name, TsmColors.Ball, 48.dp)
                 Column(Modifier.weight(1f).padding(start = 12.dp)) {
                     Text(st.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    val last = mine.maxOfOrNull { it.startedAt }
+                    val last = seen[st.id]
                     Text(
-                        s.studentSessions(mine.size) + (last?.let { " · " + s.studentLast(Reports.date(it, lang)) } ?: ""),
+                        s.studentSessions(mine.size) + " · " + (last?.let { s.studentLast(Reports.date(it, lang)) } ?: s.coNever),
                         color = TsmColors.TextDim, fontSize = 13.sp,
                     )
                     st.racket?.let { c.racketById(it) }?.label?.takeIf { it.isNotBlank() }?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
+                    // Come va dall'ultima valutazione tecnica, e la classifica.
+                    val tr = com.tennis.scoremanager.data.Coaching.trend(book, st.id)
+                    val rk = com.tennis.scoremanager.data.Coaching.ranking(book, st.id)
+                    if (tr != null || rk != null) Text(listOfNotNull(rk, tr?.let { if (it >= 0) "▲ " + s.evTrendUp else "▼ " + s.evTrendDown }).joinToString(" · "),
+                        color = if ((tr ?: 0.0) < 0) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp)
                 }
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
             }
@@ -140,13 +181,15 @@ fun StudentScreen(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
     val mine = Students.sessionsOf(sessions, st.id)
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var edit by remember { mutableStateOf(false) }
     var delete by remember { mutableStateOf(false) }
     var purge by remember { mutableStateOf(false) }
     var merge by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
+    var sendProfile by remember { mutableStateOf(false) }
+    if (sendProfile) com.tennis.scoremanager.ui.SendProfileDialog(c, st) { sendProfile = false }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
         title = st.name,
@@ -158,7 +201,7 @@ fun StudentScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(if (c.activeRole.value == com.tennis.scoremanager.Role.COACH) HomeTab.STUDENTS else HomeTab.TRAIN) }, Modifier.weight(1f))
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.coachNow(st.id) }, Modifier.weight(1f))
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -301,10 +344,18 @@ fun StudentScreen(c: MatchController) {
                 delay(800)
                 c.savePlayer(st.copy(note = note))
             }
-            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
+            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
+                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
+        }
+        // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
+        if (st.student) {
+            com.tennis.scoremanager.ui.StudentCoachSections(c, st)
+            com.tennis.scoremanager.ui.StudentProgressSections(c, st)
         }
         // Il report da dare all'allievo (PDF o immagine per WhatsApp).
         if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
+        // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
+        GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
         GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
         if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
         // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
@@ -417,7 +468,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
 @Composable
 private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val lines = remember(st) { c.studentMatches(st).reversed() }
     var picked by remember { mutableStateOf(emptySet<String>()) }
     AlertDialog(

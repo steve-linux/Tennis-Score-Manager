@@ -50,10 +50,12 @@ fun DeskScreen(c: MatchController) {
     val context = LocalContext.current
     var scanBad by remember { mutableStateOf(false) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { scanBad = !c.desk.scan(it) } }
+    // Dal ruolo Allenatore è l'Allenatore da PC: solo i suoi dati (allievi, agenda, corsi, ricevute).
+    val coach = c.activeRole.collectAsState().value == com.tennis.scoremanager.Role.COACH
     ScreenScaffold(
-        onHelp = { c.openHelp("7.20") },
-        title = s.deskTitle,
-        subtitle = s.deskHint,
+        onHelp = { c.openHelp(if (coach) "7.6" else "7.20") },
+        title = if (coach) s.ccDeskTitle else s.deskTitle,
+        subtitle = if (coach) s.ccDeskHint else s.deskHint,
         icon = Icons.Filled.Computer,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
@@ -66,7 +68,7 @@ fun DeskScreen(c: MatchController) {
         if (!ui.running) {
             Text(s.deskIntro, color = TsmColors.TextDim)
             if (ui.failed) Text(s.deskFailed, color = TsmColors.Orange)
-            GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start() }, Modifier.fillMaxWidth())
+            GhostButton(s.deskStart, Icons.Filled.PowerSettingsNew, { c.desk.start(coach) }, Modifier.fillMaxWidth())
             firstTime()
             return@ScreenScaffold
         }

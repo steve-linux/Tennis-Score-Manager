@@ -24,6 +24,8 @@ data class Rubber(
     val record: String? = null,
     /** Non giocata, vinta a tavolino: il punteggio è quello del regolamento (6-0 6-0). */
     val walkover: Boolean = false,
+    /** Il codice della scheda partita mandata con la convocazione: il risultato che torna deve averlo. */
+    val cardCode: String? = null,
 )
 
 /**

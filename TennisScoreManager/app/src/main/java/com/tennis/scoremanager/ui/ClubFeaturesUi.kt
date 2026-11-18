@@ -101,11 +101,3 @@ fun ClubFeaturesHint(c: MatchController) {
     if (open) ClubFeaturesDialog(c) { open = false; seen = true; c.storage.clubFeaturesSeen = true }
 }
 
-/** In fondo alle schede del Circolo: cambia le funzioni. */
-@Composable
-fun ClubFeaturesButton(c: MatchController) {
-    val s = LocalStrings.current
-    var open by remember { mutableStateOf(false) }
-    GhostButton(s.cfTitle, Icons.Filled.Tune, { open = true }, Modifier.fillMaxWidth())
-    if (open) ClubFeaturesDialog(c) { open = false; c.storage.clubFeaturesSeen = true }
-}

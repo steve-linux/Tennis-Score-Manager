@@ -81,6 +81,75 @@ class DeskBridge(private val c: MatchController) : DeskData {
         "CALLUP" -> c.noticeCallUp(t, f)
         else -> c.noticeResult(t, f)
     }
+    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
+    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
+    override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun noticeCourseMoved(c: Course, key: String) = this.c.noticeCourseMoved(c, key)
+    override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+
+    /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
+    override fun profileFields(id: String) = fieldsOf(id)
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, asMember, false) }
+
+    private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
+        val photo = c.photoBytes(p.name) != null
+        DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
+    }
+
+    override fun incomingFile(text: String): DeskIncoming? {
+        val s = c.strings
+        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profilePreview(it) }
+        com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
+            val st = c.resultStatus(r)
+            val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
+            val msg = when (st) {
+                com.tennis.scoremanager.data.ResultStatus.READY -> s.mrReady
+                com.tennis.scoremanager.data.ResultStatus.SAME -> s.mrSame
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.resultNow(r))
+                com.tennis.scoremanager.data.ResultStatus.BAD_CODE -> s.mrBadCode
+                com.tennis.scoremanager.data.ResultStatus.NOT_FOUND -> s.mrNotFound
+            }
+            return DeskIncoming("RESULT", s.mrTitle, listOfNotNull(listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · "), "${r.side1} – ${r.side2}",
+                com.tennis.scoremanager.data.MatchCards.resultText(r, s.ctWalkover, s.ctRetired, s.ctDisqualified), winner?.let { s.mrWinner(it) }), msg,
+                st == com.tennis.scoremanager.data.ResultStatus.READY || st == com.tennis.scoremanager.data.ResultStatus.CONFLICT, replace = st == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
+            val st = c.attendanceStatus(r)
+            val msg = when (st) {
+                com.tennis.scoremanager.data.AttendanceStatus.READY -> s.ccAttReady
+                com.tennis.scoremanager.data.AttendanceStatus.SAME -> s.ccAttSame
+                com.tennis.scoremanager.data.AttendanceStatus.BAD_CODE -> s.ccAttBadCode
+                com.tennis.scoremanager.data.AttendanceStatus.NOT_FOUND -> s.ccAttNotFound
+            }
+            return DeskIncoming("ATTENDANCE", s.ccAttendanceTitle, listOfNotNull(r.courseName, r.coach.ifBlank { null }?.let { s.ccFrom(it) }, s.ccLessonsMarked(r.attendance.size)),
+                msg, st == com.tennis.scoremanager.data.AttendanceStatus.READY)
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p ->
+            val x = p.student
+            val guardian = listOf(x.guardian, x.guardianPhone).filter { it.isNotBlank() }.joinToString(" ")
+            return DeskIncoming("PROPOSAL", s.ccProposalTitle, listOfNotNull(x.name, x.phone.ifBlank { null }, x.email.ifBlank { null }, guardian.ifBlank { null }?.let { "${s.coGuardian}: $it" },
+                listOfNotNull(p.coach.ifBlank { null }?.let { s.ccFrom(it) }, p.level.ifBlank { null }, p.note.ifBlank { null }).joinToString(" · ").ifBlank { null }),
+                s.ccProposalCourse, true, courses = c.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.courses.value.any { it.id == id } })
+        }
+        return null
+    }
+
+    override fun applyIncoming(text: String, course: String?): String? {
+        com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
+            val st = c.resultStatus(r)
+            if (st != com.tennis.scoremanager.data.ResultStatus.READY && st != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return st.name
+            c.applyResult(r); return null
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
+            val st = c.attendanceStatus(r)
+            if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
+            c.applyAttendance(r); return null
+        }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.courses.value.any { it.id == id } }); return null }
+        return "NOT_A_FILE"
+    }
     override fun setClubName(name: String) { c.storage.clubName = name }
     override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
     override fun addCourt(info: CourtInfo): Boolean = c.addCourt(info)
@@ -126,15 +195,56 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
 }
 
+/** I dati veri dell'app per l'Allenatore da PC: allievi, agenda, corsi, PDF ed Excel fatti dal telefono. */
+class CoachBridge(private val c: MatchController) : CoachData {
+    override fun now(): Long = System.currentTimeMillis()
+    override val lang: String get() = c.options.value.lang.code
+    override fun coachName(): String = c.me()?.name ?: c.storage.myName
+    override fun book() = c.coachBook.value
+    override fun players(): List<PlayerProfile> = c.players.value
+    override fun sessions() = c.serveSessions.value
+    override fun addDiary(student: String, text: String) = c.addDiary(student, text)
+    override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
+    override fun markPackPaid(packId: String) { c.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
+    override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
+        c.markCourseLesson(courseId, key, start, present, cancelled, note)
+    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
+    override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
+    override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
+    override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
+    override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
+    override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
+    override fun profileFields(id: String) = fieldsOf(id)
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
+    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profilePreview(it) }
+    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, false, true) }
+
+    private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
+        val photo = c.photoBytes(p.name) != null
+        DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
+    }
+    override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
+    private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
+    override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
+    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.registerFile(courseId, coachSide = true))
+    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.registerXlsx(courseId, coachSide = true))
+    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.receiptsXlsx(year))
+}
+
 /**
  * La Segreteria da PC sul telefono: acceso solo quando serve. Si spegne da solo dopo mezz'ora senza nessuno collegato.
  * Il certificato sta nella cartella esclusa dai backup: la chiave privata non esce mai dal telefono.
  */
-class DeskManager(context: Context, private val data: DeskData) {
+class DeskManager(context: Context, private val data: DeskData, private val coachData: CoachData? = null) {
 
     data class Ui(
         val running: Boolean = false, val urls: List<String> = emptyList(), val code: String = "", val waitingIp: String? = null,
         val connectedIp: String? = null, val fingerprint: String = "", val failed: Boolean = false,
+        /** Acceso come Allenatore da PC (solo i dati dell'allenatore) o come Segreteria da PC. */
+        val coach: Boolean = false,
     )
 
     private val app = context.applicationContext
@@ -148,16 +258,19 @@ class DeskManager(context: Context, private val data: DeskData) {
 
     private fun asset(name: String): ByteArray? = files[name] ?: runCatching { app.assets.open("desk/$name").use { it.readBytes() } }.getOrNull()?.also { files[name] = it }
 
-    fun start() {
+    /** Accende il server; [coach] = Allenatore da PC. Acceso nell'altro modo, si spegne e riparte in questo. */
+    fun start(coach: Boolean = false) {
+        if (server != null && _ui.value.coach != coach) stop()
         scope.launch {
             synchronized(this@DeskManager) {
                 if (server != null) return@launch
                 try {
                     val cert = DeskCert.loadOrCreate(app.noBackupFilesDir)
-                    val s = DeskServer(cert, DeskApi(data, auth, qr = ::qrRows), ::asset, { TvServer.isLocalPeer(it) })
+                    val api = DeskApi(data, auth, qr = ::qrRows, coach = if (coach) coachData?.let { CoachApi(it) } else null)
+                    val s = DeskServer(cert, api, ::asset, { TvServer.isLocalPeer(it) })
                     s.start()
                     server = s
-                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint)
+                    _ui.value = Ui(running = true, fingerprint = cert.fingerprint, coach = coach)
                 } catch (e: Exception) {
                     Log.w(TAG, "Avvio non riuscito", e)
                     _ui.value = Ui(failed = true)

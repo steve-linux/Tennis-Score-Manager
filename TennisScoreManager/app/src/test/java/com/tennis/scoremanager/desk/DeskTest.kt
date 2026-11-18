@@ -42,6 +42,63 @@ class DeskTest {
         return field(req("GET", "/pair/$id").second, "token")!!
     }
 
+    @Test fun corsoColNumeroDiLezioniCheSaltaLeFeste() {
+        val k = login()
+        // Il martedì dal 1° dicembre 2026: l'8 è l'Immacolata, quindi la seconda lezione è il 15.
+        val body = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60}],"lessons":2}"""
+        assertTrue(req("POST", "/courses/end", body, k).second.contains("2026-12-15"))
+        assertTrue(req("POST", "/courses/end", body.replace("}]", "}],\"skipHolidays\":false").replace(",\"lessons\":2", ",\"lessons\":2"), k).second.contains("2026-12-08"))
+        assertEquals(200, req("POST", "/courses", body, k).first)
+        val c = data.school.single { it.name == "Mini" }
+        assertEquals(1, c.cancelled.size)
+        val list = req("GET", "/courses", token = k).second
+        assertTrue(list, "\"holiday\":\"Immacolata Concezione\"" in list)
+    }
+
+    @Test fun lezioneSpostataERecupero() {
+        val k = login()
+        val body = """{"name":"Mini","from":"2026-12-01","slots":[{"weekday":2,"startMin":1020,"minutes":60}],"lessons":3,"skipHolidays":false}"""
+        assertEquals(200, req("POST", "/courses", body, k).first)
+        val c = data.school.single { it.name == "Mini" }
+        val key8 = com.tennis.scoremanager.data.Courses.lessons(c)[1].key
+        // Giovedì 10 alle 18.
+        val (st, out) = req("POST", "/courses/${c.id}/move", """{"key":"$key8","date":"2026-12-10","startMin":1080}""", k)
+        assertEquals(200, st)
+        assertTrue(out, "\"movedFrom\":\"2026-12-08\"" in out)
+        assertTrue(out, "\"date\":\"2026-12-10\",\"startMin\":1080" in out)
+        // Il recupero: dopo l'ultima (il 15), il 22.
+        val mk = req("POST", "/courses/${c.id}/move", """{"key":"$key8","makeup":true}""", k).second
+        assertTrue(mk, "\"date\":\"2026-12-22\"" in mk)
+        // Com'era.
+        req("POST", "/courses/${c.id}/move", """{"key":"$key8","reset":true}""", k)
+        assertTrue(data.school.single { it.name == "Mini" }.moved.isEmpty())
+        assertEquals(404, req("POST", "/courses/${c.id}/move", """{"key":"nessuna","date":"2026-12-10","startMin":1080}""", k).first)
+    }
+
+    @Test fun profiloDalPc() {
+        val k = login()
+        val (_, made) = req("POST", "/people", """{"firstName":"Luca","lastName":"Verdi","phone":"333","email":"luca@example.org","member":false}""", k)
+        val id = Regex("\"id\":\"([^\"]+)\"").find(made)!!.groupValues[1]
+        assertTrue(req("GET", "/people/$id/profile", token = k).second.contains("CONTACTS"))
+        // Solo i contatti scelti: niente altro nel file.
+        val file = req("GET", "/people/$id/profile.tsm", token = k, q = mapOf("fields" to "CONTACTS")).second
+        assertTrue(file, "\"tsm-profile\"" in file && "luca@example.org" in file)
+        // Un profilo che arriva: anteprima e poi socio nuovo.
+        val other = file.replace("Luca", "Marta").replace("luca@example.org", "marta@example.org").replace("333", "444")
+        val chk = req("POST", "/files/check", "{\"text\":${kotlinx.serialization.json.JsonPrimitive(other)}}", k).second
+        assertTrue(chk, "\"kind\":\"PROFILE\"" in chk)
+        assertEquals(200, req("POST", "/files/apply", "{\"text\":${kotlinx.serialization.json.JsonPrimitive(other)},\"asMember\":true}", k).first)
+        assertTrue(data.list.any { it.firstName == "Marta" && it.member != null })
+        assertEquals(404, req("GET", "/people/nessuno/profile", token = k).first)
+    }
+
+    @Test fun ilPlanningMostraLeFeste() {
+        val tk = login()
+        val m = req("GET", "/month", token = tk, q = mapOf("date" to "2026-12-01")).second
+        assertTrue(m, "\"holiday\":\"Natale\"" in m)
+        assertTrue(req("GET", "/day", token = tk, q = mapOf("date" to "2026-12-08")).second.contains("Immacolata"))
+    }
+
     @Test fun senzaChiaveNonSiVedeNiente() {
         for ((m, p) in listOf("GET" to "/people", "GET" to "/money", "GET" to "/day", "POST" to "/fees", "GET" to "/info", "DELETE" to "/bookings/x")) {
             assertEquals(p, 401, req(m, p).first)
@@ -381,7 +438,7 @@ class DeskTest {
         assertEquals(30, Regex("\"date\":").findAll(m).count())
         // Un'ora su un campo, con due campi aperti 15 ore: 3%. La domenica chiusa tutta.
         assertTrue(m, "{\"date\":\"2026-11-11\",\"bookings\":1,\"matches\":0,\"busy\":3,\"blocked\":0}" in m)
-        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100}" in m)
+        assertTrue(m, "{\"date\":\"2026-11-15\",\"bookings\":0,\"matches\":0,\"busy\":0,\"blocked\":100,\"holiday\":\"Chiuso\"}" in m)
         assertEquals(400, req("GET", "/week", token = k, q = mapOf("date" to "boh")).first)
     }
 

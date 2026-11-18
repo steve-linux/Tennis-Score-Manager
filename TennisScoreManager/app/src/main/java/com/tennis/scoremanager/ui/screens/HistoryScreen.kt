@@ -93,7 +93,7 @@ fun HistoryScreen(c: MatchController) {
     val sendUrl by c.transferUrl.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
-    BackHandler { if (player != null) player = null else c.home() }
+    BackHandler { if (player != null) player = null else c.back() }
 
     ScreenScaffold(
 
@@ -102,7 +102,7 @@ fun HistoryScreen(c: MatchController) {
         subtitle = s.historySubtitle,
         icon = Icons.Filled.History,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.home() },
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.back() },
                 Modifier.weight(1f))
             BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
                 Modifier.weight(1f))
@@ -174,7 +174,7 @@ fun HistoryScreen(c: MatchController) {
 @Composable
 private fun TransferPickDialog(c: MatchController, onDone: (Set<String>?) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val all = remember { c.sendableMatches() }
     // Di solito si manda l'ultima partita: parte già spuntata.
     var picked by remember { mutableStateOf(setOfNotNull(all.firstOrNull()?.id)) }

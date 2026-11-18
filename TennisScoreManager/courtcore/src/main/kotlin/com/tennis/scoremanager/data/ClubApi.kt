@@ -46,6 +46,14 @@ const val CHAT_EDIT_MINUTES = 15
 @Serializable data class SrvOk(val ok: Boolean = true)
 
 /**
+ * Un file lasciato sul server per qualcuno (la casella): scheda partita, risultato, scheda corso, presenze, allievo
+ * proposto, scheda progressi. [kind] dice cos'è; [text] è il file (JSON). Chi lo riceve lo prende e lo toglie.
+ */
+@Serializable data class SrvMail(val id: String, val from: String = "", val fromName: String = "", val kind: String = "", val text: String = "", val at: Long = 0)
+/** Un file da lasciare: [to] è l'id del giocatore (dalla segreteria) e vuoto per la segreteria (dal giocatore). */
+@Serializable data class SrvMailIn(val to: String = "", val kind: String = "", val text: String = "")
+
+/**
  * Il tunnel da internet del server. [state]: OFF, WORKING, LOGIN e ENABLE (la segreteria apre [link]), ON (con [url]),
  * ERROR (con [code]). [available] è falso se sul server manca l'aiutante del tunnel: va aggiornato il kit.
  */

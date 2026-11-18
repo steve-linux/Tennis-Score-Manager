@@ -22,7 +22,8 @@ class CourtOnlineTest {
         clear(); set(2026, Calendar.NOVEMBER, 9 + plusDays, h, m)
     }.timeInMillis
 
-    private val now = mon(10)
+    // Calcolato a ogni uso: il fuso di Roma si mette in @Before, dopo che la classe è già stata creata.
+    private val now: Long get() = mon(10)
     private val sync = ClubSync(
         club = "TC Prova", courts = listOf("Campo 1", "Campo 2"),
         settings = CourtSettings(openHour = 8, closeHour = 22, slotMinutes = 60, centsPerHour = 1000, centsPerHourLights = 1500, lightsFrom = 18),

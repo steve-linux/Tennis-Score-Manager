@@ -94,7 +94,7 @@ fun MembersScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val players by c.players.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var todoOnly by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
@@ -126,6 +126,8 @@ fun MembersScreen(c: MatchController) {
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
             GhostButton(s.ntMembersButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
             OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+            // Un socio nuovo che arriva da un altro circolo: il QR del suo profilo.
+            com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         }
         for (p in shown) {
             val m = p.member ?: continue
@@ -216,7 +218,7 @@ private fun MemberPickDialog(c: MatchController, onDone: (PlayerProfile?) -> Uni
 @Composable
 fun MemberSection(c: MatchController, p: PlayerProfile) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val roles by c.roles.collectAsState()
     var edit by remember { mutableStateOf(false) }
     var remove by remember { mutableStateOf(false) }
@@ -295,7 +297,7 @@ private fun DateField(label: String, value: Long?, lang: com.tennis.scoremanager
 @Composable
 private fun MemberEditDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val m0 = p.member ?: Membership()
     var phone by remember { mutableStateOf(p.phone) }
     var email by remember { mutableStateOf(p.email) }

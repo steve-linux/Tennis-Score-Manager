@@ -47,7 +47,17 @@ data class ServeAttempt(
     /** Dritto, rovescio e volée: direzione voluta e, per la volée, se di dritto o di rovescio. */
     val direction: ShotDirection? = null,
     val wing: Wing? = null,
-)
+    /** Tra i migliori colpi: un esempio da rivedere e da confrontare (la clip resta anche con "Solo i video"). */
+    val starred: Boolean = false,
+    /** false = colpo della lezione registrata senza dentro o fuori: non conta nelle percentuali. */
+    val marked: Boolean = true,
+    /** Lezione registrata: il colpo riconosciuto dal braccialetto (null = non riconosciuto). */
+    val stroke: TrainedStroke? = null,
+) {
+    /** Dentro o fuori segnato: solo questi contano nei confronti. */
+    val isIn: Boolean get() = marked && inPlay
+    val isOut: Boolean get() = marked && !inPlay
+}
 
 @Serializable
 data class ServeSession(
@@ -69,6 +79,9 @@ data class ServeSession(
     val racket: RacketUse? = null,
     /** Esercizio guidato seguito (nome di quel giorno); null = allenamento libero. */
     val drillName: String? = null,
+    /** Lezione registrata: id della lezione (le sue sessioni, una per colpo, hanno lo stesso) e lezione dell'agenda. */
+    val lesson: String? = null,
+    val coachLesson: String? = null,
 )
 
 /**
@@ -101,7 +114,7 @@ object ServeTraining {
         val pct: Int? get() = if (total == 0) null else Math.round(inPlay * 100.0 / total).toInt()
     }
 
-    fun count(serves: List<ServeAttempt>): Count = Count(serves.size, serves.count { it.inPlay })
+    fun count(serves: List<ServeAttempt>): Count = Count(serves.count { it.marked }, serves.count { it.isIn })
 
     /** Righe del riepilogo: per lato, per prima e seconda, e per bersaglio (solo quelli usati). */
     data class Breakdown(
@@ -129,4 +142,43 @@ object ServeTraining {
     /** Media dei picchi del polso dei servizi riconosciuti (null se nessuno): dentro e fuori, per confrontarli. */
     fun meanGyro(serves: List<ServeAttempt>): Int? =
         serves.mapNotNull { it.gyroDps }.takeIf { it.isNotEmpty() }?.average()?.let { Math.round(it).toInt() }
+}
+
+/**
+ * Lezione registrata: il telefono fisso a fondo campo e ogni colpo riconosciuto dal braccialetto diventa una clip, senza
+ * premere tasti. Durante la lezione i colpi stanno insieme; si salvano come una sessione per colpo (dritto, rovescio,
+ * servizio, volée), ognuna nella sua sottocartella della lezione, così analisi, migliori colpi e andamento restano per colpo.
+ */
+object Lessons {
+    /** Colpo del braccialetto (BandProtocol.STROKE_*) come colpo allenato; null se non riconosciuto. */
+    fun strokeOf(band: Int): TrainedStroke? = TrainedStroke.entries.firstOrNull { it.band == band }
+
+    /** Dove va un colpo della lezione: quello riconosciuto, altrimenti il dritto (dall'analisi si può spostare). */
+    fun groupOf(a: ServeAttempt): TrainedStroke = a.stroke ?: TrainedStroke.FOREHAND
+
+    fun sessionId(lesson: String, stroke: TrainedStroke): String = "$lesson-${stroke.name.lowercase()}"
+
+    /** La sessione di [stroke] nella lezione [lesson] (cartella: quella della lezione più il nome del colpo). */
+    fun sessionOf(lesson: ServeSession, stroke: TrainedStroke, strokeName: (Int) -> String): ServeSession =
+        lesson.copy(
+            id = sessionId(lesson.id, stroke), stroke = stroke, lesson = lesson.id,
+            folder = lesson.folder?.let { "$it/${strokeName(stroke.band)}" },
+            serves = lesson.serves.filter { groupOf(it) == stroke },
+        )
+
+    /** Le sessioni della lezione, solo dei colpi che ci sono. */
+    fun split(lesson: ServeSession, strokeName: (Int) -> String): List<ServeSession> =
+        TrainedStroke.entries.map { sessionOf(lesson, it, strokeName) }.filter { it.serves.isNotEmpty() }
+
+    /**
+     * La lezione dell'agenda in corso adesso per [student] (o, senza allievo, quella con un allievo solo): da un quarto
+     * d'ora prima dell'inizio alla fine. Non quelle annullate.
+     */
+    fun current(lessons: List<CoachLesson>, student: String?, now: Long): CoachLesson? =
+        lessons.filter { !it.cancelled && now in (it.start - 15 * 60_000L)..(it.start + it.minutes * 60_000L) }
+            .firstOrNull { if (student != null) student in it.students else it.students.size == 1 }
+
+    /** L'ultimo colpo senza dentro o fuori, se è degli ultimi [windowMs]: lì va il tasto dentro/fuori. */
+    fun toMark(serves: List<ServeAttempt>, now: Long, windowMs: Long = 15_000L): ServeAttempt? =
+        serves.lastOrNull()?.takeIf { !it.marked && now - it.at <= windowMs }
 }

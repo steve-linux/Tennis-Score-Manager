@@ -284,7 +284,7 @@ private fun PinSection(c: MatchController, me: SrvMe, onSaved: () -> Unit) {
 private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val locale = c.options.value.lang.locale
+    val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     var me by remember { mutableStateOf<SrvMe?>(null) }
     var day by remember { mutableStateOf<SrvDay?>(null) }
@@ -687,7 +687,7 @@ private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onBusy: (CourtInfo, Lon
 @Composable
 private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInfo, start: Long, ct: ClubTime, onDone: (Boolean) -> Unit) {
     val s = LocalStrings.current
-    val locale = c.options.value.lang.locale
+    val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     val options = (slot..maxOf(me.rules.maxMinutes, slot) step slot).toList()
     var minutes by remember { mutableStateOf(options.first()) }

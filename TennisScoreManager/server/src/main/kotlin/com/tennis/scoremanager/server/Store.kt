@@ -78,7 +78,20 @@ data class State(
     val seeks: List<com.tennis.scoremanager.data.Seek> = emptyList(),
     /** I messaggi delle chat (bacheca e annunci): restano al massimo [CHAT_DAYS] giorni. */
     val chats: List<ChatMsg> = emptyList(),
+    /** La casella dei file: [MailItem.to] "" = la segreteria, sennò l'id del giocatore. */
+    val mail: List<MailItem> = emptyList(),
 )
+
+/** Un file lasciato per qualcuno; resta finché non lo prende (al massimo [MailItem.KEEP_DAYS] giorni). */
+@Serializable
+data class MailItem(val id: String, val to: String, val from: String, val fromName: String, val kind: String, val text: String, val at: Long) {
+    companion object {
+        const val KEEP_DAYS = 30
+        const val MAX_TEXT = 300_000
+        const val MAX_PER_BOX = 200
+        val KINDS = setOf("card", "result", "course", "attendance", "proposal", "progress", "profile")
+    }
+}
 
 object Secrets {
     private val rnd = SecureRandom()

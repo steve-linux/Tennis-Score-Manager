@@ -26,6 +26,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Draw
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
@@ -34,7 +37,9 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -44,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -72,6 +78,7 @@ import java.io.File
  * Con [EXTRA_POSE_DIR] (clip di un servizio analizzato) disegna sopra lo scheletro del giocatore, che segue il video
  * anche ingrandito, e ha i tasti per saltare ai tre momenti chiave.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class ReplayActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
@@ -83,6 +90,40 @@ class ReplayActivity : ComponentActivity() {
     private var pose: ServePoseResult? = null
     private var poseStarts: List<Long> = emptyList()
     private var poseAt = 0L
+    /** Il video, per prenderne il fotogramma da annotare; il fotogramma in annotazione (null = moviola). */
+    private var texture: TextureView? = null
+    private var annotating by mutableStateOf<android.graphics.Bitmap?>(null)
+    /** La cartella della clip (allenamento dei colpi): lì si salvano le note. null = moviola della partita. */
+    private val notesDir: File? by lazy {
+        intent.getStringExtra(EXTRA_POSE_DIR)?.let(::File) ?: files.firstOrNull()?.parentFile?.takeIf { intent.getStringExtra(EXTRA_STAR_SESSION) != null }
+    }
+    private var micAnswer: ((Boolean) -> Unit)? = null
+    private val micPermission = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
+        micAnswer?.invoke(ok); micAnswer = null
+    }
+
+    private fun askMic(answer: (Boolean) -> Unit) {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED) answer(true)
+        else { micAnswer = answer; micPermission.launch(android.Manifest.permission.RECORD_AUDIO) }
+    }
+
+    /** Il fotogramma fermo, con lo scheletro se è acceso, da annotare. */
+    private fun grabFrame(p: ExoPlayer, skeleton: Boolean): android.graphics.Bitmap? {
+        val bmp = texture?.bitmap ?: return null
+        if (!skeleton) return bmp
+        val abs = (poseStarts.getOrNull(p.currentMediaItemIndex) ?: return bmp) + p.currentPosition
+        val f = poseAt(abs - poseAt) ?: return bmp
+        val out = bmp.copy(android.graphics.Bitmap.Config.ARGB_8888, true)
+        val img = out.asImageBitmap()
+        androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+            androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(img),
+            androidx.compose.ui.geometry.Size(out.width.toFloat(), out.height.toFloat()),
+        ) { drawSkeleton(f, TsmColors.Ball) }
+        return out
+    }
+
+    /** Un fotogramma, in ms: dal video (60 fotogrammi = 17 ms), altrimenti 33 come a 30. */
+    private fun frameMs(p: ExoPlayer): Long = p.videoFormat?.frameRate?.takeIf { it > 1f }?.let { Math.round(1000f / it).toLong() } ?: 33L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,19 +200,22 @@ class ReplayActivity : ComponentActivity() {
 
     @Composable
     private fun Content(p: ExoPlayer) {
-        val s = stringsFor(controller.options.value.lang)
+        val s = stringsFor(controller.options.collectAsState().value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
         var speed by remember { mutableFloatStateOf(if (pose?.metrics != null || pose?.ground != null) 0.5f else 1f) }
         var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(Offset.Zero) }
-        remember(p) {
-            p.addListener(object : Player.Listener {
+        // Le proporzioni arrivano col primo fotogramma; l'ascolto si toglie quando la pagina sparisce.
+        DisposableEffect(p) {
+            val l = object : Player.Listener {
                 override fun onVideoSizeChanged(v: VideoSize) {
                     if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
                 }
-            })
+            }
+            p.addListener(l)
+            onDispose { p.removeListener(l) }
         }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
             // L'immagine: proporzioni del video, al centro; due dita per ingrandire e spostare.
@@ -205,11 +249,21 @@ class ReplayActivity : ComponentActivity() {
                             translationY = pan.y
                         },
                 ) {
-                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
+                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it); texture = it } }, modifier = Modifier.fillMaxSize())
                     if (skeleton) SkeletonOverlay(p)
                 }
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            // Tra i migliori colpi (si toglie con un altro tocco).
+            intent.getStringExtra(EXTRA_STAR_SESSION)?.let { sid ->
+                var star by remember { mutableStateOf(intent.getBooleanExtra(EXTRA_STAR_ON, false)) }
+                Btn(if (star) Icons.Filled.Star else Icons.Filled.StarBorder, null, star, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(12.dp)) {
+                    star = !star
+                    val at = intent.getLongExtra(EXTRA_STAR_AT, 0L)
+                    if (intent.getBooleanExtra(EXTRA_STAR_LIVE, false)) setResult(RESULT_OK, android.content.Intent().putExtra(EXTRA_STAR_AT, at).putExtra(EXTRA_STAR_ON, star))
+                    else controller.setServeStar(sid, at, star)
+                }
+            }
             // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
             if (controller.canShowReplayOnTv) {
                 Btn(Icons.Filled.Tv, s.replayOnBoard, onTv, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(12.dp)) {
@@ -259,7 +313,7 @@ class ReplayActivity : ComponentActivity() {
                 Btn(Icons.Filled.SkipPrevious, null, false) {
                     p.pause()
                     playing = false
-                    p.seekTo(maxOf(0, p.currentPosition - 33))
+                    p.seekTo(maxOf(0, p.currentPosition - frameMs(p)))
                     syncBoard(p, true)
                 }
                 Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
@@ -270,11 +324,20 @@ class ReplayActivity : ComponentActivity() {
                 Btn(Icons.Filled.SkipNext, null, false) {
                     p.pause()
                     playing = false
-                    p.seekTo(p.currentPosition + 33)
+                    p.seekTo(p.currentPosition + frameMs(p))
                     syncBoard(p, true)
+                }
+                // Annota il fotogramma fermo (frecce, cerchi, voce): solo per le clip dell'allenamento.
+                if (notesDir != null) Btn(Icons.Filled.Draw, null, false) {
+                    p.pause()
+                    playing = false
+                    syncBoard(p, true)
+                    annotating = grabFrame(p, skeleton)
                 }
             }
         }
+        // L'annotazione copre la moviola; chiusa, si torna al fotogramma fermo.
+        annotating?.let { bmp -> notesDir?.let { d -> AnnotateScreen(bmp, d, s, ::askMic) { annotating = null } } }
     }
 
     /** Il tabellone fa quello che fa la moviola dell'arbitro: stesso pezzo, stesso istante, fermo o in movimento. */
@@ -305,6 +368,14 @@ class ReplayActivity : ComponentActivity() {
         /** Cartella della clip di un servizio analizzato (pose.json e starts.txt) e istante del servizio (ms). */
         const val EXTRA_POSE_DIR = "pose_dir"
         const val EXTRA_POSE_AT = "pose_at"
+        /**
+         * La stella dei migliori colpi: sessione e istante del colpo e se ce l'ha già. Con [EXTRA_STAR_LIVE] (sessione
+         * ancora in corso) la stella torna come risultato ([EXTRA_STAR_ON]) e la salva l'allenamento.
+         */
+        const val EXTRA_STAR_SESSION = "star_session"
+        const val EXTRA_STAR_AT = "star_at"
+        const val EXTRA_STAR_ON = "star_on"
+        const val EXTRA_STAR_LIVE = "star_live"
         private const val MAX_ZOOM = 6f
     }
 }

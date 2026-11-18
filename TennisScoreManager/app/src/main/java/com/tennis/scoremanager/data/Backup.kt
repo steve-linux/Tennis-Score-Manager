@@ -48,9 +48,11 @@ object Backup {
             .sumOf { d -> d.walkTopDown().filter { it.isFile && isVideo(it) }.sumOf { it.length() } }
 
     /** Scrive il backup in [out]; [onProgress] riceve i file scritti. */
-    fun write(c: Context, storage: Storage, out: OutputStream, videos: Boolean, version: String, strokesFolder: String, onProgress: (Int) -> Unit = {}) {
+    fun write(c: Context, storage: Storage, out: OutputStream, videos: Boolean, version: String, strokesFolder: String, password: CharArray? = null, onProgress: (Int) -> Unit = {}) {
         var n = 0
-        ZipOutputStream(out.buffered()).use { zip ->
+        // Con la password il file si cifra mentre si scrive (vedi BackupCrypt).
+        val sink = if (password != null && password.isNotEmpty()) BackupCrypt.encrypting(out, password) else out
+        ZipOutputStream(sink.buffered()).use { zip ->
             fun put(name: String, f: File) {
                 zip.putNextEntry(ZipEntry(name).apply { time = f.lastModified() })
                 f.inputStream().use { it.copyTo(zip) }
@@ -87,11 +89,14 @@ object Backup {
 
     fun autoDir(storage: Storage) = File(storage.documentsRoot, AUTO_DIR)
 
-    /** "TSM backup 2026-11-05 2130.zip". */
-    fun autoName(at: Long): String = AUTO_PREFIX + java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at)) + ".zip"
+    /** Estensione dei backup protetti da password (non sono ZIP leggibili senza la password). */
+    const val LOCKED_EXT = ".tsmbak"
+
+    /** "TSM backup 2026-11-05 2130.zip" (o ".tsmbak", protetto da password). */
+    fun autoName(at: Long, locked: Boolean = false): String = AUTO_PREFIX + java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at)) + if (locked) LOCKED_EXT else ".zip"
 
     /** Le copie automatiche, dalla più nuova. */
-    fun autoList(storage: Storage): List<File> = autoDir(storage).listFiles { f -> f.isFile && f.name.startsWith(AUTO_PREFIX) && f.name.endsWith(".zip") }
+    fun autoList(storage: Storage): List<File> = autoDir(storage).listFiles { f -> f.isFile && f.name.startsWith(AUTO_PREFIX) && (f.name.endsWith(".zip") || f.name.endsWith(LOCKED_EXT)) }
         .orEmpty().sortedByDescending { it.lastModified() }
 
     /**
@@ -112,14 +117,28 @@ object Backup {
     }
 
     /** Scrive una copia automatica (senza video) e tiene le ultime [AUTO_KEEP]. */
-    fun writeAuto(c: Context, storage: Storage, version: String, strokesFolder: String, at: Long): File {
+    fun writeAuto(c: Context, storage: Storage, version: String, strokesFolder: String, at: Long, password: CharArray? = null): File {
         val dir = autoDir(storage).apply { mkdirs() }
-        val f = File(dir, autoName(at))
+        val f = File(dir, autoName(at, locked = password != null && password.isNotEmpty()))
         val tmp = File(dir, ".${f.name}.tmp")
-        tmp.outputStream().use { write(c, storage, it, videos = false, version = version, strokesFolder = strokesFolder) }
+        tmp.outputStream().use { write(c, storage, it, videos = false, version = version, strokesFolder = strokesFolder, password = password) }
         if (!tmp.renameTo(f)) { tmp.copyTo(f, overwrite = true); tmp.delete() }
         autoList(storage).drop(AUTO_KEEP).forEach { it.delete() }
         return f
+    }
+
+    /** Il backup che si apre con [open] è protetto da password. */
+    fun isLocked(open: () -> InputStream?): Boolean = runCatching { open()?.use { BackupCrypt.isEncrypted(it) } == true }.getOrDefault(false)
+
+    /**
+     * Il backup in chiaro: così com'è, o decifrato con [password] se è protetto ([BackupCrypt.WrongPassword] se la
+     * password manca o è sbagliata).
+     */
+    fun openPlain(open: () -> InputStream?, password: CharArray?): InputStream? {
+        if (!isLocked(open)) return open()
+        val s = open() ?: return null
+        if (password == null) { s.close(); throw BackupCrypt.WrongPassword() }
+        return try { BackupCrypt.decrypting(s, password) } catch (e: Exception) { s.close(); throw e }
     }
 
     /** Legge solo il manifest (per chiedere conferma prima di ripristinare); null se non è un backup dell'app. */
@@ -137,7 +156,8 @@ object Backup {
     fun restore(c: Context, storage: Storage, input: InputStream): Boolean {
         val stage = File(c.cacheDir, "restore").apply { deleteRecursively(); mkdirs() }
         var manifest: Manifest? = null
-        ZipInputStream(input.buffered()).use { zip ->
+        val src = input.buffered()
+        ZipInputStream(src).use { zip ->
             while (true) {
                 val e = zip.nextEntry ?: break
                 if (e.isDirectory) continue
@@ -151,6 +171,9 @@ object Backup {
                 f.parentFile?.mkdirs()
                 f.outputStream().use { zip.copyTo(it) }
             }
+            // Fino in fondo: in un backup protetto il sigillo è alla fine e si controlla lì (file toccato = errore,
+            // prima di cancellare i dati di adesso).
+            try { val buf = ByteArray(8192); while (src.read(buf) >= 0) Unit } catch (e: java.io.IOException) { stage.deleteRecursively(); throw e }
         }
         if (manifest == null || manifest!!.version > VERSION) {
             stage.deleteRecursively()
@@ -176,9 +199,11 @@ object Backup {
     /**
      * Cancella i dati dell'app: cartella interna (non il modello dell'analisi), impostazioni, voce, analisi delle clip
      * dei colpi in Documenti ([strokesFolders]); con [videos] anche i video delle clip, la moviola e gli highlights. I file salvati
-     * dall'utente in Documenti e i video della galleria restano.
+     * dall'utente in Documenti e i video della galleria restano; con [autoCopies] anche le copie automatiche (Backup).
      */
-    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>) {
+    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>, autoCopies: Boolean = false) {
+        // Le copie automatiche in Documenti restano anche se si disinstalla l'app: a richiesta si tolgono anche quelle.
+        if (autoCopies) autoList(storage).forEach { it.delete() }
         c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.forEach { it.deleteRecursively() }
         PREFS.map { File(prefsDir(c), it) }.forEach { it.delete() }
         extDir(c)?.let { ext ->

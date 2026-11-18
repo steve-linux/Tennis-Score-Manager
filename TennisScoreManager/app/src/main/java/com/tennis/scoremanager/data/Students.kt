@@ -32,7 +32,7 @@ data class PlayerProfile(
     val createdAt: Long = 0,
     /** La sua racchetta (Racket.id): va con le sue sessioni di allenamento, com'era quel giorno. */
     val racket: String? = null,
-    /** Allievo dell'allenatore: compare in Allenati › Allievi e si sceglie in "Chi si allena". */
+    /** Allievo dell'allenatore: compare in Allievi (ruolo Allenatore) e si sceglie in "Chi si allena". */
     val student: Boolean = false,
     /** Altri identificativi che sono lui: lo stesso giocatore creato su un altro telefono, o unito a questo. */
     val aliases: Set<String> = emptySet(),
@@ -51,6 +51,11 @@ data class PlayerProfile(
     /** Il circolo in cui gioca (anche un altro dal nostro). */
     val club: String = "",
     val backhand: Backhand? = null,
+    /** Per i minorenni (anche non soci): chi è il genitore o tutore e il suo telefono, per gli avvisi. */
+    val guardian: String = "",
+    val guardianPhone: String = "",
+    /** Consenso (dell'allievo o del genitore) a essere ripreso e a tenerne i dati: quando è stato dato, null = non segnato. */
+    val consentAt: Long? = null,
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")

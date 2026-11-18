@@ -35,6 +35,8 @@ object CourtPlans {
     fun weekday(t: Long): Int = CourtTime.weekday(t)
 
     fun blockActive(b: CourtBlock, day: Long): Boolean = CourtTime.blockActive(b, day)
+    /** Il nome della chiusura del circolo quel giorno (blocco su tutti i campi per tutto il giorno); null = aperto. */
+    fun closedOn(plan: CourtPlan, day: Long): String? = CourtTime.closedOn(plan, day)
 
     /** I blocchi del giorno, campo per campo ([courts] = i campi del circolo, per i blocchi "tutti i campi"). */
     fun blocksOn(plan: CourtPlan, day: Long, courts: List<String>?): List<Occupied> = plan.blocks.filter { blockActive(it, day) }.flatMap { b ->

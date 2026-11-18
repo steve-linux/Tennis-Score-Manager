@@ -78,14 +78,14 @@ fun CourtStatsScreen(c: MatchController) {
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
     val courts by c.clubCourts.collectAsState()
-    val locale = c.options.value.lang.locale
+    val locale = c.options.collectAsState().value.lang.locale
     var kind by rememberSaveable { mutableIntStateOf(0) }
     val (from, to) = period(kind, System.currentTimeMillis())
     val r = remember(plan, tournaments, courts, from, to) { CourtStats.report(plan, tournaments, courts, from, to) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.15") },
         title = s.stTitle,
-        subtitle = shortDate(from, c.options.value.lang) + " – " + shortDate(CourtPlans.addDays(to, -1), c.options.value.lang),
+        subtitle = shortDate(from, c.options.collectAsState().value.lang) + " – " + shortDate(CourtPlans.addDays(to, -1), c.options.collectAsState().value.lang),
         icon = Icons.Filled.BarChart,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {

@@ -112,7 +112,7 @@ fun LadderScreen(c: MatchController) {
     val list by c.ladders.collectAsState()
     val id by c.openLadderId.collectAsState()
     val l = list.firstOrNull { it.id == id } ?: run { c.back(); return }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     fun name(p: String) = c.playerById(p)?.name ?: "?"
     var arrange by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
@@ -136,7 +136,6 @@ fun LadderScreen(c: MatchController) {
                     color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 Text(if (ch.deadline < now) s.ldLate else s.ldBy(shortDate(ch.deadline, lang)), color = if (ch.deadline < now) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = { c.playChallenge(l, ch) }) { Text(s.ldPlay, color = TsmColors.Ball) }
                     TextButton(onClick = { result = ch }) { Text(s.ldResult) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {

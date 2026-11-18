@@ -289,11 +289,15 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                 }
                 OutlinedTextField(theirs1, { theirs1 = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmTheirs) })
                 if (r.doubles) OutlinedTextField(theirs2, { theirs2 = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmTheirs2) })
-                if (r.ours.size == need && r.won == null) GhostButton(s.ctPlayLive, Icons.Filled.PlayArrow, {
+                // Formazione pronta: il punteggio dal campo si tiene nel ruolo Tu (Gioca › Partite del circolo).
+                if (r.ours.size == need && r.won == null) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Convoca i nostri di questa partita con la scheda partita (la formazione si salva prima).
+                if (r.ours.size == need && r.won == null) GhostButton(s.ctConvoke, Icons.Filled.HowToReg, {
                     val x = current()
                     c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
                     onDone()
-                    c.playTeamRubber(c.team(t.id) ?: t, (c.team(t.id) ?: t).fixtures.first { it.id == f.id }, index)
+                    val tt = c.team(t.id) ?: t
+                    c.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
                 }, Modifier.fillMaxWidth())
                 OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
@@ -322,7 +326,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
 private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     var f by remember { mutableStateOf(f0) }
     var askDelete by remember { mutableStateOf(false) }

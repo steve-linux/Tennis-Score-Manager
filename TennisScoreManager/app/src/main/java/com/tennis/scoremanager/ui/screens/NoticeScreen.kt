@@ -135,10 +135,17 @@ fun NoticeScreen(c: MatchController) {
                                 modifier = Modifier.clickable { open = !open }, maxLines = if (open) 30 else 3)
                         }
                         // Larghi uguali su una riga: con tre tasti "Email" non va più a capo a metà parola.
+                        // La scheda partita allegata: va con WhatsApp e con l'email (l'SMS porta solo il testo).
+                        val file = r.attachment?.takeIf { it.exists() }
+                        if (file != null) Text(s.ntCardAttached(file.name), color = TsmColors.Ball, fontSize = 12.sp)
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp", Modifier.weight(1f)) { mark(r); open(whatsApp(wa, textOf(r))) }
+                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp", Modifier.weight(1f)) {
+                                mark(r); open(if (file != null) com.tennis.scoremanager.ui.whatsAppFile(context, wa, textOf(r), file) else whatsApp(wa, textOf(r)))
+                            }
                             if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS", Modifier.weight(1f)) { mark(r); open(sms(listOf(r.phone), textOf(r))) }
-                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail, Modifier.weight(1f)) { mark(r); open(email(listOf(r.email), emptyList(), p.subject, textOf(r))) }
+                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail, Modifier.weight(1f)) {
+                                mark(r); open(if (file != null) com.tennis.scoremanager.ui.emailFile(context, r.email, p.subject, textOf(r), file) else email(listOf(r.email), emptyList(), p.subject, textOf(r)))
+                            }
                         }
                     }
                 }

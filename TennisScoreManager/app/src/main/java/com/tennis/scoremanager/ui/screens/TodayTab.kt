@@ -25,7 +25,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +76,7 @@ private fun TodayCard(icon: ImageVector, title: String, lines: List<String>, ale
 @Composable
 fun TodayTab(c: MatchController) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val f by c.clubFeatures.collectAsState()
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
@@ -83,7 +85,14 @@ fun TodayTab(c: MatchController) {
     val courses by c.courses.collectAsState()
     val teams by c.teams.collectAsState()
     val ladders by c.ladders.collectAsState()
-    val now = remember { System.currentTimeMillis() }
+    // Si aggiorna ogni minuto: lasciata aperta (un tablet in segreteria) passa da sola al giorno dopo.
+    var now by remember { androidx.compose.runtime.mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(60_000)
+            now = System.currentTimeMillis()
+        }
+    }
     val today = CourtPlans.dayStart(now)
     val tomorrow = CourtPlans.addDays(today, 1)
     fun hm(t: Long) = Reports.time(t, lang)
@@ -157,7 +166,6 @@ fun TodayTab(c: MatchController) {
         }
     }
     if (shown == 0) Text(s.tdNothing, color = TsmColors.TextDim)
-    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 
 /** Le prenotazioni e le disdette online da leggere, le più nuove in alto: toccandone una si apre il planning di quel giorno. */

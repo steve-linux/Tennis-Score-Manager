@@ -6,6 +6,8 @@ package com.tennis.scoremanager.server
 import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.Cell
 import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.SrvMail
+import com.tennis.scoremanager.data.SrvMailIn
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
@@ -146,6 +148,13 @@ class Api(
             r.method == "POST" && p == listOf("admin", "chat", "board") -> { admin(r); chatPost(null, "board", r) }
             r.method == "DELETE" && p.size == 4 && p[0] == "admin" && p[1] == "chat" && p[2] == "msg" -> { admin(r); chatDelete(p[3]) }
             r.method == "GET" && p == listOf("me") -> me(player(r))
+            // La casella dei file (schede partita, risultati, schede corso, presenze, proposte, schede progressi).
+            r.method == "POST" && p == listOf("admin", "mail") -> { admin(r); leaveMail(read(SrvMailIn.serializer(), r), "", "") }
+            r.method == "GET" && p == listOf("admin", "mail") -> { admin(r); takeMail("") }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "mail" -> { admin(r); dropMail("", p[2]) }
+            r.method == "POST" && p == listOf("mail") -> player(r).let { pl -> leaveMail(read(SrvMailIn.serializer(), r).copy(to = ""), pl.id, pl.name) }
+            r.method == "GET" && p == listOf("mail") -> takeMail(player(r).id)
+            r.method == "DELETE" && p.size == 2 && p[0] == "mail" -> dropMail(player(r).id, p[1])
             r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
@@ -270,6 +279,33 @@ class Api(
         if (!backupName.matches(name)) throw ApiError(400, "BAD_REQUEST")
         val f = java.io.File(backupDir, name).takeIf { it.isFile } ?: throw ApiError(404, "NOT_FOUND")
         return ok(SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(f.readBytes())))
+    }
+
+    /** Lascia un file nella casella di [MailItem.to]: la segreteria a un giocatore invitato, un giocatore alla segreteria. */
+    private fun leaveMail(i: SrvMailIn, from: String, fromName: String): Resp {
+        if (i.kind !in MailItem.KINDS || i.text.isBlank() || i.text.length > MailItem.MAX_TEXT) throw ApiError(400, "BAD_REQUEST")
+        val now = store.now()
+        store.update { s ->
+            if (i.to.isNotEmpty() && s.players.none { it.id == i.to }) throw ApiError(404, "NOT_FOUND")
+            val fresh = s.mail.filter { now - it.at < MailItem.KEEP_DAYS * 86_400_000L }
+            val box = fresh.filter { it.to == i.to }
+            val keep = fresh - box.dropLast(MailItem.MAX_PER_BOX - 1).toSet()
+            s.copy(mail = keep + MailItem(Secrets.id("m"), i.to, from, fromName, i.kind, i.text, now)) to Unit
+        }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /** I file della casella di [to] ("" = la segreteria), dal più vecchio. */
+    private fun takeMail(to: String): Resp {
+        val now = store.now()
+        val list = store.state.mail.filter { it.to == to && now - it.at < MailItem.KEEP_DAYS * 86_400_000L }.sortedBy { it.at }
+        return ok(ListSerializer(SrvMail.serializer()), list.map { SrvMail(it.id, it.from, it.fromName, it.kind, it.text, it.at) })
+    }
+
+    /** Preso: il file esce dalla casella (solo dalla propria). */
+    private fun dropMail(to: String, id: String): Resp {
+        store.update { s -> s.copy(mail = s.mail.filterNot { it.id == id && it.to == to }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     /** La segreteria toglie un'attesa o un annuncio (fuori luogo, o già sistemato a voce). */

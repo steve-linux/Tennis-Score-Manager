@@ -20,7 +20,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew testDebugUnitTest assembleDebug --stacktrace
+      # testDebugUnitTest copre solo l'app: le regole dei campi e il server del circolo hanno i loro test (test).
+      # lintDebug ferma la build sugli errori di lint (i warning restano nel report).
+      - run: ./gradlew testDebugUnitTest :courtcore:test :server:test lintDebug assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -7,7 +7,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,12 +39,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
@@ -119,7 +118,6 @@ import kotlinx.coroutines.delay
 fun SummaryScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val activity = LocalActivity.current
     val sm by c.summary.collectAsState()
     val done = sm ?: return
     val rec = done.record
@@ -134,8 +132,8 @@ fun SummaryScreen(c: MatchController) {
     var confirmDelete by remember { mutableStateOf(false) }
     /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
     var shareChoice by remember { mutableStateOf(false) }
-    // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
-    BackHandler { if (fromHistory) c.backToHistory() }
+    // Indietro come "Fatto": si torna da dove era partita la partita (un torneo, la prima schermata) o allo storico.
+    BackHandler { c.closeSummary() }
 
     // Con l'app a tutto schermo la tastiera non restringe la pagina da sola: ci pensa imePadding. Mentre si
     // scrivono le note i pulsanti in basso spariscono, così resta spazio per vedere il testo.
@@ -245,6 +243,8 @@ fun SummaryScreen(c: MatchController) {
             Modifier.fillMaxWidth().background(TsmColors.Surface).padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Partita di una scheda della segreteria: il risultato da rimandarle.
+            com.tennis.scoremanager.ui.SendResultButton(c, rec.id)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, { shareChoice = true }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
@@ -252,11 +252,11 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // La partita finita è già nello storico: uscire non fa perdere niente.
                 if (fromHistory) {
-                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.backToHistory() }, Modifier.weight(1f))
+                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.closeSummary() }, Modifier.weight(1f))
                     GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.weight(1f))
                 } else {
                     GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
-                    GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                    GhostButton(s.done, Icons.Filled.Check, { c.closeSummary() }, Modifier.weight(1f))
                 }
             }
         }
@@ -268,7 +268,16 @@ fun SummaryScreen(c: MatchController) {
             onDismissRequest = { shareChoice = false },
             icon = { Icon(Icons.Filled.Share, null, tint = TsmColors.Orange) },
             title = { Text(s.shareChoose) },
-            text = { Text(s.shareChooseHint) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.shareChooseHint)
+                    // La partita in un file da aprire con TSM (all'allenatore, o su un altro telefono): finisce nel suo storico.
+                    GhostButton(s.ccMatchShare, Icons.Filled.Share, {
+                        shareChoice = false
+                        c.matchFileToShare(rec)?.let { f -> runCatching { context.startActivity(com.tennis.scoremanager.ui.shareFile(context, rec.setup.event, f)) } }
+                    }, Modifier.fillMaxWidth())
+                }
+            },
             confirmButton = {
                 TextButton(onClick = {
                     shareChoice = false

@@ -29,6 +29,8 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -136,10 +138,11 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
 
 /**
  * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
- * le altre in "Tutte le sessioni".
+ * le altre in "Tutte le sessioni". Nel profilo Tu ci si allena da soli; in quello dell'Allenatore ([coach]) si sceglie
+ * l'allievo, e sessioni, cartelle e andamento sono suoi.
  */
 @Composable
-fun ServeTrainingCard(c: MatchController) {
+fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val sessions by c.serveSessions.collectAsState()
@@ -147,12 +150,19 @@ fun ServeTrainingCard(c: MatchController) {
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
     LaunchedEffect(Unit) { c.refreshServeSessions(); c.refreshStudents() }
+    // Tu: nessun allievo (ti alleni tu). Allenatore: l'allievo dell'ultima volta, se non ce n'è già uno scelto.
+    LaunchedEffect(coach) { if (coach) c.restoreCoachStudent() else if (c.trainStudent.value != null) c.setTrainStudent(null) }
     val trainee by c.trainStudent.collectAsState()
     // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
     val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
-    SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
+    // Due funzioni diverse sullo stesso motore: il tuo allenamento (Tu) e quello di un allievo (Allenatore).
+    SectionCard(if (coach) s.coachTrainTitle else s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        TraineeRow(c)
+        if (coach) {
+            TraineeRow(c)
+            // Prima si sceglie chi si allena: il resto (colpo, esercizio, avvio, sessioni) è suo.
+            if (trainee == null) return@SectionCard
+        }
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
@@ -166,6 +176,19 @@ fun ServeTrainingCard(c: MatchController) {
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+        // 60 fotogrammi al secondo: solo sui telefoni che ce la fanno (molti si fermano a 30).
+        val can60 = remember { com.tennis.scoremanager.video.CameraLenses.supports60(context) }
+        if (can60) {
+            var fps60 by remember { mutableStateOf(c.storage.trainFps60) }
+            SwitchRow(Icons.Filled.Speed, s.fps60Title, s.fps60Hint, fps60) { fps60 = it; c.storage.trainFps60 = it }
+        }
+        // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
+        GhostButton(s.lessonRecord, Icons.Filled.School, {
+            context.startActivity(
+                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
+            )
+        }, Modifier.fillMaxWidth())
+        Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
         if (mine.isNotEmpty()) {
             Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
             StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
@@ -180,7 +203,7 @@ fun ServeTrainingCard(c: MatchController) {
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
-/** Chi si allena: un allievo (le sessioni, le cartelle e l'andamento sono suoi) o nessuno. */
+/** Chi si allena con l'allenatore: uno dei suoi allievi (le sessioni, le cartelle e l'andamento sono suoi). */
 @Composable
 fun TraineeRow(c: MatchController) {
     val s = LocalStrings.current
@@ -217,7 +240,6 @@ fun TraineeRow(c: MatchController) {
                         Text(label, color = if (id == trainee) TsmColors.Ball else TsmColors.TextMain, fontWeight = if (id == trainee) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier.padding(start = 10.dp))
                     }
-                    option(s.trainNoStudent, null, null)
                     for (st in students) option(st.name, st.id, st.name)
                 }
             },
@@ -263,7 +285,10 @@ fun PlayerEditDialog(
     var student by remember { mutableStateOf(player?.student ?: asStudent) }
     var phone by remember { mutableStateOf(player?.phone.orEmpty()) }
     var email by remember { mutableStateOf(player?.email.orEmpty()) }
-    val lang = c.options.value.lang
+    var guardian by remember { mutableStateOf(player?.guardian.orEmpty()) }
+    var guardianPhone by remember { mutableStateOf(player?.guardianPhone.orEmpty()) }
+    var consentAt by remember { mutableStateOf(player?.consentAt) }
+    val lang = c.options.collectAsState().value.lang
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
     val players by c.players.collectAsState()
@@ -343,6 +368,10 @@ fun PlayerEditDialog(
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
                 androidx.compose.material3.OutlinedTextField(email, { email = it.trim().take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.memberEmail) },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email))
+                // Per gli allievi: il genitore (minorenni) e il consenso a riprese e dati.
+                if (student) GuardianFields(guardian, guardianPhone, consentAt != null, { guardian = it }, { guardianPhone = it }) { on ->
+                    consentAt = if (on) consentAt ?: System.currentTimeMillis() else null
+                }
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
                 val choices = rackets.filter { !it.retired || it.id == racket }
                 Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -366,6 +395,7 @@ fun PlayerEditDialog(
                     hand = hand, racket = racket, student = student,
                     sex = sex, birth = birth, heightCm = height.toIntOrNull(), weightKg = weight.toIntOrNull(), club = club.trim(), backhand = backhand,
                     phone = phone.trim(), email = email.trim(),
+                    guardian = guardian.trim(), guardianPhone = guardianPhone.trim(), consentAt = consentAt,
                 )
                 c.savePlayer(p)
                 // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.
@@ -403,14 +433,16 @@ fun SessionRow(
     c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,
 ) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val n = ServeTraining.count(sess.serves)
     Row(modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(vertical = 6.dp)) {
         Column(Modifier.weight(1f)) {
             Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp)
             if (extra != null) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
+            // Dalla lezione registrata: i colpi senza dentro o fuori non contano nella percentuale.
+            if (sess.lesson != null) Text(s.lessonCount(sess.serves.size), color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
+        if (n.total > 0 || sess.lesson == null) Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
     }
 }
 
@@ -529,7 +561,10 @@ private fun PlacementDiagram(stroke: TrainedStroke) {
 @Composable
 fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE) {
     val b = ServeTraining.breakdown(serves, stroke)
-    Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+    // Colpi della lezione senza dentro o fuori: si contano e basta.
+    val unmarked = serves.count { !it.marked }
+    if (unmarked > 0) Text(s.lessonCount(serves.size), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = if (b.all.total > 0) 16.sp else 22.sp)
+    if (b.all.total > 0 || unmarked == 0) Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
     @Composable
     fun rows(title: String, map: Map<String, ServeTraining.Count>) {
         if (map.isEmpty()) return
@@ -546,8 +581,8 @@ fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedS
     rows(s.serveByTarget, b.byTarget.mapKeys { serveTargetName(s, it.key) })
     rows(s.byWing, b.byWing.mapKeys { wingName(s, it.key) })
     rows(s.byDirection, b.byDirection.mapKeys { directionName(s, it.key) })
-    val gin = ServeTraining.meanGyro(serves.filter { it.inPlay })
-    val gout = ServeTraining.meanGyro(serves.filter { !it.inPlay })
+    val gin = ServeTraining.meanGyro(serves.filter { it.isIn })
+    val gout = ServeTraining.meanGyro(serves.filter { it.isOut })
     if (gin != null && gout != null) Text(s.serveWrist(gin, gout), color = TsmColors.TextDim, fontSize = 13.sp)
 }
 
@@ -607,6 +642,6 @@ fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
         context.startActivity(Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray()))
     }
     GhostButton(s.servePlayAll, Icons.Filled.PlayArrow, { play(sess.serves) }, Modifier.fillMaxWidth())
-    if (sess.serves.any { it.inPlay && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.inPlay }) }, Modifier.fillMaxWidth())
-    if (sess.serves.any { !it.inPlay && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { !it.inPlay }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.isIn && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.isIn }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.isOut && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.isOut }) }, Modifier.fillMaxWidth())
 }

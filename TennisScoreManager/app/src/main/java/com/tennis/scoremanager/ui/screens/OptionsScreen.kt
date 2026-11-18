@@ -204,6 +204,9 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
     BackHandler { c.back() }
 
+    // La posizione serve solo al luogo nel riepilogo: si chiede una volta, poi decide l'interruttore in Altri dettagli.
+    fun askLocation() = c.storage.matchPlace && !(locPerm && locOn) && !c.storage.locationAsked
+
     fun onNext() {
         if (o.mode == PlayMode.BANDS) {
             if (!bandsReadyEnv) {
@@ -225,12 +228,12 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                     return
                 }
             }
-            if (!(locPerm && locOn)) {
+            if (askLocation()) {
                 locationDialog = true
                 return
             }
         }
-        c.go(Screen.START)
+        c.go(Screen.TOSS)
     }
 
     val match = page == OptionsPage.MATCH
@@ -260,27 +263,9 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         val quick by c.quickStart.collectAsState()
         val short = match && quick
         if (short) SectionCard(s.likeLastTitle, Icons.Filled.Replay) {
-            val mode = when (o.mode) { PlayMode.REFEREE -> s.modeReferee; PlayMode.BANDS -> s.modeBands; PlayMode.REMOTES -> s.modeRemotes }
-            val format = when (o.format) {
-                MatchFormat.BEST_OF_THREE -> s.formatBestOfThree
-                MatchFormat.BEST_OF_FIVE -> s.formatBestOfFive
-                MatchFormat.TWO_SETS_MATCH_TIEBREAK -> s.formatMatchTiebreak
-                MatchFormat.PRO_SET -> s.formatProSet
-                MatchFormat.MATCH_TIEBREAK_ONLY -> s.formatMatchTiebreakOnly
-            }
-            val extra = when {
-                o.format == MatchFormat.MATCH_TIEBREAK_ONLY -> null
-                o.noAd -> if (su.sport == Sport.PADEL) s.goldenPoint else s.noAd
-                o.starPoint -> s.starPoint
-                else -> null
-            }
-            // Il pro set e i set brevi dicono a quanti game: "Pro set · 8 game".
-            val games = s.gamesN(o.gamesPerSet).takeIf { o.format == MatchFormat.PRO_SET || (o.format != MatchFormat.MATCH_TIEBREAK_ONLY && o.gamesPerSet != 6) }
-            Text(listOfNotNull(mode, format, games, extra).joinToString(" · "), color = TsmColors.TextMain)
+            Text(likeLastLine(o, su.sport == Sport.PADEL, s), color = TsmColors.TextMain)
             GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false }, Modifier.fillMaxWidth())
         }
-        // Come l'ultima volta il sorteggio viene subito: è l'unica cosa da fare.
-        if (short) CoinTossSection(c, o, names, su.doubles)
         // Modalità (come l'ultima volta si vede solo coi braccialetti o i telecomandi: vanno collegati)
         if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
@@ -327,22 +312,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
         if (devices) RelaySection(c, names)
 
-        // Lingua
-        if (page == OptionsPage.VOICE) SectionCard(s.languageSection, Icons.Filled.Language) {
-            // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
-            // Bloccata mentre si generano i file vocali, come motore e voce (vedi VoiceSection).
-            val generating = c.voiceProgress.collectAsState().value != null
-            Segmented(
-                Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
-                selected = o.lang.ordinal,
-                onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
-                columns = 2,
-                enabled = !generating,
-            )
-            Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        }
-
-        // Audio e voce
+        // Audio e voce (la lingua si sceglie in Impostazioni)
         if (page == OptionsPage.VOICE) VoiceSection(c, o)
 
         // Tabellone su TV
@@ -371,7 +341,20 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             }
             // Solo super tie-break: niente game, quindi niente game per set, tie-break dei set né vantaggi.
             val onlyTiebreak = o.format == MatchFormat.MATCH_TIEBREAK_ONLY
-            if (!onlyTiebreak) {
+            val padel = su.sport == Sport.PADEL
+            // Le altre regole, chiuse in una riga finché non servono (si aprono da sole se non sono quelle di sempre).
+            var moreRules by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+            val line = otherRulesLine(o, padel, s)
+            if (!moreRules && line.isNotEmpty()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(s.otherRules, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(line, color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    TextButton(onClick = { moreRules = true }) { Text(s.setupChange, color = TsmColors.Ball) }
+                }
+            }
+            if (moreRules && !onlyTiebreak) {
                 Text(s.gamesPerSetTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 val choices = if (o.format == MatchFormat.PRO_SET) listOf(8, 10) else listOf(6, 4)
                 Segmented(
@@ -384,18 +367,17 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                     c.updateOptions { it.copy(setTiebreak = v) }
                 }
             }
-            val padel = su.sport == Sport.PADEL
-            if (!onlyTiebreak) SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+            if (moreRules && !onlyTiebreak) SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
                 c.updateOptions { it.copy(noAd = v, starPoint = if (v) false else it.starPoint) }
             }
             // Golden point e star point si escludono: accenderne uno spegne l'altro; spenti tutti e due = vantaggi.
-            if (padel && !onlyTiebreak) {
+            if (moreRules && padel && !onlyTiebreak) {
                 SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
                     c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
                 }
             }
             // Cambio palle dei tornei: niente, 7/9, 9/11, 11/13; con l'animazione facoltativa.
-            if (!padel && !short) {
+            if (moreRules && !padel) {
                 Text(s.newBalls, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 Text(s.newBallsHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 val choices = listOf(0 to 0) + com.tennis.scoremanager.model.NewBalls.choices
@@ -411,8 +393,6 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             }
         }
 
-        // Sorteggio
-        if (match && !short) CoinTossSection(c, o, names, su.doubles)
     }
 
     if (locationDialog) {
@@ -424,13 +404,17 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             confirmButton = {
                 Button(onClick = {
                     locationDialog = false
+                    c.storage.locationAsked = true
                     if (!locPerm) requestLocation() else openLocationSettings()
                 }) { Text(s.enable) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     locationDialog = false
-                    c.go(Screen.START)
+                    c.storage.locationAsked = true
+                    // Senza posizione: niente luogo nel riepilogo (si riaccende in Nuova partita › Altri dettagli).
+                    c.setMatchPlace(false)
+                    c.go(Screen.TOSS)
                 }) { Text(s.continueWithout) }
             },
         )
@@ -463,7 +447,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             confirmButton = {
                 Button(onClick = {
                     missingRemotes = null
-                    if (!(locPerm && locOn)) locationDialog = true else c.go(Screen.START)
+                    if (askLocation()) locationDialog = true else c.go(Screen.TOSS)
                 }) { Text(s.continueAnyway) }
             },
             dismissButton = { TextButton(onClick = { missingRemotes = null }) { Text(s.cancel) } },
@@ -478,7 +462,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
             confirmButton = {
                 Button(onClick = {
                     missingBands = null
-                    c.go(Screen.START)
+                    c.go(Screen.TOSS)
                 }) { Text(s.continueAnyway) }
             },
             dismissButton = { TextButton(onClick = { missingBands = null }) { Text(s.cancel) } },
@@ -847,6 +831,69 @@ private fun SmallAction(text: String, icon: androidx.compose.ui.graphics.vector.
         Spacer(Modifier.width(6.dp))
         Text(text, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
+}
+
+/** Le altre regole in una riga: "6 game · Tie-break nei set · No-Ad · Cambio palle 7/9". */
+internal fun otherRulesLine(o: MatchOptions, padel: Boolean, s: Strings): String {
+    if (o.format == MatchFormat.MATCH_TIEBREAK_ONLY) return ""
+    return listOfNotNull(
+        s.gamesN(o.gamesPerSet),
+        s.setTiebreak.takeIf { o.setTiebreak },
+        (if (padel) s.goldenPoint else s.noAd).takeIf { o.noAd },
+        s.starPoint.takeIf { padel && o.starPoint && !o.noAd },
+        "${s.newBalls} ${o.newBallsFirst}/${o.newBallsEvery}".takeIf { !padel && o.newBallsFirst > 0 },
+    ).joinToString(" · ")
+}
+
+/**
+ * Passo 3 di Nuova partita: il sorteggio, chi serve e i lati. Con "Come l'ultima volta" ci si arriva subito, con le
+ * regole di allora in una riga (Cambia le riapre).
+ */
+@Composable
+fun TossScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val o by c.options.collectAsState()
+    val su by c.setup.collectAsState()
+    val quick by c.quickStart.collectAsState()
+    val names = remember(su, s) { Names(su, s) }
+    BackHandler { c.back() }
+    ScreenScaffold(
+        onHelp = { c.openHelp("7") },
+        title = s.coinToss,
+        subtitle = s.step3Hint,
+        icon = Icons.Filled.Casino,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.START) }, Modifier.weight(1f))
+        },
+    ) {
+        if (quick) SectionCard(s.likeLastTitle, Icons.Filled.Replay) {
+            Text(likeLastLine(o, su.sport == Sport.PADEL, s), color = TsmColors.TextMain)
+            GhostButton(s.likeLastChange, Icons.Filled.Tune, { c.quickStart.value = false; c.go(Screen.OPTIONS) }, Modifier.fillMaxWidth())
+        }
+        CoinTossSection(c, o, names, su.doubles)
+    }
+}
+
+/** Modalità, formato e regole in una riga, per "Come l'ultima volta": "Arbitro · 3 set · No-Ad". */
+private fun likeLastLine(o: MatchOptions, padel: Boolean, s: Strings): String {
+    val mode = when (o.mode) { PlayMode.REFEREE -> s.modeReferee; PlayMode.BANDS -> s.modeBands; PlayMode.REMOTES -> s.modeRemotes }
+    val format = when (o.format) {
+        MatchFormat.BEST_OF_THREE -> s.formatBestOfThree
+        MatchFormat.BEST_OF_FIVE -> s.formatBestOfFive
+        MatchFormat.TWO_SETS_MATCH_TIEBREAK -> s.formatMatchTiebreak
+        MatchFormat.PRO_SET -> s.formatProSet
+        MatchFormat.MATCH_TIEBREAK_ONLY -> s.formatMatchTiebreakOnly
+    }
+    val extra = when {
+        o.format == MatchFormat.MATCH_TIEBREAK_ONLY -> null
+        o.noAd -> if (padel) s.goldenPoint else s.noAd
+        o.starPoint -> s.starPoint
+        else -> null
+    }
+    // Il pro set e i set brevi dicono a quanti game: "Pro set · 8 game".
+    val games = s.gamesN(o.gamesPerSet).takeIf { o.format == MatchFormat.PRO_SET || (o.format != MatchFormat.MATCH_TIEBREAK_ONLY && o.gamesPerSet != 6) }
+    return listOfNotNull(mode, format, games, extra).joinToString(" · ")
 }
 
 @Composable

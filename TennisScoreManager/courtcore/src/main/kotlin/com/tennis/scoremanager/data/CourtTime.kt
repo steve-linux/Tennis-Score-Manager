@@ -36,8 +36,24 @@ object CourtTime {
     /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
     fun blockActive(b: CourtBlock, day: Long): Boolean {
         val d = dayStart(day)
-        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays)
+        val inDates = if (!b.yearly) d >= dayStart(b.from) && d <= dayStart(b.to) else d >= dayStart(b.from) && monthDayIn(d, b.from, b.to)
+        return inDates && (b.weekdays.isEmpty() || weekday(d) in b.weekdays) && d !in b.except
     }
+
+    /** Il giorno [d] cade, in qualunque anno, tra il giorno-mese di [from] e quello di [to] (anche a cavallo di capodanno). */
+    private fun monthDayIn(d: Long, from: Long, to: Long): Boolean {
+        fun md(t: Long) = Calendar.getInstance().apply { timeInMillis = t }.let { (it.get(Calendar.MONTH) + 1) * 100 + it.get(Calendar.DAY_OF_MONTH) }
+        val x = md(d); val a = md(from); val b = md(to)
+        return if (a <= b) x in a..b else x >= a || x <= b
+    }
+
+    /**
+     * Il circolo è chiuso quel giorno: un blocco (non di un corso) su tutti i campi per tutto l'orario di apertura. Il
+     * nome è quello del blocco ("Festa del patrono", "Chiusura estiva"); null = aperto.
+     */
+    fun closedOn(plan: CourtPlan, day: Long): String? = plan.blocks.firstOrNull { b ->
+        b.reason != BlockReason.COURSE && b.courts.isEmpty() && b.startMin <= plan.settings.openHour * 60 && b.endMin >= plan.settings.closeHour * 60 && blockActive(b, day)
+    }?.let { it.label.ifBlank { "—" } }
 
     /** Inizio e fine del blocco nel giorno [day]. */
     fun blockSpan(b: CourtBlock, day: Long): Pair<Long, Long> = at(day, b.startMin / 60, b.startMin % 60) to at(day, 0) + b.endMin * 60_000L

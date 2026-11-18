@@ -13,6 +13,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -78,6 +79,7 @@ import com.tennis.scoremanager.data.Occupied
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.Players
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.PlayerEditDialog
@@ -130,11 +132,30 @@ private fun occupiedLabel(c: MatchController, s: Strings, o: Occupied): String {
 @Composable
 fun CourtsPlanScreen(c: MatchController) {
     val s = LocalStrings.current
-    val context = LocalContext.current
     BackHandler { c.back() }
+    var settings by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        onHelp = { c.openHelp("7.15") },
+        title = s.planTitle,
+        subtitle = null,
+        icon = Icons.Filled.CalendarMonth,
+        action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.planSettings, tint = TsmColors.Ball) } },
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) { PlanBody(c) }
+    if (settings) PlanSettingsDialog(c, c.courtPlan.collectAsState().value.settings) { settings = false }
+}
+
+/**
+ * Il planning: il giorno, un campo per colonna e un'ora per riga. Sta nella sua schermata e nella scheda Planning del
+ * Circolo ([inTab]: lì, senza l'ingranaggio in alto, Orari e prezzi è un tasto).
+ */
+@Composable
+fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
@@ -144,19 +165,18 @@ fun CourtsPlanScreen(c: MatchController) {
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
-    var server by remember { mutableStateOf(false) }
     var editBlock by remember { mutableStateOf<com.tennis.scoremanager.data.CourtBlock?>(null) }
     val occ = CourtPlans.occupied(plan, tournaments, day)
     val slots = CourtPlans.slots(day, plan.settings)
     val stepMs = plan.settings.slotMinutes * 60_000L
-    ScreenScaffold(
-        onHelp = { c.openHelp("7.15") },
-        title = s.planTitle,
-        subtitle = com.tennis.scoremanager.data.Notices.day(day, lang),
-        icon = Icons.Filled.CalendarMonth,
-        action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.planSettings, tint = TsmColors.Ball) } },
-        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
-    ) {
+    // Senza campi non c'è planning: prima si scrivono.
+    if (courts.isEmpty()) {
+        Text(s.clubNoCourts, color = TsmColors.TextDim)
+        BigButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.fillMaxWidth())
+        if (manage) CourtsManageDialog(c) { manage = false }
+        return
+    }
+    run {
         // Il giorno: indietro, oggi, il calendario, avanti.
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { day = CourtPlans.addDays(day, -1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null, tint = TsmColors.TextMain) }
@@ -164,15 +184,24 @@ fun CourtsPlanScreen(c: MatchController) {
             DateButton(s.planDay, day, lang, Modifier.weight(1f)) { day = CourtPlans.dayStart(it) }
             IconButton(onClick = { day = CourtPlans.addDays(day, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
         }
+        // Festa nazionale: in rosso, così si vede subito.
+        com.tennis.scoremanager.data.Holidays.on(day + 12 * 3_600_000L, com.tennis.scoremanager.data.Holidays.country(lang.code))?.let { name ->
+            Text("${s.hdHoliday}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        }
+        CourtPlans.closedOn(plan, day + 12 * 3_600_000L)?.let { name ->
+            Text("${s.clClosed}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
+        if (inTab) GhostButton(s.planSettings, Icons.Filled.Settings, { settings = true }, Modifier.fillMaxWidth())
         val features by c.clubFeatures.collectAsState()
         if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
-        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
+        // Solo lo stato (e la sincronizzazione ogni minuto): il server si apre da Altro.
+        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c)
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -222,7 +251,6 @@ fun CourtsPlanScreen(c: MatchController) {
     }
     if (settings) PlanSettingsDialog(c, plan.settings) { settings = false }
     if (manage) CourtsManageDialog(c) { manage = false }
-    if (server) ClubServerDialog(c) { server = false }
     if (blocks) BlocksDialog(c, onEdit = { blocks = false; editBlock = it }) { blocks = false }
     editBlock?.let { b -> BlockEditDialog(c, b, isNew = plan.blocks.none { it.id == b.id }) { editBlock = null } }
 }
@@ -232,7 +260,7 @@ fun CourtsPlanScreen(c: MatchController) {
 private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, onDone: (List<Long>?) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.clubTournaments.collectAsState()
     val courts = c.storage.clubCourts
@@ -388,14 +416,12 @@ fun PlayerPickDialog(c: MatchController, except: Set<String>, title: String? = n
 
 /** Orari, caselle, prezzi e luci del planning. */
 @Composable
-private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: () -> Unit) {
+internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var st by remember { mutableStateOf(st0) }
     var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
     var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
-    var courtsOpen by remember { mutableStateOf(false) }
-    var serverOpen by remember { mutableStateOf(false) }
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
         IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
@@ -415,11 +441,7 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
                 MoneyField(price, s.planPrice) { price = it }
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
-                GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
-                if (c.has(com.tennis.scoremanager.ClubFeature.SERVER)) {
-                    GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
-                    Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
-                }
+                // I campi hanno il loro tasto nel planning e il server sta in Altro: qui solo orari e prezzi.
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
@@ -434,8 +456,6 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
-    if (courtsOpen) CourtsManageDialog(c) { courtsOpen = false }
-    if (serverOpen) ClubServerDialog(c) { serverOpen = false }
 }
 
 fun surfaceName(s: Strings, x: com.tennis.scoremanager.data.Surface): String = when (x) {
@@ -457,7 +477,7 @@ fun courtTraits(s: Strings, i: com.tennis.scoremanager.data.CourtInfo): String =
 @Composable
 fun CourtsManageDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     val plan by c.courtPlan.collectAsState()
     var edit by remember { mutableStateOf<com.tennis.scoremanager.data.CourtInfo?>(null) }
@@ -507,7 +527,7 @@ private fun CourtThumb(c: MatchController, name: String, size: Int, onClick: (()
 private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data.CourtInfo, isNew: Boolean, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
     var i by remember { mutableStateOf(i0) }
     var name by remember { mutableStateOf(i0.name) }
@@ -613,7 +633,7 @@ private fun blockLine(s: Strings, b: com.tennis.scoremanager.data.CourtBlock, la
 @Composable
 private fun BlocksDialog(c: MatchController, onEdit: (com.tennis.scoremanager.data.CourtBlock) -> Unit, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
     AlertDialog(
         onDismissRequest = onDone,
@@ -643,10 +663,11 @@ private fun BlocksDialog(c: MatchController, onEdit: (com.tennis.scoremanager.da
 private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data.CourtBlock, isNew: Boolean, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val courts = c.storage.clubCourts
     val tournaments by c.clubTournaments.collectAsState()
     var b by remember { mutableStateOf(b0) }
+    var hit by remember { mutableStateOf<List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>>(emptyList()) }
     fun time(min: Int, onPick: (Int) -> Unit) = TimePickerDialog(context, { _, h, m -> onPick(h * 60 + m) }, (min / 60).coerceAtMost(23), min % 60, true).show()
     AlertDialog(
         onDismissRequest = onDone,
@@ -654,6 +675,10 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(b.label, { b = b.copy(label = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.blkLabel) })
+                // La festa del patrono in un tocco: tutti i campi, tutto il giorno, ogni anno (resta da scegliere il giorno).
+                if (isNew) GhostButton(s.blkPatron, Icons.Filled.CalendarMonth, {
+                    b = b.copy(label = s.blkPatron, courts = emptyList(), startMin = 0, endMin = 24 * 60, weekdays = emptySet(), yearly = true, reason = com.tennis.scoremanager.data.BlockReason.OTHER)
+                }, Modifier.fillMaxWidth())
                 val reasons = com.tennis.scoremanager.data.BlockReason.entries
                 Segmented(reasons.map { SegOption(blockReasonName(s, it)) }, reasons.indexOf(b.reason), { b = b.copy(reason = reasons[it]) }, columns = 2)
                 // Dal torneo: nome e date già pronti.
@@ -687,10 +712,25 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
                     GhostButton("${s.blkStart}: %02d:%02d".format(b.startMin / 60, b.startMin % 60), Icons.Filled.Schedule, { time(b.startMin) { m -> b = b.copy(startMin = m, endMin = maxOf(b.endMin, m + 30)) } }, Modifier.fillMaxWidth())
                     GhostButton("${s.blkEnd}: %02d:%02d".format(b.endMin / 60, b.endMin % 60), Icons.Filled.Schedule, { time(b.endMin) { m -> b = b.copy(endMin = maxOf(m, b.startMin + 30)) } }, Modifier.fillMaxWidth())
                 }
+                // Ogni anno negli stessi giorni (festa del patrono, chiusura estiva).
+                SwitchRow(Icons.Filled.CalendarMonth, s.blkYearly, s.blkYearlyHint, b.yearly) { b = b.copy(yearly = it) }
                 if (!isNew) TextButton(onClick = { c.saveCourtBlock(b0, delete = true); onDone() }) { Text(s.blkDelete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(onClick = { c.saveCourtBlock(b.copy(label = b.label.trim())); onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = {
+            val saved = b.copy(label = b.label.trim())
+            c.saveCourtBlock(saved)
+            // Una chiusura su lezioni dei corsi già in calendario: si propone di annullarle.
+            hit = c.courseLessonsClosedBy(saved)
+            if (hit.isEmpty()) onDone()
+        }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (hit.isNotEmpty()) AlertDialog(
+        onDismissRequest = { hit = emptyList(); onDone() },
+        title = { Text(s.clLessonsHit(hit.size)) },
+        text = { Text(hit.take(8).joinToString("\n") { (co, l) -> co.name + " · " + com.tennis.scoremanager.data.Notices.day(l.start, lang) }, color = TsmColors.TextMain, fontSize = 14.sp) },
+        confirmButton = { TextButton(onClick = { c.cancelCourseLessons(hit); hit = emptyList(); onDone() }) { Text(s.clCancelThem, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { hit = emptyList(); onDone() }) { Text(s.clKeepThem) } },
     )
 }

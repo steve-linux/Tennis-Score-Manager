@@ -17,6 +17,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
 import android.widget.Toast
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,6 +52,7 @@ import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.HelpOutline
@@ -96,6 +98,7 @@ import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.Lessons
 import com.tennis.scoremanager.data.ServeAttempt
 import com.tennis.scoremanager.data.ServeKind
 import com.tennis.scoremanager.data.ServeSession
@@ -176,6 +179,56 @@ class CameraActivity : ComponentActivity() {
     // ---------------------------------------------------------------- allenamento al servizio (EXTRA_SERVE)
 
     private val serveMode by lazy { intent.getBooleanExtra(EXTRA_SERVE, false) }
+    /**
+     * Lezione registrata ([EXTRA_LESSON]): ogni colpo riconosciuto dal braccialetto diventa una clip, senza tasti. In
+     * [serveSession] i colpi stanno insieme; si salvano come una sessione per colpo ([Lessons.split]).
+     */
+    private val lessonMode by lazy { serveMode && intent.getBooleanExtra(EXTRA_LESSON, false) }
+    /** Colpi della lezione già salvati come sessione: se uno sparisce (annullato) il suo file si toglie. */
+    private var lessonSaved = emptySet<TrainedStroke>()
+    /** La lezione dell'agenda in corso (ora d'inizio, da mostrare). */
+    private val agendaLesson = MutableStateFlow<Long?>(null)
+
+    private fun lessonPart(t: TrainedStroke): ServeSession = Lessons.sessionOf(serveSession.value, t, s.strokeName)
+
+    /** Cartella delle clip di un colpo: quella della sessione o, nella lezione, quella del suo colpo. */
+    private fun clipsDirOf(a: ServeAttempt): File =
+        controller.storage.serveClipsDir(if (lessonMode) lessonPart(Lessons.groupOf(a)) else serveSession.value)
+
+    private fun videoBytes(): Long =
+        if (lessonMode) Lessons.split(serveSession.value, s.strokeName).sumOf { controller.storage.serveVideoBytes(it) }
+        else controller.storage.serveVideoBytes(serveSession.value)
+
+    /** Salva la sessione (nella lezione: una per colpo, e via quelle rimaste vuote). */
+    private fun persist(sess: ServeSession) {
+        if (!lessonMode) { controller.storage.saveServeSession(sess); return }
+        val parts = Lessons.split(sess, s.strokeName)
+        parts.forEach { controller.storage.saveServeSession(it) }
+        val now = parts.map { it.stroke }.toSet()
+        (lessonSaved - now).forEach { controller.storage.deleteServeSession(Lessons.sessionOf(sess, it, s.strokeName)) }
+        lessonSaved = now
+    }
+
+    /** Colpo riconosciuto durante la lezione: si segna da solo, senza dentro o fuori, e se ne prende la clip. */
+    private fun lessonShot(st: com.tennis.scoremanager.ble.RawStroke) {
+        val now = System.currentTimeMillis()
+        lastTrainActivity = now
+        val clip = "%03d".format(serveSession.value.serves.size + 1) + "_$now"
+        saveServes {
+            it + ServeAttempt(now, true, ServeSide.DEUCE, ServeKind.FIRST, detected = true, gyroDps = st.peakGyroDps, accelG = st.peakAccelG,
+                marked = false, stroke = Lessons.strokeOf(st.stroke))
+        }
+        cutClip(now, clip)
+    }
+
+    /** KEY1 / KEY2 (o lo schermo) subito dopo un colpo della lezione: dentro o fuori, facoltativo. */
+    private fun lessonMark(inPlay: Boolean, band: Side? = null) {
+        if (trainPaused.value) return
+        val a = Lessons.toMark(serveSession.value.serves, System.currentTimeMillis()) ?: return
+        lastTrainActivity = System.currentTimeMillis()
+        saveServes { list -> list.map { if (it.at == a.at) it.copy(marked = true, inPlay = inPlay) else it } }
+        bandShow(band, if (inPlay) s.serveIn else s.serveOut, a.stroke?.let { strokeLabel(s, it) } ?: s.lessonShot)
+    }
     private val serveSession = MutableStateFlow(ServeSession("s${System.currentTimeMillis()}", System.currentTimeMillis()))
     private val serveSide = MutableStateFlow(ServeSide.DEUCE)
     private val serveKind = MutableStateFlow(ServeKind.FIRST)
@@ -366,7 +419,10 @@ class CameraActivity : ComponentActivity() {
         if (prepared) return true
         val st = stream()
         val rotation = CameraHelper.getCameraOrientation(this)
-        prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
+        // Allenamento dei colpi a 60 fotogrammi, se scelto e se il telefono ce la fa: il doppio dei dati, bitrate più alto.
+        val fps60 = serveMode && controller.storage.trainFps60 && CameraLenses.supports60(this)
+        prepared = st.prepareVideo(WIDTH, HEIGHT, if (fps60) VIDEO_BITRATE_60 else VIDEO_BITRATE, fps = if (fps60) 60 else 30, rotation = rotation) &&
+            st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
     }
@@ -378,17 +434,22 @@ class CameraActivity : ComponentActivity() {
         val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
         // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
-        val student = controller.studentById(controller.trainStudent.value)
-        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
+        // Lezione: quella dell'agenda in corso (e, senza allievo scelto, il suo allievo se è uno solo).
+        val agenda = if (lessonMode) Lessons.current(controller.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
+        agendaLesson.value = agenda?.start
+        val student = controller.studentById(controller.trainStudent.value ?: agenda?.students?.singleOrNull())
+        val folder = if (lessonMode) controller.storage.newLessonFolder(serveSession.value.startedAt, s.strokeFolderName, s.lessonFolder, student?.name)
+        else controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
         val racket = student?.racket?.let { controller.racketById(it) }?.use()
         // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
-        drill.value = controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        drill.value = if (lessonMode) null else controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
         serveSession.value = serveSession.value.copy(
             stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
+            lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,
         )
         applyDrillStep()
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
-        if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
+        if (!lessonMode && controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
             controller.ble.events.collect { e ->
                 // In pausa KEY1 riprende e gli altri tasti non fanno niente (niente colpi segnati per sbaglio).
@@ -397,8 +458,8 @@ class CameraActivity : ComponentActivity() {
                     return@collect
                 }
                 when (e.type) {
-                    BandProtocol.EVT_POINT -> serveOutcome(true, e.side)
-                    BandProtocol.EVT_UNDO -> serveOutcome(false, e.side)
+                    BandProtocol.EVT_POINT -> if (lessonMode) lessonMark(true, e.side) else serveOutcome(true, e.side)
+                    BandProtocol.EVT_UNDO -> if (lessonMode) lessonMark(false, e.side) else serveOutcome(false, e.side)
                     BandProtocol.EVT_BATTERY -> undoServe(e.side)
                 }
             }
@@ -412,6 +473,7 @@ class CameraActivity : ComponentActivity() {
                     if (autoPaused) resumeTraining()
                     return@collect
                 }
+                if (lessonMode) { lessonShot(st.stroke); return@collect }
                 lastTrainActivity = System.currentTimeMillis()
                 lastDetected = ServeTraining.Detected(System.currentTimeMillis(), st.stroke.peakGyroDps, st.stroke.peakAccelG)
                 servePending.value = true
@@ -431,7 +493,11 @@ class CameraActivity : ComponentActivity() {
     private fun endServeTraining() {
         controller.serveTraining = false
         val sess = serveSession.value
-        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess)
+        if (lessonMode) {
+            // Lezione senza colpi: via la sua cartella (se è vuota); altrimenti le sessioni dei colpi con la fine.
+            if (sess.serves.isEmpty()) sess.folder?.let { File(controller.storage.documentsRoot, it).delete() }
+            else persist(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
+        } else if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess)
         else controller.storage.saveServeSession(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
         controller.refreshServeSessions()
     }
@@ -439,7 +505,7 @@ class CameraActivity : ComponentActivity() {
     private fun saveServes(transform: (List<ServeAttempt>) -> List<ServeAttempt>) {
         val sess = serveSession.value.let { it.copy(serves = transform(it.serves)) }
         serveSession.value = sess
-        lifecycleScope.launch(Dispatchers.IO) { controller.storage.saveServeSession(sess) }
+        lifecycleScope.launch(Dispatchers.IO) { persist(sess) }
     }
 
     /**
@@ -447,6 +513,36 @@ class CameraActivity : ComponentActivity() {
      * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
      */
     /** Spegne telecamera e memoria; i tasti del braccialetto non segnano finché non si riprende. */
+    /** Rivedi l'ultimo: la stella data nella moviola torna qui e va nella sessione in corso. */
+    private val replayLast = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
+        val d = r.data
+        if (r.resultCode == RESULT_OK && d != null && d.hasExtra(ReplayActivity.EXTRA_STAR_AT)) {
+            val at = d.getLongExtra(ReplayActivity.EXTRA_STAR_AT, 0L)
+            val on = d.getBooleanExtra(ReplayActivity.EXTRA_STAR_ON, false)
+            saveServes { list -> list.map { if (it.at == at) it.copy(starred = on) else it } }
+        }
+    }
+
+    /**
+     * Rivedi l'ultimo colpo senza chiudere l'allenamento: pausa (telecamera e memoria si fermano), la sua clip nella
+     * moviola (rallentatore, fotogramma per fotogramma, stella); al ritorno Riprendi o KEY1.
+     */
+    private fun replayLastShot() {
+        val sess = serveSession.value
+        val last = sess.serves.lastOrNull { it.clip != null } ?: return
+        val part = if (lessonMode) lessonPart(Lessons.groupOf(last)) else sess
+        val files = controller.serveClipFiles(part, listOf(last))
+        if (files.isEmpty()) return
+        lastTrainActivity = System.currentTimeMillis()
+        pauseTraining()
+        android.widget.Toast.makeText(this, s.trainReplayPaused, android.widget.Toast.LENGTH_LONG).show()
+        replayLast.launch(
+            Intent(this, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray())
+                .putExtra(ReplayActivity.EXTRA_STAR_SESSION, part.id).putExtra(ReplayActivity.EXTRA_STAR_AT, last.at)
+                .putExtra(ReplayActivity.EXTRA_STAR_ON, last.starred).putExtra(ReplayActivity.EXTRA_STAR_LIVE, true),
+        )
+    }
+
     private fun pauseTraining(auto: Boolean = false) {
         if (trainPaused.value) return
         trainPaused.value = true
@@ -500,12 +596,18 @@ class CameraActivity : ComponentActivity() {
         say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + (next?.let { ". $it" } ?: ""))
         if (next != null) bandShow(band, s.drillBandNext, next.take(20))
         else bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
+        cutClip(at, clip)
+    }
+
+    /** La clip del colpo delle [at], quando la memoria della moviola ha anche i 3 secondi dopo. */
+    private fun cutClip(at: Long, clip: String) {
         val st = stream ?: return
         if (!st.isOnPreview) return
         lifecycleScope.launch {
             val wait = at + ServeTraining.CLIP_AFTER_MS + 600 - System.currentTimeMillis()
             if (wait > 0) delay(wait)
-            val dir = File(controller.storage.serveClipsDir(serveSession.value), clip)
+            val shot = serveSession.value.serves.firstOrNull { it.at == at } ?: return@launch
+            val dir = File(clipsDirOf(shot), clip)
             val parts = withContext(Dispatchers.IO) {
                 // I pezzi da 4 s si uniscono in un video solo (si apre e si condivide); se non riesce restano i pezzi.
                 val tmp = File(cacheDir, "serve_cut_$clip")
@@ -520,7 +622,7 @@ class CameraActivity : ComponentActivity() {
                 return@launch
             }
             saveServes { list -> list.map { if (it.at == at) it.copy(clip = clip) else it } }
-            trainBytes.value = withContext(Dispatchers.IO) { controller.storage.serveVideoBytes(serveSession.value) }
+            trainBytes.value = withContext(Dispatchers.IO) { videoBytes() }
         }
     }
 
@@ -530,7 +632,8 @@ class CameraActivity : ComponentActivity() {
         saveServes { it.dropLast(1) }
         // Tolto un colpo, l'esercizio torna al passo di prima se serve.
         applyDrillStep()
-        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
+        val dir = clipsDirOf(last)
+        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(dir, c).deleteRecursively() } }
         say(s.serveSayUndo)
         val n = ServeTraining.count(serveSession.value.serves)
         bandShow(band, s.serveSayUndo, "${n.inPlay}/${n.total}")
@@ -1013,8 +1116,18 @@ class CameraActivity : ComponentActivity() {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Una riga sola, piccola: conteggio, ultimo colpo, braccialetto, riconoscimento, memoria, "i".
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
-                    sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    if (lessonMode) {
+                        // Lezione: quanti colpi e l'ultimo (il colpo riconosciuto, o dentro/fuori se segnato).
+                        Pill(str.lessonCount(sess.serves.size), TsmColors.SurfaceHigh)
+                        sess.serves.lastOrNull()?.let {
+                            val name = it.stroke?.let { t -> strokeLabel(str, t) } ?: str.lessonShot
+                            Pill(if (it.marked) "$name · ${if (it.inPlay) str.serveIn else str.serveOut}" else name,
+                                if (!it.marked) TsmColors.SurfaceHigh else if (it.inPlay) TsmColors.Ok else TsmColors.Danger)
+                        }
+                    } else {
+                        Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
+                        sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    }
                     // Esercizio: passo e colpi fatti nel passo.
                     val d by drill.collectAsState()
                     d?.let { dd ->
@@ -1035,8 +1148,14 @@ class CameraActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         @Composable fun line(t: String) = Text(t, color = TsmColors.TextMain, fontSize = 13.sp)
-                        line(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand)
-                        line(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveWaiting else str.strokeWaiting)
+                        line(band?.let { str.serveBandOk(it.name) } ?: if (lessonMode) str.lessonNoBand else str.serveNoBand)
+                        if (lessonMode) {
+                            line(str.lessonWaiting)
+                            line(str.lessonMarkHint)
+                            agendaLesson.collectAsState().value?.let { t ->
+                                line(str.lessonAgenda(java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(java.util.Date(t)) + (sess.studentName?.let { " · $it" } ?: "")))
+                            }
+                        } else line(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveWaiting else str.strokeWaiting)
                         st?.let { line(if (!it.supportsStrokes) str.trainRecOldFw else if (it.strokes) str.trainRecOn else str.trainRecStarting) }
                         line(if (paused) (if (autoPaused) str.trainAutoPaused else str.trainPaused) else str.trainMemory(clips, mb))
                     }
@@ -1047,12 +1166,15 @@ class CameraActivity : ComponentActivity() {
                 if (paused) {
                     Btn(Icons.Filled.PlayArrow, str.trainResume, TsmColors.Ok) { resumeTraining() }
                 } else {
-                    Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
-                    Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                    Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { if (lessonMode) lessonMark(true) else serveOutcome(true) }
+                    Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { if (lessonMode) lessonMark(false) else serveOutcome(false) }
                     Btn(Icons.Filled.Pause, str.trainPause, TsmColors.SurfaceHigh) { pauseTraining() }
                 }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
-                if (sess.stroke == TrainedStroke.SERVE) {
+                // L'ultimo colpo subito, al rallentatore, senza chiudere l'allenamento.
+                if (sess.serves.any { it.clip != null }) Btn(Icons.Filled.Replay, str.trainReplayLast, TsmColors.SurfaceHigh) { replayLastShot() }
+                if (lessonMode) Unit
+                else if (sess.stroke == TrainedStroke.SERVE) {
                     Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
                         serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
                     }
@@ -1087,8 +1209,17 @@ class CameraActivity : ComponentActivity() {
                 title = { Text(str.serveSummary) },
                 text = {
                     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ServeSummaryContent(str, sess.serves, sess.stroke)
-                        ServeReplayButtons(controller, sess)
+                        if (lessonMode) {
+                            // Lezione: i colpi per tipo (le sessioni si aprono da Allenati, una per colpo).
+                            Text(str.lessonCount(sess.serves.size), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                            for (part in Lessons.split(sess, str.strokeName)) {
+                                val m = ServeTraining.count(part.serves)
+                                Text(strokeLabel(str, part.stroke) + " · ${part.serves.size}" + (if (m.total > 0) " · " + str.serveCountLine(m.inPlay, m.total) else ""), color = TsmColors.TextMain)
+                            }
+                        } else {
+                            ServeSummaryContent(str, sess.serves, sess.stroke)
+                            ServeReplayButtons(controller, sess)
+                        }
                     }
                 },
                 confirmButton = { TextButton(onClick = { serveSummary.value = false; finish() }) { Text(str.serveEnd) } },
@@ -1229,6 +1360,8 @@ class CameraActivity : ComponentActivity() {
         const val EXTRA_SERVE = "serve"
         /** Colpo dell'allenamento (TrainedStroke, di serie il servizio). */
         const val EXTRA_STROKE = "stroke"
+        /** Con [EXTRA_SERVE]: lezione registrata, ogni colpo riconosciuto diventa una clip (vedi [Lessons]). */
+        const val EXTRA_LESSON = "lesson"
         /** Pausa automatica dell'allenamento dopo questo tempo senza colpi. */
         const val AUTO_PAUSE_MS = 5 * 60_000L
         private const val TAG = "Telecamera"
@@ -1236,6 +1369,8 @@ class CameraActivity : ComponentActivity() {
         private const val HEIGHT = 1080
         /** 6 Mbit/s: quanto chiede YouTube per il 1080p a 30 fotogrammi. */
         private const val VIDEO_BITRATE = 6_000_000
+        /** A 60 fotogrammi: 10 Mbit/s, come chiede YouTube per il 1080p60. */
+        private const val VIDEO_BITRATE_60 = 10_000_000
         /** Inquadratura per l'arbitro: larghezza dei fotogrammi e ogni quanto. */
         private const val PREVIEW_W = 640
         private const val PREVIEW_EVERY_MS = 330L

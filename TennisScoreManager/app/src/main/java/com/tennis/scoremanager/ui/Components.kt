@@ -122,6 +122,7 @@ fun AppRoot(c: MatchController) {
                 Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
                 Screen.OPTIONS -> OptionsScreen(c)
+                Screen.TOSS -> com.tennis.scoremanager.ui.screens.TossScreen(c)
                 Screen.START -> StartScreen(c)
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
@@ -139,6 +140,9 @@ fun AppRoot(c: MatchController) {
                 Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
                 Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
                 Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
+                Screen.LESSONS -> com.tennis.scoremanager.ui.screens.LessonsScreen(c)
+                Screen.COACH_COURSE -> CoachCourseScreen(c)
+                Screen.SETTINGS -> com.tennis.scoremanager.ui.screens.SettingsScreen(c)
                 Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
                 Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
                 Screen.BOOK_COURT -> com.tennis.scoremanager.ui.screens.BookCourtScreen(c)
@@ -158,6 +162,16 @@ fun AppRoot(c: MatchController) {
                 Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
             }
         }
+        // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
+        val card by c.incomingCard.collectAsState()
+        card?.let { IncomingCardDialog(c, it) }
+        val result by c.incomingResult.collectAsState()
+        result?.let { IncomingResultDialog(c, it) }
+        c.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
+        c.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
+        c.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
+        c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
+        c.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }

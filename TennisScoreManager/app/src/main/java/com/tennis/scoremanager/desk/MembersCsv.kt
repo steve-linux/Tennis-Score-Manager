@@ -61,7 +61,7 @@ object MembersCsv {
 
     /** Le righe del testo, con i campi tra virgolette (che possono contenere separatori e a capo). */
     fun table(text: String): List<Pair<Int, List<String>>> {
-        val t = text.removePrefix("﻿")
+        val t = text.removePrefix("\uFEFF")
         val d = delimiter(t.lineSequence().firstOrNull { it.isNotBlank() }.orEmpty())
         val rows = mutableListOf<Pair<Int, List<String>>>()
         var row = mutableListOf<String>()

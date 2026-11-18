@@ -107,3 +107,12 @@ Ob der Anschluss eine öffentliche Adresse hat: Vergleicht die WAN-Adresse auf d
 - Um die Buchungen eine Zeit lang zu stoppen (Wartung, Schließung), **Online-Buchung offen** ausschalten: Die Spieler sehen den Plan, buchen aber nicht.
 - Ein Spieler, der nicht mehr buchen soll: in seiner Karte **Online-Zugang entfernen**.
 - Eine Mitteilung für alle (Plätze gesperrt, ein Turnier, ein Fest): **Vereinsserver › Vereinsbrett** oder **Online-Buchungen** am PC. Sie erreicht die Spieler mit einer Benachrichtigung und bleibt 30 Tage. Unter **Chats und Meldungen** könnt ihr unpassende Nachrichten im Vereinschat, in den Chats von Partner gesucht und in gemeldeten privaten Nachrichten entfernen.
+
+## 7. Den Server aktualisieren
+
+Wenn ein neuer Server erscheint (zum Beispiel mit dem **Dateipostfach**: Kurskarten an die Trainer, Anwesenheiten und Ergebnisse zurück ans Büro ohne WhatsApp), bittet euren Techniker, ihn zu aktualisieren. **Die Daten bleiben**: Spieler, Buchungen, das gekoppelte Telefon des Büros.
+
+- **Raspberry Pi oder PC mit Debian/Ubuntu**: das neue Kit (`tsm-server-kit.tar.gz`) kopieren und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten.
+- **TSM-SERVER-Stick**: den Vereins-PC ausschalten, den Stick abziehen und an einem Linux-PC `tar xzf tsm-server-kit.tar.gz && sudo tsm-server/update-usb.sh /dev/sdX` starten (`lsblk` zeigt, welcher der Stick ist). Stick wieder einstecken und einschalten: der neue Server startet. Der Stick muss nicht neu erstellt werden (das würde die Daten löschen).
+
+Solange der Server nicht aktualisiert ist, funktioniert die App trotzdem: Karten und Anwesenheiten gehen wie bisher als Datei über WhatsApp.

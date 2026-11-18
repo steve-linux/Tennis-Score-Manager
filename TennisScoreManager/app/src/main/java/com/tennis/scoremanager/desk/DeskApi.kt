@@ -72,6 +72,8 @@ interface DeskData {
     val club: String
     val lang: String
     fun now(): Long
+    /** Il Paese per le festività nazionali del planning. */
+    fun country(): String = com.tennis.scoremanager.data.Holidays.country(lang)
     fun players(): List<PlayerProfile>
     fun savePlayers(list: List<PlayerProfile>)
     fun book(): ClubBook
@@ -112,6 +114,25 @@ interface DeskData {
     fun deleteTeam(t: Team)
     /** Apre sul telefono l'avviso dell'incontro: disponibilità (a tutti o a chi non ha risposto), convocazione, risultato. */
     fun teamNotice(t: Team, f: Fixture, kind: String)
+    /** Apre sul telefono la convocazione con la scheda partita: di una partita del tabellone, di una partita dell'incontro. */
+    fun convokeMatch(t: ClubTournament, matchId: String) {}
+    fun convokeRubber(t: Team, f: Fixture, index: Int) {}
+    /** Apre sul telefono l'invio della scheda corso all'allenatore. */
+    fun sendCourseToCoach(c: Course) {}
+    /** Sul telefono: l'avviso agli iscritti che la lezione [key] è stata spostata. */
+    fun noticeCourseMoved(c: Course, key: String) {}
+    /** Il registro presenze del corso, in PDF o in Excel (fatto dal telefono). */
+    fun registerPdf(c: Course): ByteArray? = null
+    fun registerXlsx(c: Course): ByteArray? = null
+    /** Un file ricevuto (risultato dal campo, presenze dell'allenatore, allievo proposto): cos'è e se si può registrare. */
+    fun incomingFile(text: String): DeskIncoming? = null
+    /** Lo registra come farebbe il telefono; null se fatto, sennò il codice dell'errore. */
+    fun applyIncoming(text: String, course: String?): String? = "NOT_FOUND"
+    /** Il profilo da passare: quali dati ci sono e quali si propongono, e il file coi dati scelti (null = giocatore che non c'è). */
+    fun profileFields(id: String): DeskProfileFields? = null
+    fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = null
+    /** Un profilo caricato dal PC: entra tra i giocatori (socio se [asMember]); null = non è un profilo. */
+    fun applyProfile(text: String, asMember: Boolean): String? = null
     /** Impostazioni del circolo, come in Orari e prezzi, Campi e Modi di pagamento nell'app. */
     fun setClubName(name: String)
     fun saveCourtSettings(st: CourtSettings)
@@ -175,6 +196,15 @@ interface DeskData {
 @Serializable data class DeskPairOut(val state: String, val id: String? = null, val token: String? = null)
 /** Il QR da disegnare: una stringa di 0 e 1 per riga. */
 @Serializable data class DeskQrOut(val id: String, val rows: List<String>)
+/** Un file ricevuto, letto: cosa è ([kind]), le righe da mostrare, com'è rispetto ai dati e se si può registrare. */
+@Serializable data class DeskIncoming(
+    val kind: String, val title: String, val lines: List<String>, val status: String, val canApply: Boolean,
+    val replace: Boolean = false, val courses: List<DeskIdName> = emptyList(), val course: String? = null,
+)
+@Serializable data class DeskIdName(val id: String, val name: String)
+@Serializable data class DeskFileIn(val text: String = "", val course: String? = null, val asMember: Boolean = true)
+@Serializable data class DeskProfileFields(val available: List<com.tennis.scoremanager.data.ProfileField>, val defaults: List<com.tennis.scoremanager.data.ProfileField>)
+@Serializable data class DeskIndexIn(val index: Int = 0)
 @Serializable data class DeskInfo(val club: String, val lang: String, val today: String, val year: Int, val features: List<ClubFeature> = emptyList(), val courts: List<String> = emptyList())
 /** Una riga di Oggi: quando, dove, cosa (e il torneo da aprire). */
 @Serializable data class DeskTodayLine(val text: String, val startMin: Int? = null, val court: String = "", val date: String? = null, val cup: String? = null)
@@ -238,11 +268,11 @@ interface DeskData {
     /** Partita di torneo: il torneo. Blocco: il motivo, e se si cambia da qui (non quelli di corsi e squadre). */
     val cup: String? = null, val reason: BlockReason? = null, val editable: Boolean = false,
 )
-@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>)
+@Serializable data class DeskDay(val date: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val items: List<DeskItem>, val holiday: String? = null)
 /** La settimana da lunedì: i sette giorni come in [DeskDay]. */
 @Serializable data class DeskWeek(val from: String, val openHour: Int, val closeHour: Int, val slotMinutes: Int, val courts: List<String>, val days: List<DeskDay>)
 /** Un giorno del mese in breve: prenotazioni, partite, quanto sono occupati e chiusi i campi (in percentuale). */
-@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int)
+@Serializable data class DeskDaySum(val date: String, val bookings: Int, val matches: Int, val busy: Int, val blocked: Int, val holiday: String? = null)
 @Serializable data class DeskMonth(val first: String, val courts: List<String>, val days: List<DeskDaySum>)
 @Serializable data class DeskBookingIn(
     val court: String, val date: String, val startMin: Int, val minutes: Int, val kind: BookingKind = BookingKind.PLAY,
@@ -263,7 +293,14 @@ interface DeskData {
 @Serializable data class DeskTop(val name: String, val count: Int)
 @Serializable data class DeskSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
 @Serializable data class DeskStudent(val id: String, val name: String, val present: Int, val marked: Int, val owedCents: Int)
-@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>)
+@Serializable data class DeskLesson(val key: String, val date: String, val startMin: Int, val minutes: Int, val court: String, val cancelled: Boolean, val marked: Boolean, val present: List<String>, val holiday: String? = null,
+    /** Spostata: il giorno e l'ora che aveva. */
+    val movedFrom: String? = null, val movedFromMin: Int? = null,
+    /** L'istruttore non c'è quel giorno (il motivo, dalle sue presenze). */
+    val away: com.tennis.scoremanager.data.BusyKind? = null)
+/** Spostare una lezione: un altro giorno, ora, durata o campo; [makeup] = il recupero in fondo al corso; [reset] = com'era. */
+@Serializable data class DeskLessonMoveIn(val key: String, val date: String = "", val startMin: Int = 0, val minutes: Int? = null, val court: String? = null,
+    val makeup: Boolean = false, val reset: Boolean = false, val notify: Boolean = false)
 /** Una quota del corso: il mese ("2026-11") o la stagione (""), quanti addebiti e quanti pagati. */
 @Serializable data class DeskCourseFee(val month: String, val label: String, val charged: Int, val paid: Int)
 @Serializable data class DeskCourse(
@@ -272,9 +309,12 @@ interface DeskData {
     val students: List<DeskStudent>, val lessons: List<DeskLesson>, val fees: List<DeskCourseFee>,
 )
 @Serializable data class DeskCourseIn(
-    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String,
+    val name: String, val level: String = "", val coach: String? = null, val coachName: String = "", val from: String, val to: String = "",
     val maxStudents: Int = 0, val feeCents: Int = 0, val feeKind: CourseFee = CourseFee.MONTHLY, val note: String = "", val slots: List<DeskSlot> = emptyList(),
+    /** Quante lezioni (la fine si calcola da inizio e orari) e se le feste nazionali non contano (e risultano annullate). */
+    val lessons: Int? = null, val skipHolidays: Boolean = true,
 )
+@Serializable data class DeskEnd(val to: String? = null)
 @Serializable data class DeskMarkIn(val key: String, val present: List<String> = emptyList(), val cancelled: Boolean? = null)
 @Serializable data class DeskChargeCourseIn(val month: String = "")
 @Serializable data class DeskRubber(val doubles: Boolean, val ours: List<String>, val theirs: List<String>, val score: String, val won: Boolean?, val walkover: Boolean = false)
@@ -340,6 +380,8 @@ interface DeskData {
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
     val from: String = "", val to: String = "", val weekdays: List<Int> = emptyList(), val startMin: Int = 0, val endMin: Int = 24 * 60, val editable: Boolean = true,
+    /** Ogni anno negli stessi giorni (festa del patrono, chiusura estiva). */
+    val yearly: Boolean = false,
 )
 @Serializable data class DeskQuote(val cents: Int, val lights: Boolean)
 
@@ -389,11 +431,13 @@ class DeskApi(
     private val data: DeskData, private val auth: DeskAuth, private val zone: () -> ZoneId = ZoneId::systemDefault,
     /** Il testo come QR, riga per riga. */
     private val qr: (String) -> List<String> = { listOf(it) },
+    /** Allenatore da PC: con questa, il PC vede solo i dati dell'allenatore e niente della segreteria. */
+    private val coach: CoachApi? = null,
 ) {
 
     data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
     class Resp(val status: Int, val body: ByteArray, val type: String = JSON)
-    private class Fail(val status: Int, val code: String) : Exception(code)
+    class Fail(val status: Int, val code: String) : Exception(code)
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
@@ -419,15 +463,25 @@ class DeskApi(
         if (m == "GET" && p.size == 2 && p[0] == "pair") return pairState(p[1], r.ip)
         if (!auth.check(r.token, r.ip)) throw Fail(401, "UNAUTHORIZED")
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
+        if (coach != null) return data.tx { coach.route(m, p, r, data.club) }
         // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
         if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p, r)
         if (p.firstOrNull() == "backup") return backup(m, p.drop(1), r)
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
+                m == "POST" && p == listOf("files", "check") -> ok(DeskIncoming.serializer(), data.incomingFile(read(DeskFileIn.serializer(), r).text) ?: throw Fail(400, "NOT_A_FILE"))
+                m == "POST" && p == listOf("files", "apply") -> {
+                    val i = read(DeskFileIn.serializer(), r)
+                    if (data.applyProfile(i.text, i.asMember) == null) data.applyIncoming(i.text, i.course)?.let { throw Fail(409, it) }
+                    done()
+                }
                 m == "GET" && p == listOf("people") -> people()
                 m == "POST" && p == listOf("people") -> savePerson(read(DeskPerson.serializer(), r), null)
                 m == "PUT" && p.size == 2 && p[0] == "people" -> savePerson(read(DeskPerson.serializer(), r), p[1])
+                m == "GET" && p.size == 3 && p[0] == "people" && p[2] == "profile" -> ok(DeskProfileFields.serializer(), data.profileFields(p[1]) ?: throw Fail(404, "NOT_FOUND"))
+                m == "GET" && p.size == 3 && p[0] == "people" && p[2] == "profile.tsm" ->
+                    Resp(200, (data.profileFile(p[1], profileFieldsOf(r.query["fields"])) ?: throw Fail(404, "NOT_FOUND")).toByteArray(), "application/octet-stream")
                 m == "POST" && p == listOf("people", "import", "preview") -> importCsv(read(DeskCsvIn.serializer(), r), false)
                 m == "POST" && p == listOf("people", "import") -> importCsv(read(DeskCsvIn.serializer(), r), true)
                 m == "GET" && p == listOf("money") -> money(r.query["year"]?.toIntOrNull())
@@ -482,6 +536,7 @@ class DeskApi(
                 p.size >= 2 && p[0] == "teams" -> teamRoute(m, p.drop(1), r)
                 m == "GET" && p == listOf("courses") -> ok(ListSerializer(DeskCourse.serializer()), data.courses().sortedBy { it.name.lowercase() }.map(::courseOut))
                 m == "POST" && p == listOf("courses") -> saveCourse(null, read(DeskCourseIn.serializer(), r))
+                m == "POST" && p == listOf("courses", "end") -> read(DeskCourseIn.serializer(), r).let { i -> ok(DeskEnd.serializer(), DeskEnd(courseEnd(i)?.let { day(it) })) }
                 p.size >= 2 && p[0] == "courses" -> courseRoute(m, p.drop(1), r)
                 m == "POST" && p == listOf("blocks") -> saveBlock(read(DeskBlock.serializer(), r))
                 m == "DELETE" && p.size == 2 && p[0] == "blocks" -> {
@@ -687,7 +742,7 @@ class DeskApi(
             }
         }
         val s = plan.settings
-        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items)
+        return DeskDay(day(start + 12 * 3_600_000L)!!, s.openHour, s.closeHour, s.slotMinutes, data.courts(), items, dayOff(start + 12 * 3_600_000L))
     }
 
     private fun localDay(date: String?): LocalDate = runCatching { LocalDate.parse(date.orEmpty()) }.getOrElse { throw Fail(400, "BAD_DATE") }
@@ -705,6 +760,7 @@ class DeskApi(
         val plan = data.plan(); val cups = data.tournaments(); val courts = data.courts()
         val s = plan.settings
         val open = (s.closeHour - s.openHour).coerceAtLeast(1) * 60
+        val holidays = com.tennis.scoremanager.data.Holidays.of(first.year, data.country())
         val days = (0 until first.lengthOfMonth()).map { i ->
             val d = first.plusDays(i.toLong())
             val start = dayStart(d.toString())
@@ -714,7 +770,7 @@ class DeskApi(
             val used = occ.filter { it.block == null }.sumOf(::minutes)
             val closed = occ.filter { it.block != null }.sumOf { o -> minutes(o) * (if (o.court == CourtPlans.ALL) courts.size else 1) }
             val cap = (open * courts.size).coerceAtLeast(1)
-            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100))
+            DeskDaySum(d.toString(), occ.count { it.booking != null }, occ.count { it.match != null }, (used * 100 / cap).coerceAtMost(100), (closed * 100 / cap).coerceAtMost(100), holidays[d] ?: CourtPlans.closedOn(plan, start + 12 * 3_600_000L))
         }
         return ok(DeskMonth.serializer(), DeskMonth(first.toString(), courts, days))
     }
@@ -765,7 +821,7 @@ class DeskApi(
     }
 
     private fun blocks(): Resp = ok(ListSerializer(DeskBlock.serializer()), data.plan().blocks.sortedBy { it.from }.map { b ->
-        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b))
+        DeskBlock(b.id, b.label, b.reason, b.courts, day(b.from)!!, day(b.to)!!, b.weekdays.sorted(), b.startMin, b.endMin, editable(b), b.yearly)
     })
 
     private fun saveBlock(i: DeskBlock): Resp {
@@ -779,7 +835,7 @@ class DeskApi(
         if (i.reason == BlockReason.COURSE) throw Fail(400, "BAD_REQUEST")
         val b = (old ?: CourtBlock(CourtPlans.newId("k"), "", from = from, to = to)).copy(
             label = text(i.label, 40), reason = i.reason, courts = i.courts.distinct(), from = from, to = to,
-            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin,
+            weekdays = i.weekdays.filter { it in 1..7 }.toSet(), startMin = i.startMin, endMin = i.endMin, yearly = i.yearly,
         )
         data.saveBlock(b, delete = false)
         return done()
@@ -1110,6 +1166,12 @@ class DeskApi(
             withFixture(t, if (score.isEmpty() && i.won == null) withPlayers.copy(rubbers = withPlayers.rubbers.mapIndexed { k, x -> if (k == i.index) x.copy(score = "", won = null) else x })
                 else Teams.setRubber(withPlayers, i.index, score, i.won, walkover = i.walkover))
         }
+        m == "POST" && rest == listOf("rubber-notice") -> {
+            val i = read(DeskIndexIn.serializer(), r).index
+            val ru = f.rubbers.getOrNull(i) ?: throw Fail(404, "NOT_FOUND")
+            if (ru.ours.size != (if (ru.doubles) 2 else 1) || ru.won != null) throw Fail(409, "NOT_READY")
+            data.convokeRubber(t, f, i); done()
+        }
         m == "POST" && rest == listOf("notice") -> {
             val kind = read(DeskNoticeIn.serializer(), r).kind
             if (kind !in setOf("AVAILABILITY", "MISSING", "CALLUP", "RESULT")) throw Fail(400, "BAD_REQUEST")
@@ -1138,7 +1200,10 @@ class DeskApi(
         }
         val lessons = Courses.lessons(c).map { l ->
             val start = CourtPlans.dayStart(l.start)
-            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList())
+            DeskLesson(l.key, day(l.start)!!, ((l.start - start) / 60_000L).toInt(), l.minutes, l.court, l.key in c.cancelled, l.key in c.attendance, c.attendance[l.key].orEmpty().toList(),
+                dayOff(l.start),
+                l.movedFrom?.let { day(it) }, l.movedFrom?.let { ((it - CourtPlans.dayStart(it)) / 60_000L).toInt() },
+                com.tennis.scoremanager.data.Coaching.busyOn(c.coachAway, l.start)?.kind)
         }
         val keys = c.students.flatMap { id -> listOf(id) + (Players.byId(people, id)?.aliases.orEmpty()) }.toSet()
         val fees = if (c.feeCents <= 0) emptyList() else feeMonths(c).map { (key, month) ->
@@ -1157,6 +1222,9 @@ class DeskApi(
         val rest = p.drop(1)
         return when {
             m == "PUT" && rest.isEmpty() -> saveCourse(c, read(DeskCourseIn.serializer(), r))
+            m == "POST" && rest == listOf("send-coach") -> { if (c.coach == null) throw Fail(409, "NO_COACH"); data.sendCourseToCoach(c); done() }
+            m == "GET" && rest == listOf("register.pdf") -> Resp(200, data.registerPdf(c) ?: throw Fail(404, "NOT_FOUND"), "application/pdf")
+            m == "GET" && rest == listOf("register.xlsx") -> Resp(200, data.registerXlsx(c) ?: throw Fail(404, "NOT_FOUND"), com.tennis.scoremanager.data.Xlsx.MIME)
             m == "DELETE" && rest.isEmpty() -> { data.deleteCourse(c); done() }
             m == "POST" && rest == listOf("students") -> {
                 val people = data.players()
@@ -1172,6 +1240,26 @@ class DeskApi(
                 if (i.cancelled == null) n = Courses.mark(n, i.key, i.present.filter { it in c.students }.toSet())
                 courseSaved(n)
             }
+            m == "POST" && rest == listOf("move") -> {
+                val i = read(DeskLessonMoveIn.serializer(), r)
+                val l = Courses.lessons(c).firstOrNull { it.key == i.key } ?: throw Fail(404, "NOT_FOUND")
+                val n = when {
+                    i.reset -> l.movedFrom?.let { Courses.move(c, l.key, it) } ?: c
+                    i.makeup -> {
+                        val mk = Courses.makeup(c.copy(moved = c.moved - l.key)) { t -> com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) != null } ?: throw Fail(409, "BAD_TIME")
+                        Courses.move(c, l.key, mk.start, mk.minutes, mk.court)
+                    }
+                    else -> {
+                        val d = noon(i.date) ?: throw Fail(400, "BAD_DATE")
+                        if (i.startMin !in 0 until 24 * 60 || (i.minutes != null && i.minutes !in 15..8 * 60)) throw Fail(400, "BAD_TIME")
+                        if (!i.court.isNullOrEmpty() && i.court !in data.courts()) throw Fail(404, "NOT_FOUND")
+                        Courses.move(c, l.key, CourtPlans.at(CourtPlans.dayStart(d), i.startMin / 60, i.startMin % 60), i.minutes, i.court)
+                    }
+                }
+                val out = courseSaved(n)
+                if (i.notify && !i.reset) data.noticeCourseMoved(n, l.key)
+                out
+            }
             m == "POST" && rest == listOf("charge") -> {
                 if (c.feeCents <= 0) throw Fail(409, "NO_FEE")
                 val key = read(DeskChargeCourseIn.serializer(), r).month
@@ -1182,12 +1270,28 @@ class DeskApi(
         }
     }
 
+    /** "PHOTO,CONTACTS" → i gruppi di dati (null = quelli proposti). */
+    private fun profileFieldsOf(q: String?): Set<com.tennis.scoremanager.data.ProfileField>? =
+        q?.split(',')?.mapNotNull { x -> runCatching { com.tennis.scoremanager.data.ProfileField.valueOf(x.trim()) }.getOrNull() }?.toSet()
+
     private fun courseSaved(c: Course): Resp { data.saveCourse(c); return ok(DeskCourse.serializer(), courseOut(course(c.id))) }
+
+    /** La festa nazionale o la chiusura del circolo del giorno di [t] (il nome); null = giorno normale. */
+    private fun dayOff(t: Long): String? = com.tennis.scoremanager.data.Holidays.on(t, data.country(), zone()) ?: CourtPlans.closedOn(data.plan(), t)
+
+    /** La fine del corso dal numero di lezioni (saltando le feste, se richiesto); null senza numero o senza orari. */
+    private fun courseEnd(i: DeskCourseIn): Long? {
+        val n = i.lessons ?: return null
+        val from = noon(i.from)?.let { CourtPlans.dayStart(it) } ?: return null
+        val slots = i.slots.filter { it.weekday in 1..7 }.map { CourseSlot(it.weekday, it.startMin, it.minutes, it.court) }
+        return Courses.endAfter(from, slots, n.coerceIn(1, 300)) { t -> i.skipHolidays && dayOff(t) != null }
+    }
 
     private fun saveCourse(old: Course?, i: DeskCourseIn): Resp {
         val name = text(i.name, 80)
         if (name.isEmpty()) throw Fail(400, "NAME_REQUIRED")
-        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE"); val to = noon(i.to) ?: throw Fail(400, "BAD_DATE")
+        val from = noon(i.from) ?: throw Fail(400, "BAD_DATE")
+        val to = courseEnd(i)?.let { it + 12 * 3_600_000L } ?: noon(i.to) ?: throw Fail(400, "BAD_DATE")
         if (to < from || to - from > 400L * 86_400_000L) throw Fail(400, "BAD_DATE")
         if (i.feeCents != 0) cents(i.feeCents)
         val courts = data.courts()
@@ -1202,7 +1306,9 @@ class DeskApi(
             name = name, level = text(i.level, 60), coach = coach, coachName = if (coach != null) "" else text(i.coachName, 80), from = from, to = to,
             maxStudents = i.maxStudents.coerceIn(0, 200), feeCents = i.feeCents, feeKind = i.feeKind, note = text(i.note, 500), slots = slots,
         )
-        data.saveCourse(c)
+        // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
+        val saved = if (i.skipHolidays) c.copy(cancelled = c.cancelled + Courses.skipped(c) { t -> dayOff(t) != null }) else c
+        data.saveCourse(saved)
         return ok(DeskId.serializer(), DeskId(c.id))
     }
 
@@ -1283,6 +1389,11 @@ class DeskApi(
             }
             m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "result" -> result(t, rest[1], read(DeskResultIn.serializer(), r))
             m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "schedule" -> schedule(t, rest[1], read(DeskScheduleIn.serializer(), r))
+            m == "POST" && rest.size == 3 && rest[0] == "matches" && rest[2] == "convoke" -> {
+                val mt = t.matches.firstOrNull { it.id == rest[1] } ?: throw Fail(404, "NOT_FOUND")
+                if (mt.played || mt.a == null || mt.b == null) throw Fail(409, "NOT_READY")
+                data.convokeMatch(t, mt.id); done()
+            }
             else -> throw Fail(404, "NOT_FOUND")
         }
     }

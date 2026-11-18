@@ -151,6 +151,10 @@ object StudentReportPdf {
             section(s.studentNotes)
             wrap(r.note, paint(10.5f), W - 2 * M, 14f)
         }
+        for ((title, lines) in r.extra) {
+            section(title)
+            for (l in lines) wrap(l, paint(10.5f), W - 2 * M, 14f)
+        }
         page?.let { doc.finishPage(it) }
         doc.writeTo(out)
         doc.close()

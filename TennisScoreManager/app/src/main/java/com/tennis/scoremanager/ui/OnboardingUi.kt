@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Watch
@@ -72,15 +73,18 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     val o by c.options.collectAsState()
     var step by remember { mutableIntStateOf(0) }
     var use by remember { mutableStateOf<Use?>(null) }
-    // Ruoli (Tu, Allenatore, Circolo), circolo e promemoria del backup.
-    var roles by remember { mutableStateOf(c.roles.value) }
+    // Il ruolo (Tu, Allenatore o Circolo), il circolo e il promemoria del backup.
+    var role by remember { mutableStateOf(c.activeRole.value) }
     var club by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
     var reminder by remember { mutableStateOf(true) }
+    var autoBackup by remember { mutableStateOf(c.storage.personalBackupAuto) }
     val steps = Step.entries.filter { st ->
         when (st) {
-            Step.USE -> com.tennis.scoremanager.Role.PLAYER in roles
-            Step.CLUB -> com.tennis.scoremanager.Role.CLUB in roles
+            Step.USE -> role == com.tennis.scoremanager.Role.PLAYER
+            Step.CLUB -> role == com.tennis.scoremanager.Role.CLUB
+            // La segreteria non ha una scheda da giocatore: il nome non serve.
+            Step.YOU -> role != com.tennis.scoremanager.Role.CLUB
             else -> true
         }
     }
@@ -93,13 +97,16 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         // Solo alla prima presentazione si propone cosa tenere: rifatta da Altro, non spegne niente.
         val firstTime = !c.storage.onboarded
         c.storage.onboarded = true
-        c.setRoles(roles)
-        if (com.tennis.scoremanager.Role.CLUB in roles) {
+        c.setRole(role)
+        if (role == com.tennis.scoremanager.Role.CLUB) {
             c.storage.clubName = club
             c.setClubCourts(courts.lines())
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
+        c.setPersonalBackupAuto(autoBackup)
+        // Il backup automatico l'ha appena visto qui: niente avviso nella prima schermata.
+        c.storage.autoBackupNoticeSeen = true
         if (first.isNotBlank() && last.isNotBlank()) {
             // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
             val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
@@ -110,14 +117,12 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             c.setMe(p)
             if (c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = p.name, p1aId = p.id) }
         }
-        // Si parte dal primo ruolo scelto; per chi gioca, dalla scheda dell'uso detto.
-        val first = com.tennis.scoremanager.Role.entries.first { it in roles }
-        c.setActiveRole(first)
-        if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
+        // Si parte dalla prima scheda del ruolo; per chi gioca, da quella dell'uso detto.
+        if (role == com.tennis.scoremanager.Role.PLAYER) when (use) {
             Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
             Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
-            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.VIDEO) }
+            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()
@@ -143,11 +148,13 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                         Text(s.onbLang, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         // Ogni lingua è scritta in sé stessa: si ritrova anche se l'app parte in una lingua che non si legge.
                         Segmented(Lang.entries.map { SegOption("${it.flag}  ${it.label}") }, o.lang.ordinal, { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } }, columns = 2)
+                        // Solo la prima volta: chi aveva già l'app (e l'ha reinstallata) riprende i suoi dati da una copia.
+                        if (!c.storage.onboarded) FirstStartRestore(c)
                     }
                     Step.ROLES -> {
                         Text(s.onbRolesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                        RolesPicker(roles) { roles = it }
+                        RolePicker(role) { role = it }
                     }
                     Step.CLUB -> {
                         Text(s.onbClubTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -156,6 +163,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     Step.PRIVACY -> {
                         Text(s.onbPrivacyTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(s.onbPrivacyText, color = TsmColors.TextMain, fontSize = 15.sp)
+                        SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, autoBackup) { autoBackup = it }
                         SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it }
                     }
                     Step.USE -> {

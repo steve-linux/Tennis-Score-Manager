@@ -62,9 +62,10 @@ fun DataScreen(c: MatchController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     BackHandler { c.back() }
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var videos by remember { mutableStateOf(false) }
     var wipeVideos by remember { mutableStateOf(false) }
+    var wipeCopies by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
@@ -75,26 +76,30 @@ fun DataScreen(c: MatchController) {
     val videoMb by produceState(0L) {
         value = withContext(Dispatchers.IO) { Backup.videoBytes(context, c.storage, s.strokeFolderName) / 1_048_576 }
     }
-    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        busy = s.dataBusy
-        scope.launch {
-            val ok = withContext(Dispatchers.IO) {
-                runCatching {
-                    context.contentResolver.openOutputStream(uri)?.use { Backup.write(context, c.storage, it, videos, BuildConfig.VERSION_NAME, s.strokeFolderName) } ?: error("open")
-                }.isSuccess
+    // Con la password i backup si cifrano (e il file non è più uno ZIP: .tsmbak).
+    val writeTo: (android.net.Uri?) -> Unit = { uri ->
+        if (uri != null) {
+            busy = s.dataBusy
+            scope.launch {
+                val ok = withContext(Dispatchers.IO) {
+                    runCatching {
+                        context.contentResolver.openOutputStream(uri)?.use { Backup.write(context, c.storage, it, videos, BuildConfig.VERSION_NAME, s.strokeFolderName, c.storage.backupPassword?.toCharArray()) } ?: error("open")
+                    }.isSuccess
+                }
+                busy = null
+                if (ok) c.storage.lastBackupAt = System.currentTimeMillis()
+                message = if (ok) s.dataBackupDone else s.dataBackupFailed
             }
-            busy = null
-            if (ok) c.storage.lastBackupAt = System.currentTimeMillis()
-            message = if (ok) s.dataBackupDone else s.dataBackupFailed
         }
     }
+    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip"), writeTo)
+    val createLocked = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream"), writeTo)
+    // Un backup scelto: in chiaro o protetto (allora prima la password).
+    val opener = remember { com.tennis.scoremanager.ui.BackupOpener({ input, m -> restoreAsk = input to m }) { message = it } }
+    com.tennis.scoremanager.ui.BackupOpenerDialog(opener)
     val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        scope.launch {
-            val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
-            if (m == null) message = s.dataNotBackup else restoreAsk = { context.contentResolver.openInputStream(uri) } to m
-        }
+        scope.launch { opener.pick({ context.contentResolver.openInputStream(uri) }, s) }
     }
     ScreenScaffold(
         onHelp = { c.openHelp("7.8") },
@@ -104,11 +109,6 @@ fun DataScreen(c: MatchController) {
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
         // Chi usa l'app: i ruoli cambiano le schede della prima schermata, non i dati.
-        val roles by c.roles.collectAsState()
-        SectionCard(s.rolesTitle, Icons.Filled.Groups) {
-            Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
-            com.tennis.scoremanager.ui.RolesPicker(roles) { c.setRoles(it) }
-        }
         SectionCard(s.dataBackup, Icons.Filled.Backup) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }
@@ -116,9 +116,11 @@ fun DataScreen(c: MatchController) {
             var auto by remember { mutableStateOf(c.storage.personalBackupAuto) }
             SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.setPersonalBackupAuto(it) }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
+            com.tennis.scoremanager.ui.BackupPasswordRow(c, { message = it }) { copies = c.personalBackups() }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-                create.launch("TennisScoreManager-backup-$stamp.zip")
+                if (c.storage.backupPassword != null) createLocked.launch("TennisScoreManager-backup-$stamp${Backup.LOCKED_EXT}")
+                else create.launch("TennisScoreManager-backup-$stamp.zip")
             }, Modifier.fillMaxWidth())
         }
         SectionCard(s.autoBackupCopies, Icons.Filled.Schedule) {
@@ -127,20 +129,17 @@ fun DataScreen(c: MatchController) {
             Text(copies.firstOrNull()?.let { s.autoBackupLast(short.format(Date(it.lastModified()))) } ?: s.autoBackupNone,
                 color = TsmColors.TextDim, fontSize = 13.sp)
             for (f in copies) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("${short.format(Date(f.lastModified()))} · ${(f.length() + 524_287) / 1_048_576} MB",
+                Text("${short.format(Date(f.lastModified()))} · ${(f.length() + 524_287) / 1_048_576} MB" + if (f.name.endsWith(Backup.LOCKED_EXT)) " · ${s.bpLocked}" else "",
                     color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
                 TextButton(onClick = {
                     // Si condivide una copia nella cartella "share": il FileProvider dà solo quella.
                     scope.launch {
                         val out = withContext(Dispatchers.IO) { java.io.File(java.io.File(context.cacheDir, "share").apply { mkdirs() }, f.name).also { f.copyTo(it, overwrite = true) } }
-                        context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(out, "application/zip"), s.autoBackupShare))
+                        context.startActivity(android.content.Intent.createChooser(c.shareFileIntent(out, if (f.name.endsWith(Backup.LOCKED_EXT)) "application/octet-stream" else "application/zip"), s.autoBackupShare))
                     }
                 }) { Text(s.autoBackupShare) }
                 TextButton(onClick = {
-                    scope.launch {
-                        val m = withContext(Dispatchers.IO) { runCatching { f.inputStream().use { Backup.peek(it) } }.getOrNull() }
-                        if (m == null) message = s.dataNotBackup else restoreAsk = { f.inputStream() } to m
-                    }
+                    scope.launch { opener.pick({ f.inputStream() }, s) }
                 }) { Text(s.dataRestoreDo) }
             }
             GhostButton(s.autoBackupNow, Icons.Filled.Backup, {
@@ -160,6 +159,7 @@ fun DataScreen(c: MatchController) {
         SectionCard(s.dataWipe, Icons.Filled.DeleteForever, accent = TsmColors.Danger) {
             Text(s.dataWipeHint, color = TsmColors.TextDim, fontSize = 13.sp)
             SwitchRow(Icons.Filled.Videocam, s.dataWipeVideos, s.dataWipeVideosHint, wipeVideos) { wipeVideos = it }
+            SwitchRow(Icons.Filled.Schedule, s.dataWipeCopies, s.dataWipeCopiesHint, wipeCopies) { wipeCopies = it }
             GhostButton(s.dataWipe, Icons.Filled.DeleteForever, { wipeAsk = 1 }, Modifier.fillMaxWidth())
         }
     }
@@ -204,7 +204,7 @@ fun DataScreen(c: MatchController) {
                     wipeAsk = 0
                     busy = s.dataBusy
                     scope.launch {
-                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName)) }
+                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName), autoCopies = wipeCopies) }
                         busy = null
                         closeAfter = true
                         message = s.dataWipeDone

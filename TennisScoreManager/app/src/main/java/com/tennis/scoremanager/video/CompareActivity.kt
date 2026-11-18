@@ -37,7 +37,9 @@ import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -72,6 +74,7 @@ import java.io.File
  * momenti chiave in comune. "Sovrapponi" disegna lo scheletro del secondo sopra il primo, con le anche nello stesso
  * punto e il busto della stessa lunghezza: si vede subito dove il movimento cambia.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class CompareActivity : ComponentActivity() {
     private val controller get() = (application as TsmApp).controller
 
@@ -146,7 +149,7 @@ class CompareActivity : ComponentActivity() {
 
     @Composable
     private fun Content() {
-        val s = stringsFor(controller.options.value.lang)
+        val s = stringsFor(controller.options.collectAsState().value.lang)
         var speed by remember { mutableFloatStateOf(0.5f) }
         var playing by remember { mutableStateOf(true) }
         var skeleton by remember { mutableStateOf(true) }
@@ -239,12 +242,15 @@ class CompareActivity : ComponentActivity() {
     @Composable
     private fun VideoBox(sd: Side, over: @Composable () -> Unit) {
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
-        remember(sd) {
-            sd.player.addListener(object : Player.Listener {
+        // Le proporzioni arrivano col primo fotogramma; l'ascolto si toglie quando il riquadro sparisce.
+        DisposableEffect(sd) {
+            val l = object : Player.Listener {
                 override fun onVideoSizeChanged(v: VideoSize) {
                     if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
                 }
-            })
+            }
+            sd.player.addListener(l)
+            onDispose { sd.player.removeListener(l) }
         }
         Box(Modifier.aspectRatio(ratio)) {
             AndroidView(factory = { ctx -> TextureView(ctx).also { sd.player.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())

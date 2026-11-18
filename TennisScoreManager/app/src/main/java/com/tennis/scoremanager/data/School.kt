@@ -14,6 +14,10 @@ data class CourseSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60
 @Serializable
 enum class CourseFee { SEASON, MONTHLY }
 
+/** Dove è finita una lezione spostata: il nuovo inizio e, se cambiano, durata e campo. */
+@Serializable
+data class LessonMove(val start: Long, val minutes: Int? = null, val court: String? = null)
+
 /**
  * Un corso della scuola tennis: allievi (giocatori del database), istruttore, orari settimanali nella stagione
  * [from]–[to], quota. [attendance]: per ogni lezione (chiave [Courses.key]) chi c'era; [cancelled]: le lezioni
@@ -38,10 +42,16 @@ data class Course(
     val attendance: Map<String, Set<String>> = emptyMap(),
     val cancelled: Set<String> = emptySet(),
     val createdAt: Long = 0,
+    /** Il codice della scheda corso mandata all'allenatore: le presenze che tornano devono averlo. */
+    val cardCode: String? = null,
+    /** Le lezioni spostate (chiave della lezione → dove è finita): tengono la chiave, quindi presenze e registro restano. */
+    val moved: Map<String, LessonMove> = emptyMap(),
+    /** I giorni in cui l'istruttore non c'è, arrivati con le sue presenze (solo il motivo, senza note). */
+    val coachAway: List<CoachBusy> = emptyList(),
 )
 
-/** Una lezione del calendario del corso. */
-data class Lesson(val key: String, val start: Long, val minutes: Int, val court: String) {
+/** Una lezione del calendario del corso; [movedFrom]: l'inizio che aveva, se è stata spostata. */
+data class Lesson(val key: String, val start: Long, val minutes: Int, val court: String, val movedFrom: Long? = null) {
     val end: Long get() = start + minutes * 60_000L
 }
 
@@ -54,8 +64,33 @@ object Courses {
         return "%04d-%02d-%02d@%02d%02d@%s".format(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), court)
     }
 
-    /** Tutte le lezioni della stagione, in ordine, dagli orari settimanali. */
+    /** Tutte le lezioni della stagione, in ordine, dagli orari settimanali; quelle spostate dove sono finite. */
     fun lessons(c: Course): List<Lesson> {
+        val plain = plainLessons(c)
+        if (c.moved.isEmpty()) return plain
+        return plain.map { l -> c.moved[l.key]?.let { m -> Lesson(l.key, m.start, m.minutes ?: l.minutes, m.court ?: l.court, l.start) } ?: l }.sortedBy { it.start }
+    }
+
+    /** Sposta la lezione [key] (non è più annullata); rimessa al suo posto, non risulta spostata. */
+    fun move(c: Course, key: String, start: Long, minutes: Int? = null, court: String? = null): Course {
+        val orig = plainLessons(c).firstOrNull { it.key == key } ?: return c
+        val same = start == orig.start && (minutes ?: orig.minutes) == orig.minutes && (court ?: orig.court) == orig.court
+        return c.copy(moved = if (same) c.moved - key else c.moved + (key to LessonMove(start, minutes?.takeIf { it != orig.minutes }, court?.takeIf { it != orig.court })), cancelled = c.cancelled - key)
+    }
+
+    /**
+     * Il recupero: il primo orario del corso dopo l'ultima lezione, in un giorno che non è da saltare ([skip]: le
+     * feste); null senza orari.
+     */
+    fun makeup(c: Course, skip: (Long) -> Boolean = { false }): Lesson? {
+        if (c.slots.isEmpty()) return null
+        val last = lessons(c).maxOfOrNull { it.start } ?: c.to
+        val probe = c.copy(from = CourtPlans.addDays(CourtPlans.dayStart(last), 1), to = CourtPlans.addDays(CourtPlans.dayStart(last), 120), moved = emptyMap())
+        return plainLessons(probe).firstOrNull { !skip(it.start) }
+    }
+
+    /** Le lezioni dagli orari settimanali, senza gli spostamenti. */
+    private fun plainLessons(c: Course): List<Lesson> {
         val out = mutableListOf<Lesson>()
         var day = CourtPlans.dayStart(c.from)
         val last = CourtPlans.dayStart(c.to)
@@ -122,13 +157,40 @@ object Courses {
      * I periodi non prenotabili del corso, uno per orario: il campo, il giorno della settimana e le ore, per tutta
      * la stagione. Così nel planning nessuno prenota sopra il corso (le sue lezioni sì).
      */
-    fun blocks(c: Course): List<CourtBlock> = c.slots.filter { it.court.isNotBlank() }.mapIndexed { i, s ->
-        CourtBlock(
-            id = "course-${c.id}-$i", label = c.name, reason = BlockReason.COURSE, courts = listOf(s.court),
-            from = CourtPlans.dayStart(c.from), to = CourtPlans.dayStart(c.to), weekdays = setOf(s.weekday),
-            startMin = s.startMin, endMin = (s.startMin + s.minutes).coerceAtMost(24 * 60), course = c.id,
-        )
+    fun blocks(c: Course): List<CourtBlock> {
+        // Le lezioni spostate: il giorno di prima l'orario si libera, quello nuovo si occupa.
+        val away = plainLessons(c).filter { it.key in c.moved }
+        val weekly = c.slots.filter { it.court.isNotBlank() }.mapIndexed { i, s ->
+            val except = away.filter { CourtPlans.weekday(it.start) == s.weekday && it.court == s.court && minuteOf(it.start) == s.startMin }.map { CourtPlans.dayStart(it.start) }.toSet()
+            CourtBlock(
+                id = "course-${c.id}-$i", label = c.name, reason = BlockReason.COURSE, courts = listOf(s.court),
+                from = CourtPlans.dayStart(c.from), to = CourtPlans.dayStart(c.to), weekdays = setOf(s.weekday),
+                startMin = s.startMin, endMin = (s.startMin + s.minutes).coerceAtMost(24 * 60), course = c.id, except = except,
+            )
+        }
+        val moved = lessons(c).filter { it.movedFrom != null && it.court.isNotBlank() && it.key !in c.cancelled }.map { l ->
+            val m = minuteOf(l.start)
+            CourtBlock(
+                id = "course-${c.id}-m-${l.key}", label = c.name, reason = BlockReason.COURSE, courts = listOf(l.court),
+                from = CourtPlans.dayStart(l.start), to = CourtPlans.dayStart(l.start), startMin = m, endMin = (m + l.minutes).coerceAtMost(24 * 60), course = c.id,
+            )
+        }
+        return weekly + moved
     }
+
+    private fun minuteOf(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
+    /**
+     * Il giorno dell'[n]-esima lezione partendo da [from] con quegli orari, saltando i giorni [skip] (le feste); null
+     * senza orari o con [n] < 1. Serve a calcolare la fine del corso dal numero di lezioni.
+     */
+    fun endAfter(from: Long, slots: List<CourseSlot>, n: Int, skip: (Long) -> Boolean = { false }): Long? {
+        if (slots.isEmpty() || n < 1) return null
+        val probe = Course("x", "", slots = slots, from = from, to = CourtPlans.addDays(from, 3 * 366))
+        return lessons(probe).filter { !skip(it.start) }.getOrNull(n - 1)?.let { CourtPlans.dayStart(it.start) }
+    }
+
+    /** Le lezioni del corso che cadono in un giorno [skip] (le feste): da segnare annullate. */
+    fun skipped(c: Course, skip: (Long) -> Boolean): Set<String> = lessons(c).filter { skip(it.start) }.map { it.key }.toSet()
 
     /** Il corso è pieno (con un massimo di allievi). */
     fun full(c: Course): Boolean = c.maxStudents > 0 && c.students.size >= c.maxStudents

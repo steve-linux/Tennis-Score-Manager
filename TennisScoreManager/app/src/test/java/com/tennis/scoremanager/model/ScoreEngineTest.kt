@@ -553,6 +553,40 @@ class ScoreEngineTest {
         assertEquals("3", st.pointLabel(P1))
     }
 
+    /** Lo stato dopo gli eventi e quello che resta con "Annulla". */
+    private fun undo(rules: RulesConfig, events: List<MatchEvent>): List<MatchEvent>? =
+        ScoreEngine.undo(ScoreEngine.replay(rules, events), events)
+
+    @Test fun annullaDopoIlPunteggioImpostatoTogliesoloQuello() {
+        val r = RulesConfig()
+        val set = MatchEvent.ScoreSet(listOf(SetScore(6, 3)), 4, 3, 2, 1, P2)
+        val points = listOf(MatchEvent.Point(P1), MatchEvent.Point(P2))
+        assertEquals("i punti di prima restano", points, undo(r, points + set))
+        assertEquals("partita iniziata col punteggio a mano: si torna a zero", emptyList<MatchEvent>(), undo(r, listOf(set)))
+    }
+
+    @Test fun annullaTogliesoloLaCorrezioneDellArbitro() {
+        val r = RulesConfig()
+        val points = listOf(MatchEvent.Point(P1), MatchEvent.Point(P1))
+        for (fix in listOf(MatchEvent.ServerFix(P2), MatchEvent.EndsFix(), MatchEvent.Penalty(P1, PenaltyKind.CODE), MatchEvent.Break(P2, BreakKind.MEDICAL))) {
+            assertEquals(fix.toString(), points, undo(r, points + fix))
+        }
+        assertEquals(listOf(MatchEvent.Point(P1)), undo(r, points))
+        assertNull("niente da annullare", undo(r, emptyList()))
+    }
+
+    @Test fun annullaIlPuntoDelSetConLeScelteDelSetNuovo() {
+        val r = RulesConfig(doubles = true)
+        // 6-0 per P1: il set nuovo parte con ordine di servizio e di risposta scelti dopo l'ultimo punto.
+        val set = List(24) { MatchEvent.Point(P1) }
+        val orders = listOf(MatchEvent.ServeOrder(2, 1, 0), MatchEvent.ReceiveOrder(2, 1, 0))
+        assertEquals(2, ScoreEngine.replay(r, set + orders).setNumber)
+        assertEquals("va via il punto del set e le scelte dopo", set.dropLast(1), undo(r, set + orders))
+        // A set iniziato l'ordine di risposta è una correzione: si toglie da solo, il punto resta.
+        val mid = set + MatchEvent.Point(P2) + MatchEvent.ReceiveOrder(2, 0, 1)
+        assertEquals(mid.dropLast(1), undo(r, mid))
+    }
+
     @Test fun ordineDiRispostaNelDoppio() {
         var s = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = P1))
         assertEquals(null, s.receiverPlayer)

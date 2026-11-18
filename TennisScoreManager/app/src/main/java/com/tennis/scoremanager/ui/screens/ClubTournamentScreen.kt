@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CardRules
+import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.data.CTFormat
 import com.tennis.scoremanager.data.CTKind
 import com.tennis.scoremanager.data.CTMatch
@@ -99,7 +101,7 @@ fun ClubTournamentsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val list by c.clubTournaments.collectAsState()
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.13") },
@@ -223,7 +225,7 @@ private fun EntriesTab(
     onAdd: () -> Unit, onOpen: (String) -> Unit,
 ) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     // Le informazioni del torneo.
     val info = listOfNotNull(
         t.start?.let { st -> s.ctDates(shortDate(st, lang), t.end?.let { shortDate(it, lang) } ?: shortDate(st, lang)) },
@@ -396,7 +398,7 @@ private fun DrawTab(c: MatchController, t: ClubTournament, onOpen: (String) -> U
 @Composable
 private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
     // Prima quelle da giocare (in ordine di orario), poi le giocate; i bye non contano.
     val ms = t.matches.filter { !it.bye }
@@ -424,7 +426,7 @@ private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -
 private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val a = entryName(c, t.entries.firstOrNull { it.id == m.a })
     val b = entryName(c, t.entries.firstOrNull { it.id == m.b })
     var winner by remember { mutableStateOf(m.winner) }
@@ -442,7 +444,15 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("$a – $b", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                if (!m.played && m.a != null && m.b != null) BigButton(s.ctPlayLive, Icons.Filled.PlayArrow, { onDone(); c.playClubMatch(t, m.copy(court = court)) }, Modifier.fillMaxWidth())
+                // Il punteggio dal campo si tiene nel ruolo Tu (Gioca › Partite del circolo): qui il risultato a mano.
+                if (!m.played && m.a != null && m.b != null) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Convoca: a ciascuno giorno, ora e campo (quelli scelti qui sotto) con la scheda partita per chi tiene il punteggio.
+                if (!m.played && m.a != null && m.b != null) GhostButton(s.ctConvoke, Icons.Filled.Schedule, {
+                    var cur = c.clubTournament(t.id) ?: t
+                    if (court != m.court || at != m.at) { c.setClubSchedule(cur, m.id, court, at); cur = c.clubTournament(t.id) ?: cur }
+                    onDone()
+                    c.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
+                }, Modifier.fillMaxWidth())
                 Text(s.ctWinner, color = TsmColors.TextDim, fontSize = 13.sp)
                 val sides = listOf(m.a, m.b)
                 Segmented(listOf(SegOption(a), SegOption(b)), sides.indexOf(winner).takeIf { winner != null } ?: -1, { winner = sides[it] }, columns = 1)
@@ -563,7 +573,7 @@ private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () ->
 @Composable
 private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var pickDay by remember { mutableStateOf(false) }
     val open = t.matches.filter { !it.played && it.a != null && it.b != null }
     // I giorni con partite in programma (a mezzanotte, uno per giorno).
@@ -593,7 +603,7 @@ private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: ()
 @Composable
 private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone: (String?) -> Unit) {
     val s = LocalStrings.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     var name by remember { mutableStateOf(t?.name.orEmpty()) }
     var kind by remember { mutableStateOf(t?.kind ?: CTKind.SOCIAL) }
     var doubles by remember { mutableStateOf(t?.doubles ?: false) }
@@ -608,6 +618,7 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
     var limit by remember { mutableStateOf(t?.rankLimit.orEmpty()) }
     var code by remember { mutableStateOf(t?.fitpCode.orEmpty()) }
     var referee by remember { mutableStateOf(t?.referee.orEmpty()) }
+    var rules by remember { mutableStateOf(t?.rules) }
     var askDelete by remember { mutableStateOf(false) }
     val drawn = t?.drawn == true
     val feeOk = fee.isBlank() || Fees.parse(fee) != null
@@ -639,6 +650,25 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                 MoneyField(fee, s.ctFee) { fee = it }
                 if ((Fees.parse(fee) ?: 0) > 0) SwitchRow(Icons.Filled.EmojiEvents, s.ctPaidOnly, s.ctPaidOnlyHint, requirePaid) { requirePaid = it }
                 field(limit, s.ctLimit) { limit = it.trim().uppercase() }
+                // Le regole delle partite: vanno nella scheda partita e in campo non si cambiano per errore.
+                Text(s.ctRules, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+                val formats = listOf(null, MatchFormat.BEST_OF_THREE, MatchFormat.TWO_SETS_MATCH_TIEBREAK, MatchFormat.PRO_SET)
+                Segmented(
+                    listOf(SegOption(s.ctRulesFree), SegOption(s.formatBestOfThree), SegOption(s.formatMatchTiebreak), SegOption(s.formatProSet)),
+                    formats.indexOf(rules?.format), { i ->
+                        rules = formats[i]?.let { f ->
+                            val old = rules ?: CardRules()
+                            val games = if (f == MatchFormat.PRO_SET) old.gamesPerSet.takeIf { it in listOf(8, 10) } ?: 8 else old.gamesPerSet.takeIf { it in listOf(6, 4) } ?: 6
+                            old.copy(format = f, gamesPerSet = games)
+                        }
+                    }, columns = 2,
+                )
+                rules?.let { r ->
+                    val games = if (r.format == MatchFormat.PRO_SET) listOf(8, 10) else listOf(6, 4)
+                    Segmented(games.map { SegOption(s.gamesN(it)) }, games.indexOf(r.gamesPerSet), { rules = r.copy(gamesPerSet = games[it]) })
+                    SwitchRow(Icons.Filled.EmojiEvents, s.noAd, null, r.noAd) { rules = r.copy(noAd = it) }
+                }
+                Text(s.ctRulesHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 if (kind == CTKind.FITP) {
                     field(code, s.ctFitpCode) { code = it }
                     field(referee, s.ctReferee) { referee = it }
@@ -653,6 +683,7 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                     name = name.trim(), kind = kind, doubles = doubles, category = category.trim(), format = format, groups = groups, qualify = qualify,
                     start = start, end = end, feeCents = Fees.parse(fee) ?: 0, requirePaid = requirePaid, rankLimit = limit,
                     fitpCode = if (kind == CTKind.FITP) code.trim() else "", referee = if (kind == CTKind.FITP) referee.trim() else "",
+                    rules = rules,
                 )
                 c.saveClubTournament(saved)
                 onDone(saved.id)

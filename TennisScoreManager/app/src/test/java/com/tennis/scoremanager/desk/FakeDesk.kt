@@ -41,6 +41,15 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun <T> tx(f: () -> T): T = synchronized(this) { f() }
     override var club = "TC Prova"
     override var lang = "it"
+    override fun country() = "IT"
+    override fun profileFields(id: String) = list.firstOrNull { it.id == id }?.let { p -> DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, false), com.tennis.scoremanager.data.ProfileCards.defaults(p, false).toList()) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?) =
+        list.firstOrNull { it.id == id }?.let { p -> com.tennis.scoremanager.data.ProfileCards.encode(com.tennis.scoremanager.data.ProfileCards.card(p, fields ?: com.tennis.scoremanager.data.ProfileCards.defaults(p, false), null, club, time)) }
+    override fun incomingFile(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { DeskIncoming("PROFILE", "Profilo", listOf(it.profile.name), "", true) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { card ->
+        val p = com.tennis.scoremanager.data.ProfileCards.merge(com.tennis.scoremanager.data.ProfileCards.find(list, card.profile), card.profile, "nuovo", time, asMember)
+        savePlayers(listOf(p)); p.id
+    }
     override fun now() = time
     override fun players() = list
     override fun savePlayers(list: List<PlayerProfile>) { val ids = list.map { it.id }.toSet(); this.list = this.list.filter { it.id !in ids } + list }

@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,7 +65,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun HelpScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = c.options.value.lang
+    val lang = c.options.collectAsState().value.lang
     val sections = remember(lang) {
         val text = runCatching { context.assets.open("help/${lang.code}.md").bufferedReader().readText() }
             .recoverCatching { context.assets.open("help/en.md").bufferedReader().readText() }.getOrDefault("")

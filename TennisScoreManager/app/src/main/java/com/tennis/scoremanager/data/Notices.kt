@@ -9,7 +9,11 @@ import java.io.File
 import java.util.Calendar
 
 /** Chi riceve un avviso: il suo testo (personale o quello di tutti) e i contatti. */
-data class NoticeRecipient(val id: String, val name: String, val phone: String, val email: String, val text: String)
+data class NoticeRecipient(
+    val id: String, val name: String, val phone: String, val email: String, val text: String,
+    /** Un file da allegare al suo messaggio (la scheda partita): WhatsApp ed email lo mandano col testo. */
+    val attachment: java.io.File? = null,
+)
 
 /**
  * Un avviso da mandare: [common] è il testo per tutti (email in copia nascosta, SMS a tutti, gruppo), i destinatari
@@ -44,15 +48,16 @@ object Notices {
 
     /** Il telefono a cui scrivere: il suo, o quello del genitore per un minorenne (o se lui non ne ha). */
     fun phoneOf(p: PlayerProfile, now: Long): String {
-        val guardian = p.member?.guardianPhone.orEmpty()
+        // Il genitore: quello della scheda del giocatore (allievi) o quello del socio.
+        val guardian = p.guardianPhone.ifBlank { p.member?.guardianPhone.orEmpty() }
         return if (guardian.isNotBlank() && (Members.minor(p, now) || p.phone.isBlank())) guardian else p.phone
     }
 
     private fun firstName(p: PlayerProfile): String = p.firstName.ifBlank { p.name }
 
     /** Il saluto: al genitore di un minorenne si scrive del figlio. */
-    private fun hello(s: Strings, p: PlayerProfile, now: Long): String =
-        if (Members.minor(p, now) && p.member?.guardianPhone?.isNotBlank() == true && p.phone.isBlank()) s.ntHelloParent(firstName(p)) else s.ntHello(firstName(p))
+    fun hello(s: Strings, p: PlayerProfile, now: Long): String =
+        if (Members.minor(p, now) && p.guardianPhone.ifBlank { p.member?.guardianPhone.orEmpty() }.isNotBlank() && p.phone.isBlank()) s.ntHelloParent(firstName(p)) else s.ntHello(firstName(p))
 
     private fun sign(club: String): List<String> = if (club.isBlank()) emptyList() else listOf("", club)
 
@@ -82,8 +87,12 @@ object Notices {
     }
 
     /** La prossima partita di [p] nel torneo. */
-    fun matchText(s: Strings, t: ClubTournament, m: CTMatch, round: String, names: (String?) -> String, p: PlayerProfile, club: String, lang: Lang, now: Long): String =
-        (listOf(hello(s, p, now), s.ntMatch(round, t.name), "${names(m.a)} – ${names(m.b)}", whenText(s, m, lang)) + sign(club)).joinToString("\n")
+    fun matchText(
+        s: Strings, t: ClubTournament, m: CTMatch, round: String, names: (String?) -> String, p: PlayerProfile, club: String, lang: Lang, now: Long,
+        card: Boolean = false,
+    ): String =
+        (listOf(hello(s, p, now), s.ntMatch(round, t.name), "${names(m.a)} – ${names(m.b)}", whenText(s, m, lang)) +
+            listOfNotNull(s.ntCardHowTo.takeIf { card }) + sign(club)).joinToString("\n")
 
     /** L'ordine di gioco di un giorno (o tutte le partite in programma), per il gruppo. */
     fun orderOfPlay(s: Strings, t: ClubTournament, ms: List<CTMatch>, round: (CTMatch) -> String, names: (String?) -> String, title: String, lang: Lang, club: String): String {

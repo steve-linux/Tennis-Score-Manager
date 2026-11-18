@@ -23,6 +23,8 @@ data class Challenge(
     /** I posti prima della partita (1 = primo), per la cronologia. */
     val challengerPos: Int = 0,
     val defenderPos: Int = 0,
+    /** Il codice della scheda partita mandata ai due: il risultato che torna deve averlo. */
+    val cardCode: String? = null,
 ) {
     val open: Boolean get() = challengerWon == null && !cancelled
 }

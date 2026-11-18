@@ -288,6 +288,8 @@ const DESK_I18N = {
       OTHER: "Altro",
     },
     err: {
+      NOT_A_FILE: "Questo file non è un risultato, un file di presenze o un allievo proposto di TSM.",
+      NO_COACH: "Il corso non ha un istruttore del database: sceglilo in Modifica.",
       NOT_BACKUP: "Questo file non è un backup della segreteria di TSM.",
       NOT_PAIRED: "Il server delle prenotazioni non è abbinato.",
       COURT_EXISTS: "C'è già un campo con questo nome.",
@@ -609,6 +611,8 @@ const DESK_I18N = {
       OTHER: "Other",
     },
     err: {
+      NOT_A_FILE: "This file is not a TSM result, attendance file or proposed student.",
+      NO_COACH: "The course has no coach from the database: pick one in Edit.",
       NOT_BACKUP: "This file isn't a TSM office backup.",
       NOT_PAIRED: "The booking server isn't paired.",
       COURT_EXISTS: "There's already a court with this name.",
@@ -931,6 +935,8 @@ const DESK_I18N = {
       OTHER: "Autre",
     },
     err: {
+      NOT_A_FILE: "Ce fichier n'est pas un résultat, un fichier de présences ou un élève proposé de TSM.",
+      NO_COACH: "Le cours n'a pas d'entraîneur de la base : choisissez-le dans Modifier.",
       NOT_BACKUP: "Ce fichier n'est pas une sauvegarde du secrétariat TSM.",
       NOT_PAIRED: "Le serveur des réservations n'est pas associé.",
       COURT_EXISTS: "Il y a déjà un court avec ce nom.",
@@ -1252,6 +1258,8 @@ const DESK_I18N = {
       OTHER: "Andere",
     },
     err: {
+      NOT_A_FILE: "Diese Datei ist kein TSM-Ergebnis, keine Anwesenheitsdatei und kein vorgeschlagener Schüler.",
+      NO_COACH: "Der Kurs hat keinen Trainer aus der Datenbank: unter Bearbeiten wählen.",
       NOT_BACKUP: "Diese Datei ist keine Büro-Sicherung von TSM.",
       NOT_PAIRED: "Der Buchungsserver ist nicht gekoppelt.",
       COURT_EXISTS: "Es gibt schon einen Platz mit diesem Namen.",
@@ -1573,6 +1581,8 @@ const DESK_I18N = {
       OTHER: "Otro",
     },
     err: {
+      NOT_A_FILE: "Este archivo no es un resultado, un archivo de asistencia ni un alumno propuesto de TSM.",
+      NO_COACH: "El curso no tiene un entrenador de la base de datos: elígelo en Editar.",
       NOT_BACKUP: "Este archivo no es una copia de la secretaría de TSM.",
       NOT_PAIRED: "El servidor de reservas no está vinculado.",
       COURT_EXISTS: "Ya hay una pista con este nombre.",
@@ -1894,6 +1904,8 @@ const DESK_I18N = {
       OTHER: "Outro",
     },
     err: {
+      NOT_A_FILE: "Este arquivo não é um resultado, um arquivo de presenças nem um aluno proposto do TSM.",
+      NO_COACH: "O curso não tem um treinador da base de dados: escolha-o em Editar.",
       NOT_BACKUP: "Este arquivo não é uma cópia da secretaria do TSM.",
       NOT_PAIRED: "O servidor de reservas não está associado.",
       COURT_EXISTS: "Já há uma quadra com este nome.",

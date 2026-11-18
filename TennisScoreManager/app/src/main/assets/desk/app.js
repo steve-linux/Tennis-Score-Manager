@@ -195,6 +195,8 @@ async function start() {
   info = await api('GET', '/info');
   T = pick(info.lang);
   document.documentElement.lang = T.lang;
+  // Acceso dal ruolo Allenatore: solo le sue pagine (coach.js).
+  if (info.mode === 'coach') return coachStart();
   document.title = T.title + ' · ' + info.club;
   planDate = info.today;
   await render();
@@ -218,6 +220,8 @@ async function render() {
       h('div.brand', info.club || T.title, h('small', T.title)),
       VIEWS().map(([v, l]) => h('button' + (v === view ? '.on' : ''), { 'aria-current': v === view ? 'page' : null, onclick: () => { view = v; if (v === 'cups') cupId = null; if (v === 'school') courseId = null; if (v === 'teams') { teamId = null; fixtureId = null; } render(); } },
         l, v === 'today' ? h('span.badge', { id: 'newsbadge', hidden: !newsCount }, String(newsCount)) : null)),
+      // I file arrivati su WhatsApp Web o per email: risultati dal campo, presenze dell'allenatore, allievi proposti.
+      h('button', { onclick: uploadFile, title: T.ccUploadHint }, T.ccUpload),
       h('div.spacer'),
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
@@ -290,6 +294,62 @@ function saveCsv(name, rows) {
 
 /** L'intestazione che compare solo sulla carta: circolo, cosa e quando. */
 const printHead = (what) => h('div.printonly.phead', h('b', info.club), ' · ', h('span.what', what), ' · ', dateText(info.today));
+
+/** Scarica un file del telefono (Excel) col suo nome. */
+async function deskDownload(path, name) {
+  try {
+    const blob = await api('GET', path, undefined, true);
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name }); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { toast(errText(e)); }
+}
+
+/**
+ * Carica un file ricevuto (.tsm): il telefono lo legge e dice cos'è e com'è rispetto ai dati (da registrare, già
+ * registrato, diverso, codice sbagliato); se si può, Registra fa come sul telefono.
+ */
+function uploadFile() {
+  const input = h('input', { type: 'file', accept: '.tsm,.json,application/json,application/octet-stream' });
+  input.addEventListener('change', async () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    if (f.size > 512 * 1024) { toast(T.err.NOT_A_FILE); return; }
+    const text = await f.text();
+    let x;
+    try { x = await api('POST', '/files/check', { text }); } catch (e) { toast(errText(e)); return; }
+    const course = x.kind === 'PROPOSAL' ? select([['', T.ccNoCourse]].concat(x.courses.map((c) => [c.id, c.name])), x.course || '') : null;
+    // Un profilo: si aggiunge (o completa chi c'è già) e, a scelta, diventa socio.
+    const asMember = x.kind === 'PROFILE' ? h('input', { type: 'checkbox', checked: true }) : null;
+    dialog(x.title, h('div', x.lines.map((l, i) => h(i === 0 ? 'p' : 'p.dim', i === 0 ? h('b', l) : l)), h('p' + (x.canApply ? '.dim' : ''), x.status), course ? field(T.ccProposalCourse, course) : null,
+      asMember ? h('label.check', asMember, T.pfAsMember) : null),
+      x.canApply ? async () => {
+        await api('POST', '/files/apply', { text, course: course ? course.value || null : null, asMember: asMember ? asMember.checked : true });
+        toast(T.saved);
+        await render();
+      } : null, { saveText: x.replace ? T.mrReplace : (x.kind === 'PROPOSAL' ? T.ccProposalAdd : x.kind === 'PROFILE' ? T.pfAdd : T.mrApply) });
+  });
+  input.click();
+}
+
+const PROFILE_FIELDS = { PHOTO: () => T.pfPhoto, CONTACTS: () => T.pfContacts, BIRTH: () => T.pfBirth, PLAY: () => T.pfPlay, BODY: () => T.pfBody, GUARDIAN: () => T.pfGuardian, FITP: () => T.pfFitp, MEDICAL: () => T.pfMedical };
+
+/**
+ * Passa il profilo: si scelgono i dati (il certificato medico solo a mano) e si scarica il file .tsm, da mandare al
+ * nuovo circolo o allenatore (che lo apre con TSM). [base]: '/people/' o '/coach/students/'.
+ */
+async function profileExport(base, id, name) {
+  let f;
+  try { f = await api('GET', base + encodeURIComponent(id) + '/profile'); } catch (e) { toast(errText(e)); return; }
+  const boxes = f.available.map((k) => [k, h('input', { type: 'checkbox', checked: f.defaults.includes(k) })]);
+  dialog(T.pfSend + ' · ' + name, h('div',
+    h('p.dim', T.pfSendHint), h('p.dim', T.pfAlways),
+    boxes.length ? h('div.checks', boxes.map(([k, x]) => h('label.check', { title: k === 'MEDICAL' ? T.pfMedicalHint : '' }, x, PROFILE_FIELDS[k]()))) : h('p.dim', T.pfNothing),
+    h('p.dim', T.pfAsFileHint)), async () => {
+    const fields = boxes.filter(([, x]) => x.checked).map(([k]) => k).join(',');
+    await deskDownload(base + encodeURIComponent(id) + '/profile.tsm?fields=' + encodeURIComponent(fields), T.pfFilePrefix + ' ' + name + '.tsm');
+  }, { saveText: T.pfAsFile });
+}
 
 /** Apre un PDF del telefono in una scheda nuova (o lo scarica, se il browser blocca la scheda). */
 async function openPdf(path, name) {
@@ -375,15 +435,15 @@ function editPerson(p) {
     field(T.note, f.note, 'full'));
   // Col server delle prenotazioni: l'invito per prenotare online e, per chi prenota già, il modo di togliere l'accesso.
   const server = p && (!info.features || !info.features.length || info.features.includes('SERVER'));
-  const online = server ? [
-    h('button.left', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
+  const online = [p ? h('button.left', { type: 'button', onclick: () => profileExport('/people/', p.id, p.name) }, T.pfSend) : null].concat(server ? [
+    h('button', { type: 'button', onclick: () => inviteDialog(p) }, T.srvInvite),
     p.pin ? h('button', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id) + '/pin'); toast(T.srvPinResetDone); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvPinReset) : null,
     p.online ? h('button.danger', { type: 'button', onclick: async () => {
       try { await api('DELETE', '/online/players/' + encodeURIComponent(p.id)); toast(T.srvRevoked); await showPeople(); } catch (e) { toast(errText(e)); }
     } }, T.srvRevoke) : null,
-  ] : null;
+  ] : []);
   dialog(p ? p.name : T.newMember, body, async () => {
     const out = { firstName: f.firstName.value, lastName: f.lastName.value, nickname: f.nickname.value, phone: f.phone.value, email: f.email.value, birth: f.birth.value || null, note: f.note.value,
       member: member.checked, since: f.since.value || null, number: f.number.value, fitpNumber: f.fitpNumber.value, fitpCard: card.value || null, fitpYear: f.fitpYear.value ? Number(f.fitpYear.value) : null,
@@ -650,9 +710,9 @@ async function showPlan() {
     for (let i = 0; i < lead; i++) cells.push(h('div.mday.out'));
     for (const x of m.days) {
       const n = Number(x.date.slice(8));
-      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : ''), {
-        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
-      }, h('b', n),
+      cells.push(h('button.mday' + (x.date === info.today ? '.now' : '') + (x.blocked >= 100 ? '.closed' : '') + (x.holiday ? '.hol' : ''), {
+        type: 'button', title: long(x.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (x.holiday ? ' · ' + x.holiday : ''), onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+      }, h('b', n), x.holiday ? h('span.holname', x.holiday) : null,
       x.bookings ? h('span', T.nBookings(x.bookings)) : null,
       x.matches ? h('span', '🏆 ' + x.matches) : null,
       x.blocked >= 100 ? h('span.dim', T.blkShort) : x.blocked ? h('span.dim', T.blkShort + ' ' + x.blocked + '%') : null,
@@ -673,7 +733,7 @@ async function showPlan() {
   } else {
     d = await api('GET', '/day?date=' + planDate);
     days = [d];
-    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    title = long(planDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + (d.holiday ? ' · ' + d.holiday : '');
   }
   // In settimana con tanti campi se ne guarda uno alla volta, se no non si legge.
   let courts = d.courts;
@@ -698,8 +758,8 @@ async function showPlan() {
   grid.style.gridTemplateRows = 'repeat(' + heads + ', auto) repeat(' + rows + ', ' + Math.max(ROW, Math.round(ROW * slot / 30)) + 'px)';
   const place = (e, row, col, span, colSpan) => { e.style.gridRow = row + ' / span ' + span; e.style.gridColumn = col + ' / span ' + (colSpan || 1); grid.append(e); };
   place(h('div'), 1, 1, heads);
-  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : ''), {
-    type: 'button', title: T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
+  if (week) days.forEach((x, i) => place(h('button.gcourt.gday' + (x.date === info.today ? '.now' : '') + (x.holiday ? '.hol' : ''), {
+    type: 'button', title: x.holiday ? x.holiday : T.viewDay, onclick: () => { planDate = x.date; planView = 'day'; showPlan(); },
   }, long(x.date, { weekday: 'short', day: 'numeric' })), 1, 2 + i * courts.length, 1, courts.length));
   if (!week || two) cols.forEach((c, i) => place(h('div.gcourt' + (two ? '.small' : ''), c.court), heads, i + 2, 1));
   for (let r = 0; r < rows; r++) {
@@ -826,7 +886,7 @@ async function editBlock(d, id) {
 }
 
 function blockDialog(d, b) {
-  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440 };
+  const v = b || { label: '', reason: 'MAINTENANCE', courts: [], from: planDate, to: planDate, weekdays: [], startMin: 0, endMin: 1440, yearly: false };
   const label = h('input', { maxlength: 40, value: v.label });
   const reason = select([['MAINTENANCE', T.blkMaintenance], ['TOURNAMENT', T.blkTournament], ['OTHER', T.bkOther]], v.reason);
   const all = h('input', { type: 'checkbox', checked: !v.courts.length });
@@ -835,6 +895,11 @@ function blockDialog(d, b) {
   const from = h('input', { type: 'date', value: v.from, required: true }), to = h('input', { type: 'date', value: v.to, required: true });
   const days = [1, 2, 3, 4, 5, 6, 7].map((n) => [n, h('input', { type: 'checkbox', checked: v.weekdays.includes(n) })]);
   const allDay = h('input', { type: 'checkbox', checked: v.startMin === 0 && v.endMin === 1440 });
+  const yearly = h('input', { type: 'checkbox', checked: !!v.yearly });
+  // La festa del patrono in un clic: tutti i campi, tutto il giorno, ogni anno (resta da scegliere il giorno).
+  const patron = b ? null : h('button', { type: 'button', onclick: () => {
+    label.value = T.blkPatron; reason.value = 'OTHER'; all.checked = true; allDay.checked = true; yearly.checked = true; days.forEach(([, x]) => { x.checked = false; }); update();
+  } }, T.blkPatron);
   const t1 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 15 * 60 : v.startMin), step: 300 });
   const t2 = h('input', { type: 'time', value: hhmm(v.startMin === 0 && v.endMin === 1440 ? 18 * 60 : Math.min(v.endMin, 1439)), step: 300 });
   const f1 = field(T.blkStart, t1), f2 = field(T.blkEnd, t2);
@@ -844,16 +909,18 @@ function blockDialog(d, b) {
     try { await api('DELETE', '/blocks/' + encodeURIComponent(b.id)); dlg.close(); toast(T.saved); await showPlan(); } catch (e) { toast(errText(e)); }
   } }, T.blkDelete);
   const dlg = dialog(b ? b.label || T.blkTitle : T.blkNew, h('div.form',
+    patron ? h('div.full', patron) : null,
     field(T.blkLabel, label, 'full'), field(T.kind, reason), h('span'),
     h('label.check.full', all, T.blkAllCourts), courtBox,
     field(T.blkFrom, from), field(T.blkTo, to),
     h('h3', T.blkDays), h('div.full.checks', days.map(([n, x]) => h('label.check', x, weekdayName(n)))), h('p.full.dim', T.blkDaysHint),
-    h('label.check.full', allDay, T.blkAllDay), f1, f2), async () => {
+    h('label.check.full', allDay, T.blkAllDay), f1, f2,
+    h('label.check.full', { title: T.blkYearlyHint }, yearly, T.blkYearly), h('p.full.dim', T.blkYearlyHint)), async () => {
     const pick = courts.filter(([, x]) => x.checked).map(([c]) => c);
     const body = {
       id: b ? b.id : '', label: label.value, reason: reason.value, courts: all.checked ? [] : pick, from: from.value, to: to.value,
       weekdays: days.filter(([, x]) => x.checked).map(([n]) => n),
-      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'),
+      startMin: allDay.checked ? 0 : toMin(t1.value || '00:00'), endMin: allDay.checked ? 1440 : toMin(t2.value || '00:00'), yearly: yearly.checked,
     };
     if (!all.checked && !pick.length) throw new Error(T.blkPickCourt);
     await api('POST', '/blocks', body);
@@ -1125,6 +1192,15 @@ function openMatch(t, m, who) {
   const clear = (m.winner || m.noShow) && h('button.danger.left', { type: 'button', onclick: async () => {
     try { await api('POST', base + '/result', {}); d.close(); toast(T.saved); await showCup(t.id); } catch (e) { toast(errText(e)); }
   } }, T.ctClearResult);
+  // Convoca: giorno, ora e campo (salvati prima, se cambiati) e la scheda partita; l'avviso si apre sul telefono.
+  const convoke = !m.winner && !m.noShow && m.a && m.b && h('button', { type: 'button', onclick: async () => {
+    try {
+      const sched = { court: court.value, date: date.value || null, startMin: time.value ? toMin(time.value) : null };
+      if (sched.court !== m.court || sched.date !== (m.date || null) || (sched.date && sched.startMin !== m.startMin)) await api('POST', base + '/schedule', sched);
+      await api('POST', base + '/convoke', {});
+      d.close(); alert(T.noticeOpened); await showCup(t.id);
+    } catch (e) { toast(errText(e)); }
+  } }, T.ctConvoke);
   const d = dialog(roundName(t, m) + ': ' + who(m.a) + ' – ' + who(m.b), h('div.form',
     h('h3', T.ctWinner), h('label.check.full', wa, who(m.a)), h('label.check.full', wb, who(m.b)),
     field(T.ctScore, score, 'full'), h('label.check', wo, T.ctWalkoverLong), h('label.check', rit, T.ctRetiredLong),
@@ -1148,7 +1224,7 @@ function openMatch(t, m, who) {
     }
     toast(T.saved);
     await showCup(t.id);
-  }, { left: clear });
+  }, { left: h('span.left', clear || null, convoke || null) });
 }
 
 function editCup(t) {
@@ -1691,7 +1767,10 @@ function showFixture(t, f) {
     score.addEventListener('input', () => { wo.checked = false; const w = winnerOf(score.value); if (w) won.value = w === 'a' ? 'true' : 'false'; });
     const save = () => fixDo('/rubber', { index: i, ours: ours.map((x) => x.value), theirs: theirs.map((x) => x.value), score: score.value, won: won.value === '' ? null : won.value === 'true', walkover: wo.checked });
     return h('tr', h('td', h('b', rubberName(t, i))), h('td.rubber', ours, h('span.dim', ' – '), theirs), h('td', score), h('td', won), h('td', h('label.check', wo, T.ctWalkover)),
-      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save)));
+      h('td.num.noprint', h('button', { type: 'button', onclick: save }, T.save),
+        // Formazione pronta e partita da giocare: la scheda partita ai nostri (l'avviso si apre sul telefono).
+        ru.won == null && ru.ours.filter(Boolean).length === (ru.doubles ? 2 : 1)
+          ? h('button', { type: 'button', onclick: async () => { if (await fixDo('/rubber-notice', { index: i })) alert(T.noticeOpened); } }, T.ctConvoke) : null));
   }))));
 
   put(main(),
@@ -1810,6 +1889,11 @@ function showCourse(c) {
   put(main(),
     h('div.head', h('button', { onclick: () => { courseId = null; showSchool(); }, 'aria-label': T.scTitle, title: T.scTitle }, '←'), h('h1', c.name),
       h('button', { onclick: () => window.print() }, T.print), h('button', { onclick: () => editCourse(c) }, T.edit)),
+    // La scheda corso all'allenatore (l'invio si apre sul telefono) e il registro presenze in PDF o Excel.
+    h('div.actions.noprint', { style: 'justify-content:flex-start;margin-top:0' },
+      c.coach ? h('button', { onclick: async () => { try { await api('POST', '/courses/' + encodeURIComponent(c.id) + '/send-coach', {}); alert(T.noticeOpened); } catch (e) { toast(errText(e)); } } }, T.ccSendToCoach) : null,
+      h('button', { onclick: () => openPdf('/courses/' + encodeURIComponent(c.id) + '/register.pdf', T.rgTitle + ' ' + c.name) }, T.rgPdf),
+      h('button', { onclick: () => deskDownload('/courses/' + encodeURIComponent(c.id) + '/register.xlsx', T.rgTitle + ' ' + c.name + '.xlsx') }, T.xlSave)),
     h('p.dim', [c.level, coachOf(c) ? T.scCoachLine(coachOf(c)) : '', dateText(c.from) + ' – ' + dateText(c.to), feeText(c)].filter(Boolean).join(' · '),
       h('br'), c.slots.length ? c.slots.map(slotText).join(' · ') : T.scNoLessons),
     printHead(T.scTitle + ' · ' + c.name + ' · ' + Object.fromEntries(tabs)[courseTab]),
@@ -1854,16 +1938,23 @@ function courseLessons(c, body) {
   const rows = c.lessons.filter((l) => ({ next: l.date >= info.today, past: l.date < info.today, all: true })[lessonShow]);
   if (lessonShow === 'past') rows.reverse();
   const names = Object.fromEntries(c.students.map((x) => [x.id, x.name]));
+  // Le prossime lezioni (non annullate) nei giorni in cui l'istruttore non c'è.
+  const away = c.lessons.filter((l) => l.away && !l.cancelled && l.date >= info.today).length;
   put(body,
     h('div.tools.noprint', show, h('span.dim', T.lessonHint)),
+    away ? h('p', { style: 'color:var(--warn);font-weight:600' }, T.scCoachAwayCount(away)) : null,
     rows.length ? h('div.panel', h('table',
       h('thead', h('tr', [T.cupWhen, T.ctTime, T.ctCourt, T.status].map((x) => h('th', { scope: 'col' }, x)))),
       h('tbody', rows.map((l) => h('tr.row', { tabindex: 0, onclick: () => openLesson(c, l), onkeydown: (e) => { if (e.key === 'Enter') openLesson(c, l); } },
-        h('td', shortDay(l.date)), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
+        h('td', { style: l.holiday ? 'color:var(--bad)' : '', title: l.holiday || '' }, shortDay(l.date), l.holiday ? h('div.holname', l.holiday) : null,
+          l.movedFrom ? h('div', { style: 'color:var(--warn);font-size:12px' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+          l.away ? h('div', { style: 'color:var(--warn);font-size:12px;font-weight:600' }, T.scCoachAway(awayName(l.away))) : null), h('td', hhmm(l.startMin) + '–' + hhmm(l.startMin + l.minutes)), h('td', l.court),
         h('td', l.cancelled ? h('span.tag.bad', T.scCancelled) : l.marked ? h('span', { title: l.present.map((id) => names[id] || '').join(', ') }, T.scPresent(l.present.filter((id) => names[id]).length, c.students.length))
           : l.date < info.today ? h('span.tag.warn', T.scToMark) : ''))))))
       : h('div.panel', h('div.empty', c.slots.length ? T.noResults : T.scNoLessons)));
 }
+
+const awayName = (k) => ({ BUSY: T.bzBusy, VACATION: T.bzVacation, TOURNAMENT: T.bzTournament, SICK: T.bzSick, OTHER: T.bzOther })[k] || k;
 
 function openLesson(c, l) {
   const boxes = c.students.map((x) => [x.id, h('input', { type: 'checkbox', checked: l.marked ? l.present.includes(x.id) : false })]);
@@ -1872,7 +1963,10 @@ function openLesson(c, l) {
   };
   const left = h('button.danger.left', { type: 'button', onclick: () => act({ key: l.key, cancelled: !l.cancelled }) }, l.cancelled ? T.restoreLesson : T.cancelLessonBtn);
   const all = h('button', { type: 'button', onclick: () => boxes.forEach(([, x]) => { x.checked = true; }) }, T.allPresent);
+  const move = h('button', { type: 'button', onclick: () => { dlg.close(); moveLesson(c, l); } }, T.scMove);
   const dlg = dialog(c.name + ' · ' + shortDay(l.date) + ' ' + hhmm(l.startMin), h('div.form',
+    l.movedFrom ? h('p.full', { style: 'color:var(--warn)' }, T.scMovedFrom(shortDay(l.movedFrom) + ' ' + hhmm(l.movedFromMin))) : null,
+    h('div.full', move),
     l.cancelled ? h('p.full', h('span.tag.bad', T.scCancelled)) : null,
     h('h3', T.scWhoWasThere), c.students.length ? h('div.full.checks', boxes.map(([id, x]) => h('label.check', x, c.students.find((s) => s.id === id).name)), all) : h('p.full.dim', T.noResults),
     h('p.full.dim', T.cancelLessonHint)), l.cancelled ? null : async () => {
@@ -1880,6 +1974,29 @@ function openLesson(c, l) {
     toast(T.saved);
     await showSchool();
   }, { left });
+}
+
+/** Sposta la lezione: un altro giorno, ora, durata o campo; il recupero in fondo al corso; o com'era. */
+function moveLesson(c, l) {
+  const date = h('input', { type: 'date', required: true, value: l.date });
+  const at = h('input', { type: 'time', required: true, step: 300, value: hhmm(l.startMin) });
+  const mins = h('input', { type: 'number', min: 15, max: 480, step: 15, value: l.minutes });
+  const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), l.court);
+  const notify = h('input', { type: 'checkbox' });
+  const send = async (body) => {
+    await api('POST', '/courses/' + encodeURIComponent(c.id) + '/move', { key: l.key, notify: notify.checked, ...body });
+    toast(notify.checked && !body.reset ? T.noticeOpened : T.saved);
+    await showSchool();
+  };
+  const quick = async (body) => { try { await send(body); dlg.close(); } catch (e) { toast(errText(e)); } };
+  const left = l.movedFrom ? h('button.left', { type: 'button', onclick: () => quick({ reset: true }) }, T.scMoveBack) : null;
+  const dlg = dialog(T.scMoveTitle + ' · ' + c.name, h('div.form',
+    h('p.full.dim', T.scMoveHint),
+    h('div.full', h('button', { type: 'button', onclick: () => quick({ makeup: true }) }, T.scMakeup)),
+    field(T.scMoveTo, date), field(T.ctTime, at), field(T.bkDuration, mins), field(T.ctCourt, ct),
+    c.students.length ? h('label.full', { style: 'display:flex;gap:8px;align-items:center' }, notify, T.scNotifyMoved) : null), async () => {
+    await send({ date: date.value, startMin: toMin(at.value), minutes: Number(mins.value) || null, court: ct.value });
+  }, { left, saveText: T.scMove });
 }
 
 function courseFees(c, body) {
@@ -1901,7 +2018,22 @@ function editCourse(c) {
   const level = h('input', { maxlength: 60, value: v.level });
   const coach = select([['', '—']].concat(people.map((p) => [p.id, p.name])), v.coach || '');
   const coachName = h('input', { maxlength: 80, value: v.coachName, placeholder: T.scCoach });
-  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', required: true, value: v.to });
+  const from = h('input', { type: 'date', required: true, value: v.from }), to = h('input', { type: 'date', value: v.to });
+  // Quante lezioni: la fine la calcola il telefono da inizio e orari (saltando le feste, se richiesto).
+  const count = h('input', { type: 'number', min: 1, max: 300, value: c ? c.lessons.filter((l) => !l.cancelled).length || '' : '', placeholder: '—' });
+  const skipHol = h('input', { type: 'checkbox' }); skipHol.checked = true;
+  const endBox = h('div.full');
+  let endSeq = 0;
+  async function drawEnd() {
+    const n = Number(count.value);
+    if (!count.value || !(n > 0)) { put(endBox, field(T.blkTo, to)); return; }
+    const my = ++endSeq;
+    let out = null;
+    try { out = await api('POST', '/courses/end', { name: 'x', from: from.value, slots, lessons: n, skipHolidays: skipHol.checked }); } catch (e) { /* senza orari non c'è fine */ }
+    if (my !== endSeq) return;
+    put(endBox, h('p', out && out.to ? T.ccEndAuto(shortDay(out.to)) : h('span.dim', T.scSchedule + ' —')));
+  }
+  count.addEventListener('input', drawEnd); from.addEventListener('change', drawEnd); skipHol.addEventListener('change', drawEnd);
   const fee = h('input', { inputmode: 'decimal', value: v.feeCents ? (v.feeCents / 100).toFixed(2).replace('.', ',') : '' });
   const kind = select([['MONTHLY', T.scMonthly], ['SEASON', T.scSeasonFee]], v.feeKind);
   const max = h('input', { type: 'number', min: 0, max: 200, value: v.maxStudents || '', placeholder: T.scNoMax });
@@ -1912,16 +2044,16 @@ function editCourse(c) {
   function draw() {
     put(box, slots.map((x, i) => {
       const wd = select([1, 2, 3, 4, 5, 6, 7].map((n) => [String(n), weekdayName(n)]), String(x.weekday));
-      wd.addEventListener('change', () => { x.weekday = Number(wd.value); });
-      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); } });
+      wd.addEventListener('change', () => { x.weekday = Number(wd.value); drawEnd(); });
+      const at = h('input', { type: 'time', value: hhmm(x.startMin), step: 300, 'aria-label': T.ctTime, onchange: () => { if (at.value) x.startMin = toMin(at.value); drawEnd(); } });
       const len = select((minutes.includes(x.minutes) ? minutes : minutes.concat([x.minutes]).sort((a, b) => a - b)).map((m) => [String(m), m + ' min']), String(x.minutes));
       len.addEventListener('change', () => { x.minutes = Number(len.value); });
       const ct = select([['', '—']].concat((info.courts || []).map((k) => [k, k])), x.court);
       ct.addEventListener('change', () => { x.court = ct.value; });
-      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); } }, '×'));
-    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); } }, T.scAddSlot));
+      return h('div.slot', wd, at, len, ct, h('button.danger', { type: 'button', title: T.remove, onclick: () => { slots.splice(i, 1); draw(); drawEnd(); } }, '×'));
+    }), h('button', { type: 'button', onclick: () => { slots.push({ weekday: 1, startMin: 17 * 60, minutes: 60, court: '' }); draw(); drawEnd(); } }, T.scAddSlot));
   }
-  draw();
+  draw(); drawEnd();
   const del = c && h('button.danger.left', { type: 'button', onclick: async () => {
     if (!confirm(T.scDeleteAsk(c.name))) return;
     try { await api('DELETE', '/courses/' + encodeURIComponent(c.id)); dlg.close(); courseId = null; toast(T.saved); await showSchool(); } catch (e) { toast(errText(e)); }
@@ -1929,13 +2061,16 @@ function editCourse(c) {
   const dlg = dialog(c ? c.name : T.scNew, h('div.form',
     field(T.scName, name, 'full'), field(T.scLevel, level, 'full'),
     field(T.scCoach, coach), field(T.scCoachFree, coachName),
-    field(T.blkFrom, from), field(T.blkTo, to),
     field(T.scFee, fee), field(T.kind, kind), field(T.scMaxField, max), field(T.note, note),
-    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint)), async () => {
+    h('h3', T.scSchedule), box, h('p.full.dim', T.scScheduleHint),
+    field(T.blkFrom, from), field(T.ccLessonsCount, count),
+    h('label.full', { style: 'display:flex;gap:8px;align-items:center', title: T.scSkipDaysHint }, skipHol, T.scSkipDays), endBox), async () => {
     const fc = fee.value.trim() ? cents(fee.value) : 0;
     if (fc === null) throw new Error(T.err.BAD_AMOUNT);
+    const n = Number(count.value);
     const body = { name: name.value, level: level.value, coach: coach.value || null, coachName: coach.value ? '' : coachName.value, from: from.value, to: to.value,
-      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots };
+      maxStudents: Number(max.value) || 0, feeCents: fc, feeKind: kind.value, note: note.value, slots,
+      lessons: count.value && n > 0 ? n : null, skipHolidays: skipHol.checked };
     if (c) await api('PUT', '/courses/' + encodeURIComponent(c.id), body);
     else { const out = await api('POST', '/courses', body); courseId = out.id; courseTab = 'students'; }
     toast(T.saved);
