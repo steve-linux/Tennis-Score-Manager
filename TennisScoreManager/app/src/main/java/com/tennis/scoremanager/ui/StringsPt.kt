@@ -2727,6 +2727,19 @@ object PtStrings : Strings {
     override val psTrunk = "Tronco (a partir da vertical)"
     override val psShoulders = "Linha dos ombros"
     override val psStance = "Apoios (afastamento dos pés)"
+    override val lessonShot = "Aula"
+    override val lessonRecord = "Gravar a aula"
+    override val lessonRecordHint = "Telefone fixo no fundo da quadra e pulseira no pulso de quem joga: cada golpe reconhecido vira um clipe, colocado sozinho entre forehands, backhands, saques e voleios. Não é preciso apertar nada; KEY1 ou KEY2 logo após um golpe marca-o dentro ou fora."
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Aula · 1 golpe" else "Aula · $n golpes" }
+    override val lessonWaiting = "Aula · cada golpe reconhecido vira um clipe"
+    override val lessonAgenda: (String) -> String = { t -> "Aula da agenda: $t" }
+    override val lessonMarkHint = "Dentro ou fora (opcional): logo após o golpe"
+    override val vsGuess: (String) -> String = { x -> "Pelo vídeo parece: $x" }
+    override val vsMove: (String) -> String = { x -> "Mover para: $x" }
+    override val vsMoved = "Golpe movido: a análise é refeita no golpe certo"
+    override val vsUnknown = "A pulseira não o reconheceu"
+    override val lessonFolder = "Aulas"
+    override val lessonNoBand = "Nenhuma pulseira conectada: sem ela, a aula não grava os golpes."
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }

@@ -73,7 +73,7 @@ object StudentReport {
             listOf(true, false).mapNotNull { inPlay ->
                 mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.asSequence().flatMap { sess ->
                     val dir = storage.serveClipsDir(sess)
-                    sess.serves.reversed().asSequence().filter { it.inPlay == inPlay && it.clip != null }.map { a -> a to File(dir, a.clip!!) }
+                    sess.serves.reversed().asSequence().filter { (if (inPlay) it.isIn else it.isOut) && it.clip != null }.map { a -> a to File(dir, a.clip!!) }
                 }.mapNotNull { (a, d) ->
                     val imgs = names.map { (label, file) -> label to File(d, file) }.filter { it.second.exists() }
                     if (imgs.size == names.size) Example(t, inPlay, a.at, imgs) else null

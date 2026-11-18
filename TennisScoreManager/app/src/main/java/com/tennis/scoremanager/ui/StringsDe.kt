@@ -2723,6 +2723,19 @@ object DeStrings : Strings {
     override val psTrunk = "Oberkörper (zur Senkrechten)"
     override val psShoulders = "Schulterlinie"
     override val psStance = "Stand (Fußabstand)"
+    override val lessonShot = "Trainerstunde"
+    override val lessonRecord = "Stunde aufnehmen"
+    override val lessonRecordHint = "Handy fest hinter der Grundlinie, Armband am Handgelenk des Spielers: Jeder erkannte Schlag wird ein Clip und landet von selbst bei Vorhand, Rückhand, Aufschlag oder Volley. Nichts zu drücken; KEY1 oder KEY2 direkt nach einem Schlag markiert ihn als im Feld oder aus."
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Stunde · 1 Schlag" else "Stunde · $n Schläge" }
+    override val lessonWaiting = "Stunde · jeder erkannte Schlag wird ein Clip"
+    override val lessonAgenda: (String) -> String = { t -> "Stunde aus dem Kalender: $t" }
+    override val lessonMarkHint = "Im Feld oder aus (freiwillig): direkt nach dem Schlag"
+    override val vsGuess: (String) -> String = { x -> "Laut Video wohl: $x" }
+    override val vsMove: (String) -> String = { x -> "Verschieben zu: $x" }
+    override val vsMoved = "Schlag verschoben: die Analyse wird beim richtigen Schlag neu gemacht"
+    override val vsUnknown = "Das Armband hat ihn nicht erkannt"
+    override val lessonFolder = "Trainerstunden"
+    override val lessonNoBand = "Kein Armband verbunden: ohne es nimmt die Stunde keine Schläge auf."
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }

@@ -1062,6 +1062,46 @@ class MatchController(
         return updated
     }
 
+    /**
+     * Sposta un colpo nella sessione di un altro colpo (riconosciuto dal video): nella stessa lezione, o in una sessione
+     * nuova della stessa ora. La clip va nella cartella giusta e, se c'è ancora il video, l'analisi si rifà per quel
+     * colpo. Restituisce la sessione di partenza aggiornata (null se è rimasta vuota e non c'è più).
+     */
+    fun moveServeShot(sessionId: String, at: Long, to: com.tennis.scoremanager.data.TrainedStroke, s: com.tennis.scoremanager.ui.Strings): com.tennis.scoremanager.data.ServeSession? {
+        val all = storage.loadServeSessions()
+        val src = all.firstOrNull { it.id == sessionId } ?: return null
+        val a = src.serves.firstOrNull { it.at == at } ?: return src
+        if (src.stroke == to) return src
+        val lesson = src.lesson
+        val targetId = if (lesson != null) com.tennis.scoremanager.data.Lessons.sessionId(lesson, to) else "${src.id}-${to.name.lowercase()}"
+        val target = all.firstOrNull { it.id == targetId } ?: src.copy(
+            id = targetId, stroke = to, serves = emptyList(), drillName = null,
+            folder = if (lesson != null) src.folder?.substringBeforeLast('/')?.let { "$it/${s.strokeName(to.band)}" }
+            else storage.newServeFolder(to, src.startedAt, s.strokeFolderName, s.strokeName, src.studentName),
+        )
+        a.clip?.let { clip ->
+            val from = File(storage.serveClipsDir(src), clip)
+            val dest = File(storage.serveClipsDir(target), clip)
+            if (from.isDirectory && !from.renameTo(dest)) {
+                if (runCatching { from.copyRecursively(dest, overwrite = true) }.getOrDefault(false)) from.deleteRecursively()
+            }
+            // Col video l'analisi si rifà (finestra e misure cambiano col colpo); senza, resta quella che c'è.
+            if (dest.listFiles { f -> f.extension == "mp4" }?.isNotEmpty() == true) {
+                for (n in listOf(
+                    com.tennis.scoremanager.video.ServeClipAnalysis.RESULT, com.tennis.scoremanager.video.ServeClipAnalysis.TROPHY,
+                    com.tennis.scoremanager.video.ServeClipAnalysis.KNEE, com.tennis.scoremanager.video.ServeClipAnalysis.CONTACT,
+                    com.tennis.scoremanager.video.ServeClipAnalysis.PREP, com.tennis.scoremanager.video.ServeClipAnalysis.FINISH,
+                )) File(dest, n).delete()
+            }
+        }
+        storage.saveServeSession(target.copy(serves = (target.serves + a.copy(stroke = if (lesson != null) to else a.stroke)).sortedBy { it.at }))
+        val rest = src.copy(serves = src.serves.filter { it.at != at })
+        val out = if (rest.serves.isEmpty()) { storage.deleteServeSession(rest); null } else { storage.saveServeSession(rest); rest }
+        refreshServeSessions()
+        serveDiskVersion.value++
+        return out
+    }
+
     /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
     fun deleteServeSessions(list: List<com.tennis.scoremanager.data.ServeSession>, videosOnly: Boolean = false) {
         scope.launch {

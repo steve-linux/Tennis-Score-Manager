@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -174,6 +175,13 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+        // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
+        GhostButton(s.lessonRecord, Icons.Filled.School, {
+            context.startActivity(
+                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
+            )
+        }, Modifier.fillMaxWidth())
+        Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
         if (mine.isNotEmpty()) {
             Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
             StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
@@ -424,8 +432,10 @@ fun SessionRow(
         Column(Modifier.weight(1f)) {
             Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp)
             if (extra != null) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
+            // Dalla lezione registrata: i colpi senza dentro o fuori non contano nella percentuale.
+            if (sess.lesson != null) Text(s.lessonCount(sess.serves.size), color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
+        if (n.total > 0 || sess.lesson == null) Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
     }
 }
 
@@ -544,7 +554,10 @@ private fun PlacementDiagram(stroke: TrainedStroke) {
 @Composable
 fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE) {
     val b = ServeTraining.breakdown(serves, stroke)
-    Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+    // Colpi della lezione senza dentro o fuori: si contano e basta.
+    val unmarked = serves.count { !it.marked }
+    if (unmarked > 0) Text(s.lessonCount(serves.size), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = if (b.all.total > 0) 16.sp else 22.sp)
+    if (b.all.total > 0 || unmarked == 0) Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
     @Composable
     fun rows(title: String, map: Map<String, ServeTraining.Count>) {
         if (map.isEmpty()) return
@@ -561,8 +574,8 @@ fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedS
     rows(s.serveByTarget, b.byTarget.mapKeys { serveTargetName(s, it.key) })
     rows(s.byWing, b.byWing.mapKeys { wingName(s, it.key) })
     rows(s.byDirection, b.byDirection.mapKeys { directionName(s, it.key) })
-    val gin = ServeTraining.meanGyro(serves.filter { it.inPlay })
-    val gout = ServeTraining.meanGyro(serves.filter { !it.inPlay })
+    val gin = ServeTraining.meanGyro(serves.filter { it.isIn })
+    val gout = ServeTraining.meanGyro(serves.filter { it.isOut })
     if (gin != null && gout != null) Text(s.serveWrist(gin, gout), color = TsmColors.TextDim, fontSize = 13.sp)
 }
 
@@ -622,6 +635,6 @@ fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
         context.startActivity(Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray()))
     }
     GhostButton(s.servePlayAll, Icons.Filled.PlayArrow, { play(sess.serves) }, Modifier.fillMaxWidth())
-    if (sess.serves.any { it.inPlay && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.inPlay }) }, Modifier.fillMaxWidth())
-    if (sess.serves.any { !it.inPlay && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { !it.inPlay }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.isIn && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.isIn }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.isOut && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.isOut }) }, Modifier.fillMaxWidth())
 }

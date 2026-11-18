@@ -131,7 +131,7 @@ fun StrokeSessionsScreen(c: MatchController) {
             val context = androidx.compose.ui.platform.LocalContext.current
             val when_ = SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "dMMMyyyyHHmm"), lang.locale)
             for ((sess, i, a) in best) {
-                Text("★ ${name} ${i + 1} · ${when_.format(Date(a.at))} · ${if (a.inPlay) s.serveIn else s.serveOut}",
+                Text("★ ${name} ${i + 1} · ${when_.format(Date(a.at))} · ${if (!a.marked) s.lessonShot else if (a.inPlay) s.serveIn else s.serveOut}",
                     color = TsmColors.TextMain, fontSize = 14.sp,
                     modifier = Modifier.fillMaxWidth().clickable {
                         val dir = File(c.storage.serveClipsDir(sess), a.clip!!)

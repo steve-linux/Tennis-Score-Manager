@@ -11153,6 +11153,9 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - Statt Seite, erster/zweiter und Ziel wählt man die gewünschte **Richtung** (**Cross**, **Mitte**, **Longline**) und beim Volley, ob **Vorhand** oder **Rückhand**; die Übersicht zählt sie getrennt.
 - **Bewegungsanalyse**: Die drei Momente sind **Ausholen** (wo das Handgelenk am Ende der Ausholbewegung stehen bleibt), **Treffpunkt** (Handgelenk am schnellsten; dort liest die App ein Bild alle 33 ms) und **Ausschwung** (Handgelenk nach dem Treffpunkt am höchsten; beim Volley, wo das Handgelenk stehen bleibt). Sind mehrere Schläge im Fenster, zählt der vom Armband erkannte; von MoveNet vertauschte Handgelenke (passiert von der Seite) werden von selbst richtiggestellt. Von **der Seite** filmen: von vorn geht das Ausholen in die Tiefe und ist nicht zu sehen. Die Messwerte (*—*, wenn Ellbogen oder Beine nicht zu sehen sind): stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts, wie weit **vor dem Körper** getroffen wird, **Weite des Ausholens**, Höhe des Ausschwungs (alle im Verhältnis zur Körpergröße) und die Zeit vom Ausholen zum Treffpunkt. Das Video mit Skelett hat die Tasten **Ausholen**, **Treffpunkt** und **Ausschwung**.
 
+**Stunde aufnehmen** (unter Starten): das Handy fest **hinter der Grundlinie**, hinter dem Spieler, und das Armband an seinem Handgelenk mit Schlagerkennung. Nichts zu drücken: **jeder erkannte Schlag** wird ein Clip und landet von selbst bei **Vorhand, Rückhand, Aufschlag und Volley** (erkennt das Armband ihn nicht, kommt er zur Vorhand). Direkt nach einem Schlag markieren KEY1 oder KEY2 ihn als **im Feld** oder **aus** (freiwillig); Schläge ohne Markierung zählen nicht in den Prozenten. Läuft im Kalender des Trainers gerade eine Stunde, gehört die Aufnahme zu ihr (und zum Schüler, wenn es nur einer ist). Am Ende hat jeder Schlag seine Einheit, markiert mit **Trainerstunde**, im Ordner **Schlagtraining/Trainerstunden**.
+- **Der Schlag aus dem Video**: Sieht der Schlag in der Bewegungsanalyse laut Video nach einem anderen aus (z. B. *Laut Video wohl: Rückhand*), legt **Verschieben zu: Rückhand** ihn zum richtigen Schlag und die Analyse wird neu gemacht. Die Hinweise sind einfach (beide Arme über dem Kopf beim Aufschlag, wenig Weg des Handgelenks beim Volley, Hände nah beieinander bei der Rückhand): Verschieben wird nur angeboten, wenn sie klar sind oder das Armband ihn nicht erkannt hatte.
+
 ### 7.6 Schüler: der Teil für den Trainer
 
 - **Schüler** (Rolle Trainer) › **Neuer Schüler**: Name (derselbe wie in den Matches: Foto, Verlauf und Rating finden sich dann von selbst) und Hand.
@@ -11761,6 +11764,9 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - Instead of side, first/second and target you choose the intended **direction** (**cross-court**, **middle**, **down the line**) and, for the volley, whether it is a **forehand** or **backhand** volley; the summary counts them separately.
 - **Movement analysis**: the three moments are **preparation** (where the wrist stops at the end of the take-back), **contact** (wrist fastest; around it the app reads one frame every 33 ms) and **finish** (wrist highest after contact; for the volley, where the wrist stops). If there are several shots in the window, the one recognised by the wristband counts; wrists swapped by MoveNet (it happens from the side) are put right by themselves. Film **from the side**: from the front the take-back goes in depth and can't be seen. The measurements (*—* if the elbow or legs can't be seen): deepest knee bend, elbow at contact, contact height, how far **in front of the body** you hit, **preparation size**, finish height (all relative to body height) and the time from preparation to contact. The skeleton video has **Preparation**, **Contact** and **Finish** buttons.
 
+**Record the lesson** (under Start): the phone fixed **behind the baseline**, behind the player, and the band on their wrist with shot recognition. Nothing to press: **every recognized shot** becomes a clip and is filed on its own among **forehands, backhands, serves and volleys** (if the band does not recognize it, it goes with the forehands). Right after a shot, KEY1 or KEY2 marks it **in** or **out** (optional); shots without in/out do not count in the percentages. If the Coach agenda has a lesson going on, the recording belongs to it (and to the student, if there is only one). At the end each stroke has its own session, marked **Lesson**, in the **Stroke practice/Lessons** folder.
+- **The stroke from the video**: in the movement analysis, when from the video the shot looks like another one (e.g. *From the video it looks like: Backhand*), **Move to: Backhand** puts it under the right stroke and the analysis is redone. The clues are simple (both arms above the head in the serve, little wrist travel in the volley, hands close together in the backhand): moving is only offered when they are clear, or when the band had not recognized it.
+
 ### 7.6 Students: the coach's part
 
 - **Students** (Coach role) › **New student**: name (the same as in matches: photo, history and rating are then found by themselves) and hand.
@@ -12367,6 +12373,9 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **Dónde poner el teléfono**: al lado de quien golpea, perpendicular a la dirección de los golpes, a 4-5 m y fuera del pasillo, a la altura del punto de impacto; objetivo a 1 m; todo el swing en el encuadre (la muñeca se mueve unos 2 m adelante y atrás). Para la volea: al lado de quien juega en la red, a 3-4 m, a su altura. Siempre del mismo lado toda la sesión, y nunca en la trayectoria de la pelota.
 - En lugar de lado, primero/segundo y objetivo se elige la **dirección** deseada (**cruzado**, **al centro**, **paralelo**) y, para la volea, si es **de derecha** o **de revés**; el resumen los cuenta por separado.
 - **Análisis del movimiento**: los tres momentos son **preparación** (donde la muñeca se para al final del armado), **impacto** (muñeca más rápida; alrededor la app vuelve a leer un fotograma cada 33 ms) y **final** (muñeca más alta tras el impacto; en la volea, donde la muñeca se para). Si hay varios golpes en la ventana, cuenta el que reconoció la pulsera; las muñecas intercambiadas por MoveNet (pasa de lado) se corrigen solas. Graba **de lado**: de frente el armado va en profundidad y no se ve. Las medidas (*—* si no se ven el codo o las piernas): rodilla más flexionada, codo en el impacto, altura del impacto, cuánto **delante del cuerpo** se golpea, **amplitud de la preparación**, altura del final (todas respecto a la estatura) y el tiempo de la preparación al impacto. El vídeo con el esqueleto tiene los botones **Preparación**, **Impacto** y **Final**.
+
+**Grabar la clase** (debajo de Empezar): el teléfono fijo **al fondo de la pista**, detrás de quien juega, y la pulsera en su muñeca con el reconocimiento de golpes. No hay que pulsar nada: **cada golpe reconocido** se convierte en un clip y se coloca solo entre **derechas, reveses, saques y voleas** (si la pulsera no lo reconoce, va con las derechas). Justo después de un golpe, KEY1 o KEY2 lo marcan **dentro** o **fuera** (opcional); los golpes sin dentro/fuera no cuentan en los porcentajes. Si en la agenda del Entrenador hay una clase en curso, la grabación es suya (y del alumno, si es uno solo). Al final cada golpe tiene su sesión, marcada **Clase**, en la carpeta **Entrenamiento de golpes/Clases**.
+- **El golpe por el vídeo**: en el análisis del movimiento, cuando por el vídeo el golpe parece otro (por ejemplo *Por el vídeo parece: Revés*), **Mover a: Revés** lo pone en el golpe correcto y el análisis se rehace. Los indicios son sencillos (los dos brazos por encima de la cabeza en el saque, poco recorrido de la muñeca en la volea, las manos juntas en el revés): solo se propone moverlo cuando son claros, o cuando la pulsera no lo había reconocido.
 
 ### 7.6 Alumnos: la parte del entrenador
 
@@ -12975,6 +12984,9 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - À la place du côté, premier/second et cible, on choisit la **direction** voulue (**croisé**, **au centre**, **le long de la ligne**) et, pour la volée, si elle est **de coup droit** ou **de revers** ; le bilan les compte à part.
 - **Analyse du mouvement** : les trois moments sont la **préparation** (là où le poignet s'arrête au bout de l'armé), l'**impact** (poignet le plus rapide ; autour, l'appli relit une image toutes les 33 ms) et le **finish** (poignet le plus haut après l'impact ; pour la volée, là où le poignet s'arrête). S'il y a plusieurs coups dans la fenêtre, c'est celui reconnu par le bracelet qui compte ; les poignets inversés par MoveNet (cela arrive de profil) sont remis en place tout seuls. Filmez **de profil** : de face, l'armé part en profondeur et ne se voit pas. Les mesures (*—* si le coude ou les jambes ne se voient pas) : genou le plus fléchi, coude à l'impact, hauteur de l'impact, distance de frappe **devant le corps**, **ampleur de la préparation**, hauteur du finish (toutes rapportées à la taille) et le temps de la préparation à l'impact. La vidéo avec le squelette a les boutons **Préparation**, **Impact** et **Finish**.
 
+**Enregistrer la leçon** (sous Commencer) : le téléphone fixe **au fond du court**, derrière le joueur, et le bracelet à son poignet avec la reconnaissance des coups. Rien à appuyer : **chaque coup reconnu** devient un clip et se range tout seul parmi **coups droits, revers, services et volées** (si le bracelet ne le reconnaît pas, il va avec les coups droits). Juste après un coup, KEY1 ou KEY2 le marque **bon** ou **faute** (facultatif) ; les coups sans bon/faute ne comptent pas dans les pourcentages. Si l'agenda de l'Entraîneur a une leçon en cours, l'enregistrement lui appartient (et à l'élève, s'il est seul). À la fin, chaque coup a sa séance, marquée **Leçon**, dans le dossier **Entraînement des coups/Leçons**.
+- **Le coup d'après la vidéo** : dans l'analyse du mouvement, quand d'après la vidéo le coup semble être un autre (par exemple *D'après la vidéo, on dirait : Revers*), **Déplacer vers : Revers** le range dans le bon coup et l'analyse est refaite. Les indices sont simples (les deux bras au-dessus de la tête au service, peu de trajet du poignet à la volée, les mains proches au revers) : on ne propose de le déplacer que s'ils sont clairs, ou si le bracelet ne l'avait pas reconnu.
+
 ### 7.6 Élèves : la partie pour l'entraîneur
 
 - **Élèves** (rôle Entraîneur) › **Nouvel élève** : nom (le même que dans les matchs : photo, historique et classement se retrouvent tout seuls) et main.
@@ -13582,6 +13594,9 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - Al posto di lato, prima/seconda e bersaglio si sceglie la **direzione** voluta (**incrociato**, **al centro**, **lungolinea**) e, per la volée, se è **di dritto** o **di rovescio**; il riepilogo li conta a parte.
 - **Analisi del movimento**: i tre momenti sono **preparazione** (dove il polso si ferma in fondo all'apertura), **impatto** (polso più veloce; lì intorno l'app rilegge un fotogramma ogni 33 ms) e **finale** (polso più in alto dopo l'impatto; nella volée, dove il polso si ferma). Se nella finestra ci sono più colpi vale quello riconosciuto dal braccialetto; i polsi scambiati da MoveNet (succede di lato) si rimettono a posto da soli. Riprendi **di lato**: di fronte l'apertura va in profondità e non si vede. Le misure (*—* se il gomito o le gambe non si vedono): ginocchio più piegato, gomito all'impatto, altezza dell'impatto, quanto **davanti al corpo** si colpisce, **ampiezza della preparazione**, altezza del finale (tutte in rapporto alla statura) e il tempo dalla preparazione all'impatto. Il video con lo scheletro ha i tasti **Preparazione**, **Impatto** e **Finale**.
 
+**Registra la lezione** (sotto Inizia): il telefono fisso **a fondo campo**, dietro a chi gioca, e il braccialetto al suo polso con il riconoscimento dei colpi. Non si preme niente: **ogni colpo riconosciuto** diventa una clip e va da solo tra **dritti, rovesci, servizi e volée** (se il braccialetto non lo riconosce va tra i dritti). Subito dopo un colpo, KEY1 o KEY2 lo segnano **dentro** o **fuori** (facoltativo); i colpi senza dentro/fuori non contano nelle percentuali. Se nell'agenda dell'Allenatore c'è una lezione in corso, la registrazione è sua (e dell'allievo, se è uno solo). A fine lezione ogni colpo ha la sua sessione, segnata **Lezione**, nella cartella **Allenamento colpi/Lezioni**.
+- **Il colpo dal video**: nell'analisi del movimento, quando dal video il colpo sembra un altro (per esempio *Dal video sembra: Rovescio*), **Sposta tra: Rovescio** lo mette nel colpo giusto e l'analisi si rifà. Gli indizi sono semplici (le due braccia sopra la testa nel servizio, poca strada del polso nella volée, le mani vicine nel rovescio): si propone di spostarlo solo quando sono chiari, o quando il braccialetto non l'aveva riconosciuto.
+
 ### 7.6 Allievi: la parte per l'allenatore
 
 - **Allievi** (ruolo Allenatore) › **Nuovo allievo**: nome (lo stesso delle partite: così foto, storico e rating si ritrovano da soli) e mano.
@@ -14188,6 +14203,9 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **Onde colocar o telefone**: ao lado de quem bate, perpendicular à direção dos golpes, a 4-5 m e fora do corredor, na altura do ponto de impacto; lente a cerca de 1 m; o swing inteiro no enquadramento (o pulso se move uns 2 m para a frente e para trás). Para o voleio: ao lado de quem joga na rede, a 3-4 m, na altura dele. Sempre do mesmo lado durante a sessão, e nunca na trajetória da bola.
 - No lugar de lado, primeiro/segundo e alvo escolhe-se a **direção** desejada (**cruzado**, **no centro**, **paralela**) e, para o voleio, se é **de forehand** ou **de backhand**; o resumo conta-os à parte.
 - **Análise do movimento**: os três momentos são **preparação** (onde o pulso para no fim da preparação), **impacto** (pulso mais rápido; ali perto o app relê um quadro a cada 33 ms) e **final** (pulso mais alto depois do impacto; no voleio, onde o pulso para). Se houver vários golpes na janela, vale o reconhecido pela pulseira; os pulsos trocados pelo MoveNet (acontece de lado) se corrigem sozinhos. Filme **de lado**: de frente a preparação vai em profundidade e não aparece. As medidas (*—* se o cotovelo ou as pernas não aparecem): joelho mais flexionado, cotovelo no impacto, altura do impacto, quanto **à frente do corpo** se bate, **amplitude da preparação**, altura do final (todas em relação à altura) e o tempo da preparação ao impacto. O vídeo com o esqueleto tem os botões **Preparação**, **Impacto** e **Final**.
+
+**Gravar a aula** (embaixo de Começar): o telefone fixo **no fundo da quadra**, atrás de quem joga, e a pulseira no pulso dele com o reconhecimento de golpes. Não é preciso apertar nada: **cada golpe reconhecido** vira um clipe e vai sozinho para **forehands, backhands, saques e voleios** (se a pulseira não o reconhece, vai para os forehands). Logo após um golpe, KEY1 ou KEY2 o marcam **dentro** ou **fora** (opcional); os golpes sem dentro/fora não contam nas porcentagens. Se na agenda do Treinador há uma aula em andamento, a gravação é dela (e do aluno, se for um só). No fim cada golpe tem sua sessão, marcada **Aula**, na pasta **Treino de golpes/Aulas**.
+- **O golpe pelo vídeo**: na análise do movimento, quando pelo vídeo o golpe parece outro (por exemplo *Pelo vídeo parece: Backhand*), **Mover para: Backhand** o coloca no golpe certo e a análise é refeita. Os indícios são simples (os dois braços acima da cabeça no saque, pouco caminho do pulso no voleio, as mãos juntas no backhand): só se propõe mover quando são claros, ou quando a pulseira não o tinha reconhecido.
 
 ### 7.6 Alunos: a parte do treinador
 
@@ -16527,6 +16545,46 @@ class MatchController(
         storage.saveServeSession(updated)
         refreshServeSessions()
         return updated
+    }
+
+    /**
+     * Sposta un colpo nella sessione di un altro colpo (riconosciuto dal video): nella stessa lezione, o in una sessione
+     * nuova della stessa ora. La clip va nella cartella giusta e, se c'è ancora il video, l'analisi si rifà per quel
+     * colpo. Restituisce la sessione di partenza aggiornata (null se è rimasta vuota e non c'è più).
+     */
+    fun moveServeShot(sessionId: String, at: Long, to: com.tennis.scoremanager.data.TrainedStroke, s: com.tennis.scoremanager.ui.Strings): com.tennis.scoremanager.data.ServeSession? {
+        val all = storage.loadServeSessions()
+        val src = all.firstOrNull { it.id == sessionId } ?: return null
+        val a = src.serves.firstOrNull { it.at == at } ?: return src
+        if (src.stroke == to) return src
+        val lesson = src.lesson
+        val targetId = if (lesson != null) com.tennis.scoremanager.data.Lessons.sessionId(lesson, to) else "${src.id}-${to.name.lowercase()}"
+        val target = all.firstOrNull { it.id == targetId } ?: src.copy(
+            id = targetId, stroke = to, serves = emptyList(), drillName = null,
+            folder = if (lesson != null) src.folder?.substringBeforeLast('/')?.let { "$it/${s.strokeName(to.band)}" }
+            else storage.newServeFolder(to, src.startedAt, s.strokeFolderName, s.strokeName, src.studentName),
+        )
+        a.clip?.let { clip ->
+            val from = File(storage.serveClipsDir(src), clip)
+            val dest = File(storage.serveClipsDir(target), clip)
+            if (from.isDirectory && !from.renameTo(dest)) {
+                if (runCatching { from.copyRecursively(dest, overwrite = true) }.getOrDefault(false)) from.deleteRecursively()
+            }
+            // Col video l'analisi si rifà (finestra e misure cambiano col colpo); senza, resta quella che c'è.
+            if (dest.listFiles { f -> f.extension == "mp4" }?.isNotEmpty() == true) {
+                for (n in listOf(
+                    com.tennis.scoremanager.video.ServeClipAnalysis.RESULT, com.tennis.scoremanager.video.ServeClipAnalysis.TROPHY,
+                    com.tennis.scoremanager.video.ServeClipAnalysis.KNEE, com.tennis.scoremanager.video.ServeClipAnalysis.CONTACT,
+                    com.tennis.scoremanager.video.ServeClipAnalysis.PREP, com.tennis.scoremanager.video.ServeClipAnalysis.FINISH,
+                )) File(dest, n).delete()
+            }
+        }
+        storage.saveServeSession(target.copy(serves = (target.serves + a.copy(stroke = if (lesson != null) to else a.stroke)).sortedBy { it.at }))
+        val rest = src.copy(serves = src.serves.filter { it.at != at })
+        val out = if (rest.serves.isEmpty()) { storage.deleteServeSession(rest); null } else { storage.saveServeSession(rest); rest }
+        refreshServeSessions()
+        serveDiskVersion.value++
+        return out
     }
 
     /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
@@ -30336,7 +30394,15 @@ data class ServeAttempt(
     val wing: Wing? = null,
     /** Tra i migliori colpi: un esempio da rivedere e da confrontare (la clip resta anche con "Solo i video"). */
     val starred: Boolean = false,
-)
+    /** false = colpo della lezione registrata senza dentro o fuori: non conta nelle percentuali. */
+    val marked: Boolean = true,
+    /** Lezione registrata: il colpo riconosciuto dal braccialetto (null = non riconosciuto). */
+    val stroke: TrainedStroke? = null,
+) {
+    /** Dentro o fuori segnato: solo questi contano nei confronti. */
+    val isIn: Boolean get() = marked && inPlay
+    val isOut: Boolean get() = marked && !inPlay
+}
 
 @Serializable
 data class ServeSession(
@@ -30358,6 +30424,9 @@ data class ServeSession(
     val racket: RacketUse? = null,
     /** Esercizio guidato seguito (nome di quel giorno); null = allenamento libero. */
     val drillName: String? = null,
+    /** Lezione registrata: id della lezione (le sue sessioni, una per colpo, hanno lo stesso) e lezione dell'agenda. */
+    val lesson: String? = null,
+    val coachLesson: String? = null,
 )
 
 /**
@@ -30390,7 +30459,7 @@ object ServeTraining {
         val pct: Int? get() = if (total == 0) null else Math.round(inPlay * 100.0 / total).toInt()
     }
 
-    fun count(serves: List<ServeAttempt>): Count = Count(serves.size, serves.count { it.inPlay })
+    fun count(serves: List<ServeAttempt>): Count = Count(serves.count { it.marked }, serves.count { it.isIn })
 
     /** Righe del riepilogo: per lato, per prima e seconda, e per bersaglio (solo quelli usati). */
     data class Breakdown(
@@ -30418,6 +30487,45 @@ object ServeTraining {
     /** Media dei picchi del polso dei servizi riconosciuti (null se nessuno): dentro e fuori, per confrontarli. */
     fun meanGyro(serves: List<ServeAttempt>): Int? =
         serves.mapNotNull { it.gyroDps }.takeIf { it.isNotEmpty() }?.average()?.let { Math.round(it).toInt() }
+}
+
+/**
+ * Lezione registrata: il telefono fisso a fondo campo e ogni colpo riconosciuto dal braccialetto diventa una clip, senza
+ * premere tasti. Durante la lezione i colpi stanno insieme; si salvano come una sessione per colpo (dritto, rovescio,
+ * servizio, volée), ognuna nella sua sottocartella della lezione, così analisi, migliori colpi e andamento restano per colpo.
+ */
+object Lessons {
+    /** Colpo del braccialetto (BandProtocol.STROKE_*) come colpo allenato; null se non riconosciuto. */
+    fun strokeOf(band: Int): TrainedStroke? = TrainedStroke.entries.firstOrNull { it.band == band }
+
+    /** Dove va un colpo della lezione: quello riconosciuto, altrimenti il dritto (dall'analisi si può spostare). */
+    fun groupOf(a: ServeAttempt): TrainedStroke = a.stroke ?: TrainedStroke.FOREHAND
+
+    fun sessionId(lesson: String, stroke: TrainedStroke): String = "$lesson-${stroke.name.lowercase()}"
+
+    /** La sessione di [stroke] nella lezione [lesson] (cartella: quella della lezione più il nome del colpo). */
+    fun sessionOf(lesson: ServeSession, stroke: TrainedStroke, strokeName: (Int) -> String): ServeSession =
+        lesson.copy(
+            id = sessionId(lesson.id, stroke), stroke = stroke, lesson = lesson.id,
+            folder = lesson.folder?.let { "$it/${strokeName(stroke.band)}" },
+            serves = lesson.serves.filter { groupOf(it) == stroke },
+        )
+
+    /** Le sessioni della lezione, solo dei colpi che ci sono. */
+    fun split(lesson: ServeSession, strokeName: (Int) -> String): List<ServeSession> =
+        TrainedStroke.entries.map { sessionOf(lesson, it, strokeName) }.filter { it.serves.isNotEmpty() }
+
+    /**
+     * La lezione dell'agenda in corso adesso per [student] (o, senza allievo, quella con un allievo solo): da un quarto
+     * d'ora prima dell'inizio alla fine. Non quelle annullate.
+     */
+    fun current(lessons: List<CoachLesson>, student: String?, now: Long): CoachLesson? =
+        lessons.filter { !it.cancelled && now in (it.start - 15 * 60_000L)..(it.start + it.minutes * 60_000L) }
+            .firstOrNull { if (student != null) student in it.students else it.students.size == 1 }
+
+    /** L'ultimo colpo senza dentro o fuori, se è degli ultimi [windowMs]: lì va il tasto dentro/fuori. */
+    fun toMark(serves: List<ServeAttempt>, now: Long, windowMs: Long = 15_000L): ServeAttempt? =
+        serves.lastOrNull()?.takeIf { !it.marked && now - it.at <= windowMs }
 }
 TSM_EOF
 
@@ -30587,6 +30695,17 @@ class Storage(context: Context) {
         return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
     }
 
+    /**
+     * Cartella di una lezione registrata: Allenamento colpi/Lezioni[/allievo]/<data e ora>; dentro, una sottocartella per
+     * colpo (vedi [Lessons.sessionOf]). null se Documenti non si può scrivere.
+     */
+    fun newLessonFolder(startedAt: Long, base: String, lessons: String, student: String? = null): String? {
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd HH.mm.ss", java.util.Locale.ROOT).format(java.util.Date(startedAt))
+        val who = student?.let { "/" + Students.folderName(it) }.orEmpty()
+        val rel = "$base/$lessons$who/$stamp"
+        return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
+    }
+
     /** Dove stavano le clip prima della 2.5: la cartella dei video dell'app. */
     private fun legacyClipsDir(id: String): File =
         File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id")
@@ -30648,7 +30767,12 @@ class Storage(context: Context) {
         val dir = serveClipsDir(sess)
         dir.deleteRecursively()
         // La cartella dell'allievo rimasta vuota se ne va con l'ultima sessione.
-        if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
+        // La lezione: la cartella della lezione se ne va con l'ultimo colpo, poi quella dell'allievo se vuota.
+        if (sess.lesson != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.let { lesson ->
+            lesson.delete()
+            if (sess.student != null) lesson.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
+        }
+        else if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
 
     /** Esercizi guidati, in un file solo. */
@@ -31368,12 +31492,97 @@ object StrokeCheck {
      */
     fun recurring(outs: List<List<StrokeFlag>>, ins: List<List<StrokeFlag>>): List<Triple<StrokeFlag.Kind, Int, Int>> {
         if (outs.isEmpty()) return emptyList()
-        fun share(list: List<List<StrokeFlag>>, k: StrokeFlag.Kind) = if (list.isEmpty()) 0f else list.count { f -> f.any { it.kind == k } }.toFloat() / list.size
-        return StrokeFlag.Kind.entries.mapNotNull { k ->
-            val n = outs.count { f -> f.any { it.kind == k } }
-            if (n >= 2 && share(outs, k) > share(ins, k)) Triple(k, n, outs.size) else null
+        // "Impatto dietro al corpo" e "più indietro del solito" sono lo stesso problema: si contano insieme.
+        fun family(k: StrokeFlag.Kind) = when (k) {
+            StrokeFlag.Kind.ELBOW_BENT -> StrokeFlag.Kind.ELBOW_LESS
+            StrokeFlag.Kind.KNEES_STIFF -> StrokeFlag.Kind.KNEES_LESS
+            StrokeFlag.Kind.CONTACT_LOW -> StrokeFlag.Kind.CONTACT_LOWER
+            StrokeFlag.Kind.CONTACT_BEHIND -> StrokeFlag.Kind.CONTACT_LATER
+            StrokeFlag.Kind.PREP_SHORT -> StrokeFlag.Kind.PREP_SHORTER
+            StrokeFlag.Kind.FINISH_LOW -> StrokeFlag.Kind.FINISH_LOWER
+            else -> k
+        }
+        fun has(f: List<StrokeFlag>, fam: StrokeFlag.Kind) = f.any { family(it.kind) == fam }
+        fun share(list: List<List<StrokeFlag>>, fam: StrokeFlag.Kind) = if (list.isEmpty()) 0f else list.count { has(it, fam) }.toFloat() / list.size
+        return StrokeFlag.Kind.entries.map(::family).distinct().mapNotNull { fam ->
+            val n = outs.count { has(it, fam) }
+            if (n < 2 || share(outs, fam) <= share(ins, fam)) return@mapNotNull null
+            // Il nome è quello che compare più spesso nei colpi fuori (senza riferimento c'è solo quello assoluto).
+            val name = outs.flatMap { f -> f.map { it.kind }.filter { family(it) == fam }.distinct() }.groupingBy { it }.eachCount().maxByOrNull { it.value }!!.key
+            Triple(name, n, outs.size)
         }.sortedByDescending { it.second }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/StrokeVision.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/StrokeVision.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlin.math.hypot
+
+/** Il colpo visto nel video; [sure] false quando gli indizi sono deboli (allora non si propone di spostarlo). */
+data class StrokeGuess(val stroke: TrainedStroke, val sure: Boolean)
+
+/**
+ * Riconoscimento del colpo dal solo video, dai punti del corpo già trovati con l'analisi (senza braccialetto). Indizi
+ * semplici e prudenti: nel servizio tutti e due i polsi vanno sopra la testa (lancio e colpo); nella volée il polso fa
+ * poca strada; nel rovescio, quando la racchetta è più indietro, le due mani sono vicine (a due mani, o l'altra mano
+ * che regge il cuore della racchetta), nel dritto l'altro braccio è lontano, steso in avanti. Le misure sono in
+ * frazioni della statura, così non contano la distanza dalla telecamera e la risoluzione.
+ */
+object StrokeVision {
+    private const val SCORE = ServePose.MIN_SCORE
+
+    fun guess(frames: List<PoseFrame>): StrokeGuess? {
+        val stature = stature(frames) ?: return null
+        fun seen(f: PoseFrame, i: Int) = f.s[i] >= SCORE
+        // Il polso che colpisce è quello che va più veloce.
+        fun peak(w: Int): Pair<Float, Int> {
+            var best = 0f; var at = -1
+            for (k in 1 until frames.size) {
+                val a = frames[k - 1]; val b = frames[k]
+                if (!seen(a, w) || !seen(b, w)) continue
+                val dt = (b.t - a.t).coerceAtLeast(1L).toFloat()
+                val v = hypot(b.x[w] - a.x[w], b.y[w] - a.y[w]) / dt
+                if (v > best) { best = v; at = k }
+            }
+            return best to at
+        }
+        val (vl, kl) = peak(ServePose.L_WRIST)
+        val (vr, kr) = peak(ServePose.R_WRIST)
+        if (kl < 0 && kr < 0) return null
+        val hit = if (vr >= vl) ServePose.R_WRIST else ServePose.L_WRIST
+        val other = if (hit == ServePose.R_WRIST) ServePose.L_WRIST else ServePose.R_WRIST
+        val peakAt = if (hit == ServePose.R_WRIST) kr else kl
+        // Quanto sopra la testa (naso) arriva un polso, in statura; negativo = sotto.
+        fun up(w: Int) = frames.filter { seen(it, w) && seen(it, ServePose.NOSE) }.maxOfOrNull { (it.y[ServePose.NOSE] - it.y[w]) / stature } ?: -1f
+        val hitUp = up(hit); val otherUp = up(other)
+        if (hitUp > 0.15f && otherUp > 0.08f) return StrokeGuess(TrainedStroke.SERVE, hitUp > 0.25f && otherUp > 0.12f)
+        // Strada orizzontale del polso che colpisce.
+        val xs = frames.filter { seen(it, hit) }.map { it.x[hit] }
+        if (xs.size < 3) return null
+        val amp = (xs.max() - xs.min()) / stature
+        if (amp < 0.45f) return StrokeGuess(TrainedStroke.VOLLEY, amp < 0.35f)
+        // La racchetta più indietro: prima del picco, il polso più lontano dal centro delle anche.
+        val before = frames.take(peakAt.coerceAtLeast(1)).filter { seen(it, hit) && seen(it, other) && seen(it, ServePose.L_HIP) && seen(it, ServePose.R_HIP) }
+        val back = before.maxByOrNull { kotlin.math.abs(it.x[hit] - (it.x[ServePose.L_HIP] + it.x[ServePose.R_HIP]) / 2) } ?: return null
+        val gap = hypot(back.x[hit] - back.x[other], back.y[hit] - back.y[other]) / stature
+        return when {
+            gap < 0.18f -> StrokeGuess(TrainedStroke.BACKHAND, gap < 0.12f)
+            gap > 0.25f -> StrokeGuess(TrainedStroke.FOREHAND, gap > 0.32f)
+            else -> null
+        }
+    }
+
+    /** Statura come nell'analisi: naso-caviglia diviso 0,89, mediana sui fotogrammi in cui si vedono. */
+    fun stature(frames: List<PoseFrame>): Float? = frames.mapNotNull { g ->
+        val ankle = listOfNotNull(g.y[ServePose.L_ANKLE].takeIf { g.s[ServePose.L_ANKLE] >= SCORE }, g.y[ServePose.R_ANKLE].takeIf { g.s[ServePose.R_ANKLE] >= SCORE }).maxOrNull()
+        if (ankle == null || g.s[ServePose.NOSE] < SCORE) null else (ankle - g.y[ServePose.NOSE]) / 0.89f
+    }.sorted().let { if (it.isEmpty()) null else it[it.size / 2] }?.takeIf { it > 0.05f }
 }
 TSM_EOF
 
@@ -31516,7 +31725,7 @@ object StudentReport {
             listOf(true, false).mapNotNull { inPlay ->
                 mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.asSequence().flatMap { sess ->
                     val dir = storage.serveClipsDir(sess)
-                    sess.serves.reversed().asSequence().filter { it.inPlay == inPlay && it.clip != null }.map { a -> a to File(dir, a.clip!!) }
+                    sess.serves.reversed().asSequence().filter { (if (inPlay) it.isIn else it.isOut) && it.clip != null }.map { a -> a to File(dir, a.clip!!) }
                 }.mapNotNull { (a, d) ->
                     val imgs = names.map { (label, file) -> label to File(d, file) }.filter { it.second.exists() }
                     if (imgs.size == names.size) Example(t, inPlay, a.at, imgs) else null
@@ -47115,6 +47324,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -47260,6 +47470,13 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+        // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
+        GhostButton(s.lessonRecord, Icons.Filled.School, {
+            context.startActivity(
+                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
+            )
+        }, Modifier.fillMaxWidth())
+        Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
         if (mine.isNotEmpty()) {
             Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
             StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
@@ -47510,8 +47727,10 @@ fun SessionRow(
         Column(Modifier.weight(1f)) {
             Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp)
             if (extra != null) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
+            // Dalla lezione registrata: i colpi senza dentro o fuori non contano nella percentuale.
+            if (sess.lesson != null) Text(s.lessonCount(sess.serves.size), color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
+        if (n.total > 0 || sess.lesson == null) Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
     }
 }
 
@@ -47630,7 +47849,10 @@ private fun PlacementDiagram(stroke: TrainedStroke) {
 @Composable
 fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE) {
     val b = ServeTraining.breakdown(serves, stroke)
-    Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+    // Colpi della lezione senza dentro o fuori: si contano e basta.
+    val unmarked = serves.count { !it.marked }
+    if (unmarked > 0) Text(s.lessonCount(serves.size), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = if (b.all.total > 0) 16.sp else 22.sp)
+    if (b.all.total > 0 || unmarked == 0) Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
     @Composable
     fun rows(title: String, map: Map<String, ServeTraining.Count>) {
         if (map.isEmpty()) return
@@ -47647,8 +47869,8 @@ fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedS
     rows(s.serveByTarget, b.byTarget.mapKeys { serveTargetName(s, it.key) })
     rows(s.byWing, b.byWing.mapKeys { wingName(s, it.key) })
     rows(s.byDirection, b.byDirection.mapKeys { directionName(s, it.key) })
-    val gin = ServeTraining.meanGyro(serves.filter { it.inPlay })
-    val gout = ServeTraining.meanGyro(serves.filter { !it.inPlay })
+    val gin = ServeTraining.meanGyro(serves.filter { it.isIn })
+    val gout = ServeTraining.meanGyro(serves.filter { it.isOut })
     if (gin != null && gout != null) Text(s.serveWrist(gin, gout), color = TsmColors.TextDim, fontSize = 13.sp)
 }
 
@@ -47708,8 +47930,8 @@ fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
         context.startActivity(Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray()))
     }
     GhostButton(s.servePlayAll, Icons.Filled.PlayArrow, { play(sess.serves) }, Modifier.fillMaxWidth())
-    if (sess.serves.any { it.inPlay && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.inPlay }) }, Modifier.fillMaxWidth())
-    if (sess.serves.any { !it.inPlay && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { !it.inPlay }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.isIn && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.isIn }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.isOut && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.isOut }) }, Modifier.fillMaxWidth())
 }
 TSM_EOF
 
@@ -50569,6 +50791,18 @@ interface Strings {
     val psTrunk: String
     val psShoulders: String
     val psStance: String
+    val lessonShot: String
+    val lessonRecord: String
+    val lessonRecordHint: String
+    val lessonCount: (Int) -> String
+    val lessonWaiting: String
+    val lessonAgenda: (String) -> String
+    val lessonMarkHint: String
+    val vsGuess: (String) -> String
+    val vsMove: (String) -> String
+    val vsMoved: String
+    val vsUnknown: String
+    val lessonFolder: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -53289,6 +53523,18 @@ object ItStrings : Strings {
     override val psTrunk = "Busto (dalla verticale)"
     override val psShoulders = "Linea delle spalle"
     override val psStance = "Base (distanza dei piedi)"
+    override val lessonShot = "Lezione"
+    override val lessonRecord = "Registra la lezione"
+    override val lessonRecordHint = "Telefono fisso a fondo campo e braccialetto al polso di chi gioca: ogni colpo riconosciuto diventa una clip, messa da sola tra dritti, rovesci, servizi e volée. Non serve premere niente; KEY1 o KEY2 subito dopo un colpo lo segnano dentro o fuori."
+    override val lessonCount: (Int) -> String = { n -> "Lezione · $n colpi" }
+    override val lessonWaiting = "Lezione · ogni colpo riconosciuto diventa una clip"
+    override val lessonAgenda: (String) -> String = { t -> "Lezione dell'agenda: $t" }
+    override val lessonMarkHint = "Dentro o fuori (facoltativo): subito dopo il colpo"
+    override val vsGuess: (String) -> String = { x -> "Dal video sembra: $x" }
+    override val vsMove: (String) -> String = { x -> "Sposta tra: $x" }
+    override val vsMoved = "Colpo spostato: l'analisi si rifà nel colpo giusto"
+    override val vsUnknown = "Il braccialetto non l'ha riconosciuto"
+    override val lessonFolder = "Lezioni"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -56010,6 +56256,18 @@ object EnStrings : Strings {
     override val psTrunk = "Trunk (from vertical)"
     override val psShoulders = "Shoulder line"
     override val psStance = "Stance (feet apart)"
+    override val lessonShot = "Lesson"
+    override val lessonRecord = "Record the lesson"
+    override val lessonRecordHint = "Phone fixed behind the baseline and band on the player's wrist: every recognized shot becomes a clip, filed on its own among forehands, backhands, serves and volleys. Nothing to press; KEY1 or KEY2 right after a shot marks it in or out."
+    override val lessonCount: (Int) -> String = { n -> "Lesson · $n shots" }
+    override val lessonWaiting = "Lesson · every recognized shot becomes a clip"
+    override val lessonAgenda: (String) -> String = { t -> "Agenda lesson: $t" }
+    override val lessonMarkHint = "In or out (optional): right after the shot"
+    override val vsGuess: (String) -> String = { x -> "From the video it looks like: $x" }
+    override val vsMove: (String) -> String = { x -> "Move to: $x" }
+    override val vsMoved = "Shot moved: the analysis is redone under the right stroke"
+    override val vsUnknown = "The band did not recognize it"
+    override val lessonFolder = "Lessons"
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }
@@ -58756,6 +59014,18 @@ object DeStrings : Strings {
     override val psTrunk = "Oberkörper (zur Senkrechten)"
     override val psShoulders = "Schulterlinie"
     override val psStance = "Stand (Fußabstand)"
+    override val lessonShot = "Trainerstunde"
+    override val lessonRecord = "Stunde aufnehmen"
+    override val lessonRecordHint = "Handy fest hinter der Grundlinie, Armband am Handgelenk des Spielers: Jeder erkannte Schlag wird ein Clip und landet von selbst bei Vorhand, Rückhand, Aufschlag oder Volley. Nichts zu drücken; KEY1 oder KEY2 direkt nach einem Schlag markiert ihn als im Feld oder aus."
+    override val lessonCount: (Int) -> String = { n -> "Stunde · $n Schläge" }
+    override val lessonWaiting = "Stunde · jeder erkannte Schlag wird ein Clip"
+    override val lessonAgenda: (String) -> String = { t -> "Stunde aus dem Kalender: $t" }
+    override val lessonMarkHint = "Im Feld oder aus (freiwillig): direkt nach dem Schlag"
+    override val vsGuess: (String) -> String = { x -> "Laut Video wohl: $x" }
+    override val vsMove: (String) -> String = { x -> "Verschieben zu: $x" }
+    override val vsMoved = "Schlag verschoben: die Analyse wird beim richtigen Schlag neu gemacht"
+    override val vsUnknown = "Das Armband hat ihn nicht erkannt"
+    override val lessonFolder = "Trainerstunden"
     override val bzClash: (Int) -> String = { if (it == 1) "1 Stunde fällt auf deine Termine" else "$it Stunden fallen auf deine Termine" }
     override val ccDeleteAsk: (String) -> String = { "Kurs $it und seine Anwesenheit entfernen?" }
     override val mrWinner: (String) -> String = { "Sieger: $it" }
@@ -61492,6 +61762,18 @@ object EsStrings : Strings {
     override val psTrunk = "Tronco (desde la vertical)"
     override val psShoulders = "Línea de los hombros"
     override val psStance = "Apoyos (separación de los pies)"
+    override val lessonShot = "Clase"
+    override val lessonRecord = "Grabar la clase"
+    override val lessonRecordHint = "Teléfono fijo al fondo de la pista y pulsera en la muñeca de quien juega: cada golpe reconocido se convierte en un clip, colocado solo entre derechas, reveses, saques y voleas. No hay que pulsar nada; KEY1 o KEY2 justo después de un golpe lo marca dentro o fuera."
+    override val lessonCount: (Int) -> String = { n -> "Clase · $n golpes" }
+    override val lessonWaiting = "Clase · cada golpe reconocido se convierte en un clip"
+    override val lessonAgenda: (String) -> String = { t -> "Clase de la agenda: $t" }
+    override val lessonMarkHint = "Dentro o fuera (opcional): justo después del golpe"
+    override val vsGuess: (String) -> String = { x -> "Por el vídeo parece: $x" }
+    override val vsMove: (String) -> String = { x -> "Mover a: $x" }
+    override val vsMoved = "Golpe movido: el análisis se rehace en el golpe correcto"
+    override val vsUnknown = "La pulsera no lo ha reconocido"
+    override val lessonFolder = "Clases"
     override val bzClash: (Int) -> String = { if (it == 1) "1 clase cae en tus compromisos" else "$it clases caen en tus compromisos" }
     override val ccDeleteAsk: (String) -> String = { "¿Quitar el curso $it y su asistencia?" }
     override val mrWinner: (String) -> String = { "Gana $it" }
@@ -64230,6 +64512,18 @@ object FrStrings : Strings {
     override val psTrunk = "Buste (depuis la verticale)"
     override val psShoulders = "Ligne des épaules"
     override val psStance = "Appuis (écart des pieds)"
+    override val lessonShot = "Leçon"
+    override val lessonRecord = "Enregistrer la leçon"
+    override val lessonRecordHint = "Téléphone fixe au fond du court et bracelet au poignet du joueur : chaque coup reconnu devient un clip, rangé tout seul parmi coups droits, revers, services et volées. Rien à appuyer ; KEY1 ou KEY2 juste après un coup le marque bon ou faute."
+    override val lessonCount: (Int) -> String = { n -> "Leçon · $n coups" }
+    override val lessonWaiting = "Leçon · chaque coup reconnu devient un clip"
+    override val lessonAgenda: (String) -> String = { t -> "Leçon de l'agenda : $t" }
+    override val lessonMarkHint = "Bon ou faute (facultatif) : juste après le coup"
+    override val vsGuess: (String) -> String = { x -> "D'après la vidéo, on dirait : $x" }
+    override val vsMove: (String) -> String = { x -> "Déplacer vers : $x" }
+    override val vsMoved = "Coup déplacé : l'analyse est refaite dans le bon coup"
+    override val vsUnknown = "Le bracelet ne l'a pas reconnu"
+    override val lessonFolder = "Leçons"
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
@@ -66969,6 +67263,18 @@ object PtStrings : Strings {
     override val psTrunk = "Tronco (a partir da vertical)"
     override val psShoulders = "Linha dos ombros"
     override val psStance = "Apoios (afastamento dos pés)"
+    override val lessonShot = "Aula"
+    override val lessonRecord = "Gravar a aula"
+    override val lessonRecordHint = "Telefone fixo no fundo da quadra e pulseira no pulso de quem joga: cada golpe reconhecido vira um clipe, colocado sozinho entre forehands, backhands, saques e voleios. Não é preciso apertar nada; KEY1 ou KEY2 logo após um golpe marca-o dentro ou fora."
+    override val lessonCount: (Int) -> String = { n -> "Aula · $n golpes" }
+    override val lessonWaiting = "Aula · cada golpe reconhecido vira um clipe"
+    override val lessonAgenda: (String) -> String = { t -> "Aula da agenda: $t" }
+    override val lessonMarkHint = "Dentro ou fora (opcional): logo após o golpe"
+    override val vsGuess: (String) -> String = { x -> "Pelo vídeo parece: $x" }
+    override val vsMove: (String) -> String = { x -> "Mover para: $x" }
+    override val vsMoved = "Golpe movido: a análise é refeita no golpe certo"
+    override val vsUnknown = "A pulseira não o reconheceu"
+    override val lessonFolder = "Aulas"
     override val bzClash: (Int) -> String = { if (it == 1) "1 aula calha nos teus compromissos" else "$it aulas calham nos teus compromissos" }
     override val ccDeleteAsk: (String) -> String = { "Remover o curso $it e as suas presenças?" }
     override val mrWinner: (String) -> String = { "Vence $it" }
@@ -77998,7 +78304,7 @@ fun StrokeSessionsScreen(c: MatchController) {
             val context = androidx.compose.ui.platform.LocalContext.current
             val when_ = SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "dMMMyyyyHHmm"), lang.locale)
             for ((sess, i, a) in best) {
-                Text("★ ${name} ${i + 1} · ${when_.format(Date(a.at))} · ${if (a.inPlay) s.serveIn else s.serveOut}",
+                Text("★ ${name} ${i + 1} · ${when_.format(Date(a.at))} · ${if (!a.marked) s.lessonShot else if (a.inPlay) s.serveIn else s.serveOut}",
                     color = TsmColors.TextMain, fontSize = 14.sp,
                     modifier = Modifier.fillMaxWidth().clickable {
                         val dir = File(c.storage.serveClipsDir(sess), a.clip!!)
@@ -80785,6 +81091,7 @@ import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.Lessons
 import com.tennis.scoremanager.data.ServeAttempt
 import com.tennis.scoremanager.data.ServeKind
 import com.tennis.scoremanager.data.ServeSession
@@ -80865,6 +81172,56 @@ class CameraActivity : ComponentActivity() {
     // ---------------------------------------------------------------- allenamento al servizio (EXTRA_SERVE)
 
     private val serveMode by lazy { intent.getBooleanExtra(EXTRA_SERVE, false) }
+    /**
+     * Lezione registrata ([EXTRA_LESSON]): ogni colpo riconosciuto dal braccialetto diventa una clip, senza tasti. In
+     * [serveSession] i colpi stanno insieme; si salvano come una sessione per colpo ([Lessons.split]).
+     */
+    private val lessonMode by lazy { serveMode && intent.getBooleanExtra(EXTRA_LESSON, false) }
+    /** Colpi della lezione già salvati come sessione: se uno sparisce (annullato) il suo file si toglie. */
+    private var lessonSaved = emptySet<TrainedStroke>()
+    /** La lezione dell'agenda in corso (ora d'inizio, da mostrare). */
+    private val agendaLesson = MutableStateFlow<Long?>(null)
+
+    private fun lessonPart(t: TrainedStroke): ServeSession = Lessons.sessionOf(serveSession.value, t, s.strokeName)
+
+    /** Cartella delle clip di un colpo: quella della sessione o, nella lezione, quella del suo colpo. */
+    private fun clipsDirOf(a: ServeAttempt): File =
+        controller.storage.serveClipsDir(if (lessonMode) lessonPart(Lessons.groupOf(a)) else serveSession.value)
+
+    private fun videoBytes(): Long =
+        if (lessonMode) Lessons.split(serveSession.value, s.strokeName).sumOf { controller.storage.serveVideoBytes(it) }
+        else controller.storage.serveVideoBytes(serveSession.value)
+
+    /** Salva la sessione (nella lezione: una per colpo, e via quelle rimaste vuote). */
+    private fun persist(sess: ServeSession) {
+        if (!lessonMode) { controller.storage.saveServeSession(sess); return }
+        val parts = Lessons.split(sess, s.strokeName)
+        parts.forEach { controller.storage.saveServeSession(it) }
+        val now = parts.map { it.stroke }.toSet()
+        (lessonSaved - now).forEach { controller.storage.deleteServeSession(Lessons.sessionOf(sess, it, s.strokeName)) }
+        lessonSaved = now
+    }
+
+    /** Colpo riconosciuto durante la lezione: si segna da solo, senza dentro o fuori, e se ne prende la clip. */
+    private fun lessonShot(st: com.tennis.scoremanager.ble.RawStroke) {
+        val now = System.currentTimeMillis()
+        lastTrainActivity = now
+        val clip = "%03d".format(serveSession.value.serves.size + 1) + "_$now"
+        saveServes {
+            it + ServeAttempt(now, true, ServeSide.DEUCE, ServeKind.FIRST, detected = true, gyroDps = st.peakGyroDps, accelG = st.peakAccelG,
+                marked = false, stroke = Lessons.strokeOf(st.stroke))
+        }
+        cutClip(now, clip)
+    }
+
+    /** KEY1 / KEY2 (o lo schermo) subito dopo un colpo della lezione: dentro o fuori, facoltativo. */
+    private fun lessonMark(inPlay: Boolean, band: Side? = null) {
+        if (trainPaused.value) return
+        val a = Lessons.toMark(serveSession.value.serves, System.currentTimeMillis()) ?: return
+        lastTrainActivity = System.currentTimeMillis()
+        saveServes { list -> list.map { if (it.at == a.at) it.copy(marked = true, inPlay = inPlay) else it } }
+        bandShow(band, if (inPlay) s.serveIn else s.serveOut, a.stroke?.let { strokeLabel(s, it) } ?: s.lessonShot)
+    }
     private val serveSession = MutableStateFlow(ServeSession("s${System.currentTimeMillis()}", System.currentTimeMillis()))
     private val serveSide = MutableStateFlow(ServeSide.DEUCE)
     private val serveKind = MutableStateFlow(ServeKind.FIRST)
@@ -81067,17 +81424,22 @@ class CameraActivity : ComponentActivity() {
         val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
         // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
-        val student = controller.studentById(controller.trainStudent.value)
-        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
+        // Lezione: quella dell'agenda in corso (e, senza allievo scelto, il suo allievo se è uno solo).
+        val agenda = if (lessonMode) Lessons.current(controller.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
+        agendaLesson.value = agenda?.start
+        val student = controller.studentById(controller.trainStudent.value ?: agenda?.students?.singleOrNull())
+        val folder = if (lessonMode) controller.storage.newLessonFolder(serveSession.value.startedAt, s.strokeFolderName, s.lessonFolder, student?.name)
+        else controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
         val racket = student?.racket?.let { controller.racketById(it) }?.use()
         // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
-        drill.value = controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        drill.value = if (lessonMode) null else controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
         serveSession.value = serveSession.value.copy(
             stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
+            lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,
         )
         applyDrillStep()
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
-        if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
+        if (!lessonMode && controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
             controller.ble.events.collect { e ->
                 // In pausa KEY1 riprende e gli altri tasti non fanno niente (niente colpi segnati per sbaglio).
@@ -81086,8 +81448,8 @@ class CameraActivity : ComponentActivity() {
                     return@collect
                 }
                 when (e.type) {
-                    BandProtocol.EVT_POINT -> serveOutcome(true, e.side)
-                    BandProtocol.EVT_UNDO -> serveOutcome(false, e.side)
+                    BandProtocol.EVT_POINT -> if (lessonMode) lessonMark(true, e.side) else serveOutcome(true, e.side)
+                    BandProtocol.EVT_UNDO -> if (lessonMode) lessonMark(false, e.side) else serveOutcome(false, e.side)
                     BandProtocol.EVT_BATTERY -> undoServe(e.side)
                 }
             }
@@ -81101,6 +81463,7 @@ class CameraActivity : ComponentActivity() {
                     if (autoPaused) resumeTraining()
                     return@collect
                 }
+                if (lessonMode) { lessonShot(st.stroke); return@collect }
                 lastTrainActivity = System.currentTimeMillis()
                 lastDetected = ServeTraining.Detected(System.currentTimeMillis(), st.stroke.peakGyroDps, st.stroke.peakAccelG)
                 servePending.value = true
@@ -81120,7 +81483,11 @@ class CameraActivity : ComponentActivity() {
     private fun endServeTraining() {
         controller.serveTraining = false
         val sess = serveSession.value
-        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess)
+        if (lessonMode) {
+            // Lezione senza colpi: via la sua cartella (se è vuota); altrimenti le sessioni dei colpi con la fine.
+            if (sess.serves.isEmpty()) sess.folder?.let { File(controller.storage.documentsRoot, it).delete() }
+            else persist(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
+        } else if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess)
         else controller.storage.saveServeSession(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
         controller.refreshServeSessions()
     }
@@ -81128,7 +81495,7 @@ class CameraActivity : ComponentActivity() {
     private fun saveServes(transform: (List<ServeAttempt>) -> List<ServeAttempt>) {
         val sess = serveSession.value.let { it.copy(serves = transform(it.serves)) }
         serveSession.value = sess
-        lifecycleScope.launch(Dispatchers.IO) { controller.storage.saveServeSession(sess) }
+        lifecycleScope.launch(Dispatchers.IO) { persist(sess) }
     }
 
     /**
@@ -81153,14 +81520,15 @@ class CameraActivity : ComponentActivity() {
     private fun replayLastShot() {
         val sess = serveSession.value
         val last = sess.serves.lastOrNull { it.clip != null } ?: return
-        val files = controller.serveClipFiles(sess, listOf(last))
+        val part = if (lessonMode) lessonPart(Lessons.groupOf(last)) else sess
+        val files = controller.serveClipFiles(part, listOf(last))
         if (files.isEmpty()) return
         lastTrainActivity = System.currentTimeMillis()
         pauseTraining()
         android.widget.Toast.makeText(this, s.trainReplayPaused, android.widget.Toast.LENGTH_LONG).show()
         replayLast.launch(
             Intent(this, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray())
-                .putExtra(ReplayActivity.EXTRA_STAR_SESSION, sess.id).putExtra(ReplayActivity.EXTRA_STAR_AT, last.at)
+                .putExtra(ReplayActivity.EXTRA_STAR_SESSION, part.id).putExtra(ReplayActivity.EXTRA_STAR_AT, last.at)
                 .putExtra(ReplayActivity.EXTRA_STAR_ON, last.starred).putExtra(ReplayActivity.EXTRA_STAR_LIVE, true),
         )
     }
@@ -81218,12 +81586,18 @@ class CameraActivity : ComponentActivity() {
         say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + (next?.let { ". $it" } ?: ""))
         if (next != null) bandShow(band, s.drillBandNext, next.take(20))
         else bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
+        cutClip(at, clip)
+    }
+
+    /** La clip del colpo delle [at], quando la memoria della moviola ha anche i 3 secondi dopo. */
+    private fun cutClip(at: Long, clip: String) {
         val st = stream ?: return
         if (!st.isOnPreview) return
         lifecycleScope.launch {
             val wait = at + ServeTraining.CLIP_AFTER_MS + 600 - System.currentTimeMillis()
             if (wait > 0) delay(wait)
-            val dir = File(controller.storage.serveClipsDir(serveSession.value), clip)
+            val shot = serveSession.value.serves.firstOrNull { it.at == at } ?: return@launch
+            val dir = File(clipsDirOf(shot), clip)
             val parts = withContext(Dispatchers.IO) {
                 // I pezzi da 4 s si uniscono in un video solo (si apre e si condivide); se non riesce restano i pezzi.
                 val tmp = File(cacheDir, "serve_cut_$clip")
@@ -81238,7 +81612,7 @@ class CameraActivity : ComponentActivity() {
                 return@launch
             }
             saveServes { list -> list.map { if (it.at == at) it.copy(clip = clip) else it } }
-            trainBytes.value = withContext(Dispatchers.IO) { controller.storage.serveVideoBytes(serveSession.value) }
+            trainBytes.value = withContext(Dispatchers.IO) { videoBytes() }
         }
     }
 
@@ -81248,7 +81622,8 @@ class CameraActivity : ComponentActivity() {
         saveServes { it.dropLast(1) }
         // Tolto un colpo, l'esercizio torna al passo di prima se serve.
         applyDrillStep()
-        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
+        val dir = clipsDirOf(last)
+        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(dir, c).deleteRecursively() } }
         say(s.serveSayUndo)
         val n = ServeTraining.count(serveSession.value.serves)
         bandShow(band, s.serveSayUndo, "${n.inPlay}/${n.total}")
@@ -81731,8 +82106,18 @@ class CameraActivity : ComponentActivity() {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Una riga sola, piccola: conteggio, ultimo colpo, braccialetto, riconoscimento, memoria, "i".
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
-                    sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    if (lessonMode) {
+                        // Lezione: quanti colpi e l'ultimo (il colpo riconosciuto, o dentro/fuori se segnato).
+                        Pill(str.lessonCount(sess.serves.size), TsmColors.SurfaceHigh)
+                        sess.serves.lastOrNull()?.let {
+                            val name = it.stroke?.let { t -> strokeLabel(str, t) } ?: str.lessonShot
+                            Pill(if (it.marked) "$name · ${if (it.inPlay) str.serveIn else str.serveOut}" else name,
+                                if (!it.marked) TsmColors.SurfaceHigh else if (it.inPlay) TsmColors.Ok else TsmColors.Danger)
+                        }
+                    } else {
+                        Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
+                        sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    }
                     // Esercizio: passo e colpi fatti nel passo.
                     val d by drill.collectAsState()
                     d?.let { dd ->
@@ -81754,7 +82139,13 @@ class CameraActivity : ComponentActivity() {
                     ) {
                         @Composable fun line(t: String) = Text(t, color = TsmColors.TextMain, fontSize = 13.sp)
                         line(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand)
-                        line(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveWaiting else str.strokeWaiting)
+                        if (lessonMode) {
+                            line(str.lessonWaiting)
+                            line(str.lessonMarkHint)
+                            agendaLesson.collectAsState().value?.let { t ->
+                                line(str.lessonAgenda(java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(java.util.Date(t)) + (sess.studentName?.let { " · $it" } ?: "")))
+                            }
+                        } else line(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveWaiting else str.strokeWaiting)
                         st?.let { line(if (!it.supportsStrokes) str.trainRecOldFw else if (it.strokes) str.trainRecOn else str.trainRecStarting) }
                         line(if (paused) (if (autoPaused) str.trainAutoPaused else str.trainPaused) else str.trainMemory(clips, mb))
                     }
@@ -81765,14 +82156,15 @@ class CameraActivity : ComponentActivity() {
                 if (paused) {
                     Btn(Icons.Filled.PlayArrow, str.trainResume, TsmColors.Ok) { resumeTraining() }
                 } else {
-                    Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
-                    Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                    Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { if (lessonMode) lessonMark(true) else serveOutcome(true) }
+                    Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { if (lessonMode) lessonMark(false) else serveOutcome(false) }
                     Btn(Icons.Filled.Pause, str.trainPause, TsmColors.SurfaceHigh) { pauseTraining() }
                 }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
                 // L'ultimo colpo subito, al rallentatore, senza chiudere l'allenamento.
                 if (sess.serves.any { it.clip != null }) Btn(Icons.Filled.Replay, str.trainReplayLast, TsmColors.SurfaceHigh) { replayLastShot() }
-                if (sess.stroke == TrainedStroke.SERVE) {
+                if (lessonMode) Unit
+                else if (sess.stroke == TrainedStroke.SERVE) {
                     Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
                         serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
                     }
@@ -81807,8 +82199,17 @@ class CameraActivity : ComponentActivity() {
                 title = { Text(str.serveSummary) },
                 text = {
                     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ServeSummaryContent(str, sess.serves, sess.stroke)
-                        ServeReplayButtons(controller, sess)
+                        if (lessonMode) {
+                            // Lezione: i colpi per tipo (le sessioni si aprono da Allenati, una per colpo).
+                            Text(str.lessonCount(sess.serves.size), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                            for (part in Lessons.split(sess, str.strokeName)) {
+                                val m = ServeTraining.count(part.serves)
+                                Text(strokeLabel(str, part.stroke) + " · ${part.serves.size}" + (if (m.total > 0) " · " + str.serveCountLine(m.inPlay, m.total) else ""), color = TsmColors.TextMain)
+                            }
+                        } else {
+                            ServeSummaryContent(str, sess.serves, sess.stroke)
+                            ServeReplayButtons(controller, sess)
+                        }
                     }
                 },
                 confirmButton = { TextButton(onClick = { serveSummary.value = false; finish() }) { Text(str.serveEnd) } },
@@ -81949,6 +82350,8 @@ class CameraActivity : ComponentActivity() {
         const val EXTRA_SERVE = "serve"
         /** Colpo dell'allenamento (TrainedStroke, di serie il servizio). */
         const val EXTRA_STROKE = "stroke"
+        /** Con [EXTRA_SERVE]: lezione registrata, ogni colpo riconosciuto diventa una clip (vedi [Lessons]). */
+        const val EXTRA_LESSON = "lesson"
         /** Pausa automatica dell'allenamento dopo questo tempo senza colpi. */
         const val AUTO_PAUSE_MS = 5 * 60_000L
         private const val TAG = "Telecamera"
@@ -84847,6 +85250,7 @@ import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.StrokeCheck
 import com.tennis.scoremanager.data.StrokeFlag
+import com.tennis.scoremanager.data.StrokeVision
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
@@ -84911,7 +85315,7 @@ class ServeAnalysisActivity : ComponentActivity() {
             val loaded = if (o.id == sess.id) res else loadResults(o)
             o.serves.filter { it.starred }.mapNotNull { a -> a.clip?.let { loaded[it] } }
         }
-        val ins = sess.serves.filter { it.inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        val ins = sess.serves.filter { it.isIn }.mapNotNull { a -> a.clip?.let { res[it] } }
         fun of(list: List<ServePoseResult>) = if (sess.stroke == TrainedStroke.SERVE) ServePose.mean(list.mapNotNull { it.metrics })?.let { Reference(it, null, false) }
             else ServePose.groundMean(list.mapNotNull { it.ground })?.let { Reference(null, it, false) }
         of(best)?.let { return Reference(it.serve, it.ground, true) }
@@ -85110,7 +85514,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     @Composable
     private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>, ref: Reference?) {
         val str = s
-        fun of(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        fun of(inPlay: Boolean) = sess.serves.filter { if (inPlay) it.isIn else it.isOut }.mapNotNull { a -> a.clip?.let { res[it] } }
         val rows: List<Triple<String, String, String>>
         val nIn: Int
         val nOut: Int
@@ -85154,7 +85558,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                 }
             }
             // Quello che torna nei colpi fuori più che in quelli dentro: dove guardare col maestro.
-            fun flagsOf(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }.map { flags(sess.stroke, it, ref) }
+            fun flagsOf(inPlay: Boolean) = sess.serves.filter { if (inPlay) it.isIn else it.isOut }.mapNotNull { a -> a.clip?.let { res[it] } }.map { flags(sess.stroke, it, ref) }
             val rec = StrokeCheck.recurring(flagsOf(false), flagsOf(true))
             if (rec.isNotEmpty()) {
                 Text(str.fxOutsRecurring, color = TsmColors.Orange, fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -85181,7 +85585,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                     tint = if (a.starred) TsmColors.Ball else TsmColors.TextDim,
                     modifier = Modifier.padding(end = 10.dp).clickable { controller.setServeStar(sess.id, a.at, !a.starred)?.let { session.value = it } },
                 )
-                Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
+                Text(outcome(a), color = if (!a.marked) TsmColors.TextDim else if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
             }
             when {
                 a.clip == null -> Text(str.poseNoClip, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -85191,6 +85595,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                     if (!v.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
                     if (r.people > 1) Text(str.poseManyPeople(r.people), color = TsmColors.Orange, fontSize = 13.sp)
                     Text(v.brief, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Guess(sess, a, r)
                     // I possibili problemi in breve (aperto, coi valori).
                     val fl = flags(sess.stroke, r, ref)
                     if (fl.isNotEmpty() && !expanded) Text("⚠ " + fl.take(3).joinToString(" · ") { flagLabel(it.kind) }, color = TsmColors.Orange, fontSize = 13.sp)
@@ -85264,6 +85669,32 @@ class ServeAnalysisActivity : ComponentActivity() {
             }
         }.sortedWith(compareByDescending<Candidate> { it.a.starred }.thenByDescending { it.a.at }).take(80)
 
+    /** Dentro, fuori, o "Lezione" per i colpi della lezione registrata senza dentro o fuori. */
+    private fun outcome(a: ServeAttempt): String = if (!a.marked) s.lessonShot else if (a.inPlay) s.serveIn else s.serveOut
+
+    /**
+     * Il colpo visto nel video, quando non è quello della sessione: con un indizio chiaro (o se il braccialetto non
+     * l'aveva riconosciuto) si può spostare nel colpo giusto.
+     */
+    @Composable
+    private fun Guess(sess: ServeSession, a: ServeAttempt, r: ServePoseResult) {
+        val str = s
+        val g = remember(r) { StrokeVision.guess(r.frames) }
+        val unknown = sess.lesson != null && a.stroke == null
+        if (unknown) Text(str.vsUnknown, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (g == null || g.stroke == sess.stroke || !(g.sure || unknown)) return
+        Text(str.vsGuess(strokeLabel(str, g.stroke)), color = TsmColors.Orange, fontSize = 13.sp)
+        GhostButton(str.vsMove(strokeLabel(str, g.stroke)), Icons.AutoMirrored.Filled.CompareArrows, {
+            lifecycleScope.launch {
+                val left = withContext(Dispatchers.IO) { controller.moveServeShot(sess.id, a.at, g.stroke, str) }
+                android.widget.Toast.makeText(this@ServeAnalysisActivity, str.vsMoved, android.widget.Toast.LENGTH_LONG).show()
+                if (left == null) { finish(); return@launch }
+                session.value = left
+                a.clip?.let { c -> results.value = results.value - c }
+            }
+        }, Modifier.fillMaxWidth())
+    }
+
     /** "Dritto 3 · 29 ott 22:26 · Dentro": corto, sta in una riga sopra il video. */
     private fun label(sess: ServeSession, index: Int, a: ServeAttempt): String {
         val str = s
@@ -85271,7 +85702,7 @@ class ServeAnalysisActivity : ComponentActivity() {
         val name = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
         val loc = com.tennis.scoremanager.data.Reports.locale(lang)
         val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "dMMMHHmm"), loc).format(java.util.Date(a.at))
-        return "$name · $day · ${if (a.inPlay) str.serveIn else str.serveOut}"
+        return "$name · $day · ${outcome(a)}"
     }
 
     @Composable
@@ -85303,7 +85734,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                                 }.padding(10.dp),
                             ) {
                                 // I migliori colpi per primi, con la stella: il modello con cui confrontarsi.
-                                Text((if (c.a.starred) "★ " else "") + label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
+                                Text((if (c.a.starred) "★ " else "") + label(c.sess, c.index, c.a), color = if (!c.a.isOut) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
                                 if (c.sess.id == sess.id) Text(str.compareThisSession, color = TsmColors.TextDim, fontSize = 12.sp)
                             }
                         }
@@ -102045,6 +102476,9 @@ class StrokeCheckTest {
         assertEquals(listOf(Triple(StrokeFlag.Kind.CONTACT_LATER, 2, 3)), r)
         // Una volta sola non basta.
         assertTrue(StrokeCheck.recurring(listOf(late, emptyList()), emptyList()).isEmpty())
+        // "Dietro al corpo" e "più indietro del solito" si contano insieme, col nome più frequente.
+        val behind = listOf(StrokeFlag(StrokeFlag.Kind.CONTACT_BEHIND))
+        assertEquals(listOf(Triple(StrokeFlag.Kind.CONTACT_LATER, 3, 3)), StrokeCheck.recurring(listOf(late, behind, late), emptyList()))
     }
 
     @Test fun postureFromFrames() {
@@ -102153,6 +102587,93 @@ class StrokeReportTest {
         assertNull(Reports.wristSpeedLine(rec, Side.P1, ItStrings))
         // E i colpi nuovi si aggiungono senza problemi.
         assertEquals(1200, st.add(BandProtocol.STROKE_SERVE, 1200).maxGyro(BandProtocol.STROKE_SERVE))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeVisionTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeVisionTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class StrokeVisionTest {
+    /** Una persona in piedi (naso 0,1, caviglie 0,9) con i polsi dove dice [wrists] (destro, sinistro) a ogni fotogramma. */
+    private fun clip(vararg wrists: Pair<Pair<Float, Float>, Pair<Float, Float>>): List<PoseFrame> = wrists.mapIndexed { k, (r, l) ->
+        val x = MutableList(17) { 0.5f }; val y = MutableList(17) { 0.5f }
+        y[ServePose.NOSE] = 0.1f
+        x[ServePose.L_HIP] = 0.48f; x[ServePose.R_HIP] = 0.52f; y[ServePose.L_HIP] = 0.5f; y[ServePose.R_HIP] = 0.5f
+        y[ServePose.L_ANKLE] = 0.9f; y[ServePose.R_ANKLE] = 0.9f; x[ServePose.L_ANKLE] = 0.4f; x[ServePose.R_ANKLE] = 0.6f
+        x[ServePose.R_WRIST] = r.first; y[ServePose.R_WRIST] = r.second
+        x[ServePose.L_WRIST] = l.first; y[ServePose.L_WRIST] = l.second
+        PoseFrame(k * 66L, x, y, List(17) { 0.9f })
+    }
+
+    @Test fun serveBothArmsUp() {
+        val g = StrokeVision.guess(clip(
+            (0.55f to 0.5f) to (0.45f to 0.5f), (0.6f to 0.4f) to (0.45f to -0.15f), (0.55f to 0.2f) to (0.45f to 0.0f),
+            (0.5f to -0.15f) to (0.45f to 0.3f), (0.3f to 0.4f) to (0.45f to 0.5f),
+        ))
+        assertEquals(StrokeGuess(TrainedStroke.SERVE, true), g)
+    }
+
+    @Test fun forehandArmsApartBackhandTogether() {
+        // Dritto: preparazione con il polso destro indietro (0,8) e il sinistro steso avanti (0,3), poi il colpo.
+        val fh = clip((0.7f to 0.5f) to (0.35f to 0.45f), (0.8f to 0.55f) to (0.3f to 0.45f), (0.5f to 0.5f) to (0.4f to 0.5f), (0.15f to 0.3f) to (0.45f to 0.5f))
+        assertEquals(TrainedStroke.FOREHAND, StrokeVision.guess(fh)?.stroke)
+        // Rovescio: le due mani insieme indietro, poi il colpo.
+        val bh = clip((0.75f to 0.5f) to (0.72f to 0.52f), (0.82f to 0.55f) to (0.8f to 0.56f), (0.5f to 0.5f) to (0.5f to 0.52f), (0.15f to 0.3f) to (0.2f to 0.32f))
+        assertEquals(StrokeGuess(TrainedStroke.BACKHAND, true), StrokeVision.guess(bh))
+    }
+
+    @Test fun volleyShortSwing() {
+        val v = clip((0.55f to 0.45f) to (0.4f to 0.5f), (0.6f to 0.45f) to (0.4f to 0.5f), (0.45f to 0.45f) to (0.4f to 0.5f), (0.4f to 0.45f) to (0.4f to 0.5f))
+        val g = StrokeVision.guess(v)!!
+        assertEquals(TrainedStroke.VOLLEY, g.stroke)
+        assertTrue(g.sure)
+    }
+
+    @Test fun nothingWithoutBody() {
+        assertNull(StrokeVision.guess(emptyList()))
+    }
+}
+
+class LessonsTest {
+    private fun a(at: Long, stroke: TrainedStroke?, marked: Boolean = false) = ServeAttempt(at, true, ServeSide.DEUCE, ServeKind.FIRST, marked = marked, stroke = stroke, clip = "c$at")
+
+    @Test fun splitByStroke() {
+        val l = ServeSession("s1", 0L, serves = listOf(a(1, TrainedStroke.FOREHAND), a(2, TrainedStroke.BACKHAND), a(3, null), a(4, TrainedStroke.BACKHAND)), folder = "Lezioni/x")
+        val parts = Lessons.split(l) { listOf("Dritto", "Rovescio", "Servizio", "Volée")[it] }
+        assertEquals(listOf(TrainedStroke.FOREHAND, TrainedStroke.BACKHAND), parts.map { it.stroke })
+        assertEquals(listOf(1L, 3L), parts[0].serves.map { it.at })
+        assertEquals("Lezioni/x/Rovescio", parts[1].folder)
+        assertEquals("s1-backhand", parts[1].id)
+        assertTrue(parts.all { it.lesson == "s1" })
+    }
+
+    @Test fun unmarkedShotsDoNotCount() {
+        val n = ServeTraining.count(listOf(a(1, null), a(2, null, marked = true)))
+        assertEquals(1, n.total); assertEquals(1, n.inPlay)
+    }
+
+    @Test fun markOnlyTheRecentShot() {
+        assertEquals(10L, Lessons.toMark(listOf(a(10, null)), 10_000L)?.at)
+        assertNull(Lessons.toMark(listOf(a(10, null)), 40_000L))
+        assertNull(Lessons.toMark(listOf(a(10, null, marked = true)), 11L))
+    }
+
+    @Test fun currentAgendaLesson() {
+        val h = 3_600_000L
+        val ls = listOf(CoachLesson("a", 10 * h, 60, listOf("p1")), CoachLesson("b", 10 * h, 60, listOf("p2", "p3")))
+        assertEquals("b", Lessons.current(ls, "p3", 10 * h + 5)?.id)
+        assertEquals("a", Lessons.current(ls, null, 10 * h - 10 * 60_000L)?.id)
+        assertNull(Lessons.current(ls, "p1", 12 * h))
     }
 }
 TSM_EOF
@@ -116878,6 +117399,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 376 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 378 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

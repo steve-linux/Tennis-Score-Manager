@@ -2795,6 +2795,19 @@ interface Strings {
     val psTrunk: String
     val psShoulders: String
     val psStance: String
+    val lessonShot: String
+    val lessonRecord: String
+    val lessonRecordHint: String
+    val lessonCount: (Int) -> String
+    val lessonWaiting: String
+    val lessonAgenda: (String) -> String
+    val lessonMarkHint: String
+    val vsGuess: (String) -> String
+    val vsMove: (String) -> String
+    val vsMoved: String
+    val vsUnknown: String
+    val lessonFolder: String
+    val lessonNoBand: String
     val bzClash: (Int) -> String
     val ccDeleteAsk: (String) -> String
     val mrWinner: (String) -> String
@@ -5515,6 +5528,19 @@ object ItStrings : Strings {
     override val psTrunk = "Busto (dalla verticale)"
     override val psShoulders = "Linea delle spalle"
     override val psStance = "Base (distanza dei piedi)"
+    override val lessonShot = "Lezione"
+    override val lessonRecord = "Registra la lezione"
+    override val lessonRecordHint = "Telefono fisso a fondo campo e braccialetto al polso di chi gioca: ogni colpo riconosciuto diventa una clip, messa da sola tra dritti, rovesci, servizi e volée. Non serve premere niente; KEY1 o KEY2 subito dopo un colpo lo segnano dentro o fuori."
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Lezione · 1 colpo" else "Lezione · $n colpi" }
+    override val lessonWaiting = "Lezione · ogni colpo riconosciuto diventa una clip"
+    override val lessonAgenda: (String) -> String = { t -> "Lezione dell'agenda: $t" }
+    override val lessonMarkHint = "Dentro o fuori (facoltativo): subito dopo il colpo"
+    override val vsGuess: (String) -> String = { x -> "Dal video sembra: $x" }
+    override val vsMove: (String) -> String = { x -> "Sposta tra: $x" }
+    override val vsMoved = "Colpo spostato: l'analisi si rifà nel colpo giusto"
+    override val vsUnknown = "Il braccialetto non l'ha riconosciuto"
+    override val lessonFolder = "Lezioni"
+    override val lessonNoBand = "Nessun braccialetto collegato: senza, la lezione non registra i colpi."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lezione cade nei tuoi impegni" else "$it lezioni cadono nei tuoi impegni" }
     override val ccDeleteAsk: (String) -> String = { "Togliere il corso $it e le sue presenze?" }
     override val mrWinner: (String) -> String = { "Vince $it" }
@@ -8236,6 +8262,19 @@ object EnStrings : Strings {
     override val psTrunk = "Trunk (from vertical)"
     override val psShoulders = "Shoulder line"
     override val psStance = "Stance (feet apart)"
+    override val lessonShot = "Lesson"
+    override val lessonRecord = "Record the lesson"
+    override val lessonRecordHint = "Phone fixed behind the baseline and band on the player's wrist: every recognized shot becomes a clip, filed on its own among forehands, backhands, serves and volleys. Nothing to press; KEY1 or KEY2 right after a shot marks it in or out."
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Lesson · 1 shot" else "Lesson · $n shots" }
+    override val lessonWaiting = "Lesson · every recognized shot becomes a clip"
+    override val lessonAgenda: (String) -> String = { t -> "Agenda lesson: $t" }
+    override val lessonMarkHint = "In or out (optional): right after the shot"
+    override val vsGuess: (String) -> String = { x -> "From the video it looks like: $x" }
+    override val vsMove: (String) -> String = { x -> "Move to: $x" }
+    override val vsMoved = "Shot moved: the analysis is redone under the right stroke"
+    override val vsUnknown = "The band did not recognize it"
+    override val lessonFolder = "Lessons"
+    override val lessonNoBand = "No band connected: without it the lesson does not record any shots."
     override val bzClash: (Int) -> String = { if (it == 1) "1 lesson falls on your commitments" else "$it lessons fall on your commitments" }
     override val ccDeleteAsk: (String) -> String = { "Remove the course $it and its attendance?" }
     override val mrWinner: (String) -> String = { "Winner: $it" }

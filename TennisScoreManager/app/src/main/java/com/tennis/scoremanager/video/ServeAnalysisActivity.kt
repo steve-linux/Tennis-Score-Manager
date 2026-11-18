@@ -59,6 +59,7 @@ import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.StrokeCheck
 import com.tennis.scoremanager.data.StrokeFlag
+import com.tennis.scoremanager.data.StrokeVision
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
@@ -123,7 +124,7 @@ class ServeAnalysisActivity : ComponentActivity() {
             val loaded = if (o.id == sess.id) res else loadResults(o)
             o.serves.filter { it.starred }.mapNotNull { a -> a.clip?.let { loaded[it] } }
         }
-        val ins = sess.serves.filter { it.inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        val ins = sess.serves.filter { it.isIn }.mapNotNull { a -> a.clip?.let { res[it] } }
         fun of(list: List<ServePoseResult>) = if (sess.stroke == TrainedStroke.SERVE) ServePose.mean(list.mapNotNull { it.metrics })?.let { Reference(it, null, false) }
             else ServePose.groundMean(list.mapNotNull { it.ground })?.let { Reference(null, it, false) }
         of(best)?.let { return Reference(it.serve, it.ground, true) }
@@ -322,7 +323,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     @Composable
     private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>, ref: Reference?) {
         val str = s
-        fun of(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        fun of(inPlay: Boolean) = sess.serves.filter { if (inPlay) it.isIn else it.isOut }.mapNotNull { a -> a.clip?.let { res[it] } }
         val rows: List<Triple<String, String, String>>
         val nIn: Int
         val nOut: Int
@@ -366,7 +367,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                 }
             }
             // Quello che torna nei colpi fuori più che in quelli dentro: dove guardare col maestro.
-            fun flagsOf(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }.map { flags(sess.stroke, it, ref) }
+            fun flagsOf(inPlay: Boolean) = sess.serves.filter { if (inPlay) it.isIn else it.isOut }.mapNotNull { a -> a.clip?.let { res[it] } }.map { flags(sess.stroke, it, ref) }
             val rec = StrokeCheck.recurring(flagsOf(false), flagsOf(true))
             if (rec.isNotEmpty()) {
                 Text(str.fxOutsRecurring, color = TsmColors.Orange, fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -393,7 +394,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                     tint = if (a.starred) TsmColors.Ball else TsmColors.TextDim,
                     modifier = Modifier.padding(end = 10.dp).clickable { controller.setServeStar(sess.id, a.at, !a.starred)?.let { session.value = it } },
                 )
-                Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
+                Text(outcome(a), color = if (!a.marked) TsmColors.TextDim else if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
             }
             when {
                 a.clip == null -> Text(str.poseNoClip, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -403,6 +404,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                     if (!v.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
                     if (r.people > 1) Text(str.poseManyPeople(r.people), color = TsmColors.Orange, fontSize = 13.sp)
                     Text(v.brief, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Guess(sess, a, r)
                     // I possibili problemi in breve (aperto, coi valori).
                     val fl = flags(sess.stroke, r, ref)
                     if (fl.isNotEmpty() && !expanded) Text("⚠ " + fl.take(3).joinToString(" · ") { flagLabel(it.kind) }, color = TsmColors.Orange, fontSize = 13.sp)
@@ -476,6 +478,32 @@ class ServeAnalysisActivity : ComponentActivity() {
             }
         }.sortedWith(compareByDescending<Candidate> { it.a.starred }.thenByDescending { it.a.at }).take(80)
 
+    /** Dentro, fuori, o "Lezione" per i colpi della lezione registrata senza dentro o fuori. */
+    private fun outcome(a: ServeAttempt): String = if (!a.marked) s.lessonShot else if (a.inPlay) s.serveIn else s.serveOut
+
+    /**
+     * Il colpo visto nel video, quando non è quello della sessione: con un indizio chiaro (o se il braccialetto non
+     * l'aveva riconosciuto) si può spostare nel colpo giusto.
+     */
+    @Composable
+    private fun Guess(sess: ServeSession, a: ServeAttempt, r: ServePoseResult) {
+        val str = s
+        val g = remember(r) { StrokeVision.guess(r.frames) }
+        val unknown = sess.lesson != null && a.stroke == null
+        if (unknown) Text(str.vsUnknown, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (g == null || g.stroke == sess.stroke || !(g.sure || unknown)) return
+        Text(str.vsGuess(strokeLabel(str, g.stroke)), color = TsmColors.Orange, fontSize = 13.sp)
+        GhostButton(str.vsMove(strokeLabel(str, g.stroke)), Icons.AutoMirrored.Filled.CompareArrows, {
+            lifecycleScope.launch {
+                val left = withContext(Dispatchers.IO) { controller.moveServeShot(sess.id, a.at, g.stroke, str) }
+                android.widget.Toast.makeText(this@ServeAnalysisActivity, str.vsMoved, android.widget.Toast.LENGTH_LONG).show()
+                if (left == null) { finish(); return@launch }
+                session.value = left
+                a.clip?.let { c -> results.value = results.value - c }
+            }
+        }, Modifier.fillMaxWidth())
+    }
+
     /** "Dritto 3 · 29 ott 22:26 · Dentro": corto, sta in una riga sopra il video. */
     private fun label(sess: ServeSession, index: Int, a: ServeAttempt): String {
         val str = s
@@ -483,7 +511,7 @@ class ServeAnalysisActivity : ComponentActivity() {
         val name = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
         val loc = com.tennis.scoremanager.data.Reports.locale(lang)
         val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "dMMMHHmm"), loc).format(java.util.Date(a.at))
-        return "$name · $day · ${if (a.inPlay) str.serveIn else str.serveOut}"
+        return "$name · $day · ${outcome(a)}"
     }
 
     @Composable
@@ -515,7 +543,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                                 }.padding(10.dp),
                             ) {
                                 // I migliori colpi per primi, con la stella: il modello con cui confrontarsi.
-                                Text((if (c.a.starred) "★ " else "") + label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
+                                Text((if (c.a.starred) "★ " else "") + label(c.sess, c.index, c.a), color = if (!c.a.isOut) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
                                 if (c.sess.id == sess.id) Text(str.compareThisSession, color = TsmColors.TextDim, fontSize = 12.sp)
                             }
                         }

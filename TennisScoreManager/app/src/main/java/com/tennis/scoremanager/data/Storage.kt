@@ -162,6 +162,17 @@ class Storage(context: Context) {
         return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
     }
 
+    /**
+     * Cartella di una lezione registrata: Allenamento colpi/Lezioni[/allievo]/<data e ora>; dentro, una sottocartella per
+     * colpo (vedi [Lessons.sessionOf]). null se Documenti non si può scrivere.
+     */
+    fun newLessonFolder(startedAt: Long, base: String, lessons: String, student: String? = null): String? {
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd HH.mm.ss", java.util.Locale.ROOT).format(java.util.Date(startedAt))
+        val who = student?.let { "/" + Students.folderName(it) }.orEmpty()
+        val rel = "$base/$lessons$who/$stamp"
+        return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
+    }
+
     /** Dove stavano le clip prima della 2.5: la cartella dei video dell'app. */
     private fun legacyClipsDir(id: String): File =
         File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id")
@@ -223,7 +234,12 @@ class Storage(context: Context) {
         val dir = serveClipsDir(sess)
         dir.deleteRecursively()
         // La cartella dell'allievo rimasta vuota se ne va con l'ultima sessione.
-        if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
+        // La lezione: la cartella della lezione se ne va con l'ultimo colpo, poi quella dell'allievo se vuota.
+        if (sess.lesson != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.let { lesson ->
+            lesson.delete()
+            if (sess.student != null) lesson.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
+        }
+        else if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
 
     /** Esercizi guidati, in un file solo. */

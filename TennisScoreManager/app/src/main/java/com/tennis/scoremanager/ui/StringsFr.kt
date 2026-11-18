@@ -2726,6 +2726,19 @@ object FrStrings : Strings {
     override val psTrunk = "Buste (depuis la verticale)"
     override val psShoulders = "Ligne des épaules"
     override val psStance = "Appuis (écart des pieds)"
+    override val lessonShot = "Leçon"
+    override val lessonRecord = "Enregistrer la leçon"
+    override val lessonRecordHint = "Téléphone fixe au fond du court et bracelet au poignet du joueur : chaque coup reconnu devient un clip, rangé tout seul parmi coups droits, revers, services et volées. Rien à appuyer ; KEY1 ou KEY2 juste après un coup le marque bon ou faute."
+    override val lessonCount: (Int) -> String = { n -> if (n == 1) "Leçon · 1 coup" else "Leçon · $n coups" }
+    override val lessonWaiting = "Leçon · chaque coup reconnu devient un clip"
+    override val lessonAgenda: (String) -> String = { t -> "Leçon de l'agenda : $t" }
+    override val lessonMarkHint = "Bon ou faute (facultatif) : juste après le coup"
+    override val vsGuess: (String) -> String = { x -> "D'après la vidéo, on dirait : $x" }
+    override val vsMove: (String) -> String = { x -> "Déplacer vers : $x" }
+    override val vsMoved = "Coup déplacé : l'analyse est refaite dans le bon coup"
+    override val vsUnknown = "Le bracelet ne l'a pas reconnu"
+    override val lessonFolder = "Leçons"
+    override val lessonNoBand = "Aucun bracelet connecté : sans lui, la leçon n'enregistre pas les coups."
     override val bzClash: (Int) -> String = { if (it == 1) "1 séance tombe pendant tes indisponibilités" else "$it séances tombent pendant tes indisponibilités" }
     override val ccDeleteAsk: (String) -> String = { "Supprimer le cours $it et ses présences ?" }
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
