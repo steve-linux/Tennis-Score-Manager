@@ -287,6 +287,14 @@ interface Strings {
     val hlStats: String
     val hlStatsHint: (Int, Int) -> String
     val hlStatsNone: String
+    val hlLastPoint: String
+    val hlIntro: String
+    val hlIntroHint: (Int) -> String
+    val introHeight: String
+    val introHand: String
+    val introClub: String
+    val introRecord: String
+    val introH2h: String
     val cardTitle: (String) -> String
     val cardFinal: String
     val cardPartial: String
@@ -3090,7 +3098,7 @@ object ItStrings : Strings {
     override val hlRallies = "Scambi lunghi (dai braccialetti)"
     override val hlMax = "Durata massima"
     override val hlCustom = "Altra durata (minuti)"
-    override val hlMusic = "Musica delle statistiche"
+    override val hlMusic = "Musica di intro e statistiche"
     override val hlMusicPick = "Scegli un brano"
     override val hlMusicReset = "Usa quella dell'app"
     override val hlMusicHint = "Un brano dal telefono: se ne usa l'inizio, con dissolvenza. Usa solo musica che hai il diritto di mettere nei tuoi video."
@@ -3104,6 +3112,14 @@ object ItStrings : Strings {
     override val hlStats = "Statistiche a fine video"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n schermate con le statistiche della partita ($sec s) dopo i punti." }
     override val hlStatsNone = "Statistiche non disponibili: la partita del video non è nello storico."
+    override val hlLastPoint = "Ultimo punto della partita"
+    override val hlIntro = "Intro come nei tornei (all'inizio)"
+    override val hlIntroHint: (Int) -> String = { "Presentazione dei giocatori ($it s): foto o avatar, classifica e dati del giocatore, prima dei punti." }
+    override val introHeight = "Altezza"
+    override val introHand = "Mano"
+    override val introClub = "Circolo"
+    override val introRecord = "Vittorie – sconfitte"
+    override val introH2h = "Scontri diretti"
     override val cardTitle: (String) -> String = { "Statistiche ${it.lowercase()}" }
     override val cardFinal = "Risultato finale"
     override val cardPartial = "Parziale"
@@ -5846,7 +5862,7 @@ object EnStrings : Strings {
     override val hlRallies = "Long rallies (from the wristbands)"
     override val hlMax = "Maximum length"
     override val hlCustom = "Other length (minutes)"
-    override val hlMusic = "Statistics music"
+    override val hlMusic = "Intro and statistics music"
     override val hlMusicPick = "Choose a track"
     override val hlMusicReset = "Use the app's own"
     override val hlMusicHint = "A track from the phone: its beginning is used, with fades. Only use music you have the right to put in your videos."
@@ -5860,6 +5876,14 @@ object EnStrings : Strings {
     override val hlStats = "Statistics at the end of the video"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n screens with the match statistics ($sec s) after the points." }
     override val hlStatsNone = "Statistics not available: the video's match is not in the history."
+    override val hlLastPoint = "Last point of the match"
+    override val hlIntro = "Tournament-style intro (at the start)"
+    override val hlIntroHint: (Int) -> String = { "Player presentation ($it s): photo or avatar, ranking and player details, before the points." }
+    override val introHeight = "Height"
+    override val introHand = "Hand"
+    override val introClub = "Club"
+    override val introRecord = "Wins – losses"
+    override val introH2h = "Head to head"
     override val cardTitle: (String) -> String = { "$it statistics" }
     override val cardFinal = "Final"
     override val cardPartial = "Partial"

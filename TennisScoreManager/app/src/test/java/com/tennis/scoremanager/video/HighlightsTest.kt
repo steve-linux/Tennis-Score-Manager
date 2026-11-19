@@ -13,6 +13,21 @@ class HighlightsTest {
     private fun p(at: Long, kind: String? = null, pressure: String? = null, strokes: Int? = null) =
         PointMark(at, "", 0, kind, pressure = pressure, strokes = strokes)
 
+    /** Tutte le voci tranne l'ultimo punto, per provare le altre da sole. */
+    private val noLast = Highlights.Category.entries.toSet() - Highlights.Category.LAST_POINT
+
+    @Test
+    fun lastPointIsAVoice() {
+        val pts = listOf(p(20_000), p(40_000, kind = "ACE"), p(60_000))
+        // Di serie l'ultimo punto c'è, anche se non è niente di speciale, e viene prima di tutto il resto.
+        val clips = Highlights.select(pts, null, 0)
+        assertEquals(listOf(1, 2), clips.map { it.index })
+        assertEquals(Highlights.Reason.LAST_POINT, clips[1].reason)
+        assertEquals(listOf(2), Highlights.select(pts, null, 0, Highlights.Options(maxMs = 10_000)).map { it.index })
+        // Spento: resta solo l'ace.
+        assertEquals(listOf(1), Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast)).map { it.index })
+    }
+
     @Test
     fun picksByReasonAndKeepsTimeOrder() {
         val pts = listOf(
@@ -35,10 +50,10 @@ class HighlightsTest {
     fun orderDecidesWhoStays() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "BREAK_POINT"), p(60_000, kind = "WINNER"))
         // Al minimo 7 s l'uno: con 14 s ne stanno due. Di serie vincono palla break e (tra ace e vincente) l'ace.
-        assertEquals(listOf(0, 1), Highlights.select(pts, null, 0, Highlights.Options(maxMs = 14_000)).map { it.index })
+        assertEquals(listOf(0, 1), Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast, maxMs = 14_000)).map { it.index })
         // Vincenti in cima, poi ace: la palla break resta fuori.
         val order = listOf(Highlights.Category.WINNERS, Highlights.Category.ACES, Highlights.Category.BIG_POINTS, Highlights.Category.LONG_RALLIES)
-        assertEquals(listOf(0, 2), Highlights.select(pts, null, 0, Highlights.Options(order = order, maxMs = 14_000)).map { it.index })
+        assertEquals(listOf(0, 2), Highlights.select(pts, null, 0, Highlights.Options(order = order, enabled = noLast, maxMs = 14_000)).map { it.index })
     }
 
     @Test
@@ -63,7 +78,7 @@ class HighlightsTest {
     fun stillOverLimitDropsLeastImportant() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
         // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori la voce più in basso (di serie i vincenti).
-        val clips = Highlights.select(pts, null, 0, Highlights.Options(maxMs = 20_000))
+        val clips = Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast, maxMs = 20_000))
         assertEquals(listOf(0, 1), clips.map { it.index })
         assertEquals(7_000L, clips[0].durationMs)
     }

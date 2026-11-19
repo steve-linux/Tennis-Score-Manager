@@ -2424,7 +2424,7 @@ const APP_I18N = {
     coNever: "jamais vu",
     coNextLesson: (it) => `Prochain : ${it}`,
     coNoLessons: "Aucun cours prévu.",
-    coNote: "Note",
+    coNote: "Remarque",
     coNotify: "Prévenir",
     coPackLessons: "Nombre de cours",
     coPackLine: (n, p) => `${n} cours · ${p}`,
@@ -11111,7 +11111,8 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
 
 - **Fortschritt** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*.
 - **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
-- **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
+- **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (letzter Punkt des Matches, Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
+  - **Intro wie bei Turnieren (am Anfang)**: 9 Sekunden vor den Punkten, mit derselben Grafik und Musik wie die Statistiken, ein- und ausgeblendet: oben Turnier und Runde (oder Verein) und das Datum; an den Seiten Foto oder Porträt, Vorname und NACHNAME und das FITP-Ranking groß; in der Mitte der Vergleich mit den Daten, die die App kennt (TSM-Wertung, Alter, Größe, Spielhand, Rückhand, Verein, Siege – Niederlagen) und der direkte Vergleich vor diesem Match. Die Daten stammen aus der Spielerkarte unter *Spieler*: Was nicht eingetragen ist, fehlt. Das Video braucht nur die Namen der Spieler.
   - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde. Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** unter *Neues Match*) (ohne Wahl der Mann; gilt in der ganzen App, auch unter *Neues Match*, im Verlauf, im Spielbericht, im PDF und auf der Anzeigetafel); darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (*Weitere Angaben* unter *Neues Match*) oder Club und Platz.
   - **Musik** unter den Statistiken, mit Ein- und Ausblendung: *Nowhere Land* von Kevin MacLeod (incompetech.com, Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn), oder ein eigener Titel mit **Titel wählen** (es wird der Anfang verwendet; nur Musik verwenden, die du in deinen Videos nutzen darfst).
   - Unten auf jeder Statistikseite steht **Erstellt mit Tennis Score Manager** mit der Adresse der Website.
@@ -11725,7 +11726,8 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
 
 - **Progress** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*.
 - **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
-- **Highlights**: automatic edit of the best points (aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
+- **Highlights**: automatic edit of the best points (last point of the match, aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
+  - **Tournament-style intro (at the start)**: 9 seconds before the points, with the same graphics and music as the statistics, fading in and out: tournament and round (or club) and the date at the top; on the sides photo or portrait, first name and SURNAME and the FITP ranking in large type; in the middle the comparison with the data the app knows (TSM rating, age, height, hand, backhand, club, wins – losses) and the head to head before that match. The data come from the player card in *Players*: whatever is not filled in is left out. The video only needs the players' names.
   - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn. The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice in *New match*) (without a choice, the man; this applies across the app, also in *New match*, history, summary, PDF and TV scoreboard); below, the percentage of points won. At the top, tournament, category and round (*More details* in *New match*), or club and court.
   - **Music** under the statistics, with fade in and out: *Nowhere Land* by Kevin MacLeod (incompetech.com, CC BY 4.0 licence: if you publish the video, credit it), or a track of yours with **Choose a track** (its beginning is used; only use music you have the right to put in your videos).
   - At the bottom of every statistics screen there is the line **Made with Tennis Score Manager** with the website address.
@@ -12338,7 +12340,8 @@ Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marc
 
 - **Progresos** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*.
 - **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
-- **Mejores jugadas**: montaje automático de los mejores puntos (aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
+- **Mejores jugadas**: montaje automático de los mejores puntos (último punto del partido, aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
+  - **Intro como en los torneos (al principio)**: 9 segundos antes de los puntos, con el mismo diseño y la misma música que las estadísticas, con fundido: arriba torneo y ronda (o club) y la fecha; a los lados foto o retrato, nombre y APELLIDO y la clasificación FITP en grande; en el centro la comparación con los datos que la app conoce (rating TSM, edad, altura, mano, revés, club, victorias – derrotas) y los enfrentamientos antes de ese partido. Los datos vienen de la ficha del jugador en *Jugadores*: lo que no está rellenado no aparece. Basta con que el vídeo tenga los nombres de los jugadores.
   - **Estadísticas al final del vídeo**: 2 o 3 pantallas de 10 segundos como en las retransmisiones de los torneos: saque y bolas de break; puntos, errores y peloteos cortos y largos; pulso, si se llevaba la banda. El partido es el del historial jugado mientras se grababa, o el de los puntos marcados en un vídeo importado. A los lados, la foto del jugador; sin foto, un retrato estilizado de hombre o de mujer (elección **Hombre / Mujer** en *Nuevo partido*) (sin elección, el del hombre; vale en toda la app, también en *Nuevo partido*, el historial, el resumen, el PDF y el marcador de la TV); debajo, el porcentaje de puntos ganados. Arriba, torneo, categoría y ronda (*Más detalles* en *Nuevo partido*), o club y pista.
   - **Música** bajo las estadísticas, con fundido de entrada y de salida: *Nowhere Land* de Kevin MacLeod (incompetech.com, licencia CC BY 4.0: si publicas el vídeo, cítalo), o una pista tuya con **Elegir una pista** (se usa el principio; usa solo música que tengas derecho a poner en tus vídeos).
   - Al pie de cada pantalla de estadísticas aparece **Creado con Tennis Score Manager** con la dirección del sitio.
@@ -12951,7 +12954,8 @@ Un deuxième téléphone sur un trépied filme le match et met le score de l'arb
 
 - **Progrès** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*.
 - **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
-- **Temps forts** : montage automatique des plus beaux points (aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
+- **Temps forts** : montage automatique des plus beaux points (dernier point du match, aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
+  - **Intro comme dans les tournois (au début)** : 9 secondes avant les points, avec le même graphisme et la même musique que les statistiques, en fondu : en haut tournoi et tour (ou club) et la date ; sur les côtés photo ou portrait, prénom et NOM et le classement FITP en grand ; au centre la comparaison avec les données que l'app connaît (classement TSM, âge, taille, main, revers, club, victoires – défaites) et le face-à-face avant ce match. Les données viennent de la fiche du joueur dans *Joueurs* : ce qui n'est pas rempli n'apparaît pas. Il suffit que la vidéo ait les noms des joueurs.
   - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture. Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** dans *Nouveau match*) (sans choix, celui de l'homme ; valable dans toute l'application, aussi dans *Nouveau match*, l'historique, le résumé, le PDF et le tableau TV) ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (*Autres détails* dans *Nouveau match*), ou club et court.
   - **Musique** sous les statistiques, avec fondu en entrée et en sortie : *Nowhere Land* de Kevin MacLeod (incompetech.com, licence CC BY 4.0 : si vous publiez la vidéo, citez-le), ou un morceau à vous avec **Choisir un morceau** (on en utilise le début ; n'utilisez que de la musique que vous avez le droit de mettre dans vos vidéos).
   - En bas de chaque écran de statistiques figure la mention **Créé avec Tennis Score Manager** avec l'adresse du site.
@@ -13564,7 +13568,8 @@ Un secondo telefono su un treppiede riprende la partita e mette sul video il pun
 
 - **Progressi** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*.
 - **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
-- **Highlights**: montaggio automatico dei punti più belli (ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
+- **Highlights**: montaggio automatico dei punti più belli (ultimo punto della partita, ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
+  - **Intro come nei tornei (all'inizio)**: 9 secondi prima dei punti, con la stessa grafica e la stessa musica delle statistiche, in dissolvenza: in alto torneo e turno (o circolo) e la data; ai lati foto o ritratto, nome e COGNOME e la classifica FITP in grande; al centro il confronto con i dati che l'app conosce (rating TSM, età, altezza, mano, rovescio, circolo, vittorie – sconfitte) e gli scontri diretti prima di quella partita. I dati vengono dalla scheda del giocatore in *Giocatori*: mancano quelli non scritti. Basta che il video abbia i nomi dei giocatori.
   - **Statistiche a fine video**: 2 o 3 schermate da 10 secondi come nelle dirette dei tornei: servizio e palle break; punti, errori e scambi corti e lunghi; battito, se c'era la fascia. La partita è quella dello storico giocata mentre si registrava, o quella dei punti segnati su un video importato. Ai lati la foto del giocatore; senza foto un ritratto stilizzato di uomo o di donna (scelta **Uomo / Donna** in *Nuova partita*) (senza scelta, quello dell'uomo; vale in tutta l'app, anche in *Nuova partita*, storico, riepilogo, PDF e tabellone TV); sotto, la percentuale di punti vinti. In alto torneo, categoria e turno (*Altri dettagli* in *Nuova partita*), oppure circolo e campo.
   - **Musica** sotto le statistiche, con dissolvenza in entrata e in uscita: *Nowhere Land* di Kevin MacLeod (incompetech.com, licenza CC BY 4.0: se pubblichi il video, citalo nei crediti), oppure un brano tuo con **Scegli un brano** (se ne usa l'inizio; usa solo musica che hai il diritto di mettere nei tuoi video).
   - In fondo a ogni schermata delle statistiche c'è la scritta **Creato con Tennis Score Manager** con l'indirizzo del sito.
@@ -14177,7 +14182,8 @@ Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do á
 
 - **Progresso** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*.
 - **Filtros do treinador** (ícone do filtro): só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points. **Reproduzir** coloca-os em sequência.
-- **Melhores momentos**: montagem automática dos melhores pontos (aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
+- **Melhores momentos**: montagem automática dos melhores pontos (último ponto da partida, aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
+  - **Intro como nos torneios (no início)**: 9 segundos antes dos pontos, com o mesmo visual e a mesma música das estatísticas, com transição suave: no topo torneio e ronda (ou clube) e a data; dos lados foto ou retrato, nome e APELIDO e o ranking FITP em grande; no centro a comparação com os dados que a app conhece (rating TSM, idade, altura, mão, backhand, clube, vitórias – derrotas) e os confrontos diretos antes dessa partida. Os dados vêm da ficha do jogador em *Jogadores*: o que não estiver preenchido não aparece. Basta que o vídeo tenha os nomes dos jogadores.
   - **Estatísticas no fim do vídeo**: 2 ou 3 telas de 10 segundos como nas transmissões dos torneios: saque e break points; pontos, erros e trocas de bola curtas e longas; batimentos, se a cinta foi usada. A partida é a do histórico jogada durante a gravação, ou a dos pontos marcados num vídeo importado. Nas laterais, a foto do jogador; sem foto, um retrato estilizado de homem ou de mulher (escolha **Homem / Mulher** em *Nova partida*) (sem escolha, o do homem; vale em todo o app, também em *Nova partida*, no histórico, no resumo, no PDF e no placar da TV); embaixo, a porcentagem de pontos ganhos. No alto, torneio, categoria e fase (*Mais detalhes* em *Nova partida*), ou clube e quadra.
   - **Música** sob as estatísticas, com fade de entrada e de saída: *Nowhere Land* de Kevin MacLeod (incompetech.com, licença CC BY 4.0: se publicar o vídeo, dê o crédito), ou uma faixa sua com **Escolher uma faixa** (usa-se o começo; use só músicas que você tem o direito de colocar nos seus vídeos).
   - No rodapé de cada tela de estatísticas aparece **Criado com Tennis Score Manager** com o endereço do site.
@@ -31218,6 +31224,11 @@ class Storage(context: Context) {
     var highlightStats: Boolean
         get() = prefs.getBoolean("hl_stats", true)
         set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
+
+    /** Intro come nei tornei in testa agli highlights. */
+    var highlightIntro: Boolean
+        get() = prefs.getBoolean("hl_intro", true)
+        set(v) = prefs.edit().putBoolean("hl_intro", v).apply()
 
     /** Moviola mandata subito anche al tabellone. */
     var replayOnBoard: Boolean
@@ -48402,6 +48413,14 @@ interface Strings {
     val hlStats: String
     val hlStatsHint: (Int, Int) -> String
     val hlStatsNone: String
+    val hlLastPoint: String
+    val hlIntro: String
+    val hlIntroHint: (Int) -> String
+    val introHeight: String
+    val introHand: String
+    val introClub: String
+    val introRecord: String
+    val introH2h: String
     val cardTitle: (String) -> String
     val cardFinal: String
     val cardPartial: String
@@ -51205,7 +51224,7 @@ object ItStrings : Strings {
     override val hlRallies = "Scambi lunghi (dai braccialetti)"
     override val hlMax = "Durata massima"
     override val hlCustom = "Altra durata (minuti)"
-    override val hlMusic = "Musica delle statistiche"
+    override val hlMusic = "Musica di intro e statistiche"
     override val hlMusicPick = "Scegli un brano"
     override val hlMusicReset = "Usa quella dell'app"
     override val hlMusicHint = "Un brano dal telefono: se ne usa l'inizio, con dissolvenza. Usa solo musica che hai il diritto di mettere nei tuoi video."
@@ -51219,6 +51238,14 @@ object ItStrings : Strings {
     override val hlStats = "Statistiche a fine video"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n schermate con le statistiche della partita ($sec s) dopo i punti." }
     override val hlStatsNone = "Statistiche non disponibili: la partita del video non è nello storico."
+    override val hlLastPoint = "Ultimo punto della partita"
+    override val hlIntro = "Intro come nei tornei (all'inizio)"
+    override val hlIntroHint: (Int) -> String = { "Presentazione dei giocatori ($it s): foto o avatar, classifica e dati del giocatore, prima dei punti." }
+    override val introHeight = "Altezza"
+    override val introHand = "Mano"
+    override val introClub = "Circolo"
+    override val introRecord = "Vittorie – sconfitte"
+    override val introH2h = "Scontri diretti"
     override val cardTitle: (String) -> String = { "Statistiche ${it.lowercase()}" }
     override val cardFinal = "Risultato finale"
     override val cardPartial = "Parziale"
@@ -53961,7 +53988,7 @@ object EnStrings : Strings {
     override val hlRallies = "Long rallies (from the wristbands)"
     override val hlMax = "Maximum length"
     override val hlCustom = "Other length (minutes)"
-    override val hlMusic = "Statistics music"
+    override val hlMusic = "Intro and statistics music"
     override val hlMusicPick = "Choose a track"
     override val hlMusicReset = "Use the app's own"
     override val hlMusicHint = "A track from the phone: its beginning is used, with fades. Only use music you have the right to put in your videos."
@@ -53975,6 +54002,14 @@ object EnStrings : Strings {
     override val hlStats = "Statistics at the end of the video"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n screens with the match statistics ($sec s) after the points." }
     override val hlStatsNone = "Statistics not available: the video's match is not in the history."
+    override val hlLastPoint = "Last point of the match"
+    override val hlIntro = "Tournament-style intro (at the start)"
+    override val hlIntroHint: (Int) -> String = { "Player presentation ($it s): photo or avatar, ranking and player details, before the points." }
+    override val introHeight = "Height"
+    override val introHand = "Hand"
+    override val introClub = "Club"
+    override val introRecord = "Wins – losses"
+    override val introH2h = "Head to head"
     override val cardTitle: (String) -> String = { "$it statistics" }
     override val cardFinal = "Final"
     override val cardPartial = "Partial"
@@ -56740,7 +56775,7 @@ object DeStrings : Strings {
     override val hlRallies = "Lange Ballwechsel (von den Armbändern)"
     override val hlMax = "Maximale Länge"
     override val hlCustom = "Andere Länge (Minuten)"
-    override val hlMusic = "Musik der Statistiken"
+    override val hlMusic = "Musik für Intro und Statistiken"
     override val hlMusicPick = "Titel wählen"
     override val hlMusicReset = "Die der App verwenden"
     override val hlMusicHint = "Ein Titel vom Telefon: Der Anfang wird mit Ein- und Ausblendung verwendet. Nur Musik verwenden, die du in deinen Videos nutzen darfst."
@@ -56754,6 +56789,14 @@ object DeStrings : Strings {
     override val hlStats = "Statistiken am Videoende"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n Bildschirme mit den Spielstatistiken ($sec s) nach den Punkten." }
     override val hlStatsNone = "Keine Statistiken: Das Match des Videos ist nicht im Verlauf."
+    override val hlLastPoint = "Letzter Punkt des Matches"
+    override val hlIntro = "Intro wie bei Turnieren (am Anfang)"
+    override val hlIntroHint: (Int) -> String = { "Vorstellung der Spieler ($it s): Foto oder Avatar, Ranking und Spielerdaten, vor den Punkten." }
+    override val introHeight = "Größe"
+    override val introHand = "Spielhand"
+    override val introClub = "Verein"
+    override val introRecord = "Siege – Niederlagen"
+    override val introH2h = "Direkter Vergleich"
     override val cardTitle: (String) -> String = { "${it}statistik" }
     override val cardFinal = "Endstand"
     override val cardPartial = "Zwischenstand"
@@ -59511,7 +59554,7 @@ object EsStrings : Strings {
     override val hlRallies = "Peloteos largos (de las pulseras)"
     override val hlMax = "Duración máxima"
     override val hlCustom = "Otra duración (minutos)"
-    override val hlMusic = "Música de las estadísticas"
+    override val hlMusic = "Música de la intro y las estadísticas"
     override val hlMusicPick = "Elegir una pista"
     override val hlMusicReset = "Usar la de la app"
     override val hlMusicHint = "Una pista del teléfono: se usa el principio, con fundido. Usa solo música que tengas derecho a poner en tus vídeos."
@@ -59525,6 +59568,14 @@ object EsStrings : Strings {
     override val hlStats = "Estadísticas al final del vídeo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n pantallas con las estadísticas del partido ($sec s) después de los puntos." }
     override val hlStatsNone = "Estadísticas no disponibles: el partido del vídeo no está en el historial."
+    override val hlLastPoint = "Último punto del partido"
+    override val hlIntro = "Intro como en los torneos (al principio)"
+    override val hlIntroHint: (Int) -> String = { "Presentación de los jugadores ($it s): foto o avatar, clasificación y datos del jugador, antes de los puntos." }
+    override val introHeight = "Altura"
+    override val introHand = "Mano"
+    override val introClub = "Club"
+    override val introRecord = "Victorias – derrotas"
+    override val introH2h = "Enfrentamientos"
     override val cardTitle: (String) -> String = { "Estadísticas del ${it.lowercase()}" }
     override val cardFinal = "Resultado final"
     override val cardPartial = "Parcial"
@@ -62286,7 +62337,7 @@ object FrStrings : Strings {
     override val hlRallies = "Longs échanges (des bracelets)"
     override val hlMax = "Durée maximale"
     override val hlCustom = "Autre durée (minutes)"
-    override val hlMusic = "Musique des statistiques"
+    override val hlMusic = "Musique de l'intro et des statistiques"
     override val hlMusicPick = "Choisir un morceau"
     override val hlMusicReset = "Utiliser celle de l'application"
     override val hlMusicHint = "Un morceau du téléphone : on en utilise le début, avec fondu. N'utilisez que de la musique que vous avez le droit de mettre dans vos vidéos."
@@ -62300,6 +62351,14 @@ object FrStrings : Strings {
     override val hlStats = "Statistiques en fin de vidéo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n écrans avec les statistiques du match ($sec s) après les points." }
     override val hlStatsNone = "Statistiques indisponibles : le match de la vidéo n'est pas dans l'historique."
+    override val hlLastPoint = "Dernier point du match"
+    override val hlIntro = "Intro comme dans les tournois (au début)"
+    override val hlIntroHint: (Int) -> String = { "Présentation des joueurs ($it s) : photo ou avatar, classement et infos du joueur, avant les points." }
+    override val introHeight = "Taille"
+    override val introHand = "Main"
+    override val introClub = "Club"
+    override val introRecord = "Victoires – défaites"
+    override val introH2h = "Face-à-face"
     override val cardTitle: (String) -> String = { "Statistiques du ${it.lowercase()}" }
     override val cardFinal = "Score final"
     override val cardPartial = "Partiel"
@@ -64390,7 +64449,7 @@ object FrStrings : Strings {
     override val coWhen = "Quand"
     override val coMinutes: (Int) -> String = { "$it min" }
     override val coPlace = "Où (terrain, club)"
-    override val coNote = "Note"
+    override val coNote = "Remarque"
     override val coWho = "Qui"
     override val coRemindTomorrow: (Int) -> String = { "Rappeler les cours de demain ($it)" }
     override val coRemind: (String) -> String = { "Je vous rappelle le cours : $it." }
@@ -65060,7 +65119,7 @@ object PtStrings : Strings {
     override val hlRallies = "Ralis longos (das pulseiras)"
     override val hlMax = "Duração máxima"
     override val hlCustom = "Outra duração (minutos)"
-    override val hlMusic = "Música das estatísticas"
+    override val hlMusic = "Música da intro e das estatísticas"
     override val hlMusicPick = "Escolher uma faixa"
     override val hlMusicReset = "Usar a do app"
     override val hlMusicHint = "Uma faixa do telefone: usa-se o começo, com fade. Use só músicas que você tem o direito de colocar nos seus vídeos."
@@ -65074,6 +65133,14 @@ object PtStrings : Strings {
     override val hlStats = "Estatísticas no fim do vídeo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n telas com as estatísticas da partida ($sec s) depois dos pontos." }
     override val hlStatsNone = "Estatísticas indisponíveis: a partida do vídeo não está no histórico."
+    override val hlLastPoint = "Último ponto da partida"
+    override val hlIntro = "Intro como nos torneios (no início)"
+    override val hlIntroHint: (Int) -> String = { "Apresentação dos jogadores ($it s): foto ou avatar, ranking e dados do jogador, antes dos pontos." }
+    override val introHeight = "Altura"
+    override val introHand = "Mão"
+    override val introClub = "Clube"
+    override val introRecord = "Vitórias – derrotas"
+    override val introH2h = "Confrontos diretos"
     override val cardTitle: (String) -> String = { "Estatísticas da ${it.lowercase()}" }
     override val cardFinal = "Resultado final"
     override val cardPartial = "Parcial"
@@ -83845,6 +83912,162 @@ class TiltSensor(context: Context, private val rotation: () -> Int) : SensorEven
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/HighlightIntro.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightIntro.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.data.Backhand
+import com.tennis.scoremanager.data.Hand
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Players
+import com.tennis.scoremanager.data.Rating
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.Strings
+import java.util.Calendar
+
+/**
+ * L'intro degli highlights, come la presentazione dei giocatori prima delle partite dei tornei: torneo e turno in
+ * alto, i due giocatori ai lati (foto o avatar, nome e COGNOME) e al centro il confronto coi dati che l'app ha già
+ * (classifica, rating TSM, età, altezza, mano, rovescio, circolo, bilancio e scontri diretti prima di questa partita).
+ * Qui si decide cosa mostrare; il disegno, nello stesso stile delle statistiche, è in [StatsCardRenderer.intro].
+ */
+object HighlightIntro {
+    /** Durata dell'intro nel video, dissolvenze comprese. */
+    const val MS = 9_000L
+
+    /** Un giocatore: [first] piccolo sopra, [last] grande (come "Jannik / SINNER"). */
+    data class Person(val first: String, val last: String, val female: Boolean?)
+
+    /** Una riga del confronto: i valori dei due lati già scritti ("–" se manca). */
+    data class Row(val label: String, val a: String, val b: String)
+
+    data class Card(
+        /** In alto: il torneo, o il circolo, o "Highlights". */
+        val title: String,
+        /** Sotto il titolo: categoria e turno, o il campo. */
+        val subtitle: String,
+        /** In alto a destra: la data (e il circolo se il titolo è il torneo). */
+        val place: List<String>,
+        /** Nello stesso ordine dei nomi delle statistiche ([Names.players]): le foto valgono per tutte e due. */
+        val people: Map<Side, List<Person>>,
+        val rows: List<Row>,
+        /** Scontri diretti prima di questa partita (solo singolare, e solo se si sono già incontrati). */
+        val h2h: Pair<Int, Int>?,
+        val h2hLabel: String = "",
+        /** In fondo al pannello di ogni lato, in grande: la classifica (nel doppio "4.1 / 4.3"), e la sua scritta. */
+        val ranks: Map<Side, String> = emptyMap(),
+        val rankLabel: String = "",
+    )
+
+    /**
+     * [history]: le partite finite dello storico; contano solo quelle finite prima di [before] (l'inizio della
+     * partita del video), così bilancio, rating e scontri diretti sono quelli della vigilia. [date] è già scritta.
+     */
+    fun card(
+        rec: MatchRecord, s: Strings, profiles: List<PlayerProfile>, history: List<MatchRecord>, before: Long, date: String,
+        female: (String) -> Boolean = { false },
+    ): Card {
+        val su = rec.setup
+        val names = Names(su, s)
+        val past = history.filter { it.id != rec.id && (it.endedAt ?: it.updatedAt) <= before }
+            .map { it to ScoreEngine.replay(it.rules, it.events) }
+        val played = past.map { (r, st) -> PlayerStats.Played(r, st.winner) }
+        val rating = Rating.compute(past.mapNotNull { (r, st) -> Rating.gameOf(r, st.sets, st.winner) }, su.sport)
+
+        // I giocatori veri di ogni posto (chi non ha nome resta "Giocatore 1" e non ha dati).
+        val ids = mapOf(Side.P1 to listOf(su.p1aId, su.p1bId), Side.P2 to listOf(su.p2aId, su.p2bId))
+        val setRanks = mapOf(Side.P1 to listOf(su.p1aRank, su.p1bRank), Side.P2 to listOf(su.p2aRank, su.p2bRank))
+        val sexes = mapOf(Side.P1 to listOf(su.p1aSex, su.p1bSex), Side.P2 to listOf(su.p2aSex, su.p2bSex))
+        class Slot(val shown: String, val who: PlayerStats.Who?, val profile: PlayerProfile?, val rank: String, val sex: String)
+        val slots = Side.entries.associateWith { side ->
+            val real = PlayerStats.whos(su, side)
+            names.players(side).mapIndexed { i, shown ->
+                val who = real.firstOrNull { it.name == shown }
+                val id = ids.getValue(side)[i]
+                val profile = Players.byId(profiles, id) ?: who?.let { w -> Players.byName(profiles, w.name).singleOrNull() }
+                Slot(shown, who, profile, setRanks.getValue(side)[i].trim(), sexes.getValue(side)[i])
+            }
+        }
+
+        val people = slots.mapValues { (_, list) ->
+            list.map { sl ->
+                val p = sl.profile
+                val (first, last) = if (p != null && p.complete && p.nickname.isBlank()) p.firstName.trim() to p.lastName.trim() else split(sl.shown)
+                val sex = sl.sex.ifEmpty { p?.sex.orEmpty() }
+                Person(first, last, when (sex) { "F" -> true; "M" -> false; else -> if (sl.who != null && female(sl.shown)) true else null })
+            }
+        }
+
+        // Una riga per dato, solo se almeno un lato ce l'ha; nel doppio i due valori del lato con "/".
+        fun row(label: String, value: (Slot) -> String?): Row? {
+            val v = Side.entries.associateWith { side -> slots.getValue(side).map { value(it)?.takeIf { x -> x.isNotBlank() } } }
+            if (v.values.flatten().all { it == null }) return null
+            fun text(side: Side) = v.getValue(side).joinToString(" / ") { it ?: "–" }
+            return Row(label, text(Side.P1), text(Side.P2))
+        }
+        val rankRow = row(s.memberRankingLabel) { it.rank.ifEmpty { it.profile?.member?.ranking.orEmpty() } }
+        val rows = listOfNotNull(
+            row(s.ratingTitle) { sl -> sl.who?.let { rating.player(it.key)?.rating?.toString() } },
+            row(s.heartAge) { sl -> sl.profile?.birth?.let { age(it, before) }?.takeIf { it in 4..110 }?.toString() },
+            row(s.introHeight) { sl -> sl.profile?.heightCm?.let { "$it cm" } },
+            row(s.introHand) { sl -> when (sl.profile?.hand) { Hand.RIGHT -> s.handRight; Hand.LEFT -> s.handLeft; null -> null } },
+            row(s.playerBackhand) { sl -> when (sl.profile?.backhand) { Backhand.ONE -> s.backhandOne; Backhand.TWO -> s.backhandTwo; null -> null } },
+            row(s.introClub) { it.profile?.club },
+            row(s.introRecord) { sl ->
+                sl.who?.let { w ->
+                    val mine = PlayerStats.matchesOf(played, w.key).filter { it.winner != null }
+                    if (mine.isEmpty()) null else {
+                        val won = mine.count { it.winner == PlayerStats.sideOf(it.rec, w.key) }
+                        "$won–${mine.size - won}"
+                    }
+                }
+            },
+        )
+
+        // Scontri diretti: nel singolare, tra due giocatori veri che si sono già incontrati.
+        val h2h = if (su.doubles) null else {
+            val a = slots.getValue(Side.P1).firstOrNull()?.who
+            val b = slots.getValue(Side.P2).firstOrNull()?.who
+            if (a == null || b == null) null
+            else PlayerStats.rivals(played, a.key).firstOrNull { it.key == b.key }?.let { it.won to it.lost }
+        }
+
+        val event = su.event.trim()
+        val club = su.club.trim()
+        val court = su.court.trim().takeIf { it.isNotEmpty() }?.let { "${s.court} $it" }.orEmpty()
+        val title = event.ifEmpty { club }.ifEmpty { s.hlTitle }
+        val subtitle = if (event.isNotEmpty()) listOf(su.category.trim(), su.round.trim()).filter { it.isNotEmpty() }.joinToString(" · ") else court
+        val place = listOf(date, if (event.isNotEmpty()) listOf(club, court).filter { it.isNotEmpty() }.joinToString(" · ") else "").filter { it.isNotEmpty() }
+        val ranks = if (rankRow == null) emptyMap() else mapOf(Side.P1 to rankRow.a, Side.P2 to rankRow.b)
+        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, ranks, s.memberRankingLabel)
+    }
+
+    /** "Mario Rossi" → ("Mario", "Rossi"); un nome solo resta tutto grande. */
+    fun split(name: String): Pair<String, String> {
+        val t = name.trim()
+        val i = t.lastIndexOf(' ')
+        return if (i <= 0) "" to t else t.substring(0, i).trim() to t.substring(i + 1)
+    }
+
+    /** Anni compiuti il giorno [at] da chi è nato il giorno [birth]. */
+    fun age(birth: Long, at: Long): Int {
+        val b = Calendar.getInstance().apply { timeInMillis = birth }
+        val n = Calendar.getInstance().apply { timeInMillis = at }
+        var y = n.get(Calendar.YEAR) - b.get(Calendar.YEAR)
+        val md = { c: Calendar -> c.get(Calendar.MONTH) * 100 + c.get(Calendar.DAY_OF_MONTH) }
+        if (md(n) < md(b)) y--
+        return y
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/HighlightMaker.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightMaker.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -83892,19 +84115,24 @@ class HighlightMaker(context: Context) {
     private var transformer: Transformer? = null
     private val main = Handler(Looper.getMainLooper())
 
-    /** Schermate delle statistiche da mettere in coda: la partita, le foto dei giocatori e la scritta "punti vinti". */
+    /**
+     * Intro in testa e schermate delle statistiche in coda (null = non le si vuole): la partita, le foto dei giocatori
+     * (nell'ordine dei nomi, valgono per tutte e due) e la scritta "punti vinti".
+     */
     class Stats(
-        val card: HighlightStats.Card, val photos: Map<Side, List<Bitmap?>>, val pointsWon: String, val music: File? = null,
+        val card: HighlightStats.Card?, val photos: Map<Side, List<Bitmap?>>, val pointsWon: String, val music: File? = null,
         val avatars: StatsCardRenderer.Avatars? = null,
         /** Il brano dell'app, copiato dalle risorse (la musica scelta dall'utente ha la precedenza). */
         val defaultMusic: File? = null,
         /** In fondo alle schermate: "Creato con Tennis Score Manager" e l'indirizzo del sito. */
         val credit: String = "", val site: String = "",
+        /** L'intro come nei tornei, [HighlightIntro.MS] prima dei punti. */
+        val intro: HighlightIntro.Card? = null,
     )
 
     /**
      * Da chiamare sul thread principale. [onProgress] in percento; [onDone] col file dei capitoli, o null se fallisce.
-     * Con [stats] le schermate delle statistiche chiudono il video, [HighlightStats.PAGE_MS] l'una.
+     * Con [stats] le schermate delle statistiche chiudono il video, [HighlightStats.PAGE_MS] l'una, e l'intro lo apre.
      */
     fun make(
         e: VideoLibrary.Entry,
@@ -83928,13 +84156,16 @@ class HighlightMaker(context: Context) {
                 Effects(listOf(), listOf(OverlayEffect(listOf(BitmapOverlay.createStaticBitmapOverlay(bmp, at(-0.94f, -0.88f, -1f, -1f))))))
             } ?: Effects.EMPTY
             EditedMediaItem.Builder(item).setEffects(effects).build()
-        } + statsItems(stats, width, height)
+        }
+        val intro = introItem(stats, width, height)
+        val introMs = if (intro != null) HighlightIntro.MS else 0L
+        val all = listOfNotNull(intro) + items + statsItems(stats, width, height)
         val dir = app.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: app.filesDir
         val out = File(dir, "TSM_highlights_${System.currentTimeMillis()}.mp4")
         val t = Transformer.Builder(app).addListener(object : Transformer.Listener {
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                 transformer = null
-                Thread { val f = finish(e, clips, out); main.post { onDone(f) } }.start()
+                Thread { val f = finish(e, clips, out, introMs); main.post { onDone(f) } }.start()
             }
 
             override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
@@ -83945,11 +84176,13 @@ class HighlightMaker(context: Context) {
             }
         }).build()
         transformer = t
-        // Le immagini delle statistiche non hanno audio: una traccia muta tiene insieme video e immagini, e sotto
-        // le statistiche suona il sottofondo dell'app (seconda sequenza solo audio, dopo una pausa lunga quanto i punti).
-        val sequence = EditedMediaItemSequence.Builder(items).experimentalSetForceAudioTrack(stats != null).build()
-        val music = musicSequence(stats, clips.sumOf { it.durationMs })
-        t.start(Composition.Builder(listOfNotNull(sequence, music)).build(), out.absolutePath)
+        // Intro e statistiche sono immagini senza audio: una traccia muta tiene insieme video e immagini; sotto
+        // l'intro e sotto le statistiche suona il sottofondo (sequenze solo audio: l'intro all'inizio, le statistiche
+        // dopo una pausa lunga quanto intro e punti).
+        val sequence = EditedMediaItemSequence.Builder(all).experimentalSetForceAudioTrack(stats != null).build()
+        val introMusic = if (intro != null) musicItem(stats, HighlightIntro.MS, "intro.wav")?.let { EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO)).addItem(it).build() } else null
+        val music = musicSequence(stats, introMs + clips.sumOf { it.durationMs })
+        t.start(Composition.Builder(listOfNotNull(sequence, introMusic, music)).build(), out.absolutePath)
         // Avanzamento: Transformer lo dice solo se glielo si chiede.
         val holder = ProgressHolder()
         val poll = object : Runnable {
@@ -83985,25 +84218,72 @@ class HighlightMaker(context: Context) {
         }
     }.getOrNull()
 
-    private fun musicSequence(stats: Stats?, clipsMs: Long): EditedMediaItemSequence? {
+    private fun musicSequence(stats: Stats?, beforeMs: Long): EditedMediaItemSequence? {
         val pages = stats?.card?.pages?.size ?: 0
         if (pages == 0) return null
-        val wav = File(app.cacheDir, "hl_stats/music.wav")
-        val ms = pages * HighlightStats.PAGE_MS
+        val item = musicItem(stats, pages * HighlightStats.PAGE_MS, "music.wav") ?: return null
+        return EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO)).addGap(beforeMs * 1000).addItem(item).build()
+    }
+
+    /** L'inizio del sottofondo, lungo [ms], con dissolvenza in entrata e in uscita. */
+    private fun musicItem(stats: Stats?, ms: Long, name: String): EditedMediaItem? {
+        stats ?: return null
+        val wav = File(app.cacheDir, "hl_stats/$name").apply { parentFile?.mkdirs() }
         // Il brano scelto dall'utente, se c'è e si legge; altrimenti quello dell'app ("Nowhere Land"); se nemmeno
         // quello si legge, la musica generata.
-        val chosen = listOfNotNull(stats?.music, stats?.defaultMusic).firstOrNull { it.exists() && MusicClip.writeWav(it, ms, wav) } != null
+        val chosen = listOfNotNull(stats.music, stats.defaultMusic).firstOrNull { it.exists() && MusicClip.writeWav(it, ms, wav) } != null
         if (!chosen) StatsMusic.writeWav(ms, wav)
-        val item = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(wav))).build()
-        return EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO)).addGap(clipsMs * 1000).addItem(item).build()
+        return EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(wav))).build()
+    }
+
+    /**
+     * L'intro: un fondo nero fermo per [HighlightIntro.MS] e sopra, fotogramma per fotogramma, l'animazione di
+     * [StatsCardRenderer.intro] (dissolvenze comprese).
+     */
+    private fun introItem(stats: Stats?, width: Int, height: Int): EditedMediaItem? {
+        val card = stats?.intro ?: return null
+        val dir = File(app.cacheDir, "hl_intro").apply { deleteRecursively(); mkdirs() }
+        val f = File(dir, "black.png")
+        val black = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLACK) }
+        f.outputStream().use { black.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        black.recycle()
+        val overlay = IntroOverlay(width, height) { ms, bmp -> StatsCardRenderer.intro(card, ms, bmp, stats.photos, stats.avatars, stats.credit, stats.site) }
+        val item = MediaItem.Builder().setUri(Uri.fromFile(f)).setImageDurationMs(HighlightIntro.MS).build()
+        return EditedMediaItem.Builder(item).setFrameRate(30)
+            .setEffects(Effects(listOf(), listOf(OverlayEffect(listOf(overlay))))).build()
+    }
+
+    /**
+     * Fotogrammi dell'intro disegnati al momento. Due immagini a turno: Media3 ricarica la texture quando cambia
+     * l'immagine, e intanto quella di prima resta intatta.
+     */
+    private class IntroOverlay(width: Int, height: Int, private val draw: (Long, Bitmap) -> Unit) : BitmapOverlay() {
+        private val buffers = Array(2) { Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888) }
+        private var current = 0
+        private var lastMs = -1L
+
+        override fun getBitmap(presentationTimeUs: Long): Bitmap {
+            val ms = (presentationTimeUs / 1000).coerceIn(0, HighlightIntro.MS)
+            if (ms != lastMs) {
+                current = 1 - current
+                draw(ms, buffers[current])
+                lastMs = ms
+            }
+            return buffers[current]
+        }
+
+        override fun release() {
+            super.release()
+            buffers.forEach { it.recycle() }
+        }
     }
 
     /** Una schermata per pagina, alla misura del video, come immagine ferma per [HighlightStats.PAGE_MS]. */
     private fun statsItems(stats: Stats?, width: Int, height: Int): List<EditedMediaItem> {
-        stats ?: return emptyList()
+        val card = stats?.card ?: return emptyList()
         val dir = File(app.cacheDir, "hl_stats").apply { deleteRecursively(); mkdirs() }
-        return stats.card.pages.mapIndexed { i, page ->
-            val bmp = StatsCardRenderer.render(stats.card, page, width, height, stats.photos, stats.pointsWon, stats.avatars, stats.credit, stats.site)
+        return card.pages.mapIndexed { i, page ->
+            val bmp = StatsCardRenderer.render(card, page, width, height, stats.photos, stats.pointsWon, stats.avatars, stats.credit, stats.site)
             val f = File(dir, "stats_$i.png")
             f.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bmp.recycle()
@@ -84013,8 +84293,9 @@ class HighlightMaker(context: Context) {
     }
 
     /** Copia in galleria e capitoli del montaggio: ogni pezzo è un punto, con l'ora nel nuovo video. */
-    private fun finish(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, out: File): File? = runCatching {
-        var offset = 0L
+    private fun finish(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, out: File, introMs: Long): File? = runCatching {
+        // I punti cominciano dopo l'intro.
+        var offset = introMs
         val marks = clips.map { c ->
             val p = e.chapters.points[c.index]
             val end = offset + (p.at - c.startMs)
@@ -84132,6 +84413,15 @@ object HighlightStats {
             setup = setupFor(ch.names, current),
             options = MatchOptions(detailedStats = events.any { it.kind != null }),
         )
+    }
+
+    /**
+     * Per l'intro quando la partita non si trova: bastano i nomi segnati nel video (null se non ce ne sono). Come
+     * in [record], torneo e classifiche vengono dalla pagina 1 se i nomi sono gli stessi.
+     */
+    fun namesOnly(ch: VideoChapters, current: SetupData? = null): MatchRecord? {
+        if (ch.names.none { it.isNotBlank() }) return null
+        return MatchRecord(id = "video", rules = ch.rules ?: com.tennis.scoremanager.model.RulesConfig(), setup = setupFor(ch.names, current), options = MatchOptions())
     }
 
     private fun setupFor(names: List<String>, current: SetupData?): SetupData {
@@ -84272,8 +84562,8 @@ package com.tennis.scoremanager.video
 import com.tennis.scoremanager.model.RulesConfig
 
 /**
- * Highlights: quali punti finiscono nel montaggio e da dove a dove. Le voci (palle break/set/match point, ace,
- * vincenti, scambi lunghi) hanno la precedenza nell'ordine scelto dall'utente. Se tutti insieme superano la durata scelta, prima
+ * Highlights: quali punti finiscono nel montaggio e da dove a dove. Le voci (ultimo punto, palle break/set/match
+ * point, ace, vincenti, scambi lunghi) hanno la precedenza nell'ordine scelto dall'utente. Se tutti insieme superano la durata scelta, prima
  * si accorciano i pezzi (meno secondi prima della fine del punto, fino a [MIN_BEFORE_MS]), poi, se non basta, si
  * lasciano fuori i meno importanti; alla fine si rimettono in ordine di tempo.
  */
@@ -84287,10 +84577,13 @@ object Highlights {
     /** Dagli 8 colpi in su lo scambio è lungo. */
     const val LONG_RALLY = 8
 
-    enum class Reason { MATCH_POINT, SET_POINT, BREAK_POINT, LONG_RALLY, ACE, WINNER }
+    enum class Reason { LAST_POINT, MATCH_POINT, SET_POINT, BREAK_POINT, LONG_RALLY, ACE, WINNER }
 
-    /** Le voci che si possono mettere negli highlights, ordinabili: quelle più in alto hanno la precedenza. */
-    enum class Category { BIG_POINTS, ACES, WINNERS, LONG_RALLIES }
+    /**
+     * Le voci che si possono mettere negli highlights, ordinabili: quelle più in alto hanno la precedenza.
+     * [LAST_POINT] è l'ultimo punto segnato nel video: a partita finita, quello che la chiude.
+     */
+    enum class Category { LAST_POINT, BIG_POINTS, ACES, WINNERS, LONG_RALLIES }
 
     /**
      * Cosa includere e con che precedenza: [order] dalla più importante, [enabled] quelle accese. Quando non ci
@@ -84310,13 +84603,15 @@ object Highlights {
 
     private fun category(r: Reason): Category = when (r) {
         Reason.MATCH_POINT, Reason.SET_POINT, Reason.BREAK_POINT -> Category.BIG_POINTS
+        Reason.LAST_POINT -> Category.LAST_POINT
         Reason.LONG_RALLY -> Category.LONG_RALLIES
         Reason.ACE -> Category.ACES
         Reason.WINNER -> Category.WINNERS
     }
 
-    /** Tutti i motivi per cui il punto potrebbe entrare (un ace su palla break ne ha due). */
-    private fun reasons(p: PointMark, pressure: String?): List<Reason> = listOfNotNull(
+    /** Tutti i motivi per cui il punto potrebbe entrare (un ace su palla break ne ha due); [last]: è l'ultimo. */
+    private fun reasons(p: PointMark, pressure: String?, last: Boolean): List<Reason> = listOfNotNull(
+        Reason.LAST_POINT.takeIf { last },
         when (pressure) {
             "MATCH_POINT" -> Reason.MATCH_POINT
             "SET_POINT" -> Reason.SET_POINT
@@ -84333,7 +84628,8 @@ object Highlights {
      * break, set e match point", match point > set point > palla break.
      */
     fun priority(r: Reason, o: Options): Int {
-        val rank = o.order.size - o.order.indexOf(category(r))
+        // Una voce che l'ordine non elenca conta meno di tutte.
+        val rank = o.order.indexOf(category(r)).let { if (it < 0) 0 else o.order.size - it }
         val sub = when (r) {
             Reason.MATCH_POINT -> 3
             Reason.SET_POINT -> 2
@@ -84344,8 +84640,8 @@ object Highlights {
     }
 
     /** Il motivo più forte per tenere il punto tra le voci accese (null = non va negli highlights). */
-    fun reason(p: PointMark, pressure: String?, o: Options): Reason? =
-        reasons(p, pressure).filter { category(it) in o.enabled }.maxByOrNull { priority(it, o) }
+    fun reason(p: PointMark, pressure: String?, o: Options, last: Boolean = false): Reason? =
+        reasons(p, pressure, last).filter { category(it) in o.enabled }.maxByOrNull { priority(it, o) }
 
     /** Il pezzo di video del punto [i]: da [before] prima della fine (non prima del punto precedente) a 2 s dopo. */
     fun clip(points: List<PointMark>, i: Int, videoMs: Long, before: Long = BEFORE_MS): Clip? {
@@ -84364,7 +84660,7 @@ object Highlights {
     fun select(points: List<PointMark>, rules: RulesConfig?, videoMs: Long, o: Options = Options()): List<Clip> {
         val chosen = points.mapIndexedNotNull { i, p ->
             val pressure = p.pressure ?: rules?.let { PointMarks.pressure(PointMarks.stateAfter(it, points, i)) }
-            reason(p, pressure, o)?.let { i to it }
+            reason(p, pressure, o, last = i == points.lastIndex)?.let { i to it }
         }
         fun clips(before: Long) = chosen.mapNotNull { (i, r) -> clip(points, i, videoMs, before)?.copy(reason = r, priority = priority(r, o)) }
         // Troppo lungo: prima si accorciano tutti i pezzi, un secondo alla volta.
@@ -86590,6 +86886,149 @@ object StatsCardRenderer {
         return out
     }
 
+    /**
+     * Un fotogramma dell'intro ([HighlightIntro]) al tempo [t] in millisecondi, disegnato in [out] (già della misura
+     * del video). Stessa grafica delle statistiche: la banda del torneo scende dall'alto, i pannelli dei giocatori
+     * entrano dai lati, poi "VS" e le righe del confronto una alla volta, gli scontri diretti per ultimi. Dissolvenza
+     * dal nero all'inizio e verso il nero alla fine, a tempo con la musica.
+     */
+    fun intro(
+        card: HighlightIntro.Card, t: Long, out: Bitmap, photos: Map<Side, List<Bitmap?>>, avatars: Avatars? = null,
+        credit: String = "", site: String = "",
+    ) {
+        val c = Canvas(out)
+        c.drawColor(BG)
+        val scale = minOf(out.width / W, out.height / H)
+        c.save()
+        c.translate((out.width - W * scale) / 2, (out.height - H * scale) / 2)
+        c.scale(scale, scale)
+        // Banda in alto: titolo e turno a sinistra, data e luogo a destra.
+        c.save()
+        c.translate(0f, -220f * (1 - ease(t, 150, 650)))
+        val r = RectF(60f, 40f, W - 60f, 190f)
+        c.drawRoundRect(r, 18f, 18f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            shader = LinearGradient(r.left, 0f, r.right, 0f, BAND, BAND_DARK, Shader.TileMode.CLAMP)
+        })
+        val tp = paint(50f, bold = true)
+        c.drawText(fit(card.title.uppercase(), tp, 1100f), 100f, if (card.subtitle.isEmpty()) 132f else 108f, tp)
+        if (card.subtitle.isNotEmpty()) {
+            val sp = paint(28f, DIM, bold = true)
+            c.drawText(fit(card.subtitle.uppercase(), sp, 1100f), 100f, 158f, sp)
+        }
+        card.place.take(2).forEachIndexed { i, line ->
+            val p = paint(if (i == 0) 34f else 26f, if (i == 0) TEXT else DIM, bold = i == 0, align = Paint.Align.RIGHT)
+            c.drawText(fit(line.uppercase(), p, 560f), W - 100f, if (card.place.size == 1) 128f else if (i == 0) 108f else 154f, p)
+        }
+        c.restore()
+        // I giocatori entrano dai lati.
+        val slide = 1 - ease(t, 400, 700)
+        for (side in Side.entries) {
+            c.save()
+            c.translate(if (side == Side.P1) -600f * slide else 600f * slide, 0f)
+            introPlayer(c, card, side, photos[side].orEmpty(), avatars)
+            c.restore()
+        }
+        // Al centro: "VS", il confronto riga per riga, gli scontri diretti.
+        val left = 580f
+        val right = W - 580f
+        val mid = (left + right) / 2
+        val alone = card.rows.isEmpty() && card.h2h == null
+        // "VS" e le righe insieme, al centro in altezza tra la banda e gli scontri diretti (o il fondo).
+        val bottom = if (card.h2h != null) 880f else 1010f
+        val rowH = ((bottom - 230f - 170f) / card.rows.size.coerceAtLeast(1)).coerceAtMost(84f)
+        val top = 230f + (bottom - 230f - 170f - rowH * card.rows.size) / 2 + 170f
+        val vs = ease(t, 1000, 450)
+        if (vs > 0) {
+            c.save()
+            val vy = if (alone) 680f else top - 45f
+            val sz = if (alone) 220f else 130f
+            val k = 0.6f + 0.4f * vs
+            c.scale(k, k, mid, vy - sz * 0.35f)
+            c.drawText("VS", mid, vy, paint(sz, YELLOW, bold = true, align = Paint.Align.CENTER).apply { alpha = (255 * vs).toInt() })
+            c.restore()
+        }
+        var y = top
+        card.rows.forEachIndexed { i, row ->
+            val k = ease(t, ROWS_AT + i * ROW_STEP, 350)
+            if (k > 0) {
+                val a = (255 * k).toInt()
+                val base = y + rowH * 0.55f + 24f * (1 - k)
+                c.drawText(row.a, left, base, paint(44f, TEXT, bold = true).apply { alpha = a })
+                c.drawText(row.b, right, base, paint(44f, TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = a })
+                val lp = paint(26f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = a }
+                c.drawText(fit(row.label.uppercase(), lp, right - left - 300f), mid, base - 6f, lp)
+                // La linea sotto la riga si allunga dal centro verso i lati.
+                val ly = y + rowH * 0.78f
+                val half = (right - left) / 2 * k
+                c.drawRect(RectF(mid - half, ly, mid + half, ly + 4f), Paint().apply { color = LINE })
+            }
+            y += rowH
+        }
+        card.h2h?.let { (a, b) ->
+            val k = ease(t, ROWS_AT + card.rows.size * ROW_STEP + 150, 400)
+            if (k > 0) {
+                val al = (255 * k).toInt()
+                c.drawRect(RectF(left - 40f, 900f, right + 40f, 946f), Paint().apply { color = BAND; alpha = al })
+                c.drawText(card.h2hLabel.uppercase(), mid, 933f, paint(26f, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                c.drawText("$a", left, 1022f, paint(64f, if (a > b) YELLOW else TEXT, bold = true).apply { alpha = al })
+                c.drawText("$b", right, 1022f, paint(64f, if (b > a) YELLOW else TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = al })
+                c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+            }
+        }
+        footer(c, credit, site)
+        c.restore()
+        // Dissolvenze: dal nero e verso il nero.
+        val shown = minOf(t.toFloat() / FADE_IN, (HighlightIntro.MS - t).toFloat() / FADE_OUT).coerceIn(0f, 1f)
+        if (shown < 1f) c.drawColor(Color.argb((255 * (1 - shown)).toInt(), 0, 0, 0))
+    }
+
+    private const val FADE_IN = 800f
+    private const val FADE_OUT = 1000f
+    private const val ROWS_AT = 1500L
+    private const val ROW_STEP = 220L
+
+    /** Da 0 a 1 tra [start] e [start]+[dur] millisecondi, rallentando alla fine. */
+    private fun ease(t: Long, start: Long, dur: Long): Float {
+        val x = ((t - start).toFloat() / dur).coerceIn(0f, 1f)
+        return 1 - (1 - x) * (1 - x) * (1 - x)
+    }
+
+    /** Pannello del giocatore nell'intro: come nelle statistiche, ma col nome piccolo e il COGNOME grande. */
+    private fun introPlayer(c: Canvas, card: HighlightIntro.Card, side: Side, photos: List<Bitmap?>, avatars: Avatars?) {
+        val people = card.people[side].orEmpty()
+        val x0 = if (side == Side.P1) 60f else W - 520f
+        val r = RectF(x0, 230f, x0 + 460f, 1040f)
+        c.drawRoundRect(r, 18f, 18f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = PANEL })
+        val accent = if (side == Side.P1) P1 else P2
+        val n = people.size.coerceAtLeast(1)
+        val size = if (n == 1) 340f else 200f
+        val gap = 24f
+        var x = r.centerX() - (n * size + (n - 1) * gap) / 2
+        val top = if (n == 1) 300f else 320f
+        for (i in 0 until n) {
+            avatar(c, photos.getOrNull(i), people.getOrNull(i)?.female, accent, x, top, size, avatars)
+            x += size + gap
+        }
+        var y = top + size + 90f
+        for (p in people) {
+            if (p.first.isNotEmpty()) {
+                val fp = paint(if (n == 1) 38f else 30f, DIM, bold = true, align = Paint.Align.CENTER)
+                c.drawText(fit(p.first.uppercase(), fp, 420f), r.centerX(), y, fp)
+                y += if (n == 1) 70f else 52f
+            }
+            val lp = paint(if (n == 1) 66f else 46f, TEXT, bold = true, align = Paint.Align.CENTER)
+            c.drawText(fit(p.last.uppercase(), lp, 420f), r.centerX(), y, lp)
+            y += if (n == 1) 90f else 70f
+        }
+        // In fondo la classifica, grande come la percentuale di punti vinti nelle statistiche.
+        card.ranks[side]?.let { rank ->
+            c.drawText(card.rankLabel.uppercase(), r.centerX(), 900f, paint(28f, DIM, bold = true, align = Paint.Align.CENTER))
+            val rp = paint(if (n == 1) 110f else 80f, accent, bold = true, align = Paint.Align.CENTER)
+            c.drawText(fit(rank, rp, 420f), r.centerX(), 1005f, rp)
+        }
+        c.drawRect(RectF(r.left, r.bottom - 8f, r.right, r.bottom), Paint().apply { color = accent })
+    }
+
     private fun header(c: Canvas, card: HighlightStats.Card) {
         val r = RectF(60f, 40f, W - 60f, 190f)
         c.drawRoundRect(r, 18f, 18f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -87011,6 +87450,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.WindowManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -87390,8 +87830,11 @@ class VideoPlayerActivity : ComponentActivity() {
         var o by remember {
             val st = controller.storage
             val order = st.highlightOrder.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }
-            val full = order + Highlights.Category.entries.filter { it !in order }
+            // Le voci nuove (che l'ordine salvato non conosce) arrivano in fondo e accese.
+            val added = Highlights.Category.entries.filter { it !in order }
+            val full = order + added
             val enabled = st.highlightEnabled?.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }?.toSet()
+                ?.let { if (order.isEmpty()) it else it + added }
             mutableStateOf(Highlights.Options(order = full, enabled = enabled ?: Highlights.Category.entries.toSet()))
         }
         // Dai social (1-5 minuti) al video del circolo (10-15).
@@ -87408,6 +87851,10 @@ class VideoPlayerActivity : ComponentActivity() {
             }
         }
         val statsPages = remember(statsRec) { statsRec?.let { HighlightStats.card(it, str).pages.size } ?: 0 }
+        // Intro come nei tornei: basta sapere chi gioca (la partita dello storico, quella ricostruita dai punti o
+        // almeno i nomi segnati nel video).
+        var withIntro by remember { mutableStateOf(controller.storage.highlightIntro) }
+        val introRec = remember(statsRec, e) { statsRec ?: HighlightStats.namesOnly(e.chapters, controller.setup.value) }
         // Musica delle statistiche: un brano dal telefono (copiato nell'app) o quella generata dall'app.
         var musicName by remember { mutableStateOf(controller.storage.highlightMusicName) }
         val pickMusic = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -87436,6 +87883,7 @@ class VideoPlayerActivity : ComponentActivity() {
                     // In alto le voci che contano di più: se non ci sta tutto, restano fuori prima quelle in fondo.
                     o.order.forEachIndexed { i, cat ->
                         val label = when (cat) {
+                            Highlights.Category.LAST_POINT -> str.hlLastPoint
                             Highlights.Category.BIG_POINTS -> str.hlBig
                             Highlights.Category.ACES -> str.videoKind("ACE")
                             Highlights.Category.WINNERS -> str.videoKind("WINNER")
@@ -87480,6 +87928,15 @@ class VideoPlayerActivity : ComponentActivity() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    // Prima l'intro, poi le statistiche: come arrivano nel video.
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(withIntro && introRec != null, { on ->
+                            withIntro = on
+                            controller.storage.highlightIntro = on
+                        }, enabled = introRec != null)
+                        Text(str.hlIntro, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    }
+                    if (introRec != null) Text(str.hlIntroHint((HighlightIntro.MS / 1000).toInt()), fontSize = 11.sp, color = TsmColors.TextDim)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         androidx.compose.material3.Checkbox(withStats && statsPages > 0, { on ->
                             withStats = on
@@ -87487,7 +87944,11 @@ class VideoPlayerActivity : ComponentActivity() {
                         }, enabled = statsPages > 0)
                         Text(str.hlStats, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     }
-                    if (withStats && statsPages > 0) {
+                    Text(
+                        if (statsPages > 0) str.hlStatsHint(statsPages, (statsPages * HighlightStats.PAGE_MS / 1000).toInt()) else str.hlStatsNone,
+                        fontSize = 11.sp, color = TsmColors.TextDim,
+                    )
+                    if ((withStats && statsPages > 0) || (withIntro && introRec != null)) {
                         Text("${str.hlMusic}: ${musicName ?: STATS_MUSIC_CREDIT}", fontSize = 13.sp, maxLines = 3)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             TextButton(onClick = { pickMusic.launch("audio/*") }) { Text(str.hlMusicPick) }
@@ -87501,10 +87962,6 @@ class VideoPlayerActivity : ComponentActivity() {
                         if (musicName == null) Text(str.hlMusicCredit(STATS_MUSIC_CREDIT), fontSize = 11.sp, color = TsmColors.TextDim)
                     }
                     Text(
-                        if (statsPages > 0) str.hlStatsHint(statsPages, (statsPages * HighlightStats.PAGE_MS / 1000).toInt()) else str.hlStatsNone,
-                        fontSize = 11.sp, color = TsmColors.TextDim,
-                    )
-                    Text(
                         if (clips.isEmpty()) str.hlNone else str.hlPreview(clips.size, Chapters.time(clips.sumOf { it.durationMs })),
                         fontSize = 13.sp, color = if (clips.isEmpty()) TsmColors.Orange else TsmColors.TextMain,
                     )
@@ -87514,7 +87971,7 @@ class VideoPlayerActivity : ComponentActivity() {
             confirmButton = {
                 TextButton(enabled = clips.isNotEmpty(), onClick = {
                     onClose()
-                    montage(e, clips, statsRec?.takeIf { withStats && statsPages > 0 })
+                    montage(e, clips, statsRec?.takeIf { withStats && statsPages > 0 }, introRec?.takeIf { withIntro })
                 }) { Text(str.hlCreate) }
             },
             dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
@@ -87522,13 +87979,13 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Monta [clips] (highlights o punti filtrati) e apre il risultato. */
-    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, statsRec: MatchRecord? = null) {
+    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, statsRec: MatchRecord? = null, introRec: MatchRecord? = null) {
         val str = s
         player?.pause()
         hlProgress = 0
         val m = HighlightMaker(this)
         maker = m
-        val stats = statsRec?.let { rec ->
+        val stats = (statsRec ?: introRec)?.let { rec ->
             val base = HighlightStats.card(rec, str)
             // Il sesso detto in pagina 1 per quel nome vale anche se la partita non lo ricorda.
             val card = base.copy(players = base.players.mapValues { (side, p) ->
@@ -87549,12 +88006,19 @@ class VideoPlayerActivity : ComponentActivity() {
             // Il brano dell'app sta nelle risorse: per leggerlo come file lo si copia una volta nella cache.
             val bundled = File(cacheDir, "stats_music.m4a")
             if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
+            // Intro: dati del database e storico fino all'inizio della partita del video.
+            val intro = if (introRec == null) null else runCatching {
+                val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
+                val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.isFemale(it) }
+            }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
-                card, photos, str.pointsWon,
+                card.takeIf { statsRec != null }, photos, str.pointsWon,
                 controller.storage.highlightMusicFile.takeIf { controller.storage.highlightMusicName != null }, avatars,
                 bundled.takeIf { it.exists() },
                 credit = str.generatedWith,
                 site = Reports.siteUrl(controller.options.value.lang).removePrefix("https://").removeSuffix("/"),
+                intro = intro,
             )
         }
         m.make(e, clips, { hlProgress = it }, stats = stats) { file ->
@@ -106658,6 +107122,96 @@ class FramingTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/HighlightIntroTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/HighlightIntroTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.data.Backhand
+import com.tennis.scoremanager.data.Hand
+import com.tennis.scoremanager.data.MatchOptions
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.ItStrings
+import java.util.Calendar
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class HighlightIntroTest {
+
+    private val rules = RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY)
+    private val setup = SetupData(club = "TC Verona", p1a = "Mario Rossi", p1aId = "r", p1aRank = "4.1", p2a = "Bianchi")
+
+    private fun day(y: Int, m: Int, d: Int) = Calendar.getInstance().apply { clear(); set(y, m - 1, d, 12, 0) }.timeInMillis
+
+    /** Un super tie-break finito 10-0 per [winner]. */
+    private fun rec(id: String, end: Long, winner: Side, su: SetupData = setup) = MatchRecord(
+        id = id, setup = su, options = MatchOptions(), rules = rules, events = List(10) { MatchEvent.Point(winner = winner) },
+        startedAt = end - 3_600_000, endedAt = end, updatedAt = end, finished = true,
+    )
+
+    private val rossi = PlayerProfile(
+        id = "r", name = "Mario Rossi", firstName = "Mario", lastName = "Rossi", birth = day(1990, 6, 15), heightCm = 183,
+        hand = Hand.LEFT, backhand = Backhand.TWO, club = "CT Padova",
+    )
+
+    @Test
+    fun showsPlayersDataAndHistoryBeforeTheMatch() {
+        val start = day(2026, 11, 10)
+        val now = rec("oggi", start + 3_600_000, Side.P1)
+        val history = listOf(
+            rec("a", day(2026, 9, 1), Side.P1),
+            rec("b", day(2026, 10, 1), Side.P2),
+            now,
+            rec("dopo", day(2026, 12, 1), Side.P1),
+        )
+        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026")
+        assertEquals("TC VERONA".lowercase(), c.title.lowercase())
+        assertEquals(listOf("10 novembre 2026"), c.place)
+        assertEquals(listOf(HighlightIntro.Person("Mario", "Rossi", null)), c.people.getValue(Side.P1))
+        assertEquals(listOf(HighlightIntro.Person("", "Bianchi", null)), c.people.getValue(Side.P2))
+        val rows = c.rows.associate { it.label to (it.a to it.b) }
+        assertEquals(mapOf(Side.P1 to "4.1", Side.P2 to "–"), c.ranks)
+        assertEquals("36" to "–", rows[ItStrings.heartAge])
+        assertEquals("183 cm" to "–", rows[ItStrings.introHeight])
+        assertEquals(ItStrings.handLeft to "–", rows[ItStrings.introHand])
+        assertEquals("CT Padova" to "–", rows[ItStrings.introClub])
+        // Solo le due partite di prima: né questa né quella dopo.
+        assertEquals("1–1" to "1–1", rows[ItStrings.introRecord])
+        assertEquals(1 to 1, c.h2h)
+    }
+
+    @Test
+    fun withoutDataOnlyNamesAndEvent() {
+        val su = SetupData(p1a = "Verdi", p2a = "Neri", event = "Open d'autunno", category = "Lim. 4.1", round = "Finale")
+        val r = rec("x", day(2026, 11, 10), Side.P2, su)
+        val c = HighlightIntro.card(r, ItStrings, emptyList(), listOf(r), day(2026, 11, 10), "10 novembre 2026")
+        assertEquals("Open d'autunno", c.title)
+        assertEquals("Lim. 4.1 · Finale", c.subtitle)
+        assertEquals(emptyList<HighlightIntro.Row>(), c.rows)
+        assertEquals(emptyMap<Side, String>(), c.ranks)
+        assertNull(c.h2h)
+    }
+
+    @Test
+    fun splitsNamesAndCountsAge() {
+        assertEquals("Mario" to "Rossi", HighlightIntro.split("Mario Rossi"))
+        assertEquals("Anna Maria" to "Verdi", HighlightIntro.split(" Anna Maria Verdi "))
+        assertEquals("" to "Neri", HighlightIntro.split("Neri"))
+        assertEquals(35, HighlightIntro.age(day(1990, 11, 11), day(2026, 11, 10)))
+        assertEquals(36, HighlightIntro.age(day(1990, 11, 10), day(2026, 11, 10)))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/HighlightStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/HighlightStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -106778,6 +107332,21 @@ class HighlightsTest {
     private fun p(at: Long, kind: String? = null, pressure: String? = null, strokes: Int? = null) =
         PointMark(at, "", 0, kind, pressure = pressure, strokes = strokes)
 
+    /** Tutte le voci tranne l'ultimo punto, per provare le altre da sole. */
+    private val noLast = Highlights.Category.entries.toSet() - Highlights.Category.LAST_POINT
+
+    @Test
+    fun lastPointIsAVoice() {
+        val pts = listOf(p(20_000), p(40_000, kind = "ACE"), p(60_000))
+        // Di serie l'ultimo punto c'è, anche se non è niente di speciale, e viene prima di tutto il resto.
+        val clips = Highlights.select(pts, null, 0)
+        assertEquals(listOf(1, 2), clips.map { it.index })
+        assertEquals(Highlights.Reason.LAST_POINT, clips[1].reason)
+        assertEquals(listOf(2), Highlights.select(pts, null, 0, Highlights.Options(maxMs = 10_000)).map { it.index })
+        // Spento: resta solo l'ace.
+        assertEquals(listOf(1), Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast)).map { it.index })
+    }
+
     @Test
     fun picksByReasonAndKeepsTimeOrder() {
         val pts = listOf(
@@ -106800,10 +107369,10 @@ class HighlightsTest {
     fun orderDecidesWhoStays() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "BREAK_POINT"), p(60_000, kind = "WINNER"))
         // Al minimo 7 s l'uno: con 14 s ne stanno due. Di serie vincono palla break e (tra ace e vincente) l'ace.
-        assertEquals(listOf(0, 1), Highlights.select(pts, null, 0, Highlights.Options(maxMs = 14_000)).map { it.index })
+        assertEquals(listOf(0, 1), Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast, maxMs = 14_000)).map { it.index })
         // Vincenti in cima, poi ace: la palla break resta fuori.
         val order = listOf(Highlights.Category.WINNERS, Highlights.Category.ACES, Highlights.Category.BIG_POINTS, Highlights.Category.LONG_RALLIES)
-        assertEquals(listOf(0, 2), Highlights.select(pts, null, 0, Highlights.Options(order = order, maxMs = 14_000)).map { it.index })
+        assertEquals(listOf(0, 2), Highlights.select(pts, null, 0, Highlights.Options(order = order, enabled = noLast, maxMs = 14_000)).map { it.index })
     }
 
     @Test
@@ -106828,7 +107397,7 @@ class HighlightsTest {
     fun stillOverLimitDropsLeastImportant() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
         // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori la voce più in basso (di serie i vincenti).
-        val clips = Highlights.select(pts, null, 0, Highlights.Options(maxMs = 20_000))
+        val clips = Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast, maxMs = 20_000))
         assertEquals(listOf(0, 1), clips.map { it.index })
         assertEquals(7_000L, clips[0].durationMs)
     }
@@ -108317,7 +108886,8 @@ class CourtOnlineTest {
         clear(); set(2026, Calendar.NOVEMBER, 9 + plusDays, h, m)
     }.timeInMillis
 
-    private val now = mon(10)
+    // Calcolato a ogni uso: il fuso di Roma si mette in @Before, dopo che la classe è già stata creata.
+    private val now: Long get() = mon(10)
     private val sync = ClubSync(
         club = "TC Prova", courts = listOf("Campo 1", "Campo 2"),
         settings = CourtSettings(openHour = 8, closeHour = 22, slotMinutes = 60, centsPerHour = 1000, centsPerHourLights = 1500, lightsFrom = 18),
@@ -118159,6 +118729,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 381 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 383 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
