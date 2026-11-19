@@ -13,7 +13,8 @@ Tennis Score Manager keeps the score of a tennis match by the ITF rules and call
 * End-of-match statistics, for the match or per set (serve, return, break points, points in a row…), and a point-by-point log with break points, set points and match points.
 * Detailed stats, for someone scoring from the side of the court: aces, double faults, first serves, winners and errors.
 * History on the phone: finished matches to reopen, players with wins, losses and head to head; matches saved (JSON) on another phone can be imported, also with a QR code on the same Wi-Fi. Player photos, on the TV scoreboard too.
-* You, Coach and Club roles, showing only the features you use: player database, rating, goals, students, drills, backup.
+* One role of your choice (You, Coach or Club), showing only the features you use: player database, rating, goals, automatic backups, also password-protected.
+* Coach: students, lessons and courses, attendance, receipts and register in PDF and Excel, calendar; also from a PC.
 * Heart rate straps, workouts and movement analysis. Camera phone: video with the score, RTMP live streaming, highlights and replay.
 * Club: members, fees and non-tax receipts, court planner, club and federation tournaments, teams, tennis school, notices; also from a PC browser.
 * Optional club server (Raspberry Pi or USB stick): online booking, waiting list, partner search, notice board and chat.

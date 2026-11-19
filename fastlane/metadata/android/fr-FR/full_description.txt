@@ -13,7 +13,8 @@ Tennis Score Manager compte les points d'un match de tennis selon les règles de
 * Statistiques de fin de match, pour le match ou par manche (service, retour, balles de break, points d'affilée…), et déroulé point par point avec balles de break, de set et de match.
 * Statistiques détaillées, pour qui marque depuis le bord du court : aces, doubles fautes, premières balles, coups gagnants et erreurs.
 * Historique sur le téléphone : matchs terminés à rouvrir, joueurs avec victoires, défaites et face-à-face ; les matchs enregistrés (JSON) sur un autre téléphone s'importent, aussi avec un code QR sur le même Wi-Fi. Photos des joueurs, aussi sur le tableau TV.
-* Rôles Vous, Entraîneur et Club, avec seulement les fonctions utilisées : joueurs, classement Elo, objectifs, élèves, exercices, sauvegarde.
+* Un rôle au choix (Vous, Entraîneur ou Club), avec seulement les fonctions utilisées : joueurs, classement Elo, objectifs, sauvegardes automatiques.
+* Entraîneur : élèves, leçons et cours, présences, reçus et registre en PDF et Excel, calendrier ; aussi depuis le PC.
 * Ceintures cardio, entraînements et analyse du mouvement. Téléphone-caméra : vidéo avec score, direct RTMP, résumés et ralenti.
 * Club : membres, cotisations et reçus non fiscaux, planning des courts, tournois, équipes, école de tennis, avis ; aussi depuis un navigateur sur PC.
 * Serveur de club facultatif (Raspberry Pi ou clé USB) : réservation en ligne, liste d'attente, recherche de partenaire, panneau d'affichage et chat.

@@ -13,7 +13,8 @@ O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regra
 * Estatísticas de fim de partida, da partida ou por set (saque, devolução, break points, pontos seguidos…), e histórico ponto a ponto com break points, set points e match points.
 * Estatísticas detalhadas, para quem marca da beira da quadra: aces, duplas faltas, primeiros saques, winners e erros.
 * Histórico no telefone: partidas terminadas para reabrir, jogadores com vitórias, derrotas e confronto direto; dá para importar partidas salvas (JSON) em outro telefone, também com um código QR na mesma rede Wi-Fi. Fotos dos jogadores, também no placar da TV.
-* Papéis Você, Treinador e Clube, só com as funções que você usa: banco de jogadores, rating, metas, alunos, exercícios, backup.
+* Um papel à escolha (Você, Treinador ou Clube), só com as funções que você usa: banco de jogadores, rating, metas, backups automáticos, também com senha.
+* Treinador: alunos, aulas e cursos, presenças, recibos e registro em PDF e Excel, calendário; também pelo PC.
 * Cintas cardíacas, treinos e análise do movimento. Celular-câmera: vídeo com placar, transmissão RTMP, melhores momentos e replay.
 * Clube: sócios, mensalidades e recibos não fiscais, agenda de quadras, torneios internos e federados, equipes, escola de tênis, avisos; também no navegador do PC.
 * Servidor do clube opcional (Raspberry Pi ou pen drive): reservas online, lista de espera, busca de parceiro, mural e chat.
