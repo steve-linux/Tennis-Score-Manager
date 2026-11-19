@@ -2030,7 +2030,7 @@ const APP_I18N = {
     coNever: "jamais vu",
     coNextLesson: (it) => `Prochain : ${it}`,
     coNoLessons: "Aucun cours prévu.",
-    coNote: "Note",
+    coNote: "Remarque",
     coNotify: "Prévenir",
     coPackLessons: "Nombre de cours",
     coPackLine: (n, p) => `${n} cours · ${p}`,

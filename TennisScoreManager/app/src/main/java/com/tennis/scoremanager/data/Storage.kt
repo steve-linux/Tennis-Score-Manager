@@ -546,6 +546,13 @@ class Storage(context: Context) {
         } ?: TvSettings()
         set(v) = prefs.edit().putString("tv", json.encodeToString(TvSettings.serializer(), v)).apply()
 
+    /** TSM Arena: giocatori, livello e opzioni dell'ultima volta. */
+    var arena: com.tennis.scoremanager.arena.ArenaSettings
+        get() = prefs.getString("arena", null)?.let {
+            runCatching { json.decodeFromString(com.tennis.scoremanager.arena.ArenaSettings.serializer(), it) }.getOrNull()
+        } ?: com.tennis.scoremanager.arena.ArenaSettings()
+        set(v) = prefs.edit().putString("arena", json.encodeToString(com.tennis.scoremanager.arena.ArenaSettings.serializer(), v)).apply()
+
     /** Ultimo indirizzo a cui si è collegato questo telefono usato come tabellone ("192.168.43.1:8080"). */
     var lastScoreboardHost: String?
         get() = prefs.getString("display_host", null)

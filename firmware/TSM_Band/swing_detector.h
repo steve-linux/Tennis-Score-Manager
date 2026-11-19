@@ -53,6 +53,9 @@ class SwingDetector {
   bool push(const ImuSample& s, Swing& out);
   void reset();
 
+  // Dentro un colpo: dalla soglia superata finché il colpo non è completo (lo usa TSM Arena per partire subito).
+  bool inSwing() const { return inSwing_; }
+
   const DetectorConfig& config() const { return cfg_; }
 
  private:

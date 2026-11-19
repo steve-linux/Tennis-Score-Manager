@@ -692,6 +692,25 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 
 **Vorschau ohne Telefone**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in einem Browser (auch `&lang=en`, `fr`, `de`, `es`, `pt` und `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) zeigt die Anzeigetafel mit Testdaten.
 
+### 8.4 TSM Arena: Tennis am Fernseher mit den Armbändern (App 2.7, Firmware 2.5)
+
+Ein Tennisspiel am Fernseher, wie auf den Konsolen, bei dem **das Armband der Schläger ist**: praktisch zu Hause zwischen zwei Stunden, um das Timing und die Wahl zwischen Vorhand und Rückhand zu üben. Der Spieler auf dem Bildschirm läuft von selbst: Man denkt nur daran, **wann** man schlägt. Zu früh geht der Ball cross, zu spät longline; je schneller das Handgelenk, desto härter der Schlag.
+
+Die Armbänder brauchen **Firmware 2.5** (5): Solange das Spiel offen ist, schickt das Armband den Beginn jedes Schlags in wenigen Hundertstelsekunden und verlangt eine schnelle Bluetooth-Verbindung (mehr Verbrauch nur während des Spiels).
+
+1. **Trainieren** (oder **Schüler**, für den Trainer) › **TSM Arena**. Der Handybildschirm bleibt an, solange die Seite offen ist.
+2. **Am Fernseher**: Öffne die angezeigte Adresse (z. B. `192.168.43.1:8080/arena`) im Browser des Fernsehers, einer TV-Box oder eines angeschlossenen Laptops, im selben Netz oder im Hotspot des Handys; oder scanne den QR-Code. Kein Internet nötig. Drücke einmal **OK** auf der Seite, damit der Ton läuft.
+3. **Spieler**: *Gegen das Handy* (Spieler 1 gegen den Computer, drei Stufen) oder *Zwei Spieler*, je ein Armband. Tippe auf den Namen, um zu wählen, wer spielt (du oder ein Schüler). Darunter steht der Zustand jedes Armbands.
+4. **Spiel**: Spiele zum Sieg (1, 3 oder 5), **Nur der richtige Schlag zählt** (mit der Schlagkalibrierung, 6.4, kostet eine Vorhand statt einer Rückhand den Punkt), **Stimme des Schiedsrichters** am Fernseher, **Verzögerung des Fernsehers**: Wenn du immer zu spät bist, obwohl es sich richtig anfühlt, erhöhe sie (gering für Monitore und Fernseher im Spielmodus).
+5. **Schwinge** (oder drücke die **große Taste** des Armbands), um zu beginnen. Ein Schwung reicht zum Aufschlag. Die **kleine Taste** pausiert. Am Ende zeigt der Fernseher Schläge, perfekte, zu frühe, zu späte, falsche Schläge, höchstes Handgelenktempo und längsten Ballwechsel; ein Schwung startet die Revanche.
+6. Zum Verlassen: **Zurück**. Das Armband geht wieder in den Stromsparmodus und der Fernseher zeigt, dass das Spiel geschlossen ist.
+
+- Trage das Armband fest und lass **Platz um dich herum**: Gespielt wird mit dem Schläger in der Hand (besser ohne Ball) oder auch mit leerer Hand.
+- **Ansicht**: Allein spielt man **aus der Ich-Perspektive** (Schläger und Armband im Vordergrund, der Ball kommt auf dich zu); zu zweit von hinten, wie im Fernsehen. Die Taste **V** einer Tastatur wechselt die Ansicht. Ein **Ring** am Treffpunkt zieht sich zusammen, während der Ball kommt, und wird grün, wenn du schlagen musst; nach jedem Schlag erscheint das Balltempo.
+- **Grafik** (unter *Spiel*): **Realistisches 3D** (Spieler mit echtem Körper, Schatten, Stadionlicht, Publikum), **Einfaches 3D** (Low-Poly, leichter) oder **2D**. Wenn der Fernseher ruckelt oder kein 3D (WebGL) kann, wechselt das Spiel von selbst zur leichteren Grafik. Für 3D eignen sich ein PC, eine TV-Box oder ein aktueller Stick; günstige Fernseher schaffen oft nur 2D. Das Spielermodell ist „3D Male Base Mesh“ (CC0); die Tennisbewegungen berechnet das Spiel.
+- Während des Spiels zählen die Armbandtasten keine Punkte in Matches.
+- **Vorschau ohne Handy und Armbänder**: `TennisScoreManager/app/src/main/assets/arena.html?demo=1` in einem Browser (auch `&lang=en`, `fr`, `it`, `es`, `pt`); die Leertaste ist der Schwung.
+
 ## 9. Angewandte Regeln (ITF) und abgestimmte Entscheidungen
 
 - **Spiel**: 0-15-30-40, Einstand, Vorteil, Spiel. **No-Ad**: bei 40:40 entscheidender Punkt („Einstand, entscheidender Punkt“).

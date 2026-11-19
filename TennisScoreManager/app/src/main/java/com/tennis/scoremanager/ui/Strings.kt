@@ -1204,6 +1204,41 @@ interface Strings {
     val backupDueHint: (String?) -> String
     val drillsTitle: String
     val drillsHint: String
+
+    // TSM Arena
+    val arenaTitle: String get() = "TSM Arena"
+    val arenaHint: String
+    val arenaPlayers: String
+    val arenaVsCpu: String
+    val arenaTwoPlayers: String
+    val arenaYou: String
+    val arenaBandReady: String
+    val arenaBandMissing: String
+    val arenaBandOld: String
+    val arenaTv: String
+    val arenaTvHint: String
+    val arenaScreens: (Int) -> String
+    val arenaHowTo: String
+    val arenaMatch: String
+    val arenaLevel: String
+    val arenaEasy: String
+    val arenaNormal: String
+    val arenaHard: String
+    val arenaGames: String
+    val arenaStrict: String
+    val arenaStrictHint: String
+    val arenaVoice: String
+    val arenaTvLag: String
+    val arenaLagLow: String
+    val arenaLagMedium: String
+    val arenaLagHigh: String
+    val arenaTvLagHint: String
+    val arenaPreview: String
+    val arenaGraphics: String
+    val arenaGfx2d: String
+    val arenaGfxLow: String
+    val arenaGfxReal: String
+    val arenaGfxHint: String
     val drillNew: String
     val drillsNone: String
     val drillName: String
@@ -3992,6 +4027,40 @@ object ItStrings : Strings {
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Non hai ancora mai salvato un backup: tocca per farlo." else "Ultimo backup: $last. Tocca per farne uno nuovo." }
     override val drillsTitle = "Esercizi"
     override val drillsHint = "Esercizi guidati: un colpo e i passi in fila (es. 20 dritti incrociati, poi 20 lungolinea)"
+
+    // TSM Arena
+    override val arenaHint = "Tennis sulla TV con il braccialetto come racchetta"
+    override val arenaPlayers = "Giocatori"
+    override val arenaVsCpu = "Contro il telefono"
+    override val arenaTwoPlayers = "Due giocatori"
+    override val arenaYou = "Tu"
+    override val arenaBandReady = "Braccialetto collegato"
+    override val arenaBandMissing = "Braccialetto non collegato (Dispositivi)"
+    override val arenaBandOld = "Braccialetto da aggiornare al firmware 2.5"
+    override val arenaTv = "Sulla TV"
+    override val arenaTvHint = "Apri l'indirizzo nel browser della TV (o inquadra il QR) sulla stessa rete o sull'hotspot di questo telefono. Premi OK una volta sulla pagina per sentire l'audio."
+    override val arenaScreens: (Int) -> String = { n: Int -> "TV collegate: $n" }
+    override val arenaHowTo = "Braccialetto sul polso della racchetta, spazio intorno a te: fai uno swing o premi il tasto grande per iniziare. Il tasto piccolo mette in pausa."
+    override val arenaMatch = "Partita"
+    override val arenaLevel = "Livello"
+    override val arenaEasy = "Facile"
+    override val arenaNormal = "Normale"
+    override val arenaHard = "Difficile"
+    override val arenaGames = "Game per vincere"
+    override val arenaStrict = "Conta solo il colpo giusto"
+    override val arenaStrictHint = "Un dritto al posto del rovescio (o il contrario) è punto perso. Serve la calibrazione dei colpi del braccialetto."
+    override val arenaVoice = "Voce dell'arbitro"
+    override val arenaTvLag = "Ritardo della TV"
+    override val arenaLagLow = "Basso"
+    override val arenaLagMedium = "Medio"
+    override val arenaLagHigh = "Alto"
+    override val arenaTvLagHint = "Se colpisci sempre in ritardo anche quando ti sembra giusto, alza il valore. Basso per monitor e TV in modalità gioco."
+    override val arenaPreview = "Prova sul telefono"
+    override val arenaGraphics = "Grafica"
+    override val arenaGfx2d = "2D"
+    override val arenaGfxLow = "3D semplice"
+    override val arenaGfxReal = "3D realistica"
+    override val arenaGfxHint = "Se la TV va a scatti, il gioco passa da solo a una grafica più leggera (realistica, poi semplice, poi 2D)."
     override val drillNew = "Nuovo esercizio"
     override val drillsNone = "Ancora nessun esercizio."
     override val drillName = "Nome dell'esercizio"
@@ -6748,6 +6817,40 @@ object EnStrings : Strings {
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "You have never saved a backup yet: tap to make one." else "Last backup: $last. Tap to make a new one." }
     override val drillsTitle = "Drills"
     override val drillsHint = "Guided drills: a stroke and its steps in a row (e.g. 20 cross-court forehands, then 20 down the line)"
+
+    // TSM Arena
+    override val arenaHint = "Tennis on the TV with the wristband as your racket"
+    override val arenaPlayers = "Players"
+    override val arenaVsCpu = "Against the phone"
+    override val arenaTwoPlayers = "Two players"
+    override val arenaYou = "You"
+    override val arenaBandReady = "Wristband connected"
+    override val arenaBandMissing = "Wristband not connected (Devices)"
+    override val arenaBandOld = "Wristband needs firmware 2.5"
+    override val arenaTv = "On the TV"
+    override val arenaTvHint = "Open the address in the TV browser (or scan the QR) on the same network or on this phone's hotspot. Press OK once on the page to hear the sound."
+    override val arenaScreens: (Int) -> String = { n: Int -> "TVs connected: $n" }
+    override val arenaHowTo = "Wristband on your racket wrist, space around you: swing or press the big key to start. The small key pauses."
+    override val arenaMatch = "Match"
+    override val arenaLevel = "Level"
+    override val arenaEasy = "Easy"
+    override val arenaNormal = "Normal"
+    override val arenaHard = "Hard"
+    override val arenaGames = "Games to win"
+    override val arenaStrict = "Only the right stroke counts"
+    override val arenaStrictHint = "A forehand instead of a backhand (or vice versa) loses the point. Needs the wristband's stroke calibration."
+    override val arenaVoice = "Umpire voice"
+    override val arenaTvLag = "TV delay"
+    override val arenaLagLow = "Low"
+    override val arenaLagMedium = "Medium"
+    override val arenaLagHigh = "High"
+    override val arenaTvLagHint = "If you are always late even when it feels right, raise it. Low for monitors and TVs in game mode."
+    override val arenaPreview = "Try on the phone"
+    override val arenaGraphics = "Graphics"
+    override val arenaGfx2d = "2D"
+    override val arenaGfxLow = "Simple 3D"
+    override val arenaGfxReal = "Realistic 3D"
+    override val arenaGfxHint = "If the TV stutters, the game switches by itself to lighter graphics (realistic, then simple, then 2D)."
     override val drillNew = "New drill"
     override val drillsNone = "No drills yet."
     override val drillName = "Drill name"

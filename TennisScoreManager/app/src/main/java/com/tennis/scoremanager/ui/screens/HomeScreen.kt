@@ -53,6 +53,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Today
@@ -248,6 +249,8 @@ private fun CoachTab(c: MatchController) {
     if (month) com.tennis.scoremanager.ui.MonthSummaryDialog(c) { month = false }
     // Gli esercizi si scelgono e si gestiscono dentro l'allenamento (Esercizio › Gestisci), una strada sola.
     ServeTrainingCard(c, coach = true)
+    // TSM Arena: tennis sulla TV coi braccialetti, da casa tra una lezione e l'altra.
+    Entry(Icons.Filled.SportsEsports, s.arenaTitle, s.arenaHint) { c.openArena() }
 }
 
 /**
@@ -472,6 +475,8 @@ private fun TrainTab(c: MatchController) {
     if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     if (PlayerFeature.TRAINING in pf) ServeTrainingCard(c, coach = false)
+    // TSM Arena: tennis sulla TV coi braccialetti come racchette.
+    if (PlayerFeature.BANDS in pf || PlayerFeature.TRAINING in pf) Entry(Icons.Filled.SportsEsports, s.arenaTitle, s.arenaHint) { c.openArena() }
 }
 
 @Composable
