@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.WindowManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -388,8 +389,11 @@ class VideoPlayerActivity : ComponentActivity() {
         var o by remember {
             val st = controller.storage
             val order = st.highlightOrder.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }
-            val full = order + Highlights.Category.entries.filter { it !in order }
+            // Le voci nuove (che l'ordine salvato non conosce) arrivano in fondo e accese.
+            val added = Highlights.Category.entries.filter { it !in order }
+            val full = order + added
             val enabled = st.highlightEnabled?.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }?.toSet()
+                ?.let { if (order.isEmpty()) it else it + added }
             mutableStateOf(Highlights.Options(order = full, enabled = enabled ?: Highlights.Category.entries.toSet()))
         }
         // Dai social (1-5 minuti) al video del circolo (10-15).
@@ -406,6 +410,10 @@ class VideoPlayerActivity : ComponentActivity() {
             }
         }
         val statsPages = remember(statsRec) { statsRec?.let { HighlightStats.card(it, str).pages.size } ?: 0 }
+        // Intro come nei tornei: basta sapere chi gioca (la partita dello storico, quella ricostruita dai punti o
+        // almeno i nomi segnati nel video).
+        var withIntro by remember { mutableStateOf(controller.storage.highlightIntro) }
+        val introRec = remember(statsRec, e) { statsRec ?: HighlightStats.namesOnly(e.chapters, controller.setup.value) }
         // Musica delle statistiche: un brano dal telefono (copiato nell'app) o quella generata dall'app.
         var musicName by remember { mutableStateOf(controller.storage.highlightMusicName) }
         val pickMusic = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -434,6 +442,7 @@ class VideoPlayerActivity : ComponentActivity() {
                     // In alto le voci che contano di più: se non ci sta tutto, restano fuori prima quelle in fondo.
                     o.order.forEachIndexed { i, cat ->
                         val label = when (cat) {
+                            Highlights.Category.LAST_POINT -> str.hlLastPoint
                             Highlights.Category.BIG_POINTS -> str.hlBig
                             Highlights.Category.ACES -> str.videoKind("ACE")
                             Highlights.Category.WINNERS -> str.videoKind("WINNER")
@@ -478,6 +487,15 @@ class VideoPlayerActivity : ComponentActivity() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    // Prima l'intro, poi le statistiche: come arrivano nel video.
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(withIntro && introRec != null, { on ->
+                            withIntro = on
+                            controller.storage.highlightIntro = on
+                        }, enabled = introRec != null)
+                        Text(str.hlIntro, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    }
+                    if (introRec != null) Text(str.hlIntroHint((HighlightIntro.MS / 1000).toInt()), fontSize = 11.sp, color = TsmColors.TextDim)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         androidx.compose.material3.Checkbox(withStats && statsPages > 0, { on ->
                             withStats = on
@@ -485,7 +503,11 @@ class VideoPlayerActivity : ComponentActivity() {
                         }, enabled = statsPages > 0)
                         Text(str.hlStats, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     }
-                    if (withStats && statsPages > 0) {
+                    Text(
+                        if (statsPages > 0) str.hlStatsHint(statsPages, (statsPages * HighlightStats.PAGE_MS / 1000).toInt()) else str.hlStatsNone,
+                        fontSize = 11.sp, color = TsmColors.TextDim,
+                    )
+                    if ((withStats && statsPages > 0) || (withIntro && introRec != null)) {
                         Text("${str.hlMusic}: ${musicName ?: STATS_MUSIC_CREDIT}", fontSize = 13.sp, maxLines = 3)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             TextButton(onClick = { pickMusic.launch("audio/*") }) { Text(str.hlMusicPick) }
@@ -499,10 +521,6 @@ class VideoPlayerActivity : ComponentActivity() {
                         if (musicName == null) Text(str.hlMusicCredit(STATS_MUSIC_CREDIT), fontSize = 11.sp, color = TsmColors.TextDim)
                     }
                     Text(
-                        if (statsPages > 0) str.hlStatsHint(statsPages, (statsPages * HighlightStats.PAGE_MS / 1000).toInt()) else str.hlStatsNone,
-                        fontSize = 11.sp, color = TsmColors.TextDim,
-                    )
-                    Text(
                         if (clips.isEmpty()) str.hlNone else str.hlPreview(clips.size, Chapters.time(clips.sumOf { it.durationMs })),
                         fontSize = 13.sp, color = if (clips.isEmpty()) TsmColors.Orange else TsmColors.TextMain,
                     )
@@ -512,7 +530,7 @@ class VideoPlayerActivity : ComponentActivity() {
             confirmButton = {
                 TextButton(enabled = clips.isNotEmpty(), onClick = {
                     onClose()
-                    montage(e, clips, statsRec?.takeIf { withStats && statsPages > 0 })
+                    montage(e, clips, statsRec?.takeIf { withStats && statsPages > 0 }, introRec?.takeIf { withIntro })
                 }) { Text(str.hlCreate) }
             },
             dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
@@ -520,13 +538,13 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Monta [clips] (highlights o punti filtrati) e apre il risultato. */
-    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, statsRec: MatchRecord? = null) {
+    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, statsRec: MatchRecord? = null, introRec: MatchRecord? = null) {
         val str = s
         player?.pause()
         hlProgress = 0
         val m = HighlightMaker(this)
         maker = m
-        val stats = statsRec?.let { rec ->
+        val stats = (statsRec ?: introRec)?.let { rec ->
             val base = HighlightStats.card(rec, str)
             // Il sesso detto in pagina 1 per quel nome vale anche se la partita non lo ricorda.
             val card = base.copy(players = base.players.mapValues { (side, p) ->
@@ -547,12 +565,19 @@ class VideoPlayerActivity : ComponentActivity() {
             // Il brano dell'app sta nelle risorse: per leggerlo come file lo si copia una volta nella cache.
             val bundled = File(cacheDir, "stats_music.m4a")
             if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
+            // Intro: dati del database e storico fino all'inizio della partita del video.
+            val intro = if (introRec == null) null else runCatching {
+                val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
+                val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.isFemale(it) }
+            }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
-                card, photos, str.pointsWon,
+                card.takeIf { statsRec != null }, photos, str.pointsWon,
                 controller.storage.highlightMusicFile.takeIf { controller.storage.highlightMusicName != null }, avatars,
                 bundled.takeIf { it.exists() },
                 credit = str.generatedWith,
                 site = Reports.siteUrl(controller.options.value.lang).removePrefix("https://").removeSuffix("/"),
+                intro = intro,
             )
         }
         m.make(e, clips, { hlProgress = it }, stats = stats) { file ->

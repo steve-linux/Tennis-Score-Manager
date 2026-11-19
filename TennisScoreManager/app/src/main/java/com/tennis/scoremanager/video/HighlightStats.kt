@@ -86,6 +86,15 @@ object HighlightStats {
         )
     }
 
+    /**
+     * Per l'intro quando la partita non si trova: bastano i nomi segnati nel video (null se non ce ne sono). Come
+     * in [record], torneo e classifiche vengono dalla pagina 1 se i nomi sono gli stessi.
+     */
+    fun namesOnly(ch: VideoChapters, current: SetupData? = null): MatchRecord? {
+        if (ch.names.none { it.isNotBlank() }) return null
+        return MatchRecord(id = "video", rules = ch.rules ?: com.tennis.scoremanager.model.RulesConfig(), setup = setupFor(ch.names, current), options = MatchOptions())
+    }
+
     private fun setupFor(names: List<String>, current: SetupData?): SetupData {
         val a = names.getOrElse(0) { "" }
         val b = names.getOrElse(1) { "" }

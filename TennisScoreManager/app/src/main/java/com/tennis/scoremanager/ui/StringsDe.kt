@@ -258,7 +258,7 @@ object DeStrings : Strings {
     override val hlRallies = "Lange Ballwechsel (von den Armbändern)"
     override val hlMax = "Maximale Länge"
     override val hlCustom = "Andere Länge (Minuten)"
-    override val hlMusic = "Musik der Statistiken"
+    override val hlMusic = "Musik für Intro und Statistiken"
     override val hlMusicPick = "Titel wählen"
     override val hlMusicReset = "Die der App verwenden"
     override val hlMusicHint = "Ein Titel vom Telefon: Der Anfang wird mit Ein- und Ausblendung verwendet. Nur Musik verwenden, die du in deinen Videos nutzen darfst."
@@ -272,6 +272,14 @@ object DeStrings : Strings {
     override val hlStats = "Statistiken am Videoende"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n Bildschirme mit den Spielstatistiken ($sec s) nach den Punkten." }
     override val hlStatsNone = "Keine Statistiken: Das Match des Videos ist nicht im Verlauf."
+    override val hlLastPoint = "Letzter Punkt des Matches"
+    override val hlIntro = "Intro wie bei Turnieren (am Anfang)"
+    override val hlIntroHint: (Int) -> String = { "Vorstellung der Spieler ($it s): Foto oder Avatar, Ranking und Spielerdaten, vor den Punkten." }
+    override val introHeight = "Größe"
+    override val introHand = "Spielhand"
+    override val introClub = "Verein"
+    override val introRecord = "Siege – Niederlagen"
+    override val introH2h = "Direkter Vergleich"
     override val cardTitle: (String) -> String = { "${it}statistik" }
     override val cardFinal = "Endstand"
     override val cardPartial = "Zwischenstand"

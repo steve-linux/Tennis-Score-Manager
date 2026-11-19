@@ -579,6 +579,11 @@ class Storage(context: Context) {
         get() = prefs.getBoolean("hl_stats", true)
         set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
 
+    /** Intro come nei tornei in testa agli highlights. */
+    var highlightIntro: Boolean
+        get() = prefs.getBoolean("hl_intro", true)
+        set(v) = prefs.edit().putBoolean("hl_intro", v).apply()
+
     /** Moviola mandata subito anche al tabellone. */
     var replayOnBoard: Boolean
         get() = prefs.getBoolean("replay_on_board", false)
