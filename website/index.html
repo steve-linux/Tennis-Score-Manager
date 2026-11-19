@@ -17,8 +17,8 @@
   if(sup.indexOf(pick)>=0)location.replace(pick+'/'+location.hash);
 })();
 </script>
-<title>Tennis Score Manager – Punteggio di tennis e padel con voce dell'arbitro, statistiche, braccialetti e tabellone TV</title>
-<meta name="description" content="App Android libera e gratuita per tenere il punteggio di tennis e padel secondo le regole ITF: chiamate vocali dell'arbitro, statistiche e cronologia punto per punto, braccialetti Bluetooth M5StickS3 o telecomandini da selfie e tabellone su TV. Funziona offline, in sei lingue, senza pubblicità.">
+<title>Tennis Score Manager – Punteggio di tennis e padel con voce dell'arbitro, statistiche, tabellone TV e gestione del circolo</title>
+<meta name="description" content="App Android libera e gratuita per il punteggio di tennis e padel secondo le regole ITF, con voce dell'arbitro, statistiche, braccialetti Bluetooth e tabellone su TV. Per i circoli: soci, quote, planning dei campi, tornei e prenotazioni online. Il segnapunti funziona offline. In sei lingue, senza pubblicità.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -39,7 +39,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Punteggio di tennis e padel secondo le regole ITF, con voce dell'arbitro, statistiche di fine partita, braccialetti Bluetooth e tabellone su TV. Libera, offline, senza pubblicità.">
+<meta property="og:description" content="Punteggio di tennis e padel secondo le regole ITF, con voce dell'arbitro, statistiche e tabellone su TV. Per i circoli: soci, quote, planning dei campi, tornei e prenotazioni online. Libera, senza pubblicità.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -299,7 +299,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Libera e gratuita · licenza GPL-3.0</div>
       <h1>Il tuo punteggio tennis, <em>come un vero Pro.</em></h1>
-      <p class="lead">L'app Android che tiene il punteggio di tennis e padel secondo le regole ITF e lo chiama ad alta voce come un giudice di sedia. Si segna dal telefono, da due braccialetti o da due telecomandini Bluetooth; a fine partita hai statistiche, cronologia punto per punto e, coi braccialetti, anche i tuoi colpi, e il risultato può andare in diretta su una TV. Con una fascia cardio Bluetooth misuri anche battito e calorie, in partita e in allenamento.</p>
+      <p class="lead">L'app Android che tiene il punteggio di tennis e padel secondo le regole ITF e lo chiama ad alta voce come un giudice di sedia. Si segna dal telefono, da due braccialetti o da due telecomandini Bluetooth; a fine partita hai statistiche, cronologia punto per punto e, coi braccialetti, anche i tuoi colpi, e il risultato può andare in diretta su una TV. Con una fascia cardio Bluetooth misuri anche battito e calorie, in partita e in allenamento. Per i circoli: soci, quote, planning dei campi, tornei e prenotazioni online.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Scarica l'app</a>
         <a class="btn btn-ghost" href="#features">Scopri le funzioni <svg class="icon"><use href="#i-down"/></svg></a>
@@ -319,7 +319,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="head">
       <div class="eyebrow">Funzionalità</div>
       <h2>Tutto quello che ti serve sul campo</h2>
-      <p>Pensata per partite vere, anche senza arbitro: tocchi chi ha vinto il punto, al resto pensa l'app.</p>
+      <p>Pensata per partite vere, anche senza arbitro: tocchi chi ha vinto il punto, al resto pensa l'app. Scegli il ruolo, Tu, Allenatore o Circolo, e tieni solo le funzioni che usi; in molte schermate il «?» apre subito la guida.</p>
     </div>
     <div class="cards">
       <article class="card">
@@ -391,6 +391,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Fasce e braccialetti arrivano a pochi metri meno della lunghezza del campo: un secondo telefono all'altro fondo fa da ponte, con una rete sua e senza perdere dati.</p>
         <button class="more" data-open="d-second">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Per chi allena</h3>
+        <p>Allievi con scheda e note, esercizi guidati, analisi del movimento con lo scheletro sul video e un report da mandare all'allievo.</p>
+        <button class="more" data-open="d-coach">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Arbitro completo</h3>
+        <p>Ritiro e w.o., richiami di condotta e di tempo, squalifica, pause, riscaldamento e cambio palle, come in una partita arbitrata.</p>
+        <button class="more" data-open="d-umpire">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Rating, racchette e obiettivi</h3>
+        <p>Rating TSM dalle partite, racchette e incordature a confronto, obiettivi, calendario, «Il mio anno» e backup automatico.</p>
+        <button class="more" data-open="d-goals">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
         <h3>Riconosce i tuoi colpi</h3>
@@ -408,6 +426,18 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Il tuo circolo, in un'app</h3>
         <p>Soci e quote, planning dei campi, tornei sociali e FITP, squadre, scuola tennis e avvisi, anche dal browser del PC. Con un server facoltativo i giocatori prenotano il campo online.</p>
         <button class="more" data-open="d-club">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>La segreteria dal computer</h3>
+        <p>Soci, quote, planning e tornei con tastiera e mouse: un computer sulla stessa rete apre la segreteria nel browser, senza installare niente e con i dati sempre sul telefono.</p>
+        <button class="more" data-open="d-desk">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide">
+        <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+        <h3>Prenota il campo, trova il compagno</h3>
+        <p>Se il circolo usa il server, i giocatori prenotano dall'app o dal web, anche su iPhone, si mettono in lista d'attesa, cercano un compagno e si parlano in chat.</p>
+        <button class="more" data-open="d-book">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
     </div>
   </div>
@@ -749,6 +779,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <p>Con un secondo telefono che fa da telecamera, collegato a quello dell'arbitro con un QR, la partita diventa un video col punteggio sopra.</p>
     <ul>
       <li><strong>Telefono-telecamera:</strong> registra in 1080p con la grafica del punteggio, o va in diretta RTMP su YouTube, Twitch, Facebook o un server tuo.</li>
+      <li><strong>Assistente inquadratura:</strong> dici distanza, altezza e campo, e l'app indica come inclinare il telefono; la sagoma del campo aiuta a metterlo a posto.</li>
       <li><strong>Video punto per punto:</strong> un capitolo per ogni punto, da rivedere per punto, game o set; i capitoli si copiano anche per YouTube.</li>
       <li><strong>Video importati:</strong> anche un video fatto con un'altra fotocamera: i punti si segnano guardandolo e il punteggio si calcola da solo.</li>
       <li><strong>Filtri da allenatore:</strong> solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point.</li>
@@ -765,14 +796,102 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div><h3 id="t-club">Circolo e prenotazioni online</h3></div>
     <p>Nel ruolo Circolo l'app diventa la segreteria: i dati stanno sul telefono e accendi solo le funzioni che usi.</p>
     <ul>
+      <li><strong>Oggi:</strong> la prima pagina della segreteria: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno.</li>
       <li><strong>Soci e quote:</strong> tessere, scadenza del certificato medico, pagamenti registrati e ricevute non fiscali, esportazione CSV.</li>
       <li><strong>Planning dei campi:</strong> vista per giorno, settimana e mese, prenotazioni ripetute, prezzi, orari e statistiche di utilizzo.</li>
-      <li><strong>Tornei e squadre:</strong> tornei sociali e FITP con tabellone e gironi, campionati a squadre, classifica a sfida: le partite si giocano col segnapunti.</li>
+      <li><strong>Tornei e squadre:</strong> tornei sociali e FITP con tabellone e gironi, campionati a squadre, classifica a sfida: le partite si giocano col segnapunti. Il tabellone del torneo va anche sul tabellone TV.</li>
       <li><strong>Scuola tennis e avvisi:</strong> corsi, allievi, presenze e quote; avvisi via WhatsApp, Telegram, SMS o email.</li>
       <li><strong>Segreteria da PC:</strong> il circolo si gestisce dal browser del computer, con i dati sempre sul telefono.</li>
       <li><strong>Server facoltativo:</strong> su Raspberry Pi o chiavetta USB: prenotazioni online dall'app o dalla pagina web anche su iPhone, lista d'attesa, Cerco compagno, promemoria, bacheca e chat tra soci.</li>
     </ul>
     <div class="note">Il server è del circolo, senza abbonamenti. Per raggiungerlo da internet si può usare Tailscale o DuckDNS. Senza server l'app funziona uguale.</div>
+  </div>
+</dialog>
+
+<dialog id="d-coach" aria-labelledby="t-coach" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div><h3 id="t-coach">Allenatore e allievi</h3></div>
+    <p>Col ruolo Allenatore l'app segue ogni allievo: sessioni, video e misure restano sul telefono.</p>
+    <ul>
+      <li><strong>Allievi:</strong> scheda con colpi, movimento, partite, rating, racchetta e note dell'allenatore.</li>
+      <li><strong>Allenamento dei colpi:</strong> servizio, dritto, rovescio e volée, col telefono sul cavalletto e il braccialetto al polso.</li>
+      <li><strong>Esercizi guidati:</strong> un colpo e i passi in fila; la voce annuncia il passo successivo.</li>
+      <li><strong>Analisi del movimento:</strong> il corpo riconosciuto nelle clip, lo scheletro sul video al rallentatore e le misure dei momenti chiave.</li>
+      <li><strong>Confronto:</strong> i due colpi insieme, allineati sull'impatto, al rallentatore o fotogramma per fotogramma. Con Sovrapponi lo scheletro del secondo si disegna sul primo e si vede subito dove il movimento cambia.</li>
+      <li><strong>Report per l'allievo:</strong> PDF completo o immagine da mandare su WhatsApp.</li>
+    </ul>
+    <div class="note">Il modello per l'analisi (MoveNet, 7 MB) si scarica una volta sola, su richiesta; poi si lavora sul telefono e le clip non lo lasciano. Le misure sono stime: servono soprattutto a confrontare i colpi nel tempo.</div>
+  </div>
+</dialog>
+
+<dialog id="d-umpire" aria-labelledby="t-umpire" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-umpire">Arbitro completo</h3></div>
+    <p>Il tasto Arbitro raccoglie quello che serve quando la partita non va liscia.</p>
+    <ul>
+      <li><strong>Ritiro e w.o.:</strong> il ritiro chiude la partita col punteggio del momento; prima del primo punto diventa un w.o.</li>
+      <li><strong>Richiami e squalifica:</strong> violazione di condotta e di tempo, con la conseguenza indicata prima di confermare.</li>
+      <li><strong>Pause:</strong> medical timeout di 3 minuti, bagno o cambio d'abiti di 5, riscaldamento di 5 prima del primo punto.</li>
+      <li><strong>Cambio palle:</strong> agli intervalli che scegli, con l'animazione su telefono e tabellone TV.</li>
+      <li><strong>Correzioni:</strong> correggi chi serve e i lati; con Imposta punteggio riparti da una partita iniziata senza l'app.</li>
+    </ul>
+    <div class="note">I punti inseriti con Imposta punteggio non entrano nelle statistiche.</div>
+  </div>
+</dialog>
+
+<dialog id="d-goals" aria-labelledby="t-goals" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-goals">Rating, racchette e obiettivi</h3></div>
+    <p>Tutto calcolato sul telefono dalle tue partite, senza account.</p>
+    <ul>
+      <li><strong>Rating TSM:</strong> sale quando vinci, di più contro chi ha un rating alto; con classifica e andamento nel tempo.</li>
+      <li><strong>Racchette:</strong> ogni racchetta con incordature, ore di gioco e sensazioni; confronto tra racchette o tensioni.</li>
+      <li><strong>Obiettivi:</strong> un traguardo e una barra che si riempie con le medie delle ultime partite.</li>
+      <li><strong>Il mio anno:</strong> partite, vittorie, rivale e mesi più attivi in un'immagine da condividere.</li>
+      <li><strong>Calendario:</strong> partite e allenamenti mese per mese, e da quante settimane di fila giochi.</li>
+      <li><strong>Come l'ultima volta:</strong> stessi giocatori, campo e regole, e si va dritti al sorteggio.</li>
+      <li><strong>Backup:</strong> un file ZIP con tutti i dati e una copia automatica ogni giorno, senza video.</li>
+    </ul>
+    <div class="note">Le ultime 5 copie automatiche restano in Documenti anche se disinstalli l'app.</div>
+  </div>
+</dialog>
+
+<dialog id="d-book" aria-labelledby="t-book" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div><h3 id="t-book">Prenota il campo, trova il compagno</h3></div>
+    <p>Per i giocatori dei circoli che usano il server: si entra con l'invito della segreteria.</p>
+    <ul>
+      <li><strong>Prenota:</strong> scegli il giorno e tocca una casella libera, dall'app Android o dalla pagina web anche su iPhone; disdici finché sei in tempo.</li>
+      <li><strong>Numero e PIN:</strong> rientri da solo se cambi telefono, e nell'app puoi seguire più circoli.</li>
+      <li><strong>Lista d'attesa:</strong> su una casella occupata, «Avvisami se si libera»: arriva l'avviso e vince chi prenota per primo.</li>
+      <li><strong>Cerco compagno:</strong> pubblichi un annuncio con giorno, fascia oraria e livello; al completo il server prenota da solo il primo campo libero.</li>
+      <li><strong>Chat:</strong> la chat del circolo e quella di ogni annuncio; messaggi privati solo con chi li accetta, con Blocca e Segnala.</li>
+      <li><strong>Bacheca del circolo:</strong> gli avvisi della segreteria, con una notifica.</li>
+      <li><strong>Promemoria:</strong> un avviso prima dell'orario e se la segreteria toglie la prenotazione.</li>
+    </ul>
+    <div class="note">Queste funzioni ci sono solo se il circolo usa il server. La segreteria modera le chat.</div>
+  </div>
+</dialog>
+
+<dialog id="d-desk" aria-labelledby="t-desk" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-desk">La segreteria dal computer</h3></div>
+    <p>Inserire soci e pagamenti è più comodo al computer: Windows, Mac o Linux aprono nel browser una pagina servita dal telefono.</p>
+    <ul>
+      <li><strong>Senza installare niente:</strong> basta un computer sulla stessa rete del telefono; non serve il server del circolo.</li>
+      <li><strong>I dati restano sul telefono:</strong> il computer li vede e li modifica finché è collegato, e non ne tiene copie.</li>
+      <li><strong>Oggi e soci:</strong> la giornata in una pagina; soci con stampa, CSV e importazione da Excel.</li>
+      <li><strong>Quote e planning:</strong> pagamenti e ricevute in PDF; planning per giorno, settimana e mese.</li>
+      <li><strong>Tutto il circolo:</strong> tornei, scuola tennis, squadre, statistiche, impostazioni e prenotazioni online.</li>
+      <li><strong>Backup:</strong> un unico file da scaricare sul PC, e una copia automatica al giorno.</li>
+      <li><strong>Sicurezza:</strong> collegamento cifrato, accesso con QR o codice confermato sul telefono, un solo computer alla volta, solo in rete locale.</li>
+    </ul>
+    <div class="note">Il telefono deve restare acceso e sulla stessa rete. Al primo accesso il browser avvisa che la connessione non è privata: è normale, perché il certificato lo crea il telefono.</div>
   </div>
 </dialog>
 
