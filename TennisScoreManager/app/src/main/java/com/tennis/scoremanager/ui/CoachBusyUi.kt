@@ -101,10 +101,10 @@ fun BusyDialog(c: MatchController, b0: CoachBusy, isNew: Boolean, onDone: () -> 
                 val kinds = BusyKind.entries
                 Segmented(kinds.map { SegOption(busyKindName(s, it)) }, kinds.indexOf(b.kind), { b = b.copy(kind = kinds[it]) }, columns = 3)
                 OutlinedTextField(b.note, { b = b.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bzNote) })
-                if (!isNew) TextButton(onClick = { c.deleteCoachBusy(b.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteCoachBusy(b.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(onClick = { c.saveCoachBusy(b); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(onClick = { c.coaching.saveCoachBusy(b); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
     )
 }

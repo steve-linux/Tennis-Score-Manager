@@ -253,8 +253,8 @@ fun CourseScreen(c: MatchController) {
     if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.school.saveCourse(co.copy(students = co.students + it.id)) } }
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
     if (register) {
-        val file = remember { c.registerFile(co.id, coachSide = false) }
-        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = false) }) { register = false }
+        val file = remember { c.coaching.registerFile(co.id, coachSide = false) }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.coaching.registerXlsx(co.id, coachSide = false) }) { register = false }
     }
 }
 

@@ -162,7 +162,7 @@ fun StudentProgressSections(c: MatchController, st: PlayerProfile) {
                     Text(s.rkHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 }
             },
-            confirmButton = { TextButton(onClick = { c.addRanking(st.id, v); rankEdit = false }) { Text(s.save) } },
+            confirmButton = { TextButton(onClick = { c.coaching.addRanking(st.id, v); rankEdit = false }) { Text(s.save) } },
             dismissButton = { TextButton(onClick = { rankEdit = false }) { Text(s.back) } },
         )
     }
@@ -183,10 +183,10 @@ private fun EvaluationDialog(c: MatchController, e0: Evaluation, isNew: Boolean,
                 }
                 OutlinedTextField(e.note, { e = e.copy(note = it.take(500)) }, Modifier.fillMaxWidth(), label = { Text(s.evNote) },
                     trailingIcon = { DictateIcon(c) { said -> e = e.copy(note = appendDictated(e.note, said).take(500)) } })
-                if (!isNew) TextButton(onClick = { c.deleteEvaluation(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteEvaluation(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(enabled = e.scores.isNotEmpty(), onClick = { c.saveEvaluation(e); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(enabled = e.scores.isNotEmpty(), onClick = { c.coaching.saveEvaluation(e); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -204,13 +204,13 @@ private fun FitnessDialog(c: MatchController, x0: FitnessTest, isNew: Boolean, o
                     texts.value[k].orEmpty(), { v -> texts.value = texts.value + (k to v.take(8)) }, Modifier.fillMaxWidth(), singleLine = true,
                     label = { Text(testLabel(s, k)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 )
-                if (!isNew) TextButton(onClick = { c.deleteFitnessTest(x0.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteFitnessTest(x0.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 val values = texts.value.mapNotNull { (k, v) -> v.replace(',', '.').toDoubleOrNull()?.let { k to it } }.toMap()
-                if (values.isNotEmpty()) c.saveFitnessTest(x0.copy(values = values))
+                if (values.isNotEmpty()) c.coaching.saveFitnessTest(x0.copy(values = values))
                 onDone()
             }) { Text(s.save) }
         },
@@ -237,10 +237,10 @@ private fun ManualMatchDialog(c: MatchController, m0: ManualMatch, isNew: Boolea
                     com.tennis.scoremanager.data.ClubTournaments.winnerFromScore(v)?.let { w -> m = m.copy(won = w == "a") }
                 }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.mmScore) })
                 Segmented(listOf(SegOption(s.studentWon), SegOption(s.studentLost)), if (m.won) 0 else 1, { m = m.copy(won = it == 0) })
-                if (!isNew) TextButton(onClick = { c.deleteManualMatch(m.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteManualMatch(m.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(enabled = m.opponent.isNotBlank() || m.score.isNotBlank(), onClick = { c.saveManualMatch(m); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(enabled = m.opponent.isNotBlank() || m.score.isNotBlank(), onClick = { c.coaching.saveManualMatch(m); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -265,11 +265,11 @@ private fun EventDialog(c: MatchController, e0: StudentEvent, isNew: Boolean, on
                         val who = c.playerById(e.student)?.name.orEmpty()
                         addToCalendar(ctx, calendarIntent("${e.name} · $who", com.tennis.scoremanager.data.CourtPlans.dayStart(e.at), 24 * 60, e.place, e.note, allDay = true), s)
                     }, Modifier.fillMaxWidth())
-                    TextButton(onClick = { c.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.coaching.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             }
         },
-        confirmButton = { TextButton(enabled = e.name.isNotBlank(), onClick = { c.saveStudentEvent(e); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(enabled = e.name.isNotBlank(), onClick = { c.coaching.saveStudentEvent(e); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }

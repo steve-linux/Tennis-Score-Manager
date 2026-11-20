@@ -126,7 +126,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            if (p.paidAt == null) TextButton(onClick = { c.coaching.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
             // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
             else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
@@ -154,8 +154,8 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
     receipt?.let { id ->
-        val file = remember(id) { c.packReceiptFile(id) }
-        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.noticePackReceipt(id) }) { receipt = null }
+        val file = remember(id) { c.coaching.packReceiptFile(id) }
+        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.coaching.noticePackReceipt(id) }) { receipt = null }
     }
 
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }

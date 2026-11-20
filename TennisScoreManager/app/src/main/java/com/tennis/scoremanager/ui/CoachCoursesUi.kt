@@ -330,8 +330,8 @@ fun CoachCourseScreen(c: MatchController) {
         confirmButton = { TextButton(onClick = { calendar = false }) { Text(s.back) } },
     )
     if (register) {
-        val file = remember { c.registerFile(co.id, coachSide = true) }
-        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = true) }) { register = false }
+        val file = remember { c.coaching.registerFile(co.id, coachSide = true) }
+        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.coaching.registerXlsx(co.id, coachSide = true) }) { register = false }
     }
 }
 
@@ -523,7 +523,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
     val to = (cal.clone() as java.util.Calendar).apply { add(java.util.Calendar.MONTH, 1) }.timeInMillis
     val label = java.text.SimpleDateFormat("LLLL yyyy", lang.locale).format(java.util.Date(from))
     val m = Coaching.month(book, from, to)
-    val text = c.monthText(m, label)
+    val text = c.coaching.monthText(m, label)
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.cmMonth) },
@@ -538,12 +538,12 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
                 if (m.paidCents == 0 && m.privateLessons == 0 && m.courseLessons == 0) Text(s.cmEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
                 // Le ricevute dei pacchetti dell'anno del mese mostrato, in Excel (per il commercialista).
                 val year = java.util.Calendar.getInstance().apply { timeInMillis = from }.get(java.util.Calendar.YEAR)
-                GhostButton("${s.xlReceipts} $year (Excel)", Icons.Filled.School, { shareXlsx(context, c, c.receiptsXlsx(year)) }, Modifier.fillMaxWidth())
+                GhostButton("${s.xlReceipts} $year (Excel)", Icons.Filled.School, { shareXlsx(context, c, c.coaching.receiptsXlsx(year)) }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                val wa = Notices.waNumber(c.coachOffice())
+                val wa = Notices.waNumber(c.coaching.coachOffice())
                 val i = if (wa != null) android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://wa.me/$wa?text=" + android.net.Uri.encode(text)))
                 else android.content.Intent.createChooser(android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text), null)
                 runCatching { context.startActivity(i) }

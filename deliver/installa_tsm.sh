@@ -17218,7 +17218,7 @@ class MatchController(
                 ?.takeIf { it.size in 100..2_000_000 && BitmapFactory.decodeByteArray(it, 0, it.size) != null }
                 ?.let { storage.savePhoto(key, it); photosVersion.value++ }
         }
-        if (pl.student && card.profile.ranking.isNotBlank() && coaching.coachBook.value.rankings.none { it.student == pl.id }) addRanking(pl.id, card.profile.ranking)
+        if (pl.student && card.profile.ranking.isNotBlank() && coaching.coachBook.value.rankings.none { it.student == pl.id }) coaching.addRanking(pl.id, card.profile.ranking)
         _toasts.tryEmit(if (old == null) strings.pfAdded(pl.name) else strings.pfCompleted(pl.name))
         return pl
     }
@@ -17237,35 +17237,6 @@ class MatchController(
         _toasts.tryEmit(strings.ccProposalApplied(pl.name))
     }
 
-    // Partite, tornei, classifica, valutazioni e test degli allievi.
-    fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
-    fun deleteManualMatch(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
-    /** Gli impegni dell'allenatore (giorni occupati). */
-    fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
-        val b = coaching.coachBook.value
-        val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
-        coaching.putCoach(busyChanged(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from })))
-    }
-    fun deleteCoachBusy(id: String) { val b = coaching.coachBook.value; coaching.putCoach(busyChanged(b.copy(busy = b.busy.filter { it.id != id }))) }
-
-    /** Gli impegni sono cambiati: i corsi della segreteria hanno qualcosa da mandarle (vanno con le presenze). */
-    private fun busyChanged(b: com.tennis.scoremanager.data.CoachBook): com.tennis.scoremanager.data.CoachBook {
-        val now = System.currentTimeMillis()
-        return b.copy(courses = b.courses.map { if (!it.personal && it.card.course.to >= now) it.copy(changedAt = now) else it })
-    }
-    fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
-    fun deleteStudentEvent(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(events = b.events.filter { it.id != id })) }
-    fun addRanking(student: String, ranking: String) {
-        val r = ranking.trim().uppercase().take(10)
-        if (r.isEmpty()) return
-        val b = coaching.coachBook.value
-        coaching.putCoach(b.copy(rankings = b.rankings + com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), student, System.currentTimeMillis(), r)))
-    }
-    fun saveEvaluation(e: com.tennis.scoremanager.data.Evaluation) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(evaluations = b.evaluations.filter { it.id != e.id } + e)) }
-    fun deleteEvaluation(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(evaluations = b.evaluations.filter { it.id != id })) }
-    fun saveFitnessTest(x: com.tennis.scoremanager.data.FitnessTest) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(tests = b.tests.filter { it.id != x.id } + x)) }
-    fun deleteFitnessTest(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(tests = b.tests.filter { it.id != id })) }
-
     /** La partita finita in un file, da mandare all'allenatore (o a un altro telefono): la apre con TSM. */
     fun matchFileToShare(rec: MatchRecord): File? {
         val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
@@ -17281,22 +17252,6 @@ class MatchController(
             refreshHistory(); refreshSaved()
         }
     }
-
-    /** Il riepilogo del mese per la segreteria, in un testo (lezioni, ore, allievi, incassi, corsi, presenze). */
-    fun monthText(m: com.tennis.scoremanager.data.Coaching.Month, label: String): String {
-        val s = strings; val lang = options.value.lang
-        return listOfNotNull(
-            s.cmMonthTitle(label) + (me()?.name ?: storage.myName).ifBlank { null }?.let { " · $it" }.orEmpty(),
-            s.cmPrivate(m.privateLessons, hoursText(m.privateMinutes), m.students),
-            s.cmCourses(m.courseLessons, hoursText(m.courseMinutes)) + (m.presencePct?.let { " · " + s.cmPresence(it) } ?: ""),
-            m.paidCents.takeIf { it > 0 }?.let { s.cmPaid(com.tennis.scoremanager.data.Fees.money(it, lang.locale)) },
-        ).joinToString("\n")
-    }
-
-    private fun hoursText(minutes: Int): String = if (minutes % 60 == 0) "${minutes / 60} h" else "${minutes / 60} h ${minutes % 60}′"
-
-    /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
-    fun coachOffice(): String = coaching.coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
 
     // ---- Scheda progressi: l'allenatore la manda, l'allievo la tiene in Progressi ----
 
@@ -17418,88 +17373,6 @@ class MatchController(
         mail.forEach { m -> runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.dropAdminMail(m.id) } } } }
         if (done.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibApplied, done.joinToString(" · "))
         if (keep.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
-    }
-
-    // ---- Allenatore: ricevute dei pacchetti e registro presenze ----
-
-    /** Segna pagato il pacchetto e gli dà il numero di ricevuta (una serie per anno). */
-    fun markPackPaid(p: com.tennis.scoremanager.data.LessonPack) {
-        val now = System.currentTimeMillis()
-        coaching.savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coaching.coachBook.value, now)))
-    }
-
-    /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
-    fun packReceiptFile(packId: String): File? {
-        val p0 = coaching.coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
-        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coaching.coachBook.value, p0.paidAt!!)).also { coaching.savePack(it) } else p0
-        val s = strings
-        val st = playerById(p.student)
-        val coach = me()?.name ?: storage.myName
-        val club = coaching.coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
-        val header = listOf(coach, club).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { s.receiptTitle }
-        // Il minorenne non paga da sé: la ricevuta è intestata al genitore, per l'allievo.
-        val from = st?.let { x -> x.guardian.takeIf { it.isNotBlank() }?.let { g -> s.rcFor(g, x.name) } ?: x.name }.orEmpty()
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.receiptTitle} ${p.receipt!!.replace('/', '-')} ${st?.name.orEmpty()}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
-        return runCatching {
-            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(header, p.receipt, p.paidAt!!, from, s.rcPack(p.lessons), "", p.cents, s, options.value.lang, it) }
-            f
-        }.getOrNull()
-    }
-
-    /** Manda la ricevuta all'allievo (al genitore se è minorenne), con il PDF allegato. */
-    fun noticePackReceipt(packId: String) {
-        val p = coaching.coachBook.value.packs.firstOrNull { it.id == packId } ?: return
-        val st = playerById(p.student) ?: return
-        val f = packReceiptFile(packId) ?: return
-        val now = System.currentTimeMillis()
-        val number = coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
-        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.rcText(number)).joinToString("\n")
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.receiptTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
-    }
-
-    /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
-    fun registerFile(courseId: String, coachSide: Boolean): File? {
-        val s = strings
-        val co = (if (coachSide) coaching.coachCourse(courseId)?.course else school.course(courseId)) ?: return null
-        val cardNames = coaching.coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
-        val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
-        val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
-        val club = if (coachSide) coaching.coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
-        val header = listOf(club, coach.takeIf { it.isNotBlank() }?.let { s.scCoachLine(it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.rgTitle} ${co.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
-        return runCatching {
-            f.outputStream().use { com.tennis.scoremanager.data.AttendancePdf.write(co, names, header, s, options.value.lang, System.currentTimeMillis(), it) }
-            f
-        }.getOrNull()
-    }
-
-    /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
-    fun registerXlsx(courseId: String, coachSide: Boolean): File? {
-        val s = strings
-        val co = (if (coachSide) coaching.coachCourse(courseId)?.course else school.course(courseId)) ?: return null
-        val cardNames = coaching.coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
-        val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.rgTitle} ${co.name}.xlsx".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
-        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write(co.name, rows, it) }; f }.getOrNull()
-    }
-
-    /** Le ricevute dei pacchetti di un anno in Excel: numero, data, da chi, allievo, per cosa, importo. */
-    fun receiptsXlsx(year: Int): File? {
-        val s = strings
-        val cal = java.util.Calendar.getInstance()
-        val packs = coaching.coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
-            .sortedBy { it.receipt }
-        val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
-        val rows = listOf(listOf<Any?>(s.xlNumber, s.payDate, s.receiptReceivedFrom, s.xlStudent, s.receiptFor, s.receiptAmount)) + packs.map { p ->
-            val st = playerById(p.student)
-            listOf<Any?>(p.receipt, df.format(java.util.Date(p.paidAt!!)), st?.guardian?.ifBlank { null } ?: st?.name.orEmpty(), st?.name.orEmpty(), s.rcPack(p.lessons), p.cents / 100.0)
-        }
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.xlReceipts} $year.xlsx")
-        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write("${s.xlReceipts} $year", rows, it) }; f }.getOrNull()
     }
 
     // ---- Obiettivi (Progressi) ----
@@ -23625,6 +23498,133 @@ class CoachArea(
         val office = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
         val text = listOf(strings.ccProposalText(st.name), level.trim(), note.trim()).filter { it.isNotBlank() }.joinToString("\n")
         return Triple(f, text, office)
+    }
+
+    // Partite, tornei, classifica, valutazioni e test degli allievi.
+    fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
+    fun deleteManualMatch(id: String) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
+    /** Gli impegni dell'allenatore (giorni occupati). */
+    fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
+        val b = coachBook.value
+        val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
+        putCoach(busyChanged(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from })))
+    }
+    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(busyChanged(b.copy(busy = b.busy.filter { it.id != id }))) }
+
+    /** Gli impegni sono cambiati: i corsi della segreteria hanno qualcosa da mandarle (vanno con le presenze). */
+    internal fun busyChanged(b: com.tennis.scoremanager.data.CoachBook): com.tennis.scoremanager.data.CoachBook {
+        val now = System.currentTimeMillis()
+        return b.copy(courses = b.courses.map { if (!it.personal && it.card.course.to >= now) it.copy(changedAt = now) else it })
+    }
+    fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
+    fun deleteStudentEvent(id: String) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != id })) }
+    fun addRanking(student: String, ranking: String) {
+        val r = ranking.trim().uppercase().take(10)
+        if (r.isEmpty()) return
+        val b = coachBook.value
+        putCoach(b.copy(rankings = b.rankings + com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), student, System.currentTimeMillis(), r)))
+    }
+    fun saveEvaluation(e: com.tennis.scoremanager.data.Evaluation) { val b = coachBook.value; putCoach(b.copy(evaluations = b.evaluations.filter { it.id != e.id } + e)) }
+    fun deleteEvaluation(id: String) { val b = coachBook.value; putCoach(b.copy(evaluations = b.evaluations.filter { it.id != id })) }
+    fun saveFitnessTest(x: com.tennis.scoremanager.data.FitnessTest) { val b = coachBook.value; putCoach(b.copy(tests = b.tests.filter { it.id != x.id } + x)) }
+    fun deleteFitnessTest(id: String) { val b = coachBook.value; putCoach(b.copy(tests = b.tests.filter { it.id != id })) }
+
+    /** Il riepilogo del mese per la segreteria, in un testo (lezioni, ore, allievi, incassi, corsi, presenze). */
+    fun monthText(m: com.tennis.scoremanager.data.Coaching.Month, label: String): String {
+        val s = strings; val lang = options.value.lang
+        return listOfNotNull(
+            s.cmMonthTitle(label) + (me()?.name ?: storage.myName).ifBlank { null }?.let { " · $it" }.orEmpty(),
+            s.cmPrivate(m.privateLessons, hoursText(m.privateMinutes), m.students),
+            s.cmCourses(m.courseLessons, hoursText(m.courseMinutes)) + (m.presencePct?.let { " · " + s.cmPresence(it) } ?: ""),
+            m.paidCents.takeIf { it > 0 }?.let { s.cmPaid(com.tennis.scoremanager.data.Fees.money(it, lang.locale)) },
+        ).joinToString("\n")
+    }
+
+    internal fun hoursText(minutes: Int): String = if (minutes % 60 == 0) "${minutes / 60} h" else "${minutes / 60} h ${minutes % 60}′"
+
+    /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
+    fun coachOffice(): String = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+
+    // ---- Allenatore: ricevute dei pacchetti e registro presenze ----
+
+    /** Segna pagato il pacchetto e gli dà il numero di ricevuta (una serie per anno). */
+    fun markPackPaid(p: com.tennis.scoremanager.data.LessonPack) {
+        val now = System.currentTimeMillis()
+        savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
+    }
+
+    /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
+    fun packReceiptFile(packId: String): File? {
+        val p0 = coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
+        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, p0.paidAt!!)).also { savePack(it) } else p0
+        val s = strings
+        val st = playerById(p.student)
+        val coach = me()?.name ?: storage.myName
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val header = listOf(coach, club).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { s.receiptTitle }
+        // Il minorenne non paga da sé: la ricevuta è intestata al genitore, per l'allievo.
+        val from = st?.let { x -> x.guardian.takeIf { it.isNotBlank() }?.let { g -> s.rcFor(g, x.name) } ?: x.name }.orEmpty()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt!!.replace('/', '-')} ${st?.name.orEmpty()}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(header, p.receipt, p.paidAt!!, from, s.rcPack(p.lessons), "", p.cents, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** Manda la ricevuta all'allievo (al genitore se è minorenne), con il PDF allegato. */
+    fun noticePackReceipt(packId: String) {
+        val p = coachBook.value.packs.firstOrNull { it.id == packId } ?: return
+        val st = playerById(p.student) ?: return
+        val f = packReceiptFile(packId) ?: return
+        val now = System.currentTimeMillis()
+        val number = coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.rcText(number)).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.receiptTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
+    fun registerFile(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else school.course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
+        val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
+        val club = if (coachSide) coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
+        val header = listOf(club, coach.takeIf { it.isNotBlank() }?.let { s.scCoachLine(it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.AttendancePdf.write(co, names, header, s, options.value.lang, System.currentTimeMillis(), it) }
+            f
+        }.getOrNull()
+    }
+
+    /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
+    fun registerXlsx(courseId: String, coachSide: Boolean): File? {
+        val s = strings
+        val co = (if (coachSide) coachCourse(courseId)?.course else school.course(courseId)) ?: return null
+        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.rgTitle} ${co.name}.xlsx".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write(co.name, rows, it) }; f }.getOrNull()
+    }
+
+    /** Le ricevute dei pacchetti di un anno in Excel: numero, data, da chi, allievo, per cosa, importo. */
+    fun receiptsXlsx(year: Int): File? {
+        val s = strings
+        val cal = java.util.Calendar.getInstance()
+        val packs = coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
+            .sortedBy { it.receipt }
+        val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
+        val rows = listOf(listOf<Any?>(s.xlNumber, s.payDate, s.receiptReceivedFrom, s.xlStudent, s.receiptFor, s.receiptAmount)) + packs.map { p ->
+            val st = playerById(p.student)
+            listOf<Any?>(p.receipt, df.format(java.util.Date(p.paidAt!!)), st?.guardian?.ifBlank { null } ?: st?.name.orEmpty(), st?.name.orEmpty(), s.rcPack(p.lessons), p.cents / 100.0)
+        }
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.xlReceipts} $year.xlsx")
+        return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write("${s.xlReceipts} $year", rows, it) }; f }.getOrNull()
     }
 }
 TSM_EOF
@@ -35852,8 +35852,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
     override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
-    override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
-    override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerPdf(c: Course): ByteArray? = this.c.coaching.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerXlsx(c: Course): ByteArray? = this.c.coaching.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
     /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
     override fun profileFields(id: String) = fieldsOf(id)
@@ -35972,15 +35972,15 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun sessions() = c.serveSessions.value
     override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
-    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.markPackPaid(it) } }
     override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
         c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)
     override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.coaching.saveCoachOwnCourse(c)
     override fun deleteOwnCourse(id: String) = c.coaching.deleteCoachCourse(id)
     override fun setCourseColor(id: String, color: String) = c.coaching.setCoachCourseColor(id, color)
-    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
-    override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.coaching.saveCoachBusy(b)
+    override fun deleteBusy(id: String) = c.coaching.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun profileFields(id: String) = fieldsOf(id)
@@ -35994,11 +35994,11 @@ class CoachBridge(private val c: MatchController) : CoachData {
     }
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
-    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
+    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.coaching.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
-    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.registerFile(courseId, coachSide = true))
-    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.registerXlsx(courseId, coachSide = true))
-    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.receiptsXlsx(year))
+    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.coaching.registerFile(courseId, coachSide = true))
+    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.coaching.registerXlsx(courseId, coachSide = true))
+    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.coaching.receiptsXlsx(year))
 }
 
 /**
@@ -42468,10 +42468,10 @@ fun BusyDialog(c: MatchController, b0: CoachBusy, isNew: Boolean, onDone: () -> 
                 val kinds = BusyKind.entries
                 Segmented(kinds.map { SegOption(busyKindName(s, it)) }, kinds.indexOf(b.kind), { b = b.copy(kind = kinds[it]) }, columns = 3)
                 OutlinedTextField(b.note, { b = b.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bzNote) })
-                if (!isNew) TextButton(onClick = { c.deleteCoachBusy(b.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteCoachBusy(b.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(onClick = { c.saveCoachBusy(b); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(onClick = { c.coaching.saveCoachBusy(b); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
     )
 }
@@ -42967,8 +42967,8 @@ fun CoachCourseScreen(c: MatchController) {
         confirmButton = { TextButton(onClick = { calendar = false }) { Text(s.back) } },
     )
     if (register) {
-        val file = remember { c.registerFile(co.id, coachSide = true) }
-        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = true) }) { register = false }
+        val file = remember { c.coaching.registerFile(co.id, coachSide = true) }
+        PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.coaching.registerXlsx(co.id, coachSide = true) }) { register = false }
     }
 }
 
@@ -43160,7 +43160,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
     val to = (cal.clone() as java.util.Calendar).apply { add(java.util.Calendar.MONTH, 1) }.timeInMillis
     val label = java.text.SimpleDateFormat("LLLL yyyy", lang.locale).format(java.util.Date(from))
     val m = Coaching.month(book, from, to)
-    val text = c.monthText(m, label)
+    val text = c.coaching.monthText(m, label)
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.cmMonth) },
@@ -43175,12 +43175,12 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
                 if (m.paidCents == 0 && m.privateLessons == 0 && m.courseLessons == 0) Text(s.cmEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
                 // Le ricevute dei pacchetti dell'anno del mese mostrato, in Excel (per il commercialista).
                 val year = java.util.Calendar.getInstance().apply { timeInMillis = from }.get(java.util.Calendar.YEAR)
-                GhostButton("${s.xlReceipts} $year (Excel)", Icons.Filled.School, { shareXlsx(context, c, c.receiptsXlsx(year)) }, Modifier.fillMaxWidth())
+                GhostButton("${s.xlReceipts} $year (Excel)", Icons.Filled.School, { shareXlsx(context, c, c.coaching.receiptsXlsx(year)) }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                val wa = Notices.waNumber(c.coachOffice())
+                val wa = Notices.waNumber(c.coaching.coachOffice())
                 val i = if (wa != null) android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://wa.me/$wa?text=" + android.net.Uri.encode(text)))
                 else android.content.Intent.createChooser(android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text), null)
                 runCatching { context.startActivity(i) }
@@ -43360,7 +43360,7 @@ fun StudentProgressSections(c: MatchController, st: PlayerProfile) {
                     Text(s.rkHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 }
             },
-            confirmButton = { TextButton(onClick = { c.addRanking(st.id, v); rankEdit = false }) { Text(s.save) } },
+            confirmButton = { TextButton(onClick = { c.coaching.addRanking(st.id, v); rankEdit = false }) { Text(s.save) } },
             dismissButton = { TextButton(onClick = { rankEdit = false }) { Text(s.back) } },
         )
     }
@@ -43381,10 +43381,10 @@ private fun EvaluationDialog(c: MatchController, e0: Evaluation, isNew: Boolean,
                 }
                 OutlinedTextField(e.note, { e = e.copy(note = it.take(500)) }, Modifier.fillMaxWidth(), label = { Text(s.evNote) },
                     trailingIcon = { DictateIcon(c) { said -> e = e.copy(note = appendDictated(e.note, said).take(500)) } })
-                if (!isNew) TextButton(onClick = { c.deleteEvaluation(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteEvaluation(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(enabled = e.scores.isNotEmpty(), onClick = { c.saveEvaluation(e); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(enabled = e.scores.isNotEmpty(), onClick = { c.coaching.saveEvaluation(e); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -43402,13 +43402,13 @@ private fun FitnessDialog(c: MatchController, x0: FitnessTest, isNew: Boolean, o
                     texts.value[k].orEmpty(), { v -> texts.value = texts.value + (k to v.take(8)) }, Modifier.fillMaxWidth(), singleLine = true,
                     label = { Text(testLabel(s, k)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 )
-                if (!isNew) TextButton(onClick = { c.deleteFitnessTest(x0.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteFitnessTest(x0.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 val values = texts.value.mapNotNull { (k, v) -> v.replace(',', '.').toDoubleOrNull()?.let { k to it } }.toMap()
-                if (values.isNotEmpty()) c.saveFitnessTest(x0.copy(values = values))
+                if (values.isNotEmpty()) c.coaching.saveFitnessTest(x0.copy(values = values))
                 onDone()
             }) { Text(s.save) }
         },
@@ -43435,10 +43435,10 @@ private fun ManualMatchDialog(c: MatchController, m0: ManualMatch, isNew: Boolea
                     com.tennis.scoremanager.data.ClubTournaments.winnerFromScore(v)?.let { w -> m = m.copy(won = w == "a") }
                 }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.mmScore) })
                 Segmented(listOf(SegOption(s.studentWon), SegOption(s.studentLost)), if (m.won) 0 else 1, { m = m.copy(won = it == 0) })
-                if (!isNew) TextButton(onClick = { c.deleteManualMatch(m.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.coaching.deleteManualMatch(m.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(enabled = m.opponent.isNotBlank() || m.score.isNotBlank(), onClick = { c.saveManualMatch(m); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(enabled = m.opponent.isNotBlank() || m.score.isNotBlank(), onClick = { c.coaching.saveManualMatch(m); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -43463,11 +43463,11 @@ private fun EventDialog(c: MatchController, e0: StudentEvent, isNew: Boolean, on
                         val who = c.playerById(e.student)?.name.orEmpty()
                         addToCalendar(ctx, calendarIntent("${e.name} · $who", com.tennis.scoremanager.data.CourtPlans.dayStart(e.at), 24 * 60, e.place, e.note, allDay = true), s)
                     }, Modifier.fillMaxWidth())
-                    TextButton(onClick = { c.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.coaching.deleteStudentEvent(e.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             }
         },
-        confirmButton = { TextButton(enabled = e.name.isNotBlank(), onClick = { c.saveStudentEvent(e); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(enabled = e.name.isNotBlank(), onClick = { c.coaching.saveStudentEvent(e); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -43603,7 +43603,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            if (p.paidAt == null) TextButton(onClick = { c.coaching.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
             // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
             else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
@@ -43631,8 +43631,8 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
     receipt?.let { id ->
-        val file = remember(id) { c.packReceiptFile(id) }
-        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.noticePackReceipt(id) }) { receipt = null }
+        val file = remember(id) { c.coaching.packReceiptFile(id) }
+        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.coaching.noticePackReceipt(id) }) { receipt = null }
     }
 
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }
@@ -77889,8 +77889,8 @@ fun CourseScreen(c: MatchController) {
     if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.school.saveCourse(co.copy(students = co.students + it.id)) } }
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
     if (register) {
-        val file = remember { c.registerFile(co.id, coachSide = false) }
-        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = false) }) { register = false }
+        val file = remember { c.coaching.registerFile(co.id, coachSide = false) }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.coaching.registerXlsx(co.id, coachSide = false) }) { register = false }
     }
 }
 

@@ -85,8 +85,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
     override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
-    override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
-    override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerPdf(c: Course): ByteArray? = this.c.coaching.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerXlsx(c: Course): ByteArray? = this.c.coaching.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
     /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
     override fun profileFields(id: String) = fieldsOf(id)
@@ -205,15 +205,15 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun sessions() = c.serveSessions.value
     override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
-    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.markPackPaid(it) } }
     override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
         c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)
     override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.coaching.saveCoachOwnCourse(c)
     override fun deleteOwnCourse(id: String) = c.coaching.deleteCoachCourse(id)
     override fun setCourseColor(id: String, color: String) = c.coaching.setCoachCourseColor(id, color)
-    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
-    override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.coaching.saveCoachBusy(b)
+    override fun deleteBusy(id: String) = c.coaching.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun profileFields(id: String) = fieldsOf(id)
@@ -227,11 +227,11 @@ class CoachBridge(private val c: MatchController) : CoachData {
     }
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
-    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
+    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.coaching.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
-    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.registerFile(courseId, coachSide = true))
-    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.registerXlsx(courseId, coachSide = true))
-    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.receiptsXlsx(year))
+    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.coaching.registerFile(courseId, coachSide = true))
+    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.coaching.registerXlsx(courseId, coachSide = true))
+    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.coaching.receiptsXlsx(year))
 }
 
 /**
