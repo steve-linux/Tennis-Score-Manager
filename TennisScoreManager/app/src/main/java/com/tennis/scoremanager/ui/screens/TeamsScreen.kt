@@ -327,7 +327,7 @@ private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: 
     val s = LocalStrings.current
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     var f by remember { mutableStateOf(f0) }
     var askDelete by remember { mutableStateOf(false) }
     AlertDialog(

@@ -3,8 +3,10 @@
 package com.tennis.scoremanager.club
 
 import com.tennis.scoremanager.Navigator
+import com.tennis.scoremanager.Role
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.ClubBook
+import com.tennis.scoremanager.data.ClubServerConf
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.NoticePlan
@@ -22,6 +24,13 @@ interface ClubHost {
     val strings: Strings
     val nav: Navigator
     val options: MutableStateFlow<MatchOptions>
+    val activeRole: MutableStateFlow<Role>
+
+    /** Tornei, squadre e sfide: il planning ne guarda i campi occupati. */
+    val competitions: ClubCompetitions
+
+    /** Il server del circolo (facoltativo): le disdette delle prenotazioni online passano da qui. */
+    fun saveServer(f: (ClubServerConf) -> ClubServerConf)
 
     // Giocatori, registro delle quote e planning dei campi.
     val players: MutableStateFlow<List<PlayerProfile>>

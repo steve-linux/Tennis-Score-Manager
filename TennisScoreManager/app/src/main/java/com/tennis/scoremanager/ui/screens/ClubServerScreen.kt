@@ -225,7 +225,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     val conf by c.clubServer.collectAsState()
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     val scope = rememberCoroutineScope()
     var busy by remember { mutableStateOf(false) }
     var msg by remember { mutableStateOf<String?>(null) }

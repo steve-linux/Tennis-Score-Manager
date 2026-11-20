@@ -100,7 +100,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         c.setRole(role)
         if (role == com.tennis.scoremanager.Role.CLUB) {
             c.storage.clubName = club
-            c.setClubCourts(courts.lines())
+            c.planning.setClubCourts(courts.lines())
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder

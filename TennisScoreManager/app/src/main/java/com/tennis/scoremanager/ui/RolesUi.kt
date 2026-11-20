@@ -99,7 +99,7 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
             TextButton(onClick = {
                 c.storage.clubName = name
                 c.storage.clubPhone = phone
-                if (hadNone) c.setClubCourts(courts.lines())
+                if (hadNone) c.planning.setClubCourts(courts.lines())
                 onDone()
             }) { Text(s.ok) }
         },

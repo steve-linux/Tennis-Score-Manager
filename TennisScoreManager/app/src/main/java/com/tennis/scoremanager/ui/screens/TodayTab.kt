@@ -82,7 +82,7 @@ fun TodayTab(c: MatchController) {
     val tournaments by c.competitions.clubTournaments.collectAsState()
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    val courses by c.courses.collectAsState()
+    val courses by c.school.courses.collectAsState()
     val teams by c.competitions.teams.collectAsState()
     val ladders by c.competitions.ladders.collectAsState()
     // Si aggiorna ogni minuto: lasciata aperta (un tablet in segreteria) passa da sola al giorno dopo.
@@ -113,7 +113,7 @@ fun TodayTab(c: MatchController) {
         }
         val online = occ.count { it.booking?.online != null }
         TodayCard(Icons.Filled.CalendarMonth, if (occ.isEmpty()) s.tdCourtsNone else s.tdCourts(occ.size),
-            next + listOfNotNull(s.tdOnline(online).takeIf { online > 0 })) { c.openCourtsPlan() }
+            next + listOfNotNull(s.tdOnline(online).takeIf { online > 0 })) { c.planning.openCourtsPlan() }
         shown++
     }
     if (ClubFeature.PAYMENTS in f) {
@@ -142,7 +142,7 @@ fun TodayTab(c: MatchController) {
         val lessons = courses.flatMap { co -> Courses.lessons(co).filter { it.start in today until tomorrow && it.key !in co.cancelled }.map { co to it } }.sortedBy { it.second.start }
         if (lessons.isNotEmpty()) {
             TodayCard(Icons.Filled.School, s.tdLessons(lessons.size), lessons.take(3).map { (co, l) -> listOf(hm(l.start), co.name, l.court).filter { it.isNotBlank() }.joinToString(" · ") }) {
-                if (lessons.map { it.first.id }.distinct().size == 1) c.openCourse(lessons.first().first.id) else c.openSchool()
+                if (lessons.map { it.first.id }.distinct().size == 1) c.school.openCourse(lessons.first().first.id) else c.school.openSchool()
             }
             shown++
         }

@@ -77,7 +77,7 @@ fun CourtStatsScreen(c: MatchController) {
     BackHandler { c.back() }
     val plan by c.courtPlan.collectAsState()
     val tournaments by c.competitions.clubTournaments.collectAsState()
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     val locale = c.options.collectAsState().value.lang.locale
     var kind by rememberSaveable { mutableIntStateOf(0) }
     val (from, to) = period(kind, System.currentTimeMillis())

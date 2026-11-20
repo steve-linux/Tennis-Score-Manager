@@ -352,7 +352,7 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
             val x = c.moveCoachLesson(co.id, l.key, start, minutes, court)
             moving = false
             onDone()
-            if (notify && x != null) c.noticeCourseMoved(x, l.key)
+            if (notify && x != null) c.school.noticeCourseMoved(x, l.key)
         }) { moving = false }
         return
     }
@@ -455,7 +455,7 @@ fun IncomingAttendanceDialog(c: MatchController, r: AttendanceReport) {
 @Composable
 fun IncomingProposalDialog(c: MatchController, p: StudentProposal) {
     val s = LocalStrings.current
-    val courses by c.courses.collectAsState()
+    val courses by c.school.courses.collectAsState()
     var pick by remember { mutableStateOf(p.course?.takeIf { id -> courses.any { it.id == id } }) }
     AlertDialog(
         onDismissRequest = { c.incomingProposal.value = null },

@@ -56,21 +56,21 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun savePlayers(list: List<PlayerProfile>) = c.savePlayers(list)
     override fun book(): ClubBook = c.clubBook.value
     override fun saveBook(b: ClubBook) = c.saveClubBook(b)
-    override fun payTypes(): List<PayType> = c.payTypes()
-    override fun courts(): List<String> = c.clubCourts.value
+    override fun payTypes(): List<PayType> = c.planning.payTypes()
+    override fun courts(): List<String> = c.planning.clubCourts.value
     override fun plan(): CourtPlan = c.courtPlan.value
     override fun tournaments(): List<ClubTournament> = c.competitions.clubTournaments.value
-    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.saveBooking(b, weeks, charge)
-    override fun deleteBooking(b: CourtBooking, series: Boolean) = c.deleteBooking(b, wholeSeries = series)
-    override fun saveBlock(b: CourtBlock, delete: Boolean) = c.saveCourtBlock(b, delete)
+    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.planning.saveBooking(b, weeks, charge)
+    override fun deleteBooking(b: CourtBooking, series: Boolean) = c.planning.deleteBooking(b, wholeSeries = series)
+    override fun saveBlock(b: CourtBlock, delete: Boolean) = c.planning.saveCourtBlock(b, delete)
     override fun features(): Set<ClubFeature> = c.clubFeatures.value
-    override fun courses(): List<Course> = c.courses.value
+    override fun courses(): List<Course> = c.school.courses.value
     override fun teams(): List<Team> = c.competitions.teams.value
     override fun ladders(): List<Ladder> = c.competitions.ladders.value
-    override fun saveCourse(c: Course) = this.c.saveCourse(c)
-    override fun deleteCourse(c: Course) = this.c.deleteCourse(c.id)
-    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.courseFeeLabel(c, month)
-    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
+    override fun saveCourse(c: Course) = this.c.school.saveCourse(c)
+    override fun deleteCourse(c: Course) = this.c.school.deleteCourse(c.id)
+    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.school.courseFeeLabel(c, month)
+    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.school.chargeCourse(c, month)
     override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
     override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
     override fun saveTeam(t: Team) = c.competitions.saveTeam(t)
@@ -84,7 +84,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
-    override fun noticeCourseMoved(c: Course, key: String) = this.c.noticeCourseMoved(c, key)
+    override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
@@ -131,7 +131,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
             val guardian = listOf(x.guardian, x.guardianPhone).filter { it.isNotBlank() }.joinToString(" ")
             return DeskIncoming("PROPOSAL", s.ccProposalTitle, listOfNotNull(x.name, x.phone.ifBlank { null }, x.email.ifBlank { null }, guardian.ifBlank { null }?.let { "${s.coGuardian}: $it" },
                 listOfNotNull(p.coach.ifBlank { null }?.let { s.ccFrom(it) }, p.level.ifBlank { null }, p.note.ifBlank { null }).joinToString(" · ").ifBlank { null }),
-                s.ccProposalCourse, true, courses = c.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.courses.value.any { it.id == id } })
+                s.ccProposalCourse, true, courses = c.school.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.school.courses.value.any { it.id == id } })
         }
         return null
     }
@@ -147,17 +147,17 @@ class DeskBridge(private val c: MatchController) : DeskData {
             if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
             c.applyAttendance(r); return null
         }
-        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.courses.value.any { it.id == id } }); return null }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.school.courses.value.any { it.id == id } }); return null }
         return "NOT_A_FILE"
     }
     override fun setClubName(name: String) { c.storage.clubName = name }
-    override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
-    override fun addCourt(info: CourtInfo): Boolean = c.addCourt(info)
-    override fun renameCourt(old: String, new: String): Boolean = c.renameCourt(old, new)
-    override fun saveCourtInfo(info: CourtInfo) = c.saveCourtInfo(info)
-    override fun deleteCourt(name: String) = c.deleteCourt(name)
-    override fun moveCourt(name: String, up: Boolean) = c.moveCourt(name, up)
-    override fun savePayTypes(list: List<PayType>) = c.savePayTypes(list)
+    override fun saveCourtSettings(st: CourtSettings) = c.planning.saveCourtSettings(st)
+    override fun addCourt(info: CourtInfo): Boolean = c.planning.addCourt(info)
+    override fun renameCourt(old: String, new: String): Boolean = c.planning.renameCourt(old, new)
+    override fun saveCourtInfo(info: CourtInfo) = c.planning.saveCourtInfo(info)
+    override fun deleteCourt(name: String) = c.planning.deleteCourt(name)
+    override fun moveCourt(name: String, up: Boolean) = c.planning.moveCourt(name, up)
+    override fun savePayTypes(list: List<PayType>) = c.planning.savePayTypes(list)
     override fun serverConf(): ClubServerConf = c.clubServer.value
     override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) {
         c.saveServerRules(rules, payInfo)

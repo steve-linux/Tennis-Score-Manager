@@ -1170,8 +1170,8 @@ class MatchController(
     /** Tutto quello della segreteria, adesso (vedi [com.tennis.scoremanager.data.OfficeSnapshot]). */
     fun officeSnapshot(): com.tennis.scoremanager.data.OfficeSnapshot = com.tennis.scoremanager.data.OfficeSnapshot(
         createdAt = System.currentTimeMillis(), app = com.tennis.scoremanager.BuildConfig.VERSION_NAME, club = storage.clubName,
-        courts = clubCourts.value, features = clubFeatures.value.map { it.name }.sorted(), players = players.value, book = clubBook.value,
-        plan = courtPlan.value, tournaments = competitions.clubTournaments.value, courses = courses.value, teams = competitions.teams.value, ladders = competitions.ladders.value,
+        courts = planning.clubCourts.value, features = clubFeatures.value.map { it.name }.sorted(), players = players.value, book = clubBook.value,
+        plan = courtPlan.value, tournaments = competitions.clubTournaments.value, courses = school.courses.value, teams = competitions.teams.value, ladders = competitions.ladders.value,
         serverRules = clubServer.value.rules, payInfo = clubServer.value.payInfo,
     )
 
@@ -1259,11 +1259,11 @@ class MatchController(
         clubBook.value = s.book
         courtPlan.value = s.plan
         competitions.clubTournaments.value = s.tournaments
-        courses.value = s.courses
+        school.courses.value = s.courses
         competitions.teams.value = s.teams
         competitions.ladders.value = s.ladders
         storage.clubName = s.club
-        setClubCourts(s.courts)
+        planning.setClubCourts(s.courts)
         s.features?.let { names ->
             val set = names.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }.toSet()
             clubFeatures.value = set
@@ -1752,9 +1752,9 @@ class MatchController(
 
     /** Segreteria: la scheda del corso in un file (il codice nasce al primo invio e resta). */
     fun courseCardFile(courseId: String): File? {
-        val co = course(courseId) ?: return null
-        val code = co.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { saveCourse(co.copy(cardCode = it)) }
-        val card = com.tennis.scoremanager.data.CourseCards.card(course(courseId) ?: co, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone) { playerById(it) }
+        val co = school.course(courseId) ?: return null
+        val code = co.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { school.saveCourse(co.copy(cardCode = it)) }
+        val card = com.tennis.scoremanager.data.CourseCards.card(school.course(courseId) ?: co, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone) { playerById(it) }
         if (card.office.isBlank()) _toasts.tryEmit(strings.mcNoOffice)
         val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
         return runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccFilePrefix, co.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encode(card)) } }.getOrNull()
@@ -1889,14 +1889,14 @@ class MatchController(
         putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(sentAt = System.currentTimeMillis()) else it }))
     }
 
-    fun attendanceStatus(r: com.tennis.scoremanager.data.AttendanceReport): com.tennis.scoremanager.data.AttendanceStatus = com.tennis.scoremanager.data.CourseCards.check(r, courses.value)
+    fun attendanceStatus(r: com.tennis.scoremanager.data.AttendanceReport): com.tennis.scoremanager.data.AttendanceStatus = com.tennis.scoremanager.data.CourseCards.check(r, school.courses.value)
 
     /** Segreteria: le presenze dell'allenatore nel corso. */
     fun applyAttendance(r: com.tennis.scoremanager.data.AttendanceReport) {
         incomingAttendance.value = null
-        val co = course(r.course) ?: return
+        val co = school.course(r.course) ?: return
         if (co.cardCode != r.code) return
-        saveCourse(com.tennis.scoremanager.data.CourseCards.apply(co, r))
+        school.saveCourse(com.tennis.scoremanager.data.CourseCards.apply(co, r))
         _toasts.tryEmit(strings.ccAttendanceApplied)
     }
 
@@ -1993,7 +1993,7 @@ class MatchController(
                 guardian = it.guardian.ifBlank { cs.guardian }, guardianPhone = it.guardianPhone.ifBlank { cs.guardianPhone }, consentAt = it.consentAt ?: cs.consentAt)
         }
         savePlayer(pl)
-        courseId?.let { course(it) }?.let { co -> if (pl.id !in co.students) saveCourse(co.copy(students = co.students + pl.id)) }
+        courseId?.let { school.course(it) }?.let { co -> if (pl.id !in co.students) school.saveCourse(co.copy(students = co.students + pl.id)) }
         _toasts.tryEmit(strings.ccProposalApplied(pl.name))
     }
 
@@ -2221,7 +2221,7 @@ class MatchController(
     /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
     fun registerFile(courseId: String, coachSide: Boolean): File? {
         val s = strings
-        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val co = (if (coachSide) coachCourse(courseId)?.course else school.course(courseId)) ?: return null
         val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
         val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
         val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
@@ -2238,7 +2238,7 @@ class MatchController(
     /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
     fun registerXlsx(courseId: String, coachSide: Boolean): File? {
         val s = strings
-        val co = (if (coachSide) coachCourse(courseId)?.course else course(courseId)) ?: return null
+        val co = (if (coachSide) coachCourse(courseId)?.course else school.course(courseId)) ?: return null
         val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
         val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
@@ -2362,7 +2362,7 @@ class MatchController(
 
     // ---- Tornei, squadre e classifica a sfida del circolo: vedi ClubCompetitions ----
 
-    val competitions = com.tennis.scoremanager.club.ClubCompetitions(this, storage, scope, io)
+    override val competitions = com.tennis.scoremanager.club.ClubCompetitions(this, storage, scope, io)
 
     // ---- Statistiche dei campi (dal planning o dalla scheda Planning: Indietro torna lì) ----
 
@@ -2380,95 +2380,11 @@ class MatchController(
         nav.push(Screen.HELP)
     }
 
-    // ---- Scuola tennis ----
+    // ---- Scuola tennis e planning dei campi: vedi ClubSchool e ClubPlanning ----
 
-    val courses = MutableStateFlow(storage.loadCourses())
-    val openCourseId = MutableStateFlow<String?>(null)
-
-    fun openSchool() {
-        refreshPlayers()
-        nav.push(Screen.SCHOOL)
-    }
-
-    fun openCourse(id: String) {
-        openCourseId.value = id
-        nav.push(Screen.COURSE)
-    }
-
-    fun course(id: String?): com.tennis.scoremanager.data.Course? = id?.let { i -> courses.value.firstOrNull { it.id == i } }
-
-    /** Salva il corso e rifà i suoi periodi non prenotabili nel planning (uno per orario). */
-    fun saveCourse(c: com.tennis.scoremanager.data.Course) {
-        val list = courses.value.filter { it.id != c.id } + c
-        courses.value = list
-        scope.launch(io) { storage.saveCourses(list) }
-        val p = courtPlan.value
-        val np = p.copy(blocks = p.blocks.filter { it.course != c.id } + com.tennis.scoremanager.data.Courses.blocks(c))
-        if (np != p) {
-            courtPlan.value = np
-            scope.launch(io) { storage.saveCourtPlan(np) }
-        }
-    }
-
-    /** Toglie il corso e i suoi periodi non prenotabili; le quote già addebitate restano nel registro. */
-    fun deleteCourse(id: String) {
-        val list = courses.value.filter { it.id != id }
-        courses.value = list
-        scope.launch(io) { storage.saveCourses(list) }
-        val p = courtPlan.value.let { it.copy(blocks = it.blocks.filter { b -> b.course != id }) }
-        courtPlan.value = p
-        scope.launch(io) { storage.saveCourtPlan(p) }
-    }
-
-    /** I corsi di un giocatore (come allievo). */
-    fun coursesOf(p: com.tennis.scoremanager.data.PlayerProfile): List<com.tennis.scoremanager.data.Course> {
-        val keys = setOf(p.id) + p.aliases
-        return courses.value.filter { c -> c.students.any { it in keys } }
-    }
-
-    /** "SAT Under 10 · novembre 2026" o "SAT Under 10 · stagione": la voce della quota nel registro. */
-    fun courseFeeLabel(c: com.tennis.scoremanager.data.Course, month: Pair<Int, Int>?): String {
-        if (month == null) return "${c.name} · ${strings.scSeason}"
-        val cal = java.util.Calendar.getInstance().apply { set(month.first, month.second, 1) }
-        return "${c.name} · " + java.text.SimpleDateFormat("LLLL yyyy", options.value.lang.locale).format(cal.time)
-    }
-
-    /** Addebita la quota del mese (o della stagione) a chi non l'ha ancora; restituisce quanti addebiti nuovi. */
-    fun chargeCourse(c: com.tennis.scoremanager.data.Course, month: Pair<Int, Int>?): Int {
-        val due = month?.let { (y, m) -> java.util.Calendar.getInstance().apply { set(y, m, 10, 12, 0, 0) }.timeInMillis } ?: c.from
-        val (book, n) = com.tennis.scoremanager.data.Courses.charge(clubBook.value, c, players.value, courseFeeLabel(c, month), System.currentTimeMillis(), due)
-        if (n > 0) saveClubBook(book)
-        return n
-    }
-
-    /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
-    /** Le lezioni future (non annullate) dei corsi che cadono nella chiusura [b] del circolo; vuoto se [b] non chiude il circolo. */
-    fun courseLessonsClosedBy(b: com.tennis.scoremanager.data.CourtBlock): List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>> {
-        val only = courtPlan.value.copy(blocks = listOf(b))
-        val now = System.currentTimeMillis()
-        return courses.value.flatMap { co ->
-            com.tennis.scoremanager.data.Courses.lessons(co).filter { it.start >= now && it.key !in co.cancelled && com.tennis.scoremanager.data.CourtPlans.closedOn(only, it.start) != null }.map { co to it }
-        }.sortedBy { it.second.start }
-    }
-
-    /** Annulla quelle lezioni (si rimettono dall'appello o si spostano). */
-    fun cancelCourseLessons(list: List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>) {
-        for ((id, ls) in list.groupBy { it.first.id }) {
-            val co = course(id) ?: continue
-            saveCourse(co.copy(cancelled = co.cancelled + ls.map { it.second.key }))
-        }
-    }
-
-    /** Agli iscritti: la lezione [key] del corso [c] (già spostata) da quando a quando. */
-    fun noticeCourseMoved(c: com.tennis.scoremanager.data.Course, key: String) {
-        val l = com.tennis.scoremanager.data.Courses.lessons(c).firstOrNull { it.key == key } ?: return
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        fun at(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + com.tennis.scoremanager.data.Reports.time(t, lang)
-        val text = (listOfNotNull(s.scMovedNotice(c.name), l.movedFrom?.let { at(it) + " →" }, at(l.start) + listOf(l.court).filter { it.isNotBlank() }.joinToString { " · $it" })
-            + listOfNotNull(clubSign.ifBlank { null }.takeIf { activeRole.value == Role.CLUB })).joinToString("\n")
-        val rec = c.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scMovedTitle, c.name, text, rec))
-    }
+    val school = com.tennis.scoremanager.club.ClubSchool(this, storage, scope, io)
+    val planning = com.tennis.scoremanager.club.ClubPlanning(this, app, storage, scope, io)
+    override val courtPlan get() = planning.courtPlan
 
     /** Allenatore: sposta una lezione di un suo corso (non di quelli della segreteria: l'orario lo decide lei). */
     fun moveCoachLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?): com.tennis.scoremanager.data.Course? {
@@ -2479,220 +2395,13 @@ class MatchController(
         return moved
     }
 
-    fun noticeCourse(c: com.tennis.scoremanager.data.Course, lesson: com.tennis.scoremanager.data.Lesson?) {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val people = c.students.mapNotNull { playerById(it) }
-        val text = if (lesson != null) (listOf(s.scCancelledNotice(c.name), com.tennis.scoremanager.data.Notices.day(lesson.start, lang) + ", " + com.tennis.scoremanager.data.Reports.time(lesson.start, lang) + listOf(lesson.court).filter { it.isNotBlank() }.joinToString { " · $it" })
-            + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n") else "${c.name}\n\n"
-        val rec = people.map { com.tennis.scoremanager.data.Notices.recipient(it, if (lesson != null) text else "", now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(if (lesson != null) s.scCancelledTitle else s.ntKindFree, c.name, text, rec, editable = lesson == null))
-    }
-
-    // ---- Planning dei campi ----
-
-    override val courtPlan = MutableStateFlow(storage.loadCourtPlan())
-
-    fun openCourtsPlan() {
-        refreshPlayers()
-        nav.push(Screen.COURTS_PLAN)
-    }
-
-    fun saveCourtSettings(st: com.tennis.scoremanager.data.CourtSettings) {
-        val p = courtPlan.value.copy(settings = st)
-        courtPlan.value = p
-        scope.launch(io) { storage.saveCourtPlan(p) }
-    }
-
-    private fun putBookings(list: List<com.tennis.scoremanager.data.CourtBooking>, remove: Set<String> = emptySet()) {
-        val ids = list.map { it.id }.toSet() + remove
-        val p = courtPlan.value.copy(bookings = courtPlan.value.bookings.filter { it.id !in ids } + list)
-        courtPlan.value = p
-        scope.launch(io) { storage.saveCourtPlan(p) }
-    }
-
-    /** "Campo 1 · sab 14 nov 18:00": la descrizione negli addebiti e negli avvisi. */
-    fun bookingLabel(b: com.tennis.scoremanager.data.CourtBooking): String {
-        val lang = options.value.lang
-        val loc = lang.locale
-        val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "EEEdMMM"), loc).format(java.util.Date(b.start))
-        return "${b.court} · $day ${com.tennis.scoremanager.data.Reports.time(b.start, lang)}"
-    }
-
-    /**
-     * Salva una prenotazione (nuova o cambiata), ripetuta per [weeks] settimane; con [charge] il prezzo si divide tra
-     * i giocatori del database e va nel registro. Restituisce le date saltate perché il campo era occupato.
-     */
-    fun saveBooking(b: com.tennis.scoremanager.data.CourtBooking, weeks: Int, charge: Boolean): List<Long> {
-        val (list, skipped) = if (weeks > 1) com.tennis.scoremanager.data.CourtPlans.weekly(courtPlan.value, competitions.clubTournaments.value, b, weeks) else listOf(b) to emptyList()
-        val old = courtPlan.value.bookings.firstOrNull { it.id == b.id }
-        // Una prenotazione online spostata (campo, ora, durata) diventa della segreteria: sul server si toglie.
-        val keepOnline = old?.online?.takeIf { old.court == b.court && old.start == b.start && old.minutes == b.minutes }
-        old?.online?.let { id -> if (keepOnline == null) saveServer { it.copy(cancel = (it.cancel + id).distinct()) } }
-        var book = clubBook.value
-        // Cambiando una prenotazione, gli addebiti di prima non pagati si tolgono e si rifanno.
-        old?.charges?.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
-        val now = System.currentTimeMillis()
-        val saved = list.map { x ->
-            val people = x.players.mapNotNull { playerById(it) }
-            if (!charge || x.cents <= 0 || people.isEmpty()) x.copy(charges = old?.takeIf { it.id == x.id }?.charges?.filter { id -> book.charges.any { it.id == id } }.orEmpty())
-            else {
-                val parts = com.tennis.scoremanager.data.CourtPlans.split(x.cents, people.size)
-                val before = book.charges.map { it.id }.toSet()
-                people.forEachIndexed { i, p -> book = com.tennis.scoremanager.data.Fees.charge(book, p, bookingLabel(x), parts[i], now) }
-                x.copy(charges = book.charges.map { it.id }.filter { it !in before })
-            }
-        }
-        saveClubBook(book)
-        putBookings(saved.map { it.copy(online = if (it.id == b.id) keepOnline else null) })
-        return skipped
-    }
-
-    /** Com'è fatto un campo e i suoi prezzi. */
-    /** I modi di pagamento del circolo (quelli proposti finché non se ne sceglie uno). */
-    fun payTypes(): List<com.tennis.scoremanager.data.PayType> = com.tennis.scoremanager.data.Fees.types(clubBook.value) { com.tennis.scoremanager.ui.payMethodName(strings, it) }
-
-    fun savePayTypes(list: List<com.tennis.scoremanager.data.PayType>) = saveClubBook(clubBook.value.copy(payTypes = list))
-
-    fun saveCourtInfo(info: com.tennis.scoremanager.data.CourtInfo) {
-        val st = courtPlan.value.settings
-        saveCourtSettings(st.copy(courts = st.courts.filter { it.name != info.name } + info))
-    }
-
-    /** I campi del circolo, nell'ordine in cui si vedono (Nuova partita, planning, tornei). */
-    val clubCourts = MutableStateFlow(storage.clubCourts)
-
-    fun setClubCourts(list: List<String>) {
-        val clean = list.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
-        storage.clubCourts = clean
-        clubCourts.value = clean
-    }
-
-    /** Un campo nuovo con le sue caratteristiche; false se il nome c'è già. */
-    fun addCourt(info: com.tennis.scoremanager.data.CourtInfo): Boolean {
-        val name = info.name.trim()
-        if (name.isEmpty() || clubCourts.value.any { it.equals(name, ignoreCase = true) }) return false
-        setClubCourts(clubCourts.value + name)
-        saveCourtInfo(info.copy(name = name))
-        return true
-    }
-
-    /**
-     * Rinomina un campo: lo seguono caratteristiche e prezzi, prenotazioni, periodi non prenotabili e partite dei
-     * tornei. false se il nome nuovo è già di un altro campo.
-     */
-    fun renameCourt(old: String, new: String): Boolean {
-        val n = new.trim()
-        if (n.isEmpty()) return false
-        if (n == old) return true
-        if (clubCourts.value.any { it != old && it.equals(n, ignoreCase = true) }) return false
-        setClubCourts(clubCourts.value.map { if (it == old) n else it })
-        val p = courtPlan.value
-        val np = p.copy(
-            settings = p.settings.copy(courts = p.settings.courts.map { if (it.name == old) it.copy(name = n) else it }),
-            bookings = p.bookings.map { if (it.court == old) it.copy(court = n) else it },
-            blocks = p.blocks.map { b -> b.copy(courts = b.courts.map { if (it == old) n else it }) },
-        )
-        courtPlan.value = np
-        scope.launch(io) { storage.saveCourtPlan(np) }
-        for (t in competitions.clubTournaments.value) if (t.matches.any { it.court == old }) competitions.saveClubTournament(t.copy(matches = t.matches.map { if (it.court == old) it.copy(court = n) else it }))
-        return true
-    }
-
-    /** Le prenotazioni da oggi in poi su quel campo (quelle che sparirebbero eliminandolo). */
-    fun futureBookings(court: String): Int {
-        val today = com.tennis.scoremanager.data.CourtPlans.dayStart(System.currentTimeMillis())
-        return courtPlan.value.bookings.count { it.court == court && it.start >= today }
-    }
-
-    /** Elimina un campo: via le sue prenotazioni future (con gli addebiti non pagati) e le sue caratteristiche. */
-    fun deleteCourt(court: String) {
-        courtPlan.value.settings.info(court).photos.forEach { n -> scope.launch(io) { courtPhotoFile(n).delete() } }
-        val today = com.tennis.scoremanager.data.CourtPlans.dayStart(System.currentTimeMillis())
-        courtPlan.value.bookings.filter { it.court == court && it.start >= today }.forEach { deleteBooking(it, false) }
-        setClubCourts(clubCourts.value - court)
-        val p = courtPlan.value
-        val np = p.copy(
-            settings = p.settings.copy(courts = p.settings.courts.filter { it.name != court }),
-            blocks = p.blocks.mapNotNull { b -> if (court !in b.courts) b else b.copy(courts = b.courts - court).takeIf { it.courts.isNotEmpty() } },
-        )
-        courtPlan.value = np
-        scope.launch(io) { storage.saveCourtPlan(np) }
-    }
-
-    /** La cartella delle foto dei campi (nei dati dell'app: va nel backup). */
-    private val courtPhotosDir: File get() = File(app.filesDir, "court_photos").apply { mkdirs() }
-
-    fun courtPhotoFile(name: String): File = File(courtPhotosDir, name)
-
-    /** Aggiunge al campo le foto scelte, ridotte (lato lungo 1600 px) e in JPEG. */
-    fun addCourtPhotos(court: String, uris: List<android.net.Uri>) {
-        if (uris.isEmpty()) return
-        scope.launch {
-            val names = withContext(io) {
-                uris.mapNotNull { uri ->
-                    runCatching {
-                        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                        app.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, bounds) }
-                        var sample = 1
-                        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= 1600) sample *= 2
-                        val bmp = app.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) } ?: return@runCatching null
-                        val k = 1600f / maxOf(bmp.width, bmp.height)
-                        val out = if (k < 1f) android.graphics.Bitmap.createScaledBitmap(bmp, (bmp.width * k).toInt(), (bmp.height * k).toInt(), true) else bmp
-                        val name = "c" + java.util.UUID.randomUUID().toString().take(12) + ".jpg"
-                        courtPhotoFile(name).outputStream().use { out.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
-                        if (out !== bmp) out.recycle()
-                        bmp.recycle()
-                        name
-                    }.getOrNull()
-                }
-            }
-            val info = courtPlan.value.settings.info(court)
-            saveCourtInfo(info.copy(photos = info.photos + names))
-        }
-    }
-
-    fun removeCourtPhoto(court: String, name: String) {
-        val info = courtPlan.value.settings.info(court)
-        saveCourtInfo(info.copy(photos = info.photos - name))
-        scope.launch(io) { courtPhotoFile(name).delete() }
-    }
-
-    /** Sposta un campo di un posto nell'elenco ([up] = verso l'inizio). */
-    fun moveCourt(court: String, up: Boolean) {
-        val l = clubCourts.value.toMutableList()
-        val i = l.indexOf(court); val j = if (up) i - 1 else i + 1
-        if (i < 0 || j !in l.indices) return
-        l[i] = l[j].also { l[j] = l[i] }
-        setClubCourts(l)
-    }
-
-    /** Salva (o toglie, con [delete]) un periodo di campi non prenotabili. */
-    fun saveCourtBlock(b: com.tennis.scoremanager.data.CourtBlock, delete: Boolean = false) {
-        val p = courtPlan.value.copy(blocks = courtPlan.value.blocks.filter { it.id != b.id } + listOfNotNull(b.takeIf { !delete }))
-        courtPlan.value = p
-        scope.launch(io) { storage.saveCourtPlan(p) }
-    }
-
-    /**
-     * Toglie la prenotazione (o tutta la serie da quella in poi); gli addebiti non pagati spariscono. Quelle fatte
-     * online si tolgono anche dal server ([fromServer]: le ha già tolte lui).
-     */
-    fun deleteBooking(b: com.tennis.scoremanager.data.CourtBooking, wholeSeries: Boolean, fromServer: Boolean = false) {
-        val gone = if (wholeSeries && b.series != null) courtPlan.value.bookings.filter { it.series == b.series && it.start >= b.start } else listOf(b)
-        if (!fromServer) gone.mapNotNull { it.online }.takeIf { it.isNotEmpty() }?.let { ids -> saveServer { it.copy(cancel = (it.cancel + ids).distinct()) } }
-        var book = clubBook.value
-        gone.flatMap { it.charges }.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
-        saveClubBook(book)
-        putBookings(emptyList(), gone.map { it.id }.toSet())
-    }
-
     // ---- Server del circolo (facoltativo) ----
 
     /** Il server del circolo per le prenotazioni dei giocatori; non abbinato = si prenota solo in segreteria. */
     val clubServer = MutableStateFlow(storage.loadClubServer())
     private val serverLock = kotlinx.coroutines.sync.Mutex()
 
-    private fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) {
+    override fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) {
         val n = synchronized(clubServer) { f(clubServer.value).also { clubServer.value = it } }
         scope.launch(io) { storage.saveClubServer(n) }
     }
@@ -2704,7 +2413,7 @@ class MatchController(
         }
         // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
         scope.launch {
-            combine(courtPlan, competitions.clubTournaments, clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
+            combine(courtPlan, competitions.clubTournaments, planning.clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
                 .collectLatest { delay(3_000); if (clubServer.value.paired) syncServerNow() }
         }
     }
@@ -2736,16 +2445,16 @@ class MatchController(
                 withContext(Dispatchers.IO) { try { srv.withServer(conf) { it.cancel(id) } } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
                 saveServer { it.copy(cancel = it.cancel - id) }
             }
-            val sync = srv.buildSync(conf, courtPlan.value, competitions.clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
+            val sync = srv.buildSync(conf, courtPlan.value, competitions.clubTournaments.value, planning.clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
             val st = withContext(Dispatchers.IO) { srv.withServer(conf) { it.sync(sync) } }
             // La casella: risultati dal campo, presenze e proposte degli allenatori.
             runCatching { fetchOfficeMail(conf) }
             val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
-            gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
-            if (added.isNotEmpty()) putBookings(added)
+            gone.forEach { planning.deleteBooking(it, wholeSeries = false, fromServer = true) }
+            if (added.isNotEmpty()) planning.putBookings(added)
             // Le novità per la segreteria: chi ha prenotato o disdetto online da quando si è guardato l'ultima volta.
             val news = com.tennis.scoremanager.data.ClubServers.onlineNews(clubServer.value.seen, st.bookings, System.currentTimeMillis(), conf.cancel.toSet()) { b ->
-                listOf(b.name, b.court, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
+                listOf(b.name, b.court, planning.bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
             }
             if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
             saveServer {
@@ -2777,7 +2486,7 @@ class MatchController(
 
     fun openPlanAt(day: Long) {
         planDayRequest.value = day
-        openCourtsPlan()
+        planning.openCourtsPlan()
     }
 
     // ---- Cosa usi (Tu e Allenatore) ----
@@ -2811,7 +2520,7 @@ class MatchController(
         storage.clubFeatures?.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }?.toSet()
             ?: (ClubFeature.entries.filter { it.base } + listOfNotNull(
                 ClubFeature.TEAMS.takeIf { competitions.teams.value.isNotEmpty() },
-                ClubFeature.SCHOOL.takeIf { courses.value.isNotEmpty() },
+                ClubFeature.SCHOOL.takeIf { school.courses.value.isNotEmpty() },
                 ClubFeature.LADDER.takeIf { competitions.ladders.value.isNotEmpty() },
                 ClubFeature.SERVER.takeIf { clubServer.value.paired },
             )).toSet(),
@@ -2885,7 +2594,7 @@ class MatchController(
     // ---- Prenota un campo (il giocatore, col server del suo circolo): vedi PlayerBooking ----
 
     val book = com.tennis.scoremanager.club.PlayerBooking(
-        app, storage, scope, io, { strings }, { options.value.lang.locale }, ::serverAnswers, ::fetchMyMail, ::bookingLabel,
+        app, storage, scope, io, { strings }, { options.value.lang.locale }, ::serverAnswers, ::fetchMyMail, { planning.bookingLabel(it) },
     ) { go(Screen.BOOK_COURT) }
 
     /** La segreteria: i messaggi di una stanza, la bacheca, le stanze, togliere un messaggio. Codice d'errore o il risultato. */
@@ -2922,10 +2631,10 @@ class MatchController(
         val each = com.tennis.scoremanager.data.Fees.money(com.tennis.scoremanager.data.CourtPlans.split(b.cents, heads).firstOrNull() ?: 0, lang.locale)
         val pay = if (b.cents <= 0) emptyList() else if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE)
             listOf(s.ntPayOnline(each)) + com.tennis.scoremanager.data.Notices.payLines(s, clubBook.value) else listOf(s.ntPayCourt(each))
-        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
+        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${planning.bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
             + pay + listOfNotNull(b.note.ifBlank { null }, clubSign.ifBlank { null })).joinToString("\n")
         val rec = b.players.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, bookingLabel(b), text, rec))
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, planning.bookingLabel(b), text, rec))
     }
 
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
@@ -3164,7 +2873,7 @@ class MatchController(
      * Il ruolo, uno solo: decide le schede della prima schermata e cosa c'è in Altro. I dati sono gli stessi per tutti e
      * cambiando ruolo (Impostazioni) non si perde niente. Chi aveva più ruoli accesi resta in quello che stava usando.
      */
-    val activeRole = MutableStateFlow(
+    override val activeRole = MutableStateFlow(
         Role.entries.firstOrNull { it.name == storage.activeRole && it.name in storage.roles }
             ?: Role.entries.firstOrNull { it.name in storage.roles } ?: Role.PLAYER,
     )
