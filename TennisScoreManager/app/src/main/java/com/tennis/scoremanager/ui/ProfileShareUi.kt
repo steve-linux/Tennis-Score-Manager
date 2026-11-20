@@ -111,7 +111,7 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
                 GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profileQr(p, fields) }, Modifier.fillMaxWidth())
                 Text(s.pfAsQrHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 // Col server del circolo (il giocatore è già iscritto): dritto nella casella della segreteria, con la foto.
-                for (a in c.bookingAccounts.collectAsState().value.filter { it.joined })
+                for (a in c.book.bookingAccounts.collectAsState().value.filter { it.joined })
                     GhostButton(s.pfToOffice(a.club.ifBlank { a.url }), Icons.Filled.Share, { c.profileToOffice(a.url, p, fields); onDone() }, Modifier.fillMaxWidth())
             }
         },

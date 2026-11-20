@@ -136,7 +136,7 @@ fun HomeScreen(c: MatchController) {
     // Le schede che restano vuote con quello che non si usa spariscono.
     val pf by c.playerFeatures.collectAsState()
     val cf by c.clubFeatures.collectAsState()
-    val accounts by c.bookingAccounts.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     val tabs = role.tabs.filter { t ->
         when (t) {
             // Il circolo di chi gioca: solo dopo esserci entrati con l'invito della segreteria.
@@ -444,8 +444,8 @@ private fun ResumeEntries(c: MatchController, club: Boolean?) {
 private fun BookingTab(c: MatchController) {
     val s = LocalStrings.current
     ClubNews(c)
-    val accounts by c.bookingAccounts.collectAsState()
-    val reach by c.bookingReach.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
+    val reach by c.book.bookingReach.collectAsState()
     val down = accounts.filter { reach[it.url] == false }
     val names = { l: List<com.tennis.scoremanager.data.BookingAccount> -> l.joinToString(", ") { it.club.ifBlank { it.url } } }
     val hint = when {
@@ -454,13 +454,13 @@ private fun BookingTab(c: MatchController) {
         else -> s.pbEntryJoined(names(accounts))
     }
     Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint, main = true) { c.go(Screen.BOOK_COURT) }
-    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
-    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.book.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.book.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
     // La chat del circolo, sempre a portata: l'ultimo messaggio e quanti da leggere.
     for (a in accounts.filter { it.joined }) {
         val title = listOfNotNull(s.pbClubChat, a.club.takeIf { accounts.size > 1 && it.isNotBlank() }).joinToString(" · ") +
             if (a.clubUnread > 0) " (${a.clubUnread})" else ""
-        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
+        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.book.selectBooking(a.url); c.book.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
     }
 }
 
@@ -550,7 +550,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
             }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
-            val bookingAccounts by c.bookingAccounts.collectAsState()
+            val bookingAccounts by c.book.bookingAccounts.collectAsState()
             if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
         }
     }
@@ -619,26 +619,26 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
 @Composable
 private fun ClubNews(c: MatchController) {
     val s = LocalStrings.current
-    val accounts by c.bookingAccounts.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
     // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
     // Nell'elenco restano le chat degli annunci; bacheca, chat del circolo e private hanno la loro striscia.
     val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it.startsWith("s-") }.map { (room, title) -> Triple(a, room, title) } }
-    LaunchedEffect(Unit) { c.refreshClubNews() }
+    LaunchedEffect(Unit) { c.book.refreshClubNews() }
     // La bacheca ha la sua striscia, in cima, col numero degli avvisi da leggere: si tocca e si apre.
     for (a in accounts.filter { it.boardUnread > 0 }) {
         BoardBanner(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, s.pbBoardUnread(a.boardUnread)).joinToString(" · ")) {
-            c.selectBooking(a.url); c.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
         }
     }
     for (a in accounts) {
         val where = a.club.takeIf { many && it.isNotBlank() }
         if (a.clubUnread > 0) BoardBanner(listOfNotNull(where, s.pbClubUnread(a.clubUnread)).joinToString(" · "), Icons.Filled.Forum) {
-            c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
         }
         for ((room, name) in a.chatNews.filterKeys { it.startsWith("d-") }) BoardBanner(listOfNotNull(where, s.pbDmFrom(name)).joinToString(" · "), Icons.Filled.Mail) {
-            c.selectBooking(a.url); c.chatRequest.value = room; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = room; c.go(Screen.BOOK_COURT)
         }
     }
     if (news.isEmpty() && chats.isEmpty()) return
@@ -654,31 +654,31 @@ private fun ClubNews(c: MatchController) {
         for ((a, room, title) in chats) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
-                    .clickable { c.selectBooking(a.url); if (room.startsWith("s-")) c.bookTabRequest.value = 2 else c.chatRequest.value = room; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
+                    .clickable { c.book.selectBooking(a.url); if (room.startsWith("s-")) c.book.bookTabRequest.value = 2 else c.book.chatRequest.value = room; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(if (room == "board") s.pbBoardTitle else s.pbChatNew, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, title.ifBlank { null }).joinToString(" · ").ifBlank { s.pbBoardRead }, color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                androidx.compose.material3.IconButton(onClick = { c.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                androidx.compose.material3.IconButton(onClick = { c.book.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
         for ((a, k) in news.take(6)) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
-                    .clickable { c.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
+                    .clickable { c.book.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(s.pbSeekTitle, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Text(c.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
+                    Text(c.book.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                androidx.compose.material3.IconButton(onClick = { c.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                androidx.compose.material3.IconButton(onClick = { c.book.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
         if (news.size + chats.size > 1) androidx.compose.material3.TextButton(onClick = {
-            accounts.forEach { a -> c.readSeeks(a.url); a.chatNews.keys.forEach { c.markChatRead(a.url, it, System.currentTimeMillis()) } }
+            accounts.forEach { a -> c.book.readSeeks(a.url); a.chatNews.keys.forEach { c.book.markChatRead(a.url, it, System.currentTimeMillis()) } }
         }) { Text(s.tdNewsReadAll) }
     }
 }

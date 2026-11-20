@@ -228,7 +228,7 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                 Segmented(lengths.map { SegOption(s.coMinutes(it)) }, lengths.indexOf(l.minutes), { l = l.copy(minutes = lengths[it]) }, columns = 3)
                 OutlinedTextField(l.place, { l = l.copy(place = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coPlace) })
                 // Col circolo collegato (invito della segreteria) il campo si prenota da qui: la lezione resta salvata.
-                if (c.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
+                if (c.book.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
                     if (l.students.isNotEmpty()) c.saveLesson(l)
                     onDone()
                     c.go(com.tennis.scoremanager.Screen.BOOK_COURT)

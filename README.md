@@ -53,6 +53,8 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Regole del punteggio (annulla = rigioca gli eventi) | `app/.../model/ScoreEngine.kt` + test in `app/src/test` |
 | Frasi e chiamate vocali | `app/.../voice/Calls.kt`, parole e ordine di ogni lingua in `voice/CallWords.kt`, correzioni di pronuncia in `voice/Pronunciation.kt` |
 | Tempi (25/90/120/30 s), messaggi, flusso partita | `app/.../MatchController.kt` |
+| Prenota un campo dal giocatore (circoli, Cerco compagno, chat, controllo in background) | `app/.../club/PlayerBooking.kt` (in `MatchController` è `book`), `ui/screens/BookCourtScreen.kt`, `service/OnlineAlerts.kt` |
+| File dei dati che si leggono ancora dopo un aggiornamento | `app/src/test/.../data/FormatUpgradeTest.kt`, esempi in `app/src/test/resources/formati/<versione>/` |
 | Telecomandi Bluetooth da selfie (clic, doppio clic, pressione lunga) | `app/.../remote/PressDetector.kt` + test, `remote/RemoteInput.kt` |
 | Protocollo Bluetooth (condiviso col firmware) | `app/.../ble/BandProtocol.kt` e in cima a `TSM_Band.ino` |
 | Impostazioni dei braccialetti, stima autonomia | `app/.../ble/BandProtocol.kt` (`BandSettings`), `ble/BatteryModel.kt`, `ui/BandSettingsPanel.kt` |

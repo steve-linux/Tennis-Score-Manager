@@ -30,6 +30,7 @@ mkdir -p "$DEST/app/src/main/assets/desk"
 mkdir -p "$DEST/app/src/main/assets/help"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/club"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/desk"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
@@ -61,6 +62,7 @@ mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/video"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
+mkdir -p "$DEST/app/src/test/resources/formati/2.6.0"
 mkdir -p "$DEST/app/src/test/resources/pose"
 mkdir -p "$DEST/courtcore"
 mkdir -p "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data"
@@ -15409,10 +15411,10 @@ class MainActivity : ComponentActivity() {
             val club = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
             if (club != null) {
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
-                controller.selectBooking(club)
+                controller.book.selectBooking(club)
                 val room = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
-                if (room != null) controller.chatRequest.value = room else controller.bookTabRequest.value = 2
+                if (room != null) controller.book.chatRequest.value = room else controller.book.bookTabRequest.value = 2
             }
             controller.go(Screen.BOOK_COURT)
             return
@@ -17626,12 +17628,12 @@ class MatchController(
 
     /** Giocatore o allenatore: lascia un file alla segreteria sul server [url]; true se è arrivato. */
     suspend fun postToOffice(url: String, kind: String, text: String): Boolean {
-        val a = bookingAccounts.value.firstOrNull { it.url == url && it.joined } ?: return false
-        return bookingWith(a) { it.postMail(kind, text) }.isSuccess
+        val a = book.bookingAccounts.value.firstOrNull { it.url == url && it.joined } ?: return false
+        return book.bookingWith(a) { it.postMail(kind, text) }.isSuccess
     }
 
     /** Il server del circolo da cui sono arrivati i corsi dell'allenatore (per mandare presenze e proposte da lì). */
-    fun coachVia(): String? = coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> bookingAccounts.value.any { it.url == url && it.joined } }
+    fun coachVia(): String? = coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> book.bookingAccounts.value.any { it.url == url && it.joined } }
 
     /** Allenatore: le presenze del corso alla segreteria dal server; true se arrivate. */
     suspend fun sendAttendanceServer(courseId: String): Boolean {
@@ -17653,12 +17655,12 @@ class MatchController(
 
     /** Giocatore/allenatore: prende i file della sua casella su quel server, li tiene da aprire e li toglie dal server. */
     private suspend fun fetchMyMail(a: com.tennis.scoremanager.data.BookingAccount) {
-        val mail = bookingWith(a) { it.myMail() }.getOrNull().orEmpty()
+        val mail = book.bookingWith(a) { it.myMail() }.getOrNull().orEmpty()
         if (mail.isEmpty()) return
         val have = inbox.value.map { it.id }.toSet()
         val fresh = mail.filter { it.id !in have }.map { com.tennis.scoremanager.data.InboxItem(it.id, it.kind, it.text, it.fromName, a.url, it.at) }
         putInbox(inbox.value + fresh)
-        mail.forEach { m -> bookingWith(a) { it.dropMyMail(m.id) } }
+        mail.forEach { m -> book.bookingWith(a) { it.dropMyMail(m.id) } }
         if (fresh.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
     }
 
@@ -18765,297 +18767,11 @@ class MatchController(
         }
     }
 
-    // ---- Prenota un campo (il giocatore, col server del suo circolo) ----
+    // ---- Prenota un campo (il giocatore, col server del suo circolo): vedi PlayerBooking ----
 
-    /** I circoli in cui il giocatore è entrato (anche più d'uno); [bookingAccount] è quello che si sta guardando. */
-    val bookingAccounts = MutableStateFlow(storage.loadBookingAccounts())
-    val bookingAccount = MutableStateFlow(storage.loadBookingAccount().takeIf { it.joined } ?: bookingAccounts.value.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount())
-
-    /**
-     * Salva il circolo [a] (riconosciuto dall'indirizzo [url]): aggiornato al suo posto, o in fondo se è nuovo.
-     * Non più collegato (uscito, accesso tolto) = tolto dall'elenco; se era quello guardato, si passa al primo che resta.
-     */
-    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount, url: String = bookingAccount.value.url) {
-        val list = bookingAccounts.value
-        val next = when {
-            !a.joined -> list.filter { it.url != url }
-            list.any { it.url == url } -> list.map { if (it.url == url) a else it }
-            else -> list + a
-        }
-        bookingAccounts.value = next
-        val cur = bookingAccount.value
-        bookingAccount.value = when {
-            cur.url == url -> if (a.joined) a else next.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount()
-            !cur.joined -> a.takeIf { it.joined } ?: cur
-            else -> cur
-        }
-        val shown = bookingAccount.value
-        scope.launch(io) { storage.saveBookingAccounts(next); storage.saveBookingAccount(shown) }
-    }
-
-    /** Il server di ciascun circolo risponde? (indirizzo → sì o no; manca = non ancora controllato). */
-    val bookingReach = MutableStateFlow<Map<String, Boolean>>(emptyMap())
-
-    private fun markReach(url: String, ok: Boolean) {
-        if (bookingReach.value[url] != ok) bookingReach.value = bookingReach.value + (url to ok)
-    }
-
-    /** Si chiede a ogni server dei propri circoli se risponde (le funzioni online si accendono e spengono da sole). */
-    suspend fun checkBookingServers() {
-        for (a in bookingAccounts.value) markReach(a.url, serverAnswers(a.url))
-    }
-
-    /** Si guarda un altro dei propri circoli. */
-    fun selectBooking(url: String) {
-        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
-        bookingAccount.value = a
-        scope.launch(io) { storage.saveBookingAccount(a) }
-    }
-
-    /**
-     * Entra nel circolo con l'invito: il link o il QR (con dentro l'indirizzo), oppure il codice e [url].
-     * null = fatto, altrimenti il codice dell'errore.
-     */
-    suspend fun joinBooking(invite: String, url: String): String? {
-        val (u0, code) = com.tennis.scoremanager.data.ClubServers.parseInvite(invite) ?: return "BAD_CODE"
-        val u = u0 ?: com.tennis.scoremanager.data.ClubServers.cleanUrl(url).ifEmpty { return "NEED_URL" }
-        return try {
-            val (t, me) = withContext(Dispatchers.IO) {
-                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).claim(code)
-                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
-            }
-            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
-            null
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
-    }
-
-    /** Un circolo nuovo (o lo stesso, rientrando): si aggiunge all'elenco e si guarda subito. */
-    private fun addBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
-        val old = bookingAccounts.value.firstOrNull { it.url == a.url }
-        // Rientrando nello stesso circolo restano le impostazioni (promemoria) e le notizie già viste.
-        saveBookingAccount(old?.copy(token = a.token, name = a.name, player = a.player, club = a.club) ?: a, a.url)
-        selectBooking(a.url)
-    }
-
-    /**
-     * Rientra con numero e PIN: [club] è l'indirizzo del circolo o il vecchio link d'invito (da lì si prende
-     * l'indirizzo). null = fatto, altrimenti il codice dell'errore.
-     */
-    suspend fun loginBooking(club: String, phone: String, pin: String): String? {
-        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(club.substringBefore("#").substringBefore("?").trimEnd('/')).ifEmpty { return "NEED_URL" }
-        return try {
-            val (t, me) = withContext(Dispatchers.IO) {
-                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).login(phone, pin)
-                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
-            }
-            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
-            null
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
-    }
-
-    /** Numero e PIN per rientrare da soli in questo circolo. null = fatto, altrimenti il codice dell'errore. */
-    suspend fun setBookingPin(phone: String, pin: String): String? = booking { it.setPin(phone, pin) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" }
-
-    /**
-     * Una chiamata del giocatore al server del suo circolo. Se il server non riconosce più la chiave (accesso
-     * tolto dalla segreteria) si esce dal circolo: serve un nuovo invito.
-     */
-    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> = bookingWith(bookingAccount.value, f)
-
-    /** Come [booking], per un circolo qualsiasi dei propri (il controllo in background li guarda tutti). */
-    private suspend fun <T> bookingWith(a: com.tennis.scoremanager.data.BookingAccount, f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
-        if (!a.joined) return Result.failure(com.tennis.scoremanager.data.ClubServerError("UNAUTHORIZED"))
-        return try {
-            Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) }).also { markReach(a.url, true) }
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
-            // Non risponde (rete): le sue funzioni si spengono finché non torna; ogni altro errore vuol dire che risponde.
-            markReach(a.url, e.code != "NET" && e.code != "BAD_URL")
-            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(), a.url)
-            Result.failure(e)
-        }
-    }
-
-    init {
-        // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
-        scope.launch {
-            bookingAccounts.map { l -> l.any { it.joined && it.reminders } }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
-        }
-        // Con l'app aperta, ogni tre minuti: i server dei propri circoli rispondono?
-        scope.launch {
-            while (true) {
-                if (bookingAccounts.value.isNotEmpty()) checkBookingServers()
-                delay(180_000)
-            }
-        }
-    }
-
-    fun setBookingReminders(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(reminders = on))
-
-    /** Notifiche dei nuovi annunci di Cerco compagno in questo circolo (gli annunci restano nelle novità e in Compagni). */
-    fun setSeekAlerts(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(seekAlerts = on))
-
-    /** Disdetta da qui: non è una notizia da dare al giocatore. */
-    fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
-
-    /** Il controllo del giocatore (in background), circolo per circolo: promemoria della partita e prenotazioni tolte dalla segreteria. */
-    suspend fun checkMyBookings() {
-        val many = bookingAccounts.value.size > 1
-        for (a0 in bookingAccounts.value) checkMyBookings(a0, many)
-    }
-
-    /** [many]: si è in più circoli, e negli avvisi si dice di quale. */
-    private suspend fun checkMyBookings(a: com.tennis.scoremanager.data.BookingAccount, many: Boolean) {
-        if (!a.joined) return
-        val me = bookingWith(a) { it.me() }.getOrNull() ?: return
-        // La casella dei file (convocazioni, schede corso) da questo circolo.
-        runCatching { fetchMyMail(a) }
-        val now = System.currentTimeMillis()
-        val club = if (many) me.club.ifBlank { a.club }.ifBlank { null } else null
-        fun label(court: String, start: Long) = listOfNotNull(club, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", court, start))).joinToString(" · ")
-        val news = com.tennis.scoremanager.data.ClubServers.myNews(a, me.bookings, me.rules.remindHours, now) { b -> label(b.court, b.start) }
-        val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
-        val seeks = bookingWith(a) { it.seeks() }.getOrNull()
-        val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
-        // Gli annunci nuovi degli altri: nelle novità di Gioca e, se si vogliono gli avvisi, una notifica.
-        val (acc2, freshSeeks) = seeks?.let { com.tennis.scoremanager.data.ClubServers.noteSeeks(sk?.account ?: acc, it) } ?: ((sk?.account ?: acc) to emptyList())
-        saveBookingAccount(acc2, a.url)
-        // Gli annunci che non sono più aperti (al completo, tolti): via le loro notifiche, che altrimenti confondono.
-        if (seeks != null) closedSeeks(a, acc2).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
-        // Le chat: bacheca e annunci in cui si è, con i messaggi nuovi.
-        saveBookingAccount(checkChats(acc2, me, seeks, club), a.url)
-        if (a.reminders) {
-            com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
-                app, strings, news.remind.map { it.label }, news.removed.map { it.label },
-                freed.map { w -> label(w.freedCourt!!, w.start) },
-            )
-            if (sk != null) com.tennis.scoremanager.service.OnlineAlerts.postSeeks(
-                app, strings,
-                sk.joined.map { it.players.last() + " · " + it.date },
-                sk.booked.map { label(it.bookedCourt!!, it.bookedStart!!) + " · " + it.players.joinToString(", ") },
-                sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
-            )
-            if (a.seekAlerts) for (k in freshSeeks) com.tennis.scoremanager.service.OnlineAlerts.postNewSeek(app, strings, k.id, a.url, seekLine(k, club))
-        }
-    }
-
-    /** Un annuncio in una riga: "Mario · sab 8 nov 17:00–20:00 · singolo · ne manca 1" (col circolo davanti se serve). */
-    fun seekLine(k: com.tennis.scoremanager.data.SrvSeek, club: String? = null): String {
-        val s = strings
-        fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
-        val day = runCatching {
-            java.time.format.DateTimeFormatter.ofPattern("EEE d MMM", options.value.lang.locale).format(java.time.LocalDate.parse(k.date))
-        }.getOrDefault(k.date)
-        return listOfNotNull(club, k.owner, "$day ${hm(k.fromMin)}–${hm(k.toMin)}", if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level.ifBlank { null }, s.pbSeekNeed(k.need)).joinToString(" · ")
-    }
-
-    /** Gli annunci letti dal telefono (dalla schermata): si aggiornano le novità senza notifica. */
-    fun noteSeeks(seeks: List<com.tennis.scoremanager.data.SrvSeek>) {
-        val a = bookingAccount.value
-        if (!a.joined) return
-        val next = com.tennis.scoremanager.data.ClubServers.noteSeeks(a, seeks).first
-        saveBookingAccount(next, a.url)
-        closedSeeks(a, next).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
-    }
-
-    /** Gli annunci che c'erano in [before] e non sono più aperti in [after]. */
-    private fun closedSeeks(before: com.tennis.scoremanager.data.BookingAccount, after: com.tennis.scoremanager.data.BookingAccount): List<String> {
-        val open = after.openSeeks.map { it.id }.toSet()
-        return before.openSeeks.map { it.id }.filter { it !in open }
-    }
-
-    /** Annunci letti in [url] ([ids] null = tutti quelli aperti): spariscono dalle novità. */
-    fun readSeeks(url: String, ids: List<String>? = null) {
-        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
-        val add = ids ?: a.openSeeks.map { it.id }
-        // Letti: anche le loro notifiche non servono più.
-        add.forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
-        if (add.all { it in a.seekRead }) return
-        saveBookingAccount(a.copy(seekRead = (a.seekRead + add).distinct()), url)
-    }
-
-    /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
-    val bookTabRequest = MutableStateFlow<Int?>(null)
-    /** Da Gioca o da una notifica: Prenota un campo apre subito questa chat ("board", "club", "d-…"). */
-    val chatRequest = MutableStateFlow<String?>(null)
-
-    /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
-    fun openSeekNews(url: String, id: String) {
-        readSeeks(url, listOf(id))
-        selectBooking(url)
-        bookTabRequest.value = 2
-        go(Screen.BOOK_COURT)
-    }
-
-    // ---- Chat del circolo (giocatore e segreteria) ----
-
-    /** Letta la chat [room] del circolo [url] fino ad [at]: sparisce dalle novità. */
-    fun markChatRead(url: String, room: String, at: Long) {
-        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
-        com.tennis.scoremanager.service.OnlineAlerts.cancelChat(app, room)
-        if ((a.chatRead[room] ?: 0) >= at && room !in a.chatNews) return
-        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room, boardUnread = if (room == "board") 0 else a.boardUnread,
-            clubUnread = if (room == "club") 0 else a.clubUnread), url)
-    }
-
-    /**
-     * Le chat con messaggi nuovi, nel controllo in background: la bacheca (se la segreteria ha scritto) e gli
-     * annunci in cui si è. Si avvisa una volta per messaggio; l'account torna con le novità aggiornate.
-     */
-    private suspend fun checkChats(a: com.tennis.scoremanager.data.BookingAccount, me: com.tennis.scoremanager.data.SrvMe, seeks: List<com.tennis.scoremanager.data.SrvSeek>?, club: String?): com.tennis.scoremanager.data.BookingAccount {
-        val chats = bookingWith(a) { it.myChats() }.getOrNull()
-        val rooms = buildList {
-            if (me.boardLast > 0) add(Triple("board", "", me.boardLast))
-            seeks?.filter { (it.mine || it.joined) && it.chatLast > 0 }?.forEach { add(Triple("s-" + it.id, seekLine(it), it.chatLast)) }
-            // La chat del circolo (se se ne vogliono le notifiche) e le private.
-            chats?.filter { it.last > 0 && (it.room != "club" || me.clubChat) }?.forEach {
-                add(Triple(it.room, if (it.room == "club") strings.pbClubChat else it.title, it.last))
-            }
-        }
-        var acc = a
-        for ((room, title, last) in rooms) {
-            if (last <= (acc.chatRead[room] ?: 0)) continue
-            val since = maxOf(acc.chatRead[room] ?: 0, acc.chatNotified[room] ?: 0)
-            if (last > since) {
-                val fresh = bookingWith(a) { it.chat(room, since) }.getOrNull().orEmpty().filter { !it.mine }
-                if (fresh.isNotEmpty() && a.reminders) {
-                    val m = fresh.last()
-                    com.tennis.scoremanager.service.OnlineAlerts.postChat(app, strings, room, a.url,
-                        when {
-                            room == "board" -> listOfNotNull(club, strings.pbBoardTitle).joinToString(" · ")
-                            room == "club" -> listOfNotNull(club, strings.pbClubChat).joinToString(" · ")
-                            room.startsWith("d-") -> strings.pbDmNew
-                            else -> strings.pbChatNew
-                        },
-                        "${m.name}: ${m.text}")
-                }
-                acc = acc.copy(chatNotified = acc.chatNotified + (room to last))
-            }
-            // La bacheca ha la sua striscia in cima a Gioca, col numero degli avvisi da leggere.
-            if (room == "board") {
-                val n = bookingWith(a) { it.chat(room, acc.chatRead[room] ?: 0) }.getOrNull()?.count { !it.mine }
-                if (n != null) acc = acc.copy(boardUnread = n)
-            } else acc = acc.copy(chatNews = acc.chatNews + (room to title))
-        }
-        // La chat del circolo in Gioca (anche con le notifiche spente): l'ultimo messaggio e quanti da leggere.
-        val clubRoom = chats?.firstOrNull { it.room == "club" }
-        if (clubRoom != null && clubRoom.last > acc.clubPreviewAt) {
-            val read = acc.chatRead["club"] ?: 0
-            bookingWith(a) { it.chat("club", 0) }.getOrNull()?.let { l ->
-                acc = acc.copy(clubPreview = l.lastOrNull()?.let { "${it.name}: ${it.text}" }.orEmpty().take(140),
-                    clubPreviewAt = clubRoom.last, clubUnread = l.count { !it.mine && it.at > read })
-            }
-        }
-        return acc
-    }
-
-    private var newsCheckedAt = 0L
-    /** Aprendo Gioca: le novità dei circoli (chat, bacheca, annunci) subito, al massimo una volta al minuto. */
-    fun refreshClubNews() {
-        val now = System.currentTimeMillis()
-        if (bookingAccounts.value.isEmpty() || now - newsCheckedAt < 60_000) return
-        newsCheckedAt = now
-        scope.launch { checkMyBookings() }
-    }
+    val book = com.tennis.scoremanager.club.PlayerBooking(
+        app, storage, scope, io, { strings }, { options.value.lang.locale }, ::serverAnswers, ::fetchMyMail, ::bookingLabel,
+    ) { go(Screen.BOOK_COURT) }
 
     /** La segreteria: i messaggi di una stanza, la bacheca, le stanze, togliere un messaggio. Codice d'errore o il risultato. */
     suspend fun <T> serverAdmin(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
@@ -19064,15 +18780,6 @@ class MatchController(
         return try {
             Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { f(it) } })
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
-    }
-
-    /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
-    fun leaveBooking() {
-        val a = bookingAccount.value
-        scope.launch {
-            if (a.joined) runCatching { withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(a.url, a.token).logout() } }
-        }
-        saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
     }
 
     /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
@@ -23384,6 +23091,351 @@ class StrapGaps {
         const val GAP_MS = 3_000L
         /** Il secondo che ci si aspetta comunque tra una misura e l'altra non è perso. */
         private const val EXPECTED_MS = 1_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/club/PlayerBooking.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/club/PlayerBooking.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.club
+
+import android.app.Application
+import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.ui.Strings
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
+
+/**
+ * Prenota un campo, dalla parte del giocatore: i circoli in cui è entrato (col server del circolo), le prenotazioni,
+ * gli annunci di Cerco compagno, le chat e il controllo in background con le notifiche. La segreteria (planning,
+ * server abbinato) resta in MatchController; qui arrivano solo le poche cose che servono, come funzioni.
+ */
+class PlayerBooking(
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+    private val stringsOf: () -> Strings,
+    private val localeOf: () -> Locale,
+    /** Il server all'indirizzo dato risponde? */
+    private val serverAnswers: suspend (String) -> Boolean,
+    /** La casella dei file (convocazioni, schede corso) mandati al giocatore da quel circolo. */
+    private val fetchMail: suspend (com.tennis.scoremanager.data.BookingAccount) -> Unit,
+    /** "sab 8 nov · 17:00": il giorno e l'ora di una prenotazione. */
+    private val bookingLabel: (com.tennis.scoremanager.data.CourtBooking) -> String,
+    /** Apre la schermata Prenota un campo. */
+    private val openBookCourt: () -> Unit,
+) {
+    private val strings: Strings get() = stringsOf()
+    private val locale: Locale get() = localeOf()
+
+    /** I circoli in cui il giocatore è entrato (anche più d'uno); [bookingAccount] è quello che si sta guardando. */
+    val bookingAccounts = MutableStateFlow(storage.loadBookingAccounts())
+    val bookingAccount = MutableStateFlow(storage.loadBookingAccount().takeIf { it.joined } ?: bookingAccounts.value.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount())
+
+    /**
+     * Salva il circolo [a] (riconosciuto dall'indirizzo [url]): aggiornato al suo posto, o in fondo se è nuovo.
+     * Non più collegato (uscito, accesso tolto) = tolto dall'elenco; se era quello guardato, si passa al primo che resta.
+     */
+    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount, url: String = bookingAccount.value.url) {
+        val list = bookingAccounts.value
+        val next = when {
+            !a.joined -> list.filter { it.url != url }
+            list.any { it.url == url } -> list.map { if (it.url == url) a else it }
+            else -> list + a
+        }
+        bookingAccounts.value = next
+        val cur = bookingAccount.value
+        bookingAccount.value = when {
+            cur.url == url -> if (a.joined) a else next.firstOrNull() ?: com.tennis.scoremanager.data.BookingAccount()
+            !cur.joined -> a.takeIf { it.joined } ?: cur
+            else -> cur
+        }
+        val shown = bookingAccount.value
+        scope.launch(io) { storage.saveBookingAccounts(next); storage.saveBookingAccount(shown) }
+    }
+
+    /** Il server di ciascun circolo risponde? (indirizzo → sì o no; manca = non ancora controllato). */
+    val bookingReach = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+
+    private fun markReach(url: String, ok: Boolean) {
+        if (bookingReach.value[url] != ok) bookingReach.value = bookingReach.value + (url to ok)
+    }
+
+    /** Si chiede a ogni server dei propri circoli se risponde (le funzioni online si accendono e spengono da sole). */
+    suspend fun checkBookingServers() {
+        for (a in bookingAccounts.value) markReach(a.url, serverAnswers(a.url))
+    }
+
+    /** Si guarda un altro dei propri circoli. */
+    fun selectBooking(url: String) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
+        bookingAccount.value = a
+        scope.launch(io) { storage.saveBookingAccount(a) }
+    }
+
+    /**
+     * Entra nel circolo con l'invito: il link o il QR (con dentro l'indirizzo), oppure il codice e [url].
+     * null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun joinBooking(invite: String, url: String): String? {
+        val (u0, code) = com.tennis.scoremanager.data.ClubServers.parseInvite(invite) ?: return "BAD_CODE"
+        val u = u0 ?: com.tennis.scoremanager.data.ClubServers.cleanUrl(url).ifEmpty { return "NEED_URL" }
+        return try {
+            val (t, me) = withContext(Dispatchers.IO) {
+                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).claim(code)
+                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
+            }
+            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Un circolo nuovo (o lo stesso, rientrando): si aggiunge all'elenco e si guarda subito. */
+    private fun addBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
+        val old = bookingAccounts.value.firstOrNull { it.url == a.url }
+        // Rientrando nello stesso circolo restano le impostazioni (promemoria) e le notizie già viste.
+        saveBookingAccount(old?.copy(token = a.token, name = a.name, player = a.player, club = a.club) ?: a, a.url)
+        selectBooking(a.url)
+    }
+
+    /**
+     * Rientra con numero e PIN: [club] è l'indirizzo del circolo o il vecchio link d'invito (da lì si prende
+     * l'indirizzo). null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun loginBooking(club: String, phone: String, pin: String): String? {
+        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(club.substringBefore("#").substringBefore("?").trimEnd('/')).ifEmpty { return "NEED_URL" }
+        return try {
+            val (t, me) = withContext(Dispatchers.IO) {
+                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).login(phone, pin)
+                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
+            }
+            addBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Numero e PIN per rientrare da soli in questo circolo. null = fatto, altrimenti il codice dell'errore. */
+    suspend fun setBookingPin(phone: String, pin: String): String? = booking { it.setPin(phone, pin) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" }
+
+    /**
+     * Una chiamata del giocatore al server del suo circolo. Se il server non riconosce più la chiave (accesso
+     * tolto dalla segreteria) si esce dal circolo: serve un nuovo invito.
+     */
+    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> = bookingWith(bookingAccount.value, f)
+
+    /** Come [booking], per un circolo qualsiasi dei propri (il controllo in background li guarda tutti). */
+    internal suspend fun <T> bookingWith(a: com.tennis.scoremanager.data.BookingAccount, f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
+        if (!a.joined) return Result.failure(com.tennis.scoremanager.data.ClubServerError("UNAUTHORIZED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) }).also { markReach(a.url, true) }
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
+            // Non risponde (rete): le sue funzioni si spengono finché non torna; ogni altro errore vuol dire che risponde.
+            markReach(a.url, e.code != "NET" && e.code != "BAD_URL")
+            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(), a.url)
+            Result.failure(e)
+        }
+    }
+
+    init {
+        // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
+        scope.launch {
+            bookingAccounts.map { l -> l.any { it.joined && it.reminders } }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
+        }
+        // Con l'app aperta, ogni tre minuti: i server dei propri circoli rispondono?
+        scope.launch {
+            while (true) {
+                if (bookingAccounts.value.isNotEmpty()) checkBookingServers()
+                delay(180_000)
+            }
+        }
+    }
+
+    fun setBookingReminders(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(reminders = on))
+
+    /** Notifiche dei nuovi annunci di Cerco compagno in questo circolo (gli annunci restano nelle novità e in Compagni). */
+    fun setSeekAlerts(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(seekAlerts = on))
+
+    /** Disdetta da qui: non è una notizia da dare al giocatore. */
+    fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
+
+    /** Il controllo del giocatore (in background), circolo per circolo: promemoria della partita e prenotazioni tolte dalla segreteria. */
+    suspend fun checkMyBookings() {
+        val many = bookingAccounts.value.size > 1
+        for (a0 in bookingAccounts.value) checkMyBookings(a0, many)
+    }
+
+    /** [many]: si è in più circoli, e negli avvisi si dice di quale. */
+    private suspend fun checkMyBookings(a: com.tennis.scoremanager.data.BookingAccount, many: Boolean) {
+        if (!a.joined) return
+        val me = bookingWith(a) { it.me() }.getOrNull() ?: return
+        // La casella dei file (convocazioni, schede corso) da questo circolo.
+        runCatching { fetchMail(a) }
+        val now = System.currentTimeMillis()
+        val club = if (many) me.club.ifBlank { a.club }.ifBlank { null } else null
+        fun label(court: String, start: Long) = listOfNotNull(club, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", court, start))).joinToString(" · ")
+        val news = com.tennis.scoremanager.data.ClubServers.myNews(a, me.bookings, me.rules.remindHours, now) { b -> label(b.court, b.start) }
+        val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
+        val seeks = bookingWith(a) { it.seeks() }.getOrNull()
+        val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
+        // Gli annunci nuovi degli altri: nelle novità di Gioca e, se si vogliono gli avvisi, una notifica.
+        val (acc2, freshSeeks) = seeks?.let { com.tennis.scoremanager.data.ClubServers.noteSeeks(sk?.account ?: acc, it) } ?: ((sk?.account ?: acc) to emptyList())
+        saveBookingAccount(acc2, a.url)
+        // Gli annunci che non sono più aperti (al completo, tolti): via le loro notifiche, che altrimenti confondono.
+        if (seeks != null) closedSeeks(a, acc2).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+        // Le chat: bacheca e annunci in cui si è, con i messaggi nuovi.
+        saveBookingAccount(checkChats(acc2, me, seeks, club), a.url)
+        if (a.reminders) {
+            com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
+                app, strings, news.remind.map { it.label }, news.removed.map { it.label },
+                freed.map { w -> label(w.freedCourt!!, w.start) },
+            )
+            if (sk != null) com.tennis.scoremanager.service.OnlineAlerts.postSeeks(
+                app, strings,
+                sk.joined.map { it.players.last() + " · " + it.date },
+                sk.booked.map { label(it.bookedCourt!!, it.bookedStart!!) + " · " + it.players.joinToString(", ") },
+                sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
+            )
+            if (a.seekAlerts) for (k in freshSeeks) com.tennis.scoremanager.service.OnlineAlerts.postNewSeek(app, strings, k.id, a.url, seekLine(k, club))
+        }
+    }
+
+    /** Un annuncio in una riga: "Mario · sab 8 nov 17:00–20:00 · singolo · ne manca 1" (col circolo davanti se serve). */
+    fun seekLine(k: com.tennis.scoremanager.data.SrvSeek, club: String? = null): String {
+        val s = strings
+        fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+        val day = runCatching {
+            java.time.format.DateTimeFormatter.ofPattern("EEE d MMM", locale).format(java.time.LocalDate.parse(k.date))
+        }.getOrDefault(k.date)
+        return listOfNotNull(club, k.owner, "$day ${hm(k.fromMin)}–${hm(k.toMin)}", if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level.ifBlank { null }, s.pbSeekNeed(k.need)).joinToString(" · ")
+    }
+
+    /** Gli annunci letti dal telefono (dalla schermata): si aggiornano le novità senza notifica. */
+    fun noteSeeks(seeks: List<com.tennis.scoremanager.data.SrvSeek>) {
+        val a = bookingAccount.value
+        if (!a.joined) return
+        val next = com.tennis.scoremanager.data.ClubServers.noteSeeks(a, seeks).first
+        saveBookingAccount(next, a.url)
+        closedSeeks(a, next).forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+    }
+
+    /** Gli annunci che c'erano in [before] e non sono più aperti in [after]. */
+    private fun closedSeeks(before: com.tennis.scoremanager.data.BookingAccount, after: com.tennis.scoremanager.data.BookingAccount): List<String> {
+        val open = after.openSeeks.map { it.id }.toSet()
+        return before.openSeeks.map { it.id }.filter { it !in open }
+    }
+
+    /** Annunci letti in [url] ([ids] null = tutti quelli aperti): spariscono dalle novità. */
+    fun readSeeks(url: String, ids: List<String>? = null) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
+        val add = ids ?: a.openSeeks.map { it.id }
+        // Letti: anche le loro notifiche non servono più.
+        add.forEach { com.tennis.scoremanager.service.OnlineAlerts.cancelSeek(app, it) }
+        if (add.all { it in a.seekRead }) return
+        saveBookingAccount(a.copy(seekRead = (a.seekRead + add).distinct()), url)
+    }
+
+    /** La scheda di Prenota un campo da aprire (2 = Compagni), chiesta dalle novità. */
+    val bookTabRequest = MutableStateFlow<Int?>(null)
+    /** Da Gioca o da una notifica: Prenota un campo apre subito questa chat ("board", "club", "d-…"). */
+    val chatRequest = MutableStateFlow<String?>(null)
+
+    /** Aperto un annuncio dalle novità: si va in Compagni di quel circolo e l'annuncio è letto. */
+    fun openSeekNews(url: String, id: String) {
+        readSeeks(url, listOf(id))
+        selectBooking(url)
+        bookTabRequest.value = 2
+        openBookCourt()
+    }
+
+    // ---- Chat del circolo (giocatore e segreteria) ----
+
+    /** Letta la chat [room] del circolo [url] fino ad [at]: sparisce dalle novità. */
+    fun markChatRead(url: String, room: String, at: Long) {
+        val a = bookingAccounts.value.firstOrNull { it.url == url } ?: return
+        com.tennis.scoremanager.service.OnlineAlerts.cancelChat(app, room)
+        if ((a.chatRead[room] ?: 0) >= at && room !in a.chatNews) return
+        saveBookingAccount(a.copy(chatRead = a.chatRead + (room to maxOf(at, a.chatRead[room] ?: 0)), chatNews = a.chatNews - room, boardUnread = if (room == "board") 0 else a.boardUnread,
+            clubUnread = if (room == "club") 0 else a.clubUnread), url)
+    }
+
+    /**
+     * Le chat con messaggi nuovi, nel controllo in background: la bacheca (se la segreteria ha scritto) e gli
+     * annunci in cui si è. Si avvisa una volta per messaggio; l'account torna con le novità aggiornate.
+     */
+    private suspend fun checkChats(a: com.tennis.scoremanager.data.BookingAccount, me: com.tennis.scoremanager.data.SrvMe, seeks: List<com.tennis.scoremanager.data.SrvSeek>?, club: String?): com.tennis.scoremanager.data.BookingAccount {
+        val chats = bookingWith(a) { it.myChats() }.getOrNull()
+        val rooms = buildList {
+            if (me.boardLast > 0) add(Triple("board", "", me.boardLast))
+            seeks?.filter { (it.mine || it.joined) && it.chatLast > 0 }?.forEach { add(Triple("s-" + it.id, seekLine(it), it.chatLast)) }
+            // La chat del circolo (se se ne vogliono le notifiche) e le private.
+            chats?.filter { it.last > 0 && (it.room != "club" || me.clubChat) }?.forEach {
+                add(Triple(it.room, if (it.room == "club") strings.pbClubChat else it.title, it.last))
+            }
+        }
+        var acc = a
+        for ((room, title, last) in rooms) {
+            if (last <= (acc.chatRead[room] ?: 0)) continue
+            val since = maxOf(acc.chatRead[room] ?: 0, acc.chatNotified[room] ?: 0)
+            if (last > since) {
+                val fresh = bookingWith(a) { it.chat(room, since) }.getOrNull().orEmpty().filter { !it.mine }
+                if (fresh.isNotEmpty() && a.reminders) {
+                    val m = fresh.last()
+                    com.tennis.scoremanager.service.OnlineAlerts.postChat(app, strings, room, a.url,
+                        when {
+                            room == "board" -> listOfNotNull(club, strings.pbBoardTitle).joinToString(" · ")
+                            room == "club" -> listOfNotNull(club, strings.pbClubChat).joinToString(" · ")
+                            room.startsWith("d-") -> strings.pbDmNew
+                            else -> strings.pbChatNew
+                        },
+                        "${m.name}: ${m.text}")
+                }
+                acc = acc.copy(chatNotified = acc.chatNotified + (room to last))
+            }
+            // La bacheca ha la sua striscia in cima a Gioca, col numero degli avvisi da leggere.
+            if (room == "board") {
+                val n = bookingWith(a) { it.chat(room, acc.chatRead[room] ?: 0) }.getOrNull()?.count { !it.mine }
+                if (n != null) acc = acc.copy(boardUnread = n)
+            } else acc = acc.copy(chatNews = acc.chatNews + (room to title))
+        }
+        // La chat del circolo in Gioca (anche con le notifiche spente): l'ultimo messaggio e quanti da leggere.
+        val clubRoom = chats?.firstOrNull { it.room == "club" }
+        if (clubRoom != null && clubRoom.last > acc.clubPreviewAt) {
+            val read = acc.chatRead["club"] ?: 0
+            bookingWith(a) { it.chat("club", 0) }.getOrNull()?.let { l ->
+                acc = acc.copy(clubPreview = l.lastOrNull()?.let { "${it.name}: ${it.text}" }.orEmpty().take(140),
+                    clubPreviewAt = clubRoom.last, clubUnread = l.count { !it.mine && it.at > read })
+            }
+        }
+        return acc
+    }
+
+    private var newsCheckedAt = 0L
+    /** Aprendo Gioca: le novità dei circoli (chat, bacheca, annunci) subito, al massimo una volta al minuto. */
+    fun refreshClubNews() {
+        val now = System.currentTimeMillis()
+        if (bookingAccounts.value.isEmpty() || now - newsCheckedAt < 60_000) return
+        newsCheckedAt = now
+        scope.launch { checkMyBookings() }
+    }
+
+    /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
+    fun leaveBooking() {
+        val a = bookingAccount.value
+        scope.launch {
+            if (a.joined) runCatching { withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(a.url, a.token).logout() } }
+        }
+        saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
     }
 }
 TSM_EOF
@@ -30661,17 +30713,19 @@ class Storage(context: Context) {
     companion object {
         /** Foto ricordo per partita: bastano per il PDF e lo tengono sui 3-4 MB. */
         const val MAX_MATCH_PHOTOS = 10
-    }
 
+        /** Come si leggono e scrivono i file dei dati; i test di aggiornamento ([FormatUpgradeTest]) usano questo. */
+        val JSON = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            prettyPrint = true
+        }
+    }
 
     private val app = context.applicationContext
     private val prefs = app.getSharedPreferences("tsm", Context.MODE_PRIVATE)
 
-    val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-        prettyPrint = true
-    }
+    val json = JSON
 
     /** I file messi da parte in questa sessione perché non si leggevano (vedi [readOr]): la prima schermata lo dice. */
     val unreadable: MutableList<String> = java.util.concurrent.CopyOnWriteArrayList()
@@ -38899,7 +38953,7 @@ class ServerCheckJob : JobService() {
         val c = (application as TsmApp).controller
         scope.launch {
             // Lo stesso servizio per la segreteria (planning e prenotazioni online) e per il giocatore (promemoria).
-            if (params.jobId == PLAYER_JOB) c.checkMyBookings() else c.syncServerNow()
+            if (params.jobId == PLAYER_JOB) c.book.checkMyBookings() else c.syncServerNow()
             jobFinished(params, false)
         }
         return true
@@ -43410,7 +43464,7 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                 Segmented(lengths.map { SegOption(s.coMinutes(it)) }, lengths.indexOf(l.minutes), { l = l.copy(minutes = lengths[it]) }, columns = 3)
                 OutlinedTextField(l.place, { l = l.copy(place = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coPlace) })
                 // Col circolo collegato (invito della segreteria) il campo si prenota da qui: la lezione resta salvata.
-                if (c.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
+                if (c.book.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
                     if (l.students.isNotEmpty()) c.saveLesson(l)
                     onDone()
                     c.go(com.tennis.scoremanager.Screen.BOOK_COURT)
@@ -46139,7 +46193,7 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
                 GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profileQr(p, fields) }, Modifier.fillMaxWidth())
                 Text(s.pfAsQrHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 // Col server del circolo (il giocatore è già iscritto): dritto nella casella della segreteria, con la foto.
-                for (a in c.bookingAccounts.collectAsState().value.filter { it.joined })
+                for (a in c.book.bookingAccounts.collectAsState().value.filter { it.joined })
                     GhostButton(s.pfToOffice(a.club.ifBlank { a.url }), Icons.Filled.Share, { c.profileToOffice(a.url, p, fields); onDone() }, Modifier.fillMaxWidth())
             }
         },
@@ -68092,8 +68146,8 @@ private class ClubTime(zone: String, private val locale: Locale) {
 fun BookCourtScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val account by c.bookingAccount.collectAsState()
-    val accounts by c.bookingAccounts.collectAsState()
+    val account by c.book.bookingAccount.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     var adding by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.18") },
@@ -68109,10 +68163,10 @@ fun BookCourtScreen(c: MatchController) {
             // Più circoli: si sceglie quale guardare; ogni circolo ha la sua schermata (si ricarica cambiando).
             if (accounts.size > 1) Segmented(
                 accounts.map { SegOption(it.club.ifBlank { it.url.substringAfter("//") }) }, accounts.indexOfFirst { it.url == account.url },
-                { c.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
+                { c.book.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
             )
             // Server che non risponde: si dice qui, e tutto si riaccende da solo quando torna.
-            val reach by c.bookingReach.collectAsState()
+            val reach by c.book.bookingReach.collectAsState()
             if (reach[account.url] == false) Text(s.pbOffline, color = TsmColors.Orange, fontSize = 13.sp)
             androidx.compose.runtime.key(account.url) { BookingView(c) { adding = true } }
         }
@@ -68129,7 +68183,7 @@ private fun JoinClub(c: MatchController, onJoined: () -> Unit = {}) {
     var msg by remember { mutableStateOf<String?>(null) }
     fun join(text: String) {
         busy = true; msg = null
-        scope.launch { msg = c.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false; if (msg == null) onJoined() }
+        scope.launch { msg = c.book.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false; if (msg == null) onJoined() }
     }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { invite = it; join(it) } }
     Text(s.pbJoinIntro, color = TsmColors.TextDim, fontSize = 14.sp)
@@ -68159,7 +68213,7 @@ private fun JoinClub(c: MatchController, onJoined: () -> Unit = {}) {
             visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
         GhostButton(s.pbLoginGo, Icons.Filled.Login, {
             busy = true; loginMsg = null
-            scope.launch { loginMsg = c.loginBooking(club, phone, pin)?.let { bookErrorText(s, it) }; busy = false; pin = ""; if (loginMsg == null) onJoined() }
+            scope.launch { loginMsg = c.book.loginBooking(club, phone, pin)?.let { bookErrorText(s, it) }; busy = false; pin = ""; if (loginMsg == null) onJoined() }
         }, Modifier.fillMaxWidth(), enabled = !busy && club.isNotBlank() && phone.isNotBlank() && pin.length >= 4)
         loginMsg?.let { Text(it, color = TsmColors.Orange, fontSize = 14.sp) }
     }
@@ -68191,7 +68245,7 @@ private fun PinSection(c: MatchController, me: SrvMe, onSaved: () -> Unit) {
                 if (pin != pin2) { msg = s.pbPinMismatch; return@GhostButton }
                 busy = true; msg = null
                 scope.launch {
-                    val err = c.setBookingPin(phone, pin)
+                    val err = c.book.setBookingPin(phone, pin)
                     busy = false
                     if (err == null) { msg = s.pbPinSaved; editing = false; pin = ""; pin2 = ""; onSaved() } else msg = bookErrorText(s, err)
                 }
@@ -68229,32 +68283,32 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     // Le proprie prenotazioni e il giorno scelto, ora e poi ogni minuto (le caselle degli altri cambiano).
     LaunchedEffect(tick) {
         while (true) {
-            c.booking { it.me() }.onSuccess { m ->
+            c.book.booking { it.me() }.onSuccess { m ->
                 me = m
-                c.booking { it.seeks() }.onSuccess { seeks = it; c.noteSeeks(it) }
-                c.booking { it.myChats() }.onSuccess { rooms = it }
+                c.book.booking { it.seeks() }.onSuccess { seeks = it; c.book.noteSeeks(it) }
+                c.book.booking { it.myChats() }.onSuccess { rooms = it }
                 val d = date?.takeIf { it in m.days } ?: m.days.firstOrNull()
                 date = d
-                if (d != null) c.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
+                if (d != null) c.book.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
             }.onFailure { error = bookErrorText(s, errCode(it)) }
             kotlinx.coroutines.delay(60_000)
         }
     }
     fun reload() { tick++ }
     // Dalle novità di Gioca o da una notifica: si apre direttamente quella chat (o Compagni).
-    val wantChat by c.chatRequest.collectAsState()
+    val wantChat by c.book.chatRequest.collectAsState()
     LaunchedEffect(wantChat) {
         wantChat?.let { room ->
             if (room != "board") tab = 3
             chatRoom = room to (rooms.firstOrNull { it.room == room }?.title ?: "")
-            c.chatRequest.value = null
+            c.book.chatRequest.value = null
         }
     }
-    val wantTab by c.bookTabRequest.collectAsState()
-    LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
-    val acct by c.bookingAccount.collectAsState()
+    val wantTab by c.book.bookTabRequest.collectAsState()
+    LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.book.bookTabRequest.value = null } }
+    val acct by c.book.bookingAccount.collectAsState()
     // Guardando Compagni gli annunci sono letti: spariscono dalle novità.
-    LaunchedEffect(tab, acct.openSeeks) { if (tab == 2 && acct.unreadSeeks.isNotEmpty()) c.readSeeks(acct.url) }
+    LaunchedEffect(tab, acct.openSeeks) { if (tab == 2 && acct.unreadSeeks.isNotEmpty()) c.book.readSeeks(acct.url) }
     // Tornando sulla schermata (dall'app o dal telefono) si riprende tutto: intanto altri possono aver prenotato.
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { if (me != null) reload() }
 
@@ -68281,7 +68335,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         val boardRead = acct.chatRead["board"] ?: 0
         if (m.boardLast > boardRead) {
             var unread by remember { mutableStateOf(0) }
-            LaunchedEffect(m.boardLast, boardRead) { c.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
+            LaunchedEffect(m.boardLast, boardRead) { c.book.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
             BoardBanner(s.pbBoardUnread(maxOf(1, unread))) { chatRoom = "board" to "" }
         }
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
@@ -68304,7 +68358,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                         Column(
                             Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) TsmColors.Ball else TsmColors.Surface)
                                 .border(1.dp, if (on) TsmColors.Ball else TsmColors.Outline, RoundedCornerShape(12.dp))
-                                .clickable { date = d; day = null; scope.launch { c.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
+                                .clickable { date = d; day = null; scope.launch { c.book.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
                                 .padding(horizontal = 12.dp, vertical = 6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
@@ -68352,14 +68406,14 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                         Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
                     }
                     w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
-                    TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
+                    TextButton(onClick = { scope.launch { c.book.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
                 }
 
                 // Promemoria e avvisi sul telefono (anche ad app chiusa).
-                val acc by c.bookingAccount.collectAsState()
+                val acc by c.book.bookingAccount.collectAsState()
                 val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
                 SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
-                    c.setBookingReminders(on)
+                    c.book.setBookingReminders(on)
                     if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 }
                 PinSection(c, m) { reload() }
@@ -68370,7 +68424,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
                 Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 // Le notifiche dei nuovi annunci di questo circolo si possono spegnere (gli annunci restano qui e in Gioca).
-                SwitchRow(Icons.Filled.NotificationsActive, s.pbSeekAlerts, s.pbSeekAlertsHint, acct.seekAlerts) { c.setSeekAlerts(it) }
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbSeekAlerts, s.pbSeekAlertsHint, acct.seekAlerts) { c.book.setSeekAlerts(it) }
                 if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
                 for (k in seeks) Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
@@ -68385,7 +68439,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     Row {
                         fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
                             scope.launch {
-                                c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
+                                c.book.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
                                     .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
                                 reload()
                             }
@@ -68407,7 +68461,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             }
             else -> {
                 fun prefs(p: com.tennis.scoremanager.data.SrvPrefsIn) = scope.launch {
-                    c.booking { it.setPrefs(p) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
+                    c.book.booking { it.setPrefs(p) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
                     reload()
                 }
                 // L'elenco come nelle app di messaggi: in cima la chat del circolo, poi le private, le più recenti prima.
@@ -68423,7 +68477,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 }
                 if (rooms.none { it.room.startsWith("d-") }) Text(s.pbDmNone, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
                 GhostButton(s.pbDmWrite, Icons.Filled.Add, {
-                    scope.launch { c.booking { it.people() }.onSuccess { people = it }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() } }
+                    scope.launch { c.book.booking { it.people() }.onSuccess { people = it }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() } }
                 }, Modifier.fillMaxWidth())
                 // Le scelte: le notifiche della chat del circolo e chi mi può scrivere in privato (spento di partenza).
                 SwitchRow(Icons.Filled.NotificationsActive, s.pbClubChatAlerts, s.pbClubChatAlertsHint, m.clubChat) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(clubChat = it)) }
@@ -68431,7 +68485,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 if (m.blocked.isNotEmpty()) {
                     Text(s.pbBlockedList, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     for (b in m.blocked) TextButton(onClick = {
-                        scope.launch { c.booking { it.block(b.id, false) }; reload() }
+                        scope.launch { c.book.booking { it.block(b.id, false) }; reload() }
                     }) { Text(s.pbUnblock(b.name), color = TsmColors.Ball) }
                 }
             }
@@ -68457,7 +68511,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 text = { Text(s.pbBlockAsk(name)) },
                 confirmButton = { TextButton(onClick = {
                     blockAsk = null; chatRoom = null
-                    scope.launch { c.booking { it.block(id, true) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }; reload() }
+                    scope.launch { c.book.booking { it.block(id, true) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }; reload() }
                 }) { Text(s.pbBlock, color = TsmColors.Danger) } },
                 dismissButton = { TextButton(onClick = { blockAsk = null }) { Text(s.back) } },
             )
@@ -68470,16 +68524,16 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             val name = title.ifBlank { rooms.firstOrNull { it.room == room }?.title.orEmpty() }
             com.tennis.scoremanager.ui.ChatDialog(
                 title = when { board -> s.pbBoardTitle; room == "club" -> s.pbClubChat; other != null -> name.ifBlank { s.pbChat }; else -> "${s.pbChat} · $title" },
-                load = { c.booking { it.chat(room, 0) } },
-                send = if (board) null else { text -> c.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
-                report = if (board) null else { id -> c.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
-                editMine = if (board) null else { id, t -> c.booking { it.editChat(id, t) }.exceptionOrNull()?.let(::errCode) },
-                deleteMine = if (board) null else { id -> c.booking { it.deleteMine(id) }.exceptionOrNull()?.let(::errCode) },
+                load = { c.book.booking { it.chat(room, 0) } },
+                send = if (board) null else { text -> c.book.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
+                report = if (board) null else { id -> c.book.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
+                editMine = if (board) null else { id, t -> c.book.booking { it.editChat(id, t) }.exceptionOrNull()?.let(::errCode) },
+                deleteMine = if (board) null else { id -> c.book.booking { it.deleteMine(id) }.exceptionOrNull()?.let(::errCode) },
                 hint = when { board -> s.pbBoardHint; room == "club" -> s.pbClubChatHint; other != null -> s.pbDmHint; else -> null },
                 extra = other?.let { id -> s.pbBlock to { blockAsk = id to name } },
                 group = room == "club" || room.startsWith("s-"),
                 errText = { bookErrorText(s, it) },
-                onRead = { at -> c.markChatRead(acct.url, room, at) },
+                onRead = { at -> c.book.markChatRead(acct.url, room, at) },
             ) { chatRoom = null; reload() }
         }
 
@@ -68513,7 +68567,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     TextButton(enabled = !busy, onClick = {
                         busy = true
                         scope.launch {
-                            c.booking { it.addWait(com.tennis.scoremanager.data.SrvWaitIn(if (any) null else court.name, start, day?.slotMinutes ?: 60)) }
+                            c.book.booking { it.addWait(com.tennis.scoremanager.data.SrvWaitIn(if (any) null else court.name, start, day?.slotMinutes ?: 60)) }
                                 .onSuccess { waitFor = null; Toast.makeText(context, s.pbWaitAdded, Toast.LENGTH_SHORT).show(); reload() }
                                 .onFailure { e ->
                                     val code = errCode(e)
@@ -68543,8 +68597,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     TextButton(enabled = b.canCancel && !busy, onClick = {
                         busy = true
                         scope.launch {
-                            c.booking { it.cancelMine(b.id) }
-                                .onSuccess { c.noteMyCancel(b.id); cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
+                            c.book.booking { it.cancelMine(b.id) }
+                                .onSuccess { c.book.noteMyCancel(b.id); cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
                                 .onFailure { err = bookErrorText(s, errCode(it)) }
                             busy = false
                         }
@@ -68557,7 +68611,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     if (leave) AlertDialog(
         onDismissRequest = { leave = false },
         text = { Text(s.pbLeaveAsk) },
-        confirmButton = { TextButton(onClick = { leave = false; c.leaveBooking() }) { Text(s.pbLeave, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { leave = false; c.book.leaveBooking() }) { Text(s.pbLeave, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { leave = false }) { Text(s.back) } },
     )
 }
@@ -68618,7 +68672,7 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
     var busy by remember { mutableStateOf(false) }
     LaunchedEffect(minutes, heating) {
         quote = null; err = null
-        c.booking { it.quote(court.name, start, minutes, heating) }
+        c.book.booking { it.quote(court.name, start, minutes, heating) }
             .onSuccess { q -> quote = q; err = q.problem?.let { bookErrorText(s, it) } }
             .onFailure { err = bookErrorText(s, errCode(it)) }
     }
@@ -68645,7 +68699,7 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
             TextButton(enabled = quote != null && quote?.problem == null && !busy, onClick = {
                 busy = true
                 scope.launch {
-                    c.booking { it.book(SrvBookIn(court.name, start, minutes, heating)) }
+                    c.book.booking { it.book(SrvBookIn(court.name, start, minutes, heating)) }
                         .onSuccess { onDone(true) }
                         .onFailure { err = bookErrorText(s, errCode(it)) }
                     busy = false
@@ -68703,7 +68757,7 @@ private fun SeekDialog(c: MatchController, me: SrvMe, day: SrvDay?, date: String
             TextButton(enabled = !busy, onClick = {
                 busy = true
                 scope.launch {
-                    c.booking { it.addSeek(com.tennis.scoremanager.data.SrvSeekIn(d, from, to, doubles, level, note)) }
+                    c.book.booking { it.addSeek(com.tennis.scoremanager.data.SrvSeekIn(d, from, to, doubles, level, note)) }
                         .onSuccess { onDone(true) }.onFailure { err = bookErrorText(s, errCode(it)) }
                     busy = false
                 }
@@ -71974,7 +72028,7 @@ fun HomeScreen(c: MatchController) {
     // Le schede che restano vuote con quello che non si usa spariscono.
     val pf by c.playerFeatures.collectAsState()
     val cf by c.clubFeatures.collectAsState()
-    val accounts by c.bookingAccounts.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     val tabs = role.tabs.filter { t ->
         when (t) {
             // Il circolo di chi gioca: solo dopo esserci entrati con l'invito della segreteria.
@@ -72282,8 +72336,8 @@ private fun ResumeEntries(c: MatchController, club: Boolean?) {
 private fun BookingTab(c: MatchController) {
     val s = LocalStrings.current
     ClubNews(c)
-    val accounts by c.bookingAccounts.collectAsState()
-    val reach by c.bookingReach.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
+    val reach by c.book.bookingReach.collectAsState()
     val down = accounts.filter { reach[it.url] == false }
     val names = { l: List<com.tennis.scoremanager.data.BookingAccount> -> l.joinToString(", ") { it.club.ifBlank { it.url } } }
     val hint = when {
@@ -72292,13 +72346,13 @@ private fun BookingTab(c: MatchController) {
         else -> s.pbEntryJoined(names(accounts))
     }
     Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint, main = true) { c.go(Screen.BOOK_COURT) }
-    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
-    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.book.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.book.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
     // La chat del circolo, sempre a portata: l'ultimo messaggio e quanti da leggere.
     for (a in accounts.filter { it.joined }) {
         val title = listOfNotNull(s.pbClubChat, a.club.takeIf { accounts.size > 1 && it.isNotBlank() }).joinToString(" · ") +
             if (a.clubUnread > 0) " (${a.clubUnread})" else ""
-        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
+        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.book.selectBooking(a.url); c.book.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
     }
 }
 
@@ -72388,7 +72442,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
             }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
-            val bookingAccounts by c.bookingAccounts.collectAsState()
+            val bookingAccounts by c.book.bookingAccounts.collectAsState()
             if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
         }
     }
@@ -72457,26 +72511,26 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
 @Composable
 private fun ClubNews(c: MatchController) {
     val s = LocalStrings.current
-    val accounts by c.bookingAccounts.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
     // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
     // Nell'elenco restano le chat degli annunci; bacheca, chat del circolo e private hanno la loro striscia.
     val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it.startsWith("s-") }.map { (room, title) -> Triple(a, room, title) } }
-    LaunchedEffect(Unit) { c.refreshClubNews() }
+    LaunchedEffect(Unit) { c.book.refreshClubNews() }
     // La bacheca ha la sua striscia, in cima, col numero degli avvisi da leggere: si tocca e si apre.
     for (a in accounts.filter { it.boardUnread > 0 }) {
         BoardBanner(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, s.pbBoardUnread(a.boardUnread)).joinToString(" · ")) {
-            c.selectBooking(a.url); c.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
         }
     }
     for (a in accounts) {
         val where = a.club.takeIf { many && it.isNotBlank() }
         if (a.clubUnread > 0) BoardBanner(listOfNotNull(where, s.pbClubUnread(a.clubUnread)).joinToString(" · "), Icons.Filled.Forum) {
-            c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
         }
         for ((room, name) in a.chatNews.filterKeys { it.startsWith("d-") }) BoardBanner(listOfNotNull(where, s.pbDmFrom(name)).joinToString(" · "), Icons.Filled.Mail) {
-            c.selectBooking(a.url); c.chatRequest.value = room; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = room; c.go(Screen.BOOK_COURT)
         }
     }
     if (news.isEmpty() && chats.isEmpty()) return
@@ -72492,31 +72546,31 @@ private fun ClubNews(c: MatchController) {
         for ((a, room, title) in chats) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
-                    .clickable { c.selectBooking(a.url); if (room.startsWith("s-")) c.bookTabRequest.value = 2 else c.chatRequest.value = room; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
+                    .clickable { c.book.selectBooking(a.url); if (room.startsWith("s-")) c.book.bookTabRequest.value = 2 else c.book.chatRequest.value = room; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(if (room == "board") s.pbBoardTitle else s.pbChatNew, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, title.ifBlank { null }).joinToString(" · ").ifBlank { s.pbBoardRead }, color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                androidx.compose.material3.IconButton(onClick = { c.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                androidx.compose.material3.IconButton(onClick = { c.book.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
         for ((a, k) in news.take(6)) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
-                    .clickable { c.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
+                    .clickable { c.book.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(s.pbSeekTitle, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Text(c.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
+                    Text(c.book.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                androidx.compose.material3.IconButton(onClick = { c.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                androidx.compose.material3.IconButton(onClick = { c.book.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
         if (news.size + chats.size > 1) androidx.compose.material3.TextButton(onClick = {
-            accounts.forEach { a -> c.readSeeks(a.url); a.chatNews.keys.forEach { c.markChatRead(a.url, it, System.currentTimeMillis()) } }
+            accounts.forEach { a -> c.book.readSeeks(a.url); a.chatNews.keys.forEach { c.book.markChatRead(a.url, it, System.currentTimeMillis()) } }
         }) { Text(s.tdNewsReadAll) }
     }
 }
@@ -101507,6 +101561,84 @@ class DrillsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/FormatUpgradeTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/FormatUpgradeTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.PenaltyKind
+import com.tennis.scoremanager.model.Side
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/**
+ * Aggiornamento dell'app: i file scritti da una versione uscita si leggono ancora, senza perdere niente.
+ * Storage salta in silenzio le partite che non riesce a leggere, quindi un formato cambiato male le farebbe sparire:
+ * qui invece il test si ferma. Gli esempi in `resources/formati/<versione>/` li ha scritti il codice di quella versione
+ * (generatore in `FixtureExport.kt.txt`), con nomi di prova. A ogni versione nuova se ne aggiunge una cartella.
+ */
+class FormatUpgradeTest {
+    private val json = Storage.JSON
+
+    private fun text(version: String, name: String) =
+        requireNotNull(javaClass.getResource("/formati/$version/$name")) { "manca formati/$version/$name" }.readText()
+
+    /** Legge e riscrive: il file rifatto dall'app di oggi deve rileggersi uguale. */
+    private fun <T> read(version: String, name: String, s: KSerializer<T>): T {
+        val v = json.decodeFromString(s, text(version, name))
+        assertEquals("$version/$name riscritto", v, json.decodeFromString(s, json.encodeToString(s, v)))
+        return v
+    }
+
+    @Test
+    fun matchesFrom260() {
+        val m = read("2.6.0", "match_finished.json", MatchRecord.serializer())
+        assertTrue(m.finished)
+        assertEquals(10, m.events.size)
+        // Tutti i tipi di evento della 2.6.0 (punto, ordine di servizio e di risposta, richiamo, pausa, correzioni, punteggio, ritiro).
+        val kinds = m.events.map { it::class }.toSet()
+        assertEquals(9, kinds.size)
+        assertEquals(PenaltyKind.TIME, m.events.filterIsInstance<MatchEvent.Penalty>().single().kind)
+        assertEquals(Side.P2, m.events.filterIsInstance<MatchEvent.Retired>().single().side)
+        assertEquals("Via Prova 1", m.location?.address)
+        assertEquals(90, m.batteryStart[Side.P1])
+        assertEquals("Partita di prova", m.notes)
+        assertTrue(m.friendly)
+
+        val s = read("2.6.0", "match_suspended.json", MatchRecord.serializer())
+        assertTrue(s.suspended)
+        assertEquals(4, s.events.size)
+    }
+
+    @Test
+    fun playersAndTrainingFrom260() {
+        assertEquals(listOf("Mario Rossi", "Luca Bianchi"), read("2.6.0", "players.json", ListSerializer(PlayerProfile.serializer())).map { it.name })
+        assertEquals("w1", read("2.6.0", "workout.json", WorkoutRecord.serializer()).id)
+        assertEquals("s1", read("2.6.0", "serve_session.json", ServeSession.serializer()).id)
+        assertEquals(10, read("2.6.0", "drills.json", ListSerializer(Drill.serializer())).single().steps.single().count)
+        assertEquals(60.0, read("2.6.0", "goals.json", ListSerializer(Goal.serializer())).single().target, 0.0)
+        assertEquals("st1", read("2.6.0", "rackets.json", ListSerializer(Racket.serializer())).single().stringings.single().id)
+        assertEquals(4, read("2.6.0", "tournament.json", Tournament.serializer()).players.size)
+    }
+
+    @Test
+    fun clubFrom260() {
+        val book = read("2.6.0", "club_book.json", ClubBook.serializer())
+        assertEquals(15000, book.fees.single().cents)
+        assertEquals(15000, book.charges.single().payments.single().cents)
+        assertEquals("Squadra A", read("2.6.0", "club_teams.json", ListSerializer(Team.serializer())).single().name)
+        assertEquals("Corso bambini", read("2.6.0", "club_school.json", ListSerializer(Course.serializer())).single().name)
+        assertEquals("Classifica sociale", read("2.6.0", "club_ladders.json", ListSerializer(Ladder.serializer())).single().name)
+        assertEquals("Torneo sociale", read("2.6.0", "club_tournaments.json", ListSerializer(ClubTournament.serializer())).single().name)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/GoalsYearTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/GoalsYearTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -108194,6 +108326,137 @@ class VoiceFilesTest {
         override fun player(side: Side, index: Int) = side(side)
     }
 }
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/FixtureExport.kt.txt
+cat > "$DEST/app/src/test/resources/formati/2.6.0/FixtureExport.kt.txt" << 'TSM_EOF'
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import org.junit.Test
+import java.io.File
+
+/** Genera i file d'esempio come li scrive la 2.6.0 (stessa configurazione JSON di Storage), con nomi di prova. */
+class FixtureExport {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+
+    private fun <T> w(dir: File, name: String, s: KSerializer<T>, v: T) = File(dir, name).writeText(json.encodeToString(s, v))
+
+    @Test
+    fun export() {
+        val out = File(System.getenv("FIXTURE_OUT") ?: return).apply { mkdirs() }
+        val t0 = 1794000000000L
+        val events = listOf(
+            MatchEvent.ServeOrder(1, 0, 0),
+            MatchEvent.ReceiveOrder(1, 0, 0),
+            MatchEvent.Point(Side.P1, t0 + 1000, strokes = 4, kind = PointKind.WINNER),
+            MatchEvent.Point(Side.P2, t0 + 2000, kind = PointKind.ACE, secondServe = true),
+            MatchEvent.Penalty(Side.P2, PenaltyKind.TIME, t0 + 3000),
+            MatchEvent.Break(Side.P1, BreakKind.MEDICAL, t0 + 4000),
+            MatchEvent.ServerFix(Side.P1, 0, t0 + 5000),
+            MatchEvent.EndsFix(t0 + 6000),
+            MatchEvent.ScoreSet(listOf(SetScore(6, 4)), 2, 1, 1, 0, Side.P2, 0, t0 + 7000),
+            MatchEvent.Retired(Side.P2, t0 + 8000),
+        )
+        val match = MatchRecord(
+            id = "m1794000000000", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(),
+            events = events, clockMs = 3_600_000, startedAt = t0, endedAt = t0 + 8000, finished = true,
+            location = MatchLocation(45.0, 11.0, "Via Prova 1"), updatedAt = t0 + 9000,
+            batteryStart = mapOf(Side.P1 to 90, Side.P2 to 85), batteryEnd = mapOf(Side.P1 to 70, Side.P2 to 60),
+            notes = "Partita di prova", friendly = true,
+        )
+        w(out, "match_finished.json", MatchRecord.serializer(), match)
+        w(out, "match_suspended.json", MatchRecord.serializer(), match.copy(id = "m1794000100000", events = events.take(4), finished = false, suspended = true, endedAt = null))
+        w(out, "players.json", ListSerializer(PlayerProfile.serializer()), listOf(PlayerProfile("p1", "Mario Rossi"), PlayerProfile("p2", "Luca Bianchi")))
+        w(out, "workout.json", WorkoutRecord.serializer(), WorkoutRecord("w1", t0))
+        w(out, "serve_session.json", ServeSession.serializer(), ServeSession("s1", t0))
+        w(out, "drills.json", ListSerializer(Drill.serializer()), listOf(Drill("d1", "Servizio esterno", TrainedStroke.SERVE, listOf(DrillStep(10)))))
+        w(out, "goals.json", ListSerializer(Goal.serializer()), listOf(Goal("g1", GoalKind.FIRST_SERVE, 60.0)))
+        w(out, "rackets.json", ListSerializer(Racket.serializer()), listOf(Racket("r1").copy(stringings = listOf(Stringing("st1", t0)))))
+        w(out, "tournament.json", Tournament.serializer(), Tournament("t1", players = listOf("Rossi", "Bianchi", "Verdi", "Neri")))
+        w(out, "club_book.json", ClubBook.serializer(), ClubBook(
+            fees = listOf(Fee("f1", "Quota annuale", 15000, FeeKind.MEMBERSHIP)),
+            charges = listOf(Charge("c1", "p1", "Mario Rossi", "f1", "Quota annuale", 15000, t0).copy(payments = listOf(Payment("pay1", 15000, t0, PayMethod.CASH)))),
+        ))
+        w(out, "club_teams.json", ListSerializer(Team.serializer()), listOf(Team("tm1", "Squadra A")))
+        w(out, "club_school.json", ListSerializer(Course.serializer()), listOf(Course("co1", "Corso bambini", from = t0, to = t0 + 90L * 86_400_000)))
+        w(out, "club_ladders.json", ListSerializer(Ladder.serializer()), listOf(Ladder("l1", "Classifica sociale")))
+        w(out, "club_tournaments.json", ListSerializer(ClubTournament.serializer()), listOf(ClubTournament("ct1", "Torneo sociale")))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/club_book.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/club_book.json" << 'TSM_EOF'
+{"fees":[{"id":"f1","name":"Quota annuale","cents":15000,"kind":"MEMBERSHIP","due":null,"createdAt":0,"tournament":null}],"charges":[{"id":"c1","player":"p1","name":"Mario Rossi","fee":"f1","label":"Quota annuale","cents":15000,"createdAt":1794000000000,"due":null,"payments":[{"id":"pay1","cents":15000,"at":1794000000000,"method":"CASH","ref":"","receipt":"","methodName":""}],"cancelled":false,"kind":null}],"receiptYear":0,"receiptNext":1,"payTypes":[]}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/club_ladders.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/club_ladders.json" << 'TSM_EOF'
+[{"id":"l1","name":"Classifica sociale","players":[],"reach":3,"days":14,"challenges":[],"createdAt":0}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/club_school.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/club_school.json" << 'TSM_EOF'
+[{"id":"co1","name":"Corso bambini","level":"","coach":null,"coachName":"","students":[],"slots":[],"from":1794000000000,"to":1801776000000,"maxStudents":0,"feeCents":0,"feeKind":"MONTHLY","note":"","attendance":{},"cancelled":[],"createdAt":0}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/club_teams.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/club_teams.json" << 'TSM_EOF'
+[{"id":"tm1","name":"Squadra A","championship":"","season":"","captain":null,"roster":[],"singles":4,"doubles":2,"fitp":true,"fixtures":[],"createdAt":0}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/club_tournaments.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/club_tournaments.json" << 'TSM_EOF'
+[{"id":"ct1","name":"Torneo sociale","kind":"SOCIAL","format":"KNOCKOUT","doubles":false,"category":"","start":null,"end":null,"feeCents":0,"feeId":null,"requirePaid":true,"rankLimit":"","fitpCode":"","referee":"","groups":2,"qualify":2,"entries":[],"matches":[],"drawnAt":null,"manualEdits":0,"createdAt":0}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/drills.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/drills.json" << 'TSM_EOF'
+[{"id":"d1","name":"Servizio esterno","stroke":"SERVE","steps":[{"count":10,"side":null,"kind":null,"target":null,"direction":null,"wing":null}],"createdAt":0}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/goals.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/goals.json" << 'TSM_EOF'
+[{"id":"g1","kind":"FIRST_SERVE","target":60.0,"window":5,"createdAt":0,"reachedAt":null,"seen":false}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/match_finished.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/match_finished.json" << 'TSM_EOF'
+{"id":"m1794000000000","setup":{"club":"","court":"","doubles":false,"p1a":"","p1b":"","p2a":"","p2b":"","sport":"TENNIS","event":"","category":"","round":"","p1aRank":"","p1bRank":"","p2aRank":"","p2bRank":"","p1aSex":"","p1bSex":"","p2aSex":"","p2bSex":"","p1Racket":"","p2Racket":"","p1aId":"","p1bId":"","p2aId":"","p2bId":""},"options":{"mode":"REFEREE","lang":"IT","audio":true,"format":"BEST_OF_THREE","gamesPerSet":6,"setTiebreak":true,"noAd":false,"detailedStats":false,"starPoint":false,"tossWinner":null,"firstServer":"P1","p1Left":true,"firstServerP1":0,"firstServerP2":0,"ttsEngine":null,"ttsVoice":null,"voiceFiles":false,"bandsOffAtEnd":true,"addressLookup":false,"heartRate":false,"newBallsFirst":0,"newBallsEvery":0,"newBallsAnimation":false},"rules":{"format":"BEST_OF_THREE","gamesPerSet":6,"setTiebreak":true,"noAd":false,"starPoint":false,"doubles":false,"firstServer":"P1","p1StartsLeft":true,"firstServerP1":0,"firstServerP2":0},"events":[{"type":"serveOrder","setNumber":1,"firstP1":0,"firstP2":0},{"type":"receiveOrder","setNumber":1,"deuceP1":0,"deuceP2":0},{"type":"point","winner":"P1","at":1794000001000,"strokes":4,"kind":"WINNER","secondServe":false},{"type":"point","winner":"P2","at":1794000002000,"strokes":null,"kind":"ACE","secondServe":true},{"type":"penalty","side":"P2","kind":"TIME","at":1794000003000},{"type":"break","side":"P1","kind":"MEDICAL","at":1794000004000},{"type":"serverFix","side":"P1","player":0,"at":1794000005000},{"type":"endsFix","at":1794000006000},{"type":"scoreSet","sets":[{"g1":6,"g2":4,"tb1":null,"tb2":null,"matchTiebreak":false,"partial":false}],"g1":2,"g2":1,"pt1":1,"pt2":0,"server":"P2","serverPlayer":0,"at":1794000007000},{"type":"retired","side":"P2","at":1794000008000,"disqualified":false}],"clockMs":3600000,"startedAt":1794000000000,"endedAt":1794000008000,"suspended":false,"finished":true,"location":{"lat":45.0,"lon":11.0,"address":"Via Prova 1"},"updatedAt":1794000009000,"batteryStart":{"P1":90,"P2":85},"batteryEnd":{"P1":70,"P2":60},"strokes":{},"heart":{},"notes":"Partita di prova","friendly":true,"rackets":{}}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/match_suspended.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/match_suspended.json" << 'TSM_EOF'
+{"id":"m1794000100000","setup":{"club":"","court":"","doubles":false,"p1a":"","p1b":"","p2a":"","p2b":"","sport":"TENNIS","event":"","category":"","round":"","p1aRank":"","p1bRank":"","p2aRank":"","p2bRank":"","p1aSex":"","p1bSex":"","p2aSex":"","p2bSex":"","p1Racket":"","p2Racket":"","p1aId":"","p1bId":"","p2aId":"","p2bId":""},"options":{"mode":"REFEREE","lang":"IT","audio":true,"format":"BEST_OF_THREE","gamesPerSet":6,"setTiebreak":true,"noAd":false,"detailedStats":false,"starPoint":false,"tossWinner":null,"firstServer":"P1","p1Left":true,"firstServerP1":0,"firstServerP2":0,"ttsEngine":null,"ttsVoice":null,"voiceFiles":false,"bandsOffAtEnd":true,"addressLookup":false,"heartRate":false,"newBallsFirst":0,"newBallsEvery":0,"newBallsAnimation":false},"rules":{"format":"BEST_OF_THREE","gamesPerSet":6,"setTiebreak":true,"noAd":false,"starPoint":false,"doubles":false,"firstServer":"P1","p1StartsLeft":true,"firstServerP1":0,"firstServerP2":0},"events":[{"type":"serveOrder","setNumber":1,"firstP1":0,"firstP2":0},{"type":"receiveOrder","setNumber":1,"deuceP1":0,"deuceP2":0},{"type":"point","winner":"P1","at":1794000001000,"strokes":4,"kind":"WINNER","secondServe":false},{"type":"point","winner":"P2","at":1794000002000,"strokes":null,"kind":"ACE","secondServe":true}],"clockMs":3600000,"startedAt":1794000000000,"endedAt":null,"suspended":true,"finished":false,"location":{"lat":45.0,"lon":11.0,"address":"Via Prova 1"},"updatedAt":1794000009000,"batteryStart":{"P1":90,"P2":85},"batteryEnd":{"P1":70,"P2":60},"strokes":{},"heart":{},"notes":"Partita di prova","friendly":true,"rackets":{}}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/players.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/players.json" << 'TSM_EOF'
+[{"id":"p1","name":"Mario Rossi","firstName":"","lastName":"","nickname":"","hand":null,"note":"","createdAt":0,"racket":null,"student":false,"aliases":[],"phone":"","email":"","birth":null,"member":null,"sex":"","heightCm":null,"weightKg":null,"club":"","backhand":null},{"id":"p2","name":"Luca Bianchi","firstName":"","lastName":"","nickname":"","hand":null,"note":"","createdAt":0,"racket":null,"student":false,"aliases":[],"phone":"","email":"","birth":null,"member":null,"sex":"","heightCm":null,"weightKg":null,"club":"","backhand":null}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/rackets.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/rackets.json" << 'TSM_EOF'
+[{"id":"r1","name":"","brand":"","model":"","weightG":null,"balanceMm":null,"headCm2":null,"pattern":"","owner":"","stringings":[{"id":"st1","date":1794000000000,"type":"MONO","brand":"","model":"","gaugeMm":null,"mainsKg":null,"crossesKg":null,"crossModel":"","notes":""}],"checkHours":20,"notes":"","retired":false,"createdAt":0}]
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/serve_session.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/serve_session.json" << 'TSM_EOF'
+{"id":"s1","startedAt":1794000000000,"endedAt":null,"serves":[],"stroke":"SERVE","folder":null,"student":null,"studentName":null,"racket":null,"drillName":null}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/tournament.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/tournament.json" << 'TSM_EOF'
+{"id":"t1","name":"","kind":"AMERICANO","players":["Rossi","Bianchi","Verdi","Neri"],"courts":1,"scoring":"POINTS","pointsPerMatch":24,"minutes":12,"rounds":[],"createdAt":0,"finished":false}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/workout.json
+cat > "$DEST/app/src/test/resources/formati/2.6.0/workout.json" << 'TSM_EOF'
+{"id":"w1","startedAt":1794000000000,"endedAt":0,"durationS":0,"heart":{"t":[],"bpm":[],"profile":null},"laps":[],"cooldown":[],"rr":[],"strapName":null,"racket":null}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/test/resources/pose/backhand_one_hand.json
@@ -118729,6 +118992,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 383 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 400 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
