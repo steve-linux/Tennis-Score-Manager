@@ -383,7 +383,7 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
     if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
     // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
-    val cards by c.receivedCards.collectAsState()
+    val cards by c.cards.receivedCards.collectAsState()
     for (rc in cards.filter { it.result != null && it.sentAt == null }) {
         val r = rc.result!!
         Entry(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ")) {

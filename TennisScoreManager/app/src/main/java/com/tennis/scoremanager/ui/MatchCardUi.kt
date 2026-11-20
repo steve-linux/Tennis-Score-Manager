@@ -53,7 +53,7 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
     val lang = c.options.collectAsState().value.lang
     val busy = c.screen.collectAsState().value.let { it == Screen.MATCH || it == Screen.START }
     AlertDialog(
-        onDismissRequest = { c.incomingCard.value = null },
+        onDismissRequest = { c.cards.incomingCard.value = null },
         icon = { Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.Ball) },
         title = { Text(s.mcTitle) },
         text = {
@@ -70,7 +70,7 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
                 Text(if (busy) s.mcBusy else s.mcHint, color = if (busy) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
             }
         },
-        confirmButton = { if (!busy) TextButton(onClick = { c.prepareCard(card) }) { Text(s.mcPrepare) } },
+        confirmButton = { if (!busy) TextButton(onClick = { c.cards.prepareCard(card) }) { Text(s.mcPrepare) } },
         dismissButton = {
             androidx.compose.foundation.layout.Row {
                 // La partita convocata nel calendario (giorno, ora, campo).
@@ -81,7 +81,7 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
                         addToCalendar(ctx, calendarIntent("${card.round.ifBlank { card.event }}: $who", at, 90, listOf(card.club, card.court).filter { it.isNotBlank() }.joinToString(" · "), card.event), s)
                     }) { Text(s.calShort) }
                 }
-                TextButton(onClick = { c.incomingCard.value = null }) { Text(s.back) }
+                TextButton(onClick = { c.cards.incomingCard.value = null }) { Text(s.back) }
             }
         },
     )
@@ -91,14 +91,14 @@ fun IncomingCardDialog(c: MatchController, card: MatchCard) {
  * Manda il risultato della partita della scheda [code] alla segreteria: WhatsApp dritto al suo numero (dalla scheda),
  * o si sceglie a chi se la scheda non ha il numero. Il testo si legge anche senza aprire il file.
  */
-fun sendResult(context: android.content.Context, c: MatchController, code: String) = c.sendResultAuto(code) { sendResultByApp(context, c, code) }
+fun sendResult(context: android.content.Context, c: MatchController, code: String) = c.cards.sendResultAuto(code) { sendResultByApp(context, c, code) }
 
 private fun sendResultByApp(context: android.content.Context, c: MatchController, code: String) {
-    val (file, text) = c.resultToSend(code) ?: return
-    val office = c.receivedCards.value.firstOrNull { it.card.code == code }?.card?.office.orEmpty()
+    val (file, text) = c.cards.resultToSend(code) ?: return
+    val office = c.cards.receivedCards.value.firstOrNull { it.card.code == code }?.card?.office.orEmpty()
     val wa = com.tennis.scoremanager.data.Notices.waNumber(office)
     val intent = if (wa != null) whatsAppFile(context, wa, text, file) else shareFile(context, text, file)
-    runCatching { context.startActivity(intent); c.resultSent(code) }
+    runCatching { context.startActivity(intent); c.cards.resultSent(code) }
 }
 
 /** Nel riepilogo di una partita giocata da una scheda: il risultato da mandare alla segreteria. */
@@ -106,7 +106,7 @@ private fun sendResultByApp(context: android.content.Context, c: MatchController
 fun SendResultButton(c: MatchController, recordId: String) {
     val s = LocalStrings.current
     val context = androidx.compose.ui.platform.LocalContext.current
-    val cards by c.receivedCards.collectAsState()
+    val cards by c.cards.receivedCards.collectAsState()
     val rc = cards.firstOrNull { it.record == recordId && it.result != null } ?: return
     BigButton(if (rc.sentAt == null) s.mrSend else s.mrSendAgain, androidx.compose.material.icons.Icons.AutoMirrored.Filled.Send,
         { sendResult(context, c, rc.card.code) }, Modifier.fillMaxWidth())
@@ -119,11 +119,11 @@ fun SendResultButton(c: MatchController, recordId: String) {
 @Composable
 fun IncomingResultDialog(c: MatchController, r: com.tennis.scoremanager.data.MatchResult) {
     val s = LocalStrings.current
-    val status = remember(r) { c.resultStatus(r) }
-    val now = remember(r) { c.resultNow(r) }
+    val status = remember(r) { c.cards.resultStatus(r) }
+    val now = remember(r) { c.cards.resultNow(r) }
     val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
     AlertDialog(
-        onDismissRequest = { c.incomingResult.value = null },
+        onDismissRequest = { c.cards.incomingResult.value = null },
         icon = { Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.Ball) },
         title = { Text(s.mrTitle) },
         text = {
@@ -144,14 +144,14 @@ fun IncomingResultDialog(c: MatchController, r: com.tennis.scoremanager.data.Mat
         },
         confirmButton = {
             when (status) {
-                com.tennis.scoremanager.data.ResultStatus.READY -> TextButton(onClick = { c.applyResult(r) }) { Text(s.mrApply) }
-                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> TextButton(onClick = { c.applyResult(r) }) { Text(s.mrReplace, color = TsmColors.Danger) }
-                else -> TextButton(onClick = { c.incomingResult.value = null }) { Text(s.ok) }
+                com.tennis.scoremanager.data.ResultStatus.READY -> TextButton(onClick = { c.cards.applyResult(r) }) { Text(s.mrApply) }
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> TextButton(onClick = { c.cards.applyResult(r) }) { Text(s.mrReplace, color = TsmColors.Danger) }
+                else -> TextButton(onClick = { c.cards.incomingResult.value = null }) { Text(s.ok) }
             }
         },
         dismissButton = {
             if (status == com.tennis.scoremanager.data.ResultStatus.READY || status == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
-                TextButton(onClick = { c.incomingResult.value = null }) { Text(s.back) }
+                TextButton(onClick = { c.cards.incomingResult.value = null }) { Text(s.back) }
         },
     )
 }

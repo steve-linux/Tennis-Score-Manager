@@ -102,12 +102,12 @@ class DeskBridge(private val c: MatchController) : DeskData {
         val s = c.strings
         com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profilePreview(it) }
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
-            val st = c.resultStatus(r)
+            val st = c.cards.resultStatus(r)
             val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
             val msg = when (st) {
                 com.tennis.scoremanager.data.ResultStatus.READY -> s.mrReady
                 com.tennis.scoremanager.data.ResultStatus.SAME -> s.mrSame
-                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.resultNow(r))
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.cards.resultNow(r))
                 com.tennis.scoremanager.data.ResultStatus.BAD_CODE -> s.mrBadCode
                 com.tennis.scoremanager.data.ResultStatus.NOT_FOUND -> s.mrNotFound
             }
@@ -138,9 +138,9 @@ class DeskBridge(private val c: MatchController) : DeskData {
 
     override fun applyIncoming(text: String, course: String?): String? {
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
-            val st = c.resultStatus(r)
+            val st = c.cards.resultStatus(r)
             if (st != com.tennis.scoremanager.data.ResultStatus.READY && st != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return st.name
-            c.applyResult(r); return null
+            c.cards.applyResult(r); return null
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
             val st = c.coaching.attendanceStatus(r)
@@ -173,20 +173,20 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
-    override fun officeBackup(): Pair<String, ByteArray> = c.officeBackupName() to c.officeBackupBytes()
+    override fun officeBackup(): Pair<String, ByteArray> = c.office.officeBackupName() to c.office.officeBackupBytes()
     override fun officeAuto(): Boolean = c.storage.officeBackupAuto
-    override fun setOfficeAuto(on: Boolean) = c.setOfficeBackupAuto(on)
+    override fun setOfficeAuto(on: Boolean) = c.office.setOfficeBackupAuto(on)
     override fun officeLast(): Pair<Long, String> = c.storage.officeBackupAt to c.storage.officeBackupServerError
-    override fun localBackups(): List<OfficeBackupFile> = c.officeBackups()
-    override fun localBackup(name: String): ByteArray? = c.officeBackupFile(name)?.readBytes()
-    override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.officeBackupNow(onlyIfChanged = false) }
+    override fun localBackups(): List<OfficeBackupFile> = c.office.officeBackups()
+    override fun localBackup(name: String): ByteArray? = c.office.officeBackupFile(name)?.readBytes()
+    override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.office.officeBackupNow(onlyIfChanged = false) }
     override fun serverChatRooms() = ClubServers.withServer(c.clubServer.value) { it.adminChats() }
     override fun serverChat(room: String) = ClubServers.withServer(c.clubServer.value) { it.adminChat(room) }
     override fun serverBoardPost(text: String) { ClubServers.withServer(c.clubServer.value) { it.postBoard(text) } }
     override fun serverChatDelete(id: String) { ClubServers.withServer(c.clubServer.value) { it.deleteChat(id) } }
     override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
     override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
-    override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.restoreOffice(s) }
+    override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.office.restoreOffice(s) }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.competitions.saveClubTournament(t)

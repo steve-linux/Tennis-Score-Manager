@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package com.tennis.scoremanager.club
 
+import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.Navigator
 import com.tennis.scoremanager.Role
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.ClubTournament
 import com.tennis.scoremanager.data.CourtPlan
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.NoticePlan
@@ -30,12 +32,28 @@ interface ClubHost {
     val competitions: ClubCompetitions
 
     /** Il server del circolo (facoltativo): le disdette delle prenotazioni online passano da qui. */
+    val clubServer: MutableStateFlow<ClubServerConf>
     fun saveServer(f: (ClubServerConf) -> ClubServerConf)
+    /** Manda un file alla casella della segreteria sul server del circolo [url]; true = arrivato. */
+    suspend fun postToOffice(url: String, kind: String, text: String): Boolean
+    /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
+    var incomingVia: String?
+
+    // Le altre parti del circolo e le funzioni scelte (per il backup della segreteria).
+    val school: ClubSchool
+    val planning: ClubPlanning
+    val clubFeatures: MutableStateFlow<Set<ClubFeature>>
+
+    /** Un messaggio breve in basso sullo schermo. */
+    fun toast(text: String)
 
     // Giocatori, registro delle quote e planning dei campi.
     val players: MutableStateFlow<List<PlayerProfile>>
     fun playerById(id: String?): PlayerProfile?
     fun refreshPlayers()
+    fun savePlayer(p: PlayerProfile)
+    /** Il nome di un iscritto al torneo (giocatore o coppia). */
+    fun entryNameOf(t: ClubTournament, id: String?): String
     val clubBook: MutableStateFlow<ClubBook>
     fun saveClubBook(book: ClubBook)
     val courtPlan: MutableStateFlow<CourtPlan>

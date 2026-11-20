@@ -163,9 +163,9 @@ fun AppRoot(c: MatchController) {
             }
         }
         // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
-        val card by c.incomingCard.collectAsState()
+        val card by c.cards.incomingCard.collectAsState()
         card?.let { IncomingCardDialog(c, it) }
-        val result by c.incomingResult.collectAsState()
+        val result by c.cards.incomingResult.collectAsState()
         result?.let { IncomingResultDialog(c, it) }
         c.coaching.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
         c.coaching.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
