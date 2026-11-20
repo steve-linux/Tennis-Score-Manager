@@ -368,9 +368,9 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
-    val goals by c.goals.collectAsState()
+    val goals by c.progress.goals.collectAsState()
     for (g in goals.filter { it.reachedAt != null && !it.seen }) {
-        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
+        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.progress.goalSeen(g.id); c.progress.openProgress() }
     }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
@@ -481,13 +481,13 @@ private fun ProgressTab(c: MatchController) {
     val history by c.history.collectAsState()
     val me = c.me()?.name ?: c.storage.myName
     val mine = remember(history, me) {
-        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
+        if (me.isBlank()) null else c.progress.ratingSports().firstOrNull()?.let { c.progress.ratingTable(it).player(c.myKey()) }
     }
     val pf by c.playerFeatures.collectAsState()
     if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
-    ) { c.openProgress() }
+    ) { c.progress.openProgress() }
     // La scheda progressi mandata dal proprio allenatore (valutazione, obiettivi, test, lezioni).
     com.tennis.scoremanager.ui.MyCoachSection(c)
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }

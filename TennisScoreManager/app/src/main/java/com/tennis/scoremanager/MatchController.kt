@@ -198,7 +198,7 @@ class MatchController(
     val heart: HeartRateManager,
     val voice: VoicePack,
     val announcer: Announcer,
-) : com.tennis.scoremanager.club.ClubHost, com.tennis.scoremanager.coach.CoachHost {
+) : com.tennis.scoremanager.club.ClubHost, com.tennis.scoremanager.coach.CoachHost, com.tennis.scoremanager.player.PlayerHost {
     companion object {
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
@@ -272,7 +272,7 @@ class MatchController(
     /** Il torneo del circolo mostrato sul tabellone (ClubTournament.id), null = nessuno. */
     override val tvClubTournament = MutableStateFlow<String?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
-    val history = MutableStateFlow<List<LiveMatch>>(emptyList())
+    override val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
     val summaryFromHistory = MutableStateFlow(false)
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
@@ -360,7 +360,7 @@ class MatchController(
     /** Allenamento con la fascia, senza partita (schermata a parte, pulsante in pagina 1). */
     val workout = WorkoutSession(scope) { rec -> onWorkoutFinished(rec) }
     /** Allenamenti salvati, dal più recente. */
-    val workouts = MutableStateFlow<List<WorkoutRecord>>(emptyList())
+    override val workouts = MutableStateFlow<List<WorkoutRecord>>(emptyList())
     /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
     val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
     private var workoutSide = Side.P1
@@ -1620,41 +1620,9 @@ class MatchController(
         if (keep.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
     }
 
-    // ---- Obiettivi (Progressi) ----
+    // ---- Progressi, rating TSM e obiettivi: vedi ProgressArea ----
 
-    val goals = MutableStateFlow(storage.loadGoals())
-
-    /** Le partite finite di chi usa l'app (Altro › Tu), dalla più vecchia; vuoto se non si sa chi è. */
-    fun myLines(): List<com.tennis.scoremanager.data.PlayerStats.MatchLine> =
-        myKey().takeIf { it.isNotEmpty() }?.let { com.tennis.scoremanager.data.PlayerStats.lines(played(), it) }.orEmpty()
-
-    fun goalStatus(g: com.tennis.scoremanager.data.Goal): com.tennis.scoremanager.data.Goals.Status =
-        com.tennis.scoremanager.data.Goals.status(g, myLines(), workouts.value.map { it.startedAt }, System.currentTimeMillis())
-
-    private fun putGoals(list: List<com.tennis.scoremanager.data.Goal>) {
-        goals.value = list
-        scope.launch(io) { storage.saveGoals(list) }
-    }
-
-    /** Un obiettivo nuovo; se è già raggiunto, lo si sa subito senza avviso. */
-    fun addGoal(kind: com.tennis.scoremanager.data.GoalKind, target: Double, window: Int) {
-        val now = System.currentTimeMillis()
-        val g = com.tennis.scoremanager.data.Goal(com.tennis.scoremanager.data.Goals.newId(), kind, target, window, now)
-        val reached = goalStatus(g).reached
-        putGoals(goals.value + g.copy(reachedAt = if (reached) now else null, seen = reached))
-    }
-
-    fun deleteGoal(id: String) = putGoals(goals.value.filter { it.id != id })
-
-    fun goalSeen(id: String) = putGoals(goals.value.map { if (it.id == id) it.copy(seen = true) else it })
-
-    /** Dopo una partita o un allenamento: gli obiettivi raggiunti adesso prendono la data (e l'avviso in Gioca). */
-    private fun checkGoals() {
-        val list = goals.value
-        if (list.none { it.reachedAt == null }) return
-        val next = com.tennis.scoremanager.data.Goals.markReached(list, myLines(), workouts.value.map { it.startedAt }, System.currentTimeMillis())
-        if (next != list) putGoals(next)
-    }
+    val progress = com.tennis.scoremanager.player.ProgressArea(this, app, storage, scope, io)
 
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
@@ -1681,11 +1649,11 @@ class MatchController(
     /** Partite finite del giocatore dallo storico, dalla più vecchia. */
     fun studentMatches(p: com.tennis.scoremanager.data.PlayerProfile): List<PlayerStats.MatchLine> {
         val keys = keysOf(p)
-        return PlayerStats.linesBy(played()) { rec -> Side.entries.firstOrNull { side -> PlayerStats.whos(rec.setup, side).any { it.key in keys } } }
+        return PlayerStats.linesBy(progress.played()) { rec -> Side.entries.firstOrNull { side -> PlayerStats.whos(rec.setup, side).any { it.key in keys } } }
     }
 
     /** Rating TSM del giocatore nello sport con più partite (null senza partite). */
-    fun studentRating(p: com.tennis.scoremanager.data.PlayerProfile) = ratingSports().firstOrNull()?.let { ratingTable(it).player(p.id) }
+    fun studentRating(p: com.tennis.scoremanager.data.PlayerProfile) = progress.ratingSports().firstOrNull()?.let { progress.ratingTable(it).player(p.id) }
 
     /**
      * Tu: il tuo giocatore del database. Prima del database c'era solo il nome (Altro › Tu): se è di un giocatore solo,
@@ -2259,7 +2227,7 @@ class MatchController(
         storage.backupReminder && !storage.personalBackupAuto && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
 
     /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
-    fun myKey(): String = me()?.id ?: keyForName(storage.myName)
+    override fun myKey(): String = me()?.id ?: keyForName(storage.myName)
 
     /** Chi è un nome scritto (es. il proprio, in Altro › Tu): il giocatore del database se è uno solo, sennò il nome. */
     fun keyForName(name: String): String =
@@ -3211,7 +3179,7 @@ class MatchController(
     }
 
     /** Partite dello storico e allenamenti, come sessioni con una racchetta. */
-    fun racketSessions(): List<RacketStats.Session> = RacketStats.sessions(played(), workouts.value)
+    fun racketSessions(): List<RacketStats.Session> = RacketStats.sessions(progress.played(), workouts.value)
 
     /** Sensazioni dette nel riepilogo per la racchetta di un lato. */
     fun setMatchFeel(side: Side, feel: Feel) {
@@ -3266,78 +3234,6 @@ class MatchController(
 
     // ---------------------------------------------------------------- progressi
 
-    /** Pagina 1 › Progressi: documenti stampabili, uno per gli allenamenti e uno per le partite di un giocatore. */
-    fun openProgress() {
-        refreshHistory()
-        refreshWorkouts()
-        nav.push(Screen.PROGRESS)
-    }
-
-    private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
-
-    /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
-    /** Giocatori dello storico (chi è, nome): col nome del database se è un giocatore del database. */
-    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to (playerById(it.key)?.name ?: it.name) }
-
-    /** Rating TSM di uno sport, dalle partite finite dello storico (le amichevoli non contano). */
-    fun ratingTable(sport: com.tennis.scoremanager.data.Sport): com.tennis.scoremanager.data.Rating.Table =
-        com.tennis.scoremanager.data.Rating.compute(
-            history.value.mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner) }, sport,
-        )
-
-    /** Rating dello sport di [m], con [m] dentro anche se lo storico non l'ha ancora ricaricata (appena finita). */
-    fun ratingTableWith(m: LiveMatch): com.tennis.scoremanager.data.Rating.Table =
-        com.tennis.scoremanager.data.Rating.compute(
-            (history.value.filter { it.record.id != m.record.id } + m)
-                .mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner) },
-            m.record.setup.sport,
-        )
-
-    /** Sport con almeno una partita che conta per il rating, il più giocato per primo. */
-    fun ratingSports(): List<com.tennis.scoremanager.data.Sport> =
-        history.value.mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner)?.sport }
-            .groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
-
-    /** Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta. */
-    private fun shortDate(): (Long) -> String {
-        val fmt = java.text.SimpleDateFormat("dd/MM/yy", options.value.lang.locale)
-        return { fmt.format(java.util.Date(it)) }
-    }
-
-    /** L'elenco da spuntare dei Progressi: allenamenti ([playerKey] null) o partite del giocatore, dal più recente. */
-    fun progressItems(playerKey: String?): List<ProgressItem> {
-        val s = strings
-        val fmt = java.text.SimpleDateFormat("EEE dd/MM/yy HH:mm", options.value.lang.locale)
-        val date: (Long) -> String = { fmt.format(java.util.Date(it)).replaceFirstChar { c -> c.uppercase() } }
-        return if (playerKey == null) ProgressItems.workouts(workouts.value, date)
-        else ProgressItems.matches(PlayerStats.lines(played(), playerKey), playerKey, s.progressWon, s.progressLost, date)
-    }
-
-    /** [playerKey] null = allenamenti; [ids] = quelli spuntati (null = tutti). */
-    fun progressReport(playerKey: String?, ids: Set<String>? = null): Progress.Report {
-        val s = strings
-        val date = shortDate()
-        return if (playerKey == null) {
-            Progress.workouts(workouts.value.filter { ids == null || it.id in ids }, s, date)
-        } else {
-            val name = PlayerStats.players(played()).firstOrNull { it.key == playerKey }?.name ?: playerKey
-            Progress.matches(PlayerStats.lines(played(), playerKey).filter { ids == null || it.rec.id in ids }, name, s, date)
-        }
-    }
-
-    /** Il PDF dei progressi nella cartella di condivisione; null se non si è potuto scrivere. */
-    fun progressPdf(playerKey: String?, ids: Set<String>? = null): File? {
-        val r = progressReport(playerKey, ids)
-        val s = strings
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val name = (if (playerKey == null) s.progressWorkouts else "${s.progressMatches} ${r.title.substringAfter(": ")}")
-            .replace(Regex("[\\/:*?\"<>|]"), "_")
-        val file = File(dir, "$name.pdf")
-        return runCatching {
-            file.outputStream().use { ProgressPdf.write(r, s, "Tennis Score Manager · ${Reports.date(System.currentTimeMillis(), options.value.lang)}", it) }
-            file
-        }.getOrNull()
-    }
 
     /**
      * Il report di [p] come file da condividere: PDF completo ([pdf]) o immagine; [days] = gli ultimi giorni (null =
@@ -3421,8 +3317,8 @@ class MatchController(
         nav.push(Screen.WORKOUT)
     }
 
-    private fun refreshWorkouts() {
-        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() }; checkGoals() }
+    override fun refreshWorkouts() {
+        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() }; progress.checkGoals() }
     }
 
     /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
@@ -3478,7 +3374,7 @@ class MatchController(
         return Intent.createChooser(send, s.share)
     }
 
-    fun refreshHistory() {
+    override fun refreshHistory() {
         scope.launch {
             history.value = withContext(io) {
                 // Le partite senza giocatori del database (di prima, o arrivate da versioni vecchie) li ricevono ora.
@@ -3487,7 +3383,7 @@ class MatchController(
                 storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
                 storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
             }
-            checkGoals()
+            progress.checkGoals()
         }
     }
 
