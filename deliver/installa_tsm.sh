@@ -31,6 +31,7 @@ mkdir -p "$DEST/app/src/main/assets/help"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/club"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/coach"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/desk"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
@@ -15400,8 +15401,8 @@ class MainActivity : ComponentActivity() {
             i.removeExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)
             when {
                 target == "inbox" -> controller.openInbox()
-                target == "lessons" -> controller.openLessons()
-                target.startsWith("course:") -> controller.openCoachCourse(target.removePrefix("course:"))
+                target == "lessons" -> controller.coaching.openLessons()
+                target.startsWith("course:") -> controller.coaching.openCoachCourse(target.removePrefix("course:"))
             }
             return
         }
@@ -15709,7 +15710,7 @@ class MatchController(
     val heart: HeartRateManager,
     val voice: VoicePack,
     val announcer: Announcer,
-) : com.tennis.scoremanager.club.ClubHost {
+) : com.tennis.scoremanager.club.ClubHost, com.tennis.scoremanager.coach.CoachHost {
     companion object {
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
@@ -15808,6 +15809,7 @@ class MatchController(
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
+    override fun toast(text: String) { _toasts.tryEmit(text) }
     val toasts: SharedFlow<String> = _toasts
 
     /** Tabellone TV: impostazioni, server web e messaggi per il pubblico (solo quelli di gioco). */
@@ -16533,13 +16535,13 @@ class MatchController(
     }
 
     /** Sessioni di allenamento al servizio salvate, dalla più recente. */
-    val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
+    override val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
 
     fun refreshServeSessions() {
         scope.launch {
             serveSessions.value = withContext(io) { storage.loadServeSessions() }
             // Gli obiettivi degli allievi si controllano sulle sessioni nuove.
-            checkStudentGoals()
+            coaching.checkStudentGoals()
         }
     }
 
@@ -16669,7 +16671,7 @@ class MatchController(
     }
 
     /** Tanti giocatori in una volta (Segreteria da PC, import di un foglio): un solo salvataggio. */
-    fun savePlayers(changed: List<com.tennis.scoremanager.data.PlayerProfile>) {
+    override fun savePlayers(changed: List<com.tennis.scoremanager.data.PlayerProfile>) {
         val ids = changed.map { it.id }.toSet()
         val list = players.value.filter { it.id !in ids } + changed
         players.value = list.sortedBy { it.name.lowercase() }
@@ -16945,7 +16947,7 @@ class MatchController(
         nav.push(Screen.STUDENT)
     }
 
-    // ---- Allenatore: diario, obiettivi, agenda, pacchetti di lezioni, gruppi ----
+    // ---- Allenatore: diario, obiettivi, agenda, pacchetti di lezioni, gruppi, corsi della scuola: vedi CoachArea ----
 
     // ---- Scheda partita ricevuta (convocazione della segreteria) ----
 
@@ -16960,7 +16962,7 @@ class MatchController(
     val incomingResult = MutableStateFlow<com.tennis.scoremanager.data.MatchResult?>(null)
 
     /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
-    private var incomingVia: String? = null
+    override var incomingVia: String? = null
 
     /** Il testo di un file aperto con TSM: una scheda partita o un risultato; sennò lo si dice. */
     fun receiveCardText(text: String?, via: String? = null) {
@@ -16969,11 +16971,11 @@ class MatchController(
         if (card != null) { incomingCard.value = card; return }
         val result = text?.let { com.tennis.scoremanager.data.MatchCards.decodeResult(it) }
         if (result != null) { incomingResult.value = result; return }
-        text?.let { com.tennis.scoremanager.data.CourseCards.decode(it) }?.let { incomingCourse.value = it; return }
+        text?.let { com.tennis.scoremanager.data.CourseCards.decode(it) }?.let { coaching.incomingCourse.value = it; return }
         text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { incomingProgress.value = it; return }
-        text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { incomingAttendance.value = it; return }
-        text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { incomingProposal.value = it; return }
-        text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }?.let { incomingProfile.value = it; return }
+        text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { coaching.incomingAttendance.value = it; return }
+        text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { coaching.incomingProposal.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }?.let { coaching.incomingProfile.value = it; return }
         // Una partita (da "File della partita" di un altro telefono): nello storico.
         text?.let { runCatching { storage.json.decodeFromString(MatchRecord.serializer(), it) }.getOrNull() }?.takeIf { it.events.isNotEmpty() }?.let { receiveMatchRecord(it); return }
         _toasts.tryEmit(strings.mcNotValid)
@@ -17146,280 +17148,7 @@ class MatchController(
         scope.launch(io) { storage.saveReceivedCards(list) }
     }
 
-    val coachBook = MutableStateFlow(storage.loadCoachBook())
-
-    private fun putCoach(b: com.tennis.scoremanager.data.CoachBook) {
-        coachBook.value = b
-        scope.launch(io) { storage.saveCoachBook(b) }
-    }
-
-    fun addDiary(student: String, text: String, at: Long = System.currentTimeMillis()) {
-        val t = text.trim().take(2000)
-        if (t.isEmpty()) return
-        val b = coachBook.value
-        putCoach(b.copy(diary = b.diary + com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), student, at, t)))
-    }
-
-    fun deleteDiary(id: String) = coachBook.value.let { b -> putCoach(b.copy(diary = b.diary.filter { it.id != id })) }
-
-    /** Un obiettivo nuovo; se è già raggiunto lo si sa subito. */
-    fun addStudentGoal(student: String, stroke: com.tennis.scoremanager.data.TrainedStroke, targetPct: Int, window: Int) {
-        val now = System.currentTimeMillis()
-        val g = com.tennis.scoremanager.data.StudentGoal(com.tennis.scoremanager.data.Coaching.newId("g"), student, stroke, targetPct, window, createdAt = now)
-        val reached = com.tennis.scoremanager.data.Coaching.goalStatus(g, serveSessions.value).reached(g)
-        coachBook.value.let { b -> putCoach(b.copy(goals = b.goals + g.copy(reachedAt = if (reached) now else null))) }
-    }
-
-    fun deleteStudentGoal(id: String) = coachBook.value.let { b -> putCoach(b.copy(goals = b.goals.filter { it.id != id })) }
-
-    /** Dopo un allenamento: gli obiettivi raggiunti adesso prendono la data. */
-    private fun checkStudentGoals() {
-        val b = coachBook.value
-        if (b.goals.none { it.reachedAt == null }) return
-        val next = com.tennis.scoremanager.data.Coaching.markReached(b, serveSessions.value, System.currentTimeMillis())
-        if (next != b) putCoach(next)
-    }
-
-    fun saveLesson(l: com.tennis.scoremanager.data.CoachLesson) = coachBook.value.let { b ->
-        putCoach(b.copy(lessons = b.lessons.filter { it.id != l.id } + l))
-    }
-
-    fun deleteLesson(id: String) = coachBook.value.let { b -> putCoach(b.copy(lessons = b.lessons.filter { it.id != id })) }
-
-    fun savePack(p: com.tennis.scoremanager.data.LessonPack) = coachBook.value.let { b ->
-        putCoach(b.copy(packs = b.packs.filter { it.id != p.id } + p))
-    }
-
-    fun deletePack(id: String) = coachBook.value.let { b -> putCoach(b.copy(packs = b.packs.filter { it.id != id })) }
-
-    fun saveGroup(g: com.tennis.scoremanager.data.StudentGroup) = coachBook.value.let { b ->
-        putCoach(b.copy(groups = b.groups.filter { it.id != g.id } + g))
-    }
-
-    fun deleteGroup(id: String) = coachBook.value.let { b -> putCoach(b.copy(groups = b.groups.filter { it.id != id })) }
-
-    fun openLessons() {
-        refreshPlayers()
-        nav.push(Screen.LESSONS)
-    }
-
-    /** "lunedì 16 novembre, 18:00 · Campo 2". */
-    fun lessonWhen(l: com.tennis.scoremanager.data.CoachLesson): String {
-        val lang = options.value.lang
-        return listOfNotNull("${com.tennis.scoremanager.data.Notices.day(l.start, lang)}, ${Reports.time(l.start, lang)}", l.place.ifBlank { null }).joinToString(" · ")
-    }
-
-    /** Un messaggio libero agli allievi (a chi è minorenne arriva al genitore): WhatsApp, SMS o email dall'app degli avvisi. */
-    /**
-     * Il report degli ultimi 30 giorni a ciascuno (al genitore se è minorenne), uno per uno con il PDF allegato.
-     * Si fanno i PDF di tutti prima di aprire gli avvisi.
-     */
-    fun noticeReports(ids: List<String>) {
-        val s = strings
-        scope.launch {
-            val now = System.currentTimeMillis()
-            val rec = withContext(io) {
-                ids.mapNotNull { playerById(it) }.map { p ->
-                    val f = studentReportFile(p, 30, pdf = true)
-                    val text = listOf(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.rpText(p.name), clubSign).filter { it.isNotBlank() }.joinToString("\n")
-                    com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = f)
-                }
-            }
-            openNotice(com.tennis.scoremanager.data.NoticePlan(s.rpAll, s.studentsTitle, s.rpText(""), rec))
-        }
-    }
-
-    fun noticeStudents(ids: List<String>) {
-        val now = System.currentTimeMillis()
-        val rec = ids.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.coWriteTitle, strings.studentsTitle, "", rec, editable = true))
-    }
-
-    /** Il promemoria delle lezioni [lessons]: a ogni allievo la sua (giorno, ora, dove). */
-    fun noticeLessons(lessons: List<com.tennis.scoremanager.data.CoachLesson>) {
-        val s = strings; val now = System.currentTimeMillis()
-        val rec = lessons.sortedBy { it.start }.flatMap { l ->
-            l.students.mapNotNull { playerById(it) }.map { p ->
-                val text = listOfNotNull(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.coRemind(lessonWhen(l)), l.note.ifBlank { null }).joinToString("\n")
-                com.tennis.scoremanager.data.Notices.recipient(p, text, now)
-            }
-        }.distinctBy { it.id }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.coLessons, s.coLessons, lessons.firstOrNull()?.let { s.coRemind(lessonWhen(it)) }.orEmpty(), rec))
-    }
-
-    /** Partita tra due allievi dalla scheda: i due in campo, e si va in Nuova partita (Indietro torna alla scheda). */
-    fun matchWith(a: String, b: String) {
-        val pa = playerById(a) ?: return
-        val pb = playerById(b) ?: return
-        updateSetup { it.copy(doubles = false, p1a = pa.name, p1aId = pa.id, p2a = pb.name, p2aId = pb.id, p1b = "", p1bId = "", p2b = "", p2bId = "") }
-        go(Screen.SETUP)
-    }
-
-    // ---- Allenatore: corsi della scuola (scheda corso), presenze, proposte, partite e progressi degli allievi ----
-
-    val openCoachCourseId = MutableStateFlow<String?>(null)
-    fun openCoachCourse(id: String) { openCoachCourseId.value = id; nav.push(Screen.COACH_COURSE) }
-    fun coachCourse(id: String?): com.tennis.scoremanager.data.CoachCourse? = coachBook.value.courses.firstOrNull { it.card.course.id == id }
-
-    /** Segreteria: la scheda del corso in un file (il codice nasce al primo invio e resta). */
-    fun courseCardFile(courseId: String): File? {
-        val co = school.course(courseId) ?: return null
-        val code = co.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { school.saveCourse(co.copy(cardCode = it)) }
-        val card = com.tennis.scoremanager.data.CourseCards.card(school.course(courseId) ?: co, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone) { playerById(it) }
-        if (card.office.isBlank()) _toasts.tryEmit(strings.mcNoOffice)
-        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
-        return runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccFilePrefix, co.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encode(card)) } }.getOrNull()
-    }
-
-    /** Segreteria: manda la scheda del corso all'allenatore (WhatsApp col file). */
-    fun sendCourseToCoach(co: com.tennis.scoremanager.data.Course) {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val file = courseCardFile(co.id)
-        val coach = co.coach?.let { playerById(it) }
-        val text = listOf(s.ccCardText(co.name, co.students.size), "${com.tennis.scoremanager.ui.screens.shortDate(co.from, lang)} – ${com.tennis.scoremanager.ui.screens.shortDate(co.to, lang)}",
-            s.ccCardHowTo, clubSign).filter { it.isNotBlank() }.joinToString("\n")
-        val rec = listOfNotNull(coach?.let { com.tennis.scoremanager.data.Notices.recipient(it, text, now).copy(attachment = file) })
-        if (coach != null && file != null) serverMail(coach.id, "course", file)
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ccSendToCoach, co.name, text, rec))
-    }
-
-    /** Allenatore: è arrivata una scheda corso (finestra di conferma). */
-    val incomingCourse = MutableStateFlow<com.tennis.scoremanager.data.CourseCard?>(null)
-    /** Segreteria: sono arrivate le presenze di un corso. */
-    val incomingAttendance = MutableStateFlow<com.tennis.scoremanager.data.AttendanceReport?>(null)
-    /** Segreteria: l'allenatore propone un allievo nuovo. */
-    val incomingProposal = MutableStateFlow<com.tennis.scoremanager.data.StudentProposal?>(null)
-    /** Un profilo arrivato (file o QR): la persona da aggiungere o da completare tra i giocatori. */
-    val incomingProfile = MutableStateFlow<com.tennis.scoremanager.data.ProfileCard?>(null)
-
-    /**
-     * Allenatore: il corso tra i suoi; gli iscritti diventano suoi allievi col loro id della segreteria (così le
-     * presenze tornano alla persona giusta), con contatti, genitore e consenso dove qui mancano.
-     */
-    fun acceptCourse(card: com.tennis.scoremanager.data.CourseCard) {
-        incomingCourse.value = null
-        val now = System.currentTimeMillis()
-        val changed = card.students.map { cs ->
-            val old = playerById(cs.id)
-            (old ?: com.tennis.scoremanager.data.PlayerProfile(cs.id, cs.name, cs.firstName, cs.lastName, cs.nickname, createdAt = now)).let { p ->
-                p.copy(
-                    student = true,
-                    phone = p.phone.ifBlank { cs.phone }, email = p.email.ifBlank { cs.email },
-                    guardian = p.guardian.ifBlank { cs.guardian }, guardianPhone = p.guardianPhone.ifBlank { cs.guardianPhone },
-                    consentAt = p.consentAt ?: cs.consentAt,
-                )
-            }
-        }
-        if (changed.isNotEmpty()) savePlayers(changed)
-        cs_ranking(card.students, now)
-        val b = coachBook.value
-        val via = incomingVia
-        putCoach(b.copy(courses = com.tennis.scoremanager.data.CourseCards.receive(b.courses, card).map { if (it.card.course.id == card.course.id && via != null) it.copy(via = via) else it }))
-        openCoachCourse(card.course.id)
-    }
-
-    /** La classifica arrivata con la scheda entra nella storia dell'allievo se è nuova. */
-    private fun cs_ranking(list: List<com.tennis.scoremanager.data.CourseStudent>, now: Long) {
-        val b = coachBook.value
-        val add = list.filter { it.ranking.isNotBlank() && com.tennis.scoremanager.data.Coaching.ranking(b, it.id) != it.ranking }
-            .map { com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), it.id, now, it.ranking) }
-        if (add.isNotEmpty()) putCoach(b.copy(rankings = b.rankings + add))
-    }
-
-    /**
-     * Allenatore: l'appello di una lezione del corso. [note] va anche nel diario di chi c'era (una volta: se la nota
-     * cambia, si aggiunge la nuova).
-     */
-    fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) {
-        val b = coachBook.value
-        val cc = b.courses.firstOrNull { it.card.course.id == courseId } ?: return
-        val n = note.trim()
-        val updated = cc.copy(
-            attendance = if (cancelled) cc.attendance - key else cc.attendance + (key to present),
-            cancelled = if (cancelled) cc.cancelled + key else cc.cancelled - key,
-            notes = if (n.isEmpty()) cc.notes - key else cc.notes + (key to n),
-            changedAt = System.currentTimeMillis(),
-        )
-        val diary = if (!cancelled && n.isNotEmpty() && cc.notes[key] != n)
-            present.map { com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), it, start, "${cc.card.course.name}: $n") } else emptyList()
-        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) updated else it }, diary = b.diary + diary))
-    }
-
-    /**
-     * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
-     * non si cambiano qui (li cambia lei e li rimanda).
-     */
-    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course, color: String? = null) {
-        val b = coachBook.value
-        val old = b.courses.firstOrNull { it.card.course.id == co.id }
-        if (old != null && !old.personal) return
-        val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
-            ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
-        val withColor = if (color != null && color in com.tennis.scoremanager.data.CourseCards.COLORS) cc.copy(color = color) else cc
-        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + withColor))
-    }
-
-    /** L'etichetta colorata di un corso dell'allenatore (qualsiasi: anche quelli della segreteria, solo sul suo telefono). */
-    fun setCoachCourseColor(id: String, color: String) {
-        if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) return
-        val b = coachBook.value
-        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == id) it.copy(color = color) else it }))
-    }
-
-    /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */
-    fun deleteCoachCourse(id: String) {
-        val b = coachBook.value
-        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != id }))
-    }
-
-    /** Allenatore: avvisa gli iscritti che la lezione è annullata (a chi è minorenne scrive al genitore). */
-    fun noticeCourseCancelled(courseId: String, lessonStart: Long) {
-        val cc = coachCourse(courseId) ?: return
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val text = listOf(s.scCancelledNotice(cc.card.course.name), com.tennis.scoremanager.data.Notices.day(lessonStart, lang) + ", " + com.tennis.scoremanager.data.Reports.time(lessonStart, lang))
-            .joinToString("\n")
-        val rec = cc.card.course.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scCancelledTitle, cc.card.course.name, text, rec))
-    }
-
-    /** Allenatore: il file delle presenze da mandare, il testo e il numero della segreteria (dalla scheda). */
-    fun attendanceToSend(courseId: String): Triple<File, String, String>? {
-        val cc = coachCourse(courseId) ?: return null
-        val now = System.currentTimeMillis()
-        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, now, coachBook.value.busy)
-        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
-        val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccAttendancePrefix, cc.card.course.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeReport(r)) } }.getOrNull() ?: return null
-        val co = cc.course
-        val held = com.tennis.scoremanager.data.Courses.lessons(co).count { it.key in cc.attendance }
-        val text = listOf(strings.ccAttendanceText(cc.card.course.name, held), cc.card.club).filter { it.isNotBlank() }.joinToString("\n")
-        return Triple(f, text, cc.card.office)
-    }
-
-    fun attendanceSent(courseId: String) {
-        val b = coachBook.value
-        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(sentAt = System.currentTimeMillis()) else it }))
-    }
-
-    fun attendanceStatus(r: com.tennis.scoremanager.data.AttendanceReport): com.tennis.scoremanager.data.AttendanceStatus = com.tennis.scoremanager.data.CourseCards.check(r, school.courses.value)
-
-    /** Segreteria: le presenze dell'allenatore nel corso. */
-    fun applyAttendance(r: com.tennis.scoremanager.data.AttendanceReport) {
-        incomingAttendance.value = null
-        val co = school.course(r.course) ?: return
-        if (co.cardCode != r.code) return
-        school.saveCourse(com.tennis.scoremanager.data.CourseCards.apply(co, r))
-        _toasts.tryEmit(strings.ccAttendanceApplied)
-    }
-
-    /** Allenatore: propone alla segreteria un allievo nuovo (file + testo; WhatsApp alla segreteria se se ne sa il numero). */
-    fun proposalToSend(st: com.tennis.scoremanager.data.PlayerProfile, level: String, note: String, courseId: String?): Triple<File, String, String>? {
-        val p = com.tennis.scoremanager.data.StudentProposal(student = com.tennis.scoremanager.data.CourseCards.student(st, st.id), coach = me()?.name ?: storage.myName, course = courseId, level = level.trim(), note = note.trim(), sentAt = System.currentTimeMillis())
-        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
-        val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccProposalPrefix, st.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeProposal(p)) } }.getOrNull() ?: return null
-        val office = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
-        val text = listOf(strings.ccProposalText(st.name), level.trim(), note.trim()).filter { it.isNotBlank() }.joinToString("\n")
-        return Triple(f, text, office)
-    }
+    val coaching = com.tennis.scoremanager.coach.CoachArea(this, app, storage, scope, io)
 
     // ---------------------------------------------------------------- passaggio del profilo
 
@@ -17471,7 +17200,7 @@ class MatchController(
     /** Il testo letto da un QR: se è un profilo si apre, se no si dice che non lo è. */
     fun receiveProfileQr(text: String?) {
         val card = text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }
-        if (card == null) _toasts.tryEmit(strings.pfNotProfile) else incomingProfile.value = card
+        if (card == null) _toasts.tryEmit(strings.pfNotProfile) else coaching.incomingProfile.value = card
     }
 
     /**
@@ -17479,7 +17208,7 @@ class MatchController(
      * mette se non ce n'è già una; all'allenatore la classifica va anche nello storico delle classifiche.
      */
     fun applyProfile(card: com.tennis.scoremanager.data.ProfileCard, intoId: String?, asMember: Boolean, asStudent: Boolean): com.tennis.scoremanager.data.PlayerProfile {
-        incomingProfile.value = null
+        coaching.incomingProfile.value = null
         val old = intoId?.let { playerById(it) }
         val pl = com.tennis.scoremanager.data.ProfileCards.merge(old, card.profile, com.tennis.scoremanager.data.Players.newId(), System.currentTimeMillis(), asMember, asStudent)
         savePlayer(pl)
@@ -17489,14 +17218,14 @@ class MatchController(
                 ?.takeIf { it.size in 100..2_000_000 && BitmapFactory.decodeByteArray(it, 0, it.size) != null }
                 ?.let { storage.savePhoto(key, it); photosVersion.value++ }
         }
-        if (pl.student && card.profile.ranking.isNotBlank() && coachBook.value.rankings.none { it.student == pl.id }) addRanking(pl.id, card.profile.ranking)
+        if (pl.student && card.profile.ranking.isNotBlank() && coaching.coachBook.value.rankings.none { it.student == pl.id }) addRanking(pl.id, card.profile.ranking)
         _toasts.tryEmit(if (old == null) strings.pfAdded(pl.name) else strings.pfCompleted(pl.name))
         return pl
     }
 
     /** Segreteria: l'allievo proposto entra tra i giocatori (e nel corso scelto). */
     fun applyProposal(p: com.tennis.scoremanager.data.StudentProposal, courseId: String?) {
-        incomingProposal.value = null
+        coaching.incomingProposal.value = null
         val cs = p.student
         val existing = playerById(cs.id) ?: com.tennis.scoremanager.data.Players.sameFullName(players.value, cs.firstName, cs.lastName).singleOrNull()
         val pl = (existing ?: com.tennis.scoremanager.data.PlayerProfile(cs.id, cs.name, cs.firstName, cs.lastName, cs.nickname, createdAt = System.currentTimeMillis())).let {
@@ -17509,33 +17238,33 @@ class MatchController(
     }
 
     // Partite, tornei, classifica, valutazioni e test degli allievi.
-    fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
-    fun deleteManualMatch(id: String) { val b = coachBook.value; putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
+    fun saveManualMatch(m: com.tennis.scoremanager.data.ManualMatch) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != m.id } + m)) }
+    fun deleteManualMatch(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(manualMatches = b.manualMatches.filter { it.id != id })) }
     /** Gli impegni dell'allenatore (giorni occupati). */
     fun saveCoachBusy(x: com.tennis.scoremanager.data.CoachBusy) {
-        val b = coachBook.value
+        val b = coaching.coachBook.value
         val y = x.copy(from = com.tennis.scoremanager.data.CourtPlans.dayStart(minOf(x.from, x.to)), to = com.tennis.scoremanager.data.CourtPlans.dayStart(maxOf(x.from, x.to)), note = x.note.trim().take(200))
-        putCoach(busyChanged(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from })))
+        coaching.putCoach(busyChanged(b.copy(busy = (b.busy.filter { it.id != y.id } + y).sortedBy { it.from })))
     }
-    fun deleteCoachBusy(id: String) { val b = coachBook.value; putCoach(busyChanged(b.copy(busy = b.busy.filter { it.id != id }))) }
+    fun deleteCoachBusy(id: String) { val b = coaching.coachBook.value; coaching.putCoach(busyChanged(b.copy(busy = b.busy.filter { it.id != id }))) }
 
     /** Gli impegni sono cambiati: i corsi della segreteria hanno qualcosa da mandarle (vanno con le presenze). */
     private fun busyChanged(b: com.tennis.scoremanager.data.CoachBook): com.tennis.scoremanager.data.CoachBook {
         val now = System.currentTimeMillis()
         return b.copy(courses = b.courses.map { if (!it.personal && it.card.course.to >= now) it.copy(changedAt = now) else it })
     }
-    fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
-    fun deleteStudentEvent(id: String) { val b = coachBook.value; putCoach(b.copy(events = b.events.filter { it.id != id })) }
+    fun saveStudentEvent(e: com.tennis.scoremanager.data.StudentEvent) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(events = b.events.filter { it.id != e.id } + e)) }
+    fun deleteStudentEvent(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(events = b.events.filter { it.id != id })) }
     fun addRanking(student: String, ranking: String) {
         val r = ranking.trim().uppercase().take(10)
         if (r.isEmpty()) return
-        val b = coachBook.value
-        putCoach(b.copy(rankings = b.rankings + com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), student, System.currentTimeMillis(), r)))
+        val b = coaching.coachBook.value
+        coaching.putCoach(b.copy(rankings = b.rankings + com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), student, System.currentTimeMillis(), r)))
     }
-    fun saveEvaluation(e: com.tennis.scoremanager.data.Evaluation) { val b = coachBook.value; putCoach(b.copy(evaluations = b.evaluations.filter { it.id != e.id } + e)) }
-    fun deleteEvaluation(id: String) { val b = coachBook.value; putCoach(b.copy(evaluations = b.evaluations.filter { it.id != id })) }
-    fun saveFitnessTest(x: com.tennis.scoremanager.data.FitnessTest) { val b = coachBook.value; putCoach(b.copy(tests = b.tests.filter { it.id != x.id } + x)) }
-    fun deleteFitnessTest(id: String) { val b = coachBook.value; putCoach(b.copy(tests = b.tests.filter { it.id != id })) }
+    fun saveEvaluation(e: com.tennis.scoremanager.data.Evaluation) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(evaluations = b.evaluations.filter { it.id != e.id } + e)) }
+    fun deleteEvaluation(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(evaluations = b.evaluations.filter { it.id != id })) }
+    fun saveFitnessTest(x: com.tennis.scoremanager.data.FitnessTest) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(tests = b.tests.filter { it.id != x.id } + x)) }
+    fun deleteFitnessTest(id: String) { val b = coaching.coachBook.value; coaching.putCoach(b.copy(tests = b.tests.filter { it.id != id })) }
 
     /** La partita finita in un file, da mandare all'allenatore (o a un altro telefono): la apre con TSM. */
     fun matchFileToShare(rec: MatchRecord): File? {
@@ -17567,7 +17296,7 @@ class MatchController(
     private fun hoursText(minutes: Int): String = if (minutes % 60 == 0) "${minutes / 60} h" else "${minutes / 60} h ${minutes % 60}′"
 
     /** Il numero della segreteria che l'allenatore conosce (dall'ultima scheda corso). */
-    fun coachOffice(): String = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+    fun coachOffice(): String = coaching.coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
 
     // ---- Scheda progressi: l'allenatore la manda, l'allievo la tiene in Progressi ----
 
@@ -17577,8 +17306,8 @@ class MatchController(
     /** Allenatore: la scheda progressi dell'allievo in un file da mandargli. */
     fun progressCardFile(studentId: String): File? {
         val st = playerById(studentId) ?: return null
-        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
-        val card = com.tennis.scoremanager.data.ProgressCards.build(coachBook.value, serveSessions.value, st.id, st.name, me()?.name ?: storage.myName, club, System.currentTimeMillis())
+        val club = coaching.coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val card = com.tennis.scoremanager.data.ProgressCards.build(coaching.coachBook.value, serveSessions.value, st.id, st.name, me()?.name ?: storage.myName, club, System.currentTimeMillis())
         val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
         return runCatching { File(dir, com.tennis.scoremanager.data.ProgressCards.fileName(strings.pcTitle, st.name)).apply { writeText(com.tennis.scoremanager.data.ProgressCards.encode(card)) } }.getOrNull()
     }
@@ -17633,15 +17362,15 @@ class MatchController(
     }
 
     /** Il server del circolo da cui sono arrivati i corsi dell'allenatore (per mandare presenze e proposte da lì). */
-    fun coachVia(): String? = coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> book.bookingAccounts.value.any { it.url == url && it.joined } }
+    fun coachVia(): String? = coaching.coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> book.bookingAccounts.value.any { it.url == url && it.joined } }
 
     /** Allenatore: le presenze del corso alla segreteria dal server; true se arrivate. */
     suspend fun sendAttendanceServer(courseId: String): Boolean {
-        val cc = coachCourse(courseId) ?: return false
+        val cc = coaching.coachCourse(courseId) ?: return false
         val url = cc.via ?: return false
-        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis(), coachBook.value.busy)
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis(), coaching.coachBook.value.busy)
         val ok = postToOffice(url, "attendance", com.tennis.scoremanager.data.CourseCards.encodeReport(r))
-        if (ok) attendanceSent(courseId)
+        if (ok) coaching.attendanceSent(courseId)
         return ok
     }
 
@@ -17679,8 +17408,8 @@ class MatchController(
             when {
                 r != null && resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.READY -> { applyResult(r); done += "${r.side1} – ${r.side2} ${r.score}" }
                 r != null && resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.SAME -> {}
-                a != null && attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.READY -> { applyAttendance(a); done += a.courseName }
-                a != null && attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.SAME -> {}
+                a != null && coaching.attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.READY -> { coaching.applyAttendance(a); done += a.courseName }
+                a != null && coaching.attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.SAME -> {}
                 else -> keep += com.tennis.scoremanager.data.InboxItem(m.id, m.kind, m.text, m.fromName, "", m.at)
             }
         }
@@ -17696,17 +17425,17 @@ class MatchController(
     /** Segna pagato il pacchetto e gli dà il numero di ricevuta (una serie per anno). */
     fun markPackPaid(p: com.tennis.scoremanager.data.LessonPack) {
         val now = System.currentTimeMillis()
-        savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
+        coaching.savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coaching.coachBook.value, now)))
     }
 
     /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
     fun packReceiptFile(packId: String): File? {
-        val p0 = coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
-        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, p0.paidAt!!)).also { savePack(it) } else p0
+        val p0 = coaching.coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null
+        val p = if (p0.receipt == null) p0.copy(receipt = com.tennis.scoremanager.data.Coaching.nextReceipt(coaching.coachBook.value, p0.paidAt!!)).also { coaching.savePack(it) } else p0
         val s = strings
         val st = playerById(p.student)
         val coach = me()?.name ?: storage.myName
-        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val club = coaching.coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
         val header = listOf(coach, club).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { s.receiptTitle }
         // Il minorenne non paga da sé: la ricevuta è intestata al genitore, per l'allievo.
         val from = st?.let { x -> x.guardian.takeIf { it.isNotBlank() }?.let { g -> s.rcFor(g, x.name) } ?: x.name }.orEmpty()
@@ -17720,11 +17449,11 @@ class MatchController(
 
     /** Manda la ricevuta all'allievo (al genitore se è minorenne), con il PDF allegato. */
     fun noticePackReceipt(packId: String) {
-        val p = coachBook.value.packs.firstOrNull { it.id == packId } ?: return
+        val p = coaching.coachBook.value.packs.firstOrNull { it.id == packId } ?: return
         val st = playerById(p.student) ?: return
         val f = packReceiptFile(packId) ?: return
         val now = System.currentTimeMillis()
-        val number = coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
+        val number = coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.receipt.orEmpty()
         val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.rcText(number)).joinToString("\n")
         openNotice(com.tennis.scoremanager.data.NoticePlan(strings.receiptTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
     }
@@ -17732,11 +17461,11 @@ class MatchController(
     /** Il registro presenze di un corso in PDF (per l'allenatore il suo corso, per la segreteria quello della scuola). */
     fun registerFile(courseId: String, coachSide: Boolean): File? {
         val s = strings
-        val co = (if (coachSide) coachCourse(courseId)?.course else school.course(courseId)) ?: return null
-        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val co = (if (coachSide) coaching.coachCourse(courseId)?.course else school.course(courseId)) ?: return null
+        val cardNames = coaching.coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
         val names = { id: String -> playerById(id)?.name ?: cardNames[id] ?: "—" }
         val coach = (co.coach?.let { playerById(it)?.name } ?: co.coachName).ifBlank { if (coachSide) me()?.name ?: storage.myName else "" }
-        val club = if (coachSide) coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
+        val club = if (coachSide) coaching.coachCourse(courseId)?.card?.club.orEmpty() else storage.clubName
         val header = listOf(club, coach.takeIf { it.isNotBlank() }?.let { s.scCoachLine(it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
         val f = File(dir, "${s.rgTitle} ${co.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
@@ -17749,8 +17478,8 @@ class MatchController(
     /** Il registro presenze del corso in Excel (.xlsx): una colonna per lezione, presenze e lezioni in fondo. */
     fun registerXlsx(courseId: String, coachSide: Boolean): File? {
         val s = strings
-        val co = (if (coachSide) coachCourse(courseId)?.course else school.course(courseId)) ?: return null
-        val cardNames = coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
+        val co = (if (coachSide) coaching.coachCourse(courseId)?.course else school.course(courseId)) ?: return null
+        val cardNames = coaching.coachCourse(courseId)?.card?.students.orEmpty().associate { it.id to it.name }
         val rows = com.tennis.scoremanager.data.Xlsx.registerRows(co, { id -> playerById(id)?.name ?: cardNames[id] ?: "—" }, s.xlStudent, s.rgTotal, s.coLessons, System.currentTimeMillis())
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
         val f = File(dir, "${s.rgTitle} ${co.name}.xlsx".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
@@ -17761,7 +17490,7 @@ class MatchController(
     fun receiptsXlsx(year: Int): File? {
         val s = strings
         val cal = java.util.Calendar.getInstance()
-        val packs = coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
+        val packs = coaching.coachBook.value.packs.filter { p -> p.receipt != null && p.paidAt != null && cal.apply { timeInMillis = p.paidAt }.get(java.util.Calendar.YEAR) == year }
             .sortedBy { it.receipt }
         val df = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ROOT)
         val rows = listOf(listOf<Any?>(s.xlNumber, s.payDate, s.receiptReceivedFrom, s.xlStudent, s.receiptFor, s.receiptAmount)) + packs.map { p ->
@@ -17844,7 +17573,7 @@ class MatchController(
      * Tu: il tuo giocatore del database. Prima del database c'era solo il nome (Altro › Tu): se è di un giocatore solo,
      * è lui.
      */
-    fun me(): com.tennis.scoremanager.data.PlayerProfile? =
+    override fun me(): com.tennis.scoremanager.data.PlayerProfile? =
         playerById(storage.myPlayerId) ?: com.tennis.scoremanager.data.Players.byName(players.value, storage.myName).singleOrNull()
 
     /** Sei tu: il tuo nome segue quello del giocatore (per le versioni e i punti dell'app che usano ancora il nome). */
@@ -17893,16 +17622,16 @@ class MatchController(
 
     // ---- Scuola tennis e planning dei campi: vedi ClubSchool e ClubPlanning ----
 
-    val school = com.tennis.scoremanager.club.ClubSchool(this, storage, scope, io)
+    override val school = com.tennis.scoremanager.club.ClubSchool(this, storage, scope, io)
     val planning = com.tennis.scoremanager.club.ClubPlanning(this, app, storage, scope, io)
     override val courtPlan get() = planning.courtPlan
 
     /** Allenatore: sposta una lezione di un suo corso (non di quelli della segreteria: l'orario lo decide lei). */
     fun moveCoachLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?): com.tennis.scoremanager.data.Course? {
-        val b = coachBook.value
+        val b = coaching.coachBook.value
         val cc = b.courses.firstOrNull { it.card.course.id == courseId }?.takeIf { it.personal } ?: return null
         val moved = com.tennis.scoremanager.data.Courses.move(cc.card.course, key, start, minutes, court)
-        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = moved), cancelled = it.cancelled - key, changedAt = System.currentTimeMillis()) else it }))
+        coaching.putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(card = it.card.copy(course = moved), cancelled = it.cancelled - key, changedAt = System.currentTimeMillis()) else it }))
         return moved
     }
 
@@ -19496,7 +19225,7 @@ class MatchController(
      * Il report di [p] come file da condividere: PDF completo ([pdf]) o immagine; [days] = gli ultimi giorni (null =
      * tutto). L'allenatore è il tuo giocatore, il circolo quello di Circolo › Campi. null se non si è potuto fare.
      */
-    fun studentReportFile(p: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean): File? {
+    override fun studentReportFile(p: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean): File? {
         val s = strings
         val now = System.currentTimeMillis()
         val r = com.tennis.scoremanager.data.StudentReport.build(
@@ -19523,7 +19252,7 @@ class MatchController(
      */
     private fun coachReportExtra(p: com.tennis.scoremanager.data.PlayerProfile, from: Long?): List<Pair<String, List<String>>> {
         val s = strings; val lang = options.value.lang
-        val b = coachBook.value
+        val b = coaching.coachBook.value
         val C = com.tennis.scoremanager.data.Coaching
         fun d(at: Long) = com.tennis.scoremanager.ui.screens.shortDate(at, lang)
         val ev = C.evaluationsOf(b, p.id)
@@ -23592,6 +23321,363 @@ class PlayerBooking(
         }
         saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/coach/CoachArea.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/coach/CoachArea.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.coach
+
+import android.app.Application
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.Storage
+import java.io.File
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * Il lavoro dell'allenatore: diario, obiettivi, agenda e pacchetti di lezioni, gruppi, avvisi agli allievi, i corsi
+ * ricevuti dalla segreteria (scheda corso) con presenze e proposte. Quello che serve del resto dell'app è in [CoachHost].
+ */
+class CoachArea(
+    host: CoachHost,
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+) : CoachHost by host {
+    val coachBook = MutableStateFlow(storage.loadCoachBook())
+
+    internal fun putCoach(b: com.tennis.scoremanager.data.CoachBook) {
+        coachBook.value = b
+        scope.launch(io) { storage.saveCoachBook(b) }
+    }
+
+    fun addDiary(student: String, text: String, at: Long = System.currentTimeMillis()) {
+        val t = text.trim().take(2000)
+        if (t.isEmpty()) return
+        val b = coachBook.value
+        putCoach(b.copy(diary = b.diary + com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), student, at, t)))
+    }
+
+    fun deleteDiary(id: String) = coachBook.value.let { b -> putCoach(b.copy(diary = b.diary.filter { it.id != id })) }
+
+    /** Un obiettivo nuovo; se è già raggiunto lo si sa subito. */
+    fun addStudentGoal(student: String, stroke: com.tennis.scoremanager.data.TrainedStroke, targetPct: Int, window: Int) {
+        val now = System.currentTimeMillis()
+        val g = com.tennis.scoremanager.data.StudentGoal(com.tennis.scoremanager.data.Coaching.newId("g"), student, stroke, targetPct, window, createdAt = now)
+        val reached = com.tennis.scoremanager.data.Coaching.goalStatus(g, serveSessions.value).reached(g)
+        coachBook.value.let { b -> putCoach(b.copy(goals = b.goals + g.copy(reachedAt = if (reached) now else null))) }
+    }
+
+    fun deleteStudentGoal(id: String) = coachBook.value.let { b -> putCoach(b.copy(goals = b.goals.filter { it.id != id })) }
+
+    /** Dopo un allenamento: gli obiettivi raggiunti adesso prendono la data. */
+    internal fun checkStudentGoals() {
+        val b = coachBook.value
+        if (b.goals.none { it.reachedAt == null }) return
+        val next = com.tennis.scoremanager.data.Coaching.markReached(b, serveSessions.value, System.currentTimeMillis())
+        if (next != b) putCoach(next)
+    }
+
+    fun saveLesson(l: com.tennis.scoremanager.data.CoachLesson) = coachBook.value.let { b ->
+        putCoach(b.copy(lessons = b.lessons.filter { it.id != l.id } + l))
+    }
+
+    fun deleteLesson(id: String) = coachBook.value.let { b -> putCoach(b.copy(lessons = b.lessons.filter { it.id != id })) }
+
+    fun savePack(p: com.tennis.scoremanager.data.LessonPack) = coachBook.value.let { b ->
+        putCoach(b.copy(packs = b.packs.filter { it.id != p.id } + p))
+    }
+
+    fun deletePack(id: String) = coachBook.value.let { b -> putCoach(b.copy(packs = b.packs.filter { it.id != id })) }
+
+    fun saveGroup(g: com.tennis.scoremanager.data.StudentGroup) = coachBook.value.let { b ->
+        putCoach(b.copy(groups = b.groups.filter { it.id != g.id } + g))
+    }
+
+    fun deleteGroup(id: String) = coachBook.value.let { b -> putCoach(b.copy(groups = b.groups.filter { it.id != id })) }
+
+    fun openLessons() {
+        refreshPlayers()
+        nav.push(Screen.LESSONS)
+    }
+
+    /** "lunedì 16 novembre, 18:00 · Campo 2". */
+    fun lessonWhen(l: com.tennis.scoremanager.data.CoachLesson): String {
+        val lang = options.value.lang
+        return listOfNotNull("${com.tennis.scoremanager.data.Notices.day(l.start, lang)}, ${Reports.time(l.start, lang)}", l.place.ifBlank { null }).joinToString(" · ")
+    }
+
+    /** Un messaggio libero agli allievi (a chi è minorenne arriva al genitore): WhatsApp, SMS o email dall'app degli avvisi. */
+    /**
+     * Il report degli ultimi 30 giorni a ciascuno (al genitore se è minorenne), uno per uno con il PDF allegato.
+     * Si fanno i PDF di tutti prima di aprire gli avvisi.
+     */
+    fun noticeReports(ids: List<String>) {
+        val s = strings
+        scope.launch {
+            val now = System.currentTimeMillis()
+            val rec = withContext(io) {
+                ids.mapNotNull { playerById(it) }.map { p ->
+                    val f = studentReportFile(p, 30, pdf = true)
+                    val text = listOf(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.rpText(p.name), clubSign).filter { it.isNotBlank() }.joinToString("\n")
+                    com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = f)
+                }
+            }
+            openNotice(com.tennis.scoremanager.data.NoticePlan(s.rpAll, s.studentsTitle, s.rpText(""), rec))
+        }
+    }
+
+    fun noticeStudents(ids: List<String>) {
+        val now = System.currentTimeMillis()
+        val rec = ids.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.coWriteTitle, strings.studentsTitle, "", rec, editable = true))
+    }
+
+    /** Il promemoria delle lezioni [lessons]: a ogni allievo la sua (giorno, ora, dove). */
+    fun noticeLessons(lessons: List<com.tennis.scoremanager.data.CoachLesson>) {
+        val s = strings; val now = System.currentTimeMillis()
+        val rec = lessons.sortedBy { it.start }.flatMap { l ->
+            l.students.mapNotNull { playerById(it) }.map { p ->
+                val text = listOfNotNull(com.tennis.scoremanager.data.Notices.hello(s, p, now), s.coRemind(lessonWhen(l)), l.note.ifBlank { null }).joinToString("\n")
+                com.tennis.scoremanager.data.Notices.recipient(p, text, now)
+            }
+        }.distinctBy { it.id }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.coLessons, s.coLessons, lessons.firstOrNull()?.let { s.coRemind(lessonWhen(it)) }.orEmpty(), rec))
+    }
+
+    /** Partita tra due allievi dalla scheda: i due in campo, e si va in Nuova partita (Indietro torna alla scheda). */
+    fun matchWith(a: String, b: String) {
+        val pa = playerById(a) ?: return
+        val pb = playerById(b) ?: return
+        updateSetup { it.copy(doubles = false, p1a = pa.name, p1aId = pa.id, p2a = pb.name, p2aId = pb.id, p1b = "", p1bId = "", p2b = "", p2bId = "") }
+        go(Screen.SETUP)
+    }
+
+    // ---- Allenatore: corsi della scuola (scheda corso), presenze, proposte, partite e progressi degli allievi ----
+
+    val openCoachCourseId = MutableStateFlow<String?>(null)
+    fun openCoachCourse(id: String) { openCoachCourseId.value = id; nav.push(Screen.COACH_COURSE) }
+    fun coachCourse(id: String?): com.tennis.scoremanager.data.CoachCourse? = coachBook.value.courses.firstOrNull { it.card.course.id == id }
+
+    /** Segreteria: la scheda del corso in un file (il codice nasce al primo invio e resta). */
+    fun courseCardFile(courseId: String): File? {
+        val co = school.course(courseId) ?: return null
+        val code = co.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { school.saveCourse(co.copy(cardCode = it)) }
+        val card = com.tennis.scoremanager.data.CourseCards.card(school.course(courseId) ?: co, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone) { playerById(it) }
+        if (card.office.isBlank()) toast(strings.mcNoOffice)
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccFilePrefix, co.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encode(card)) } }.getOrNull()
+    }
+
+    /** Segreteria: manda la scheda del corso all'allenatore (WhatsApp col file). */
+    fun sendCourseToCoach(co: com.tennis.scoremanager.data.Course) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val file = courseCardFile(co.id)
+        val coach = co.coach?.let { playerById(it) }
+        val text = listOf(s.ccCardText(co.name, co.students.size), "${com.tennis.scoremanager.ui.screens.shortDate(co.from, lang)} – ${com.tennis.scoremanager.ui.screens.shortDate(co.to, lang)}",
+            s.ccCardHowTo, clubSign).filter { it.isNotBlank() }.joinToString("\n")
+        val rec = listOfNotNull(coach?.let { com.tennis.scoremanager.data.Notices.recipient(it, text, now).copy(attachment = file) })
+        if (coach != null && file != null) serverMail(coach.id, "course", file)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ccSendToCoach, co.name, text, rec))
+    }
+
+    /** Allenatore: è arrivata una scheda corso (finestra di conferma). */
+    val incomingCourse = MutableStateFlow<com.tennis.scoremanager.data.CourseCard?>(null)
+    /** Segreteria: sono arrivate le presenze di un corso. */
+    val incomingAttendance = MutableStateFlow<com.tennis.scoremanager.data.AttendanceReport?>(null)
+    /** Segreteria: l'allenatore propone un allievo nuovo. */
+    val incomingProposal = MutableStateFlow<com.tennis.scoremanager.data.StudentProposal?>(null)
+    /** Un profilo arrivato (file o QR): la persona da aggiungere o da completare tra i giocatori. */
+    val incomingProfile = MutableStateFlow<com.tennis.scoremanager.data.ProfileCard?>(null)
+
+    /**
+     * Allenatore: il corso tra i suoi; gli iscritti diventano suoi allievi col loro id della segreteria (così le
+     * presenze tornano alla persona giusta), con contatti, genitore e consenso dove qui mancano.
+     */
+    fun acceptCourse(card: com.tennis.scoremanager.data.CourseCard) {
+        incomingCourse.value = null
+        val now = System.currentTimeMillis()
+        val changed = card.students.map { cs ->
+            val old = playerById(cs.id)
+            (old ?: com.tennis.scoremanager.data.PlayerProfile(cs.id, cs.name, cs.firstName, cs.lastName, cs.nickname, createdAt = now)).let { p ->
+                p.copy(
+                    student = true,
+                    phone = p.phone.ifBlank { cs.phone }, email = p.email.ifBlank { cs.email },
+                    guardian = p.guardian.ifBlank { cs.guardian }, guardianPhone = p.guardianPhone.ifBlank { cs.guardianPhone },
+                    consentAt = p.consentAt ?: cs.consentAt,
+                )
+            }
+        }
+        if (changed.isNotEmpty()) savePlayers(changed)
+        cs_ranking(card.students, now)
+        val b = coachBook.value
+        val via = incomingVia
+        putCoach(b.copy(courses = com.tennis.scoremanager.data.CourseCards.receive(b.courses, card).map { if (it.card.course.id == card.course.id && via != null) it.copy(via = via) else it }))
+        openCoachCourse(card.course.id)
+    }
+
+    /** La classifica arrivata con la scheda entra nella storia dell'allievo se è nuova. */
+    internal fun cs_ranking(list: List<com.tennis.scoremanager.data.CourseStudent>, now: Long) {
+        val b = coachBook.value
+        val add = list.filter { it.ranking.isNotBlank() && com.tennis.scoremanager.data.Coaching.ranking(b, it.id) != it.ranking }
+            .map { com.tennis.scoremanager.data.RankingEntry(com.tennis.scoremanager.data.Coaching.newId("r"), it.id, now, it.ranking) }
+        if (add.isNotEmpty()) putCoach(b.copy(rankings = b.rankings + add))
+    }
+
+    /**
+     * Allenatore: l'appello di una lezione del corso. [note] va anche nel diario di chi c'era (una volta: se la nota
+     * cambia, si aggiunge la nuova).
+     */
+    fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) {
+        val b = coachBook.value
+        val cc = b.courses.firstOrNull { it.card.course.id == courseId } ?: return
+        val n = note.trim()
+        val updated = cc.copy(
+            attendance = if (cancelled) cc.attendance - key else cc.attendance + (key to present),
+            cancelled = if (cancelled) cc.cancelled + key else cc.cancelled - key,
+            notes = if (n.isEmpty()) cc.notes - key else cc.notes + (key to n),
+            changedAt = System.currentTimeMillis(),
+        )
+        val diary = if (!cancelled && n.isNotEmpty() && cc.notes[key] != n)
+            present.map { com.tennis.scoremanager.data.DiaryEntry(com.tennis.scoremanager.data.Coaching.newId("d"), it, start, "${cc.card.course.name}: $n") } else emptyList()
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) updated else it }, diary = b.diary + diary))
+    }
+
+    /**
+     * Allenatore: salva un corso suo (nuovo o cambiato): nome, livello, date, orari, allievi. I corsi della segreteria
+     * non si cambiano qui (li cambia lei e li rimanda).
+     */
+    fun saveCoachOwnCourse(co: com.tennis.scoremanager.data.Course, color: String? = null) {
+        val b = coachBook.value
+        val old = b.courses.firstOrNull { it.card.course.id == co.id }
+        if (old != null && !old.personal) return
+        val cc = old?.copy(card = old.card.copy(course = co, issuedAt = System.currentTimeMillis()))
+            ?: com.tennis.scoremanager.data.CoachCourse(com.tennis.scoremanager.data.CourseCard(code = "", issuedAt = System.currentTimeMillis(), course = co), personal = true)
+        val withColor = if (color != null && color in com.tennis.scoremanager.data.CourseCards.COLORS) cc.copy(color = color) else cc
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != co.id } + withColor))
+    }
+
+    /** L'etichetta colorata di un corso dell'allenatore (qualsiasi: anche quelli della segreteria, solo sul suo telefono). */
+    fun setCoachCourseColor(id: String, color: String) {
+        if (color !in com.tennis.scoremanager.data.CourseCards.COLORS) return
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == id) it.copy(color = color) else it }))
+    }
+
+    /** Toglie un corso dall'elenco dell'allenatore (i suoi; quelli della segreteria tornano se lei li rimanda). */
+    fun deleteCoachCourse(id: String) {
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.filter { it.card.course.id != id }))
+    }
+
+    /** Allenatore: avvisa gli iscritti che la lezione è annullata (a chi è minorenne scrive al genitore). */
+    fun noticeCourseCancelled(courseId: String, lessonStart: Long) {
+        val cc = coachCourse(courseId) ?: return
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val text = listOf(s.scCancelledNotice(cc.card.course.name), com.tennis.scoremanager.data.Notices.day(lessonStart, lang) + ", " + com.tennis.scoremanager.data.Reports.time(lessonStart, lang))
+            .joinToString("\n")
+        val rec = cc.card.course.students.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.scCancelledTitle, cc.card.course.name, text, rec))
+    }
+
+    /** Allenatore: il file delle presenze da mandare, il testo e il numero della segreteria (dalla scheda). */
+    fun attendanceToSend(courseId: String): Triple<File, String, String>? {
+        val cc = coachCourse(courseId) ?: return null
+        val now = System.currentTimeMillis()
+        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, now, coachBook.value.busy)
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccAttendancePrefix, cc.card.course.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeReport(r)) } }.getOrNull() ?: return null
+        val co = cc.course
+        val held = com.tennis.scoremanager.data.Courses.lessons(co).count { it.key in cc.attendance }
+        val text = listOf(strings.ccAttendanceText(cc.card.course.name, held), cc.card.club).filter { it.isNotBlank() }.joinToString("\n")
+        return Triple(f, text, cc.card.office)
+    }
+
+    fun attendanceSent(courseId: String) {
+        val b = coachBook.value
+        putCoach(b.copy(courses = b.courses.map { if (it.card.course.id == courseId) it.copy(sentAt = System.currentTimeMillis()) else it }))
+    }
+
+    fun attendanceStatus(r: com.tennis.scoremanager.data.AttendanceReport): com.tennis.scoremanager.data.AttendanceStatus = com.tennis.scoremanager.data.CourseCards.check(r, school.courses.value)
+
+    /** Segreteria: le presenze dell'allenatore nel corso. */
+    fun applyAttendance(r: com.tennis.scoremanager.data.AttendanceReport) {
+        incomingAttendance.value = null
+        val co = school.course(r.course) ?: return
+        if (co.cardCode != r.code) return
+        school.saveCourse(com.tennis.scoremanager.data.CourseCards.apply(co, r))
+        toast(strings.ccAttendanceApplied)
+    }
+
+    /** Allenatore: propone alla segreteria un allievo nuovo (file + testo; WhatsApp alla segreteria se se ne sa il numero). */
+    fun proposalToSend(st: com.tennis.scoremanager.data.PlayerProfile, level: String, note: String, courseId: String?): Triple<File, String, String>? {
+        val p = com.tennis.scoremanager.data.StudentProposal(student = com.tennis.scoremanager.data.CourseCards.student(st, st.id), coach = me()?.name ?: storage.myName, course = courseId, level = level.trim(), note = note.trim(), sentAt = System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        val f = runCatching { File(dir, com.tennis.scoremanager.data.CourseCards.fileName(strings.ccProposalPrefix, st.name)).apply { writeText(com.tennis.scoremanager.data.CourseCards.encodeProposal(p)) } }.getOrNull() ?: return null
+        val office = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.office.orEmpty()
+        val text = listOf(strings.ccProposalText(st.name), level.trim(), note.trim()).filter { it.isNotBlank() }.joinToString("\n")
+        return Triple(f, text, office)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/coach/CoachHost.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/coach/CoachHost.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.coach
+
+import com.tennis.scoremanager.Navigator
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.club.ClubSchool
+import com.tennis.scoremanager.data.MatchOptions
+import com.tennis.scoremanager.data.NoticePlan
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.ui.Strings
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.File
+
+/**
+ * Quello che il lavoro dell'allenatore ([CoachArea]) chiede al resto dell'app, cioè a MatchController.
+ * Una voce nuova qui è una dipendenza nuova.
+ */
+interface CoachHost {
+    val strings: Strings
+    val nav: Navigator
+    val options: MutableStateFlow<MatchOptions>
+    fun go(to: Screen)
+    /** Un messaggio breve in basso sullo schermo. */
+    fun toast(text: String)
+
+    // Giocatori e allievi.
+    fun me(): PlayerProfile?
+    fun playerById(id: String?): PlayerProfile?
+    fun refreshPlayers()
+    fun savePlayers(changed: List<PlayerProfile>)
+    /** Gli allenamenti dei colpi, per i progressi degli allievi. */
+    val serveSessions: MutableStateFlow<List<ServeSession>>
+    fun studentReportFile(p: PlayerProfile, days: Int?, pdf: Boolean): File?
+    /** Partita tra due allievi: Nuova partita già pronta. */
+    fun updateSetup(transform: (SetupData) -> SetupData)
+
+    // La scuola del circolo (corsi mandati all'allenatore) e gli avvisi.
+    val school: ClubSchool
+    /** La firma degli avvisi: il nome del circolo. */
+    val clubSign: String
+    fun openNotice(plan: NoticePlan)
+    fun serverMail(to: String, kind: String, file: File)
+    /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
+    var incomingVia: String?
 }
 TSM_EOF
 
@@ -35764,7 +35850,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     }
     override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
-    override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
     override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
@@ -35797,7 +35883,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
                 st == com.tennis.scoremanager.data.ResultStatus.READY || st == com.tennis.scoremanager.data.ResultStatus.CONFLICT, replace = st == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
-            val st = c.attendanceStatus(r)
+            val st = c.coaching.attendanceStatus(r)
             val msg = when (st) {
                 com.tennis.scoremanager.data.AttendanceStatus.READY -> s.ccAttReady
                 com.tennis.scoremanager.data.AttendanceStatus.SAME -> s.ccAttSame
@@ -35824,9 +35910,9 @@ class DeskBridge(private val c: MatchController) : DeskData {
             c.applyResult(r); return null
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
-            val st = c.attendanceStatus(r)
+            val st = c.coaching.attendanceStatus(r)
             if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
-            c.applyAttendance(r); return null
+            c.coaching.applyAttendance(r); return null
         }
         com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.school.courses.value.any { it.id == id } }); return null }
         return "NOT_A_FILE"
@@ -35881,18 +35967,18 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun now(): Long = System.currentTimeMillis()
     override val lang: String get() = c.options.value.lang.code
     override fun coachName(): String = c.me()?.name ?: c.storage.myName
-    override fun book() = c.coachBook.value
+    override fun book() = c.coaching.coachBook.value
     override fun players(): List<PlayerProfile> = c.players.value
     override fun sessions() = c.serveSessions.value
-    override fun addDiary(student: String, text: String) = c.addDiary(student, text)
+    override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
-    override fun markPackPaid(packId: String) { c.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
-    override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
+    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
-        c.markCourseLesson(courseId, key, start, present, cancelled, note)
-    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
-    override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
-    override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
+        c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)
+    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.coaching.saveCoachOwnCourse(c)
+    override fun deleteOwnCourse(id: String) = c.coaching.deleteCoachCourse(id)
+    override fun setCourseColor(id: String, color: String) = c.coaching.setCoachCourseColor(id, color)
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
     override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
@@ -39222,7 +39308,7 @@ class RemindersJob : JobService() {
             if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
             val s = c.strings
             val shown = c.storage.remindersShown
-            val items = Reminders.due(System.currentTimeMillis(), c.activeRole.value == com.tennis.scoremanager.Role.COACH, c.coachBook.value, c.receivedCards.value, shown) { id -> c.playerById(id)?.name ?: "—" }
+            val items = Reminders.due(System.currentTimeMillis(), c.activeRole.value == com.tennis.scoremanager.Role.COACH, c.coaching.coachBook.value, c.receivedCards.value, shown) { id -> c.playerById(id)?.name ?: "—" }
             if (items.isEmpty()) return
             val nm = context.getSystemService(NotificationManager::class.java)
             if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.rmChannel, NotificationManager.IMPORTANCE_DEFAULT))
@@ -42339,13 +42425,13 @@ fun busyDays(b: CoachBusy, lang: com.tennis.scoremanager.model.Lang): String =
 fun BusySection(c: MatchController) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var open by remember { mutableStateOf<CoachBusy?>(null) }
     var isNew by remember { mutableStateOf(false) }
     val today = CourtPlans.dayStart(System.currentTimeMillis())
     val clashes = Coaching.busyClashes(book, System.currentTimeMillis()) { ids -> ids.mapNotNull { c.playerById(it)?.name }.joinToString(", ") }
     if (clashes.isNotEmpty()) SectionCard(s.bzClash(clashes.size), Icons.Filled.Warning) {
-        for (x in clashes.take(20)) Text("${c.lessonWhen(com.tennis.scoremanager.data.CoachLesson("", x.start))} · ${x.title} — ${busyLabel(s, x.busy)}",
+        for (x in clashes.take(20)) Text("${c.coaching.lessonWhen(com.tennis.scoremanager.data.CoachLesson("", x.start))} · ${x.title} — ${busyLabel(s, x.busy)}",
             color = TsmColors.Orange, fontSize = 14.sp)
         if (clashes.size > 20) Text("+${clashes.size - 20}", color = TsmColors.TextDim)
         Text(s.bzClashHint, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -42477,7 +42563,7 @@ fun CoachMonthCalendar(c: MatchController, book: CoachBook, onLesson: (CoachLess
         for (cc in book.courses) {
             val co = cc.course
             for (les in Courses.lessons(co).filter { it.start in month until next })
-                out += CalEntry(les.start, les.minutes, co.name, courseColor(cc.label), les.key in co.cancelled) { c.openCoachCourse(co.id) }
+                out += CalEntry(les.start, les.minutes, co.name, courseColor(cc.label), les.key in co.cancelled) { c.coaching.openCoachCourse(co.id) }
         }
         for (e in book.events.filter { it.at in month until next }) out += CalEntry(e.at, 0, "${e.name} · ${c.playerById(e.student)?.name.orEmpty()}", EventColor, false) { c.openStudent(e.student) }
         out.sortedBy { it.start }.groupBy { CourtPlans.dayStart(it.start) }
@@ -42645,7 +42731,7 @@ private fun lessonText(l: Lesson, lang: com.tennis.scoremanager.model.Lang): Str
 @Composable
 fun CoachCoursesSection(c: MatchController) {
     val s = LocalStrings.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val now = System.currentTimeMillis()
     var creating by remember { mutableStateOf(false) }
@@ -42661,11 +42747,11 @@ fun CoachCoursesSection(c: MatchController) {
         ).joinToString(" · ")
         // I corsi dell'allenatore in azzurro, quelli della segreteria nel colore dell'app.
         com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.School, co.name, listOfNotNull(s.ccOwnTag.takeIf { cc.personal }, hint.ifBlank { null }).joinToString(" · ").ifBlank { null },
-            tint = courseColor(cc.label)) { c.openCoachCourse(co.id) }
+            tint = courseColor(cc.label)) { c.coaching.openCoachCourse(co.id) }
     }
     // Un corso suo, non della segreteria: gruppi, preagonistica, un camp estivo.
     com.tennis.scoremanager.ui.screens.Entry(Icons.Filled.Add, s.ccNew, s.ccNewHint) { creating = true }
-    if (creating) CoachCourseEditDialog(c, null) { id -> creating = false; id?.let { c.openCoachCourse(it) } }
+    if (creating) CoachCourseEditDialog(c, null) { id -> creating = false; id?.let { c.coaching.openCoachCourse(it) } }
 }
 
 /**
@@ -42690,7 +42776,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     val country = remember { com.tennis.scoremanager.data.Holidays.country(lang.code) }
     val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null }
     // Anche i giorni occupati dell'allenatore, se lo si chiede (e solo se ne ha).
-    val busyList = c.coachBook.collectAsState().value.busy
+    val busyList = c.coaching.coachBook.collectAsState().value.busy
     var skipBusy by remember { mutableStateOf(busyList.isNotEmpty()) }
     val isBusy = { t: Long -> Coaching.busyOn(busyList, t) != null }
     val skip = { t: Long -> (skipHolidays && isHoliday(t)) || (skipBusy && isBusy(t)) }
@@ -42745,7 +42831,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
                 val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(co.from, co.slots, it, skip) } ?: co.to
                 val x = co.copy(name = co.name.trim(), level = co.level.trim(), to = end)
                 // Le lezioni nei giorni di festa risultano annullate (si possono sempre rimettere dall'appello).
-                c.saveCoachOwnCourse(x.copy(cancelled = x.cancelled + Courses.skipped(x, skip)), color); onDone(co.id)
+                c.coaching.saveCoachOwnCourse(x.copy(cancelled = x.cancelled + Courses.skipped(x, skip)), color); onDone(co.id)
             }) { Text(s.save) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -42754,7 +42840,7 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     if (askDelete) AlertDialog(
         onDismissRequest = { askDelete = false },
         text = { Text(s.ccDeleteAsk(co.name)) },
-        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCoachCourse(co.id); onDone(null); c.back() }) { Text(s.delete, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.coaching.deleteCoachCourse(co.id); onDone(null); c.back() }) { Text(s.delete, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
 }
@@ -42768,8 +42854,8 @@ fun CoachCourseScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     BackHandler { c.back() }
-    val book by c.coachBook.collectAsState()
-    val id by c.openCoachCourseId.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
+    val id by c.coaching.openCoachCourseId.collectAsState()
     val cc = book.courses.firstOrNull { it.card.course.id == id } ?: return
     val co = cc.course
     val lang = c.options.collectAsState().value.lang
@@ -42789,7 +42875,7 @@ fun CoachCourseScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             if (!cc.personal) BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
-                val byApp = { c.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.attendanceSent(co.id) } }
+                val byApp = { c.coaching.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.coaching.attendanceSent(co.id) } }
                 // Corso arrivato dal server del circolo: le presenze tornano da lì; se non risponde, su WhatsApp.
                 if (cc.via != null) scope.launch { if (c.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
                 else byApp()
@@ -42809,7 +42895,7 @@ fun CoachCourseScreen(c: MatchController) {
         // L'etichetta colorata del corso: balza all'occhio nell'elenco e nel calendario (anche sul PC).
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.ccColor, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(end = 10.dp))
-            CourseColorDots(cc.label) { c.setCoachCourseColor(co.id, it) }
+            CourseColorDots(cc.label) { c.coaching.setCoachCourseColor(co.id, it) }
         }
         Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons)), tab, { tab = it })
         if (tab == 0) {
@@ -42826,7 +42912,7 @@ fun CoachCourseScreen(c: MatchController) {
                     }
                 }
             }
-            if (co.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Campaign, { c.noticeStudents(co.students) }, Modifier.fillMaxWidth())
+            if (co.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Campaign, { c.coaching.noticeStudents(co.students) }, Modifier.fillMaxWidth())
         } else {
             val all = Courses.lessons(co)
             val past = all.filter { it.start <= now }.reversed()
@@ -42918,9 +43004,9 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
                 SwitchRow(Icons.Filled.EventBusy, s.scCancelLesson, null, cancelled) { cancelled = it }
                 if (cancelled) {
                     if (co.students.isNotEmpty()) GhostButton(s.scNotifyCancelled, Icons.Filled.Campaign, {
-                        c.markCourseLesson(co.id, l.key, l.start, emptySet(), true, "")
+                        c.coaching.markCourseLesson(co.id, l.key, l.start, emptySet(), true, "")
                         onDone()
-                        c.noticeCourseCancelled(co.id, l.start)
+                        c.coaching.noticeCourseCancelled(co.id, l.start)
                     }, Modifier.fillMaxWidth())
                 } else if (canMark) {
                     Text(s.scWhoWasThere + " (${present.size}/${co.students.size})", color = TsmColors.TextDim, fontSize = 13.sp)
@@ -42940,7 +43026,7 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
         },
         confirmButton = {
             TextButton(onClick = {
-                if (cancelled || canMark) c.markCourseLesson(co.id, l.key, l.start, present, cancelled, note)
+                if (cancelled || canMark) c.coaching.markCourseLesson(co.id, l.key, l.start, present, cancelled, note)
                 onDone()
             }) { Text(s.ok) }
         },
@@ -42953,9 +43039,9 @@ private fun CourseLessonDialog(c: MatchController, cc: CoachCourse, l: Lesson, o
 fun IncomingCourseDialog(c: MatchController, card: CourseCard) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
-    val update = c.coachBook.collectAsState().value.courses.any { it.card.course.id == card.course.id }
+    val update = c.coaching.coachBook.collectAsState().value.courses.any { it.card.course.id == card.course.id }
     AlertDialog(
-        onDismissRequest = { c.incomingCourse.value = null },
+        onDismissRequest = { c.coaching.incomingCourse.value = null },
         icon = { Icon(Icons.Filled.School, null, tint = TsmColors.Ball) },
         title = { Text(s.ccIncomingTitle) },
         text = {
@@ -42967,8 +43053,8 @@ fun IncomingCourseDialog(c: MatchController, card: CourseCard) {
                 Text(s.ccIncomingHint, color = TsmColors.TextDim, fontSize = 13.sp)
             }
         },
-        confirmButton = { TextButton(onClick = { c.acceptCourse(card) }) { Text(if (update) s.ccUpdate else s.ccAccept) } },
-        dismissButton = { TextButton(onClick = { c.incomingCourse.value = null }) { Text(s.back) } },
+        confirmButton = { TextButton(onClick = { c.coaching.acceptCourse(card) }) { Text(if (update) s.ccUpdate else s.ccAccept) } },
+        dismissButton = { TextButton(onClick = { c.coaching.incomingCourse.value = null }) { Text(s.back) } },
     )
 }
 
@@ -42976,9 +43062,9 @@ fun IncomingCourseDialog(c: MatchController, card: CourseCard) {
 @Composable
 fun IncomingAttendanceDialog(c: MatchController, r: AttendanceReport) {
     val s = LocalStrings.current
-    val status = remember(r) { c.attendanceStatus(r) }
+    val status = remember(r) { c.coaching.attendanceStatus(r) }
     AlertDialog(
-        onDismissRequest = { c.incomingAttendance.value = null },
+        onDismissRequest = { c.coaching.incomingAttendance.value = null },
         icon = { Icon(Icons.Filled.School, null, tint = TsmColors.Ball) },
         title = { Text(s.ccAttendanceTitle) },
         text = {
@@ -42995,10 +43081,10 @@ fun IncomingAttendanceDialog(c: MatchController, r: AttendanceReport) {
             }
         },
         confirmButton = {
-            if (status == AttendanceStatus.READY) TextButton(onClick = { c.applyAttendance(r) }) { Text(s.mrApply) }
-            else TextButton(onClick = { c.incomingAttendance.value = null }) { Text(s.ok) }
+            if (status == AttendanceStatus.READY) TextButton(onClick = { c.coaching.applyAttendance(r) }) { Text(s.mrApply) }
+            else TextButton(onClick = { c.coaching.incomingAttendance.value = null }) { Text(s.ok) }
         },
-        dismissButton = { if (status == AttendanceStatus.READY) TextButton(onClick = { c.incomingAttendance.value = null }) { Text(s.back) } },
+        dismissButton = { if (status == AttendanceStatus.READY) TextButton(onClick = { c.coaching.incomingAttendance.value = null }) { Text(s.back) } },
     )
 }
 
@@ -43009,7 +43095,7 @@ fun IncomingProposalDialog(c: MatchController, p: StudentProposal) {
     val courses by c.school.courses.collectAsState()
     var pick by remember { mutableStateOf(p.course?.takeIf { id -> courses.any { it.id == id } }) }
     AlertDialog(
-        onDismissRequest = { c.incomingProposal.value = null },
+        onDismissRequest = { c.coaching.incomingProposal.value = null },
         icon = { Icon(Icons.Filled.School, null, tint = TsmColors.Ball) },
         title = { Text(s.ccProposalTitle) },
         text = {
@@ -43025,7 +43111,7 @@ fun IncomingProposalDialog(c: MatchController, p: StudentProposal) {
             }
         },
         confirmButton = { TextButton(onClick = { c.applyProposal(p, pick) }) { Text(s.ccProposalAdd) } },
-        dismissButton = { TextButton(onClick = { c.incomingProposal.value = null }) { Text(s.back) } },
+        dismissButton = { TextButton(onClick = { c.coaching.incomingProposal.value = null }) { Text(s.back) } },
     )
 }
 
@@ -43050,7 +43136,7 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
         },
         confirmButton = {
             TextButton(onClick = {
-                val byApp = { c.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) } }
+                val byApp = { c.coaching.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) } }
                 // Con il server del circolo dei suoi corsi la proposta va da lì; se non risponde, su WhatsApp.
                 if (c.coachVia() != null) scope.launch { if (c.sendProposalServer(st, level, note)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
                 else byApp()
@@ -43067,7 +43153,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var back by remember { mutableStateOf(0) }
     val cal = java.util.Calendar.getInstance().apply { timeInMillis = CourtPlans.dayStart(System.currentTimeMillis()); set(java.util.Calendar.DAY_OF_MONTH, 1); add(java.util.Calendar.MONTH, -back) }
     val from = cal.timeInMillis
@@ -43178,7 +43264,7 @@ fun testValue(key: String, v: Double): String =
 @Composable
 fun StudentProgressSections(c: MatchController, st: PlayerProfile) {
     val s = LocalStrings.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val lang = c.options.collectAsState().value.lang
     var evalOpen by remember { mutableStateOf<Evaluation?>(null) }
     var testOpen by remember { mutableStateOf<FitnessTest?>(null) }
@@ -43459,7 +43545,7 @@ import java.util.Calendar
 fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val sessions by c.serveSessions.collectAsState()
     val lang = c.options.collectAsState().value.lang
     var goalNew by remember { mutableStateOf(false) }
@@ -43477,9 +43563,9 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2,
             trailingIcon = { DictateIcon(c) { said -> text = appendDictated(text, said).take(2000) } })
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.addDiary(st.id, text); text = "" }, Modifier.weight(1f))
+            GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.coaching.addDiary(st.id, text); text = "" }, Modifier.weight(1f))
             // A voce: si parla e la nota va subito nel diario, con la data di oggi.
-            val dictate = rememberDictation(c) { said -> c.addDiary(st.id, appendDictated("", said)); android.widget.Toast.makeText(context, s.dictAdded, android.widget.Toast.LENGTH_SHORT).show() }
+            val dictate = rememberDictation(c) { said -> c.coaching.addDiary(st.id, appendDictated("", said)); android.widget.Toast.makeText(context, s.dictAdded, android.widget.Toast.LENGTH_SHORT).show() }
             if (dictate != null) GhostButton(s.dictNote, Icons.Filled.Mic, dictate, Modifier.weight(1f))
         }
         val diary = Coaching.diaryOf(book, st.id)
@@ -43496,7 +43582,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         if (goals.isEmpty()) Text(s.coGoalsNone, color = TsmColors.TextDim, fontSize = 13.sp)
         for (g in goals) {
             val now = Coaching.goalStatus(g, sessions)
-            Column(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { c.deleteStudentGoal(g.id) }).padding(vertical = 4.dp)) {
+            Column(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { c.coaching.deleteStudentGoal(g.id) }).padding(vertical = 4.dp)) {
                 Text(s.coGoalLine(strokeLabel(s, g.stroke), g.targetPct), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 Text(
                     g.reachedAt?.let { s.coGoalReached(shortDate(it, lang)) } ?: now.pct?.let { s.coGoalNow(it, now.sessions) } ?: s.coGoalNoData,
@@ -43510,7 +43596,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     // Lezioni: la prossima, il pacchetto (comprate, fatte, rimaste) e cosa c'è da pagare.
     SectionCard(s.coLessons, Icons.Filled.Event) {
         val next = Coaching.upcoming(Coaching.lessonsOf(book, st.id), System.currentTimeMillis()).firstOrNull()
-        Text(next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coNoLessons, color = TsmColors.TextMain)
+        Text(next?.let { s.coNextLesson(c.coaching.lessonWhen(it)) } ?: s.coNoLessons, color = TsmColors.TextMain)
         val bal = Coaching.balance(book, st.id)
         if (bal.bought > 0 || bal.used > 0) Text(s.coBalance(bal.bought, bal.used, bal.left), color = if (bal.left < 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         if (bal.absences > 0 || bal.toRecover > 0) Text(listOfNotNull(s.evAbsences(bal.absences).takeIf { bal.absences > 0 }, s.laToRecover(bal.toRecover).takeIf { bal.toRecover > 0 }).joinToString(" · "),
@@ -43535,7 +43621,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         if (st.guardian.isNotBlank() || st.guardianPhone.isNotBlank()) Text("${s.coGuardian}: ${listOf(st.guardian, st.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ")}", color = TsmColors.TextMain, fontSize = 13.sp)
         Text(st.consentAt?.let { s.coConsentGiven(shortDate(it, lang)) } ?: s.coConsentMissing, color = if (st.consentAt != null) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            GhostButton(s.coWrite, Icons.Filled.Message, { c.noticeStudents(listOf(st.id)) }, Modifier.weight(1f))
+            GhostButton(s.coWrite, Icons.Filled.Message, { c.coaching.noticeStudents(listOf(st.id)) }, Modifier.weight(1f))
             GhostButton(s.coMatchWith, Icons.Filled.SportsTennis, { matchPick = true }, Modifier.weight(1f))
         }
         // Dopo una lezione di prova: i suoi dati alla segreteria, per iscriverlo a un corso.
@@ -43552,12 +43638,12 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }
     if (packNew) PackDialog(c, st.id) { packNew = false }
-    if (matchPick) StudentPickDialog(c, s.coMatchWith, exclude = setOf(st.id), multi = false) { picked -> matchPick = false; picked.firstOrNull()?.let { c.matchWith(st.id, it) } }
+    if (matchPick) StudentPickDialog(c, s.coMatchWith, exclude = setOf(st.id), multi = false) { picked -> matchPick = false; picked.firstOrNull()?.let { c.coaching.matchWith(st.id, it) } }
     deleteEntry?.let { id ->
         AlertDialog(
             onDismissRequest = { deleteEntry = null },
             text = { Text(s.delete + "?") },
-            confirmButton = { TextButton(onClick = { c.deleteDiary(id); deleteEntry = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { c.coaching.deleteDiary(id); deleteEntry = null }) { Text(s.delete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { deleteEntry = null }) { Text(s.back) } },
         )
     }
@@ -43584,7 +43670,7 @@ fun StudentGoalDialog(c: MatchController, student: String, onDone: () -> Unit) {
                 Segmented(windows.map { SegOption("$it") }, windows.indexOf(window), { window = windows[it] })
             }
         },
-        confirmButton = { TextButton(onClick = { c.addStudentGoal(student, stroke, target, window); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(onClick = { c.coaching.addStudentGoal(student, stroke, target, window); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
     )
 }
@@ -43595,12 +43681,12 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
     val s = LocalStrings.current
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var l by remember(l0.id) { mutableStateOf(l0) }
     var pick by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text(if (isNew) s.coLessonNew else c.lessonWhen(l)) },
+        title = { Text(if (isNew) s.coLessonNew else c.coaching.lessonWhen(l)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(s.coWho, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
@@ -43620,7 +43706,7 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                 OutlinedTextField(l.place, { l = l.copy(place = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coPlace) })
                 // Col circolo collegato (invito della segreteria) il campo si prenota da qui: la lezione resta salvata.
                 if (c.book.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
-                    if (l.students.isNotEmpty()) c.saveLesson(l)
+                    if (l.students.isNotEmpty()) c.coaching.saveLesson(l)
                     onDone()
                     c.go(com.tennis.scoremanager.Screen.BOOK_COURT)
                 }, Modifier.fillMaxWidth())
@@ -43638,18 +43724,18 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                             l = l.copy(absent = if (i == 1) l.absent + sid else l.absent - sid, excused = if (i == 2) l.excused + sid else l.excused - sid)
                         })
                     }
-                    GhostButton(s.coNotify, Icons.Filled.Message, { c.saveLesson(l); onDone(); c.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
+                    GhostButton(s.coNotify, Icons.Filled.Message, { c.coaching.saveLesson(l); onDone(); c.coaching.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
                     // La lezione nel calendario del telefono (con chi e dove).
                     val ctx = androidx.compose.ui.platform.LocalContext.current
                     GhostButton(s.calAdd, Icons.Filled.Event, {
                         val who = l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ")
                         addToCalendar(ctx, calendarIntent("${s.coLessons}: $who", l.start, l.minutes, l.place, l.note), s)
                     }, Modifier.fillMaxWidth())
-                    TextButton(onClick = { c.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.coaching.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { if (l.students.isNotEmpty()) { c.saveLesson(l); onDone() } }) { Text(s.save) } },
+        confirmButton = { TextButton(onClick = { if (l.students.isNotEmpty()) { c.coaching.saveLesson(l); onDone() } }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
     )
     if (pick) StudentPickDialog(c, s.coWho, initial = l.students.toSet(), multi = true) { ids -> pick = false; l = l.copy(students = ids, group = null) }
@@ -43678,7 +43764,7 @@ fun PackDialog(c: MatchController, student: String, onDone: () -> Unit) {
             TextButton(onClick = {
                 val cents = if (price.isBlank()) 0 else Fees.parse(price) ?: return@TextButton
                 val now = System.currentTimeMillis()
-                c.savePack(LessonPack(Coaching.newId("p"), student, count, cents, now, if (paid) now else null))
+                c.coaching.savePack(LessonPack(Coaching.newId("p"), student, count, cents, now, if (paid) now else null))
                 onDone()
             }) { Text(s.save) }
         },
@@ -43691,7 +43777,7 @@ fun PackDialog(c: MatchController, student: String, onDone: () -> Unit) {
 fun StudentPickDialog(c: MatchController, title: String, exclude: Set<String> = emptySet(), initial: Set<String> = emptySet(), multi: Boolean, onDone: (List<String>) -> Unit) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
-    val groups = c.coachBook.collectAsState().value.groups
+    val groups = c.coaching.coachBook.collectAsState().value.groups
     var picked by remember { mutableStateOf(initial) }
     // Anche con centinaia di allievi: si cerca per nome, si guarda un gruppo, solo i scelti; se ne mostrano 100.
     var query by remember { mutableStateOf("") }
@@ -43736,7 +43822,7 @@ fun StudentPickDialog(c: MatchController, title: String, exclude: Set<String> = 
 @Composable
 fun GroupsDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var editing by remember { mutableStateOf<StudentGroup?>(null) }
     var pick by remember { mutableStateOf(false) }
     val g = editing
@@ -43749,10 +43835,10 @@ fun GroupsDialog(c: MatchController, onDone: () -> Unit) {
                     OutlinedTextField(g.name, { editing = g.copy(name = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coGroupName) })
                     Text(g.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ").ifBlank { "—" }, color = TsmColors.TextMain)
                     GhostButton(s.coWho, Icons.Filled.Groups, { pick = true }, Modifier.fillMaxWidth())
-                    if (book.groups.any { it.id == g.id }) TextButton(onClick = { c.deleteGroup(g.id); editing = null }) { Text(s.delete, color = TsmColors.Danger) }
+                    if (book.groups.any { it.id == g.id }) TextButton(onClick = { c.coaching.deleteGroup(g.id); editing = null }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             },
-            confirmButton = { TextButton(onClick = { if (g.name.isNotBlank()) { c.saveGroup(g); editing = null } }) { Text(s.save) } },
+            confirmButton = { TextButton(onClick = { if (g.name.isNotBlank()) { c.coaching.saveGroup(g); editing = null } }) { Text(s.save) } },
             dismissButton = { TextButton(onClick = { editing = null }) { Text(s.cancel) } },
         )
         if (pick) StudentPickDialog(c, s.coWho, initial = g.students.toSet(), multi = true) { ids -> pick = false; editing = g.copy(students = ids) }
@@ -43961,11 +44047,11 @@ fun AppRoot(c: MatchController) {
         card?.let { IncomingCardDialog(c, it) }
         val result by c.incomingResult.collectAsState()
         result?.let { IncomingResultDialog(c, it) }
-        c.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
-        c.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
-        c.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
+        c.coaching.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
+        c.coaching.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
+        c.coaching.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
         c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
-        c.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
+        c.coaching.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
@@ -46392,7 +46478,7 @@ fun IncomingProfileDialog(c: MatchController, card: ProfileCard) {
     val photo = remember(card.photo) {
         card.photo?.let { runCatching { java.util.Base64.getDecoder().decode(it) }.getOrNull() }?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }?.asImageBitmap()
     }
-    val close = { c.incomingProfile.value = null }
+    val close = { c.coaching.incomingProfile.value = null }
     AlertDialog(
         onDismissRequest = close,
         icon = { Icon(Icons.Filled.SwapHoriz, null, tint = TsmColors.Ball) },
@@ -72285,9 +72371,9 @@ private fun CoachTab(c: MatchController) {
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
     // L'agenda delle lezioni: la prossima nella riga, e dentro il promemoria di quelle di domani.
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
-    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coAgendaHint) { c.openLessons() }
+    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.coaching.lessonWhen(it)) } ?: s.coAgendaHint) { c.coaching.openLessons() }
     // I corsi della scuola ricevuti dalla segreteria (scheda corso), con le presenze da mandare.
     com.tennis.scoremanager.ui.CoachCoursesSection(c)
     var month by remember { mutableStateOf(false) }
@@ -73045,7 +73131,7 @@ import com.tennis.scoremanager.ui.tomorrowLessons
 fun LessonsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var open by remember { mutableStateOf<CoachLesson?>(null) }
     val now = System.currentTimeMillis()
     ScreenScaffold(
@@ -73059,7 +73145,7 @@ fun LessonsScreen(c: MatchController) {
         },
     ) {
         val tomorrow = tomorrowLessons(book, now)
-        if (tomorrow.isNotEmpty()) BigButton(s.coRemindTomorrow(tomorrow.size), Icons.Filled.NotificationsActive, { c.noticeLessons(tomorrow) }, Modifier.fillMaxWidth())
+        if (tomorrow.isNotEmpty()) BigButton(s.coRemindTomorrow(tomorrow.size), Icons.Filled.NotificationsActive, { c.coaching.noticeLessons(tomorrow) }, Modifier.fillMaxWidth())
         // Il mese (lezioni private, corsi, tornei, feste e impegni) o l'elenco delle prossime.
         var asList by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
         com.tennis.scoremanager.ui.Segmented(listOf(com.tennis.scoremanager.ui.SegOption(s.agMonth), com.tennis.scoremanager.ui.SegOption(s.agList)), if (asList) 1 else 0, { asList = it == 1 })
@@ -73074,7 +73160,7 @@ fun LessonsScreen(c: MatchController) {
         if (past.isNotEmpty()) SectionCard(s.coToMark, Icons.Filled.Event) {
             for (l in past.take(20)) Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { LessonRow(c, l) { open = l } }
-                TextButton(onClick = { c.saveLesson(l.copy(done = true)) }) { Text(s.coDone, color = TsmColors.Ok) }
+                TextButton(onClick = { c.coaching.saveLesson(l.copy(done = true)) }) { Text(s.coDone, color = TsmColors.Ok) }
             }
         }
         // I giorni in cui l'allenatore non c'è, e le lezioni che ci cadono.
@@ -73087,13 +73173,13 @@ fun LessonsScreen(c: MatchController) {
 private fun LessonRow(c: MatchController, l: CoachLesson, onClick: () -> Unit) {
     val s = LocalStrings.current
     Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp)) {
-        Text(c.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(c.coaching.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
         // Lezione in un giorno di festa: in rosso.
         com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.collectAsState().value.lang.code))?.let {
             Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         // In un giorno occupato: in arancione.
-        Coaching.busyOn(c.coachBook.collectAsState().value.busy, l.start)?.let {
+        Coaching.busyOn(c.coaching.coachBook.collectAsState().value.busy, l.start)?.let {
             Text(com.tennis.scoremanager.ui.busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         Text(l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") + if (l.cancelled) " · ${s.coCancelled}" else if (l.done) " · ${s.coDone}" else "",
@@ -77717,7 +77803,7 @@ fun CourseScreen(c: MatchController) {
             0 -> {
                 Text(s.scStudentsCount(co.students.size, co.maxStudents), color = if (Courses.full(co)) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
                 // La scheda corso all'allenatore (orari, iscritti, contatti): segna lui le presenze e le rimanda.
-                if (co.coach != null) GhostButton(s.ccSendToCoach, Icons.Filled.Campaign, { c.sendCourseToCoach(co) }, Modifier.fillMaxWidth())
+                if (co.coach != null) GhostButton(s.ccSendToCoach, Icons.Filled.Campaign, { c.coaching.sendCourseToCoach(co) }, Modifier.fillMaxWidth())
                 if (!Courses.full(co)) BigButton(s.scAddStudent, Icons.Filled.PersonAdd, { adding = true }, Modifier.fillMaxWidth())
                 for (sid in co.students) {
                     val p = c.playerById(sid)
@@ -79033,7 +79119,7 @@ fun StudentsScreen(c: MatchController) {
         // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
         com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
-        val book by c.coachBook.collectAsState()
+        val book by c.coaching.coachBook.collectAsState()
         var query by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
         var byLast by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
         var filter by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
@@ -79051,9 +79137,9 @@ fun StudentsScreen(c: MatchController) {
             }
             if (filter == "away") Text(s.coAwayHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val group = book.groups.firstOrNull { it.id == filter }
-            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.noticeStudents(group.students) }, Modifier.fillMaxWidth())
+            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.coaching.noticeStudents(group.students) }, Modifier.fillMaxWidth())
             // Il report di ciascuno (ultimi 30 giorni) al genitore o all'allievo, uno per uno: dell'elenco che si vede.
-            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
+            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.coaching.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
         }
         val shown = students
             .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }
@@ -81991,7 +82077,7 @@ class CameraActivity : ComponentActivity() {
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
         // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
         // Lezione: quella dell'agenda in corso (e, senza allievo scelto, il suo allievo se è uno solo).
-        val agenda = if (lessonMode) Lessons.current(controller.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
+        val agenda = if (lessonMode) Lessons.current(controller.coaching.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
         agendaLesson.value = agenda?.start
         val student = controller.studentById(controller.trainStudent.value ?: agenda?.students?.singleOrNull())
         val folder = if (lessonMode) controller.storage.newLessonFolder(serveSession.value.startedAt, s.strokeFolderName, s.lessonFolder, student?.name)
@@ -119147,6 +119233,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 404 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 406 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -58,13 +58,13 @@ fun busyDays(b: CoachBusy, lang: com.tennis.scoremanager.model.Lang): String =
 fun BusySection(c: MatchController) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var open by remember { mutableStateOf<CoachBusy?>(null) }
     var isNew by remember { mutableStateOf(false) }
     val today = CourtPlans.dayStart(System.currentTimeMillis())
     val clashes = Coaching.busyClashes(book, System.currentTimeMillis()) { ids -> ids.mapNotNull { c.playerById(it)?.name }.joinToString(", ") }
     if (clashes.isNotEmpty()) SectionCard(s.bzClash(clashes.size), Icons.Filled.Warning) {
-        for (x in clashes.take(20)) Text("${c.lessonWhen(com.tennis.scoremanager.data.CoachLesson("", x.start))} · ${x.title} — ${busyLabel(s, x.busy)}",
+        for (x in clashes.take(20)) Text("${c.coaching.lessonWhen(com.tennis.scoremanager.data.CoachLesson("", x.start))} · ${x.title} — ${busyLabel(s, x.busy)}",
             color = TsmColors.Orange, fontSize = 14.sp)
         if (clashes.size > 20) Text("+${clashes.size - 20}", color = TsmColors.TextDim)
         Text(s.bzClashHint, color = TsmColors.TextDim, fontSize = 13.sp)

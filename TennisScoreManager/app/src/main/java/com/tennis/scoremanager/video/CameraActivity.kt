@@ -435,7 +435,7 @@ class CameraActivity : ComponentActivity() {
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
         // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
         // Lezione: quella dell'agenda in corso (e, senza allievo scelto, il suo allievo se è uno solo).
-        val agenda = if (lessonMode) Lessons.current(controller.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
+        val agenda = if (lessonMode) Lessons.current(controller.coaching.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
         agendaLesson.value = agenda?.start
         val student = controller.studentById(controller.trainStudent.value ?: agenda?.students?.singleOrNull())
         val folder = if (lessonMode) controller.storage.newLessonFolder(serveSession.value.startedAt, s.strokeFolderName, s.lessonFolder, student?.name)

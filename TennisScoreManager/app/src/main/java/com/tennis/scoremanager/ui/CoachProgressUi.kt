@@ -66,7 +66,7 @@ fun testValue(key: String, v: Double): String =
 @Composable
 fun StudentProgressSections(c: MatchController, st: PlayerProfile) {
     val s = LocalStrings.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val lang = c.options.collectAsState().value.lang
     var evalOpen by remember { mutableStateOf<Evaluation?>(null) }
     var testOpen by remember { mutableStateOf<FitnessTest?>(null) }

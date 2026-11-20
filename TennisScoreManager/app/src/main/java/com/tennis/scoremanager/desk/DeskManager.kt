@@ -83,7 +83,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
     }
     override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
-    override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
+    override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
     override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
     override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
@@ -116,7 +116,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
                 st == com.tennis.scoremanager.data.ResultStatus.READY || st == com.tennis.scoremanager.data.ResultStatus.CONFLICT, replace = st == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
-            val st = c.attendanceStatus(r)
+            val st = c.coaching.attendanceStatus(r)
             val msg = when (st) {
                 com.tennis.scoremanager.data.AttendanceStatus.READY -> s.ccAttReady
                 com.tennis.scoremanager.data.AttendanceStatus.SAME -> s.ccAttSame
@@ -143,9 +143,9 @@ class DeskBridge(private val c: MatchController) : DeskData {
             c.applyResult(r); return null
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
-            val st = c.attendanceStatus(r)
+            val st = c.coaching.attendanceStatus(r)
             if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
-            c.applyAttendance(r); return null
+            c.coaching.applyAttendance(r); return null
         }
         com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.school.courses.value.any { it.id == id } }); return null }
         return "NOT_A_FILE"
@@ -200,18 +200,18 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun now(): Long = System.currentTimeMillis()
     override val lang: String get() = c.options.value.lang.code
     override fun coachName(): String = c.me()?.name ?: c.storage.myName
-    override fun book() = c.coachBook.value
+    override fun book() = c.coaching.coachBook.value
     override fun players(): List<PlayerProfile> = c.players.value
     override fun sessions() = c.serveSessions.value
-    override fun addDiary(student: String, text: String) = c.addDiary(student, text)
+    override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
-    override fun markPackPaid(packId: String) { c.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
-    override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
+    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
+    override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
-        c.markCourseLesson(courseId, key, start, present, cancelled, note)
-    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
-    override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
-    override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
+        c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)
+    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.coaching.saveCoachOwnCourse(c)
+    override fun deleteOwnCourse(id: String) = c.coaching.deleteCoachCourse(id)
+    override fun setCourseColor(id: String, color: String) = c.coaching.setCoachCourseColor(id, color)
     override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
     override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }

@@ -238,9 +238,9 @@ private fun CoachTab(c: MatchController) {
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
     // L'agenda delle lezioni: la prossima nella riga, e dentro il promemoria di quelle di domani.
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
-    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coAgendaHint) { c.openLessons() }
+    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.coaching.lessonWhen(it)) } ?: s.coAgendaHint) { c.coaching.openLessons() }
     // I corsi della scuola ricevuti dalla segreteria (scheda corso), con le presenze da mandare.
     com.tennis.scoremanager.ui.CoachCoursesSection(c)
     var month by remember { mutableStateOf(false) }

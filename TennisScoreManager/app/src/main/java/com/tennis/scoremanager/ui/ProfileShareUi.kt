@@ -155,7 +155,7 @@ fun IncomingProfileDialog(c: MatchController, card: ProfileCard) {
     val photo = remember(card.photo) {
         card.photo?.let { runCatching { java.util.Base64.getDecoder().decode(it) }.getOrNull() }?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }?.asImageBitmap()
     }
-    val close = { c.incomingProfile.value = null }
+    val close = { c.coaching.incomingProfile.value = null }
     AlertDialog(
         onDismissRequest = close,
         icon = { Icon(Icons.Filled.SwapHoriz, null, tint = TsmColors.Ball) },

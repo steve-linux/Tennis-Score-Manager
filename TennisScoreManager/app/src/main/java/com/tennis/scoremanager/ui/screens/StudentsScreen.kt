@@ -102,7 +102,7 @@ fun StudentsScreen(c: MatchController) {
         // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
         com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
-        val book by c.coachBook.collectAsState()
+        val book by c.coaching.coachBook.collectAsState()
         var query by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
         var byLast by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
         var filter by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
@@ -120,9 +120,9 @@ fun StudentsScreen(c: MatchController) {
             }
             if (filter == "away") Text(s.coAwayHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val group = book.groups.firstOrNull { it.id == filter }
-            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.noticeStudents(group.students) }, Modifier.fillMaxWidth())
+            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.coaching.noticeStudents(group.students) }, Modifier.fillMaxWidth())
             // Il report di ciascuno (ultimi 30 giorni) al genitore o all'allievo, uno per uno: dell'elenco che si vede.
-            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
+            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.coaching.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
         }
         val shown = students
             .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }

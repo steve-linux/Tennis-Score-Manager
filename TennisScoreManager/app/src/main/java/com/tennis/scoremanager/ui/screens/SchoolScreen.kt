@@ -167,7 +167,7 @@ fun CourseScreen(c: MatchController) {
             0 -> {
                 Text(s.scStudentsCount(co.students.size, co.maxStudents), color = if (Courses.full(co)) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
                 // La scheda corso all'allenatore (orari, iscritti, contatti): segna lui le presenze e le rimanda.
-                if (co.coach != null) GhostButton(s.ccSendToCoach, Icons.Filled.Campaign, { c.sendCourseToCoach(co) }, Modifier.fillMaxWidth())
+                if (co.coach != null) GhostButton(s.ccSendToCoach, Icons.Filled.Campaign, { c.coaching.sendCourseToCoach(co) }, Modifier.fillMaxWidth())
                 if (!Courses.full(co)) BigButton(s.scAddStudent, Icons.Filled.PersonAdd, { adding = true }, Modifier.fillMaxWidth())
                 for (sid in co.students) {
                     val p = c.playerById(sid)
