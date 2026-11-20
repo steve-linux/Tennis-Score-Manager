@@ -68,7 +68,7 @@ import java.util.Calendar
 fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val sessions by c.serveSessions.collectAsState()
     val lang = c.options.collectAsState().value.lang
     var goalNew by remember { mutableStateOf(false) }
@@ -86,9 +86,9 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2,
             trailingIcon = { DictateIcon(c) { said -> text = appendDictated(text, said).take(2000) } })
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.addDiary(st.id, text); text = "" }, Modifier.weight(1f))
+            GhostButton(s.coDiaryAdd, Icons.Filled.Add, { c.coaching.addDiary(st.id, text); text = "" }, Modifier.weight(1f))
             // A voce: si parla e la nota va subito nel diario, con la data di oggi.
-            val dictate = rememberDictation(c) { said -> c.addDiary(st.id, appendDictated("", said)); android.widget.Toast.makeText(context, s.dictAdded, android.widget.Toast.LENGTH_SHORT).show() }
+            val dictate = rememberDictation(c) { said -> c.coaching.addDiary(st.id, appendDictated("", said)); android.widget.Toast.makeText(context, s.dictAdded, android.widget.Toast.LENGTH_SHORT).show() }
             if (dictate != null) GhostButton(s.dictNote, Icons.Filled.Mic, dictate, Modifier.weight(1f))
         }
         val diary = Coaching.diaryOf(book, st.id)
@@ -105,7 +105,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         if (goals.isEmpty()) Text(s.coGoalsNone, color = TsmColors.TextDim, fontSize = 13.sp)
         for (g in goals) {
             val now = Coaching.goalStatus(g, sessions)
-            Column(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { c.deleteStudentGoal(g.id) }).padding(vertical = 4.dp)) {
+            Column(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { c.coaching.deleteStudentGoal(g.id) }).padding(vertical = 4.dp)) {
                 Text(s.coGoalLine(strokeLabel(s, g.stroke), g.targetPct), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 Text(
                     g.reachedAt?.let { s.coGoalReached(shortDate(it, lang)) } ?: now.pct?.let { s.coGoalNow(it, now.sessions) } ?: s.coGoalNoData,
@@ -119,14 +119,14 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     // Lezioni: la prossima, il pacchetto (comprate, fatte, rimaste) e cosa c'è da pagare.
     SectionCard(s.coLessons, Icons.Filled.Event) {
         val next = Coaching.upcoming(Coaching.lessonsOf(book, st.id), System.currentTimeMillis()).firstOrNull()
-        Text(next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coNoLessons, color = TsmColors.TextMain)
+        Text(next?.let { s.coNextLesson(c.coaching.lessonWhen(it)) } ?: s.coNoLessons, color = TsmColors.TextMain)
         val bal = Coaching.balance(book, st.id)
         if (bal.bought > 0 || bal.used > 0) Text(s.coBalance(bal.bought, bal.used, bal.left), color = if (bal.left < 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         if (bal.absences > 0 || bal.toRecover > 0) Text(listOfNotNull(s.evAbsences(bal.absences).takeIf { bal.absences > 0 }, s.laToRecover(bal.toRecover).takeIf { bal.toRecover > 0 }).joinToString(" · "),
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            if (p.paidAt == null) TextButton(onClick = { c.coaching.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
             // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
             else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
@@ -144,7 +144,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         if (st.guardian.isNotBlank() || st.guardianPhone.isNotBlank()) Text("${s.coGuardian}: ${listOf(st.guardian, st.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ")}", color = TsmColors.TextMain, fontSize = 13.sp)
         Text(st.consentAt?.let { s.coConsentGiven(shortDate(it, lang)) } ?: s.coConsentMissing, color = if (st.consentAt != null) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            GhostButton(s.coWrite, Icons.Filled.Message, { c.noticeStudents(listOf(st.id)) }, Modifier.weight(1f))
+            GhostButton(s.coWrite, Icons.Filled.Message, { c.coaching.noticeStudents(listOf(st.id)) }, Modifier.weight(1f))
             GhostButton(s.coMatchWith, Icons.Filled.SportsTennis, { matchPick = true }, Modifier.weight(1f))
         }
         // Dopo una lezione di prova: i suoi dati alla segreteria, per iscriverlo a un corso.
@@ -154,19 +154,19 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
     receipt?.let { id ->
-        val file = remember(id) { c.packReceiptFile(id) }
-        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.noticePackReceipt(id) }) { receipt = null }
+        val file = remember(id) { c.coaching.packReceiptFile(id) }
+        PdfActionsDialog(c, file, s.receiptTitle, s.receiptNotFiscal, { c.coaching.noticePackReceipt(id) }) { receipt = null }
     }
 
     if (goalNew) StudentGoalDialog(c, st.id) { goalNew = false }
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }
     if (packNew) PackDialog(c, st.id) { packNew = false }
-    if (matchPick) StudentPickDialog(c, s.coMatchWith, exclude = setOf(st.id), multi = false) { picked -> matchPick = false; picked.firstOrNull()?.let { c.matchWith(st.id, it) } }
+    if (matchPick) StudentPickDialog(c, s.coMatchWith, exclude = setOf(st.id), multi = false) { picked -> matchPick = false; picked.firstOrNull()?.let { c.coaching.matchWith(st.id, it) } }
     deleteEntry?.let { id ->
         AlertDialog(
             onDismissRequest = { deleteEntry = null },
             text = { Text(s.delete + "?") },
-            confirmButton = { TextButton(onClick = { c.deleteDiary(id); deleteEntry = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { c.coaching.deleteDiary(id); deleteEntry = null }) { Text(s.delete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { deleteEntry = null }) { Text(s.back) } },
         )
     }
@@ -193,7 +193,7 @@ fun StudentGoalDialog(c: MatchController, student: String, onDone: () -> Unit) {
                 Segmented(windows.map { SegOption("$it") }, windows.indexOf(window), { window = windows[it] })
             }
         },
-        confirmButton = { TextButton(onClick = { c.addStudentGoal(student, stroke, target, window); onDone() }) { Text(s.save) } },
+        confirmButton = { TextButton(onClick = { c.coaching.addStudentGoal(student, stroke, target, window); onDone() }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
     )
 }
@@ -204,12 +204,12 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
     val s = LocalStrings.current
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var l by remember(l0.id) { mutableStateOf(l0) }
     var pick by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text(if (isNew) s.coLessonNew else c.lessonWhen(l)) },
+        title = { Text(if (isNew) s.coLessonNew else c.coaching.lessonWhen(l)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(s.coWho, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
@@ -228,8 +228,8 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                 Segmented(lengths.map { SegOption(s.coMinutes(it)) }, lengths.indexOf(l.minutes), { l = l.copy(minutes = lengths[it]) }, columns = 3)
                 OutlinedTextField(l.place, { l = l.copy(place = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coPlace) })
                 // Col circolo collegato (invito della segreteria) il campo si prenota da qui: la lezione resta salvata.
-                if (c.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
-                    if (l.students.isNotEmpty()) c.saveLesson(l)
+                if (c.book.bookingAccounts.collectAsState().value.isNotEmpty()) GhostButton(s.coBookCourt, Icons.Filled.Event, {
+                    if (l.students.isNotEmpty()) c.coaching.saveLesson(l)
                     onDone()
                     c.go(com.tennis.scoremanager.Screen.BOOK_COURT)
                 }, Modifier.fillMaxWidth())
@@ -247,18 +247,18 @@ fun LessonDialog(c: MatchController, l0: CoachLesson, isNew: Boolean, onDone: ()
                             l = l.copy(absent = if (i == 1) l.absent + sid else l.absent - sid, excused = if (i == 2) l.excused + sid else l.excused - sid)
                         })
                     }
-                    GhostButton(s.coNotify, Icons.Filled.Message, { c.saveLesson(l); onDone(); c.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
+                    GhostButton(s.coNotify, Icons.Filled.Message, { c.coaching.saveLesson(l); onDone(); c.coaching.noticeLessons(listOf(l)) }, Modifier.fillMaxWidth())
                     // La lezione nel calendario del telefono (con chi e dove).
                     val ctx = androidx.compose.ui.platform.LocalContext.current
                     GhostButton(s.calAdd, Icons.Filled.Event, {
                         val who = l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ")
                         addToCalendar(ctx, calendarIntent("${s.coLessons}: $who", l.start, l.minutes, l.place, l.note), s)
                     }, Modifier.fillMaxWidth())
-                    TextButton(onClick = { c.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.coaching.deleteLesson(l.id); onDone() }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { if (l.students.isNotEmpty()) { c.saveLesson(l); onDone() } }) { Text(s.save) } },
+        confirmButton = { TextButton(onClick = { if (l.students.isNotEmpty()) { c.coaching.saveLesson(l); onDone() } }) { Text(s.save) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.cancel) } },
     )
     if (pick) StudentPickDialog(c, s.coWho, initial = l.students.toSet(), multi = true) { ids -> pick = false; l = l.copy(students = ids, group = null) }
@@ -287,7 +287,7 @@ fun PackDialog(c: MatchController, student: String, onDone: () -> Unit) {
             TextButton(onClick = {
                 val cents = if (price.isBlank()) 0 else Fees.parse(price) ?: return@TextButton
                 val now = System.currentTimeMillis()
-                c.savePack(LessonPack(Coaching.newId("p"), student, count, cents, now, if (paid) now else null))
+                c.coaching.savePack(LessonPack(Coaching.newId("p"), student, count, cents, now, if (paid) now else null))
                 onDone()
             }) { Text(s.save) }
         },
@@ -300,7 +300,7 @@ fun PackDialog(c: MatchController, student: String, onDone: () -> Unit) {
 fun StudentPickDialog(c: MatchController, title: String, exclude: Set<String> = emptySet(), initial: Set<String> = emptySet(), multi: Boolean, onDone: (List<String>) -> Unit) {
     val s = LocalStrings.current
     val students by c.students.collectAsState()
-    val groups = c.coachBook.collectAsState().value.groups
+    val groups = c.coaching.coachBook.collectAsState().value.groups
     var picked by remember { mutableStateOf(initial) }
     // Anche con centinaia di allievi: si cerca per nome, si guarda un gruppo, solo i scelti; se ne mostrano 100.
     var query by remember { mutableStateOf("") }
@@ -345,7 +345,7 @@ fun StudentPickDialog(c: MatchController, title: String, exclude: Set<String> = 
 @Composable
 fun GroupsDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var editing by remember { mutableStateOf<StudentGroup?>(null) }
     var pick by remember { mutableStateOf(false) }
     val g = editing
@@ -358,10 +358,10 @@ fun GroupsDialog(c: MatchController, onDone: () -> Unit) {
                     OutlinedTextField(g.name, { editing = g.copy(name = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.coGroupName) })
                     Text(g.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ").ifBlank { "—" }, color = TsmColors.TextMain)
                     GhostButton(s.coWho, Icons.Filled.Groups, { pick = true }, Modifier.fillMaxWidth())
-                    if (book.groups.any { it.id == g.id }) TextButton(onClick = { c.deleteGroup(g.id); editing = null }) { Text(s.delete, color = TsmColors.Danger) }
+                    if (book.groups.any { it.id == g.id }) TextButton(onClick = { c.coaching.deleteGroup(g.id); editing = null }) { Text(s.delete, color = TsmColors.Danger) }
                 }
             },
-            confirmButton = { TextButton(onClick = { if (g.name.isNotBlank()) { c.saveGroup(g); editing = null } }) { Text(s.save) } },
+            confirmButton = { TextButton(onClick = { if (g.name.isNotBlank()) { c.coaching.saveGroup(g); editing = null } }) { Text(s.save) } },
             dismissButton = { TextButton(onClick = { editing = null }) { Text(s.cancel) } },
         )
         if (pick) StudentPickDialog(c, s.coWho, initial = g.students.toSet(), multi = true) { ids -> pick = false; editing = g.copy(students = ids) }

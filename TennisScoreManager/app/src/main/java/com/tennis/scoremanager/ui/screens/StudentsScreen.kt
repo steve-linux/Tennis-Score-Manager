@@ -102,7 +102,7 @@ fun StudentsScreen(c: MatchController) {
         // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
         com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
-        val book by c.coachBook.collectAsState()
+        val book by c.coaching.coachBook.collectAsState()
         var query by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
         var byLast by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
         var filter by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
@@ -120,9 +120,9 @@ fun StudentsScreen(c: MatchController) {
             }
             if (filter == "away") Text(s.coAwayHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val group = book.groups.firstOrNull { it.id == filter }
-            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.noticeStudents(group.students) }, Modifier.fillMaxWidth())
+            if (group != null && group.students.isNotEmpty()) GhostButton(s.coWrite, Icons.Filled.Share, { c.coaching.noticeStudents(group.students) }, Modifier.fillMaxWidth())
             // Il report di ciascuno (ultimi 30 giorni) al genitore o all'allievo, uno per uno: dell'elenco che si vede.
-            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
+            if (students.isNotEmpty()) GhostButton(s.rpAll, Icons.Filled.Share, { c.coaching.noticeReports((group?.students ?: students.map { it.id })) }, Modifier.fillMaxWidth())
         }
         val shown = students
             .filter { query.isBlank() || com.tennis.scoremanager.data.Players.search(listOf(it), query).isNotEmpty() }
@@ -230,20 +230,20 @@ fun StudentScreen(c: MatchController) {
         PlayerOnlineSection(c, st)
         if (com.tennis.scoremanager.ClubFeature.PAYMENTS in features) ChargesSection(c, st)
         // Le squadre in cui gioca.
-        val teamsAll by c.teams.collectAsState()
+        val teamsAll by c.competitions.teams.collectAsState()
         val mineT = teamsAll.filter { tm -> tm.roster.any { it == st.id || it in st.aliases } }
         if (mineT.isNotEmpty()) SectionCard(s.tmTitle, Icons.Filled.Groups) {
             for (tm in mineT) Text(tm.name + (tm.championship.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().clickable { c.openTeam(tm.id) }.padding(vertical = 6.dp))
+                modifier = Modifier.fillMaxWidth().clickable { c.competitions.openTeam(tm.id) }.padding(vertical = 6.dp))
         }
         // I corsi della scuola tennis che frequenta.
-        val courses by c.courses.collectAsState()
+        val courses by c.school.courses.collectAsState()
         val mineC = courses.filter { co -> co.students.any { it == st.id || it in st.aliases } }
         if (mineC.isNotEmpty()) SectionCard(s.scTitle, Icons.Filled.School) {
             for (co in mineC) {
                 val (pres, tot) = com.tennis.scoremanager.data.Courses.attendanceOf(co, st.id, System.currentTimeMillis())
                 Text(co.name + if (tot > 0) " · " + s.scAttendance(pres, tot) else "", color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth().clickable { c.openCourse(co.id) }.padding(vertical = 6.dp))
+                    modifier = Modifier.fillMaxWidth().clickable { c.school.openCourse(co.id) }.padding(vertical = 6.dp))
             }
         }
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->

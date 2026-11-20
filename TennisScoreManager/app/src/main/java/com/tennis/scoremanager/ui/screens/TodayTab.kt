@@ -79,12 +79,12 @@ fun TodayTab(c: MatchController) {
     val lang = c.options.collectAsState().value.lang
     val f by c.clubFeatures.collectAsState()
     val plan by c.courtPlan.collectAsState()
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    val courses by c.courses.collectAsState()
-    val teams by c.teams.collectAsState()
-    val ladders by c.ladders.collectAsState()
+    val courses by c.school.courses.collectAsState()
+    val teams by c.competitions.teams.collectAsState()
+    val ladders by c.competitions.ladders.collectAsState()
     // Si aggiorna ogni minuto: lasciata aperta (un tablet in segreteria) passa da sola al giorno dopo.
     var now by remember { androidx.compose.runtime.mutableLongStateOf(System.currentTimeMillis()) }
     LaunchedEffect(Unit) {
@@ -113,7 +113,7 @@ fun TodayTab(c: MatchController) {
         }
         val online = occ.count { it.booking?.online != null }
         TodayCard(Icons.Filled.CalendarMonth, if (occ.isEmpty()) s.tdCourtsNone else s.tdCourts(occ.size),
-            next + listOfNotNull(s.tdOnline(online).takeIf { online > 0 })) { c.openCourtsPlan() }
+            next + listOfNotNull(s.tdOnline(online).takeIf { online > 0 })) { c.planning.openCourtsPlan() }
         shown++
     }
     if (ClubFeature.PAYMENTS in f) {
@@ -133,7 +133,7 @@ fun TodayTab(c: MatchController) {
         val matches = tournaments.flatMap { t -> t.matches.filter { m -> m.at != null && m.at in today until tomorrow && m.winner == null && !m.bye }.map { t to it } }.sortedBy { it.second.at }
         if (matches.isNotEmpty()) {
             TodayCard(Icons.Filled.EmojiEvents, s.tdMatches(matches.size), matches.take(3).map { (t, m) -> listOf(hm(m.at!!), m.court, t.name).filter { it.isNotBlank() }.joinToString(" · ") }) {
-                if (matches.map { it.first.id }.distinct().size == 1) c.openClubTournament(matches.first().first.id) else c.openClubTournaments()
+                if (matches.map { it.first.id }.distinct().size == 1) c.competitions.openClubTournament(matches.first().first.id) else c.competitions.openClubTournaments()
             }
             shown++
         }
@@ -142,7 +142,7 @@ fun TodayTab(c: MatchController) {
         val lessons = courses.flatMap { co -> Courses.lessons(co).filter { it.start in today until tomorrow && it.key !in co.cancelled }.map { co to it } }.sortedBy { it.second.start }
         if (lessons.isNotEmpty()) {
             TodayCard(Icons.Filled.School, s.tdLessons(lessons.size), lessons.take(3).map { (co, l) -> listOf(hm(l.start), co.name, l.court).filter { it.isNotBlank() }.joinToString(" · ") }) {
-                if (lessons.map { it.first.id }.distinct().size == 1) c.openCourse(lessons.first().first.id) else c.openSchool()
+                if (lessons.map { it.first.id }.distinct().size == 1) c.school.openCourse(lessons.first().first.id) else c.school.openSchool()
             }
             shown++
         }
@@ -151,7 +151,7 @@ fun TodayTab(c: MatchController) {
         val week = teams.flatMap { t -> t.fixtures.filter { it.at in today until CourtPlans.addDays(today, 7) }.map { t to it } }.sortedBy { it.second.at }
         if (week.isNotEmpty()) {
             val (t0, f0) = week.first()
-            TodayCard(Icons.Filled.Groups, s.tdFixtures(week.size), week.take(3).map { (t, fx) -> "${shortDate(fx.at, lang)} · ${t.name} – ${fx.opponent}" }) { c.openFixture(t0.id, f0.id) }
+            TodayCard(Icons.Filled.Groups, s.tdFixtures(week.size), week.take(3).map { (t, fx) -> "${shortDate(fx.at, lang)} · ${t.name} – ${fx.opponent}" }) { c.competitions.openFixture(t0.id, f0.id) }
             shown++
         }
     }
@@ -160,7 +160,7 @@ fun TodayTab(c: MatchController) {
         val late = open.count { it.second.deadline < now }
         if (open.isNotEmpty()) {
             TodayCard(Icons.Filled.Leaderboard, s.tdChallenges(open.size), listOfNotNull(s.tdLate(late).takeIf { late > 0 }), alert = late > 0) {
-                if (open.map { it.first.id }.distinct().size == 1) c.openLadder(open.first().first.id) else c.openLadders()
+                if (open.map { it.first.id }.distinct().size == 1) c.competitions.openLadder(open.first().first.id) else c.competitions.openLadders()
             }
             shown++
         }

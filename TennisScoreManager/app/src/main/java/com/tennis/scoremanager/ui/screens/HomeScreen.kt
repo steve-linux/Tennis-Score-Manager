@@ -136,7 +136,7 @@ fun HomeScreen(c: MatchController) {
     // Le schede che restano vuote con quello che non si usa spariscono.
     val pf by c.playerFeatures.collectAsState()
     val cf by c.clubFeatures.collectAsState()
-    val accounts by c.bookingAccounts.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     val tabs = role.tabs.filter { t ->
         when (t) {
             // Il circolo di chi gioca: solo dopo esserci entrati con l'invito della segreteria.
@@ -238,9 +238,9 @@ private fun CoachTab(c: MatchController) {
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
     // L'agenda delle lezioni: la prossima nella riga, e dentro il promemoria di quelle di domani.
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
-    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.lessonWhen(it)) } ?: s.coAgendaHint) { c.openLessons() }
+    Entry(Icons.Filled.CalendarMonth, s.coAgenda, next?.let { s.coNextLesson(c.coaching.lessonWhen(it)) } ?: s.coAgendaHint) { c.coaching.openLessons() }
     // I corsi della scuola ricevuti dalla segreteria (scheda corso), con le presenze da mandare.
     com.tennis.scoremanager.ui.CoachCoursesSection(c)
     var month by remember { mutableStateOf(false) }
@@ -258,9 +258,9 @@ private fun CoachTab(c: MatchController) {
 private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val f by c.clubFeatures.collectAsState()
-    if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
-    if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint, main = ClubFeature.TOURNAMENTS !in f) { c.openTeams() }
-    if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint, main = ClubFeature.TOURNAMENTS !in f && ClubFeature.TEAMS !in f) { c.openLadders() }
+    if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.competitions.openClubTournaments() }
+    if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint, main = ClubFeature.TOURNAMENTS !in f) { c.competitions.openTeams() }
+    if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint, main = ClubFeature.TOURNAMENTS !in f && ClubFeature.TEAMS !in f) { c.competitions.openLadders() }
     // La segreteria non segna punteggi: dal campo si passa al ruolo Tu (Gioca › Partite del circolo).
     if (ClubFeature.TOURNAMENTS in f || ClubFeature.TEAMS in f || ClubFeature.LADDER in f) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
 }
@@ -272,7 +272,7 @@ private fun PeopleTab(c: MatchController) {
     val f by c.clubFeatures.collectAsState()
     if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
     if (ClubFeature.PAYMENTS in f) Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint, main = ClubFeature.MEMBERS !in f) { c.openPayments() }
-    if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint, main = ClubFeature.MEMBERS !in f && ClubFeature.PAYMENTS !in f) { c.openSchool() }
+    if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint, main = ClubFeature.MEMBERS !in f && ClubFeature.PAYMENTS !in f) { c.school.openSchool() }
     if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.Campaign, s.ntMembersAll, null) { c.noticeMembersAll() }
 }
 
@@ -368,9 +368,9 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
-    val goals by c.goals.collectAsState()
+    val goals by c.progress.goals.collectAsState()
     for (g in goals.filter { it.reachedAt != null && !it.seen }) {
-        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.goalSeen(g.id); c.openProgress() }
+        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.progress.goalSeen(g.id); c.progress.openProgress() }
     }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
@@ -383,7 +383,7 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
     if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
     // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
-    val cards by c.receivedCards.collectAsState()
+    val cards by c.cards.receivedCards.collectAsState()
     for (rc in cards.filter { it.result != null && it.sentAt == null }) {
         val r = rc.result!!
         Entry(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ")) {
@@ -444,8 +444,8 @@ private fun ResumeEntries(c: MatchController, club: Boolean?) {
 private fun BookingTab(c: MatchController) {
     val s = LocalStrings.current
     ClubNews(c)
-    val accounts by c.bookingAccounts.collectAsState()
-    val reach by c.bookingReach.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
+    val reach by c.book.bookingReach.collectAsState()
     val down = accounts.filter { reach[it.url] == false }
     val names = { l: List<com.tennis.scoremanager.data.BookingAccount> -> l.joinToString(", ") { it.club.ifBlank { it.url } } }
     val hint = when {
@@ -454,13 +454,13 @@ private fun BookingTab(c: MatchController) {
         else -> s.pbEntryJoined(names(accounts))
     }
     Entry(if (down.isEmpty()) Icons.Filled.CalendarMonth else Icons.Filled.CloudOff, s.pbTitle, hint, main = true) { c.go(Screen.BOOK_COURT) }
-    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
-    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.EventNote, s.pbMine, s.pbMineEntryHint) { c.book.bookTabRequest.value = 1; c.go(Screen.BOOK_COURT) }
+    Entry(Icons.Filled.PersonSearch, s.pbSeekTitle, s.pbSeekEntryHint) { c.book.bookTabRequest.value = 2; c.go(Screen.BOOK_COURT) }
     // La chat del circolo, sempre a portata: l'ultimo messaggio e quanti da leggere.
     for (a in accounts.filter { it.joined }) {
         val title = listOfNotNull(s.pbClubChat, a.club.takeIf { accounts.size > 1 && it.isNotBlank() }).joinToString(" · ") +
             if (a.clubUnread > 0) " (${a.clubUnread})" else ""
-        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
+        Entry(Icons.Filled.Forum, title, a.clubPreview.ifBlank { s.pbClubEntryHint }) { c.book.selectBooking(a.url); c.book.chatRequest.value = "club"; c.go(Screen.BOOK_COURT) }
     }
 }
 
@@ -481,13 +481,13 @@ private fun ProgressTab(c: MatchController) {
     val history by c.history.collectAsState()
     val me = c.me()?.name ?: c.storage.myName
     val mine = remember(history, me) {
-        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
+        if (me.isBlank()) null else c.progress.ratingSports().firstOrNull()?.let { c.progress.ratingTable(it).player(c.myKey()) }
     }
     val pf by c.playerFeatures.collectAsState()
     if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
-    ) { c.openProgress() }
+    ) { c.progress.openProgress() }
     // La scheda progressi mandata dal proprio allenatore (valutazione, obiettivi, test, lezioni).
     com.tennis.scoremanager.ui.MyCoachSection(c)
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
@@ -550,7 +550,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
             }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
-            val bookingAccounts by c.bookingAccounts.collectAsState()
+            val bookingAccounts by c.book.bookingAccounts.collectAsState()
             if (bookingAccounts.isEmpty()) Entry(Icons.Filled.CalendarMonth, s.pbHaveInvite, s.pbHaveInviteHint) { c.go(Screen.BOOK_COURT) }
         }
     }
@@ -565,7 +565,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
 private fun ClubGroup(c: MatchController) {
     val s = LocalStrings.current
     val f by c.clubFeatures.collectAsState()
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
     var server by remember { mutableStateOf(false) }
@@ -619,26 +619,26 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
 @Composable
 private fun ClubNews(c: MatchController) {
     val s = LocalStrings.current
-    val accounts by c.bookingAccounts.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     val many = accounts.size > 1
     val news = accounts.flatMap { a -> a.unreadSeeks.map { a to it } }.sortedWith(compareBy({ it.second.date }, { it.second.fromMin }))
     // Le chat con messaggi nuovi: la bacheca del circolo e quelle degli annunci in cui si è.
     // Nell'elenco restano le chat degli annunci; bacheca, chat del circolo e private hanno la loro striscia.
     val chats = accounts.flatMap { a -> a.chatNews.filterKeys { it.startsWith("s-") }.map { (room, title) -> Triple(a, room, title) } }
-    LaunchedEffect(Unit) { c.refreshClubNews() }
+    LaunchedEffect(Unit) { c.book.refreshClubNews() }
     // La bacheca ha la sua striscia, in cima, col numero degli avvisi da leggere: si tocca e si apre.
     for (a in accounts.filter { it.boardUnread > 0 }) {
         BoardBanner(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, s.pbBoardUnread(a.boardUnread)).joinToString(" · ")) {
-            c.selectBooking(a.url); c.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = "board"; c.go(Screen.BOOK_COURT)
         }
     }
     for (a in accounts) {
         val where = a.club.takeIf { many && it.isNotBlank() }
         if (a.clubUnread > 0) BoardBanner(listOfNotNull(where, s.pbClubUnread(a.clubUnread)).joinToString(" · "), Icons.Filled.Forum) {
-            c.selectBooking(a.url); c.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = "club"; c.go(Screen.BOOK_COURT)
         }
         for ((room, name) in a.chatNews.filterKeys { it.startsWith("d-") }) BoardBanner(listOfNotNull(where, s.pbDmFrom(name)).joinToString(" · "), Icons.Filled.Mail) {
-            c.selectBooking(a.url); c.chatRequest.value = room; c.go(Screen.BOOK_COURT)
+            c.book.selectBooking(a.url); c.book.chatRequest.value = room; c.go(Screen.BOOK_COURT)
         }
     }
     if (news.isEmpty() && chats.isEmpty()) return
@@ -654,31 +654,31 @@ private fun ClubNews(c: MatchController) {
         for ((a, room, title) in chats) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
-                    .clickable { c.selectBooking(a.url); if (room.startsWith("s-")) c.bookTabRequest.value = 2 else c.chatRequest.value = room; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
+                    .clickable { c.book.selectBooking(a.url); if (room.startsWith("s-")) c.book.bookTabRequest.value = 2 else c.book.chatRequest.value = room; c.go(Screen.BOOK_COURT) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(if (room == "board") s.pbBoardTitle else s.pbChatNew, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(a.club.takeIf { many && it.isNotBlank() }, title.ifBlank { null }).joinToString(" · ").ifBlank { s.pbBoardRead }, color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                androidx.compose.material3.IconButton(onClick = { c.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                androidx.compose.material3.IconButton(onClick = { c.book.markChatRead(a.url, room, System.currentTimeMillis()) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
         for ((a, k) in news.take(6)) {
             androidx.compose.foundation.layout.Row(
                 Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
-                    .clickable { c.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
+                    .clickable { c.book.openSeekNews(a.url, k.id) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.layout.Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                     Text(s.pbSeekTitle, color = TsmColors.Ball, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Text(c.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
+                    Text(c.book.seekLine(k, if (many) a.club.ifBlank { null } else null), color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                androidx.compose.material3.IconButton(onClick = { c.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                androidx.compose.material3.IconButton(onClick = { c.book.readSeeks(a.url, listOf(k.id)) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
         if (news.size + chats.size > 1) androidx.compose.material3.TextButton(onClick = {
-            accounts.forEach { a -> c.readSeeks(a.url); a.chatNews.keys.forEach { c.markChatRead(a.url, it, System.currentTimeMillis()) } }
+            accounts.forEach { a -> c.book.readSeeks(a.url); a.chatNews.keys.forEach { c.book.markChatRead(a.url, it, System.currentTimeMillis()) } }
         }) { Text(s.tdNewsReadAll) }
     }
 }

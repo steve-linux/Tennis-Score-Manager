@@ -86,7 +86,7 @@ private fun lessonLine(l: Lesson, lang: Lang): String =
 fun SchoolScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.courses.collectAsState()
+    val list by c.school.courses.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     var creating by remember { mutableStateOf(false) }
@@ -110,7 +110,7 @@ fun SchoolScreen(c: MatchController) {
             if (items.isEmpty()) continue
             SectionCard(title, Icons.Filled.School) {
                 for (co in items.sortedBy { it.name.lowercase() }) {
-                    Row(Modifier.fillMaxWidth().clickable { c.openCourse(co.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().clickable { c.school.openCourse(co.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(co.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                             Text(
@@ -126,7 +126,7 @@ fun SchoolScreen(c: MatchController) {
             }
         }
     }
-    if (creating) CourseEditDialog(c, null) { id -> creating = false; id?.let { c.openCourse(it) } }
+    if (creating) CourseEditDialog(c, null) { id -> creating = false; id?.let { c.school.openCourse(it) } }
 }
 
 /** Un corso: allievi con le presenze, lezioni con l'appello, quote. */
@@ -135,8 +135,8 @@ fun CourseScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     BackHandler { c.back() }
-    val list by c.courses.collectAsState()
-    val id by c.openCourseId.collectAsState()
+    val list by c.school.courses.collectAsState()
+    val id by c.school.openCourseId.collectAsState()
     val co = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
@@ -158,7 +158,7 @@ fun CourseScreen(c: MatchController) {
         action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            if (co.students.isNotEmpty()) BigButton(s.scNotify, Icons.Filled.Campaign, { c.noticeCourse(co, null) }, Modifier.weight(1f))
+            if (co.students.isNotEmpty()) BigButton(s.scNotify, Icons.Filled.Campaign, { c.school.noticeCourse(co, null) }, Modifier.weight(1f))
         },
     ) {
         if (co.slots.isNotEmpty()) Text(co.slots.joinToString("\n") { slotLine(s, it, lang) }, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -167,7 +167,7 @@ fun CourseScreen(c: MatchController) {
             0 -> {
                 Text(s.scStudentsCount(co.students.size, co.maxStudents), color = if (Courses.full(co)) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
                 // La scheda corso all'allenatore (orari, iscritti, contatti): segna lui le presenze e le rimanda.
-                if (co.coach != null) GhostButton(s.ccSendToCoach, Icons.Filled.Campaign, { c.sendCourseToCoach(co) }, Modifier.fillMaxWidth())
+                if (co.coach != null) GhostButton(s.ccSendToCoach, Icons.Filled.Campaign, { c.coaching.sendCourseToCoach(co) }, Modifier.fillMaxWidth())
                 if (!Courses.full(co)) BigButton(s.scAddStudent, Icons.Filled.PersonAdd, { adding = true }, Modifier.fillMaxWidth())
                 for (sid in co.students) {
                     val p = c.playerById(sid)
@@ -179,7 +179,7 @@ fun CourseScreen(c: MatchController) {
                             if (tot > 0) Text(s.scAttendance(pres, tot), color = if (pres * 4 < tot * 3) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
                             p?.let { Fees.owed(book, it) }?.takeIf { it > 0 }?.let { Text(s.issueFeeDue(Fees.money(it, lang.locale)), color = TsmColors.Orange, fontSize = 13.sp) }
                         }
-                        IconButton(onClick = { c.saveCourse(co.copy(students = co.students - sid)) }) { Icon(Icons.Filled.Close, s.scRemoveStudent, tint = TsmColors.TextDim) }
+                        IconButton(onClick = { c.school.saveCourse(co.copy(students = co.students - sid)) }) { Icon(Icons.Filled.Close, s.scRemoveStudent, tint = TsmColors.TextDim) }
                     }
                 }
             }
@@ -233,14 +233,14 @@ fun CourseScreen(c: MatchController) {
                     Text("${Fees.money(co.feeCents, lang.locale)} · ${if (co.feeKind == CourseFee.MONTHLY) s.scMonthly else s.scSeasonFee}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                     val periods: List<Pair<Int, Int>?> = if (co.feeKind == CourseFee.MONTHLY) Courses.months(co) else listOf(null)
                     for (m in periods) {
-                        val label = c.courseFeeLabel(co, m)
+                        val label = c.school.courseFeeLabel(co, m)
                         val charged = book.charges.filter { it.label == label && !it.cancelled }
                         val paid = charged.count { it.settled }
                         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).padding(10.dp)) {
                             Text(label.substringAfter(" · "), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                             if (charged.isNotEmpty()) Text(s.feeChargedLine(paid, charged.size), color = if (paid == charged.size) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
                             if (charged.size < co.students.size) GhostButton(s.scChargeStudents, Icons.Filled.Euro, {
-                                val n = c.chargeCourse(co, m)
+                                val n = c.school.chargeCourse(co, m)
                                 Toast.makeText(context, s.scCharged(n), Toast.LENGTH_SHORT).show()
                             }, Modifier.fillMaxWidth())
                         }
@@ -250,11 +250,11 @@ fun CourseScreen(c: MatchController) {
         }
     }
     if (edit) CourseEditDialog(c, co) { edit = false }
-    if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.saveCourse(co.copy(students = co.students + it.id)) } }
+    if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.school.saveCourse(co.copy(students = co.students + it.id)) } }
     openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
     if (register) {
-        val file = remember { c.registerFile(co.id, coachSide = false) }
-        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.registerXlsx(co.id, coachSide = false) }) { register = false }
+        val file = remember { c.coaching.registerFile(co.id, coachSide = false) }
+        com.tennis.scoremanager.ui.PdfActionsDialog(c, file, s.rgTitle, s.rgLegend, null, excel = { c.coaching.registerXlsx(co.id, coachSide = false) }) { register = false }
     }
 }
 
@@ -266,14 +266,14 @@ private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -
     var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
     var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
     var moving by remember { mutableStateOf(false) }
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     if (moving) {
-        com.tennis.scoremanager.ui.MoveLessonDialog(c, c.course(co.id) ?: co, l, courts, { start, minutes, court, notify ->
-            val x = Courses.move(c.course(co.id) ?: co, l.key, start, minutes, court)
-            c.saveCourse(x)
+        com.tennis.scoremanager.ui.MoveLessonDialog(c, c.school.course(co.id) ?: co, l, courts, { start, minutes, court, notify ->
+            val x = Courses.move(c.school.course(co.id) ?: co, l.key, start, minutes, court)
+            c.school.saveCourse(x)
             moving = false
             onDone()
-            if (notify) c.noticeCourseMoved(x, l.key)
+            if (notify) c.school.noticeCourseMoved(x, l.key)
         }) { moving = false }
         return
     }
@@ -293,18 +293,18 @@ private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -
                         SwitchRow(Icons.Filled.School, name, null, sid in present) { on -> present = if (on) present + sid else present - sid }
                     }
                 } else if (co.students.isNotEmpty()) GhostButton(s.scNotifyCancelled, Icons.Filled.Campaign, {
-                    var x = Courses.setCancelled(c.course(co.id) ?: co, l.key, true)
-                    c.saveCourse(x)
+                    var x = Courses.setCancelled(c.school.course(co.id) ?: co, l.key, true)
+                    c.school.saveCourse(x)
                     onDone()
-                    c.noticeCourse(x, l)
+                    c.school.noticeCourse(x, l)
                 }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                var x = Courses.setCancelled(c.course(co.id) ?: co, l.key, cancelled)
+                var x = Courses.setCancelled(c.school.course(co.id) ?: co, l.key, cancelled)
                 if (!cancelled && l.start <= System.currentTimeMillis() + 3_600_000L) x = Courses.mark(x, l.key, present)
-                c.saveCourse(x)
+                c.school.saveCourse(x)
                 onDone()
             }) { Text(s.ok) }
         },
@@ -318,7 +318,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     val s = LocalStrings.current
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     val today = CourtPlans.dayStart(System.currentTimeMillis())
     var x by remember { mutableStateOf(co ?: Course(Courses.newId("k"), "", from = today, to = CourtPlans.addDays(today, 180), createdAt = System.currentTimeMillis())) }
     var fee by remember { mutableStateOf(co?.feeCents?.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }
@@ -381,7 +381,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 val y = x.copy(name = x.name.trim(), feeCents = Fees.parse(fee.ifBlank { "0" }) ?: 0, to = end)
                 // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
                 val saved = if (skipHolidays) y.copy(cancelled = y.cancelled + Courses.skipped(y, isHoliday)) else y
-                c.saveCourse(saved)
+                c.school.saveCourse(saved)
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
@@ -423,7 +423,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     if (askDelete && co != null) AlertDialog(
         onDismissRequest = { askDelete = false },
         text = { Text(s.scDeleteAsk(co.name)) },
-        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCourse(co.id); onDone(null); c.back() }) { Text(s.scDelete, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.school.deleteCourse(co.id); onDone(null); c.back() }) { Text(s.scDelete, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
 }

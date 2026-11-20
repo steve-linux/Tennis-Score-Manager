@@ -67,7 +67,7 @@ fun goalLine(s: Strings, g: Goal): String =
 @Composable
 fun GoalsCard(c: MatchController) {
     val s = LocalStrings.current
-    val goals by c.goals.collectAsState()
+    val goals by c.progress.goals.collectAsState()
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     var adding by remember { mutableStateOf(false) }
@@ -77,11 +77,11 @@ fun GoalsCard(c: MatchController) {
         Text(s.goalsHint, color = TsmColors.TextDim, fontSize = 13.sp)
         if (goals.isEmpty()) Text(s.goalsNone, color = TsmColors.TextDim)
         for (g in goals) {
-            val st = remember(g, history, workouts) { c.goalStatus(g) }
+            val st = remember(g, history, workouts) { c.progress.goalStatus(g) }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(goalLine(s, g), color = TsmColors.TextMain, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                    TextButton(onClick = { c.deleteGoal(g.id) }) { Text(s.goalDelete, color = TsmColors.TextDim) }
+                    TextButton(onClick = { c.progress.deleteGoal(g.id) }) { Text(s.goalDelete, color = TsmColors.TextDim) }
                 }
                 LinearProgressIndicator(progress = { st.progress }, modifier = Modifier.fillMaxWidth(), color = if (st.reached) TsmColors.Ok else TsmColors.Ball)
                 val parts = listOfNotNull(
@@ -122,7 +122,7 @@ private fun GoalDialog(c: MatchController, onDone: () -> Unit) {
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { c.addGoal(kind, target, window); onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = { c.progress.addGoal(kind, target, window); onDone() }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -135,7 +135,7 @@ fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     val lang = c.options.collectAsState().value.lang
-    val lines = remember(history) { c.myLines() }
+    val lines = remember(history) { c.progress.myLines() }
     val years = remember(lines) { YearReview.years(lines).ifEmpty { listOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) } }
     var year by remember { mutableIntStateOf(years.first()) }
     val name = c.me()?.name ?: c.storage.myName

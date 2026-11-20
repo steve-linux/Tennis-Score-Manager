@@ -1,0 +1,57 @@
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import org.junit.Test
+import java.io.File
+
+/** Genera i file d'esempio come li scrive la 2.6.0 (stessa configurazione JSON di Storage), con nomi di prova. */
+class FixtureExport {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+
+    private fun <T> w(dir: File, name: String, s: KSerializer<T>, v: T) = File(dir, name).writeText(json.encodeToString(s, v))
+
+    @Test
+    fun export() {
+        val out = File(System.getenv("FIXTURE_OUT") ?: return).apply { mkdirs() }
+        val t0 = 1794000000000L
+        val events = listOf(
+            MatchEvent.ServeOrder(1, 0, 0),
+            MatchEvent.ReceiveOrder(1, 0, 0),
+            MatchEvent.Point(Side.P1, t0 + 1000, strokes = 4, kind = PointKind.WINNER),
+            MatchEvent.Point(Side.P2, t0 + 2000, kind = PointKind.ACE, secondServe = true),
+            MatchEvent.Penalty(Side.P2, PenaltyKind.TIME, t0 + 3000),
+            MatchEvent.Break(Side.P1, BreakKind.MEDICAL, t0 + 4000),
+            MatchEvent.ServerFix(Side.P1, 0, t0 + 5000),
+            MatchEvent.EndsFix(t0 + 6000),
+            MatchEvent.ScoreSet(listOf(SetScore(6, 4)), 2, 1, 1, 0, Side.P2, 0, t0 + 7000),
+            MatchEvent.Retired(Side.P2, t0 + 8000),
+        )
+        val match = MatchRecord(
+            id = "m1794000000000", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(),
+            events = events, clockMs = 3_600_000, startedAt = t0, endedAt = t0 + 8000, finished = true,
+            location = MatchLocation(45.0, 11.0, "Via Prova 1"), updatedAt = t0 + 9000,
+            batteryStart = mapOf(Side.P1 to 90, Side.P2 to 85), batteryEnd = mapOf(Side.P1 to 70, Side.P2 to 60),
+            notes = "Partita di prova", friendly = true,
+        )
+        w(out, "match_finished.json", MatchRecord.serializer(), match)
+        w(out, "match_suspended.json", MatchRecord.serializer(), match.copy(id = "m1794000100000", events = events.take(4), finished = false, suspended = true, endedAt = null))
+        w(out, "players.json", ListSerializer(PlayerProfile.serializer()), listOf(PlayerProfile("p1", "Mario Rossi"), PlayerProfile("p2", "Luca Bianchi")))
+        w(out, "workout.json", WorkoutRecord.serializer(), WorkoutRecord("w1", t0))
+        w(out, "serve_session.json", ServeSession.serializer(), ServeSession("s1", t0))
+        w(out, "drills.json", ListSerializer(Drill.serializer()), listOf(Drill("d1", "Servizio esterno", TrainedStroke.SERVE, listOf(DrillStep(10)))))
+        w(out, "goals.json", ListSerializer(Goal.serializer()), listOf(Goal("g1", GoalKind.FIRST_SERVE, 60.0)))
+        w(out, "rackets.json", ListSerializer(Racket.serializer()), listOf(Racket("r1").copy(stringings = listOf(Stringing("st1", t0)))))
+        w(out, "tournament.json", Tournament.serializer(), Tournament("t1", players = listOf("Rossi", "Bianchi", "Verdi", "Neri")))
+        w(out, "club_book.json", ClubBook.serializer(), ClubBook(
+            fees = listOf(Fee("f1", "Quota annuale", 15000, FeeKind.MEMBERSHIP)),
+            charges = listOf(Charge("c1", "p1", "Mario Rossi", "f1", "Quota annuale", 15000, t0).copy(payments = listOf(Payment("pay1", 15000, t0, PayMethod.CASH)))),
+        ))
+        w(out, "club_teams.json", ListSerializer(Team.serializer()), listOf(Team("tm1", "Squadra A")))
+        w(out, "club_school.json", ListSerializer(Course.serializer()), listOf(Course("co1", "Corso bambini", from = t0, to = t0 + 90L * 86_400_000)))
+        w(out, "club_ladders.json", ListSerializer(Ladder.serializer()), listOf(Ladder("l1", "Classifica sociale")))
+        w(out, "club_tournaments.json", ListSerializer(ClubTournament.serializer()), listOf(ClubTournament("ct1", "Torneo sociale")))
+    }
+}

@@ -159,7 +159,7 @@ class ServerCheckJob : JobService() {
         val c = (application as TsmApp).controller
         scope.launch {
             // Lo stesso servizio per la segreteria (planning e prenotazioni online) e per il giocatore (promemoria).
-            if (params.jobId == PLAYER_JOB) c.checkMyBookings() else c.syncServerNow()
+            if (params.jobId == PLAYER_JOB) c.book.checkMyBookings() else c.syncServerNow()
             jobFinished(params, false)
         }
         return true

@@ -111,7 +111,7 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
                 GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profileQr(p, fields) }, Modifier.fillMaxWidth())
                 Text(s.pfAsQrHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 // Col server del circolo (il giocatore è già iscritto): dritto nella casella della segreteria, con la foto.
-                for (a in c.bookingAccounts.collectAsState().value.filter { it.joined })
+                for (a in c.book.bookingAccounts.collectAsState().value.filter { it.joined })
                     GhostButton(s.pfToOffice(a.club.ifBlank { a.url }), Icons.Filled.Share, { c.profileToOffice(a.url, p, fields); onDone() }, Modifier.fillMaxWidth())
             }
         },
@@ -155,7 +155,7 @@ fun IncomingProfileDialog(c: MatchController, card: ProfileCard) {
     val photo = remember(card.photo) {
         card.photo?.let { runCatching { java.util.Base64.getDecoder().decode(it) }.getOrNull() }?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }?.asImageBitmap()
     }
-    val close = { c.incomingProfile.value = null }
+    val close = { c.coaching.incomingProfile.value = null }
     AlertDialog(
         onDismissRequest = close,
         icon = { Icon(Icons.Filled.SwapHoriz, null, tint = TsmColors.Ball) },

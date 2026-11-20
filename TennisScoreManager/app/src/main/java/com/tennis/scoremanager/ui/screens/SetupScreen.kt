@@ -144,7 +144,7 @@ fun SetupScreen(c: MatchController) {
             )
             if (su.doubles) Text(s.doublesHint, color = TsmColors.TextDim)
         }
-        val recent = remember(c.history.collectAsState().value, c.players.collectAsState().value) { c.progressPlayers().take(12) }
+        val recent = remember(c.history.collectAsState().value, c.players.collectAsState().value) { c.progress.progressPlayers().take(12) }
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).

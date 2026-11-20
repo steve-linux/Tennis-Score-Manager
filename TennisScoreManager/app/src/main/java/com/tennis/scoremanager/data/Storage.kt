@@ -15,17 +15,19 @@ class Storage(context: Context) {
     companion object {
         /** Foto ricordo per partita: bastano per il PDF e lo tengono sui 3-4 MB. */
         const val MAX_MATCH_PHOTOS = 10
-    }
 
+        /** Come si leggono e scrivono i file dei dati; i test di aggiornamento ([FormatUpgradeTest]) usano questo. */
+        val JSON = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            prettyPrint = true
+        }
+    }
 
     private val app = context.applicationContext
     private val prefs = app.getSharedPreferences("tsm", Context.MODE_PRIVATE)
 
-    val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-        prettyPrint = true
-    }
+    val json = JSON
 
     /** I file messi da parte in questa sessione perché non si leggevano (vedi [readOr]): la prima schermata lo dice. */
     val unreadable: MutableList<String> = java.util.concurrent.CopyOnWriteArrayList()

@@ -35,8 +35,8 @@ class MainActivity : ComponentActivity() {
             i.removeExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)
             when {
                 target == "inbox" -> controller.openInbox()
-                target == "lessons" -> controller.openLessons()
-                target.startsWith("course:") -> controller.openCoachCourse(target.removePrefix("course:"))
+                target == "lessons" -> controller.coaching.openLessons()
+                target.startsWith("course:") -> controller.coaching.openCoachCourse(target.removePrefix("course:"))
             }
             return
         }
@@ -46,10 +46,10 @@ class MainActivity : ComponentActivity() {
             val club = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
             if (club != null) {
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
-                controller.selectBooking(club)
+                controller.book.selectBooking(club)
                 val room = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
-                if (room != null) controller.chatRequest.value = room else controller.bookTabRequest.value = 2
+                if (room != null) controller.book.chatRequest.value = room else controller.book.bookTabRequest.value = 2
             }
             controller.go(Screen.BOOK_COURT)
             return
