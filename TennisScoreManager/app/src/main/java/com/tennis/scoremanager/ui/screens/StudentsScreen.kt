@@ -230,11 +230,11 @@ fun StudentScreen(c: MatchController) {
         PlayerOnlineSection(c, st)
         if (com.tennis.scoremanager.ClubFeature.PAYMENTS in features) ChargesSection(c, st)
         // Le squadre in cui gioca.
-        val teamsAll by c.teams.collectAsState()
+        val teamsAll by c.competitions.teams.collectAsState()
         val mineT = teamsAll.filter { tm -> tm.roster.any { it == st.id || it in st.aliases } }
         if (mineT.isNotEmpty()) SectionCard(s.tmTitle, Icons.Filled.Groups) {
             for (tm in mineT) Text(tm.name + (tm.championship.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().clickable { c.openTeam(tm.id) }.padding(vertical = 6.dp))
+                modifier = Modifier.fillMaxWidth().clickable { c.competitions.openTeam(tm.id) }.padding(vertical = 6.dp))
         }
         // I corsi della scuola tennis che frequenta.
         val courses by c.courses.collectAsState()

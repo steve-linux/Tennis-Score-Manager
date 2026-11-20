@@ -154,7 +154,7 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val plan by c.courtPlan.collectAsState()
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val courts by c.clubCourts.collectAsState()
     var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
@@ -226,7 +226,7 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
                                 .clickable {
                                     when {
                                         o?.booking != null -> editing = o.booking
-                                        o?.tournament != null -> c.openClubTournament(o.tournament.id)
+                                        o?.tournament != null -> c.competitions.openClubTournament(o.tournament.id)
                                         // Nel blocco di un corso si mettono le sue lezioni; gli altri blocchi si aprono per cambiarli.
                                         o?.block?.reason == com.tennis.scoremanager.data.BlockReason.COURSE ->
                                             editing = CourtBooking(CourtPlans.newId("b"), ct, slot, plan.settings.slotMinutes, BookingKind.LESSON, note = o.block.label)
@@ -262,7 +262,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     val courts = c.storage.clubCourts
     var b by remember { mutableStateOf(b0) }
     var weeks by remember { mutableStateOf(1) }
@@ -665,7 +665,7 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val courts = c.storage.clubCourts
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     var b by remember { mutableStateOf(b0) }
     var hit by remember { mutableStateOf<List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>>(emptyList()) }
     fun time(min: Int, onPick: (Int) -> Unit) = TimePickerDialog(context, { _, h, m -> onPick(h * 60 + m) }, (min / 60).coerceAtMost(23), min % 60, true).show()

@@ -64,7 +64,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun LaddersScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.ladders.collectAsState()
+    val list by c.competitions.ladders.collectAsState()
     var create by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.19") },
@@ -76,7 +76,7 @@ fun LaddersScreen(c: MatchController) {
     ) {
         if (list.isEmpty()) Text(s.ldNone, color = TsmColors.TextDim)
         for (l in list) Column(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.openLadder(l.id) }.padding(14.dp),
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.competitions.openLadder(l.id) }.padding(14.dp),
         ) {
             Text(l.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
             val first = l.players.firstOrNull()?.let { c.playerById(it)?.name }
@@ -93,7 +93,7 @@ fun LaddersScreen(c: MatchController) {
             confirmButton = {
                 TextButton(enabled = name.isNotBlank(), onClick = {
                     val l = Ladder(Ladders.newId("l"), name.trim(), createdAt = System.currentTimeMillis())
-                    c.saveLadder(l); create = false; c.openLadder(l.id)
+                    c.competitions.saveLadder(l); create = false; c.competitions.openLadder(l.id)
                 }) { Text(s.ok) }
             },
             dismissButton = { TextButton(onClick = { create = false }) { Text(s.back) } },
@@ -109,8 +109,8 @@ fun LaddersScreen(c: MatchController) {
 fun LadderScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.ladders.collectAsState()
-    val id by c.openLadderId.collectAsState()
+    val list by c.competitions.ladders.collectAsState()
+    val id by c.competitions.openLadderId.collectAsState()
     val l = list.firstOrNull { it.id == id } ?: run { c.back(); return }
     val lang = c.options.collectAsState().value.lang
     fun name(p: String) = c.playerById(p)?.name ?: "?"
@@ -139,8 +139,8 @@ fun LadderScreen(c: MatchController) {
                     TextButton(onClick = { result = ch }) { Text(s.ldResult) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(onClick = { c.notifyChallenge(l, ch) }) { Text(s.ldNotify) }
-                    TextButton(onClick = { c.saveLadder(Ladders.cancel(l, ch.id)) }) { Text(s.ldCancel, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.competitions.notifyChallenge(l, ch) }) { Text(s.ldNotify) }
+                    TextButton(onClick = { c.competitions.saveLadder(Ladders.cancel(l, ch.id)) }) { Text(s.ldCancel, color = TsmColors.Danger) }
                 }
             }
         }
@@ -153,9 +153,9 @@ fun LadderScreen(c: MatchController) {
                     Text(name(p), color = TsmColors.TextMain, fontWeight = if (i < 3) FontWeight.Bold else FontWeight.Normal, modifier = Modifier.weight(1f).clickable { c.openStudent(p) })
                     if (Ladders.busy(l, p)) Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Orange)
                     if (arrange) {
-                        IconButton(onClick = { c.saveLadder(Ladders.move(l, p, up = true)) }, enabled = i > 0) { Icon(Icons.Filled.KeyboardArrowUp, null) }
-                        IconButton(onClick = { c.saveLadder(Ladders.move(l, p, up = false)) }, enabled = i < l.players.size - 1) { Icon(Icons.Filled.KeyboardArrowDown, null) }
-                        IconButton(onClick = { c.saveLadder(Ladders.remove(l, p)) }) { Icon(Icons.Filled.Close, s.ldRemove, tint = TsmColors.Danger) }
+                        IconButton(onClick = { c.competitions.saveLadder(Ladders.move(l, p, up = true)) }, enabled = i > 0) { Icon(Icons.Filled.KeyboardArrowUp, null) }
+                        IconButton(onClick = { c.competitions.saveLadder(Ladders.move(l, p, up = false)) }, enabled = i < l.players.size - 1) { Icon(Icons.Filled.KeyboardArrowDown, null) }
+                        IconButton(onClick = { c.competitions.saveLadder(Ladders.remove(l, p)) }) { Icon(Icons.Filled.Close, s.ldRemove, tint = TsmColors.Danger) }
                     }
                 }
             }
@@ -176,7 +176,7 @@ fun LadderScreen(c: MatchController) {
         }
     }
 
-    if (adding) PlayerPickDialog(c, l.players.toSet(), s.ldAdd) { p -> adding = false; p?.let { c.saveLadder(Ladders.add(l, listOf(it.id))) } }
+    if (adding) PlayerPickDialog(c, l.players.toSet(), s.ldAdd) { p -> adding = false; p?.let { c.competitions.saveLadder(Ladders.add(l, listOf(it.id))) } }
 
     if (newChallenge) {
         var who by remember { mutableStateOf<String?>(null) }
@@ -191,7 +191,7 @@ fun LadderScreen(c: MatchController) {
                     if (options.isEmpty()) Text(s.ldNobody, color = TsmColors.TextDim)
                     for (p in options) Text("${Ladders.position(l, p)}°  ${name(p)}", color = TsmColors.TextMain, fontSize = 16.sp,
                         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable {
-                            if (w == null) who = p else { c.saveLadder(Ladders.challenge(l, w, p, System.currentTimeMillis())); newChallenge = false }
+                            if (w == null) who = p else { c.competitions.saveLadder(Ladders.challenge(l, w, p, System.currentTimeMillis())); newChallenge = false }
                         }.padding(10.dp))
                 }
             },
@@ -217,7 +217,7 @@ fun LadderScreen(c: MatchController) {
                 }
             },
             confirmButton = {
-                TextButton(enabled = w != null, onClick = { c.saveLadder(Ladders.result(l, ch.id, score, w, System.currentTimeMillis())); result = null }) { Text(s.ok) }
+                TextButton(enabled = w != null, onClick = { c.competitions.saveLadder(Ladders.result(l, ch.id, score, w, System.currentTimeMillis())); result = null }) { Text(s.ok) }
             },
             dismissButton = { TextButton(onClick = { result = null }) { Text(s.back) } },
         )
@@ -245,13 +245,13 @@ fun LadderScreen(c: MatchController) {
                     GhostButton(s.ldDelete, Icons.Filled.Close, { del = true }, Modifier.fillMaxWidth())
                 }
             },
-            confirmButton = { TextButton(enabled = nm.isNotBlank(), onClick = { c.saveLadder(l.copy(name = nm.trim(), reach = reach, days = days)); settings = false }) { Text(s.ok) } },
+            confirmButton = { TextButton(enabled = nm.isNotBlank(), onClick = { c.competitions.saveLadder(l.copy(name = nm.trim(), reach = reach, days = days)); settings = false }) { Text(s.ok) } },
             dismissButton = { TextButton(onClick = { settings = false }) { Text(s.back) } },
         )
         if (del) AlertDialog(
             onDismissRequest = { del = false },
             text = { Text(s.ldDeleteAsk) },
-            confirmButton = { TextButton(onClick = { del = false; settings = false; c.deleteLadder(l.id); c.back() }) { Text(s.ldDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { del = false; settings = false; c.competitions.deleteLadder(l.id); c.back() }) { Text(s.ldDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { del = false }) { Text(s.back) } },
         )
     }

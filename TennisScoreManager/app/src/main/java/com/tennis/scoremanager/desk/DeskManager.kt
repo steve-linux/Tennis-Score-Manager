@@ -59,27 +59,27 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun payTypes(): List<PayType> = c.payTypes()
     override fun courts(): List<String> = c.clubCourts.value
     override fun plan(): CourtPlan = c.courtPlan.value
-    override fun tournaments(): List<ClubTournament> = c.clubTournaments.value
+    override fun tournaments(): List<ClubTournament> = c.competitions.clubTournaments.value
     override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.saveBooking(b, weeks, charge)
     override fun deleteBooking(b: CourtBooking, series: Boolean) = c.deleteBooking(b, wholeSeries = series)
     override fun saveBlock(b: CourtBlock, delete: Boolean) = c.saveCourtBlock(b, delete)
     override fun features(): Set<ClubFeature> = c.clubFeatures.value
     override fun courses(): List<Course> = c.courses.value
-    override fun teams(): List<Team> = c.teams.value
-    override fun ladders(): List<Ladder> = c.ladders.value
+    override fun teams(): List<Team> = c.competitions.teams.value
+    override fun ladders(): List<Ladder> = c.competitions.ladders.value
     override fun saveCourse(c: Course) = this.c.saveCourse(c)
     override fun deleteCourse(c: Course) = this.c.deleteCourse(c.id)
     override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.courseFeeLabel(c, month)
     override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
     override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
     override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
-    override fun saveTeam(t: Team) = c.saveTeam(t)
-    override fun deleteTeam(t: Team) = c.deleteTeam(t.id)
+    override fun saveTeam(t: Team) = c.competitions.saveTeam(t)
+    override fun deleteTeam(t: Team) = c.competitions.deleteTeam(t.id)
     override fun teamNotice(t: Team, f: Fixture, kind: String) = when (kind) {
-        "AVAILABILITY" -> c.noticeAvailability(t, f, missingOnly = false)
-        "MISSING" -> c.noticeAvailability(t, f, missingOnly = true)
-        "CALLUP" -> c.noticeCallUp(t, f)
-        else -> c.noticeResult(t, f)
+        "AVAILABILITY" -> c.competitions.noticeAvailability(t, f, missingOnly = false)
+        "MISSING" -> c.competitions.noticeAvailability(t, f, missingOnly = true)
+        "CALLUP" -> c.competitions.noticeCallUp(t, f)
+        else -> c.competitions.noticeResult(t, f)
     }
     override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
     override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
@@ -189,10 +189,10 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.restoreOffice(s) }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
-    override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
-    override fun deleteTournament(t: ClubTournament) = c.deleteClubTournament(t.id)
-    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.addClubEntry(t, people)
-    override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
+    override fun saveTournament(t: ClubTournament) = c.competitions.saveClubTournament(t)
+    override fun deleteTournament(t: ClubTournament) = c.competitions.deleteClubTournament(t.id)
+    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.competitions.addClubEntry(t, people)
+    override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.competitions.removeClubEntry(t, entry.id)
 }
 
 /** I dati veri dell'app per l'Allenatore da PC: allievi, agenda, corsi, PDF ed Excel fatti dal telefono. */
