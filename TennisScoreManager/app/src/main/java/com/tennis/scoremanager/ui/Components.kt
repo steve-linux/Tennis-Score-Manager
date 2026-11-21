@@ -170,7 +170,7 @@ fun AppRoot(c: MatchController) {
         c.coaching.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
         c.coaching.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
         c.coaching.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
-        c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
+        c.coaching.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
         c.coaching.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()

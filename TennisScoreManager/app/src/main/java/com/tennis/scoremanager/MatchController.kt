@@ -1369,14 +1369,14 @@ class MatchController(
     override var incomingVia: String? = null
 
     /** Il testo di un file aperto con TSM: una scheda partita o un risultato; sennò lo si dice. */
-    fun receiveCardText(text: String?, via: String? = null) {
+    override fun receiveCardText(text: String?, via: String?) {
         incomingVia = via
         val card = text?.let { com.tennis.scoremanager.data.MatchCards.decode(it) }
         if (card != null) { cards.incomingCard.value = card; return }
         val result = text?.let { com.tennis.scoremanager.data.MatchCards.decodeResult(it) }
         if (result != null) { cards.incomingResult.value = result; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decode(it) }?.let { coaching.incomingCourse.value = it; return }
-        text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { incomingProgress.value = it; return }
+        text?.let { com.tennis.scoremanager.data.ProgressCards.decode(it) }?.let { coaching.incomingProgress.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeReport(it) }?.let { coaching.incomingAttendance.value = it; return }
         text?.let { com.tennis.scoremanager.data.CourseCards.decodeProposal(it) }?.let { coaching.incomingProposal.value = it; return }
         text?.let { com.tennis.scoremanager.data.ProfileCards.decode(it) }?.let { coaching.incomingProfile.value = it; return }
@@ -1386,7 +1386,7 @@ class MatchController(
     }
 
     /** La scheda partita e i risultati tra segreteria e giocatori: vedi MatchCardsArea. */
-    val cards = com.tennis.scoremanager.club.MatchCardsArea(this, app, storage, scope, io)
+    override val cards = com.tennis.scoremanager.club.MatchCardsArea(this, app, storage, scope, io)
 
     override val coaching = com.tennis.scoremanager.coach.CoachArea(this, app, storage, scope, io)
 
@@ -1411,127 +1411,12 @@ class MatchController(
         }
     }
 
-    // ---- Scheda progressi: l'allenatore la manda, l'allievo la tiene in Progressi ----
+    // ---- Scheda progressi: vedi CoachArea. Casella del server del circolo: vedi ServerMailbox ----
 
-    val incomingProgress = MutableStateFlow<com.tennis.scoremanager.data.ProgressCard?>(null)
-    val myProgress = MutableStateFlow(storage.loadMyProgress())
-
-    /** Allenatore: la scheda progressi dell'allievo in un file da mandargli. */
-    fun progressCardFile(studentId: String): File? {
-        val st = playerById(studentId) ?: return null
-        val club = coaching.coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
-        val card = com.tennis.scoremanager.data.ProgressCards.build(coaching.coachBook.value, serveSessions.value, st.id, st.name, me()?.name ?: storage.myName, club, System.currentTimeMillis())
-        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
-        return runCatching { File(dir, com.tennis.scoremanager.data.ProgressCards.fileName(strings.pcTitle, st.name)).apply { writeText(com.tennis.scoremanager.data.ProgressCards.encode(card)) } }.getOrNull()
-    }
-
-    /** Allenatore: manda la scheda progressi all'allievo (al genitore se è minorenne), col file allegato. */
-    fun noticeProgressCard(studentId: String) {
-        val st = playerById(studentId) ?: return
-        val f = progressCardFile(studentId) ?: return
-        val now = System.currentTimeMillis()
-        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.pcText).joinToString("\n")
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.pcTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
-    }
-
-    /** Allievo: la scheda arrivata va nei suoi progressi (una più vecchia di quella che c'è non la sostituisce). */
-    fun acceptProgress(card: com.tennis.scoremanager.data.ProgressCard) {
-        incomingProgress.value = null
-        val old = myProgress.value
-        if (old != null && old.issuedAt > card.issuedAt) return
-        myProgress.value = card
-        scope.launch(io) { storage.saveMyProgress(card) }
-    }
-
-    // ---- Casella del server del circolo (facoltativo): schede, risultati, presenze viaggiano da soli ----
-
-    /** I file arrivati dal server e non ancora aperti (Dal circolo, nella prima schermata). */
-    val inbox = MutableStateFlow(storage.loadInbox())
-
-    private fun putInbox(list: List<com.tennis.scoremanager.data.InboxItem>) {
-        inbox.value = list
-        scope.launch(io) { storage.saveInbox(list) }
-    }
-
-    /** Apre il primo file della casella come se arrivasse da WhatsApp (ma ricordando che viene dal server). */
-    fun openInbox() {
-        val first = inbox.value.firstOrNull() ?: return
-        putInbox(inbox.value.drop(1))
-        receiveCardText(first.text, first.via.ifBlank { null })
-    }
-
-    /** Segreteria: lascia un file nella casella del giocatore sul server (se c'è il server e lui è iscritto). */
-    override fun serverMail(to: String, kind: String, file: File) {
-        val conf = clubServer.value
-        if (!conf.paired) return
-        val text = runCatching { file.readText() }.getOrNull() ?: return
-        scope.launch(io) { runCatching { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.sendMail(to, kind, text) } } }
-    }
-
-    /** Giocatore o allenatore: lascia un file alla segreteria sul server [url]; true se è arrivato. */
-    override suspend fun postToOffice(url: String, kind: String, text: String): Boolean {
-        val a = book.bookingAccounts.value.firstOrNull { it.url == url && it.joined } ?: return false
-        return book.bookingWith(a) { it.postMail(kind, text) }.isSuccess
-    }
-
-    /** Il server del circolo da cui sono arrivati i corsi dell'allenatore (per mandare presenze e proposte da lì). */
-    fun coachVia(): String? = coaching.coachBook.value.courses.mapNotNull { it.via }.firstOrNull { url -> book.bookingAccounts.value.any { it.url == url && it.joined } }
-
-    /** Allenatore: le presenze del corso alla segreteria dal server; true se arrivate. */
-    suspend fun sendAttendanceServer(courseId: String): Boolean {
-        val cc = coaching.coachCourse(courseId) ?: return false
-        val url = cc.via ?: return false
-        val r = com.tennis.scoremanager.data.CourseCards.report(cc, me()?.name ?: storage.myName, System.currentTimeMillis(), coaching.coachBook.value.busy)
-        val ok = postToOffice(url, "attendance", com.tennis.scoremanager.data.CourseCards.encodeReport(r))
-        if (ok) coaching.attendanceSent(courseId)
-        return ok
-    }
-
-    /** Allenatore: l'allievo proposto alla segreteria dal server; true se arrivato. */
-    suspend fun sendProposalServer(st: com.tennis.scoremanager.data.PlayerProfile, level: String, note: String): Boolean {
-        val url = coachVia() ?: return false
-        val p = com.tennis.scoremanager.data.StudentProposal(student = com.tennis.scoremanager.data.CourseCards.student(st, st.id), coach = me()?.name ?: storage.myName,
-            level = level.trim(), note = note.trim(), sentAt = System.currentTimeMillis())
-        return postToOffice(url, "proposal", com.tennis.scoremanager.data.CourseCards.encodeProposal(p))
-    }
-
-    /** Giocatore/allenatore: prende i file della sua casella su quel server, li tiene da aprire e li toglie dal server. */
-    private suspend fun fetchMyMail(a: com.tennis.scoremanager.data.BookingAccount) {
-        val mail = book.bookingWith(a) { it.myMail() }.getOrNull().orEmpty()
-        if (mail.isEmpty()) return
-        val have = inbox.value.map { it.id }.toSet()
-        val fresh = mail.filter { it.id !in have }.map { com.tennis.scoremanager.data.InboxItem(it.id, it.kind, it.text, it.fromName, a.url, it.at) }
-        putInbox(inbox.value + fresh)
-        mail.forEach { m -> book.bookingWith(a) { it.dropMyMail(m.id) } }
-        if (fresh.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
-    }
-
-    /**
-     * Segreteria: prende i file della sua casella. Risultati e presenze col codice giusto si registrano subito (come
-     * con Registra); gli altri (diversi da quello che c'è, allievi proposti) restano da aprire.
-     */
-    override suspend fun fetchOfficeMail(conf: com.tennis.scoremanager.data.ClubServerConf) {
-        val mail = runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.adminMail() } } }.getOrNull().orEmpty()
-        if (mail.isEmpty()) return
-        val keep = mutableListOf<com.tennis.scoremanager.data.InboxItem>()
-        val done = mutableListOf<String>()
-        for (m in mail) {
-            val r = com.tennis.scoremanager.data.MatchCards.decodeResult(m.text)
-            val a = com.tennis.scoremanager.data.CourseCards.decodeReport(m.text)
-            when {
-                r != null && cards.resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.READY -> { cards.applyResult(r); done += "${r.side1} – ${r.side2} ${r.score}" }
-                r != null && cards.resultStatus(r) == com.tennis.scoremanager.data.ResultStatus.SAME -> {}
-                a != null && coaching.attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.READY -> { coaching.applyAttendance(a); done += a.courseName }
-                a != null && coaching.attendanceStatus(a) == com.tennis.scoremanager.data.AttendanceStatus.SAME -> {}
-                else -> keep += com.tennis.scoremanager.data.InboxItem(m.id, m.kind, m.text, m.fromName, "", m.at)
-            }
-        }
-        val have = inbox.value.map { it.id }.toSet()
-        putInbox(inbox.value + keep.filter { it.id !in have })
-        mail.forEach { m -> runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.dropAdminMail(m.id) } } } }
-        if (done.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibApplied, done.joinToString(" · "))
-        if (keep.isNotEmpty()) com.tennis.scoremanager.service.RemindersJob.notifyInbox(app, strings.ibNew, strings.ibTitle(inbox.value.size))
-    }
+    val mailbox = com.tennis.scoremanager.club.ServerMailbox(this, app, storage, scope, io)
+    override fun serverMail(to: String, kind: String, file: File) = mailbox.serverMail(to, kind, file)
+    override suspend fun postToOffice(url: String, kind: String, text: String): Boolean = mailbox.postToOffice(url, kind, text)
+    override suspend fun fetchOfficeMail(conf: com.tennis.scoremanager.data.ClubServerConf) = mailbox.fetchOfficeMail(conf)
 
     // ---- Progressi, rating TSM e obiettivi: vedi ProgressArea ----
 
@@ -1688,8 +1573,8 @@ class MatchController(
 
     // ---- Prenota un campo (il giocatore, col server del suo circolo): vedi PlayerBooking ----
 
-    val book = com.tennis.scoremanager.club.PlayerBooking(
-        app, storage, scope, io, { strings }, { options.value.lang.locale }, { serverArea.serverAnswers(it) }, ::fetchMyMail, { planning.bookingLabel(it) },
+    override val book = com.tennis.scoremanager.club.PlayerBooking(
+        app, storage, scope, io, { strings }, { options.value.lang.locale }, { serverArea.serverAnswers(it) }, { mailbox.fetchMyMail(it) }, { planning.bookingLabel(it) },
     ) { go(Screen.BOOK_COURT) }
 
     /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */

@@ -150,7 +150,7 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         // Dopo una lezione di prova: i suoi dati alla segreteria, per iscriverlo a un corso.
         GhostButton(s.ccPropose, Icons.Filled.Message, { propose = true }, Modifier.fillMaxWidth())
         // I suoi progressi (valutazione, obiettivi, test, lezioni) da tenere nell'app, nel ruolo Tu.
-        GhostButton(s.pcSend, Icons.Filled.Message, { c.noticeProgressCard(st.id) }, Modifier.fillMaxWidth())
+        GhostButton(s.pcSend, Icons.Filled.Message, { c.coaching.noticeProgressCard(st.id) }, Modifier.fillMaxWidth())
     }
     if (propose) ProposeStudentDialog(c, st) { propose = false }
     receipt?.let { id ->

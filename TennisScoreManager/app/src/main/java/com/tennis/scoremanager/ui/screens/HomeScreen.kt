@@ -158,8 +158,8 @@ fun HomeScreen(c: MatchController) {
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
     ) {
         // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
-        val inbox by c.inbox.collectAsState()
-        if (inbox.isNotEmpty()) Entry(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint, main = true) { c.openInbox() }
+        val inbox by c.mailbox.inbox.collectAsState()
+        if (inbox.isNotEmpty()) Entry(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint, main = true) { c.mailbox.openInbox() }
         // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
         if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
         // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.

@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         i?.getStringExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)?.let { target ->
             i.removeExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)
             when {
-                target == "inbox" -> controller.openInbox()
+                target == "inbox" -> controller.mailbox.openInbox()
                 target == "lessons" -> controller.coaching.openLessons()
                 target.startsWith("course:") -> controller.coaching.openCoachCourse(target.removePrefix("course:"))
             }

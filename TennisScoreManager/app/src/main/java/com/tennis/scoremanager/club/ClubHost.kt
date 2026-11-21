@@ -54,6 +54,12 @@ interface ClubHost {
     val coaching: com.tennis.scoremanager.coach.CoachArea
     val photosVersion: MutableStateFlow<Int>
 
+    // Casella sul server: i circoli del giocatore, le schede partita, l'apertura di un file arrivato.
+    val book: PlayerBooking
+    val cards: MatchCardsArea
+    /** Apre il testo di un file arrivato (scheda, risultato, corso, profilo...) come da WhatsApp; [via] = il server. */
+    fun receiveCardText(text: String?, via: String? = null)
+
     // Giocatori, registro delle quote e planning dei campi.
     val players: MutableStateFlow<List<PlayerProfile>>
     fun playerById(id: String?): PlayerProfile?

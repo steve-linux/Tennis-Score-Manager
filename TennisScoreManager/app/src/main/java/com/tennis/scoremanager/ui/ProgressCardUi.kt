@@ -32,7 +32,7 @@ fun IncomingProgressDialog(c: MatchController, card: ProgressCard) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     AlertDialog(
-        onDismissRequest = { c.incomingProgress.value = null },
+        onDismissRequest = { c.coaching.incomingProgress.value = null },
         icon = { Icon(Icons.Filled.Grading, null, tint = TsmColors.Ball) },
         title = { Text(s.pcTitle) },
         text = {
@@ -43,8 +43,8 @@ fun IncomingProgressDialog(c: MatchController, card: ProgressCard) {
                 Text(s.pcHint, color = TsmColors.TextDim, fontSize = 13.sp)
             }
         },
-        confirmButton = { TextButton(onClick = { c.acceptProgress(card) }) { Text(s.pcSave) } },
-        dismissButton = { TextButton(onClick = { c.incomingProgress.value = null }) { Text(s.back) } },
+        confirmButton = { TextButton(onClick = { c.coaching.acceptProgress(card) }) { Text(s.pcSave) } },
+        dismissButton = { TextButton(onClick = { c.coaching.incomingProgress.value = null }) { Text(s.back) } },
     )
 }
 
@@ -52,7 +52,7 @@ fun IncomingProgressDialog(c: MatchController, card: ProgressCard) {
 @Composable
 fun MyCoachSection(c: MatchController) {
     val s = LocalStrings.current
-    val card by c.myProgress.collectAsState()
+    val card by c.coaching.myProgress.collectAsState()
     val p = card ?: return
     val lang = c.options.collectAsState().value.lang
     SectionCard(s.pcSection, Icons.Filled.Grading) {

@@ -425,4 +425,36 @@ class CoachArea(
         val f = File(dir, "${s.xlReceipts} $year.xlsx")
         return runCatching { f.outputStream().use { com.tennis.scoremanager.data.Xlsx.write("${s.xlReceipts} $year", rows, it) }; f }.getOrNull()
     }
+
+    // ---- Scheda progressi: l'allenatore la manda, l'allievo la tiene in Progressi ----
+
+    val incomingProgress = MutableStateFlow<com.tennis.scoremanager.data.ProgressCard?>(null)
+    val myProgress = MutableStateFlow(storage.loadMyProgress())
+
+    /** Allenatore: la scheda progressi dell'allievo in un file da mandargli. */
+    fun progressCardFile(studentId: String): File? {
+        val st = playerById(studentId) ?: return null
+        val club = coachBook.value.courses.maxByOrNull { it.card.issuedAt }?.card?.club.orEmpty().ifBlank { storage.clubName }
+        val card = com.tennis.scoremanager.data.ProgressCards.build(coachBook.value, serveSessions.value, st.id, st.name, me()?.name ?: storage.myName, club, System.currentTimeMillis())
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.ProgressCards.fileName(strings.pcTitle, st.name)).apply { writeText(com.tennis.scoremanager.data.ProgressCards.encode(card)) } }.getOrNull()
+    }
+
+    /** Allenatore: manda la scheda progressi all'allievo (al genitore se è minorenne), col file allegato. */
+    fun noticeProgressCard(studentId: String) {
+        val st = playerById(studentId) ?: return
+        val f = progressCardFile(studentId) ?: return
+        val now = System.currentTimeMillis()
+        val text = listOf(com.tennis.scoremanager.data.Notices.hello(strings, st, now), strings.pcText).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.pcTitle, st.name, text, listOf(com.tennis.scoremanager.data.Notices.recipient(st, text, now).copy(attachment = f))))
+    }
+
+    /** Allievo: la scheda arrivata va nei suoi progressi (una più vecchia di quella che c'è non la sostituisce). */
+    fun acceptProgress(card: com.tennis.scoremanager.data.ProgressCard) {
+        incomingProgress.value = null
+        val old = myProgress.value
+        if (old != null && old.issuedAt > card.issuedAt) return
+        myProgress.value = card
+        scope.launch(io) { storage.saveMyProgress(card) }
+    }
 }

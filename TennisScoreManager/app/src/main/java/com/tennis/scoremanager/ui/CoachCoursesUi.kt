@@ -240,7 +240,7 @@ fun CoachCourseScreen(c: MatchController) {
             if (!cc.personal) BigButton(s.ccSendAttendance, Icons.AutoMirrored.Filled.Send, {
                 val byApp = { c.coaching.attendanceToSend(co.id)?.let { (f, text, office) -> if (sendToOffice(context, f, text, office)) c.coaching.attendanceSent(co.id) } }
                 // Corso arrivato dal server del circolo: le presenze tornano da lì; se non risponde, su WhatsApp.
-                if (cc.via != null) scope.launch { if (c.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
+                if (cc.via != null) scope.launch { if (c.mailbox.sendAttendanceServer(co.id)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
                 else byApp()
             }, Modifier.weight(1f))
         },
@@ -501,7 +501,7 @@ fun ProposeStudentDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
             TextButton(onClick = {
                 val byApp = { c.coaching.proposalToSend(st, level, note, null)?.let { (f, text, office) -> sendToOffice(context, f, text, office) } }
                 // Con il server del circolo dei suoi corsi la proposta va da lì; se non risponde, su WhatsApp.
-                if (c.coachVia() != null) scope.launch { if (c.sendProposalServer(st, level, note)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
+                if (c.mailbox.coachVia() != null) scope.launch { if (c.mailbox.sendProposalServer(st, level, note)) android.widget.Toast.makeText(context, s.ibSentServer, android.widget.Toast.LENGTH_SHORT).show() else byApp() }
                 else byApp()
                 onDone()
             }) { Text(s.ccPropose) }
