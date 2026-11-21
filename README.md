@@ -44,6 +44,8 @@ cd TennisScoreManager
 
 Su Windows `.\gradlew testDebugUnitTest assembleDebug` da PowerShell. Serve un JDK 17 o più recente (`JAVA_HOME`): va bene quello incluso in Android Studio, nella sua cartella `jbr`.
 
+I test dell'interfaccia girano sul PC con Robolectric: la prima volta scaricano da Maven Central l'Android che usano (una volta sola, poi resta nella cache).
+
 Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0).
 
 ## Dove mettere le mani
@@ -75,6 +77,7 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Funzioni scelte ("Cosa usi" per Tu e Allenatore, funzioni del circolo) | `app/.../club/FeatureChoices.kt` (in `MatchController` è `features`), `ui/PlayerFeaturesUi.kt`, `ui/ClubFeaturesUi.kt` |
 | Prenota un campo dal giocatore (circoli, Cerco compagno, chat, controllo in background) | `app/.../club/PlayerBooking.kt` (in `MatchController` è `book`), `ui/screens/BookCourtScreen.kt`, `service/OnlineAlerts.kt` |
 | File dei dati che si leggono ancora dopo un aggiornamento | `app/src/test/.../data/FormatUpgradeTest.kt`, esempi in `app/src/test/resources/formati/<versione>/` |
+| Test dell'interfaccia senza telefono (Robolectric: l'app vera sul PC) | `app/src/test/.../ui/AppFlowTest.kt` (nuova partita, punti, annulla, sospendi e riprendi), `ui/StartupTest.kt` (ogni ruolo col tabellone TV acceso: tutte le schede e le schermate), `data/BackupRoundTripTest.kt` (backup, cancellazione e ripristino, anche con password) |
 | Telecomandi Bluetooth da selfie (clic, doppio clic, pressione lunga) | `app/.../remote/PressDetector.kt` + test, `remote/RemoteInput.kt` |
 | Protocollo Bluetooth (condiviso col firmware) | `app/.../ble/BandProtocol.kt` e in cima a `TSM_Band.ino` |
 | Impostazioni dei braccialetti, stima autonomia | `app/.../ble/BandProtocol.kt` (`BandSettings`), `ble/BatteryModel.kt`, `ui/BandSettingsPanel.kt` |

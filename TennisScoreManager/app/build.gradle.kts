@@ -48,6 +48,8 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Robolectric (test dell'interfaccia sul PC): servono risorse e manifest veri dell'app.
+        unitTests.isIncludeAndroidResources = true
     }
     // F-Droid: niente blocco "dependency metadata" (cifrato con la chiave di Google) nell'APK firmato
     dependenciesInfo {
@@ -88,4 +90,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    // Test dell'interfaccia senza telefono: l'app vera dentro Robolectric. Solo test, niente nell'APK di rilascio.
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

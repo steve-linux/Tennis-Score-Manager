@@ -64,6 +64,7 @@ mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/video"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
+mkdir -p "$DEST/app/src/test/resources/formati/2.4.3"
 mkdir -p "$DEST/app/src/test/resources/formati/2.6.0"
 mkdir -p "$DEST/app/src/test/resources/pose"
 mkdir -p "$DEST/courtcore"
@@ -136,6 +137,8 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Robolectric (test dell'interfaccia sul PC): servono risorse e manifest veri dell'app.
+        unitTests.isIncludeAndroidResources = true
     }
     // F-Droid: niente blocco "dependency metadata" (cifrato con la chiave di Google) nell'APK firmato
     dependenciesInfo {
@@ -176,6 +179,11 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    // Test dell'interfaccia senza telefono: l'app vera dentro Robolectric. Solo test, niente nell'APK di rilascio.
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 TSM_EOF
 
@@ -101268,6 +101276,103 @@ class BackupCryptTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/BackupRoundTripTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/BackupRoundTripTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.data
+
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.ConscryptMode
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+
+/**
+ * Backup e ripristino con i file veri dell'app (Robolectric): si salva, si cancella tutto, si ripristina e i dati
+ * tornano uguali. Un backup sbagliato (password errata, file troncato) non deve cancellare i dati di adesso.
+ */
+@RunWith(RobolectricTestRunner::class)
+// Senza Conscrypt: Robolectric lo metterebbe come provider TLS di tutta la JVM e cambierebbe l'HTTPS dei test che girano dopo (DeskTest).
+@ConscryptMode(ConscryptMode.Mode.OFF)
+@Config(sdk = [35], application = Application::class)
+class BackupRoundTripTest {
+    private val app: Application = ApplicationProvider.getApplicationContext()
+    private lateinit var storage: Storage
+    private lateinit var match: MatchRecord
+
+    @Before
+    fun data() {
+        storage = Storage(app)
+        val text = requireNotNull(javaClass.getResource("/formati/2.6.0/match_suspended.json")).readText()
+        match = Storage.JSON.decodeFromString(MatchRecord.serializer(), text)
+        storage.saveMatch(match)
+        storage.setup = SetupData(club = "Circolo Prova")
+        File(app.filesDir, "players.json").writeText("""[{"id":"p1","name":"Mario Rossi"}]""")
+    }
+
+    private fun backup(password: String? = null): ByteArray =
+        ByteArrayOutputStream().also { Backup.write(app, storage, it, videos = false, version = "test", strokesFolder = "Colpi", password = password?.toCharArray()) }.toByteArray()
+
+    private fun restore(bytes: ByteArray, password: String? = null): Boolean =
+        Backup.openPlain({ ByteArrayInputStream(bytes) }, password?.toCharArray())!!.use { Backup.restore(app, storage, it) }
+
+    private fun prefsText() = File(app.applicationInfo.dataDir, "shared_prefs/tsm.xml").readText()
+
+    private fun assertDataBack() {
+        assertEquals(match, storage.loadUnfinished().single())
+        assertTrue(File(app.filesDir, "players.json").readText().contains("Mario Rossi"))
+        assertTrue(prefsText().contains("Circolo Prova"))
+    }
+
+    @Test
+    fun plain() {
+        val b = backup()
+        Backup.wipe(app, storage, videos = false, strokesFolders = emptyList())
+        assertTrue(storage.loadUnfinished().isEmpty())
+        assertFalse(File(app.filesDir, "players.json").exists())
+        assertTrue(restore(b))
+        assertDataBack()
+    }
+
+    @Test
+    fun withPassword() {
+        val b = backup("segreta")
+        assertTrue(Backup.isLocked { ByteArrayInputStream(b) })
+        try {
+            restore(b, "sbagliata")
+            fail("password sbagliata accettata")
+        } catch (_: BackupCrypt.WrongPassword) {
+        } catch (_: java.io.IOException) {
+        }
+        assertDataBack() // niente cancellato
+        Backup.wipe(app, storage, videos = false, strokesFolders = emptyList())
+        assertTrue(restore(b, "segreta"))
+        assertDataBack()
+    }
+
+    @Test
+    fun brokenFileTouchesNothing() {
+        val b = backup("segreta")
+        val cut = b.copyOf(b.size - 40) // ultima parte persa (sigillo compreso)
+        runCatching { restore(cut, "segreta") }.onSuccess { assertFalse("file troncato ripristinato", it) }
+        assertDataBack()
+        assertFalse(runCatching { restore("non è un backup".toByteArray()) }.getOrDefault(false))
+        assertDataBack()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClosureTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClosureTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -102526,8 +102631,12 @@ cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/FormatUpgradeTest.kt
 package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PenaltyKind
+import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.TvSettings
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import org.junit.Assert.assertEquals
@@ -102593,6 +102702,43 @@ class FormatUpgradeTest {
         assertEquals("Corso bambini", read("2.6.0", "club_school.json", ListSerializer(Course.serializer())).single().name)
         assertEquals("Classifica sociale", read("2.6.0", "club_ladders.json", ListSerializer(Ladder.serializer())).single().name)
         assertEquals("Torneo sociale", read("2.6.0", "club_tournaments.json", ListSerializer(ClubTournament.serializer())).single().name)
+    }
+
+    /** Stesso formato di expected_scores.txt della 2.4.3. */
+    private fun desc(m: MatchState) = "sets=" + m.sets.joinToString(" ") { "${it.g1}-${it.g2}" + (it.tb1?.let { t -> "(${t}-${it.tb2})" } ?: "") } +
+        " games=${m.g1}-${m.g2} points=${m.pt1}-${m.pt2} winner=${m.winner} played=${m.pointsPlayed} p1Left=${m.p1Left}"
+
+    /**
+     * 2.4.3, l'ultima uscita prima della 2.6.0: partita in corso (files/matches) e ultima finita (files/last_finished.json),
+     * doppio al meglio di due set con match tie-break. Rigiocando gli eventi il punteggio di oggi è quello della 2.4.3.
+     */
+    @Test
+    fun matchesFrom243() {
+        val expected = text("2.4.3", "expected_scores.txt").lines().filter { it.isNotBlank() }.associate { it.substringBefore(' ') to it.substringAfter(' ') }
+        val m = read("2.4.3", "last_finished.json", MatchRecord.serializer())
+        assertTrue(m.finished)
+        assertEquals("Paolo Verdi", m.setup.p1b)
+        assertEquals(MatchFormat.TWO_SETS_MATCH_TIEBREAK, m.rules.format)
+        assertEquals(60, m.batteryEnd[Side.P2])
+        assertEquals(expected["finished"], desc(ScoreEngine.replay(m.rules, m.events)))
+
+        val s = read("2.4.3", "match_suspended.json", MatchRecord.serializer())
+        assertTrue(s.suspended)
+        assertEquals(expected["suspended"], desc(ScoreEngine.replay(s.rules, s.events)))
+    }
+
+    /** Le impostazioni che la 2.4.3 teneva nelle preferenze come testo JSON (setup, options, tv). */
+    @Test
+    fun settingsFrom243() {
+        assertEquals("Circolo Prova", read("2.4.3", "prefs_setup.json", SetupData.serializer()).club)
+        val o = read("2.4.3", "prefs_options.json", MatchOptions.serializer())
+        assertEquals(PlayMode.BANDS, o.mode)
+        assertEquals(Side.P2, o.tossWinner)
+        assertTrue(o.voiceFiles)
+        val tv = read("2.4.3", "prefs_tv.json", TvSettings.serializer())
+        assertTrue(tv.enabled)
+        assertEquals("Torneo di prova", tv.title)
+        assertEquals("#00FF00", tv.color1)
     }
 }
 TSM_EOF
@@ -107848,6 +107994,119 @@ class TvSnapshotTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ui/AppFlowTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ui/AppFlowTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.ui
+
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isRoot
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.printToString
+import com.tennis.scoremanager.MainActivity
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.TsmApp
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.ConscryptMode
+import org.robolectric.shadows.ShadowLooper
+import java.util.concurrent.TimeUnit
+
+/**
+ * L'app vera (MainActivity, dati vuoti, lingua italiana) dentro Robolectric, sul PC e nella build di GitHub:
+ * il percorso di ogni partita, toccando gli stessi pulsanti che si toccano sul telefono.
+ */
+@RunWith(RobolectricTestRunner::class)
+// Senza Conscrypt: Robolectric lo metterebbe come provider TLS di tutta la JVM e cambierebbe l'HTTPS dei test che girano dopo (DeskTest).
+@ConscryptMode(ConscryptMode.Mode.OFF)
+@Config(sdk = [35], qualifiers = "w411dp-h914dp-xxhdpi")
+class AppFlowTest {
+    @get:Rule val rule = createAndroidComposeRule<MainActivity>()
+
+    private val c: MatchController get() = (rule.activity.application as TsmApp).controller
+
+    @Test
+    fun newMatchPointUndoSuspendResume() {
+        rule.waitForIdle()
+        assertEquals(Screen.HOME, c.screen.value)
+        tap("Nuova partita")
+        assertEquals(Screen.SETUP, c.screen.value)
+        tap("Avanti")
+        assertEquals(Screen.OPTIONS, c.screen.value)
+        tap("Avanti")
+        tap("Continua senza") // la posizione per il riepilogo: qui no
+        assertEquals(Screen.TOSS, c.screen.value)
+        tap("Avanti")
+        assertEquals(Screen.START, c.screen.value)
+        tap("Inizia partita")
+        assertEquals(Screen.MATCH, c.screen.value)
+
+        // Quattro punti al Giocatore 1: primo game. Annulla toglie l'ultimo punto e riporta il game a 40-0.
+        repeat(4) { tap("Giocatore 1") }
+        assertScore(g1 = 1, pt1 = 0)
+        tap("Annulla")
+        assertScore(g1 = 0, pt1 = 3)
+        shown("40")
+
+        // Sospesa e lasciata: resta tra le partite da riprendere, salvata.
+        tap("Sospendi")
+        shown("PARTITA SOSPESA")
+        assertTrue(c.live.value!!.record.suspended)
+        tap("Esci")
+        tap("Torna al menu")
+        assertEquals(Screen.HOME, c.screen.value)
+        val saved = c.storage.loadUnfinished().single()
+        assertEquals(3, saved.events.count { it is com.tennis.scoremanager.model.MatchEvent.Point })
+
+        // Ripresa dalla prima schermata: stesso punteggio, e il punto successivo chiude il game.
+        tap("Riprendi:")
+        assertEquals(Screen.MATCH, c.screen.value)
+        assertScore(g1 = 0, pt1 = 3)
+        if (c.live.value!!.record.suspended) tap("Riprendi")
+        tap("Giocatore 1")
+        assertScore(g1 = 1, pt1 = 0)
+    }
+
+    private fun assertScore(g1: Int, pt1: Int) {
+        assertNotNull(c.live.value)
+        val st = c.live.value!!.state
+        assertEquals("game", g1, st.g1)
+        assertEquals("punti", pt1, st.pt1)
+    }
+
+    private fun shown(text: String) {
+        assertTrue("non si vede «$text»", rule.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty())
+    }
+
+    /**
+     * Tocca il primo elemento toccabile con quel testo. Il clic va come azione dell'elemento: in Robolectric il tocco
+     * simulato su schermo non arriva ai pulsanti. Prima l'orologio va avanti: l'app ignora i tocchi troppo ravvicinati
+     * e i dialoghi si armano dopo un attimo.
+     */
+    private fun tap(text: String) {
+        ShadowLooper.idleMainLooper(2, TimeUnit.SECONDS)
+        rule.mainClock.advanceTimeBy(2_000)
+        val nodes = rule.onAllNodes(hasText(text, substring = true) and hasClickAction())
+        if (nodes.fetchSemanticsNodes().isEmpty()) error("nessun pulsante «$text» in ${c.screen.value}:\n" + rule.onAllNodes(isRoot()).printToString(maxDepth = 40))
+        nodes.onFirst().performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ui/DictationTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ui/DictationTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -107866,6 +108125,95 @@ class DictationTest {
         assertEquals("Riga\nNuova", appendDictated("Riga\n", "nuova"))
         assertEquals("Testo", appendDictated("Testo", "  "))
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ui/StartupTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ui/StartupTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.ui
+
+import android.app.Application
+import android.content.Context
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.core.app.ApplicationProvider
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Role
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.ble.BleManager
+import com.tennis.scoremanager.ble.HeartRateManager
+import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.voice.Announcer
+import com.tennis.scoremanager.voice.VoicePack
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.ConscryptMode
+
+/**
+ * Avvio dell'app e tutte le schermate, per ogni ruolo, con un MatchController creato nel test sopra le preferenze
+ * scelte prima dell'avvio (MainActivity creerebbe il suo con le preferenze vuote).
+ */
+@RunWith(RobolectricTestRunner::class)
+// Senza Conscrypt: Robolectric lo metterebbe come provider TLS di tutta la JVM e cambierebbe l'HTTPS dei test che girano dopo (DeskTest).
+@ConscryptMode(ConscryptMode.Mode.OFF)
+@Config(sdk = [35], qualifiers = "w411dp-h914dp-xxhdpi", application = Application::class)
+class StartupTest {
+    @get:Rule val rule = createComposeRule()
+
+    private val app: Application = ApplicationProvider.getApplicationContext()
+
+    private fun controller(role: Role, tv: Boolean): MatchController {
+        app.getSharedPreferences("tsm", Context.MODE_PRIVATE).edit()
+            .putString("active_role", role.name)
+            .apply { if (tv) putString("tv", """{"enabled":true}""") }
+            .commit()
+        val voice = VoicePack(app)
+        val ble = BleManager(app)
+        return MatchController(app, Storage(app), ble, HeartRateManager(app, ble), voice, Announcer(app, voice))
+    }
+
+    private fun show(c: MatchController) = rule.setContent {
+        val options by c.options.collectAsState()
+        TsmTheme { CompositionLocalProvider(LocalStrings provides stringsFor(options.lang)) { AppRoot(c) } }
+    }
+
+    /**
+     * Apre ogni schermata e ogni scheda della prima schermata nel ruolo dato, col tabellone TV acceso: all'avvio
+     * publishTv gira già dentro MatchController, prima che le aree siano tutte create (il crash del 21 nov 2026).
+     * Dati vuoti: le schermate che mostrano un elemento scelto (allievo, corso...) devono reggere anche senza.
+     */
+    private fun openAll(role: Role) {
+        val c = controller(role, tv = true)
+        show(c)
+        rule.waitForIdle()
+        for (tab in role.tabs) {
+            c.home(tab)
+            rule.waitForIdle()
+        }
+        for (s in Screen.entries) {
+            try {
+                c.go(s)
+                rule.waitForIdle()
+            } catch (e: Throwable) {
+                throw AssertionError("$role: la schermata $s non si apre", e)
+            }
+            c.home()
+            rule.waitForIdle()
+        }
+    }
+
+    @Test fun player() = openAll(Role.PLAYER)
+
+    @Test fun coach() = openAll(Role.COACH)
+
+    @Test fun club() = openAll(Role.CLUB)
 }
 TSM_EOF
 
@@ -109286,6 +109634,1252 @@ class VoiceFilesTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/FixtureExport.kt.txt
+cat > "$DEST/app/src/test/resources/formati/2.4.3/FixtureExport.kt.txt" << 'TSM_EOF'
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.*
+import com.tennis.scoremanager.tv.TvSettings
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
+import org.junit.Test
+import java.io.File
+
+/**
+ * Genera i file d'esempio come li scrive la 2.4.3 (stessa configurazione JSON di Storage), con nomi di prova.
+ * Da eseguire nel codice del tag v2.4.3: FIXTURE_OUT=<cartella> ./gradlew :app:testDebugUnitTest --tests '*FixtureExport*'
+ * La 2.4.3 salva le partite in corso in files/matches, l'ultima finita in files/last_finished.json e,
+ * nelle preferenze "tsm", le stringhe JSON setup, options e tv.
+ */
+class FixtureExport {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }
+
+    private fun <T> w(dir: File, name: String, s: KSerializer<T>, v: T) = File(dir, name).writeText(json.encodeToString(s, v))
+
+    @Test
+    fun export() {
+        val out = File(System.getenv("FIXTURE_OUT") ?: return).apply { mkdirs() }
+        val t0 = 1760000000000L
+        val setup = SetupData(club = "Circolo Prova", court = "Campo 1", doubles = true, p1a = "Mario Rossi", p1b = "Paolo Verdi", p2a = "Luca Bianchi", p2b = "Marco Neri")
+        val options = MatchOptions(mode = PlayMode.BANDS, lang = Lang.EN, format = MatchFormat.TWO_SETS_MATCH_TIEBREAK, noAd = true,
+            tossWinner = Side.P2, firstServer = Side.P2, p1Left = false, firstServerP1 = 1, ttsVoice = "voce", voiceFiles = true, addressLookup = true)
+        val rules = RulesConfig(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK, noAd = true, doubles = true, firstServer = Side.P2, p1StartsLeft = false, firstServerP1 = 1)
+        // Punti a caso (seme fisso) finché il motore della 2.4.3 non dà la partita finita; con tie-break e match tie-break.
+        val rnd = java.util.Random(7)
+        val events = mutableListOf<MatchEvent>(MatchEvent.ServeOrder(1, 1, 0))
+        while (!ScoreEngine.replay(rules, events).isFinished) {
+            events += MatchEvent.Point(if (rnd.nextInt(100) < 52) Side.P1 else Side.P2, t0 + 1000L * events.size)
+        }
+        val end = ScoreEngine.replay(rules, events)
+        val half = ScoreEngine.replay(rules, events.take(events.size / 2))
+        fun desc(m: MatchState) = "sets=" + m.sets.joinToString(" ") { "${it.g1}-${it.g2}" + (it.tb1?.let { t -> "(${t}-${it.tb2})" } ?: "") } +
+            " games=${m.g1}-${m.g2} points=${m.pt1}-${m.pt2} winner=${m.winner} played=${m.pointsPlayed} p1Left=${m.p1Left}"
+        // Punteggio calcolato dalla 2.4.3: quello di oggi, rigiocando gli stessi eventi, deve dare lo stesso.
+        File(out, "expected_scores.txt").writeText("finished ${desc(end)}\nsuspended ${desc(half)}\n")
+        val finished = MatchRecord(
+            id = "m1760000000000", setup = setup, options = options, rules = rules, events = events,
+            clockMs = 1_800_000, startedAt = t0, endedAt = events.last().let { (it as MatchEvent.Point).at }, finished = true,
+            location = MatchLocation(45.0, 11.0, "Via Prova 1"), updatedAt = t0 + 25_000,
+            batteryStart = mapOf(Side.P1 to 90, Side.P2 to 85), batteryEnd = mapOf(Side.P1 to 70, Side.P2 to 60),
+        )
+        w(out, "last_finished.json", MatchRecord.serializer(), finished)
+        w(out, "match_suspended.json", MatchRecord.serializer(), finished.copy(id = "m1760000100000", events = events.take(events.size / 2), finished = false, suspended = true, endedAt = null))
+        w(out, "prefs_setup.json", SetupData.serializer(), setup)
+        w(out, "prefs_options.json", MatchOptions.serializer(), options)
+        w(out, "prefs_tv.json", TvSettings.serializer(), TvSettings(enabled = true, title = "Torneo di prova", color1 = "#00FF00", showClock = false))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/expected_scores.txt
+cat > "$DEST/app/src/test/resources/formati/2.4.3/expected_scores.txt" << 'TSM_EOF'
+finished sets=6-2 5-7 1-0(10-8) games=0-0 points=0-0 winner=P1 played=133 p1Left=false
+suspended sets=6-2 games=1-2 points=2-1 winner=null played=66 p1Left=false
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/last_finished.json
+cat > "$DEST/app/src/test/resources/formati/2.4.3/last_finished.json" << 'TSM_EOF'
+{
+    "id": "m1760000000000",
+    "setup": {
+        "club": "Circolo Prova",
+        "court": "Campo 1",
+        "doubles": true,
+        "p1a": "Mario Rossi",
+        "p1b": "Paolo Verdi",
+        "p2a": "Luca Bianchi",
+        "p2b": "Marco Neri"
+    },
+    "options": {
+        "mode": "BANDS",
+        "lang": "EN",
+        "audio": true,
+        "format": "TWO_SETS_MATCH_TIEBREAK",
+        "noAd": true,
+        "tossWinner": "P2",
+        "firstServer": "P2",
+        "p1Left": false,
+        "firstServerP1": 1,
+        "firstServerP2": 0,
+        "ttsEngine": null,
+        "ttsVoice": "voce",
+        "voiceFiles": true,
+        "bandsOffAtEnd": true,
+        "addressLookup": true
+    },
+    "rules": {
+        "format": "TWO_SETS_MATCH_TIEBREAK",
+        "noAd": true,
+        "doubles": true,
+        "firstServer": "P2",
+        "p1StartsLeft": false,
+        "firstServerP1": 1,
+        "firstServerP2": 0
+    },
+    "events": [
+        {
+            "type": "serveOrder",
+            "setNumber": 1,
+            "firstP1": 1,
+            "firstP2": 0
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000001000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000002000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000003000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000004000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000005000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000006000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000007000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000008000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000009000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000010000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000011000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000012000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000013000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000014000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000015000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000016000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000017000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000018000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000019000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000020000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000021000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000022000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000023000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000024000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000025000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000026000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000027000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000028000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000029000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000030000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000031000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000032000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000033000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000034000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000035000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000036000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000037000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000038000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000039000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000040000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000041000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000042000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000043000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000044000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000045000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000046000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000047000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000048000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000049000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000050000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000051000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000052000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000053000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000054000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000055000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000056000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000057000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000058000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000059000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000060000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000061000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000062000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000063000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000064000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000065000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000066000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000067000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000068000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000069000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000070000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000071000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000072000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000073000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000074000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000075000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000076000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000077000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000078000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000079000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000080000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000081000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000082000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000083000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000084000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000085000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000086000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000087000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000088000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000089000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000090000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000091000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000092000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000093000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000094000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000095000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000096000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000097000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000098000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000099000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000100000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000101000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000102000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000103000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000104000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000105000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000106000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000107000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000108000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000109000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000110000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000111000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000112000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000113000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000114000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000115000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000116000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000117000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000118000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000119000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000120000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000121000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000122000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000123000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000124000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000125000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000126000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000127000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000128000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000129000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000130000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000131000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000132000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000133000
+        }
+    ],
+    "clockMs": 1800000,
+    "startedAt": 1760000000000,
+    "endedAt": 1760000133000,
+    "suspended": false,
+    "finished": true,
+    "location": {
+        "lat": 45.0,
+        "lon": 11.0,
+        "address": "Via Prova 1"
+    },
+    "updatedAt": 1760000025000,
+    "batteryStart": {
+        "P1": 90,
+        "P2": 85
+    },
+    "batteryEnd": {
+        "P1": 70,
+        "P2": 60
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/match_suspended.json
+cat > "$DEST/app/src/test/resources/formati/2.4.3/match_suspended.json" << 'TSM_EOF'
+{
+    "id": "m1760000100000",
+    "setup": {
+        "club": "Circolo Prova",
+        "court": "Campo 1",
+        "doubles": true,
+        "p1a": "Mario Rossi",
+        "p1b": "Paolo Verdi",
+        "p2a": "Luca Bianchi",
+        "p2b": "Marco Neri"
+    },
+    "options": {
+        "mode": "BANDS",
+        "lang": "EN",
+        "audio": true,
+        "format": "TWO_SETS_MATCH_TIEBREAK",
+        "noAd": true,
+        "tossWinner": "P2",
+        "firstServer": "P2",
+        "p1Left": false,
+        "firstServerP1": 1,
+        "firstServerP2": 0,
+        "ttsEngine": null,
+        "ttsVoice": "voce",
+        "voiceFiles": true,
+        "bandsOffAtEnd": true,
+        "addressLookup": true
+    },
+    "rules": {
+        "format": "TWO_SETS_MATCH_TIEBREAK",
+        "noAd": true,
+        "doubles": true,
+        "firstServer": "P2",
+        "p1StartsLeft": false,
+        "firstServerP1": 1,
+        "firstServerP2": 0
+    },
+    "events": [
+        {
+            "type": "serveOrder",
+            "setNumber": 1,
+            "firstP1": 1,
+            "firstP2": 0
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000001000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000002000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000003000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000004000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000005000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000006000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000007000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000008000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000009000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000010000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000011000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000012000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000013000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000014000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000015000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000016000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000017000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000018000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000019000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000020000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000021000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000022000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000023000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000024000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000025000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000026000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000027000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000028000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000029000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000030000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000031000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000032000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000033000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000034000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000035000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000036000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000037000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000038000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000039000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000040000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000041000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000042000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000043000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000044000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000045000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000046000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000047000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000048000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000049000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000050000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000051000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000052000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000053000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000054000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000055000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000056000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000057000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000058000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000059000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000060000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000061000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000062000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000063000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000064000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000065000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000066000
+        }
+    ],
+    "clockMs": 1800000,
+    "startedAt": 1760000000000,
+    "endedAt": null,
+    "suspended": true,
+    "finished": false,
+    "location": {
+        "lat": 45.0,
+        "lon": 11.0,
+        "address": "Via Prova 1"
+    },
+    "updatedAt": 1760000025000,
+    "batteryStart": {
+        "P1": 90,
+        "P2": 85
+    },
+    "batteryEnd": {
+        "P1": 70,
+        "P2": 60
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/prefs_options.json
+cat > "$DEST/app/src/test/resources/formati/2.4.3/prefs_options.json" << 'TSM_EOF'
+{
+    "mode": "BANDS",
+    "lang": "EN",
+    "audio": true,
+    "format": "TWO_SETS_MATCH_TIEBREAK",
+    "noAd": true,
+    "tossWinner": "P2",
+    "firstServer": "P2",
+    "p1Left": false,
+    "firstServerP1": 1,
+    "firstServerP2": 0,
+    "ttsEngine": null,
+    "ttsVoice": "voce",
+    "voiceFiles": true,
+    "bandsOffAtEnd": true,
+    "addressLookup": true
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/prefs_setup.json
+cat > "$DEST/app/src/test/resources/formati/2.4.3/prefs_setup.json" << 'TSM_EOF'
+{
+    "club": "Circolo Prova",
+    "court": "Campo 1",
+    "doubles": true,
+    "p1a": "Mario Rossi",
+    "p1b": "Paolo Verdi",
+    "p2a": "Luca Bianchi",
+    "p2b": "Marco Neri"
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/resources/formati/2.4.3/prefs_tv.json
+cat > "$DEST/app/src/test/resources/formati/2.4.3/prefs_tv.json" << 'TSM_EOF'
+{
+    "enabled": true,
+    "title": "Torneo di prova",
+    "color1": "#00FF00",
+    "color2": "#FF3030",
+    "showClock": false,
+    "showTimers": true,
+    "showSets": true,
+    "showMessages": true,
+    "showServe": true,
+    "ghostSegments": true
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/resources/formati/2.6.0/FixtureExport.kt.txt
 cat > "$DEST/app/src/test/resources/formati/2.6.0/FixtureExport.kt.txt" << 'TSM_EOF'
 package com.tennis.scoremanager.data
@@ -110213,6 +111807,7 @@ lifecycle = "2.9.4"
 coroutines = "1.10.2"
 serialization = "1.9.0"
 junit = "4.13.2"
+robolectric = "4.16"
 zxing = "3.5.3"
 zxingEmbedded = "4.3.0"
 rootEncoder = "2.8.1"
@@ -110234,6 +111829,9 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 rootencoder = { group = "com.github.pedroSG94.RootEncoder", name = "library", version.ref = "rootEncoder" }
@@ -119950,6 +121548,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 424 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 434 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
