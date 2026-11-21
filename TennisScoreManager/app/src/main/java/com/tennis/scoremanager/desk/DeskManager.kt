@@ -90,17 +90,17 @@ class DeskBridge(private val c: MatchController) : DeskData {
 
     /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
     override fun profileFields(id: String) = fieldsOf(id)
-    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
-    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, asMember, false) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profiles.profileText(it, fields) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profiles.applyProfileFromDesk(it, asMember, false) }
 
     private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
-        val photo = c.photoBytes(p.name) != null
+        val photo = c.profiles.photoBytes(p.name) != null
         DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
     }
 
     override fun incomingFile(text: String): DeskIncoming? {
         val s = c.strings
-        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profilePreview(it) }
+        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profiles.profilePreview(it) }
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
             val st = c.cards.resultStatus(r)
             val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
@@ -147,7 +147,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
             if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
             c.coaching.applyAttendance(r); return null
         }
-        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.school.courses.value.any { it.id == id } }); return null }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.profiles.applyProposal(p, course?.takeIf { id -> c.school.courses.value.any { it.id == id } }); return null }
         return "NOT_A_FILE"
     }
     override fun setClubName(name: String) { c.storage.clubName = name }
@@ -217,12 +217,12 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun profileFields(id: String) = fieldsOf(id)
-    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
-    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profilePreview(it) }
-    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, false, true) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profiles.profileText(it, fields) }
+    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profiles.profilePreview(it) }
+    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profiles.applyProfileFromDesk(it, false, true) }
 
     private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
-        val photo = c.photoBytes(p.name) != null
+        val photo = c.profiles.photoBytes(p.name) != null
         DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
     }
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)

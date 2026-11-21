@@ -49,6 +49,11 @@ interface ClubHost {
     /** Un messaggio breve in basso sullo schermo. */
     fun toast(text: String)
 
+    // Passaggio del profilo: chi lo manda, l'allenatore che lo riceve, le foto da ricaricare.
+    fun me(): PlayerProfile?
+    val coaching: com.tennis.scoremanager.coach.CoachArea
+    val photosVersion: MutableStateFlow<Int>
+
     // Giocatori, registro delle quote e planning dei campi.
     val players: MutableStateFlow<List<PlayerProfile>>
     fun playerById(id: String?): PlayerProfile?

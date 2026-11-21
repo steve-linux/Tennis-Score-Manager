@@ -473,7 +473,7 @@ fun IncomingProposalDialog(c: MatchController, p: StudentProposal) {
                 Segmented(options.map { id -> SegOption(id?.let { x -> courses.firstOrNull { it.id == x }?.name } ?: s.ccNoCourse) }, options.indexOf(pick), { pick = options[it] }, columns = 1)
             }
         },
-        confirmButton = { TextButton(onClick = { c.applyProposal(p, pick) }) { Text(s.ccProposalAdd) } },
+        confirmButton = { TextButton(onClick = { c.profiles.applyProposal(p, pick) }) { Text(s.ccProposalAdd) } },
         dismissButton = { TextButton(onClick = { c.coaching.incomingProposal.value = null }) { Text(s.back) } },
     )
 }

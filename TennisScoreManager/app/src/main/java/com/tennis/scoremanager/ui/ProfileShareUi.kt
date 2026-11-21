@@ -86,7 +86,7 @@ private fun profileFieldIcon(f: ProfileField) = when (f) {
 fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val hasPhoto = remember(p.name) { c.photoBytes(p.name) != null }
+    val hasPhoto = remember(p.name) { c.profiles.photoBytes(p.name) != null }
     val available = remember(p) { ProfileCards.available(p, hasPhoto) }
     var fields by remember(p) { mutableStateOf(ProfileCards.defaults(p, hasPhoto)) }
     var qr by remember { mutableStateOf<String?>(null) }
@@ -104,15 +104,15 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
                     fields = if (on) fields + f else fields - f
                 }
                 BigButton(s.pfAsFile, Icons.Filled.Share, {
-                    c.profileToSend(p, fields)?.let { (file, text) -> context.startActivity(shareFile(context, text, file)) }
+                    c.profiles.profileToSend(p, fields)?.let { (file, text) -> context.startActivity(shareFile(context, text, file)) }
                     onDone()
                 }, Modifier.fillMaxWidth())
                 Text(s.pfAsFileHint, color = TsmColors.TextDim, fontSize = 12.sp)
-                GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profileQr(p, fields) }, Modifier.fillMaxWidth())
+                GhostButton(s.pfAsQr, Icons.Filled.QrCode, { qr = c.profiles.profileQr(p, fields) }, Modifier.fillMaxWidth())
                 Text(s.pfAsQrHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 // Col server del circolo (il giocatore è già iscritto): dritto nella casella della segreteria, con la foto.
                 for (a in c.book.bookingAccounts.collectAsState().value.filter { it.joined })
-                    GhostButton(s.pfToOffice(a.club.ifBlank { a.url }), Icons.Filled.Share, { c.profileToOffice(a.url, p, fields); onDone() }, Modifier.fillMaxWidth())
+                    GhostButton(s.pfToOffice(a.club.ifBlank { a.url }), Icons.Filled.Share, { c.profiles.profileToOffice(a.url, p, fields); onDone() }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
@@ -131,7 +131,7 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
 @Composable
 fun ReceiveProfileButton(c: MatchController, modifier: Modifier = Modifier.fillMaxWidth()) {
     val s = LocalStrings.current
-    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.receiveProfileQr(it) } }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.profiles.receiveProfileQr(it) } }
     GhostButton(s.pfReceive, Icons.Filled.QrCodeScanner, {
         scanner.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.pfScanPrompt).setBeepEnabled(false).setOrientationLocked(true))
     }, modifier)
@@ -190,7 +190,7 @@ fun IncomingProfileDialog(c: MatchController, card: ProfileCard) {
         confirmButton = {
             val into = match?.id?.takeIf { intoExisting }
             TextButton(onClick = {
-                val pl = c.applyProfile(card, into, asMember, asStudent)
+                val pl = c.profiles.applyProfile(card, into, asMember, asStudent)
                 c.openStudent(pl.id)
             }) { Text(if (into != null) s.pfComplete else s.pfAdd) }
         },
