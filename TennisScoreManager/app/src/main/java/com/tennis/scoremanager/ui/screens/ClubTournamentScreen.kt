@@ -451,7 +451,7 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
                     var cur = c.competitions.clubTournament(t.id) ?: t
                     if (court != m.court || at != m.at) { c.competitions.setClubSchedule(cur, m.id, court, at); cur = c.competitions.clubTournament(t.id) ?: cur }
                     onDone()
-                    c.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
+                    c.notices.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
                 }, Modifier.fillMaxWidth())
                 Text(s.ctWinner, color = TsmColors.TextDim, fontSize = 13.sp)
                 val sides = listOf(m.a, m.b)
@@ -584,13 +584,13 @@ private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: ()
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (!pickDay) {
-                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.noticeEntries(t) }, Modifier.fillMaxWidth())
-                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.noticeMatches(t, null) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.notices.noticeEntries(t) }, Modifier.fillMaxWidth())
+                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.notices.noticeMatches(t, null) }, Modifier.fillMaxWidth())
                     if (days.isNotEmpty()) GhostButton(s.ntKindOrder, Icons.Filled.Schedule, { pickDay = true }, Modifier.fillMaxWidth())
-                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.noticeDraw(t) }, Modifier.fillMaxWidth())
-                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
+                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.notices.noticeDraw(t) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.notices.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
                 } else for (d in days) {
-                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.noticeMatches(t, d) }, Modifier.fillMaxWidth())
+                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.notices.noticeMatches(t, d) }, Modifier.fillMaxWidth())
                 }
             }
         },

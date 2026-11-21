@@ -15424,7 +15424,7 @@ class MainActivity : ComponentActivity() {
         val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
         if (day > 0) {
             i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
-            controller.openPlanAt(day)
+            controller.serverArea.openPlanAt(day)
         }
     }
 
@@ -17110,7 +17110,7 @@ class MatchController(
      * Segreteria: prende i file della sua casella. Risultati e presenze col codice giusto si registrano subito (come
      * con Registra); gli altri (diversi da quello che c'è, allievi proposti) restano da aprire.
      */
-    private suspend fun fetchOfficeMail(conf: com.tennis.scoremanager.data.ClubServerConf) {
+    override suspend fun fetchOfficeMail(conf: com.tennis.scoremanager.data.ClubServerConf) {
         val mail = runCatching { withContext(io) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.adminMail() } } }.getOrNull().orEmpty()
         if (mail.isEmpty()) return
         val keep = mutableListOf<com.tennis.scoremanager.data.InboxItem>()
@@ -17236,97 +17236,10 @@ class MatchController(
 
     // ---- Server del circolo (facoltativo) ----
 
-    /** Il server del circolo per le prenotazioni dei giocatori; non abbinato = si prenota solo in segreteria. */
-    override val clubServer = MutableStateFlow(storage.loadClubServer())
-    private val serverLock = kotlinx.coroutines.sync.Mutex()
-
-    override fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) {
-        val n = synchronized(clubServer) { f(clubServer.value).also { clubServer.value = it } }
-        scope.launch(io) { storage.saveClubServer(n) }
-    }
-
-    init {
-        // Il controllo in background (notifiche delle prenotazioni online) solo con un server abbinato e gli avvisi accesi.
-        scope.launch {
-            clubServer.map { it.paired && it.alerts }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedule(app, it) }
-        }
-        // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
-        scope.launch {
-            combine(courtPlan, competitions.clubTournaments, planning.clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
-                .collectLatest { delay(3_000); if (clubServer.value.paired) syncServerNow() }
-        }
-    }
-
-    /** Abbina la segreteria al server con il codice che il server ha scritto all'avvio. null = fatto, altrimenti il codice dell'errore. */
-    suspend fun pairServer(url: String, code: String): String? {
-        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(url)
-        if (u.isEmpty()) return "BAD_URL"
-        return try {
-            val token = withContext(Dispatchers.IO) {
-                com.tennis.scoremanager.data.ClubServerClient(u, null).info()
-                com.tennis.scoremanager.data.ClubServerClient(u, null).pair(code).token
-            }
-            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList(), seen = null) }
-            syncServerNow()
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
-    }
-
-    /**
-     * Manda il planning al server e prende le prenotazioni online: le nuove entrano nel planning, quelle disdette
-     * escono. Prima toglie dal server quelle tolte in segreteria. null = fatto, altrimenti il codice dell'errore.
-     */
-    suspend fun syncServerNow(): String? = serverLock.withLock {
-        val conf = clubServer.value
-        if (!conf.paired) return@withLock null
-        val srv = com.tennis.scoremanager.data.ClubServers
-        try {
-            for (id in conf.cancel) {
-                withContext(Dispatchers.IO) { try { srv.withServer(conf) { it.cancel(id) } } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
-                saveServer { it.copy(cancel = it.cancel - id) }
-            }
-            val sync = srv.buildSync(conf, courtPlan.value, competitions.clubTournaments.value, planning.clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
-            val st = withContext(Dispatchers.IO) { srv.withServer(conf) { it.sync(sync) } }
-            // La casella: risultati dal campo, presenze e proposte degli allenatori.
-            runCatching { fetchOfficeMail(conf) }
-            val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
-            gone.forEach { planning.deleteBooking(it, wholeSeries = false, fromServer = true) }
-            if (added.isNotEmpty()) planning.putBookings(added)
-            // Le novità per la segreteria: chi ha prenotato o disdetto online da quando si è guardato l'ultima volta.
-            val news = com.tennis.scoremanager.data.ClubServers.onlineNews(clubServer.value.seen, st.bookings, System.currentTimeMillis(), conf.cancel.toSet()) { b ->
-                listOf(b.name, b.court, planning.bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
-            }
-            if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
-            saveServer {
-                it.copy(
-                    lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen,
-                    inbox = com.tennis.scoremanager.data.ClubServers.addNotices(it.inbox, news.notices),
-                )
-            }
-            null
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
-            saveServer { it.copy(error = e.code) }
-            e.code
-        }
-    }
-
-    fun setServerAlerts(on: Boolean) = saveServer { it.copy(alerts = on) }
-
-    /** Un messaggio di Oggi letto (null = tutti): sparisce. */
-    fun readOnlineNotice(id: String?) = saveServer { conf -> conf.copy(inbox = if (id == null) emptyList() else conf.inbox.filter { it.id != id }) }
-
-    /** Aperto un messaggio di Oggi: sparisce e si va al planning di quel giorno. */
-    fun openOnlineNotice(n: com.tennis.scoremanager.data.OnlineNotice) {
-        readOnlineNotice(n.id)
-        openPlanAt(com.tennis.scoremanager.data.CourtPlans.dayStart(n.start))
-    }
-
-    /** Il giorno su cui aprire il planning (dalla notifica di una prenotazione online). */
-    val planDayRequest = MutableStateFlow<Long?>(null)
-
-    fun openPlanAt(day: Long) {
-        planDayRequest.value = day
-        planning.openCourtsPlan()
-    }
+    /** Il server del circolo dalla parte della segreteria: vedi ClubServerArea. */
+    val serverArea = com.tennis.scoremanager.club.ClubServerArea(this, app, storage, scope, io)
+    override val clubServer get() = serverArea.clubServer
+    override fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) = serverArea.saveServer(f)
 
     // ---- Cosa usi (Tu e Allenatore) ----
 
@@ -17373,77 +17286,11 @@ class MatchController(
         storage.clubFeatures = n.map { it.name }.toSet()
     }
 
-    fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =
-        saveServer { it.copy(rules = rules, payInfo = payInfo.trim(), publicUrl = com.tennis.scoremanager.data.ClubServers.cleanUrl(publicUrl)) }
-
-    /** L'invito per un giocatore: codice e scadenza (il link lo fa [com.tennis.scoremanager.data.ClubServers.inviteLink]). */
-    suspend fun serverInvite(p: com.tennis.scoremanager.data.PlayerProfile): Result<com.tennis.scoremanager.data.SrvInvite> {
-        val conf = clubServer.value
-        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
-        return try {
-            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.invite(p.id, p.name) } })
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
-    }
-
-    /** Il server risponde a [url] (la rete del circolo o l'indirizzo da internet)? Per la lista dei controlli. */
-    suspend fun serverAnswers(url: String): Boolean = url.isNotBlank() && withContext(Dispatchers.IO) {
-        runCatching { com.tennis.scoremanager.data.ClubServerClient(com.tennis.scoremanager.data.ClubServers.cleanUrl(url), null).info() }.isSuccess
-    }
-
-    /** Il tunnel da internet del server: com'è messo e, con [on], accendilo o spegnilo. */
-    suspend fun serverTunnel(on: Boolean? = null): Result<com.tennis.scoremanager.data.SrvTunnel> {
-        val conf = clubServer.value
-        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
-        return try {
-            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { if (on == null) it.tunnel() else it.setTunnel(on) } })
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
-    }
-
-    /** Il giocatore non prenota più online (le sue prenotazioni restano nel planning). */
-    suspend fun serverRemovePlayer(id: String): String? {
-        val conf = clubServer.value
-        return try {
-            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.removePlayer(id) } }
-            saveServer { it.copy(players = it.players.filter { p -> p.id != id }) }
-            null
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
-    }
-
-    /** Il socio ha dimenticato il PIN: lo si azzera (rientra con un invito e se ne sceglie un altro). null = fatto. */
-    suspend fun serverResetPin(id: String): String? {
-        val conf = clubServer.value
-        return try {
-            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.resetPin(id) } }
-            saveServer { it.copy(players = it.players.map { p -> if (p.id == id) p.copy(hasPin = false) else p }) }
-            null
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
-    }
-
-    /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
-    fun unpairServer() {
-        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl, alerts = it.alerts) }
-        val p = courtPlan.value
-        if (p.bookings.any { it.online != null }) {
-            val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })
-            courtPlan.value = np
-            scope.launch(io) { storage.saveCourtPlan(np) }
-        }
-    }
-
     // ---- Prenota un campo (il giocatore, col server del suo circolo): vedi PlayerBooking ----
 
     val book = com.tennis.scoremanager.club.PlayerBooking(
-        app, storage, scope, io, { strings }, { options.value.lang.locale }, ::serverAnswers, ::fetchMyMail, { planning.bookingLabel(it) },
+        app, storage, scope, io, { strings }, { options.value.lang.locale }, { serverArea.serverAnswers(it) }, ::fetchMyMail, { planning.bookingLabel(it) },
     ) { go(Screen.BOOK_COURT) }
-
-    /** La segreteria: i messaggi di una stanza, la bacheca, le stanze, togliere un messaggio. Codice d'errore o il risultato. */
-    suspend fun <T> serverAdmin(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
-        val conf = clubServer.value
-        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
-        return try {
-            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { f(it) } })
-        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
-    }
 
     /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
     fun courtLine(court: String): String {
@@ -17488,210 +17335,12 @@ class MatchController(
     override fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
         t.entries.firstOrNull { it.id == id }?.let { e -> e.players.mapIndexed { i, p -> playerById(p)?.name ?: e.names.getOrNull(i).orEmpty() }.joinToString(" / ") } ?: "—"
 
-    private fun peopleOf(t: com.tennis.scoremanager.data.ClubTournament, entryIds: Collection<String?>): List<com.tennis.scoremanager.data.PlayerProfile> =
-        t.entries.filter { it.id in entryIds }.flatMap { it.players }.distinct().mapNotNull { playerById(it) }
 
     override val clubSign: String get() = storage.clubName
 
-    /** A ogni iscritto: iscrizione confermata e quota pagata o da pagare. */
-    fun noticeEntries(t: com.tennis.scoremanager.data.ClubTournament) {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val people = peopleOf(t, t.entries.map { it.id })
-        val rec = people.map { p -> com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.entryText(s, t, p, clubBook.value, clubSign, lang, now), now) }
-        // Per il gruppo: l'elenco degli iscritti.
-        val common = (listOf(s.ntEntriesList(t.name)) + t.entries.map { "• " + entryNameOf(t, it.id) } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindEntries, t.name, common, rec))
-    }
-
-    /**
-     * Le partite da giocare: a ciascun giocatore la sua (turno, avversario, giorno, ora, campo); per il gruppo
-     * l'ordine di gioco. [day] = solo quel giorno, null = tutte quelle già con i due giocatori.
-     */
-    fun noticeMatches(t: com.tennis.scoremanager.data.ClubTournament, day: Long?) {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val open = t.matches.filter { !it.played && it.a != null && it.b != null }
-        val ms = if (day != null) com.tennis.scoremanager.data.Notices.onDay(open, day) else open
-        val names = { id: String? -> entryNameOf(t, id) }
-        val title = if (day != null) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(day, lang)) else s.ntOrderAll(t.name)
-        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(s, t, ms, { competitions.clubRoundName(t, it) }, names, title, lang, clubSign)
-        openNotice(com.tennis.scoremanager.data.NoticePlan(if (day != null) s.ntKindOrder else s.ntKindNext, title, common, convocations(t, ms)))
-    }
-
-    /** Convoca i giocatori di una partita sola, con la sua scheda partita. */
-    fun noticeMatch(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch) {
-        val title = "${competitions.clubRoundName(t, m)}: ${entryNameOf(t, m.a)} – ${entryNameOf(t, m.b)}"
-        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(strings, t, listOf(m), { competitions.clubRoundName(t, it) }, { entryNameOf(t, it) },
-            listOfNotNull(t.name, m.at?.let { com.tennis.scoremanager.data.Notices.day(it, options.value.lang) }).joinToString(" · "), options.value.lang, clubSign)
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ctConvoke, title, common, convocations(t, listOf(m))))
-    }
-
-    /** A ciascun giocatore la sua partita (turno, avversario, giorno, ora, campo) con la scheda partita allegata. */
-    private fun convocations(t: com.tennis.scoremanager.data.ClubTournament, ms: List<com.tennis.scoremanager.data.CTMatch>): List<com.tennis.scoremanager.data.NoticeRecipient> {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val names = { id: String? -> entryNameOf(t, id) }
-        return ms.flatMap { m ->
-            val card = matchCardFile(t.id, m.id)
-            card?.let { f -> peopleOf(t, listOf(m.a, m.b)).forEach { p -> serverMail(p.id, "card", f) } }
-            peopleOf(t, listOf(m.a, m.b)).map { p ->
-                val text = com.tennis.scoremanager.data.Notices.matchText(s, t, m, competitions.clubRoundName(t, m), names, p, clubSign, lang, now, card = card != null)
-                com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
-            }
-        }
-    }
-
-    /**
-     * La scheda partita (vedi [com.tennis.scoremanager.data.MatchCard]) in un file da allegare. Il codice nasce alla
-     * prima convocazione e resta lo stesso nelle successive (un risultato tornato vale anche dopo uno spostamento).
-     * Null se la partita è già giocata o non ha ancora i due giocatori.
-     */
-    fun matchCardFile(tournamentId: String, matchId: String): File? {
-        val t = competitions.clubTournament(tournamentId) ?: return null
-        val m = t.matches.firstOrNull { it.id == matchId } ?: return null
-        if (m.played || m.a == null || m.b == null) return null
-        val code = m.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
-            competitions.saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(cardCode = code) else it }))
-        }
-        val card = com.tennis.scoremanager.data.MatchCards.forTournament(
-            t, m, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, competitions.clubRoundName(t, m),
-        ) { playerById(it) } ?: return null
-        return writeCardFile(card)
-    }
-
-    private fun writeCardFile(card: com.tennis.scoremanager.data.MatchCard): File? {
-        // Senza il telefono della segreteria il risultato non sa dove tornare: lo si dice a chi convoca.
-        if (card.office.isBlank()) _toasts.tryEmit(strings.mcNoOffice)
-        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
-        return runCatching { File(dir, com.tennis.scoremanager.data.MatchCards.fileName(card)).apply { writeText(com.tennis.scoremanager.data.MatchCards.encode(card)) } }.getOrNull()
-    }
-
-    /** La scheda di una partita di un incontro a squadre (codice come per i tornei: nasce alla prima convocazione). */
-    fun rubberCardFile(teamId: String, fixtureId: String, index: Int): File? {
-        val t = competitions.team(teamId) ?: return null
-        val f = t.fixtures.firstOrNull { it.id == fixtureId } ?: return null
-        val r = f.rubbers.getOrNull(index) ?: return null
-        val code = r.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
-            competitions.saveFixture(t, f.copy(rubbers = f.rubbers.mapIndexed { k, x -> if (k == index) x.copy(cardCode = code) else x }))
-        }
-        val card = com.tennis.scoremanager.data.MatchCards.forRubber(
-            t, f, index, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, competitions.rubberName(t, index),
-        ) { playerById(it) } ?: return null
-        return writeCardFile(card)
-    }
-
-    /** La scheda di una sfida della classifica. */
-    override fun challengeCardFile(ladderId: String, challengeId: String): File? {
-        val l = competitions.ladder(ladderId) ?: return null
-        val ch = l.challenges.firstOrNull { it.id == challengeId } ?: return null
-        val code = ch.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
-            competitions.saveLadder(l.copy(challenges = l.challenges.map { if (it.id == challengeId) it.copy(cardCode = code) else it }))
-        }
-        val card = com.tennis.scoremanager.data.MatchCards.forChallenge(
-            l, ch, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, strings.ldPositions(ch.challengerPos, ch.defenderPos),
-        ) { playerById(it) } ?: return null
-        return writeCardFile(card)
-    }
-
-    /** Convoca i nostri giocatori di una partita dell'incontro, con la scheda partita per chi tiene il punteggio. */
-    fun noticeRubber(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, index: Int) {
-        val s = strings
-        val r = f.rubbers.getOrNull(index) ?: return
-        val card = rubberCardFile(t.id, f.id, index)
-        val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ")
-        val theirs = r.theirs.filter { it.isNotBlank() }.joinToString(" / ").ifBlank { f.opponent }
-        val lines = listOfNotNull(s.ntMatch(competitions.rubberName(t, index), "${t.name} – ${f.opponent}"), "$ours – $theirs", competitions.fixtureWhen(f), s.ntCardHowTo.takeIf { card != null })
-        val now = System.currentTimeMillis()
-        card?.let { f -> r.ours.forEach { serverMail(it, "card", f) } }
-        val rec = r.ours.mapNotNull { playerById(it) }.map { p ->
-            val text = (listOf(s.ntHello(p.firstName.ifBlank { p.name })) + lines + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n")
-            com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
-        }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ctConvoke, "${competitions.rubberName(t, index)}: $ours – $theirs", lines.joinToString("\n"), rec))
-    }
-
-    /** Il tabellone in un'immagine, per il gruppo e i social; a ciascuno lo stesso testo. */
-    fun noticeDraw(t: com.tennis.scoremanager.data.ClubTournament) {
-        val s = strings; val now = System.currentTimeMillis()
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.ctTabDraw} ${t.name}.png".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
-        val sub = listOfNotNull(clubSign.ifBlank { null }, t.category.ifBlank { null }, if (t.kind == com.tennis.scoremanager.data.CTKind.FITP) "FITP" else s.ctSocial).joinToString(" · ")
-        val ok = runCatching {
-            val b = com.tennis.scoremanager.data.ClubDrawImage.render(t, { entryNameOf(t, it) }, s, sub, s.generatedWith)
-            f.outputStream().use { b.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
-            b.recycle()
-        }.isSuccess
-        val common = (listOf(s.ntDrawText(t.name)) + t.champion?.let { listOf(s.ctChampion(entryNameOf(t, it))) }.orEmpty() + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
-        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, common, now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindDraw, t.name, common, rec, image = f.takeIf { ok }))
-    }
-
-    /** Messaggio libero agli iscritti: il testo si scrive nella schermata degli avvisi. */
-    fun noticeFreeTournament(t: com.tennis.scoremanager.data.ClubTournament) {
-        val now = System.currentTimeMillis()
-        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntKindFree, t.name, "${t.name}\n\n", rec, editable = true))
-    }
-
-    /** Sollecito a chi deve qualcosa al circolo, voce per voce; con [only] solo quegli addebiti (dalla Segreteria da PC). */
-    fun noticeDues(only: Set<String>? = null) {
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntDuesButton, strings.paymentsTitle, "", duesRecipients(only)))
-    }
-
-    /** Chi deve qualcosa e il suo messaggio, voce per voce; con [only] solo quegli addebiti. */
-    fun duesRecipients(only: Set<String>? = null): List<com.tennis.scoremanager.data.NoticeRecipient> {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val book = clubBook.value
-        return players.value.mapNotNull { p ->
-            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 && (only == null || it.id in only) }
-            if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now, com.tennis.scoremanager.data.Notices.payLines(s, book)), now)
-        }
-    }
-
-    /** Ai soci che hanno qualcosa da sistemare (certificato, tessera, consensi…), a ciascuno il suo. */
-    fun noticeMembersTodo() {
-        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
-        val rec = players.value.filter { it.member != null }.mapNotNull { p ->
-            val issues = com.tennis.scoremanager.data.Members.issues(p, now).filter { it != com.tennis.scoremanager.data.Members.Issue.NO_CONTACT }
-            if (issues.isEmpty()) null
-            else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.memberText(s, p, issues.map { com.tennis.scoremanager.ui.screens.issueText(s, p, it, now, lang) }, clubSign, now), now)
-        }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntMembersTodo, s.membersTitle, "", rec))
-    }
-
-    /** Messaggio libero a tutti i soci. */
-    fun noticeMembersAll() {
-        val now = System.currentTimeMillis()
-        val rec = players.value.filter { it.member != null }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntMembersAll, clubSign.ifBlank { strings.membersTitle }, clubSign.ifBlank { "" }.let { if (it.isBlank()) "" else "$it\n\n" }, rec, editable = true))
-    }
-
-    /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
-    fun receiptFile(chargeId: String, paymentId: String): File? {
-        val c = clubBook.value.charges.firstOrNull { it.id == chargeId } ?: return null
-        val p = c.payments.firstOrNull { it.id == paymentId } ?: return null
-        val s = strings
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.receiptTitle} ${p.receipt.replace('/', '-')} ${c.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
-        return runCatching {
-            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(c, p, storage.clubName, s, options.value.lang, it) }
-            f
-        }.getOrNull()
-    }
-
-    /** I pagamenti di un anno in CSV, per il commercialista. */
-    fun paymentsCsv(year: Int): File? {
-        val s = strings
-        val lang = options.value.lang
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val f = File(dir, "${s.paymentsCsvName} $year.csv")
-        return runCatching {
-            // Date in cifre (01/11/2026): il foglio di calcolo le riconosce come date.
-            val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "ddMMyyyy"), lang.locale)
-            val text = com.tennis.scoremanager.data.Fees.csv(clubBook.value, year, s.paymentsCsvHeader, { com.tennis.scoremanager.ui.payMethodName(s, it) }, { day.format(java.util.Date(it)) }, lang.locale)
-            // Il BOM fa riconoscere al foglio di calcolo le lettere accentate.
-            f.writeText("\uFEFF" + text)
-            f
-        }.getOrNull()
-    }
+    /** Gli avvisi del circolo: vedi ClubNotices. */
+    val notices = com.tennis.scoremanager.club.ClubNotices(this, app, storage, scope, io)
+    override fun challengeCardFile(ladderId: String, challengeId: String): File? = notices.challengeCardFile(ladderId, challengeId)
 
     fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
         val list = drills.value.filter { it.id != d.id } + d
@@ -21964,6 +21613,8 @@ interface ClubHost {
     fun saveServer(f: (ClubServerConf) -> ClubServerConf)
     /** Manda un file alla casella della segreteria sul server del circolo [url]; true = arrivato. */
     suspend fun postToOffice(url: String, kind: String, text: String): Boolean
+    /** Prende dalla casella della segreteria sul server i file arrivati (risultati, presenze, profili). */
+    suspend fun fetchOfficeMail(conf: ClubServerConf)
     /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
     var incomingVia: String?
 
@@ -22002,6 +21653,235 @@ interface ClubHost {
     fun openNotice(plan: NoticePlan)
     fun serverMail(to: String, kind: String, file: File)
     fun challengeCardFile(ladderId: String, challengeId: String): File?
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/club/ClubNotices.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/club/ClubNotices.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.club
+
+import android.app.Application
+import com.tennis.scoremanager.data.Storage
+import java.io.File
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
+
+/**
+ * Gli avvisi del circolo: iscritti, partite e convocazioni con la scheda partita, sorteggio, quote da pagare,
+ * soci, ricevute dei pagamenti e CSV dell'anno. La finestra che li manda (openNotice) è di MatchController.
+ * Quello che serve del resto dell'app è in [ClubHost].
+ */
+class ClubNotices(
+    host: ClubHost,
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+) : ClubHost by host {
+    internal fun peopleOf(t: com.tennis.scoremanager.data.ClubTournament, entryIds: Collection<String?>): List<com.tennis.scoremanager.data.PlayerProfile> =
+        t.entries.filter { it.id in entryIds }.flatMap { it.players }.distinct().mapNotNull { playerById(it) }
+    /** A ogni iscritto: iscrizione confermata e quota pagata o da pagare. */
+    fun noticeEntries(t: com.tennis.scoremanager.data.ClubTournament) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val people = peopleOf(t, t.entries.map { it.id })
+        val rec = people.map { p -> com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.entryText(s, t, p, clubBook.value, clubSign, lang, now), now) }
+        // Per il gruppo: l'elenco degli iscritti.
+        val common = (listOf(s.ntEntriesList(t.name)) + t.entries.map { "• " + entryNameOf(t, it.id) } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindEntries, t.name, common, rec))
+    }
+
+    /**
+     * Le partite da giocare: a ciascun giocatore la sua (turno, avversario, giorno, ora, campo); per il gruppo
+     * l'ordine di gioco. [day] = solo quel giorno, null = tutte quelle già con i due giocatori.
+     */
+    fun noticeMatches(t: com.tennis.scoremanager.data.ClubTournament, day: Long?) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val open = t.matches.filter { !it.played && it.a != null && it.b != null }
+        val ms = if (day != null) com.tennis.scoremanager.data.Notices.onDay(open, day) else open
+        val names = { id: String? -> entryNameOf(t, id) }
+        val title = if (day != null) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(day, lang)) else s.ntOrderAll(t.name)
+        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(s, t, ms, { competitions.clubRoundName(t, it) }, names, title, lang, clubSign)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(if (day != null) s.ntKindOrder else s.ntKindNext, title, common, convocations(t, ms)))
+    }
+
+    /** Convoca i giocatori di una partita sola, con la sua scheda partita. */
+    fun noticeMatch(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch) {
+        val title = "${competitions.clubRoundName(t, m)}: ${entryNameOf(t, m.a)} – ${entryNameOf(t, m.b)}"
+        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(strings, t, listOf(m), { competitions.clubRoundName(t, it) }, { entryNameOf(t, it) },
+            listOfNotNull(t.name, m.at?.let { com.tennis.scoremanager.data.Notices.day(it, options.value.lang) }).joinToString(" · "), options.value.lang, clubSign)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ctConvoke, title, common, convocations(t, listOf(m))))
+    }
+
+    /** A ciascun giocatore la sua partita (turno, avversario, giorno, ora, campo) con la scheda partita allegata. */
+    internal fun convocations(t: com.tennis.scoremanager.data.ClubTournament, ms: List<com.tennis.scoremanager.data.CTMatch>): List<com.tennis.scoremanager.data.NoticeRecipient> {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val names = { id: String? -> entryNameOf(t, id) }
+        return ms.flatMap { m ->
+            val card = matchCardFile(t.id, m.id)
+            card?.let { f -> peopleOf(t, listOf(m.a, m.b)).forEach { p -> serverMail(p.id, "card", f) } }
+            peopleOf(t, listOf(m.a, m.b)).map { p ->
+                val text = com.tennis.scoremanager.data.Notices.matchText(s, t, m, competitions.clubRoundName(t, m), names, p, clubSign, lang, now, card = card != null)
+                com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
+            }
+        }
+    }
+
+    /**
+     * La scheda partita (vedi [com.tennis.scoremanager.data.MatchCard]) in un file da allegare. Il codice nasce alla
+     * prima convocazione e resta lo stesso nelle successive (un risultato tornato vale anche dopo uno spostamento).
+     * Null se la partita è già giocata o non ha ancora i due giocatori.
+     */
+    fun matchCardFile(tournamentId: String, matchId: String): File? {
+        val t = competitions.clubTournament(tournamentId) ?: return null
+        val m = t.matches.firstOrNull { it.id == matchId } ?: return null
+        if (m.played || m.a == null || m.b == null) return null
+        val code = m.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            competitions.saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(cardCode = code) else it }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forTournament(
+            t, m, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, competitions.clubRoundName(t, m),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    internal fun writeCardFile(card: com.tennis.scoremanager.data.MatchCard): File? {
+        // Senza il telefono della segreteria il risultato non sa dove tornare: lo si dice a chi convoca.
+        if (card.office.isBlank()) toast(strings.mcNoOffice)
+        val dir = File(app.cacheDir, "share/cards").apply { mkdirs() }
+        return runCatching { File(dir, com.tennis.scoremanager.data.MatchCards.fileName(card)).apply { writeText(com.tennis.scoremanager.data.MatchCards.encode(card)) } }.getOrNull()
+    }
+
+    /** La scheda di una partita di un incontro a squadre (codice come per i tornei: nasce alla prima convocazione). */
+    fun rubberCardFile(teamId: String, fixtureId: String, index: Int): File? {
+        val t = competitions.team(teamId) ?: return null
+        val f = t.fixtures.firstOrNull { it.id == fixtureId } ?: return null
+        val r = f.rubbers.getOrNull(index) ?: return null
+        val code = r.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            competitions.saveFixture(t, f.copy(rubbers = f.rubbers.mapIndexed { k, x -> if (k == index) x.copy(cardCode = code) else x }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forRubber(
+            t, f, index, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, competitions.rubberName(t, index),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    /** La scheda di una sfida della classifica. */
+    override fun challengeCardFile(ladderId: String, challengeId: String): File? {
+        val l = competitions.ladder(ladderId) ?: return null
+        val ch = l.challenges.firstOrNull { it.id == challengeId } ?: return null
+        val code = ch.cardCode ?: com.tennis.scoremanager.data.MatchCards.newCode().also { code ->
+            competitions.saveLadder(l.copy(challenges = l.challenges.map { if (it.id == challengeId) it.copy(cardCode = code) else it }))
+        }
+        val card = com.tennis.scoremanager.data.MatchCards.forChallenge(
+            l, ch, code, System.currentTimeMillis(), storage.clubName, storage.clubPhone, strings.ldPositions(ch.challengerPos, ch.defenderPos),
+        ) { playerById(it) } ?: return null
+        return writeCardFile(card)
+    }
+
+    /** Convoca i nostri giocatori di una partita dell'incontro, con la scheda partita per chi tiene il punteggio. */
+    fun noticeRubber(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, index: Int) {
+        val s = strings
+        val r = f.rubbers.getOrNull(index) ?: return
+        val card = rubberCardFile(t.id, f.id, index)
+        val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ")
+        val theirs = r.theirs.filter { it.isNotBlank() }.joinToString(" / ").ifBlank { f.opponent }
+        val lines = listOfNotNull(s.ntMatch(competitions.rubberName(t, index), "${t.name} – ${f.opponent}"), "$ours – $theirs", competitions.fixtureWhen(f), s.ntCardHowTo.takeIf { card != null })
+        val now = System.currentTimeMillis()
+        card?.let { f -> r.ours.forEach { serverMail(it, "card", f) } }
+        val rec = r.ours.mapNotNull { playerById(it) }.map { p ->
+            val text = (listOf(s.ntHello(p.firstName.ifBlank { p.name })) + lines + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n")
+            com.tennis.scoremanager.data.Notices.recipient(p, text, now).copy(attachment = card)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ctConvoke, "${competitions.rubberName(t, index)}: $ours – $theirs", lines.joinToString("\n"), rec))
+    }
+
+    /** Il tabellone in un'immagine, per il gruppo e i social; a ciascuno lo stesso testo. */
+    fun noticeDraw(t: com.tennis.scoremanager.data.ClubTournament) {
+        val s = strings; val now = System.currentTimeMillis()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.ctTabDraw} ${t.name}.png".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        val sub = listOfNotNull(clubSign.ifBlank { null }, t.category.ifBlank { null }, if (t.kind == com.tennis.scoremanager.data.CTKind.FITP) "FITP" else s.ctSocial).joinToString(" · ")
+        val ok = runCatching {
+            val b = com.tennis.scoremanager.data.ClubDrawImage.render(t, { entryNameOf(t, it) }, s, sub, s.generatedWith)
+            f.outputStream().use { b.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+            b.recycle()
+        }.isSuccess
+        val common = (listOf(s.ntDrawText(t.name)) + t.champion?.let { listOf(s.ctChampion(entryNameOf(t, it))) }.orEmpty() + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, common, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindDraw, t.name, common, rec, image = f.takeIf { ok }))
+    }
+
+    /** Messaggio libero agli iscritti: il testo si scrive nella schermata degli avvisi. */
+    fun noticeFreeTournament(t: com.tennis.scoremanager.data.ClubTournament) {
+        val now = System.currentTimeMillis()
+        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntKindFree, t.name, "${t.name}\n\n", rec, editable = true))
+    }
+
+    /** Sollecito a chi deve qualcosa al circolo, voce per voce; con [only] solo quegli addebiti (dalla Segreteria da PC). */
+    fun noticeDues(only: Set<String>? = null) {
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntDuesButton, strings.paymentsTitle, "", duesRecipients(only)))
+    }
+
+    /** Chi deve qualcosa e il suo messaggio, voce per voce; con [only] solo quegli addebiti. */
+    fun duesRecipients(only: Set<String>? = null): List<com.tennis.scoremanager.data.NoticeRecipient> {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val book = clubBook.value
+        return players.value.mapNotNull { p ->
+            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 && (only == null || it.id in only) }
+            if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now, com.tennis.scoremanager.data.Notices.payLines(s, book)), now)
+        }
+    }
+
+    /** Ai soci che hanno qualcosa da sistemare (certificato, tessera, consensi…), a ciascuno il suo. */
+    fun noticeMembersTodo() {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val rec = players.value.filter { it.member != null }.mapNotNull { p ->
+            val issues = com.tennis.scoremanager.data.Members.issues(p, now).filter { it != com.tennis.scoremanager.data.Members.Issue.NO_CONTACT }
+            if (issues.isEmpty()) null
+            else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.memberText(s, p, issues.map { com.tennis.scoremanager.ui.screens.issueText(s, p, it, now, lang) }, clubSign, now), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntMembersTodo, s.membersTitle, "", rec))
+    }
+
+    /** Messaggio libero a tutti i soci. */
+    fun noticeMembersAll() {
+        val now = System.currentTimeMillis()
+        val rec = players.value.filter { it.member != null }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntMembersAll, clubSign.ifBlank { strings.membersTitle }, clubSign.ifBlank { "" }.let { if (it.isBlank()) "" else "$it\n\n" }, rec, editable = true))
+    }
+
+    /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
+    fun receiptFile(chargeId: String, paymentId: String): File? {
+        val c = clubBook.value.charges.firstOrNull { it.id == chargeId } ?: return null
+        val p = c.payments.firstOrNull { it.id == paymentId } ?: return null
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt.replace('/', '-')} ${c.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(c, p, storage.clubName, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** I pagamenti di un anno in CSV, per il commercialista. */
+    fun paymentsCsv(year: Int): File? {
+        val s = strings
+        val lang = options.value.lang
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.paymentsCsvName} $year.csv")
+        return runCatching {
+            // Date in cifre (01/11/2026): il foglio di calcolo le riconosce come date.
+            val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "ddMMyyyy"), lang.locale)
+            val text = com.tennis.scoremanager.data.Fees.csv(clubBook.value, year, s.paymentsCsvHeader, { com.tennis.scoremanager.ui.payMethodName(s, it) }, { day.format(java.util.Date(it)) }, lang.locale)
+            // Il BOM fa riconoscere al foglio di calcolo le lettere accentate.
+            f.writeText("\uFEFF" + text)
+            f
+        }.getOrNull()
+    }
 }
 TSM_EOF
 
@@ -22351,6 +22231,199 @@ class ClubSchool(
             + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n") else "${c.name}\n\n"
         val rec = people.map { com.tennis.scoremanager.data.Notices.recipient(it, if (lesson != null) text else "", now) }
         openNotice(com.tennis.scoremanager.data.NoticePlan(if (lesson != null) s.scCancelledTitle else s.ntKindFree, c.name, text, rec, editable = lesson == null))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/club/ClubServerArea.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/club/ClubServerArea.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.club
+
+import android.app.Application
+import com.tennis.scoremanager.data.Storage
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+
+/**
+ * Il server del circolo (facoltativo), dalla parte della segreteria: abbinamento, sincronizzazione del planning,
+ * avvisi delle prenotazioni online, regole, inviti, tunnel, PIN dei giocatori, chat della segreteria.
+ * Quello che serve del resto dell'app è in [ClubHost].
+ */
+class ClubServerArea(
+    host: ClubHost,
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+) : ClubHost by host {
+    /** Il server del circolo per le prenotazioni dei giocatori; non abbinato = si prenota solo in segreteria. */
+    override val clubServer = MutableStateFlow(storage.loadClubServer())
+    internal val serverLock = kotlinx.coroutines.sync.Mutex()
+
+    override fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) {
+        val n = synchronized(clubServer) { f(clubServer.value).also { clubServer.value = it } }
+        scope.launch(io) { storage.saveClubServer(n) }
+    }
+
+    init {
+        // Il controllo in background (notifiche delle prenotazioni online) solo con un server abbinato e gli avvisi accesi.
+        scope.launch {
+            clubServer.map { it.paired && it.alerts }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedule(app, it) }
+        }
+        // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
+        scope.launch {
+            combine(courtPlan, competitions.clubTournaments, planning.clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
+                .collectLatest { delay(3_000); if (clubServer.value.paired) syncServerNow() }
+        }
+    }
+
+    /** Abbina la segreteria al server con il codice che il server ha scritto all'avvio. null = fatto, altrimenti il codice dell'errore. */
+    suspend fun pairServer(url: String, code: String): String? {
+        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(url)
+        if (u.isEmpty()) return "BAD_URL"
+        return try {
+            val token = withContext(Dispatchers.IO) {
+                com.tennis.scoremanager.data.ClubServerClient(u, null).info()
+                com.tennis.scoremanager.data.ClubServerClient(u, null).pair(code).token
+            }
+            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList(), seen = null) }
+            syncServerNow()
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /**
+     * Manda il planning al server e prende le prenotazioni online: le nuove entrano nel planning, quelle disdette
+     * escono. Prima toglie dal server quelle tolte in segreteria. null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun syncServerNow(): String? = serverLock.withLock {
+        val conf = clubServer.value
+        if (!conf.paired) return@withLock null
+        val srv = com.tennis.scoremanager.data.ClubServers
+        try {
+            for (id in conf.cancel) {
+                withContext(Dispatchers.IO) { try { srv.withServer(conf) { it.cancel(id) } } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
+                saveServer { it.copy(cancel = it.cancel - id) }
+            }
+            val sync = srv.buildSync(conf, courtPlan.value, competitions.clubTournaments.value, planning.clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
+            val st = withContext(Dispatchers.IO) { srv.withServer(conf) { it.sync(sync) } }
+            // La casella: risultati dal campo, presenze e proposte degli allenatori.
+            runCatching { fetchOfficeMail(conf) }
+            val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
+            gone.forEach { planning.deleteBooking(it, wholeSeries = false, fromServer = true) }
+            if (added.isNotEmpty()) planning.putBookings(added)
+            // Le novità per la segreteria: chi ha prenotato o disdetto online da quando si è guardato l'ultima volta.
+            val news = com.tennis.scoremanager.data.ClubServers.onlineNews(clubServer.value.seen, st.bookings, System.currentTimeMillis(), conf.cancel.toSet()) { b ->
+                listOf(b.name, b.court, planning.bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
+            }
+            if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
+            saveServer {
+                it.copy(
+                    lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen,
+                    inbox = com.tennis.scoremanager.data.ClubServers.addNotices(it.inbox, news.notices),
+                )
+            }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
+            saveServer { it.copy(error = e.code) }
+            e.code
+        }
+    }
+
+    fun setServerAlerts(on: Boolean) = saveServer { it.copy(alerts = on) }
+
+    /** Un messaggio di Oggi letto (null = tutti): sparisce. */
+    fun readOnlineNotice(id: String?) = saveServer { conf -> conf.copy(inbox = if (id == null) emptyList() else conf.inbox.filter { it.id != id }) }
+
+    /** Aperto un messaggio di Oggi: sparisce e si va al planning di quel giorno. */
+    fun openOnlineNotice(n: com.tennis.scoremanager.data.OnlineNotice) {
+        readOnlineNotice(n.id)
+        openPlanAt(com.tennis.scoremanager.data.CourtPlans.dayStart(n.start))
+    }
+
+    /** Il giorno su cui aprire il planning (dalla notifica di una prenotazione online). */
+    val planDayRequest = MutableStateFlow<Long?>(null)
+
+    fun openPlanAt(day: Long) {
+        planDayRequest.value = day
+        planning.openCourtsPlan()
+    }
+
+    fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =
+        saveServer { it.copy(rules = rules, payInfo = payInfo.trim(), publicUrl = com.tennis.scoremanager.data.ClubServers.cleanUrl(publicUrl)) }
+
+    /** L'invito per un giocatore: codice e scadenza (il link lo fa [com.tennis.scoremanager.data.ClubServers.inviteLink]). */
+    suspend fun serverInvite(p: com.tennis.scoremanager.data.PlayerProfile): Result<com.tennis.scoremanager.data.SrvInvite> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.invite(p.id, p.name) } })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+
+    /** Il server risponde a [url] (la rete del circolo o l'indirizzo da internet)? Per la lista dei controlli. */
+    suspend fun serverAnswers(url: String): Boolean = url.isNotBlank() && withContext(Dispatchers.IO) {
+        runCatching { com.tennis.scoremanager.data.ClubServerClient(com.tennis.scoremanager.data.ClubServers.cleanUrl(url), null).info() }.isSuccess
+    }
+
+    /** Il tunnel da internet del server: com'è messo e, con [on], accendilo o spegnilo. */
+    suspend fun serverTunnel(on: Boolean? = null): Result<com.tennis.scoremanager.data.SrvTunnel> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { if (on == null) it.tunnel() else it.setTunnel(on) } })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+
+    /** Il giocatore non prenota più online (le sue prenotazioni restano nel planning). */
+    suspend fun serverRemovePlayer(id: String): String? {
+        val conf = clubServer.value
+        return try {
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.removePlayer(id) } }
+            saveServer { it.copy(players = it.players.filter { p -> p.id != id }) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Il socio ha dimenticato il PIN: lo si azzera (rientra con un invito e se ne sceglie un altro). null = fatto. */
+    suspend fun serverResetPin(id: String): String? {
+        val conf = clubServer.value
+        return try {
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.resetPin(id) } }
+            saveServer { it.copy(players = it.players.map { p -> if (p.id == id) p.copy(hasPin = false) else p }) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
+    fun unpairServer() {
+        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl, alerts = it.alerts) }
+        val p = courtPlan.value
+        if (p.bookings.any { it.online != null }) {
+            val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
+    }
+
+    /** La segreteria: i messaggi di una stanza, la bacheca, le stanze, togliere un messaggio. Codice d'errore o il risultato. */
+    suspend fun <T> serverAdmin(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { f(it) } })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 }
 TSM_EOF
@@ -35649,8 +35722,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun deleteCourse(c: Course) = this.c.school.deleteCourse(c.id)
     override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.school.courseFeeLabel(c, month)
     override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.school.chargeCourse(c, month)
-    override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
-    override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
+    override fun dues(charges: Set<String>): List<DeskDue> = c.notices.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
+    override fun sendDues(charges: Set<String>) = c.notices.noticeDues(charges)
     override fun saveTeam(t: Team) = c.competitions.saveTeam(t)
     override fun deleteTeam(t: Team) = c.competitions.deleteTeam(t.id)
     override fun teamNotice(t: Team, f: Fixture, kind: String) = when (kind) {
@@ -35659,8 +35732,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
         "CALLUP" -> c.competitions.noticeCallUp(t, f)
         else -> c.competitions.noticeResult(t, f)
     }
-    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
-    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
+    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.notices.noticeMatch(t, it) } }
+    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.notices.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
     override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.coaching.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
@@ -35738,16 +35811,16 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun savePayTypes(list: List<PayType>) = c.planning.savePayTypes(list)
     override fun serverConf(): ClubServerConf = c.clubServer.value
     override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) {
-        c.saveServerRules(rules, payInfo)
-        c.setServerAlerts(alerts)
+        c.serverArea.saveServerRules(rules, payInfo)
+        c.serverArea.setServerAlerts(alerts)
     }
     // Rete: gira sul filo della richiesta, mai su quello principale.
     override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
-    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
-    override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
+    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.syncServerNow() }
+    override fun readOnlineNotice(id: String?) = c.serverArea.readOnlineNotice(id)
     override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
-    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
-    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverResetPin(playerId) }
+    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.serverRemovePlayer(playerId) }
+    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.serverResetPin(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
@@ -35765,8 +35838,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
     override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
     override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.office.restoreOffice(s) }
-    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
-    override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.notices.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
+    override fun paymentsCsv(year: Int): ByteArray? = c.notices.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.competitions.saveClubTournament(t)
     override fun deleteTournament(t: ClubTournament) = c.competitions.deleteClubTournament(t.id)
     override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.competitions.addClubEntry(t, people)
@@ -39474,7 +39547,7 @@ class ServerCheckJob : JobService() {
         val c = (application as TsmApp).controller
         scope.launch {
             // Lo stesso servizio per la segreteria (planning e prenotazioni online) e per il giocatore (promemoria).
-            if (params.jobId == PLAYER_JOB) c.book.checkMyBookings() else c.syncServerNow()
+            if (params.jobId == PLAYER_JOB) c.book.checkMyBookings() else c.serverArea.syncServerNow()
             jobFinished(params, false)
         }
         return true
@@ -69382,7 +69455,7 @@ private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (S
     var kick by remember { mutableStateOf(0) }
     LaunchedEffect(kick) {
         while (true) {
-            c.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            c.serverArea.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
             val state = t?.state
             delay(if (state == "WORKING" || state == "LOGIN" || state == "ENABLE") 3_000 else 30_000)
         }
@@ -69392,7 +69465,7 @@ private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (S
     fun set(on: Boolean) {
         busy = true
         scope.launch {
-            c.serverTunnel(on).onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            c.serverArea.serverTunnel(on).onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
             if (!on && publicUrl.endsWith(".ts.net")) onPublicUrl("")
             busy = false
             kick++
@@ -69449,7 +69522,7 @@ fun ServerStatusLine(c: MatchController, onClick: (() -> Unit)? = null) {
     val lang = c.options.collectAsState().value.lang
     if (!conf.paired) return
     LaunchedEffect(conf.url) {
-        while (true) { c.syncServerNow(); kotlinx.coroutines.delay(60_000) }
+        while (true) { c.serverArea.syncServerNow(); kotlinx.coroutines.delay(60_000) }
     }
     val err = conf.error
     Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -69490,8 +69563,8 @@ private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data
     LaunchedEffect(round, publicUrl) {
         while (true) {
             local = null; remote = null
-            local = c.serverAnswers(conf.url)
-            remote = if (publicUrl.isBlank()) false else c.serverAnswers(publicUrl)
+            local = c.serverArea.serverAnswers(conf.url)
+            remote = if (publicUrl.isBlank()) false else c.serverArea.serverAnswers(publicUrl)
             delay(30_000)
         }
     }
@@ -69542,7 +69615,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
             IconButton(onClick = { onChange((v + step).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
         }
 
-    fun save() { if (conf.paired) c.saveServerRules(rules, pay, publicUrl) }
+    fun save() { if (conf.paired) c.serverArea.saveServerRules(rules, pay, publicUrl) }
 
     AlertDialog(
         onDismissRequest = { save(); onDone() },
@@ -69557,7 +69630,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters), supportingText = { Text(s.srvSetupHint, fontSize = 11.sp) })
                     GhostButton(s.srvPair, Icons.Filled.Link, {
                         busy = true; msg = null
-                        scope.launch { msg = c.pairServer(url, code)?.let { srvErrorText(s, it) }; busy = false }
+                        scope.launch { msg = c.serverArea.pairServer(url, code)?.let { srvErrorText(s, it) }; busy = false }
                     }, Modifier.fillMaxWidth(), enabled = !busy && url.isNotBlank() && code.isNotBlank())
                 } else {
                     Text(s.srvConnected(conf.club.ifBlank { conf.url }), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
@@ -69570,13 +69643,13 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     )
                     GhostButton(s.srvSyncNow, Icons.Filled.Sync, {
                         busy = true; msg = null
-                        scope.launch { c.saveServerRules(rules, pay, publicUrl); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
+                        scope.launch { c.serverArea.saveServerRules(rules, pay, publicUrl); msg = c.serverArea.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
                     }, Modifier.fillMaxWidth(), enabled = !busy)
                     OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
-                    TunnelSection(c, publicUrl) { publicUrl = it; c.saveServerRules(rules, pay, it) }
+                    TunnelSection(c, publicUrl) { publicUrl = it; c.serverArea.saveServerRules(rules, pay, it) }
                     SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
-                        c.setServerAlerts(on)
+                        c.serverArea.setServerAlerts(on)
                         if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)
                             notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                     }
@@ -69586,7 +69659,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     // La bacheca (scrive solo la segreteria) e le chat degli annunci, da controllare.
                     GhostButton(s.srvBoard, Icons.Filled.Campaign, { chat = "board" to s.srvBoard }, Modifier.fillMaxWidth())
                     GhostButton(s.srvChats, Icons.Filled.Forum, {
-                        scope.launch { c.serverAdmin { it.adminChats() }.onSuccess { rooms = it }.onFailure { e -> msg = srvErrorText(s, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") } }
+                        scope.launch { c.serverArea.serverAdmin { it.adminChats() }.onSuccess { rooms = it }.onFailure { e -> msg = srvErrorText(s, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") } }
                     }, Modifier.fillMaxWidth())
 
                     SwitchRow(Icons.Filled.SportsTennis, s.srvOpen, s.srvOpenHint, rules.open) { rules = rules.copy(open = it) }
@@ -69635,9 +69708,9 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
         val board = room == "board"
         com.tennis.scoremanager.ui.ChatDialog(
             title = title,
-            load = { c.serverAdmin { it.adminChat(room) } },
-            send = if (board) { t -> c.serverAdmin { it.postBoard(t) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } } else null,
-            delete = { id -> c.serverAdmin { it.deleteChat(id) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } },
+            load = { c.serverArea.serverAdmin { it.adminChat(room) } },
+            send = if (board) { t -> c.serverArea.serverAdmin { it.postBoard(t) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } } else null,
+            delete = { id -> c.serverArea.serverAdmin { it.deleteChat(id) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } },
             hint = if (board) s.srvBoardHint else s.srvChatsHint,
             group = !board,
             icon = if (board) Icons.Filled.Campaign else null,
@@ -69647,7 +69720,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     if (unpair) AlertDialog(
         onDismissRequest = { unpair = false },
         text = { Text(s.srvUnpairAsk) },
-        confirmButton = { TextButton(onClick = { unpair = false; c.unpairServer() }) { Text(s.srvUnpair, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { unpair = false; c.serverArea.unpairServer() }) { Text(s.srvUnpair, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { unpair = false }) { Text(s.back) } },
     )
 }
@@ -69668,18 +69741,18 @@ fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
         linked?.let { Text(s.srvLinked(whenText(maxOf(it.lastSeen, it.since), lang)), color = TsmColors.Ok, fontSize = 13.sp) }
         GhostButton(s.srvInvite, Icons.Filled.QrCode2, {
             busy = true; msg = null
-            scope.launch { c.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
+            scope.launch { c.serverArea.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
         }, Modifier.fillMaxWidth(), enabled = !busy)
         if (linked?.hasPin == true) {
             Text(s.srvPinSet, color = TsmColors.TextDim, fontSize = 13.sp)
             GhostButton(s.srvPinReset, Icons.Filled.Password, {
                 busy = true; msg = null
-                scope.launch { msg = c.serverResetPin(p.id)?.let { srvErrorText(s, it) } ?: s.srvPinResetDone; busy = false }
+                scope.launch { msg = c.serverArea.serverResetPin(p.id)?.let { srvErrorText(s, it) } ?: s.srvPinResetDone; busy = false }
             }, Modifier.fillMaxWidth(), enabled = !busy)
         }
         if (linked != null) GhostButton(s.srvRevoke, Icons.Filled.LinkOff, {
             busy = true; msg = null
-            scope.launch { msg = c.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
+            scope.launch { msg = c.serverArea.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
         }, Modifier.fillMaxWidth(), enabled = !busy)
         msg?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
     }
@@ -70169,7 +70242,7 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
                     var cur = c.competitions.clubTournament(t.id) ?: t
                     if (court != m.court || at != m.at) { c.competitions.setClubSchedule(cur, m.id, court, at); cur = c.competitions.clubTournament(t.id) ?: cur }
                     onDone()
-                    c.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
+                    c.notices.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
                 }, Modifier.fillMaxWidth())
                 Text(s.ctWinner, color = TsmColors.TextDim, fontSize = 13.sp)
                 val sides = listOf(m.a, m.b)
@@ -70302,13 +70375,13 @@ private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: ()
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (!pickDay) {
-                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.noticeEntries(t) }, Modifier.fillMaxWidth())
-                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.noticeMatches(t, null) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.notices.noticeEntries(t) }, Modifier.fillMaxWidth())
+                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.notices.noticeMatches(t, null) }, Modifier.fillMaxWidth())
                     if (days.isNotEmpty()) GhostButton(s.ntKindOrder, Icons.Filled.Schedule, { pickDay = true }, Modifier.fillMaxWidth())
-                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.noticeDraw(t) }, Modifier.fillMaxWidth())
-                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
+                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.notices.noticeDraw(t) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.notices.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
                 } else for (d in days) {
-                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.noticeMatches(t, d) }, Modifier.fillMaxWidth())
+                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.notices.noticeMatches(t, d) }, Modifier.fillMaxWidth())
                 }
             }
         },
@@ -70754,8 +70827,8 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     val courts by c.planning.clubCourts.collectAsState()
     var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
-    val askedDay by c.planDayRequest.collectAsState()
-    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.planDayRequest.value = null } }
+    val askedDay by c.serverArea.planDayRequest.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.serverArea.planDayRequest.value = null } }
     var editing by remember { mutableStateOf<CourtBooking?>(null) }
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
@@ -72686,7 +72759,7 @@ private fun PeopleTab(c: MatchController) {
     if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
     if (ClubFeature.PAYMENTS in f) Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint, main = ClubFeature.MEMBERS !in f) { c.openPayments() }
     if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint, main = ClubFeature.MEMBERS !in f && ClubFeature.PAYMENTS !in f) { c.school.openSchool() }
-    if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.Campaign, s.ntMembersAll, null) { c.noticeMembersAll() }
+    if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.Campaign, s.ntMembersAll, null) { c.notices.noticeMembersAll() }
 }
 
 @Composable
@@ -75025,8 +75098,8 @@ fun MembersScreen(c: MatchController) {
         title = { Text(s.ntChoose) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                GhostButton(s.ntMembersTodo, Icons.Filled.VerifiedUser, { notify = false; c.noticeMembersTodo() }, Modifier.fillMaxWidth())
-                GhostButton(s.ntMembersAll, Icons.Filled.Campaign, { notify = false; c.noticeMembersAll() }, Modifier.fillMaxWidth())
+                GhostButton(s.ntMembersTodo, Icons.Filled.VerifiedUser, { notify = false; c.notices.noticeMembersTodo() }, Modifier.fillMaxWidth())
+                GhostButton(s.ntMembersAll, Icons.Filled.Campaign, { notify = false; c.notices.noticeMembersAll() }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {},
@@ -76610,7 +76683,7 @@ fun PaymentsScreen(c: MatchController) {
             val open = book.charges.filter { it.left > 0 }.groupBy { it.player.ifEmpty { "#" + it.name } }
                 .map { (key, list) -> Triple(key, list, list.sumOf { it.left }) }.sortedByDescending { it.third }
             if (open.isEmpty()) Text(s.dueNone, color = TsmColors.TextDim, fontSize = 13.sp)
-            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.noticeDues() }, Modifier.fillMaxWidth())
+            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.notices.noticeDues() }, Modifier.fillMaxWidth())
             for ((key, list, left) in open) {
                 val p = players.firstOrNull { it.id == key || key in it.aliases }
                 Row(
@@ -76650,7 +76723,7 @@ fun PaymentsScreen(c: MatchController) {
             val years = listOf(year - 1, year)
             Segmented(years.map { SegOption(it.toString()) }, years.indexOf(exportYear), { exportYear = years[it] })
             GhostButton(s.paymentsExport, Icons.Filled.TableChart, {
-                val f = c.paymentsCsv(exportYear)
+                val f = c.notices.paymentsCsv(exportYear)
                 if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
                 else context.startActivity(c.shareFileIntent(f, "text/csv"))
             }, Modifier.fillMaxWidth())
@@ -76822,7 +76895,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
     var unpay by remember { mutableStateOf<String?>(null) }
     var cancel by remember { mutableStateOf(false) }
     fun share(paymentId: String) {
-        val f = c.receiptFile(ch.id, paymentId)
+        val f = c.notices.receiptFile(ch.id, paymentId)
         if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
         else context.startActivity(c.shareFileIntent(f, "application/pdf"))
     }
@@ -80748,7 +80821,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                     c.competitions.saveFixture(c.competitions.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
                     onDone()
                     val tt = c.competitions.team(t.id) ?: t
-                    c.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
+                    c.notices.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
                 }, Modifier.fillMaxWidth())
                 OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
@@ -81067,7 +81140,7 @@ private fun OnlineNews(c: MatchController, news: List<com.tennis.scoremanager.da
         Text(s.tdNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
         for (n in news.take(8)) {
             Row(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.openOnlineNotice(n) }.padding(start = 10.dp),
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.serverArea.openOnlineNotice(n) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(if (n.cancelled) Icons.Filled.EventBusy else Icons.Filled.EventAvailable, null, tint = if (n.cancelled) TsmColors.Orange else TsmColors.Ok)
@@ -81075,10 +81148,10 @@ private fun OnlineNews(c: MatchController, news: List<com.tennis.scoremanager.da
                     Text(if (n.cancelled) s.tdNewsCancelled else s.tdNewsBooked, color = if (n.cancelled) TsmColors.Orange else TsmColors.Ok, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Text(n.label, color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                IconButton(onClick = { c.readOnlineNotice(n.id) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                IconButton(onClick = { c.serverArea.readOnlineNotice(n.id) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
-        if (news.size > 1) TextButton(onClick = { c.readOnlineNotice(null) }) { Text(s.tdNewsReadAll) }
+        if (news.size > 1) TextButton(onClick = { c.serverArea.readOnlineNotice(null) }) { Text(s.tdNewsReadAll) }
     }
 }
 TSM_EOF
@@ -119513,6 +119586,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 413 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 415 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

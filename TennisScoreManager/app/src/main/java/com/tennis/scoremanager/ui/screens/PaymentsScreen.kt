@@ -159,7 +159,7 @@ fun PaymentsScreen(c: MatchController) {
             val open = book.charges.filter { it.left > 0 }.groupBy { it.player.ifEmpty { "#" + it.name } }
                 .map { (key, list) -> Triple(key, list, list.sumOf { it.left }) }.sortedByDescending { it.third }
             if (open.isEmpty()) Text(s.dueNone, color = TsmColors.TextDim, fontSize = 13.sp)
-            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.noticeDues() }, Modifier.fillMaxWidth())
+            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.notices.noticeDues() }, Modifier.fillMaxWidth())
             for ((key, list, left) in open) {
                 val p = players.firstOrNull { it.id == key || key in it.aliases }
                 Row(
@@ -199,7 +199,7 @@ fun PaymentsScreen(c: MatchController) {
             val years = listOf(year - 1, year)
             Segmented(years.map { SegOption(it.toString()) }, years.indexOf(exportYear), { exportYear = years[it] })
             GhostButton(s.paymentsExport, Icons.Filled.TableChart, {
-                val f = c.paymentsCsv(exportYear)
+                val f = c.notices.paymentsCsv(exportYear)
                 if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
                 else context.startActivity(c.shareFileIntent(f, "text/csv"))
             }, Modifier.fillMaxWidth())
@@ -371,7 +371,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
     var unpay by remember { mutableStateOf<String?>(null) }
     var cancel by remember { mutableStateOf(false) }
     fun share(paymentId: String) {
-        val f = c.receiptFile(ch.id, paymentId)
+        val f = c.notices.receiptFile(ch.id, paymentId)
         if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
         else context.startActivity(c.shareFileIntent(f, "application/pdf"))
     }

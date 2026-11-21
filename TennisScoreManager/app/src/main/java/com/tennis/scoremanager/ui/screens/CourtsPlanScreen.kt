@@ -159,8 +159,8 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     val courts by c.planning.clubCourts.collectAsState()
     var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
-    val askedDay by c.planDayRequest.collectAsState()
-    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.planDayRequest.value = null } }
+    val askedDay by c.serverArea.planDayRequest.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.serverArea.planDayRequest.value = null } }
     var editing by remember { mutableStateOf<CourtBooking?>(null) }
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }

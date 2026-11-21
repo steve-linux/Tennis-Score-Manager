@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
         if (day > 0) {
             i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
-            controller.openPlanAt(day)
+            controller.serverArea.openPlanAt(day)
         }
     }
 

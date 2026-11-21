@@ -183,7 +183,7 @@ private fun OnlineNews(c: MatchController, news: List<com.tennis.scoremanager.da
         Text(s.tdNewsHint, color = TsmColors.TextDim, fontSize = 12.sp)
         for (n in news.take(8)) {
             Row(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.openOnlineNotice(n) }.padding(start = 10.dp),
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.serverArea.openOnlineNotice(n) }.padding(start = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(if (n.cancelled) Icons.Filled.EventBusy else Icons.Filled.EventAvailable, null, tint = if (n.cancelled) TsmColors.Orange else TsmColors.Ok)
@@ -191,10 +191,10 @@ private fun OnlineNews(c: MatchController, news: List<com.tennis.scoremanager.da
                     Text(if (n.cancelled) s.tdNewsCancelled else s.tdNewsBooked, color = if (n.cancelled) TsmColors.Orange else TsmColors.Ok, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Text(n.label, color = TsmColors.TextMain, fontSize = 14.sp)
                 }
-                IconButton(onClick = { c.readOnlineNotice(n.id) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
+                IconButton(onClick = { c.serverArea.readOnlineNotice(n.id) }) { Icon(Icons.Filled.Check, s.tdNewsRead, tint = TsmColors.TextDim) }
             }
         }
-        if (news.size > 1) TextButton(onClick = { c.readOnlineNotice(null) }) { Text(s.tdNewsReadAll) }
+        if (news.size > 1) TextButton(onClick = { c.serverArea.readOnlineNotice(null) }) { Text(s.tdNewsReadAll) }
     }
 }
 

@@ -36,6 +36,8 @@ interface ClubHost {
     fun saveServer(f: (ClubServerConf) -> ClubServerConf)
     /** Manda un file alla casella della segreteria sul server del circolo [url]; true = arrivato. */
     suspend fun postToOffice(url: String, kind: String, text: String): Boolean
+    /** Prende dalla casella della segreteria sul server i file arrivati (risultati, presenze, profili). */
+    suspend fun fetchOfficeMail(conf: ClubServerConf)
     /** Da dove viene il file che si sta aprendo: l'indirizzo del server del circolo, o null (WhatsApp, file). */
     var incomingVia: String?
 

@@ -297,7 +297,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                     c.competitions.saveFixture(c.competitions.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
                     onDone()
                     val tt = c.competitions.team(t.id) ?: t
-                    c.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
+                    c.notices.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
                 }, Modifier.fillMaxWidth())
                 OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)

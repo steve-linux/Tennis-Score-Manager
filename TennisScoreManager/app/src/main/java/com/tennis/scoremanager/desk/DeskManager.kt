@@ -71,8 +71,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun deleteCourse(c: Course) = this.c.school.deleteCourse(c.id)
     override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.school.courseFeeLabel(c, month)
     override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.school.chargeCourse(c, month)
-    override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
-    override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
+    override fun dues(charges: Set<String>): List<DeskDue> = c.notices.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
+    override fun sendDues(charges: Set<String>) = c.notices.noticeDues(charges)
     override fun saveTeam(t: Team) = c.competitions.saveTeam(t)
     override fun deleteTeam(t: Team) = c.competitions.deleteTeam(t.id)
     override fun teamNotice(t: Team, f: Fixture, kind: String) = when (kind) {
@@ -81,8 +81,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
         "CALLUP" -> c.competitions.noticeCallUp(t, f)
         else -> c.competitions.noticeResult(t, f)
     }
-    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
-    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
+    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.notices.noticeMatch(t, it) } }
+    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.notices.noticeRubber(t, f, index)
     override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
     override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
     override fun registerPdf(c: Course): ByteArray? = this.c.coaching.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
@@ -160,16 +160,16 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun savePayTypes(list: List<PayType>) = c.planning.savePayTypes(list)
     override fun serverConf(): ClubServerConf = c.clubServer.value
     override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) {
-        c.saveServerRules(rules, payInfo)
-        c.setServerAlerts(alerts)
+        c.serverArea.saveServerRules(rules, payInfo)
+        c.serverArea.setServerAlerts(alerts)
     }
     // Rete: gira sul filo della richiesta, mai su quello principale.
     override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
-    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
-    override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
+    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.syncServerNow() }
+    override fun readOnlineNotice(id: String?) = c.serverArea.readOnlineNotice(id)
     override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
-    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
-    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverResetPin(playerId) }
+    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.serverRemovePlayer(playerId) }
+    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.serverResetPin(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
@@ -187,8 +187,8 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
     override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
     override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.office.restoreOffice(s) }
-    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
-    override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.notices.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
+    override fun paymentsCsv(year: Int): ByteArray? = c.notices.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.competitions.saveClubTournament(t)
     override fun deleteTournament(t: ClubTournament) = c.competitions.deleteClubTournament(t.id)
     override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.competitions.addClubEntry(t, people)
