@@ -1,0 +1,2 @@
+finished sets=6-2 5-7 1-0(10-8) games=0-0 points=0-0 winner=P1 played=133 p1Left=false
+suspended sets=6-2 games=1-2 points=2-1 winner=null played=66 p1Left=false

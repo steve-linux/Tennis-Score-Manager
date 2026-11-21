@@ -3,8 +3,12 @@
 package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PenaltyKind
+import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.TvSettings
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import org.junit.Assert.assertEquals
@@ -70,5 +74,42 @@ class FormatUpgradeTest {
         assertEquals("Corso bambini", read("2.6.0", "club_school.json", ListSerializer(Course.serializer())).single().name)
         assertEquals("Classifica sociale", read("2.6.0", "club_ladders.json", ListSerializer(Ladder.serializer())).single().name)
         assertEquals("Torneo sociale", read("2.6.0", "club_tournaments.json", ListSerializer(ClubTournament.serializer())).single().name)
+    }
+
+    /** Stesso formato di expected_scores.txt della 2.4.3. */
+    private fun desc(m: MatchState) = "sets=" + m.sets.joinToString(" ") { "${it.g1}-${it.g2}" + (it.tb1?.let { t -> "(${t}-${it.tb2})" } ?: "") } +
+        " games=${m.g1}-${m.g2} points=${m.pt1}-${m.pt2} winner=${m.winner} played=${m.pointsPlayed} p1Left=${m.p1Left}"
+
+    /**
+     * 2.4.3, l'ultima uscita prima della 2.6.0: partita in corso (files/matches) e ultima finita (files/last_finished.json),
+     * doppio al meglio di due set con match tie-break. Rigiocando gli eventi il punteggio di oggi è quello della 2.4.3.
+     */
+    @Test
+    fun matchesFrom243() {
+        val expected = text("2.4.3", "expected_scores.txt").lines().filter { it.isNotBlank() }.associate { it.substringBefore(' ') to it.substringAfter(' ') }
+        val m = read("2.4.3", "last_finished.json", MatchRecord.serializer())
+        assertTrue(m.finished)
+        assertEquals("Paolo Verdi", m.setup.p1b)
+        assertEquals(MatchFormat.TWO_SETS_MATCH_TIEBREAK, m.rules.format)
+        assertEquals(60, m.batteryEnd[Side.P2])
+        assertEquals(expected["finished"], desc(ScoreEngine.replay(m.rules, m.events)))
+
+        val s = read("2.4.3", "match_suspended.json", MatchRecord.serializer())
+        assertTrue(s.suspended)
+        assertEquals(expected["suspended"], desc(ScoreEngine.replay(s.rules, s.events)))
+    }
+
+    /** Le impostazioni che la 2.4.3 teneva nelle preferenze come testo JSON (setup, options, tv). */
+    @Test
+    fun settingsFrom243() {
+        assertEquals("Circolo Prova", read("2.4.3", "prefs_setup.json", SetupData.serializer()).club)
+        val o = read("2.4.3", "prefs_options.json", MatchOptions.serializer())
+        assertEquals(PlayMode.BANDS, o.mode)
+        assertEquals(Side.P2, o.tossWinner)
+        assertTrue(o.voiceFiles)
+        val tv = read("2.4.3", "prefs_tv.json", TvSettings.serializer())
+        assertTrue(tv.enabled)
+        assertEquals("Torneo di prova", tv.title)
+        assertEquals("#00FF00", tv.color1)
     }
 }

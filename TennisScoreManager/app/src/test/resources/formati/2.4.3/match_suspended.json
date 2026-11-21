@@ -1,0 +1,395 @@
+{
+    "id": "m1760000100000",
+    "setup": {
+        "club": "Circolo Prova",
+        "court": "Campo 1",
+        "doubles": true,
+        "p1a": "Mario Rossi",
+        "p1b": "Paolo Verdi",
+        "p2a": "Luca Bianchi",
+        "p2b": "Marco Neri"
+    },
+    "options": {
+        "mode": "BANDS",
+        "lang": "EN",
+        "audio": true,
+        "format": "TWO_SETS_MATCH_TIEBREAK",
+        "noAd": true,
+        "tossWinner": "P2",
+        "firstServer": "P2",
+        "p1Left": false,
+        "firstServerP1": 1,
+        "firstServerP2": 0,
+        "ttsEngine": null,
+        "ttsVoice": "voce",
+        "voiceFiles": true,
+        "bandsOffAtEnd": true,
+        "addressLookup": true
+    },
+    "rules": {
+        "format": "TWO_SETS_MATCH_TIEBREAK",
+        "noAd": true,
+        "doubles": true,
+        "firstServer": "P2",
+        "p1StartsLeft": false,
+        "firstServerP1": 1,
+        "firstServerP2": 0
+    },
+    "events": [
+        {
+            "type": "serveOrder",
+            "setNumber": 1,
+            "firstP1": 1,
+            "firstP2": 0
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000001000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000002000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000003000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000004000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000005000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000006000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000007000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000008000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000009000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000010000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000011000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000012000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000013000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000014000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000015000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000016000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000017000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000018000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000019000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000020000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000021000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000022000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000023000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000024000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000025000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000026000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000027000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000028000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000029000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000030000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000031000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000032000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000033000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000034000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000035000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000036000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000037000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000038000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000039000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000040000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000041000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000042000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000043000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000044000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000045000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000046000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000047000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000048000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000049000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000050000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000051000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000052000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000053000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000054000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000055000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000056000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000057000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000058000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000059000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000060000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000061000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000062000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000063000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000064000
+        },
+        {
+            "type": "point",
+            "winner": "P2",
+            "at": 1760000065000
+        },
+        {
+            "type": "point",
+            "winner": "P1",
+            "at": 1760000066000
+        }
+    ],
+    "clockMs": 1800000,
+    "startedAt": 1760000000000,
+    "endedAt": null,
+    "suspended": true,
+    "finished": false,
+    "location": {
+        "lat": 45.0,
+        "lon": 11.0,
+        "address": "Via Prova 1"
+    },
+    "updatedAt": 1760000025000,
+    "batteryStart": {
+        "P1": 90,
+        "P2": 85
+    },
+    "batteryEnd": {
+        "P1": 70,
+        "P2": 60
+    }
+}
