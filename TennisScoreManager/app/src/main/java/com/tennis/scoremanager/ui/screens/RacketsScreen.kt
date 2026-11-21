@@ -37,6 +37,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -87,7 +89,7 @@ fun RacketsScreen(c: MatchController) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     val o by c.options.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<Racket?>(null) }
     /** Incordatura in modifica, con la sua racchetta. */
     var stringing by remember { mutableStateOf<Pair<String, Stringing>?>(null) }
@@ -226,13 +228,15 @@ private fun RacketCard(
 
 // ---------------------------------------------------------------- schede
 
+// Modifier dopo tastiera e lunghezza: le chiamate li passano per posizione.
+@Suppress("ModifierParameter")
 @Composable
 private fun TextInput(
     value: String,
     label: String,
     keyboard: KeyboardType = KeyboardType.Text,
     max: Int = 40,
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     onChange: (String) -> Unit,
 ) {
     OutlinedTextField(
@@ -245,7 +249,7 @@ private fun TextInput(
             keyboardType = keyboard,
         ),
         colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TsmColors.Ball, focusedLabelColor = TsmColors.Ball, cursorColor = TsmColors.Ball),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -350,7 +354,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
     var gauge by remember { mutableStateOf(start.gaugeMm.field(lang)) }
     var mains by remember { mutableStateOf(start.mainsKg.field(lang)) }
     var crosses by remember { mutableStateOf(start.crossesKg.field(lang)) }
-    var date by remember { mutableStateOf(start.date) }
+    var date by remember { mutableLongStateOf(start.date) }
     var notes by remember { mutableStateOf(start.notes) }
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(

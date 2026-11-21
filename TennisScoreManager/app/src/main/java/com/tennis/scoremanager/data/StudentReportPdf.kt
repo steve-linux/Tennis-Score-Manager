@@ -16,6 +16,8 @@ import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.strokeLabel
 import java.io.OutputStream
+import androidx.core.graphics.scale
+import androidx.core.graphics.createBitmap
 
 /** Il report dell'allievo in PDF (A4, più pagine se serve), coi colori di stampa. */
 object StudentReportPdf {
@@ -126,7 +128,7 @@ object StudentReportPdf {
                     val x = M + i * (iw + gap)
                     if (b != null) {
                         // Ridotte prima di metterle nel PDF (non comprime le immagini).
-                        val small = Bitmap.createScaledBitmap(b, (iw * 2).toInt(), (ih * 2).toInt(), true)
+                        val small = b.scale((iw * 2).toInt(), (ih * 2).toInt())
                         c().drawBitmap(small, null, RectF(x, y, x + iw, y + ih), Paint(Paint.FILTER_BITMAP_FLAG))
                         if (small !== b) small.recycle()
                         b.recycle()
@@ -195,7 +197,7 @@ object StudentReportImage {
 
     fun render(r: StudentReport.Report, s: Strings, lang: Lang): Bitmap {
         val w = 1080; val h = 1350
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         c.drawColor(bg)
         fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {

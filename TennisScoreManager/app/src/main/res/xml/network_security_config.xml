@@ -2,6 +2,6 @@
 <!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <!-- Il tabellone arriva in http dal telefono dell'arbitro sulla rete locale (hotspot): niente https lì. -->
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config cleartextTrafficPermitted="true" tools:ignore="InsecureBaseConfiguration" />
 </network-security-config>

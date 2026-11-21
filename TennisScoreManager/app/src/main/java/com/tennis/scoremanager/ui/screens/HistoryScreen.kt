@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -82,7 +83,7 @@ fun HistoryScreen(c: MatchController) {
     val s = LocalStrings.current
     val matches by c.history.collectAsState()
     /** 0 = partite, 1 = giocatori. */
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     /** Giocatore aperto (chiave del nome); null = elenco. */
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }

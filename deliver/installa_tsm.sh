@@ -48,7 +48,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/workout"
 mkdir -p "$DEST/app/src/main/res/drawable"
 mkdir -p "$DEST/app/src/main/res/drawable-nodpi"
-mkdir -p "$DEST/app/src/main/res/mipmap-anydpi-v26"
+mkdir -p "$DEST/app/src/main/res/mipmap-anydpi"
 mkdir -p "$DEST/app/src/main/res/raw"
 mkdir -p "$DEST/app/src/main/res/values"
 mkdir -p "$DEST/app/src/main/res/xml"
@@ -187,6 +187,26 @@ dependencies {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/lint.xml
+cat > "$DEST/app/lint.xml" << 'TSM_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Avvisi di lint spenti di proposito: così ogni avviso nuovo si vede subito. -->
+<lint>
+    <!-- Le versioni di Gradle e delle librerie si aggiornano a mano e con una prova: litert-api deve restare alla 1.x
+         per F-Droid (controllo nella build di GitHub) e ogni libreria nuova va guardata prima di entrare. -->
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <!-- Codice di BouncyCastle, portato da RootEncoder (modulo whip), non dell'app. -->
+    <issue id="TrustAllX509TrustManager">
+        <ignore path="**/bctls-*.jar" />
+        <ignore path="**/bcpkix-*.jar" />
+    </issue>
+</lint>
+TSM_EOF
+
 # ---------------------------------------------------------------- app/proguard-rules.pro
 cat > "$DEST/app/proguard-rules.pro" << 'TSM_EOF'
 # SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -310,10 +330,13 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         </activity>
 
         <!-- Telefono usato come tabellone: pagina del telefono dell'arbitro a schermo intero, in orizzontale -->
+        <!-- Orientamenti fissi voluti (tabellone, video e telecamera in orizzontale, QR in verticale): da Android 16 i
+             tablet e gli schermi grandi li ignorano, e va bene così. -->
         <!-- Lettore QR (zxing-android-embedded): in verticale come il resto dell'app -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
             android:windowSoftInputMode="stateAlwaysHidden"
@@ -323,6 +346,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:name=".tv.DisplayActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
 
@@ -331,6 +355,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:name=".video.ReplayActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Lettore dei video delle partite, con i capitoli punto per punto -->
@@ -338,6 +363,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:name=".video.VideoPlayerActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Allenamento al servizio: posizione del corpo nelle clip (MoveNet, sul telefono) -->
@@ -350,6 +376,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:name=".video.CompareActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
@@ -357,6 +384,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:name=".video.CameraActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
 
@@ -15651,6 +15679,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
+import androidx.core.net.toUri
 
 enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, LESSONS, COACH_COURSE, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
@@ -18267,7 +18296,7 @@ class MatchController(
 
     fun folderLabel(): String {
         val tree = storage.historyTree ?: return if (Build.VERSION.SDK_INT >= 29) DOCUMENTS_DIR else strings.defaultFolder
-        return runCatching { DocumentsContract.getTreeDocumentId(Uri.parse(tree)).substringAfter(':').ifBlank { "/" } }
+        return runCatching { DocumentsContract.getTreeDocumentId(tree.toUri()).substringAfter(':').ifBlank { "/" } }
             .getOrDefault(strings.defaultFolder)
     }
 
@@ -18303,7 +18332,7 @@ class MatchController(
                         })
                     }
                     if (tree != null) {
-                        val treeUri = Uri.parse(tree)
+                        val treeUri = tree.toUri()
                         val parent = DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
                         for ((file, mime, write) in outputs) {
                             val doc = DocumentsContract.createDocument(app.contentResolver, parent, mime, file) ?: error("createDocument")
@@ -21212,6 +21241,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import androidx.core.graphics.scale
 
 /**
  * Il planning dei campi: i campi del circolo con caratteristiche, foto e prezzi, le prenotazioni (con gli addebiti
@@ -21372,7 +21402,7 @@ class ClubPlanning(
                         while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= 1600) sample *= 2
                         val bmp = app.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) } ?: return@runCatching null
                         val k = 1600f / maxOf(bmp.width, bmp.height)
-                        val out = if (k < 1f) android.graphics.Bitmap.createScaledBitmap(bmp, (bmp.width * k).toInt(), (bmp.height * k).toInt(), true) else bmp
+                        val out = if (k < 1f) bmp.scale((bmp.width * k).toInt(), (bmp.height * k).toInt()) else bmp
                         val name = "c" + java.util.UUID.randomUUID().toString().take(12) + ".jpg"
                         courtPhotoFile(name).outputStream().use { out.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
                         if (out !== bmp) out.recycle()
@@ -24020,6 +24050,7 @@ import android.graphics.Typeface
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.ctRoundName
 import com.tennis.scoremanager.ui.groupLetter
+import androidx.core.graphics.createBitmap
 
 /**
  * Il tabellone di un torneo in un'immagine da mandare al gruppo o sui social: in alto nome e circolo, poi i gironi
@@ -24040,7 +24071,7 @@ object ClubDrawImage {
         val drawH = if (rounds > 0) 70f + first * (BOX_H + GAP) else 0f
         val w = maxOf(1080f, M * 2 + rounds * COL_W).toInt()
         val h = (190f + groupRows * 46f + groups.size * 20f + drawH + 90f).toInt().coerceAtMost(8000)
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         val bg = 0xFF0B1220.toInt(); val surface = 0xFF151D2E.toInt(); val main = 0xFFF1F5FB.toInt(); val dim = 0xFF9AA8BD.toInt(); val ball = 0xFFC6F432.toInt()
         c.drawColor(bg)
@@ -27637,6 +27668,8 @@ import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.Strings
 import java.io.File
 import java.io.OutputStream
+import androidx.core.graphics.scale
+import androidx.core.graphics.withClip
 
 /**
  * Riepilogo completo in PDF (A4), fatto con PdfDocument di Android, senza librerie: risultato con l'immagine del
@@ -27845,14 +27878,13 @@ object PdfReport {
     private fun fit(b: Bitmap, wPt: Float, hPt: Float): Bitmap {
         val tw = (wPt * PX_PER_PT).toInt().coerceAtLeast(1)
         val th = (hPt * PX_PER_PT).toInt().coerceAtLeast(1)
-        return if (b.width <= tw && b.height <= th) b else Bitmap.createScaledBitmap(b, tw, th, true)
+        return if (b.width <= tw && b.height <= th) b else b.scale(tw, th)
     }
 
     private fun drawCircle(c: Canvas, b: Bitmap, x: Float, y: Float, size: Float) {
-        c.save()
-        c.clipPath(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) })
-        c.drawBitmap(fit(b, size, size), null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
-        c.restore()
+        c.withClip(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) }) {
+            drawBitmap(fit(b, size, size), null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
+        }
     }
 
     private fun statsTable(wr: Writer, rows: List<Triple<String, String, String>>, names: Names) {
@@ -29237,6 +29269,7 @@ import com.tennis.scoremanager.ui.stringsFor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.graphics.createBitmap
 
 /** Resoconto finale della partita: testo, JSON e immagine da condividere. */
 object Reports {
@@ -29419,7 +29452,7 @@ object Reports {
     fun renderCard(rec: MatchRecord, state: MatchState, s: Strings, names: Names): Bitmap {
         val w = 1080
         val h = 1350
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         val bg = Paint().apply {
             shader = LinearGradient(0f, 0f, 0f, h.toFloat(), Color.rgb(12, 18, 32), Color.rgb(10, 60, 48), Shader.TileMode.CLAMP)
@@ -30506,6 +30539,7 @@ import com.tennis.scoremanager.tv.TvSettings
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.io.File
+import androidx.core.content.edit
 
 /** Preferenze e partite salvate in locale (memoria interna dell'app). */
 class Storage(context: Context) {
@@ -30564,7 +30598,7 @@ class Storage(context: Context) {
     fun playerSex(key: String): String = prefs.getString("sex_$key", "") ?: ""
 
     fun setPlayerSex(key: String, sex: String) {
-        prefs.edit().apply { if (sex.isEmpty()) remove("sex_$key") else putString("sex_$key", sex) }.apply()
+        prefs.edit { if (sex.isEmpty()) remove("sex_$key") else putString("sex_$key", sex) }
     }
 
     fun deletePhoto(key: String) {
@@ -31002,12 +31036,12 @@ class Storage(context: Context) {
     /** Chi si allena con l'allenamento dei colpi (PlayerProfile.id; vuoto = nessun allievo). */
     var trainStudent: String
         get() = prefs.getString("train_student", null) ?: ""
-        set(v) = prefs.edit().putString("train_student", v).apply()
+        set(v) = prefs.edit { putString("train_student", v) }
 
     /** L'ultimo allievo scelto dall'allenatore: lo ritrova tornando al suo profilo (nel profilo Tu ci si allena da soli). */
     var coachStudent: String
         get() = prefs.getString("coach_student", null) ?: ""
-        set(v) = prefs.edit().putString("coach_student", v).apply()
+        set(v) = prefs.edit { putString("coach_student", v) }
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")
@@ -31023,127 +31057,127 @@ class Storage(context: Context) {
     /** Racchetta scelta per gli allenamenti ("" = nessuna). */
     var workoutRacket: String
         get() = prefs.getString("workout_racket", null) ?: ""
-        set(v) = prefs.edit().putString("workout_racket", v).apply()
+        set(v) = prefs.edit { putString("workout_racket", v) }
 
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 
     var setup: SetupData
         get() = read(prefs.getString("setup", null)) ?: SetupData()
-        set(v) = prefs.edit().putString("setup", json.encodeToString(SetupData.serializer(), v)).apply()
+        set(v) = prefs.edit { putString("setup", json.encodeToString(SetupData.serializer(), v)) }
 
     var options: MatchOptions
         get() = prefs.getString("options", null)?.let {
             runCatching { json.decodeFromString(MatchOptions.serializer(), it) }.getOrNull()
         } ?: MatchOptions()
-        set(v) = prefs.edit().putString("options", json.encodeToString(MatchOptions.serializer(), v)).apply()
+        set(v) = prefs.edit { putString("options", json.encodeToString(MatchOptions.serializer(), v)) }
 
     /** Tabellone TV: impostazioni del telefono, non della partita. */
     var tv: TvSettings
         get() = prefs.getString("tv", null)?.let {
             runCatching { json.decodeFromString(TvSettings.serializer(), it) }.getOrNull()
         } ?: TvSettings()
-        set(v) = prefs.edit().putString("tv", json.encodeToString(TvSettings.serializer(), v)).apply()
+        set(v) = prefs.edit { putString("tv", json.encodeToString(TvSettings.serializer(), v)) }
 
     /** Ultimo indirizzo a cui si è collegato questo telefono usato come tabellone ("192.168.43.1:8080"). */
     var lastScoreboardHost: String?
         get() = prefs.getString("display_host", null)
-        set(v) = prefs.edit().putString("display_host", v).apply()
+        set(v) = prefs.edit { putString("display_host", v) }
 
     /** Telefono-telecamera: server RTMP della diretta (di serie YouTube) e chiave di trasmissione. */
     var streamUrl: String
         get() = prefs.getString("stream_url", null) ?: "rtmp://a.rtmp.youtube.com/live2"
-        set(v) = prefs.edit().putString("stream_url", v.trim()).apply()
+        set(v) = prefs.edit { putString("stream_url", v.trim()) }
     var streamKey: String
         get() = prefs.getString("stream_key", null) ?: ""
-        set(v) = prefs.edit().putString("stream_key", v.trim()).apply()
+        set(v) = prefs.edit { putString("stream_key", v.trim()) }
     /** Highlights: ordine delle voci (dalla più importante) e quelle accese, come l'ultima volta. */
     var highlightOrder: List<String>
         get() = prefs.getString("hl_order", null)?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
-        set(v) = prefs.edit().putString("hl_order", v.joinToString(",")).apply()
+        set(v) = prefs.edit { putString("hl_order", v.joinToString(",")) }
     var highlightEnabled: Set<String>?
         get() = prefs.getString("hl_enabled", null)?.split(',')?.filter { it.isNotBlank() }?.toSet()
-        set(v) = prefs.edit().putString("hl_enabled", v?.joinToString(",")).apply()
+        set(v) = prefs.edit { putString("hl_enabled", v?.joinToString(",")) }
     /** Brano scelto per le statistiche degli highlights: una copia sul telefono, col nome da mostrare. */
     val highlightMusicFile: File get() = File(app.filesDir, "hl_music")
     var highlightMusicName: String?
         get() = prefs.getString("hl_music_name", null)?.takeIf { highlightMusicFile.exists() }
         set(v) {
             if (v == null) highlightMusicFile.delete()
-            prefs.edit().putString("hl_music_name", v).apply()
+            prefs.edit { putString("hl_music_name", v) }
         }
 
     /** Highlights: schermate delle statistiche in coda al montaggio. */
     var highlightStats: Boolean
         get() = prefs.getBoolean("hl_stats", true)
-        set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
+        set(v) = prefs.edit { putBoolean("hl_stats", v) }
 
     /** Intro come nei tornei in testa agli highlights. */
     var highlightIntro: Boolean
         get() = prefs.getBoolean("hl_intro", true)
-        set(v) = prefs.edit().putBoolean("hl_intro", v).apply()
+        set(v) = prefs.edit { putBoolean("hl_intro", v) }
 
     /** Moviola mandata subito anche al tabellone. */
     var replayOnBoard: Boolean
         get() = prefs.getBoolean("replay_on_board", false)
-        set(v) = prefs.edit().putBoolean("replay_on_board", v).apply()
+        set(v) = prefs.edit { putBoolean("replay_on_board", v) }
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
-        set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+        set(v) = prefs.edit { putBoolean("camera_overlay", v) }
     /** Prima accensione fatta (lingua, uso, nome) e il nome di chi usa l'app (per Progressi e rating; "" = non detto). */
     var onboarded: Boolean
         get() = prefs.getBoolean("onboarded", false)
-        set(v) = prefs.edit().putBoolean("onboarded", v).apply()
+        set(v) = prefs.edit { putBoolean("onboarded", v) }
     var myName: String
         get() = prefs.getString("my_name", null) ?: ""
-        set(v) = prefs.edit().putString("my_name", v.trim()).apply()
+        set(v) = prefs.edit { putString("my_name", v.trim()) }
 
     /** Cosa usa chi gioca (PlayerFeature.name); null = mai scelto (tutto acceso, come prima). */
     var playerFeatures: Set<String>?
         get() = prefs.getStringSet("player_features", null)?.toSet()
-        set(v) = prefs.edit().putStringSet("player_features", v).apply()
+        set(v) = prefs.edit { putStringSet("player_features", v) }
 
     var playerFeaturesSeen: Boolean
         get() = prefs.getBoolean("player_features_seen", false)
-        set(v) = prefs.edit().putBoolean("player_features_seen", v).apply()
+        set(v) = prefs.edit { putBoolean("player_features_seen", v) }
 
     /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
     var clubFeatures: Set<String>?
         get() = prefs.getStringSet("club_features", null)?.toSet()
-        set(v) = prefs.edit().putStringSet("club_features", v).apply()
+        set(v) = prefs.edit { putStringSet("club_features", v) }
 
     /** Il suggerimento "scegli le funzioni" è già stato visto. */
     var clubFeaturesSeen: Boolean
         get() = prefs.getBoolean("club_features_seen", false)
-        set(v) = prefs.edit().putBoolean("club_features_seen", v).apply()
+        set(v) = prefs.edit { putBoolean("club_features_seen", v) }
 
     /** Il ruolo (Role.name; prima se ne potevano accendere più di uno) e quello attivo; di serie Tu. */
     var roles: Set<String>
         get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")
-        set(v) = prefs.edit().putStringSet("roles", v).apply()
+        set(v) = prefs.edit { putStringSet("roles", v) }
     var activeRole: String
         get() = prefs.getString("active_role", null) ?: "PLAYER"
-        set(v) = prefs.edit().putString("active_role", v).apply()
+        set(v) = prefs.edit { putString("active_role", v) }
 
     /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
     var clubName: String
         get() = prefs.getString("club_name", null) ?: ""
-        set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+        set(v) = prefs.edit { putString("club_name", v.trim()) }
     /** Promemoria del telefono (lezioni di domani, presenze da mandare, partita del giorno) e quelli già mostrati. */
     var remindersOn: Boolean
         get() = prefs.getBoolean("reminders_on", true)
-        set(v) = prefs.edit().putBoolean("reminders_on", v).apply()
+        set(v) = prefs.edit { putBoolean("reminders_on", v) }
     var remindersShown: Set<String>
         get() = prefs.getStringSet("reminders_shown", null)?.toSet() ?: emptySet()
-        set(v) = prefs.edit().putStringSet("reminders_shown", v).apply()
+        set(v) = prefs.edit { putStringSet("reminders_shown", v) }
 
     /** Il telefono della segreteria: va nelle schede partita, i giocatori rimandano lì il risultato. */
     var clubPhone: String
         get() = prefs.getString("club_phone", null) ?: ""
-        set(v) = prefs.edit().putString("club_phone", v.trim()).apply()
+        set(v) = prefs.edit { putString("club_phone", v.trim()) }
     var clubCourts: List<String>
         get() = prefs.getString("club_courts", null)?.split('\n')?.filter { it.isNotBlank() } ?: emptyList()
-        set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
+        set(v) = prefs.edit { putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")) }
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
     /**
@@ -31152,41 +31186,41 @@ class Storage(context: Context) {
      */
     var personalBackupAuto: Boolean
         get() = prefs.getBoolean("personal_backup_auto", true)
-        set(v) = prefs.edit().putBoolean("personal_backup_auto", v).apply()
+        set(v) = prefs.edit { putBoolean("personal_backup_auto", v) }
     var personalBackupPrint: String
         get() = prefs.getString("personal_backup_print", null) ?: ""
-        set(v) = prefs.edit().putString("personal_backup_print", v).apply()
+        set(v) = prefs.edit { putString("personal_backup_print", v) }
 
     /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa, acceso di serie), l'impronta e l'ora dell'ultimo. */
     var officeBackupAuto: Boolean
         get() = prefs.getBoolean("office_backup_auto", true)
-        set(v) = prefs.edit().putBoolean("office_backup_auto", v).apply()
+        set(v) = prefs.edit { putBoolean("office_backup_auto", v) }
     var officeBackupPrint: String
         get() = prefs.getString("office_backup_print", null) ?: ""
-        set(v) = prefs.edit().putString("office_backup_print", v).apply()
+        set(v) = prefs.edit { putString("office_backup_print", v) }
     var officeBackupAt: Long
         get() = prefs.getLong("office_backup_at", 0L)
-        set(v) = prefs.edit().putLong("office_backup_at", v).apply()
+        set(v) = prefs.edit { putLong("office_backup_at", v) }
     /** L'ultimo invio della copia al server non riuscito (il codice), vuoto se è andato. */
     var officeBackupServerError: String
         get() = prefs.getString("office_backup_server_error", null) ?: ""
-        set(v) = prefs.edit().putString("office_backup_server_error", v).apply()
+        set(v) = prefs.edit { putString("office_backup_server_error", v) }
     /** Le copie automatiche della segreteria (fuori dal backup completo: sono già una copia). */
     val officeBackupDir: File get() = File(app.filesDir, "office_backups")
 
     /** Il luogo della partita (riepilogo e PDF) dalla posizione del telefono; chi non lo vuole lo spegne. */
     var matchPlace: Boolean
         get() = prefs.getBoolean("match_place", true)
-        set(v) = prefs.edit().putBoolean("match_place", v).apply()
+        set(v) = prefs.edit { putBoolean("match_place", v) }
     /** La domanda sulla posizione prima della partita si fa una volta sola. */
     var locationAsked: Boolean
         get() = prefs.getBoolean("location_asked", false)
-        set(v) = prefs.edit().putBoolean("location_asked", v).apply()
+        set(v) = prefs.edit { putBoolean("location_asked", v) }
 
     /** Chi aveva già l'app ha visto l'avviso che il backup automatico ora è acceso di serie. */
     var autoBackupNoticeSeen: Boolean
         get() = prefs.getBoolean("auto_backup_notice_seen", false)
-        set(v) = prefs.edit().putBoolean("auto_backup_notice_seen", v).apply()
+        set(v) = prefs.edit { putBoolean("auto_backup_notice_seen", v) }
 
     /**
      * La password dei backup (null = senza): in un file di impostazioni a parte, che non entra nei backup. Serve alle
@@ -31195,39 +31229,39 @@ class Storage(context: Context) {
     private val secret = app.getSharedPreferences("tsm_secret", Context.MODE_PRIVATE)
     var backupPassword: String?
         get() = secret.getString("backup_password", null)?.takeIf { it.isNotEmpty() }
-        set(v) = secret.edit().apply { if (v.isNullOrEmpty()) remove("backup_password") else putString("backup_password", v) }.apply()
+        set(v) = secret.edit { if (v.isNullOrEmpty()) remove("backup_password") else putString("backup_password", v) }
 
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
-        set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()
+        set(v) = prefs.edit { putBoolean("backup_reminder", v) }
     var lastBackupAt: Long
         get() = prefs.getLong("last_backup", 0L)
-        set(v) = prefs.edit().putLong("last_backup", v).apply()
+        set(v) = prefs.edit { putLong("last_backup", v) }
 
     /** Tu: il tuo giocatore del database (PlayerProfile.id; vuoto = non ancora scelto). */
     var myPlayerId: String
         get() = prefs.getString("my_player", null) ?: ""
-        set(v) = prefs.edit().putString("my_player", v).apply()
+        set(v) = prefs.edit { putString("my_player", v) }
 
     /** Allenamento dei colpi: video a 60 fotogrammi al secondo (solo se tutti gli obiettivi ce la fanno). */
     var trainFps60: Boolean
         get() = prefs.getBoolean("train_fps60", false)
-        set(v) = prefs.edit().putBoolean("train_fps60", v).apply()
+        set(v) = prefs.edit { putBoolean("train_fps60", v) }
 
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
         get() = prefs.getString("camera_lens", null)
-        set(v) = prefs.edit().putString("camera_lens", v).apply()
+        set(v) = prefs.edit { putString("camera_lens", v) }
     /** Assistente inquadratura: metri dietro la linea di fondo, metri da terra, campo (Framing.Court). */
     var framingDistance: Float
         get() = prefs.getFloat("framing_distance", 6f)
-        set(v) = prefs.edit().putFloat("framing_distance", v).apply()
+        set(v) = prefs.edit { putFloat("framing_distance", v) }
     var framingHeight: Float
         get() = prefs.getFloat("framing_height", 2.5f)
-        set(v) = prefs.edit().putFloat("framing_height", v).apply()
+        set(v) = prefs.edit { putFloat("framing_height", v) }
     var framingCourt: String
         get() = prefs.getString("framing_court", null) ?: "TENNIS_DOUBLES"
-        set(v) = prefs.edit().putString("framing_court", v).apply()
+        set(v) = prefs.edit { putString("framing_court", v) }
     /** Taratura completa della sagoma (distanza, altezza e campo sono quelli qui sopra). */
     var framingCalib: com.tennis.scoremanager.video.Framing.Calib
         get() = com.tennis.scoremanager.video.Framing.Calib(
@@ -31236,9 +31270,11 @@ class Storage(context: Context) {
             prefs.getFloat("framing_fov", 1f), prefs.getFloat("framing_pitch_off", 0f),
         )
         set(v) {
-            prefs.edit().putFloat("framing_distance", v.distance).putFloat("framing_height", v.height).putString("framing_court", v.court)
-                .putFloat("framing_pan", v.pan).putFloat("framing_lateral", v.lateral).putFloat("framing_fov", v.fovScale)
-                .putFloat("framing_pitch_off", v.pitchOffset).apply()
+            prefs.edit {
+                putFloat("framing_distance", v.distance).putFloat("framing_height", v.height).putString("framing_court", v.court)
+                    .putFloat("framing_pan", v.pan).putFloat("framing_lateral", v.lateral).putFloat("framing_fov", v.fovScale)
+                    .putFloat("framing_pitch_off", v.pitchOffset)
+            }
         }
 
     /** Taratura salvata per un campo ("Circolo · Campo" dal punteggio dell'arbitro), null se non c'è. */
@@ -31249,7 +31285,7 @@ class Storage(context: Context) {
 
     fun saveFramingCalibFor(place: String, c: com.tennis.scoremanager.video.Framing.Calib) {
         if (place.isBlank()) return
-        prefs.edit().putString("framing_calib_" + place.trim().lowercase(), json.encodeToString(com.tennis.scoremanager.video.Framing.Calib.serializer(), c)).apply()
+        prefs.edit { putString("framing_calib_" + place.trim().lowercase(), json.encodeToString(com.tennis.scoremanager.video.Framing.Calib.serializer(), c)) }
     }
 
     private fun read(s: String?): SetupData? =
@@ -31263,13 +31299,13 @@ class Storage(context: Context) {
      */
     var strokesAutoOn: Set<String>
         get() = prefs.getStringSet("strokes_auto_on", null).orEmpty().toSet()
-        set(v) = prefs.edit().putStringSet("strokes_auto_on", v).apply()
+        set(v) = prefs.edit { putStringSet("strokes_auto_on", v) }
     fun bandName(p1: Boolean): String? = prefs.getString(if (p1) "band_p1_name" else "band_p2_name", null)
     fun setBand(p1: Boolean, address: String?, name: String?) {
-        prefs.edit()
-            .putString(if (p1) "band_p1" else "band_p2", address)
-            .putString(if (p1) "band_p1_name" else "band_p2_name", name)
-            .apply()
+        prefs.edit {
+            putString(if (p1) "band_p1" else "band_p2", address)
+                .putString(if (p1) "band_p1_name" else "band_p2_name", name)
+        }
     }
 
     /** Telecomandi Bluetooth: descrittore del dispositivo (identità stabile di Android) e nome mostrato. */
@@ -31278,21 +31314,21 @@ class Storage(context: Context) {
     /** Tasto premuto all'associazione: dà il punto; gli altri tasti dello stesso telecomando annullano (null = tutti punto). */
     fun remoteKey(p1: Boolean): Int? = prefs.getInt(if (p1) "remote_p1_key" else "remote_p2_key", -1).takeIf { it >= 0 }
     fun setRemote(p1: Boolean, descriptor: String?, name: String?, key: Int?) {
-        prefs.edit()
-            .putString(if (p1) "remote_p1" else "remote_p2", descriptor)
-            .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
-            .putInt(if (p1) "remote_p1_key" else "remote_p2_key", key ?: -1)
-            .apply()
+        prefs.edit {
+            putString(if (p1) "remote_p1" else "remote_p2", descriptor)
+                .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
+                .putInt(if (p1) "remote_p1_key" else "remote_p2_key", key ?: -1)
+        }
     }
 
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
     fun strapAddress(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1" else "strap_p2", null)
     fun strapName(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1_name" else "strap_p2_name", null)
     fun setStrap(p1: Boolean, address: String?, name: String?) {
-        prefs.edit()
-            .putString(if (p1) "strap_p1" else "strap_p2", address)
-            .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
-            .apply()
+        prefs.edit {
+            putString(if (p1) "strap_p1" else "strap_p2", address)
+                .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
+        }
     }
 
     /** Chi indossa la fascia del lato (per le calorie); null = non detto. */
@@ -31300,24 +31336,24 @@ class Storage(context: Context) {
         prefs.getString(if (p1) "heart_p1" else "heart_p2", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
 
     fun setHeartProfile(p1: Boolean, p: HeartProfile?) {
-        prefs.edit().putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }).apply()
+        prefs.edit { putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }) }
     }
 
     fun bandBaseMa(address: String): Double? =
         prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()
 
     fun setBandBaseMa(address: String, ma: Double) {
-        prefs.edit().putFloat("base_ma_$address", ma.toFloat()).apply()
+        prefs.edit { putFloat("base_ma_$address", ma.toFloat()) }
     }
 
     var historyTree: String?
         get() = prefs.getString("history_tree", null)
-        set(v) = prefs.edit().putString("history_tree", v).apply()
+        set(v) = prefs.edit { putString("history_tree", v) }
 
     /** Id della partita il cui riepilogo è a schermo (null dopo "Nuova partita" o "Esci"). */
     var summaryOpen: String?
         get() = prefs.getString("summary_open", null)
-        set(v) = prefs.edit().putString("summary_open", v).apply()
+        set(v) = prefs.edit { putString("summary_open", v) }
 
     /** Scrittura atomica: prima su file temporaneo, poi rinomina (sicuro anche se il telefono si spegne). */
     @Synchronized
@@ -31750,6 +31786,8 @@ import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.strokeLabel
 import java.io.OutputStream
+import androidx.core.graphics.scale
+import androidx.core.graphics.createBitmap
 
 /** Il report dell'allievo in PDF (A4, più pagine se serve), coi colori di stampa. */
 object StudentReportPdf {
@@ -31860,7 +31898,7 @@ object StudentReportPdf {
                     val x = M + i * (iw + gap)
                     if (b != null) {
                         // Ridotte prima di metterle nel PDF (non comprime le immagini).
-                        val small = Bitmap.createScaledBitmap(b, (iw * 2).toInt(), (ih * 2).toInt(), true)
+                        val small = b.scale((iw * 2).toInt(), (ih * 2).toInt())
                         c().drawBitmap(small, null, RectF(x, y, x + iw, y + ih), Paint(Paint.FILTER_BITMAP_FLAG))
                         if (small !== b) small.recycle()
                         b.recycle()
@@ -31929,7 +31967,7 @@ object StudentReportImage {
 
     fun render(r: StudentReport.Report, s: Strings, lang: Lang): Bitmap {
         val w = 1080; val h = 1350
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         c.drawColor(bg)
         fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
@@ -32878,6 +32916,7 @@ import android.graphics.Typeface
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.ui.Strings
 import java.util.Calendar
+import androidx.core.graphics.createBitmap
 
 /**
  * Il mio anno: le partite finite di chi usa l'app in un anno, in breve. Quante, quante vinte, le ore in campo, il
@@ -32933,7 +32972,7 @@ object YearReviewImage {
 
     fun render(y: YearReview.Year, name: String, s: Strings, lang: Lang): Bitmap {
         val w = 1080; val h = 1350
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         c.drawColor(bg)
         fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
@@ -36813,6 +36852,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.graphics.scale
 
 /**
  * Le foto: quella di ogni giocatore (ritagliata quadrata, anche sul tabellone TV), il ritratto di uomo o di donna
@@ -36852,7 +36892,7 @@ class PhotosArea(
                     }
                     val side = minOf(src.width, src.height)
                     val square = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
-                    val small = Bitmap.createScaledBitmap(square, MatchController.PHOTO_PX, MatchController.PHOTO_PX, true)
+                    val small = square.scale(MatchController.PHOTO_PX, MatchController.PHOTO_PX)
                     val out = ByteArrayOutputStream()
                     small.compress(Bitmap.CompressFormat.JPEG, 85, out)
                     storage.savePhoto(key, out.toByteArray())
@@ -36935,7 +36975,7 @@ class PhotosArea(
             app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
         }
         val scale = minOf(1f, maxSide.toFloat() / maxOf(src.width, src.height))
-        val img = if (scale < 1f) Bitmap.createScaledBitmap(src, (src.width * scale).toInt(), (src.height * scale).toInt(), true) else src
+        val img = if (scale < 1f) src.scale((src.width * scale).toInt(), (src.height * scale).toInt()) else src
         return ByteArrayOutputStream().also { img.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
     }
 
@@ -39626,7 +39666,7 @@ class DeskService : Service() {
         }
         val s = c.strings
         val nm = getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.deskTitle, NotificationManager.IMPORTANCE_LOW))
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, s.deskTitle, NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 2, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE)
         val stop = PendingIntent.getService(this, 3, Intent(this, DeskService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(this, CHANNEL)
@@ -39705,9 +39745,7 @@ class MatchService : Service() {
         val nm = getSystemService(NotificationManager::class.java)
         val c = (application as TsmApp).controller
         val s = c.strings
-        if (Build.VERSION.SDK_INT >= 26) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, s.notifChannel, NotificationManager.IMPORTANCE_LOW))
-        }
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, s.notifChannel, NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,
@@ -39814,7 +39852,7 @@ object OnlineAlerts {
     private fun postPlayerLines(context: Context, s: Strings, items: List<Pair<String, String>>) {
         if (items.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
             context, PLAYER_ID,
             Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true),
@@ -39843,7 +39881,7 @@ object OnlineAlerts {
     fun postNewSeek(context: Context, s: Strings, id: String, club: String, text: String) {
         if (!allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
             context, SEEK_ID + (id.hashCode() and 0xfff),
             Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true).putExtra(EXTRA_SEEK_CLUB, club),
@@ -39862,7 +39900,7 @@ object OnlineAlerts {
     fun postChat(context: Context, s: Strings, room: String, club: String, title: String, text: String) {
         if (!allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val i = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true)
         // Toccandola si apre proprio quella chat, nel suo circolo (quella di un annuncio sta in Compagni).
         i.putExtra(EXTRA_SEEK_CLUB, club)
@@ -39886,7 +39924,7 @@ object OnlineAlerts {
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.srvAlertChannel, NotificationManager.IMPORTANCE_DEFAULT))
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, s.srvAlertChannel, NotificationManager.IMPORTANCE_DEFAULT))
         val lines = added.map { s.srvAlertNew(it) } + cancelled.map { s.srvAlertGone(it) }
         val open = PendingIntent.getActivity(
             context, ID,
@@ -40019,7 +40057,7 @@ class RemindersJob : JobService() {
         fun notifyInbox(context: Context, title: String, text: String) {
             if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
             val nm = context.getSystemService(NotificationManager::class.java)
-            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, title, NotificationManager.IMPORTANCE_DEFAULT))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, title, NotificationManager.IMPORTANCE_DEFAULT))
             val open = PendingIntent.getActivity(context, ID - 1,
                 Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_TARGET, "inbox"),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
@@ -40036,7 +40074,7 @@ class RemindersJob : JobService() {
             val items = Reminders.due(System.currentTimeMillis(), c.activeRole.value == com.tennis.scoremanager.Role.COACH, c.coaching.coachBook.value, c.cards.receivedCards.value, shown) { id -> c.playerById(id)?.name ?: "—" }
             if (items.isEmpty()) return
             val nm = context.getSystemService(NotificationManager::class.java)
-            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.rmChannel, NotificationManager.IMPORTANCE_DEFAULT))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, s.rmChannel, NotificationManager.IMPORTANCE_DEFAULT))
             for (it in items) {
                 val title = when (it.kind) {
                     Reminders.Kind.TOMORROW -> s.rmTomorrow(it.count)
@@ -41238,6 +41276,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
 
 /**
  * Piccolo server web sul telefono dell'arbitro, attivo solo con il tabellone TV acceso.
@@ -41354,7 +41393,7 @@ class TvServer(context: Context) {
     /** Identità di questo telefono: dopo un'interruzione il telefono-tabellone lo ritrova anche se l'indirizzo è cambiato. */
     private val serverId: String by lazy {
         val prefs = app.getSharedPreferences("tv_server", Context.MODE_PRIVATE)
-        prefs.getString("id", null) ?: java.util.UUID.randomUUID().toString().take(8).also { prefs.edit().putString("id", it).apply() }
+        prefs.getString("id", null) ?: java.util.UUID.randomUUID().toString().take(8).also { prefs.edit { putString("id", it)} }
     }
 
     /** Indirizzo da mostrare e da mettere nel QR, es. http://192.168.43.1:8080/ (null = nessuna rete locale). */
@@ -42525,6 +42564,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -42628,7 +42668,7 @@ fun ChatDialog(
     var text by remember { mutableStateOf("") }
     var err by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
-    var tick by remember { mutableStateOf(0) }
+    var tick by remember { mutableIntStateOf(0) }
     var menu by remember { mutableStateOf(false) }
     var picked by remember { mutableStateOf<SrvChatMsg?>(null) }
     /** Il proprio messaggio che si sta correggendo: il testo va nella barra in basso. */
@@ -43396,6 +43436,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -43423,10 +43464,12 @@ import com.tennis.scoremanager.data.StudentProposal
 import com.tennis.scoremanager.ui.screens.shortDate
 import java.io.File
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 /** Il colore dell'etichetta di un corso ("#RRGGBB"). */
 fun courseColor(hex: String): androidx.compose.ui.graphics.Color =
-    runCatching { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(hex)) }.getOrDefault(TsmColors.Ball)
+    runCatching { androidx.compose.ui.graphics.Color(hex.toColorInt()) }.getOrDefault(TsmColors.Ball)
 
 /** I pallini dei colori tra cui scegliere l'etichetta di un corso; quello scelto ha il bordo. */
 @Composable
@@ -43506,9 +43549,9 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     val isBusy = { t: Long -> Coaching.busyOn(busyList, t) != null }
     val skip = { t: Long -> (skipHolidays && isHoliday(t)) || (skipBusy && isBusy(t)) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
-    var wd by remember { mutableStateOf(1) }
-    var startMin by remember { mutableStateOf(17 * 60) }
-    var minutes by remember { mutableStateOf(60) }
+    var wd by remember { mutableIntStateOf(1) }
+    var startMin by remember { mutableIntStateOf(17 * 60) }
+    var minutes by remember { mutableIntStateOf(60) }
     var place by remember { mutableStateOf("") }
     fun dayName(d: Int) = java.time.DayOfWeek.of(d).getDisplayName(java.time.format.TextStyle.SHORT, lang.locale)
     fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
@@ -43585,7 +43628,7 @@ fun CoachCourseScreen(c: MatchController) {
     val co = cc.course
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
-    var tab by rememberSaveable { mutableStateOf(1) }
+    var tab by rememberSaveable { mutableIntStateOf(1) }
     var open by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
     var register by remember { mutableStateOf(false) }
@@ -43879,7 +43922,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val book by c.coaching.coachBook.collectAsState()
-    var back by remember { mutableStateOf(0) }
+    var back by remember { mutableIntStateOf(0) }
     val cal = java.util.Calendar.getInstance().apply { timeInMillis = CourtPlans.dayStart(System.currentTimeMillis()); set(java.util.Calendar.DAY_OF_MONTH, 1); add(java.util.Calendar.MONTH, -back) }
     val from = cal.timeInMillis
     val to = (cal.clone() as java.util.Calendar).apply { add(java.util.Calendar.MONTH, 1) }.timeInMillis
@@ -43906,7 +43949,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
         confirmButton = {
             TextButton(onClick = {
                 val wa = Notices.waNumber(c.coaching.coachOffice())
-                val i = if (wa != null) android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://wa.me/$wa?text=" + android.net.Uri.encode(text)))
+                val i = if (wa != null) android.content.Intent(android.content.Intent.ACTION_VIEW, ("https://wa.me/$wa?text=" + android.net.Uri.encode(text)).toUri())
                 else android.content.Intent.createChooser(android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text), null)
                 runCatching { context.startActivity(i) }
             }) { Text(s.cmSend) }
@@ -45109,6 +45152,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45141,8 +45186,8 @@ fun MoveLessonDialog(c: MatchController, co: Course, l: Lesson, courts: List<Str
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val country = remember { Holidays.country(lang.code) }
-    var start by remember { mutableStateOf(l.start) }
-    var minutes by remember { mutableStateOf(l.minutes) }
+    var start by remember { mutableLongStateOf(l.start) }
+    var minutes by remember { mutableIntStateOf(l.minutes) }
     var court by remember { mutableStateOf(l.court) }
     val makeup = remember(co, l.key) { Courses.makeup(co.copy(moved = co.moved - l.key)) { t -> Holidays.on(t, country) != null } }
     fun when_(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + Reports.time(t, lang)
@@ -45550,6 +45595,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45623,7 +45669,7 @@ private fun GoalDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val kinds = GoalKind.entries
     var kind by remember { mutableStateOf(GoalKind.FIRST_SERVE) }
-    var target by remember(kind) { mutableStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
+    var target by remember(kind) { mutableDoubleStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
     val windows = listOf(3, 5, 10)
     var window by remember { mutableIntStateOf(5) }
     AlertDialog(
@@ -45688,7 +45734,7 @@ fun ActivityCalendarCard(c: MatchController) {
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val today = java.util.Calendar.getInstance()
-    var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
+    var ym by remember { mutableIntStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
     val days = remember(history, workouts) {
         com.tennis.scoremanager.data.ActivityCalendar.byDay(
             history.filter { it.record.finished }.map { it.record.id to (it.record.startedAt ?: it.record.updatedAt) },
@@ -45812,6 +45858,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46020,8 +46067,10 @@ fun WorkoutStrapCard(c: MatchController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val o by c.options.collectAsState()
     val btOn by c.ble.adapterOn.collectAsState()
-    var permTick by remember { mutableStateOf(0) }
+    var permTick by remember { mutableIntStateOf(0) }
     val permsOk = remember(permTick) {
+        // Lint lo crede sempre falso, ma fino ad Android 11 la ricerca Bluetooth chiede anche la posizione.
+        //noinspection ObsoleteSdkInt
         c.ble.hasPermissions() && (android.os.Build.VERSION.SDK_INT >= 31 || com.tennis.scoremanager.data.LocationHelper.hasPermission(context))
     }
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -47177,12 +47226,12 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
 
 /** Ricevi un profilo: legge il QR mostrato dall'altro telefono (il file invece si apre con Condividi › TSM). */
 @Composable
-fun ReceiveProfileButton(c: MatchController, modifier: Modifier = Modifier.fillMaxWidth()) {
+fun ReceiveProfileButton(c: MatchController, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.profiles.receiveProfileQr(it) } }
     GhostButton(s.pfReceive, Icons.Filled.QrCodeScanner, {
         scanner.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.pfScanPrompt).setBeepEnabled(false).setOrientationLocked(true))
-    }, modifier)
+    }, modifier.fillMaxWidth())
 }
 
 /**
@@ -48866,6 +48915,8 @@ const val RECENT_SESSIONS = 3
 
 /** Una sessione in elenco: data e ora, colpi dentro e percentuale. */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+// Modifier dopo extra: le chiamate passano extra per posizione.
+@Suppress("ModifierParameter")
 @Composable
 fun SessionRow(
     c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,
@@ -68802,6 +68853,8 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.TvColors
 import com.tennis.scoremanager.tv.TvSnapshots
+import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 /** Pagina 2: tabellone su TV (acceso/spento, indirizzo e QR, aspetto). */
 @Composable
@@ -68823,7 +68876,7 @@ fun TvSection(c: MatchController) {
         }
         val port by c.tvServer.port.collectAsState()
         GhostButton(s.tvPreview, Icons.Filled.OpenInBrowser, {
-            port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://127.0.0.1:$p/"))) } }
+            port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, "http://127.0.0.1:$p/".toUri())) } }
         }, Modifier.fillMaxWidth(), enabled = port != null)
 
         Row(
@@ -68912,7 +68965,7 @@ private fun ColorRow(label: String, selected: String, onPick: (String) -> Unit) 
             for (hex in TvColors.palette) {
                 val on = hex.equals(selected, ignoreCase = true)
                 Box(
-                    Modifier.size(28.dp).clip(CircleShape).background(Color(android.graphics.Color.parseColor(hex)))
+                    Modifier.size(28.dp).clip(CircleShape).background(Color(hex.toColorInt()))
                         .border(if (on) 3.dp else 1.dp, if (on) Color.White else TsmColors.Outline, CircleShape)
                         .clickable { onPick(hex) },
                 )
@@ -69031,6 +69084,7 @@ import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
+import androidx.compose.runtime.mutableIntStateOf
 
 private const val B_TIME_W = 52
 private const val B_CELL_W = 104
@@ -69244,7 +69298,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     var rooms by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvChatRoom>>(emptyList()) }
     var people by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvPerson>?>(null) }
     var blockAsk by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var tick by remember { mutableStateOf(0) }
+    var tick by remember { mutableIntStateOf(0) }
 
     // Le proprie prenotazioni e il giorno scelto, ora e poi ogni minuto (le caselle degli altri cambiano).
     LaunchedEffect(tick) {
@@ -69300,7 +69354,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         // Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca.
         val boardRead = acct.chatRead["board"] ?: 0
         if (m.boardLast > boardRead) {
-            var unread by remember { mutableStateOf(0) }
+            var unread by remember { mutableIntStateOf(0) }
             LaunchedEffect(m.boardLast, boardRead) { c.book.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
             BoardBanner(s.pbBoardUnread(maxOf(1, unread))) { chatRoom = "board" to "" }
         }
@@ -69380,7 +69434,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
                 SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
                     c.book.setBookingReminders(on)
-                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context)) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 }
                 PinSection(c, m) { reload() }
                 GhostButton(s.pbAddClub, Icons.Filled.Add, onAddClub, Modifier.fillMaxWidth())
@@ -69631,7 +69685,7 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
     val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     val options = (slot..maxOf(me.rules.maxMinutes, slot) step slot).toList()
-    var minutes by remember { mutableStateOf(options.first()) }
+    var minutes by remember { mutableIntStateOf(options.first()) }
     var heating by remember { mutableStateOf(false) }
     var quote by remember { mutableStateOf<SrvQuote?>(null) }
     var err by remember { mutableStateOf<String?>(null) }
@@ -69684,8 +69738,8 @@ private fun SeekDialog(c: MatchController, me: SrvMe, day: SrvDay?, date: String
     val step = day?.slotMinutes ?: 60
     val mins = day?.cells?.map { ct.minutes(it.start) }?.distinct()?.sorted()?.ifEmpty { null } ?: (8 until 22).map { it * 60 }
     var d by remember { mutableStateOf(date ?: me.days.first()) }
-    var from by remember { mutableStateOf(mins.getOrElse(1) { mins.first() }) }
-    var to by remember { mutableStateOf(minOf(from + 180, mins.last() + step)) }
+    var from by remember { mutableIntStateOf(mins.getOrElse(1) { mins.first() }) }
+    var to by remember { mutableIntStateOf(minOf(from + 180, mins.last() + step)) }
     var doubles by remember { mutableStateOf(false) }
     var level by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
@@ -69777,6 +69831,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -69824,7 +69879,7 @@ private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (S
     var t by remember { mutableStateOf<SrvTunnel?>(null) }
     var err by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
-    var kick by remember { mutableStateOf(0) }
+    var kick by remember { mutableIntStateOf(0) }
     LaunchedEffect(kick) {
         while (true) {
             c.serverArea.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
@@ -69931,7 +69986,7 @@ private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data
     val conf by c.clubServer.collectAsState()
     var local by remember { mutableStateOf<Boolean?>(null) }
     var remote by remember { mutableStateOf<Boolean?>(null) }
-    var round by remember { mutableStateOf(0) }
+    var round by remember { mutableIntStateOf(0) }
     LaunchedEffect(round, publicUrl) {
         while (true) {
             local = null; remote = null
@@ -70022,7 +70077,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     TunnelSection(c, publicUrl) { publicUrl = it; c.serverArea.saveServerRules(rules, pay, it) }
                     SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
                         c.serverArea.setServerAlerts(on)
-                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)
+                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context))
                             notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                     }
                     if (conf.alerts && !notifOk) Text(s.srvAlertsOff, color = TsmColors.Orange, fontSize = 12.sp)
@@ -70207,6 +70262,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -70315,7 +70371,7 @@ fun ClubTournamentScreen(c: MatchController) {
     val t = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var askDraw by remember { mutableStateOf(false) }
@@ -70772,8 +70828,8 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
     var doubles by remember { mutableStateOf(t?.doubles ?: false) }
     var category by remember { mutableStateOf(t?.category.orEmpty()) }
     var format by remember { mutableStateOf(t?.format ?: CTFormat.KNOCKOUT) }
-    var groups by remember { mutableStateOf(t?.groups ?: 2) }
-    var qualify by remember { mutableStateOf(t?.qualify ?: 2) }
+    var groups by remember { mutableIntStateOf(t?.groups ?: 2) }
+    var qualify by remember { mutableIntStateOf(t?.qualify ?: 2) }
     var start by remember { mutableStateOf(t?.start) }
     var end by remember { mutableStateOf(t?.end) }
     var fee by remember { mutableStateOf(t?.feeCents?.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }
@@ -71097,6 +71153,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -71197,7 +71255,7 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     val tournaments by c.competitions.clubTournaments.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val courts by c.planning.clubCourts.collectAsState()
-    var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
+    var day by rememberSaveable { mutableLongStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
     val askedDay by c.serverArea.planDayRequest.collectAsState()
     androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.serverArea.planDayRequest.value = null } }
@@ -71305,7 +71363,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val tournaments by c.competitions.clubTournaments.collectAsState()
     val courts = c.storage.clubCourts
     var b by remember { mutableStateOf(b0) }
-    var weeks by remember { mutableStateOf(1) }
+    var weeks by remember { mutableIntStateOf(1) }
     var guests by remember { mutableStateOf(b0.names.joinToString(", ")) }
     var priceText by remember { mutableStateOf(if (isNew) "" else plain(b0.cents, lang)) }
     var manualPrice by remember { mutableStateOf(!isNew) }
@@ -71803,6 +71861,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -71851,7 +71910,7 @@ fun DataScreen(c: MatchController) {
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
     var restoreAsk by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
     var copies by remember { mutableStateOf(c.backups.personalBackups()) }
-    var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
+    var wipeAsk by remember { mutableIntStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
     var closeAfter by remember { mutableStateOf(false) }
     val videoMb by produceState(0L) {
         value = withContext(Dispatchers.IO) { Backup.videoBytes(context, c.storage, s.strokeFolderName) / 1_048_576 }
@@ -72519,6 +72578,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -72561,7 +72621,7 @@ fun HistoryScreen(c: MatchController) {
     val s = LocalStrings.current
     val matches by c.history.collectAsState()
     /** 0 = partite, 1 = giocatori. */
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     /** Giocatore aperto (chiave del nome); null = elenco. */
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }
@@ -73583,6 +73643,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73771,8 +73832,8 @@ fun LadderScreen(c: MatchController) {
 
     if (settings) {
         var nm by remember { mutableStateOf(l.name) }
-        var reach by remember { mutableStateOf(l.reach) }
-        var days by remember { mutableStateOf(l.days) }
+        var reach by remember { mutableIntStateOf(l.reach) }
+        var days by remember { mutableIntStateOf(l.days) }
         var del by remember { mutableStateOf(false) }
         @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
             Text(label, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
@@ -74889,6 +74950,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -75213,7 +75275,7 @@ fun MatchChronologyTab(rec: MatchRecord, names: Names) {
     val s = LocalStrings.current
     val games = remember(rec) { MatchStats.chronology(MatchStats.points(rec)) }
     val sets = (games.maxOfOrNull { it.set } ?: -1) + 1
-    var set by remember(rec.id) { mutableStateOf(0) }
+    var set by remember(rec.id) { mutableIntStateOf(0) }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (sets > 1) {
             Segmented((1..sets).map { SegOption(s.periodSet(it)) }, selected = set.coerceIn(0, sets - 1), onSelect = { set = it })
@@ -75722,6 +75784,7 @@ import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.core.net.toUri
 
 /** Apre l'app giusta; se non c'è, lo dice. */
 private fun launch(context: Context, intent: Intent, noApp: String) {
@@ -75729,12 +75792,12 @@ private fun launch(context: Context, intent: Intent, noApp: String) {
 }
 
 /** WhatsApp con la chat di quel numero e il messaggio già scritto (si preme Invia). */
-private fun whatsApp(number: String, text: String) = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number?text=" + Uri.encode(text)))
+private fun whatsApp(number: String, text: String) = Intent(Intent.ACTION_VIEW, ("https://wa.me/$number?text=" + Uri.encode(text)).toUri())
 
 private fun sms(numbers: List<String>, text: String) =
-    Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + numbers.joinToString(";") { Uri.encode(it) })).putExtra("sms_body", text)
+    Intent(Intent.ACTION_SENDTO, ("smsto:" + numbers.joinToString(";") { Uri.encode(it) }).toUri()).putExtra("sms_body", text)
 
-private fun email(to: List<String>, bcc: List<String>, subject: String, text: String) = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+private fun email(to: List<String>, bcc: List<String>, subject: String, text: String) = Intent(Intent.ACTION_SENDTO, "mailto:".toUri()).apply {
     if (to.isNotEmpty()) putExtra(Intent.EXTRA_EMAIL, to.toTypedArray())
     if (bcc.isNotEmpty()) putExtra(Intent.EXTRA_BCC, bcc.toTypedArray())
     putExtra(Intent.EXTRA_SUBJECT, subject)
@@ -76935,6 +76998,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -76974,13 +77039,13 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier.fillMaxWidth(), onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier, onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
         val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis() }
         DatePickerDialog(context, { _, y, m, d -> onPick(noonOf(y, m, d)) }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-    }, modifier)
+    }, modifier.fillMaxWidth())
 }
 
 @Composable
@@ -77016,7 +77081,7 @@ fun PaymentsScreen(c: MatchController) {
     val year = Members.year(now)
     var editFee by remember { mutableStateOf<Fee?>(null) }
     var newFee by remember { mutableStateOf(false) }
-    var exportYear by remember { mutableStateOf(year) }
+    var exportYear by remember { mutableIntStateOf(year) }
     var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.12") },
@@ -77322,7 +77387,7 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
-    var at by remember { mutableStateOf(today()) }
+    var at by remember { mutableLongStateOf(today()) }
     // I modi di pagamento del circolo: il primo è quello proposto.
     val types = remember { c.planning.payTypes() }
     var type by remember { mutableStateOf(types.first()) }
@@ -77784,6 +77849,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -77834,7 +77901,7 @@ fun RacketsScreen(c: MatchController) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     val o by c.options.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<Racket?>(null) }
     /** Incordatura in modifica, con la sua racchetta. */
     var stringing by remember { mutableStateOf<Pair<String, Stringing>?>(null) }
@@ -77973,13 +78040,15 @@ private fun RacketCard(
 
 // ---------------------------------------------------------------- schede
 
+// Modifier dopo tastiera e lunghezza: le chiamate li passano per posizione.
+@Suppress("ModifierParameter")
 @Composable
 private fun TextInput(
     value: String,
     label: String,
     keyboard: KeyboardType = KeyboardType.Text,
     max: Int = 40,
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     onChange: (String) -> Unit,
 ) {
     OutlinedTextField(
@@ -77992,7 +78061,7 @@ private fun TextInput(
             keyboardType = keyboard,
         ),
         colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TsmColors.Ball, focusedLabelColor = TsmColors.Ball, cursorColor = TsmColors.Ball),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -78097,7 +78166,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
     var gauge by remember { mutableStateOf(start.gaugeMm.field(lang)) }
     var mains by remember { mutableStateOf(start.mainsKg.field(lang)) }
     var crosses by remember { mutableStateOf(start.crossesKg.field(lang)) }
-    var date by remember { mutableStateOf(start.date) }
+    var date by remember { mutableLongStateOf(start.date) }
     var notes by remember { mutableStateOf(start.notes) }
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -78399,6 +78468,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -78504,7 +78574,7 @@ fun CourseScreen(c: MatchController) {
     val plan by c.courtPlan.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var openLesson by remember { mutableStateOf<Lesson?>(null) }
@@ -78836,6 +78906,7 @@ import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.core.net.toUri
 
 /** Indirizzo del codice sorgente, mostrato con la versione e la licenza. */
 private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
@@ -78888,7 +78959,7 @@ fun SettingsScreen(c: MatchController) {
             Text(s.aboutVersion(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
             Text(s.aboutLicense(BuildConfig.VERSION_NAME), color = TsmColors.TextDim, fontSize = 13.sp)
             // Nessun browser installato: il tocco non fa nulla invece di chiudere l'app.
-            fun open(url: String) = runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+            fun open(url: String) = runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
             GhostButton(s.aboutSite, Icons.Filled.Public, { open(Reports.siteUrl(o.lang)) }, Modifier.fillMaxWidth())
             GhostButton(s.aboutSource, Icons.Filled.Code, { open(SOURCE_URL) }, Modifier.fillMaxWidth())
         }
@@ -80316,6 +80387,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80368,7 +80440,7 @@ fun SummaryScreen(c: MatchController) {
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
     /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
-    var tab by remember(rec.id) { mutableStateOf(0) }
+    var tab by remember(rec.id) { mutableIntStateOf(0) }
     val fromHistory by c.summaryFromHistory.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
     /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
@@ -80937,6 +81009,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -81023,7 +81096,7 @@ fun TeamScreen(c: MatchController) {
     val id by c.competitions.openTeamId.collectAsState()
     val t = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     val now = System.currentTimeMillis()
@@ -82440,6 +82513,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -82508,6 +82582,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.graphics.scale
 
 /**
  * Telefono-telecamera: dietro il campo, al centro. Registra la partita in MP4 1080p e può trasmetterla in diretta
@@ -83144,6 +83219,8 @@ class CameraActivity : ComponentActivity() {
         val battery = runCatching {
             getSystemService(android.os.BatteryManager::class.java).getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
         }.getOrNull()?.takeIf { it in 0..100 }
+        // Solo un avviso prima di registrare: lo spazio libero visibile basta (la cache che Android può liberare non conta).
+        @android.annotation.SuppressLint("UsableSpace")
         val free = runCatching { (getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir).usableSpace / (1024 * 1024) }.getOrNull()
         controller.relay.sendCamState(
             CamState(
@@ -83187,7 +83264,7 @@ class CameraActivity : ComponentActivity() {
                 }
                 if (bmp != null) {
                     val jpeg = withContext(Dispatchers.Default) {
-                        val small = android.graphics.Bitmap.createScaledBitmap(bmp, PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1), true)
+                        val small = bmp.scale(PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1))
                         ByteArrayOutputStream().also { small.compress(android.graphics.Bitmap.CompressFormat.JPEG, 55, it) }.toByteArray()
                     }
                     controller.relay.sendCamFrame(jpeg)
@@ -83604,7 +83681,7 @@ class CameraActivity : ComponentActivity() {
         val msg by message.collectAsState()
         val relay by controller.relay.ui.collectAsState()
         val score by controller.relay.score.collectAsState()
-        var now by remember { mutableStateOf(SystemClock.elapsedRealtime()) }
+        var now by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
         LaunchedEffect(rec) {
             while (rec) {
                 now = SystemClock.elapsedRealtime()
@@ -85123,6 +85200,7 @@ import androidx.media3.transformer.Transformer
 import com.tennis.scoremanager.model.Side
 import java.io.File
 import kotlinx.serialization.json.Json
+import androidx.core.graphics.createBitmap
 
 /**
  * Monta gli highlights sul telefono (Media3 Transformer): i pezzi scelti da [Highlights.select], uno dopo l'altro,
@@ -85264,7 +85342,7 @@ class HighlightMaker(context: Context) {
         val card = stats?.intro ?: return null
         val dir = File(app.cacheDir, "hl_intro").apply { deleteRecursively(); mkdirs() }
         val f = File(dir, "black.png")
-        val black = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLACK) }
+        val black = createBitmap(width, height).apply { eraseColor(android.graphics.Color.BLACK) }
         f.outputStream().use { black.compress(Bitmap.CompressFormat.PNG, 100, it) }
         black.recycle()
         val overlay = IntroOverlay(width, height) { ms, bmp -> StatsCardRenderer.intro(card, ms, bmp, stats.photos, stats.avatars, stats.credit, stats.site) }
@@ -85278,7 +85356,7 @@ class HighlightMaker(context: Context) {
      * l'immagine, e intanto quella di prima resta intatta.
      */
     private class IntroOverlay(width: Int, height: Int, private val draw: (Long, Bitmap) -> Unit) : BitmapOverlay() {
-        private val buffers = Array(2) { Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888) }
+        private val buffers = Array(2) { createBitmap(width, height) }
         private var current = 0
         private var lastMs = -1L
 
@@ -85809,6 +85887,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
+import androidx.core.graphics.createBitmap
 
 /**
  * Disegna la grafica del punteggio come nelle dirette dei tornei: due righe scure con nome, set finiti, game del
@@ -85845,7 +85924,7 @@ object OverlayRenderer {
         val bannerText = o.banner?.uppercase()
         val bannerH = if (bannerText != null) 40f * scale else 0f
         val height = titleH + 2 * rowH + bannerH
-        val bmp = Bitmap.createBitmap(width.toInt().coerceAtLeast(1), height.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(width.toInt().coerceAtLeast(1), height.toInt().coerceAtLeast(1))
         val c = Canvas(bmp)
         val fill = Paint().apply { isAntiAlias = true }
 
@@ -86001,6 +86080,7 @@ import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import kotlin.math.abs
 import kotlin.math.max
+import androidx.core.graphics.createBitmap
 
 /**
  * Posizione del corpo con MoveNet SinglePose Thunder (17 punti), tutto sul telefono. Si usa dopo l'allenamento, clip
@@ -86026,7 +86106,7 @@ class PoseAnalyzer(context: Context) : Closeable {
      * il giocatore ingrandito si vede meglio; fuori dall'immagine è nero.
      */
     fun detect(bmp: Bitmap, crop: RectF, masks: List<RectF> = emptyList()): Array<FloatArray> {
-        val input = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val input = createBitmap(size, size)
         Canvas(input).apply {
             drawColor(Color.BLACK)
             val m = Matrix().apply { setRectToRect(crop, RectF(0f, 0f, size.toFloat(), size.toFloat()), Matrix.ScaleToFit.FILL) }
@@ -87185,6 +87265,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -87619,7 +87701,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     @Composable
     private fun Notes(d: File) {
         val str = s
-        var version by remember { mutableStateOf(0) }
+        var version by remember { mutableIntStateOf(0) }
         val resumed = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState().value
         val notes by androidx.compose.runtime.produceState(emptyList<Pair<ClipNotes.Note, Bitmap?>>(), d, version, resumed) {
             value = withContext(Dispatchers.IO) { ClipNotes.list(d).map { it to ClipNotes.thumbnail(it.image) } }
@@ -87773,7 +87855,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     /** Immagine a tutto schermo: due dita per ingrandire (fino a 6×) e spostare, doppio tocco per tornare normale. */
     @Composable
     private fun ZoomDialog(bmp: Bitmap, onClose: () -> Unit) {
-        var zoom by remember { mutableStateOf(1f) }
+        var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
         androidx.compose.ui.window.Dialog(onDismissRequest = onClose, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
             androidx.compose.foundation.layout.Box(
@@ -87855,6 +87937,10 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
 import com.tennis.scoremanager.model.Side
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withClip
+import androidx.core.graphics.withTranslation
+import androidx.core.graphics.withSave
 
 /**
  * Una schermata delle statistiche come nelle dirette dei tornei: in alto titolo, risultato e torneo; ai lati i
@@ -87893,7 +87979,7 @@ object StatsCardRenderer {
         card: HighlightStats.Card, page: List<HighlightStats.Section>, width: Int, height: Int, photos: Map<Side, List<Bitmap?>>, pointsWon: String,
         avatars: Avatars? = null, credit: String = "", site: String = "",
     ): Bitmap {
-        val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val out = createBitmap(width, height)
         val c = Canvas(out)
         c.drawColor(BG)
         val scale = minOf(width / W, height / H)
@@ -87943,10 +88029,9 @@ object StatsCardRenderer {
         // I giocatori entrano dai lati.
         val slide = 1 - ease(t, 400, 700)
         for (side in Side.entries) {
-            c.save()
-            c.translate(if (side == Side.P1) -600f * slide else 600f * slide, 0f)
-            introPlayer(c, card, side, photos[side].orEmpty(), avatars)
-            c.restore()
+            c.withTranslation(if (side == Side.P1) -600f * slide else 600f * slide, 0f) {
+                introPlayer(this, card, side, photos[side].orEmpty(), avatars)
+            }
         }
         // Al centro: "VS", il confronto riga per riga, gli scontri diretti.
         val left = 580f
@@ -87959,13 +88044,13 @@ object StatsCardRenderer {
         val top = 230f + (bottom - 230f - 170f - rowH * card.rows.size) / 2 + 170f
         val vs = ease(t, 1000, 450)
         if (vs > 0) {
-            c.save()
-            val vy = if (alone) 680f else top - 45f
-            val sz = if (alone) 220f else 130f
-            val k = 0.6f + 0.4f * vs
-            c.scale(k, k, mid, vy - sz * 0.35f)
-            c.drawText("VS", mid, vy, paint(sz, YELLOW, bold = true, align = Paint.Align.CENTER).apply { alpha = (255 * vs).toInt() })
-            c.restore()
+            c.withSave {
+                val vy = if (alone) 680f else top - 45f
+                val sz = if (alone) 220f else 130f
+                val k = 0.6f + 0.4f * vs
+                scale(k, k, mid, vy - sz * 0.35f)
+                drawText("VS", mid, vy, paint(sz, YELLOW, bold = true, align = Paint.Align.CENTER).apply { alpha = (255 * vs).toInt() })
+            }
         }
         var y = top
         card.rows.forEachIndexed { i, row ->
@@ -88139,10 +88224,9 @@ object StatsCardRenderer {
             c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { this.shader = shader })
         } else {
             c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(60, Color.red(accent), Color.green(accent), Color.blue(accent)) })
-            c.save()
-            c.clipPath(Path().apply { addOval(rect, Path.Direction.CW) })
-            silhouette(c, accent, rect)
-            c.restore()
+            c.withClip(Path().apply { addOval(rect, Path.Direction.CW) }) {
+                silhouette(this, accent, rect)
+            }
         }
         c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 6f; color = accent })
     }
@@ -88384,6 +88468,7 @@ import android.net.Uri
 import android.os.Environment
 import kotlinx.serialization.json.Json
 import java.io.File
+import androidx.core.net.toUri
 
 /**
  * I video registrati dal telefono-telecamera: per ciascuno il file dei capitoli (.json, nella cartella dell'app) e
@@ -88424,10 +88509,10 @@ object VideoLibrary {
     fun delete(context: Context, e: Entry) {
         if (e.chapters.imported) {
             e.chapters.uri?.let { u ->
-                runCatching { context.contentResolver.releasePersistableUriPermission(Uri.parse(u), Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                runCatching { context.contentResolver.releasePersistableUriPermission(u.toUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             }
         } else {
-            e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(Uri.parse(u), null, null) } }
+            e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(u.toUri(), null, null) } }
             File(e.chaptersFile.parentFile, e.chapters.video).delete()
         }
         e.chaptersFile.delete()
@@ -91631,8 +91716,8 @@ cat > "$DEST/app/src/main/res/drawable/ic_stat_tennis.xml" << 'TSM_EOF'
 </vector>
 TSM_EOF
 
-# ---------------------------------------------------------------- app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-cat > "$DEST/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" << 'TSM_EOF'
+# ---------------------------------------------------------------- app/src/main/res/mipmap-anydpi/ic_launcher.xml
+cat > "$DEST/app/src/main/res/mipmap-anydpi/ic_launcher.xml" << 'TSM_EOF'
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
@@ -91643,8 +91728,8 @@ cat > "$DEST/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" << 'TSM_EOF'
 </adaptive-icon>
 TSM_EOF
 
-# ---------------------------------------------------------------- app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
-cat > "$DEST/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" << 'TSM_EOF'
+# ---------------------------------------------------------------- app/src/main/res/mipmap-anydpi/ic_launcher_round.xml
+cat > "$DEST/app/src/main/res/mipmap-anydpi/ic_launcher_round.xml" << 'TSM_EOF'
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
@@ -100602,7 +100687,6 @@ cat > "$DEST/app/src/main/res/values/colors.xml" << 'TSM_EOF'
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <color name="tsm_background">#FF0B1220</color>
-    <color name="tsm_ball">#FFC6F432</color>
 </resources>
 TSM_EOF
 
@@ -100646,8 +100730,8 @@ cat > "$DEST/app/src/main/res/xml/network_security_config.xml" << 'TSM_EOF'
 <!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <!-- Il tabellone arriva in http dal telefono dell'arbitro sulla rete locale (hotspot): niente https lì. -->
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config cleartextTrafficPermitted="true" tools:ignore="InsecureBaseConfiguration" />
 </network-security-config>
 TSM_EOF
 
@@ -121548,6 +121632,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 434 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 435 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

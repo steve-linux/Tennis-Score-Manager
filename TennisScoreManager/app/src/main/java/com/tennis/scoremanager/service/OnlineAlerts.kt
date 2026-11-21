@@ -54,7 +54,7 @@ object OnlineAlerts {
     private fun postPlayerLines(context: Context, s: Strings, items: List<Pair<String, String>>) {
         if (items.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
             context, PLAYER_ID,
             Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true),
@@ -83,7 +83,7 @@ object OnlineAlerts {
     fun postNewSeek(context: Context, s: Strings, id: String, club: String, text: String) {
         if (!allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
             context, SEEK_ID + (id.hashCode() and 0xfff),
             Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true).putExtra(EXTRA_SEEK_CLUB, club),
@@ -102,7 +102,7 @@ object OnlineAlerts {
     fun postChat(context: Context, s: Strings, room: String, club: String, title: String, text: String) {
         if (!allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val i = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true)
         // Toccandola si apre proprio quella chat, nel suo circolo (quella di un annuncio sta in Compagni).
         i.putExtra(EXTRA_SEEK_CLUB, club)
@@ -126,7 +126,7 @@ object OnlineAlerts {
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.srvAlertChannel, NotificationManager.IMPORTANCE_DEFAULT))
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, s.srvAlertChannel, NotificationManager.IMPORTANCE_DEFAULT))
         val lines = added.map { s.srvAlertNew(it) } + cancelled.map { s.srvAlertGone(it) }
         val open = PendingIntent.getActivity(
             context, ID,

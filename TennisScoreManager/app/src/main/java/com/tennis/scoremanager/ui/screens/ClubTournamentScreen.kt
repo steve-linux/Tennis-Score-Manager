@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -152,7 +153,7 @@ fun ClubTournamentScreen(c: MatchController) {
     val t = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var askDraw by remember { mutableStateOf(false) }
@@ -609,8 +610,8 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
     var doubles by remember { mutableStateOf(t?.doubles ?: false) }
     var category by remember { mutableStateOf(t?.category.orEmpty()) }
     var format by remember { mutableStateOf(t?.format ?: CTFormat.KNOCKOUT) }
-    var groups by remember { mutableStateOf(t?.groups ?: 2) }
-    var qualify by remember { mutableStateOf(t?.qualify ?: 2) }
+    var groups by remember { mutableIntStateOf(t?.groups ?: 2) }
+    var qualify by remember { mutableIntStateOf(t?.qualify ?: 2) }
     var start by remember { mutableStateOf(t?.start) }
     var end by remember { mutableStateOf(t?.end) }
     var fee by remember { mutableStateOf(t?.feeCents?.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }

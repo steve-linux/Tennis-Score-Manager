@@ -40,9 +40,7 @@ class MatchService : Service() {
         val nm = getSystemService(NotificationManager::class.java)
         val c = (application as TsmApp).controller
         val s = c.strings
-        if (Build.VERSION.SDK_INT >= 26) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, s.notifChannel, NotificationManager.IMPORTANCE_LOW))
-        }
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, s.notifChannel, NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,

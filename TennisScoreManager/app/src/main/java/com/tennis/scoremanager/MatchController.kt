@@ -130,6 +130,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
+import androidx.core.net.toUri
 
 enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, LESSONS, COACH_COURSE, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
 
@@ -2746,7 +2747,7 @@ class MatchController(
 
     fun folderLabel(): String {
         val tree = storage.historyTree ?: return if (Build.VERSION.SDK_INT >= 29) DOCUMENTS_DIR else strings.defaultFolder
-        return runCatching { DocumentsContract.getTreeDocumentId(Uri.parse(tree)).substringAfter(':').ifBlank { "/" } }
+        return runCatching { DocumentsContract.getTreeDocumentId(tree.toUri()).substringAfter(':').ifBlank { "/" } }
             .getOrDefault(strings.defaultFolder)
     }
 
@@ -2782,7 +2783,7 @@ class MatchController(
                         })
                     }
                     if (tree != null) {
-                        val treeUri = Uri.parse(tree)
+                        val treeUri = tree.toUri()
                         val parent = DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
                         for ((file, mime, write) in outputs) {
                             val doc = DocumentsContract.createDocument(app.contentResolver, parent, mime, file) ?: error("createDocument")

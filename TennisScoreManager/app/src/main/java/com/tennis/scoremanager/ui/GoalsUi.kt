@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -103,7 +104,7 @@ private fun GoalDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val kinds = GoalKind.entries
     var kind by remember { mutableStateOf(GoalKind.FIRST_SERVE) }
-    var target by remember(kind) { mutableStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
+    var target by remember(kind) { mutableDoubleStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
     val windows = listOf(3, 5, 10)
     var window by remember { mutableIntStateOf(5) }
     AlertDialog(
@@ -168,7 +169,7 @@ fun ActivityCalendarCard(c: MatchController) {
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val today = java.util.Calendar.getInstance()
-    var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
+    var ym by remember { mutableIntStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
     val days = remember(history, workouts) {
         com.tennis.scoremanager.data.ActivityCalendar.byDay(
             history.filter { it.record.finished }.map { it.record.id to (it.record.startedAt ?: it.record.updatedAt) },

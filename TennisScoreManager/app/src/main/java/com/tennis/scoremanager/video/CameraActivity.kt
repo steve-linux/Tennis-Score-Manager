@@ -73,6 +73,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -141,6 +142,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.graphics.scale
 
 /**
  * Telefono-telecamera: dietro il campo, al centro. Registra la partita in MP4 1080p e può trasmetterla in diretta
@@ -777,6 +779,8 @@ class CameraActivity : ComponentActivity() {
         val battery = runCatching {
             getSystemService(android.os.BatteryManager::class.java).getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
         }.getOrNull()?.takeIf { it in 0..100 }
+        // Solo un avviso prima di registrare: lo spazio libero visibile basta (la cache che Android può liberare non conta).
+        @android.annotation.SuppressLint("UsableSpace")
         val free = runCatching { (getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir).usableSpace / (1024 * 1024) }.getOrNull()
         controller.relay.sendCamState(
             CamState(
@@ -820,7 +824,7 @@ class CameraActivity : ComponentActivity() {
                 }
                 if (bmp != null) {
                     val jpeg = withContext(Dispatchers.Default) {
-                        val small = android.graphics.Bitmap.createScaledBitmap(bmp, PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1), true)
+                        val small = bmp.scale(PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1))
                         ByteArrayOutputStream().also { small.compress(android.graphics.Bitmap.CompressFormat.JPEG, 55, it) }.toByteArray()
                     }
                     controller.relay.sendCamFrame(jpeg)
@@ -1237,7 +1241,7 @@ class CameraActivity : ComponentActivity() {
         val msg by message.collectAsState()
         val relay by controller.relay.ui.collectAsState()
         val score by controller.relay.score.collectAsState()
-        var now by remember { mutableStateOf(SystemClock.elapsedRealtime()) }
+        var now by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
         LaunchedEffect(rec) {
             while (rec) {
                 now = SystemClock.elapsedRealtime()

@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
 
 /**
  * Piccolo server web sul telefono dell'arbitro, attivo solo con il tabellone TV acceso.
@@ -157,7 +158,7 @@ class TvServer(context: Context) {
     /** Identità di questo telefono: dopo un'interruzione il telefono-tabellone lo ritrova anche se l'indirizzo è cambiato. */
     private val serverId: String by lazy {
         val prefs = app.getSharedPreferences("tv_server", Context.MODE_PRIVATE)
-        prefs.getString("id", null) ?: java.util.UUID.randomUUID().toString().take(8).also { prefs.edit().putString("id", it).apply() }
+        prefs.getString("id", null) ?: java.util.UUID.randomUUID().toString().take(8).also { prefs.edit { putString("id", it)} }
     }
 
     /** Indirizzo da mostrare e da mettere nel QR, es. http://192.168.43.1:8080/ (null = nessuna rete locale). */

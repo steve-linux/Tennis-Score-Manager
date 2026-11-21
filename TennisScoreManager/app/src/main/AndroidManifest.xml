@@ -100,10 +100,13 @@
         </activity>
 
         <!-- Telefono usato come tabellone: pagina del telefono dell'arbitro a schermo intero, in orizzontale -->
+        <!-- Orientamenti fissi voluti (tabellone, video e telecamera in orizzontale, QR in verticale): da Android 16 i
+             tablet e gli schermi grandi li ignorano, e va bene così. -->
         <!-- Lettore QR (zxing-android-embedded): in verticale come il resto dell'app -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
             android:windowSoftInputMode="stateAlwaysHidden"
@@ -113,6 +116,7 @@
             android:name=".tv.DisplayActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
 
@@ -121,6 +125,7 @@
             android:name=".video.ReplayActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Lettore dei video delle partite, con i capitoli punto per punto -->
@@ -128,6 +133,7 @@
             android:name=".video.VideoPlayerActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Allenamento al servizio: posizione del corpo nelle clip (MoveNet, sul telefono) -->
@@ -140,6 +146,7 @@
             android:name=".video.CompareActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
@@ -147,6 +154,7 @@
             android:name=".video.CameraActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
 

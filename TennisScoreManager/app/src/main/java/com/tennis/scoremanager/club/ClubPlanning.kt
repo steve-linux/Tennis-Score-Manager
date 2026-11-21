@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import androidx.core.graphics.scale
 
 /**
  * Il planning dei campi: i campi del circolo con caratteristiche, foto e prezzi, le prenotazioni (con gli addebiti
@@ -171,7 +172,7 @@ class ClubPlanning(
                         while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= 1600) sample *= 2
                         val bmp = app.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) } ?: return@runCatching null
                         val k = 1600f / maxOf(bmp.width, bmp.height)
-                        val out = if (k < 1f) android.graphics.Bitmap.createScaledBitmap(bmp, (bmp.width * k).toInt(), (bmp.height * k).toInt(), true) else bmp
+                        val out = if (k < 1f) bmp.scale((bmp.width * k).toInt(), (bmp.height * k).toInt()) else bmp
                         val name = "c" + java.util.UUID.randomUUID().toString().take(12) + ".jpg"
                         courtPhotoFile(name).outputStream().use { out.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
                         if (out !== bmp) out.recycle()

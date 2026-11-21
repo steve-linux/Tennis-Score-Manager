@@ -75,6 +75,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -127,7 +128,7 @@ fun SummaryScreen(c: MatchController) {
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
     /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
-    var tab by remember(rec.id) { mutableStateOf(0) }
+    var tab by remember(rec.id) { mutableIntStateOf(0) }
     val fromHistory by c.summaryFromHistory.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
     /** "Condividi": immagine e testo per i social, oppure il PDF completo. */

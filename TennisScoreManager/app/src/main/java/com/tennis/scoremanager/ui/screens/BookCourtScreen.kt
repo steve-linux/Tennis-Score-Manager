@@ -90,6 +90,7 @@ import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
+import androidx.compose.runtime.mutableIntStateOf
 
 private const val B_TIME_W = 52
 private const val B_CELL_W = 104
@@ -303,7 +304,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     var rooms by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvChatRoom>>(emptyList()) }
     var people by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvPerson>?>(null) }
     var blockAsk by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var tick by remember { mutableStateOf(0) }
+    var tick by remember { mutableIntStateOf(0) }
 
     // Le proprie prenotazioni e il giorno scelto, ora e poi ogni minuto (le caselle degli altri cambiano).
     LaunchedEffect(tick) {
@@ -359,7 +360,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         // Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca.
         val boardRead = acct.chatRead["board"] ?: 0
         if (m.boardLast > boardRead) {
-            var unread by remember { mutableStateOf(0) }
+            var unread by remember { mutableIntStateOf(0) }
             LaunchedEffect(m.boardLast, boardRead) { c.book.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
             BoardBanner(s.pbBoardUnread(maxOf(1, unread))) { chatRoom = "board" to "" }
         }
@@ -439,7 +440,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
                 SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
                     c.book.setBookingReminders(on)
-                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context)) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 }
                 PinSection(c, m) { reload() }
                 GhostButton(s.pbAddClub, Icons.Filled.Add, onAddClub, Modifier.fillMaxWidth())
@@ -690,7 +691,7 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
     val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     val options = (slot..maxOf(me.rules.maxMinutes, slot) step slot).toList()
-    var minutes by remember { mutableStateOf(options.first()) }
+    var minutes by remember { mutableIntStateOf(options.first()) }
     var heating by remember { mutableStateOf(false) }
     var quote by remember { mutableStateOf<SrvQuote?>(null) }
     var err by remember { mutableStateOf<String?>(null) }
@@ -743,8 +744,8 @@ private fun SeekDialog(c: MatchController, me: SrvMe, day: SrvDay?, date: String
     val step = day?.slotMinutes ?: 60
     val mins = day?.cells?.map { ct.minutes(it.start) }?.distinct()?.sorted()?.ifEmpty { null } ?: (8 until 22).map { it * 60 }
     var d by remember { mutableStateOf(date ?: me.days.first()) }
-    var from by remember { mutableStateOf(mins.getOrElse(1) { mins.first() }) }
-    var to by remember { mutableStateOf(minOf(from + 180, mins.last() + step)) }
+    var from by remember { mutableIntStateOf(mins.getOrElse(1) { mins.first() }) }
+    var to by remember { mutableIntStateOf(minOf(from + 180, mins.last() + step)) }
     var doubles by remember { mutableStateOf(false) }
     var level by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }

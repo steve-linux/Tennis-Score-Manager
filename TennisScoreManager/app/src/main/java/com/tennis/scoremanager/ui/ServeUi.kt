@@ -428,6 +428,8 @@ const val RECENT_SESSIONS = 3
 
 /** Una sessione in elenco: data e ora, colpi dentro e percentuale. */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+// Modifier dopo extra: le chiamate passano extra per posizione.
+@Suppress("ModifierParameter")
 @Composable
 fun SessionRow(
     c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,

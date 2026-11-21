@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -71,7 +72,7 @@ fun DataScreen(c: MatchController) {
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
     var restoreAsk by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
     var copies by remember { mutableStateOf(c.backups.personalBackups()) }
-    var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
+    var wipeAsk by remember { mutableIntStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
     var closeAfter by remember { mutableStateOf(false) }
     val videoMb by produceState(0L) {
         value = withContext(Dispatchers.IO) { Backup.videoBytes(context, c.storage, s.strokeFolderName) / 1_048_576 }

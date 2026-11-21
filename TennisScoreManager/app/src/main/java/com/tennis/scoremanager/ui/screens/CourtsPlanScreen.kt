@@ -57,6 +57,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -157,7 +159,7 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     val tournaments by c.competitions.clubTournaments.collectAsState()
     val lang = c.options.collectAsState().value.lang
     val courts by c.planning.clubCourts.collectAsState()
-    var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
+    var day by rememberSaveable { mutableLongStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
     val askedDay by c.serverArea.planDayRequest.collectAsState()
     androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.serverArea.planDayRequest.value = null } }
@@ -265,7 +267,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val tournaments by c.competitions.clubTournaments.collectAsState()
     val courts = c.storage.clubCourts
     var b by remember { mutableStateOf(b0) }
-    var weeks by remember { mutableStateOf(1) }
+    var weeks by remember { mutableIntStateOf(1) }
     var guests by remember { mutableStateOf(b0.names.joinToString(", ")) }
     var priceText by remember { mutableStateOf(if (isNew) "" else plain(b0.cents, lang)) }
     var manualPrice by remember { mutableStateOf(!isNew) }

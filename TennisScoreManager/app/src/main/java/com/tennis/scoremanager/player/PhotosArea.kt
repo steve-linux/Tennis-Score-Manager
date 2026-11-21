@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.graphics.scale
 
 /**
  * Le foto: quella di ogni giocatore (ritagliata quadrata, anche sul tabellone TV), il ritratto di uomo o di donna
@@ -59,7 +60,7 @@ class PhotosArea(
                     }
                     val side = minOf(src.width, src.height)
                     val square = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
-                    val small = Bitmap.createScaledBitmap(square, MatchController.PHOTO_PX, MatchController.PHOTO_PX, true)
+                    val small = square.scale(MatchController.PHOTO_PX, MatchController.PHOTO_PX)
                     val out = ByteArrayOutputStream()
                     small.compress(Bitmap.CompressFormat.JPEG, 85, out)
                     storage.savePhoto(key, out.toByteArray())
@@ -142,7 +143,7 @@ class PhotosArea(
             app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
         }
         val scale = minOf(1f, maxSide.toFloat() / maxOf(src.width, src.height))
-        val img = if (scale < 1f) Bitmap.createScaledBitmap(src, (src.width * scale).toInt(), (src.height * scale).toInt(), true) else src
+        val img = if (scale < 1f) src.scale((src.width * scale).toInt(), (src.height * scale).toInt()) else src
         return ByteArrayOutputStream().also { img.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
     }
 

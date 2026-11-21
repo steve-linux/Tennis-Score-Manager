@@ -39,6 +39,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -78,13 +80,13 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier.fillMaxWidth(), onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier, onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
         val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis() }
         DatePickerDialog(context, { _, y, m, d -> onPick(noonOf(y, m, d)) }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-    }, modifier)
+    }, modifier.fillMaxWidth())
 }
 
 @Composable
@@ -120,7 +122,7 @@ fun PaymentsScreen(c: MatchController) {
     val year = Members.year(now)
     var editFee by remember { mutableStateOf<Fee?>(null) }
     var newFee by remember { mutableStateOf(false) }
-    var exportYear by remember { mutableStateOf(year) }
+    var exportYear by remember { mutableIntStateOf(year) }
     var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.12") },
@@ -426,7 +428,7 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
-    var at by remember { mutableStateOf(today()) }
+    var at by remember { mutableLongStateOf(today()) }
     // I modi di pagamento del circolo: il primo è quello proposto.
     val types = remember { c.planning.payTypes() }
     var type by remember { mutableStateOf(types.first()) }

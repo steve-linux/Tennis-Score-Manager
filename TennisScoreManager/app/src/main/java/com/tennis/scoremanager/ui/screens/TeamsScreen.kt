@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -127,7 +128,7 @@ fun TeamScreen(c: MatchController) {
     val id by c.competitions.openTeamId.collectAsState()
     val t = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     val now = System.currentTimeMillis()

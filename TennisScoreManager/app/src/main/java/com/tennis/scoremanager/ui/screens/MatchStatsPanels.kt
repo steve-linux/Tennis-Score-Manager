@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -346,7 +347,7 @@ fun MatchChronologyTab(rec: MatchRecord, names: Names) {
     val s = LocalStrings.current
     val games = remember(rec) { MatchStats.chronology(MatchStats.points(rec)) }
     val sets = (games.maxOfOrNull { it.set } ?: -1) + 1
-    var set by remember(rec.id) { mutableStateOf(0) }
+    var set by remember(rec.id) { mutableIntStateOf(0) }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (sets > 1) {
             Segmented((1..sets).map { SegOption(s.periodSet(it)) }, selected = set.coerceIn(0, sets - 1), onSelect = { set = it })

@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -61,10 +62,12 @@ import com.tennis.scoremanager.data.StudentProposal
 import com.tennis.scoremanager.ui.screens.shortDate
 import java.io.File
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 /** Il colore dell'etichetta di un corso ("#RRGGBB"). */
 fun courseColor(hex: String): androidx.compose.ui.graphics.Color =
-    runCatching { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(hex)) }.getOrDefault(TsmColors.Ball)
+    runCatching { androidx.compose.ui.graphics.Color(hex.toColorInt()) }.getOrDefault(TsmColors.Ball)
 
 /** I pallini dei colori tra cui scegliere l'etichetta di un corso; quello scelto ha il bordo. */
 @Composable
@@ -144,9 +147,9 @@ fun CoachCourseEditDialog(c: MatchController, cc: CoachCourse?, onDone: (String?
     val isBusy = { t: Long -> Coaching.busyOn(busyList, t) != null }
     val skip = { t: Long -> (skipHolidays && isHoliday(t)) || (skipBusy && isBusy(t)) }
     // L'orario da aggiungere: giorno (1 = lunedì), ora, durata, dove.
-    var wd by remember { mutableStateOf(1) }
-    var startMin by remember { mutableStateOf(17 * 60) }
-    var minutes by remember { mutableStateOf(60) }
+    var wd by remember { mutableIntStateOf(1) }
+    var startMin by remember { mutableIntStateOf(17 * 60) }
+    var minutes by remember { mutableIntStateOf(60) }
     var place by remember { mutableStateOf("") }
     fun dayName(d: Int) = java.time.DayOfWeek.of(d).getDisplayName(java.time.format.TextStyle.SHORT, lang.locale)
     fun hm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
@@ -223,7 +226,7 @@ fun CoachCourseScreen(c: MatchController) {
     val co = cc.course
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
-    var tab by rememberSaveable { mutableStateOf(1) }
+    var tab by rememberSaveable { mutableIntStateOf(1) }
     var open by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
     var register by remember { mutableStateOf(false) }
@@ -517,7 +520,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val book by c.coaching.coachBook.collectAsState()
-    var back by remember { mutableStateOf(0) }
+    var back by remember { mutableIntStateOf(0) }
     val cal = java.util.Calendar.getInstance().apply { timeInMillis = CourtPlans.dayStart(System.currentTimeMillis()); set(java.util.Calendar.DAY_OF_MONTH, 1); add(java.util.Calendar.MONTH, -back) }
     val from = cal.timeInMillis
     val to = (cal.clone() as java.util.Calendar).apply { add(java.util.Calendar.MONTH, 1) }.timeInMillis
@@ -544,7 +547,7 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
         confirmButton = {
             TextButton(onClick = {
                 val wa = Notices.waNumber(c.coaching.coachOffice())
-                val i = if (wa != null) android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://wa.me/$wa?text=" + android.net.Uri.encode(text)))
+                val i = if (wa != null) android.content.Intent(android.content.Intent.ACTION_VIEW, ("https://wa.me/$wa?text=" + android.net.Uri.encode(text)).toUri())
                 else android.content.Intent.createChooser(android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, text), null)
                 runCatching { context.startActivity(i) }
             }) { Text(s.cmSend) }

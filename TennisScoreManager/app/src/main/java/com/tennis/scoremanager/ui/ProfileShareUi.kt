@@ -129,12 +129,12 @@ fun SendProfileDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) 
 
 /** Ricevi un profilo: legge il QR mostrato dall'altro telefono (il file invece si apre con Condividi › TSM). */
 @Composable
-fun ReceiveProfileButton(c: MatchController, modifier: Modifier = Modifier.fillMaxWidth()) {
+fun ReceiveProfileButton(c: MatchController, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.profiles.receiveProfileQr(it) } }
     GhostButton(s.pfReceive, Icons.Filled.QrCodeScanner, {
         scanner.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.pfScanPrompt).setBeepEnabled(false).setOrientationLocked(true))
-    }, modifier)
+    }, modifier.fillMaxWidth())
 }
 
 /**

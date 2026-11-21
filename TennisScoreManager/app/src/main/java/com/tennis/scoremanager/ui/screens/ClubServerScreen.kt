@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -86,7 +87,7 @@ private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (S
     var t by remember { mutableStateOf<SrvTunnel?>(null) }
     var err by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
-    var kick by remember { mutableStateOf(0) }
+    var kick by remember { mutableIntStateOf(0) }
     LaunchedEffect(kick) {
         while (true) {
             c.serverArea.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
@@ -193,7 +194,7 @@ private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data
     val conf by c.clubServer.collectAsState()
     var local by remember { mutableStateOf<Boolean?>(null) }
     var remote by remember { mutableStateOf<Boolean?>(null) }
-    var round by remember { mutableStateOf(0) }
+    var round by remember { mutableIntStateOf(0) }
     LaunchedEffect(round, publicUrl) {
         while (true) {
             local = null; remote = null
@@ -284,7 +285,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     TunnelSection(c, publicUrl) { publicUrl = it; c.serverArea.saveServerRules(rules, pay, it) }
                     SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
                         c.serverArea.setServerAlerts(on)
-                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)
+                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context))
                             notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                     }
                     if (conf.alerts && !notifOk) Text(s.srvAlertsOff, color = TsmColors.Orange, fontSize = 12.sp)

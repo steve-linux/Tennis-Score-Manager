@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Avvisi di lint spenti di proposito: così ogni avviso nuovo si vede subito. -->
+<lint>
+    <!-- Le versioni di Gradle e delle librerie si aggiornano a mano e con una prova: litert-api deve restare alla 1.x
+         per F-Droid (controllo nella build di GitHub) e ogni libreria nuova va guardata prima di entrare. -->
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <!-- Codice di BouncyCastle, portato da RootEncoder (modulo whip), non dell'app. -->
+    <issue id="TrustAllX509TrustManager">
+        <ignore path="**/bctls-*.jar" />
+        <ignore path="**/bcpkix-*.jar" />
+    </issue>
+</lint>

@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -225,8 +226,8 @@ fun LadderScreen(c: MatchController) {
 
     if (settings) {
         var nm by remember { mutableStateOf(l.name) }
-        var reach by remember { mutableStateOf(l.reach) }
-        var days by remember { mutableStateOf(l.days) }
+        var reach by remember { mutableIntStateOf(l.reach) }
+        var days by remember { mutableIntStateOf(l.days) }
         var del by remember { mutableStateOf(false) }
         @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
             Text(label, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))

@@ -24,6 +24,7 @@ import com.tennis.scoremanager.ui.stringsFor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.graphics.createBitmap
 
 /** Resoconto finale della partita: testo, JSON e immagine da condividere. */
 object Reports {
@@ -206,7 +207,7 @@ object Reports {
     fun renderCard(rec: MatchRecord, state: MatchState, s: Strings, names: Names): Bitmap {
         val w = 1080
         val h = 1350
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         val bg = Paint().apply {
             shader = LinearGradient(0f, 0f, 0f, h.toFloat(), Color.rgb(12, 18, 32), Color.rgb(10, 60, 48), Shader.TileMode.CLAMP)
