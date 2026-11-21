@@ -70,7 +70,7 @@ fun SettingsScreen(c: MatchController) {
         SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             // Bloccata mentre si generano i file vocali (sono nella lingua di adesso).
-            val generating = c.voiceProgress.collectAsState().value != null
+            val generating = c.voiceArea.voiceProgress.collectAsState().value != null
             Segmented(
                 Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
                 selected = o.lang.ordinal,

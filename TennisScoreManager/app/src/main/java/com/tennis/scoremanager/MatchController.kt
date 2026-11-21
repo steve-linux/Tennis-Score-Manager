@@ -196,8 +196,8 @@ class MatchController(
     val storage: Storage,
     val ble: BleManager,
     override val heart: HeartRateManager,
-    val voice: VoicePack,
-    val announcer: Announcer,
+    override val voice: VoicePack,
+    override val announcer: Announcer,
 ) : com.tennis.scoremanager.club.ClubHost, com.tennis.scoremanager.coach.CoachHost, com.tennis.scoremanager.player.PlayerHost {
     companion object {
         const val SHOT_CLOCK_S = 25          // ITF: 25" tra un punto e l'altro
@@ -275,10 +275,8 @@ class MatchController(
     override val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
     val summaryFromHistory = MutableStateFlow(false)
-    val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
-    /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
-    val voiceCount = MutableStateFlow(0)
-    val customVoiceCount = MutableStateFlow(0)
+    /** La voce dell'arbitro nelle impostazioni: vedi VoiceSettings. */
+    val voiceArea = com.tennis.scoremanager.player.VoiceSettings(this, app, storage, scope, io)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
     /** Chi indossa la fascia cardio di ciascun lato (per le calorie). */
     override val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
@@ -319,7 +317,9 @@ class MatchController(
 
     override val strings: Strings get() = stringsFor(options.value.lang)
     fun names(s: SetupData = setup.value): Names = Names(s, strings)
-    private fun calls() = CallBuilder(options.value.lang)
+    /** I nomi della partita che si sta preparando o giocando (per [PlayerHost]). */
+    override fun names(): Names = names(setup.value)
+    override fun calls() = CallBuilder(options.value.lang)
 
     private var runningSince: Long? = null
     private var cdKind: CountdownKind? = null
@@ -397,7 +397,7 @@ class MatchController(
         announcer.useGeneratedFiles = options.value.voiceFiles
         announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
         scope.launch(io) { voice.writeReadme(strings) }
-        refreshVoiceCount()
+        voiceArea.refreshVoiceCount()
         updateBandLinks()
         if (options.value.heartRate) restoreStraps()
         remotes.enabled = options.value.mode == PlayMode.REMOTES
@@ -682,7 +682,7 @@ class MatchController(
         announcer.useGeneratedFiles = v.voiceFiles
         if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
         if (old.lang != v.lang) {
-            refreshVoiceCount()
+            voiceArea.refreshVoiceCount()
             val s = strings
             scope.launch(io) { voice.writeReadme(s) }
             syncBandLanguage(ble.bands.value)
@@ -2802,78 +2802,6 @@ class MatchController(
     }
 
     // ---------------------------------------------------------------- voce
-
-    fun refreshVoiceCount() {
-        val l = options.value.lang
-        scope.launch {
-            val (gen, rec) = withContext(io) {
-                voice.refresh(l)
-                voice.generatedCount(l) to voice.customCount(l)
-            }
-            voiceCount.value = gen
-            customVoiceCount.value = rec
-        }
-    }
-
-    fun generateVoice() {
-        if (voiceProgress.value != null) return
-        val l = options.value.lang
-        scope.launch {
-            voiceProgress.value = 0 to com.tennis.scoremanager.voice.Phrases.keys.size
-            val r = try {
-                announcer.generateVoicePack(l) { i, n -> voiceProgress.value = i to n }
-            } finally {
-                voiceProgress.value = null
-            }
-            refreshVoiceCount()
-            _toasts.tryEmit(if (r.installed) strings.voiceFiles(r.created, r.total) else strings.voiceGenerationFailed)
-        }
-    }
-
-    fun importVoiceZip(uri: Uri) {
-        val l = options.value.lang
-        scope.launch {
-            // ZIP rovinato o troncato: le registrazioni restano com'erano e si avvisa (non "0 file").
-            val n = withContext(io) {
-                runCatching { voice.importZip(uri, l) }.onFailure { android.util.Log.w("Voice", "Import ZIP", it) }.getOrNull()
-            }
-            refreshVoiceCount()
-            _toasts.tryEmit(if (n == null) strings.voiceImportFailed else strings.voiceFiles(n, com.tennis.scoremanager.voice.Phrases.keys.size))
-        }
-    }
-
-    fun deleteCustomVoice() {
-        val l = options.value.lang
-        scope.launch {
-            withContext(io) { voice.deleteCustom(l) }
-            refreshVoiceCount()
-        }
-    }
-
-    /** Prova voce; lo stesso tasto la ferma ([stopVoiceTest]). */
-    fun testVoice() {
-        val n = names()
-        announcer.announce(
-            force = true,
-            name = VOICE_TEST,
-            segs = listOf(Seg.Clip("first_set"), Seg.Pause(700)) + calls().toServe(n.side(Side.P1)) + listOf(
-                Seg.Pause(700),
-                Seg.Clip("score_1_0"), Seg.Pause(500),
-                Seg.Clip("deuce"), Seg.Pause(500),
-                Seg.Clip("advantage"), Seg.Say(n.side(Side.P2)), Seg.Pause(500),
-                Seg.Clip("game"), Seg.Say(n.side(Side.P1)), Seg.Pause(300),
-                Seg.Say(n.side(Side.P1)), Seg.Clip("leads"), Seg.Clip("games_1_0"), Seg.Pause(500),
-                Seg.Clip("change_ends"), Seg.Pause(700),
-                Seg.Clip("game"), Seg.Say(n.side(Side.P2)), Seg.Pause(300),
-                Seg.Clip("games_all_6"), Seg.Clip("tiebreak"),
-            ),
-        )
-    }
-
-    /** Ferma la prova voce (e solo quella: una chiamata di partita non si tocca). */
-    fun stopVoiceTest() {
-        if (announcer.playing.value == VOICE_TEST) announcer.stop()
-    }
 
     // ---------------------------------------------------------------- riepilogo
 

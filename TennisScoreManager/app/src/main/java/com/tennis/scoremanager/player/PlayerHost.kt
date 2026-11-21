@@ -76,4 +76,11 @@ interface PlayerHost {
     val clubBook: MutableStateFlow<ClubBook>
     fun saveClubBook(book: ClubBook)
     val photos: PhotosArea
+
+    // Voce dell'arbitro.
+    val voice: com.tennis.scoremanager.voice.VoicePack
+    val announcer: com.tennis.scoremanager.voice.Announcer
+    /** I nomi della partita che si sta preparando o giocando. */
+    fun names(): com.tennis.scoremanager.data.Names
+    fun calls(): com.tennis.scoremanager.voice.CallBuilder
 }
