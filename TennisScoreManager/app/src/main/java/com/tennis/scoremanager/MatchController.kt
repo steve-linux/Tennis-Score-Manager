@@ -527,7 +527,8 @@ class MatchController(
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
         PlayerStats.names(su, side).map { n ->
             storage.photoFile(PlayerStats.key(n)).takeIf { it.exists() }?.let { "/photo/${it.name}?v=${photosVersion.value}" }
-                ?: "/avatar/${if (photos.isFemale(n)) "woman" else "man"}.webp"
+                // Non photos.isFemale: publishTv gira già durante l'avvio, quando photos non c'è ancora (stessa regola).
+                ?: "/avatar/${if (storage.playerSex(PlayerStats.key(n)) == "F") "woman" else "man"}.webp"
         }
     }
 
@@ -578,7 +579,9 @@ class MatchController(
 
     /** Il torneo sul tabellone, rifatto a ogni invio: così i risultati nuovi si vedono subito. */
     private fun tvClubSnapshot(): com.tennis.scoremanager.tv.TvClub? {
-        val t = competitions.clubTournament(tvClubTournament.value) ?: return null
+        // Prima il torneo scelto: all'avvio non ce n'è (non si salva) e competitions non è ancora creato.
+        val id = tvClubTournament.value ?: return null
+        val t = competitions.clubTournament(id) ?: return null
         val s = strings; val lang = options.value.lang
         fun n(id: String?) = if (id == null) "" else entryNameOf(t, id)
         val pages = mutableListOf<com.tennis.scoremanager.tv.TvClubPage>()
