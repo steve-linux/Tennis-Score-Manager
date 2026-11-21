@@ -468,17 +468,17 @@ private fun MatchNotesCard(c: MatchController, id: String, saved: String) {
 private fun MatchPhotosCard(c: MatchController, id: String) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val version by c.matchPhotosVersion.collectAsState()
-    val photos = remember(id, version) { c.matchPhotos(id) }
+    val version by c.photos.matchPhotosVersion.collectAsState()
+    val photos = remember(id, version) { c.photos.matchPhotos(id) }
     val left = Storage.MAX_MATCH_PHOTOS - photos.size
     var open by remember { mutableStateOf<java.io.File?>(null) }
     var cameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
-    val pickMany = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(Storage.MAX_MATCH_PHOTOS)) { c.addMatchPhotos(it) }
+    val pickMany = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(Storage.MAX_MATCH_PHOTOS)) { c.photos.addMatchPhotos(it) }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
-        cameraUri?.let { if (ok) c.addMatchPhotos(listOf(it)) }
+        cameraUri?.let { if (ok) c.photos.addMatchPhotos(listOf(it)) }
     }
     fun shoot() {
-        val u = c.cameraUri()
+        val u = c.photos.cameraUri()
         cameraUri = u
         camera.launch(u)
     }
@@ -518,7 +518,7 @@ private fun MatchPhotosCard(c: MatchController, id: String) {
             onDismissRequest = { open = null },
             text = { if (big != null) Image(big, null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxWidth()) },
             confirmButton = { TextButton(onClick = { open = null }) { Text(s.ok) } },
-            dismissButton = { TextButton(onClick = { c.removeMatchPhoto(f); open = null }) { Text(s.photoRemove) } },
+            dismissButton = { TextButton(onClick = { c.photos.removeMatchPhoto(f); open = null }) { Text(s.photoRemove) } },
         )
     }
 }

@@ -549,12 +549,12 @@ class VideoPlayerActivity : ComponentActivity() {
             // Il sesso detto in pagina 1 per quel nome vale anche se la partita non lo ricorda.
             val card = base.copy(players = base.players.mapValues { (side, p) ->
                 val real = HighlightStats.photoNames(rec, side)
-                p.copy(female = p.names.mapIndexed { i, n -> p.female.getOrNull(i) ?: if (n in real && controller.isFemale(n)) true else null })
+                p.copy(female = p.names.mapIndexed { i, n -> p.female.getOrNull(i) ?: if (n in real && controller.photos.isFemale(n)) true else null })
             })
             // Foto di chi ha il nome scritto; agli altri l'avatar con le iniziali.
             val photos = Side.entries.associateWith { side ->
                 val real = HighlightStats.photoNames(rec, side)
-                card.players[side]?.names.orEmpty().map { n -> if (n in real) controller.loadPhoto(n) else null }
+                card.players[side]?.names.orEmpty().map { n -> if (n in real) controller.photos.loadPhoto(n) else null }
             }
             val avatars = runCatching {
                 StatsCardRenderer.Avatars(
@@ -569,7 +569,7 @@ class VideoPlayerActivity : ComponentActivity() {
             val intro = if (introRec == null) null else runCatching {
                 val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
                 val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.isFemale(it) }
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.photos.isFemale(it) }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,

@@ -247,7 +247,7 @@ class MatchController(
     val setup = MutableStateFlow(storage.setup)
     override val options = MutableStateFlow(storage.options)
     val live = MutableStateFlow<LiveMatch?>(null)
-    val summary = MutableStateFlow<LiveMatch?>(null)
+    override val summary = MutableStateFlow<LiveMatch?>(null)
     val clockMs = MutableStateFlow(0L)
     val countdown = MutableStateFlow<CountdownUi?>(null)
     val message = MutableStateFlow<String?>(null)
@@ -532,7 +532,7 @@ class MatchController(
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
         PlayerStats.names(su, side).map { n ->
             storage.photoFile(PlayerStats.key(n)).takeIf { it.exists() }?.let { "/photo/${it.name}?v=${photosVersion.value}" }
-                ?: "/avatar/${if (isFemale(n)) "woman" else "man"}.webp"
+                ?: "/avatar/${if (photos.isFemale(n)) "woman" else "man"}.webp"
         }
     }
 
@@ -1323,7 +1323,7 @@ class MatchController(
         val list = players.value.filter { it.id != st.id }
         players.value = list
         if (trainStudent.value == id) setTrainStudent(null)
-        removePhoto(st.name)
+        photos.removePhoto(st.name)
         // Dal registro del circolo via gli addebiti non pagati; i pagamenti fatti restano col nome (contabilità).
         saveClubBook(com.tennis.scoremanager.data.Fees.forget(clubBook.value, setOf(st.id) + st.aliases))
         racketArea.rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { racketArea.saveRacket(it.copy(owner = "")) }
@@ -3063,69 +3063,8 @@ class MatchController(
 
     // ---------------------------------------------------------------- foto dei giocatori
 
-    /** Foto del giocatore col nome [name], ritagliata quadrata e rimpicciolita; null se non c'è. */
-    fun loadPhoto(name: String): Bitmap? {
-        val key = PlayerStats.key(name)
-        if (key.isEmpty()) return null
-        val f = storage.photoFile(key)
-        return if (f.exists()) BitmapFactory.decodeFile(f.absolutePath) else null
-    }
-
-    /** Foto scelta dalla galleria o scattata: si salva quadrata (centro dell'immagine) a [PHOTO_PX] pixel. */
-    fun setPhoto(name: String, uri: Uri) {
-        val key = PlayerStats.key(name)
-        if (key.isEmpty()) return
-        scope.launch {
-            val ok = withContext(io) {
-                runCatching {
-                    // ImageDecoder (Android 9+) raddrizza le foto girate (EXIF); prima si legge com'è.
-                    val src = if (Build.VERSION.SDK_INT >= 28) {
-                        ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
-                            val side = minOf(info.size.width, info.size.height)
-                            d.setTargetSampleSize((side / (PHOTO_PX * 2)).coerceAtLeast(1))
-                            d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                        }
-                    } else {
-                        app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
-                    }
-                    val side = minOf(src.width, src.height)
-                    val square = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
-                    val small = Bitmap.createScaledBitmap(square, PHOTO_PX, PHOTO_PX, true)
-                    val out = ByteArrayOutputStream()
-                    small.compress(Bitmap.CompressFormat.JPEG, 85, out)
-                    storage.savePhoto(key, out.toByteArray())
-                }.isSuccess
-            }
-            if (ok) photosVersion.value++ else _toasts.tryEmit(strings.photoError)
-            publishTv()
-        }
-    }
-
-    /** Donna solo se lo si è detto per quel nome; altrimenti (uomo o non detto) il ritratto è quello dell'uomo. */
-    fun isFemale(name: String): Boolean = storage.playerSex(PlayerStats.key(name)) == "F"
-
-    /** "M", "F" o "" per il giocatore [name]: vale per tutti i suoi avatar, finché non ha una foto. */
-    fun setPlayerSex(name: String, sex: String) {
-        val key = PlayerStats.key(name)
-        if (key.isEmpty()) return
-        storage.setPlayerSex(key, sex)
-        photosVersion.value++
-        publishTv()
-    }
-
-    /** Il ritratto di uomo o di donna per chi non ha la foto (PDF e highlights). */
-    fun avatarBitmap(female: Boolean): Bitmap =
-        BitmapFactory.decodeResource(app.resources, if (female) R.drawable.avatar_woman else R.drawable.avatar_man)
-
-    fun removePhoto(name: String) {
-        val key = PlayerStats.key(name)
-        if (key.isEmpty()) return
-        scope.launch {
-            withContext(io) { storage.deletePhoto(key) }
-            photosVersion.value++
-            publishTv()
-        }
-    }
+    /** Foto dei giocatori e foto ricordo delle partite: vedi PhotosArea. */
+    val photos = com.tennis.scoremanager.player.PhotosArea(this, app, storage, scope, io)
 
     // ---------------------------------------------------------------- note della partita
 
@@ -3187,63 +3126,6 @@ class MatchController(
                 if (!fromHistory) storage.saveLastFinished(rec)
             }
         }
-    }
-
-    // ---------------------------------------------------------------- foto ricordo della partita
-
-    /** Cresce a ogni foto della partita aggiunta o tolta. */
-    val matchPhotosVersion = MutableStateFlow(0)
-
-    fun matchPhotos(id: String): List<File> = storage.matchPhotos(id)
-
-    /** Foto aggiunte al riepilogo a schermo: rimpicciolite a [MATCH_PHOTO_PX] sul lato lungo, fino a 10 per partita. */
-    fun addMatchPhotos(uris: List<Uri>) {
-        val id = summary.value?.record?.id ?: return
-        val s = strings
-        scope.launch {
-            val (added, full) = withContext(io) {
-                var added = 0
-                var full = false
-                for (uri in uris) {
-                    if (storage.matchPhotos(id).size >= Storage.MAX_MATCH_PHOTOS) { full = true; break }
-                    val jpeg = runCatching { scaledJpeg(uri, MATCH_PHOTO_PX) }.getOrNull() ?: continue
-                    if (storage.addMatchPhoto(id, jpeg)) added++
-                }
-                added to full
-            }
-            matchPhotosVersion.value++
-            if (full) _toasts.tryEmit(s.matchPhotosFull)
-            else if (added == 0) _toasts.tryEmit(s.photoError)
-        }
-    }
-
-    fun removeMatchPhoto(file: File) {
-        scope.launch {
-            withContext(io) { file.delete() }
-            matchPhotosVersion.value++
-        }
-    }
-
-    /** Foto [uri] rimpicciolita (lato lungo [maxSide]) in JPEG; ImageDecoder (Android 9+) la raddrizza. */
-    private fun scaledJpeg(uri: Uri, maxSide: Int): ByteArray {
-        val src = if (Build.VERSION.SDK_INT >= 28) {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
-                val long = maxOf(info.size.width, info.size.height)
-                d.setTargetSampleSize((long / maxSide).coerceAtLeast(1))
-                d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-            }
-        } else {
-            app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
-        }
-        val scale = minOf(1f, maxSide.toFloat() / maxOf(src.width, src.height))
-        val img = if (scale < 1f) Bitmap.createScaledBitmap(src, (src.width * scale).toInt(), (src.height * scale).toInt(), true) else src
-        return ByteArrayOutputStream().also { img.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
-    }
-
-    /** File dove la fotocamera salva la foto da aggiungere al riepilogo (nella cache condivisibile). */
-    fun cameraUri(): Uri {
-        val f = File(File(app.cacheDir, "share").apply { mkdirs() }, "camera.jpg")
-        return FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", f)
     }
 
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
@@ -3535,7 +3417,7 @@ class MatchController(
         val n = summaryNames()
         PdfReport.write(
             out, sm.record, sm.state, s, n, Reports.renderCard(sm.record, sm.state, s, n),
-            storage.matchPhotos(sm.record.id), playerPhoto = { loadPhoto(it) ?: avatarBitmap(isFemale(it)) },
+            storage.matchPhotos(sm.record.id), playerPhoto = { photos.loadPhoto(it) ?: photos.avatarBitmap(photos.isFemale(it)) },
         )
     }
 

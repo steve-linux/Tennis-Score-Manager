@@ -399,7 +399,7 @@ fun PlayerEditDialog(
                 )
                 c.savePlayer(p)
                 // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.
-                if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.setPlayerSex(p.name, sex)
+                if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.photos.setPlayerSex(p.name, sex)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
                 racket?.let { c.racketArea.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.racketArea.saveRacket(it.copy(owner = p.name)) }
                 onDone(p)

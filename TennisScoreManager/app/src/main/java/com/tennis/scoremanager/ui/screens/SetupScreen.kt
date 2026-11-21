@@ -349,7 +349,7 @@ private fun SexChoice(c: MatchController, name: String, field: String, accent: C
             val v = if (i == 0) "M" else "F"
             val next = if (v == value) "" else v
             onChange(next)
-            c.setPlayerSex(name, next)
+            c.photos.setPlayerSex(name, next)
         },
     )
 }

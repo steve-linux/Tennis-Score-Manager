@@ -42,4 +42,8 @@ interface PlayerHost {
     fun updateSetup(transform: (SetupData) -> SetupData)
     /** Un messaggio breve in basso sullo schermo. */
     fun toast(text: String)
+    /** Il riepilogo aperto (le foto ricordo vanno a quella partita). */
+    val summary: MutableStateFlow<LiveMatch?>
+    /** Ridisegna il tabellone TV (le foto dei giocatori ci compaiono). */
+    fun publishTv()
 }
