@@ -440,7 +440,7 @@ class CameraActivity : ComponentActivity() {
         val student = controller.studentById(controller.trainStudent.value ?: agenda?.students?.singleOrNull())
         val folder = if (lessonMode) controller.storage.newLessonFolder(serveSession.value.startedAt, s.strokeFolderName, s.lessonFolder, student?.name)
         else controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
-        val racket = student?.racket?.let { controller.racketById(it) }?.use()
+        val racket = student?.racket?.let { controller.racketArea.racketById(it) }?.use()
         // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
         drill.value = if (lessonMode) null else controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
         serveSession.value = serveSession.value.copy(

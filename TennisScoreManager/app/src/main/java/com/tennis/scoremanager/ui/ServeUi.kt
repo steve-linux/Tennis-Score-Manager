@@ -274,7 +274,7 @@ fun PlayerEditDialog(
     var hand by remember { mutableStateOf(player?.hand) }
     var racket by remember { mutableStateOf(player?.racket) }
     var newRacket by remember { mutableStateOf<com.tennis.scoremanager.data.Racket?>(null) }
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     // Il resto della scheda: sesso (prima era solo per nome), nascita, fisico, circolo, rovescio, allievo, contatti.
     var sex by remember { mutableStateOf(player?.sex?.ifBlank { null } ?: player?.let { c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(it.name)) }.orEmpty()) }
     var birth by remember { mutableStateOf(player?.birth) }
@@ -381,7 +381,7 @@ fun PlayerEditDialog(
                 )
                 // Una racchetta che non c'è ancora si crea da qui, senza passare da Le mie racchette.
                 GhostButton(s.racketNew, androidx.compose.material.icons.Icons.Filled.SportsTennis, {
-                    newRacket = com.tennis.scoremanager.data.Racket(c.newRacketId(), owner = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick))
+                    newRacket = com.tennis.scoremanager.data.Racket(c.racketArea.newRacketId(), owner = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick))
                 }, Modifier.fillMaxWidth())
             }
         },
@@ -401,7 +401,7 @@ fun PlayerEditDialog(
                 // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.
                 if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.setPlayerSex(p.name, sex)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
-                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = p.name)) }
+                racket?.let { c.racketArea.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.racketArea.saveRacket(it.copy(owner = p.name)) }
                 onDone(p)
             }) { Text(s.ok) }
         },
@@ -416,7 +416,7 @@ fun PlayerEditDialog(
                 com.tennis.scoremanager.ui.screens.RacketEditor(c, r, isNew = true) {
                     newRacket = null
                     // Salvata: è la sua.
-                    if (c.racketById(r.id) != null) racket = r.id
+                    if (c.racketArea.racketById(r.id) != null) racket = r.id
                 }
             }
         }

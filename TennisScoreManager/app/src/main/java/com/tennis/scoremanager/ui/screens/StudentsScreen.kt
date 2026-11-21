@@ -148,7 +148,7 @@ fun StudentsScreen(c: MatchController) {
                         s.studentSessions(mine.size) + " · " + (last?.let { s.studentLast(Reports.date(it, lang)) } ?: s.coNever),
                         color = TsmColors.TextDim, fontSize = 13.sp,
                     )
-                    st.racket?.let { c.racketById(it) }?.label?.takeIf { it.isNotBlank() }?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
+                    st.racket?.let { c.racketArea.racketById(it) }?.label?.takeIf { it.isNotBlank() }?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
                     // Come va dall'ultima valutazione tecnica, e la classifica.
                     val tr = com.tennis.scoremanager.data.Coaching.trend(book, st.id)
                     val rk = com.tennis.scoremanager.data.Coaching.ranking(book, st.id)
@@ -251,10 +251,10 @@ fun StudentScreen(c: MatchController) {
             c.savePlayer(st.copy(student = on))
         }
         // La racchetta con l'incordatura montata adesso; toccandola si apre Le mie racchette.
-        val rackets by c.rackets.collectAsState()
+        val rackets by c.racketArea.rackets.collectAsState()
         val racket = st.racket?.let { r -> rackets.firstOrNull { it.id == r } }
         Row(
-            Modifier.fillMaxWidth().clickable { if (racket != null) c.openRackets() else edit = true }.padding(vertical = 4.dp),
+            Modifier.fillMaxWidth().clickable { if (racket != null) c.racketArea.openRackets() else edit = true }.padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball)

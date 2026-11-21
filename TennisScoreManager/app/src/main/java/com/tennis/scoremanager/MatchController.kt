@@ -263,7 +263,7 @@ class MatchController(
      * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
      * col tabellone acceso, all'avvio publishTv la legge subito.
      */
-    val photosVersion = MutableStateFlow(0)
+    override val photosVersion = MutableStateFlow(0)
     /**
      * Moviola sul tabellone (null = niente): la manda l'arbitro dalla sua moviola. Anche questa va dichiarata prima
      * del blocco init, che la ascolta per aggiornare il tabellone.
@@ -1326,7 +1326,7 @@ class MatchController(
         removePhoto(st.name)
         // Dal registro del circolo via gli addebiti non pagati; i pagamenti fatti restano col nome (contabilità).
         saveClubBook(com.tennis.scoremanager.data.Fees.forget(clubBook.value, setOf(st.id) + st.aliases))
-        rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
+        racketArea.rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { racketArea.saveRacket(it.copy(owner = "")) }
         scope.launch {
             withContext(io) {
                 storage.savePlayers(list)
@@ -1622,7 +1622,7 @@ class MatchController(
 
     // ---- Progressi, rating TSM e obiettivi: vedi ProgressArea ----
 
-    val progress = com.tennis.scoremanager.player.ProgressArea(this, app, storage, scope, io)
+    override val progress = com.tennis.scoremanager.player.ProgressArea(this, app, storage, scope, io)
 
     /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
     fun openMembers() {
@@ -2531,7 +2531,7 @@ class MatchController(
             players.value = list.sortedBy { it.name.lowercase() }
             scope.launch(io) { storage.savePlayers(list) }
         }
-        val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
+        val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketArea.racketsFor(su))
         competitions.linkClubMatch(rec.id, withIds)
         competitions.linkTeamRubber(rec.id, withIds)
         competitions.linkLadderMatch(rec.id, withIds)
@@ -3108,7 +3108,7 @@ class MatchController(
         }
     }
 
-    fun refreshSaved() {
+    override fun refreshSaved() {
         scope.launch { saved.value = withContext(io) { storage.loadUnfinished() } }
     }
 
@@ -3121,65 +3121,8 @@ class MatchController(
 
     // ---------------------------------------------------------------- racchetta virtuale
 
-    /** Racchette con le incordature, in ordine di creazione. */
-    val rackets = MutableStateFlow(storage.loadRackets())
-    /** Racchetta proposta per gli allenamenti ("" = nessuna). */
-    val workoutRacket = MutableStateFlow(storage.workoutRacket)
-
-    fun racketById(id: String): Racket? = id.takeIf { it.isNotEmpty() }?.let { k -> rackets.value.firstOrNull { it.id == k } }
-
-    /** Le racchette scelte in pagina 1, com'erano all'inizio della partita. */
-    private fun racketsFor(su: SetupData): Map<Side, RacketUse> = buildMap {
-        racketById(su.p1Racket)?.let { put(Side.P1, it.use()) }
-        racketById(su.p2Racket)?.let { put(Side.P2, it.use()) }
-    }
-
-    fun openRackets() {
-        refreshHistory()
-        refreshWorkouts()
-        nav.push(Screen.RACKETS)
-    }
-
-    private fun storeRackets(list: List<Racket>) {
-        rackets.value = list
-        scope.launch(io) { storage.saveRackets(list) }
-    }
-
-    fun newRacketId(): String = "r${System.currentTimeMillis()}"
-
-    fun newStringingId(): String = "s${System.currentTimeMillis()}"
-
-    /** Aggiunge o aggiorna una racchetta (stesso id). */
-    fun saveRacket(r: Racket) {
-        val list = rackets.value
-        storeRackets(if (list.any { it.id == r.id }) list.map { if (it.id == r.id) r else it } else list + r)
-    }
-
-    /** Toglie la racchetta dall'elenco; le partite giocate la conservano (ne hanno una copia). */
-    fun deleteRacket(id: String) {
-        storeRackets(rackets.value.filter { it.id != id })
-        updateSetup { it.copy(p1Racket = if (it.p1Racket == id) "" else it.p1Racket, p2Racket = if (it.p2Racket == id) "" else it.p2Racket) }
-        if (workoutRacket.value == id) setWorkoutRacket("")
-    }
-
-    fun saveStringing(racketId: String, st: Stringing) {
-        val r = racketById(racketId) ?: return
-        val list = if (r.stringings.any { it.id == st.id }) r.stringings.map { if (it.id == st.id) st else it } else r.stringings + st
-        saveRacket(r.copy(stringings = list.sortedBy { it.date }))
-    }
-
-    fun deleteStringing(racketId: String, stringingId: String) {
-        val r = racketById(racketId) ?: return
-        saveRacket(r.copy(stringings = r.stringings.filter { it.id != stringingId }))
-    }
-
-    fun setWorkoutRacket(id: String) {
-        workoutRacket.value = id
-        storage.workoutRacket = id
-    }
-
-    /** Partite dello storico e allenamenti, come sessioni con una racchetta. */
-    fun racketSessions(): List<RacketStats.Session> = RacketStats.sessions(progress.played(), workouts.value)
+    /** Racchette e incordature: vedi RacketsArea. */
+    val racketArea = com.tennis.scoremanager.player.RacketsArea(this, app, storage, scope, io)
 
     /** Sensazioni dette nel riepilogo per la racchetta di un lato. */
     fun setMatchFeel(side: Side, feel: Feel) {
@@ -3195,7 +3138,7 @@ class MatchController(
     fun setMatchRacket(side: Side, racketId: String) {
         val sm = summary.value ?: return
         val old = sm.record.rackets
-        val r = racketById(racketId)
+        val r = racketArea.racketById(racketId)
         val at = sm.record.startedAt ?: sm.record.updatedAt
         val rackets = if (r == null) old - side else old + (side to r.useAt(at).copy(feel = old[side]?.feel))
         saveSummary(sm.copy(record = sm.record.copy(rackets = rackets)))
@@ -3204,7 +3147,7 @@ class MatchController(
     /** Come [setMatchRacket] per l'allenamento aperto. */
     fun setWorkoutRacketOf(racketId: String) {
         val w = workoutDetail.value ?: return
-        val use = racketById(racketId)?.useAt(w.startedAt)?.copy(feel = w.racket?.feel)
+        val use = racketArea.racketById(racketId)?.useAt(w.startedAt)?.copy(feel = w.racket?.feel)
         saveWorkout(w.copy(racket = use))
     }
 
@@ -3328,7 +3271,7 @@ class MatchController(
         workoutSide = side
         // Ti alleni tu: età, peso e sesso dalla tua scheda, se ci sono.
         heartProfileOf(me())?.let { setHeartProfile(side, it) }
-        workoutUse = racketById(workoutRacket.value)?.use()
+        workoutUse = racketArea.racketById(racketArea.workoutRacket.value)?.use()
         workout.start(side, straps[side]?.name)
         MatchService.start(app)
         return true
@@ -3429,7 +3372,7 @@ class MatchController(
     }
 
     /** Salva partite arrivate da fuori: le finite nello storico, le altre tra le sospese. Restituisce (finite, sospese). */
-    private fun importRecords(recs: List<MatchRecord>, info: List<com.tennis.scoremanager.data.PlayerProfile> = emptyList()): Pair<Int, Int> {
+    override fun importRecords(recs: List<MatchRecord>, info: List<com.tennis.scoremanager.data.PlayerProfile>): Pair<Int, Int> {
         var done = 0
         var open = 0
         // I giocatori delle partite arrivate: quelli che conosciamo si agganciano, quelli nuovi si aggiungono col loro
@@ -3542,38 +3485,8 @@ class MatchController(
     /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
     // ---------------------------------------------------------------- rivincita
 
-    /** Nomi di un lato per l'invito: "Rossi" o "Rossi / Bianchi". */
-    private fun rematchSide(rec: MatchRecord, side: Side): String = Names(rec.setup, strings).players(side).joinToString(" / ")
-
-    /** Luogo proposto: circolo e campo della partita, altrimenti l'indirizzo trovato. */
-    fun rematchPlace(rec: MatchRecord): String =
-        listOf(rec.setup.club.trim(), rec.setup.court.trim().takeIf { it.isNotEmpty() }?.let { strings.court + " " + it })
-            .filterNot { it.isNullOrEmpty() }.joinToString(" · ").ifEmpty { rec.location?.address.orEmpty() }
-
-    /** Il messaggio d'invito, nella lingua dell'app. */
-    fun rematchText(m: LiveMatch, at: Long, place: String, note: String): String {
-        val s = strings
-        val lang = options.value.lang
-        val rec = m.record
-        val last = m.state.winner?.let { w -> s.rematchLast(Reports.scoreLine(m.state, w), rematchSide(rec, w)) }
-        return com.tennis.scoremanager.data.Rematch.message(
-            s.rematchAsk, rematchSide(rec, Side.P1), rematchSide(rec, Side.P2), s.rematchVersus,
-            "${Reports.date(at, lang)}, ${Reports.time(at, lang)}", place, last, note,
-            "${s.generatedWith} · ${Reports.siteUrl(lang).removePrefix("https://").removeSuffix("/")}",
-        )
-    }
-
-    fun rematchShareIntent(text: String): Intent =
-        Intent.createChooser(Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) }, strings.share)
-
-    /** Evento nel calendario (lo crea l'app del calendario: niente permessi). */
-    fun rematchCalendarIntent(m: LiveMatch, at: Long, place: String, text: String): Intent =
-        Intent(Intent.ACTION_INSERT).setData(android.provider.CalendarContract.Events.CONTENT_URI)
-            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME, at)
-            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_END_TIME, at + com.tennis.scoremanager.data.Rematch.durationMs(m.record.clockMs))
-            .putExtra(android.provider.CalendarContract.Events.TITLE, strings.rematchEvent("${rematchSide(m.record, Side.P1)} – ${rematchSide(m.record, Side.P2)}"))
-            .putExtra(android.provider.CalendarContract.Events.EVENT_LOCATION, place)
-            .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, text)
+    /** Invito alla rivincita: vedi RematchInvite. */
+    val rematch = com.tennis.scoremanager.player.RematchInvite(this, app, storage, scope, io)
 
     /** La stessa partita in pagina 1: giocatori, circolo, campo e regole; il torneo no. */
     /** Nuova partita più corta: le regole si vedono in una riga e si va dritti al sorteggio (finché non si tocca Cambia). */
@@ -3686,90 +3599,8 @@ class MatchController(
 
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
 
-    /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
-    val transferUrl = MutableStateFlow<String?>(null)
-    /** Quante volte l'altro telefono ha già scaricato il pacchetto (per dire "Inviato"). */
-    val transferServed = MutableStateFlow(0)
-    private var transferServer: TransferServer? = null
-
-    /** Le partite che si possono inviare: finite e sospese, dalla più recente. */
-    fun sendableMatches(): List<MatchRecord> = (storage.loadFinished() + storage.loadUnfinished()).distinctBy { it.id }.sortedByDescending { it.updatedAt }
-
-    /**
-     * Apre il server e prepara il QR con le partite [ids] scelte da chi invia (null = tutte). Con le partite viaggiano
-     * solo le foto e le schede dei loro giocatori. false = nessuna rete locale (Wi-Fi o hotspot) per l'altro telefono.
-     */
-    fun startSending(ids: Set<String>? = null): Boolean {
-        stopSending()
-        val host = TvServer.localAddresses().firstOrNull() ?: return false
-        val server = TransferServer(
-            payload = {
-                val all = (storage.loadFinished() + storage.loadUnfinished()).filter { ids == null || it.id in ids }
-                // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una), solo dei giocatori di queste.
-                val keys = all.flatMap { m -> Side.entries.flatMap { PlayerStats.names(m.setup, it) } }.map { PlayerStats.key(it) }.toSet()
-                val photos = storage.photoKeys().filter { it in keys }.associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
-                val matchPhotos = all.associate { m ->
-                    m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
-                }.filterValues { it.isNotEmpty() }
-                storage.json.encodeToString(
-                    TransferBundle.serializer(), TransferBundle(
-                        matches = all, photos = photos, matchPhotos = matchPhotos,
-                        players = all.flatMap { com.tennis.scoremanager.data.Players.slots(it.setup) }.mapNotNull { playerById(it.id) }.distinctBy { it.id }
-                            .map { com.tennis.scoremanager.data.PlayerProfile(it.id, it.name, it.firstName, it.lastName, it.nickname, it.hand, aliases = it.aliases) },
-                    ),
-                ).toByteArray()
-            },
-            onServed = { transferServed.value++ },
-        )
-        val port = runCatching { server.start() }.getOrNull() ?: return false
-        transferServer = server
-        transferServed.value = 0
-        transferUrl.value = TransferServer.url(host, port, server.token)
-        return true
-    }
-
-    fun stopSending() {
-        transferServer?.stop()
-        transferServer = null
-        transferUrl.value = null
-    }
-
-    /** Testo letto dal QR dell'altro telefono: scarica storico e partite sospese e li aggiunge a questo telefono. */
-    fun receiveFrom(text: String) {
-        val s = strings
-        if (!TransferServer.isTransferUrl(text)) {
-            _toasts.tryEmit(s.transferBadCode)
-            return
-        }
-        scope.launch {
-            val result = withContext(io) {
-                runCatching {
-                    val bundle = storage.json.decodeFromString(TransferBundle.serializer(), TransferServer.fetch(text).decodeToString())
-                    // Una foto arrivata non sostituisce quella che questo telefono ha già per lo stesso nome.
-                    bundle.photos.forEach { (k, b64) ->
-                        if (!storage.photoFile(k).exists()) runCatching { storage.savePhoto(k, Base64.decode(b64, Base64.DEFAULT)) }
-                    }
-                    // Foto ricordo: solo per le partite che qui non ne hanno già.
-                    bundle.matchPhotos.forEach { (id, list) ->
-                        if (storage.matchPhotos(id).isEmpty()) list.forEach { b64 ->
-                            runCatching { storage.addMatchPhoto(id, Base64.decode(b64, Base64.DEFAULT)) }
-                        }
-                    }
-                    importRecords(bundle.matches, bundle.players)
-                }.getOrNull()
-            }
-            _toasts.tryEmit(
-                when {
-                    result == null -> s.transferFailed
-                    result.first + result.second == 0 -> s.transferEmpty
-                    else -> s.historyImported(result.first, result.second)
-                },
-            )
-            refreshHistory()
-            refreshSaved()
-            photosVersion.value++
-        }
-    }
+    /** Trasferimento tra telefoni col QR: vedi TransferArea. */
+    val transfer = com.tennis.scoremanager.player.TransferArea(this, app, storage, scope, io)
 
     // ---------------------------------------------------------------- tempi
 

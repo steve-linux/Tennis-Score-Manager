@@ -5,7 +5,9 @@ package com.tennis.scoremanager.player
 import com.tennis.scoremanager.LiveMatch
 import com.tennis.scoremanager.Navigator
 import com.tennis.scoremanager.data.MatchOptions
+import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.ui.Strings
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,4 +29,17 @@ interface PlayerHost {
     fun refreshHistory()
     val workouts: MutableStateFlow<List<WorkoutRecord>>
     fun refreshWorkouts()
+    /** Le partite sospese, da ricaricare dopo un trasferimento. */
+    fun refreshSaved()
+    /** Aggiunge allo storico partite arrivate da fuori: (finite aggiunte, sospese aggiunte). */
+    fun importRecords(recs: List<MatchRecord>, info: List<PlayerProfile> = emptyList()): Pair<Int, Int>
+    /** Cresce quando cambiano le foto dei giocatori (le schermate le ricaricano). */
+    val photosVersion: MutableStateFlow<Int>
+
+    /** I progressi: le partite giocate, per le sessioni di ciascuna racchetta. */
+    val progress: ProgressArea
+    /** Nuova partita (togliendo una racchetta la si toglie anche da lì). */
+    fun updateSetup(transform: (SetupData) -> SetupData)
+    /** Un messaggio breve in basso sullo schermo. */
+    fun toast(text: String)
 }

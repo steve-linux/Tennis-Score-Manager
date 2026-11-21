@@ -94,7 +94,7 @@ fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
     val o by c.options.collectAsState()
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     val context = LocalContext.current
     // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna da dove la si è aperta.
     androidx.activity.compose.BackHandler { c.back() }
@@ -214,7 +214,7 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
         PlayerSlot(c, su, side, false, recent, accent)
         if (su.doubles) PlayerSlot(c, su, side, true, recent, accent)
         // Classifica, uomo/donna e racchetta arrivano dalla scheda del giocatore: qui in una riga, aperti solo se servono.
-        val rackets by c.rackets.collectAsState()
+        val rackets by c.racketArea.rackets.collectAsState()
         var details by androidx.compose.runtime.saveable.rememberSaveable(side) { mutableStateOf(false) }
         if (!details) {
             val racket = rackets.firstOrNull { it.id == (if (side == Side.P1) su.p1Racket else su.p2Racket) }?.label

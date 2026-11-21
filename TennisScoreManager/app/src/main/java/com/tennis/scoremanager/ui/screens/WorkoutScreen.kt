@@ -72,8 +72,8 @@ fun WorkoutScreen(c: MatchController) {
     val straps by c.straps.collectAsState()
     val list by c.workouts.collectAsState()
     val o by c.options.collectAsState()
-    val rackets by c.rackets.collectAsState()
-    val workoutRacket by c.workoutRacket.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
+    val workoutRacket by c.racketArea.workoutRacket.collectAsState()
     ScreenScaffold(
         onHelp = { c.openHelp("7.1") },
         title = s.workoutTitle,
@@ -130,7 +130,7 @@ fun WorkoutScreen(c: MatchController) {
         // Racchetta dell'allenamento: l'allenamento ne tiene una copia con corde e tensione.
         if (ui.phase == WorkoutPhase.IDLE && rackets.isNotEmpty()) {
             SectionCard(s.racketField, Icons.Filled.SportsTennis) {
-                RacketPicker(c, workoutRacket) { c.setWorkoutRacket(it) }
+                RacketPicker(c, workoutRacket) { c.racketArea.setWorkoutRacket(it) }
             }
         }
         if (ui.phase == WorkoutPhase.IDLE) {

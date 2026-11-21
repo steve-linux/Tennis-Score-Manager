@@ -496,7 +496,7 @@ private fun ProgressTab(c: MatchController) {
     var year by remember { mutableStateOf(false) }
     Entry(Icons.Filled.CalendarMonth, s.yrTitle, s.yrHint) { year = true }
     if (year) com.tennis.scoremanager.ui.YearReviewDialog(c) { year = false }
-    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+    if (PlayerFeature.RACKETS in pf) Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.racketArea.openRackets() }
     // Allenamento dei tuoi colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione (quelli degli
     // allievi stanno nelle loro schede).
     val sessions by c.serveSessions.collectAsState()
@@ -547,7 +547,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
             if (role == com.tennis.scoremanager.Role.COACH) Entry(Icons.Filled.Computer, s.ccDeskTitle, s.ccDeskHint) { c.go(Screen.DESK) }
             // L'allenatore non ha Progressi: le racchette (sue e degli allievi) stanno qui.
             if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.playerFeatures.collectAsState().value) {
-                Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+                Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.racketArea.openRackets() }
             }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
             val bookingAccounts by c.book.bookingAccounts.collectAsState()
