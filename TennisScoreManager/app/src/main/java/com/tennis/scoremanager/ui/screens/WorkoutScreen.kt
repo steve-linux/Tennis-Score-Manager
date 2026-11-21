@@ -61,14 +61,14 @@ import com.tennis.scoremanager.workout.WorkoutPhase
 @Composable
 fun WorkoutScreen(c: MatchController) {
     val s = LocalStrings.current
-    val detail by c.workoutDetail.collectAsState()
+    val detail by c.workoutArea.workoutDetail.collectAsState()
     BackHandler { c.back() }
     val shown = detail
     if (shown != null) {
         WorkoutDetail(c, shown)
         return
     }
-    val ui by c.workout.ui.collectAsState()
+    val ui by c.workoutArea.workout.ui.collectAsState()
     val straps by c.straps.collectAsState()
     val list by c.workouts.collectAsState()
     val o by c.options.collectAsState()
@@ -95,7 +95,7 @@ fun WorkoutScreen(c: MatchController) {
             Text("bpm", color = TsmColors.TextDim, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             strap?.let { Text(it.name, color = TsmColors.TextDim, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }
             when (ui.phase) {
-                WorkoutPhase.IDLE -> BigButton(s.workoutStart, Icons.Filled.PlayArrow, { c.startWorkout() }, Modifier.fillMaxWidth())
+                WorkoutPhase.IDLE -> BigButton(s.workoutStart, Icons.Filled.PlayArrow, { c.workoutArea.startWorkout() }, Modifier.fillMaxWidth())
                 WorkoutPhase.RUNNING, WorkoutPhase.PAUSED -> {
                     Text(
                         Reports.duration(ui.elapsedS * 1000L),
@@ -108,20 +108,20 @@ fun WorkoutScreen(c: MatchController) {
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (ui.phase == WorkoutPhase.RUNNING) {
-                            GhostButton(s.workoutPause, Icons.Filled.Pause, { c.workout.pause() }, Modifier.weight(1f))
-                            BigButton(s.workoutLap, Icons.Filled.Flag, { c.workout.lap() }, Modifier.weight(1f))
+                            GhostButton(s.workoutPause, Icons.Filled.Pause, { c.workoutArea.workout.pause() }, Modifier.weight(1f))
+                            BigButton(s.workoutLap, Icons.Filled.Flag, { c.workoutArea.workout.lap() }, Modifier.weight(1f))
                         } else {
-                            BigButton(s.workoutResume, Icons.Filled.PlayArrow, { c.workout.resume() }, Modifier.weight(1f))
+                            BigButton(s.workoutResume, Icons.Filled.PlayArrow, { c.workoutArea.workout.resume() }, Modifier.weight(1f))
                         }
                     }
-                    BigButton(s.workoutEnd, Icons.Filled.Stop, { c.workout.end() }, Modifier.fillMaxWidth(),
+                    BigButton(s.workoutEnd, Icons.Filled.Stop, { c.workoutArea.workout.end() }, Modifier.fillMaxWidth(),
                         color = TsmColors.Danger, onColor = TsmColors.TextMain)
                 }
                 WorkoutPhase.COOLDOWN -> {
                     Text(s.workoutRecovering(ui.cooldownLeft), color = TsmColors.Ball, fontSize = 18.sp, fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     Text(s.workoutRecoveringHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                    GhostButton(s.workoutSaveNow, Icons.Filled.Save, { c.workout.finish() }, Modifier.fillMaxWidth())
+                    GhostButton(s.workoutSaveNow, Icons.Filled.Save, { c.workoutArea.workout.finish() }, Modifier.fillMaxWidth())
                 }
             }
         }
@@ -138,7 +138,7 @@ fun WorkoutScreen(c: MatchController) {
                 if (list.isEmpty()) Text(s.workoutNone, color = TsmColors.TextDim)
                 for (w in list) {
                     val sum = com.tennis.scoremanager.data.HeartStats.summary(w.heart)
-                    Surface(onClick = { c.workoutDetail.value = w }, shape = RoundedCornerShape(12.dp), color = TsmColors.SurfaceHigh,
+                    Surface(onClick = { c.workoutArea.workoutDetail.value = w }, shape = RoundedCornerShape(12.dp), color = TsmColors.SurfaceHigh,
                         modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                             Text("${Reports.date(w.startedAt, o.lang)} ${Reports.time(w.startedAt, o.lang)}", color = TsmColors.TextMain,
@@ -191,13 +191,13 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
                 for (l in laps) Text(WorkoutReport.lapLine(l, s), color = TsmColors.TextMain, fontSize = 13.sp)
             }
         }
-        RacketSessionCard(c, s.racketUsed, w.racket, o.lang, onRacket = { c.setWorkoutRacketOf(it) }, onFeel = { c.setWorkoutFeel(it) })
+        RacketSessionCard(c, s.racketUsed, w.racket, o.lang, onRacket = { c.workoutArea.setWorkoutRacketOf(it) }, onFeel = { c.workoutArea.setWorkoutFeel(it) })
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.workoutShareCsv, Icons.Filled.TableChart, {
-                c.workoutShareIntent(w, pdf = false)?.let { context.startActivity(it) }
+                c.workoutArea.workoutShareIntent(w, pdf = false)?.let { context.startActivity(it) }
             }, Modifier.weight(1f))
             GhostButton(s.workoutSharePdf, Icons.Filled.PictureAsPdf, {
-                c.workoutShareIntent(w, pdf = true)?.let { context.startActivity(it) }
+                c.workoutArea.workoutShareIntent(w, pdf = true)?.let { context.startActivity(it) }
             }, Modifier.weight(1f))
         }
         GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.fillMaxWidth())
@@ -207,7 +207,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
             Icons.Filled.Delete, s.workoutDeleteTitle, s.workoutDeleteText, s.delete,
             onConfirm = {
                 confirmDelete = false
-                c.deleteWorkout(w.id)
+                c.workoutArea.deleteWorkout(w.id)
             },
             onDismiss = { confirmDelete = false },
             danger = true,

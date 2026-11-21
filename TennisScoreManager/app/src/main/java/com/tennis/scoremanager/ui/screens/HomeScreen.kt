@@ -469,7 +469,7 @@ private fun BookingTab(c: MatchController) {
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
     val pf by c.playerFeatures.collectAsState()
-    if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
+    if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.workoutArea.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     if (PlayerFeature.TRAINING in pf) ServeTrainingCard(c, coach = false)
 }

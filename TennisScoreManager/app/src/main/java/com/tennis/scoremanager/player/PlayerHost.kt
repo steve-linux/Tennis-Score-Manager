@@ -4,11 +4,14 @@ package com.tennis.scoremanager.player
 
 import com.tennis.scoremanager.LiveMatch
 import com.tennis.scoremanager.Navigator
+import com.tennis.scoremanager.ble.HeartRateManager
+import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -46,4 +49,16 @@ interface PlayerHost {
     val summary: MutableStateFlow<LiveMatch?>
     /** Ridisegna il tabellone TV (le foto dei giocatori ci compaiono). */
     fun publishTv()
+
+    // Allenamento con la fascia.
+    fun me(): PlayerProfile?
+    /** Le fasce cardio collegate. */
+    val heart: HeartRateManager
+    /** Età, peso e sesso per lato, per calorie e zone del battito. */
+    val heartProfiles: MutableStateFlow<Map<Side, HeartProfile>>
+    fun heartProfileOf(p: PlayerProfile?): HeartProfile?
+    fun setHeartProfile(side: Side, p: HeartProfile?)
+    /** Serve il servizio in primo piano (braccialetti, tabellone, fascia, allenamento)? */
+    fun needsService(): Boolean
+    val racketArea: RacketsArea
 }

@@ -195,7 +195,7 @@ class MatchController(
     private val app: Application,
     val storage: Storage,
     val ble: BleManager,
-    val heart: HeartRateManager,
+    override val heart: HeartRateManager,
     val voice: VoicePack,
     val announcer: Announcer,
 ) : com.tennis.scoremanager.club.ClubHost, com.tennis.scoremanager.coach.CoachHost, com.tennis.scoremanager.player.PlayerHost {
@@ -281,7 +281,7 @@ class MatchController(
     val customVoiceCount = MutableStateFlow(0)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
     /** Chi indossa la fascia cardio di ciascun lato (per le calorie). */
-    val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
+    override val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
     /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
     private val statusStart = mutableMapOf<Side, BandStatus>()
@@ -357,15 +357,10 @@ class MatchController(
         },
     )
 
-    /** Allenamento con la fascia, senza partita (schermata a parte, pulsante in pagina 1). */
-    val workout = WorkoutSession(scope) { rec -> onWorkoutFinished(rec) }
+    /** Allenamento con la fascia, senza partita: vedi WorkoutArea. */
+    val workoutArea = com.tennis.scoremanager.player.WorkoutArea(this, app, storage, scope, io)
     /** Allenamenti salvati, dal più recente. */
     override val workouts = MutableStateFlow<List<WorkoutRecord>>(emptyList())
-    /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
-    val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
-    private var workoutSide = Side.P1
-    /** Racchetta dell'allenamento in corso, presa all'avvio. */
-    private var workoutUse: RacketUse? = null
 
     /**
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
@@ -417,7 +412,7 @@ class MatchController(
         scope.launch {
             heart.readings.collect { (side, m) ->
                 heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
-                workout.onReading(side, m)
+                workoutArea.workout.onReading(side, m)
                 onHeartReading(side, m)
                 relay.onLocalReading(side, m)
             }
@@ -521,9 +516,9 @@ class MatchController(
     }
 
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
-    private fun needsService(): Boolean =
+    override fun needsService(): Boolean =
         options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty() ||
-            relay.ui.value.role != RelayRole.OFF || workout.active
+            relay.ui.value.role != RelayRole.OFF || workoutArea.workout.active
 
     /**
      * Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate;
@@ -720,7 +715,7 @@ class MatchController(
     fun back() {
         when (screen.value) {
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
-            Screen.WORKOUT -> if (workoutDetail.value != null) { workoutDetail.value = null; return }
+            Screen.WORKOUT -> if (workoutArea.workoutDetail.value != null) { workoutArea.workoutDetail.value = null; return }
             Screen.START -> if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
             Screen.MATCH -> return
             Screen.SUMMARY -> { closeSummary(); return }
@@ -2026,14 +2021,14 @@ class MatchController(
     }
 
     /** I dati per le calorie dalla scheda del giocatore (età, peso, sesso); null se ne manca uno. */
-    fun heartProfileOf(p: com.tennis.scoremanager.data.PlayerProfile?): HeartProfile? {
+    override fun heartProfileOf(p: com.tennis.scoremanager.data.PlayerProfile?): HeartProfile? {
         p ?: return null
         val age = com.tennis.scoremanager.data.Members.age(p.birth, System.currentTimeMillis()) ?: return null
         val kg = p.weightKg ?: return null
         return HeartProfile(age, kg, female = p.sex == "F")
     }
 
-    fun setHeartProfile(side: Side, p: HeartProfile?) {
+    override fun setHeartProfile(side: Side, p: HeartProfile?) {
         storage.setHeartProfile(side == Side.P1, p)
         heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
     }
@@ -2057,7 +2052,7 @@ class MatchController(
         // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
         if (age <= PhoneRelay.LIVE_MS) {
             strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
-            workout.onReading(side, m)
+            workoutArea.workout.onReading(side, m)
         }
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
@@ -2771,7 +2766,7 @@ class MatchController(
     // ---------------------------------------------------------------- racchetta virtuale
 
     /** Racchette e incordature: vedi RacketsArea. */
-    val racketArea = com.tennis.scoremanager.player.RacketsArea(this, app, storage, scope, io)
+    override val racketArea = com.tennis.scoremanager.player.RacketsArea(this, app, storage, scope, io)
 
     /** Sensazioni dette nel riepilogo per la racchetta di un lato. */
     fun setMatchFeel(side: Side, feel: Feel) {
@@ -2793,12 +2788,6 @@ class MatchController(
         saveSummary(sm.copy(record = sm.record.copy(rackets = rackets)))
     }
 
-    /** Come [setMatchRacket] per l'allenamento aperto. */
-    fun setWorkoutRacketOf(racketId: String) {
-        val w = workoutDetail.value ?: return
-        val use = racketArea.racketById(racketId)?.useAt(w.startedAt)?.copy(feel = w.racket?.feel)
-        saveWorkout(w.copy(racket = use))
-    }
 
     private fun saveSummary(sm: LiveMatch) {
         val rec = sm.record
@@ -2809,19 +2798,6 @@ class MatchController(
             if (!fromHistory) storage.saveLastFinished(rec)
         }
         history.value = history.value.map { if (it.record.id == rec.id) it.copy(record = rec) else it }
-    }
-
-    private fun saveWorkout(rec: WorkoutRecord) {
-        workoutDetail.value = rec
-        workouts.value = workouts.value.map { if (it.id == rec.id) rec else it }
-        scope.launch(io) { storage.saveWorkout(rec) }
-    }
-
-    /** Sensazioni dell'allenamento aperto nel riepilogo. */
-    fun setWorkoutFeel(feel: Feel) {
-        val w = workoutDetail.value ?: return
-        val use = w.racket ?: return
-        saveWorkout(w.copy(racket = use.copy(feel = feel)))
     }
 
     // ---------------------------------------------------------------- progressi
@@ -2902,68 +2878,8 @@ class MatchController(
     }
 
     // ---------------------------------------------------------------- allenamento
-
-    fun openWorkouts() {
-        workoutDetail.value = null
-        refreshWorkouts()
-        nav.push(Screen.WORKOUT)
-    }
-
     override fun refreshWorkouts() {
         scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() }; progress.checkGoals() }
-    }
-
-    /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
-    fun startWorkout(): Boolean {
-        val straps = heart.straps.value
-        val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
-        workoutSide = side
-        // Ti alleni tu: età, peso e sesso dalla tua scheda, se ci sono.
-        heartProfileOf(me())?.let { setHeartProfile(side, it) }
-        workoutUse = racketArea.racketById(racketArea.workoutRacket.value)?.use()
-        workout.start(side, straps[side]?.name)
-        MatchService.start(app)
-        return true
-    }
-
-    private fun onWorkoutFinished(rec: WorkoutRecord) {
-        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]), racket = workoutUse)
-        scope.launch {
-            withContext(io) { storage.saveWorkout(w) }
-            refreshWorkouts()
-        }
-        workoutDetail.value = w
-        if (!needsService()) MatchService.stop(app)
-    }
-
-    fun deleteWorkout(id: String) {
-        scope.launch {
-            withContext(io) { storage.deleteWorkout(id) }
-            workoutDetail.value = null
-            refreshWorkouts()
-        }
-    }
-
-    /** Condivide l'allenamento come CSV (secondo per secondo) o PDF di riepilogo. */
-    fun workoutShareIntent(w: WorkoutRecord, pdf: Boolean): Intent? {
-        val s = strings
-        val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm", java.util.Locale.ROOT).format(java.util.Date(w.startedAt))
-        val file = File(dir, "${s.workoutTitle}_$stamp.${if (pdf) "pdf" else "csv"}")
-        runCatching {
-            file.outputStream().use { o ->
-                if (pdf) WorkoutReport.pdf(w, s, options.value.lang, o) else o.write(WorkoutStats.csv(w).toByteArray())
-            }
-        }.onFailure { return null }
-        val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = if (pdf) "application/pdf" else "text/csv"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "${s.workoutTitle} ${Reports.date(w.startedAt, options.value.lang)}")
-            clipData = ClipData.newRawUri("", uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        return Intent.createChooser(send, s.share)
     }
 
     override fun refreshHistory() {
