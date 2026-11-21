@@ -134,7 +134,7 @@ fun HomeScreen(c: MatchController) {
     // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
     val role by c.activeRole.collectAsState()
     // Le schede che restano vuote con quello che non si usa spariscono.
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     val cf by c.clubFeatures.collectAsState()
     val accounts by c.book.bookingAccounts.collectAsState()
     val tabs = role.tabs.filter { t ->
@@ -364,7 +364,7 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
         c.refreshSaved()
         c.refreshHistory()
     }
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
@@ -468,7 +468,7 @@ private fun BookingTab(c: MatchController) {
 @Composable
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.workoutArea.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     if (PlayerFeature.TRAINING in pf) ServeTrainingCard(c, coach = false)
@@ -483,7 +483,7 @@ private fun ProgressTab(c: MatchController) {
     val mine = remember(history, me) {
         if (me.isBlank()) null else c.progress.ratingSports().firstOrNull()?.let { c.progress.ratingTable(it).player(c.myKey()) }
     }
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
@@ -546,7 +546,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
             // L'allenatore dal computer di casa: schede, ricevute, registro, da stampare.
             if (role == com.tennis.scoremanager.Role.COACH) Entry(Icons.Filled.Computer, s.ccDeskTitle, s.ccDeskHint) { c.go(Screen.DESK) }
             // L'allenatore non ha Progressi: le racchette (sue e degli allievi) stanno qui.
-            if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.playerFeatures.collectAsState().value) {
+            if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.features.playerFeatures.collectAsState().value) {
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.racketArea.openRackets() }
             }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).

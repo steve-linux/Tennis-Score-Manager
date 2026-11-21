@@ -270,7 +270,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
             // telecomandi (Altro › Cosa usi) si segna solo da arbitro: niente scelta.
-            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
+            if (c.features.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
                 listOf(
                     SegOption(s.modeReferee, Icons.Filled.Gavel),
                     SegOption(s.modeBands, Icons.Filled.Watch),
@@ -280,7 +280,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 onSelect = { i -> c.updateOptions { it.copy(mode = PlayMode.entries[i]) } },
                 columns = 1,
             )
-            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Text(
+            if (c.features.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Text(
                 when (o.mode) {
                     PlayMode.REFEREE -> s.modeRefereeHint
                     PlayMode.BANDS -> s.modeBandsHint
@@ -302,7 +302,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        if (devices || (match && c.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
+        if (devices || (match && c.features.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },

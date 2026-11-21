@@ -337,11 +337,11 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                         else {
                             Text(s.issueFeeDue(Fees.money(left, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
                             // Un tasto per ogni modo di pagamento del circolo.
-                            for (t in c.planning.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.payBooking(b0, t) }, Modifier.fillMaxWidth())
+                            for (t in c.planning.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.planning.payBooking(b0, t) }, Modifier.fillMaxWidth())
                         }
                     }
                     // L'addebito va in Quote e pagamenti: solo se il circolo le usa.
-                    if (b.players.isNotEmpty() && cents > 0 && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
+                    if (b.players.isNotEmpty() && cents > 0 && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
                 }
                 if (isNew) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Repeat, null, tint = TsmColors.TextDim)
@@ -350,7 +350,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     IconButton(onClick = { weeks = (weeks + 1).coerceAtMost(40) }) { Icon(Icons.Filled.Add, null) }
                 }
                 if (!isNew) {
-                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.noticeBooking(b0) }, Modifier.fillMaxWidth())
+                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.planning.noticeBooking(b0) }, Modifier.fillMaxWidth())
                     TextButton(onClick = { askDelete = true }) { Text(s.bkDelete, color = TsmColors.Danger) }
                 }
             }
@@ -361,7 +361,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
                 )
-                onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
+                onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },

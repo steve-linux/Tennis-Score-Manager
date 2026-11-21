@@ -1371,87 +1371,16 @@ class MatchController(
     override val clubServer get() = serverArea.clubServer
     override fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) = serverArea.saveServer(f)
 
-    // ---- Cosa usi (Tu e Allenatore) ----
+    // ---- Cosa usi (Tu e Allenatore) e funzioni del circolo: vedi FeatureChoices ----
 
-    /** Finché non si sceglie, tutto acceso: a chi usa già l'app non sparisce niente. */
-    val playerFeatures = MutableStateFlow(
-        storage.playerFeatures?.mapNotNull { n -> PlayerFeature.entries.firstOrNull { it.name == n } }?.toSet() ?: PlayerFeature.entries.toSet(),
-    )
-
-    fun uses(f: PlayerFeature): Boolean = f in playerFeatures.value
-
-    fun setPlayerFeature(f: PlayerFeature, on: Boolean) = setPlayerFeatures(if (on) playerFeatures.value + f else playerFeatures.value - f)
-
-    fun setPlayerFeatures(set: Set<PlayerFeature>) {
-        playerFeatures.value = set
-        storage.playerFeatures = set.map { it.name }.toSet()
-    }
-
-    /** La prima presentazione propone cosa tenere dalla risposta a "come la userai" (solo se non si è mai scelto). */
-    fun suggestPlayerFeatures(base: Set<PlayerFeature>) {
-        if (storage.playerFeatures == null) setPlayerFeatures(base + PlayerFeature.PROGRESS + PlayerFeature.RACKETS)
-    }
-
-    // ---- Funzioni del circolo ----
-
-    /**
-     * Le funzioni accese. Finché il circolo non sceglie: quelle di base più quelle in cui ci sono già dati (squadre,
-     * corsi, classifiche, server abbinato), così a chi le usa non sparisce niente.
-     */
-    override val clubFeatures = MutableStateFlow(
-        storage.clubFeatures?.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }?.toSet()
-            ?: (ClubFeature.entries.filter { it.base } + listOfNotNull(
-                ClubFeature.TEAMS.takeIf { competitions.teams.value.isNotEmpty() },
-                ClubFeature.SCHOOL.takeIf { school.courses.value.isNotEmpty() },
-                ClubFeature.LADDER.takeIf { competitions.ladders.value.isNotEmpty() },
-                ClubFeature.SERVER.takeIf { clubServer.value.paired },
-            )).toSet(),
-    )
-
-    fun has(f: ClubFeature): Boolean = f in clubFeatures.value
-
-    fun setFeature(f: ClubFeature, on: Boolean) {
-        val n = if (on) clubFeatures.value + f else clubFeatures.value - f
-        clubFeatures.value = n
-        storage.clubFeatures = n.map { it.name }.toSet()
-    }
+    val features = com.tennis.scoremanager.club.FeatureChoices(this, storage)
+    override val clubFeatures get() = features.clubFeatures
 
     // ---- Prenota un campo (il giocatore, col server del suo circolo): vedi PlayerBooking ----
 
     override val book = com.tennis.scoremanager.club.PlayerBooking(
         app, storage, scope, io, { strings }, { options.value.lang.locale }, { serverArea.serverAnswers(it) }, { mailbox.fetchMyMail(it) }, { planning.bookingLabel(it) },
     ) { go(Screen.BOOK_COURT) }
-
-    /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
-    fun courtLine(court: String): String {
-        val i = courtPlan.value.settings.info(court)
-        val s = strings
-        return listOfNotNull(court, i.surface?.let { com.tennis.scoremanager.ui.screens.surfaceName(s, it) }, if (i.covered) s.crtCovered else null).joinToString(" · ")
-    }
-
-    /** Registra il pagamento di tutti gli addebiti aperti della prenotazione (al campo o con Satispay). */
-    fun payBooking(b: com.tennis.scoremanager.data.CourtBooking, type: com.tennis.scoremanager.data.PayType) {
-        var book = clubBook.value
-        val now = System.currentTimeMillis()
-        for (id in b.charges) {
-            val ch = book.charges.firstOrNull { it.id == id } ?: continue
-            if (ch.left > 0) com.tennis.scoremanager.data.Fees.pay(book, id, ch.left, now, type.method, "", type.name)?.let { book = it.first }
-        }
-        saveClubBook(book)
-    }
-
-    /** Avvisa i giocatori della prenotazione: campo, giorno e ora, e come si paga. */
-    fun noticeBooking(b: com.tennis.scoremanager.data.CourtBooking) {
-        val s = strings; val now = System.currentTimeMillis(); val lang = options.value.lang
-        val heads = (b.players.size + b.names.size).coerceAtLeast(1)
-        val each = com.tennis.scoremanager.data.Fees.money(com.tennis.scoremanager.data.CourtPlans.split(b.cents, heads).firstOrNull() ?: 0, lang.locale)
-        val pay = if (b.cents <= 0) emptyList() else if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE)
-            listOf(s.ntPayOnline(each)) + com.tennis.scoremanager.data.Notices.payLines(s, clubBook.value) else listOf(s.ntPayCourt(each))
-        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${planning.bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
-            + pay + listOfNotNull(b.note.ifBlank { null }, clubSign.ifBlank { null })).joinToString("\n")
-        val rec = b.players.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, planning.bookingLabel(b), text, rec))
-    }
 
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
 

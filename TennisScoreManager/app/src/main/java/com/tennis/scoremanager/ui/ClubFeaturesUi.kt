@@ -73,7 +73,7 @@ fun ClubFeaturesDialog(c: MatchController, onDone: () -> Unit) {
                         val (name, hint, icon) = featureInfo(s, f)
                         // Il server abbinato non si spegne da qui: prima si scollega (se no continuerebbe a lavorare nascosto).
                         val locked = f == ClubFeature.SERVER && paired.paired && f in on
-                        SwitchRow(icon, name, if (locked) s.cfServerPaired else hint, f in on, enabled = !locked) { c.setFeature(f, it) }
+                        SwitchRow(icon, name, if (locked) s.cfServerPaired else hint, f in on, enabled = !locked) { c.features.setFeature(f, it) }
                     }
                 }
             }

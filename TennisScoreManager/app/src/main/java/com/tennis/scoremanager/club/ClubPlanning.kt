@@ -219,4 +219,35 @@ class ClubPlanning(
         saveClubBook(book)
         putBookings(emptyList(), gone.map { it.id }.toSet())
     }
+
+    /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
+    fun courtLine(court: String): String {
+        val i = courtPlan.value.settings.info(court)
+        val s = strings
+        return listOfNotNull(court, i.surface?.let { com.tennis.scoremanager.ui.screens.surfaceName(s, it) }, if (i.covered) s.crtCovered else null).joinToString(" · ")
+    }
+
+    /** Registra il pagamento di tutti gli addebiti aperti della prenotazione (al campo o con Satispay). */
+    fun payBooking(b: com.tennis.scoremanager.data.CourtBooking, type: com.tennis.scoremanager.data.PayType) {
+        var book = clubBook.value
+        val now = System.currentTimeMillis()
+        for (id in b.charges) {
+            val ch = book.charges.firstOrNull { it.id == id } ?: continue
+            if (ch.left > 0) com.tennis.scoremanager.data.Fees.pay(book, id, ch.left, now, type.method, "", type.name)?.let { book = it.first }
+        }
+        saveClubBook(book)
+    }
+
+    /** Avvisa i giocatori della prenotazione: campo, giorno e ora, e come si paga. */
+    fun noticeBooking(b: com.tennis.scoremanager.data.CourtBooking) {
+        val s = strings; val now = System.currentTimeMillis(); val lang = options.value.lang
+        val heads = (b.players.size + b.names.size).coerceAtLeast(1)
+        val each = com.tennis.scoremanager.data.Fees.money(com.tennis.scoremanager.data.CourtPlans.split(b.cents, heads).firstOrNull() ?: 0, lang.locale)
+        val pay = if (b.cents <= 0) emptyList() else if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE)
+            listOf(s.ntPayOnline(each)) + com.tennis.scoremanager.data.Notices.payLines(s, clubBook.value) else listOf(s.ntPayCourt(each))
+        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
+            + pay + listOfNotNull(b.note.ifBlank { null }, clubSign.ifBlank { null })).joinToString("\n")
+        val rec = b.players.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, bookingLabel(b), text, rec))
+    }
 }

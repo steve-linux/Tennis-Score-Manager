@@ -16884,87 +16884,16 @@ class MatchController(
     override val clubServer get() = serverArea.clubServer
     override fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) = serverArea.saveServer(f)
 
-    // ---- Cosa usi (Tu e Allenatore) ----
+    // ---- Cosa usi (Tu e Allenatore) e funzioni del circolo: vedi FeatureChoices ----
 
-    /** Finché non si sceglie, tutto acceso: a chi usa già l'app non sparisce niente. */
-    val playerFeatures = MutableStateFlow(
-        storage.playerFeatures?.mapNotNull { n -> PlayerFeature.entries.firstOrNull { it.name == n } }?.toSet() ?: PlayerFeature.entries.toSet(),
-    )
-
-    fun uses(f: PlayerFeature): Boolean = f in playerFeatures.value
-
-    fun setPlayerFeature(f: PlayerFeature, on: Boolean) = setPlayerFeatures(if (on) playerFeatures.value + f else playerFeatures.value - f)
-
-    fun setPlayerFeatures(set: Set<PlayerFeature>) {
-        playerFeatures.value = set
-        storage.playerFeatures = set.map { it.name }.toSet()
-    }
-
-    /** La prima presentazione propone cosa tenere dalla risposta a "come la userai" (solo se non si è mai scelto). */
-    fun suggestPlayerFeatures(base: Set<PlayerFeature>) {
-        if (storage.playerFeatures == null) setPlayerFeatures(base + PlayerFeature.PROGRESS + PlayerFeature.RACKETS)
-    }
-
-    // ---- Funzioni del circolo ----
-
-    /**
-     * Le funzioni accese. Finché il circolo non sceglie: quelle di base più quelle in cui ci sono già dati (squadre,
-     * corsi, classifiche, server abbinato), così a chi le usa non sparisce niente.
-     */
-    override val clubFeatures = MutableStateFlow(
-        storage.clubFeatures?.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }?.toSet()
-            ?: (ClubFeature.entries.filter { it.base } + listOfNotNull(
-                ClubFeature.TEAMS.takeIf { competitions.teams.value.isNotEmpty() },
-                ClubFeature.SCHOOL.takeIf { school.courses.value.isNotEmpty() },
-                ClubFeature.LADDER.takeIf { competitions.ladders.value.isNotEmpty() },
-                ClubFeature.SERVER.takeIf { clubServer.value.paired },
-            )).toSet(),
-    )
-
-    fun has(f: ClubFeature): Boolean = f in clubFeatures.value
-
-    fun setFeature(f: ClubFeature, on: Boolean) {
-        val n = if (on) clubFeatures.value + f else clubFeatures.value - f
-        clubFeatures.value = n
-        storage.clubFeatures = n.map { it.name }.toSet()
-    }
+    val features = com.tennis.scoremanager.club.FeatureChoices(this, storage)
+    override val clubFeatures get() = features.clubFeatures
 
     // ---- Prenota un campo (il giocatore, col server del suo circolo): vedi PlayerBooking ----
 
     override val book = com.tennis.scoremanager.club.PlayerBooking(
         app, storage, scope, io, { strings }, { options.value.lang.locale }, { serverArea.serverAnswers(it) }, { mailbox.fetchMyMail(it) }, { planning.bookingLabel(it) },
     ) { go(Screen.BOOK_COURT) }
-
-    /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
-    fun courtLine(court: String): String {
-        val i = courtPlan.value.settings.info(court)
-        val s = strings
-        return listOfNotNull(court, i.surface?.let { com.tennis.scoremanager.ui.screens.surfaceName(s, it) }, if (i.covered) s.crtCovered else null).joinToString(" · ")
-    }
-
-    /** Registra il pagamento di tutti gli addebiti aperti della prenotazione (al campo o con Satispay). */
-    fun payBooking(b: com.tennis.scoremanager.data.CourtBooking, type: com.tennis.scoremanager.data.PayType) {
-        var book = clubBook.value
-        val now = System.currentTimeMillis()
-        for (id in b.charges) {
-            val ch = book.charges.firstOrNull { it.id == id } ?: continue
-            if (ch.left > 0) com.tennis.scoremanager.data.Fees.pay(book, id, ch.left, now, type.method, "", type.name)?.let { book = it.first }
-        }
-        saveClubBook(book)
-    }
-
-    /** Avvisa i giocatori della prenotazione: campo, giorno e ora, e come si paga. */
-    fun noticeBooking(b: com.tennis.scoremanager.data.CourtBooking) {
-        val s = strings; val now = System.currentTimeMillis(); val lang = options.value.lang
-        val heads = (b.players.size + b.names.size).coerceAtLeast(1)
-        val each = com.tennis.scoremanager.data.Fees.money(com.tennis.scoremanager.data.CourtPlans.split(b.cents, heads).firstOrNull() ?: 0, lang.locale)
-        val pay = if (b.cents <= 0) emptyList() else if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE)
-            listOf(s.ntPayOnline(each)) + com.tennis.scoremanager.data.Notices.payLines(s, clubBook.value) else listOf(s.ntPayCourt(each))
-        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${planning.bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
-            + pay + listOfNotNull(b.note.ifBlank { null }, clubSign.ifBlank { null })).joinToString("\n")
-        val rec = b.players.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
-        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, planning.bookingLabel(b), text, rec))
-    }
 
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
 
@@ -21480,6 +21409,37 @@ class ClubPlanning(
         saveClubBook(book)
         putBookings(emptyList(), gone.map { it.id }.toSet())
     }
+
+    /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
+    fun courtLine(court: String): String {
+        val i = courtPlan.value.settings.info(court)
+        val s = strings
+        return listOfNotNull(court, i.surface?.let { com.tennis.scoremanager.ui.screens.surfaceName(s, it) }, if (i.covered) s.crtCovered else null).joinToString(" · ")
+    }
+
+    /** Registra il pagamento di tutti gli addebiti aperti della prenotazione (al campo o con Satispay). */
+    fun payBooking(b: com.tennis.scoremanager.data.CourtBooking, type: com.tennis.scoremanager.data.PayType) {
+        var book = clubBook.value
+        val now = System.currentTimeMillis()
+        for (id in b.charges) {
+            val ch = book.charges.firstOrNull { it.id == id } ?: continue
+            if (ch.left > 0) com.tennis.scoremanager.data.Fees.pay(book, id, ch.left, now, type.method, "", type.name)?.let { book = it.first }
+        }
+        saveClubBook(book)
+    }
+
+    /** Avvisa i giocatori della prenotazione: campo, giorno e ora, e come si paga. */
+    fun noticeBooking(b: com.tennis.scoremanager.data.CourtBooking) {
+        val s = strings; val now = System.currentTimeMillis(); val lang = options.value.lang
+        val heads = (b.players.size + b.names.size).coerceAtLeast(1)
+        val each = com.tennis.scoremanager.data.Fees.money(com.tennis.scoremanager.data.CourtPlans.split(b.cents, heads).firstOrNull() ?: 0, lang.locale)
+        val pay = if (b.cents <= 0) emptyList() else if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE)
+            listOf(s.ntPayOnline(each)) + com.tennis.scoremanager.data.Notices.payLines(s, clubBook.value) else listOf(s.ntPayCourt(each))
+        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
+            + pay + listOfNotNull(b.note.ifBlank { null }, clubSign.ifBlank { null })).joinToString("\n")
+        val rec = b.players.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, bookingLabel(b), text, rec))
+    }
 }
 TSM_EOF
 
@@ -21796,6 +21756,73 @@ class ClubServerArea(
         return try {
             Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { f(it) } })
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/club/FeatureChoices.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/club/FeatureChoices.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.club
+
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.PlayerFeature
+import com.tennis.scoremanager.data.Storage
+import kotlinx.coroutines.flow.MutableStateFlow
+
+/**
+ * Le funzioni scelte: "Cosa usi" per Tu e Allenatore (le schede che non servono spariscono) e le funzioni del
+ * circolo (squadre, scuola, sfide, server...). Finché non si sceglie, a chi usa già l'app non sparisce niente.
+ * Quello che serve del resto dell'app è in [ClubHost].
+ */
+class FeatureChoices(
+    host: ClubHost,
+    private val storage: Storage,
+) : ClubHost by host {
+    // ---- Cosa usi (Tu e Allenatore) ----
+
+    /** Finché non si sceglie, tutto acceso: a chi usa già l'app non sparisce niente. */
+    val playerFeatures = MutableStateFlow(
+        storage.playerFeatures?.mapNotNull { n -> PlayerFeature.entries.firstOrNull { it.name == n } }?.toSet() ?: PlayerFeature.entries.toSet(),
+    )
+
+    fun uses(f: PlayerFeature): Boolean = f in playerFeatures.value
+
+    fun setPlayerFeature(f: PlayerFeature, on: Boolean) = setPlayerFeatures(if (on) playerFeatures.value + f else playerFeatures.value - f)
+
+    fun setPlayerFeatures(set: Set<PlayerFeature>) {
+        playerFeatures.value = set
+        storage.playerFeatures = set.map { it.name }.toSet()
+    }
+
+    /** La prima presentazione propone cosa tenere dalla risposta a "come la userai" (solo se non si è mai scelto). */
+    fun suggestPlayerFeatures(base: Set<PlayerFeature>) {
+        if (storage.playerFeatures == null) setPlayerFeatures(base + PlayerFeature.PROGRESS + PlayerFeature.RACKETS)
+    }
+
+    // ---- Funzioni del circolo ----
+
+    /**
+     * Le funzioni accese. Finché il circolo non sceglie: quelle di base più quelle in cui ci sono già dati (squadre,
+     * corsi, classifiche, server abbinato), così a chi le usa non sparisce niente.
+     */
+    override val clubFeatures = MutableStateFlow(
+        storage.clubFeatures?.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }?.toSet()
+            ?: (ClubFeature.entries.filter { it.base } + listOfNotNull(
+                ClubFeature.TEAMS.takeIf { competitions.teams.value.isNotEmpty() },
+                ClubFeature.SCHOOL.takeIf { school.courses.value.isNotEmpty() },
+                ClubFeature.LADDER.takeIf { competitions.ladders.value.isNotEmpty() },
+                ClubFeature.SERVER.takeIf { clubServer.value.paired },
+            )).toSet(),
+    )
+
+    fun has(f: ClubFeature): Boolean = f in clubFeatures.value
+
+    fun setFeature(f: ClubFeature, on: Boolean) {
+        val n = if (on) clubFeatures.value + f else clubFeatures.value - f
+        clubFeatures.value = n
+        storage.clubFeatures = n.map { it.name }.toSet()
     }
 }
 TSM_EOF
@@ -42854,7 +42881,7 @@ fun ClubFeaturesDialog(c: MatchController, onDone: () -> Unit) {
                         val (name, hint, icon) = featureInfo(s, f)
                         // Il server abbinato non si spegne da qui: prima si scollega (se no continuerebbe a lavorare nascosto).
                         val locked = f == ClubFeature.SERVER && paired.paired && f in on
-                        SwitchRow(icon, name, if (locked) s.cfServerPaired else hint, f in on, enabled = !locked) { c.setFeature(f, it) }
+                        SwitchRow(icon, name, if (locked) s.cfServerPaired else hint, f in on, enabled = !locked) { c.features.setFeature(f, it) }
                     }
                 }
             }
@@ -46574,10 +46601,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         }
         // Si parte dalla prima scheda del ruolo; per chi gioca, da quella dell'uso detto.
         if (role == com.tennis.scoremanager.Role.PLAYER) when (use) {
-            Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
-            Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
-            Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
-            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
+            Use.REFEREE -> { if (firstTime) c.features.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
+            Use.BANDS -> { if (firstTime) c.features.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
+            Use.TRAIN -> { if (firstTime) c.features.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
+            Use.VIDEO -> { if (firstTime) c.features.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()
@@ -46855,7 +46882,7 @@ fun playerFeatureInfo(s: Strings, f: PlayerFeature): Triple<String, String, Imag
 @Composable
 fun PlayerFeaturesDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val on by c.playerFeatures.collectAsState()
+    val on by c.features.playerFeatures.collectAsState()
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.pfTitle) },
@@ -46864,7 +46891,7 @@ fun PlayerFeaturesDialog(c: MatchController, onDone: () -> Unit) {
                 Text(s.pfHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 for (f in PlayerFeature.entries) {
                     val (name, hint, icon) = playerFeatureInfo(s, f)
-                    SwitchRow(icon, name, hint, f in on) { c.setPlayerFeature(f, it) }
+                    SwitchRow(icon, name, hint, f in on) { c.features.setPlayerFeature(f, it) }
                 }
             }
         },
@@ -71339,11 +71366,11 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                         else {
                             Text(s.issueFeeDue(Fees.money(left, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
                             // Un tasto per ogni modo di pagamento del circolo.
-                            for (t in c.planning.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.payBooking(b0, t) }, Modifier.fillMaxWidth())
+                            for (t in c.planning.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.planning.payBooking(b0, t) }, Modifier.fillMaxWidth())
                         }
                     }
                     // L'addebito va in Quote e pagamenti: solo se il circolo le usa.
-                    if (b.players.isNotEmpty() && cents > 0 && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
+                    if (b.players.isNotEmpty() && cents > 0 && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
                 }
                 if (isNew) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Repeat, null, tint = TsmColors.TextDim)
@@ -71352,7 +71379,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     IconButton(onClick = { weeks = (weeks + 1).coerceAtMost(40) }) { Icon(Icons.Filled.Add, null) }
                 }
                 if (!isNew) {
-                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.noticeBooking(b0) }, Modifier.fillMaxWidth())
+                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.planning.noticeBooking(b0) }, Modifier.fillMaxWidth())
                     TextButton(onClick = { askDelete = true }) { Text(s.bkDelete, color = TsmColors.Danger) }
                 }
             }
@@ -71363,7 +71390,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
                 )
-                onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
+                onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -72954,7 +72981,7 @@ fun HomeScreen(c: MatchController) {
     // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
     val role by c.activeRole.collectAsState()
     // Le schede che restano vuote con quello che non si usa spariscono.
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     val cf by c.clubFeatures.collectAsState()
     val accounts by c.book.bookingAccounts.collectAsState()
     val tabs = role.tabs.filter { t ->
@@ -73184,7 +73211,7 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
         c.refreshSaved()
         c.refreshHistory()
     }
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
     // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
@@ -73288,7 +73315,7 @@ private fun BookingTab(c: MatchController) {
 @Composable
 private fun TrainTab(c: MatchController) {
     val s = LocalStrings.current
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.workoutArea.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     if (PlayerFeature.TRAINING in pf) ServeTrainingCard(c, coach = false)
@@ -73303,7 +73330,7 @@ private fun ProgressTab(c: MatchController) {
     val mine = remember(history, me) {
         if (me.isBlank()) null else c.progress.ratingSports().firstOrNull()?.let { c.progress.ratingTable(it).player(c.myKey()) }
     }
-    val pf by c.playerFeatures.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
     if (PlayerFeature.PROGRESS in pf) Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
         mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
@@ -73366,7 +73393,7 @@ private fun MoreTab(c: MatchController, role: com.tennis.scoremanager.Role, onTo
             // L'allenatore dal computer di casa: schede, ricevute, registro, da stampare.
             if (role == com.tennis.scoremanager.Role.COACH) Entry(Icons.Filled.Computer, s.ccDeskTitle, s.ccDeskHint) { c.go(Screen.DESK) }
             // L'allenatore non ha Progressi: le racchette (sue e degli allievi) stanno qui.
-            if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.playerFeatures.collectAsState().value) {
+            if (role == com.tennis.scoremanager.Role.COACH && PlayerFeature.RACKETS in c.features.playerFeatures.collectAsState().value) {
                 Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.racketArea.openRackets() }
             }
             // Prima di entrare in un circolo: da qui si usa l'invito (poi c'è la scheda Circolo).
@@ -76073,7 +76100,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         if (match && (!short || o.mode != PlayMode.REFEREE)) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue. Senza braccialetti e
             // telecomandi (Altro › Cosa usi) si segna solo da arbitro: niente scelta.
-            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
+            if (c.features.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Segmented(
                 listOf(
                     SegOption(s.modeReferee, Icons.Filled.Gavel),
                     SegOption(s.modeBands, Icons.Filled.Watch),
@@ -76083,7 +76110,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 onSelect = { i -> c.updateOptions { it.copy(mode = PlayMode.entries[i]) } },
                 columns = 1,
             )
-            if (c.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Text(
+            if (c.features.uses(com.tennis.scoremanager.PlayerFeature.BANDS) || o.mode != PlayMode.REFEREE) Text(
                 when (o.mode) {
                     PlayMode.REFEREE -> s.modeRefereeHint
                     PlayMode.BANDS -> s.modeBandsHint
@@ -76105,7 +76132,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        if (devices || (match && c.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
+        if (devices || (match && c.features.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -79011,7 +79038,7 @@ fun SetupScreen(c: MatchController) {
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        if (c.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+        if (c.features.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
                 selected = su.sport.ordinal,
@@ -119920,6 +119947,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 423 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 424 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
