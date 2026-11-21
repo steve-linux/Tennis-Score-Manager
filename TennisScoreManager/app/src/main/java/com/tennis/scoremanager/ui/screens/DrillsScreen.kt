@@ -66,7 +66,7 @@ import com.tennis.scoremanager.ui.wingName
 fun DrillsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val drills by c.drills.collectAsState()
+    val drills by c.drillArea.drills.collectAsState()
     var edit by remember { mutableStateOf<Drill?>(null) }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -146,7 +146,7 @@ private fun DrillEditDialog(c: MatchController, drill: Drill?, onDone: () -> Uni
                     if (stroke == TrainedStroke.SERVE) st.copy(direction = null, wing = null)
                     else st.copy(side = null, kind = null, target = null, wing = st.wing.takeIf { stroke == TrainedStroke.VOLLEY })
                 }
-                c.saveDrill((drill ?: Drill("d${System.currentTimeMillis()}", "", stroke, emptyList(), System.currentTimeMillis())).copy(name = name.trim(), stroke = stroke, steps = clean))
+                c.drillArea.saveDrill((drill ?: Drill("d${System.currentTimeMillis()}", "", stroke, emptyList(), System.currentTimeMillis())).copy(name = name.trim(), stroke = stroke, steps = clean))
                 onDone()
             }) { Text(s.ok) }
         },
@@ -156,7 +156,7 @@ private fun DrillEditDialog(c: MatchController, drill: Drill?, onDone: () -> Uni
         AlertDialog(
             onDismissRequest = { ask = false },
             text = { Text(s.drillDeleteAsk(drill.name)) },
-            confirmButton = { TextButton(onClick = { ask = false; c.deleteDrill(drill.id); onDone() }) { Text(s.drillDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { ask = false; c.drillArea.deleteDrill(drill.id); onDone() }) { Text(s.drillDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { ask = false }) { Text(s.back) } },
         )
     }

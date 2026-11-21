@@ -104,7 +104,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
-        c.setPersonalBackupAuto(autoBackup)
+        c.backups.setPersonalBackupAuto(autoBackup)
         // Il backup automatico l'ha appena visto qui: niente avviso nella prima schermata.
         c.storage.autoBackupNoticeSeen = true
         if (first.isNotBlank() && last.isNotBlank()) {

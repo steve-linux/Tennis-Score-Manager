@@ -100,7 +100,7 @@ fun BackupPasswordRow(c: MatchController, onMessage: (String) -> Unit, onChanged
     var setting by remember { mutableStateOf(false) }
     SwitchRow(Icons.Filled.Lock, s.bpTitle, s.bpHint, on) { want ->
         if (want) setting = true
-        else scope.launch { c.setBackupPassword(null); on = false; onMessage(s.bpRemoved); onChanged() }
+        else scope.launch { c.backups.setBackupPassword(null); on = false; onMessage(s.bpRemoved); onChanged() }
     }
     if (on) GhostButton(s.bpChange, Icons.Filled.Key, { setting = true }, Modifier.fillMaxWidth())
     if (setting) {
@@ -125,7 +125,7 @@ fun BackupPasswordRow(c: MatchController, onMessage: (String) -> Unit, onChanged
                 TextButton(enabled = ok, onClick = {
                     setting = false
                     scope.launch {
-                        val done = c.setBackupPassword(a)
+                        val done = c.backups.setBackupPassword(a)
                         on = true
                         onMessage(if (done) s.bpSet else s.dataBackupFailed)
                         onChanged()

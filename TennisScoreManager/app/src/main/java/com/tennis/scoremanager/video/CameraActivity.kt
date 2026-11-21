@@ -442,7 +442,7 @@ class CameraActivity : ComponentActivity() {
         else controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
         val racket = student?.racket?.let { controller.racketArea.racketById(it) }?.use()
         // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
-        drill.value = if (lessonMode) null else controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        drill.value = if (lessonMode) null else controller.drillArea.drillById(controller.drillArea.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
         serveSession.value = serveSession.value.copy(
             stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
             lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,

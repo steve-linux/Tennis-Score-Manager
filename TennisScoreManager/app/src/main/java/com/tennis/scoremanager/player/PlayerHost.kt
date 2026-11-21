@@ -6,6 +6,7 @@ import com.tennis.scoremanager.LiveMatch
 import com.tennis.scoremanager.Navigator
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.data.HeartProfile
+import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.PlayerProfile
@@ -61,4 +62,18 @@ interface PlayerHost {
     /** Serve il servizio in primo piano (braccialetti, tabellone, fascia, allenamento)? */
     fun needsService(): Boolean
     val racketArea: RacketsArea
+
+    // Cura del database dei giocatori.
+    val players: MutableStateFlow<List<PlayerProfile>>
+    fun refreshPlayers()
+    fun savePlayer(p: PlayerProfile)
+    /** L'allievo che si allena adesso (ruolo Allenatore). */
+    val trainStudent: MutableStateFlow<String?>
+    fun setTrainStudent(id: String?)
+    fun refreshServeSessions()
+    fun studentMatches(p: PlayerProfile): List<com.tennis.scoremanager.data.PlayerStats.MatchLine>
+    /** Il registro del circolo: unendo o cancellando un giocatore si aggiornano i suoi addebiti. */
+    val clubBook: MutableStateFlow<ClubBook>
+    fun saveClubBook(book: ClubBook)
+    val photos: PhotosArea
 }

@@ -16533,7 +16533,7 @@ class MatchController(
     /** Sessioni di allenamento al servizio salvate, dalla più recente. */
     override val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
 
-    fun refreshServeSessions() {
+    override fun refreshServeSessions() {
         scope.launch {
             serveSessions.value = withContext(io) { storage.loadServeSessions() }
             // Gli obiettivi degli allievi si controllano sulle sessioni nuove.
@@ -16642,7 +16642,7 @@ class MatchController(
         players.map { l -> l.filter { it.student } }.stateIn(scope, SharingStarted.Eagerly, players.value.filter { it.student })
 
     /** Chi si allena con l'allenamento dei colpi: PlayerProfile.id, null = nessun allievo. */
-    val trainStudent = MutableStateFlow(storage.trainStudent.ifEmpty { null })
+    override val trainStudent = MutableStateFlow(storage.trainStudent.ifEmpty { null })
 
     /** Giocatore aperto nella sua scheda. */
     val openStudentId = MutableStateFlow<String?>(null)
@@ -16676,43 +16676,8 @@ class MatchController(
 
     // ---- Backup della segreteria ----
 
-    /** Il backup automatico di tutti i dati (senza video), una volta al giorno. */
-    fun setPersonalBackupAuto(on: Boolean) {
-        storage.personalBackupAuto = on
-        com.tennis.scoremanager.service.DailyBackupJob.schedule(app, storage)
-    }
-
-    fun personalBackups(): List<File> = com.tennis.scoremanager.data.Backup.autoList(storage)
-
-    /**
-     * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
-     * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
-     */
-    /**
-     * Mette (o toglie, con null) la password dei backup. Con la password nuova fa subito una copia protetta e, se
-     * riesce, toglie le copie automatiche di prima senza password (avevano gli stessi dati in chiaro).
-     */
-    suspend fun setBackupPassword(pw: String?): Boolean {
-        storage.backupPassword = pw
-        if (pw == null) return true
-        val made = personalBackupNow(onlyIfChanged = false) ?: return false
-        withContext(io) { personalBackups().filter { it != made && !it.name.endsWith(com.tennis.scoremanager.data.Backup.LOCKED_EXT) }.forEach { it.delete() } }
-        return true
-    }
-
-    suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
-        // Un'app appena installata non ha niente da salvare: una copia vuota diventerebbe la "più recente" in Documenti
-        // proprio quando si vuole ripristinare quella di prima (dalla prima apertura). Le copie automatiche partono dopo.
-        if (onlyIfChanged && !storage.onboarded) return@withContext null
-        val folder = strings.strokeFolderName
-        val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
-        if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
-        val now = System.currentTimeMillis()
-        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now, storage.backupPassword?.toCharArray()) }.getOrNull()?.also {
-            storage.personalBackupPrint = print
-            storage.lastBackupAt = now
-        }
-    }
+    /** Backup di tutti i dati: vedi PersonalBackups. */
+    val backups = com.tennis.scoremanager.player.PersonalBackups(this, app, storage, scope, io)
 
     /** I backup della segreteria: vedi OfficeBackups. */
     val office = com.tennis.scoremanager.club.OfficeBackups(this, app, storage, scope, io)
@@ -16722,129 +16687,14 @@ class MatchController(
 
     fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
 
-    /** Domande in sospeso sui giocatori arrivati da un altro telefono ("è lui?"). */
-    val playerQuestions = MutableStateFlow(storage.loadPlayerQuestions())
-
-    /**
-     * Risposta a una domanda: [localId] = è il nostro giocatore (i due identificativi si legano e le sue partite
-     * arrivate diventano sue); null = un'altra persona, che si aggiunge col suo identificativo.
-     */
-    fun answerPlayerQuestion(q: com.tennis.scoremanager.data.Players.Question, localId: String?) {
-        val rest = playerQuestions.value.filter { it.incomingId != q.incomingId }
-        playerQuestions.value = rest
-        scope.launch {
-            withContext(io) {
-                var people = storage.loadPlayers()
-                if (localId != null) {
-                    people = people.map { if (it.id == localId) it.copy(aliases = it.aliases + q.incomingId) else it }
-                    storage.savePlayers(people)
-                    storage.remapPlayer(setOf(q.incomingId), localId)
-                } else if (people.none { it.id == q.incomingId }) {
-                    storage.savePlayers(people + com.tennis.scoremanager.data.PlayerProfile(q.incomingId, q.name, nickname = q.name, createdAt = System.currentTimeMillis()))
-                }
-                storage.savePlayerQuestions(rest)
-            }
-            refreshPlayers()
-            refreshHistory()
-            refreshSaved()
-        }
-    }
-
-    /**
-     * Unisce [other] a [keep]: è la stessa persona scritta in due modi o creata due volte. Le partite e le sessioni di
-     * [other] diventano di [keep], che tiene anche i suoi identificativi (così le partite che arriveranno da altri
-     * telefoni lo riconoscono).
-     */
-    fun mergePlayers(keep: String, other: String) {
-        val a = playerById(keep) ?: return
-        val b = playerById(other) ?: return
-        if (a.id == b.id) return
-        val merged = a.copy(
-            aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
-            hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
-            phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
-            sex = a.sex.ifBlank { b.sex }, heightCm = a.heightCm ?: b.heightCm, weightKg = a.weightKg ?: b.weightKg, club = a.club.ifBlank { b.club }, backhand = a.backhand ?: b.backhand,
-            note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
-        )
-        val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
-        players.value = list.sortedBy { it.name.lowercase() }
-        if (trainStudent.value == b.id) setTrainStudent(a.id)
-        scope.launch {
-            withContext(io) {
-                storage.savePlayers(list)
-                storage.remapPlayer(setOf(b.id) + b.aliases, a.id)
-                saveClubBook(com.tennis.scoremanager.data.Fees.remap(clubBook.value, setOf(b.id) + b.aliases, a.id))
-                storage.loadServeSessions().filter { it.student == b.id }.forEach { storage.saveServeSession(it.copy(student = a.id)) }
-            }
-            refreshHistory()
-            refreshSaved()
-            refreshServeSessions()
-        }
-    }
-
-    /**
-     * Separa un omonimo: le partite [matchIds] di [id] sono di un'altra persona con lo stesso nome, che nasce ora.
-     * Restituisce il giocatore nuovo.
-     */
-    fun splitPlayer(id: String, matchIds: Set<String>): com.tennis.scoremanager.data.PlayerProfile? {
-        val p = playerById(id) ?: return null
-        if (matchIds.isEmpty()) return null
-        val twin = com.tennis.scoremanager.data.PlayerProfile(com.tennis.scoremanager.data.Players.newId(), p.name, nickname = p.name, createdAt = System.currentTimeMillis())
-        val list = players.value + twin
-        players.value = list.sortedBy { it.name.lowercase() }
-        scope.launch {
-            withContext(io) {
-                storage.savePlayers(list)
-                storage.remapPlayer(setOf(p.id) + p.aliases, twin.id, matchIds)
-            }
-            refreshHistory()
-            refreshSaved()
-        }
-        return twin
-    }
+    /** Cura del database dei giocatori: vedi PlayersArea. */
+    val playersArea = com.tennis.scoremanager.player.PlayersArea(this, app, storage, scope, io)
 
     /** Un giocatore nuovo nel database (anche con lo stesso nome di un altro: un omonimo). */
     /** Posto di Nuova partita per cui si sta creando un giocatore (nome e cognome da chiedere); null = nessuno. */
     val playerToCreate = MutableStateFlow<com.tennis.scoremanager.data.Players.Slot?>(null)
 
-    /** Per distinguere due omonimi: quante partite ha e l'ultima volta (null senza partite). */
-    fun playerHint(p: com.tennis.scoremanager.data.PlayerProfile): String? {
-        val lines = studentMatches(p)
-        val last = lines.lastOrNull() ?: return if (p.student) strings.studentsTitle else null
-        return strings.playerMatchesHint(lines.size, com.tennis.scoremanager.data.Reports.date(last.rec.endedAt ?: last.rec.updatedAt, options.value.lang))
-    }
-
-    /** Toglie un allievo dall'elenco: resta un giocatore, e le sue sessioni restano sue. */
-    fun deleteStudent(id: String) {
-        val p = playerById(id) ?: return
-        if (trainStudent.value == id) setTrainStudent(null)
-        savePlayer(p.copy(student = false))
-    }
-
-    /**
-     * Cancella l'allievo e quello che il telefono ha di suo: il giocatore, le sessioni con video e analisi, note e
-     * foto; la sua racchetta resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli
-     * avversari (vi resta il nome).
-     */
-    fun purgeStudent(id: String) {
-        val st = playerById(id) ?: return
-        val list = players.value.filter { it.id != st.id }
-        players.value = list
-        if (trainStudent.value == id) setTrainStudent(null)
-        photos.removePhoto(st.name)
-        // Dal registro del circolo via gli addebiti non pagati; i pagamenti fatti restano col nome (contabilità).
-        saveClubBook(com.tennis.scoremanager.data.Fees.forget(clubBook.value, setOf(st.id) + st.aliases))
-        racketArea.rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { racketArea.saveRacket(it.copy(owner = "")) }
-        scope.launch {
-            withContext(io) {
-                storage.savePlayers(list)
-                storage.loadServeSessions().filter { it.student == st.id }.forEach { storage.deleteServeSession(it) }
-            }
-            refreshServeSessions()
-        }
-    }
-
-    fun setTrainStudent(id: String?) {
+    override fun setTrainStudent(id: String?) {
         trainStudent.value = id
         storage.trainStudent = id.orEmpty()
         // L'allenatore ritrova il suo allievo anche dopo essersi allenato da solo (nel profilo Tu non c'è allievo).
@@ -16958,7 +16808,7 @@ class MatchController(
     private fun keysOf(p: com.tennis.scoremanager.data.PlayerProfile): Set<String> = setOf(p.id) + p.aliases
 
     /** Partite finite del giocatore dallo storico, dalla più vecchia. */
-    fun studentMatches(p: com.tennis.scoremanager.data.PlayerProfile): List<PlayerStats.MatchLine> {
+    override fun studentMatches(p: com.tennis.scoremanager.data.PlayerProfile): List<PlayerStats.MatchLine> {
         val keys = keysOf(p)
         return PlayerStats.linesBy(progress.played()) { rec -> Side.entries.firstOrNull { side -> PlayerStats.whos(rec.setup, side).any { it.key in keys } } }
     }
@@ -16981,13 +16831,8 @@ class MatchController(
 
     // ---------------------------------------------------------------- esercizi guidati
 
-    /** Gli esercizi guidati; la prima volta gli esempi, uno per colpo (si cambiano o si tolgono a piacere). */
-    val drills = MutableStateFlow(storage.loadDrills() ?: com.tennis.scoremanager.data.Drills.templates({ strings.drillTemplateName(it.band) }, System.currentTimeMillis()))
-
-    /** Esercizio scelto per il prossimo allenamento (Drill.id), null = libero. */
-    val trainDrill = MutableStateFlow<String?>(null)
-
-    fun drillById(id: String?): com.tennis.scoremanager.data.Drill? = id?.let { i -> drills.value.firstOrNull { it.id == i } }
+    /** Esercizi guidati: vedi DrillsArea. */
+    val drillArea = com.tennis.scoremanager.player.DrillsArea(this, app, storage, scope, io)
 
     /** Il registro del circolo: quote, addebiti e pagamenti. */
     override val clubBook = MutableStateFlow(storage.loadClubBook())
@@ -17139,19 +16984,6 @@ class MatchController(
     /** Gli avvisi del circolo: vedi ClubNotices. */
     val notices = com.tennis.scoremanager.club.ClubNotices(this, app, storage, scope, io)
     override fun challengeCardFile(ladderId: String, challengeId: String): File? = notices.challengeCardFile(ladderId, challengeId)
-
-    fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
-        val list = drills.value.filter { it.id != d.id } + d
-        drills.value = list
-        scope.launch(io) { storage.saveDrills(list) }
-    }
-
-    fun deleteDrill(id: String) {
-        val list = drills.value.filter { it.id != id }
-        drills.value = list
-        if (trainDrill.value == id) trainDrill.value = null
-        scope.launch(io) { storage.saveDrills(list) }
-    }
 
     // ---------------------------------------------------------------- ruoli
 
@@ -18272,7 +18104,7 @@ class MatchController(
         storage.savePlayers(people)
         storage.savePlayerQuestions(questions)
         players.value = people.sortedBy { it.name.lowercase() }
-        playerQuestions.value = questions
+        playersArea.playerQuestions.value = questions
         for (rec in resolved) {
             val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
             if (state.isFinished) {
@@ -18296,7 +18128,7 @@ class MatchController(
     // ---------------------------------------------------------------- foto dei giocatori
 
     /** Foto dei giocatori e foto ricordo delle partite: vedi PhotosArea. */
-    val photos = com.tennis.scoremanager.player.PhotosArea(this, app, storage, scope, io)
+    override val photos = com.tennis.scoremanager.player.PhotosArea(this, app, storage, scope, io)
 
     // ---------------------------------------------------------------- note della partita
 
@@ -36879,6 +36711,118 @@ object ScoreEngine {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/player/DrillsArea.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/player/DrillsArea.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.player
+
+import android.app.Application
+import com.tennis.scoremanager.data.Storage
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+
+/**
+ * Gli esercizi guidati dell'allenamento dei colpi: gli esempi della prima volta, quelli scelti e modificati.
+ * Quello che serve del resto dell'app è in [PlayerHost].
+ */
+class DrillsArea(
+    host: PlayerHost,
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+) : PlayerHost by host {
+    /** Gli esercizi guidati; la prima volta gli esempi, uno per colpo (si cambiano o si tolgono a piacere). */
+    val drills = MutableStateFlow(storage.loadDrills() ?: com.tennis.scoremanager.data.Drills.templates({ strings.drillTemplateName(it.band) }, System.currentTimeMillis()))
+
+    /** Esercizio scelto per il prossimo allenamento (Drill.id), null = libero. */
+    val trainDrill = MutableStateFlow<String?>(null)
+
+    fun drillById(id: String?): com.tennis.scoremanager.data.Drill? = id?.let { i -> drills.value.firstOrNull { it.id == i } }
+
+    fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
+        val list = drills.value.filter { it.id != d.id } + d
+        drills.value = list
+        scope.launch(io) { storage.saveDrills(list) }
+    }
+
+    fun deleteDrill(id: String) {
+        val list = drills.value.filter { it.id != id }
+        drills.value = list
+        if (trainDrill.value == id) trainDrill.value = null
+        scope.launch(io) { storage.saveDrills(list) }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/player/PersonalBackups.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/player/PersonalBackups.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.player
+
+import android.app.Application
+import com.tennis.scoremanager.data.Storage
+import java.io.File
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
+
+/**
+ * I backup di tutti i dati (senza video) in Documenti › Tennis Score Manager › Backup: automatici ogni giorno, anche
+ * protetti da password.
+ * Quello che serve del resto dell'app è in [PlayerHost].
+ */
+class PersonalBackups(
+    host: PlayerHost,
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+) : PlayerHost by host {
+    /** Il backup automatico di tutti i dati (senza video), una volta al giorno. */
+    fun setPersonalBackupAuto(on: Boolean) {
+        storage.personalBackupAuto = on
+        com.tennis.scoremanager.service.DailyBackupJob.schedule(app, storage)
+    }
+
+    fun personalBackups(): List<File> = com.tennis.scoremanager.data.Backup.autoList(storage)
+
+    /**
+     * Una copia automatica di tutti i dati, senza video, in Documenti/Tennis Score Manager/Backup. Con [onlyIfChanged]
+     * si salta se non è cambiato niente. Restituisce il file, o null se saltata o non riuscita.
+     */
+    /**
+     * Mette (o toglie, con null) la password dei backup. Con la password nuova fa subito una copia protetta e, se
+     * riesce, toglie le copie automatiche di prima senza password (avevano gli stessi dati in chiaro).
+     */
+    suspend fun setBackupPassword(pw: String?): Boolean {
+        storage.backupPassword = pw
+        if (pw == null) return true
+        val made = personalBackupNow(onlyIfChanged = false) ?: return false
+        withContext(io) { personalBackups().filter { it != made && !it.name.endsWith(com.tennis.scoremanager.data.Backup.LOCKED_EXT) }.forEach { it.delete() } }
+        return true
+    }
+
+    suspend fun personalBackupNow(onlyIfChanged: Boolean): File? = withContext(io) {
+        // Un'app appena installata non ha niente da salvare: una copia vuota diventerebbe la "più recente" in Documenti
+        // proprio quando si vuole ripristinare quella di prima (dalla prima apertura). Le copie automatiche partono dopo.
+        if (onlyIfChanged && !storage.onboarded) return@withContext null
+        val folder = strings.strokeFolderName
+        val print = com.tennis.scoremanager.data.Backup.fingerprint(app, storage, folder)
+        if (onlyIfChanged && print == storage.personalBackupPrint && personalBackups().isNotEmpty()) return@withContext null
+        val now = System.currentTimeMillis()
+        runCatching { com.tennis.scoremanager.data.Backup.writeAuto(app, storage, com.tennis.scoremanager.BuildConfig.VERSION_NAME, folder, now, storage.backupPassword?.toCharArray()) }.getOrNull()?.also {
+            storage.personalBackupPrint = print
+            storage.lastBackupAt = now
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/player/PhotosArea.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/player/PhotosArea.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -37047,6 +36991,7 @@ import com.tennis.scoremanager.LiveMatch
 import com.tennis.scoremanager.Navigator
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.data.HeartProfile
+import com.tennis.scoremanager.data.ClubBook
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.PlayerProfile
@@ -37102,6 +37047,167 @@ interface PlayerHost {
     /** Serve il servizio in primo piano (braccialetti, tabellone, fascia, allenamento)? */
     fun needsService(): Boolean
     val racketArea: RacketsArea
+
+    // Cura del database dei giocatori.
+    val players: MutableStateFlow<List<PlayerProfile>>
+    fun refreshPlayers()
+    fun savePlayer(p: PlayerProfile)
+    /** L'allievo che si allena adesso (ruolo Allenatore). */
+    val trainStudent: MutableStateFlow<String?>
+    fun setTrainStudent(id: String?)
+    fun refreshServeSessions()
+    fun studentMatches(p: PlayerProfile): List<com.tennis.scoremanager.data.PlayerStats.MatchLine>
+    /** Il registro del circolo: unendo o cancellando un giocatore si aggiornano i suoi addebiti. */
+    val clubBook: MutableStateFlow<ClubBook>
+    fun saveClubBook(book: ClubBook)
+    val photos: PhotosArea
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/player/PlayersArea.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/player/PlayersArea.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+package com.tennis.scoremanager.player
+
+import android.app.Application
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Storage
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * La cura del database dei giocatori: le domande sui giocatori arrivati da un altro telefono ("è lui?"), unire due
+ * schede della stessa persona, separare un omonimo, togliere o cancellare un allievo.
+ * Quello che serve del resto dell'app è in [PlayerHost].
+ */
+class PlayersArea(
+    host: PlayerHost,
+    private val app: Application,
+    private val storage: Storage,
+    private val scope: CoroutineScope,
+    private val io: CoroutineDispatcher,
+) : PlayerHost by host {
+    /** Domande in sospeso sui giocatori arrivati da un altro telefono ("è lui?"). */
+    val playerQuestions = MutableStateFlow(storage.loadPlayerQuestions())
+
+    /**
+     * Risposta a una domanda: [localId] = è il nostro giocatore (i due identificativi si legano e le sue partite
+     * arrivate diventano sue); null = un'altra persona, che si aggiunge col suo identificativo.
+     */
+    fun answerPlayerQuestion(q: com.tennis.scoremanager.data.Players.Question, localId: String?) {
+        val rest = playerQuestions.value.filter { it.incomingId != q.incomingId }
+        playerQuestions.value = rest
+        scope.launch {
+            withContext(io) {
+                var people = storage.loadPlayers()
+                if (localId != null) {
+                    people = people.map { if (it.id == localId) it.copy(aliases = it.aliases + q.incomingId) else it }
+                    storage.savePlayers(people)
+                    storage.remapPlayer(setOf(q.incomingId), localId)
+                } else if (people.none { it.id == q.incomingId }) {
+                    storage.savePlayers(people + com.tennis.scoremanager.data.PlayerProfile(q.incomingId, q.name, nickname = q.name, createdAt = System.currentTimeMillis()))
+                }
+                storage.savePlayerQuestions(rest)
+            }
+            refreshPlayers()
+            refreshHistory()
+            refreshSaved()
+        }
+    }
+
+    /**
+     * Unisce [other] a [keep]: è la stessa persona scritta in due modi o creata due volte. Le partite e le sessioni di
+     * [other] diventano di [keep], che tiene anche i suoi identificativi (così le partite che arriveranno da altri
+     * telefoni lo riconoscono).
+     */
+    fun mergePlayers(keep: String, other: String) {
+        val a = playerById(keep) ?: return
+        val b = playerById(other) ?: return
+        if (a.id == b.id) return
+        val merged = a.copy(
+            aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
+            hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
+            phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
+            sex = a.sex.ifBlank { b.sex }, heightCm = a.heightCm ?: b.heightCm, weightKg = a.weightKg ?: b.weightKg, club = a.club.ifBlank { b.club }, backhand = a.backhand ?: b.backhand,
+            note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
+        )
+        val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
+        players.value = list.sortedBy { it.name.lowercase() }
+        if (trainStudent.value == b.id) setTrainStudent(a.id)
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.remapPlayer(setOf(b.id) + b.aliases, a.id)
+                saveClubBook(com.tennis.scoremanager.data.Fees.remap(clubBook.value, setOf(b.id) + b.aliases, a.id))
+                storage.loadServeSessions().filter { it.student == b.id }.forEach { storage.saveServeSession(it.copy(student = a.id)) }
+            }
+            refreshHistory()
+            refreshSaved()
+            refreshServeSessions()
+        }
+    }
+
+    /**
+     * Separa un omonimo: le partite [matchIds] di [id] sono di un'altra persona con lo stesso nome, che nasce ora.
+     * Restituisce il giocatore nuovo.
+     */
+    fun splitPlayer(id: String, matchIds: Set<String>): com.tennis.scoremanager.data.PlayerProfile? {
+        val p = playerById(id) ?: return null
+        if (matchIds.isEmpty()) return null
+        val twin = com.tennis.scoremanager.data.PlayerProfile(com.tennis.scoremanager.data.Players.newId(), p.name, nickname = p.name, createdAt = System.currentTimeMillis())
+        val list = players.value + twin
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.remapPlayer(setOf(p.id) + p.aliases, twin.id, matchIds)
+            }
+            refreshHistory()
+            refreshSaved()
+        }
+        return twin
+    }
+
+    /** Per distinguere due omonimi: quante partite ha e l'ultima volta (null senza partite). */
+    fun playerHint(p: com.tennis.scoremanager.data.PlayerProfile): String? {
+        val lines = studentMatches(p)
+        val last = lines.lastOrNull() ?: return if (p.student) strings.studentsTitle else null
+        return strings.playerMatchesHint(lines.size, com.tennis.scoremanager.data.Reports.date(last.rec.endedAt ?: last.rec.updatedAt, options.value.lang))
+    }
+
+    /** Toglie un allievo dall'elenco: resta un giocatore, e le sue sessioni restano sue. */
+    fun deleteStudent(id: String) {
+        val p = playerById(id) ?: return
+        if (trainStudent.value == id) setTrainStudent(null)
+        savePlayer(p.copy(student = false))
+    }
+
+    /**
+     * Cancella l'allievo e quello che il telefono ha di suo: il giocatore, le sessioni con video e analisi, note e
+     * foto; la sua racchetta resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli
+     * avversari (vi resta il nome).
+     */
+    fun purgeStudent(id: String) {
+        val st = playerById(id) ?: return
+        val list = players.value.filter { it.id != st.id }
+        players.value = list
+        if (trainStudent.value == id) setTrainStudent(null)
+        photos.removePhoto(st.name)
+        // Dal registro del circolo via gli addebiti non pagati; i pagamenti fatti restano col nome (contabilità).
+        saveClubBook(com.tennis.scoremanager.data.Fees.forget(clubBook.value, setOf(st.id) + st.aliases))
+        racketArea.rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { racketArea.saveRacket(it.copy(owner = "")) }
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.loadServeSessions().filter { it.student == st.id }.forEach { storage.deleteServeSession(it) }
+            }
+            refreshServeSessions()
+        }
+    }
 }
 TSM_EOF
 
@@ -39370,7 +39476,7 @@ class DailyBackupJob : JobService() {
         scope.launch {
             // La segreteria solo per chi fa il circolo: per gli altri sarebbe una copia vuota.
             runCatching { if (c.storage.officeBackupAuto && com.tennis.scoremanager.Role.CLUB in c.roles.value) c.office.officeBackupNow(onlyIfChanged = true) }
-            runCatching { if (c.storage.personalBackupAuto) c.personalBackupNow(onlyIfChanged = true) }
+            runCatching { if (c.storage.personalBackupAuto) c.backups.personalBackupNow(onlyIfChanged = true) }
             jobFinished(params, false)
         }
         return true
@@ -41592,7 +41698,7 @@ fun BackupPasswordRow(c: MatchController, onMessage: (String) -> Unit, onChanged
     var setting by remember { mutableStateOf(false) }
     SwitchRow(Icons.Filled.Lock, s.bpTitle, s.bpHint, on) { want ->
         if (want) setting = true
-        else scope.launch { c.setBackupPassword(null); on = false; onMessage(s.bpRemoved); onChanged() }
+        else scope.launch { c.backups.setBackupPassword(null); on = false; onMessage(s.bpRemoved); onChanged() }
     }
     if (on) GhostButton(s.bpChange, Icons.Filled.Key, { setting = true }, Modifier.fillMaxWidth())
     if (setting) {
@@ -41617,7 +41723,7 @@ fun BackupPasswordRow(c: MatchController, onMessage: (String) -> Unit, onChanged
                 TextButton(enabled = ok, onClick = {
                     setting = false
                     scope.launch {
-                        val done = c.setBackupPassword(a)
+                        val done = c.backups.setBackupPassword(a)
                         on = true
                         onMessage(if (done) s.bpSet else s.dataBackupFailed)
                         onChanged()
@@ -46408,7 +46514,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
-        c.setPersonalBackupAuto(autoBackup)
+        c.backups.setPersonalBackupAuto(autoBackup)
         // Il backup automatico l'ha appena visto qui: niente avviso nella prima schermata.
         c.storage.autoBackupNoticeSeen = true
         if (first.isNotBlank() && last.isNotBlank()) {
@@ -48347,8 +48453,8 @@ fun drillSummary(s: Strings, d: com.tennis.scoremanager.data.Drill): String = d.
 @Composable
 fun DrillRow(c: MatchController, stroke: TrainedStroke) {
     val s = LocalStrings.current
-    val drills by c.drills.collectAsState()
-    val chosen by c.trainDrill.collectAsState()
+    val drills by c.drillArea.drills.collectAsState()
+    val chosen by c.drillArea.trainDrill.collectAsState()
     val mine = drills.filter { it.stroke == stroke }
     val cur = mine.firstOrNull { it.id == chosen }
     var pick by remember { mutableStateOf(false) }
@@ -48371,7 +48477,7 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 @Composable fun option(label: String, hint: String?, id: String?) = Column(
-                    Modifier.fillMaxWidth().clickable { c.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
+                    Modifier.fillMaxWidth().clickable { c.drillArea.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
                 ) {
                     Text(label, color = if (id == cur?.id) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
                     hint?.let { Text(it, color = TsmColors.TextDim, fontSize = 12.sp) }
@@ -48582,7 +48688,7 @@ fun PlayerEditDialog(
                         ) {
                             PlayerAvatar(c, p.name, if (on) TsmColors.OnBall else TsmColors.Ball, 28.dp)
                             Text(
-                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playerHint(p)?.let { " · $it" } ?: ""),
+                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""),
                                 color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f),
                             )
                         }
@@ -71661,7 +71767,7 @@ fun DataScreen(c: MatchController) {
     var message by remember { mutableStateOf<String?>(null) }
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
     var restoreAsk by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
-    var copies by remember { mutableStateOf(c.personalBackups()) }
+    var copies by remember { mutableStateOf(c.backups.personalBackups()) }
     var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
     var closeAfter by remember { mutableStateOf(false) }
     val videoMb by produceState(0L) {
@@ -71705,9 +71811,9 @@ fun DataScreen(c: MatchController) {
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }
             SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it; c.storage.backupReminder = it }
             var auto by remember { mutableStateOf(c.storage.personalBackupAuto) }
-            SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.setPersonalBackupAuto(it) }
+            SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.backups.setPersonalBackupAuto(it) }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
-            com.tennis.scoremanager.ui.BackupPasswordRow(c, { message = it }) { copies = c.personalBackups() }
+            com.tennis.scoremanager.ui.BackupPasswordRow(c, { message = it }) { copies = c.backups.personalBackups() }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
                 if (c.storage.backupPassword != null) createLocked.launch("TennisScoreManager-backup-$stamp${Backup.LOCKED_EXT}")
@@ -71736,9 +71842,9 @@ fun DataScreen(c: MatchController) {
             GhostButton(s.autoBackupNow, Icons.Filled.Backup, {
                 busy = s.dataBusy
                 scope.launch {
-                    val f = c.personalBackupNow(onlyIfChanged = false)
+                    val f = c.backups.personalBackupNow(onlyIfChanged = false)
                     busy = null
-                    copies = c.personalBackups()
+                    copies = c.backups.personalBackups()
                     message = if (f != null) s.dataBackupDone else s.dataBackupFailed
                 }
             }, Modifier.fillMaxWidth())
@@ -72001,7 +72107,7 @@ import com.tennis.scoremanager.ui.wingName
 fun DrillsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val drills by c.drills.collectAsState()
+    val drills by c.drillArea.drills.collectAsState()
     var edit by remember { mutableStateOf<Drill?>(null) }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -72081,7 +72187,7 @@ private fun DrillEditDialog(c: MatchController, drill: Drill?, onDone: () -> Uni
                     if (stroke == TrainedStroke.SERVE) st.copy(direction = null, wing = null)
                     else st.copy(side = null, kind = null, target = null, wing = st.wing.takeIf { stroke == TrainedStroke.VOLLEY })
                 }
-                c.saveDrill((drill ?: Drill("d${System.currentTimeMillis()}", "", stroke, emptyList(), System.currentTimeMillis())).copy(name = name.trim(), stroke = stroke, steps = clean))
+                c.drillArea.saveDrill((drill ?: Drill("d${System.currentTimeMillis()}", "", stroke, emptyList(), System.currentTimeMillis())).copy(name = name.trim(), stroke = stroke, steps = clean))
                 onDone()
             }) { Text(s.ok) }
         },
@@ -72091,7 +72197,7 @@ private fun DrillEditDialog(c: MatchController, drill: Drill?, onDone: () -> Uni
         AlertDialog(
             onDismissRequest = { ask = false },
             text = { Text(s.drillDeleteAsk(drill.name)) },
-            confirmButton = { TextButton(onClick = { ask = false; c.deleteDrill(drill.id); onDone() }) { Text(s.drillDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { ask = false; c.drillArea.deleteDrill(drill.id); onDone() }) { Text(s.drillDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { ask = false }) { Text(s.back) } },
         )
     }
@@ -72785,7 +72891,7 @@ fun HomeScreen(c: MatchController) {
     val history by c.history.collectAsState()
     val saved by c.saved.collectAsState()
     // Partite arrivate da un altro telefono con un giocatore che si chiama come uno dei nostri: è lui?
-    val questions by c.playerQuestions.collectAsState()
+    val questions by c.playersArea.playerQuestions.collectAsState()
     questions.firstOrNull()?.let { PlayerQuestionDialog(c, it) }
     // Prima accensione: le domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
     var tour by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
@@ -72905,7 +73011,7 @@ private fun CoachTab(c: MatchController) {
     // Le partite lasciate a metà (da "Partita con…"), da riprendere con un tocco.
     ResumeEntries(c, club = false)
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
-    for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
+    for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playersArea.playerHint(st)) { c.openStudent(st.id) }
     // L'agenda delle lezioni: la prossima nella riga, e dentro il promemoria di quelle di domani.
     val book by c.coaching.coachBook.collectAsState()
     val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
@@ -73268,16 +73374,16 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
                 for (id in q.candidates) {
                     val p = c.playerById(id) ?: continue
                     Row(
-                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.answerPlayerQuestion(q, p.id) }.padding(10.dp),
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.playersArea.answerPlayerQuestion(q, p.id) }.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         com.tennis.scoremanager.ui.PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
-                        Text(" " + s.questionYes(p.name) + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                        Text(" " + s.questionYes(p.name) + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
                     }
                 }
             }
         },
-        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.playersArea.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
     )
 }
 
@@ -77253,7 +77359,7 @@ fun PlayersScreen(c: MatchController) {
     val list = if (query.isBlank()) players else Players.search(players, query)
     // Gli omonimi si vedono subito: stesso nome, più giocatori.
     val twins = remember(players) { players.groupBy { com.tennis.scoremanager.data.PlayerStats.key(it.name) }.filterValues { it.size > 1 }.keys }
-    val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
+    val hints = remember(players, history) { players.associate { it.id to c.playersArea.playerHint(it) } }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.7") },
@@ -79921,7 +80027,7 @@ fun StudentScreen(c: MatchController) {
             text = { Text(s.studentPurgeAsk(st.name, mine.size)) },
             confirmButton = {
                 // Sparito il giocatore, la scheda torna indietro da sola (una volta).
-                TextButton(onClick = { purge = false; c.purgeStudent(st.id) }) {
+                TextButton(onClick = { purge = false; c.playersArea.purgeStudent(st.id) }) {
                     Text(s.studentPurgeConfirm, color = TsmColors.Danger, fontWeight = FontWeight.Bold)
                 }
             },
@@ -79936,7 +80042,7 @@ fun StudentScreen(c: MatchController) {
         AlertDialog(
             onDismissRequest = { delete = false },
             text = { Text(s.studentDeleteAsk(st.name)) },
-            confirmButton = { TextButton(onClick = { delete = false; c.deleteStudent(st.id); c.back() }) { Text(s.studentDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { delete = false; c.playersArea.deleteStudent(st.id); c.back() }) { Text(s.studentDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { delete = false }) { Text(s.back) } },
         )
     }
@@ -79993,7 +80099,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
         AlertDialog(
             onDismissRequest = onDone,
             text = { Text(s.playerMergeAsk(o.name, st.name)) },
-            confirmButton = { TextButton(onClick = { c.mergePlayers(st.id, o.id); onDone() }) { Text(s.playerMerge, color = TsmColors.Danger, fontWeight = FontWeight.Bold) } },
+            confirmButton = { TextButton(onClick = { c.playersArea.mergePlayers(st.id, o.id); onDone() }) { Text(s.playerMerge, color = TsmColors.Danger, fontWeight = FontWeight.Bold) } },
             dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
         )
         return
@@ -80008,7 +80114,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
                 val list = (if (query.isBlank()) everyone else com.tennis.scoremanager.data.Players.search(everyone, query)).filter { it.id != st.id }.take(8)
                 for (p in list) Row(Modifier.fillMaxWidth().clickable { other = p }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                     PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
-                    Text(" " + p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                    Text(" " + p.name + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
                 }
             }
         },
@@ -80041,7 +80147,7 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
             }
         },
         confirmButton = {
-            TextButton(enabled = picked.isNotEmpty(), onClick = { c.splitPlayer(st.id, picked); onDone() }) { Text(s.playerSplitDo(picked.size), color = TsmColors.Danger) }
+            TextButton(enabled = picked.isNotEmpty(), onClick = { c.playersArea.splitPlayer(st.id, picked); onDone() }) { Text(s.playerSplitDo(picked.size), color = TsmColors.Danger) }
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
@@ -82620,7 +82726,7 @@ class CameraActivity : ComponentActivity() {
         else controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
         val racket = student?.racket?.let { controller.racketArea.racketById(it) }?.use()
         // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
-        drill.value = if (lessonMode) null else controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        drill.value = if (lessonMode) null else controller.drillArea.drillById(controller.drillArea.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
         serveSession.value = serveSession.value.copy(
             stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
             lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,
@@ -119769,6 +119875,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 419 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 422 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

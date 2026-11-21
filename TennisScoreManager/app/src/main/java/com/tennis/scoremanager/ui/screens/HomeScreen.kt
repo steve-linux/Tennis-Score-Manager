@@ -116,7 +116,7 @@ fun HomeScreen(c: MatchController) {
     val history by c.history.collectAsState()
     val saved by c.saved.collectAsState()
     // Partite arrivate da un altro telefono con un giocatore che si chiama come uno dei nostri: è lui?
-    val questions by c.playerQuestions.collectAsState()
+    val questions by c.playersArea.playerQuestions.collectAsState()
     questions.firstOrNull()?.let { PlayerQuestionDialog(c, it) }
     // Prima accensione: le domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
     var tour by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
@@ -236,7 +236,7 @@ private fun CoachTab(c: MatchController) {
     // Le partite lasciate a metà (da "Partita con…"), da riprendere con un tocco.
     ResumeEntries(c, club = false)
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
-    for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
+    for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playersArea.playerHint(st)) { c.openStudent(st.id) }
     // L'agenda delle lezioni: la prossima nella riga, e dentro il promemoria di quelle di domani.
     val book by c.coaching.coachBook.collectAsState()
     val next = com.tennis.scoremanager.data.Coaching.upcoming(book.lessons, System.currentTimeMillis()).firstOrNull()
@@ -599,16 +599,16 @@ private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.
                 for (id in q.candidates) {
                     val p = c.playerById(id) ?: continue
                     Row(
-                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.answerPlayerQuestion(q, p.id) }.padding(10.dp),
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.playersArea.answerPlayerQuestion(q, p.id) }.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         com.tennis.scoremanager.ui.PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
-                        Text(" " + s.questionYes(p.name) + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                        Text(" " + s.questionYes(p.name) + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
                     }
                 }
             }
         },
-        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.playersArea.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
     )
 }
 

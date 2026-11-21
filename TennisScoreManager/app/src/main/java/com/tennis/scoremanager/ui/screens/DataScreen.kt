@@ -70,7 +70,7 @@ fun DataScreen(c: MatchController) {
     var message by remember { mutableStateOf<String?>(null) }
     // Da ripristinare: come aprirlo (un file scelto o una copia automatica) e il suo manifest.
     var restoreAsk by remember { mutableStateOf<Pair<() -> java.io.InputStream?, Backup.Manifest>?>(null) }
-    var copies by remember { mutableStateOf(c.personalBackups()) }
+    var copies by remember { mutableStateOf(c.backups.personalBackups()) }
     var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
     var closeAfter by remember { mutableStateOf(false) }
     val videoMb by produceState(0L) {
@@ -114,9 +114,9 @@ fun DataScreen(c: MatchController) {
             var reminder by remember { mutableStateOf(c.storage.backupReminder) }
             SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it; c.storage.backupReminder = it }
             var auto by remember { mutableStateOf(c.storage.personalBackupAuto) }
-            SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.setPersonalBackupAuto(it) }
+            SwitchRow(Icons.Filled.Schedule, s.autoBackup, s.autoBackupHint, auto) { auto = it; c.backups.setPersonalBackupAuto(it) }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
-            com.tennis.scoremanager.ui.BackupPasswordRow(c, { message = it }) { copies = c.personalBackups() }
+            com.tennis.scoremanager.ui.BackupPasswordRow(c, { message = it }) { copies = c.backups.personalBackups() }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
                 if (c.storage.backupPassword != null) createLocked.launch("TennisScoreManager-backup-$stamp${Backup.LOCKED_EXT}")
@@ -145,9 +145,9 @@ fun DataScreen(c: MatchController) {
             GhostButton(s.autoBackupNow, Icons.Filled.Backup, {
                 busy = s.dataBusy
                 scope.launch {
-                    val f = c.personalBackupNow(onlyIfChanged = false)
+                    val f = c.backups.personalBackupNow(onlyIfChanged = false)
                     busy = null
-                    copies = c.personalBackups()
+                    copies = c.backups.personalBackups()
                     message = if (f != null) s.dataBackupDone else s.dataBackupFailed
                 }
             }, Modifier.fillMaxWidth())

@@ -368,7 +368,7 @@ fun StudentScreen(c: MatchController) {
             text = { Text(s.studentPurgeAsk(st.name, mine.size)) },
             confirmButton = {
                 // Sparito il giocatore, la scheda torna indietro da sola (una volta).
-                TextButton(onClick = { purge = false; c.purgeStudent(st.id) }) {
+                TextButton(onClick = { purge = false; c.playersArea.purgeStudent(st.id) }) {
                     Text(s.studentPurgeConfirm, color = TsmColors.Danger, fontWeight = FontWeight.Bold)
                 }
             },
@@ -383,7 +383,7 @@ fun StudentScreen(c: MatchController) {
         AlertDialog(
             onDismissRequest = { delete = false },
             text = { Text(s.studentDeleteAsk(st.name)) },
-            confirmButton = { TextButton(onClick = { delete = false; c.deleteStudent(st.id); c.back() }) { Text(s.studentDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { delete = false; c.playersArea.deleteStudent(st.id); c.back() }) { Text(s.studentDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { delete = false }) { Text(s.back) } },
         )
     }
@@ -440,7 +440,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
         AlertDialog(
             onDismissRequest = onDone,
             text = { Text(s.playerMergeAsk(o.name, st.name)) },
-            confirmButton = { TextButton(onClick = { c.mergePlayers(st.id, o.id); onDone() }) { Text(s.playerMerge, color = TsmColors.Danger, fontWeight = FontWeight.Bold) } },
+            confirmButton = { TextButton(onClick = { c.playersArea.mergePlayers(st.id, o.id); onDone() }) { Text(s.playerMerge, color = TsmColors.Danger, fontWeight = FontWeight.Bold) } },
             dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
         )
         return
@@ -455,7 +455,7 @@ private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
                 val list = (if (query.isBlank()) everyone else com.tennis.scoremanager.data.Players.search(everyone, query)).filter { it.id != st.id }.take(8)
                 for (p in list) Row(Modifier.fillMaxWidth().clickable { other = p }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                     PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
-                    Text(" " + p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                    Text(" " + p.name + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
                 }
             }
         },
@@ -488,7 +488,7 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
             }
         },
         confirmButton = {
-            TextButton(enabled = picked.isNotEmpty(), onClick = { c.splitPlayer(st.id, picked); onDone() }) { Text(s.playerSplitDo(picked.size), color = TsmColors.Danger) }
+            TextButton(enabled = picked.isNotEmpty(), onClick = { c.playersArea.splitPlayer(st.id, picked); onDone() }) { Text(s.playerSplitDo(picked.size), color = TsmColors.Danger) }
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )

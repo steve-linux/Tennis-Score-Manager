@@ -98,8 +98,8 @@ fun drillSummary(s: Strings, d: com.tennis.scoremanager.data.Drill): String = d.
 @Composable
 fun DrillRow(c: MatchController, stroke: TrainedStroke) {
     val s = LocalStrings.current
-    val drills by c.drills.collectAsState()
-    val chosen by c.trainDrill.collectAsState()
+    val drills by c.drillArea.drills.collectAsState()
+    val chosen by c.drillArea.trainDrill.collectAsState()
     val mine = drills.filter { it.stroke == stroke }
     val cur = mine.firstOrNull { it.id == chosen }
     var pick by remember { mutableStateOf(false) }
@@ -122,7 +122,7 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 @Composable fun option(label: String, hint: String?, id: String?) = Column(
-                    Modifier.fillMaxWidth().clickable { c.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
+                    Modifier.fillMaxWidth().clickable { c.drillArea.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
                 ) {
                     Text(label, color = if (id == cur?.id) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
                     hint?.let { Text(it, color = TsmColors.TextDim, fontSize = 12.sp) }
@@ -333,7 +333,7 @@ fun PlayerEditDialog(
                         ) {
                             PlayerAvatar(c, p.name, if (on) TsmColors.OnBall else TsmColors.Ball, 28.dp)
                             Text(
-                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playerHint(p)?.let { " · $it" } ?: ""),
+                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""),
                                 color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f),
                             )
                         }
