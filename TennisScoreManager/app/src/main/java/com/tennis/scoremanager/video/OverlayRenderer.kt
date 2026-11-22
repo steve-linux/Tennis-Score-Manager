@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
+import androidx.core.graphics.createBitmap
 
 /**
  * Disegna la grafica del punteggio come nelle dirette dei tornei: due righe scure con nome, set finiti, game del
@@ -45,7 +46,7 @@ object OverlayRenderer {
         val bannerText = o.banner?.uppercase()
         val bannerH = if (bannerText != null) 40f * scale else 0f
         val height = titleH + 2 * rowH + bannerH
-        val bmp = Bitmap.createBitmap(width.toInt().coerceAtLeast(1), height.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(width.toInt().coerceAtLeast(1), height.toInt().coerceAtLeast(1))
         val c = Canvas(bmp)
         val fill = Paint().apply { isAntiAlias = true }
 

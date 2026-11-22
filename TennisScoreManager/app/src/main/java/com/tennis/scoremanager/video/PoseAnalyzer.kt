@@ -27,6 +27,7 @@ import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import kotlin.math.abs
 import kotlin.math.max
+import androidx.core.graphics.createBitmap
 
 /**
  * Posizione del corpo con MoveNet SinglePose Thunder (17 punti), tutto sul telefono. Si usa dopo l'allenamento, clip
@@ -52,7 +53,7 @@ class PoseAnalyzer(context: Context) : Closeable {
      * il giocatore ingrandito si vede meglio; fuori dall'immagine è nero.
      */
     fun detect(bmp: Bitmap, crop: RectF, masks: List<RectF> = emptyList()): Array<FloatArray> {
-        val input = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val input = createBitmap(size, size)
         Canvas(input).apply {
             drawColor(Color.BLACK)
             val m = Matrix().apply { setRectToRect(crop, RectF(0f, 0f, size.toFloat(), size.toFloat()), Matrix.ScaleToFit.FILL) }

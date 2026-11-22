@@ -98,8 +98,8 @@ fun drillSummary(s: Strings, d: com.tennis.scoremanager.data.Drill): String = d.
 @Composable
 fun DrillRow(c: MatchController, stroke: TrainedStroke) {
     val s = LocalStrings.current
-    val drills by c.drills.collectAsState()
-    val chosen by c.trainDrill.collectAsState()
+    val drills by c.drillArea.drills.collectAsState()
+    val chosen by c.drillArea.trainDrill.collectAsState()
     val mine = drills.filter { it.stroke == stroke }
     val cur = mine.firstOrNull { it.id == chosen }
     var pick by remember { mutableStateOf(false) }
@@ -122,7 +122,7 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 @Composable fun option(label: String, hint: String?, id: String?) = Column(
-                    Modifier.fillMaxWidth().clickable { c.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
+                    Modifier.fillMaxWidth().clickable { c.drillArea.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
                 ) {
                     Text(label, color = if (id == cur?.id) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
                     hint?.let { Text(it, color = TsmColors.TextDim, fontSize = 12.sp) }
@@ -274,7 +274,7 @@ fun PlayerEditDialog(
     var hand by remember { mutableStateOf(player?.hand) }
     var racket by remember { mutableStateOf(player?.racket) }
     var newRacket by remember { mutableStateOf<com.tennis.scoremanager.data.Racket?>(null) }
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     // Il resto della scheda: sesso (prima era solo per nome), nascita, fisico, circolo, rovescio, allievo, contatti.
     var sex by remember { mutableStateOf(player?.sex?.ifBlank { null } ?: player?.let { c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(it.name)) }.orEmpty()) }
     var birth by remember { mutableStateOf(player?.birth) }
@@ -333,7 +333,7 @@ fun PlayerEditDialog(
                         ) {
                             PlayerAvatar(c, p.name, if (on) TsmColors.OnBall else TsmColors.Ball, 28.dp)
                             Text(
-                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playerHint(p)?.let { " · $it" } ?: ""),
+                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playersArea.playerHint(p)?.let { " · $it" } ?: ""),
                                 color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f),
                             )
                         }
@@ -381,7 +381,7 @@ fun PlayerEditDialog(
                 )
                 // Una racchetta che non c'è ancora si crea da qui, senza passare da Le mie racchette.
                 GhostButton(s.racketNew, androidx.compose.material.icons.Icons.Filled.SportsTennis, {
-                    newRacket = com.tennis.scoremanager.data.Racket(c.newRacketId(), owner = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick))
+                    newRacket = com.tennis.scoremanager.data.Racket(c.racketArea.newRacketId(), owner = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick))
                 }, Modifier.fillMaxWidth())
             }
         },
@@ -399,9 +399,9 @@ fun PlayerEditDialog(
                 )
                 c.savePlayer(p)
                 // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.
-                if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.setPlayerSex(p.name, sex)
+                if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.photos.setPlayerSex(p.name, sex)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
-                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = p.name)) }
+                racket?.let { c.racketArea.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.racketArea.saveRacket(it.copy(owner = p.name)) }
                 onDone(p)
             }) { Text(s.ok) }
         },
@@ -416,7 +416,7 @@ fun PlayerEditDialog(
                 com.tennis.scoremanager.ui.screens.RacketEditor(c, r, isNew = true) {
                     newRacket = null
                     // Salvata: è la sua.
-                    if (c.racketById(r.id) != null) racket = r.id
+                    if (c.racketArea.racketById(r.id) != null) racket = r.id
                 }
             }
         }
@@ -428,6 +428,8 @@ const val RECENT_SESSIONS = 3
 
 /** Una sessione in elenco: data e ora, colpi dentro e percentuale. */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+// Modifier dopo extra: le chiamate passano extra per posizione.
+@Suppress("ModifierParameter")
 @Composable
 fun SessionRow(
     c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,

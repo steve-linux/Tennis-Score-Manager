@@ -3,5 +3,4 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
     <color name="tsm_background">#FF0B1220</color>
-    <color name="tsm_ball">#FFC6F432</color>
 </resources>

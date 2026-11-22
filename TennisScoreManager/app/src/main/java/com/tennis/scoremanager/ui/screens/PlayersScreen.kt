@@ -54,7 +54,7 @@ fun PlayersScreen(c: MatchController) {
     val list = if (query.isBlank()) players else Players.search(players, query)
     // Gli omonimi si vedono subito: stesso nome, più giocatori.
     val twins = remember(players) { players.groupBy { com.tennis.scoremanager.data.PlayerStats.key(it.name) }.filterValues { it.size > 1 }.keys }
-    val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
+    val hints = remember(players, history) { players.associate { it.id to c.playersArea.playerHint(it) } }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.7") },

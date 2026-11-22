@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -82,15 +83,15 @@ fun HistoryScreen(c: MatchController) {
     val s = LocalStrings.current
     val matches by c.history.collectAsState()
     /** 0 = partite, 1 = giocatori. */
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     /** Giocatore aperto (chiave del nome); null = elenco. */
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { c.importMatches(it) }
-    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.receiveFrom(it) } }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.transfer.receiveFrom(it) } }
     var transferMenu by remember { mutableStateOf(false) }
     var choosing by remember { mutableStateOf(false) }
-    val sendUrl by c.transferUrl.collectAsState()
+    val sendUrl by c.transfer.transferUrl.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
     BackHandler { if (player != null) player = null else c.back() }
@@ -162,7 +163,7 @@ fun HistoryScreen(c: MatchController) {
     }
     if (choosing) TransferPickDialog(c) { ids ->
         choosing = false
-        if (ids != null && !c.startSending(ids)) Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+        if (ids != null && !c.transfer.startSending(ids)) Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
     }
     sendUrl?.let { url -> SendDialog(c, url) }
 }
@@ -175,7 +176,7 @@ fun HistoryScreen(c: MatchController) {
 private fun TransferPickDialog(c: MatchController, onDone: (Set<String>?) -> Unit) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
-    val all = remember { c.sendableMatches() }
+    val all = remember { c.transfer.sendableMatches() }
     // Di solito si manda l'ultima partita: parte già spuntata.
     var picked by remember { mutableStateOf(setOfNotNull(all.firstOrNull()?.id)) }
     var byPlayer by remember { mutableStateOf(false) }
@@ -228,10 +229,10 @@ private fun TransferPickDialog(c: MatchController, onDone: (Set<String>?) -> Uni
 @Composable
 private fun SendDialog(c: MatchController, url: String) {
     val s = LocalStrings.current
-    val served by c.transferServed.collectAsState()
-    DisposableEffect(Unit) { onDispose { c.stopSending() } }
+    val served by c.transfer.transferServed.collectAsState()
+    DisposableEffect(Unit) { onDispose { c.transfer.stopSending() } }
     AlertDialog(
-        onDismissRequest = { c.stopSending() },
+        onDismissRequest = { c.transfer.stopSending() },
         title = { Text(s.transferSend) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -240,7 +241,7 @@ private fun SendDialog(c: MatchController, url: String) {
                     fontWeight = if (served > 0) FontWeight.Bold else FontWeight.Normal)
             }
         },
-        confirmButton = { TextButton(onClick = { c.stopSending() }) { Text(s.transferClose) } },
+        confirmButton = { TextButton(onClick = { c.transfer.stopSending() }) { Text(s.transferClose) } },
     )
 }
 

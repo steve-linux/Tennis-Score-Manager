@@ -56,7 +56,7 @@ class RemindersJob : JobService() {
         fun notifyInbox(context: Context, title: String, text: String) {
             if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
             val nm = context.getSystemService(NotificationManager::class.java)
-            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, title, NotificationManager.IMPORTANCE_DEFAULT))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, title, NotificationManager.IMPORTANCE_DEFAULT))
             val open = PendingIntent.getActivity(context, ID - 1,
                 Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_TARGET, "inbox"),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
@@ -70,10 +70,10 @@ class RemindersJob : JobService() {
             if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
             val s = c.strings
             val shown = c.storage.remindersShown
-            val items = Reminders.due(System.currentTimeMillis(), c.activeRole.value == com.tennis.scoremanager.Role.COACH, c.coachBook.value, c.receivedCards.value, shown) { id -> c.playerById(id)?.name ?: "—" }
+            val items = Reminders.due(System.currentTimeMillis(), c.activeRole.value == com.tennis.scoremanager.Role.COACH, c.coaching.coachBook.value, c.cards.receivedCards.value, shown) { id -> c.playerById(id)?.name ?: "—" }
             if (items.isEmpty()) return
             val nm = context.getSystemService(NotificationManager::class.java)
-            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.rmChannel, NotificationManager.IMPORTANCE_DEFAULT))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, s.rmChannel, NotificationManager.IMPORTANCE_DEFAULT))
             for (it in items) {
                 val title = when (it.kind) {
                     Reminders.Kind.TOMORROW -> s.rmTomorrow(it.count)

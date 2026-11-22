@@ -34,9 +34,9 @@ class MainActivity : ComponentActivity() {
         i?.getStringExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)?.let { target ->
             i.removeExtra(com.tennis.scoremanager.service.RemindersJob.EXTRA_TARGET)
             when {
-                target == "inbox" -> controller.openInbox()
-                target == "lessons" -> controller.openLessons()
-                target.startsWith("course:") -> controller.openCoachCourse(target.removePrefix("course:"))
+                target == "inbox" -> controller.mailbox.openInbox()
+                target == "lessons" -> controller.coaching.openLessons()
+                target.startsWith("course:") -> controller.coaching.openCoachCourse(target.removePrefix("course:"))
             }
             return
         }
@@ -46,10 +46,10 @@ class MainActivity : ComponentActivity() {
             val club = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
             if (club != null) {
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_SEEK_CLUB)
-                controller.selectBooking(club)
+                controller.book.selectBooking(club)
                 val room = i.getStringExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
                 i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_CHAT_ROOM)
-                if (room != null) controller.chatRequest.value = room else controller.bookTabRequest.value = 2
+                if (room != null) controller.book.chatRequest.value = room else controller.book.bookTabRequest.value = 2
             }
             controller.go(Screen.BOOK_COURT)
             return
@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
         if (day > 0) {
             i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
-            controller.openPlanAt(day)
+            controller.serverArea.openPlanAt(day)
         }
     }
 
@@ -91,6 +91,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Icona toccata con l'app già aperta da una notifica o da un file: Android mette una seconda schermata principale
+        // sopra la telecamera, il tabellone o il video. Si chiude subito e torna quello che c'era (che resta acceso).
+        if (!isTaskRoot && intent?.action == android.content.Intent.ACTION_MAIN && intent.hasCategory(android.content.Intent.CATEGORY_LAUNCHER)) {
+            finish()
+            return
+        }
         controller.onActivityCreated()
         if (savedInstanceState == null) { openFromNotification(intent); openFile(intent) }
         // Tema sempre scuro: icone chiare nelle barre di sistema.

@@ -27,8 +27,8 @@ class DailyBackupJob : JobService() {
         val c = (application as TsmApp).controller
         scope.launch {
             // La segreteria solo per chi fa il circolo: per gli altri sarebbe una copia vuota.
-            runCatching { if (c.storage.officeBackupAuto && com.tennis.scoremanager.Role.CLUB in c.roles.value) c.officeBackupNow(onlyIfChanged = true) }
-            runCatching { if (c.storage.personalBackupAuto) c.personalBackupNow(onlyIfChanged = true) }
+            runCatching { if (c.storage.officeBackupAuto && com.tennis.scoremanager.Role.CLUB in c.roles.value) c.office.officeBackupNow(onlyIfChanged = true) }
+            runCatching { if (c.storage.personalBackupAuto) c.backups.personalBackupNow(onlyIfChanged = true) }
             jobFinished(params, false)
         }
         return true

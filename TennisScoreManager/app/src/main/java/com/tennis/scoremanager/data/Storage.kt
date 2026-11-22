@@ -9,23 +9,26 @@ import com.tennis.scoremanager.tv.TvSettings
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.io.File
+import androidx.core.content.edit
 
 /** Preferenze e partite salvate in locale (memoria interna dell'app). */
 class Storage(context: Context) {
     companion object {
         /** Foto ricordo per partita: bastano per il PDF e lo tengono sui 3-4 MB. */
         const val MAX_MATCH_PHOTOS = 10
-    }
 
+        /** Come si leggono e scrivono i file dei dati; i test di aggiornamento ([FormatUpgradeTest]) usano questo. */
+        val JSON = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            prettyPrint = true
+        }
+    }
 
     private val app = context.applicationContext
     private val prefs = app.getSharedPreferences("tsm", Context.MODE_PRIVATE)
 
-    val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-        prettyPrint = true
-    }
+    val json = JSON
 
     /** I file messi da parte in questa sessione perché non si leggevano (vedi [readOr]): la prima schermata lo dice. */
     val unreadable: MutableList<String> = java.util.concurrent.CopyOnWriteArrayList()
@@ -65,7 +68,7 @@ class Storage(context: Context) {
     fun playerSex(key: String): String = prefs.getString("sex_$key", "") ?: ""
 
     fun setPlayerSex(key: String, sex: String) {
-        prefs.edit().apply { if (sex.isEmpty()) remove("sex_$key") else putString("sex_$key", sex) }.apply()
+        prefs.edit { if (sex.isEmpty()) remove("sex_$key") else putString("sex_$key", sex) }
     }
 
     fun deletePhoto(key: String) {
@@ -503,12 +506,12 @@ class Storage(context: Context) {
     /** Chi si allena con l'allenamento dei colpi (PlayerProfile.id; vuoto = nessun allievo). */
     var trainStudent: String
         get() = prefs.getString("train_student", null) ?: ""
-        set(v) = prefs.edit().putString("train_student", v).apply()
+        set(v) = prefs.edit { putString("train_student", v) }
 
     /** L'ultimo allievo scelto dall'allenatore: lo ritrova tornando al suo profilo (nel profilo Tu ci si allena da soli). */
     var coachStudent: String
         get() = prefs.getString("coach_student", null) ?: ""
-        set(v) = prefs.edit().putString("coach_student", v).apply()
+        set(v) = prefs.edit { putString("coach_student", v) }
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")
@@ -524,127 +527,127 @@ class Storage(context: Context) {
     /** Racchetta scelta per gli allenamenti ("" = nessuna). */
     var workoutRacket: String
         get() = prefs.getString("workout_racket", null) ?: ""
-        set(v) = prefs.edit().putString("workout_racket", v).apply()
+        set(v) = prefs.edit { putString("workout_racket", v) }
 
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 
     var setup: SetupData
         get() = read(prefs.getString("setup", null)) ?: SetupData()
-        set(v) = prefs.edit().putString("setup", json.encodeToString(SetupData.serializer(), v)).apply()
+        set(v) = prefs.edit { putString("setup", json.encodeToString(SetupData.serializer(), v)) }
 
     var options: MatchOptions
         get() = prefs.getString("options", null)?.let {
             runCatching { json.decodeFromString(MatchOptions.serializer(), it) }.getOrNull()
         } ?: MatchOptions()
-        set(v) = prefs.edit().putString("options", json.encodeToString(MatchOptions.serializer(), v)).apply()
+        set(v) = prefs.edit { putString("options", json.encodeToString(MatchOptions.serializer(), v)) }
 
     /** Tabellone TV: impostazioni del telefono, non della partita. */
     var tv: TvSettings
         get() = prefs.getString("tv", null)?.let {
             runCatching { json.decodeFromString(TvSettings.serializer(), it) }.getOrNull()
         } ?: TvSettings()
-        set(v) = prefs.edit().putString("tv", json.encodeToString(TvSettings.serializer(), v)).apply()
+        set(v) = prefs.edit { putString("tv", json.encodeToString(TvSettings.serializer(), v)) }
 
     /** Ultimo indirizzo a cui si è collegato questo telefono usato come tabellone ("192.168.43.1:8080"). */
     var lastScoreboardHost: String?
         get() = prefs.getString("display_host", null)
-        set(v) = prefs.edit().putString("display_host", v).apply()
+        set(v) = prefs.edit { putString("display_host", v) }
 
     /** Telefono-telecamera: server RTMP della diretta (di serie YouTube) e chiave di trasmissione. */
     var streamUrl: String
         get() = prefs.getString("stream_url", null) ?: "rtmp://a.rtmp.youtube.com/live2"
-        set(v) = prefs.edit().putString("stream_url", v.trim()).apply()
+        set(v) = prefs.edit { putString("stream_url", v.trim()) }
     var streamKey: String
         get() = prefs.getString("stream_key", null) ?: ""
-        set(v) = prefs.edit().putString("stream_key", v.trim()).apply()
+        set(v) = prefs.edit { putString("stream_key", v.trim()) }
     /** Highlights: ordine delle voci (dalla più importante) e quelle accese, come l'ultima volta. */
     var highlightOrder: List<String>
         get() = prefs.getString("hl_order", null)?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
-        set(v) = prefs.edit().putString("hl_order", v.joinToString(",")).apply()
+        set(v) = prefs.edit { putString("hl_order", v.joinToString(",")) }
     var highlightEnabled: Set<String>?
         get() = prefs.getString("hl_enabled", null)?.split(',')?.filter { it.isNotBlank() }?.toSet()
-        set(v) = prefs.edit().putString("hl_enabled", v?.joinToString(",")).apply()
+        set(v) = prefs.edit { putString("hl_enabled", v?.joinToString(",")) }
     /** Brano scelto per le statistiche degli highlights: una copia sul telefono, col nome da mostrare. */
     val highlightMusicFile: File get() = File(app.filesDir, "hl_music")
     var highlightMusicName: String?
         get() = prefs.getString("hl_music_name", null)?.takeIf { highlightMusicFile.exists() }
         set(v) {
             if (v == null) highlightMusicFile.delete()
-            prefs.edit().putString("hl_music_name", v).apply()
+            prefs.edit { putString("hl_music_name", v) }
         }
 
     /** Highlights: schermate delle statistiche in coda al montaggio. */
     var highlightStats: Boolean
         get() = prefs.getBoolean("hl_stats", true)
-        set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
+        set(v) = prefs.edit { putBoolean("hl_stats", v) }
 
     /** Intro come nei tornei in testa agli highlights. */
     var highlightIntro: Boolean
         get() = prefs.getBoolean("hl_intro", true)
-        set(v) = prefs.edit().putBoolean("hl_intro", v).apply()
+        set(v) = prefs.edit { putBoolean("hl_intro", v) }
 
     /** Moviola mandata subito anche al tabellone. */
     var replayOnBoard: Boolean
         get() = prefs.getBoolean("replay_on_board", false)
-        set(v) = prefs.edit().putBoolean("replay_on_board", v).apply()
+        set(v) = prefs.edit { putBoolean("replay_on_board", v) }
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
-        set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+        set(v) = prefs.edit { putBoolean("camera_overlay", v) }
     /** Prima accensione fatta (lingua, uso, nome) e il nome di chi usa l'app (per Progressi e rating; "" = non detto). */
     var onboarded: Boolean
         get() = prefs.getBoolean("onboarded", false)
-        set(v) = prefs.edit().putBoolean("onboarded", v).apply()
+        set(v) = prefs.edit { putBoolean("onboarded", v) }
     var myName: String
         get() = prefs.getString("my_name", null) ?: ""
-        set(v) = prefs.edit().putString("my_name", v.trim()).apply()
+        set(v) = prefs.edit { putString("my_name", v.trim()) }
 
     /** Cosa usa chi gioca (PlayerFeature.name); null = mai scelto (tutto acceso, come prima). */
     var playerFeatures: Set<String>?
         get() = prefs.getStringSet("player_features", null)?.toSet()
-        set(v) = prefs.edit().putStringSet("player_features", v).apply()
+        set(v) = prefs.edit { putStringSet("player_features", v) }
 
     var playerFeaturesSeen: Boolean
         get() = prefs.getBoolean("player_features_seen", false)
-        set(v) = prefs.edit().putBoolean("player_features_seen", v).apply()
+        set(v) = prefs.edit { putBoolean("player_features_seen", v) }
 
     /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
     var clubFeatures: Set<String>?
         get() = prefs.getStringSet("club_features", null)?.toSet()
-        set(v) = prefs.edit().putStringSet("club_features", v).apply()
+        set(v) = prefs.edit { putStringSet("club_features", v) }
 
     /** Il suggerimento "scegli le funzioni" è già stato visto. */
     var clubFeaturesSeen: Boolean
         get() = prefs.getBoolean("club_features_seen", false)
-        set(v) = prefs.edit().putBoolean("club_features_seen", v).apply()
+        set(v) = prefs.edit { putBoolean("club_features_seen", v) }
 
     /** Il ruolo (Role.name; prima se ne potevano accendere più di uno) e quello attivo; di serie Tu. */
     var roles: Set<String>
         get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")
-        set(v) = prefs.edit().putStringSet("roles", v).apply()
+        set(v) = prefs.edit { putStringSet("roles", v) }
     var activeRole: String
         get() = prefs.getString("active_role", null) ?: "PLAYER"
-        set(v) = prefs.edit().putString("active_role", v).apply()
+        set(v) = prefs.edit { putString("active_role", v) }
 
     /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
     var clubName: String
         get() = prefs.getString("club_name", null) ?: ""
-        set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+        set(v) = prefs.edit { putString("club_name", v.trim()) }
     /** Promemoria del telefono (lezioni di domani, presenze da mandare, partita del giorno) e quelli già mostrati. */
     var remindersOn: Boolean
         get() = prefs.getBoolean("reminders_on", true)
-        set(v) = prefs.edit().putBoolean("reminders_on", v).apply()
+        set(v) = prefs.edit { putBoolean("reminders_on", v) }
     var remindersShown: Set<String>
         get() = prefs.getStringSet("reminders_shown", null)?.toSet() ?: emptySet()
-        set(v) = prefs.edit().putStringSet("reminders_shown", v).apply()
+        set(v) = prefs.edit { putStringSet("reminders_shown", v) }
 
     /** Il telefono della segreteria: va nelle schede partita, i giocatori rimandano lì il risultato. */
     var clubPhone: String
         get() = prefs.getString("club_phone", null) ?: ""
-        set(v) = prefs.edit().putString("club_phone", v.trim()).apply()
+        set(v) = prefs.edit { putString("club_phone", v.trim()) }
     var clubCourts: List<String>
         get() = prefs.getString("club_courts", null)?.split('\n')?.filter { it.isNotBlank() } ?: emptyList()
-        set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
+        set(v) = prefs.edit { putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")) }
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
     /**
@@ -653,41 +656,41 @@ class Storage(context: Context) {
      */
     var personalBackupAuto: Boolean
         get() = prefs.getBoolean("personal_backup_auto", true)
-        set(v) = prefs.edit().putBoolean("personal_backup_auto", v).apply()
+        set(v) = prefs.edit { putBoolean("personal_backup_auto", v) }
     var personalBackupPrint: String
         get() = prefs.getString("personal_backup_print", null) ?: ""
-        set(v) = prefs.edit().putString("personal_backup_print", v).apply()
+        set(v) = prefs.edit { putString("personal_backup_print", v) }
 
     /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa, acceso di serie), l'impronta e l'ora dell'ultimo. */
     var officeBackupAuto: Boolean
         get() = prefs.getBoolean("office_backup_auto", true)
-        set(v) = prefs.edit().putBoolean("office_backup_auto", v).apply()
+        set(v) = prefs.edit { putBoolean("office_backup_auto", v) }
     var officeBackupPrint: String
         get() = prefs.getString("office_backup_print", null) ?: ""
-        set(v) = prefs.edit().putString("office_backup_print", v).apply()
+        set(v) = prefs.edit { putString("office_backup_print", v) }
     var officeBackupAt: Long
         get() = prefs.getLong("office_backup_at", 0L)
-        set(v) = prefs.edit().putLong("office_backup_at", v).apply()
+        set(v) = prefs.edit { putLong("office_backup_at", v) }
     /** L'ultimo invio della copia al server non riuscito (il codice), vuoto se è andato. */
     var officeBackupServerError: String
         get() = prefs.getString("office_backup_server_error", null) ?: ""
-        set(v) = prefs.edit().putString("office_backup_server_error", v).apply()
+        set(v) = prefs.edit { putString("office_backup_server_error", v) }
     /** Le copie automatiche della segreteria (fuori dal backup completo: sono già una copia). */
     val officeBackupDir: File get() = File(app.filesDir, "office_backups")
 
     /** Il luogo della partita (riepilogo e PDF) dalla posizione del telefono; chi non lo vuole lo spegne. */
     var matchPlace: Boolean
         get() = prefs.getBoolean("match_place", true)
-        set(v) = prefs.edit().putBoolean("match_place", v).apply()
+        set(v) = prefs.edit { putBoolean("match_place", v) }
     /** La domanda sulla posizione prima della partita si fa una volta sola. */
     var locationAsked: Boolean
         get() = prefs.getBoolean("location_asked", false)
-        set(v) = prefs.edit().putBoolean("location_asked", v).apply()
+        set(v) = prefs.edit { putBoolean("location_asked", v) }
 
     /** Chi aveva già l'app ha visto l'avviso che il backup automatico ora è acceso di serie. */
     var autoBackupNoticeSeen: Boolean
         get() = prefs.getBoolean("auto_backup_notice_seen", false)
-        set(v) = prefs.edit().putBoolean("auto_backup_notice_seen", v).apply()
+        set(v) = prefs.edit { putBoolean("auto_backup_notice_seen", v) }
 
     /**
      * La password dei backup (null = senza): in un file di impostazioni a parte, che non entra nei backup. Serve alle
@@ -696,39 +699,39 @@ class Storage(context: Context) {
     private val secret = app.getSharedPreferences("tsm_secret", Context.MODE_PRIVATE)
     var backupPassword: String?
         get() = secret.getString("backup_password", null)?.takeIf { it.isNotEmpty() }
-        set(v) = secret.edit().apply { if (v.isNullOrEmpty()) remove("backup_password") else putString("backup_password", v) }.apply()
+        set(v) = secret.edit { if (v.isNullOrEmpty()) remove("backup_password") else putString("backup_password", v) }
 
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
-        set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()
+        set(v) = prefs.edit { putBoolean("backup_reminder", v) }
     var lastBackupAt: Long
         get() = prefs.getLong("last_backup", 0L)
-        set(v) = prefs.edit().putLong("last_backup", v).apply()
+        set(v) = prefs.edit { putLong("last_backup", v) }
 
     /** Tu: il tuo giocatore del database (PlayerProfile.id; vuoto = non ancora scelto). */
     var myPlayerId: String
         get() = prefs.getString("my_player", null) ?: ""
-        set(v) = prefs.edit().putString("my_player", v).apply()
+        set(v) = prefs.edit { putString("my_player", v) }
 
     /** Allenamento dei colpi: video a 60 fotogrammi al secondo (solo se tutti gli obiettivi ce la fanno). */
     var trainFps60: Boolean
         get() = prefs.getBoolean("train_fps60", false)
-        set(v) = prefs.edit().putBoolean("train_fps60", v).apply()
+        set(v) = prefs.edit { putBoolean("train_fps60", v) }
 
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
         get() = prefs.getString("camera_lens", null)
-        set(v) = prefs.edit().putString("camera_lens", v).apply()
+        set(v) = prefs.edit { putString("camera_lens", v) }
     /** Assistente inquadratura: metri dietro la linea di fondo, metri da terra, campo (Framing.Court). */
     var framingDistance: Float
         get() = prefs.getFloat("framing_distance", 6f)
-        set(v) = prefs.edit().putFloat("framing_distance", v).apply()
+        set(v) = prefs.edit { putFloat("framing_distance", v) }
     var framingHeight: Float
         get() = prefs.getFloat("framing_height", 2.5f)
-        set(v) = prefs.edit().putFloat("framing_height", v).apply()
+        set(v) = prefs.edit { putFloat("framing_height", v) }
     var framingCourt: String
         get() = prefs.getString("framing_court", null) ?: "TENNIS_DOUBLES"
-        set(v) = prefs.edit().putString("framing_court", v).apply()
+        set(v) = prefs.edit { putString("framing_court", v) }
     /** Taratura completa della sagoma (distanza, altezza e campo sono quelli qui sopra). */
     var framingCalib: com.tennis.scoremanager.video.Framing.Calib
         get() = com.tennis.scoremanager.video.Framing.Calib(
@@ -737,9 +740,11 @@ class Storage(context: Context) {
             prefs.getFloat("framing_fov", 1f), prefs.getFloat("framing_pitch_off", 0f),
         )
         set(v) {
-            prefs.edit().putFloat("framing_distance", v.distance).putFloat("framing_height", v.height).putString("framing_court", v.court)
-                .putFloat("framing_pan", v.pan).putFloat("framing_lateral", v.lateral).putFloat("framing_fov", v.fovScale)
-                .putFloat("framing_pitch_off", v.pitchOffset).apply()
+            prefs.edit {
+                putFloat("framing_distance", v.distance).putFloat("framing_height", v.height).putString("framing_court", v.court)
+                    .putFloat("framing_pan", v.pan).putFloat("framing_lateral", v.lateral).putFloat("framing_fov", v.fovScale)
+                    .putFloat("framing_pitch_off", v.pitchOffset)
+            }
         }
 
     /** Taratura salvata per un campo ("Circolo · Campo" dal punteggio dell'arbitro), null se non c'è. */
@@ -750,7 +755,7 @@ class Storage(context: Context) {
 
     fun saveFramingCalibFor(place: String, c: com.tennis.scoremanager.video.Framing.Calib) {
         if (place.isBlank()) return
-        prefs.edit().putString("framing_calib_" + place.trim().lowercase(), json.encodeToString(com.tennis.scoremanager.video.Framing.Calib.serializer(), c)).apply()
+        prefs.edit { putString("framing_calib_" + place.trim().lowercase(), json.encodeToString(com.tennis.scoremanager.video.Framing.Calib.serializer(), c)) }
     }
 
     private fun read(s: String?): SetupData? =
@@ -764,13 +769,13 @@ class Storage(context: Context) {
      */
     var strokesAutoOn: Set<String>
         get() = prefs.getStringSet("strokes_auto_on", null).orEmpty().toSet()
-        set(v) = prefs.edit().putStringSet("strokes_auto_on", v).apply()
+        set(v) = prefs.edit { putStringSet("strokes_auto_on", v) }
     fun bandName(p1: Boolean): String? = prefs.getString(if (p1) "band_p1_name" else "band_p2_name", null)
     fun setBand(p1: Boolean, address: String?, name: String?) {
-        prefs.edit()
-            .putString(if (p1) "band_p1" else "band_p2", address)
-            .putString(if (p1) "band_p1_name" else "band_p2_name", name)
-            .apply()
+        prefs.edit {
+            putString(if (p1) "band_p1" else "band_p2", address)
+                .putString(if (p1) "band_p1_name" else "band_p2_name", name)
+        }
     }
 
     /** Telecomandi Bluetooth: descrittore del dispositivo (identità stabile di Android) e nome mostrato. */
@@ -779,21 +784,21 @@ class Storage(context: Context) {
     /** Tasto premuto all'associazione: dà il punto; gli altri tasti dello stesso telecomando annullano (null = tutti punto). */
     fun remoteKey(p1: Boolean): Int? = prefs.getInt(if (p1) "remote_p1_key" else "remote_p2_key", -1).takeIf { it >= 0 }
     fun setRemote(p1: Boolean, descriptor: String?, name: String?, key: Int?) {
-        prefs.edit()
-            .putString(if (p1) "remote_p1" else "remote_p2", descriptor)
-            .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
-            .putInt(if (p1) "remote_p1_key" else "remote_p2_key", key ?: -1)
-            .apply()
+        prefs.edit {
+            putString(if (p1) "remote_p1" else "remote_p2", descriptor)
+                .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
+                .putInt(if (p1) "remote_p1_key" else "remote_p2_key", key ?: -1)
+        }
     }
 
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
     fun strapAddress(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1" else "strap_p2", null)
     fun strapName(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1_name" else "strap_p2_name", null)
     fun setStrap(p1: Boolean, address: String?, name: String?) {
-        prefs.edit()
-            .putString(if (p1) "strap_p1" else "strap_p2", address)
-            .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
-            .apply()
+        prefs.edit {
+            putString(if (p1) "strap_p1" else "strap_p2", address)
+                .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
+        }
     }
 
     /** Chi indossa la fascia del lato (per le calorie); null = non detto. */
@@ -801,24 +806,24 @@ class Storage(context: Context) {
         prefs.getString(if (p1) "heart_p1" else "heart_p2", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
 
     fun setHeartProfile(p1: Boolean, p: HeartProfile?) {
-        prefs.edit().putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }).apply()
+        prefs.edit { putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }) }
     }
 
     fun bandBaseMa(address: String): Double? =
         prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()
 
     fun setBandBaseMa(address: String, ma: Double) {
-        prefs.edit().putFloat("base_ma_$address", ma.toFloat()).apply()
+        prefs.edit { putFloat("base_ma_$address", ma.toFloat()) }
     }
 
     var historyTree: String?
         get() = prefs.getString("history_tree", null)
-        set(v) = prefs.edit().putString("history_tree", v).apply()
+        set(v) = prefs.edit { putString("history_tree", v) }
 
     /** Id della partita il cui riepilogo è a schermo (null dopo "Nuova partita" o "Esci"). */
     var summaryOpen: String?
         get() = prefs.getString("summary_open", null)
-        set(v) = prefs.edit().putString("summary_open", v).apply()
+        set(v) = prefs.edit { putString("summary_open", v) }
 
     /** Scrittura atomica: prima su file temporaneo, poi rinomina (sicuro anche se il telefono si spegne). */
     @Synchronized

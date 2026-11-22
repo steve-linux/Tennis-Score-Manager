@@ -1,0 +1,53 @@
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.*
+import com.tennis.scoremanager.tv.TvSettings
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
+import org.junit.Test
+import java.io.File
+
+/**
+ * Genera i file d'esempio come li scrive la 2.4.3 (stessa configurazione JSON di Storage), con nomi di prova.
+ * Da eseguire nel codice del tag v2.4.3: FIXTURE_OUT=<cartella> ./gradlew :app:testDebugUnitTest --tests '*FixtureExport*'
+ * La 2.4.3 salva le partite in corso in files/matches, l'ultima finita in files/last_finished.json e,
+ * nelle preferenze "tsm", le stringhe JSON setup, options e tv.
+ */
+class FixtureExport {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }
+
+    private fun <T> w(dir: File, name: String, s: KSerializer<T>, v: T) = File(dir, name).writeText(json.encodeToString(s, v))
+
+    @Test
+    fun export() {
+        val out = File(System.getenv("FIXTURE_OUT") ?: return).apply { mkdirs() }
+        val t0 = 1760000000000L
+        val setup = SetupData(club = "Circolo Prova", court = "Campo 1", doubles = true, p1a = "Mario Rossi", p1b = "Paolo Verdi", p2a = "Luca Bianchi", p2b = "Marco Neri")
+        val options = MatchOptions(mode = PlayMode.BANDS, lang = Lang.EN, format = MatchFormat.TWO_SETS_MATCH_TIEBREAK, noAd = true,
+            tossWinner = Side.P2, firstServer = Side.P2, p1Left = false, firstServerP1 = 1, ttsVoice = "voce", voiceFiles = true, addressLookup = true)
+        val rules = RulesConfig(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK, noAd = true, doubles = true, firstServer = Side.P2, p1StartsLeft = false, firstServerP1 = 1)
+        // Punti a caso (seme fisso) finché il motore della 2.4.3 non dà la partita finita; con tie-break e match tie-break.
+        val rnd = java.util.Random(7)
+        val events = mutableListOf<MatchEvent>(MatchEvent.ServeOrder(1, 1, 0))
+        while (!ScoreEngine.replay(rules, events).isFinished) {
+            events += MatchEvent.Point(if (rnd.nextInt(100) < 52) Side.P1 else Side.P2, t0 + 1000L * events.size)
+        }
+        val end = ScoreEngine.replay(rules, events)
+        val half = ScoreEngine.replay(rules, events.take(events.size / 2))
+        fun desc(m: MatchState) = "sets=" + m.sets.joinToString(" ") { "${it.g1}-${it.g2}" + (it.tb1?.let { t -> "(${t}-${it.tb2})" } ?: "") } +
+            " games=${m.g1}-${m.g2} points=${m.pt1}-${m.pt2} winner=${m.winner} played=${m.pointsPlayed} p1Left=${m.p1Left}"
+        // Punteggio calcolato dalla 2.4.3: quello di oggi, rigiocando gli stessi eventi, deve dare lo stesso.
+        File(out, "expected_scores.txt").writeText("finished ${desc(end)}\nsuspended ${desc(half)}\n")
+        val finished = MatchRecord(
+            id = "m1760000000000", setup = setup, options = options, rules = rules, events = events,
+            clockMs = 1_800_000, startedAt = t0, endedAt = events.last().let { (it as MatchEvent.Point).at }, finished = true,
+            location = MatchLocation(45.0, 11.0, "Via Prova 1"), updatedAt = t0 + 25_000,
+            batteryStart = mapOf(Side.P1 to 90, Side.P2 to 85), batteryEnd = mapOf(Side.P1 to 70, Side.P2 to 60),
+        )
+        w(out, "last_finished.json", MatchRecord.serializer(), finished)
+        w(out, "match_suspended.json", MatchRecord.serializer(), finished.copy(id = "m1760000100000", events = events.take(events.size / 2), finished = false, suspended = true, endedAt = null))
+        w(out, "prefs_setup.json", SetupData.serializer(), setup)
+        w(out, "prefs_options.json", MatchOptions.serializer(), options)
+        w(out, "prefs_tv.json", TvSettings.serializer(), TvSettings(enabled = true, title = "Torneo di prova", color1 = "#00FF00", showClock = false))
+    }
+}

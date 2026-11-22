@@ -18,6 +18,8 @@ import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.Strings
 import java.io.File
 import java.io.OutputStream
+import androidx.core.graphics.scale
+import androidx.core.graphics.withClip
 
 /**
  * Riepilogo completo in PDF (A4), fatto con PdfDocument di Android, senza librerie: risultato con l'immagine del
@@ -226,14 +228,13 @@ object PdfReport {
     private fun fit(b: Bitmap, wPt: Float, hPt: Float): Bitmap {
         val tw = (wPt * PX_PER_PT).toInt().coerceAtLeast(1)
         val th = (hPt * PX_PER_PT).toInt().coerceAtLeast(1)
-        return if (b.width <= tw && b.height <= th) b else Bitmap.createScaledBitmap(b, tw, th, true)
+        return if (b.width <= tw && b.height <= th) b else b.scale(tw, th)
     }
 
     private fun drawCircle(c: Canvas, b: Bitmap, x: Float, y: Float, size: Float) {
-        c.save()
-        c.clipPath(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) })
-        c.drawBitmap(fit(b, size, size), null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
-        c.restore()
+        c.withClip(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) }) {
+            drawBitmap(fit(b, size, size), null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
+        }
     }
 
     private fun statsTable(wr: Writer, rows: List<Triple<String, String, String>>, names: Names) {

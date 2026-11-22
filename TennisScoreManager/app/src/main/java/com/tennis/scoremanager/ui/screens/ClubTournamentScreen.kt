@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -100,7 +101,7 @@ private fun kindLine(s: com.tennis.scoremanager.ui.Strings, t: ClubTournament): 
 fun ClubTournamentsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.clubTournaments.collectAsState()
+    val list by c.competitions.clubTournaments.collectAsState()
     val lang = c.options.collectAsState().value.lang
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -123,7 +124,7 @@ fun ClubTournamentsScreen(c: MatchController) {
             if (items.isEmpty()) continue
             SectionCard(title, Icons.Filled.EmojiEvents) {
                 for (t in items.sortedByDescending { it.start ?: it.createdAt }) {
-                    Row(Modifier.fillMaxWidth().clickable { c.openClubTournament(t.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().clickable { c.competitions.openClubTournament(t.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                             Text(kindLine(s, t), color = TsmColors.TextDim, fontSize = 13.sp)
@@ -139,7 +140,7 @@ fun ClubTournamentsScreen(c: MatchController) {
             }
         }
     }
-    if (creating) TournamentEditDialog(c, null) { id -> creating = false; id?.let { c.openClubTournament(it) } }
+    if (creating) TournamentEditDialog(c, null) { id -> creating = false; id?.let { c.competitions.openClubTournament(it) } }
 }
 
 /** Un torneo: iscritti, tabellone (con i gironi) e partite. */
@@ -147,12 +148,12 @@ fun ClubTournamentsScreen(c: MatchController) {
 fun ClubTournamentScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.clubTournaments.collectAsState()
-    val id by c.openClubTournamentId.collectAsState()
+    val list by c.competitions.clubTournaments.collectAsState()
+    val id by c.competitions.openClubTournamentId.collectAsState()
     val t = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
     val book by c.clubBook.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var askDraw by remember { mutableStateOf(false) }
@@ -172,7 +173,7 @@ fun ClubTournamentScreen(c: MatchController) {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             when {
                 !t.drawn -> BigButton(s.ctDraw, Icons.Filled.Casino, { askDraw = true }, Modifier.weight(1f))
-                t.format == CTFormat.GROUPS && t.groupsDone && !hasKnockout -> BigButton(s.ctMakeKnockout, Icons.Filled.EmojiEvents, { c.clubKnockoutFromGroups(t); tab = 1 }, Modifier.weight(1f))
+                t.format == CTFormat.GROUPS && t.groupsDone && !hasKnockout -> BigButton(s.ctMakeKnockout, Icons.Filled.EmojiEvents, { c.competitions.clubKnockoutFromGroups(t); tab = 1 }, Modifier.weight(1f))
                 else -> Unit
             }
         },
@@ -193,7 +194,7 @@ fun ClubTournamentScreen(c: MatchController) {
             1 -> DrawTab(c, t) { openMatch = it }
             else -> MatchesTab(c, t) { openMatch = it }
         }
-        if (t.drawn && !hasResults) GhostButton(s.ctUndoDraw, Icons.Filled.Undo, { c.undoClubDraw(t) }, Modifier.fillMaxWidth())
+        if (t.drawn && !hasResults) GhostButton(s.ctUndoDraw, Icons.Filled.Undo, { c.competitions.undoClubDraw(t) }, Modifier.fillMaxWidth())
     }
     if (edit) TournamentEditDialog(c, t) { edit = false }
     if (notify) NoticeChoiceDialog(c, t) { notify = false }
@@ -211,7 +212,7 @@ fun ClubTournamentScreen(c: MatchController) {
                     if (ok.size < 2) Text(s.ctDrawTooFew, color = TsmColors.Danger)
                 }
             },
-            confirmButton = { TextButton(enabled = ok.size >= 2, onClick = { askDraw = false; if (c.drawClubTournament(t)) tab = 1 }) { Text(s.ctDraw) } },
+            confirmButton = { TextButton(enabled = ok.size >= 2, onClick = { askDraw = false; if (c.competitions.drawClubTournament(t)) tab = 1 }) { Text(s.ctDraw) } },
             dismissButton = { TextButton(onClick = { askDraw = false }) { Text(s.back) } },
         )
     }
@@ -278,7 +279,7 @@ private fun EditDraw(c: MatchController, t: ClubTournament) {
     val inGroups = t.format == CTFormat.GROUPS && !ClubTournaments.groupsLocked(t)
     val ok = ClubTournaments.eligible(t, players, book, now).map { it.id }.toSet()
     val subs = ClubTournaments.outsideDraw(t).filter { it.id in ok }
-    fun change(f: (ClubTournament) -> ClubTournament?) { failed = !c.editClubDraw(t, f); picked = null }
+    fun change(f: (ClubTournament) -> ClubTournament?) { failed = !c.competitions.editClubDraw(t, f); picked = null }
     fun tap(x: EditPick) {
         val p = picked
         when {
@@ -448,10 +449,10 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
                 if (!m.played && m.a != null && m.b != null) Text(s.ctScoreFromYou, color = TsmColors.TextDim, fontSize = 13.sp)
                 // Convoca: a ciascuno giorno, ora e campo (quelli scelti qui sotto) con la scheda partita per chi tiene il punteggio.
                 if (!m.played && m.a != null && m.b != null) GhostButton(s.ctConvoke, Icons.Filled.Schedule, {
-                    var cur = c.clubTournament(t.id) ?: t
-                    if (court != m.court || at != m.at) { c.setClubSchedule(cur, m.id, court, at); cur = c.clubTournament(t.id) ?: cur }
+                    var cur = c.competitions.clubTournament(t.id) ?: t
+                    if (court != m.court || at != m.at) { c.competitions.setClubSchedule(cur, m.id, court, at); cur = c.competitions.clubTournament(t.id) ?: cur }
                     onDone()
-                    c.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
+                    c.notices.noticeMatch(cur, cur.matches.firstOrNull { it.id == m.id } ?: m)
                 }, Modifier.fillMaxWidth())
                 Text(s.ctWinner, color = TsmColors.TextDim, fontSize = 13.sp)
                 val sides = listOf(m.a, m.b)
@@ -479,15 +480,15 @@ private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDon
                     TimePickerDialog(context, { _, h, min -> at = Calendar.getInstance().apply { timeInMillis = at!!; set(Calendar.HOUR_OF_DAY, h); set(Calendar.MINUTE, min) }.timeInMillis },
                         cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
                 }, Modifier.fillMaxWidth())
-                if (m.played) TextButton(onClick = { c.setClubResult(t, m.id, null, "", false, false); onDone() }) { Text(s.ctClearResult, color = TsmColors.Danger) }
+                if (m.played) TextButton(onClick = { c.competitions.setClubResult(t, m.id, null, "", false, false); onDone() }) { Text(s.ctClearResult, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                var cur = c.clubTournament(t.id) ?: t
-                if (court != m.court || at != m.at) { c.setClubSchedule(cur, m.id, court, at); cur = c.clubTournament(t.id) ?: cur }
+                var cur = c.competitions.clubTournament(t.id) ?: t
+                if (court != m.court || at != m.at) { c.competitions.setClubSchedule(cur, m.id, court, at); cur = c.competitions.clubTournament(t.id) ?: cur }
                 if (winner != m.winner || score != m.score || walkover != m.walkover || retired != m.retired || disqualified != m.disqualified || noShow != m.noShow)
-                    c.setClubResult(cur, m.id, winner, score, walkover, retired, disqualified, noShow)
+                    c.competitions.setClubResult(cur, m.id, winner, score, walkover, retired, disqualified, noShow)
                 onDone()
             }) { Text(s.ok) }
         },
@@ -507,7 +508,7 @@ private fun EntryDialog(c: MatchController, t: ClubTournament, e: CTEntry, onDon
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (id in e.players) c.playerById(id)?.let { p -> GhostButton(p.name, Icons.AutoMirrored.Filled.ArrowForward, { onDone(); c.openStudent(p.id) }, Modifier.fillMaxWidth()) }
                 if (t.drawn && ClubTournaments.outsideDraw(t).any { it.id == e.id })
-                    TextButton(onClick = { c.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.competitions.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
                 if (!t.drawn) {
                     Text(s.ctSeedHint, color = TsmColors.TextDim, fontSize = 13.sp)
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -515,13 +516,13 @@ private fun EntryDialog(c: MatchController, t: ClubTournament, e: CTEntry, onDon
                         Text(seed?.let { s.ctSeedN(it) } ?: s.ctSeedAuto, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                         IconButton(onClick = { seed = (seed ?: 0) + 1 }) { Icon(Icons.Filled.Add, null) }
                     }
-                    TextButton(onClick = { c.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
+                    TextButton(onClick = { c.competitions.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                if (seed != e.seed) c.saveClubTournament(t.copy(entries = t.entries.map { if (it.id == e.id) it.copy(seed = seed) else it }))
+                if (seed != e.seed) c.competitions.saveClubTournament(t.copy(entries = t.entries.map { if (it.id == e.id) it.copy(seed = seed) else it }))
                 onDone()
             }) { Text(s.ok) }
         },
@@ -543,7 +544,7 @@ private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () ->
     val list = (if (query.isBlank()) free else Players.search(free, query)).sortedBy { if (it.member != null) 0 else 1 }
     fun pick(p: PlayerProfile) {
         if (t.doubles && first == null) { first = p; query = ""; return }
-        c.addClubEntry(c.clubTournament(t.id) ?: t, listOfNotNull(first, p))
+        c.competitions.addClubEntry(c.competitions.clubTournament(t.id) ?: t, listOfNotNull(first, p))
         onDone()
     }
     AlertDialog(
@@ -584,13 +585,13 @@ private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: ()
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (!pickDay) {
-                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.noticeEntries(t) }, Modifier.fillMaxWidth())
-                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.noticeMatches(t, null) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.notices.noticeEntries(t) }, Modifier.fillMaxWidth())
+                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.notices.noticeMatches(t, null) }, Modifier.fillMaxWidth())
                     if (days.isNotEmpty()) GhostButton(s.ntKindOrder, Icons.Filled.Schedule, { pickDay = true }, Modifier.fillMaxWidth())
-                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.noticeDraw(t) }, Modifier.fillMaxWidth())
-                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
+                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.notices.noticeDraw(t) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.notices.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
                 } else for (d in days) {
-                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.noticeMatches(t, d) }, Modifier.fillMaxWidth())
+                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.notices.noticeMatches(t, d) }, Modifier.fillMaxWidth())
                 }
             }
         },
@@ -609,8 +610,8 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
     var doubles by remember { mutableStateOf(t?.doubles ?: false) }
     var category by remember { mutableStateOf(t?.category.orEmpty()) }
     var format by remember { mutableStateOf(t?.format ?: CTFormat.KNOCKOUT) }
-    var groups by remember { mutableStateOf(t?.groups ?: 2) }
-    var qualify by remember { mutableStateOf(t?.qualify ?: 2) }
+    var groups by remember { mutableIntStateOf(t?.groups ?: 2) }
+    var qualify by remember { mutableIntStateOf(t?.qualify ?: 2) }
     var start by remember { mutableStateOf(t?.start) }
     var end by remember { mutableStateOf(t?.end) }
     var fee by remember { mutableStateOf(t?.feeCents?.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }
@@ -685,7 +686,7 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                     fitpCode = if (kind == CTKind.FITP) code.trim() else "", referee = if (kind == CTKind.FITP) referee.trim() else "",
                     rules = rules,
                 )
-                c.saveClubTournament(saved)
+                c.competitions.saveClubTournament(saved)
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
@@ -694,7 +695,7 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
     if (askDelete && t != null) AlertDialog(
         onDismissRequest = { askDelete = false },
         text = { Text(s.ctDeleteAsk(t.name)) },
-        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteClubTournament(t.id); onDone(null); c.back() }) { Text(s.ctDelete, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.competitions.deleteClubTournament(t.id); onDone(null); c.back() }) { Text(s.ctDelete, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
 }

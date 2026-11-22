@@ -90,6 +90,7 @@ import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Password
 import com.tennis.scoremanager.ui.SectionCard
+import androidx.compose.runtime.mutableIntStateOf
 
 private const val B_TIME_W = 52
 private const val B_CELL_W = 104
@@ -171,8 +172,8 @@ private class ClubTime(zone: String, private val locale: Locale) {
 fun BookCourtScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val account by c.bookingAccount.collectAsState()
-    val accounts by c.bookingAccounts.collectAsState()
+    val account by c.book.bookingAccount.collectAsState()
+    val accounts by c.book.bookingAccounts.collectAsState()
     var adding by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.18") },
@@ -188,10 +189,10 @@ fun BookCourtScreen(c: MatchController) {
             // Più circoli: si sceglie quale guardare; ogni circolo ha la sua schermata (si ricarica cambiando).
             if (accounts.size > 1) Segmented(
                 accounts.map { SegOption(it.club.ifBlank { it.url.substringAfter("//") }) }, accounts.indexOfFirst { it.url == account.url },
-                { c.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
+                { c.book.selectBooking(accounts[it].url) }, columns = minOf(2, accounts.size),
             )
             // Server che non risponde: si dice qui, e tutto si riaccende da solo quando torna.
-            val reach by c.bookingReach.collectAsState()
+            val reach by c.book.bookingReach.collectAsState()
             if (reach[account.url] == false) Text(s.pbOffline, color = TsmColors.Orange, fontSize = 13.sp)
             androidx.compose.runtime.key(account.url) { BookingView(c) { adding = true } }
         }
@@ -208,7 +209,7 @@ private fun JoinClub(c: MatchController, onJoined: () -> Unit = {}) {
     var msg by remember { mutableStateOf<String?>(null) }
     fun join(text: String) {
         busy = true; msg = null
-        scope.launch { msg = c.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false; if (msg == null) onJoined() }
+        scope.launch { msg = c.book.joinBooking(text, url)?.let { bookErrorText(s, it) }; busy = false; if (msg == null) onJoined() }
     }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { invite = it; join(it) } }
     Text(s.pbJoinIntro, color = TsmColors.TextDim, fontSize = 14.sp)
@@ -238,7 +239,7 @@ private fun JoinClub(c: MatchController, onJoined: () -> Unit = {}) {
             visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
         GhostButton(s.pbLoginGo, Icons.Filled.Login, {
             busy = true; loginMsg = null
-            scope.launch { loginMsg = c.loginBooking(club, phone, pin)?.let { bookErrorText(s, it) }; busy = false; pin = ""; if (loginMsg == null) onJoined() }
+            scope.launch { loginMsg = c.book.loginBooking(club, phone, pin)?.let { bookErrorText(s, it) }; busy = false; pin = ""; if (loginMsg == null) onJoined() }
         }, Modifier.fillMaxWidth(), enabled = !busy && club.isNotBlank() && phone.isNotBlank() && pin.length >= 4)
         loginMsg?.let { Text(it, color = TsmColors.Orange, fontSize = 14.sp) }
     }
@@ -270,7 +271,7 @@ private fun PinSection(c: MatchController, me: SrvMe, onSaved: () -> Unit) {
                 if (pin != pin2) { msg = s.pbPinMismatch; return@GhostButton }
                 busy = true; msg = null
                 scope.launch {
-                    val err = c.setBookingPin(phone, pin)
+                    val err = c.book.setBookingPin(phone, pin)
                     busy = false
                     if (err == null) { msg = s.pbPinSaved; editing = false; pin = ""; pin2 = ""; onSaved() } else msg = bookErrorText(s, err)
                 }
@@ -303,37 +304,37 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     var rooms by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvChatRoom>>(emptyList()) }
     var people by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvPerson>?>(null) }
     var blockAsk by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var tick by remember { mutableStateOf(0) }
+    var tick by remember { mutableIntStateOf(0) }
 
     // Le proprie prenotazioni e il giorno scelto, ora e poi ogni minuto (le caselle degli altri cambiano).
     LaunchedEffect(tick) {
         while (true) {
-            c.booking { it.me() }.onSuccess { m ->
+            c.book.booking { it.me() }.onSuccess { m ->
                 me = m
-                c.booking { it.seeks() }.onSuccess { seeks = it; c.noteSeeks(it) }
-                c.booking { it.myChats() }.onSuccess { rooms = it }
+                c.book.booking { it.seeks() }.onSuccess { seeks = it; c.book.noteSeeks(it) }
+                c.book.booking { it.myChats() }.onSuccess { rooms = it }
                 val d = date?.takeIf { it in m.days } ?: m.days.firstOrNull()
                 date = d
-                if (d != null) c.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
+                if (d != null) c.book.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
             }.onFailure { error = bookErrorText(s, errCode(it)) }
             kotlinx.coroutines.delay(60_000)
         }
     }
     fun reload() { tick++ }
     // Dalle novità di Gioca o da una notifica: si apre direttamente quella chat (o Compagni).
-    val wantChat by c.chatRequest.collectAsState()
+    val wantChat by c.book.chatRequest.collectAsState()
     LaunchedEffect(wantChat) {
         wantChat?.let { room ->
             if (room != "board") tab = 3
             chatRoom = room to (rooms.firstOrNull { it.room == room }?.title ?: "")
-            c.chatRequest.value = null
+            c.book.chatRequest.value = null
         }
     }
-    val wantTab by c.bookTabRequest.collectAsState()
-    LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.bookTabRequest.value = null } }
-    val acct by c.bookingAccount.collectAsState()
+    val wantTab by c.book.bookTabRequest.collectAsState()
+    LaunchedEffect(wantTab) { wantTab?.let { tab = it; c.book.bookTabRequest.value = null } }
+    val acct by c.book.bookingAccount.collectAsState()
     // Guardando Compagni gli annunci sono letti: spariscono dalle novità.
-    LaunchedEffect(tab, acct.openSeeks) { if (tab == 2 && acct.unreadSeeks.isNotEmpty()) c.readSeeks(acct.url) }
+    LaunchedEffect(tab, acct.openSeeks) { if (tab == 2 && acct.unreadSeeks.isNotEmpty()) c.book.readSeeks(acct.url) }
     // Tornando sulla schermata (dall'app o dal telefono) si riprende tutto: intanto altri possono aver prenotato.
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { if (me != null) reload() }
 
@@ -359,8 +360,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
         // Gli avvisi nuovi della segreteria: una striscia in cima, col numero; toccandola si apre la bacheca.
         val boardRead = acct.chatRead["board"] ?: 0
         if (m.boardLast > boardRead) {
-            var unread by remember { mutableStateOf(0) }
-            LaunchedEffect(m.boardLast, boardRead) { c.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
+            var unread by remember { mutableIntStateOf(0) }
+            LaunchedEffect(m.boardLast, boardRead) { c.book.booking { it.chat("board", boardRead) }.onSuccess { l -> unread = l.count { !it.mine } } }
             BoardBanner(s.pbBoardUnread(maxOf(1, unread))) { chatRoom = "board" to "" }
         }
         // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
@@ -383,7 +384,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                         Column(
                             Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) TsmColors.Ball else TsmColors.Surface)
                                 .border(1.dp, if (on) TsmColors.Ball else TsmColors.Outline, RoundedCornerShape(12.dp))
-                                .clickable { date = d; day = null; scope.launch { c.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
+                                .clickable { date = d; day = null; scope.launch { c.book.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
                                 .padding(horizontal = 12.dp, vertical = 6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
@@ -431,15 +432,15 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                         Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
                     }
                     w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
-                    TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
+                    TextButton(onClick = { scope.launch { c.book.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
                 }
 
                 // Promemoria e avvisi sul telefono (anche ad app chiusa).
-                val acc by c.bookingAccount.collectAsState()
+                val acc by c.book.bookingAccount.collectAsState()
                 val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
                 SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
-                    c.setBookingReminders(on)
-                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    c.book.setBookingReminders(on)
+                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context)) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 }
                 PinSection(c, m) { reload() }
                 GhostButton(s.pbAddClub, Icons.Filled.Add, onAddClub, Modifier.fillMaxWidth())
@@ -449,7 +450,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
                 Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 // Le notifiche dei nuovi annunci di questo circolo si possono spegnere (gli annunci restano qui e in Gioca).
-                SwitchRow(Icons.Filled.NotificationsActive, s.pbSeekAlerts, s.pbSeekAlertsHint, acct.seekAlerts) { c.setSeekAlerts(it) }
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbSeekAlerts, s.pbSeekAlertsHint, acct.seekAlerts) { c.book.setSeekAlerts(it) }
                 if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
                 for (k in seeks) Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
@@ -464,7 +465,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     Row {
                         fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
                             scope.launch {
-                                c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
+                                c.book.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
                                     .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
                                 reload()
                             }
@@ -486,7 +487,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             }
             else -> {
                 fun prefs(p: com.tennis.scoremanager.data.SrvPrefsIn) = scope.launch {
-                    c.booking { it.setPrefs(p) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
+                    c.book.booking { it.setPrefs(p) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
                     reload()
                 }
                 // L'elenco come nelle app di messaggi: in cima la chat del circolo, poi le private, le più recenti prima.
@@ -502,7 +503,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 }
                 if (rooms.none { it.room.startsWith("d-") }) Text(s.pbDmNone, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 6.dp))
                 GhostButton(s.pbDmWrite, Icons.Filled.Add, {
-                    scope.launch { c.booking { it.people() }.onSuccess { people = it }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() } }
+                    scope.launch { c.book.booking { it.people() }.onSuccess { people = it }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() } }
                 }, Modifier.fillMaxWidth())
                 // Le scelte: le notifiche della chat del circolo e chi mi può scrivere in privato (spento di partenza).
                 SwitchRow(Icons.Filled.NotificationsActive, s.pbClubChatAlerts, s.pbClubChatAlertsHint, m.clubChat) { prefs(com.tennis.scoremanager.data.SrvPrefsIn(clubChat = it)) }
@@ -510,7 +511,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 if (m.blocked.isNotEmpty()) {
                     Text(s.pbBlockedList, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     for (b in m.blocked) TextButton(onClick = {
-                        scope.launch { c.booking { it.block(b.id, false) }; reload() }
+                        scope.launch { c.book.booking { it.block(b.id, false) }; reload() }
                     }) { Text(s.pbUnblock(b.name), color = TsmColors.Ball) }
                 }
             }
@@ -536,7 +537,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                 text = { Text(s.pbBlockAsk(name)) },
                 confirmButton = { TextButton(onClick = {
                     blockAsk = null; chatRoom = null
-                    scope.launch { c.booking { it.block(id, true) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }; reload() }
+                    scope.launch { c.book.booking { it.block(id, true) }.onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }; reload() }
                 }) { Text(s.pbBlock, color = TsmColors.Danger) } },
                 dismissButton = { TextButton(onClick = { blockAsk = null }) { Text(s.back) } },
             )
@@ -549,16 +550,16 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
             val name = title.ifBlank { rooms.firstOrNull { it.room == room }?.title.orEmpty() }
             com.tennis.scoremanager.ui.ChatDialog(
                 title = when { board -> s.pbBoardTitle; room == "club" -> s.pbClubChat; other != null -> name.ifBlank { s.pbChat }; else -> "${s.pbChat} · $title" },
-                load = { c.booking { it.chat(room, 0) } },
-                send = if (board) null else { text -> c.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
-                report = if (board) null else { id -> c.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
-                editMine = if (board) null else { id, t -> c.booking { it.editChat(id, t) }.exceptionOrNull()?.let(::errCode) },
-                deleteMine = if (board) null else { id -> c.booking { it.deleteMine(id) }.exceptionOrNull()?.let(::errCode) },
+                load = { c.book.booking { it.chat(room, 0) } },
+                send = if (board) null else { text -> c.book.booking { it.postChat(room, text) }.exceptionOrNull()?.let(::errCode) },
+                report = if (board) null else { id -> c.book.booking { it.report(id) }.exceptionOrNull()?.let(::errCode) },
+                editMine = if (board) null else { id, t -> c.book.booking { it.editChat(id, t) }.exceptionOrNull()?.let(::errCode) },
+                deleteMine = if (board) null else { id -> c.book.booking { it.deleteMine(id) }.exceptionOrNull()?.let(::errCode) },
                 hint = when { board -> s.pbBoardHint; room == "club" -> s.pbClubChatHint; other != null -> s.pbDmHint; else -> null },
                 extra = other?.let { id -> s.pbBlock to { blockAsk = id to name } },
                 group = room == "club" || room.startsWith("s-"),
                 errText = { bookErrorText(s, it) },
-                onRead = { at -> c.markChatRead(acct.url, room, at) },
+                onRead = { at -> c.book.markChatRead(acct.url, room, at) },
             ) { chatRoom = null; reload() }
         }
 
@@ -592,7 +593,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     TextButton(enabled = !busy, onClick = {
                         busy = true
                         scope.launch {
-                            c.booking { it.addWait(com.tennis.scoremanager.data.SrvWaitIn(if (any) null else court.name, start, day?.slotMinutes ?: 60)) }
+                            c.book.booking { it.addWait(com.tennis.scoremanager.data.SrvWaitIn(if (any) null else court.name, start, day?.slotMinutes ?: 60)) }
                                 .onSuccess { waitFor = null; Toast.makeText(context, s.pbWaitAdded, Toast.LENGTH_SHORT).show(); reload() }
                                 .onFailure { e ->
                                     val code = errCode(e)
@@ -622,8 +623,8 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
                     TextButton(enabled = b.canCancel && !busy, onClick = {
                         busy = true
                         scope.launch {
-                            c.booking { it.cancelMine(b.id) }
-                                .onSuccess { c.noteMyCancel(b.id); cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
+                            c.book.booking { it.cancelMine(b.id) }
+                                .onSuccess { c.book.noteMyCancel(b.id); cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
                                 .onFailure { err = bookErrorText(s, errCode(it)) }
                             busy = false
                         }
@@ -636,7 +637,7 @@ private fun BookingView(c: MatchController, onAddClub: () -> Unit) {
     if (leave) AlertDialog(
         onDismissRequest = { leave = false },
         text = { Text(s.pbLeaveAsk) },
-        confirmButton = { TextButton(onClick = { leave = false; c.leaveBooking() }) { Text(s.pbLeave, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { leave = false; c.book.leaveBooking() }) { Text(s.pbLeave, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { leave = false }) { Text(s.back) } },
     )
 }
@@ -690,14 +691,14 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
     val locale = c.options.collectAsState().value.lang.locale
     val scope = rememberCoroutineScope()
     val options = (slot..maxOf(me.rules.maxMinutes, slot) step slot).toList()
-    var minutes by remember { mutableStateOf(options.first()) }
+    var minutes by remember { mutableIntStateOf(options.first()) }
     var heating by remember { mutableStateOf(false) }
     var quote by remember { mutableStateOf<SrvQuote?>(null) }
     var err by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     LaunchedEffect(minutes, heating) {
         quote = null; err = null
-        c.booking { it.quote(court.name, start, minutes, heating) }
+        c.book.booking { it.quote(court.name, start, minutes, heating) }
             .onSuccess { q -> quote = q; err = q.problem?.let { bookErrorText(s, it) } }
             .onFailure { err = bookErrorText(s, errCode(it)) }
     }
@@ -724,7 +725,7 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
             TextButton(enabled = quote != null && quote?.problem == null && !busy, onClick = {
                 busy = true
                 scope.launch {
-                    c.booking { it.book(SrvBookIn(court.name, start, minutes, heating)) }
+                    c.book.booking { it.book(SrvBookIn(court.name, start, minutes, heating)) }
                         .onSuccess { onDone(true) }
                         .onFailure { err = bookErrorText(s, errCode(it)) }
                     busy = false
@@ -743,8 +744,8 @@ private fun SeekDialog(c: MatchController, me: SrvMe, day: SrvDay?, date: String
     val step = day?.slotMinutes ?: 60
     val mins = day?.cells?.map { ct.minutes(it.start) }?.distinct()?.sorted()?.ifEmpty { null } ?: (8 until 22).map { it * 60 }
     var d by remember { mutableStateOf(date ?: me.days.first()) }
-    var from by remember { mutableStateOf(mins.getOrElse(1) { mins.first() }) }
-    var to by remember { mutableStateOf(minOf(from + 180, mins.last() + step)) }
+    var from by remember { mutableIntStateOf(mins.getOrElse(1) { mins.first() }) }
+    var to by remember { mutableIntStateOf(minOf(from + 180, mins.last() + step)) }
     var doubles by remember { mutableStateOf(false) }
     var level by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
@@ -782,7 +783,7 @@ private fun SeekDialog(c: MatchController, me: SrvMe, day: SrvDay?, date: String
             TextButton(enabled = !busy, onClick = {
                 busy = true
                 scope.launch {
-                    c.booking { it.addSeek(com.tennis.scoremanager.data.SrvSeekIn(d, from, to, doubles, level, note)) }
+                    c.book.booking { it.addSeek(com.tennis.scoremanager.data.SrvSeekIn(d, from, to, doubles, level, note)) }
                         .onSuccess { onDone(true) }.onFailure { err = bookErrorText(s, errCode(it)) }
                     busy = false
                 }

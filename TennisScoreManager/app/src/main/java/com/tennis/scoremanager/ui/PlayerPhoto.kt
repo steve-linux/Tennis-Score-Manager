@@ -50,9 +50,9 @@ import kotlinx.coroutines.withContext
 fun PlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modifier: Modifier = Modifier) {
     val version by c.photosVersion.collectAsState()
     val photo by produceState<ImageBitmap?>(null, name, version) {
-        value = withContext(Dispatchers.IO) { c.loadPhoto(name)?.asImageBitmap() }
+        value = withContext(Dispatchers.IO) { c.photos.loadPhoto(name)?.asImageBitmap() }
     }
-    val female = remember(name, version) { c.isFemale(name) }
+    val female = remember(name, version) { c.photos.isFemale(name) }
     Box(
         modifier.size(size).clip(CircleShape).background(color.copy(alpha = 0.22f)).border(if (size < 40.dp) 1.5.dp else 2.dp, color, CircleShape),
         contentAlignment = Alignment.Center,
@@ -71,11 +71,11 @@ fun PlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modif
 fun EditablePlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val version by c.photosVersion.collectAsState()
-    val hasPhoto = remember(name, version) { c.loadPhoto(name) != null }
+    val hasPhoto = remember(name, version) { c.photos.loadPhoto(name) != null }
     var ask by remember { mutableStateOf(false) }
     var needName by remember { mutableStateOf(false) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) c.setPhoto(name, uri)
+        if (uri != null) c.photos.setPhoto(name, uri)
     }
     fun pick() = picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     Box(modifier.clickable {
@@ -100,7 +100,7 @@ fun EditablePlayerAvatar(c: MatchController, name: String, color: Color, size: D
             title = { Text(name) },
             text = { Text(s.photoHint) },
             confirmButton = { TextButton(onClick = { ask = false; pick() }) { Text(s.photoChange) } },
-            dismissButton = { TextButton(onClick = { ask = false; c.removePhoto(name) }) { Text(s.photoRemove) } },
+            dismissButton = { TextButton(onClick = { ask = false; c.photos.removePhoto(name) }) { Text(s.photoRemove) } },
         )
     }
     if (needName) {

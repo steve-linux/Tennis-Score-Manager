@@ -158,8 +158,8 @@ fun MembersScreen(c: MatchController) {
         title = { Text(s.ntChoose) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                GhostButton(s.ntMembersTodo, Icons.Filled.VerifiedUser, { notify = false; c.noticeMembersTodo() }, Modifier.fillMaxWidth())
-                GhostButton(s.ntMembersAll, Icons.Filled.Campaign, { notify = false; c.noticeMembersAll() }, Modifier.fillMaxWidth())
+                GhostButton(s.ntMembersTodo, Icons.Filled.VerifiedUser, { notify = false; c.notices.noticeMembersTodo() }, Modifier.fillMaxWidth())
+                GhostButton(s.ntMembersAll, Icons.Filled.Campaign, { notify = false; c.notices.noticeMembersAll() }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {},

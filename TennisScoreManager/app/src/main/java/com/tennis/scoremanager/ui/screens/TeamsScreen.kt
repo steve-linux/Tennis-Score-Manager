@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -90,7 +91,7 @@ private fun resultLine(s: Strings, f: Fixture): String {
 fun TeamsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.teams.collectAsState()
+    val list by c.competitions.teams.collectAsState()
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.17") },
@@ -105,17 +106,17 @@ fun TeamsScreen(c: MatchController) {
         if (list.isEmpty()) Text(s.tmNone, color = TsmColors.TextDim)
         val now = System.currentTimeMillis()
         for (t in list.sortedBy { it.name.lowercase() }) {
-            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface).clickable { c.openTeam(t.id) }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface).clickable { c.competitions.openTeam(t.id) }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                     Text(listOfNotNull(t.championship.ifBlank { null }, t.season.ifBlank { null }, s.tmPlayers(t.roster.size), recordLine(s, t)).joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
-                    t.fixtures.firstOrNull { it.at > now - 6 * 3_600_000L && !Teams.decided(it) }?.let { f -> Text(s.scNext("${f.opponent} · ${c.fixtureWhen(f)}"), color = TsmColors.Ball, fontSize = 13.sp) }
+                    t.fixtures.firstOrNull { it.at > now - 6 * 3_600_000L && !Teams.decided(it) }?.let { f -> Text(s.scNext("${f.opponent} · ${c.competitions.fixtureWhen(f)}"), color = TsmColors.Ball, fontSize = 13.sp) }
                 }
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
             }
         }
     }
-    if (creating) TeamEditDialog(c, null) { id -> creating = false; id?.let { c.openTeam(it) } }
+    if (creating) TeamEditDialog(c, null) { id -> creating = false; id?.let { c.competitions.openTeam(it) } }
 }
 
 /** Una squadra: la rosa (nell'ordine della lista) e gli incontri. */
@@ -123,11 +124,11 @@ fun TeamsScreen(c: MatchController) {
 fun TeamScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.teams.collectAsState()
-    val id by c.openTeamId.collectAsState()
+    val list by c.competitions.teams.collectAsState()
+    val id by c.competitions.openTeamId.collectAsState()
     val t = list.firstOrNull { it.id == id } ?: return
     val players by c.players.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var edit by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     val now = System.currentTimeMillis()
@@ -143,7 +144,7 @@ fun TeamScreen(c: MatchController) {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             if (tab == 1) BigButton(s.tmNewFixture, Icons.Filled.Add, {
                 val f = Fixture(Teams.newId("f"), "", CourtPlans.at(CourtPlans.addDays(now, 7), 9), rubbers = Teams.emptyRubbers(t))
-                c.saveFixture(t, f); c.openFixture(t.id, f.id)
+                c.competitions.saveFixture(t, f); c.competitions.openFixture(t.id, f.id)
             }, Modifier.weight(1f))
         },
     ) {
@@ -165,19 +166,19 @@ fun TeamScreen(c: MatchController) {
                         Text(p?.member?.ranking?.ifBlank { null } ?: "NC", color = TsmColors.TextDim, fontSize = 12.sp)
                         if (problems.isNotEmpty()) Text(problems.joinToString(" · ") { ctProblemText(s, it) }, color = TsmColors.Danger, fontSize = 12.sp)
                     }
-                    if (i > 0) IconButton(onClick = { c.saveTeam(t.copy(roster = t.roster.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } })) }) {
+                    if (i > 0) IconButton(onClick = { c.competitions.saveTeam(t.copy(roster = t.roster.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } })) }) {
                         Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim)
                     }
-                    IconButton(onClick = { c.saveTeam(t.copy(roster = t.roster - pid, captain = t.captain.takeIf { it != pid })) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+                    IconButton(onClick = { c.competitions.saveTeam(t.copy(roster = t.roster - pid, captain = t.captain.takeIf { it != pid })) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
                 }
             }
         } else {
             if (t.fixtures.isEmpty()) Text(s.tmNoFixtures, color = TsmColors.TextDim)
             for (f in t.fixtures.sortedBy { it.at }) {
-                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { c.openFixture(t.id, f.id) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { c.competitions.openFixture(t.id, f.id) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(f.opponent.ifBlank { "—" }, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                        Text(c.fixtureWhen(f), color = TsmColors.TextDim, fontSize = 12.sp)
+                        Text(c.competitions.fixtureWhen(f), color = TsmColors.TextDim, fontSize = 12.sp)
                     }
                     val r = resultLine(s, f)
                     if (r.isNotBlank()) Text(r, color = when (Teams.outcome(f)) { true -> TsmColors.Ok; false -> TsmColors.Danger; else -> TsmColors.TextMain }, fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -186,7 +187,7 @@ fun TeamScreen(c: MatchController) {
         }
     }
     if (edit) TeamEditDialog(c, t) { edit = false }
-    if (adding) PlayerPickDialog(c, t.roster.toSet()) { p -> adding = false; p?.let { c.saveTeam(t.copy(roster = t.roster + it.id)) } }
+    if (adding) PlayerPickDialog(c, t.roster.toSet()) { p -> adding = false; p?.let { c.competitions.saveTeam(t.copy(roster = t.roster + it.id)) } }
 }
 
 /** Un incontro: disponibilità, convocati, partite e risultato. */
@@ -194,20 +195,20 @@ fun TeamScreen(c: MatchController) {
 fun FixtureScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val list by c.teams.collectAsState()
-    val tid by c.openTeamId.collectAsState()
-    val fid by c.openFixtureId.collectAsState()
+    val list by c.competitions.teams.collectAsState()
+    val tid by c.competitions.openTeamId.collectAsState()
+    val fid by c.competitions.openFixtureId.collectAsState()
     val t = list.firstOrNull { it.id == tid } ?: return
     val f = t.fixtures.firstOrNull { it.id == fid } ?: return
     val players by c.players.collectAsState()
     var edit by remember { mutableStateOf(f.opponent.isBlank()) }
     var rubber by remember { mutableStateOf<Int?>(null) }
-    fun save(x: Fixture) = c.saveFixture(c.team(t.id) ?: t, x)
+    fun save(x: Fixture) = c.competitions.saveFixture(c.competitions.team(t.id) ?: t, x)
     fun name(id: String) = players.firstOrNull { it.id == id || id in it.aliases }?.name ?: "—"
     ScreenScaffold(
         onHelp = { c.openHelp("7.17") },
         title = "${t.name} – ${f.opponent.ifBlank { "?" }}",
-        subtitle = c.fixtureWhen(f),
+        subtitle = c.competitions.fixtureWhen(f),
         icon = Icons.Filled.EmojiEvents,
         action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
@@ -227,8 +228,8 @@ fun FixtureScreen(c: MatchController) {
             }
             if (t.roster.isEmpty()) Text(s.tmRosterEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
             else {
-                GhostButton(s.tmAskAll, Icons.Filled.Campaign, { c.noticeAvailability(t, f, false) }, Modifier.fillMaxWidth())
-                if (Teams.noAnswer(t, f).isNotEmpty() && f.availability.isNotEmpty()) GhostButton(s.tmAskMissing(Teams.noAnswer(t, f).size), Icons.Filled.Campaign, { c.noticeAvailability(t, f, true) }, Modifier.fillMaxWidth())
+                GhostButton(s.tmAskAll, Icons.Filled.Campaign, { c.competitions.noticeAvailability(t, f, false) }, Modifier.fillMaxWidth())
+                if (Teams.noAnswer(t, f).isNotEmpty() && f.availability.isNotEmpty()) GhostButton(s.tmAskMissing(Teams.noAnswer(t, f).size), Icons.Filled.Campaign, { c.competitions.noticeAvailability(t, f, true) }, Modifier.fillMaxWidth())
             }
         }
 
@@ -243,7 +244,7 @@ fun FixtureScreen(c: MatchController) {
                     save(f.copy(callUp = if (on) f.callUp + pid else f.callUp - pid))
                 }
             }
-            if (f.callUp.isNotEmpty()) BigButton(s.tmSendCallUp(f.callUp.size), Icons.Filled.Campaign, { c.noticeCallUp(t, f) }, Modifier.fillMaxWidth())
+            if (f.callUp.isNotEmpty()) BigButton(s.tmSendCallUp(f.callUp.size), Icons.Filled.Campaign, { c.competitions.noticeCallUp(t, f) }, Modifier.fillMaxWidth())
         }
 
         // Le partite: i nostri contro i loro, punteggio; si giocano anche col segnapunti.
@@ -251,13 +252,13 @@ fun FixtureScreen(c: MatchController) {
             for ((i, r) in f.rubbers.withIndex()) {
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { rubber = i }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(c.rubberName(t, i), color = TsmColors.TextDim, fontSize = 12.sp)
+                        Text(c.competitions.rubberName(t, i), color = TsmColors.TextDim, fontSize = 12.sp)
                         Text("${r.ours.map(::name).joinToString(" / ").ifBlank { "—" }} – ${r.theirs.joinToString(" / ").ifBlank { "—" }}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                     Text(r.score.ifBlank { when (r.won) { true -> s.tmWon; false -> s.tmLost; null -> "" } } + if (r.walkover) " " + s.ctWalkover else "", color = when (r.won) { true -> TsmColors.Ok; false -> TsmColors.Danger; null -> TsmColors.TextDim }, fontSize = 13.sp)
                 }
             }
-            if (f.rubbers.any { it.won != null }) GhostButton(s.tmSendResult, Icons.Filled.Campaign, { c.noticeResult(t, f) }, Modifier.fillMaxWidth())
+            if (f.rubbers.any { it.won != null }) GhostButton(s.tmSendResult, Icons.Filled.Campaign, { c.competitions.noticeResult(t, f) }, Modifier.fillMaxWidth())
         }
     }
     if (edit) FixtureEditDialog(c, t, f) { edit = false }
@@ -277,7 +278,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
     fun current() = r.copy(theirs = listOf(theirs1, theirs2).take(need).map { it.trim() }.filter { it.isNotEmpty() })
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text(c.rubberName(t, index)) },
+        title = { Text(c.competitions.rubberName(t, index)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(s.tmOurs(need), color = TsmColors.TextDim, fontSize = 13.sp)
@@ -294,10 +295,10 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
                 // Convoca i nostri di questa partita con la scheda partita (la formazione si salva prima).
                 if (r.ours.size == need && r.won == null) GhostButton(s.ctConvoke, Icons.Filled.HowToReg, {
                     val x = current()
-                    c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
+                    c.competitions.saveFixture(c.competitions.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
                     onDone()
-                    val tt = c.team(t.id) ?: t
-                    c.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
+                    val tt = c.competitions.team(t.id) ?: t
+                    c.notices.noticeRubber(tt, tt.fixtures.first { it.id == f.id }, index)
                 }, Modifier.fillMaxWidth())
                 OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40), walkover = false); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
                 val outs = listOf(null, true, false)
@@ -313,7 +314,7 @@ private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0
         confirmButton = {
             TextButton(onClick = {
                 val x = current()
-                c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
+                c.competitions.saveFixture(c.competitions.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
                 onDone()
             }) { Text(s.ok) }
         },
@@ -327,7 +328,7 @@ private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: 
     val s = LocalStrings.current
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     var f by remember { mutableStateOf(f0) }
     var askDelete by remember { mutableStateOf(false) }
     AlertDialog(
@@ -360,7 +361,7 @@ private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: 
                 TextButton(onClick = { askDelete = true }) { Text(s.tmDeleteFixture, color = TsmColors.Danger) }
             }
         },
-        confirmButton = { TextButton(enabled = f.opponent.isNotBlank(), onClick = { c.saveFixture(c.team(t.id) ?: t, f.copy(opponent = f.opponent.trim())); onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(enabled = f.opponent.isNotBlank(), onClick = { c.competitions.saveFixture(c.competitions.team(t.id) ?: t, f.copy(opponent = f.opponent.trim())); onDone() }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (askDelete) AlertDialog(
@@ -369,8 +370,8 @@ private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: 
         confirmButton = {
             TextButton(onClick = {
                 askDelete = false
-                val cur = c.team(t.id) ?: t
-                c.saveTeam(cur.copy(fixtures = cur.fixtures.filter { it.id != f0.id }))
+                val cur = c.competitions.team(t.id) ?: t
+                c.competitions.saveTeam(cur.copy(fixtures = cur.fixtures.filter { it.id != f0.id }))
                 onDone(); c.back()
             }) { Text(s.tmDeleteFixture, color = TsmColors.Danger) }
         },
@@ -413,7 +414,7 @@ private fun TeamEditDialog(c: MatchController, t0: Team?, onDone: (String?) -> U
                 val formula = t0 == null || t0.singles != t.singles || t0.doubles != t.doubles
                 val fixed = if (!formula) t.fixtures else t.fixtures.map { f -> if (f.rubbers.none { it.won != null || it.ours.isNotEmpty() }) f.copy(rubbers = Teams.emptyRubbers(t)) else f }
                 val saved = t.copy(name = t.name.trim(), fixtures = fixed, roster = (t.roster + listOfNotNull(t.captain)).distinct())
-                c.saveTeam(saved)
+                c.competitions.saveTeam(saved)
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
@@ -423,7 +424,7 @@ private fun TeamEditDialog(c: MatchController, t0: Team?, onDone: (String?) -> U
     if (askDelete && t0 != null) AlertDialog(
         onDismissRequest = { askDelete = false },
         text = { Text(s.tmDeleteAsk(t0.name)) },
-        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteTeam(t0.id); onDone(null); c.back() }) { Text(s.tmDelete, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.competitions.deleteTeam(t0.id); onDone(null); c.back() }) { Text(s.tmDelete, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
 }

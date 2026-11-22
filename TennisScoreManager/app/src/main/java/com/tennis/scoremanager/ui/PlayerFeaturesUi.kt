@@ -52,7 +52,7 @@ fun playerFeatureInfo(s: Strings, f: PlayerFeature): Triple<String, String, Imag
 @Composable
 fun PlayerFeaturesDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    val on by c.playerFeatures.collectAsState()
+    val on by c.features.playerFeatures.collectAsState()
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.pfTitle) },
@@ -61,7 +61,7 @@ fun PlayerFeaturesDialog(c: MatchController, onDone: () -> Unit) {
                 Text(s.pfHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 for (f in PlayerFeature.entries) {
                     val (name, hint, icon) = playerFeatureInfo(s, f)
-                    SwitchRow(icon, name, hint, f in on) { c.setPlayerFeature(f, it) }
+                    SwitchRow(icon, name, hint, f in on) { c.features.setPlayerFeature(f, it) }
                 }
             }
         },

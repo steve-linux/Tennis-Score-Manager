@@ -73,6 +73,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -141,6 +142,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.graphics.scale
 
 /**
  * Telefono-telecamera: dietro il campo, al centro. Registra la partita in MP4 1080p e può trasmetterla in diretta
@@ -435,14 +437,14 @@ class CameraActivity : ComponentActivity() {
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
         // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
         // Lezione: quella dell'agenda in corso (e, senza allievo scelto, il suo allievo se è uno solo).
-        val agenda = if (lessonMode) Lessons.current(controller.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
+        val agenda = if (lessonMode) Lessons.current(controller.coaching.coachBook.value.lessons, controller.trainStudent.value, System.currentTimeMillis()) else null
         agendaLesson.value = agenda?.start
         val student = controller.studentById(controller.trainStudent.value ?: agenda?.students?.singleOrNull())
         val folder = if (lessonMode) controller.storage.newLessonFolder(serveSession.value.startedAt, s.strokeFolderName, s.lessonFolder, student?.name)
         else controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
-        val racket = student?.racket?.let { controller.racketById(it) }?.use()
+        val racket = student?.racket?.let { controller.racketArea.racketById(it) }?.use()
         // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
-        drill.value = if (lessonMode) null else controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        drill.value = if (lessonMode) null else controller.drillArea.drillById(controller.drillArea.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
         serveSession.value = serveSession.value.copy(
             stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
             lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,
@@ -777,6 +779,8 @@ class CameraActivity : ComponentActivity() {
         val battery = runCatching {
             getSystemService(android.os.BatteryManager::class.java).getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
         }.getOrNull()?.takeIf { it in 0..100 }
+        // Solo un avviso prima di registrare: lo spazio libero visibile basta (la cache che Android può liberare non conta).
+        @android.annotation.SuppressLint("UsableSpace")
         val free = runCatching { (getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir).usableSpace / (1024 * 1024) }.getOrNull()
         controller.relay.sendCamState(
             CamState(
@@ -820,7 +824,7 @@ class CameraActivity : ComponentActivity() {
                 }
                 if (bmp != null) {
                     val jpeg = withContext(Dispatchers.Default) {
-                        val small = android.graphics.Bitmap.createScaledBitmap(bmp, PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1), true)
+                        val small = bmp.scale(PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1))
                         ByteArrayOutputStream().also { small.compress(android.graphics.Bitmap.CompressFormat.JPEG, 55, it) }.toByteArray()
                     }
                     controller.relay.sendCamFrame(jpeg)
@@ -900,6 +904,7 @@ class CameraActivity : ComponentActivity() {
             val ok = withContext(Dispatchers.IO) {
                 val json = File(file.parentFile, file.nameWithoutExtension + ".json")
                 fun save(uri: String?) = json.writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks, uri, started, names)))
+                var made: android.net.Uri? = null
                 runCatching {
                     save(null)
                     if (Build.VERSION.SDK_INT >= 29) {
@@ -909,12 +914,17 @@ class CameraActivity : ComponentActivity() {
                             put(MediaStore.Video.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MOVIES}/Tennis Score Manager")
                         }
                         val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: error("insert")
+                        made = uri
                         contentResolver.openOutputStream(uri)?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: error("open")
                         // Una copia sola: un'ora di partita sono 3-4 GB. I capitoli restano qui e puntano alla galleria.
                         save(uri.toString())
                         file.delete()
                     }
-                }.onFailure { Log.w(TAG, "copia del video non riuscita", it) }.isSuccess
+                }.onFailure {
+                    Log.w(TAG, "copia del video non riuscita", it)
+                    // Niente video vuoti in galleria: la voce appena creata se ne va con la copia mancata.
+                    made?.let { u -> runCatching { contentResolver.delete(u, null, null) } }
+                }.isSuccess
             }
             message.value = if (ok) s.cameraSaved(marks.size) else s.cameraSaveFailed(file.absolutePath)
         }
@@ -980,7 +990,13 @@ class CameraActivity : ComponentActivity() {
                             // In pausa la telecamera resta spenta anche tornando nell'app.
                             if (trainPaused.value) return
                             val st = stream()
+                            // Tornando nell'app durante una diretta o una registrazione: fuori Android ha bloccato la
+                            // fotocamera, che va riaperta perché il video riprenda (altrimenti nero e solo audio).
+                            val busy = st.isStreaming || recorder.fileActive
                             if (!st.isOnPreview) st.startPreview(this@apply)
+                            if (busy) camera()?.let { cam ->
+                                runCatching { cam.openCameraId(cam.getCurrentCameraId()) }.onFailure { Log.w(TAG, "fotocamera non riaperta", it) }
+                            }
                             openLens()
                             startBuffer()
                             updateOverlay()
@@ -991,7 +1007,12 @@ class CameraActivity : ComponentActivity() {
                         }
 
                         override fun surfaceDestroyed(h: SurfaceHolder) {
-                            stream?.let { if (it.isOnPreview) it.stopPreview() }
+                            stream?.let { st ->
+                                // Fuori dall'app Android blocca la fotocamera. Se resta accesa solo per la memoria della
+                                // moviola la si spegne del tutto: tornando, surfaceCreated la riaccende con la memoria.
+                                if (st.isRecording && !st.isStreaming && !recorder.fileActive) st.stopRecord()
+                                if (st.isOnPreview) st.stopPreview()
+                            }
                         }
                     })
                 }
@@ -1237,7 +1258,7 @@ class CameraActivity : ComponentActivity() {
         val msg by message.collectAsState()
         val relay by controller.relay.ui.collectAsState()
         val score by controller.relay.score.collectAsState()
-        var now by remember { mutableStateOf(SystemClock.elapsedRealtime()) }
+        var now by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
         LaunchedEffect(rec) {
             while (rec) {
                 now = SystemClock.elapsedRealtime()
@@ -1339,7 +1360,8 @@ class CameraActivity : ComponentActivity() {
             onDismissRequest = onDone,
             title = { Text(str.cameraStreamSettings) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Scorre: in orizzontale (com'è sempre la telecamera) il campo della chiave finirebbe sotto il bordo.
+                Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(str.cameraStreamHint, fontSize = 13.sp)
                     OutlinedTextField(url, { url = it }, label = { Text(str.cameraStreamUrl) }, singleLine = true)
                     OutlinedTextField(key, { key = it }, label = { Text(str.cameraStreamKey) }, singleLine = true)

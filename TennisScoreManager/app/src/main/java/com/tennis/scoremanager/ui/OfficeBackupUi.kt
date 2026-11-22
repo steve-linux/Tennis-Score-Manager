@@ -52,7 +52,7 @@ fun OfficeBackupDialog(c: MatchController, onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var auto by remember { mutableStateOf(c.storage.officeBackupAuto) }
-    var copies by remember { mutableStateOf(c.officeBackups()) }
+    var copies by remember { mutableStateOf(c.office.officeBackups()) }
     var ask by remember { mutableStateOf<OfficeSnapshot?>(null) }
     var note by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -70,16 +70,16 @@ fun OfficeBackupDialog(c: MatchController, onDone: () -> Unit) {
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(s.obHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                SwitchRow(Icons.Filled.Schedule, s.obAuto, s.obAutoHint, auto) { auto = it; c.setOfficeBackupAuto(it) }
+                SwitchRow(Icons.Filled.Schedule, s.obAuto, s.obAutoHint, auto) { auto = it; c.office.setOfficeBackupAuto(it) }
                 val last = c.storage.officeBackupAt
                 Text(if (last > 0) s.obLast(whenText(last, c)) else s.obNever, color = TsmColors.TextDim, fontSize = 13.sp)
                 GhostButton(s.obShare, Icons.Filled.Share, {
                     busy = true
                     scope.launch {
-                        val name = c.officeBackupNow(onlyIfChanged = false)
-                        copies = c.officeBackups()
+                        val name = c.office.officeBackupNow(onlyIfChanged = false)
+                        copies = c.office.officeBackups()
                         busy = false
-                        val f = name?.let { c.officeBackupFile(it) } ?: return@launch
+                        val f = name?.let { c.office.officeBackupFile(it) } ?: return@launch
                         // Si condivide una copia nella cartella "share": il FileProvider dà solo quella.
                         val out = withContext(Dispatchers.IO) { File(File(context.cacheDir, "share").apply { mkdirs() }, f.name).also { f.copyTo(it, overwrite = true) } }
                         context.startActivity(Intent.createChooser(c.shareFileIntent(out, "application/octet-stream"), s.obShare))
@@ -93,7 +93,7 @@ fun OfficeBackupDialog(c: MatchController, onDone: () -> Unit) {
                         Text(whenText(f.at, c), color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
                         TextButton(onClick = {
                             scope.launch {
-                                val snap = withContext(Dispatchers.IO) { c.officeBackupFile(f.name)?.readBytes()?.let(OfficeBackup::decode) }
+                                val snap = withContext(Dispatchers.IO) { c.office.officeBackupFile(f.name)?.readBytes()?.let(OfficeBackup::decode) }
                                 if (snap == null) note = s.obNotBackup else ask = snap
                             }
                         }) { Text(s.obRestore) }
@@ -118,7 +118,7 @@ fun OfficeBackupDialog(c: MatchController, onDone: () -> Unit) {
             confirmButton = {
                 TextButton(onClick = {
                     ask = null
-                    scope.launch { c.restoreOffice(snap); copies = c.officeBackups(); note = s.obRestored }
+                    scope.launch { c.office.restoreOffice(snap); copies = c.office.officeBackups(); note = s.obRestored }
                 }) { Text(s.obRestore) }
             },
             dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },

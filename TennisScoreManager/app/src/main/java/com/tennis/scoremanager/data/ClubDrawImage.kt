@@ -11,6 +11,7 @@ import android.graphics.Typeface
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.ctRoundName
 import com.tennis.scoremanager.ui.groupLetter
+import androidx.core.graphics.createBitmap
 
 /**
  * Il tabellone di un torneo in un'immagine da mandare al gruppo o sui social: in alto nome e circolo, poi i gironi
@@ -31,7 +32,7 @@ object ClubDrawImage {
         val drawH = if (rounds > 0) 70f + first * (BOX_H + GAP) else 0f
         val w = maxOf(1080f, M * 2 + rounds * COL_W).toInt()
         val h = (190f + groupRows * 46f + groups.size * 20f + drawH + 90f).toInt().coerceAtMost(8000)
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         val bg = 0xFF0B1220.toInt(); val surface = 0xFF151D2E.toInt(); val main = 0xFFF1F5FB.toInt(); val dim = 0xFF9AA8BD.toInt(); val ball = 0xFFC6F432.toInt()
         c.drawColor(bg)

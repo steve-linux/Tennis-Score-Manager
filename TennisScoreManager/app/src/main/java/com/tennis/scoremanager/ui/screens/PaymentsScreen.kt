@@ -39,6 +39,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -78,13 +80,13 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier.fillMaxWidth(), onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier, onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
         val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis() }
         DatePickerDialog(context, { _, y, m, d -> onPick(noonOf(y, m, d)) }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-    }, modifier)
+    }, modifier.fillMaxWidth())
 }
 
 @Composable
@@ -120,7 +122,7 @@ fun PaymentsScreen(c: MatchController) {
     val year = Members.year(now)
     var editFee by remember { mutableStateOf<Fee?>(null) }
     var newFee by remember { mutableStateOf(false) }
-    var exportYear by remember { mutableStateOf(year) }
+    var exportYear by remember { mutableIntStateOf(year) }
     var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.12") },
@@ -159,7 +161,7 @@ fun PaymentsScreen(c: MatchController) {
             val open = book.charges.filter { it.left > 0 }.groupBy { it.player.ifEmpty { "#" + it.name } }
                 .map { (key, list) -> Triple(key, list, list.sumOf { it.left }) }.sortedByDescending { it.third }
             if (open.isEmpty()) Text(s.dueNone, color = TsmColors.TextDim, fontSize = 13.sp)
-            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.noticeDues() }, Modifier.fillMaxWidth())
+            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.notices.noticeDues() }, Modifier.fillMaxWidth())
             for ((key, list, left) in open) {
                 val p = players.firstOrNull { it.id == key || key in it.aliases }
                 Row(
@@ -179,14 +181,14 @@ fun PaymentsScreen(c: MatchController) {
         // I modi di pagamento li sceglie il circolo: quelli a distanza, con link, IBAN o numero, vanno negli avvisi.
         SectionCard(s.ptTitle, Icons.Filled.Euro) {
             Text(s.ptHint, color = TsmColors.TextDim, fontSize = 13.sp)
-            val types = c.payTypes()
+            val types = c.planning.payTypes()
             for ((i, t) in types.withIndex()) {
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { editType = t }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                         Text(listOfNotNull(s.ptOnlineShort.takeIf { t.online }, t.details.ifBlank { null }).joinToString(" · ").ifBlank { s.ptAtClub }, color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 2)
                     }
-                    if (i > 0) androidx.compose.material3.IconButton(onClick = { c.savePayTypes(types.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } }) }) {
+                    if (i > 0) androidx.compose.material3.IconButton(onClick = { c.planning.savePayTypes(types.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } }) }) {
                         Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim)
                     }
                 }
@@ -199,7 +201,7 @@ fun PaymentsScreen(c: MatchController) {
             val years = listOf(year - 1, year)
             Segmented(years.map { SegOption(it.toString()) }, years.indexOf(exportYear), { exportYear = years[it] })
             GhostButton(s.paymentsExport, Icons.Filled.TableChart, {
-                val f = c.paymentsCsv(exportYear)
+                val f = c.notices.paymentsCsv(exportYear)
                 if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
                 else context.startActivity(c.shareFileIntent(f, "text/csv"))
             }, Modifier.fillMaxWidth())
@@ -371,7 +373,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
     var unpay by remember { mutableStateOf<String?>(null) }
     var cancel by remember { mutableStateOf(false) }
     fun share(paymentId: String) {
-        val f = c.receiptFile(ch.id, paymentId)
+        val f = c.notices.receiptFile(ch.id, paymentId)
         if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
         else context.startActivity(c.shareFileIntent(f, "application/pdf"))
     }
@@ -426,9 +428,9 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
-    var at by remember { mutableStateOf(today()) }
+    var at by remember { mutableLongStateOf(today()) }
     // I modi di pagamento del circolo: il primo è quello proposto.
-    val types = remember { c.payTypes() }
+    val types = remember { c.planning.payTypes() }
     var type by remember { mutableStateOf(types.first()) }
     val method = type.method
     var ref by remember { mutableStateOf("") }
@@ -463,7 +465,7 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
 private fun PayTypeDialog(c: MatchController, t0: com.tennis.scoremanager.data.PayType, onDone: () -> Unit) {
     val s = LocalStrings.current
     var t by remember { mutableStateOf(t0) }
-    val types = c.payTypes()
+    val types = c.planning.payTypes()
     val isNew = types.none { it.id == t0.id }
     AlertDialog(
         onDismissRequest = onDone,
@@ -473,13 +475,13 @@ private fun PayTypeDialog(c: MatchController, t0: com.tennis.scoremanager.data.P
                 OutlinedTextField(t.name, { t = t.copy(name = it.take(30)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ptName) })
                 OutlinedTextField(t.details, { t = t.copy(details = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.ptDetails) })
                 com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Euro, s.ptOnline, s.ptOnlineHint, t.online) { t = t.copy(online = it) }
-                if (!isNew && types.size > 1) TextButton(onClick = { c.savePayTypes(types.filter { it.id != t0.id }); onDone() }) { Text(s.ptDelete, color = TsmColors.Danger) }
+                if (!isNew && types.size > 1) TextButton(onClick = { c.planning.savePayTypes(types.filter { it.id != t0.id }); onDone() }) { Text(s.ptDelete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
             TextButton(enabled = t.name.isNotBlank(), onClick = {
                 val saved = t.copy(name = t.name.trim(), details = t.details.trim())
-                c.savePayTypes(if (isNew) types + saved else types.map { if (it.id == saved.id) saved else it })
+                c.planning.savePayTypes(if (isNew) types + saved else types.map { if (it.id == saved.id) saved else it })
                 onDone()
             }) { Text(s.ok) }
         },

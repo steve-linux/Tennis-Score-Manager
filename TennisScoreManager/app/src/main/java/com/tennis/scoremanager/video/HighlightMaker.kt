@@ -31,6 +31,7 @@ import androidx.media3.transformer.Transformer
 import com.tennis.scoremanager.model.Side
 import java.io.File
 import kotlinx.serialization.json.Json
+import androidx.core.graphics.createBitmap
 
 /**
  * Monta gli highlights sul telefono (Media3 Transformer): i pezzi scelti da [Highlights.select], uno dopo l'altro,
@@ -172,7 +173,7 @@ class HighlightMaker(context: Context) {
         val card = stats?.intro ?: return null
         val dir = File(app.cacheDir, "hl_intro").apply { deleteRecursively(); mkdirs() }
         val f = File(dir, "black.png")
-        val black = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLACK) }
+        val black = createBitmap(width, height).apply { eraseColor(android.graphics.Color.BLACK) }
         f.outputStream().use { black.compress(Bitmap.CompressFormat.PNG, 100, it) }
         black.recycle()
         val overlay = IntroOverlay(width, height) { ms, bmp -> StatsCardRenderer.intro(card, ms, bmp, stats.photos, stats.avatars, stats.credit, stats.site) }
@@ -186,7 +187,7 @@ class HighlightMaker(context: Context) {
      * l'immagine, e intanto quella di prima resta intatta.
      */
     private class IntroOverlay(width: Int, height: Int, private val draw: (Long, Bitmap) -> Unit) : BitmapOverlay() {
-        private val buffers = Array(2) { Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888) }
+        private val buffers = Array(2) { createBitmap(width, height) }
         private var current = 0
         private var lastMs = -1L
 

@@ -37,6 +37,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -83,15 +85,15 @@ import java.util.Locale
 @Composable
 fun RacketsScreen(c: MatchController) {
     val s = LocalStrings.current
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     val o by c.options.collectAsState()
-    var tab by rememberSaveable { mutableStateOf(0) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<Racket?>(null) }
     /** Incordatura in modifica, con la sua racchetta. */
     var stringing by remember { mutableStateOf<Pair<String, Stringing>?>(null) }
-    val sessions = remember(history, workouts) { c.racketSessions() }
+    val sessions = remember(history, workouts) { c.racketArea.racketSessions() }
 
     val e = editing
     val st = stringing
@@ -124,7 +126,7 @@ fun RacketsScreen(c: MatchController) {
                 )
             }
             BigButton(s.racketAdd, Icons.Filled.Add, {
-                editing = Racket(id = c.newRacketId(), pattern = "16x19", createdAt = System.currentTimeMillis())
+                editing = Racket(id = c.racketArea.newRacketId(), pattern = "16x19", createdAt = System.currentTimeMillis())
             }, Modifier.fillMaxWidth())
             Text(s.stringCheckNote, color = TsmColors.TextDim, fontSize = 12.sp)
         } else {
@@ -135,8 +137,8 @@ fun RacketsScreen(c: MatchController) {
 
 /** Nuova incordatura: si parte da quella montata (spesso si cambia solo la tensione), con la data di oggi. */
 private fun newStringing(c: MatchController, r: Racket): Stringing =
-    r.current?.copy(id = c.newStringingId(), date = System.currentTimeMillis(), notes = "")
-        ?: Stringing(id = c.newStringingId(), date = System.currentTimeMillis())
+    r.current?.copy(id = c.racketArea.newStringingId(), date = System.currentTimeMillis(), notes = "")
+        ?: Stringing(id = c.racketArea.newStringingId(), date = System.currentTimeMillis())
 
 // ---------------------------------------------------------------- testi
 
@@ -226,13 +228,15 @@ private fun RacketCard(
 
 // ---------------------------------------------------------------- schede
 
+// Modifier dopo tastiera e lunghezza: le chiamate li passano per posizione.
+@Suppress("ModifierParameter")
 @Composable
 private fun TextInput(
     value: String,
     label: String,
     keyboard: KeyboardType = KeyboardType.Text,
     max: Int = 40,
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     onChange: (String) -> Unit,
 ) {
     OutlinedTextField(
@@ -245,7 +249,7 @@ private fun TextInput(
             keyboardType = keyboard,
         ),
         colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TsmColors.Ball, focusedLabelColor = TsmColors.Ball, cursorColor = TsmColors.Ball),
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -285,7 +289,7 @@ fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () 
         bottomBar = {
             GhostButton(s.cancel, Icons.AutoMirrored.Filled.ArrowBack, onClose, Modifier.weight(1f))
             BigButton(s.save, Icons.Filled.Save, {
-                c.saveRacket(build())
+                c.racketArea.saveRacket(build())
                 onClose()
             }, Modifier.weight(1f))
         },
@@ -328,7 +332,7 @@ fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () 
             Icons.Filled.Delete, s.racketDeleteTitle, s.racketDeleteText, s.delete,
             onConfirm = {
                 confirmDelete = false
-                c.deleteRacket(start.id)
+                c.racketArea.deleteRacket(start.id)
                 onClose()
             },
             onDismiss = { confirmDelete = false },
@@ -341,7 +345,7 @@ fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () 
 private fun StringingEditor(c: MatchController, racketId: String, start: Stringing, lang: Lang, onClose: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val racket = c.racketById(racketId)
+    val racket = c.racketArea.racketById(racketId)
     val isNew = racket?.stringings?.none { it.id == start.id } ?: true
     var type by remember { mutableStateOf(start.type) }
     var brand by remember { mutableStateOf(start.brand) }
@@ -350,7 +354,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
     var gauge by remember { mutableStateOf(start.gaugeMm.field(lang)) }
     var mains by remember { mutableStateOf(start.mainsKg.field(lang)) }
     var crosses by remember { mutableStateOf(start.crossesKg.field(lang)) }
-    var date by remember { mutableStateOf(start.date) }
+    var date by remember { mutableLongStateOf(start.date) }
     var notes by remember { mutableStateOf(start.notes) }
     var confirmDelete by remember { mutableStateOf(false) }
     ScreenScaffold(
@@ -362,7 +366,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
             GhostButton(s.cancel, Icons.AutoMirrored.Filled.ArrowBack, onClose, Modifier.weight(1f))
             BigButton(s.save, Icons.Filled.Save, {
                 val m = mains.toDoubleOrNullComma()
-                c.saveStringing(racketId, start.copy(
+                c.racketArea.saveStringing(racketId, start.copy(
                     type = type, brand = brand.trim(), model = model.trim(), crossModel = if (type == StringType.HYBRID) cross.trim() else "",
                     gaugeMm = gauge.toDoubleOrNullComma(), mainsKg = m,
                     // Una tensione sola vale per verticali e orizzontali.
@@ -413,7 +417,7 @@ private fun StringingEditor(c: MatchController, racketId: String, start: Stringi
             Icons.Filled.Delete, s.stringDeleteTitle, s.racketDeleteText, s.delete,
             onConfirm = {
                 confirmDelete = false
-                c.deleteStringing(racketId, start.id)
+                c.racketArea.deleteStringing(racketId, start.id)
                 onClose()
             },
             onDismiss = { confirmDelete = false },
@@ -542,7 +546,7 @@ private fun CompareRow(r: Row2, lang: Lang) {
 @Composable
 internal fun RacketPicker(c: MatchController, selected: String, owner: String = "", onSelect: (String) -> Unit) {
     val s = LocalStrings.current
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     val k = owner.trim().lowercase(Locale.ROOT)
     val shown = rackets.filter { !it.retired || it.id == selected }
         .sortedByDescending { k.isNotEmpty() && it.owner.trim().lowercase(Locale.ROOT) == k }
@@ -566,7 +570,7 @@ internal fun RacketSessionCard(
     onFeel: (Feel) -> Unit,
 ) {
     val s = LocalStrings.current
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     if (rackets.isEmpty() && use == null) return
     SectionCard(title, Icons.Filled.SportsTennis, accent = accent) {
         // Una racchetta tolta dall'elenco resta nella partita: la si mostra col suo nome.

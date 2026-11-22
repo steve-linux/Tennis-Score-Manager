@@ -69,9 +69,9 @@ private fun RematchDialog(c: MatchController, m: LiveMatch, onClose: () -> Unit)
     var at by remember {
         mutableLongStateOf(Rematch.suggestedTime(rec.startedAt ?: rec.updatedAt, System.currentTimeMillis()))
     }
-    var place by remember { mutableStateOf(c.rematchPlace(rec)) }
+    var place by remember { mutableStateOf(c.rematch.rematchPlace(rec)) }
     var note by remember { mutableStateOf("") }
-    val text = c.rematchText(m, at, place, note)
+    val text = c.rematch.rematchText(m, at, place, note)
     fun pickDate() {
         val cal = Calendar.getInstance().apply { timeInMillis = at }
         DatePickerDialog(context, { _, y, mo, d ->
@@ -104,10 +104,10 @@ private fun RematchDialog(c: MatchController, m: LiveMatch, onClose: () -> Unit)
                     text, color = TsmColors.TextMain, fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).padding(10.dp),
                 )
-                GhostButton(s.rematchSend, Icons.AutoMirrored.Filled.Send, { context.startActivity(c.rematchShareIntent(text)) }, Modifier.fillMaxWidth())
+                GhostButton(s.rematchSend, Icons.AutoMirrored.Filled.Send, { context.startActivity(c.rematch.rematchShareIntent(text)) }, Modifier.fillMaxWidth())
                 GhostButton(s.rematchCalendar, Icons.Filled.CalendarMonth, {
                     try {
-                        context.startActivity(c.rematchCalendarIntent(m, at, place, text))
+                        context.startActivity(c.rematch.rematchCalendarIntent(m, at, place, text))
                     } catch (_: ActivityNotFoundException) {
                         Toast.makeText(context, s.rematchNoCalendar, Toast.LENGTH_SHORT).show()
                     }

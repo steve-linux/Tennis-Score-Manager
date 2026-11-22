@@ -15,6 +15,10 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
 import com.tennis.scoremanager.model.Side
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withClip
+import androidx.core.graphics.withTranslation
+import androidx.core.graphics.withSave
 
 /**
  * Una schermata delle statistiche come nelle dirette dei tornei: in alto titolo, risultato e torneo; ai lati i
@@ -53,7 +57,7 @@ object StatsCardRenderer {
         card: HighlightStats.Card, page: List<HighlightStats.Section>, width: Int, height: Int, photos: Map<Side, List<Bitmap?>>, pointsWon: String,
         avatars: Avatars? = null, credit: String = "", site: String = "",
     ): Bitmap {
-        val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val out = createBitmap(width, height)
         val c = Canvas(out)
         c.drawColor(BG)
         val scale = minOf(width / W, height / H)
@@ -103,10 +107,9 @@ object StatsCardRenderer {
         // I giocatori entrano dai lati.
         val slide = 1 - ease(t, 400, 700)
         for (side in Side.entries) {
-            c.save()
-            c.translate(if (side == Side.P1) -600f * slide else 600f * slide, 0f)
-            introPlayer(c, card, side, photos[side].orEmpty(), avatars)
-            c.restore()
+            c.withTranslation(if (side == Side.P1) -600f * slide else 600f * slide, 0f) {
+                introPlayer(this, card, side, photos[side].orEmpty(), avatars)
+            }
         }
         // Al centro: "VS", il confronto riga per riga, gli scontri diretti.
         val left = 580f
@@ -119,13 +122,13 @@ object StatsCardRenderer {
         val top = 230f + (bottom - 230f - 170f - rowH * card.rows.size) / 2 + 170f
         val vs = ease(t, 1000, 450)
         if (vs > 0) {
-            c.save()
-            val vy = if (alone) 680f else top - 45f
-            val sz = if (alone) 220f else 130f
-            val k = 0.6f + 0.4f * vs
-            c.scale(k, k, mid, vy - sz * 0.35f)
-            c.drawText("VS", mid, vy, paint(sz, YELLOW, bold = true, align = Paint.Align.CENTER).apply { alpha = (255 * vs).toInt() })
-            c.restore()
+            c.withSave {
+                val vy = if (alone) 680f else top - 45f
+                val sz = if (alone) 220f else 130f
+                val k = 0.6f + 0.4f * vs
+                scale(k, k, mid, vy - sz * 0.35f)
+                drawText("VS", mid, vy, paint(sz, YELLOW, bold = true, align = Paint.Align.CENTER).apply { alpha = (255 * vs).toInt() })
+            }
         }
         var y = top
         card.rows.forEachIndexed { i, row ->
@@ -299,10 +302,9 @@ object StatsCardRenderer {
             c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { this.shader = shader })
         } else {
             c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(60, Color.red(accent), Color.green(accent), Color.blue(accent)) })
-            c.save()
-            c.clipPath(Path().apply { addOval(rect, Path.Direction.CW) })
-            silhouette(c, accent, rect)
-            c.restore()
+            c.withClip(Path().apply { addOval(rect, Path.Direction.CW) }) {
+                silhouette(this, accent, rect)
+            }
         }
         c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 6f; color = accent })
     }

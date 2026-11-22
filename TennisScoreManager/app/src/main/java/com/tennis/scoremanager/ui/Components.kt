@@ -163,15 +163,15 @@ fun AppRoot(c: MatchController) {
             }
         }
         // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
-        val card by c.incomingCard.collectAsState()
+        val card by c.cards.incomingCard.collectAsState()
         card?.let { IncomingCardDialog(c, it) }
-        val result by c.incomingResult.collectAsState()
+        val result by c.cards.incomingResult.collectAsState()
         result?.let { IncomingResultDialog(c, it) }
-        c.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
-        c.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
-        c.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
-        c.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
-        c.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
+        c.coaching.incomingCourse.collectAsState().value?.let { IncomingCourseDialog(c, it) }
+        c.coaching.incomingAttendance.collectAsState().value?.let { IncomingAttendanceDialog(c, it) }
+        c.coaching.incomingProposal.collectAsState().value?.let { IncomingProposalDialog(c, it) }
+        c.coaching.incomingProgress.collectAsState().value?.let { IncomingProgressDialog(c, it) }
+        c.coaching.incomingProfile.collectAsState().value?.let { IncomingProfileDialog(c, it) }
         // Il cambio palle sopra qualunque schermata: in partita e quando lo si prova dalle regole.
         val balls by c.ballsAnimation.collectAsState()
         if (balls != null) androidx.compose.runtime.key(balls) { NewBallsOverlay(LocalStrings.current.newBallsCall) { c.stopBallsAnimation() } }
