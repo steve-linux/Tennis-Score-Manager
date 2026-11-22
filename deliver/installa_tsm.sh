@@ -298,11 +298,13 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="36">
 
-        <!-- configChanges: un telecomando Bluetooth è una tastiera, collegarlo non deve ricreare la schermata -->
+        <!-- configChanges: un telecomando Bluetooth è una tastiera, collegarlo non deve ricreare la schermata.
+             singleTop, non singleTask: riaprendo l'app dall'icona singleTask chiudeva le schermate sopra (telefono-telecamera,
+             tabellone, video), fermando registrazione e diretta. Così Android riporta l'app com'era. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:windowSoftInputMode="adjustResize"
@@ -15494,6 +15496,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Icona toccata con l'app già aperta da una notifica o da un file: Android mette una seconda schermata principale
+        // sopra la telecamera, il tabellone o il video. Si chiude subito e torna quello che c'era (che resta acceso).
+        if (!isTaskRoot && intent?.action == android.content.Intent.ACTION_MAIN && intent.hasCategory(android.content.Intent.CATEGORY_LAUNCHER)) {
+            finish()
+            return
+        }
         controller.onActivityCreated()
         if (savedInstanceState == null) { openFromNotification(intent); openFile(intent) }
         // Tema sempre scuro: icone chiare nelle barre di sistema.

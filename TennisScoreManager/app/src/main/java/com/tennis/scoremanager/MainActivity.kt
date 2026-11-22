@@ -91,6 +91,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Icona toccata con l'app già aperta da una notifica o da un file: Android mette una seconda schermata principale
+        // sopra la telecamera, il tabellone o il video. Si chiude subito e torna quello che c'era (che resta acceso).
+        if (!isTaskRoot && intent?.action == android.content.Intent.ACTION_MAIN && intent.hasCategory(android.content.Intent.CATEGORY_LAUNCHER)) {
+            finish()
+            return
+        }
         controller.onActivityCreated()
         if (savedInstanceState == null) { openFromNotification(intent); openFile(intent) }
         // Tema sempre scuro: icone chiare nelle barre di sistema.
