@@ -560,6 +560,7 @@ class MatchController(
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
                 balls = ballsAnimation.value,
+                arena = arenaActive,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -1459,6 +1460,7 @@ class MatchController(
         // Il gioco usa il server del tabellone anche con il tabellone spento.
         tvServer.start()
         publishArena()
+        publishTv()  // la TV sul tabellone passa da sola al gioco
         go(Screen.ARENA)
     }
 
@@ -1476,11 +1478,14 @@ class MatchController(
         arenaActive = false
         for (side in Side.entries) ble.setArena(side, false)
         tvServer.publishArena(com.tennis.scoremanager.arena.Arena.closed(), keep = true)
+        publishTv()
         scope.launch {
             delay(1_500)  // il tempo di mandare "A|0" ai braccialetti e "chiusa" alla TV
             if (arenaActive) return@launch
             updateBandLinks()
-            if (!tv.value.enabled && relay.ui.value.role != RelayRole.MAIN) tvServer.stop()
+            // Con una TV collegata il server resta acceso: la TV torna al tabellone e ritrova il gioco alla prossima partita.
+            val screensOn = tvServer.clients.value + tvServer.arenaClients.value > 0
+            if (!tv.value.enabled && relay.ui.value.role != RelayRole.MAIN && !screensOn) tvServer.stop()
         }
     }
 

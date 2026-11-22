@@ -586,6 +586,8 @@ The wristbands need **firmware 2.5** (5): while the game is open the wristband s
 
 1. **Train** (or **Students**, for the coach) › **TSM Arena**. The phone screen stays on while the page is open.
 2. **On the TV**: open the address shown (e.g. `192.168.43.1:8080/arena`) in the browser of the TV, a TV box or a connected laptop, on the same network or on the phone's hotspot; or scan the QR. No internet needed. Press **OK** once on the page to turn on the sound.
+   - **With Android TV** (Nvidia Shield, Chromecast with Google TV, Android TVs): install TSM on the TV too. It shows up among the apps and opens as a scoreboard: it finds the phone on the same network by itself and switches to Arena when you open it on the phone, then back to the scoreboard when you close it. No addresses to type, and sounds play without pressing OK.
+   - **In a browser** just open the scoreboard address once (without `/arena`) and bookmark it: the page also switches to the game and back on its own.
 3. **Players**: *Against the phone* (Player 1 against the CPU, three levels) or *Two players*, one wristband each. Tap the name to choose who plays (you or one of the students). Below is the state of each wristband.
 4. **Match**: games to win (1, 3 or 5), **Only the right stroke counts** (with the stroke calibration, 6.4, a forehand instead of a backhand loses the point), **Umpire voice** on the TV, **TV delay**: if you are always late even when it feels right, raise it (low for monitors and TVs in game mode).
 5. **Swing** (or press the **big key** of the wristband) to start. One swing serves. The **small key** pauses. At the end the TV shows strokes, perfect, early, late, wrong strokes, top wrist speed and longest rally; a swing starts the rematch.

@@ -2267,6 +2267,7 @@ object PtStrings : Strings {
     override val displayMode = "Usar como placar"
     override val displaySearching = "Procurando o telefone do árbitro…"
     override val displaySteps = "1. Ative o hotspot num dos dois telefones e conecte o outro.\n2. No telefone do árbitro: página 2 → «Placar na TV» ativado.\n3. Ligue este telefone ao monitor (cabo USB-C/HDMI) ou transmita a tela para um Chromecast."
+    override val displayStepsTv = "No telefone abra o TSM Arena (Treinar › TSM Arena) ou ative o «Placar na TV» (página 2).\nTelefone e TV na mesma rede Wi-Fi: esta TV encontra o telefone sozinha e passa sozinha do placar para o Arena."
     override val displayManual = "Endereço (ex. 192.168.43.1:8080)"
     override val displayConnect = "Conectar"
     override val displayNotFound = "Não encontrado. Verifique se os dois telefones estão na mesma rede e se o placar está ativado no app do árbitro."

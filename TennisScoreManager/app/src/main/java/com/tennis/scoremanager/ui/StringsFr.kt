@@ -2266,6 +2266,7 @@ object FrStrings : Strings {
     override val displayMode = "Utiliser comme tableau"
     override val displaySearching = "Recherche du téléphone de l'arbitre…"
     override val displaySteps = "1. Activez le point d'accès sur l'un des deux téléphones et connectez-y l'autre.\n2. Sur le téléphone de l'arbitre : page 2 → « Tableau d'affichage TV » activé.\n3. Branchez ce téléphone à l'écran (câble USB-C/HDMI) ou castez l'écran sur un Chromecast."
+    override val displayStepsTv = "Sur le téléphone, ouvre TSM Arena (S'entraîner › TSM Arena) ou active le « Tableau d'affichage TV » (page 2).\nTéléphone et télé sur le même réseau Wi-Fi : cette télé trouve le téléphone toute seule et passe d'elle-même du tableau à Arena."
     override val displayManual = "Adresse (ex. 192.168.43.1:8080)"
     override val displayConnect = "Connecter"
     override val displayNotFound = "Introuvable. Vérifiez que les deux téléphones sont sur le même réseau et que le tableau est activé dans l'application de l'arbitre."

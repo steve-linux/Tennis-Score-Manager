@@ -79,6 +79,8 @@ data class TvSnapshot(
     val club: TvClub? = null,
     /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
     val balls: Long? = null,
+    /** TSM Arena aperta sul telefono: la pagina del tabellone passa da sola al gioco (/arena), che torna qui alla chiusura. */
+    val arena: Boolean = false,
 )
 
 /**
@@ -194,6 +196,7 @@ data class TvInput(
     val replay: TvReplay? = null,
     val club: TvClub? = null,
     val balls: Long? = null,
+    val arena: Boolean = false,
 )
 
 object TvSnapshots {
@@ -272,6 +275,7 @@ object TvSnapshots {
             replay = i.replay,
             club = i.club,
             balls = i.balls,
+            arena = i.arena,
         )
     }
 

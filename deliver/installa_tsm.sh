@@ -47,6 +47,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/workout"
 mkdir -p "$DEST/app/src/main/res/drawable"
 mkdir -p "$DEST/app/src/main/res/drawable-nodpi"
+mkdir -p "$DEST/app/src/main/res/drawable-xhdpi"
 mkdir -p "$DEST/app/src/main/res/mipmap-anydpi-v26"
 mkdir -p "$DEST/app/src/main/res/raw"
 mkdir -p "$DEST/app/src/main/res/values"
@@ -209,6 +210,9 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
     <!-- Fotocamera solo per leggere il QR quando si riceve lo storico da un altro telefono: facoltativa -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- Installabile anche su Android TV (Nvidia Shield...): lì si apre come tabellone e TSM Arena, senza touch -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <!-- Bluetooth LE per i braccialetti (Android 12+ usa SCAN/CONNECT, prima BLUETOOTH/ADMIN) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -265,6 +269,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:banner="@drawable/tv_banner"
         android:supportsRtl="true"
         android:theme="@style/Theme.TSM"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -317,6 +322,19 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
+
+        <!-- Sulla TV (Android TV): l'app compare tra le altre e si apre come tabellone, che trova da solo il telefono in
+             rete (annuncio _tsm._tcp) e passa a TSM Arena quando il telefono la apre. Niente indirizzi da scrivere. -->
+        <activity-alias
+            android:name=".tv.TvLauncher"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:targetActivity=".tv.DisplayActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Moviola sul telefono dell'arbitro: gira con il telefono (la partita resta in verticale) -->
         <activity
@@ -1460,7 +1478,11 @@ function onMessage(d) {
   } else if (d.t === 'swing') onSwing((+d.side || 1) - 1, clamp(+d.s || 0.5, 0.1, 1), +d.gyro || 0);
   else if (d.t === 'stroke') onStroke((+d.side || 1) - 1, +d.k);
   else if (d.t === 'key') onKey((+d.side || 1) - 1, +d.k);
-  else if (d.t === 'closed') { link = 'closed'; S.phase = 'title'; S.paused = false; ovRender(); }
+  else if (d.t === 'closed') {
+    link = 'closed'; S.phase = 'title'; S.paused = false; ovRender();
+    // Il gioco è finito sul telefono: dopo il messaggio si torna al tabellone, che ripassa qui alla prossima partita.
+    if (!DEMO && location.protocol !== 'file:') setTimeout(() => { if (link === 'closed') location.replace('/'); }, 3000);
+  }
 }
 function connect() {
   if (DEMO || !window.EventSource) return;
@@ -18455,6 +18477,8 @@ Die Armbänder brauchen **Firmware 2.5** (5): Solange das Spiel offen ist, schic
 
 1. **Trainieren** (oder **Schüler**, für den Trainer) › **TSM Arena**. Der Handybildschirm bleibt an, solange die Seite offen ist.
 2. **Am Fernseher**: Öffne die angezeigte Adresse (z. B. `192.168.43.1:8080/arena`) im Browser des Fernsehers, einer TV-Box oder eines angeschlossenen Laptops, im selben Netz oder im Hotspot des Handys; oder scanne den QR-Code. Kein Internet nötig. Drücke einmal **OK** auf der Seite, damit der Ton läuft.
+   - **Mit Android TV** (Nvidia Shield, Chromecast mit Google TV, Android-Fernseher): Installiere TSM auch auf dem Fernseher. Es erscheint bei den Apps und öffnet sich als Anzeigetafel: Es findet das Handy im selben Netz von selbst und wechselt zu Arena, sobald du es am Handy öffnest, und zurück zur Anzeigetafel, wenn du es schließt. Keine Adressen eintippen, und die Töne laufen ohne OK-Taste.
+   - **Im Browser** reicht es, die Adresse der Anzeigetafel (ohne `/arena`) einmal zu öffnen und als Lesezeichen zu speichern: Auch dort wechselt die Seite von selbst zum Spiel und zurück.
 3. **Spieler**: *Gegen das Handy* (Spieler 1 gegen den Computer, drei Stufen) oder *Zwei Spieler*, je ein Armband. Tippe auf den Namen, um zu wählen, wer spielt (du oder ein Schüler). Darunter steht der Zustand jedes Armbands.
 4. **Spiel**: Spiele zum Sieg (1, 3 oder 5), **Nur der richtige Schlag zählt** (mit der Schlagkalibrierung, 6.4, kostet eine Vorhand statt einer Rückhand den Punkt), **Stimme des Schiedsrichters** am Fernseher, **Verzögerung des Fernsehers**: Wenn du immer zu spät bist, obwohl es sich richtig anfühlt, erhöhe sie (gering für Monitore und Fernseher im Spielmodus).
 5. **Schwinge** (oder drücke die **große Taste** des Armbands), um zu beginnen. Ein Schwung reicht zum Aufschlag. Die **kleine Taste** pausiert. Am Ende zeigt der Fernseher Schläge, perfekte, zu frühe, zu späte, falsche Schläge, höchstes Handgelenktempo und längsten Ballwechsel; ein Schwung startet die Revanche.
@@ -19087,6 +19111,8 @@ The wristbands need **firmware 2.5** (5): while the game is open the wristband s
 
 1. **Train** (or **Students**, for the coach) › **TSM Arena**. The phone screen stays on while the page is open.
 2. **On the TV**: open the address shown (e.g. `192.168.43.1:8080/arena`) in the browser of the TV, a TV box or a connected laptop, on the same network or on the phone's hotspot; or scan the QR. No internet needed. Press **OK** once on the page to turn on the sound.
+   - **With Android TV** (Nvidia Shield, Chromecast with Google TV, Android TVs): install TSM on the TV too. It shows up among the apps and opens as a scoreboard: it finds the phone on the same network by itself and switches to Arena when you open it on the phone, then back to the scoreboard when you close it. No addresses to type, and sounds play without pressing OK.
+   - **In a browser** just open the scoreboard address once (without `/arena`) and bookmark it: the page also switches to the game and back on its own.
 3. **Players**: *Against the phone* (Player 1 against the CPU, three levels) or *Two players*, one wristband each. Tap the name to choose who plays (you or one of the students). Below is the state of each wristband.
 4. **Match**: games to win (1, 3 or 5), **Only the right stroke counts** (with the stroke calibration, 6.4, a forehand instead of a backhand loses the point), **Umpire voice** on the TV, **TV delay**: if you are always late even when it feels right, raise it (low for monitors and TVs in game mode).
 5. **Swing** (or press the **big key** of the wristband) to start. One swing serves. The **small key** pauses. At the end the TV shows strokes, perfect, early, late, wrong strokes, top wrist speed and longest rally; a swing starts the rematch.
@@ -19718,6 +19744,8 @@ Las pulseras necesitan el **firmware 2.5** (5): con el juego abierto, la pulsera
 
 1. **Entrenar** (o **Alumnos**, para el entrenador) › **TSM Arena**. La pantalla del teléfono queda encendida mientras la página está abierta.
 2. **En la tele**: abre la dirección mostrada (p. ej. `192.168.43.1:8080/arena`) en el navegador de la tele, de un TV box o de un portátil conectado, en la misma red o en el punto de acceso del teléfono; o escanea el QR. No hace falta internet. Pulsa **OK** una vez en la página para activar el sonido.
+   - **Con Android TV** (Nvidia Shield, Chromecast con Google TV, teles Android): instala TSM también en la tele. Aparece entre las apps y se abre como marcador: encuentra sola el teléfono en la misma red y pasa sola a Arena cuando la abres en el teléfono, y vuelve al marcador cuando la cierras. Sin direcciones que escribir, y los sonidos suenan sin pulsar OK.
+   - **En un navegador** basta con abrir una vez la dirección del marcador (sin `/arena`) y guardarla en favoritos: también ahí la página pasa sola al juego y vuelve.
 3. **Jugadores**: *Contra el teléfono* (Jugador 1 contra la CPU, tres niveles) o *Dos jugadores*, una pulsera cada uno. Toca el nombre para elegir quién juega (tú o un alumno). Debajo está el estado de cada pulsera.
 4. **Partido**: juegos para ganar (1, 3 o 5), **Solo cuenta el golpe correcto** (con la calibración de golpes, 6.4, una derecha en lugar de un revés pierde el punto), **Voz del árbitro** en la tele, **Retraso de la tele**: si siempre llegas tarde aunque te parezca bien, súbelo (bajo para monitores y teles en modo juego).
 5. Haz un **swing** (o pulsa la **tecla grande** de la pulsera) para empezar. Un swing basta para sacar. La **tecla pequeña** pone en pausa. Al final la tele muestra golpes, perfectos, anticipados, tarde, golpes equivocados, velocidad máxima de la muñeca y peloteo más largo; un swing empieza la revancha.
@@ -20349,6 +20377,8 @@ Les bracelets doivent avoir le **firmware 2.5** (5) : quand le jeu est ouvert, l
 
 1. **S'entraîner** (ou **Élèves**, pour l'entraîneur) › **TSM Arena**. L'écran du téléphone reste allumé tant que la page est ouverte.
 2. **Sur la télé** : ouvre l'adresse affichée (p. ex. `192.168.43.1:8080/arena`) dans le navigateur de la télé, d'un boîtier TV ou d'un portable branché, sur le même réseau ou sur le point d'accès du téléphone ; ou scanne le QR. Pas besoin d'internet. Appuie une fois sur **OK** sur la page pour activer le son.
+   - **Avec Android TV** (Nvidia Shield, Chromecast avec Google TV, télés Android) : installe TSM aussi sur la télé. Elle apparaît parmi les applis et s'ouvre en tableau d'affichage : elle trouve toute seule le téléphone sur le même réseau et passe d'elle-même à Arena quand tu l'ouvres sur le téléphone, puis revient au tableau quand tu la fermes. Aucune adresse à taper, et les sons partent sans appuyer sur OK.
+   - **Dans un navigateur**, il suffit d'ouvrir une fois l'adresse du tableau (sans `/arena`) et de l'ajouter aux favoris : là aussi la page passe toute seule au jeu et revient.
 3. **Joueurs** : *Contre le téléphone* (Joueur 1 contre l'ordinateur, trois niveaux) ou *Deux joueurs*, un bracelet chacun. Touche le nom pour choisir qui joue (toi ou un élève). En dessous, l'état de chaque bracelet.
 4. **Match** : jeux pour gagner (1, 3 ou 5), **Seul le bon coup compte** (avec l'étalonnage des coups, 6.4, un coup droit à la place d'un revers fait perdre le point), **Voix de l'arbitre** sur la télé, **Retard de la télé** : si tu frappes toujours en retard même quand ça te semble juste, augmente-le (faible pour les moniteurs et les télés en mode jeu).
 5. Fais un **swing** (ou appuie sur la **grande touche** du bracelet) pour commencer. Un swing suffit pour servir. La **petite touche** met en pause. À la fin, la télé affiche coups, parfaits, en avance, en retard, mauvais coups, vitesse max du poignet et plus long échange ; un swing lance la revanche.
@@ -20980,6 +21010,8 @@ Serve il **firmware 2.5** sui braccialetti (5): quando il gioco è aperto il bra
 
 1. **Allenati** (o **Allievi**, per l'allenatore) › **TSM Arena**. Lo schermo del telefono resta acceso finché la pagina è aperta.
 2. **Sulla TV**: apri l'indirizzo mostrato (es. `192.168.43.1:8080/arena`) nel browser della TV, di una TV box o di un portatile collegato, sulla stessa rete o sull'hotspot del telefono; oppure inquadra il QR. Non serve internet. Premi **OK** una volta sulla pagina per attivare l'audio.
+   - **Con Android TV** (Nvidia Shield, Chromecast con Google TV, TV Android): installa TSM anche sulla TV. Compare tra le app e si apre come tabellone: trova da solo il telefono sulla stessa rete e passa da solo ad Arena quando la apri sul telefono, poi torna al tabellone quando la chiudi. Niente indirizzi da scrivere, e i suoni partono senza premere OK.
+   - **Nel browser** basta aprire una volta l'indirizzo del tabellone (senza `/arena`) e salvarlo tra i preferiti: anche lì la pagina passa da sola al gioco e torna indietro.
 3. **Giocatori**: *Contro il telefono* (Giocatore 1 contro la CPU, coi tre livelli) oppure *Due giocatori*, un braccialetto ciascuno. Tocca il nome per scegliere chi gioca (tu o uno degli allievi). Sotto c'è lo stato di ogni braccialetto.
 4. **Partita**: game per vincere (1, 3 o 5), **Conta solo il colpo giusto** (con la calibrazione dei colpi, 6.4, un dritto al posto del rovescio è punto perso), **Voce dell'arbitro** sulla TV, **Ritardo della TV**: se colpisci sempre in ritardo anche quando ti sembra giusto, alzalo (basso per monitor e TV in modalità gioco).
 5. Fai uno **swing** (o premi il **tasto grande** del braccialetto) per iniziare. Per servire basta uno swing. Il **tasto piccolo** mette in pausa. A fine partita la TV mostra colpi, perfetti, in anticipo, in ritardo, colpi sbagliati, velocità massima del polso e scambio più lungo; uno swing fa partire la rivincita.
@@ -21611,6 +21643,8 @@ As pulseiras precisam do **firmware 2.5** (5): com o jogo aberto, a pulseira man
 
 1. **Treinar** (ou **Alunos**, para o treinador) › **TSM Arena**. A tela do celular fica acesa enquanto a página está aberta.
 2. **Na TV**: abra o endereço mostrado (ex. `192.168.43.1:8080/arena`) no navegador da TV, de um TV box ou de um notebook conectado, na mesma rede ou no ponto de acesso do celular; ou leia o QR. Não precisa de internet. Aperte **OK** uma vez na página para ligar o som.
+   - **Com Android TV** (Nvidia Shield, Chromecast com Google TV, TVs Android): instale o TSM também na TV. Ele aparece entre os apps e abre como placar: encontra sozinho o celular na mesma rede e passa sozinho para o Arena quando você o abre no celular, voltando ao placar quando você o fecha. Nada de endereços para digitar, e os sons tocam sem apertar OK.
+   - **Num navegador** basta abrir uma vez o endereço do placar (sem `/arena`) e salvá-lo nos favoritos: ali também a página passa sozinha para o jogo e volta.
 3. **Jogadores**: *Contra o celular* (Jogador 1 contra a CPU, três níveis) ou *Dois jogadores*, uma pulseira cada. Toque no nome para escolher quem joga (você ou um aluno). Embaixo aparece o estado de cada pulseira.
 4. **Partida**: games para vencer (1, 3 ou 5), **Só conta o golpe certo** (com a calibração de golpes, 6.4, um forehand no lugar de um backhand perde o ponto), **Voz do árbitro** na TV, **Atraso da TV**: se você sempre bate atrasado mesmo quando parece certo, aumente (baixo para monitores e TVs no modo de jogo).
 5. Faça um **swing** (ou aperte a **tecla grande** da pulseira) para começar. Um swing basta para sacar. A **tecla pequena** pausa. No fim a TV mostra golpes, perfeitos, adiantados, atrasados, golpes errados, velocidade máxima do pulso e troca mais longa; um swing começa a revanche.
@@ -22094,6 +22128,8 @@ function tick() {
 }
 
 function onState(json) {
+  // TSM Arena aperta sul telefono: si passa al gioco (che torna qui quando lo si chiude), senza scrivere altri indirizzi.
+  if (json && json.arena && !isDemo && location.protocol !== "file:") { location.replace("/arena"); return; }
   S = json;
   recvAt = lastMsg = performance.now();
   render();
@@ -23190,6 +23226,7 @@ class MatchController(
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
                 balls = ballsAnimation.value,
+                arena = arenaActive,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -24089,6 +24126,7 @@ class MatchController(
         // Il gioco usa il server del tabellone anche con il tabellone spento.
         tvServer.start()
         publishArena()
+        publishTv()  // la TV sul tabellone passa da sola al gioco
         go(Screen.ARENA)
     }
 
@@ -24106,11 +24144,14 @@ class MatchController(
         arenaActive = false
         for (side in Side.entries) ble.setArena(side, false)
         tvServer.publishArena(com.tennis.scoremanager.arena.Arena.closed(), keep = true)
+        publishTv()
         scope.launch {
             delay(1_500)  // il tempo di mandare "A|0" ai braccialetti e "chiusa" alla TV
             if (arenaActive) return@launch
             updateBandLinks()
-            if (!tv.value.enabled && relay.ui.value.role != RelayRole.MAIN) tvServer.stop()
+            // Con una TV collegata il server resta acceso: la TV torna al tabellone e ritrova il gioco alla prossima partita.
+            val screensOn = tvServer.clients.value + tvServer.arenaClients.value > 0
+            if (!tv.value.enabled && relay.ui.value.role != RelayRole.MAIN && !screensOn) tvServer.stop()
         }
     }
 
@@ -46688,6 +46729,10 @@ class DisplayActivity : ComponentActivity() {
     private var systemDismissAt = 0L
     private var searchJob: Job? = null
     private var lastBack = 0L
+    /** L'app gira su una TV (Android TV, aperta dalla sua voce tra le app): istruzioni per chi usa il telefono. */
+    private val onTv by lazy {
+        (getSystemService(android.app.UiModeManager::class.java)?.currentModeType ?: 0) == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+    }
     /** Solo per le prove (adb): accetta anche il server di questo stesso telefono. */
     private var allowSelf = false
 
@@ -46908,8 +46953,8 @@ class DisplayActivity : ComponentActivity() {
                 } else if (missing) {
                     Text(str.displayNotFound, color = TsmColors.Orange, fontSize = 16.sp)
                 }
-                Text(str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(if (onTv) str.displayStepsTv else str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
+                if (!onTv) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Cast, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(str.tvChromecastHint, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -47008,6 +47053,8 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
     setBackgroundColor(Color.BLACK)
     settings.javaScriptEnabled = true
     settings.domStorageEnabled = true
+    // Suoni di TSM Arena senza dover premere OK sul telecomando (la pagina è nostra, non un sito qualsiasi).
+    settings.mediaPlaybackRequiresUserGesture = false
     overScrollMode = View.OVER_SCROLL_NEVER
     isVerticalScrollBarEnabled = false
     isHorizontalScrollBarEnabled = false
@@ -47023,10 +47070,25 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
         }
     }
     webViewClient = object : WebViewClient() {
+        /** Pagine di fila non arrivate: il telefono forse ha cambiato indirizzo o porta, e lo si cerca di nuovo. */
+        var failures = 0
+        /** onPageFinished arriva anche dopo un errore: si azzera solo per una pagina arrivata davvero. */
+        var failed = false
+
+        override fun onPageFinished(view: WebView, url: String) {
+            if (failed) failed = false else failures = 0
+        }
+
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
             val page = view.tag as? ScoreboardPage ?: return
+            if (!request.isForMainFrame) return
+            failed = true
+            if (++failures >= 3) {
+                failures = 0
+                onLost()
+            }
             // se intanto la pagina è cambiata (o la WebView è stata distrutta) non si ricarica più quella vecchia
-            if (request.isForMainFrame) view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
+            view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
         }
     }
 }
@@ -47374,6 +47436,8 @@ data class TvSnapshot(
     val club: TvClub? = null,
     /** Animazione del cambio palle: un numero nuovo = parte (null = niente). */
     val balls: Long? = null,
+    /** TSM Arena aperta sul telefono: la pagina del tabellone passa da sola al gioco (/arena), che torna qui alla chiusura. */
+    val arena: Boolean = false,
 )
 
 /**
@@ -47489,6 +47553,7 @@ data class TvInput(
     val replay: TvReplay? = null,
     val club: TvClub? = null,
     val balls: Long? = null,
+    val arena: Boolean = false,
 )
 
 object TvSnapshots {
@@ -47567,6 +47632,7 @@ object TvSnapshots {
             replay = i.replay,
             club = i.club,
             balls = i.balls,
+            arena = i.arena,
         )
     }
 
@@ -57918,6 +57984,8 @@ interface Strings {
     val displayMode: String
     val displaySearching: String
     val displaySteps: String
+    /** Al posto di [displaySteps] quando l'app gira su una TV (Android TV). */
+    val displayStepsTv: String
     val displayManual: String
     val displayConnect: String
     val displayNotFound: String
@@ -60710,6 +60778,7 @@ object ItStrings : Strings {
     override val displayMode = "Usa come tabellone"
     override val displaySearching = "Cerco il telefono dell'arbitro…"
     override val displaySteps = "1. Accendi l'hotspot su uno dei due telefoni e collega l'altro.\n2. Sul telefono dell'arbitro: pagina 2 → «Tabellone su TV» acceso.\n3. Collega questo telefono al monitor (cavo USB-C/HDMI) o trasmetti lo schermo a un Chromecast."
+    override val displayStepsTv = "Sul telefono apri TSM Arena (Allenati › TSM Arena) oppure accendi il «Tabellone su TV» (pagina 2).\nTelefono e TV sulla stessa rete Wi-Fi: questa TV trova il telefono da sola e passa da sola dal tabellone ad Arena."
     override val displayManual = "Indirizzo (es. 192.168.43.1:8080)"
     override val displayConnect = "Collega"
     override val displayNotFound = "Non trovato. Controlla che i due telefoni siano sulla stessa rete e che il tabellone sia acceso nell'app dell'arbitro."
@@ -63501,6 +63570,7 @@ object EnStrings : Strings {
     override val displayMode = "Use as scoreboard"
     override val displaySearching = "Looking for the umpire's phone…"
     override val displaySteps = "1. Turn on the hotspot on one phone and connect the other.\n2. On the umpire's phone: page 2 → «TV scoreboard» on.\n3. Connect this phone to the monitor (USB-C/HDMI cable) or cast the screen to a Chromecast."
+    override val displayStepsTv = "On the phone open TSM Arena (Train › TSM Arena) or turn on the «TV scoreboard» (page 2).\nPhone and TV on the same Wi-Fi network: this TV finds the phone by itself and switches between scoreboard and Arena on its own."
     override val displayManual = "Address (e.g. 192.168.43.1:8080)"
     override val displayConnect = "Connect"
     override val displayNotFound = "Not found. Check that both phones are on the same network and the scoreboard is on in the umpire's app."
@@ -66317,6 +66387,7 @@ object DeStrings : Strings {
     override val displayMode = "Als Anzeigetafel verwenden"
     override val displaySearching = "Suche das Telefon des Schiedsrichters…"
     override val displaySteps = "1. Schalte auf einem der beiden Telefone den Hotspot ein und verbinde das andere.\n2. Auf dem Telefon des Schiedsrichters: Seite 2 → «TV-Anzeigetafel» ein.\n3. Verbinde dieses Telefon mit dem Monitor (USB-C/HDMI-Kabel) oder übertrage den Bildschirm auf einen Chromecast."
+    override val displayStepsTv = "Öffne am Handy TSM Arena (Trainieren › TSM Arena) oder schalte die «TV-Anzeigetafel» ein (Seite 2).\nHandy und Fernseher im selben WLAN: Dieser Fernseher findet das Handy selbst und wechselt von allein zwischen Anzeigetafel und Arena."
     override val displayManual = "Adresse (z. B. 192.168.43.1:8080)"
     override val displayConnect = "Verbinden"
     override val displayNotFound = "Nicht gefunden. Prüfe, ob beide Telefone im selben Netz sind und die Anzeigetafel in der App des Schiedsrichters eingeschaltet ist."
@@ -69123,6 +69194,7 @@ object EsStrings : Strings {
     override val displayMode = "Usar como marcador"
     override val displaySearching = "Buscando el teléfono del juez…"
     override val displaySteps = "1. Activa el punto de acceso en uno de los dos teléfonos y conecta el otro.\n2. En el teléfono del juez: página 2 → «Marcador en TV» activado.\n3. Conecta este teléfono al monitor (cable USB-C/HDMI) o envía la pantalla a un Chromecast."
+    override val displayStepsTv = "En el teléfono abre TSM Arena (Entrenar › TSM Arena) o activa el «Marcador en TV» (página 2).\nTeléfono y TV en la misma red Wi-Fi: esta TV encuentra el teléfono sola y pasa por sí misma del marcador a Arena."
     override val displayManual = "Dirección (p. ej. 192.168.43.1:8080)"
     override val displayConnect = "Conectar"
     override val displayNotFound = "No encontrado. Comprueba que los dos teléfonos están en la misma red y que el marcador está activado en la app del juez."
@@ -71931,6 +72003,7 @@ object FrStrings : Strings {
     override val displayMode = "Utiliser comme tableau"
     override val displaySearching = "Recherche du téléphone de l'arbitre…"
     override val displaySteps = "1. Activez le point d'accès sur l'un des deux téléphones et connectez-y l'autre.\n2. Sur le téléphone de l'arbitre : page 2 → « Tableau d'affichage TV » activé.\n3. Branchez ce téléphone à l'écran (câble USB-C/HDMI) ou castez l'écran sur un Chromecast."
+    override val displayStepsTv = "Sur le téléphone, ouvre TSM Arena (S'entraîner › TSM Arena) ou active le « Tableau d'affichage TV » (page 2).\nTéléphone et télé sur le même réseau Wi-Fi : cette télé trouve le téléphone toute seule et passe d'elle-même du tableau à Arena."
     override val displayManual = "Adresse (ex. 192.168.43.1:8080)"
     override val displayConnect = "Connecter"
     override val displayNotFound = "Introuvable. Vérifiez que les deux téléphones sont sur le même réseau et que le tableau est activé dans l'application de l'arbitre."
@@ -74740,6 +74813,7 @@ object PtStrings : Strings {
     override val displayMode = "Usar como placar"
     override val displaySearching = "Procurando o telefone do árbitro…"
     override val displaySteps = "1. Ative o hotspot num dos dois telefones e conecte o outro.\n2. No telefone do árbitro: página 2 → «Placar na TV» ativado.\n3. Ligue este telefone ao monitor (cabo USB-C/HDMI) ou transmita a tela para um Chromecast."
+    override val displayStepsTv = "No telefone abra o TSM Arena (Treinar › TSM Arena) ou ative o «Placar na TV» (página 2).\nTelefone e TV na mesma rede Wi-Fi: esta TV encontra o telefone sozinha e passa sozinha do placar para o Arena."
     override val displayManual = "Endereço (ex. 192.168.43.1:8080)"
     override val displayConnect = "Conectar"
     override val displayNotFound = "Não encontrado. Verifique se os dois telefones estão na mesma rede e se o placar está ativado no app do árbitro."
@@ -98040,6 +98114,304 @@ WraY+SvB5glgox79pPrK3OO0k3eVdO+afQmLR3cUKWwcDNPhBuOr47vLZa5D1eELC/AzzrYiAfVR
 ljR/rXIAVQx+g+QAAABY1dkrdVnjTjqoDDWBqyPsQgZdgACfT/q6sBUElEAA
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/res/drawable-xhdpi/tv_banner.png
+base64 -d > "$DEST/app/src/main/res/drawable-xhdpi/tv_banner.png" << 'TSM_EOF'
+iVBORw0KGgoAAAANSUhEUgAAAUAAAAC0CAIAAABqhmJGAABBBUlEQVR42u1dd3gVVfr+vnPOlNvT
+KFKk9yrFih0Vxd77rq7dXd2ui7prW93iT9e6unaxr33Vta9dEQGld5HQSbn9Tjvn+/0xSQghRAJJ
+SGTeh4eHJDd35g7zztffDyMlvSFAgAAdEyy4BAECBAQOECBAQOAAAQIEBA4QICBwgAABAgIHCBAg
+IHCAAAECAgcIEBA4QIAAAYEDBAgQEDhAgIDAAQIECAgcIECAgMABAgQICBwgQEDgAAECBAQOECBA
+QOAAAQIEBA4QICBwgAABAgIHCBAgIHCAAAGBAwQIEBA4QIAAAYEDBAgQEDhAgIDAAQIECAgcIECA
+gMABAgQICBwgQEDgAAECBAQOECBAQOAAAQICBwgQoENA7EKfFQEb+zZRcBsECAjcrqiKAADIav5B
+CgBBeuDJhhxGBkLU/goCECgCoIDVAQICt308wAAZEIHngvTIsQE8AABugFIQjWOiGJWCGhITIAPH
+gmSlQgTpAigADkIHoaHQgDEgAlIBmQMEBG5NY4sMEMDzIJ8l6QByKCrDolK++wA+YIQwwzBolGAI
+pV1Yp67MU5uMMGOQy1D5cik0XDrXy6SofIlctkBWrlfJSuUVADUwQyh0QAAVMDlAO7z/IyW9O7S9
+dW0o5AkURItw4AgxbJwYubcYNEokSli8BDUAqDHDICV4Lm3mQxMwDpqGAMABEEACZDKUqabvFnuz
+v/TmfuUt/MarWKuAwAijYQIBKBncNgECAu8IdTkQgZUjz4bSbmz0Ptr+R2pDx4o+g7mpowJwXJIe
+eB6Q2hQSA9b+Y3P4r/GtKyJwAVyArqMAcAlWfycXzPK+eM+d/j+3fJlEBuEoch4Y5AABgZsPzkFK
+yGeJMxi0hzjiZOOQE/QefTgHsCXYBVISAIGxerxtLggIakJfZKAbYOiIAJUb1WfvuG89a8/41C1k
+KBRDTQclAxoHCAi8bdRVCrJJCsVw7ATtzF+YY/bXoiHMO+RYQAAMAVuhqk0ESgEAaBqEQ+hKWDLb
+e/4B63+vOdUbVCiKmgHSC26kAAGBtx7rAkImSZoGx5xjnnqxOXCkYBzyOZIeML69lna7mIwI4Qhy
+Bqu+l288aT97n1W1VkWK0XcNAgQICLy54RVQyJKUsM9E/ZxfhfY7VHMkFPLk5592Cvzo1zAhouOi
++XLqPwrvvGDnsxQrxsCjDhAQeFOLBQBkq6jvMH7RNeFJpxkEkE0RspoQd+eCCKSEUBhDGsyY5v7z
++vyX77qhGAotSFMHaEMLp4eK2qfhdSxwbTr98tDNj0ZHjNcyaXJt4KKNHOZtqT8zBtKFggU9+vLJ
+Z5jFnfGbz7xsisww+pntAAF2RQJzAekq6tyd3fpE7JzLQxIgnwcuWiVH1SI0dixwPdhzgrb/MfqS
+OXLFPGlG0G/MDBBgFyKw372cqaAJk/Xb/x0fNkakUgSw08LdZp12rgCdurAjzzBsG2Z87CKipgUh
+cYBdhsCMg+eCXaBL/hS+5t6oGYJ8th35zNuSLXddAIBDJ+u9hvBpH7iZFBmhwJ0OsAsQmHFwLNJ1
+nHJ39PxfhNNZkhI4hw7XmE0E+TyMHiNG76/N+MStWKuMICQO8OPOQnMOVp6iCXbnS/E99hJVSRJa
+x76snguxBCYr1ZUnpGd/6SVK0XODmy3Aj1GRo4a9cXbnK/FRPwr2AoDQIJumWILd9XJ85N4iVflj
++FABAgI34jnXsPfV+KjxIpn88dzoXEChQJEEu+uVgMMBfowEZhwcC6IJducrjbIXoaNOKLNNzkWB
+IvEaDqeriIvglgvwoyAwMnAd0A248+X4qD0bsBcBgEBiR9PcQ2AEroQCAm/A4btfiQ8eLbLJgMMB
+fiwW2LPpd/8X2WML9hJIABQQkZCvY0JHYC/3KGdg1xgb5VJyMw7nKV7Mrn8wWtyJOVZ77EgJEBC4
+efFhtpIuvCZ8yrlm1RbslZTtb9w4PPSYhmUeZToEhxG4pLyGicHm3cNDj8T5HptxWEAmTUNHiRsf
+iXouBR1aATpwHdjvlJxwtH7NPdF0jjjfLNpFYAPNv3USR2lY0kkcm6W5BbWcYxhAtW/2ZnXWeVjo
+XxE2GIF3Fsem1XRLrWKo+x2VjEM+D0OGCUnw+ZtuKBYUhwN0QAvMGNgF2K0Xu/beqJS0ea4KARRD
+M8IGA4ACR8fS4eajnbSjHdrIQG+v7BUuJWN8j9GhFyJsiAIHAAv0nUuViKK+tRUCUlm64A/hCcfo
+meogGA7QARs5kIGVo3+8HN//CD2d2vImZgosgdFh5kNRNkyBw0DzKDvfuiQlv9SwjMBrZ+zVXKpK
+8HFDzQcExhQ4DHSXqr8pnGCr9QKjtLnjoBToBlStp58elExuJGHAjtthbNteU9qG9m7GEJEhov/i
+ul9BrDtfJCIgUkTU/H7xbfzItF2d6Nv25tROutzblMBcQLqCzrgidM0dkepU4yYIgSmwGRh9jes6
+i2N9SkjKf+f8Za37lIYl1G58aQTmUEUR36eWvS4DLavmL7Z+Z1E5A5Ogkclg6UFRAl9/zp5yTiZa
+hDs+PCylbLO7iTHGtj6NjYicMymVZdueZYOUwBhwtkk1nwgU1UgicA6c67qmaRrnHBGISKkf5jMR
+yW1QP2GMcc6be2W2/c0ZY7sWgRkDK089+/HHPirSTZByq1MKCEyBp6Aw0Li1szjB5zAArHGnLndu
+ERBrlBhtf+kI7K7amb20KzmG/YfORu+1ZfZNkvIcI02cpJSQiONV52b++7QdL8UdkdQiolg0KkQb
+5fls28kXCo3aKMG57bhWJiNCZr9+fUaNGDpk8MCe3bt16lQWDoeEEFJ6hYKVTmcqKqvWb6hYWb6q
+fNXq8vI169ZvzGcyoBQIYYZM3mQHPBHpuhYJh5tUJQQEKFhWoWA1j8NEXIhYNEI/1IRg2XahYGE7
+mLMRbWmwlISLrg0XFWMq1VQESKAQBIfIYvsPBNBFnEDgAWA37ZyCWr7afdzAzgrcne05V/Q3bthN
+O8sP1xkYVfKDhdZvBUaaZq/vSTouXXRNeNr7rpUnXyV3++xhNpt7ZuoDB0zYR0rJW3P4w/M8IcT9
+Dz4+5eo/xUtLPE/WN7yImKqq7tS1ywXnnXXKSceOHzsqFApty9tms7kV35cvWLR45qzZX8/8dt68
+hal0ZmvE4JxnkqnDjjvqsYfullJxzraieaQYYwsWLj7syJO3nb2c83R18r57bzvjtBOl53EhmrgO
+d9x5/03X3xrvVOZ53i5BYMYhm6R9j9AnnWKkM9uSv1EAyCGy1L7WoQ09tYsJPALZW/99Ti1Oyeka
+Fu+seBhBc2h9V+2U3bSzCFwAZKBXeu8uta/nGEYQP+ggMAb5HAwcxE+7zPzntfl45+03wkSUiMeL
+EvG2+eyRcLgBJRBRKZXP5c//2TnXTflN7149a70MRaQajSj9d0BExlg0Ghk+bPDwYYNPOfFYAFi9
+Zt0hk0787ruVpmkopbZmgbfl8+6z17hDDzngP6/9N1aU+EGvmCFaltWnX59zzzolEon84JuHw6F2
+EgS3kR9PCjQdzvmVSbTtOhUEgBzCy+0/r3Wf8YnBMTTUvD/Bx3lUjTtjLwwC96i6WBzQV7/Of8og
+iFXuQwvsKyRkEbRtDNG5gKxFJ5xndh/A7MIOzTx7nkdE/t+tB9d1t4wPEVEpKT35yIN3PvzAP3r3
+6ulJKZUiIs6ZEEIIviVE7Q/8LJdSSkrpuh4Rde/WNRwKNUrd+hwmIs+TTZytfzUu+tm522xguJPN
+nXXGSZFIxG3yStZeB7ULlZG4gGySJp9t7neIns1Sc+Q1iIB07Pyd85eMmsNAJ3AFxoaaD8T5WI8y
+bcxhBOFSdVfttOHmowJjBBJBrPdeWm7fIiCKoG97sRoRHBt268YunBJ2CrQjCRFsWzQ4umPZTzxy
+z3nnnuF5nlJKcM4Z2/bg0LfDnHMhOCI6jts0e7fxIwshAOCwQw8ctcfIfC73gwknx3XjZaXnnXsG
+APjn38zL8KMmsPQgFMPTLjEdj5r/yX17zeYVfrbBew1BU+AKjA0y/09jxW3Za4kgPErH+Oi++hQE
+VOAiaBu8l5fY1+hYSkDNbTXhAjJ5Ouxko98IUch3vP5KIXi2Ovm73/7i1JOPc11XCLElT+oMrFcP
+stZKt2pJTEql69p555zuFaymCSw4L2SyRx95WN8+vfz4GYJGjvrRbyFLY/fXBgwXhcL2KcISglDg
+LLZ/l5JfMdAU2AZ2G2Y+KDChwGqDmQcEpsDSWMlA41aGpl8x2uC9stj+A4ewv4xle24yF+JRPOxE
+3c1vvxFuQI+toemYTSm1LW9SZx4Zw0K+MGDIwGuu+pVSSjSW8pFS1jOwm8BrrbTvCbdSGczn4emn
+ndh19x62bTfxaFBEQhMXXXBuOyrvtqMkFgHjcObPTc53RKVRMdABaLF99ejQSxoWKXCibOhQ4955
+1oUKXATemhqQSCARtMHGHWHWX4HLQM+quUvs6ziEAdh2t3kyDnmbjj/ffPkRK1lJYjtE8IiKihI+
+MVqvwAsA/vtHoxEgAkDGuJPLn//TsyKRsJ+Y3dL2cs49z5s9Z/6SpcvXbdhYyBf8rFWXzp12371H
+n167l5WV1BXAPM9rWdPHGEopO3cqPfmEY+656/5EWWmjGWPGWC6b22ef8fvvt5d/zgGBN0u3FnIw
+aLQYM0HL52lHxCUJJAPDUevnWRcMMG6JsIEKnBgfNcC8ZYH1i1YtDiMwl1KDzdsTfE+/KJ1V8+dZ
+FyNwBL4jjSWI4FjQrRs7YLL+/D+t5taEiUg39H89PPXd9z8ipXArBGCItmWdcvLxQ4cMJKIGtsh3
+Gj/+9Mv/vf+hEYlsLQT1Xzbtqxl6KKQUKSXDicQxRx1ORA2I53dYMcbuf/Dxe+57aOmyFXahAErV
+bKZBBM500ywrKx3Qv+8+e4079OD99917fDgcAgA/NdWS/3UAF5x/1sOPPult5coyhspxLjjvLMaY
+58k2q6h3DAIjA8+iI04xomGsTu1o9y+B5BjJynlzrZ+OMKeGWT8FTimf2F07r9z5p46dW6OwhCAc
+2thd+2kncQyBZKBbavU860KP0hzMHW8LQwRPwaTTjVces5rblUVEuq4/9NATNXKYTe10rO4/oN/Q
+IQOVUg2MjM/Mt9/94JYbrwFRBlsV70IAQtOMRMJAyrLtwQP7D+jfd0vXVCnJOb/lb3dec9UULVpk
+GIZhGn77ZF0VSSlVWVm9Zs3nH73/0V9vu3tA/76TJ0088/QTx40dLYTYEQ4TbUrpc86UUqNGDDv4
+4P3/+8Y7W9aTGGKhYPUZ2P/E4ycTwdYKy7sogRHBtaG0OzvkeD3vUItoOxNIgQlXVS+2rx5pTkXU
+CLzdtZ9n1OyMN5NjtGXtMAL3KFPE9+mt/w5AuVTFIbTUucZVlQITLfK8YBzyeRoxXhu5tzbrEzcc
+b15zJRHFixJN53445+mkZhhGE6+JRCJClCY6/0BnglJKKcU4l47bq1dPXdcaZH18L7Sqqvquex80
+E6WGoftR7pZvpWlC1zXGmFLquxXf33H7Pfc+8OihB+9fVVWtadvP4QZXQhExgIvOP+fNN97ZavXo
+9BPjsVhrd8J0vCQWMrDyNHofrUdv7lgtJu9M4AqMZ+Ss5c6tfujLMTzEuEdnnSXkWzShhQpsg3Ud
+Yt7DMUSgNCxe5tyc9L4QGG9Ba68khHTY/0hduttzlXZKEguU6lRasmXWx/9yZfnqTCYrhKjfsNVo
+gtp/T9MwEmWlmib++/Z76zds1DRt+whMRJZtN8gwE9Gkww8ZMXJYPpdv4O3Xrx7VfwgSkeO6O73L
+amcTGIAUTDhS49jCCwoIPA1L17hT17rPIGgKHA2Lhpj3+bXZlhLTQmAKnAHGLRoWK3AQxDr3hfXu
+vwUmWtbOMwa2pL0napEilB1HfXYrJh0BoKys1PeEt9GmKSKfLfF4bAdd6H+/+Jq7eUAhpTIM/Sdn
+n+YVCvUJXFM9Oqph9UgpQsRXXn2zqirZ/vPSrFXLv9FiHDZO2JJavLRG4OlYusy5oUp+wEBXYEfZ
+0O7a+fV1MHbQeXYpWconFvG9CVwGepV8f5lzfWuMQyED24ae/fju/bltQ0cpQxYsq/GckFI9uu92
+/k/OyFWttyyLMeaXjtg2eBdSqu0mjFIKEd9654Np02fWb5bymXnWGSd17tHNtp06S6uIhKb53Vp1
+ByUixjCVSj829blQ2Nx1LTBjYBVo4AjRe7CwC63SpUAADMwl9rU5tZiBQeB1FafH+HBJuR12pFGB
+bbLu/YzrCRQA8yi1zP4zA5029Za06MPOhVgExx+keRZ1jI4Oztev31hHj4b9lUS3/eX6//vH7X16
+7Z7L5lIbK9LJlO/c+jVhv4+yNQaVM5nsw489jbhptZxfT+rapfOJx0+2MhnfKfCrR3vtPa5B9Ugq
+BQCvvv7WvPkLm555+pETGBlIB4aNE6FW3JerGBiO2rjC+bsCCwAExvro1wDSDptfVGT31f0WKw+B
+r/WettRKBqFWUvZBBAUwYk+x3ZNJbQlSSjP0pctXZHO5uqn9zbojETnnv77ykllfffDOm8//6cYp
+xxwzqU/v3YkoXZ1MVVSkU2nXdRljQmyTZd52xKKRF198rao6yTkntdmJXXj+2UYk7EnZoHpUv7GZ
+MwYA/3rkye2YJYYfUxaaCBiHkXsLBa24nYzA07C4Wn6WlNNK+IEEMsHHR9nQrJzPtldGC4F5lC0V
+E0vFRN95zqlFq5x/tVTaeWvPO8elQaNEohPaeWjnNFZEpmF8v+L7GTO/PWDCPluWpuqya6GQeejB
+Bxx68AEAkC8Uli//fv6CRbO+nTvrmznzFixatXoNOK4WDoVCIT+n1QKRuWlmqsqfe/6VSy/+qVRK
+MO6bfaVozOiRBx044Z13PogXJQqFwpbVIz8R/fXMb7/49PPhI0fIrXyuH78FRgTpQrwMB40Ujtva
+PiEB0Rr3Uf9fCKyb9hMFDm5/KosReGXiKAAC4ArcZfYNkuxWbbr2Zxu67s57DxS2Re1/ISMiSsd9
+5PFnEHFrzxrfiEkpPU8qpcKh0PBhg089+bhbb7rmrf88O2va+/997ZkrfnVZ7167p6uTuVyuRfxq
+pRSi+cgTz7iuW7+uS6R8I0xK8XrVI6Vkg4M++PBU5ViMsQ4hHspaKQHteVBUyuIlrLVT8QRKYDQl
+p6flDAaCQJaKI2J8lKT8dn06JHA1VhxhAwFAgbXRfT0lp9fmt1t34lLXoUt3Jr0OsJRCShkpSjz3
+3MtfTPtaCL61igsi+pNGjLF6gw1SEZWVlkw67JA7b7t5xhfvPvnEA+PHjE5XVe/4LIFSirTwzFmz
+333/I0SsK0Ezxolo8pETh40YmkmlijqXNage+X7E6jVrX37tTWZGt0VY58dsgV2beg/giRKUXqsv
++CUAALbUud6hDQDIQOsijpdQ2I5Ulu8/99WnhFl/AskgVCFfZ6C1gagtEQiAgSM5yI6xEpkhKlLn
+XXDF+g0bhRCu62375CBD9I2zlDIWi551xkmffPj6HbffwhAd297RpmgEIHrg4an1+YkIUkrTNH96
+7ulufuOxR0/asnoEAFOf+vfGtes1Q+8oQw2tRWDyYMAIIQDaRP1YcQhn5fyMnIPAAKhMHBVivRTY
+zbJlCCghH+MjO4mj/VnftJyelNM4RtpASQ8RPID+wwXToUNIRiulQuHw4iXLJh192uIlyzRNNEth
+zzfOdW62Jvgvr7j4jVefjkajruMwtgPPMKmi8eh77304b/7C+jmqmnrS6SfHSrqfe/apVE8Q01cg
+KBSsx596Xg+HlFRBJxaYobb0BImBllJf+u2WGpaUikMkNbcxC4k8HcsQhG9y13nPKXLazKMlACME
+rOP080kp44nY7Dnz9z/kmAcefMJ1PT+OlVJ5Uiq1TUVdn8lE6LruARP2eerx+6WUO2YASXCRT2ce
+evSpeiPl4Lvxu3XtfPttt+w1fox/3Po15NfffGfhvIXhcFjRrk1gUsANGDRaeNBG3iCB5Bhe776U
+V8v9bFMxPwixuTOGSCAjbJCfgpFUKKgVDPW2EbJFBo5NvfqLks7MdTqGFw0AniejsWg6k73k0l/t
+d9DkBx95csOGCs6Z4Jwx5keh/hB/02RGBE3TXNc74rCDLjj/nGwytSMZYCmlEY08/+JrFZVV9QtC
+ftHrgvPOim4ufMVqqkdTGWcdaySYtV5Kpo0zMQhcgpVV3/rFnhgbZeJuCtzmnAcxNIr5AX4wXKAV
+Dq1H0NpY+L7DrVyRUgoh4iXFM2bNvuiiK8fsPfHsn1722NRn581fZDtO/c4NpcjPYMFW20MYEf3y
+FxdHixKe3P6uWCIyTXPNipXPPv+y3+BV3+A3oKgvPDD9628+/vjzcDTaItWsDkxgRFASInEs68Kk
+bEsaMyLHpWSt7E7UZL0V2dtcT0IFnoZFIdavttppuZRkIKCt6glKQiSGZV07RiJ6Sz30SCQcLymu
+qKx86qnnzzvv8r32nzRmr4lnnnvJHXc98PGnX1RUVDGGfgZrazle3xIOHNB3z/F7FHL5HYmElVLc
+NB994tkG9aStCfc8+MhUJ1/ocBOFrHUeyRBNYKfdmOu2ZUlTIWjV8qPaxcIYYr23fbYBAQlcA7ty
+DPs+c7X8UJHdZkxCBCkhGm/769aSaS0ppaZp8eKieEkxACxesvSZZ1749S+vPviIE0fvefBRx515
+5z0Plq9a00Sfk8/tPceNIcfZkXS0Uiocjcya+c17H3yMW39k+NWjNWvWvfzqm2Y8JqUKCFyzBMjz
+2jSQIyCGel4tl5Tzw2ATe/jKr9tsRlwdu7Baccmsmt/KSj2NNjm19XVrJWvsEyYUCsWLixKdyiLh
+cEVl1X/feu+XV141evxBf7v9Xt+j3to8U7++vaFeP/P263EQPPDQ1Cbk8nyHeerT/65Yu87Q9Q6n
+icVa1aTAztBtrmMsNXt7A9ZvltwputM767q10l61OklKpZSmafFEPFFWatnOVb/5/SOPP+OPGTT6
+8UuKi4DzHWSTlDIci7773v/mzV/UoOe5rvbOOS9Y1uNPPa+FQx0r+t2ZC74D/AiglHJdz9dz3nbL
+7HmepmncjD029dkt9bQaBMPQAtq3Ip/OPPzYZvWk+uo/iPjGm+8umLsgFA4HBG5M0bmN/TeQdQdu
+fgKZ6lvdnbbKlDoGe8PhUFlZSWpjpeM4frNkM9qVOU8mU376t1GvNZ8vtMg8R0096YVXKyurtwy8
+66pHyFjHuO5tN06Ibd2QgICKnDDrW7dbzKJVAM34j0HUHFqvwPEvS5QNbUF9j3Z73bbPc/Y8r7io
+6NMPXrvx5uu6du2cqqzKZLP+SgT2Q5sZOOfSdTt3LhNC+B0UW471rt+4EaTc8dkGv560esXKZ//9
+si+UI2vhuq5S9PXMbz766PNILNrh0let2UrJwLEpl6G2fa4xAreYH1gr9UoFtWLbs1AEhKDZtK6u
+f6uYH8TQaMsPsJOu2/ZzeLeuXa+b8uuZX75///13HLDv3q7rpioqM9mslNKf9W2wG0kILoTI5/Pk
+eb+47IJGBWt80i5ZsnzHk1h1Bl+Y5iOPP42Ihq7XnYymaZyzfz001SkUOqIeZWvNAxOBEJCsoPLl
+stcAbhcI26yMhLqGRQQuA82jjKVWMDRoW28CYiBcShbUMo2PBQCGpoZFXk1Om9pimEGD5EYqXy41
+Hdt/NhQRfee5tKT44gt+cvEFP5kx89s33nrv/Q8+nr9wcUVFVY3YLWM1iSkiUAoY271Xz5tvvOa4
+oycp1Yholq9TOWPWbKbrW0lTN5vAZiQ8e878u+97eNSIodIfYCBCxHQm8+rrb5nRSAc1v6040I8M
+hNbW0S8HM8pG+XFsRn1r0VoB0eY0QqIiu1p+HOdjCVQIe+vYxaVFbbZ+yV+YxAV0oCw051zVrCPk
+Y8eMGjtm1B+n/GbVqjXzFy6ev2Dx99+Xr9+4MZfLS6lisejuPbuP3WPUYRMPLC5KNDo5KKViDOct
+WDR37vxQy6WFSSnDMK78zTVbGHwKh8Oig4hvtB2BEUE5sHSu3O+QNlKWQOAepbvp54RZXwIPQVTL
+D4maO5hHCDynFvn3EsdQiPXOyDkcw609DOzbJ03D8uVeciMJAR3ojvLnBGtVo4lz1qNHtx49uh0+
+8aAmxOsa9VqJFKJ45LGn8+lMoqykCVXa7UA0GtnaslLosBCtxCdSkE1RG+Z/UIGbYHvXCkpWVXof
+1PVUNYPAKByqIPD87EBXcVqF93YbxaMEjEE+S45Nmo7UAX26uv1KShGRIiI/ovXDWiIgIkRgjDXK
+Xk9KIcT8BYsfefSpcCLe4m5tR6wS7aRpJALgsHKplNA2SVwmIR/lQ2N8BIECwArvzYL6nkHzUlAE
+xCGckbM3eq8jcAIvzscX8b1aQuZymy4aByhfJqnjdGL56dwtLRhjWLORkPurCJlPWv/rRnPLnicF
+5/l84fyLrszl8juoDr3roLUILHRcNl9mMtQGER0CAKj++vU6dgYgBe567xUOoe0YA/QFepY7t+TV
+UgSuoFDGj1bgtkXHC4ICWDhLEnSYSYZEIu7zU0q57QPAjfVdKiF4Mpk68bTzpk2bHol1GEWbH2kd
+mEDToHK9ylS3ejjni+Ak+Pg4H6vAQ+CV3tsZ+S3fTlVKQtBcVZ1TiwGAgdlJOzrBx3uUae1Ulr/l
+bM33ClvnivmSVFtDs4hHREKIyqrqS6/4/Xv/+ziXy3PONw0A+1tafF7Wvnkd/O/UDQnX6nKw9z74
++IBDj3v77fcTxUVNs7cFP8gPutxtcJT2GAP7FZFUpfpukbdbT92xCHmrdnBgN+282okitcZ9nIFO
+2x+4KgRR4b3ZSRwF4DHQ+hl/ml04vVXzWESg6VC5TpUv8wyjFQJgItM0G10CrOt67d/U3Drw/fc9
+/K+Hnujfr8+E/fY6cMK+48fv0bdPL0PXm9gu0cB/TmcyH338xSOPP/36G+8QQLwo8QOJKyK/V2TL
+D+J/R9Na5vmHiKbZyO4Y/3IZzbxcrXj3R0p6Q+uUQ9Ib6dIbw5ddG06mWsuRRhAuVZWIg4aYdyMI
+BJGU0+ZZ53MI79DaXmAeZYaY95SKif5C4HL3nyvs/9OwtJX6K5WEaAw/e9e58rh0KIotm23xyTZ8
+2ODOncq23A/sf2fF9+XLl60QevO2ignOFZFlWW7BAoBoUaLX7j2GDB44eNCA/n179+zZvay0JB6P
+hcMhIQRDdF0vl89XVyfXrlu/cPHSGTO+nfb1zGXLvgNF0XgMEZvOMyGi53qdO5cNHza4/hrR+h9k
+/sLF69auF9u7Hq1GMVfKcDg8fuxoxrDBgfyjfL9y1bKl3zX3cnUkAjMO2RTtd4R+96vxXJZaZ98P
+I3A5hoebj0XYQAJPUmGOdVZeLveXCe7IZSFwNSwZFXpBw2IAkpSdVTjBpQoEozUUKqUHxQm878/5
++67Lxzs1b833Nt6U+UJBbV04UjN0wzC273ZkiIwxAvA8z3Ecz3ZASmAMNBEyQ6GQoWkaZwwQlVSO
+6+TzBatggesCZ5oZMk2jiXndLT+I67p2wdraC4yQqWktwCulVCGf35qVFYZubu/l6iCbGRSYIVz4
+jbd6hezcvVVEnhBAgjXYuD3CBiqwGRjrvGczcq6OnXbYThIDw1Krl9nXDzHvJnAFJvoZ18y3Lhdg
+EGCLu0+MQ96B6R+5XG+tADgSDjfRWrwjcZ0iUrX7SkKhEIbD/oiCH6wWClY+X/DfHBH9oDeeiCGy
+umi2WR9E05raddxSASpjLJ5ItPZRWsDV1UNFrfVs0CC5kcZM0AYNF7bVwvvNEIRDFf2NGzuLYxU4
+DIysmr/MuYG1mIQVcQznaGGcjwuxXgqcMBugYVmF9wbHSMsSmAh0A9aXq4f+mkfAVqohUZNo2aPU
+Ja5qi8OM16sn1SWitvu4bfBB2uwo7XicEIEIPn/XbfEJOQThUmU37ZzdtDP89UUuJRdYl9Xmilvm
+aASKgb7EnuJSNQOdwOuqndxFO8WjVMtmpJUEQ8MZn7qpjSQ0+JGVP9vz3Q9BGekH7sswfvU/t7JS
+aS3nGSJoHqVjfI+++h/8cT9J+QX2zx21YQdzV4060rZat8D6uaQCAnOpup9+bZHYx6N0S+p1ICiA
+T95wASG4uwO0FwITgWHC6mXy87fcsIktsmQUgXuU0ljxQOMvDE1/f8JK956k9xlvhfVFBFJgLCm/
+WOH8HYBpWMIx2l//s8ZKJeRbpD2LFITCsGyBN/1Dp8XzzwECAu+otgQyePM52/VaIAZG4JJyUT5s
+uPlYmPXzCzyV8r3V7qMtkbja6gZTHcvWuFM3ev9B4Aock3UfZj4oMK7A3XEOKwWGwPdedNIVJDQI
+THCAdkRgJSEUxZmfuEvmeqEw7Ih5QeAKbJ11GWY+FGEDffZm5LdLrCkMzFZdnkCgBMaW2jek5FcM
+dAVulA0dZj5AIAnkDl1DAqFBOkvvvuRo4cD8Bmh/onZcQCFDz91vCbYjQ+pMgaPAGmj8RcMiBTYD
+Pavmz7cvV2C1vvY6IXACd6H9q7xaykBT4ETZ8AHGTRLyzVKuhS0EtCNhfOff9rI5XigMFBA4QHsj
+sJIQiuGHr9mrVkrD2L5UFhJ4DPSBxt8TfE8FLgPDpjXzrAs9SrW2+a2XkTZdVbXY/oMii4GmwO0s
+jh9o3Cohj4Dbx2Fk4Hrwnydt5IHvHKCd1YGhXkE4VUFFZWy/g/VcAZrZleUTQw4PPV7CD6iTy1lo
+/aKgVgiMtsGo/aYlphgqqO88SBaLgxgIAjfKhhms2wbvVYFhaGaDh5QQj+O0/zmP/b0QDtJXAdot
+gYGAC1z0jdxvsl7auVkrvxEBHdrQ37ihVBzqx70eZeZbF6flDIGJNld+VRzDaTkjrWaU8okcDQIZ
+ZcM4RqrkR1ijBU/b3OsDngM3XJLbsEppBgb10QDtlcAAQofkenIcOPx4o2BtoxFGAFJQ6G38rrv2
+UwIPgSmy51sXpeTXGhbvJN1m4hjJqfkuVJSKwwEkACX4uAgblJSfb3tALj0oiuHrz9jP3mlFS1qm
+xhYgIDC0Xmu0HsJl8+TYg/Qevblj/2BViQGQhNwA45Zu2tkE/qZh/p1zy0bvdQPLdprqOgCAEhhP
+yxk6lsb4aASmwImwgWHeZ737MkPxg3aYCLgGmTTddGk2lwPGg+pRgPZN4Jp+/TStWSknn2m6TXrR
+CIzAU5AfaNzaRZygwGGgIbA17tRy9587z/ZuxmGGoWr5kQupOBvL0VRgh9mAMOtVLT+VlG9aUFpK
+KI7ig38rvPecEykKzG+AjkBgIjAjuGyuLO6Ce+6nbS2bhcD8KlF/4+bO4ng/7pWUX+7ctNK5W8NE
+G+SctzmDr1XLTzJqVqk4nGPYrw8XiQlpOd2FKgaNz3wrCZEozv7au+XnWT3cMrP7iE39ae0yIWOA
+sJ2tsojAGCDr2AsZ4cc3D9zEClzDgEc/LurZl1t52mKNCFNgCYwOMx+KsmG+7fUoO9+6JCW/1Hay
+59x4Y7ZLVQk+bqj5gMCY/7hxqfqbwgm2Wi+woSq1Px0uOFxweGreV1443jLmV8qmnHDGodUmnCCf
+JpDADAhHm5eHQwRk4FjgOkQEjIHQsI21xAML3PxsloBsihbPlpPPMKj2hq4/4csxNsJ8MsIG+WQg
+oKXOtZXeuwZ2af660LbJS0fyanlGzSoRB/kcFhgt4nun5BcepBvMLSkJRTG8fUr+3eecWMvlrqJx
+DIXRCKEZQjOMZhjNEBq1f6QHpFpeKI8U6CE49dLQgZP1aDEuX6CEaI5yuIJ8mrr25ANHih59eXFn
+xhDzWepYC1Z3LQtcX23nnN+GrvpbpCpFW/yvY3/jxk7iKABwqHKR/euUN21nVIya26Sd1VmXoeZ9
+ETYEgBQ5c63zMnJ2fW0Qz4XiIvzvi/bVZ2Yi8RYo/PoejRnC+/4b796LOXbNM8JvEamJUBCuOC69
+ZI4XjqAiAAKlNrm7vhn02ejbav/fdefGWE15W6laS041P/UcKOqEby4p7s/Eo68Xrjw+7T+S6ht8
+IiC1hXeNQAoYg0v/FD7yNKOkMzMBLaB0Ss2ZJq89L2PlifOah/sm73qLM685ty2OsuU5K1nzU2TA
+aptu6n9MCITdmyUfEyvFp+4sjNhLTD7JqExSPccJCeRC60owIcIGzrV+5qgNAuPtmb01W10w6qiN
+cwvnDw89HmK95ljnpuUsDYvq+kykhGgcly+Rf7kyp5tIrePQ6gaEwggItgV2gfwYmDFwsuRY4Ddu
+6yE0QqAkIIL0wCoQEYQiSAqsagICYUIogkoBIBRy5HnABYTCmE0RuQAMwjHkwl/FBq88Zncqc6d9
+6Ai9hle5NCnXH2QB4GCEsMEzmjNIp+iyG8MX/SKc9GjZArl2pYzEsM9gPnZ/zTAhnwHOgXHwXCik
+azfGcjBC6M+lMg6uA1au9uoKCEeRc1AKsN45myHMJAlc0KOoG4AM7AI5hZrmV2HUfszAAm9HC6F0
+IBTFu16JDxsrspvJRyOBROAcTBeqOUTasNdqx0cdsyHWU8OylJxen71KgSagkKMrTkjPm+5F4tiy
+ssfhKHINskk6cLJ+/UMxjcPUuwoP3JiPl6LrQLJSDR0rho3Vogms2qCmf+iuXCqjCXQdSBTjgBGC
+c5g30+McJp5ghGM4/SNn7jTPjKB0YcAIXlLKUima+5W7z2H60LFiwxr1wau2lQMugHHoO4QbOlZV
+qNUrlP9EGLO/6D9MmGHMpal8uVw610tW0qZSGdbw58F3E6NGa++/bf/qxDQgGCaWdmEDRvBvPvcK
+WRI65DMUL2HjD9S692HIYN1KNftLr3K9Ejrk0lTWlY0/WOvagykFK5fKrz5wrTyZEXQdGDiCl5Sy
+ZJIWfePtN0kfMJz/7zXnu4XSdaj3IL7HflppF5bP0Oxp3tzpbiiCgQXenvBJMyBVpa49L/Poh4lo
+glkFqt1TR76qhgc5DuGOwt7a4eGITessWl2fvb4rGArhdRdkZ3/qJbqg19KxfCZFjEE+Sfks+c6z
+Y1G2mhSAknD1XdHjf2IWcUQACbC6Ut322+xbz9mKoP9w8cBrCQn00uPWPhP1Yd1FNSjHDU05L/ve
+SzYiXH5j5IiDja/nuYu+9c46M2QBKaBPTtF/d3rGtqAogf94Md6njD/zrDXl3IwZxqvuiJzyMzMC
+CAASIAL4xPOFq8/OxGqrZQigCDQDdRNcouJS1m+oWFsus0kqr/bKl8pIHIUG+QyN2V+75p5o74E8
+DoiAJsCDT+T/dGFWeLDv4fqUuyM9e/E4MAWUBpo/0/vjBZmVS6Xn1ZzzjAXuikXeiceH4oCXbUwt
+nO6ee1X4wj+EuyZqHibVHj15Z+G+P+V0swO3wbGdt5UDInEsXyqvPCGdSykzVN8o+csJePupGG37
+zAOCxiG0GXsBIlG84fLsO8/Z8VZgr58aFBqgtmmzITJAHWyLLvhD6JzzQ5ZFt92cO+WQ5AvPWSWl
+eM290SFjhHKAAAseVVfTseeY33zu3nl3rqJScQ3PvsLUDSQFjkWVUvXoy8YeqN12S/bLL5xUnvY9
+RN/3CN3OEkPIZSijyLGJXBowgh/zEzNv0Q1XZ4/dt/riU1P/eixftVH5Ae1mTSxVasUiaXDsP5w/
+8r/EA28lbn4sduLFoeLO6LngOtC1J7/l8VifgTyXpWeftW66Nvvim5aUABK69eY3PBzt3ouvW6du
+vy378EOFdIpGjhF/fCCmGwgKHJsqperWi407UPvHbbm/35tbOMvbe5L+u79EonH897PWqYckb/tz
+znPp4t+EjznXzKaIcwgs8PYEw5EEzv7Su+KE9F2vxCPx+nYYOmx3EtVpyvvsDUfx5suzL95nxTuj
+dFvtkLV/6pI85EJxF3bYyYYt6ZtP3Yf/micFqaQad4DWuTObeKI+5zOXMSCieALfftG++tQ0APTo
+ww+ZrJd0YYkSXLeSGAPOwJLwh7Mzsz609zzMuPu1uCLoNcDPMgFjfiEXAcCMIAK4Djg2pZNUvtz9
+4N82N7HBqAYRCB3u+1O+2+582FiBACPHiGFjxHFnGt9eYF59dqZ8iXfopWaX3ZjjwVN3Fu67NgcM
+Hzegaw9GBAcerZd1Yq4HD92af+6ugu/QnfQzc8geYvS+2iev2ZzX7CSecm72s9dtZqBy4LYX40iw
+5nt17x/zG9bI+d94ex6sjR2nH36K8Z+pVseNhHfyLlrpQaIUZ3/pXXF8LYfz1IEW5EKTUhuINex9
+wWev15YrPwGISruwolKWdWjUPtqnlaWIqCQZJhYDGzRKq3tIMgYzPnaZgVxA1UbFEDhHxhAIiEBH
+XLzCW75AalGWy5BVgIjZcIkxKUKBS2Z7C2a6e+6p33hHLA9UuVGtWCQf+Vvhy/ec+ukiUqCbuOZ7
+denk1D6H6XvsJwaPFgNGCOnBuHHaKZeYt/8qu3t/DgRWgT78j6NHMRxFKSFVRYDQvTdHgkKe5kzz
+wkXMtmnmp+5JF5ocoHtvP6UOBuKy77zZ09xoGWMMpAddejCbIF6ML80uYhylJN3AEMLAETyWYPks
+cdEh5QR3Plc8dzMOJ0pYJkUdvaAvJeg6hEy8oc727ow8upKgJBkCv53lff62G02gUuDaJD0oXy6R
+o1Lks9gvtCjZsFzs55KlC4Ck5KY8VKP7KPNZ+vUpmZMvNIeOE117su69+V4TtF6D+Dn7Jqs2bCa4
+SQpch6wCvPW0/dbztiZgv0n6TY/ECop69uMA4LkEAJyDZoBjQSgCngO+oqX0an7EOXgeSBc0vWaS
+0/M2nbNjAUNwPQACKUF6IABSVeqNp2zdQECQHjk2patJypryWGCBd4jDc6Z5lx6Zvv5f0aGjRXWy
+A3PYcyEWx1SV+uPPsm8/Z7fGpoUfdqcVAMP1q+T6VapTmSCCB2/O19Y9sccgUUfEzRxvf8kqbRay
+1ny5+XcafglAEuIlDAH+eV3O/9FJl4au/kc0EsOe/fm6clfTa3JFRMA5nH1laOk8uWCWV8hRIUPV
+G0l6xBCzKQKARd9KQOACTr8stGxuNpOk0i6sRx8+6xNvyVwJCLqOE0825nyVC0Xw0BMMJcGTtGy+
+9J8OfvDiH45xsJL03QJvz32EbuLrT9nlC2simaKuvLQLK+RI0zuqmq9oRzd9MS761rv06PTNj0QP
+OFxPZWs67DpW+KskFBfh8iXyuvMzrZRzbtpzFgIEAGMEDHJZeuZe688PRsfvpz39ddHnbztmGPsP
+E4ceqv/hsswLizzOUWgg6rVMMw4Coe7pyQUIhLpCLiL4r6/rgfW/5BqAR527sTtfjs+f4S1fIPNZ
+2nuiFtKhsprWfq/q2Fuzh9GFUy8LDdydz1vibVitlKSBo0S8mCHCB6/a3MAPXnWOP8/bcy9xxKnG
+oFFi5TI5Yqz45gv3m08zH/3HmXuxt8ce2umXmcPHi1AEB44UUY4vvWjP/drjIUQGAjc5+USgmfj8
+A9ahJxo9duMPvpt47yXbsalnX37ECcZ/nrWvOTtjlGEH3WfajsJN6UG0CPMZ+sXx6YumhC+YEpYe
+2QXoKCGx34RUnMA3X7D/+stcslK1PXtdF1JVpHGw8oQE0Ti+/qTFBZzzy9CQPcSee2guQDKvPvnU
+WfCNhwJdh1KVJDRw7JrJh3yOkilKV5Ff/cqlKZmiTIrqGr9SVSQUWAVCBCJIV1MyWlO+yqWpagNN
+OFI//CjUADJAK5bLf96UX71Chuu3TCAQwSsPW5NON3bbnfUfwAVg2qG138sn7yp88qYTjmMhS1ef
+lb7ylsheB2v9BvNBg4WraMUiiRrksnT1WZnf/C0yZoK29wRdAW3cqF591bn72pymgaM2O2c/GWGG
+YfFs79cnp39+U3jIGHHxFWEFkPFo2UL58RuOMDuwmP7OaeRouscDCLJVNOFo/dr7ot17sGSaavrm
+2rHh9RutPJvu/mP+qTsLuom6AW38UCcCTatJBdv2pk6sbJoSJazXABaKol2AirVq3Srp217OIRRF
+BLAK5HdihsKo6aAI8hlSCsJRFAKkhHyWfNc3HEX0O70sYgzCUWQMXAcKeQICLqBTN1ZcxoQGVp5W
+LlOpStXonEMhS+EYdunBisqYpoOVh5VLZfUGFYkjESAD1wbXod37887dGSJUrFPryhUQMA62RVJC
+n0G8rCtTCtaVq/Jl0gwhF9DgnKGe/kk+S5qOvQfxRAlKD6o2qrUrlWuTGcaAwNDy/dLVtFtPdsUt
+kaNOM1wP8jnivD22uUsPNB1iIZw5zb3td/lvP3OjJVjXXbxTfPjNeqEBGAfpgm2RUoAMNA01fVP4
+6r++roFZqZoz9x2fmi5iBL+8t+X7++F93ZdE4DokPfDDH91EoUGjMxuMg/SaerH/9LEt8FzyN07r
+Bm56ygPYBfJcQARNR93c1A7d4Jzrc1gR2AXyRZ24AN1Axjp2R3Q7JbB/A9kFcAp05BnGhVPCAwfz
+rEWO3Y48aimBc4hHsKJKPXWn9eRdBadAkcTOSThvVkDyc0zUcGDYz9U2yFphbSqr/pd132nw5Zbv
+3/AF/hAyNH6sxnaz/8CLN41bUMNnYt2cQ4N5iS3PuQGNaw4HPwYd37YeJ2xWuyXXwAjhvK+8d150
+8gXqM0R0KmOOB/4TdKdZYwKpAADicfRceP1p++ZLs+897xhh1EPtV16DfpBOLXd9mnGsbXhxg7z3
+1hLmzb4OFMwDt8mtEIqiY8EX/3U/eM0JxbDvYJGIoyTwHGjj2VFSoCRwAbEoMoFffuDccEnu2bus
+bJYiRdjI3FyAALusC93Aj+IcrALYBRownE880Tj+fLNbd+YR5HOkZI0sSysGlgoQwAyjISCTobdf
+sF9/0v72S5cU+JO9wVKFAAGBt0k/qZAnNw9de7MDJuuTTjVG7K2ZGjgSbJukC3537o6b5boZccZB
+N8DQUAEsmy/fe9F+72V7yRzJOERi6Gd92snF2awvqrEfNQiMAwQE3jl1JsbAscDKkR6CkXtr+x+p
+7z1R69mXx6MoARyXHLu2HQc3JS1rkiWNtgFCTVDkZy8ZgtDBMFAAFBxau1LN/Mz99A33qw+ddCVp
+IQiFkah9ZS83eQF+DwNtlievf+kCBARuH9aYg5KQz5JyIVqEPfvz8QdoI/YWg0aJrrszQ0cONUIe
+jk1+u++WhVnmdxERaAYyfxAZwJVQsV4tnevNm+5N/8hdMsdLVhAghKMoNGiHDjNRTf3W/5i5NNUF
+FEQQjSMyQADHrmnACBAQuL3Aj36lB7ZFngXIoagMew8UXXqwASP5gOHCCGGvARwRInGMxlDRZuy1
+bUpWEBdQvkzms1S+RC78Vq79Xq5cJjesVtIGpoMRQk0D8r3l9ueCMg7ZJP3+H5FjzzLTadI0+PWp
+6flfe5E4ZpK016H6rY9H8zkoKsKp9xbu/2M+VopKbqbk+oOaUg31qOopS9UvDjf4T6kv0NWg2NOE
+NpV/dN8h8v8tvYCn0AFaKbfbdfTH/kNhxCgQgVWA2dNc+Rm89TQwHRiHks6MFJR1ZZ26Mk9uEklj
+HHIZKl8muYBkBTk2KQ8AgAnQDQxHEeM1t107b5QlgnAEixKoEErjePRZ5uzPs4hIio77idGpjFXp
+VBRH3/MHBM8Fu0AkNylXhSIoRENNqQY6WKx2Lt/x27ZUza8zraadi2qHEws58iwABCOCftoCEcwQ
+MlFz2bemTUUEuQwpBbqBXEC2mgAgFMfA8//REnhLJte1+/nqhwSQriJAqK7wFszaPL9FwDhoBvqL
+tjUdsd6ATt0bdpRObI+AFGQdOvBY/fH/Y+vLVb/hYp/D9YxFpMCrnRZUEorKcMBwrXtfFk8w16HV
+K9T0D91sWpkhdF0YOlbU6WDtf+RmOlh+BNG9D+8/nHftyUMRLORo2Xxv5ice1M485DI0ci9t3EGa
+lacPXrE9F/Y8WJMSlszx0tUkNMimqM/gxrWphAbjD9JCJpavkJXr1eQzzVgxvv6knU0SE0EG7kdN
+4IZ1/833mwKApmFjk6ybklgduopLAAIxk5Irl9K4cdohxxtT/56bdKrepYh99ZXbuRuWFQlfQymf
+oavuiFxwdjgLJAAYYBZo/lz36rMzq7+TrtuUDpbrghBwx4vxcQM1G4gDKMAMqPdeda6/MKMUFDJ0
+0oXmVXdEQxoWAc7/deir/7nHnmkgwEWTU1++73oenPmL0CXXbaFNdX2OcYwm8NYnYz3L+LvvOrEi
+PGy8ngH68l23eqNnasECx/akidX2lFbKH3Df/I/q8NSt/3/p2PDGU7ZHNPEkvagLn3iSkbXVG09Z
+mz4ggdCgcp36+x25syclj51Q/ZvL0yvL5ajh2s+uDjt2jSDe1nSwChkyQjh/pnf17zOnHpo89oDq
+O/6WzWbp6OOMyWeauSrVf7i48tYIIKxeI//yt+yMT9xJpxnVSSq4AADKoQmT9N/f1og21bHnmlaa
+GAM7Dxtyaq9DtEgMr78p+8Dd+UKOeLD/bdexwLssFFAkhl++78ydYwweJX7510if/nzax+6sz7zL
+bmDKZ4CCUAT/MSVvmNizH4/EYO50b80K2aMb6z+Mx4tZqkrhVnSwdu/Pfcm4KWdlEmWsW2/GOEz/
+0J18phkPw8i9xbN3wr5HaLEYehIe+kv++bsLACCfjk8+3XBcf8Qejj7H5ASrGtOmeuURyxejNk1c
+u1JeelRq/XcSNAxHUQTmNyDwj9/RABAaJCvorWfs394amXiSwRHefMrOZ+tJBTKw8nT6ZaHzfx/q
+2o2ZgACQdFRBkhlGX/VmazpYQgNAQIAp90WPPM0oLWICQAFUZpRkZIYRADrtxhhBIUfzpnuREmbl
+afY075gzDH/2AzXsuhVtqgEjeKQIpQdEZHKYPc1bv1IV78Y8D4LtjQGBdxkOKwhF8N0X7PN+H47F
+cfUa9eFrducefFM5x6PBe2i/vS2iC/jov86LD1upSrrkj+H9DtLq13Ia1cFiDECpyWdFfnpxKOmo
+J/5Z+Og/ttDw6rsiRTHuv862iAA0HYwQ5tIEHsUSWFe6J9qqNlUmScoD1GtOwCkQcgjYGxB4l6Eu
+1ZS7dBNWzFNvPWeddkbo9Set5HrVox9X9frS+g4RiOBKePkR68MXC2ZclHZhrmooc9Wo8BUADhjJ
+Cy5lU/TwX/IbV7rD9jYSJcytfcGCmVIhMIanX2auWiY7dWfH/8QoWMQ4Mgbg0XcL5bi9GtOm6sqs
+HIRjteViDCZDAgLvSuC1WlakQA/jfX/KP/a3Qj5HIoxKQn3hq/KlEhmQgouuDQ8fJ/Y7Ut+9P1NI
+mr4tOlj0/SJpahiO4Z8eiH63QB5xuiGE/+bEdPzsbeerD90DDtIPO8nY9wg9HMUNq5TrQCgCRIAc
+nr+/cPBxeiPaVM/Z15yZ5pzXHCso/AZZ6F0HfveFr2WlJAADz4OqyhrBVF/IKpmifJZQwzlfef+6
+OW8XaOgocflVkRkfu289Z3sZTFY2pYOVTFE+Q8jZa0/Yr71kc4aHTDLOuCL09N2F+TO9fAqyafKf
+C1POzbzynLVhrbLzdM+1uSfuKMRj6LrkucB09LWpvvrCKe6EF18Rvvx3kYOPM3xtKq6jlJCupmSK
+8rmg5XPXaKUM4Lu4Zhh1X8sqS/424BqpYwWstrOlrhe6kKe+g3mXHmz9KrVsviwuY4YBUkE++8M6
+WH41bvBoHomzFYu8deWq026MMXBdKOQIGURiuGG1Mkz0PJIF+sd/EgcdqVdWqZ8ekNqwWhkhyKUb
+16YywugvsqgT2Qo4HBB4V0EDLaumhbIYA6tAngtCgBlGz6tpovST1U3rYPmkKuRJSdAN1A1wXQDy
+takgXUXX3Bcds6/2/qu2lLDXIdoeE7Qw4AN35O+4KhctQn94uwltqgYiWwGCGHhXiYGBNy4EhbU6
+z3XzwEqBEUIzXNPf4m85qPvd+orKm/06bfo7HEG/U1UpqL/+FxmsXSn7/cwcOjyiA2SBVq2Qrz9p
+P3ZbIRSt0RtStb3r9bWp6nLgdZLUQRIrsMABdo4vUNqFde7GNAOsHKxeISvWqkgMkQWcDAgcADrG
+chnXqVmsoRuo6SBV0AsZuNABOgg0HfwmDaAOMIwZEDhAAGh6ICwABHXgAAECBAQOECAgcIAAAQIC
+BwgQICBwgAABgQMECBAQOECAAAGBAwQIEBA4QICAwAECBAgIHCBAgIDAAQIECAgcIEBA4AABAgQE
+DhAgQEDgAAECAgcIECAgcIAAAQICBwgQICBwgAABgQMECNDO8P9odLMLmwKo5AAAAABJRU5ErkJg
+gg==
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/res/drawable/ic_launcher_background.xml
 cat > "$DEST/app/src/main/res/drawable/ic_launcher_background.xml" << 'TSM_EOF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -114269,6 +114641,17 @@ class TvSnapshotTest {
         assertTrue("\"tsm\":1" in json)  // la ricerca del tabellone riconosce il server da questo
     }
 
+    /** TSM Arena aperta: lo dice lo stato del tabellone, e la pagina della TV passa da sola al gioco (scoreboard.html). */
+    @Test
+    fun arenaFlagReachesTheTv() {
+        val json = Json { encodeDefaults = true }
+        val off = json.encodeToString(TvSnapshot.serializer(), TvSnapshots.build(input(screen = Screen.HOME)))
+        assertTrue("\"arena\":false" in off)
+        val on = TvSnapshots.build(input(screen = Screen.ARENA).copy(arena = true))
+        assertTrue(on.arena)
+        assertTrue("\"arena\":true" in json.encodeToString(TvSnapshot.serializer(), on))
+    }
+
     @Test
     fun defaultTitle() {
         assertEquals("", TvSnapshots.defaultTitle(SetupData(), ItStrings))
@@ -127780,6 +128163,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 394 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 395 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

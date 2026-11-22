@@ -2334,6 +2334,8 @@ interface Strings {
     val displayMode: String
     val displaySearching: String
     val displaySteps: String
+    /** Al posto di [displaySteps] quando l'app gira su una TV (Android TV). */
+    val displayStepsTv: String
     val displayManual: String
     val displayConnect: String
     val displayNotFound: String
@@ -5126,6 +5128,7 @@ object ItStrings : Strings {
     override val displayMode = "Usa come tabellone"
     override val displaySearching = "Cerco il telefono dell'arbitro…"
     override val displaySteps = "1. Accendi l'hotspot su uno dei due telefoni e collega l'altro.\n2. Sul telefono dell'arbitro: pagina 2 → «Tabellone su TV» acceso.\n3. Collega questo telefono al monitor (cavo USB-C/HDMI) o trasmetti lo schermo a un Chromecast."
+    override val displayStepsTv = "Sul telefono apri TSM Arena (Allenati › TSM Arena) oppure accendi il «Tabellone su TV» (pagina 2).\nTelefono e TV sulla stessa rete Wi-Fi: questa TV trova il telefono da sola e passa da sola dal tabellone ad Arena."
     override val displayManual = "Indirizzo (es. 192.168.43.1:8080)"
     override val displayConnect = "Collega"
     override val displayNotFound = "Non trovato. Controlla che i due telefoni siano sulla stessa rete e che il tabellone sia acceso nell'app dell'arbitro."
@@ -7917,6 +7920,7 @@ object EnStrings : Strings {
     override val displayMode = "Use as scoreboard"
     override val displaySearching = "Looking for the umpire's phone…"
     override val displaySteps = "1. Turn on the hotspot on one phone and connect the other.\n2. On the umpire's phone: page 2 → «TV scoreboard» on.\n3. Connect this phone to the monitor (USB-C/HDMI cable) or cast the screen to a Chromecast."
+    override val displayStepsTv = "On the phone open TSM Arena (Train › TSM Arena) or turn on the «TV scoreboard» (page 2).\nPhone and TV on the same Wi-Fi network: this TV finds the phone by itself and switches between scoreboard and Arena on its own."
     override val displayManual = "Address (e.g. 192.168.43.1:8080)"
     override val displayConnect = "Connect"
     override val displayNotFound = "Not found. Check that both phones are on the same network and the scoreboard is on in the umpire's app."

@@ -438,6 +438,8 @@ function tick() {
 }
 
 function onState(json) {
+  // TSM Arena aperta sul telefono: si passa al gioco (che torna qui quando lo si chiude), senza scrivere altri indirizzi.
+  if (json && json.arena && !isDemo && location.protocol !== "file:") { location.replace("/arena"); return; }
   S = json;
   recvAt = lastMsg = performance.now();
   render();

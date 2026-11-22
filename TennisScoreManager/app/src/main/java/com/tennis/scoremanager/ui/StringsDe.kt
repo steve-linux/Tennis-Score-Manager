@@ -2263,6 +2263,7 @@ object DeStrings : Strings {
     override val displayMode = "Als Anzeigetafel verwenden"
     override val displaySearching = "Suche das Telefon des Schiedsrichters…"
     override val displaySteps = "1. Schalte auf einem der beiden Telefone den Hotspot ein und verbinde das andere.\n2. Auf dem Telefon des Schiedsrichters: Seite 2 → «TV-Anzeigetafel» ein.\n3. Verbinde dieses Telefon mit dem Monitor (USB-C/HDMI-Kabel) oder übertrage den Bildschirm auf einen Chromecast."
+    override val displayStepsTv = "Öffne am Handy TSM Arena (Trainieren › TSM Arena) oder schalte die «TV-Anzeigetafel» ein (Seite 2).\nHandy und Fernseher im selben WLAN: Dieser Fernseher findet das Handy selbst und wechselt von allein zwischen Anzeigetafel und Arena."
     override val displayManual = "Adresse (z. B. 192.168.43.1:8080)"
     override val displayConnect = "Verbinden"
     override val displayNotFound = "Nicht gefunden. Prüfe, ob beide Telefone im selben Netz sind und die Anzeigetafel in der App des Schiedsrichters eingeschaltet ist."

@@ -2264,6 +2264,7 @@ object EsStrings : Strings {
     override val displayMode = "Usar como marcador"
     override val displaySearching = "Buscando el teléfono del juez…"
     override val displaySteps = "1. Activa el punto de acceso en uno de los dos teléfonos y conecta el otro.\n2. En el teléfono del juez: página 2 → «Marcador en TV» activado.\n3. Conecta este teléfono al monitor (cable USB-C/HDMI) o envía la pantalla a un Chromecast."
+    override val displayStepsTv = "En el teléfono abre TSM Arena (Entrenar › TSM Arena) o activa el «Marcador en TV» (página 2).\nTeléfono y TV en la misma red Wi-Fi: esta TV encuentra el teléfono sola y pasa por sí misma del marcador a Arena."
     override val displayManual = "Dirección (p. ej. 192.168.43.1:8080)"
     override val displayConnect = "Conectar"
     override val displayNotFound = "No encontrado. Comprueba que los dos teléfonos están en la misma red y que el marcador está activado en la app del juez."

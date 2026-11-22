@@ -1062,7 +1062,11 @@ function onMessage(d) {
   } else if (d.t === 'swing') onSwing((+d.side || 1) - 1, clamp(+d.s || 0.5, 0.1, 1), +d.gyro || 0);
   else if (d.t === 'stroke') onStroke((+d.side || 1) - 1, +d.k);
   else if (d.t === 'key') onKey((+d.side || 1) - 1, +d.k);
-  else if (d.t === 'closed') { link = 'closed'; S.phase = 'title'; S.paused = false; ovRender(); }
+  else if (d.t === 'closed') {
+    link = 'closed'; S.phase = 'title'; S.paused = false; ovRender();
+    // Il gioco è finito sul telefono: dopo il messaggio si torna al tabellone, che ripassa qui alla prossima partita.
+    if (!DEMO && location.protocol !== 'file:') setTimeout(() => { if (link === 'closed') location.replace('/'); }, 3000);
+  }
 }
 function connect() {
   if (DEMO || !window.EventSource) return;

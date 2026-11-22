@@ -146,6 +146,17 @@ class TvSnapshotTest {
         assertTrue("\"tsm\":1" in json)  // la ricerca del tabellone riconosce il server da questo
     }
 
+    /** TSM Arena aperta: lo dice lo stato del tabellone, e la pagina della TV passa da sola al gioco (scoreboard.html). */
+    @Test
+    fun arenaFlagReachesTheTv() {
+        val json = Json { encodeDefaults = true }
+        val off = json.encodeToString(TvSnapshot.serializer(), TvSnapshots.build(input(screen = Screen.HOME)))
+        assertTrue("\"arena\":false" in off)
+        val on = TvSnapshots.build(input(screen = Screen.ARENA).copy(arena = true))
+        assertTrue(on.arena)
+        assertTrue("\"arena\":true" in json.encodeToString(TvSnapshot.serializer(), on))
+    }
+
     @Test
     fun defaultTitle() {
         assertEquals("", TvSnapshots.defaultTitle(SetupData(), ItStrings))

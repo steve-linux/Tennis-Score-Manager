@@ -120,6 +120,10 @@ class DisplayActivity : ComponentActivity() {
     private var systemDismissAt = 0L
     private var searchJob: Job? = null
     private var lastBack = 0L
+    /** L'app gira su una TV (Android TV, aperta dalla sua voce tra le app): istruzioni per chi usa il telefono. */
+    private val onTv by lazy {
+        (getSystemService(android.app.UiModeManager::class.java)?.currentModeType ?: 0) == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+    }
     /** Solo per le prove (adb): accetta anche il server di questo stesso telefono. */
     private var allowSelf = false
 
@@ -340,8 +344,8 @@ class DisplayActivity : ComponentActivity() {
                 } else if (missing) {
                     Text(str.displayNotFound, color = TsmColors.Orange, fontSize = 16.sp)
                 }
-                Text(str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(if (onTv) str.displayStepsTv else str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
+                if (!onTv) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Cast, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(str.tvChromecastHint, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -440,6 +444,8 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
     setBackgroundColor(Color.BLACK)
     settings.javaScriptEnabled = true
     settings.domStorageEnabled = true
+    // Suoni di TSM Arena senza dover premere OK sul telecomando (la pagina è nostra, non un sito qualsiasi).
+    settings.mediaPlaybackRequiresUserGesture = false
     overScrollMode = View.OVER_SCROLL_NEVER
     isVerticalScrollBarEnabled = false
     isHorizontalScrollBarEnabled = false
@@ -455,10 +461,25 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
         }
     }
     webViewClient = object : WebViewClient() {
+        /** Pagine di fila non arrivate: il telefono forse ha cambiato indirizzo o porta, e lo si cerca di nuovo. */
+        var failures = 0
+        /** onPageFinished arriva anche dopo un errore: si azzera solo per una pagina arrivata davvero. */
+        var failed = false
+
+        override fun onPageFinished(view: WebView, url: String) {
+            if (failed) failed = false else failures = 0
+        }
+
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
             val page = view.tag as? ScoreboardPage ?: return
+            if (!request.isForMainFrame) return
+            failed = true
+            if (++failures >= 3) {
+                failures = 0
+                onLost()
+            }
             // se intanto la pagina è cambiata (o la WebView è stata distrutta) non si ricarica più quella vecchia
-            if (request.isForMainFrame) view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
+            view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
         }
     }
 }
