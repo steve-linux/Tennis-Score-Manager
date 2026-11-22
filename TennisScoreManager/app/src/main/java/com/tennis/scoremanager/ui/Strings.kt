@@ -1192,6 +1192,8 @@ interface Strings {
     val dataRestoreAsk: (String, String, Boolean) -> String
     val tabTournaments: String
     val roleCoach: String
+    /** Il pulsante in alto nella prima schermata che cambia ruolo (Tu, Allenatore, Circolo). */
+    val roleSwitch: String
     val roleClub: String
     val roleYouHint: String
     val roleCoachHint: String
@@ -4026,6 +4028,7 @@ object ItStrings : Strings {
     override val tabTournaments = "Tornei"
     override val roleCoach = "Allenatore"
     override val roleClub = "Circolo"
+    override val roleSwitch = "Cambia ruolo"
     override val roleYouHint = "Giochi: segnapunti, allenamenti, video, progressi, racchette e le prenotazioni al tuo circolo."
     override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, esercizi, agenda delle lezioni, pacchetti, report e note; con Partita con… li fai giocare tra loro."
     override val roleClubHint = "La segreteria: oggi, planning dei campi, soci e quote, scuola tennis, tornei e squadre."
@@ -6825,6 +6828,7 @@ object EnStrings : Strings {
     override val tabTournaments = "Tournaments"
     override val roleCoach = "Coach"
     override val roleClub = "Club"
+    override val roleSwitch = "Switch role"
     override val roleYouHint = "You play: scoring, training, videos, progress, rackets and bookings at your club."
     override val roleCoachHint = "Your students: stroke practice, drills, lesson schedule, packs, reports and notes; with Match with… they play each other."
     override val roleClubHint = "The club office: today, court planner, members and fees, tennis school, tournaments and teams."

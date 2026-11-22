@@ -1149,6 +1149,7 @@ object DeStrings : Strings {
     override val tabTournaments = "Turniere"
     override val roleCoach = "Trainer"
     override val roleClub = "Verein"
+    override val roleSwitch = "Rolle wechseln"
     override val roleYouHint = "Du spielst: Zählen, Training, Videos, Fortschritte, Schläger und Buchungen in deinem Verein."
     override val roleCoachHint = "Deine Schüler: Schlagtraining, Übungen, Stundenplan, Pakete, Berichte und Notizen; mit Match mit… spielen sie gegeneinander."
     override val roleClubHint = "Das Vereinsbüro: Heute, Platzbelegung, Mitglieder und Beiträge, Tennisschule, Turniere und Mannschaften."

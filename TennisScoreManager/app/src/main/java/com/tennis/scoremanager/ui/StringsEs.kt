@@ -1150,6 +1150,7 @@ object EsStrings : Strings {
     override val tabTournaments = "Torneos"
     override val roleCoach = "Entrenador"
     override val roleClub = "Club"
+    override val roleSwitch = "Cambiar de rol"
     override val roleYouHint = "Juegas: marcador, entrenamientos, vídeos, progresos, raquetas y reservas en tu club."
     override val roleCoachHint = "Tus alumnos: entrenamiento de golpes, ejercicios, agenda de clases, paquetes, informes y notas; con Partido con… juegan entre ellos."
     override val roleClubHint = "La secretaría: hoy, planning de pistas, socios y cuotas, escuela de tenis, torneos y equipos."

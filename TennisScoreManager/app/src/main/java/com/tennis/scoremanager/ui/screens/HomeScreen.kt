@@ -157,6 +157,8 @@ fun HomeScreen(c: MatchController) {
     ScreenScaffold(
         onHelp = { c.openHelp(tabHelp(tab)) },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
+        // Il ruolo sempre in vista: un tocco e si passa a Tu, Allenatore o Circolo.
+        action = { com.tennis.scoremanager.ui.RoleSwitchButton(c) },
     ) {
         // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
         val inbox by c.mailbox.inbox.collectAsState()

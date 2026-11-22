@@ -18319,6 +18319,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Mehr** enthält in jeder Rolle, was zur App gehört: **Einstellungen** (Sprache, Stimme des Schiedsrichters, Geräte, Rolle und Funktionen, Sicherung und Daten und ganz unten **Über die App** mit App-Version, Lizenz und Quellcode), **Hilfe** und **App-Einführung**.
   - **Rolle und Funktionen** lässt in den Menüs nur, was gebraucht wird. Für Du und Trainer, **Was du nutzt**: Armbänder und Fernbedienungen, Brustgurte, Schlagtraining, Video und Kamera, Fortschritte und Wertung, Schläger, Padel; was ausgeschaltet ist, erscheint nicht, und leer gebliebene Reiter verschwinden (ohne Fortschritt wandert der Verlauf nach Spielen). Für den Verein, **Vereinsfunktionen**: Grundausstattung sind Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; dazu Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik, Vereinsserver und Büro am PC. Die Daten ausgeschalteter Funktionen bleiben.
   - Das **?** oben in vielen Bildschirmen öffnet die Anleitung genau beim Abschnitt dieses Bildschirms.
+- **Die Rollen-Taste** oben rechts auf dem ersten Bildschirm (z. B. **Du ▾**) zeigt immer die aktive Rolle: antippen und **Du**, **Trainer** oder **Verein** wählen, um sofort zu wechseln, ohne über die Einstellungen zu gehen.
 - Wer mehrere Rollen eingeschaltet hatte, bleibt in der, die er gerade nutzte: die anderen findet man durch Rollenwechsel wieder, nichts wird gelöscht.
 - **Erster Start**: Sprache, Rolle, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **automatischen Sicherung** (standardmäßig an) und der **Erinnerung an die Sicherung** (wenn du die automatische ausschaltest, erinnert dich der erste Bildschirm alle 30 Tage daran); beides steht auch unter Sicherung und Daten.
 
@@ -18954,6 +18955,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **More** has the app-wide things in every role: **Settings** (language, umpire's voice, devices, role and features, backup and data and, at the bottom, **About** with the app version, the licence and the source code), **Help** and **App introduction**.
   - **Role and features** keeps in the menus only what you need. For You and Coach, **What you use**: wristbands and remotes, heart rate straps, stroke training, video and camera, progress and rating, rackets, padel; what you turn off does not appear and tabs left empty disappear (without Progress the history moves to Play). For the Club, **Club features**: the basics are Members, Fees and payments, Court planner and Club tournaments; the extras are Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. The data of features turned off stays.
   - The **?** at the top of many screens opens the guide right at that screen's section.
+- **The role button**, top right on the first screen (e.g. **You ▾**), always shows the active role: tap it and pick **You**, **Coach** or **Club** to switch at once, without going through Settings.
 - If you had more roles turned on, you stay in the one you were using: the others are found by changing role, nothing is deleted.
 - **First start**: language, role, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **automatic backup** (on by default) and the **backup reminder** (if you turn the automatic one off, every 30 days the first screen reminds you to make one); both are also in Backup and data.
 
@@ -19588,6 +19590,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Más** tiene en todos los roles lo que es de la app: **Ajustes** (idioma, voz del árbitro, dispositivos, rol y funciones, copia de seguridad y datos y, al final, **Acerca de** con la versión de la app, la licencia y el código fuente), **Ayuda** y **Presentación de la app**.
   - **Rol y funciones** deja en los menús solo lo que hace falta. Para Tú y Entrenador, **Lo que usas**: pulseras y mandos, bandas de pulso, entrenamiento de golpes, vídeo y cámara, progresos y rating, raquetas, pádel; lo que se apaga no aparece y las pestañas que quedan vacías desaparecen (sin Progresos el historial pasa a Jugar). Para el Club, **Funciones del club**: de base Socios, Cuotas y pagos, Planning de pistas y Torneos del club; además Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas, Servidor del club y Secretaría desde el PC. Los datos de las funciones apagadas se quedan.
   - El **?** de arriba en muchas pantallas abre la guía justo en la sección de esa pantalla.
+- **El botón del rol**, arriba a la derecha en la primera pantalla (p. ej. **Tú ▾**), muestra siempre el rol activo: tócalo y elige **Tú**, **Entrenador** o **Club** para cambiar al instante, sin pasar por Ajustes.
 - Quien tenía varios roles activados se queda en el que estaba usando: los demás se encuentran cambiando de rol, no se borra nada.
 - **Primer arranque**: idioma, rol, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con la **copia automática** (activada de serie) y el **recordatorio de copia** (si apagas la automática, cada 30 días la primera pantalla te recuerda hacer una); están también en Copia de seguridad y datos.
 
@@ -20222,6 +20225,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Plus** contient dans chaque rôle ce qui concerne l'appli : **Réglages** (langue, voix de l'arbitre, appareils, rôle et fonctions, sauvegarde et données et, tout en bas, **À propos** avec la version de l'appli, la licence et le code source), **Aide** et **Présentation de l'appli**.
   - **Rôle et fonctions** ne garde dans les menus que ce qui sert. Pour Vous et Entraîneur, **Ce que vous utilisez** : bracelets et télécommandes, ceintures cardio, entraînement des coups, vidéo et caméra, progrès et classement, raquettes, padel ; ce qu'on éteint n'apparaît plus et les onglets restés vides disparaissent (sans Progrès, l'historique passe dans Jouer). Pour le Club, **Fonctions du club** : de base Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains, Serveur du club et Secrétariat sur PC. Les données des fonctions éteintes restent.
   - Le **?** en haut de nombreux écrans ouvre le guide à la section de cet écran.
+- **Le bouton du rôle**, en haut à droite du premier écran (ex. **Vous ▾**), montre toujours le rôle actif : touchez-le et choisissez **Vous**, **Entraîneur** ou **Club** pour changer tout de suite, sans passer par les Réglages.
 - Qui avait activé plusieurs rôles reste dans celui qu'il utilisait : les autres se retrouvent en changeant de rôle, rien n'est effacé.
 - **Premier démarrage** : langue, rôle, votre nom (prénom, nom, surnom), comment vous utilisez l'appli (avec *Vous*), le club (avec *Club*), vos données avec la **sauvegarde automatique** (activée par défaut) et le **rappel de sauvegarde** (si vous éteignez l'automatique, tous les 30 jours le premier écran vous rappelle d'en faire une) ; on les retrouve dans Sauvegarde et données.
 
@@ -20856,6 +20860,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Altro** ha in ogni ruolo le cose dell'app: **Impostazioni** (lingua, voce dell'arbitro, dispositivi, ruolo e funzioni, backup e dati e, in fondo, **Informazioni** con la versione dell'app, la licenza e il codice sorgente), **Aiuto** e **Presentazione dell'app**.
   - **Ruolo e funzioni** tiene nei menu solo quello che serve. Per Tu e Allenatore, **Cosa usi**: braccialetti e telecomandi, fasce cardio, allenamento dei colpi, video e telecamera, progressi e rating, racchette, padel; quello che si spegne non compare e le schede rimaste vuote spariscono (senza Progressi lo storico va in Gioca). Per il Circolo, **Funzioni del circolo**: di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi, Server del circolo e Segreteria da PC. I dati delle funzioni spente restano.
   - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
+- **Il pulsante del ruolo**, in alto a destra nella prima schermata (es. **Tu ▾**), mostra sempre il ruolo attivo: toccalo e scegli **Tu**, **Allenatore** o **Circolo** per cambiare subito, senza passare dalle Impostazioni.
 - Chi aveva acceso più ruoli resta in quello che stava usando: gli altri si ritrovano cambiando ruolo, niente si cancella.
 - **Prima apertura**: lingua, ruolo, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **backup automatico** (acceso di serie) e il **promemoria del backup** (se spegni quello automatico, ogni 30 giorni la prima schermata ti ricorda di farne uno); li trovi anche in Backup e dati.
 
@@ -21490,6 +21495,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Mais** tem em todos os papéis o que é do app: **Configurações** (idioma, voz do árbitro, dispositivos, papel e funções, backup e dados e, no fim, **Sobre o app** com a versão do app, a licença e o código-fonte), **Ajuda** e **Apresentação do app**.
   - **Papel e funções** deixa nos menus só o que é preciso. Para Você e Treinador, **O que usas**: pulseiras e controles, cintas cardíacas, treino de golpes, vídeo e câmera, progressos e rating, raquetes, padel; o que se desliga não aparece e as abas que ficam vazias somem (sem Progresso o histórico vai para Jogar). Para o Clube, **Funções do clube**: de base Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; além disso Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras, Servidor do clube e Secretaria no PC. Os dados das funções desligadas ficam.
   - O **?** no alto de muitas telas abre o guia justamente na seção daquela tela.
+- **O botão do papel**, no canto superior direito da primeira tela (ex. **Você ▾**), mostra sempre o papel ativo: toque nele e escolha **Você**, **Treinador** ou **Clube** para mudar na hora, sem passar pelas Configurações.
 - Quem tinha vários papéis ligados fica no que estava a usar: os outros encontram-se mudando de papel, nada é apagado.
 - **Primeira vez**: idioma, papel, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **backup automático** (ligado por padrão) e o **lembrete de backup** (se você desligar o automático, a cada 30 dias a primeira tela lembra de fazer um); estão também em Backup e dados.
 
@@ -55760,6 +55766,13 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RolesUi.kt" << 'TSM_EO
 package com.tennis.scoremanager.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.draw.clip
@@ -55894,6 +55907,50 @@ fun RolesFeaturesDialog(c: MatchController, onDone: () -> Unit) {
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
+}
+
+/**
+ * Il ruolo sempre in vista, in alto nella prima schermata: mostra quello attivo e con un tocco apre gli altri.
+ * Cambiare ruolo cambia solo le schede (come in Impostazioni): i dati restano.
+ */
+@Composable
+fun RoleSwitchButton(c: MatchController) {
+    val s = LocalStrings.current
+    val role by c.activeRole.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    fun name(r: Role) = when (r) { Role.PLAYER -> s.moreProfile; Role.COACH -> s.roleCoach; Role.CLUB -> s.roleClub }
+    fun icon(r: Role) = when (r) { Role.PLAYER -> Icons.Filled.Person; Role.COACH -> Icons.Filled.School; Role.CLUB -> Icons.Filled.Business }
+    androidx.compose.foundation.layout.Box {
+        androidx.compose.foundation.layout.Row(
+            Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                .background(TsmColors.SurfaceHigh)
+                .border(1.dp, TsmColors.Ball, androidx.compose.foundation.shape.RoundedCornerShape(50))
+                .clickable(onClickLabel = s.roleSwitch) { open = true }
+                .semantics { contentDescription = "${s.roleSwitch}: ${name(role)}" }
+                .padding(start = 10.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            androidx.compose.material3.Icon(icon(role), null, tint = TsmColors.Ball, modifier = Modifier.size(20.dp))
+            Text(
+                name(role), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1,
+                modifier = Modifier.padding(start = 6.dp).widthIn(max = 110.dp),
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+            androidx.compose.material3.Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
+        }
+        androidx.compose.material3.DropdownMenu(open, { open = false }) {
+            Text(s.roleSwitch, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+            for (r in Role.entries) {
+                val on = r == role
+                androidx.compose.material3.DropdownMenuItem(
+                    text = { Text(name(r), fontWeight = if (on) FontWeight.Bold else FontWeight.Normal) },
+                    leadingIcon = { androidx.compose.material3.Icon(icon(r), null, tint = if (on) TsmColors.Ball else TsmColors.TextDim) },
+                    trailingIcon = if (on) ({ androidx.compose.material3.Icon(Icons.Filled.Check, null, tint = TsmColors.Ball) }) else null,
+                    onClick = { open = false; if (!on) c.setRole(r) },
+                )
+            }
+        }
+    }
 }
 TSM_EOF
 
@@ -57935,6 +57992,8 @@ interface Strings {
     val dataRestoreAsk: (String, String, Boolean) -> String
     val tabTournaments: String
     val roleCoach: String
+    /** Il pulsante in alto nella prima schermata che cambia ruolo (Tu, Allenatore, Circolo). */
+    val roleSwitch: String
     val roleClub: String
     val roleYouHint: String
     val roleCoachHint: String
@@ -60769,6 +60828,7 @@ object ItStrings : Strings {
     override val tabTournaments = "Tornei"
     override val roleCoach = "Allenatore"
     override val roleClub = "Circolo"
+    override val roleSwitch = "Cambia ruolo"
     override val roleYouHint = "Giochi: segnapunti, allenamenti, video, progressi, racchette e le prenotazioni al tuo circolo."
     override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, esercizi, agenda delle lezioni, pacchetti, report e note; con Partita con… li fai giocare tra loro."
     override val roleClubHint = "La segreteria: oggi, planning dei campi, soci e quote, scuola tennis, tornei e squadre."
@@ -63568,6 +63628,7 @@ object EnStrings : Strings {
     override val tabTournaments = "Tournaments"
     override val roleCoach = "Coach"
     override val roleClub = "Club"
+    override val roleSwitch = "Switch role"
     override val roleYouHint = "You play: scoring, training, videos, progress, rackets and bookings at your club."
     override val roleCoachHint = "Your students: stroke practice, drills, lesson schedule, packs, reports and notes; with Match with… they play each other."
     override val roleClubHint = "The club office: today, court planner, members and fees, tennis school, tournaments and teams."
@@ -66390,6 +66451,7 @@ object DeStrings : Strings {
     override val tabTournaments = "Turniere"
     override val roleCoach = "Trainer"
     override val roleClub = "Verein"
+    override val roleSwitch = "Rolle wechseln"
     override val roleYouHint = "Du spielst: Zählen, Training, Videos, Fortschritte, Schläger und Buchungen in deinem Verein."
     override val roleCoachHint = "Deine Schüler: Schlagtraining, Übungen, Stundenplan, Pakete, Berichte und Notizen; mit Match mit… spielen sie gegeneinander."
     override val roleClubHint = "Das Vereinsbüro: Heute, Platzbelegung, Mitglieder und Beiträge, Tennisschule, Turniere und Mannschaften."
@@ -69205,6 +69267,7 @@ object EsStrings : Strings {
     override val tabTournaments = "Torneos"
     override val roleCoach = "Entrenador"
     override val roleClub = "Club"
+    override val roleSwitch = "Cambiar de rol"
     override val roleYouHint = "Juegas: marcador, entrenamientos, vídeos, progresos, raquetas y reservas en tu club."
     override val roleCoachHint = "Tus alumnos: entrenamiento de golpes, ejercicios, agenda de clases, paquetes, informes y notas; con Partido con… juegan entre ellos."
     override val roleClubHint = "La secretaría: hoy, planning de pistas, socios y cuotas, escuela de tenis, torneos y equipos."
@@ -72022,6 +72085,7 @@ object FrStrings : Strings {
     override val tabTournaments = "Tournois"
     override val roleCoach = "Entraîneur"
     override val roleClub = "Club"
+    override val roleSwitch = "Changer de rôle"
     override val roleYouHint = "Vous jouez : comptage des points, entraînements, vidéos, progrès, raquettes et réservations dans votre club."
     override val roleCoachHint = "Vos élèves : entraînement des coups, exercices, agenda des cours, forfaits, rapports et notes ; avec Match avec… ils jouent entre eux."
     override val roleClubHint = "Le secrétariat : aujourd'hui, planning des terrains, adhérents et cotisations, école de tennis, tournois et équipes."
@@ -74840,6 +74904,7 @@ object PtStrings : Strings {
     override val tabTournaments = "Torneios"
     override val roleCoach = "Treinador"
     override val roleClub = "Clube"
+    override val roleSwitch = "Mudar de papel"
     override val roleYouHint = "Você joga: placar, treinos, vídeos, progresso, raquetes e reservas no seu clube."
     override val roleCoachHint = "Seus alunos: treino de golpes, exercícios, agenda das aulas, pacotes, relatórios e notas; com Partida com… eles jogam entre si."
     override val roleClubHint = "A secretaria: hoje, agenda das quadras, sócios e mensalidades, escola de tênis, torneios e equipes."
@@ -81102,6 +81167,8 @@ fun HomeScreen(c: MatchController) {
     ScreenScaffold(
         onHelp = { c.openHelp(tabHelp(tab)) },
         title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
+        // Il ruolo sempre in vista: un tocco e si passa a Tu, Allenatore o Circolo.
+        action = { com.tennis.scoremanager.ui.RoleSwitchButton(c) },
     ) {
         // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
         val inbox by c.mailbox.inbox.collectAsState()
@@ -116678,7 +116745,13 @@ import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performSemanticsAction
+import com.tennis.scoremanager.HomeTab
+import org.junit.Assert.assertEquals
 import androidx.test.core.app.ApplicationProvider
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Role
@@ -116753,6 +116826,22 @@ class StartupTest {
     @Test fun coach() = openAll(Role.COACH)
 
     @Test fun club() = openAll(Role.CLUB)
+
+    /** Il pulsante del ruolo in alto nella prima schermata: un tocco apre i ruoli, un altro passa all'Allenatore. */
+    @Test fun roleButtonSwitchesRole() {
+        val c = controller(Role.PLAYER, tv = false)
+        show(c)
+        rule.waitForIdle()
+        val s = stringsFor(c.options.value.lang)
+        rule.onNode(hasContentDescription("${s.roleSwitch}: ${s.moreProfile}")).performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+        rule.onNode(hasText(s.roleCoach), useUnmergedTree = true).assertExists()
+        rule.onAllNodes(hasText(s.roleCoach))[0].performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+        assertEquals(Role.COACH, c.activeRole.value)
+        assertEquals(HomeTab.STUDENTS, c.homeTab.value)
+        rule.onNode(hasContentDescription("${s.roleSwitch}: ${s.roleCoach}")).assertExists()
+    }
 }
 TSM_EOF
 
