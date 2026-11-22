@@ -36,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,6 +78,14 @@ fun ArenaScreen(c: MatchController) {
     DisposableEffect(Unit) {
         view.keepScreenOn = true
         onDispose { view.keepScreenOn = false }
+    }
+    // App appena installata: senza "Dispositivi nelle vicinanze" i braccialetti non si vedono e la schermata direbbe solo
+    // "non collegato". I permessi si chiedono qui, e appena concessi i braccialetti si ricollegano.
+    val permLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+    ) { c.arenaBandsAgain() }
+    LaunchedEffect(Unit) {
+        if (!c.ble.hasPermissions()) permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions())
     }
     val a by c.arena.collectAsState()
     val bands by c.ble.bands.collectAsState()

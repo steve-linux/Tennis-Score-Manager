@@ -1462,6 +1462,14 @@ class MatchController(
         go(Screen.ARENA)
     }
 
+    /** Arena con i permessi Bluetooth appena concessi: i braccialetti si ricollegano senza riaprire l'app. */
+    fun arenaBandsAgain() {
+        if (!arenaActive) return
+        updateBandLinks()
+        ble.reconnectAll()
+        for (side in Side.entries) ble.setArena(side, true)
+    }
+
     /** Uscita da TSM Arena: braccialetti di nuovo a basso consumo, server spento se il tabellone non serve. */
     fun closeArena() {
         if (!arenaActive) return
