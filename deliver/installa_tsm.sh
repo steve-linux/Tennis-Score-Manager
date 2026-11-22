@@ -83344,6 +83344,7 @@ class CameraActivity : ComponentActivity() {
             val ok = withContext(Dispatchers.IO) {
                 val json = File(file.parentFile, file.nameWithoutExtension + ".json")
                 fun save(uri: String?) = json.writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks, uri, started, names)))
+                var made: android.net.Uri? = null
                 runCatching {
                     save(null)
                     if (Build.VERSION.SDK_INT >= 29) {
@@ -83353,12 +83354,17 @@ class CameraActivity : ComponentActivity() {
                             put(MediaStore.Video.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MOVIES}/Tennis Score Manager")
                         }
                         val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: error("insert")
+                        made = uri
                         contentResolver.openOutputStream(uri)?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: error("open")
                         // Una copia sola: un'ora di partita sono 3-4 GB. I capitoli restano qui e puntano alla galleria.
                         save(uri.toString())
                         file.delete()
                     }
-                }.onFailure { Log.w(TAG, "copia del video non riuscita", it) }.isSuccess
+                }.onFailure {
+                    Log.w(TAG, "copia del video non riuscita", it)
+                    // Niente video vuoti in galleria: la voce appena creata se ne va con la copia mancata.
+                    made?.let { u -> runCatching { contentResolver.delete(u, null, null) } }
+                }.isSuccess
             }
             message.value = if (ok) s.cameraSaved(marks.size) else s.cameraSaveFailed(file.absolutePath)
         }
@@ -83424,7 +83430,13 @@ class CameraActivity : ComponentActivity() {
                             // In pausa la telecamera resta spenta anche tornando nell'app.
                             if (trainPaused.value) return
                             val st = stream()
+                            // Tornando nell'app durante una diretta o una registrazione: fuori Android ha bloccato la
+                            // fotocamera, che va riaperta perché il video riprenda (altrimenti nero e solo audio).
+                            val busy = st.isStreaming || recorder.fileActive
                             if (!st.isOnPreview) st.startPreview(this@apply)
+                            if (busy) camera()?.let { cam ->
+                                runCatching { cam.openCameraId(cam.getCurrentCameraId()) }.onFailure { Log.w(TAG, "fotocamera non riaperta", it) }
+                            }
                             openLens()
                             startBuffer()
                             updateOverlay()
@@ -83435,7 +83447,12 @@ class CameraActivity : ComponentActivity() {
                         }
 
                         override fun surfaceDestroyed(h: SurfaceHolder) {
-                            stream?.let { if (it.isOnPreview) it.stopPreview() }
+                            stream?.let { st ->
+                                // Fuori dall'app Android blocca la fotocamera. Se resta accesa solo per la memoria della
+                                // moviola la si spegne del tutto: tornando, surfaceCreated la riaccende con la memoria.
+                                if (st.isRecording && !st.isStreaming && !recorder.fileActive) st.stopRecord()
+                                if (st.isOnPreview) st.stopPreview()
+                            }
                         }
                     })
                 }
@@ -83783,7 +83800,8 @@ class CameraActivity : ComponentActivity() {
             onDismissRequest = onDone,
             title = { Text(str.cameraStreamSettings) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Scorre: in orizzontale (com'è sempre la telecamera) il campo della chiave finirebbe sotto il bordo.
+                Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(str.cameraStreamHint, fontSize = 13.sp)
                     OutlinedTextField(url, { url = it }, label = { Text(str.cameraStreamUrl) }, singleLine = true)
                     OutlinedTextField(key, { key = it }, label = { Text(str.cameraStreamKey) }, singleLine = true)
