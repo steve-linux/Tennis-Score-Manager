@@ -34,26 +34,26 @@ class ClubMatchReady(val event: String, val round: String, val players: String, 
  */
 @Composable
 fun clubMatchesReady(c: MatchController): List<ClubMatchReady> {
-    val tournaments by c.clubTournaments.collectAsState()
-    val teams by c.teams.collectAsState()
-    val ladders by c.ladders.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
+    val teams by c.competitions.teams.collectAsState()
+    val ladders by c.competitions.ladders.collectAsState()
     val s = LocalStrings.current
     return buildList {
         for (t in tournaments) for (m in t.matches) {
             if (m.played || m.a == null || m.b == null || m.record != null) continue
-            add(ClubMatchReady(t.name, c.clubRoundName(t, m), "${c.entryNameOf(t, m.a)} – ${c.entryNameOf(t, m.b)}") { c.playClubMatch(t, m) })
+            add(ClubMatchReady(t.name, c.competitions.clubRoundName(t, m), "${c.entryNameOf(t, m.a)} – ${c.entryNameOf(t, m.b)}") { c.competitions.playClubMatch(t, m) })
         }
         for (t in teams) for (f in t.fixtures) f.rubbers.forEachIndexed { i, r ->
             val need = if (r.doubles) 2 else 1
             if (r.ours.size != need || r.won != null || r.walkover || r.record != null) return@forEachIndexed
             val ours = r.ours.joinToString(" / ") { c.playerById(it)?.name.orEmpty() }
             val theirs = r.theirs.filter { it.isNotBlank() }.joinToString(" / ").ifBlank { f.opponent }
-            add(ClubMatchReady("${t.name} – ${f.opponent}", c.rubberName(t, i), "$ours – $theirs") { c.playTeamRubber(t, f, i) })
+            add(ClubMatchReady("${t.name} – ${f.opponent}", c.competitions.rubberName(t, i), "$ours – $theirs") { c.competitions.playTeamRubber(t, f, i) })
         }
         for (l in ladders) for (ch in l.challenges) {
             if (!ch.open || ch.record != null) continue
             val a = c.playerById(ch.challenger)?.name.orEmpty(); val b = c.playerById(ch.defender)?.name.orEmpty()
-            add(ClubMatchReady(l.name, s.ldTitle, "$a – $b") { c.playChallenge(l, ch) })
+            add(ClubMatchReady(l.name, s.ldTitle, "$a – $b") { c.competitions.playChallenge(l, ch) })
         }
     }
 }

@@ -94,7 +94,7 @@ fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
     val o by c.options.collectAsState()
-    val rackets by c.rackets.collectAsState()
+    val rackets by c.racketArea.rackets.collectAsState()
     val context = LocalContext.current
     // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna da dove la si è aperta.
     androidx.activity.compose.BackHandler { c.back() }
@@ -144,11 +144,11 @@ fun SetupScreen(c: MatchController) {
             )
             if (su.doubles) Text(s.doublesHint, color = TsmColors.TextDim)
         }
-        val recent = remember(c.history.collectAsState().value, c.players.collectAsState().value) { c.progressPlayers().take(12) }
+        val recent = remember(c.history.collectAsState().value, c.players.collectAsState().value) { c.progress.progressPlayers().take(12) }
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        if (c.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+        if (c.features.uses(com.tennis.scoremanager.PlayerFeature.PADEL) || su.sport == Sport.PADEL) SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
                 selected = su.sport.ordinal,
@@ -214,7 +214,7 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
         PlayerSlot(c, su, side, false, recent, accent)
         if (su.doubles) PlayerSlot(c, su, side, true, recent, accent)
         // Classifica, uomo/donna e racchetta arrivano dalla scheda del giocatore: qui in una riga, aperti solo se servono.
-        val rackets by c.rackets.collectAsState()
+        val rackets by c.racketArea.rackets.collectAsState()
         var details by androidx.compose.runtime.saveable.rememberSaveable(side) { mutableStateOf(false) }
         if (!details) {
             val racket = rackets.firstOrNull { it.id == (if (side == Side.P1) su.p1Racket else su.p2Racket) }?.label
@@ -349,7 +349,7 @@ private fun SexChoice(c: MatchController, name: String, field: String, accent: C
             val v = if (i == 0) "M" else "F"
             val next = if (v == value) "" else v
             onChange(next)
-            c.setPlayerSex(name, next)
+            c.photos.setPlayerSex(name, next)
         },
     )
 }

@@ -39,6 +39,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -473,7 +475,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     @Composable
     private fun Notes(d: File) {
         val str = s
-        var version by remember { mutableStateOf(0) }
+        var version by remember { mutableIntStateOf(0) }
         val resumed = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState().value
         val notes by androidx.compose.runtime.produceState(emptyList<Pair<ClipNotes.Note, Bitmap?>>(), d, version, resumed) {
             value = withContext(Dispatchers.IO) { ClipNotes.list(d).map { it to ClipNotes.thumbnail(it.image) } }
@@ -627,7 +629,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     /** Immagine a tutto schermo: due dita per ingrandire (fino a 6×) e spostare, doppio tocco per tornare normale. */
     @Composable
     private fun ZoomDialog(bmp: Bitmap, onClose: () -> Unit) {
-        var zoom by remember { mutableStateOf(1f) }
+        var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
         androidx.compose.ui.window.Dialog(onDismissRequest = onClose, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
             androidx.compose.foundation.layout.Box(

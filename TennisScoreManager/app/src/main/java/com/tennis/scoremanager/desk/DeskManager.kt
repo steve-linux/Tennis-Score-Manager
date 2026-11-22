@@ -56,58 +56,58 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun savePlayers(list: List<PlayerProfile>) = c.savePlayers(list)
     override fun book(): ClubBook = c.clubBook.value
     override fun saveBook(b: ClubBook) = c.saveClubBook(b)
-    override fun payTypes(): List<PayType> = c.payTypes()
-    override fun courts(): List<String> = c.clubCourts.value
+    override fun payTypes(): List<PayType> = c.planning.payTypes()
+    override fun courts(): List<String> = c.planning.clubCourts.value
     override fun plan(): CourtPlan = c.courtPlan.value
-    override fun tournaments(): List<ClubTournament> = c.clubTournaments.value
-    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.saveBooking(b, weeks, charge)
-    override fun deleteBooking(b: CourtBooking, series: Boolean) = c.deleteBooking(b, wholeSeries = series)
-    override fun saveBlock(b: CourtBlock, delete: Boolean) = c.saveCourtBlock(b, delete)
+    override fun tournaments(): List<ClubTournament> = c.competitions.clubTournaments.value
+    override fun saveBooking(b: CourtBooking, weeks: Int, charge: Boolean): List<Long> = c.planning.saveBooking(b, weeks, charge)
+    override fun deleteBooking(b: CourtBooking, series: Boolean) = c.planning.deleteBooking(b, wholeSeries = series)
+    override fun saveBlock(b: CourtBlock, delete: Boolean) = c.planning.saveCourtBlock(b, delete)
     override fun features(): Set<ClubFeature> = c.clubFeatures.value
-    override fun courses(): List<Course> = c.courses.value
-    override fun teams(): List<Team> = c.teams.value
-    override fun ladders(): List<Ladder> = c.ladders.value
-    override fun saveCourse(c: Course) = this.c.saveCourse(c)
-    override fun deleteCourse(c: Course) = this.c.deleteCourse(c.id)
-    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.courseFeeLabel(c, month)
-    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.chargeCourse(c, month)
-    override fun dues(charges: Set<String>): List<DeskDue> = c.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
-    override fun sendDues(charges: Set<String>) = c.noticeDues(charges)
-    override fun saveTeam(t: Team) = c.saveTeam(t)
-    override fun deleteTeam(t: Team) = c.deleteTeam(t.id)
+    override fun courses(): List<Course> = c.school.courses.value
+    override fun teams(): List<Team> = c.competitions.teams.value
+    override fun ladders(): List<Ladder> = c.competitions.ladders.value
+    override fun saveCourse(c: Course) = this.c.school.saveCourse(c)
+    override fun deleteCourse(c: Course) = this.c.school.deleteCourse(c.id)
+    override fun courseFeeLabel(c: Course, month: Pair<Int, Int>?): String = this.c.school.courseFeeLabel(c, month)
+    override fun chargeCourse(c: Course, month: Pair<Int, Int>?): Int = this.c.school.chargeCourse(c, month)
+    override fun dues(charges: Set<String>): List<DeskDue> = c.notices.duesRecipients(charges).map { DeskDue(it.id, it.name, it.phone, it.email, it.text) }
+    override fun sendDues(charges: Set<String>) = c.notices.noticeDues(charges)
+    override fun saveTeam(t: Team) = c.competitions.saveTeam(t)
+    override fun deleteTeam(t: Team) = c.competitions.deleteTeam(t.id)
     override fun teamNotice(t: Team, f: Fixture, kind: String) = when (kind) {
-        "AVAILABILITY" -> c.noticeAvailability(t, f, missingOnly = false)
-        "MISSING" -> c.noticeAvailability(t, f, missingOnly = true)
-        "CALLUP" -> c.noticeCallUp(t, f)
-        else -> c.noticeResult(t, f)
+        "AVAILABILITY" -> c.competitions.noticeAvailability(t, f, missingOnly = false)
+        "MISSING" -> c.competitions.noticeAvailability(t, f, missingOnly = true)
+        "CALLUP" -> c.competitions.noticeCallUp(t, f)
+        else -> c.competitions.noticeResult(t, f)
     }
-    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.noticeMatch(t, it) } }
-    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.noticeRubber(t, f, index)
-    override fun sendCourseToCoach(c: Course) = this.c.sendCourseToCoach(c)
-    override fun noticeCourseMoved(c: Course, key: String) = this.c.noticeCourseMoved(c, key)
-    override fun registerPdf(c: Course): ByteArray? = this.c.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
-    override fun registerXlsx(c: Course): ByteArray? = this.c.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun convokeMatch(t: ClubTournament, matchId: String) { t.matches.firstOrNull { it.id == matchId }?.let { c.notices.noticeMatch(t, it) } }
+    override fun convokeRubber(t: Team, f: Fixture, index: Int) = c.notices.noticeRubber(t, f, index)
+    override fun sendCourseToCoach(c: Course) = this.c.coaching.sendCourseToCoach(c)
+    override fun noticeCourseMoved(c: Course, key: String) = this.c.school.noticeCourseMoved(c, key)
+    override fun registerPdf(c: Course): ByteArray? = this.c.coaching.registerFile(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
+    override fun registerXlsx(c: Course): ByteArray? = this.c.coaching.registerXlsx(c.id, coachSide = false)?.let { runCatching { it.readBytes() }.getOrNull() }
 
     /** Un file ricevuto letto come lo leggerebbe il telefono: risultato dal campo, presenze dell'allenatore o allievo proposto. */
     override fun profileFields(id: String) = fieldsOf(id)
-    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
-    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, asMember, false) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profiles.profileText(it, fields) }
+    override fun applyProfile(text: String, asMember: Boolean): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profiles.applyProfileFromDesk(it, asMember, false) }
 
     private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
-        val photo = c.photoBytes(p.name) != null
+        val photo = c.profiles.photoBytes(p.name) != null
         DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
     }
 
     override fun incomingFile(text: String): DeskIncoming? {
         val s = c.strings
-        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profilePreview(it) }
+        com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { return c.profiles.profilePreview(it) }
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
-            val st = c.resultStatus(r)
+            val st = c.cards.resultStatus(r)
             val winner = when (r.winner) { 1 -> r.side1; 2 -> r.side2; else -> null }
             val msg = when (st) {
                 com.tennis.scoremanager.data.ResultStatus.READY -> s.mrReady
                 com.tennis.scoremanager.data.ResultStatus.SAME -> s.mrSame
-                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.resultNow(r))
+                com.tennis.scoremanager.data.ResultStatus.CONFLICT -> s.mrConflict(c.cards.resultNow(r))
                 com.tennis.scoremanager.data.ResultStatus.BAD_CODE -> s.mrBadCode
                 com.tennis.scoremanager.data.ResultStatus.NOT_FOUND -> s.mrNotFound
             }
@@ -116,7 +116,7 @@ class DeskBridge(private val c: MatchController) : DeskData {
                 st == com.tennis.scoremanager.data.ResultStatus.READY || st == com.tennis.scoremanager.data.ResultStatus.CONFLICT, replace = st == com.tennis.scoremanager.data.ResultStatus.CONFLICT)
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
-            val st = c.attendanceStatus(r)
+            val st = c.coaching.attendanceStatus(r)
             val msg = when (st) {
                 com.tennis.scoremanager.data.AttendanceStatus.READY -> s.ccAttReady
                 com.tennis.scoremanager.data.AttendanceStatus.SAME -> s.ccAttSame
@@ -131,68 +131,68 @@ class DeskBridge(private val c: MatchController) : DeskData {
             val guardian = listOf(x.guardian, x.guardianPhone).filter { it.isNotBlank() }.joinToString(" ")
             return DeskIncoming("PROPOSAL", s.ccProposalTitle, listOfNotNull(x.name, x.phone.ifBlank { null }, x.email.ifBlank { null }, guardian.ifBlank { null }?.let { "${s.coGuardian}: $it" },
                 listOfNotNull(p.coach.ifBlank { null }?.let { s.ccFrom(it) }, p.level.ifBlank { null }, p.note.ifBlank { null }).joinToString(" · ").ifBlank { null }),
-                s.ccProposalCourse, true, courses = c.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.courses.value.any { it.id == id } })
+                s.ccProposalCourse, true, courses = c.school.courses.value.sortedBy { it.name.lowercase() }.map { DeskIdName(it.id, it.name) }, course = p.course?.takeIf { id -> c.school.courses.value.any { it.id == id } })
         }
         return null
     }
 
     override fun applyIncoming(text: String, course: String?): String? {
         com.tennis.scoremanager.data.MatchCards.decodeResult(text)?.let { r ->
-            val st = c.resultStatus(r)
+            val st = c.cards.resultStatus(r)
             if (st != com.tennis.scoremanager.data.ResultStatus.READY && st != com.tennis.scoremanager.data.ResultStatus.CONFLICT) return st.name
-            c.applyResult(r); return null
+            c.cards.applyResult(r); return null
         }
         com.tennis.scoremanager.data.CourseCards.decodeReport(text)?.let { r ->
-            val st = c.attendanceStatus(r)
+            val st = c.coaching.attendanceStatus(r)
             if (st != com.tennis.scoremanager.data.AttendanceStatus.READY) return st.name
-            c.applyAttendance(r); return null
+            c.coaching.applyAttendance(r); return null
         }
-        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.applyProposal(p, course?.takeIf { id -> c.courses.value.any { it.id == id } }); return null }
+        com.tennis.scoremanager.data.CourseCards.decodeProposal(text)?.let { p -> c.profiles.applyProposal(p, course?.takeIf { id -> c.school.courses.value.any { it.id == id } }); return null }
         return "NOT_A_FILE"
     }
     override fun setClubName(name: String) { c.storage.clubName = name }
-    override fun saveCourtSettings(st: CourtSettings) = c.saveCourtSettings(st)
-    override fun addCourt(info: CourtInfo): Boolean = c.addCourt(info)
-    override fun renameCourt(old: String, new: String): Boolean = c.renameCourt(old, new)
-    override fun saveCourtInfo(info: CourtInfo) = c.saveCourtInfo(info)
-    override fun deleteCourt(name: String) = c.deleteCourt(name)
-    override fun moveCourt(name: String, up: Boolean) = c.moveCourt(name, up)
-    override fun savePayTypes(list: List<PayType>) = c.savePayTypes(list)
+    override fun saveCourtSettings(st: CourtSettings) = c.planning.saveCourtSettings(st)
+    override fun addCourt(info: CourtInfo): Boolean = c.planning.addCourt(info)
+    override fun renameCourt(old: String, new: String): Boolean = c.planning.renameCourt(old, new)
+    override fun saveCourtInfo(info: CourtInfo) = c.planning.saveCourtInfo(info)
+    override fun deleteCourt(name: String) = c.planning.deleteCourt(name)
+    override fun moveCourt(name: String, up: Boolean) = c.planning.moveCourt(name, up)
+    override fun savePayTypes(list: List<PayType>) = c.planning.savePayTypes(list)
     override fun serverConf(): ClubServerConf = c.clubServer.value
     override fun saveServerRules(rules: BookingRules, payInfo: String, alerts: Boolean) {
-        c.saveServerRules(rules, payInfo)
-        c.setServerAlerts(alerts)
+        c.serverArea.saveServerRules(rules, payInfo)
+        c.serverArea.setServerAlerts(alerts)
     }
     // Rete: gira sul filo della richiesta, mai su quello principale.
     override fun serverState(): SrvAdmin = ClubServers.withServer(c.clubServer.value) { it.state() }
-    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.syncServerNow() }
-    override fun readOnlineNotice(id: String?) = c.readOnlineNotice(id)
+    override fun serverSync(): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.syncServerNow() }
+    override fun readOnlineNotice(id: String?) = c.serverArea.readOnlineNotice(id)
     override fun serverInvite(player: PlayerProfile): SrvInvite = ClubServers.withServer(c.clubServer.value) { it.invite(player.id, player.name) }
-    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverRemovePlayer(playerId) }
-    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverResetPin(playerId) }
+    override fun serverRevoke(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.serverRemovePlayer(playerId) }
+    override fun serverResetPin(playerId: String): String? = runBlocking(Dispatchers.Main.immediate) { c.serverArea.serverResetPin(playerId) }
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
-    override fun officeBackup(): Pair<String, ByteArray> = c.officeBackupName() to c.officeBackupBytes()
+    override fun officeBackup(): Pair<String, ByteArray> = c.office.officeBackupName() to c.office.officeBackupBytes()
     override fun officeAuto(): Boolean = c.storage.officeBackupAuto
-    override fun setOfficeAuto(on: Boolean) = c.setOfficeBackupAuto(on)
+    override fun setOfficeAuto(on: Boolean) = c.office.setOfficeBackupAuto(on)
     override fun officeLast(): Pair<Long, String> = c.storage.officeBackupAt to c.storage.officeBackupServerError
-    override fun localBackups(): List<OfficeBackupFile> = c.officeBackups()
-    override fun localBackup(name: String): ByteArray? = c.officeBackupFile(name)?.readBytes()
-    override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.officeBackupNow(onlyIfChanged = false) }
+    override fun localBackups(): List<OfficeBackupFile> = c.office.officeBackups()
+    override fun localBackup(name: String): ByteArray? = c.office.officeBackupFile(name)?.readBytes()
+    override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.office.officeBackupNow(onlyIfChanged = false) }
     override fun serverChatRooms() = ClubServers.withServer(c.clubServer.value) { it.adminChats() }
     override fun serverChat(room: String) = ClubServers.withServer(c.clubServer.value) { it.adminChat(room) }
     override fun serverBoardPost(text: String) { ClubServers.withServer(c.clubServer.value) { it.postBoard(text) } }
     override fun serverChatDelete(id: String) { ClubServers.withServer(c.clubServer.value) { it.deleteChat(id) } }
     override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
     override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
-    override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.restoreOffice(s) }
-    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
-    override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
-    override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
-    override fun deleteTournament(t: ClubTournament) = c.deleteClubTournament(t.id)
-    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.addClubEntry(t, people)
-    override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.removeClubEntry(t, entry.id)
+    override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.office.restoreOffice(s) }
+    override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.notices.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
+    override fun paymentsCsv(year: Int): ByteArray? = c.notices.paymentsCsv(year)?.readBytes()
+    override fun saveTournament(t: ClubTournament) = c.competitions.saveClubTournament(t)
+    override fun deleteTournament(t: ClubTournament) = c.competitions.deleteClubTournament(t.id)
+    override fun addEntry(t: ClubTournament, people: List<PlayerProfile>) = c.competitions.addClubEntry(t, people)
+    override fun removeEntry(t: ClubTournament, entry: CTEntry) = c.competitions.removeClubEntry(t, entry.id)
 }
 
 /** I dati veri dell'app per l'Allenatore da PC: allievi, agenda, corsi, PDF ed Excel fatti dal telefono. */
@@ -200,38 +200,38 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun now(): Long = System.currentTimeMillis()
     override val lang: String get() = c.options.value.lang.code
     override fun coachName(): String = c.me()?.name ?: c.storage.myName
-    override fun book() = c.coachBook.value
+    override fun book() = c.coaching.coachBook.value
     override fun players(): List<PlayerProfile> = c.players.value
     override fun sessions() = c.serveSessions.value
-    override fun addDiary(student: String, text: String) = c.addDiary(student, text)
+    override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
-    override fun markPackPaid(packId: String) { c.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.markPackPaid(it) } }
-    override fun setLessonDone(lessonId: String, done: Boolean) { c.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
+    override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.markPackPaid(it) } }
+    override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
-        c.markCourseLesson(courseId, key, start, present, cancelled, note)
-    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.saveCoachOwnCourse(c)
-    override fun deleteOwnCourse(id: String) = c.deleteCoachCourse(id)
-    override fun setCourseColor(id: String, color: String) = c.setCoachCourseColor(id, color)
-    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.saveCoachBusy(b)
-    override fun deleteBusy(id: String) = c.deleteCoachBusy(id)
+        c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)
+    override fun saveOwnCourse(c: com.tennis.scoremanager.data.Course) = this.c.coaching.saveCoachOwnCourse(c)
+    override fun deleteOwnCourse(id: String) = c.coaching.deleteCoachCourse(id)
+    override fun setCourseColor(id: String, color: String) = c.coaching.setCoachCourseColor(id, color)
+    override fun saveBusy(b: com.tennis.scoremanager.data.CoachBusy) = c.coaching.saveCoachBusy(b)
+    override fun deleteBusy(id: String) = c.coaching.deleteCoachBusy(id)
     override fun moveLesson(courseId: String, key: String, start: Long, minutes: Int?, court: String?) { c.moveCoachLesson(courseId, key, start, minutes, court) }
     override fun saveStudent(p: PlayerProfile) = c.savePlayer(p)
     override fun profileFields(id: String) = fieldsOf(id)
-    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profileText(it, fields) }
-    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profilePreview(it) }
-    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.applyProfileFromDesk(it, false, true) }
+    override fun profileFile(id: String, fields: Set<com.tennis.scoremanager.data.ProfileField>?): String? = c.playerById(id)?.let { c.profiles.profileText(it, fields) }
+    override fun profilePreview(text: String): DeskIncoming? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profiles.profilePreview(it) }
+    override fun applyProfile(text: String): String? = com.tennis.scoremanager.data.ProfileCards.decode(text)?.let { c.profiles.applyProfileFromDesk(it, false, true) }
 
     private fun fieldsOf(id: String): DeskProfileFields? = c.playerById(id)?.let { p ->
-        val photo = c.photoBytes(p.name) != null
+        val photo = c.profiles.photoBytes(p.name) != null
         DeskProfileFields(com.tennis.scoremanager.data.ProfileCards.available(p, photo), com.tennis.scoremanager.data.ProfileCards.defaults(p, photo).toList())
     }
     override fun country(): String = com.tennis.scoremanager.data.Holidays.country(c.options.value.lang.code)
     private fun bytesOf(f: java.io.File?): ByteArray? = f?.let { runCatching { it.readBytes() }.getOrNull() }
-    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.packReceiptFile(packId))
+    override fun receiptPdf(packId: String): ByteArray? = bytesOf(c.coaching.packReceiptFile(packId))
     override fun reportPdf(student: String, days: Int?): ByteArray? = c.playerById(student)?.let { bytesOf(c.studentReportFile(it, days, pdf = true)) }
-    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.registerFile(courseId, coachSide = true))
-    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.registerXlsx(courseId, coachSide = true))
-    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.receiptsXlsx(year))
+    override fun registerPdf(courseId: String): ByteArray? = bytesOf(c.coaching.registerFile(courseId, coachSide = true))
+    override fun registerXlsx(courseId: String): ByteArray? = bytesOf(c.coaching.registerXlsx(courseId, coachSide = true))
+    override fun receiptsXlsx(year: Int): ByteArray? = bytesOf(c.coaching.receiptsXlsx(year))
 }
 
 /**

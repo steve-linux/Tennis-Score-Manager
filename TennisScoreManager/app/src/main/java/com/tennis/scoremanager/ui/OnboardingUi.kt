@@ -100,11 +100,11 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         c.setRole(role)
         if (role == com.tennis.scoremanager.Role.CLUB) {
             c.storage.clubName = club
-            c.setClubCourts(courts.lines())
+            c.planning.setClubCourts(courts.lines())
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
-        c.setPersonalBackupAuto(autoBackup)
+        c.backups.setPersonalBackupAuto(autoBackup)
         // Il backup automatico l'ha appena visto qui: niente avviso nella prima schermata.
         c.storage.autoBackupNoticeSeen = true
         if (first.isNotBlank() && last.isNotBlank()) {
@@ -119,10 +119,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         }
         // Si parte dalla prima scheda del ruolo; per chi gioca, da quella dell'uso detto.
         if (role == com.tennis.scoremanager.Role.PLAYER) when (use) {
-            Use.REFEREE -> { if (firstTime) c.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
-            Use.BANDS -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
-            Use.TRAIN -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
-            Use.VIDEO -> { if (firstTime) c.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
+            Use.REFEREE -> { if (firstTime) c.features.suggestPlayerFeatures(emptySet()); c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
+            Use.BANDS -> { if (firstTime) c.features.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.BANDS)); c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
+            Use.TRAIN -> { if (firstTime) c.features.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.HEART, com.tennis.scoremanager.PlayerFeature.TRAINING)); c.home(HomeTab.TRAIN) }
+            Use.VIDEO -> { if (firstTime) c.features.suggestPlayerFeatures(setOf(com.tennis.scoremanager.PlayerFeature.VIDEO)); c.home(HomeTab.PLAY) }
             null -> c.home(HomeTab.PLAY)
         }
         onDone()

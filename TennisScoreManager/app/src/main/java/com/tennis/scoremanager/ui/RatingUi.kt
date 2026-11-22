@@ -53,7 +53,7 @@ fun ratingDelta(d: Int): String = when {
 fun RatingSection(c: MatchController, key: String?) {
     val s = LocalStrings.current
     val history by c.history.collectAsState()
-    val sports = remember(history) { c.ratingSports() }
+    val sports = remember(history) { c.progress.ratingSports() }
     var chosen by rememberSaveable { mutableStateOf<Sport?>(null) }
     val sport = chosen?.takeIf { it in sports } ?: sports.firstOrNull()
     SectionCard(s.ratingTitle, Icons.Filled.EmojiEvents) {
@@ -64,7 +64,7 @@ fun RatingSection(c: MatchController, key: String?) {
         if (sports.size > 1) {
             Segmented(sports.map { SegOption(if (it == Sport.PADEL) s.sportPadel else s.sportTennis) }, sports.indexOf(sport), { chosen = sports[it] })
         }
-        val table = remember(history, sport) { c.ratingTable(sport) }
+        val table = remember(history, sport) { c.progress.ratingTable(sport) }
         val me = key?.let { table.player(it) }
         if (me != null) {
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -140,7 +140,7 @@ fun SummaryRatingCard(c: MatchController, m: LiveMatch) {
     val history by c.history.collectAsState()
     SectionCard(s.ratingTitle, Icons.Filled.EmojiEvents) {
         SwitchRow(Icons.Filled.Handshake, s.ratingFriendly, s.ratingFriendlyHint, rec.friendly) { c.setFriendly(it) }
-        val table = remember(history, rec) { c.ratingTableWith(m) }
+        val table = remember(history, rec) { c.progress.ratingTableWith(m) }
         val deltas = table.deltas[rec.id]
         if (rec.friendly || deltas == null) {
             Text(s.ratingNotCounted, color = TsmColors.TextDim, fontSize = 13.sp)

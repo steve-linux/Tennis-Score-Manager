@@ -48,7 +48,7 @@ import com.tennis.scoremanager.ui.tomorrowLessons
 fun LessonsScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
-    val book by c.coachBook.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
     var open by remember { mutableStateOf<CoachLesson?>(null) }
     val now = System.currentTimeMillis()
     ScreenScaffold(
@@ -62,7 +62,7 @@ fun LessonsScreen(c: MatchController) {
         },
     ) {
         val tomorrow = tomorrowLessons(book, now)
-        if (tomorrow.isNotEmpty()) BigButton(s.coRemindTomorrow(tomorrow.size), Icons.Filled.NotificationsActive, { c.noticeLessons(tomorrow) }, Modifier.fillMaxWidth())
+        if (tomorrow.isNotEmpty()) BigButton(s.coRemindTomorrow(tomorrow.size), Icons.Filled.NotificationsActive, { c.coaching.noticeLessons(tomorrow) }, Modifier.fillMaxWidth())
         // Il mese (lezioni private, corsi, tornei, feste e impegni) o l'elenco delle prossime.
         var asList by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
         com.tennis.scoremanager.ui.Segmented(listOf(com.tennis.scoremanager.ui.SegOption(s.agMonth), com.tennis.scoremanager.ui.SegOption(s.agList)), if (asList) 1 else 0, { asList = it == 1 })
@@ -77,7 +77,7 @@ fun LessonsScreen(c: MatchController) {
         if (past.isNotEmpty()) SectionCard(s.coToMark, Icons.Filled.Event) {
             for (l in past.take(20)) Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { LessonRow(c, l) { open = l } }
-                TextButton(onClick = { c.saveLesson(l.copy(done = true)) }) { Text(s.coDone, color = TsmColors.Ok) }
+                TextButton(onClick = { c.coaching.saveLesson(l.copy(done = true)) }) { Text(s.coDone, color = TsmColors.Ok) }
             }
         }
         // I giorni in cui l'allenatore non c'è, e le lezioni che ci cadono.
@@ -90,13 +90,13 @@ fun LessonsScreen(c: MatchController) {
 private fun LessonRow(c: MatchController, l: CoachLesson, onClick: () -> Unit) {
     val s = LocalStrings.current
     Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp)) {
-        Text(c.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(c.coaching.lessonWhen(l) + " · " + s.coMinutes(l.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
         // Lezione in un giorno di festa: in rosso.
         com.tennis.scoremanager.data.Holidays.on(l.start, com.tennis.scoremanager.data.Holidays.country(c.options.collectAsState().value.lang.code))?.let {
             Text("${s.hdHoliday}: $it", color = TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         // In un giorno occupato: in arancione.
-        Coaching.busyOn(c.coachBook.collectAsState().value.busy, l.start)?.let {
+        Coaching.busyOn(c.coaching.coachBook.collectAsState().value.busy, l.start)?.let {
             Text(com.tennis.scoremanager.ui.busyLabel(s, it), color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
         Text(l.students.mapNotNull { c.playerById(it)?.name }.joinToString(", ") + if (l.cancelled) " · ${s.coCancelled}" else if (l.done) " · ${s.coDone}" else "",

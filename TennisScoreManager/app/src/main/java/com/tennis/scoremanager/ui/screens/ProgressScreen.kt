@@ -78,7 +78,7 @@ fun ProgressScreen(c: MatchController) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     var matches by rememberSaveable { mutableStateOf(false) }
-    val players = remember(history) { c.progressPlayers() }
+    val players = remember(history) { c.progress.progressPlayers() }
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     // Si parte da chi usa l'app (Altro › Tu), se ha partite; altrimenti dal giocatore con più partite.
     val me = c.myKey().takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
@@ -86,11 +86,11 @@ fun ProgressScreen(c: MatchController) {
     // Filtri e spunte valgono per la scheda e il giocatore scelti: cambiandoli si riparte da tutto.
     var filter by remember(matches, key) { mutableStateOf(ProgressFilter()) }
     var excluded by remember(matches, key) { mutableStateOf(emptySet<String>()) }
-    val items = remember(history, workouts, matches, key) { if (matches && key == null) emptyList() else c.progressItems(key) }
+    val items = remember(history, workouts, matches, key) { if (matches && key == null) emptyList() else c.progress.progressItems(key) }
     val now = remember { System.currentTimeMillis() }
     val shown = items.filter { filter.accepts(it, now) }
     val selected = shown.map { it.id }.filter { it !in excluded }.toSet()
-    val report = remember(history, workouts, matches, key, selected) { if (matches && key == null) null else c.progressReport(key, selected) }
+    val report = remember(history, workouts, matches, key, selected) { if (matches && key == null) null else c.progress.progressReport(key, selected) }
     ScreenScaffold(
         onHelp = { c.openHelp("7.2") },
         title = s.progressTitle,
@@ -126,10 +126,10 @@ fun ProgressScreen(c: MatchController) {
         if (report != null && selected.isNotEmpty()) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 GhostButton(s.progressPdf, Icons.Filled.PictureAsPdf, {
-                    c.progressPdf(key, selected)?.let { context.startActivity(c.shareFileIntent(it, "application/pdf")) }
+                    c.progress.progressPdf(key, selected)?.let { context.startActivity(c.shareFileIntent(it, "application/pdf")) }
                 }, Modifier.weight(1f))
                 GhostButton(s.progressPrint, Icons.Filled.Print, {
-                    c.progressPdf(key, selected)?.let { printPdf(context, it) }
+                    c.progress.progressPdf(key, selected)?.let { printPdf(context, it) }
                 }, Modifier.weight(1f))
             }
         }

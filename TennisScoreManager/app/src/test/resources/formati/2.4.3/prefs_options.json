@@ -1,0 +1,17 @@
+{
+    "mode": "BANDS",
+    "lang": "EN",
+    "audio": true,
+    "format": "TWO_SETS_MATCH_TIEBREAK",
+    "noAd": true,
+    "tossWinner": "P2",
+    "firstServer": "P2",
+    "p1Left": false,
+    "firstServerP1": 1,
+    "firstServerP2": 0,
+    "ttsEngine": null,
+    "ttsVoice": "voce",
+    "voiceFiles": true,
+    "bandsOffAtEnd": true,
+    "addressLookup": true
+}

@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -67,7 +68,7 @@ fun goalLine(s: Strings, g: Goal): String =
 @Composable
 fun GoalsCard(c: MatchController) {
     val s = LocalStrings.current
-    val goals by c.goals.collectAsState()
+    val goals by c.progress.goals.collectAsState()
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     var adding by remember { mutableStateOf(false) }
@@ -77,11 +78,11 @@ fun GoalsCard(c: MatchController) {
         Text(s.goalsHint, color = TsmColors.TextDim, fontSize = 13.sp)
         if (goals.isEmpty()) Text(s.goalsNone, color = TsmColors.TextDim)
         for (g in goals) {
-            val st = remember(g, history, workouts) { c.goalStatus(g) }
+            val st = remember(g, history, workouts) { c.progress.goalStatus(g) }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(goalLine(s, g), color = TsmColors.TextMain, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                    TextButton(onClick = { c.deleteGoal(g.id) }) { Text(s.goalDelete, color = TsmColors.TextDim) }
+                    TextButton(onClick = { c.progress.deleteGoal(g.id) }) { Text(s.goalDelete, color = TsmColors.TextDim) }
                 }
                 LinearProgressIndicator(progress = { st.progress }, modifier = Modifier.fillMaxWidth(), color = if (st.reached) TsmColors.Ok else TsmColors.Ball)
                 val parts = listOfNotNull(
@@ -103,7 +104,7 @@ private fun GoalDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val kinds = GoalKind.entries
     var kind by remember { mutableStateOf(GoalKind.FIRST_SERVE) }
-    var target by remember(kind) { mutableStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
+    var target by remember(kind) { mutableDoubleStateOf(Goals.choices(kind)[Goals.choices(kind).size / 2]) }
     val windows = listOf(3, 5, 10)
     var window by remember { mutableIntStateOf(5) }
     AlertDialog(
@@ -122,7 +123,7 @@ private fun GoalDialog(c: MatchController, onDone: () -> Unit) {
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { c.addGoal(kind, target, window); onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = { c.progress.addGoal(kind, target, window); onDone() }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -135,7 +136,7 @@ fun YearReviewDialog(c: MatchController, onDone: () -> Unit) {
     val history by c.history.collectAsState()
     val workouts by c.workouts.collectAsState()
     val lang = c.options.collectAsState().value.lang
-    val lines = remember(history) { c.myLines() }
+    val lines = remember(history) { c.progress.myLines() }
     val years = remember(lines) { YearReview.years(lines).ifEmpty { listOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)) } }
     var year by remember { mutableIntStateOf(years.first()) }
     val name = c.me()?.name ?: c.storage.myName
@@ -168,7 +169,7 @@ fun ActivityCalendarCard(c: MatchController) {
     val lang = c.options.collectAsState().value.lang
     val now = remember { System.currentTimeMillis() }
     val today = java.util.Calendar.getInstance()
-    var ym by remember { mutableStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
+    var ym by remember { mutableIntStateOf(today.get(java.util.Calendar.YEAR) * 12 + today.get(java.util.Calendar.MONTH)) }
     val days = remember(history, workouts) {
         com.tennis.scoremanager.data.ActivityCalendar.byDay(
             history.filter { it.record.finished }.map { it.record.id to (it.record.startedAt ?: it.record.updatedAt) },

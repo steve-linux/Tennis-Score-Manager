@@ -82,7 +82,7 @@ fun CoachMonthCalendar(c: MatchController, book: CoachBook, onLesson: (CoachLess
         for (cc in book.courses) {
             val co = cc.course
             for (les in Courses.lessons(co).filter { it.start in month until next })
-                out += CalEntry(les.start, les.minutes, co.name, courseColor(cc.label), les.key in co.cancelled) { c.openCoachCourse(co.id) }
+                out += CalEntry(les.start, les.minutes, co.name, courseColor(cc.label), les.key in co.cancelled) { c.coaching.openCoachCourse(co.id) }
         }
         for (e in book.events.filter { it.at in month until next }) out += CalEntry(e.at, 0, "${e.name} · ${c.playerById(e.student)?.name.orEmpty()}", EventColor, false) { c.openStudent(e.student) }
         out.sortedBy { it.start }.groupBy { CourtPlans.dayStart(it.start) }

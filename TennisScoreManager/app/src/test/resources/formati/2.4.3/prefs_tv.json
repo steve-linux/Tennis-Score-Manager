@@ -1,0 +1,12 @@
+{
+    "enabled": true,
+    "title": "Torneo di prova",
+    "color1": "#00FF00",
+    "color2": "#FF3030",
+    "showClock": false,
+    "showTimers": true,
+    "showSets": true,
+    "showMessages": true,
+    "showServe": true,
+    "ghostSegments": true
+}

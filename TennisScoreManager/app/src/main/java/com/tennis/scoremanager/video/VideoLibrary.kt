@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Environment
 import kotlinx.serialization.json.Json
 import java.io.File
+import androidx.core.net.toUri
 
 /**
  * I video registrati dal telefono-telecamera: per ciascuno il file dei capitoli (.json, nella cartella dell'app) e
@@ -50,10 +51,10 @@ object VideoLibrary {
     fun delete(context: Context, e: Entry) {
         if (e.chapters.imported) {
             e.chapters.uri?.let { u ->
-                runCatching { context.contentResolver.releasePersistableUriPermission(Uri.parse(u), Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                runCatching { context.contentResolver.releasePersistableUriPermission(u.toUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             }
         } else {
-            e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(Uri.parse(u), null, null) } }
+            e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(u.toUri(), null, null) } }
             File(e.chaptersFile.parentFile, e.chapters.video).delete()
         }
         e.chaptersFile.delete()

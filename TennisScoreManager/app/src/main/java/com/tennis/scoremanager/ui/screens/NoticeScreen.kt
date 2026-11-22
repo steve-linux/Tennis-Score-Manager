@@ -51,6 +51,7 @@ import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.core.net.toUri
 
 /** Apre l'app giusta; se non c'è, lo dice. */
 private fun launch(context: Context, intent: Intent, noApp: String) {
@@ -58,12 +59,12 @@ private fun launch(context: Context, intent: Intent, noApp: String) {
 }
 
 /** WhatsApp con la chat di quel numero e il messaggio già scritto (si preme Invia). */
-private fun whatsApp(number: String, text: String) = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number?text=" + Uri.encode(text)))
+private fun whatsApp(number: String, text: String) = Intent(Intent.ACTION_VIEW, ("https://wa.me/$number?text=" + Uri.encode(text)).toUri())
 
 private fun sms(numbers: List<String>, text: String) =
-    Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + numbers.joinToString(";") { Uri.encode(it) })).putExtra("sms_body", text)
+    Intent(Intent.ACTION_SENDTO, ("smsto:" + numbers.joinToString(";") { Uri.encode(it) }).toUri()).putExtra("sms_body", text)
 
-private fun email(to: List<String>, bcc: List<String>, subject: String, text: String) = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+private fun email(to: List<String>, bcc: List<String>, subject: String, text: String) = Intent(Intent.ACTION_SENDTO, "mailto:".toUri()).apply {
     if (to.isNotEmpty()) putExtra(Intent.EXTRA_EMAIL, to.toTypedArray())
     if (bcc.isNotEmpty()) putExtra(Intent.EXTRA_BCC, bcc.toTypedArray())
     putExtra(Intent.EXTRA_SUBJECT, subject)

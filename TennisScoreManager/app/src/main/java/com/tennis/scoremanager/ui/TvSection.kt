@@ -65,6 +65,8 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.TvColors
 import com.tennis.scoremanager.tv.TvSnapshots
+import androidx.core.net.toUri
+import androidx.core.graphics.toColorInt
 
 /** Pagina 2: tabellone su TV (acceso/spento, indirizzo e QR, aspetto). */
 @Composable
@@ -86,7 +88,7 @@ fun TvSection(c: MatchController) {
         }
         val port by c.tvServer.port.collectAsState()
         GhostButton(s.tvPreview, Icons.Filled.OpenInBrowser, {
-            port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://127.0.0.1:$p/"))) } }
+            port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, "http://127.0.0.1:$p/".toUri())) } }
         }, Modifier.fillMaxWidth(), enabled = port != null)
 
         Row(
@@ -175,7 +177,7 @@ private fun ColorRow(label: String, selected: String, onPick: (String) -> Unit) 
             for (hex in TvColors.palette) {
                 val on = hex.equals(selected, ignoreCase = true)
                 Box(
-                    Modifier.size(28.dp).clip(CircleShape).background(Color(android.graphics.Color.parseColor(hex)))
+                    Modifier.size(28.dp).clip(CircleShape).background(Color(hex.toColorInt()))
                         .border(if (on) 3.dp else 1.dp, if (on) Color.White else TsmColors.Outline, CircleShape)
                         .clickable { onPick(hex) },
                 )

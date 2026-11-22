@@ -57,6 +57,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -154,13 +156,13 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val plan by c.courtPlan.collectAsState()
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     val lang = c.options.collectAsState().value.lang
-    val courts by c.clubCourts.collectAsState()
-    var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
+    val courts by c.planning.clubCourts.collectAsState()
+    var day by rememberSaveable { mutableLongStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
     // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
-    val askedDay by c.planDayRequest.collectAsState()
-    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.planDayRequest.value = null } }
+    val askedDay by c.serverArea.planDayRequest.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.serverArea.planDayRequest.value = null } }
     var editing by remember { mutableStateOf<CourtBooking?>(null) }
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
@@ -226,7 +228,7 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
                                 .clickable {
                                     when {
                                         o?.booking != null -> editing = o.booking
-                                        o?.tournament != null -> c.openClubTournament(o.tournament.id)
+                                        o?.tournament != null -> c.competitions.openClubTournament(o.tournament.id)
                                         // Nel blocco di un corso si mettono le sue lezioni; gli altri blocchi si aprono per cambiarli.
                                         o?.block?.reason == com.tennis.scoremanager.data.BlockReason.COURSE ->
                                             editing = CourtBooking(CourtPlans.newId("b"), ct, slot, plan.settings.slotMinutes, BookingKind.LESSON, note = o.block.label)
@@ -262,10 +264,10 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val plan by c.courtPlan.collectAsState()
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     val courts = c.storage.clubCourts
     var b by remember { mutableStateOf(b0) }
-    var weeks by remember { mutableStateOf(1) }
+    var weeks by remember { mutableIntStateOf(1) }
     var guests by remember { mutableStateOf(b0.names.joinToString(", ")) }
     var priceText by remember { mutableStateOf(if (isNew) "" else plain(b0.cents, lang)) }
     var manualPrice by remember { mutableStateOf(!isNew) }
@@ -280,7 +282,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val blocked = CourtPlans.blockedBy(plan, b.court, b.start, b.end, b.kind)
     AlertDialog(
         onDismissRequest = { onDone(null) },
-        title = { Text(if (isNew) s.bkNew else c.bookingLabel(b0)) },
+        title = { Text(if (isNew) s.bkNew else c.planning.bookingLabel(b0)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (courts.size > 1) Segmented(courts.map { SegOption(it) }, courts.indexOf(b.court), { b = b.copy(court = courts[it]) }, columns = minOf(3, courts.size))
@@ -325,7 +327,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                         Segmented(listOf(SegOption(s.bkPayCourt), SegOption(s.bkPayOnline)), ways.indexOf(b.payWhere), { b = b.copy(payWhere = ways[it]) })
                         if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE) {
                             c.clubBook.collectAsState().value
-                            val ons = c.payTypes().filter { it.online && it.details.isNotBlank() }
+                            val ons = c.planning.payTypes().filter { it.online && it.details.isNotBlank() }
                             Text(if (ons.isEmpty()) s.payOptionsNone else ons.joinToString(" · ") { it.name }, color = if (ons.isEmpty()) TsmColors.Orange else TsmColors.TextDim, fontSize = 12.sp)
                         }
                     }
@@ -337,11 +339,11 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                         else {
                             Text(s.issueFeeDue(Fees.money(left, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
                             // Un tasto per ogni modo di pagamento del circolo.
-                            for (t in c.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.payBooking(b0, t) }, Modifier.fillMaxWidth())
+                            for (t in c.planning.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.planning.payBooking(b0, t) }, Modifier.fillMaxWidth())
                         }
                     }
                     // L'addebito va in Quote e pagamenti: solo se il circolo le usa.
-                    if (b.players.isNotEmpty() && cents > 0 && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
+                    if (b.players.isNotEmpty() && cents > 0 && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
                 }
                 if (isNew) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Repeat, null, tint = TsmColors.TextDim)
@@ -350,7 +352,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     IconButton(onClick = { weeks = (weeks + 1).coerceAtMost(40) }) { Icon(Icons.Filled.Add, null) }
                 }
                 if (!isNew) {
-                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.noticeBooking(b0) }, Modifier.fillMaxWidth())
+                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.planning.noticeBooking(b0) }, Modifier.fillMaxWidth())
                     TextButton(onClick = { askDelete = true }) { Text(s.bkDelete, color = TsmColors.Danger) }
                 }
             }
@@ -361,7 +363,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
                 )
-                onDone(c.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
+                onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -372,8 +374,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
         text = { Text(s.bkDeleteAsk) },
         confirmButton = {
             Column(horizontalAlignment = Alignment.End) {
-                TextButton(onClick = { askDelete = false; c.deleteBooking(b0, false); onDone(null) }) { Text(s.bkDeleteOne, color = TsmColors.Danger) }
-                if (b0.series != null) TextButton(onClick = { askDelete = false; c.deleteBooking(b0, true); onDone(null) }) { Text(s.bkDeleteSeries, color = TsmColors.Danger) }
+                TextButton(onClick = { askDelete = false; c.planning.deleteBooking(b0, false); onDone(null) }) { Text(s.bkDeleteOne, color = TsmColors.Danger) }
+                if (b0.series != null) TextButton(onClick = { askDelete = false; c.planning.deleteBooking(b0, true); onDone(null) }) { Text(s.bkDeleteSeries, color = TsmColors.Danger) }
             }
         },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
@@ -450,7 +452,7 @@ internal fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: 
         confirmButton = {
             TextButton(enabled = Fees.parse(price.ifBlank { "0" }) != null && Fees.parse(priceL.ifBlank { "0" }) != null, onClick = {
                 // I campi si cambiano nel loro dialogo: qui si tengono come sono adesso.
-                c.saveCourtSettings(st.copy(courts = c.courtPlan.value.settings.courts, centsPerHour = Fees.parse(price.ifBlank { "0" }) ?: 0, centsPerHourLights = Fees.parse(priceL.ifBlank { "0" }) ?: 0))
+                c.planning.saveCourtSettings(st.copy(courts = c.courtPlan.value.settings.courts, centsPerHour = Fees.parse(price.ifBlank { "0" }) ?: 0, centsPerHourLights = Fees.parse(priceL.ifBlank { "0" }) ?: 0))
                 onDone()
             }) { Text(s.ok) }
         },
@@ -478,7 +480,7 @@ fun courtTraits(s: Strings, i: com.tennis.scoremanager.data.CourtInfo): String =
 fun CourtsManageDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     val plan by c.courtPlan.collectAsState()
     var edit by remember { mutableStateOf<com.tennis.scoremanager.data.CourtInfo?>(null) }
     var creating by remember { mutableStateOf(false) }
@@ -499,7 +501,7 @@ fun CourtsManageDialog(c: MatchController, onDone: () -> Unit) {
                                 color = TsmColors.TextDim, fontSize = 12.sp,
                             )
                         }
-                        if (idx > 0) IconButton(onClick = { c.moveCourt(ct, true) }) { Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim) }
+                        if (idx > 0) IconButton(onClick = { c.planning.moveCourt(ct, true) }) { Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim) }
                     }
                 }
                 GhostButton(s.crtNew, Icons.Filled.Add, { creating = true }, Modifier.fillMaxWidth())
@@ -514,7 +516,7 @@ fun CourtsManageDialog(c: MatchController, onDone: () -> Unit) {
 /** Una foto del campo, quadrata e ritagliata. */
 @Composable
 private fun CourtThumb(c: MatchController, name: String, size: Int, onClick: (() -> Unit)? = null) {
-    val bmp = remember(name) { runCatching { android.graphics.BitmapFactory.decodeFile(c.courtPhotoFile(name).absolutePath, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) }.getOrNull() }
+    val bmp = remember(name) { runCatching { android.graphics.BitmapFactory.decodeFile(c.planning.courtPhotoFile(name).absolutePath, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) }.getOrNull() }
     bmp ?: return
     androidx.compose.foundation.Image(
         bmp.asImageBitmap(), null, contentScale = androidx.compose.ui.layout.ContentScale.Crop,
@@ -540,7 +542,7 @@ private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data
     // Le foto si leggono dal planning: si aggiungono e si tolgono subito, anche prima di OK.
     val photos = if (isNew) emptyList() else plan.settings.info(i0.name).photos
     val pick = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia(6)) { uris ->
-        c.addCourtPhotos(i0.name, uris)
+        c.planning.addCourtPhotos(i0.name, uris)
     }
     AlertDialog(
         onDismissRequest = onDone,
@@ -563,7 +565,7 @@ private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data
                     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         for (p in photos) Box {
                             CourtThumb(c, p, 84) { big = p }
-                            IconButton(onClick = { c.removeCourtPhoto(i0.name, p) }, modifier = Modifier.align(Alignment.TopEnd).width(28.dp).height(28.dp)) {
+                            IconButton(onClick = { c.planning.removeCourtPhoto(i0.name, p) }, modifier = Modifier.align(Alignment.TopEnd).width(28.dp).height(28.dp)) {
                                 Icon(Icons.Filled.Close, s.crtPhotoRemove, tint = Color.White, modifier = Modifier.background(Color(0x99000000), RoundedCornerShape(14.dp)))
                             }
                         }
@@ -582,9 +584,9 @@ private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data
                     name = n, centsPerHour = price.ifBlank { null }?.let(Fees::parse), centsPerHourLights = priceL.ifBlank { null }?.let(Fees::parse),
                     heatingCentsPerHour = heat.ifBlank { null }?.let(Fees::parse) ?: 0,
                 )
-                val done = if (isNew) c.addCourt(saved) else c.renameCourt(i0.name, n).also { okRename ->
+                val done = if (isNew) c.planning.addCourt(saved) else c.planning.renameCourt(i0.name, n).also { okRename ->
                     // Le foto sono quelle di adesso (aggiunte o tolte mentre il dialogo era aperto).
-                    if (okRename) c.saveCourtInfo(saved.copy(photos = c.courtPlan.value.settings.info(n).photos))
+                    if (okRename) c.planning.saveCourtInfo(saved.copy(photos = c.courtPlan.value.settings.info(n).photos))
                 }
                 if (done) onDone() else Toast.makeText(context, s.crtExists, Toast.LENGTH_LONG).show()
             }) { Text(s.ok) }
@@ -593,13 +595,13 @@ private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data
     )
     if (askDelete) AlertDialog(
         onDismissRequest = { askDelete = false },
-        text = { Text(s.crtDeleteAsk(i0.name, c.futureBookings(i0.name))) },
-        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCourt(i0.name); onDone() }) { Text(s.crtDelete, color = TsmColors.Danger) } },
+        text = { Text(s.crtDeleteAsk(i0.name, c.planning.futureBookings(i0.name))) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.planning.deleteCourt(i0.name); onDone() }) { Text(s.crtDelete, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
     big?.let { p ->
         androidx.compose.ui.window.Dialog(onDismissRequest = { big = null }, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
-            val bmp = remember(p) { runCatching { android.graphics.BitmapFactory.decodeFile(c.courtPhotoFile(p).absolutePath) }.getOrNull() }
+            val bmp = remember(p) { runCatching { android.graphics.BitmapFactory.decodeFile(c.planning.courtPhotoFile(p).absolutePath) }.getOrNull() }
             Box(Modifier.fillMaxWidth().background(Color.Black).clickable { big = null }, contentAlignment = Alignment.Center) {
                 bmp?.let { androidx.compose.foundation.Image(it.asImageBitmap(), null, modifier = Modifier.fillMaxWidth(), contentScale = androidx.compose.ui.layout.ContentScale.Fit) }
             }
@@ -665,7 +667,7 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val courts = c.storage.clubCourts
-    val tournaments by c.clubTournaments.collectAsState()
+    val tournaments by c.competitions.clubTournaments.collectAsState()
     var b by remember { mutableStateOf(b0) }
     var hit by remember { mutableStateOf<List<Pair<com.tennis.scoremanager.data.Course, com.tennis.scoremanager.data.Lesson>>>(emptyList()) }
     fun time(min: Int, onPick: (Int) -> Unit) = TimePickerDialog(context, { _, h, m -> onPick(h * 60 + m) }, (min / 60).coerceAtMost(23), min % 60, true).show()
@@ -714,14 +716,14 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
                 }
                 // Ogni anno negli stessi giorni (festa del patrono, chiusura estiva).
                 SwitchRow(Icons.Filled.CalendarMonth, s.blkYearly, s.blkYearlyHint, b.yearly) { b = b.copy(yearly = it) }
-                if (!isNew) TextButton(onClick = { c.saveCourtBlock(b0, delete = true); onDone() }) { Text(s.blkDelete, color = TsmColors.Danger) }
+                if (!isNew) TextButton(onClick = { c.planning.saveCourtBlock(b0, delete = true); onDone() }) { Text(s.blkDelete, color = TsmColors.Danger) }
             }
         },
         confirmButton = { TextButton(onClick = {
             val saved = b.copy(label = b.label.trim())
-            c.saveCourtBlock(saved)
+            c.planning.saveCourtBlock(saved)
             // Una chiusura su lezioni dei corsi già in calendario: si propone di annullarle.
-            hit = c.courseLessonsClosedBy(saved)
+            hit = c.school.courseLessonsClosedBy(saved)
             if (hit.isEmpty()) onDone()
         }) { Text(s.ok) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
@@ -730,7 +732,7 @@ private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data
         onDismissRequest = { hit = emptyList(); onDone() },
         title = { Text(s.clLessonsHit(hit.size)) },
         text = { Text(hit.take(8).joinToString("\n") { (co, l) -> co.name + " · " + com.tennis.scoremanager.data.Notices.day(l.start, lang) }, color = TsmColors.TextMain, fontSize = 14.sp) },
-        confirmButton = { TextButton(onClick = { c.cancelCourseLessons(hit); hit = emptyList(); onDone() }) { Text(s.clCancelThem, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { c.school.cancelCourseLessons(hit); hit = emptyList(); onDone() }) { Text(s.clCancelThem, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { hit = emptyList(); onDone() }) { Text(s.clKeepThem) } },
     )
 }

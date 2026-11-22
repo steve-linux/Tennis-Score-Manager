@@ -19,10 +19,30 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      # Cache delle dipendenze anche dai rami (di serie la scrive solo main): ogni commit fa due build (push e PR) e
+      # riscaricare tutto da Maven Central a ogni build porta al "429 Too Many Requests".
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+      # L'Android che Robolectric usa nei test dell'interfaccia: lo scarica lui da Maven Central, fuori dalla cache di Gradle.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-${{ hashFiles('TennisScoreManager/gradle/libs.versions.toml') }}
       # testDebugUnitTest copre solo l'app: le regole dei campi e il server del circolo hanno i loro test (test).
       # lintDebug ferma la build sugli errori di lint (i warning restano nel report).
+      # F-Droid blocca litert-api 2.x (firme SUSS, indagine dell'8 nov 2026): deve restare alla 1.x.
+      - name: Dipendenze accettate da F-Droid
+        run: |
+          grep -Eq '^litertApi = "1\.' gradle/libs.versions.toml || { echo "::error::litert-api deve restare 1.x: F-Droid rifiuta la 2.x"; exit 1; }
       - run: ./gradlew testDebugUnitTest :courtcore:test :server:test lintDebug assembleDebug --stacktrace
+      # La build di rilascio (R8 e risorse ridotte) è quella che compila F-Droid: si prova qui, prima del tag.
+      - run: ./gradlew assembleRelease --stacktrace
+      - name: Peso dell'APK
+        run: |
+          for f in app/build/outputs/apk/release/*.apk app/build/outputs/apk/debug/*.apk; do
+            echo "- $(basename "$f"): $(( $(stat -c %s "$f") / 1024 / 1024 )) MB" >> "$GITHUB_STEP_SUMMARY"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:

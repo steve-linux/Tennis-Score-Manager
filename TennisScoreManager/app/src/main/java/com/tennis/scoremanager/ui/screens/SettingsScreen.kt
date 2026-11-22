@@ -42,6 +42,7 @@ import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.core.net.toUri
 
 /** Indirizzo del codice sorgente, mostrato con la versione e la licenza. */
 private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
@@ -70,7 +71,7 @@ fun SettingsScreen(c: MatchController) {
         SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             // Bloccata mentre si generano i file vocali (sono nella lingua di adesso).
-            val generating = c.voiceProgress.collectAsState().value != null
+            val generating = c.voiceArea.voiceProgress.collectAsState().value != null
             Segmented(
                 Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
                 selected = o.lang.ordinal,
@@ -94,7 +95,7 @@ fun SettingsScreen(c: MatchController) {
             Text(s.aboutVersion(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
             Text(s.aboutLicense(BuildConfig.VERSION_NAME), color = TsmColors.TextDim, fontSize = 13.sp)
             // Nessun browser installato: il tocco non fa nulla invece di chiudere l'app.
-            fun open(url: String) = runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+            fun open(url: String) = runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
             GhostButton(s.aboutSite, Icons.Filled.Public, { open(Reports.siteUrl(o.lang)) }, Modifier.fillMaxWidth())
             GhostButton(s.aboutSource, Icons.Filled.Code, { open(SOURCE_URL) }, Modifier.fillMaxWidth())
         }

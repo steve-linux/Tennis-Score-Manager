@@ -6,8 +6,8 @@ package com.tennis.scoremanager.video
 import com.tennis.scoremanager.model.RulesConfig
 
 /**
- * Highlights: quali punti finiscono nel montaggio e da dove a dove. Le voci (palle break/set/match point, ace,
- * vincenti, scambi lunghi) hanno la precedenza nell'ordine scelto dall'utente. Se tutti insieme superano la durata scelta, prima
+ * Highlights: quali punti finiscono nel montaggio e da dove a dove. Le voci (ultimo punto, palle break/set/match
+ * point, ace, vincenti, scambi lunghi) hanno la precedenza nell'ordine scelto dall'utente. Se tutti insieme superano la durata scelta, prima
  * si accorciano i pezzi (meno secondi prima della fine del punto, fino a [MIN_BEFORE_MS]), poi, se non basta, si
  * lasciano fuori i meno importanti; alla fine si rimettono in ordine di tempo.
  */
@@ -21,10 +21,13 @@ object Highlights {
     /** Dagli 8 colpi in su lo scambio è lungo. */
     const val LONG_RALLY = 8
 
-    enum class Reason { MATCH_POINT, SET_POINT, BREAK_POINT, LONG_RALLY, ACE, WINNER }
+    enum class Reason { LAST_POINT, MATCH_POINT, SET_POINT, BREAK_POINT, LONG_RALLY, ACE, WINNER }
 
-    /** Le voci che si possono mettere negli highlights, ordinabili: quelle più in alto hanno la precedenza. */
-    enum class Category { BIG_POINTS, ACES, WINNERS, LONG_RALLIES }
+    /**
+     * Le voci che si possono mettere negli highlights, ordinabili: quelle più in alto hanno la precedenza.
+     * [LAST_POINT] è l'ultimo punto segnato nel video: a partita finita, quello che la chiude.
+     */
+    enum class Category { LAST_POINT, BIG_POINTS, ACES, WINNERS, LONG_RALLIES }
 
     /**
      * Cosa includere e con che precedenza: [order] dalla più importante, [enabled] quelle accese. Quando non ci
@@ -44,13 +47,15 @@ object Highlights {
 
     private fun category(r: Reason): Category = when (r) {
         Reason.MATCH_POINT, Reason.SET_POINT, Reason.BREAK_POINT -> Category.BIG_POINTS
+        Reason.LAST_POINT -> Category.LAST_POINT
         Reason.LONG_RALLY -> Category.LONG_RALLIES
         Reason.ACE -> Category.ACES
         Reason.WINNER -> Category.WINNERS
     }
 
-    /** Tutti i motivi per cui il punto potrebbe entrare (un ace su palla break ne ha due). */
-    private fun reasons(p: PointMark, pressure: String?): List<Reason> = listOfNotNull(
+    /** Tutti i motivi per cui il punto potrebbe entrare (un ace su palla break ne ha due); [last]: è l'ultimo. */
+    private fun reasons(p: PointMark, pressure: String?, last: Boolean): List<Reason> = listOfNotNull(
+        Reason.LAST_POINT.takeIf { last },
         when (pressure) {
             "MATCH_POINT" -> Reason.MATCH_POINT
             "SET_POINT" -> Reason.SET_POINT
@@ -67,7 +72,8 @@ object Highlights {
      * break, set e match point", match point > set point > palla break.
      */
     fun priority(r: Reason, o: Options): Int {
-        val rank = o.order.size - o.order.indexOf(category(r))
+        // Una voce che l'ordine non elenca conta meno di tutte.
+        val rank = o.order.indexOf(category(r)).let { if (it < 0) 0 else o.order.size - it }
         val sub = when (r) {
             Reason.MATCH_POINT -> 3
             Reason.SET_POINT -> 2
@@ -78,8 +84,8 @@ object Highlights {
     }
 
     /** Il motivo più forte per tenere il punto tra le voci accese (null = non va negli highlights). */
-    fun reason(p: PointMark, pressure: String?, o: Options): Reason? =
-        reasons(p, pressure).filter { category(it) in o.enabled }.maxByOrNull { priority(it, o) }
+    fun reason(p: PointMark, pressure: String?, o: Options, last: Boolean = false): Reason? =
+        reasons(p, pressure, last).filter { category(it) in o.enabled }.maxByOrNull { priority(it, o) }
 
     /** Il pezzo di video del punto [i]: da [before] prima della fine (non prima del punto precedente) a 2 s dopo. */
     fun clip(points: List<PointMark>, i: Int, videoMs: Long, before: Long = BEFORE_MS): Clip? {
@@ -98,7 +104,7 @@ object Highlights {
     fun select(points: List<PointMark>, rules: RulesConfig?, videoMs: Long, o: Options = Options()): List<Clip> {
         val chosen = points.mapIndexedNotNull { i, p ->
             val pressure = p.pressure ?: rules?.let { PointMarks.pressure(PointMarks.stateAfter(it, points, i)) }
-            reason(p, pressure, o)?.let { i to it }
+            reason(p, pressure, o, last = i == points.lastIndex)?.let { i to it }
         }
         fun clips(before: Long) = chosen.mapNotNull { (i, r) -> clip(points, i, videoMs, before)?.copy(reason = r, priority = priority(r, o)) }
         // Troppo lungo: prima si accorciano tutti i pezzi, un secondo alla volta.

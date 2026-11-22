@@ -26,6 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,8 +60,8 @@ fun MoveLessonDialog(c: MatchController, co: Course, l: Lesson, courts: List<Str
     val context = LocalContext.current
     val lang = c.options.collectAsState().value.lang
     val country = remember { Holidays.country(lang.code) }
-    var start by remember { mutableStateOf(l.start) }
-    var minutes by remember { mutableStateOf(l.minutes) }
+    var start by remember { mutableLongStateOf(l.start) }
+    var minutes by remember { mutableIntStateOf(l.minutes) }
     var court by remember { mutableStateOf(l.court) }
     val makeup = remember(co, l.key) { Courses.makeup(co.copy(moved = co.moved - l.key)) { t -> Holidays.on(t, country) != null } }
     fun when_(t: Long) = com.tennis.scoremanager.data.Notices.day(t, lang) + ", " + Reports.time(t, lang)

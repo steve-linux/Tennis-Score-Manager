@@ -45,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -253,8 +254,10 @@ fun WorkoutStrapCard(c: MatchController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val o by c.options.collectAsState()
     val btOn by c.ble.adapterOn.collectAsState()
-    var permTick by remember { mutableStateOf(0) }
+    var permTick by remember { mutableIntStateOf(0) }
     val permsOk = remember(permTick) {
+        // Lint lo crede sempre falso, ma fino ad Android 11 la ricerca Bluetooth chiede anche la posizione.
+        //noinspection ObsoleteSdkInt
         c.ble.hasPermissions() && (android.os.Build.VERSION.SDK_INT >= 31 || com.tennis.scoremanager.data.LocationHelper.hasPermission(context))
     }
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {

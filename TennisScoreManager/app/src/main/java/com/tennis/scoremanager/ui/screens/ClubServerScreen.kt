@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -86,10 +87,10 @@ private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (S
     var t by remember { mutableStateOf<SrvTunnel?>(null) }
     var err by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
-    var kick by remember { mutableStateOf(0) }
+    var kick by remember { mutableIntStateOf(0) }
     LaunchedEffect(kick) {
         while (true) {
-            c.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            c.serverArea.serverTunnel().onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
             val state = t?.state
             delay(if (state == "WORKING" || state == "LOGIN" || state == "ENABLE") 3_000 else 30_000)
         }
@@ -99,7 +100,7 @@ private fun TunnelSection(c: MatchController, publicUrl: String, onPublicUrl: (S
     fun set(on: Boolean) {
         busy = true
         scope.launch {
-            c.serverTunnel(on).onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
+            c.serverArea.serverTunnel(on).onSuccess { t = it; err = null }.onFailure { err = (it as? ClubServerError)?.code ?: "NET" }
             if (!on && publicUrl.endsWith(".ts.net")) onPublicUrl("")
             busy = false
             kick++
@@ -156,7 +157,7 @@ fun ServerStatusLine(c: MatchController, onClick: (() -> Unit)? = null) {
     val lang = c.options.collectAsState().value.lang
     if (!conf.paired) return
     LaunchedEffect(conf.url) {
-        while (true) { c.syncServerNow(); kotlinx.coroutines.delay(60_000) }
+        while (true) { c.serverArea.syncServerNow(); kotlinx.coroutines.delay(60_000) }
     }
     val err = conf.error
     Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -193,12 +194,12 @@ private fun ServerChecks(c: MatchController, rules: com.tennis.scoremanager.data
     val conf by c.clubServer.collectAsState()
     var local by remember { mutableStateOf<Boolean?>(null) }
     var remote by remember { mutableStateOf<Boolean?>(null) }
-    var round by remember { mutableStateOf(0) }
+    var round by remember { mutableIntStateOf(0) }
     LaunchedEffect(round, publicUrl) {
         while (true) {
             local = null; remote = null
-            local = c.serverAnswers(conf.url)
-            remote = if (publicUrl.isBlank()) false else c.serverAnswers(publicUrl)
+            local = c.serverArea.serverAnswers(conf.url)
+            remote = if (publicUrl.isBlank()) false else c.serverArea.serverAnswers(publicUrl)
             delay(30_000)
         }
     }
@@ -225,7 +226,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     val conf by c.clubServer.collectAsState()
-    val courts by c.clubCourts.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
     val scope = rememberCoroutineScope()
     var busy by remember { mutableStateOf(false) }
     var msg by remember { mutableStateOf<String?>(null) }
@@ -249,7 +250,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
             IconButton(onClick = { onChange((v + step).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
         }
 
-    fun save() { if (conf.paired) c.saveServerRules(rules, pay, publicUrl) }
+    fun save() { if (conf.paired) c.serverArea.saveServerRules(rules, pay, publicUrl) }
 
     AlertDialog(
         onDismissRequest = { save(); onDone() },
@@ -264,7 +265,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters), supportingText = { Text(s.srvSetupHint, fontSize = 11.sp) })
                     GhostButton(s.srvPair, Icons.Filled.Link, {
                         busy = true; msg = null
-                        scope.launch { msg = c.pairServer(url, code)?.let { srvErrorText(s, it) }; busy = false }
+                        scope.launch { msg = c.serverArea.pairServer(url, code)?.let { srvErrorText(s, it) }; busy = false }
                     }, Modifier.fillMaxWidth(), enabled = !busy && url.isNotBlank() && code.isNotBlank())
                 } else {
                     Text(s.srvConnected(conf.club.ifBlank { conf.url }), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
@@ -277,14 +278,14 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     )
                     GhostButton(s.srvSyncNow, Icons.Filled.Sync, {
                         busy = true; msg = null
-                        scope.launch { c.saveServerRules(rules, pay, publicUrl); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
+                        scope.launch { c.serverArea.saveServerRules(rules, pay, publicUrl); msg = c.serverArea.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
                     }, Modifier.fillMaxWidth(), enabled = !busy)
                     OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
-                    TunnelSection(c, publicUrl) { publicUrl = it; c.saveServerRules(rules, pay, it) }
+                    TunnelSection(c, publicUrl) { publicUrl = it; c.serverArea.saveServerRules(rules, pay, it) }
                     SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
-                        c.setServerAlerts(on)
-                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)
+                        c.serverArea.setServerAlerts(on)
+                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context))
                             notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                     }
                     if (conf.alerts && !notifOk) Text(s.srvAlertsOff, color = TsmColors.Orange, fontSize = 12.sp)
@@ -293,7 +294,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     // La bacheca (scrive solo la segreteria) e le chat degli annunci, da controllare.
                     GhostButton(s.srvBoard, Icons.Filled.Campaign, { chat = "board" to s.srvBoard }, Modifier.fillMaxWidth())
                     GhostButton(s.srvChats, Icons.Filled.Forum, {
-                        scope.launch { c.serverAdmin { it.adminChats() }.onSuccess { rooms = it }.onFailure { e -> msg = srvErrorText(s, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") } }
+                        scope.launch { c.serverArea.serverAdmin { it.adminChats() }.onSuccess { rooms = it }.onFailure { e -> msg = srvErrorText(s, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") } }
                     }, Modifier.fillMaxWidth())
 
                     SwitchRow(Icons.Filled.SportsTennis, s.srvOpen, s.srvOpenHint, rules.open) { rules = rules.copy(open = it) }
@@ -342,9 +343,9 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
         val board = room == "board"
         com.tennis.scoremanager.ui.ChatDialog(
             title = title,
-            load = { c.serverAdmin { it.adminChat(room) } },
-            send = if (board) { t -> c.serverAdmin { it.postBoard(t) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } } else null,
-            delete = { id -> c.serverAdmin { it.deleteChat(id) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } },
+            load = { c.serverArea.serverAdmin { it.adminChat(room) } },
+            send = if (board) { t -> c.serverArea.serverAdmin { it.postBoard(t) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } } else null,
+            delete = { id -> c.serverArea.serverAdmin { it.deleteChat(id) }.exceptionOrNull()?.let { (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET" } },
             hint = if (board) s.srvBoardHint else s.srvChatsHint,
             group = !board,
             icon = if (board) Icons.Filled.Campaign else null,
@@ -354,7 +355,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     if (unpair) AlertDialog(
         onDismissRequest = { unpair = false },
         text = { Text(s.srvUnpairAsk) },
-        confirmButton = { TextButton(onClick = { unpair = false; c.unpairServer() }) { Text(s.srvUnpair, color = TsmColors.Danger) } },
+        confirmButton = { TextButton(onClick = { unpair = false; c.serverArea.unpairServer() }) { Text(s.srvUnpair, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { unpair = false }) { Text(s.back) } },
     )
 }
@@ -375,18 +376,18 @@ fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
         linked?.let { Text(s.srvLinked(whenText(maxOf(it.lastSeen, it.since), lang)), color = TsmColors.Ok, fontSize = 13.sp) }
         GhostButton(s.srvInvite, Icons.Filled.QrCode2, {
             busy = true; msg = null
-            scope.launch { c.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
+            scope.launch { c.serverArea.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
         }, Modifier.fillMaxWidth(), enabled = !busy)
         if (linked?.hasPin == true) {
             Text(s.srvPinSet, color = TsmColors.TextDim, fontSize = 13.sp)
             GhostButton(s.srvPinReset, Icons.Filled.Password, {
                 busy = true; msg = null
-                scope.launch { msg = c.serverResetPin(p.id)?.let { srvErrorText(s, it) } ?: s.srvPinResetDone; busy = false }
+                scope.launch { msg = c.serverArea.serverResetPin(p.id)?.let { srvErrorText(s, it) } ?: s.srvPinResetDone; busy = false }
             }, Modifier.fillMaxWidth(), enabled = !busy)
         }
         if (linked != null) GhostButton(s.srvRevoke, Icons.Filled.LinkOff, {
             busy = true; msg = null
-            scope.launch { msg = c.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
+            scope.launch { msg = c.serverArea.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
         }, Modifier.fillMaxWidth(), enabled = !busy)
         msg?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
     }

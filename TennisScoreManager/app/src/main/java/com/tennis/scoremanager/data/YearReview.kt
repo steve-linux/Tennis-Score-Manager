@@ -12,6 +12,7 @@ import android.graphics.Typeface
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.ui.Strings
 import java.util.Calendar
+import androidx.core.graphics.createBitmap
 
 /**
  * Il mio anno: le partite finite di chi usa l'app in un anno, in breve. Quante, quante vinte, le ore in campo, il
@@ -67,7 +68,7 @@ object YearReviewImage {
 
     fun render(y: YearReview.Year, name: String, s: Strings, lang: Lang): Bitmap {
         val w = 1080; val h = 1350
-        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bmp = createBitmap(w, h)
         val c = Canvas(bmp)
         c.drawColor(bg)
         fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {

@@ -13,7 +13,8 @@ Tennis Score Manager zählt die Punkte eines Tennismatches nach den ITF-Regeln u
 * Statistiken zum Matchende, für das ganze Match oder je Satz (Aufschlag, Return, Breakbälle, Punkte in Folge…), und Verlauf Punkt für Punkt mit Break-, Satz- und Matchbällen.
 * Detaillierte Statistik für jemanden, der vom Spielfeldrand zählt: Asse, Doppelfehler, erste Aufschläge, Winner und Fehler.
 * Verlauf auf dem Telefon: beendete Matches zum erneuten Öffnen, Spieler mit Siegen, Niederlagen und direktem Vergleich; auf einem anderen Telefon gespeicherte Matches (JSON) lassen sich importieren, auch per QR-Code im selben WLAN. Spielerfotos, auch auf der TV-Anzeigetafel.
-* Rollen Du, Trainer und Verein, nur mit den Funktionen, die du nutzt: Spielerdatenbank, Rating, Ziele, Schüler, Übungen, Backup.
+* Eine Rolle nach Wahl (Du, Trainer oder Verein), nur mit den Funktionen, die du nutzt: Spielerdatenbank, Rating, Ziele, automatische Backups, auch mit Passwort.
+* Trainer: Schüler, Stunden und Kurse, Anwesenheit, Quittungen und Register als PDF und Excel, Kalender; auch am PC.
 * Pulsgurte, Training und Bewegungsanalyse. Kamera-Handy: Video mit Spielstand, RTMP-Livestream, Highlights und Zeitlupe.
 * Verein: Mitglieder, Beiträge und Quittungen, Platzplan, Vereins- und Verbandsturniere, Teams, Tennisschule, Mitteilungen; auch im PC-Browser.
 * Optionaler Vereinsserver (Raspberry Pi oder USB-Stick): Online-Buchung, Warteliste, Partnersuche, Schwarzes Brett und Chat.

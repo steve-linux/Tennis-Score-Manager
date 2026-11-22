@@ -15,6 +15,10 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
 import com.tennis.scoremanager.model.Side
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withClip
+import androidx.core.graphics.withTranslation
+import androidx.core.graphics.withSave
 
 /**
  * Una schermata delle statistiche come nelle dirette dei tornei: in alto titolo, risultato e torneo; ai lati i
@@ -53,7 +57,7 @@ object StatsCardRenderer {
         card: HighlightStats.Card, page: List<HighlightStats.Section>, width: Int, height: Int, photos: Map<Side, List<Bitmap?>>, pointsWon: String,
         avatars: Avatars? = null, credit: String = "", site: String = "",
     ): Bitmap {
-        val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val out = createBitmap(width, height)
         val c = Canvas(out)
         c.drawColor(BG)
         val scale = minOf(width / W, height / H)
@@ -64,6 +68,148 @@ object StatsCardRenderer {
         rows(c, page)
         footer(c, credit, site)
         return out
+    }
+
+    /**
+     * Un fotogramma dell'intro ([HighlightIntro]) al tempo [t] in millisecondi, disegnato in [out] (già della misura
+     * del video). Stessa grafica delle statistiche: la banda del torneo scende dall'alto, i pannelli dei giocatori
+     * entrano dai lati, poi "VS" e le righe del confronto una alla volta, gli scontri diretti per ultimi. Dissolvenza
+     * dal nero all'inizio e verso il nero alla fine, a tempo con la musica.
+     */
+    fun intro(
+        card: HighlightIntro.Card, t: Long, out: Bitmap, photos: Map<Side, List<Bitmap?>>, avatars: Avatars? = null,
+        credit: String = "", site: String = "",
+    ) {
+        val c = Canvas(out)
+        c.drawColor(BG)
+        val scale = minOf(out.width / W, out.height / H)
+        c.save()
+        c.translate((out.width - W * scale) / 2, (out.height - H * scale) / 2)
+        c.scale(scale, scale)
+        // Banda in alto: titolo e turno a sinistra, data e luogo a destra.
+        c.save()
+        c.translate(0f, -220f * (1 - ease(t, 150, 650)))
+        val r = RectF(60f, 40f, W - 60f, 190f)
+        c.drawRoundRect(r, 18f, 18f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            shader = LinearGradient(r.left, 0f, r.right, 0f, BAND, BAND_DARK, Shader.TileMode.CLAMP)
+        })
+        val tp = paint(50f, bold = true)
+        c.drawText(fit(card.title.uppercase(), tp, 1100f), 100f, if (card.subtitle.isEmpty()) 132f else 108f, tp)
+        if (card.subtitle.isNotEmpty()) {
+            val sp = paint(28f, DIM, bold = true)
+            c.drawText(fit(card.subtitle.uppercase(), sp, 1100f), 100f, 158f, sp)
+        }
+        card.place.take(2).forEachIndexed { i, line ->
+            val p = paint(if (i == 0) 34f else 26f, if (i == 0) TEXT else DIM, bold = i == 0, align = Paint.Align.RIGHT)
+            c.drawText(fit(line.uppercase(), p, 560f), W - 100f, if (card.place.size == 1) 128f else if (i == 0) 108f else 154f, p)
+        }
+        c.restore()
+        // I giocatori entrano dai lati.
+        val slide = 1 - ease(t, 400, 700)
+        for (side in Side.entries) {
+            c.withTranslation(if (side == Side.P1) -600f * slide else 600f * slide, 0f) {
+                introPlayer(this, card, side, photos[side].orEmpty(), avatars)
+            }
+        }
+        // Al centro: "VS", il confronto riga per riga, gli scontri diretti.
+        val left = 580f
+        val right = W - 580f
+        val mid = (left + right) / 2
+        val alone = card.rows.isEmpty() && card.h2h == null
+        // "VS" e le righe insieme, al centro in altezza tra la banda e gli scontri diretti (o il fondo).
+        val bottom = if (card.h2h != null) 880f else 1010f
+        val rowH = ((bottom - 230f - 170f) / card.rows.size.coerceAtLeast(1)).coerceAtMost(84f)
+        val top = 230f + (bottom - 230f - 170f - rowH * card.rows.size) / 2 + 170f
+        val vs = ease(t, 1000, 450)
+        if (vs > 0) {
+            c.withSave {
+                val vy = if (alone) 680f else top - 45f
+                val sz = if (alone) 220f else 130f
+                val k = 0.6f + 0.4f * vs
+                scale(k, k, mid, vy - sz * 0.35f)
+                drawText("VS", mid, vy, paint(sz, YELLOW, bold = true, align = Paint.Align.CENTER).apply { alpha = (255 * vs).toInt() })
+            }
+        }
+        var y = top
+        card.rows.forEachIndexed { i, row ->
+            val k = ease(t, ROWS_AT + i * ROW_STEP, 350)
+            if (k > 0) {
+                val a = (255 * k).toInt()
+                val base = y + rowH * 0.55f + 24f * (1 - k)
+                c.drawText(row.a, left, base, paint(44f, TEXT, bold = true).apply { alpha = a })
+                c.drawText(row.b, right, base, paint(44f, TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = a })
+                val lp = paint(26f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = a }
+                c.drawText(fit(row.label.uppercase(), lp, right - left - 300f), mid, base - 6f, lp)
+                // La linea sotto la riga si allunga dal centro verso i lati.
+                val ly = y + rowH * 0.78f
+                val half = (right - left) / 2 * k
+                c.drawRect(RectF(mid - half, ly, mid + half, ly + 4f), Paint().apply { color = LINE })
+            }
+            y += rowH
+        }
+        card.h2h?.let { (a, b) ->
+            val k = ease(t, ROWS_AT + card.rows.size * ROW_STEP + 150, 400)
+            if (k > 0) {
+                val al = (255 * k).toInt()
+                c.drawRect(RectF(left - 40f, 900f, right + 40f, 946f), Paint().apply { color = BAND; alpha = al })
+                c.drawText(card.h2hLabel.uppercase(), mid, 933f, paint(26f, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                c.drawText("$a", left, 1022f, paint(64f, if (a > b) YELLOW else TEXT, bold = true).apply { alpha = al })
+                c.drawText("$b", right, 1022f, paint(64f, if (b > a) YELLOW else TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = al })
+                c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+            }
+        }
+        footer(c, credit, site)
+        c.restore()
+        // Dissolvenze: dal nero e verso il nero.
+        val shown = minOf(t.toFloat() / FADE_IN, (HighlightIntro.MS - t).toFloat() / FADE_OUT).coerceIn(0f, 1f)
+        if (shown < 1f) c.drawColor(Color.argb((255 * (1 - shown)).toInt(), 0, 0, 0))
+    }
+
+    private const val FADE_IN = 800f
+    private const val FADE_OUT = 1000f
+    private const val ROWS_AT = 1500L
+    private const val ROW_STEP = 220L
+
+    /** Da 0 a 1 tra [start] e [start]+[dur] millisecondi, rallentando alla fine. */
+    private fun ease(t: Long, start: Long, dur: Long): Float {
+        val x = ((t - start).toFloat() / dur).coerceIn(0f, 1f)
+        return 1 - (1 - x) * (1 - x) * (1 - x)
+    }
+
+    /** Pannello del giocatore nell'intro: come nelle statistiche, ma col nome piccolo e il COGNOME grande. */
+    private fun introPlayer(c: Canvas, card: HighlightIntro.Card, side: Side, photos: List<Bitmap?>, avatars: Avatars?) {
+        val people = card.people[side].orEmpty()
+        val x0 = if (side == Side.P1) 60f else W - 520f
+        val r = RectF(x0, 230f, x0 + 460f, 1040f)
+        c.drawRoundRect(r, 18f, 18f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = PANEL })
+        val accent = if (side == Side.P1) P1 else P2
+        val n = people.size.coerceAtLeast(1)
+        val size = if (n == 1) 340f else 200f
+        val gap = 24f
+        var x = r.centerX() - (n * size + (n - 1) * gap) / 2
+        val top = if (n == 1) 300f else 320f
+        for (i in 0 until n) {
+            avatar(c, photos.getOrNull(i), people.getOrNull(i)?.female, accent, x, top, size, avatars)
+            x += size + gap
+        }
+        var y = top + size + 90f
+        for (p in people) {
+            if (p.first.isNotEmpty()) {
+                val fp = paint(if (n == 1) 38f else 30f, DIM, bold = true, align = Paint.Align.CENTER)
+                c.drawText(fit(p.first.uppercase(), fp, 420f), r.centerX(), y, fp)
+                y += if (n == 1) 70f else 52f
+            }
+            val lp = paint(if (n == 1) 66f else 46f, TEXT, bold = true, align = Paint.Align.CENTER)
+            c.drawText(fit(p.last.uppercase(), lp, 420f), r.centerX(), y, lp)
+            y += if (n == 1) 90f else 70f
+        }
+        // In fondo la classifica, grande come la percentuale di punti vinti nelle statistiche.
+        card.ranks[side]?.let { rank ->
+            c.drawText(card.rankLabel.uppercase(), r.centerX(), 900f, paint(28f, DIM, bold = true, align = Paint.Align.CENTER))
+            val rp = paint(if (n == 1) 110f else 80f, accent, bold = true, align = Paint.Align.CENTER)
+            c.drawText(fit(rank, rp, 420f), r.centerX(), 1005f, rp)
+        }
+        c.drawRect(RectF(r.left, r.bottom - 8f, r.right, r.bottom), Paint().apply { color = accent })
     }
 
     private fun header(c: Canvas, card: HighlightStats.Card) {
@@ -156,10 +302,9 @@ object StatsCardRenderer {
             c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { this.shader = shader })
         } else {
             c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(60, Color.red(accent), Color.green(accent), Color.blue(accent)) })
-            c.save()
-            c.clipPath(Path().apply { addOval(rect, Path.Direction.CW) })
-            silhouette(c, accent, rect)
-            c.restore()
+            c.withClip(Path().apply { addOval(rect, Path.Direction.CW) }) {
+                silhouette(this, accent, rect)
+            }
         }
         c.drawOval(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 6f; color = accent })
     }

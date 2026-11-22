@@ -23,8 +23,8 @@ android {
         applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13
-        versionName = "2.6.0"
+        versionCode = 14
+        versionName = "2.7.0"
     }
 
     buildTypes {
@@ -48,6 +48,8 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Robolectric (test dell'interfaccia sul PC): servono risorse e manifest veri dell'app.
+        unitTests.isIncludeAndroidResources = true
     }
     // F-Droid: niente blocco "dependency metadata" (cifrato con la chiave di Google) nell'APK firmato
     dependenciesInfo {
@@ -80,7 +82,12 @@ dependencies {
     // Analisi del servizio: MoveNet (posizione del corpo) con LiteRT ricompilato dai sorgenti, senza Google Play Services.
     implementation(libs.litert.fdroid)
     implementation(libs.litert.api)  // le interfacce Java (InterpreterApi, Tensor, DataType), solo Java
-    implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
+    implementation(libs.rootencoder) {  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
+        // Senza la diretta WebRTC (WHIP), che l'app non usa: porta BouncyCastle, e anche se R8 ne toglie le classi i suoi
+        // file di dati (.properties, 1,4 MB) restavano nell'APK di rilascio, 1,2 MB più pesante.
+        // GenericStream non la tocca: la usa solo WhipStream, che l'app non chiama e R8 toglie.
+        exclude(group = "com.github.pedroSG94.RootEncoder", module = "whip")
+    }
     implementation(libs.media3.exoplayer)  // lettore dei video delle partite, con i capitoli punto per punto
     implementation(libs.media3.ui)
     implementation(libs.media3.transformer)  // montaggio degli highlights sul telefono
@@ -88,4 +95,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    // Test dell'interfaccia senza telefono: l'app vera dentro Robolectric. Solo test, niente nell'APK di rilascio.
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

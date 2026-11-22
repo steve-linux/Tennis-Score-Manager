@@ -261,7 +261,7 @@ object FrStrings : Strings {
     override val hlRallies = "Longs échanges (des bracelets)"
     override val hlMax = "Durée maximale"
     override val hlCustom = "Autre durée (minutes)"
-    override val hlMusic = "Musique des statistiques"
+    override val hlMusic = "Musique de l'intro et des statistiques"
     override val hlMusicPick = "Choisir un morceau"
     override val hlMusicReset = "Utiliser celle de l'application"
     override val hlMusicHint = "Un morceau du téléphone : on en utilise le début, avec fondu. N'utilisez que de la musique que vous avez le droit de mettre dans vos vidéos."
@@ -275,6 +275,14 @@ object FrStrings : Strings {
     override val hlStats = "Statistiques en fin de vidéo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n écrans avec les statistiques du match ($sec s) après les points." }
     override val hlStatsNone = "Statistiques indisponibles : le match de la vidéo n'est pas dans l'historique."
+    override val hlLastPoint = "Dernier point du match"
+    override val hlIntro = "Intro comme dans les tournois (au début)"
+    override val hlIntroHint: (Int) -> String = { "Présentation des joueurs ($it s) : photo ou avatar, classement et infos du joueur, avant les points." }
+    override val introHeight = "Taille"
+    override val introHand = "Main"
+    override val introClub = "Club"
+    override val introRecord = "Victoires – défaites"
+    override val introH2h = "Face-à-face"
     override val cardTitle: (String) -> String = { "Statistiques du ${it.lowercase()}" }
     override val cardFinal = "Score final"
     override val cardPartial = "Partiel"
@@ -418,7 +426,7 @@ object FrStrings : Strings {
     override val tabSummary = "Résumé"
     override val tabStats = "Statistiques"
     override val tabChronology = "Point par point"
-    override val periodMatch = "Match"
+    override val periodMatch = "Partie"
     override val periodSet: (Int) -> String = { if (it == 1) "1re manche" else "${it}e manche" }
     override val statsHint = "Calculées à partir des points marqués dans l'appli et, avec les bracelets, des coups. Aces, doubles fautes, premières balles et fautes ne peuvent pas être connus."
     override val statsHintDetailed = "Calculées à partir des points marqués dans l'appli, avec les aces, fautes, coups gagnants et erreurs des statistiques détaillées et, avec les bracelets, des coups. Un point donné avec « Point » (ou par bracelets et télécommandes) compte sans détail."

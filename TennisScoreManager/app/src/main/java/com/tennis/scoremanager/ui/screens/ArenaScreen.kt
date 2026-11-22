@@ -4,7 +4,7 @@
 package com.tennis.scoremanager.ui.screens
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -102,7 +102,7 @@ fun ArenaScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             GhostButton(s.arenaPreview, Icons.Filled.OpenInBrowser, {
-                port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://127.0.0.1:$p/arena"))) } }
+                port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, "http://127.0.0.1:$p/arena".toUri())) } }
             }, Modifier.weight(1f), enabled = port != null)
         },
     ) {
