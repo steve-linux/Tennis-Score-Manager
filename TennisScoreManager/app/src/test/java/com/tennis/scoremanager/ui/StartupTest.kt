@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performSemanticsAction
@@ -103,5 +104,27 @@ class StartupTest {
         assertEquals(Role.COACH, c.activeRole.value)
         assertEquals(HomeTab.STUDENTS, c.homeTab.value)
         rule.onNode(hasContentDescription("${s.roleSwitch}: ${s.roleCoach}")).assertExists()
+    }
+
+    /** Presentazione dell'app: si va avanti fino all'ultimo passo e da lì si torna indietro. */
+    @Test fun onboardingGoesBackFromLastStep() {
+        val c = controller(Role.PLAYER, tv = false)
+        rule.setContent {
+            val options by c.options.collectAsState()
+            TsmTheme { CompositionLocalProvider(LocalStrings provides stringsFor(options.lang)) { OnboardingFlow(c) {} } }
+        }
+        rule.waitForIdle()
+        val s = stringsFor(c.options.value.lang)
+        // Tu: lingua, ruolo, nome, uso, dati = 5 passi; sul primo non c'è Indietro.
+        rule.onNode(hasText("1 / 5")).assertExists()
+        rule.onAllNodes(hasText(s.back)).assertCountEquals(0)
+        repeat(4) {
+            rule.onAllNodes(hasText(s.next))[0].performSemanticsAction(SemanticsActions.OnClick)
+            rule.waitForIdle()
+        }
+        rule.onNode(hasText("5 / 5")).assertExists()
+        rule.onAllNodes(hasText(s.back))[0].performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+        rule.onNode(hasText("4 / 5")).assertExists()
     }
 }
