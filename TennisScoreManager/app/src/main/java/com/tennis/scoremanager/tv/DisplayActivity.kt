@@ -120,6 +120,10 @@ class DisplayActivity : ComponentActivity() {
     private var systemDismissAt = 0L
     private var searchJob: Job? = null
     private var lastBack = 0L
+    /** L'app gira su una TV (Android TV, aperta dalla sua voce tra le app): istruzioni per chi usa il telefono. */
+    private val onTv by lazy {
+        (getSystemService(android.app.UiModeManager::class.java)?.currentModeType ?: 0) == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+    }
     /** Solo per le prove (adb): accetta anche il server di questo stesso telefono. */
     private var allowSelf = false
 
@@ -340,8 +344,8 @@ class DisplayActivity : ComponentActivity() {
                 } else if (missing) {
                     Text(str.displayNotFound, color = TsmColors.Orange, fontSize = 16.sp)
                 }
-                Text(str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(if (onTv) str.displayStepsTv else str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
+                if (!onTv) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Cast, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(str.tvChromecastHint, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -423,8 +427,47 @@ fun WebView.showPage(page: ScoreboardPage) {
     }
 }
 
+/**
+ * Voce dell'arbitro di TSM Arena sulla TV: la WebView di Android non ha la sintesi vocale del browser, quindi la pagina
+ * chiama TSMDisplay.speak e parla il TextToSpeech della TV (si accende alla prima frase).
+ */
+private class TvVoice(private val context: Context) {
+    private var tts: android.speech.tts.TextToSpeech? = null
+    private var ready = false
+    private var pending: Triple<String, String, Float>? = null
+
+    @Synchronized fun speak(text: String, lang: String, volume: Float) {
+        if (tts == null) tts = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
+            synchronized(this) {
+                ready = status == android.speech.tts.TextToSpeech.SUCCESS
+                pending?.let { (t, l, v) -> if (ready) say(t, l, v) }
+                pending = null
+            }
+        }
+        if (ready) say(text, lang, volume) else pending = Triple(text, lang, volume)
+    }
+
+    private fun say(text: String, lang: String, volume: Float) {
+        val engine = tts ?: return
+        runCatching { engine.language = java.util.Locale.forLanguageTag(lang) }
+        engine.setSpeechRate(1.05f)
+        val params = android.os.Bundle().apply { putFloat(android.speech.tts.TextToSpeech.Engine.KEY_PARAM_VOLUME, volume.coerceIn(0f, 1f)) }
+        engine.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, params, "arena")
+    }
+
+    @Synchronized fun shutdown() {
+        tts?.shutdown()
+        tts = null
+        ready = false
+    }
+}
+
+/** La voce di ogni WebView del tabellone, da spegnere con [release]. */
+private val voices = java.util.WeakHashMap<WebView, TvVoice>()
+
 /** WebView non più usata: si distrugge (chiude anche il collegamento /events). */
 fun WebView.release() {
+    synchronized(voices) { voices.remove(this) }?.shutdown()
     tag = null
     stopLoading()
     destroy()
@@ -440,13 +483,20 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
     setBackgroundColor(Color.BLACK)
     settings.javaScriptEnabled = true
     settings.domStorageEnabled = true
+    // Suoni di TSM Arena senza dover premere OK sul telecomando (la pagina è nostra, non un sito qualsiasi).
+    settings.mediaPlaybackRequiresUserGesture = false
     overScrollMode = View.OVER_SCROLL_NEVER
     isVerticalScrollBarEnabled = false
     isHorizontalScrollBarEnabled = false
     keepScreenOn = true
+    val voice = TvVoice(context).also { v -> synchronized(voices) { voices[this] = v } }
     addJavascriptInterface(object {
         @JavascriptInterface
         fun lost() = onLost()
+
+        /** Voce dell'arbitro di TSM Arena: [lang] come "it-IT", [volume] 0..1. */
+        @JavascriptInterface
+        fun speak(text: String, lang: String, volume: Float) = voice.speak(text.take(200), lang, volume)
     }, "TSMDisplay")
     webChromeClient = object : WebChromeClient() {
         override fun onConsoleMessage(m: ConsoleMessage): Boolean {
@@ -455,10 +505,25 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
         }
     }
     webViewClient = object : WebViewClient() {
+        /** Pagine di fila non arrivate: il telefono forse ha cambiato indirizzo o porta, e lo si cerca di nuovo. */
+        var failures = 0
+        /** onPageFinished arriva anche dopo un errore: si azzera solo per una pagina arrivata davvero. */
+        var failed = false
+
+        override fun onPageFinished(view: WebView, url: String) {
+            if (failed) failed = false else failures = 0
+        }
+
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
             val page = view.tag as? ScoreboardPage ?: return
+            if (!request.isForMainFrame) return
+            failed = true
+            if (++failures >= 3) {
+                failures = 0
+                onLost()
+            }
             // se intanto la pagina è cambiata (o la WebView è stata distrutta) non si ricarica più quella vecchia
-            if (request.isForMainFrame) view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
+            view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
         }
     }
 }

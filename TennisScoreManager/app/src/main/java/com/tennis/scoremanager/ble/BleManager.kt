@@ -81,6 +81,9 @@ data class RemoteBand(val ready: Boolean, val status: BandStatus? = null, val ba
 /** Colpo riconosciuto dal braccialetto di [side] (firmware 2.4). */
 data class BandStroke(val side: Side, val stroke: RawStroke)
 
+/** Inizio di un colpo in TSM Arena; [at] = SystemClock.elapsedRealtime() all'arrivo. */
+data class BandSwing(val side: Side, val swing: RawSwing, val at: Long)
+
 /**
  * Gestisce i due braccialetti. Ogni lato (Giocatore 1 / Giocatore 2) ha al massimo un braccialetto:
  * il legame lato <-> indirizzo è l'unica fonte di verità, così i punti non finiscono mai al giocatore sbagliato.
@@ -109,6 +112,11 @@ class BleManager(context: Context) {
     private val _strokes = MutableSharedFlow<BandStroke>(extraBufferCapacity = 32)
     /** Colpi riconosciuti dai braccialetti (firmware 2.4 con il riconoscimento acceso). */
     val strokes: SharedFlow<BandStroke> = _strokes
+    private val _swings = MutableSharedFlow<BandSwing>(extraBufferCapacity = 32)
+    /** Inizio dei colpi in TSM Arena (firmware 2.5), solo coi braccialetti in [setArena]. */
+    val swings: SharedFlow<BandSwing> = _swings
+    /** Lati in TSM Arena: alla riconnessione si riaccende da sola. */
+    private val arenaSides = mutableSetOf<Side>()
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
     private val _locationOn = MutableStateFlow(LocationHelper.isEnabled(app))
@@ -362,6 +370,15 @@ class BleManager(context: Context) {
 
     private fun viaRelay(l: BandLink, payload: String, kind: String): Boolean =
         remote[l.address]?.ready == true && relayOut?.invoke(l.address, payload, kind) == true
+
+    /**
+     * TSM Arena accesa o spenta su un braccialetto: "A|1" e connessione ad alta priorità (il colpo arriva in pochi ms),
+     * oppure di nuovo a basso consumo. Vale anche dopo una riconnessione, finché non la si spegne.
+     */
+    fun setArena(side: Side, on: Boolean) {
+        if (on) arenaSides += side else arenaSides -= side
+        links[side]?.let { l -> scope.launch { l.applyArena(on) } }
+    }
 
     fun isReady(side: Side): Boolean = links[side]?.let { it.state == LinkState.READY || remote[it.address]?.ready == true } ?: false
 
@@ -626,6 +643,7 @@ class BleManager(context: Context) {
 
         private fun handle(uuid: UUID, value: ByteArray, fromRead: Boolean) {
             val copy = value.copyOf()
+            val arrivedAt = SystemClock.elapsedRealtime()
             scope.launch {
                 // Con l'MTU minimo (23) le notifiche si fermano a 20 byte: impostazioni e stato arriverebbero
                 // tronchi. Una notifica piena si rilegge: la lettura prende il valore intero, a pezzi.
@@ -649,6 +667,7 @@ class BleManager(context: Context) {
                         _status.tryEmit(side to it)
                     }
                     BandProtocol.STROKE -> if (!fromRead) BandProtocol.parseStroke(copy)?.let { _strokes.tryEmit(BandStroke(side, it)) }
+                    BandProtocol.SWING -> if (!fromRead) BandProtocol.parseSwing(copy)?.let { _swings.tryEmit(BandSwing(side, it, arrivedAt)) }
                 }
             }
         }
@@ -711,10 +730,17 @@ class BleManager(context: Context) {
             }
             // Colpi (firmware 2.4): arrivano solo se il riconoscimento è acceso nelle impostazioni.
             svc.getCharacteristic(BandProtocol.STROKE)?.let { enableNotify(g, it) }
+            // TSM Arena (firmware 2.5): inizio dei colpi, solo quando il gioco lo chiede.
+            svc.getCharacteristic(BandProtocol.SWING)?.let { enableNotify(g, it) }
             // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
             // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
             runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
             if (g !== gatt) return
+            // In TSM Arena si riparte veloci anche dopo una riconnessione.
+            if (side in arenaSides) {
+                write(BandProtocol.arena(true))
+                runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH) }
+            }
             setupWatchdog?.cancel()
             failures = 0
             changeState(LinkState.READY)
@@ -751,6 +777,16 @@ class BleManager(context: Context) {
         }
 
         suspend fun command(msg: String): Boolean = state == LinkState.READY && write(msg)
+
+        /** TSM Arena: comando al braccialetto e priorità della connessione da questo lato. */
+        suspend fun applyArena(on: Boolean) {
+            val g = gatt ?: return
+            if (state != LinkState.READY) return  // ci pensa setup() alla prossima connessione
+            write(BandProtocol.arena(on))
+            runCatching {
+                g.requestConnectionPriority(if (on) BluetoothGatt.CONNECTION_PRIORITY_HIGH else BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER)
+            }
+        }
 
         suspend fun writeConfig(text: String): Boolean = state == LinkState.READY && write(text, BandProtocol.CONFIG)
 

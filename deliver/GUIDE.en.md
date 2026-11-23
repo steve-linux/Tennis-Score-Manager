@@ -496,6 +496,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **More** has the app-wide things in every role: **Settings** (language, umpire's voice, devices, role and features, backup and data and, at the bottom, **About** with the app version, the licence and the source code), **Help** and **App introduction**.
   - **Role and features** keeps in the menus only what you need. For You and Coach, **What you use**: wristbands and remotes, heart rate straps, stroke training, video and camera, progress and rating, rackets, padel; what you turn off does not appear and tabs left empty disappear (without Progress the history moves to Play). For the Club, **Club features**: the basics are Members, Fees and payments, Court planner and Club tournaments; the extras are Teams and leagues, Tennis school, Challenge ladder, Court statistics, Club server and Office from PC. The data of features turned off stays.
   - The **?** at the top of many screens opens the guide right at that screen's section.
+- **The role button**, top right on the first screen (e.g. **You ▾**), always shows the active role: tap it and pick **You**, **Coach** or **Club** to switch at once, without going through Settings.
 - If you had more roles turned on, you stay in the one you were using: the others are found by changing role, nothing is deleted.
 - **First start**: language, role, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **automatic backup** (on by default) and the **backup reminder** (if you turn the automatic one off, every 30 days the first screen reminds you to make one); both are also in Backup and data.
 
@@ -692,6 +693,27 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 **From a browser** (laptop, TV box): scan the QR code or type in the address, then tap **FULL SCREEN** (it appears when you move the mouse or touch the screen). Set the screen timeout to *Never*: on an http page the browser can't keep the screen on by itself. After an outage the page reconnects by itself; too many open scoreboards no longer lock out a new one (the oldest is closed).
 
 **Preview without phones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in a browser (also `&lang=en`, `fr`, `de`, `es`, `pt` and `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) shows the scoreboard with test data.
+
+### 8.4 TSM Arena: tennis on the TV with the wristbands (app 2.7, firmware 2.5)
+
+A tennis game on the TV, like the console ones, where **the wristband is the racket**: useful at home between lessons to train timing and the choice between forehand and backhand. The player on screen runs by itself: you only think about **when** to hit. Early sends the ball cross-court, late sends it down the line; the faster the wrist, the harder the shot.
+
+The wristbands need **firmware 2.5** (5): while the game is open the wristband sends the start of every stroke within a few hundredths of a second and asks for a fast Bluetooth connection (it uses more battery only while you play).
+
+1. **Train** (or **Students**, for the coach) › **TSM Arena**. The phone screen stays on while the page is open.
+2. **On the TV**: open the address shown (e.g. `192.168.43.1:8080/arena`) in the browser of the TV, a TV box or a connected laptop, on the same network or on the phone's hotspot; or scan the QR. No internet needed. Press **OK** once on the page to turn on the sound.
+   - **With Android TV** (Nvidia Shield, Chromecast with Google TV, Android TVs): install TSM on the TV too. It shows up among the apps and opens as a scoreboard: it finds the phone on the same network by itself and switches to Arena when you open it on the phone, then back to the scoreboard when you close it. No addresses to type, and sounds play without pressing OK.
+   - **In a browser** just open the scoreboard address once (without `/arena`) and bookmark it: the page also switches to the game and back on its own.
+3. **Players**: *Against the phone* (Player 1 against the CPU, three levels) or *Two players*, one wristband each. Tap the name to choose who plays (you or one of the students). Below is the state of each wristband.
+4. **Match**: games to win (1, 3 or 5), **Only the right stroke counts** (with the stroke calibration, 6.4, a forehand instead of a backhand loses the point), **Umpire voice** on the TV, **TV delay**: if you are always late even when it feels right, raise it (low for monitors and TVs in game mode).
+5. **Swing** (or press the **big key** of the wristband) to start. One swing serves. The **small key** pauses. At the end the TV shows strokes, perfect, early, late, wrong strokes, top wrist speed and longest rally; a swing starts the rematch. From the phone, at the top of the Arena screen (**Game on the TV**): **Pause**/**Resume**, **New game** (from zero, asks first) and the **Volume on the TV** for sounds and voice (with TSM on the TV the umpire's voice comes from the TV; in a browser it comes from the phone, with the match voice); you can also pause with the play/pause key of the TV remote.
+6. To leave: **Back**. The wristband goes back to low power and the TV shows that the game is closed.
+
+- Wear the wristband tight and keep **space around you**: play with the racket in hand (better without a ball) or even empty-handed.
+- **View**: alone you play **first person** (racket and wristband in the foreground, the ball comes at you); with two players the view is from behind, as on TV. The **V** key on a keyboard switches view. A **ring** on the contact point shrinks as the ball arrives and turns green when it is time to hit; after each shot the ball speed appears.
+- **Graphics** (under *Match*): **Realistic 3D** (players with a real body, shadows, stadium lights, crowd), **Simple 3D** (low-poly, lighter) or **2D**. If the TV stutters or has no 3D graphics (WebGL), the game switches by itself to the lighter one. For 3D a PC, a TV box or a recent stick is best; cheap TVs often manage only 2D. The player model is "3D Male Base Mesh" (CC0); the tennis moves are computed by the game.
+- During the game the wristband keys do not score points in matches.
+- **Preview without phone and wristbands**: `TennisScoreManager/app/src/main/assets/arena.html?demo=1` in a browser (also `&lang=it`, `fr`, `de`, `es`, `pt`); the space bar swings.
 
 ## 9. Rules applied (ITF) and agreed choices
 

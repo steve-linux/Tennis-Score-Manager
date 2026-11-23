@@ -7,6 +7,13 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
     <!-- Fotocamera solo per leggere il QR quando si riceve lo storico da un altro telefono: facoltativa -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- Installabile anche su Android TV (Nvidia Shield...): lì si apre come tabellone e TSM Arena, senza touch -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- Facoltativi anche questi: i permessi li darebbero per obbligatori e le TV senza GPS o microfono resterebbero fuori -->
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <!-- Bluetooth LE per i braccialetti (Android 12+ usa SCAN/CONNECT, prima BLUETOOTH/ADMIN) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -63,6 +70,7 @@
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:banner="@drawable/tv_banner"
         android:supportsRtl="true"
         android:theme="@style/Theme.TSM"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -121,6 +129,19 @@
             tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
+
+        <!-- Sulla TV (Android TV): l'app compare tra le altre e si apre come tabellone, che trova da solo il telefono in
+             rete (annuncio _tsm._tcp) e passa a TSM Arena quando il telefono la apre. Niente indirizzi da scrivere. -->
+        <activity-alias
+            android:name=".tv.TvLauncher"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:targetActivity=".tv.DisplayActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Moviola sul telefono dell'arbitro: gira con il telefono (la partita resta in verticale) -->
         <activity

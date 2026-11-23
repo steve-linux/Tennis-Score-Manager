@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Gavel
@@ -127,7 +128,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         }
         onDone()
     }
-    Dialog(onDismissRequest = {}, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
+    // Il tasto Indietro di Android torna al passo prima (dal primo non fa niente: per uscire c'è Salta).
+    Dialog(onDismissRequest = { if (step > 0) step-- }, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
         Column(
             Modifier.fillMaxSize().background(TsmColors.Background).systemBarsPadding().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -141,6 +143,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     Text(s.onbWelcome, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                     Text("${step + 1} / ${steps.size}", color = TsmColors.TextDim, fontSize = 13.sp)
                 }
+                TextButton(onClick = { finish() }) { Text(s.onbSkip, color = TsmColors.TextDim) }
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 when (current) {
@@ -191,7 +194,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                GhostButton(s.onbSkip, Icons.AutoMirrored.Filled.ArrowForward, { finish() }, Modifier.weight(1f))
+                // Indietro su ogni passo tranne il primo (anche sull'ultimo, prima di Inizia); Salta sta in alto.
+                if (step > 0) GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { step-- }, Modifier.weight(1f))
                 val lastStep = step >= steps.size - 1
                 BigButton(if (!lastStep) s.next else s.onbStart, Icons.AutoMirrored.Filled.ArrowForward, { if (!lastStep) step++ else finish() }, Modifier.weight(1f))
             }

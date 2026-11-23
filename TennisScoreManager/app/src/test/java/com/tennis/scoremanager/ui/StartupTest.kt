@@ -7,7 +7,14 @@ import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performSemanticsAction
+import com.tennis.scoremanager.HomeTab
+import org.junit.Assert.assertEquals
 import androidx.test.core.app.ApplicationProvider
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Role
@@ -82,4 +89,42 @@ class StartupTest {
     @Test fun coach() = openAll(Role.COACH)
 
     @Test fun club() = openAll(Role.CLUB)
+
+    /** Il pulsante del ruolo in alto nella prima schermata: un tocco apre i ruoli, un altro passa all'Allenatore. */
+    @Test fun roleButtonSwitchesRole() {
+        val c = controller(Role.PLAYER, tv = false)
+        show(c)
+        rule.waitForIdle()
+        val s = stringsFor(c.options.value.lang)
+        rule.onNode(hasContentDescription("${s.roleSwitch}: ${s.moreProfile}")).performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+        rule.onNode(hasText(s.roleCoach), useUnmergedTree = true).assertExists()
+        rule.onAllNodes(hasText(s.roleCoach))[0].performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+        assertEquals(Role.COACH, c.activeRole.value)
+        assertEquals(HomeTab.STUDENTS, c.homeTab.value)
+        rule.onNode(hasContentDescription("${s.roleSwitch}: ${s.roleCoach}")).assertExists()
+    }
+
+    /** Presentazione dell'app: si va avanti fino all'ultimo passo e da lì si torna indietro. */
+    @Test fun onboardingGoesBackFromLastStep() {
+        val c = controller(Role.PLAYER, tv = false)
+        rule.setContent {
+            val options by c.options.collectAsState()
+            TsmTheme { CompositionLocalProvider(LocalStrings provides stringsFor(options.lang)) { OnboardingFlow(c) {} } }
+        }
+        rule.waitForIdle()
+        val s = stringsFor(c.options.value.lang)
+        // Tu: lingua, ruolo, nome, uso, dati = 5 passi; sul primo non c'è Indietro.
+        rule.onNode(hasText("1 / 5")).assertExists()
+        rule.onAllNodes(hasText(s.back)).assertCountEquals(0)
+        repeat(4) {
+            rule.onAllNodes(hasText(s.next))[0].performSemanticsAction(SemanticsActions.OnClick)
+            rule.waitForIdle()
+        }
+        rule.onNode(hasText("5 / 5")).assertExists()
+        rule.onAllNodes(hasText(s.back))[0].performSemanticsAction(SemanticsActions.OnClick)
+        rule.waitForIdle()
+        rule.onNode(hasText("4 / 5")).assertExists()
+    }
 }

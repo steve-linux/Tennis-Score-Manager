@@ -30,6 +30,11 @@
   Il riconoscimento impara da chi lo indossa: la calibrazione si fa dall'app (qualche colpo per
   tipo, salvato nel braccialetto). swing_detector.* e stroke_classifier.* sono copiati da SwingSense.
 
+  TSM Arena (dalla 2.5): con "A|1" dall'app il braccialetto diventa la racchetta del gioco sulla TV. Manda SWING
+  appena un colpo comincia (circa 30 ms dopo che il polso supera la soglia, invece dei ~0,5 s di STROKE), accende
+  l'IMU anche senza "Riconoscimento colpi" e chiede una connessione veloce (7,5-15 ms, latenza 0). Il colpo
+  riconosciuto (STROKE) arriva comunque dopo, se la calibrazione c'è. "A|0" o la disconnessione: tutto come prima.
+
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
     - NimBLE-Arduino >= 2.1     (di h2zero)
@@ -47,7 +52,7 @@
 #include "stroke_classifier.h"
 #include "swing_detector.h"
 
-#define FW_VERSION "2.4"
+#define FW_VERSION "2.5"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -115,6 +120,7 @@ enum : uint8_t {
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
                                                              // dalla 2.4 anche ";sw=0;swd=1;swc=8,9,10,7;cal=-1" (colpi)
 #define STROKE_UUID  "7a1e0006-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // colpo riconosciuto (2.4): vedi sendStroke()
+#define SWING_UUID   "7a1e0007-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // inizio di un colpo in TSM Arena (2.5): vedi sendSwing()
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
 enum : uint8_t { OFF_KEY = 0, OFF_IDLE = 1, OFF_BATTERY = 2, OFF_APP = 3, OFF_TIMEOUT = 4 };
@@ -197,6 +203,7 @@ static NimBLECharacteristic* battChr  = nullptr;
 static NimBLECharacteristic* statusChr = nullptr;
 static NimBLECharacteristic* configChr = nullptr;
 static NimBLECharacteristic* strokeChr = nullptr;
+static NimBLECharacteristic* swingChr  = nullptr;
 
 static volatile bool connected      = false;
 static volatile bool justConnected  = false;
@@ -289,6 +296,15 @@ static bool     fifoAccFirst = false;  // ordine dei dati nella FIFO (vedi imuSt
 static int8_t   calStroke = -1;        // colpo in calibrazione (0-3), -1 = nessuno
 static uint16_t strokeIndex = 0;       // colpi riconosciuti da questa accensione
 static uint32_t strokeOffAt = 0;       // displayOffAt dell'ultimo colpo a schermo: finché è lo stesso lo si può sostituire
+
+// TSM Arena (dalla 2.5): vedi in cima
+static const uint8_t  ARENA_WAIT_SAMPLES = 3;  // SWING parte 3 campioni (30 ms) dopo la soglia: picco più vicino a quello vero
+static bool     arenaMode = false;     // "A|1" dall'app; si spegne con "A|0" o alla disconnessione
+static bool     arenaPending = false;  // colpo cominciato, SWING non ancora mandato
+static uint8_t  arenaWait = 0;         // campioni dalla soglia
+static float    arenaGyro = 0.0f;      // picchi da quando il colpo è cominciato
+static float    arenaAcc = 0.0f;
+static uint8_t  swingSeq = 0;
 
 // ------------------------------------------------------------------ cicalino
 static void beep(float freq, uint32_t ms) {
@@ -709,9 +725,9 @@ static void imuStop() {
   imuOn = false;
 }
 
-// L'IMU è acceso solo se serve: riconoscimento attivo o calibrazione in corso.
+// L'IMU è acceso solo se serve: riconoscimento attivo, calibrazione in corso o TSM Arena.
 static void imuUpdateNeeded() {
-  const bool want = cfg.sw || calStroke >= 0;
+  const bool want = cfg.sw || calStroke >= 0 || arenaMode;
   if (want && !imuOn) imuStart();
   else if (!want && imuOn) imuStop();
 }
@@ -884,7 +900,9 @@ static void onSwing(const swing::Swing& sw, uint32_t now) {
     publishConfig(true);
     return;
   }
-  if (!cfg.sw) return;
+  if (!cfg.sw && !arenaMode) return;
+  // In Arena senza calibrazione il colpo resterebbe sempre "?": il gioco usa già SWING, STROKE non serve.
+  if (!cfg.sw && !classifier.ready()) return;
   const swing::StrokeClassifier::Result r = classifier.classify(sw.features);
   debugSwing("play", r.stroke, r.confidence, sw);
   strokeIndex++;
@@ -899,6 +917,57 @@ static void onSwing(const swing::Swing& sw, uint32_t now) {
   }
 }
 
+// [sequenza, picco giroscopio °/s (2 byte), picco accelerazione in centesimi di g (2 byte), ms dalla soglia,
+//  id di accensione (4 byte)], little endian. Picchi da quando il polso ha superato la soglia.
+static void sendSwing(uint8_t afterMs) {
+  if (!connected || !swingChr) return;
+  const uint16_t gyro = (uint16_t)constrain(lroundf(arenaGyro), 0L, 65535L);
+  const uint16_t acc = (uint16_t)constrain(lroundf(arenaAcc * 100.0f), 0L, 65535L);
+  swingSeq++;
+  const uint8_t data[10] = {
+    swingSeq, (uint8_t)gyro, (uint8_t)(gyro >> 8), (uint8_t)acc, (uint8_t)(acc >> 8), afterMs,
+    (uint8_t)bootId, (uint8_t)(bootId >> 8), (uint8_t)(bootId >> 16), (uint8_t)(bootId >> 24),
+  };
+  swingChr->notify(data, sizeof(data), connHandle);
+}
+
+// TSM Arena: il colpo comincia quando il rilevatore entra in un colpo; SWING parte poco dopo coi picchi raccolti.
+static void arenaSample(const swing::ImuSample& s, bool started) {
+  if (!arenaMode) return;
+  const float gyro = sqrtf(s.gx * s.gx + s.gy * s.gy + s.gz * s.gz);
+  const float acc = sqrtf(s.ax * s.ax + s.ay * s.ay + s.az * s.az);
+  if (started) {
+    arenaPending = true;
+    arenaWait = 0;
+    arenaGyro = gyro;
+    arenaAcc = acc;
+    return;
+  }
+  if (!arenaPending) return;
+  arenaGyro = max(arenaGyro, gyro);
+  arenaAcc = max(arenaAcc, acc);
+  if (++arenaWait >= ARENA_WAIT_SAMPLES) {
+    arenaPending = false;
+    sendSwing((uint8_t)(arenaWait * 10));
+  }
+}
+
+static void setArena(bool on) {
+  if (on == arenaMode) return;
+  arenaMode = on;
+  arenaPending = false;
+  imuUpdateNeeded();
+  // Veloce: intervallo 7,5-15 ms senza latenza (consuma di più, solo mentre si gioca). Poi di nuovo come in onConnect.
+  if (connected && server && connHandle != BLE_HS_CONN_HANDLE_NONE) {
+    if (on) server->updateConnParams(connHandle, 6, 12, 0, 400);
+    else server->updateConnParams(connHandle, 64, 96, 3, 600);
+  }
+  if (on && connected) {
+    drawMessage("TSM ARENA", imuOn ? "" : "IMU ?", C_BALL);
+    showFor(2000);
+  }
+}
+
 // Assi come M5Unified sullo StickS3 (X = +Y del sensore, Y = -X): gli stessi di SwingSense.
 static void onImuFrame(const uint8_t* f, uint32_t now) {
   const uint8_t* g = fifoAccFirst ? f + 6 : f;
@@ -909,7 +978,10 @@ static void onImuFrame(const uint8_t* f, uint32_t now) {
   };
   swing::Swing sw;
   lastSample = s;
-  if (detector.push(s, sw)) onSwing(sw, now);
+  const bool wasInSwing = detector.inSwing();
+  const bool done = detector.push(s, sw);
+  arenaSample(s, !wasInSwing && detector.inSwing());
+  if (done) onSwing(sw, now);
 }
 
 static void drainImu(uint32_t now) {
@@ -992,6 +1064,7 @@ static void handleConfig(char* text) {
 // P|mio|avversario|servizio|intestazione   G|mieiG|loroG|mieiS|loroS|intestazione   M|riga1|riga2|secondi
 // I|riga1|riga2|secondi|RRGGBB (identifica)   O|riga1|riga2 (spegni)
 // Colpi (2.4): C|n calibra il colpo n (0-3; senza n finisce)   U| annulla l'ultimo esempio   X|n cancella il colpo n
+// TSM Arena (2.5): A|1 acceso, A|0 spento
 static int splitFields(char* s, char** out, int maxOut) {
   int n = 0;
   out[n++] = s;
@@ -1064,6 +1137,9 @@ static void handleMessage(char* msg) {
       }
       if (calStroke >= 0) drawCalib();
       publishConfig(true);
+      break;
+    case 'A':
+      setArena(n >= 2 && f[1][0] == '1');
       break;
     case 'X': {
       const int k = n >= 2 && f[1][0] ? atoi(f[1]) : -1;
@@ -1332,6 +1408,7 @@ static void setupBle() {
   configChr = svc->createCharacteristic(CONFIG_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
   configChr->setCallbacks(new ConfigCallbacks());
   strokeChr = svc->createCharacteristic(STROKE_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+  swingChr = svc->createCharacteristic(SWING_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -1594,6 +1671,7 @@ void loop() {
     advSince = now;
     identifyUntil = 0;
     stopCalibration(false);
+    setArena(false);  // l'app la riaccende alla prossima connessione, se si sta ancora giocando
     startAdvertising(true);
   }
   if (rxReady) {
@@ -1729,5 +1807,7 @@ void loop() {
 
   speakerIdle(now);
 
-  delay(20);  // 50 Hz per i tasti; nel resto del tempo la CPU resta ferma in idle
+  // 50 Hz per i tasti; nel resto del tempo la CPU resta ferma in idle. In Arena la FIFO si legge ogni 5 ms:
+  // il colpo deve arrivare al telefono subito.
+  delay(arenaMode ? 5 : 20);
 }

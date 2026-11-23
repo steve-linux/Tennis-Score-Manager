@@ -132,7 +132,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import androidx.core.net.toUri
 
-enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, LESSONS, COACH_COURSE, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK }
+enum class Screen { HOME, SETUP, OPTIONS, TOSS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, LESSONS, COACH_COURSE, PLAYERS, DATA, SETTINGS, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER, DESK, ARENA }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -558,6 +558,7 @@ class MatchController(
                 replay = tvReplay.value,
                 club = tvClubSnapshot(),
                 balls = ballsAnimation.value,
+                arena = arenaActive,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -718,6 +719,7 @@ class MatchController(
     /** Indietro: la schermata da cui si è arrivati (la partita si lascia col suo menu, il riepilogo con "Fatto"). */
     fun back() {
         when (screen.value) {
+            Screen.ARENA -> closeArena()
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutArea.workoutDetail.value != null) { workoutArea.workoutDetail.value = null; return }
             Screen.START -> if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
@@ -743,7 +745,7 @@ class MatchController(
     @Volatile private var devicesOpen = false
 
     /** I braccialetti servono: partita in modalità braccialetti, allenamento dei colpi o pagina Dispositivi. */
-    private fun bandsWanted() = options.value.mode == PlayMode.BANDS || serveTraining || devicesOpen
+    private fun bandsWanted() = options.value.mode == PlayMode.BANDS || serveTraining || devicesOpen || arenaActive
 
     /** Collega i braccialetti salvati quando servono, altrimenti li stacca (consumano meno e non segnano punti per sbaglio). */
     private fun updateBandLinks() {
@@ -1204,6 +1206,130 @@ class MatchController(
         home(HomeTab.STUDENTS)
     }
 
+    // ---------------------------------------------------------------- TSM Arena
+
+    /**
+     * TSM Arena aperta: i braccialetti mandano l'inizio dei colpi (SWING) e i loro tasti al gioco sulla TV. Un Boolean
+     * semplice (e non un flusso) perché [bandsWanted] lo legge anche mentre il controller si sta ancora costruendo.
+     */
+    @Volatile var arenaActive = false
+        private set
+
+    /** Impostazioni di TSM Arena (giocatori, livello, opzioni). */
+    val arena = MutableStateFlow(storage.arena)
+
+    /**
+     * La partita di Arena è in pausa? La TV non lo dice al telefono: lo si tiene qui dai comandi del telefono e dai
+     * tasti dei braccialetti (KEY2 pausa/ripresa, KEY1 riprende). I comandi sono assoluti: al massimo serve un tocco in più.
+     */
+    val arenaPaused = MutableStateFlow(false)
+
+    /** Pausa o ripresa della partita di Arena dal telefono. */
+    fun arenaPause(on: Boolean) {
+        if (!arenaActive) return
+        arenaPaused.value = on
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.control(if (on) "pause" else "resume"))
+    }
+
+    /** Partita nuova di Arena da zero, anche a partita in corso. */
+    fun arenaRestart() {
+        if (!arenaActive) return
+        arenaPaused.value = false
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.control("start"))
+    }
+
+    init {
+        scope.launch {
+            ble.swings.collect {
+                if (arenaActive && !relay.isSatellite) tvServer.publishArena(com.tennis.scoremanager.arena.Arena.swing(it.side.ordinal + 1, it.swing))
+            }
+        }
+        scope.launch {
+            ble.strokes.collect {
+                if (arenaActive && !relay.isSatellite) tvServer.publishArena(com.tennis.scoremanager.arena.Arena.stroke(it.side.ordinal + 1, it.stroke))
+            }
+        }
+        // Braccialetti che si collegano o si staccano: la TV mostra chi c'è.
+        scope.launch { ble.bands.collect { if (arenaActive) publishArena() } }
+        // La voce dell'arbitro di Arena la dice il telefono (voce e motore scelti per le partite); il gioco ha il suo
+        // interruttore Voce dell'arbitro, quindi parla anche con la voce delle partite spenta.
+        tvServer.onArenaSay = { text ->
+            if (arenaActive && arena.value.voice) announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)), force = true)
+        }
+    }
+
+    fun openArena() {
+        refreshPlayers()
+        arenaActive = true
+        arenaPaused.value = false
+        updateBandLinks()
+        for (side in Side.entries) ble.setArena(side, true)
+        // Il gioco usa il server del tabellone anche con il tabellone spento.
+        tvServer.start()
+        publishArena()
+        publishTv()  // la TV sul tabellone passa da sola al gioco
+        go(Screen.ARENA)
+    }
+
+    /** Arena con i permessi Bluetooth appena concessi: i braccialetti si ricollegano senza riaprire l'app. */
+    fun arenaBandsAgain() {
+        if (!arenaActive) return
+        updateBandLinks()
+        ble.reconnectAll()
+        for (side in Side.entries) ble.setArena(side, true)
+    }
+
+    /** Uscita da TSM Arena: braccialetti di nuovo a basso consumo, server spento se il tabellone non serve. */
+    fun closeArena() {
+        if (!arenaActive) return
+        arenaActive = false
+        arenaPaused.value = false
+        for (side in Side.entries) ble.setArena(side, false)
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.closed(), keep = true)
+        publishTv()
+        scope.launch {
+            delay(1_500)  // il tempo di mandare "A|0" ai braccialetti e "chiusa" alla TV
+            if (arenaActive) return@launch
+            updateBandLinks()
+            // Con una TV collegata il server resta acceso: la TV torna al tabellone e ritrova il gioco alla prossima partita.
+            val screensOn = tvServer.clients.value + tvServer.arenaClients.value > 0
+            if (!tv.value.enabled && relay.ui.value.role != RelayRole.MAIN && !screensOn) tvServer.stop()
+        }
+    }
+
+    fun updateArena(transform: (com.tennis.scoremanager.arena.ArenaSettings) -> com.tennis.scoremanager.arena.ArenaSettings) {
+        val v = transform(arena.value)
+        arena.value = v
+        storage.arena = v
+        publishArena()
+    }
+
+    /** Indirizzo del gioco da aprire sulla TV (null = nessuna rete locale). */
+    fun arenaUrl(address: String? = tvServer.addresses.value.firstOrNull()): String? = tvServer.url(address)?.let { it + "arena" }
+
+    /** Nome sulla TV del giocatore di un lato. */
+    fun arenaName(side: Side): String {
+        val a = arena.value
+        val s = strings
+        return if (side == Side.P1) {
+            (playerById(a.p1) ?: me())?.name?.takeIf { it.isNotBlank() } ?: storage.myName.ifBlank { s.player1 }
+        } else {
+            playerById(a.p2)?.name?.takeIf { it.isNotBlank() } ?: s.player2
+        }
+    }
+
+    private fun publishArena() {
+        if (!arenaActive) return
+        val bands = ble.bands.value
+        fun ready(side: Side) = bands[side]?.state == LinkState.READY
+        tvServer.publishArena(
+            com.tennis.scoremanager.arena.Arena.config(
+                arena.value, options.value.lang.code, arenaName(Side.P1), arenaName(Side.P2), ready(Side.P1), ready(Side.P2),
+            ),
+            keep = true,
+        )
+    }
+
     fun openStudents() {
         refreshPlayers()
         nav.push(Screen.STUDENTS)
@@ -1454,6 +1580,14 @@ class MatchController(
     }
 
     private fun onBandEvent(e: BandEvent) {
+        // TSM Arena: i tasti vanno al gioco sulla TV (KEY1 avvia, KEY2 pausa), mai alla partita.
+        if (arenaActive) {
+            if (e.type == BandProtocol.EVT_POINT || e.type == BandProtocol.EVT_UNDO) {
+                tvServer.publishArena(com.tennis.scoremanager.arena.Arena.key(e.side.ordinal + 1, e.type))
+                arenaPaused.value = e.type == BandProtocol.EVT_UNDO && !arenaPaused.value
+            }
+            return
+        }
         if (serveTraining) return
         when (e.type) {
             BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {

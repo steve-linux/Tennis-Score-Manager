@@ -496,6 +496,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Altro** ha in ogni ruolo le cose dell'app: **Impostazioni** (lingua, voce dell'arbitro, dispositivi, ruolo e funzioni, backup e dati e, in fondo, **Informazioni** con la versione dell'app, la licenza e il codice sorgente), **Aiuto** e **Presentazione dell'app**.
   - **Ruolo e funzioni** tiene nei menu solo quello che serve. Per Tu e Allenatore, **Cosa usi**: braccialetti e telecomandi, fasce cardio, allenamento dei colpi, video e telecamera, progressi e rating, racchette, padel; quello che si spegne non compare e le schede rimaste vuote spariscono (senza Progressi lo storico va in Gioca). Per il Circolo, **Funzioni del circolo**: di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi, Server del circolo e Segreteria da PC. I dati delle funzioni spente restano.
   - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
+- **Il pulsante del ruolo**, in alto a destra nella prima schermata (es. **Tu ▾**), mostra sempre il ruolo attivo: toccalo e scegli **Tu**, **Allenatore** o **Circolo** per cambiare subito, senza passare dalle Impostazioni.
 - Chi aveva acceso più ruoli resta in quello che stava usando: gli altri si ritrovano cambiando ruolo, niente si cancella.
 - **Prima apertura**: lingua, ruolo, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **backup automatico** (acceso di serie) e il **promemoria del backup** (se spegni quello automatico, ogni 30 giorni la prima schermata ti ricorda di farne uno); li trovi anche in Backup e dati.
 
@@ -692,6 +693,27 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 **Da un browser** (portatile, TV box): inquadra il QR o scrivi l'indirizzo, poi tocca **SCHERMO INTERO** (compare muovendo il mouse o toccando lo schermo). Imposta lo spegnimento dello schermo su *mai*: in una pagina http il browser non può tenerlo acceso da solo. Dopo un'interruzione la pagina si ricollega da sola; troppi tabelloni aperti non bloccano più quello nuovo (si chiude il più vecchio).
 
 **Anteprima senza telefoni**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in un browser (anche `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) mostra il tabellone con dati di prova.
+
+### 8.4 TSM Arena: tennis sulla TV coi braccialetti (app 2.7, firmware 2.5)
+
+Un gioco di tennis sulla TV, come quelli delle console, in cui **il braccialetto è la racchetta**: utile a casa, tra una lezione e l'altra, per allenare il tempo sulla palla e la scelta tra dritto e rovescio. Il giocatore sullo schermo corre da solo: si pensa solo a **quando** colpire. In anticipo la palla va incrociata, in ritardo lungolinea; più il polso è veloce, più il colpo è forte.
+
+Serve il **firmware 2.5** sui braccialetti (5): quando il gioco è aperto il braccialetto manda l'inizio di ogni colpo in pochi centesimi di secondo e chiede una connessione Bluetooth veloce (consuma di più solo mentre si gioca).
+
+1. **Allenati** (o **Allievi**, per l'allenatore) › **TSM Arena**. Lo schermo del telefono resta acceso finché la pagina è aperta.
+2. **Sulla TV**: apri l'indirizzo mostrato (es. `192.168.43.1:8080/arena`) nel browser della TV, di una TV box o di un portatile collegato, sulla stessa rete o sull'hotspot del telefono; oppure inquadra il QR. Non serve internet. Premi **OK** una volta sulla pagina per attivare l'audio.
+   - **Con Android TV** (Nvidia Shield, Chromecast con Google TV, TV Android): installa TSM anche sulla TV. Compare tra le app e si apre come tabellone: trova da solo il telefono sulla stessa rete e passa da solo ad Arena quando la apri sul telefono, poi torna al tabellone quando la chiudi. Niente indirizzi da scrivere, e i suoni partono senza premere OK.
+   - **Nel browser** basta aprire una volta l'indirizzo del tabellone (senza `/arena`) e salvarlo tra i preferiti: anche lì la pagina passa da sola al gioco e torna indietro.
+3. **Giocatori**: *Contro il telefono* (Giocatore 1 contro la CPU, coi tre livelli) oppure *Due giocatori*, un braccialetto ciascuno. Tocca il nome per scegliere chi gioca (tu o uno degli allievi). Sotto c'è lo stato di ogni braccialetto.
+4. **Partita**: game per vincere (1, 3 o 5), **Conta solo il colpo giusto** (con la calibrazione dei colpi, 6.4, un dritto al posto del rovescio è punto perso), **Voce dell'arbitro** sulla TV, **Ritardo della TV**: se colpisci sempre in ritardo anche quando ti sembra giusto, alzalo (basso per monitor e TV in modalità gioco).
+5. Fai uno **swing** (o premi il **tasto grande** del braccialetto) per iniziare. Per servire basta uno swing. Il **tasto piccolo** mette in pausa. A fine partita la TV mostra colpi, perfetti, in anticipo, in ritardo, colpi sbagliati, velocità massima del polso e scambio più lungo; uno swing fa partire la rivincita. Dal telefono, in cima alla schermata di Arena (**Partita sulla TV**): **Pausa**/**Riprendi**, **Nuova partita** (da zero, chiede conferma) e il **Volume sulla TV** di suoni e voce (con TSM sulla TV la voce dell'arbitro esce dalla TV; in un browser esce dal telefono, con la voce delle partite); la pausa si mette anche col tasto play/pausa del telecomando della TV.
+6. Per uscire: **Indietro**. Il braccialetto torna a basso consumo e la TV mostra che il gioco è chiuso.
+
+- Tieni il braccialetto ben stretto e lascia **spazio intorno**: si gioca con la racchetta in mano (meglio senza palla) o anche a mano vuota.
+- **Visuale**: da soli si gioca **in prima persona** (racchetta e braccialetto in primo piano, la palla ti viene incontro); in due la visuale è da dietro, come in TV. Il tasto **V** della tastiera cambia visuale. Un **anello** sul punto d'impatto si stringe mentre la palla arriva e diventa verde quando è il momento di colpire; dopo ogni colpo compare la velocità della palla.
+- **Grafica** (sotto *Partita*): **3D realistica** (giocatori con corpo vero, ombre, luci dello stadio, pubblico), **3D semplice** (low-poly, più leggera) o **2D**. Se la TV va a scatti o non ha la grafica 3D (WebGL), il gioco passa da solo a quella più leggera. Per la 3D conviene un PC, una TV box o una chiavetta recente; le TV economiche spesso reggono solo la 2D. Il modello del giocatore è "3D Male Base Mesh" (CC0); le mosse da tennis le calcola il gioco.
+- Durante il gioco i tasti del braccialetto non segnano punti nelle partite.
+- **Anteprima senza telefono e braccialetti**: `TennisScoreManager/app/src/main/assets/arena.html?demo=1` in un browser (anche `&lang=en`, `fr`, `de`, `es`, `pt`); la barra spaziatrice fa da swing.
 
 ## 9. Regole applicate (ITF) e scelte concordate
 

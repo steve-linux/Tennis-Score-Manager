@@ -4,6 +4,13 @@
 package com.tennis.scoremanager.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.draw.clip
@@ -138,4 +145,48 @@ fun RolesFeaturesDialog(c: MatchController, onDone: () -> Unit) {
         },
         confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
+}
+
+/**
+ * Il ruolo sempre in vista, in alto nella prima schermata: mostra quello attivo e con un tocco apre gli altri.
+ * Cambiare ruolo cambia solo le schede (come in Impostazioni): i dati restano.
+ */
+@Composable
+fun RoleSwitchButton(c: MatchController) {
+    val s = LocalStrings.current
+    val role by c.activeRole.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    fun name(r: Role) = when (r) { Role.PLAYER -> s.moreProfile; Role.COACH -> s.roleCoach; Role.CLUB -> s.roleClub }
+    fun icon(r: Role) = when (r) { Role.PLAYER -> Icons.Filled.Person; Role.COACH -> Icons.Filled.School; Role.CLUB -> Icons.Filled.Business }
+    androidx.compose.foundation.layout.Box {
+        androidx.compose.foundation.layout.Row(
+            Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                .background(TsmColors.SurfaceHigh)
+                .border(1.dp, TsmColors.Ball, androidx.compose.foundation.shape.RoundedCornerShape(50))
+                .clickable(onClickLabel = s.roleSwitch) { open = true }
+                .semantics { contentDescription = "${s.roleSwitch}: ${name(role)}" }
+                .padding(start = 10.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            androidx.compose.material3.Icon(icon(role), null, tint = TsmColors.Ball, modifier = Modifier.size(20.dp))
+            Text(
+                name(role), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1,
+                modifier = Modifier.padding(start = 6.dp).widthIn(max = 110.dp),
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+            androidx.compose.material3.Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
+        }
+        androidx.compose.material3.DropdownMenu(open, { open = false }) {
+            Text(s.roleSwitch, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+            for (r in Role.entries) {
+                val on = r == role
+                androidx.compose.material3.DropdownMenuItem(
+                    text = { Text(name(r), fontWeight = if (on) FontWeight.Bold else FontWeight.Normal) },
+                    leadingIcon = { androidx.compose.material3.Icon(icon(r), null, tint = if (on) TsmColors.Ball else TsmColors.TextDim) },
+                    trailingIcon = if (on) ({ androidx.compose.material3.Icon(Icons.Filled.Check, null, tint = TsmColors.Ball) }) else null,
+                    onClick = { open = false; if (!on) c.setRole(r) },
+                )
+            }
+        }
+    }
 }

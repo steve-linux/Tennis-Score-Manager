@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<!--
+  SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+  SPDX-License-Identifier: GPL-3.0-or-later
+
+  TSM Arena: tennis sulla TV coi braccialetti M5StickS3 come racchette.
+  La pagina la serve il telefono (TvServer, /arena); impostazioni e colpi arrivano da /arena/events (SSE):
+    {"t":"cfg", lang, level, games, strict, voice, lagMs, two, p1:{name,band}, p2:{name,band}}
+    {"t":"swing", side, s (forza 0..1), gyro, after}   inizio di un colpo (firmware 2.5, SWING)
+    {"t":"stroke", side, k (0 dritto, 1 rovescio, 2 servizio, 3 volée, 255 ?), conf, gyro}   colpo riconosciuto, ~0,4 s dopo
+    {"t":"key", side, k (1 tasto grande, 2 tasto piccolo)}
+    {"t":"closed"}
+  Senza internet: niente librerie esterne. Anteprima senza telefono: arena.html?demo=1 (SPAZIO = swing, V = visuale; &gfx=0/1/2, &two=1).
+  La grafica 3D (three.js) è in arena/arena3d.js, compilata da TennisScoreManager/arena3d/ (vedi build.sh).
+  Visuale in prima persona da soli, da dietro (come in TV) in due; tutto disegnato su canvas, senza immagini.
+-->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TSM Arena</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b1220;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+canvas{display:block;width:100%;height:100%;position:fixed;inset:0}
+#gl{display:none}
+#ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,.72)}
+#ov.hide{display:none}
+.card{background:linear-gradient(160deg,rgba(28,40,68,.94),rgba(10,16,30,.96));border:2px solid rgba(198,244,50,.35);border-radius:28px;backdrop-filter:blur(6px);padding:4vh 5vw;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+h1{font-size:8vh;margin-bottom:1.5vh;font-style:italic;font-weight:900;letter-spacing:.02em;text-shadow:0 0 3vh rgba(198,244,50,.35)}
+h1 span{color:#c6f432}
+.big{font-size:4.4vh;margin:1.4vh 0}
+.mid{font-size:3vh;margin:1vh 0;line-height:1.45}
+.small{font-size:2.2vh;opacity:.75;line-height:1.5;margin-top:1vh}
+.ok{color:#7dff9c}.warn{color:#ffb35c}.ball{color:#c6f432}
+.players{display:flex;gap:4vw;justify-content:center;margin:2vh 0}
+.pl{font-size:3.4vh;font-weight:700}
+.pl i{display:inline-block;width:1.2vh;height:3.4vh;vertical-align:middle;margin-right:1vh;border-radius:3px}
+table{margin:2vh auto;border-collapse:collapse;font-size:2.8vh}
+td,th{padding:.6vh 2vw}
+th{color:#9aa8bd;font-weight:600}
+td:first-child{text-align:left}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+#fsBtn{position:fixed;right:1.5vw;bottom:2vh;font:inherit;font-size:1.8vh;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:.6vh 1.2vw;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="cv"></canvas>
+<div id="ov"><div class="card" id="card"></div></div>
+<button id="fsBtn">⛶</button>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const DEMO = /[?&]demo=1/.test(location.search);
+/** Avvio dell'app del telefono che ha mandato la pagina (dal primo "cfg"). */
+let REV = 0;
+
+/* ----------------------------- Testi (6 lingue, come l'app) -------------------------------- */
+const TX = {
+  it: { wait: 'Apri TSM Arena sul telefono', waitSub: 'Tennis Score Manager › Allenati › TSM Arena', link: 'Collegamento al telefono…', lost: 'Telefono non raggiungibile: riprovo…', closed: 'TSM Arena è stata chiusa sul telefono',
+    start: 'Swing o tasto grande del braccialetto per iniziare', audio: 'Premi OK sul telecomando per attivare l\'audio', bandOn: 'braccialetto collegato', bandOff: 'braccialetto non collegato', cpu: 'Telefono',
+    serve: 'swing per servire', second: 'Seconda di servizio', fault: 'FALLO', dfault: 'DOPPIO FALLO', out: 'FUORI!', net: 'RETE!', ace: 'ACE!', winner: 'VINCENTE!', wrong: 'COLPO SBAGLIATO', wasFore: 'era un dritto', wasBack: 'era un rovescio',
+    perfect: 'PERFETTO!', early: 'ANTICIPO', late: 'RITARDO', bomb: 'BOMBA!', deuce: 'PARITÀ', adv: 'VANTAGGIO', game: 'Game', wins: 'vince!', rematch: 'Swing o tasto grande per la rivincita', go: 'VIA!',
+    paused: 'PAUSA', pauseHint: 'Tasto piccolo del braccialetto per riprendere', firstTo: n => 'primo a ' + n + ' game', levels: ['Facile', 'Normale', 'Difficile'], keys: 'Senza braccialetto: SPAZIO = swing',
+    stats: ['Colpi', 'Perfetti', 'In anticipo', 'In ritardo', 'Colpo sbagliato', 'Velocità max (°/s)'], rally: 'Scambio più lungo',
+    say: { pts: ['zero', 'quindici', 'trenta', 'quaranta'], all: 'pari', deuce: 'parità', adv: 'vantaggio', game: 'gioco', match: 'gioco, partita e incontro', fault: 'fallo', dfault: 'doppio fallo', voice: 'it-IT' } },
+  en: { wait: 'Open TSM Arena on the phone', waitSub: 'Tennis Score Manager › Train › TSM Arena', link: 'Connecting to the phone…', lost: 'Phone not reachable: retrying…', closed: 'TSM Arena was closed on the phone',
+    start: 'Swing or press the big wristband key to start', audio: 'Press OK on the remote to turn on the sound', bandOn: 'wristband connected', bandOff: 'wristband not connected', cpu: 'Phone',
+    serve: 'swing to serve', second: 'Second serve', fault: 'FAULT', dfault: 'DOUBLE FAULT', out: 'OUT!', net: 'NET!', ace: 'ACE!', winner: 'WINNER!', wrong: 'WRONG STROKE', wasFore: 'that was a forehand', wasBack: 'that was a backhand',
+    perfect: 'PERFECT!', early: 'EARLY', late: 'LATE', bomb: 'BOMB!', deuce: 'DEUCE', adv: 'ADVANTAGE', game: 'Game', wins: 'wins!', rematch: 'Swing or big key for a rematch', go: 'PLAY!',
+    paused: 'PAUSE', pauseHint: 'Small wristband key to resume', firstTo: n => 'first to ' + n + (n === 1 ? ' game' : ' games'), levels: ['Easy', 'Normal', 'Hard'], keys: 'No wristband: SPACE = swing',
+    stats: ['Strokes', 'Perfect', 'Early', 'Late', 'Wrong stroke', 'Top speed (°/s)'], rally: 'Longest rally',
+    say: { pts: ['love', 'fifteen', 'thirty', 'forty'], all: 'all', deuce: 'deuce', adv: 'advantage', game: 'game', match: 'game, set and match', fault: 'fault', dfault: 'double fault', voice: 'en-GB' } },
+  fr: { wait: 'Ouvre TSM Arena sur le téléphone', waitSub: 'Tennis Score Manager › S\'entraîner › TSM Arena', link: 'Connexion au téléphone…', lost: 'Téléphone injoignable : nouvel essai…', closed: 'TSM Arena a été fermé sur le téléphone',
+    start: 'Swing ou grande touche du bracelet pour commencer', audio: 'Appuie sur OK de la télécommande pour le son', bandOn: 'bracelet connecté', bandOff: 'bracelet non connecté', cpu: 'Téléphone',
+    serve: 'swing pour servir', second: 'Deuxième balle', fault: 'FAUTE', dfault: 'DOUBLE FAUTE', out: 'DEHORS !', net: 'FILET !', ace: 'ACE !', winner: 'GAGNANT !', wrong: 'MAUVAIS COUP', wasFore: 'c\'était un coup droit', wasBack: 'c\'était un revers',
+    perfect: 'PARFAIT !', early: 'EN AVANCE', late: 'EN RETARD', bomb: 'BOMBE !', deuce: 'ÉGALITÉ', adv: 'AVANTAGE', game: 'Jeu', wins: 'gagne !', rematch: 'Swing ou grande touche pour la revanche', go: 'JOUEZ !',
+    paused: 'PAUSE', pauseHint: 'Petite touche du bracelet pour reprendre', firstTo: n => 'premier à ' + n + (n === 1 ? ' jeu' : ' jeux'), levels: ['Facile', 'Moyen', 'Difficile'], keys: 'Sans bracelet : ESPACE = swing',
+    stats: ['Coups', 'Parfaits', 'En avance', 'En retard', 'Mauvais coup', 'Vitesse max (°/s)'], rally: 'Plus long échange',
+    say: { pts: ['zéro', 'quinze', 'trente', 'quarante'], all: 'partout', deuce: 'égalité', adv: 'avantage', game: 'jeu', match: 'jeu, set et match', fault: 'faute', dfault: 'double faute', voice: 'fr-FR' } },
+  de: { wait: 'Öffne TSM Arena am Handy', waitSub: 'Tennis Score Manager › Trainieren › TSM Arena', link: 'Verbindung zum Handy…', lost: 'Handy nicht erreichbar: neuer Versuch…', closed: 'TSM Arena wurde am Handy geschlossen',
+    start: 'Schwingen oder große Armbandtaste zum Starten', audio: 'Drücke OK auf der Fernbedienung für den Ton', bandOn: 'Armband verbunden', bandOff: 'Armband nicht verbunden', cpu: 'Handy',
+    serve: 'Schwung zum Aufschlag', second: 'Zweiter Aufschlag', fault: 'FEHLER', dfault: 'DOPPELFEHLER', out: 'AUS!', net: 'NETZ!', ace: 'ASS!', winner: 'WINNER!', wrong: 'FALSCHER SCHLAG', wasFore: 'das war eine Vorhand', wasBack: 'das war eine Rückhand',
+    perfect: 'PERFEKT!', early: 'ZU FRÜH', late: 'ZU SPÄT', bomb: 'BOMBE!', deuce: 'EINSTAND', adv: 'VORTEIL', game: 'Spiel', wins: 'gewinnt!', rematch: 'Schwingen oder große Taste für die Revanche', go: 'LOS!',
+    paused: 'PAUSE', pauseHint: 'Kleine Armbandtaste zum Fortsetzen', firstTo: n => 'wer zuerst ' + n + (n === 1 ? ' Spiel' : ' Spiele') + ' hat', levels: ['Leicht', 'Mittel', 'Schwer'], keys: 'Ohne Armband: LEERTASTE = Schwung',
+    stats: ['Schläge', 'Perfekt', 'Zu früh', 'Zu spät', 'Falscher Schlag', 'Höchsttempo (°/s)'], rally: 'Längster Ballwechsel',
+    say: { pts: ['null', 'fünfzehn', 'dreißig', 'vierzig'], all: 'beide', deuce: 'Einstand', adv: 'Vorteil', game: 'Spiel', match: 'Spiel, Satz und Sieg', fault: 'Fehler', dfault: 'Doppelfehler', voice: 'de-DE' } },
+  es: { wait: 'Abre TSM Arena en el teléfono', waitSub: 'Tennis Score Manager › Entrenar › TSM Arena', link: 'Conectando con el teléfono…', lost: 'Teléfono no disponible: reintentando…', closed: 'TSM Arena se cerró en el teléfono',
+    start: 'Swing o tecla grande de la pulsera para empezar', audio: 'Pulsa OK en el mando para activar el sonido', bandOn: 'pulsera conectada', bandOff: 'pulsera no conectada', cpu: 'Teléfono',
+    serve: 'swing para sacar', second: 'Segundo saque', fault: 'FALTA', dfault: 'DOBLE FALTA', out: '¡FUERA!', net: '¡RED!', ace: '¡ACE!', winner: '¡GANADOR!', wrong: 'GOLPE EQUIVOCADO', wasFore: 'era una derecha', wasBack: 'era un revés',
+    perfect: '¡PERFECTO!', early: 'ANTICIPADO', late: 'TARDE', bomb: '¡BOMBAZO!', deuce: 'IGUALES', adv: 'VENTAJA', game: 'Juego', wins: '¡gana!', rematch: 'Swing o tecla grande para la revancha', go: '¡A JUGAR!',
+    paused: 'PAUSA', pauseHint: 'Tecla pequeña de la pulsera para seguir', firstTo: n => 'el primero en ' + n + (n === 1 ? ' juego' : ' juegos'), levels: ['Fácil', 'Medio', 'Difícil'], keys: 'Sin pulsera: ESPACIO = swing',
+    stats: ['Golpes', 'Perfectos', 'Anticipados', 'Tarde', 'Golpe equivocado', 'Velocidad máx. (°/s)'], rally: 'Peloteo más largo',
+    say: { pts: ['nada', 'quince', 'treinta', 'cuarenta'], all: 'iguales', deuce: 'iguales', adv: 'ventaja', game: 'juego', match: 'juego, set y partido', fault: 'falta', dfault: 'doble falta', voice: 'es-ES' } },
+  pt: { wait: 'Abra o TSM Arena no celular', waitSub: 'Tennis Score Manager › Treinar › TSM Arena', link: 'Conectando ao celular…', lost: 'Celular não encontrado: tentando de novo…', closed: 'O TSM Arena foi fechado no celular',
+    start: 'Swing ou tecla grande da pulseira para começar', audio: 'Aperte OK no controle remoto para ligar o som', bandOn: 'pulseira conectada', bandOff: 'pulseira não conectada', cpu: 'Celular',
+    serve: 'swing para sacar', second: 'Segundo saque', fault: 'FALTA', dfault: 'DUPLA FALTA', out: 'FORA!', net: 'REDE!', ace: 'ACE!', winner: 'WINNER!', wrong: 'GOLPE ERRADO', wasFore: 'era um forehand', wasBack: 'era um backhand',
+    perfect: 'PERFEITO!', early: 'ADIANTADO', late: 'ATRASADO', bomb: 'BOMBA!', deuce: 'IGUAIS', adv: 'VANTAGEM', game: 'Game', wins: 'vence!', rematch: 'Swing ou tecla grande para a revanche', go: 'VALENDO!',
+    paused: 'PAUSA', pauseHint: 'Tecla pequena da pulseira para continuar', firstTo: n => 'quem fizer ' + n + (n === 1 ? ' game' : ' games') + ' primeiro', levels: ['Fácil', 'Médio', 'Difícil'], keys: 'Sem pulseira: ESPAÇO = swing',
+    stats: ['Golpes', 'Perfeitos', 'Adiantados', 'Atrasados', 'Golpe errado', 'Velocidade máx. (°/s)'], rally: 'Troca mais longa',
+    say: { pts: ['zero', 'quinze', 'trinta', 'quarenta'], all: 'iguais', deuce: 'iguais', adv: 'vantagem', game: 'game', match: 'game, set e partida', fault: 'falta', dfault: 'dupla falta', voice: 'pt-BR' } },
+};
+let T = TX.it;
+
+/* ----------------------------- Impostazioni dal telefono -------------------------------- */
+const CFG = { level: 2, games: 3, strict: true, voice: true, vol: 80, lagMs: 70, two: false, gfx: 2, p1: { name: 'Rossi', band: false }, p2: { name: '', band: false } };
+let link = DEMO ? 'demo' : 'connecting';   // connecting | ok | lost | closed | demo
+let gotCfg = DEMO;
+
+/* ----------------------------- Motore -------------------------------- */
+const G = 9.81, R = 0.035, HL = 11.885, HW = 4.115, DW = 5.485, SVC = 6.40, DT = 1 / 120;
+// Il braccialetto manda SWING ~30 ms dopo la soglia, ~60 ms prima del picco del colpo (cioè dell'impatto): arriva
+// alla pagina ~40 ms prima dell'impatto vero. La TV mostra l'immagine in ritardo di lagMs: il colpo arriva più tardi.
+const idealTc = () => 0.04 - CFG.lagMs / 1000;
+const WIN_BEFORE = 0.19, WIN_AFTER = 0.27;
+const LEVELS = {
+  1: { spd: 13, noise: 0.9, move: 4.4, react: 0.32, aim: 0.3, srv: 17, err: 0.15 },
+  2: { spd: 16.5, noise: 0.7, move: 5.5, react: 0.22, aim: 0.55, srv: 21, err: 0.09 },
+  3: { spd: 20, noise: 0.5, move: 6.6, react: 0.14, aim: 0.8, srv: 26, err: 0.05 },
+};
+const L = () => LEVELS[CFG.level] || LEVELS[2];
+const human = i => i === 0 || CFG.two;
+const nameOf = i => i === 0 ? (CFG.p1.name || 'P1') : (CFG.two ? (CFG.p2.name || 'P2') : T.cpu);
+
+const S = {
+  phase: 'title', timer: 0, shotT: 0, contact: null, server: 0, pts: [0, 0], games: [0, 0], faults: 0, winner: -1, paused: false,
+  msg: '', sub: '', msgT: 0, fb: '', fbT: 0, fbWho: 0, tossBy: -1, tossS: 0.6,
+  ball: { x: 0, y: -1, z: 0, vx: 0, vy: 0, vz: 0, bounces: 0, lastHitter: 0, serve: false, netted: false, show: false },
+  trail: [], rally: 0, lastHit: null,
+  st: null,
+};
+const P = [
+  { x: 0, z: -HL - 0.8, tx: 0, tz: -HL - 0.8, swing: -1, fore: true, react: 0, serveAnim: false, shirt: '#ffd600', shorts: '#f4f4f4', hair: '#3b2a1e' },
+  { x: 0, z: HL + 0.8, tx: 0, tz: HL + 0.8, swing: -1, fore: true, react: 0, serveAnim: false, shirt: '#e53935', shorts: '#1c2b4a', hair: '#151515' },
+];
+const newStats = () => [0, 1].map(() => ({ hits: 0, perfect: 0, early: 0, late: 0, wrong: 0, maxGyro: 0 }));
+S.st = newStats();
+const sideZ = i => (i === 0 ? -1 : 1);
+const homeZ = i => sideZ(i) * (HL + 0.8);
+const netH = x => 0.914 + 0.156 * Math.min(1, Math.abs(x) / (DW + 0.914));
+const serverXSign = (who, deuce) => (who === 0 ? 1 : -1) * (deuce ? 1 : -1);
+const isDeuceCourt = () => (S.pts[0] + S.pts[1]) % 2 === 0;
+
+function stepBall(b, dt) {
+  const pz = b.z;
+  b.vy -= G * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+  let ev = null;
+  if (!b.netted && pz * b.z <= 0 && pz !== b.z && b.y < netH(b.x) + R && Math.abs(b.x) < DW + 0.914) {
+    b.netted = true; b.z = pz > 0 ? 0.06 : -0.06; b.vz *= -0.15; b.vx *= 0.3; ev = 'net';
+  }
+  if (b.y < R && b.vy < 0) {
+    b.y = R; b.vy = -b.vy * 0.7; b.vx *= 0.86; b.vz *= 0.86;
+    if (b.vy < 0.5) b.vy = 0;
+    if (!ev && b.vy > 0) ev = 'bounce';
+  }
+  return ev;
+}
+
+function solveShot(b, tx, tz, speed, clear) {
+  const dx = tx - b.x, dz = tz - b.z, d = Math.hypot(dx, dz) || 1;
+  let vh = speed, out = null;
+  for (let i = 0; i < 60; i++) {
+    const T_ = d / vh, vy = (R - b.y + 0.5 * G * T_ * T_) / T_;
+    out = { vx: dx / T_, vy, vz: dz / T_ };
+    const tn = -b.z / (dz / T_);
+    if (tn > 0 && tn < T_) {
+      const yn = b.y + vy * tn - 0.5 * G * tn * tn;
+      if (yn < netH(b.x + dx * tn / T_) + clear) { vh *= 0.96; continue; }
+    }
+    break;
+  }
+  return out;
+}
+
+function predictContact(b, who) {
+  const s = { ...b }; let t = 0, n = 0;
+  const sz = sideZ(who);
+  for (let i = 0; i < 1000; i++) {
+    const ev = stepBall(s, DT); t += DT;
+    if (ev === 'net') return null;
+    if (ev === 'bounce') { n++; if (n >= 2) return { x: s.x, y: s.y, z: s.z, t }; }
+    if (n === 1 && s.z * sz > 0) {
+      if ((s.vy <= 0 && s.y < 1.05) || Math.abs(s.z) > HL + 3) return { x: s.x, y: s.y, z: s.z, t };
+    }
+  }
+  return null;
+}
+
+function setupReceive(r) {
+  const c = predictContact(S.ball, r);
+  S.contact = c ? { ...c, who: r, done: false } : null;
+  const p = P[r];
+  if (c) {
+    const right = r === 0 ? 1 : -1;
+    p.fore = (c.x - p.x) * right > -0.6;
+    // In prima persona la palla passa più vicina: resta nell'inquadratura fino all'impatto.
+    const off = (r === 0 && VIEW === 'fp' ? 0.5 : 0.75) * (p.fore ? 1 : -1) * right;
+    p.tx = clamp(c.x - off, -9, 9);
+    p.tz = c.z + sideZ(r) * 0.35;
+    p.tz = r === 0 ? clamp(p.tz, -HL - 3.4, -1.5) : clamp(p.tz, 1.5, HL + 3.4);
+    p.react = human(r) ? 0 : L().react;
+  }
+}
+
+function launch(who, v, isServe) {
+  const b = S.ball;
+  Object.assign(b, v);
+  b.bounces = 0; b.lastHitter = who; b.netted = false; b.show = true; b.serve = isServe;
+  S.shotT = 0; S.phase = 'rally';
+  if (!isServe) S.rally++;
+  setupReceive(1 - who);
+  const h = P[who];
+  h.tx = clamp(h.x * 0.25, -1, 1); h.tz = homeZ(who); h.react = 0.15;
+  sfx('hit', Math.hypot(v.vx, v.vz) / 30);
+  if (human(who)) {
+    const sp = Math.hypot(v.vx, v.vy, v.vz);
+    FX.speed = Math.round(sp * 3.6); FX.speedT = 2.2;
+    spawnHit(b.x, b.y, b.z, clamp((sp - 13) / 20, 0, 1));
+  }
+}
+
+function hitBall(who, tx, tz, speed) { launch(who, solveShot(S.ball, tx, tz, speed, 0.25), false); }
+
+/** Colpo di un giocatore col braccialetto: [o] > 0 in anticipo (palla incrociata), < 0 in ritardo (lungolinea). */
+function humanHit(i, s, tc, gyro) {
+  const p = P[i];
+  const o = clamp((tc - idealTc()) / 0.2, -1.25, 1.25);
+  const dir = (p.fore ? -1 : 1) * (i === 0 ? 1 : -1);
+  const tx = dir * o * 3.6 + gauss() * 0.35;
+  const tz = -sideZ(i) * (6.3 + s * 4.3 + gauss() * 0.35);
+  hitBall(i, tx, tz, 13 + s * 17);
+  const st = S.st[i];
+  st.hits++; st.maxGyro = Math.max(st.maxGyro, gyro || 0);
+  if (Math.abs(o) < 0.3) { st.perfect++; S.fb = T.perfect; } else if (o > 0) { st.early++; S.fb = T.early; } else { st.late++; S.fb = T.late; }
+  if (s > 0.85 && Math.abs(o) < 0.5) S.fb = T.bomb;
+  S.fbT = 1.1; S.fbWho = i;
+  S.lastHit = { who: i, fore: p.fore, at: performance.now(), checked: false };
+}
+
+function cpuHit() {
+  const lv = L(), h = P[0], b = S.ball;
+  let tx = Math.random() < lv.aim ? (h.x > 0 ? -1 : 1) * rnd(1.8, 3.7) : rnd(-3.2, 3.2);
+  let tz = -rnd(6.3, 10.6);
+  tx += gauss() * lv.noise * 0.6; tz += gauss() * lv.noise * 0.7;
+  if (Math.random() < lv.err) { if (Math.random() < 0.5) tx = (tx >= 0 ? 1 : -1) * rnd(4.4, 5.3); else tz = -rnd(12.2, 13.6); }
+  hitBall(1, tx, tz, lv.spd + rnd(-2, 4));
+}
+
+function toss(who, s, gyro) {
+  const p = P[who], b = S.ball;
+  // la palla si lancia con la mano sinistra, un po' davanti
+  Object.assign(b, { x: p.x + (who === 0 ? -0.3 : 0.3), y: 1.3, z: p.z - sideZ(who) * 0.35, vx: 0, vy: 5.2, vz: 0, bounces: 0, netted: false, show: true });
+  S.phase = 'toss'; S.timer = 0; S.tossBy = who; S.tossS = s;
+  p.serveAnim = true; p.swing = -1;
+  if (human(who)) { const st = S.st[who]; st.maxGyro = Math.max(st.maxGyro, gyro || 0); }
+}
+
+function serveHit() {
+  const who = S.tossBy, s = S.tossS, b = S.ball;
+  const sz = -sideZ(who);
+  const boxSign = -serverXSign(who, isDeuceCourt());
+  const second = S.faults === 1;
+  let risk, speed;
+  if (human(who)) {
+    risk = second ? 0.04 + 0.12 * Math.max(0, s - 0.6) : 0.07 + 0.42 * Math.max(0, s - 0.55);
+    speed = second ? 17 + s * 7 : 20 + s * 20;
+  } else {
+    risk = second ? 0.05 : 0.15;
+    speed = second ? 16 : L().srv + rnd(0, 5);
+  }
+  let tx = boxSign * rnd(0.6, 3.6), tz = sz * rnd(3.8, 6.0);
+  if (Math.random() < risk) { if (Math.random() < 0.6) tz = sz * rnd(6.7, 7.9); else tx = boxSign * rnd(4.35, 5.1); }
+  S.rally = 0;
+  launch(who, solveShot(b, tx, tz, speed, 0.16), true);
+}
+
+function inServiceBox(b) {
+  const who = b.lastHitter, sz = -sideZ(who);
+  const boxSign = -serverXSign(who, isDeuceCourt());
+  return b.z * sz > 0 && Math.abs(b.z) <= SVC + R && b.x * boxSign >= -R && Math.abs(b.x) <= HW + R;
+}
+
+function showMsg(m, sub, t = 1.8) { S.msg = m; S.sub = sub || ''; S.msgT = t; }
+
+function pointText(i) {
+  const a = S.pts[i], b = S.pts[1 - i];
+  if (a >= 3 && b >= 3) return a > b ? 'AD' : '40';
+  return ['0', '15', '30', '40'][a];
+}
+
+/** Punteggio da mostrare (sempre P1 prima) e da dire (chi serve prima, come l'arbitro). */
+function pointCall() {
+  const a = S.pts[0], c = S.pts[1], n = ['0', '15', '30', '40'];
+  if (a >= 3 && c >= 3) return a === c ? T.deuce : T.adv + ' ' + nameOf(a > c ? 0 : 1);
+  return n[a] + ' – ' + n[c];
+}
+function pointSay() {
+  const sv = S.server, a = S.pts[sv], c = S.pts[1 - sv], w = T.say.pts;
+  if (a >= 3 && c >= 3) return a === c ? T.say.deuce : T.say.adv + ' ' + nameOf(a > c ? sv : 1 - sv);
+  return a === c ? w[a] + ' ' + T.say.all : w[a] + ', ' + w[c];
+}
+
+function fault(reason) {
+  if (S.faults === 0) {
+    S.faults = 1; S.phase = 'fault'; S.timer = 0; S.contact = null;
+    showMsg(T.fault, T.second, 1.3);
+    say(T.say.fault);
+  } else pointTo(1 - S.ball.lastHitter, T.dfault, T.say.dfault);
+}
+
+function pointTo(w, reason, spoken) {
+  S.phase = 'point'; S.timer = 0; S.contact = null; S.faults = 0;
+  const l = 1 - w;
+  S.pts[w]++;
+  S.longest = Math.max(S.longest || 0, S.rally);
+  let sub, words;
+  if (S.pts[w] >= 4 && S.pts[w] - S.pts[l] >= 2) {
+    S.games[w]++; S.pts = [0, 0]; S.server = 1 - S.server;
+    sub = T.game + ' ' + nameOf(w) + '  ·  ' + S.games[0] + '–' + S.games[1];
+    words = T.say.game + ' ' + nameOf(w);
+    if (S.games[w] >= CFG.games) { S.winner = w; words = T.say.match + ', ' + nameOf(w); }
+  } else { sub = pointCall(); words = pointSay(); }
+  showMsg(reason, sub, 2.0);
+  say((spoken ? spoken + '. ' : '') + words);
+  sfx(human(w) ? 'cheer' : 'groan');
+}
+
+function setupServe() {
+  S.phase = 'serve'; S.timer = 0; S.contact = null; S.lastHit = null;
+  const srv = S.server, sx = serverXSign(srv, isDeuceCourt()), r = 1 - srv;
+  P[srv].tx = sx * 0.9; P[srv].tz = sideZ(srv) * (HL + 0.25);
+  P[r].tx = -sx * 2.7; P[r].tz = sideZ(r) * (HL + 0.7);
+  P.forEach(p => { p.react = 0; p.swing = -1; p.serveAnim = false; });
+  S.ball.show = true; S.trail = [];
+}
+
+function startMatch() {
+  Object.assign(S, { pts: [0, 0], games: [0, 0], faults: 0, winner: -1, server: 0, paused: false, rally: 0, longest: 0, st: newStats() });
+  P[0].x = 0.9; P[0].z = -HL - 0.25; P[1].x = -2.7; P[1].z = HL + 0.7;
+  setupServe();
+  showMsg(T.go, T.firstTo(CFG.games), 1.6);
+  ovRender();
+}
+
+/** Inizio di un colpo dal braccialetto [i] (0 = P1, 1 = P2), forza 0..1. */
+function onSwing(i, s, gyro) {
+  unlockAudio();
+  if (!human(i)) return;
+  if (S.phase === 'title' || S.phase === 'over') { if (gotCfg && (S.phase === 'title' || S.timer > 1.2)) startMatch(); return; }
+  if (S.paused) return;
+  const p = P[i];
+  if (S.phase === 'serve') { if (S.server === i && S.timer > 0.5) toss(i, s, gyro); return; }
+  if (S.phase === 'toss') return;
+  if (p.swing >= 0 && p.swing < 0.25) return;
+  p.swing = 0; p.serveAnim = false;
+  if (S.phase !== 'rally') return;
+  const c = S.contact;
+  sfx('whoosh');
+  if (!c || c.done || c.who !== i) return;
+  const tc = c.t - S.shotT, ideal = idealTc();
+  const close = Math.hypot(p.x - p.tx, p.z - p.tz) < 1.1;
+  if (tc <= ideal + WIN_AFTER && tc >= ideal - WIN_BEFORE && close) { c.done = true; humanHit(i, s, tc, gyro); }
+}
+
+/** Colpo riconosciuto dal braccialetto (~0,4 s dopo): con "solo il colpo giusto" un dritto al posto del rovescio è punto perso. */
+function onStroke(i, k) {
+  const h = S.lastHit;
+  if (!h || h.who !== i || h.checked || performance.now() - h.at > 1500) return;
+  h.checked = true;
+  if (k !== 0 && k !== 1) return;          // servizio, volée o "?": niente da controllare
+  const want = h.fore ? 0 : 1;
+  if (k === want) return;
+  S.st[i].wrong++;
+  if (CFG.strict && S.phase === 'rally' && S.ball.lastHitter === i) {
+    pointTo(1 - i, T.wrong, null);
+    S.sub = (want === 0 ? T.wasFore : T.wasBack) + '  ·  ' + S.sub;
+  }
+}
+
+function onKey(i, k) {
+  unlockAudio();
+  if (k === 1) {
+    if (S.paused) { S.paused = false; ovRender(); return; }
+    if (S.phase === 'title' || S.phase === 'over') onSwing(i, 0.6, 0);
+    return;
+  }
+  if (k === 2 && !['title', 'over'].includes(S.phase)) { S.paused = !S.paused; ovRender(); }
+}
+
+/** Comandi dal telefono: pausa, ripresa, partita nuova (da zero, anche a partita in corso). */
+function onCtl(a) {
+  unlockAudio();
+  if (a === 'pause') { if (!['title', 'over'].includes(S.phase)) { S.paused = true; ovRender(); } }
+  else if (a === 'resume') { S.paused = false; ovRender(); }
+  else if (a === 'start') { if (gotCfg) startMatch(); }
+}
+
+function movePlayers(dt) {
+  const fast = S.phase === 'serve' || S.phase === 'point' || S.phase === 'fault';
+  P.forEach((p, i) => {
+    if (p.swing >= 0) { p.swing += dt; if (p.swing > 0.45) p.swing = -1; }
+    if (p.react > 0) { p.react -= dt; return; }
+    const sp = fast ? 7 : (human(i) ? 7.8 : L().move);
+    const dx = p.tx - p.x, dz = p.tz - p.z, d = Math.hypot(dx, dz);
+    if (d > 1e-3) { const st = Math.min(d, sp * dt); p.x += dx / d * st; p.z += dz / d * st; }
+  });
+}
+
+function update(dt) {
+  if (S.paused) return;
+  S.timer += dt;
+  if (S.msgT > 0) S.msgT -= dt;
+  if (S.fbT > 0) S.fbT -= dt;
+  movePlayers(dt);
+  const b = S.ball;
+  switch (S.phase) {
+    case 'title': {
+      const t = performance.now() / 1000;
+      P[0].tx = Math.sin(t * 0.6) * 2; P[1].tx = Math.sin(t * 0.5 + 1) * 2;
+      b.show = false;
+      break;
+    }
+    case 'serve': {
+      const srv = P[S.server];
+      Object.assign(b, { x: srv.x + (S.server === 0 ? -0.3 : 0.3), y: 1.0, z: srv.z - sideZ(S.server) * 0.3, show: true });
+      const arrived = P.every(p => Math.hypot(p.x - p.tx, p.z - p.tz) < 0.05);
+      if (!human(S.server) && arrived && S.timer > 1.3) toss(S.server, 0.7, 0);
+      break;
+    }
+    case 'toss': {
+      b.vy -= G * dt; b.y += b.vy * dt;
+      const p = P[S.tossBy];
+      if (S.timer > 0.32 && p.swing < 0) p.swing = 0;
+      if (S.timer >= 0.5) serveHit();
+      break;
+    }
+    case 'rally': {
+      S.shotT += dt;
+      const ev = stepBall(b, dt);
+      S.trail.push({ x: b.x, y: b.y, z: b.z }); if (S.trail.length > 9) S.trail.shift();
+      if (ev === 'net') { sfx('net'); if (b.serve) fault('net'); else pointTo(1 - b.lastHitter, T.net); return; }
+      if (ev === 'bounce') {
+        b.bounces++;
+        sfx('bounce');
+        if (b.bounces === 1) {
+          const recv = -sideZ(b.lastHitter);
+          if (b.serve) { if (!inServiceBox(b)) { fault('out'); return; } }
+          else if (!(b.z * recv > 0 && Math.abs(b.x) <= HW + R && Math.abs(b.z) <= HL + R)) { pointTo(1 - b.lastHitter, T.out); return; }
+        } else { pointTo(b.lastHitter, b.serve ? T.ace : T.winner); return; }
+      }
+      const c = S.contact;
+      if (c && !c.done && c.who === 1 && !human(1)) {
+        const p = P[1];
+        if (c.t - S.shotT < 0.2 && p.swing < 0) p.swing = 0;
+        if (S.shotT >= c.t) {
+          c.done = true;
+          if (Math.hypot(p.x - p.tx, p.z - p.tz) < 0.7) cpuHit();
+        }
+      }
+      if (Math.abs(b.z) > HL + 9 || Math.abs(b.x) > 14) pointTo(b.lastHitter, b.serve ? T.ace : T.winner);
+      break;
+    }
+    case 'fault':
+    case 'point': {
+      stepBall(b, dt);
+      if (S.phase === 'fault' && S.timer > 1.4) setupServe();
+      else if (S.phase === 'point' && S.timer > 2.1) {
+        if (S.winner >= 0) { S.phase = 'over'; S.timer = 0; b.show = false; ovRender(); }
+        else setupServe();
+      }
+      break;
+    }
+    case 'over': stepBall(b, dt); break;
+  }
+}
+
+/* ----------------------------- Audio e voce -------------------------------- */
+let AC = null, NOISE = null, OUT = null;
+/** Volume del gioco (0-100), scelto sul telefono: vale per i suoni e per la voce dell'arbitro. */
+function applyVol() { if (OUT) OUT.gain.value = Math.pow(CFG.vol / 100, 2) * 1.5; }
+function unlockAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      OUT = AC.createGain(); OUT.connect(AC.destination); applyVol();
+      NOISE = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+      const d = NOISE.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) {}
+}
+function noise(dur, freq, q, gain, t0 = 0, sweepTo) {
+  const t = AC.currentTime + t0, src = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  src.buffer = NOISE; f.type = 'bandpass'; f.frequency.setValueAtTime(freq, t); f.Q.value = q;
+  if (sweepTo) f.frequency.exponentialRampToValueAtTime(sweepTo, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + Math.min(0.05, dur / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f).connect(g).connect(OUT); src.start(t, Math.random()); src.stop(t + dur + 0.05);
+}
+function tone(type, f0, f1, dur, gain) {
+  const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(OUT); o.start(t); o.stop(t + dur + 0.02);
+}
+function sfx(type, p = 1) {
+  if (!AC || AC.state !== 'running') return;
+  try {
+    if (type === 'hit') { tone('triangle', 1100, 180, 0.07, 0.35 + 0.3 * clamp(p, 0, 1)); noise(0.06, 2500, 1.2, 0.35); }
+    else if (type === 'bounce') tone('sine', 220, 70, 0.09, 0.35);
+    else if (type === 'net') noise(0.25, 300, 0.8, 0.3);
+    else if (type === 'whoosh') noise(0.18, 600, 1.5, 0.12, 0, 2400);
+    else if (type === 'cheer') { noise(1.6, 1300, 0.6, 0.18); noise(1.4, 700, 0.5, 0.12, 0.1); }
+    else if (type === 'groan') noise(1.0, 350, 0.7, 0.14, 0, 200);
+  } catch (e) {}
+}
+function say(text) {
+  if (!CFG.voice || !text) return;
+  // Dentro TSM sulla TV (Android TV): parla la TV, col volume del gioco.
+  if (window.TSMDisplay && TSMDisplay.speak) {
+    if (CFG.vol > 0) setTimeout(() => { try { TSMDisplay.speak(text, T.say.voice, CFG.vol / 100); } catch (e) {} }, 350);
+    return;
+  }
+  // In un browser collegato al telefono (TV Bro, portatile...) la sintesi vocale spesso non c'è: la frase la dice il
+  // telefono, con la voce dell'arbitro delle partite. Solo l'anteprima senza telefono usa quella del browser.
+  if (!DEMO && location.protocol !== 'file:') {
+    setTimeout(() => { fetch('/arena/say?t=' + encodeURIComponent(text), { cache: 'no-store' }).catch(() => {}); }, 350);
+    return;
+  }
+  if (!window.speechSynthesis) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = T.say.voice;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith(T.say.voice.slice(0, 2)));
+    if (v) u.voice = v;
+    u.rate = 1.05;
+    u.volume = CFG.vol / 100;
+    setTimeout(() => speechSynthesis.speak(u), 350);   // dopo il suono del punto
+  } catch (e) {}
+}
+
+/* ----------------------------- Disegno -------------------------------- */
+// Due visuali: "fp" = prima persona (occhi del Giocatore 1, racchetta in primo piano), "tv" = da dietro come in TV.
+// Da soli si gioca in prima persona; in due la visuale TV (si vedono tutti e due). Tasto V per cambiarla.
+let CV, CTX, W = 1280, H = 720, FOC = 1, VIEW = 'fp', viewForced = false;
+const CAM = { x: 0, y: 1.75, z: -14, pitch: 0.05 };
+const NEAR = 0.12;
+const FX = { parts: [], flash: 0, shake: 0, speed: 0, speedT: 0, crowd: null, glow: null, t: 0 };
+const fp = () => VIEW === 'fp';
+function autoView() { if (!viewForced) VIEW = CFG.two ? 'tv' : 'fp'; }
+
+function toCam(x, y, z) {
+  const rx = x - CAM.x, ry = y - CAM.y, rz = z - CAM.z, c = Math.cos(CAM.pitch), s = Math.sin(CAM.pitch);
+  return [rx, ry * c + rz * s, rz * c - ry * s];
+}
+function projC(v) { const f = FOC / v[2]; return { x: W / 2 + v[0] * f, y: H / 2 - v[1] * f, s: f, d: v[2] }; }
+/** Punto del mondo sullo schermo; null se è dietro la telecamera. */
+function proj(x, y, z) { const v = toCam(x, y, z); return v[2] < NEAR ? null : projC(v); }
+function clipNear(v) {
+  const out = [];
+  for (let i = 0; i < v.length; i++) {
+    const a = v[i], b = v[(i + 1) % v.length], ain = a[2] >= NEAR, bin = b[2] >= NEAR;
+    if (ain) out.push(a);
+    if (ain !== bin) { const t = (NEAR - a[2]) / (b[2] - a[2]); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, NEAR]); }
+  }
+  return out;
+}
+/** Poligono nel mondo ([x,y,z]...), tagliato davanti alla telecamera. */
+function polyW(pts, fill) {
+  const v = clipNear(pts.map(p => toCam(p[0], p[1], p[2])));
+  if (v.length < 3) return false;
+  CTX.beginPath();
+  v.forEach((c, i) => { const q = projC(c); i ? CTX.lineTo(q.x, q.y) : CTX.moveTo(q.x, q.y); });
+  CTX.closePath(); CTX.fillStyle = fill; CTX.fill();
+  return true;
+}
+const ground = (pts, fill) => polyW(pts.map(p => [p[0], 0, p[1]]), fill);
+function lineW(x1, z1, x2, z2, w = 0.05) {
+  const hw = w / 2;
+  if (x1 === x2) ground([[x1 - hw, z1], [x1 + hw, z1], [x2 + hw, z2], [x2 - hw, z2]], '#f4f7f2');
+  else ground([[x1, z1 - hw], [x2, z2 - hw], [x2, z2 + hw], [x1, z1 + hw]], '#f4f7f2');
+}
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = Math.round(innerWidth * dpr); H = Math.round(innerHeight * dpr);
+  const sc = Math.min(1, 1920 / W); W = Math.round(W * sc); H = Math.round(H * sc);
+  CV.width = W; CV.height = H;
+  buildAssets();
+}
+/** Pubblico (motivo ripetuto) e alone dei riflettori, preparati una volta. */
+function buildAssets() {
+  const c = document.createElement('canvas'); c.width = 240; c.height = 120;
+  const g = c.getContext('2d');
+  g.fillStyle = '#141a2c'; g.fillRect(0, 0, 240, 120);
+  const shirts = ['#e53935', '#ffd600', '#f5f5f5', '#42a5f5', '#66bb6a', '#ab47bc', '#ff8a65', '#26c6da', '#37474f', '#5c6bc0'];
+  const skins = ['#f1c7a5', '#d9a07a', '#a86f4c', '#6d4530', '#f5d3b8'];
+  for (let row = 0; row < 6; row++) {
+    for (let k = 0; k < 12; k++) {
+      const x = k * 20 + (row % 2) * 10 + Math.random() * 3, y = row * 20 + 6;
+      g.fillStyle = shirts[(Math.random() * shirts.length) | 0];
+      g.beginPath(); g.ellipse(x + 6, y + 12, 7, 6, 0, 0, 7); g.fill();
+      g.fillStyle = skins[(Math.random() * skins.length) | 0];
+      g.beginPath(); g.arc(x + 6, y + 3, 4, 0, 7); g.fill();
+    }
+  }
+  FX.crowd = CTX.createPattern(c, 'repeat');
+  const l = document.createElement('canvas'); l.width = l.height = 128;
+  const lg = l.getContext('2d'), rg = lg.createRadialGradient(64, 64, 0, 64, 64, 64);
+  rg.addColorStop(0, 'rgba(255,255,240,1)'); rg.addColorStop(0.15, 'rgba(255,250,220,.55)'); rg.addColorStop(1, 'rgba(255,240,200,0)');
+  lg.fillStyle = rg; lg.fillRect(0, 0, 128, 128);
+  FX.glow = l;
+}
+
+function updateCamera(dt) {
+  autoView();
+  const k = 1 - Math.exp(-dt * 7);
+  let tx, ty, tz, tp;
+  if (fp()) {
+    const p = P[0];
+    tx = p.x; ty = 1.75; tz = p.z - 1.25; tp = 0.06;
+    // Al servizio si alza lo sguardo verso il lancio di palla.
+    if (S.phase === 'toss' && S.tossBy === 0) tp = -0.38;
+    else if (S.phase === 'serve' && S.server === 0) tp = 0.0;
+    const moving = Math.hypot(p.tx - p.x, p.tz - p.z) > 0.15;
+    if (moving && !S.paused) ty += Math.sin(FX.t * 13) * 0.025;
+    FOC = H * 0.92;
+  } else {
+    tx = P[0].x * 0.3; ty = 8.5; tz = -25; tp = 0.36;
+    FOC = Math.min(H * 1.3, W * 0.98);
+  }
+  CAM.x += (tx - CAM.x) * k; CAM.y += (ty - CAM.y) * k; CAM.z += (tz - CAM.z) * k; CAM.pitch += (tp - CAM.pitch) * k * 0.8;
+  if (Math.abs(CAM.z - tz) > 6) { CAM.x = tx; CAM.y = ty; CAM.z = tz; CAM.pitch = tp; }  // cambio di visuale: salto
+}
+
+function drawSky() {
+  const g = CTX.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#02040b'); g.addColorStop(0.45, '#0b1430'); g.addColorStop(1, '#16244a');
+  CTX.fillStyle = g; CTX.fillRect(0, 0, W, H);
+}
+function drawStadium() {
+  // terreno attorno, muri e tribune
+  ground([[-40, -45], [40, -45], [40, 45], [-40, 45]], '#123d2a');
+  const zb = HL + 7.5, xs = DW + 8;
+  polyW([[-40, 0, zb], [40, 0, zb], [40, 1.3, zb], [-40, 1.3, zb]], '#0d5c38');                      // muro di fondo
+  polyW([[-40, 1.3, zb], [40, 1.3, zb], [40, 15, zb + 16], [-40, 15, zb + 16]], FX.crowd);          // tribuna di fondo
+  polyW([[-40, 1.3, zb], [40, 1.3, zb], [40, 15, zb + 16], [-40, 15, zb + 16]], 'rgba(5,10,25,.35)');
+  for (const sg of [-1, 1]) {
+    polyW([[sg * xs, 0, -HL - 12], [sg * xs, 0, zb], [sg * xs, 1.3, zb], [sg * xs, 1.3, -HL - 12]], '#0b5233');
+    polyW([[sg * xs, 1.3, -HL - 12], [sg * xs, 1.3, zb], [sg * (xs + 14), 13, zb], [sg * (xs + 14), 13, -HL - 12]], FX.crowd);
+    polyW([[sg * xs, 1.3, -HL - 12], [sg * xs, 1.3, zb], [sg * (xs + 14), 13, zb], [sg * (xs + 14), 13, -HL - 12]], 'rgba(5,10,25,.45)');
+  }
+  // scritte sul muro di fondo
+  const q = proj(0, 0.65, zb - 0.02);
+  if (q) {
+    CTX.fillStyle = 'rgba(255,255,255,.88)'; CTX.font = `800 ${Math.max(8, 0.75 * q.s)}px system-ui`; CTX.textAlign = 'center'; CTX.textBaseline = 'middle';
+    for (const [x, t] of [[-9, 'TENNIS SCORE MANAGER'], [0, 'TSM ARENA'], [9, 'TENNIS SCORE MANAGER']]) { const p = proj(x, 0.65, zb - 0.02); if (p) CTX.fillText(t, p.x, p.y); }
+  }
+  // torri dei riflettori
+  for (const [x, z] of [[-(DW + 13), HL + 11], [DW + 13, HL + 11], [-(DW + 13), -HL - 6], [DW + 13, -HL - 6]]) {
+    const b = proj(x, 0, z), t = proj(x, 24, z);
+    if (!b || !t) continue;
+    CTX.strokeStyle = '#2a3550'; CTX.lineWidth = Math.max(1.5, 0.4 * t.s); CTX.beginPath(); CTX.moveTo(b.x, b.y); CTX.lineTo(t.x, t.y); CTX.stroke();
+    CTX.fillStyle = '#e8ecf5'; const w = 3 * t.s, h = 1.4 * t.s; CTX.fillRect(t.x - w / 2, t.y - h, w, h);
+    CTX.globalCompositeOperation = 'lighter';
+    const r = Math.max(30, 18 * t.s); CTX.drawImage(FX.glow, t.x - r, t.y - h / 2 - r, r * 2, r * 2);
+    CTX.globalCompositeOperation = 'source-over';
+  }
+}
+function drawCourt() {
+  ground([[-DW - 3.6, -HL - 6.4], [DW + 3.6, -HL - 6.4], [DW + 3.6, HL + 6.4], [-DW - 3.6, HL + 6.4]], '#2c6e9e');
+  const far = proj(0, 0, HL), near = proj(0, 0, Math.max(-HL, CAM.z + 2));
+  let fill = '#25589a';
+  if (far && near) { const g = CTX.createLinearGradient(0, far.y, 0, near.y); g.addColorStop(0, '#2d66ad'); g.addColorStop(1, '#1f4f8f'); fill = g; }
+  ground([[-DW, -HL], [DW, -HL], [DW, HL], [-DW, HL]], fill);
+  lineW(-DW, -HL, DW, -HL, 0.1); lineW(-DW, HL, DW, HL, 0.1);
+  [-DW, -HW, HW, DW].forEach(x => lineW(x, -HL, x, HL));
+  lineW(-HW, -SVC, HW, -SVC); lineW(-HW, SVC, HW, SVC); lineW(0, -SVC, 0, SVC);
+  lineW(0, -HL, 0, -HL + 0.2); lineW(0, HL - 0.2, 0, HL);
+  // luce dei riflettori sul campo
+  const c = proj(0, 0, 3);
+  if (c) {
+    const g = CTX.createRadialGradient(c.x, c.y, 0, c.x, c.y, W * 0.6);
+    g.addColorStop(0, 'rgba(255,255,235,.10)'); g.addColorStop(1, 'rgba(255,255,235,0)');
+    CTX.fillStyle = g; CTX.fillRect(0, 0, W, H);
+  }
+}
+function drawNet() {
+  const x0 = -DW - 0.914, x1 = DW + 0.914;
+  ground([[x0, 0.05], [x1, 0.05], [x1, 0.6], [x0, 0.6]], 'rgba(0,0,0,.18)');                       // ombra
+  polyW([[x0, 0, 0], [x1, 0, 0], [x1, 1.07, 0], [0, 0.914, 0], [x0, 1.07, 0]], 'rgba(12,16,26,.55)');
+  CTX.strokeStyle = 'rgba(255,255,255,.13)'; CTX.lineWidth = 1;
+  for (let x = x0; x <= x1; x += 0.3) { const p = proj(x, 0, 0), q = proj(x, netH(x), 0); if (p && q) { CTX.beginPath(); CTX.moveTo(p.x, p.y); CTX.lineTo(q.x, q.y); CTX.stroke(); } }
+  for (let y = 0.12; y < 0.9; y += 0.12) { const p = proj(x0, y, 0), q = proj(x1, y, 0); if (p && q) { CTX.beginPath(); CTX.moveTo(p.x, p.y); CTX.lineTo(q.x, q.y); CTX.stroke(); } }
+  const a = proj(x0, 1.07, 0), m = proj(0, 0.914, 0), b = proj(x1, 1.07, 0);
+  if (a && m && b) {
+    CTX.strokeStyle = '#fff'; CTX.lineWidth = Math.max(2, m.s * 0.07);
+    CTX.beginPath(); CTX.moveTo(a.x, a.y); CTX.lineTo(m.x, m.y); CTX.lineTo(b.x, b.y); CTX.stroke();
+    const s0 = proj(0, 0, 0); if (s0) { CTX.lineWidth = Math.max(2, m.s * 0.05); CTX.beginPath(); CTX.moveTo(m.x, m.y); CTX.lineTo(s0.x, s0.y); CTX.stroke(); }
+  }
+  for (const x of [x0, x1]) { const p = proj(x, 0, 0), q = proj(x, 1.1, 0); if (p && q) { CTX.strokeStyle = '#c9ced8'; CTX.lineWidth = Math.max(2, p.s * 0.09); CTX.beginPath(); CTX.moveTo(p.x, p.y); CTX.lineTo(q.x, q.y); CTX.stroke(); } }
+}
+function rr(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+/** Racchetta in unità locali (manico all'origine, testa verso -y), lunga ~0,68. */
+function racketShape(g, frame, alpha = 1) {
+  g.globalAlpha *= alpha;
+  g.fillStyle = '#20232b'; rr(g, -0.018, -0.02, 0.036, 0.2, 0.012); g.fill();                       // manico
+  g.strokeStyle = frame; g.lineWidth = 0.022;
+  g.beginPath(); g.moveTo(0, -0.02); g.lineTo(-0.07, -0.33); g.moveTo(0, -0.02); g.lineTo(0.07, -0.33); g.stroke();   // cuore
+  g.beginPath(); g.ellipse(0, -0.5, 0.12, 0.17, 0, 0, 7);
+  g.fillStyle = 'rgba(235,240,250,.18)'; g.fill(); g.stroke();
+  g.save(); g.beginPath(); g.ellipse(0, -0.5, 0.11, 0.16, 0, 0, 7); g.clip();
+  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 0.004;
+  for (let i = -5; i <= 5; i++) { g.beginPath(); g.moveTo(i * 0.02, -0.68); g.lineTo(i * 0.02, -0.32); g.stroke(); }
+  for (let i = -8; i <= 8; i++) { g.beginPath(); g.moveTo(-0.13, -0.5 + i * 0.02); g.lineTo(0.13, -0.5 + i * 0.02); g.stroke(); }
+  g.restore();
+}
+function drawPlayer(p, i) {
+  const base = proj(p.x, 0, p.z);
+  if (!base) return;
+  const sc = base.s, g = CTX;
+  g.fillStyle = 'rgba(0,0,0,.32)'; g.beginPath(); g.ellipse(base.x, base.y, 0.5 * sc, 0.13 * sc, 0, 0, 7); g.fill();
+  g.save(); g.translate(base.x, base.y); g.scale(sc, sc);
+  const back = i === 0 && !fp(), hs = back ? 1 : -1;
+  const moving = Math.hypot(p.tx - p.x, p.tz - p.z) > 0.1;
+  const step = moving && !S.paused ? Math.sin(FX.t * 14) * 0.12 : 0;
+  // gambe e scarpe
+  const skin = '#e3a983', skinD = '#c98d66';
+  for (const [x, st] of [[-0.15, step], [0.05, -step]]) {
+    const lg = g.createLinearGradient(x, 0, x + 0.12, 0); lg.addColorStop(0, skin); lg.addColorStop(1, skinD);
+    g.fillStyle = lg; rr(g, x + st * 0.4, -0.88, 0.11, 0.82, 0.04); g.fill();
+    g.fillStyle = '#f7f7f7'; rr(g, x - 0.02 + st * 0.4, -0.1, 0.16, 0.1, 0.04); g.fill();
+    g.fillStyle = p.shirt; g.fillRect(x - 0.02 + st * 0.4, -0.04, 0.16, 0.02);
+  }
+  g.fillStyle = p.shorts; rr(g, -0.23, -1.02, 0.46, 0.32, 0.05); g.fill();
+  // busto con ombra laterale
+  const tg = g.createLinearGradient(-0.25, 0, 0.25, 0); tg.addColorStop(0, p.shirt); tg.addColorStop(0.7, p.shirt); tg.addColorStop(1, 'rgba(0,0,0,.35)');
+  g.fillStyle = p.shirt; rr(g, -0.25, -1.52, 0.5, 0.58, 0.12); g.fill();
+  g.fillStyle = tg; rr(g, -0.25, -1.52, 0.5, 0.58, 0.12); g.fill();
+  // braccio libero
+  g.strokeStyle = skin; g.lineCap = 'round'; g.lineWidth = 0.09;
+  g.beginPath(); g.moveTo(-0.24 * hs, -1.42); g.quadraticCurveTo(-0.36 * hs, -1.2, -0.28 * hs, -1.0); g.stroke();
+  // testa, capelli, fascia
+  g.fillStyle = skin; g.beginPath(); g.arc(0, -1.68, 0.13, 0, 7); g.fill();
+  g.fillStyle = p.hair; g.beginPath();
+  if (back) g.arc(0, -1.7, 0.136, 0, 7); else g.arc(0, -1.73, 0.136, Math.PI * 1.05, Math.PI * 1.95);
+  g.fill();
+  g.fillStyle = '#fff'; g.fillRect(-0.135, -1.77, 0.27, 0.035);
+  if (!back) { g.fillStyle = '#222'; g.fillRect(-0.06, -1.7, 0.025, 0.025); g.fillRect(0.035, -1.7, 0.025, 0.025); }
+  // braccio della racchetta e racchetta
+  let ang;
+  const u = p.swing >= 0 ? clamp(p.swing / 0.32, 0, 1) : -1;
+  const e = u < 0 ? 0 : 1 - Math.pow(1 - u, 2);
+  if (p.serveAnim && (S.phase === 'toss' || S.phase === 'rally')) ang = u < 0 ? 2.6 : 2.9 - e * 3.9;
+  else if (u >= 0) ang = p.fore ? 1.9 - e * 3.8 : -1.9 + e * 3.8;
+  else ang = (S.phase === 'serve' && S.server === i) ? 0.5 : -0.35;
+  const sx = 0.23 * hs, sy = -1.42, a = ang * hs;
+  const hx = sx + Math.sin(a) * 0.55, hy = sy + Math.cos(a) * 0.55;
+  g.beginPath(); g.moveTo(sx, sy); g.lineTo(hx, hy); g.stroke();
+  g.save(); g.translate(hx, hy); g.rotate(Math.PI - a); racketShape(g, i === 0 ? '#d4a900' : '#c62828'); g.restore();
+  g.restore();
+}
+function drawShadow() {
+  const b = S.ball, q = proj(b.x, 0, b.z);
+  if (!q) return;
+  const k = clamp(1 - b.y / 6, 0.3, 1);
+  CTX.fillStyle = `rgba(0,0,0,${0.38 * k})`; CTX.beginPath(); CTX.ellipse(q.x, q.y, Math.max(2, 0.07 * q.s), Math.max(1, 0.025 * q.s), 0, 0, 7); CTX.fill();
+}
+function drawBall() {
+  const b = S.ball;
+  if (S.phase === 'rally' || S.phase === 'point' || S.phase === 'fault') {
+    let prev = null;
+    S.trail.forEach((t, k) => {
+      const q = proj(t.x, t.y, t.z);
+      if (q && prev) {
+        CTX.strokeStyle = `rgba(214,255,90,${(k / S.trail.length) * 0.45})`; CTX.lineCap = 'round';
+        CTX.lineWidth = Math.max(1.5, 0.06 * q.s * (k / S.trail.length));
+        CTX.beginPath(); CTX.moveTo(prev.x, prev.y); CTX.lineTo(q.x, q.y); CTX.stroke();
+      }
+      prev = q;
+    });
+  }
+  const q = proj(b.x, b.y, b.z);
+  if (!q) return;
+  const r = Math.max(3.5, 0.06 * q.s);
+  CTX.globalCompositeOperation = 'lighter';
+  CTX.drawImage(FX.glow, q.x - r * 3, q.y - r * 3, r * 6, r * 6);
+  CTX.globalCompositeOperation = 'source-over';
+  const g = CTX.createRadialGradient(q.x - r * 0.35, q.y - r * 0.35, r * 0.1, q.x, q.y, r);
+  g.addColorStop(0, '#f6ffc0'); g.addColorStop(0.5, '#d4f53c'); g.addColorStop(1, '#93b51c');
+  CTX.fillStyle = g; CTX.beginPath(); CTX.arc(q.x, q.y, r, 0, 7); CTX.fill();
+  if (r > 6) { CTX.strokeStyle = 'rgba(255,255,255,.7)'; CTX.lineWidth = r * 0.12; CTX.beginPath(); CTX.arc(q.x - r * 0.9, q.y, r * 0.8, -0.9, 0.9); CTX.stroke(); }
+}
+/** Bersaglio dove colpire: un anello che si stringe sul punto d'impatto e diventa verde nel momento giusto. */
+function drawTarget() {
+  const c = S.contact;
+  if (S.phase !== 'rally' || !c || c.done || !human(c.who) || (c.who === 1 && fp())) return;
+  const tc = c.t - S.shotT, d = tc - idealTc();
+  if (tc > 1.0 || d < -WIN_BEFORE) return;
+  const q = proj(c.x, Math.max(0.35, c.y), c.z);
+  if (!q) return;
+  const base = clamp(0.12 * q.s, 10, H * 0.07), r = base * (1 + clamp(d, 0, 1) * 2.2);
+  const good = Math.abs(d) < 0.07;
+  CTX.strokeStyle = good ? 'rgba(125,255,156,.95)' : `rgba(255,211,107,${0.35 + 0.5 * (1 - clamp(d, 0, 1))})`;
+  CTX.lineWidth = Math.max(2, base * 0.12);
+  CTX.beginPath(); CTX.arc(q.x, q.y, r, 0, 7); CTX.stroke();
+  CTX.lineWidth = Math.max(1, base * 0.05); CTX.beginPath(); CTX.arc(q.x, q.y, base, 0, 7); CTX.stroke();
+}
+function spawnHit(x, y, z, power) {
+  for (let i = 0; i < 18; i++) {
+    FX.parts.push({ x, y, z, vx: gauss() * 2.5, vy: Math.random() * 3 + 1, vz: gauss() * 2.5, life: 0.45 + Math.random() * 0.3, c: Math.random() < 0.5 ? '#f6ffc0' : '#ffffff' });
+  }
+  FX.flash = 0.18; FX.shake = 0.08 + 0.2 * Math.max(0, power - 0.6);
+}
+function updateFx(dt) {
+  FX.t += dt;
+  for (const p of FX.parts) { p.vy -= 9.8 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; p.life -= dt; }
+  FX.parts = FX.parts.filter(p => p.life > 0 && p.y > 0);
+  FX.flash = Math.max(0, FX.flash - dt); FX.shake = Math.max(0, FX.shake - dt * 0.6); FX.speedT = Math.max(0, FX.speedT - dt);
+}
+function drawFx() {
+  CTX.globalCompositeOperation = 'lighter';
+  for (const p of FX.parts) {
+    const q = proj(p.x, p.y, p.z); if (!q) continue;
+    CTX.globalAlpha = clamp(p.life * 2, 0, 1); CTX.fillStyle = p.c;
+    CTX.beginPath(); CTX.arc(q.x, q.y, clamp(0.01 * q.s, 1.5, 5), 0, 7); CTX.fill();
+  }
+  CTX.globalAlpha = 1; CTX.globalCompositeOperation = 'source-over';
+}
+
+/** Racchetta in prima persona: segue il colpo (preparazione, impatto, chiusura sopra la spalla). */
+function racketPose() {
+  const p = P[0], t = FX.t;
+  const u = p.swing >= 0 ? clamp(p.swing / 0.36, 0, 1) : -1;
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const path = (keys, k) => {   // keys: [[x, y, angolo]...] equidistanti
+    const n = keys.length - 1, f = clamp(k, 0, 1) * n, i = Math.min(n - 1, Math.floor(f)), r = f - i;
+    const e = r * r * (3 - 2 * r);
+    return keys[i].map((v, j) => lerp(v, keys[i + 1][j], e));
+  };
+  const serving = p.serveAnim && (S.phase === 'toss' || S.phase === 'rally');
+  if (serving) {
+    if (u < 0) return [0.74, 0.62, 2.7];
+    return path([[0.74, 0.62, 2.7], [0.62, 0.22, 0.1], [0.42, 0.6, -1.6], [0.26, 1.1, -2.6]], u);
+  }
+  const sg = p.fore ? 1 : -1, X = x => (sg > 0 ? x : 1 - x);
+  if (u >= 0) {
+    const k = path([[0.95, 1.02, 1.5], [0.82, 0.86, 0.6], [0.6, 0.72, -0.05], [0.38, 0.62, -1.2], [0.24, 0.5, -2.3]], u);
+    return [X(k[0]), k[1], k[2] * sg];
+  }
+  // pronto: racchetta davanti, un po' verso il lato del colpo che arriva
+  const c = S.contact, wait = c && !c.done && c.who === 0 && S.phase === 'rally';
+  const prep = wait ? clamp(1 - (c.t - S.shotT) / 0.9, 0, 1) : 0;
+  const bob = Math.sin(t * 2.2) * 0.008;
+  return [X(lerp(0.6, 0.9, prep)), lerp(0.98, 0.98, prep) + bob, lerp(-0.25, 1.3, prep) * sg];
+}
+function drawFirstPerson() {
+  const [hx, hy, a] = racketPose(), L_ = H * 0.72;
+  const serving = P[0].serveAnim && (S.phase === 'toss' || S.phase === 'rally');
+  const side = serving ? 1 : (P[0].fore ? 1 : -1);
+  const draw = (x, y, ang, alpha) => {
+    const px = x * W, py = y * H, c = Math.cos(ang), sn = Math.sin(ang);
+    const loc = (lx, ly) => [px + (lx * c - ly * sn) * L_, py + (lx * sn + ly * c) * L_];
+    CTX.save(); CTX.globalAlpha = alpha;
+    // braccio: dal bordo in basso (spalla fuori campo) al polso, più largo verso la spalla
+    const [wx, wy] = loc(0, 0.13), ax = W / 2 + side * W * 0.3, ay = H * 1.35;
+    const dx = wx - ax, dy = wy - ay, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+    const w0 = H * 0.11, w1 = H * 0.05;
+    const ag = CTX.createLinearGradient(wx + nx * w1, wy + ny * w1, wx - nx * w1, wy - ny * w1);
+    ag.addColorStop(0, '#e2a882'); ag.addColorStop(1, '#b77a54');
+    CTX.fillStyle = ag; CTX.beginPath();
+    CTX.moveTo(ax + nx * w0, ay + ny * w0); CTX.lineTo(wx + nx * w1, wy + ny * w1);
+    CTX.lineTo(wx - nx * w1, wy - ny * w1); CTX.lineTo(ax - nx * w0, ay - ny * w0); CTX.closePath(); CTX.fill();
+    // braccialetto (lo stick TSM) poco sotto il polso
+    const bx = wx - dx / len * H * 0.05, by = wy - dy / len * H * 0.05;
+    CTX.save(); CTX.translate(bx, by); CTX.rotate(Math.atan2(dy, dx) + Math.PI / 2);
+    CTX.fillStyle = '#1b1e26'; rr(CTX, -w1 * 1.25, -H * 0.03, w1 * 2.5, H * 0.06, H * 0.01); CTX.fill();
+    CTX.fillStyle = '#c6f432'; rr(CTX, -w1 * 0.7, -H * 0.019, w1 * 1.4, H * 0.038, H * 0.005); CTX.fill();
+    CTX.restore();
+    // racchetta e mano
+    CTX.translate(px, py); CTX.rotate(ang); CTX.scale(L_, L_);
+    racketShape(CTX, '#d4a900');
+    CTX.fillStyle = '#e3a983'; CTX.beginPath(); CTX.ellipse(0, 0.07, 0.065, 0.08, 0, 0, 7); CTX.fill();
+    CTX.fillStyle = 'rgba(0,0,0,.12)'; CTX.beginPath(); CTX.ellipse(0.02, 0.09, 0.04, 0.05, 0, 0, 7); CTX.fill();
+    CTX.restore();
+  };
+  // scia del movimento
+  if (P[0].swing >= 0 && P[0].swing < 0.36) {
+    const save = P[0].swing;
+    for (const dtb of [0.07, 0.035]) { P[0].swing = Math.max(0, save - dtb); const [x, y, an] = racketPose(); draw(x, y, an, 0.12); }
+    P[0].swing = save;
+  }
+  draw(hx, hy, a, 1);
+}
+function drawHUD() {
+  const g = CTX, u = H / 100;
+  // tabellone in stile TV
+  const bx = 2.5 * u, by = 2.5 * u, rh = 5.4 * u, w = 42 * u;
+  const bg = g.createLinearGradient(0, by, 0, by + rh * 2);
+  bg.addColorStop(0, 'rgba(20,28,48,.92)'); bg.addColorStop(1, 'rgba(8,12,24,.92)');
+  g.fillStyle = bg; rr(g, bx, by, w, rh * 2 + 1.2 * u, 1.2 * u); g.fill();
+  g.strokeStyle = 'rgba(198,244,50,.35)'; g.lineWidth = 0.2 * u; g.stroke();
+  g.fillStyle = '#c6f432'; g.fillRect(bx + 34 * u, by, 8 * u, rh * 2 + 1.2 * u);
+  g.textBaseline = 'middle';
+  [0, 1].forEach(i => {
+    const y = by + 0.6 * u + rh * i + rh / 2;
+    g.fillStyle = P[i].shirt; g.fillRect(bx + 1.2 * u, y - 1.7 * u, 0.8 * u, 3.4 * u);
+    g.fillStyle = '#fff'; g.font = `700 ${2.9 * u}px system-ui`; g.textAlign = 'left';
+    let n = nameOf(i); if (n.length > 12) n = n.slice(0, 11) + '…';
+    g.fillText(n.toUpperCase(), bx + 3 * u, y);
+    if (S.phase !== 'title' && S.server === i) { g.fillStyle = '#c6f432'; g.beginPath(); g.arc(bx + 26 * u, y, 0.8 * u, 0, 7); g.fill(); }
+    g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillText(S.games[i], bx + 30.5 * u, y);
+    g.fillStyle = '#0b1220'; g.font = `800 ${2.9 * u}px system-ui`; g.fillText(pointText(i), bx + 38 * u, y);
+  });
+  g.textAlign = 'left'; g.font = `500 ${1.8 * u}px system-ui`; g.fillStyle = 'rgba(255,255,255,.6)';
+  g.fillText((CFG.two ? '' : T.levels[CFG.level - 1] + ' · ') + T.firstTo(CFG.games), bx, by + rh * 2 + 3.4 * u);
+  // velocità dell'ultimo colpo
+  if (FX.speedT > 0) {
+    g.globalAlpha = clamp(FX.speedT * 2, 0, 1);
+    g.fillStyle = 'rgba(8,12,24,.85)'; rr(g, bx, by + rh * 2 + 5.5 * u, 17 * u, 5 * u, 1 * u); g.fill();
+    g.fillStyle = '#c6f432'; g.font = `800 ${3 * u}px system-ui`; g.textAlign = 'left';
+    g.fillText(FX.speed + ' km/h', bx + 1.5 * u, by + rh * 2 + 8 * u);
+    g.globalAlpha = 1;
+  }
+  // braccialetti e collegamento
+  g.textAlign = 'right'; g.font = `600 ${2 * u}px system-ui`;
+  const bands = [CFG.p1.band, CFG.two && CFG.p2.band].filter((b, i) => i === 0 || CFG.two);
+  const allOk = link === 'ok' && bands.every(Boolean);
+  g.fillStyle = allOk ? '#7dff9c' : '#ffb35c';
+  const txt = link === 'lost' ? T.lost : (link === 'demo' ? T.keys : (allOk ? '● ' + T.bandOn : '○ ' + T.bandOff));
+  g.fillText(txt, W - 2.5 * u, 4.5 * u);
+  let hint = '';
+  if (S.phase === 'serve' && human(S.server) && S.timer > 0.5) hint = nameOf(S.server) + ': ' + (S.faults === 1 ? T.second + ' · ' : '') + T.serve;
+  if (hint) {
+    g.font = `700 ${3 * u}px system-ui`; g.textAlign = 'center';
+    const tw = g.measureText(hint).width + 5 * u;
+    g.fillStyle = 'rgba(8,12,24,.7)'; rr(g, W / 2 - tw / 2, H - 11 * u, tw, 5.6 * u, 2.8 * u); g.fill();
+    g.fillStyle = `rgba(255,255,255,${0.7 + 0.3 * Math.sin(FX.t * 5)})`; g.fillText(hint, W / 2, H - 8.2 * u);
+  }
+  if (S.msgT > 0) {
+    const k = clamp(S.msgT * 3, 0, 1), pop = 1 + Math.max(0, S.msgT - 1.7) * 2;
+    g.save(); g.globalAlpha = k; g.translate(W / 2, 40 * u); g.scale(pop, pop); g.textAlign = 'center';
+    g.font = `900 italic ${11 * u}px system-ui`; g.lineWidth = 1.4 * u; g.strokeStyle = 'rgba(0,0,0,.55)';
+    g.shadowColor = 'rgba(198,244,50,.6)'; g.shadowBlur = 3 * u;
+    g.strokeText(S.msg, 0, 0); g.fillStyle = '#fff'; g.fillText(S.msg, 0, 0);
+    g.shadowBlur = 0;
+    if (S.sub) { g.font = `800 ${4.4 * u}px system-ui`; g.fillStyle = '#c6f432'; g.strokeText(S.sub, 0, 9 * u); g.fillText(S.sub, 0, 9 * u); }
+    g.restore();
+  }
+  if (S.fbT > 0) {
+    const pl = P[S.fbWho];
+    const q = fp() && S.fbWho === 0 ? { x: W / 2, y: H * 0.62 } : proj(pl.x, 2.3, pl.z);
+    if (q) {
+      g.globalAlpha = clamp(S.fbT * 2, 0, 1); g.textAlign = 'center'; g.font = `900 italic ${4.2 * u}px system-ui`;
+      g.fillStyle = S.fb === T.perfect || S.fb === T.bomb ? '#7dff9c' : '#ffd36b';
+      g.lineWidth = 0.8 * u; g.strokeStyle = 'rgba(0,0,0,.5)';
+      g.strokeText(S.fb, q.x, q.y - (1.1 - S.fbT) * 6 * u); g.fillText(S.fb, q.x, q.y - (1.1 - S.fbT) * 6 * u); g.globalAlpha = 1;
+    }
+  }
+}
+function drawVignette() {
+  const g = CTX.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, Math.hypot(W, H) * 0.6);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)');
+  CTX.fillStyle = g; CTX.fillRect(0, 0, W, H);
+  if (FX.flash > 0) { CTX.fillStyle = `rgba(255,255,240,${FX.flash * 0.6})`; CTX.fillRect(0, 0, W, H); }
+}
+let lastFrame = 0;
+function render() {
+  const now = performance.now(), dt = Math.min(0.05, (now - (lastFrame || now)) / 1000); lastFrame = now;
+  if (!S.paused) updateFx(dt);
+  updateCamera(dt);
+  if (gfxMode !== '2d' && window.Arena3D) {
+    // 3D: la scena la disegna three.js sotto; qui sopra solo tabellone, scritte e vignettatura.
+    let ok = true;
+    try { ok = Arena3D.render(FX.t); } catch (e) { ok = false; }
+    CTX.clearRect(0, 0, W, H);
+    drawVignette();
+    drawHUD();
+    if (!ok && !/[?&]keep3d=1/.test(location.search)) { gfxFailed[gfxMode] = true; applyGfx(); }
+    return;
+  }
+  CTX.save();
+  if (FX.shake > 0) CTX.translate(gauss() * FX.shake * H * 0.03, gauss() * FX.shake * H * 0.03);
+  drawSky();
+  drawStadium();
+  drawCourt();
+  const b = S.ball, items = [{ z: 0, f: drawNet }, { z: P[1].z, f: () => drawPlayer(P[1], 1) }];
+  if (!fp()) items.push({ z: P[0].z, f: () => drawPlayer(P[0], 0) });
+  if (b.show && b.y > -0.5) { items.push({ z: b.z + 0.02, f: drawShadow }); items.push({ z: b.z - 0.01, f: drawBall }); }
+  items.sort((a, c) => c.z - a.z).forEach(it => it.f());
+  drawTarget();
+  drawFx();
+  if (fp()) drawFirstPerson();
+  CTX.restore();
+  drawVignette();
+  drawHUD();
+}
+
+/* ----------------------------- Grafica 3D (three.js, assets/arena/arena3d.js) -------------------------------- */
+// CFG.gfx: 0 = 2D (questa pagina), 1 = 3D semplice (low-poly), 2 = 3D realistica. Se la TV non ha WebGL o va a
+// scatti si scende da sola: realistica → semplice → 2D.
+let gfxMode = '2d', gfxLoading = false;
+const gfxFailed = { real: false, low: false };
+const ASSET = n => (location.protocol === 'file:' ? 'arena/' : '/arena/') + n;
+function hasWebGL() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } }
+function loadScript(src) { return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+function wantGfx() { return CFG.gfx === 2 && !gfxFailed.real ? 'real' : (CFG.gfx >= 1 && !gfxFailed.low ? 'low' : '2d'); }
+const api3d = {
+  S, P, CFG, FX, CAM, human, idealTc, netH, WIN_BEFORE, consts: { HL, HW, DW, SVC },
+  view: () => VIEW, H: () => H, FOC: () => FOC, asset: ASSET,
+};
+async function applyGfx() {
+  const want = wantGfx();
+  if (gfxLoading || want === gfxMode) return;
+  if (gfxMode !== '2d' && window.Arena3D) Arena3D.dispose();
+  gfxMode = '2d'; $('#gl').style.display = 'none';
+  if (want === '2d') return;
+  if (!hasWebGL()) { gfxFailed.real = gfxFailed.low = true; return; }
+  gfxLoading = true;
+  try {
+    if (!window.Arena3D) await loadScript(ASSET('arena3d.js'));
+    await Arena3D.init($('#gl'), api3d, want);
+    gfxMode = want; $('#gl').style.display = 'block';
+  } catch (e) { gfxFailed[want] = true; }
+  gfxLoading = false;
+  if (wantGfx() !== gfxMode) applyGfx();
+}
+
+/* ----------------------------- Schermate sopra il campo -------------------------------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function playersHtml() {
+  const row = i => {
+    const band = i === 0 ? CFG.p1.band : CFG.p2.band;
+    const st = human(i) ? `<div class="small ${band ? 'ok' : 'warn'}">${band ? '● ' + T.bandOn : '○ ' + T.bandOff}</div>` : `<div class="small">${T.levels[CFG.level - 1]}</div>`;
+    return `<div><div class="pl"><i style="background:${P[i].shirt}"></i>${esc(nameOf(i))}</div>${st}</div>`;
+  };
+  return `<div class="players">${row(0)}<div class="pl">–</div>${row(1)}</div>`;
+}
+function statsHtml() {
+  const cols = [0, 1].filter(human);
+  const v = [s => s.hits, s => s.perfect, s => s.early, s => s.late, s => s.wrong, s => Math.round(s.maxGyro)];
+  let h = `<table><tr><th></th>${cols.map(i => `<th>${esc(nameOf(i))}</th>`).join('')}</tr>`;
+  T.stats.forEach((label, k) => { h += `<tr><td>${label}</td>${cols.map(i => `<td class="n">${v[k](S.st[i])}</td>`).join('')}</tr>`; });
+  h += `<tr><td>${T.rally}</td><td class="n" colspan="${cols.length}">${S.longest || 0}</td></tr></table>`;
+  return h;
+}
+function ovRender() {
+  const ov = $('#ov'), card = $('#card');
+  let html = '<h1>TSM <span>Arena</span></h1>';
+  if (link === 'closed') {
+    html += `<div class="big">${T.closed}</div>`;
+  } else if (!gotCfg) {
+    html += `<div class="big">${T.wait}</div><div class="mid ball">${T.waitSub}</div><div class="small">${link === 'lost' ? T.lost : T.link}</div>`;
+  } else if (S.paused) {
+    html += `<div class="big">${T.paused}</div>${playersHtml()}<div class="mid">${T.pauseHint}</div>`;
+  } else if (S.phase === 'over') {
+    html += `<div class="big ball">${esc(nameOf(S.winner))} ${T.wins} ${S.games[0]}–${S.games[1]}</div>${statsHtml()}<div class="mid">${T.rematch}</div>`;
+  } else if (S.phase === 'title') {
+    html += `${playersHtml()}<div class="big">${T.start}</div><div class="mid">${(CFG.two ? '' : T.levels[CFG.level - 1] + ' · ') + T.firstTo(CFG.games)}</div>
+      <div class="small">${AC && AC.state === 'running' ? '' : '🔈 ' + T.audio}${DEMO ? '<br>' + T.keys : ''}</div>`;
+  } else { ov.classList.add('hide'); return; }
+  ov.classList.remove('hide');
+  card.innerHTML = html;
+}
+
+/* ----------------------------- Collegamento al telefono -------------------------------- */
+function onMessage(d) {
+  if (!d || !d.t) return;
+  if (d.t === 'cfg') {
+    // L'app del telefono è ripartita (o è stata aggiornata): si ricarica la pagina, che può essere cambiata.
+    if (d.rev && REV && d.rev !== REV && !DEMO) { location.reload(); return; }
+    if (d.rev) REV = d.rev;
+    const lang = TX[d.lang] ? d.lang : 'en';
+    T = TX[lang]; document.documentElement.lang = lang;
+    const wasTwo = CFG.two;
+    Object.assign(CFG, {
+      level: clamp(+d.level || 2, 1, 3), games: clamp(+d.games || 3, 1, 9), strict: d.strict !== false, voice: d.voice !== false,
+      vol: d.vol === undefined ? CFG.vol : clamp(+d.vol || 0, 0, 100),
+      lagMs: clamp(+d.lagMs || 0, 0, 400), two: !!d.two, p1: d.p1 || CFG.p1, p2: d.p2 || CFG.p2,
+      gfx: d.gfx === undefined ? CFG.gfx : clamp(+d.gfx || 0, 0, 2),
+    });
+    applyGfx();
+    applyVol();
+    gotCfg = true;
+    if (link === 'closed') link = 'ok';
+    // Cambiano i giocatori a partita in corso: si ricomincia dalla schermata iniziale.
+    if (wasTwo !== CFG.two && S.phase !== 'title') { S.phase = 'title'; S.paused = false; }
+    ovRender();
+  } else if (d.t === 'swing') onSwing((+d.side || 1) - 1, clamp(+d.s || 0.5, 0.1, 1), +d.gyro || 0);
+  else if (d.t === 'stroke') onStroke((+d.side || 1) - 1, +d.k);
+  else if (d.t === 'key') onKey((+d.side || 1) - 1, +d.k);
+  else if (d.t === 'ctl') onCtl(d.a);
+  else if (d.t === 'closed') {
+    link = 'closed'; S.phase = 'title'; S.paused = false; ovRender();
+    // Il gioco è finito sul telefono: dopo il messaggio si torna al tabellone, che ripassa qui alla prossima partita.
+    if (!DEMO && location.protocol !== 'file:') setTimeout(() => { if (link === 'closed') location.replace('/'); }, 3000);
+  }
+}
+function connect() {
+  if (DEMO || !window.EventSource) return;
+  const es = new EventSource('/arena/events');
+  es.onopen = () => { if (link !== 'closed') link = 'ok'; ovRender(); };
+  es.onmessage = e => { try { onMessage(JSON.parse(e.data)); } catch (x) {} };
+  es.onerror = () => {
+    if (link !== 'closed') link = 'lost';
+    ovRender();
+    if (es.readyState === EventSource.CLOSED) setTimeout(connect, 3000);
+  };
+}
+
+/* ----------------------------- Avvio -------------------------------- */
+function toggleFS() { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) {} }
+function init() {
+  CV = $('#cv'); CTX = CV.getContext('2d');
+  resize(); addEventListener('resize', () => { resize(); if (gfxMode !== '2d' && window.Arena3D) Arena3D.resize(); });
+  if (DEMO) { const q = new URLSearchParams(location.search), l = q.get('lang'); onMessage({ t: 'cfg', lang: TX[l] ? l : 'it', level: 2, games: 3, strict: true, voice: true, lagMs: 70, two: q.get('two') === '1', gfx: q.has('gfx') ? +q.get('gfx') : 2, p1: { name: 'Rossi', band: true }, p2: { name: 'Bianchi', band: true } }); }
+  connect();
+  ovRender();
+  // Telecomando della TV o tastiera: OK/Invio sblocca l'audio; SPAZIO fa da swing (prove senza braccialetto).
+  addEventListener('keydown', e => {
+    const wasLocked = !AC || AC.state !== 'running';
+    unlockAudio();
+    if (e.code === 'Space') { e.preventDefault(); onSwing(0, 0.7, 0); }
+    else if (e.key === 'Enter' && !wasLocked) onKey(0, 1);
+    else if (e.key === 'p' || e.key === 'P' || e.key === 'MediaPlayPause') onKey(0, 2);
+    else if (e.key === 'f' || e.key === 'F') toggleFS();
+    else if (e.key === 'v' || e.key === 'V') { viewForced = true; VIEW = fp() ? 'tv' : 'fp'; }
+    if (wasLocked) setTimeout(ovRender, 200);
+  });
+  addEventListener('pointerdown', () => { unlockAudio(); setTimeout(ovRender, 200); });
+  $('#fsBtn').onclick = toggleFS;
+  if (window.speechSynthesis) speechSynthesis.getVoices();
+  // Prove automatiche dell'anteprima: avanza il gioco di n passi e disegna, senza il tempo reale.
+  if (DEMO) window.__step = n => { for (let k = 0; k < n; k++) update(DT); lastFrame = performance.now() - n * DT * 1000; render(); };
+  let last = performance.now(), acc = 0;
+  if (/[?&]manual=1/.test(location.search)) return;
+  (function frame(now) {
+    acc += Math.min(0.05, (now - last) / 1000); last = now;
+    while (acc >= DT) { update(DT); acc -= DT; }
+    render();
+    requestAnimationFrame(frame);
+  })(last);
+}
+init();
+</script>
+</body>
+</html>
