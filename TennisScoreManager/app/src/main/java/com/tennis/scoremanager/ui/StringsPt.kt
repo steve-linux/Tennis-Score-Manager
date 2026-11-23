@@ -1176,6 +1176,13 @@ object PtStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tênis na TV com a pulseira como raquete"
+    override val arenaNow = "Partida na TV"
+    override val arenaPause = "Pausa"
+    override val arenaResume = "Continuar"
+    override val arenaRestart = "Nova partida"
+    override val arenaRestartAsk = "Recomeçar do zero? A partida em andamento se perde."
+    override val arenaVolume = "Volume na TV"
+    override val arenaNowHint = "Também dá para pausar com a tecla pequena da pulseira ou com a tecla play/pausa do controle da TV."
     override val arenaPlayers = "Jogadores"
     override val arenaVsCpu = "Contra o celular"
     override val arenaTwoPlayers = "Dois jogadores"

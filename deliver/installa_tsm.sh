@@ -517,6 +517,8 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const rnd = (a, b) => a + Math.random() * (b - a);
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
 const DEMO = /[?&]demo=1/.test(location.search);
+/** Avvio dell'app del telefono che ha mandato la pagina (dal primo "cfg"). */
+let REV = 0;
 
 /* ----------------------------- Testi (6 lingue, come l'app) -------------------------------- */
 const TX = {
@@ -566,7 +568,7 @@ const TX = {
 let T = TX.it;
 
 /* ----------------------------- Impostazioni dal telefono -------------------------------- */
-const CFG = { level: 2, games: 3, strict: true, voice: true, lagMs: 70, two: false, gfx: 2, p1: { name: 'Rossi', band: false }, p2: { name: '', band: false } };
+const CFG = { level: 2, games: 3, strict: true, voice: true, vol: 80, lagMs: 70, two: false, gfx: 2, p1: { name: 'Rossi', band: false }, p2: { name: '', band: false } };
 let link = DEMO ? 'demo' : 'connecting';   // connecting | ok | lost | closed | demo
 let gotCfg = DEMO;
 
@@ -850,6 +852,14 @@ function onKey(i, k) {
   if (k === 2 && !['title', 'over'].includes(S.phase)) { S.paused = !S.paused; ovRender(); }
 }
 
+/** Comandi dal telefono: pausa, ripresa, partita nuova (da zero, anche a partita in corso). */
+function onCtl(a) {
+  unlockAudio();
+  if (a === 'pause') { if (!['title', 'over'].includes(S.phase)) { S.paused = true; ovRender(); } }
+  else if (a === 'resume') { S.paused = false; ovRender(); }
+  else if (a === 'start') { if (gotCfg) startMatch(); }
+}
+
 function movePlayers(dt) {
   const fast = S.phase === 'serve' || S.phase === 'point' || S.phase === 'fault';
   P.forEach((p, i) => {
@@ -930,11 +940,14 @@ function update(dt) {
 }
 
 /* ----------------------------- Audio e voce -------------------------------- */
-let AC = null, NOISE = null;
+let AC = null, NOISE = null, OUT = null;
+/** Volume del gioco (0-100), scelto sul telefono: vale per i suoni e per la voce dell'arbitro. */
+function applyVol() { if (OUT) OUT.gain.value = Math.pow(CFG.vol / 100, 2) * 1.5; }
 function unlockAudio() {
   try {
     if (!AC) {
       AC = new (window.AudioContext || window.webkitAudioContext)();
+      OUT = AC.createGain(); OUT.connect(AC.destination); applyVol();
       NOISE = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
       const d = NOISE.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     }
@@ -946,13 +959,13 @@ function noise(dur, freq, q, gain, t0 = 0, sweepTo) {
   src.buffer = NOISE; f.type = 'bandpass'; f.frequency.setValueAtTime(freq, t); f.Q.value = q;
   if (sweepTo) f.frequency.exponentialRampToValueAtTime(sweepTo, t + dur);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + Math.min(0.05, dur / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  src.connect(f).connect(g).connect(AC.destination); src.start(t, Math.random()); src.stop(t + dur + 0.05);
+  src.connect(f).connect(g).connect(OUT); src.start(t, Math.random()); src.stop(t + dur + 0.05);
 }
 function tone(type, f0, f1, dur, gain) {
   const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
   g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(AC.destination); o.start(t); o.stop(t + dur + 0.02);
+  o.connect(g).connect(OUT); o.start(t); o.stop(t + dur + 0.02);
 }
 function sfx(type, p = 1) {
   if (!AC || AC.state !== 'running') return;
@@ -966,7 +979,19 @@ function sfx(type, p = 1) {
   } catch (e) {}
 }
 function say(text) {
-  if (!CFG.voice || !text || !window.speechSynthesis) return;
+  if (!CFG.voice || !text) return;
+  // Dentro TSM sulla TV (Android TV): parla la TV, col volume del gioco.
+  if (window.TSMDisplay && TSMDisplay.speak) {
+    if (CFG.vol > 0) setTimeout(() => { try { TSMDisplay.speak(text, T.say.voice, CFG.vol / 100); } catch (e) {} }, 350);
+    return;
+  }
+  // In un browser collegato al telefono (TV Bro, portatile...) la sintesi vocale spesso non c'è: la frase la dice il
+  // telefono, con la voce dell'arbitro delle partite. Solo l'anteprima senza telefono usa quella del browser.
+  if (!DEMO && location.protocol !== 'file:') {
+    setTimeout(() => { fetch('/arena/say?t=' + encodeURIComponent(text), { cache: 'no-store' }).catch(() => {}); }, 350);
+    return;
+  }
+  if (!window.speechSynthesis) return;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -974,6 +999,7 @@ function say(text) {
     const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith(T.say.voice.slice(0, 2)));
     if (v) u.voice = v;
     u.rate = 1.05;
+    u.volume = CFG.vol / 100;
     setTimeout(() => speechSynthesis.speak(u), 350);   // dopo il suono del punto
   } catch (e) {}
 }
@@ -1506,15 +1532,20 @@ function ovRender() {
 function onMessage(d) {
   if (!d || !d.t) return;
   if (d.t === 'cfg') {
+    // L'app del telefono è ripartita (o è stata aggiornata): si ricarica la pagina, che può essere cambiata.
+    if (d.rev && REV && d.rev !== REV && !DEMO) { location.reload(); return; }
+    if (d.rev) REV = d.rev;
     const lang = TX[d.lang] ? d.lang : 'en';
     T = TX[lang]; document.documentElement.lang = lang;
     const wasTwo = CFG.two;
     Object.assign(CFG, {
       level: clamp(+d.level || 2, 1, 3), games: clamp(+d.games || 3, 1, 9), strict: d.strict !== false, voice: d.voice !== false,
+      vol: d.vol === undefined ? CFG.vol : clamp(+d.vol || 0, 0, 100),
       lagMs: clamp(+d.lagMs || 0, 0, 400), two: !!d.two, p1: d.p1 || CFG.p1, p2: d.p2 || CFG.p2,
       gfx: d.gfx === undefined ? CFG.gfx : clamp(+d.gfx || 0, 0, 2),
     });
     applyGfx();
+    applyVol();
     gotCfg = true;
     if (link === 'closed') link = 'ok';
     // Cambiano i giocatori a partita in corso: si ricomincia dalla schermata iniziale.
@@ -1523,6 +1554,7 @@ function onMessage(d) {
   } else if (d.t === 'swing') onSwing((+d.side || 1) - 1, clamp(+d.s || 0.5, 0.1, 1), +d.gyro || 0);
   else if (d.t === 'stroke') onStroke((+d.side || 1) - 1, +d.k);
   else if (d.t === 'key') onKey((+d.side || 1) - 1, +d.k);
+  else if (d.t === 'ctl') onCtl(d.a);
   else if (d.t === 'closed') {
     link = 'closed'; S.phase = 'title'; S.paused = false; ovRender();
     // Il gioco è finito sul telefono: dopo il messaggio si torna al tabellone, che ripassa qui alla prossima partita.
@@ -1555,7 +1587,7 @@ function init() {
     unlockAudio();
     if (e.code === 'Space') { e.preventDefault(); onSwing(0, 0.7, 0); }
     else if (e.key === 'Enter' && !wasLocked) onKey(0, 1);
-    else if (e.key === 'p' || e.key === 'P') onKey(0, 2);
+    else if (e.key === 'p' || e.key === 'P' || e.key === 'MediaPlayPause') onKey(0, 2);
     else if (e.key === 'f' || e.key === 'F') toggleFS();
     else if (e.key === 'v' || e.key === 'V') { viewForced = true; VIEW = fp() ? 'tv' : 'fp'; }
     if (wasLocked) setTimeout(ovRender, 200);
@@ -18528,7 +18560,7 @@ Die Armbänder brauchen **Firmware 2.5** (5): Solange das Spiel offen ist, schic
    - **Im Browser** reicht es, die Adresse der Anzeigetafel (ohne `/arena`) einmal zu öffnen und als Lesezeichen zu speichern: Auch dort wechselt die Seite von selbst zum Spiel und zurück.
 3. **Spieler**: *Gegen das Handy* (Spieler 1 gegen den Computer, drei Stufen) oder *Zwei Spieler*, je ein Armband. Tippe auf den Namen, um zu wählen, wer spielt (du oder ein Schüler). Darunter steht der Zustand jedes Armbands.
 4. **Spiel**: Spiele zum Sieg (1, 3 oder 5), **Nur der richtige Schlag zählt** (mit der Schlagkalibrierung, 6.4, kostet eine Vorhand statt einer Rückhand den Punkt), **Stimme des Schiedsrichters** am Fernseher, **Verzögerung des Fernsehers**: Wenn du immer zu spät bist, obwohl es sich richtig anfühlt, erhöhe sie (gering für Monitore und Fernseher im Spielmodus).
-5. **Schwinge** (oder drücke die **große Taste** des Armbands), um zu beginnen. Ein Schwung reicht zum Aufschlag. Die **kleine Taste** pausiert. Am Ende zeigt der Fernseher Schläge, perfekte, zu frühe, zu späte, falsche Schläge, höchstes Handgelenktempo und längsten Ballwechsel; ein Schwung startet die Revanche.
+5. **Schwinge** (oder drücke die **große Taste** des Armbands), um zu beginnen. Ein Schwung reicht zum Aufschlag. Die **kleine Taste** pausiert. Am Ende zeigt der Fernseher Schläge, perfekte, zu frühe, zu späte, falsche Schläge, höchstes Handgelenktempo und längsten Ballwechsel; ein Schwung startet die Revanche. Vom Telefon, oben im Arena-Bildschirm (**Spiel am Fernseher**): **Anhalten**/**Weiter**, **Neues Spiel** (von vorn, mit Rückfrage) und die **Lautstärke am Fernseher** für Töne und Stimme (mit TSM auf dem Fernseher kommt die Schiedsrichterstimme vom Fernseher, in einem Browser vom Telefon, mit der Stimme der Matches); pausieren geht auch mit der Play/Pause-Taste der TV-Fernbedienung.
 6. Zum Verlassen: **Zurück**. Das Armband geht wieder in den Stromsparmodus und der Fernseher zeigt, dass das Spiel geschlossen ist.
 
 - Trage das Armband fest und lass **Platz um dich herum**: Gespielt wird mit dem Schläger in der Hand (besser ohne Ball) oder auch mit leerer Hand.
@@ -19164,7 +19196,7 @@ The wristbands need **firmware 2.5** (5): while the game is open the wristband s
    - **In a browser** just open the scoreboard address once (without `/arena`) and bookmark it: the page also switches to the game and back on its own.
 3. **Players**: *Against the phone* (Player 1 against the CPU, three levels) or *Two players*, one wristband each. Tap the name to choose who plays (you or one of the students). Below is the state of each wristband.
 4. **Match**: games to win (1, 3 or 5), **Only the right stroke counts** (with the stroke calibration, 6.4, a forehand instead of a backhand loses the point), **Umpire voice** on the TV, **TV delay**: if you are always late even when it feels right, raise it (low for monitors and TVs in game mode).
-5. **Swing** (or press the **big key** of the wristband) to start. One swing serves. The **small key** pauses. At the end the TV shows strokes, perfect, early, late, wrong strokes, top wrist speed and longest rally; a swing starts the rematch.
+5. **Swing** (or press the **big key** of the wristband) to start. One swing serves. The **small key** pauses. At the end the TV shows strokes, perfect, early, late, wrong strokes, top wrist speed and longest rally; a swing starts the rematch. From the phone, at the top of the Arena screen (**Game on the TV**): **Pause**/**Resume**, **New game** (from zero, asks first) and the **Volume on the TV** for sounds and voice (with TSM on the TV the umpire's voice comes from the TV; in a browser it comes from the phone, with the match voice); you can also pause with the play/pause key of the TV remote.
 6. To leave: **Back**. The wristband goes back to low power and the TV shows that the game is closed.
 
 - Wear the wristband tight and keep **space around you**: play with the racket in hand (better without a ball) or even empty-handed.
@@ -19799,7 +19831,7 @@ Las pulseras necesitan el **firmware 2.5** (5): con el juego abierto, la pulsera
    - **En un navegador** basta con abrir una vez la dirección del marcador (sin `/arena`) y guardarla en favoritos: también ahí la página pasa sola al juego y vuelve.
 3. **Jugadores**: *Contra el teléfono* (Jugador 1 contra la CPU, tres niveles) o *Dos jugadores*, una pulsera cada uno. Toca el nombre para elegir quién juega (tú o un alumno). Debajo está el estado de cada pulsera.
 4. **Partido**: juegos para ganar (1, 3 o 5), **Solo cuenta el golpe correcto** (con la calibración de golpes, 6.4, una derecha en lugar de un revés pierde el punto), **Voz del árbitro** en la tele, **Retraso de la tele**: si siempre llegas tarde aunque te parezca bien, súbelo (bajo para monitores y teles en modo juego).
-5. Haz un **swing** (o pulsa la **tecla grande** de la pulsera) para empezar. Un swing basta para sacar. La **tecla pequeña** pone en pausa. Al final la tele muestra golpes, perfectos, anticipados, tarde, golpes equivocados, velocidad máxima de la muñeca y peloteo más largo; un swing empieza la revancha.
+5. Haz un **swing** (o pulsa la **tecla grande** de la pulsera) para empezar. Un swing basta para sacar. La **tecla pequeña** pone en pausa. Al final la tele muestra golpes, perfectos, anticipados, tarde, golpes equivocados, velocidad máxima de la muñeca y peloteo más largo; un swing empieza la revancha. Desde el teléfono, arriba en la pantalla de Arena (**Partido en la tele**): **Pausa**/**Seguir**, **Nuevo partido** (de cero, pide confirmación) y el **Volumen en la tele** de sonidos y voz (con TSM en la tele la voz del árbitro sale de la tele; en un navegador sale del teléfono, con la voz de los partidos); también se pausa con la tecla play/pausa del mando de la tele.
 6. Para salir: **Atrás**. La pulsera vuelve a bajo consumo y la tele indica que el juego está cerrado.
 
 - Lleva la pulsera bien ajustada y deja **espacio a tu alrededor**: se juega con la raqueta en la mano (mejor sin bola) o incluso con la mano vacía.
@@ -20434,7 +20466,7 @@ Les bracelets doivent avoir le **firmware 2.5** (5) : quand le jeu est ouvert, l
    - **Dans un navigateur**, il suffit d'ouvrir une fois l'adresse du tableau (sans `/arena`) et de l'ajouter aux favoris : là aussi la page passe toute seule au jeu et revient.
 3. **Joueurs** : *Contre le téléphone* (Joueur 1 contre l'ordinateur, trois niveaux) ou *Deux joueurs*, un bracelet chacun. Touche le nom pour choisir qui joue (toi ou un élève). En dessous, l'état de chaque bracelet.
 4. **Match** : jeux pour gagner (1, 3 ou 5), **Seul le bon coup compte** (avec l'étalonnage des coups, 6.4, un coup droit à la place d'un revers fait perdre le point), **Voix de l'arbitre** sur la télé, **Retard de la télé** : si tu frappes toujours en retard même quand ça te semble juste, augmente-le (faible pour les moniteurs et les télés en mode jeu).
-5. Fais un **swing** (ou appuie sur la **grande touche** du bracelet) pour commencer. Un swing suffit pour servir. La **petite touche** met en pause. À la fin, la télé affiche coups, parfaits, en avance, en retard, mauvais coups, vitesse max du poignet et plus long échange ; un swing lance la revanche.
+5. Fais un **swing** (ou appuie sur la **grande touche** du bracelet) pour commencer. Un swing suffit pour servir. La **petite touche** met en pause. À la fin, la télé affiche coups, parfaits, en avance, en retard, mauvais coups, vitesse max du poignet et plus long échange ; un swing lance la revanche. Depuis le téléphone, en haut de l'écran d'Arena (**Partie sur la télé**) : **Mettre en pause**/**Reprendre**, **Nouvelle partie** (à zéro, demande confirmation) et le **Volume sur la télé** des sons et de la voix (avec TSM sur la télé la voix de l'arbitre sort de la télé ; dans un navigateur elle sort du téléphone, avec la voix des matchs) ; la pause se met aussi avec la touche lecture/pause de la télécommande.
 6. Pour sortir : **Retour**. Le bracelet repasse en basse consommation et la télé indique que le jeu est fermé.
 
 - Serre bien le bracelet et garde de **l'espace autour de toi** : on joue raquette en main (plutôt sans balle) ou même à main vide.
@@ -21069,7 +21101,7 @@ Serve il **firmware 2.5** sui braccialetti (5): quando il gioco è aperto il bra
    - **Nel browser** basta aprire una volta l'indirizzo del tabellone (senza `/arena`) e salvarlo tra i preferiti: anche lì la pagina passa da sola al gioco e torna indietro.
 3. **Giocatori**: *Contro il telefono* (Giocatore 1 contro la CPU, coi tre livelli) oppure *Due giocatori*, un braccialetto ciascuno. Tocca il nome per scegliere chi gioca (tu o uno degli allievi). Sotto c'è lo stato di ogni braccialetto.
 4. **Partita**: game per vincere (1, 3 o 5), **Conta solo il colpo giusto** (con la calibrazione dei colpi, 6.4, un dritto al posto del rovescio è punto perso), **Voce dell'arbitro** sulla TV, **Ritardo della TV**: se colpisci sempre in ritardo anche quando ti sembra giusto, alzalo (basso per monitor e TV in modalità gioco).
-5. Fai uno **swing** (o premi il **tasto grande** del braccialetto) per iniziare. Per servire basta uno swing. Il **tasto piccolo** mette in pausa. A fine partita la TV mostra colpi, perfetti, in anticipo, in ritardo, colpi sbagliati, velocità massima del polso e scambio più lungo; uno swing fa partire la rivincita.
+5. Fai uno **swing** (o premi il **tasto grande** del braccialetto) per iniziare. Per servire basta uno swing. Il **tasto piccolo** mette in pausa. A fine partita la TV mostra colpi, perfetti, in anticipo, in ritardo, colpi sbagliati, velocità massima del polso e scambio più lungo; uno swing fa partire la rivincita. Dal telefono, in cima alla schermata di Arena (**Partita sulla TV**): **Pausa**/**Riprendi**, **Nuova partita** (da zero, chiede conferma) e il **Volume sulla TV** di suoni e voce (con TSM sulla TV la voce dell'arbitro esce dalla TV; in un browser esce dal telefono, con la voce delle partite); la pausa si mette anche col tasto play/pausa del telecomando della TV.
 6. Per uscire: **Indietro**. Il braccialetto torna a basso consumo e la TV mostra che il gioco è chiuso.
 
 - Tieni il braccialetto ben stretto e lascia **spazio intorno**: si gioca con la racchetta in mano (meglio senza palla) o anche a mano vuota.
@@ -21704,7 +21736,7 @@ As pulseiras precisam do **firmware 2.5** (5): com o jogo aberto, a pulseira man
    - **Num navegador** basta abrir uma vez o endereço do placar (sem `/arena`) e salvá-lo nos favoritos: ali também a página passa sozinha para o jogo e volta.
 3. **Jogadores**: *Contra o celular* (Jogador 1 contra a CPU, três níveis) ou *Dois jogadores*, uma pulseira cada. Toque no nome para escolher quem joga (você ou um aluno). Embaixo aparece o estado de cada pulseira.
 4. **Partida**: games para vencer (1, 3 ou 5), **Só conta o golpe certo** (com a calibração de golpes, 6.4, um forehand no lugar de um backhand perde o ponto), **Voz do árbitro** na TV, **Atraso da TV**: se você sempre bate atrasado mesmo quando parece certo, aumente (baixo para monitores e TVs no modo de jogo).
-5. Faça um **swing** (ou aperte a **tecla grande** da pulseira) para começar. Um swing basta para sacar. A **tecla pequena** pausa. No fim a TV mostra golpes, perfeitos, adiantados, atrasados, golpes errados, velocidade máxima do pulso e troca mais longa; um swing começa a revanche.
+5. Faça um **swing** (ou aperte a **tecla grande** da pulseira) para começar. Um swing basta para sacar. A **tecla pequena** pausa. No fim a TV mostra golpes, perfeitos, adiantados, atrasados, golpes errados, velocidade máxima do pulso e troca mais longa; um swing começa a revanche. Pelo telefone, no topo da tela do Arena (**Partida na TV**): **Pausa**/**Continuar**, **Nova partida** (do zero, pede confirmação) e o **Volume na TV** dos sons e da voz (com o TSM na TV a voz do árbitro sai da TV; num navegador sai do telefone, com a voz das partidas); também dá para pausar com a tecla play/pausa do controle da TV.
 6. Para sair: **Voltar**. A pulseira volta ao baixo consumo e a TV mostra que o jogo foi fechado.
 
 - Use a pulseira bem presa e deixe **espaço à sua volta**: joga-se com a raquete na mão (melhor sem bola) ou até de mão vazia.
@@ -23947,6 +23979,26 @@ class MatchController(
     /** Impostazioni di TSM Arena (giocatori, livello, opzioni). */
     val arena = MutableStateFlow(storage.arena)
 
+    /**
+     * La partita di Arena è in pausa? La TV non lo dice al telefono: lo si tiene qui dai comandi del telefono e dai
+     * tasti dei braccialetti (KEY2 pausa/ripresa, KEY1 riprende). I comandi sono assoluti: al massimo serve un tocco in più.
+     */
+    val arenaPaused = MutableStateFlow(false)
+
+    /** Pausa o ripresa della partita di Arena dal telefono. */
+    fun arenaPause(on: Boolean) {
+        if (!arenaActive) return
+        arenaPaused.value = on
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.control(if (on) "pause" else "resume"))
+    }
+
+    /** Partita nuova di Arena da zero, anche a partita in corso. */
+    fun arenaRestart() {
+        if (!arenaActive) return
+        arenaPaused.value = false
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.control("start"))
+    }
+
     init {
         scope.launch {
             ble.swings.collect {
@@ -23960,11 +24012,17 @@ class MatchController(
         }
         // Braccialetti che si collegano o si staccano: la TV mostra chi c'è.
         scope.launch { ble.bands.collect { if (arenaActive) publishArena() } }
+        // La voce dell'arbitro di Arena la dice il telefono (voce e motore scelti per le partite); il gioco ha il suo
+        // interruttore Voce dell'arbitro, quindi parla anche con la voce delle partite spenta.
+        tvServer.onArenaSay = { text ->
+            if (arenaActive && arena.value.voice) announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)), force = true)
+        }
     }
 
     fun openArena() {
         refreshPlayers()
         arenaActive = true
+        arenaPaused.value = false
         updateBandLinks()
         for (side in Side.entries) ble.setArena(side, true)
         // Il gioco usa il server del tabellone anche con il tabellone spento.
@@ -23986,6 +24044,7 @@ class MatchController(
     fun closeArena() {
         if (!arenaActive) return
         arenaActive = false
+        arenaPaused.value = false
         for (side in Side.entries) ble.setArena(side, false)
         tvServer.publishArena(com.tennis.scoremanager.arena.Arena.closed(), keep = true)
         publishTv()
@@ -24286,6 +24345,7 @@ class MatchController(
         if (arenaActive) {
             if (e.type == BandProtocol.EVT_POINT || e.type == BandProtocol.EVT_UNDO) {
                 tvServer.publishArena(com.tennis.scoremanager.arena.Arena.key(e.side.ordinal + 1, e.type))
+                arenaPaused.value = e.type == BandProtocol.EVT_UNDO && !arenaPaused.value
             }
             return
         }
@@ -25918,9 +25978,17 @@ data class ArenaSettings(
     val tvLag: Int = 1,
     /** Grafica: 0 = 2D, 1 = 3D semplice (low-poly), 2 = 3D realistica. La TV scende da sola se va a scatti. */
     val graphics: Int = 2,
+    /** Volume del gioco sulla TV, 0-100: suoni e voce dell'arbitro. */
+    val volume: Int = 80,
 )
 
 object Arena {
+    /**
+     * Avvio dell'app sul telefono: cambia a ogni avvio (e quindi a ogni aggiornamento). La TV rimasta aperta se ne
+     * accorge e ricarica la pagina, sennò continuerebbe con il gioco della versione di prima.
+     */
+    val REV: Long = System.currentTimeMillis()
+
     /** Partite possibili: game per vincere. */
     val GAME_CHOICES = listOf(1, 3, 5)
 
@@ -25946,6 +26014,8 @@ object Arena {
             put("games", s.games.coerceIn(1, 9))
             put("strict", s.strict)
             put("voice", s.voice)
+            put("vol", s.volume.coerceIn(0, 100))
+            put("rev", REV)
             put("lagMs", tvLagMs(s.tvLag))
             put("two", s.twoPlayers)
             put("gfx", s.graphics.coerceIn(0, 2))
@@ -25982,6 +26052,12 @@ object Arena {
         put("t", "key")
         put("side", side)
         put("k", if (type == BandProtocol.EVT_UNDO) 2 else 1)
+    }.toString()
+
+    /** Comando dal telefono: [action] "pause", "resume" o "start" (partita nuova da zero). */
+    fun control(action: String): String = buildJsonObject {
+        put("t", "ctl")
+        put("a", action)
     }.toString()
 
     /** Il gioco si chiude dal telefono: la TV torna alla schermata d'attesa. */
@@ -48122,8 +48198,47 @@ fun WebView.showPage(page: ScoreboardPage) {
     }
 }
 
+/**
+ * Voce dell'arbitro di TSM Arena sulla TV: la WebView di Android non ha la sintesi vocale del browser, quindi la pagina
+ * chiama TSMDisplay.speak e parla il TextToSpeech della TV (si accende alla prima frase).
+ */
+private class TvVoice(private val context: Context) {
+    private var tts: android.speech.tts.TextToSpeech? = null
+    private var ready = false
+    private var pending: Triple<String, String, Float>? = null
+
+    @Synchronized fun speak(text: String, lang: String, volume: Float) {
+        if (tts == null) tts = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
+            synchronized(this) {
+                ready = status == android.speech.tts.TextToSpeech.SUCCESS
+                pending?.let { (t, l, v) -> if (ready) say(t, l, v) }
+                pending = null
+            }
+        }
+        if (ready) say(text, lang, volume) else pending = Triple(text, lang, volume)
+    }
+
+    private fun say(text: String, lang: String, volume: Float) {
+        val engine = tts ?: return
+        runCatching { engine.language = java.util.Locale.forLanguageTag(lang) }
+        engine.setSpeechRate(1.05f)
+        val params = android.os.Bundle().apply { putFloat(android.speech.tts.TextToSpeech.Engine.KEY_PARAM_VOLUME, volume.coerceIn(0f, 1f)) }
+        engine.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, params, "arena")
+    }
+
+    @Synchronized fun shutdown() {
+        tts?.shutdown()
+        tts = null
+        ready = false
+    }
+}
+
+/** La voce di ogni WebView del tabellone, da spegnere con [release]. */
+private val voices = java.util.WeakHashMap<WebView, TvVoice>()
+
 /** WebView non più usata: si distrugge (chiude anche il collegamento /events). */
 fun WebView.release() {
+    synchronized(voices) { voices.remove(this) }?.shutdown()
     tag = null
     stopLoading()
     destroy()
@@ -48145,9 +48260,14 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
     isVerticalScrollBarEnabled = false
     isHorizontalScrollBarEnabled = false
     keepScreenOn = true
+    val voice = TvVoice(context).also { v -> synchronized(voices) { voices[this] = v } }
     addJavascriptInterface(object {
         @JavascriptInterface
         fun lost() = onLost()
+
+        /** Voce dell'arbitro di TSM Arena: [lang] come "it-IT", [volume] 0..1. */
+        @JavascriptInterface
+        fun speak(text: String, lang: String, volume: Float) = voice.speak(text.take(200), lang, volume)
     }, "TSMDisplay")
     webChromeClient = object : WebChromeClient() {
         override fun onConsoleMessage(m: ConsoleMessage): Boolean {
@@ -48798,6 +48918,12 @@ import androidx.core.content.edit
  */
 class TvServer(context: Context) {
 
+    /**
+     * TSM Arena: frase dell'arbitro chiesta dalla pagina del gioco (GET /arena/say?t=...). La dice il telefono con la
+     * voce delle partite, non la TV (nella WebView della TV la sintesi vocale non c'è).
+     */
+    @Volatile var onArenaSay: ((String) -> Unit)? = null
+
     /** Cartella delle foto dei giocatori (la stessa di Storage). */
     private val photoDir = File(context.filesDir, "players")
     /** Ritratti di uomo e di donna per chi non ha la foto, dalle risorse dell'app. */
@@ -49054,6 +49180,12 @@ class TvServer(context: Context) {
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
                 "/arena", "/arena/" -> respond(out, "200 OK", "text/html; charset=utf-8", arenaPage, head)
+                "/arena/say" -> {
+                    val text = parts[1].substringAfter('?', "").split('&').firstOrNull { it.startsWith("t=") }?.removePrefix("t=")
+                        ?.let { runCatching { java.net.URLDecoder.decode(it, "UTF-8") }.getOrNull() }?.trim()?.take(200)
+                    if (!head && !text.isNullOrEmpty()) onArenaSay?.invoke(text)
+                    respond(out, "204 No Content", "text/plain", ByteArray(0), head)
+                }
                 "/arena/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out, arena = true)
                 else -> if (ARENA_FILE.matches(path)) {
                     val m = ARENA_FILE.matchEntire(path)!!
@@ -58022,6 +58154,13 @@ interface Strings {
     // TSM Arena
     val arenaTitle: String get() = "TSM Arena"
     val arenaHint: String
+    val arenaNow: String
+    val arenaPause: String
+    val arenaResume: String
+    val arenaRestart: String
+    val arenaRestartAsk: String
+    val arenaVolume: String
+    val arenaNowHint: String
     val arenaPlayers: String
     val arenaVsCpu: String
     val arenaTwoPlayers: String
@@ -60855,6 +60994,13 @@ object ItStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tennis sulla TV con il braccialetto come racchetta"
+    override val arenaNow = "Partita sulla TV"
+    override val arenaPause = "Pausa"
+    override val arenaResume = "Riprendi"
+    override val arenaRestart = "Nuova partita"
+    override val arenaRestartAsk = "Ricominciare da zero? La partita in corso si perde."
+    override val arenaVolume = "Volume sulla TV"
+    override val arenaNowHint = "La pausa si mette anche col tasto piccolo del braccialetto o col tasto play/pausa del telecomando della TV."
     override val arenaPlayers = "Giocatori"
     override val arenaVsCpu = "Contro il telefono"
     override val arenaTwoPlayers = "Due giocatori"
@@ -63655,6 +63801,13 @@ object EnStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tennis on the TV with the wristband as your racket"
+    override val arenaNow = "Game on the TV"
+    override val arenaPause = "Pause"
+    override val arenaResume = "Resume"
+    override val arenaRestart = "New game"
+    override val arenaRestartAsk = "Start again from zero? The game in progress is lost."
+    override val arenaVolume = "Volume on the TV"
+    override val arenaNowHint = "You can also pause with the small wristband key or the play/pause key of the TV remote."
     override val arenaPlayers = "Players"
     override val arenaVsCpu = "Against the phone"
     override val arenaTwoPlayers = "Two players"
@@ -66478,6 +66631,13 @@ object DeStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tennis am Fernseher mit dem Armband als Schläger"
+    override val arenaNow = "Spiel am Fernseher"
+    override val arenaPause = "Anhalten"
+    override val arenaResume = "Weiter"
+    override val arenaRestart = "Neues Spiel"
+    override val arenaRestartAsk = "Von vorn beginnen? Das laufende Spiel geht verloren."
+    override val arenaVolume = "Lautstärke am Fernseher"
+    override val arenaNowHint = "Pausieren geht auch mit der kleinen Armbandtaste oder der Play/Pause-Taste der TV-Fernbedienung."
     override val arenaPlayers = "Spieler"
     override val arenaVsCpu = "Gegen das Handy"
     override val arenaTwoPlayers = "Zwei Spieler"
@@ -69294,6 +69454,13 @@ object EsStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tenis en la tele con la pulsera como raqueta"
+    override val arenaNow = "Partido en la tele"
+    override val arenaPause = "Pausa"
+    override val arenaResume = "Seguir"
+    override val arenaRestart = "Nuevo partido"
+    override val arenaRestartAsk = "¿Empezar de cero? El partido en curso se pierde."
+    override val arenaVolume = "Volumen en la tele"
+    override val arenaNowHint = "También se pausa con la tecla pequeña de la pulsera o con la tecla play/pausa del mando de la tele."
     override val arenaPlayers = "Jugadores"
     override val arenaVsCpu = "Contra el teléfono"
     override val arenaTwoPlayers = "Dos jugadores"
@@ -72112,6 +72279,13 @@ object FrStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Le tennis sur la télé avec le bracelet comme raquette"
+    override val arenaNow = "Partie sur la télé"
+    override val arenaPause = "Mettre en pause"
+    override val arenaResume = "Reprendre"
+    override val arenaRestart = "Nouvelle partie"
+    override val arenaRestartAsk = "Recommencer à zéro ? La partie en cours est perdue."
+    override val arenaVolume = "Volume sur la télé"
+    override val arenaNowHint = "On peut aussi mettre en pause avec la petite touche du bracelet ou la touche lecture/pause de la télécommande."
     override val arenaPlayers = "Joueurs"
     override val arenaVsCpu = "Contre le téléphone"
     override val arenaTwoPlayers = "Deux joueurs"
@@ -74931,6 +75105,13 @@ object PtStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tênis na TV com a pulseira como raquete"
+    override val arenaNow = "Partida na TV"
+    override val arenaPause = "Pausa"
+    override val arenaResume = "Continuar"
+    override val arenaRestart = "Nova partida"
+    override val arenaRestartAsk = "Recomeçar do zero? A partida em andamento se perde."
+    override val arenaVolume = "Volume na TV"
+    override val arenaNowHint = "Também dá para pausar com a tecla pequena da pulseira ou com a tecla play/pausa do controle da TV."
     override val arenaPlayers = "Jogadores"
     override val arenaVsCpu = "Contra o celular"
     override val arenaTwoPlayers = "Dois jogadores"
@@ -76877,6 +77058,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RecordVoiceOver
@@ -76949,6 +77134,15 @@ fun ArenaScreen(c: MatchController) {
     val addresses by c.tvServer.addresses.collectAsState()
     val port by c.tvServer.port.collectAsState()
     val screens by c.tvServer.arenaClients.collectAsState()
+    val paused by c.arenaPaused.collectAsState()
+    var askRestart by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+    if (askRestart) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { askRestart = false },
+        icon = { androidx.compose.material3.Icon(Icons.Filled.Replay, null, tint = TsmColors.Ball) },
+        text = { Text(s.arenaRestartAsk) },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { askRestart = false; c.arenaRestart() }) { Text(s.arenaRestart) } },
+        dismissButton = { androidx.compose.material3.TextButton(onClick = { askRestart = false }) { Text(s.cancel) } },
+    )
 
     ScreenScaffold(
         onHelp = { c.openHelp("8.4") },
@@ -76962,6 +77156,30 @@ fun ArenaScreen(c: MatchController) {
             }, Modifier.weight(1f), enabled = port != null)
         },
     ) {
+        // --- Comandi della partita sulla TV: pausa, partita nuova, volume
+        SectionCard(s.arenaNow, Icons.Filled.SportsEsports) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.tennis.scoremanager.ui.BigButton(
+                    if (paused) s.arenaResume else s.arenaPause, if (paused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    { c.arenaPause(!paused) }, Modifier.weight(1f),
+                )
+                GhostButton(s.arenaRestart, Icons.Filled.Replay, { askRestart = true }, Modifier.weight(1f))
+            }
+            var vol by androidx.compose.runtime.remember(a.volume) { androidx.compose.runtime.mutableFloatStateOf(a.volume.toFloat()) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                androidx.compose.material3.Icon(Icons.AutoMirrored.Filled.VolumeUp, s.arenaVolume, tint = TsmColors.TextDim)
+                Spacer(Modifier.width(8.dp))
+                Text(s.arenaVolume, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.weight(1f))
+                Text("${vol.toInt()}%", color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+            }
+            androidx.compose.material3.Slider(
+                value = vol, onValueChange = { vol = it }, valueRange = 0f..100f, steps = 9,
+                onValueChangeFinished = { c.updateArena { it.copy(volume = vol.toInt()) } },
+            )
+            Text(s.arenaNowHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
+
         // --- TV
         SectionCard(s.arenaTv, Icons.Filled.Tv) {
             val url = port?.let { c.arenaUrl(addresses.firstOrNull()) }
@@ -109321,6 +109539,22 @@ class ArenaTest {
         val key = Json.parseToJsonElement(Arena.key(1, BandProtocol.EVT_UNDO)).jsonObject
         assertEquals(2, key["k"]!!.jsonPrimitive.int)
         assertEquals(1, Json.parseToJsonElement(Arena.key(1, BandProtocol.EVT_POINT)).jsonObject["k"]!!.jsonPrimitive.int)
+    }
+
+    /** Comandi dal telefono (pausa, ripresa, partita nuova) e volume nelle impostazioni mandate alla TV. */
+    @Test
+    fun phoneControlsAndVolume() {
+        for (a in listOf("pause", "resume", "start")) {
+            val o = Json.parseToJsonElement(Arena.control(a)).jsonObject
+            assertEquals("ctl", o["t"]!!.jsonPrimitive.content)
+            assertEquals(a, o["a"]!!.jsonPrimitive.content)
+        }
+        fun vol(s: ArenaSettings) = Json.parseToJsonElement(Arena.config(s, "it", "A", "B", true, false)).jsonObject["vol"]!!.jsonPrimitive.int
+        assertEquals(80, vol(ArenaSettings()))
+        assertEquals(35, vol(ArenaSettings(volume = 35)))
+        assertEquals(100, vol(ArenaSettings(volume = 180)))
+        // Le impostazioni salvate prima del volume si leggono ancora (volume di serie).
+        assertEquals(80, Json { ignoreUnknownKeys = true }.decodeFromString(ArenaSettings.serializer(), "{\"level\":3}").volume)
     }
 }
 TSM_EOF

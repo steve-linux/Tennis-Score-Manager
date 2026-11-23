@@ -1173,6 +1173,13 @@ object EsStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tenis en la tele con la pulsera como raqueta"
+    override val arenaNow = "Partido en la tele"
+    override val arenaPause = "Pausa"
+    override val arenaResume = "Seguir"
+    override val arenaRestart = "Nuevo partido"
+    override val arenaRestartAsk = "¿Empezar de cero? El partido en curso se pierde."
+    override val arenaVolume = "Volumen en la tele"
+    override val arenaNowHint = "También se pausa con la tecla pequeña de la pulsera o con la tecla play/pausa del mando de la tele."
     override val arenaPlayers = "Jugadores"
     override val arenaVsCpu = "Contra el teléfono"
     override val arenaTwoPlayers = "Dos jugadores"

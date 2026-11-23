@@ -1175,6 +1175,13 @@ object FrStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Le tennis sur la télé avec le bracelet comme raquette"
+    override val arenaNow = "Partie sur la télé"
+    override val arenaPause = "Mettre en pause"
+    override val arenaResume = "Reprendre"
+    override val arenaRestart = "Nouvelle partie"
+    override val arenaRestartAsk = "Recommencer à zéro ? La partie en cours est perdue."
+    override val arenaVolume = "Volume sur la télé"
+    override val arenaNowHint = "On peut aussi mettre en pause avec la petite touche du bracelet ou la touche lecture/pause de la télécommande."
     override val arenaPlayers = "Joueurs"
     override val arenaVsCpu = "Contre le téléphone"
     override val arenaTwoPlayers = "Deux joueurs"

@@ -21,6 +21,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RecordVoiceOver
@@ -93,6 +97,15 @@ fun ArenaScreen(c: MatchController) {
     val addresses by c.tvServer.addresses.collectAsState()
     val port by c.tvServer.port.collectAsState()
     val screens by c.tvServer.arenaClients.collectAsState()
+    val paused by c.arenaPaused.collectAsState()
+    var askRestart by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+    if (askRestart) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { askRestart = false },
+        icon = { androidx.compose.material3.Icon(Icons.Filled.Replay, null, tint = TsmColors.Ball) },
+        text = { Text(s.arenaRestartAsk) },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { askRestart = false; c.arenaRestart() }) { Text(s.arenaRestart) } },
+        dismissButton = { androidx.compose.material3.TextButton(onClick = { askRestart = false }) { Text(s.cancel) } },
+    )
 
     ScreenScaffold(
         onHelp = { c.openHelp("8.4") },
@@ -106,6 +119,30 @@ fun ArenaScreen(c: MatchController) {
             }, Modifier.weight(1f), enabled = port != null)
         },
     ) {
+        // --- Comandi della partita sulla TV: pausa, partita nuova, volume
+        SectionCard(s.arenaNow, Icons.Filled.SportsEsports) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.tennis.scoremanager.ui.BigButton(
+                    if (paused) s.arenaResume else s.arenaPause, if (paused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    { c.arenaPause(!paused) }, Modifier.weight(1f),
+                )
+                GhostButton(s.arenaRestart, Icons.Filled.Replay, { askRestart = true }, Modifier.weight(1f))
+            }
+            var vol by androidx.compose.runtime.remember(a.volume) { androidx.compose.runtime.mutableFloatStateOf(a.volume.toFloat()) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                androidx.compose.material3.Icon(Icons.AutoMirrored.Filled.VolumeUp, s.arenaVolume, tint = TsmColors.TextDim)
+                Spacer(Modifier.width(8.dp))
+                Text(s.arenaVolume, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.weight(1f))
+                Text("${vol.toInt()}%", color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+            }
+            androidx.compose.material3.Slider(
+                value = vol, onValueChange = { vol = it }, valueRange = 0f..100f, steps = 9,
+                onValueChangeFinished = { c.updateArena { it.copy(volume = vol.toInt()) } },
+            )
+            Text(s.arenaNowHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
+
         // --- TV
         SectionCard(s.arenaTv, Icons.Filled.Tv) {
             val url = port?.let { c.arenaUrl(addresses.firstOrNull()) }

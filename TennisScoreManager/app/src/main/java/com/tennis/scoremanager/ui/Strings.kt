@@ -1218,6 +1218,13 @@ interface Strings {
     // TSM Arena
     val arenaTitle: String get() = "TSM Arena"
     val arenaHint: String
+    val arenaNow: String
+    val arenaPause: String
+    val arenaResume: String
+    val arenaRestart: String
+    val arenaRestartAsk: String
+    val arenaVolume: String
+    val arenaNowHint: String
     val arenaPlayers: String
     val arenaVsCpu: String
     val arenaTwoPlayers: String
@@ -4051,6 +4058,13 @@ object ItStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tennis sulla TV con il braccialetto come racchetta"
+    override val arenaNow = "Partita sulla TV"
+    override val arenaPause = "Pausa"
+    override val arenaResume = "Riprendi"
+    override val arenaRestart = "Nuova partita"
+    override val arenaRestartAsk = "Ricominciare da zero? La partita in corso si perde."
+    override val arenaVolume = "Volume sulla TV"
+    override val arenaNowHint = "La pausa si mette anche col tasto piccolo del braccialetto o col tasto play/pausa del telecomando della TV."
     override val arenaPlayers = "Giocatori"
     override val arenaVsCpu = "Contro il telefono"
     override val arenaTwoPlayers = "Due giocatori"
@@ -6851,6 +6865,13 @@ object EnStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tennis on the TV with the wristband as your racket"
+    override val arenaNow = "Game on the TV"
+    override val arenaPause = "Pause"
+    override val arenaResume = "Resume"
+    override val arenaRestart = "New game"
+    override val arenaRestartAsk = "Start again from zero? The game in progress is lost."
+    override val arenaVolume = "Volume on the TV"
+    override val arenaNowHint = "You can also pause with the small wristband key or the play/pause key of the TV remote."
     override val arenaPlayers = "Players"
     override val arenaVsCpu = "Against the phone"
     override val arenaTwoPlayers = "Two players"

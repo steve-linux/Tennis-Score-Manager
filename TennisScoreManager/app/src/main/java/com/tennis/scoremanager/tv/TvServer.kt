@@ -56,6 +56,12 @@ import androidx.core.content.edit
  */
 class TvServer(context: Context) {
 
+    /**
+     * TSM Arena: frase dell'arbitro chiesta dalla pagina del gioco (GET /arena/say?t=...). La dice il telefono con la
+     * voce delle partite, non la TV (nella WebView della TV la sintesi vocale non c'è).
+     */
+    @Volatile var onArenaSay: ((String) -> Unit)? = null
+
     /** Cartella delle foto dei giocatori (la stessa di Storage). */
     private val photoDir = File(context.filesDir, "players")
     /** Ritratti di uomo e di donna per chi non ha la foto, dalle risorse dell'app. */
@@ -312,6 +318,12 @@ class TvServer(context: Context) {
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
                 "/arena", "/arena/" -> respond(out, "200 OK", "text/html; charset=utf-8", arenaPage, head)
+                "/arena/say" -> {
+                    val text = parts[1].substringAfter('?', "").split('&').firstOrNull { it.startsWith("t=") }?.removePrefix("t=")
+                        ?.let { runCatching { java.net.URLDecoder.decode(it, "UTF-8") }.getOrNull() }?.trim()?.take(200)
+                    if (!head && !text.isNullOrEmpty()) onArenaSay?.invoke(text)
+                    respond(out, "204 No Content", "text/plain", ByteArray(0), head)
+                }
                 "/arena/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out, arena = true)
                 else -> if (ARENA_FILE.matches(path)) {
                     val m = ARENA_FILE.matchEntire(path)!!

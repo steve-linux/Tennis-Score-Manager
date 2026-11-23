@@ -89,4 +89,20 @@ class ArenaTest {
         assertEquals(2, key["k"]!!.jsonPrimitive.int)
         assertEquals(1, Json.parseToJsonElement(Arena.key(1, BandProtocol.EVT_POINT)).jsonObject["k"]!!.jsonPrimitive.int)
     }
+
+    /** Comandi dal telefono (pausa, ripresa, partita nuova) e volume nelle impostazioni mandate alla TV. */
+    @Test
+    fun phoneControlsAndVolume() {
+        for (a in listOf("pause", "resume", "start")) {
+            val o = Json.parseToJsonElement(Arena.control(a)).jsonObject
+            assertEquals("ctl", o["t"]!!.jsonPrimitive.content)
+            assertEquals(a, o["a"]!!.jsonPrimitive.content)
+        }
+        fun vol(s: ArenaSettings) = Json.parseToJsonElement(Arena.config(s, "it", "A", "B", true, false)).jsonObject["vol"]!!.jsonPrimitive.int
+        assertEquals(80, vol(ArenaSettings()))
+        assertEquals(35, vol(ArenaSettings(volume = 35)))
+        assertEquals(100, vol(ArenaSettings(volume = 180)))
+        // Le impostazioni salvate prima del volume si leggono ancora (volume di serie).
+        assertEquals(80, Json { ignoreUnknownKeys = true }.decodeFromString(ArenaSettings.serializer(), "{\"level\":3}").volume)
+    }
 }

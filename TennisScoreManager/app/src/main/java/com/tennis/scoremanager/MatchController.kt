@@ -1218,6 +1218,26 @@ class MatchController(
     /** Impostazioni di TSM Arena (giocatori, livello, opzioni). */
     val arena = MutableStateFlow(storage.arena)
 
+    /**
+     * La partita di Arena è in pausa? La TV non lo dice al telefono: lo si tiene qui dai comandi del telefono e dai
+     * tasti dei braccialetti (KEY2 pausa/ripresa, KEY1 riprende). I comandi sono assoluti: al massimo serve un tocco in più.
+     */
+    val arenaPaused = MutableStateFlow(false)
+
+    /** Pausa o ripresa della partita di Arena dal telefono. */
+    fun arenaPause(on: Boolean) {
+        if (!arenaActive) return
+        arenaPaused.value = on
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.control(if (on) "pause" else "resume"))
+    }
+
+    /** Partita nuova di Arena da zero, anche a partita in corso. */
+    fun arenaRestart() {
+        if (!arenaActive) return
+        arenaPaused.value = false
+        tvServer.publishArena(com.tennis.scoremanager.arena.Arena.control("start"))
+    }
+
     init {
         scope.launch {
             ble.swings.collect {
@@ -1231,11 +1251,17 @@ class MatchController(
         }
         // Braccialetti che si collegano o si staccano: la TV mostra chi c'è.
         scope.launch { ble.bands.collect { if (arenaActive) publishArena() } }
+        // La voce dell'arbitro di Arena la dice il telefono (voce e motore scelti per le partite); il gioco ha il suo
+        // interruttore Voce dell'arbitro, quindi parla anche con la voce delle partite spenta.
+        tvServer.onArenaSay = { text ->
+            if (arenaActive && arena.value.voice) announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)), force = true)
+        }
     }
 
     fun openArena() {
         refreshPlayers()
         arenaActive = true
+        arenaPaused.value = false
         updateBandLinks()
         for (side in Side.entries) ble.setArena(side, true)
         // Il gioco usa il server del tabellone anche con il tabellone spento.
@@ -1257,6 +1283,7 @@ class MatchController(
     fun closeArena() {
         if (!arenaActive) return
         arenaActive = false
+        arenaPaused.value = false
         for (side in Side.entries) ble.setArena(side, false)
         tvServer.publishArena(com.tennis.scoremanager.arena.Arena.closed(), keep = true)
         publishTv()
@@ -1557,6 +1584,7 @@ class MatchController(
         if (arenaActive) {
             if (e.type == BandProtocol.EVT_POINT || e.type == BandProtocol.EVT_UNDO) {
                 tvServer.publishArena(com.tennis.scoremanager.arena.Arena.key(e.side.ordinal + 1, e.type))
+                arenaPaused.value = e.type == BandProtocol.EVT_UNDO && !arenaPaused.value
             }
             return
         }

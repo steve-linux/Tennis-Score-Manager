@@ -36,9 +36,17 @@ data class ArenaSettings(
     val tvLag: Int = 1,
     /** Grafica: 0 = 2D, 1 = 3D semplice (low-poly), 2 = 3D realistica. La TV scende da sola se va a scatti. */
     val graphics: Int = 2,
+    /** Volume del gioco sulla TV, 0-100: suoni e voce dell'arbitro. */
+    val volume: Int = 80,
 )
 
 object Arena {
+    /**
+     * Avvio dell'app sul telefono: cambia a ogni avvio (e quindi a ogni aggiornamento). La TV rimasta aperta se ne
+     * accorge e ricarica la pagina, sennò continuerebbe con il gioco della versione di prima.
+     */
+    val REV: Long = System.currentTimeMillis()
+
     /** Partite possibili: game per vincere. */
     val GAME_CHOICES = listOf(1, 3, 5)
 
@@ -64,6 +72,8 @@ object Arena {
             put("games", s.games.coerceIn(1, 9))
             put("strict", s.strict)
             put("voice", s.voice)
+            put("vol", s.volume.coerceIn(0, 100))
+            put("rev", REV)
             put("lagMs", tvLagMs(s.tvLag))
             put("two", s.twoPlayers)
             put("gfx", s.graphics.coerceIn(0, 2))
@@ -100,6 +110,12 @@ object Arena {
         put("t", "key")
         put("side", side)
         put("k", if (type == BandProtocol.EVT_UNDO) 2 else 1)
+    }.toString()
+
+    /** Comando dal telefono: [action] "pause", "resume" o "start" (partita nuova da zero). */
+    fun control(action: String): String = buildJsonObject {
+        put("t", "ctl")
+        put("a", action)
     }.toString()
 
     /** Il gioco si chiude dal telefono: la TV torna alla schermata d'attesa. */

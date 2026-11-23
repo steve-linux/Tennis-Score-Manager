@@ -1172,6 +1172,13 @@ object DeStrings : Strings {
 
     // TSM Arena
     override val arenaHint = "Tennis am Fernseher mit dem Armband als Schläger"
+    override val arenaNow = "Spiel am Fernseher"
+    override val arenaPause = "Anhalten"
+    override val arenaResume = "Weiter"
+    override val arenaRestart = "Neues Spiel"
+    override val arenaRestartAsk = "Von vorn beginnen? Das laufende Spiel geht verloren."
+    override val arenaVolume = "Lautstärke am Fernseher"
+    override val arenaNowHint = "Pausieren geht auch mit der kleinen Armbandtaste oder der Play/Pause-Taste der TV-Fernbedienung."
     override val arenaPlayers = "Spieler"
     override val arenaVsCpu = "Gegen das Handy"
     override val arenaTwoPlayers = "Zwei Spieler"
