@@ -7,8 +7,9 @@ Tennis Score Manager lleva el marcador de un partido de tenis según las reglas 
 * Shot clock (25 s), cambio de lado (90 s) y descanso entre sets (120 s); los cambios de lado y el orden de saque los gestiona la app.
 * Cualquier punto se puede deshacer, incluso después del final de un juego, de un set o del partido: el marcador se vuelve a calcular desde el principio.
 * Pulseras M5StickS3 por Bluetooth LE (opcionales): cada jugador pulsa KEY1 para anotarse el punto y KEY2 para deshacerlo. Su firmware de Arduino está en el mismo repositorio. Desde el firmware 2.4 reconocen también derecha, revés, saque y volea tras una breve calibración.
+* TSM Arena: tenis en la tele con la pulsera (firmware 2.5) como raqueta, contra el teléfono o entre dos.
 * Sin pulseras: dos mandos Bluetooth para selfies (1–3 € cada uno), emparejados como un teclado. Un clic = punto, doble clic, pulsación larga o el otro botón = deshacer.
-* Marcador LED en un televisor o monitor: un segundo teléfono con cable HDMI, un Chromecast (enviar pantalla) o cualquier navegador en el punto de acceso del teléfono.
+* Marcador LED en un televisor o monitor: un segundo teléfono con cable HDMI, un Chromecast (enviar pantalla) o cualquier navegador en el punto de acceso del teléfono. Con Android TV, TSM se instala también en la tele.
 * Resumen del partido con el resultado set a set, duración, club, pista y lugar; se guarda como texto, JSON, imagen o PDF completo (estadísticas, historial y hasta 10 fotos del partido), o se comparte.
 * Estadísticas de final de partido, del partido o por set (saque, resto, bolas de break, puntos seguidos…), e historial punto a punto con bolas de break, de set y de partido.
 * Estadísticas detalladas, para quien anota desde fuera de la pista: aces, dobles faltas, primeros saques, golpes ganadores y errores.

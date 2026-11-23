@@ -7,8 +7,9 @@ Tennis Score Manager zählt die Punkte eines Tennismatches nach den ITF-Regeln u
 * Shot Clock (25 s), Seitenwechsel (90 s) und Satzpause (120 s); Seitenwechsel und Aufschlagfolge regelt die App.
 * Jeder Punkt lässt sich zurücknehmen, auch nach dem Ende eines Spiels, Satzes oder Matches: der Spielstand wird von Anfang an neu berechnet.
 * M5StickS3-Armbänder über Bluetooth LE (optional): jeder Spieler drückt KEY1 für den Punkt und KEY2 zum Zurücknehmen. Die Arduino-Firmware liegt im selben Repository. Ab Firmware 2.4 erkennen sie nach einer kurzen Kalibrierung auch Vorhand, Rückhand, Aufschlag und Volley.
+* TSM Arena: Tennis am Fernseher mit dem Armband (Firmware 2.5) als Schläger, gegen das Telefon oder zu zweit.
 * Ohne Armbänder: zwei Bluetooth-Selfie-Fernbedienungen (1–3 € pro Stück), wie eine Tastatur gekoppelt. Ein Klick = Punkt, Doppelklick, langes Drücken oder die andere Taste = rückgängig.
-* LED-Anzeigetafel auf einem Fernseher oder Monitor: ein zweites Telefon mit HDMI-Kabel, ein Chromecast (Bildschirmübertragung) oder ein beliebiger Browser im Hotspot des Telefons.
+* LED-Anzeigetafel auf einem Fernseher oder Monitor: ein zweites Telefon mit HDMI-Kabel, ein Chromecast (Bildschirmübertragung) oder ein beliebiger Browser im Hotspot des Telefons. Mit Android TV läuft TSM auch auf dem Fernseher.
 * Spielbericht mit dem Ergebnis Satz für Satz, Dauer, Verein, Platz und Ort; als Text, JSON, Bild oder vollständiges PDF (Statistik, Verlauf und bis zu 10 Fotos vom Match) speichern oder teilen.
 * Statistiken zum Matchende, für das ganze Match oder je Satz (Aufschlag, Return, Breakbälle, Punkte in Folge…), und Verlauf Punkt für Punkt mit Break-, Satz- und Matchbällen.
 * Detaillierte Statistik für jemanden, der vom Spielfeldrand zählt: Asse, Doppelfehler, erste Aufschläge, Winner und Fehler.

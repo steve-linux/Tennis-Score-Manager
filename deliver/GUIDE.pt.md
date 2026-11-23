@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as
 | `deliver/installa_tsm.sh` | Alternativa ao clone: cria **todo** o projeto Android e o sketch só com blocos `cat << 'TSM_EOF'` (o jar do Gradle wrapper está em base64). |
 | `deliver/GUIDE.pt.md` | Este guia (em português); o original em italiano é `deliver/GUIDA.md` e as outras traduções são `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`. |
 
-Versões usadas e verificadas: app **2.7.0** · firmware **2.4** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licença: GNU GPL versão 3 ou posterior (`LICENSE`); o app mostra a versão e a licença em **Mais › Configurações › Sobre o app**.
+Versões usadas e verificadas: app **2.8.0** · firmware **2.5** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licença: GNU GPL versão 3 ou posterior (`LICENSE`); o app mostra a versão e a licença em **Mais › Configurações › Sobre o app**.
 
 ---
 
@@ -694,7 +694,7 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 
 **Prévia sem telefones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` num navegador (também `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) mostra o placar com dados de teste.
 
-### 8.4 TSM Arena: tênis na TV com as pulseiras (app 2.7, firmware 2.5)
+### 8.4 TSM Arena: tênis na TV com as pulseiras (app 2.8, firmware 2.5)
 
 Um jogo de tênis na TV, como os dos consoles, em que **a pulseira é a raquete**: útil em casa entre uma aula e outra para treinar o tempo de bola e a escolha entre forehand e backhand. O jogador na tela corre sozinho: você só pensa em **quando** bater. Adiantado a bola vai cruzada, atrasado vai na paralela; quanto mais rápido o pulso, mais forte o golpe.
 

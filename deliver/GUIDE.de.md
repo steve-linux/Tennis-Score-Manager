@@ -13,7 +13,7 @@ Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln
 | `deliver/installa_tsm.sh` | Alternative zum Klonen: erzeugt das **gesamte** Android-Projekt und den Sketch allein aus `cat << 'TSM_EOF'`-Blöcken (das JAR des Gradle-Wrappers liegt base64-kodiert darin). |
 | `deliver/GUIDE.de.md` | Diese Anleitung (auf Deutsch); das italienische Original ist `deliver/GUIDA.md`, die weiteren Übersetzungen sind `deliver/GUIDE.en.md`, `.fr`, `.es`, `.pt`. |
 
-Verwendete und geprüfte Versionen: App **2.7.0** · Firmware **2.4** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unter **Mehr › Einstellungen › Über die App**.
+Verwendete und geprüfte Versionen: App **2.8.0** · Firmware **2.5** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unter **Mehr › Einstellungen › Über die App**.
 
 ---
 
@@ -694,7 +694,7 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 
 **Vorschau ohne Telefone**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in einem Browser (auch `&lang=en`, `fr`, `de`, `es`, `pt` und `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) zeigt die Anzeigetafel mit Testdaten.
 
-### 8.4 TSM Arena: Tennis am Fernseher mit den Armbändern (App 2.7, Firmware 2.5)
+### 8.4 TSM Arena: Tennis am Fernseher mit den Armbändern (App 2.8, Firmware 2.5)
 
 Ein Tennisspiel am Fernseher, wie auf den Konsolen, bei dem **das Armband der Schläger ist**: praktisch zu Hause zwischen zwei Stunden, um das Timing und die Wahl zwischen Vorhand und Rückhand zu üben. Der Spieler auf dem Bildschirm läuft von selbst: Man denkt nur daran, **wann** man schlägt. Zu früh geht der Ball cross, zu spät longline; je schneller das Handgelenk, desto härter der Schlag.
 

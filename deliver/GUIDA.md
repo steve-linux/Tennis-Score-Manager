@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis second
 | `deliver/installa_tsm.sh` | In alternativa al clone: crea **tutto** il progetto Android e lo sketch con soli blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
 | `deliver/GUIDA.md` | Questa guida (in italiano); le traduzioni sono `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`, `.pt`. |
 
-Versioni usate e verificate: app **2.7.0** · firmware **2.4** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licenza: GNU GPL versione 3 o successiva (`LICENSE`); versione e licenza sono anche nell'app, in **Altro › Impostazioni › Informazioni**.
+Versioni usate e verificate: app **2.8.0** · firmware **2.5** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licenza: GNU GPL versione 3 o successiva (`LICENSE`); versione e licenza sono anche nell'app, in **Altro › Impostazioni › Informazioni**.
 
 ---
 
@@ -694,7 +694,7 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 
 **Anteprima senza telefoni**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in un browser (anche `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) mostra il tabellone con dati di prova.
 
-### 8.4 TSM Arena: tennis sulla TV coi braccialetti (app 2.7, firmware 2.5)
+### 8.4 TSM Arena: tennis sulla TV coi braccialetti (app 2.8, firmware 2.5)
 
 Un gioco di tennis sulla TV, come quelli delle console, in cui **il braccialetto è la racchetta**: utile a casa, tra una lezione e l'altra, per allenare il tempo sulla palla e la scelta tra dritto e rovescio. Il giocatore sullo schermo corre da solo: si pensa solo a **quando** colpire. In anticipo la palla va incrociata, in ritardo lungolinea; più il polso è veloce, più il colpo è forte.
 

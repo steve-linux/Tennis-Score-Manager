@@ -7,8 +7,9 @@ O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regra
 * Shot clock (25 s), troca de lado (90 s) e intervalo entre sets (120 s); as trocas de lado e a ordem de saque ficam por conta do app.
 * Qualquer ponto pode ser desfeito, mesmo depois do fim de um game, de um set ou da partida: o placar é recalculado desde o início.
 * Pulseiras M5StickS3 via Bluetooth LE (opcionais): cada jogador aperta KEY1 para marcar o ponto e KEY2 para desfazer. O firmware Arduino está no mesmo repositório. A partir do firmware 2.4 reconhecem também forehand, backhand, saque e voleio, após uma breve calibração.
+* TSM Arena: tênis na TV com a pulseira (firmware 2.5) como raquete, contra o telefone ou a dois.
 * Sem pulseiras: dois controles Bluetooth de selfie bem baratos, pareados como um teclado. Um clique = ponto, clique duplo, toque longo ou o outro botão = desfazer.
-* Placar de LED numa TV ou monitor: um segundo telefone com cabo HDMI, um Chromecast (transmissão de tela) ou qualquer navegador no hotspot do telefone.
+* Placar de LED numa TV ou monitor: um segundo telefone com cabo HDMI, um Chromecast (transmissão de tela) ou qualquer navegador no hotspot do telefone. Com Android TV, o TSM se instala também na TV.
 * Resumo da partida com o placar set a set, duração, clube, quadra e local; pode ser salvo como texto, JSON, imagem ou PDF completo (estatísticas, histórico e até 10 fotos da partida), ou compartilhado.
 * Estatísticas de fim de partida, da partida ou por set (saque, devolução, break points, pontos seguidos…), e histórico ponto a ponto com break points, set points e match points.
 * Estatísticas detalhadas, para quem marca da beira da quadra: aces, duplas faltas, primeiros saques, winners e erros.
