@@ -40,8 +40,9 @@ class HighlightsTest {
         val clips = Highlights.select(pts, null, 0)
         assertEquals(listOf(1, 2, 3, 4), clips.map { it.index })
         assertEquals(Highlights.Reason.BREAK_POINT, clips[1].reason)
-        // Il vincente parte dopo la fine del punto prima (+1 s), non 12 s prima.
-        assertEquals(61_000L, clips[2].startMs)
+        // Il vincente non parte 12 s prima: riparte da dove finisce il pezzo della palla break (2 s dopo quel punto),
+        // senza rivedere il secondo che i due pezzi avrebbero in comune.
+        assertEquals(62_000L, clips[2].startMs)
         assertEquals(67_000L, clips[2].endMs)
         assertEquals(28_000L, clips[0].startMs)
     }
@@ -97,5 +98,19 @@ class HighlightsTest {
         val clips = Highlights.select(raw, rules, 0, Highlights.Options(enabled = setOf(Highlights.Category.BIG_POINTS)))
         assertEquals(listOf(7), clips.map { it.index })
         assertEquals(Highlights.Reason.BREAK_POINT, clips.single().reason)
+    }
+
+    @Test
+    fun consecutivePointsDoNotRepeatVideo() {
+        // Come nel video del 24 nov: tre palle break di fila, 13,4 s e 10 s tra un punto e l'altro.
+        val pts = listOf(p(30_122), p(37_808, pressure = "BREAK_POINT"), p(51_188, pressure = "BREAK_POINT"), p(61_140, pressure = "BREAK_POINT"))
+        val clips = Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast))
+        assertEquals(listOf(1, 2, 3), clips.map { it.index })
+        // Ogni pezzo riparte esattamente dove finisce il precedente: nessun secondo visto due volte.
+        clips.zipWithNext { a, b -> assertEquals(a.endMs, b.startMs) }
+        assertEquals(37_808 + Highlights.AFTER_MS, clips[1].startMs)
+        // Punti lontani: niente cambia.
+        val far = listOf(p(20_000, kind = "ACE"), p(80_000, kind = "ACE"))
+        assertEquals(listOf(8_000L, 68_000L), Highlights.select(far, null, 0, Highlights.Options(enabled = noLast)).map { it.startMs })
     }
 }

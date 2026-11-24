@@ -122,6 +122,20 @@ object Highlights {
             kept += c
             total += c.durationMs
         }
-        return kept.sortedBy { it.index }
+        return continuous(kept.sortedBy { it.index })
+    }
+
+    /**
+     * Due punti di fila nel montaggio: il primo finisce [AFTER_MS] dopo la sua fine, il secondo comincerebbe 1 s dopo
+     * la stessa fine, e quel secondo di video si vedrebbe due volte (sembra uno spezzone ripetuto). Il secondo
+     * pezzo riparte da dove finisce il primo: il video scorre di seguito, senza ripetere niente.
+     */
+    fun continuous(clips: List<Clip>): List<Clip> {
+        val out = ArrayList<Clip>(clips.size)
+        for (c in clips) {
+            val prev = out.lastOrNull()
+            out += if (prev != null && c.startMs < prev.endMs) c.copy(startMs = prev.endMs) else c
+        }
+        return out.filter { it.durationMs > 0 }
     }
 }
