@@ -141,7 +141,11 @@ object HighlightIntro {
             val b = slots.getValue(Side.P2).first().who!!
             past.filter { (r, st) -> st.winner != null && PlayerStats.sideOf(r, a.key)?.let { PlayerStats.sideOf(r, b.key) == it.other } == true }
                 .maxByOrNull { (r, _) -> r.endedAt ?: r.updatedAt }
-                ?.let { (r, st) -> listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!)).filter { it.isNotBlank() }.joinToString(" · ") }
+                ?.let { (r, st) ->
+                    // Finita per ritiro o squalifica: lo si dice dopo il punteggio (anche se è 0-0).
+                    val end = if (st.retired == null) "" else " " + if (st.disqualified) s.ctDisqualified else s.ctRetired
+                    listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!) + end).filter { it.isNotBlank() }.joinToString(" · ")
+                }
         }
 
         val event = su.event.trim()

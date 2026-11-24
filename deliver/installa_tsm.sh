@@ -93605,7 +93605,11 @@ object HighlightIntro {
             val b = slots.getValue(Side.P2).first().who!!
             past.filter { (r, st) -> st.winner != null && PlayerStats.sideOf(r, a.key)?.let { PlayerStats.sideOf(r, b.key) == it.other } == true }
                 .maxByOrNull { (r, _) -> r.endedAt ?: r.updatedAt }
-                ?.let { (r, st) -> listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!)).filter { it.isNotBlank() }.joinToString(" · ") }
+                ?.let { (r, st) ->
+                    // Finita per ritiro o squalifica: lo si dice dopo il punteggio (anche se è 0-0).
+                    val end = if (st.retired == null) "" else " " + if (st.disqualified) s.ctDisqualified else s.ctRetired
+                    listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!) + end).filter { it.isNotBlank() }.joinToString(" · ")
+                }
         }
 
         val event = su.event.trim()
@@ -97888,8 +97892,9 @@ class VideoPlayerActivity : ComponentActivity() {
                 else rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
                 val before = known ?: System.currentTimeMillis()
                 val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
-                val lang = controller.options.value.lang
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { Reports.date(it, lang) }
+                // Data corta per l'ultimo scontro diretto ("23 nov 2026"): sta tra i due numeri.
+                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, controller.options.value.lang.locale)
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { short.format(java.util.Date(it)) }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,
