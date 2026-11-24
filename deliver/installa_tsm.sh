@@ -97403,13 +97403,17 @@ class VideoPlayerActivity : ComponentActivity() {
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
-                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
-                    if (points.isNotEmpty() && !tagging) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
+                    // Mentre si segnano i punti, in alto c'è solo come smettere: lo spazio sotto serve tutto al pannello.
+                    if (tagging) NavBtn(Icons.Filled.Check, str.videoTagDone, Modifier.weight(2f)) { tagging = false }
+                    else {
+                        NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
+                        if (points.isNotEmpty()) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
+                    }
                 }
                 // Segnare i punti: un pulsante con la scritta, in riga da solo (prima era solo un'icona).
-                if (ch.imported || ch.rules != null) {
-                    NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, if (tagging) str.videoTagDone else str.videoTagStart, Modifier.fillMaxWidth()) {
-                        if (ch.rules == null) setup = true else tagging = !tagging
+                if (!tagging && (ch.imported || ch.rules != null)) {
+                    NavBtn(Icons.Filled.EditNote, str.videoTagStart, Modifier.fillMaxWidth()) {
+                        if (ch.rules == null) setup = true else tagging = true
                     }
                 }
                 if (tagging && ch.rules != null) {
@@ -97441,7 +97445,8 @@ class VideoPlayerActivity : ComponentActivity() {
                         NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
                     }
                 }
-                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                // L'elenco prende lo spazio che resta (prima si vedono tutti i pulsanti per segnare).
+                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
                     itemsIndexed(shown) { k, i ->
                         val pt = points[i]
                         val newGame = k == 0 || points[shown[k - 1]].game != pt.game
