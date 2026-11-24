@@ -43,6 +43,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FilterList
@@ -343,6 +344,22 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
+        // Ricomincia da capo (con conferma): via tutti i punti, il video torna all'inizio.
+        var restart by remember { mutableStateOf(false) }
+        if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestart, Modifier.fillMaxWidth()) { restart = true }
+        if (restart) AlertDialog(
+            onDismissRequest = { restart = false },
+            text = { Text(str.videoRestartAsk(points.size)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    restart = false
+                    askKind = false
+                    onChange(ch.copy(points = emptyList()))
+                    p.seekTo(0)
+                }) { Text(str.videoRestart) }
+            },
+            dismissButton = { TextButton(onClick = { restart = false }) { Text(str.back) } },
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             for (side in Side.entries) {
                 Surface(

@@ -17,10 +17,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,10 +66,23 @@ fun VideosScreen(c: MatchController) {
     val list by produceState(emptyList<VideoLibrary.Entry>(), tick) { value = withContext(Dispatchers.IO) { VideoLibrary.list(context) } }
     var toDelete by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
     // Video presi dal telefono: si apre subito il lettore per segnare i punti.
+    fun open(e: VideoLibrary.Entry) =
+        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+    // Lo stesso video importato di nuovo, coi punti già segnati: si chiede se riaprirlo o ricominciare da capo.
+    var again by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         val e = uri?.let { VideoLibrary.import(context, it) } ?: return@rememberLauncherForActivityResult
         tick++
-        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+        if (e.chapters.points.isNotEmpty()) again = e else open(e)
+    }
+    again?.let { e ->
+        AlertDialog(
+            onDismissRequest = { again = null },
+            title = { Text(s.videoAgainTitle) },
+            text = { Text(s.videoAgainText(e.chapters.points.size)) },
+            confirmButton = { TextButton(onClick = { again = null; open(e) }) { Text(s.videoReopen) } },
+            dismissButton = { TextButton(onClick = { again = null; open(VideoLibrary.restart(e)); tick++ }) { Text(s.videoRestart) } },
+        )
     }
     ScreenScaffold(
         onHelp = { c.openHelp("7.3") },

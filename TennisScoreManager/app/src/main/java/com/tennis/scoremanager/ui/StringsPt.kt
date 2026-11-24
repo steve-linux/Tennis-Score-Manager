@@ -253,6 +253,11 @@ object PtStrings : Strings {
     override val videoTagTooEarly = "Leve o vídeo para depois do último ponto marcado."
     override val videoPointFor: (String) -> String = { "Ponto $it" }
     override val videoUndoLast = "Desfazer o último"
+    override val videoAgainTitle = "Vídeo já importado"
+    override val videoAgainText: (Int) -> String = { n -> "Este vídeo já tem $n pontos marcados. Você pode reabri-lo como está ou recomeçar do zero: os pontos marcados são apagados (os nomes e quem saca primeiro ficam)." }
+    override val videoReopen = "Reabrir"
+    override val videoRestart = "Recomeçar do zero"
+    override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
     override val videoTagSetupTitle = "Quem joga?"
     override val videoFirstServer = "Quem saca primeiro"
     override val videoTagSetupHint = "Formato e regras são os da página 2."

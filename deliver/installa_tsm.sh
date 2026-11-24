@@ -18227,7 +18227,7 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
    - **Umriss** (Platzumriss): In der Vorschau erscheinen die Platzlinien so, wie das Objektiv sie sieht, und sie folgen dem Telefon beim Neigen. Die Schieberegler (**Abstand**, **Höhe**, **Richtung**, **Seitlicher Versatz** und bei Bedarf **Bildwinkel** und **Neigungskorrektur**) bewegen, bis sie auf den echten Linien liegen: So stimmt auch die Mitte, und die empfohlene Neigung wird genau. Die Einstellung wird für den Platz des Matches (*Verein · Platz* des Schiedsrichters) gespeichert und beim nächsten Mal übernommen. Umriss und Regler gibt es auch im Fenster **Kamera** des Schiedsrichters. Je höher das Telefon, desto besser sieht man die entfernte Platzhälfte: aus 2,5 m ist sie knapp über dem Netz zusammengedrückt.
 3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
 
-- **Fortschritt** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*.
+- **Fortschritt** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*. Wird ein Video mit schon markierten Punkten erneut importiert, fragt die App, ob es **wieder geöffnet** oder **von vorn begonnen** werden soll; beim Markieren löscht **Von vorn beginnen** alle Punkte und bringt das Video an den Anfang (Namen und wer zuerst aufschlägt bleiben).
 - **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
 - **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (letzter Punkt des Matches, Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
   - **Intro wie bei Turnieren (am Anfang)**: 9 Sekunden vor den Punkten, mit derselben Grafik und Musik wie die Statistiken, ein- und ausgeblendet: oben Turnier und Runde (oder Verein) und das Datum; an den Seiten Foto oder Porträt, Vorname und NACHNAME und das FITP-Ranking groß; in der Mitte der Vergleich mit den Daten, die die App kennt (TSM-Wertung, Alter, Größe, Spielhand, Rückhand, Verein, Siege – Niederlagen) und der direkte Vergleich vor diesem Match. Die Daten stammen aus der Spielerkarte unter *Spieler*: Was nicht eingetragen ist, fehlt. Das Video braucht nur die Namen der Spieler.
@@ -18863,7 +18863,7 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
    - **Outline** (court outline): the preview shows the court lines as the lens sees them, and they follow the phone as you tilt it. Move the sliders (**Distance**, **Height**, **Direction**, **Sideways offset** and, if needed, **Field of view** and **Tilt correction**) until they match the real lines: that also sets the centring, and the suggested tilt becomes accurate. The calibration is remembered for the match court (the umpire's *Club · Court*) and restored next time. Outline and sliders are also in the umpire's **Camera** window. The higher the phone, the better you see the far half of the court: from 2.5 m it is squeezed just above the net.
 3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in More › **Settings** › **Devices** › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
 
-- **Progress** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*.
+- **Progress** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*. Importing again a video that already has points, the app asks whether to **reopen** it or **start over**; while marking, **Start over** deletes all the points and takes the video back to the beginning (names and first server stay).
 - **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
 - **Highlights**: automatic edit of the best points (last point of the match, aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
   - **Tournament-style intro (at the start)**: 9 seconds before the points, with the same graphics and music as the statistics, fading in and out: tournament and round (or club) and the date at the top; on the sides photo or portrait, first name and SURNAME and the FITP ranking in large type; in the middle the comparison with the data the app knows (TSM rating, age, height, hand, backhand, club, wins – losses) and the head to head before that match. The data come from the player card in *Players*: whatever is not filled in is left out. The video only needs the players' names.
@@ -19498,7 +19498,7 @@ Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marc
    - **Silueta** (silueta de la pista): la vista previa muestra las líneas de la pista como las ve el objetivo, y siguen al teléfono cuando lo inclinas. Mueve los controles (**Distancia**, **Altura**, **Dirección**, **Desplazamiento lateral** y, si hace falta, **Campo de visión** y **Corrección de inclinación**) hasta que coincidan con las reales: así se ajusta también el centrado, y la inclinación aconsejada se vuelve precisa. El ajuste se recuerda para la pista del partido (*Club · Pista* del árbitro) y se recupera la próxima vez. Silueta y controles también están en la ventana **Cámara** del árbitro. Cuanto más alto esté el teléfono, mejor se ve la mitad lejana de la pista: desde 2,5 m queda aplastada justo encima de la red.
 3. **Cámara en alto, manejada por el árbitro**: en el teléfono del árbitro, **Cámara** (junto a *Repetición* durante el partido, o *Encuadre y mandos de la cámara* en la Más › **Ajustes** › **Dispositivos** › **Segundo teléfono**, útil para colocarla antes de empezar) muestra el encuadre del teléfono-cámara tal como queda en el vídeo, con el gráfico, y **Grabar / Parar**, **Directo**, **Gráfico** y el **zoom**. También se ven la duración de la grabación, la batería y el espacio libre (en naranja si son bajos). La imagen es pequeña y a saltos (unos 3 fotogramas por segundo) y solo se envía mientras se mira; la clave del directo se pone en el teléfono-cámara.
 
-- **Progresos** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*.
+- **Progresos** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*. Al importar de nuevo un vídeo que ya tiene puntos, la app pregunta si **volver a abrirlo** o **empezar de nuevo**; mientras marcas, **Empezar de nuevo** borra todos los puntos y lleva el vídeo al principio (los nombres y quién saca primero se quedan).
 - **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
 - **Mejores jugadas**: montaje automático de los mejores puntos (último punto del partido, aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
   - **Intro como en los torneos (al principio)**: 9 segundos antes de los puntos, con el mismo diseño y la misma música que las estadísticas, con fundido: arriba torneo y ronda (o club) y la fecha; a los lados foto o retrato, nombre y APELLIDO y la clasificación FITP en grande; en el centro la comparación con los datos que la app conoce (rating TSM, edad, altura, mano, revés, club, victorias – derrotas) y los enfrentamientos antes de ese partido. Los datos vienen de la ficha del jugador en *Jugadores*: lo que no está rellenado no aparece. Basta con que el vídeo tenga los nombres de los jugadores.
@@ -20133,7 +20133,7 @@ Un deuxième téléphone sur un trépied filme le match et met le score de l'arb
    - **Tracé** (tracé du terrain) : l'aperçu montre les lignes du terrain telles que l'objectif les voit, et elles suivent le téléphone quand on l'incline. Déplacez les curseurs (**Distance**, **Hauteur**, **Direction**, **Décalage latéral** et, si besoin, **Champ de vision** et **Correction d'inclinaison**) jusqu'à ce qu'elles coïncident avec les vraies : cela règle aussi le centrage, et l'inclinaison conseillée devient précise. Le réglage est mémorisé pour le terrain du match (*Club · Court* de l'arbitre) et repris la fois suivante. Tracé et curseurs sont aussi dans la fenêtre **Caméra** de l'arbitre. Plus le téléphone est haut, mieux on voit la moitié éloignée du terrain : à 2,5 m elle est écrasée juste au-dessus du filet.
 3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en Plus › **Réglages** › **Appareils** › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
 
-- **Progrès** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*.
+- **Progrès** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*. En important de nouveau une vidéo qui a déjà des points, l'appli demande s'il faut la **rouvrir** ou **recommencer** ; pendant le marquage, **Recommencer** efface tous les points et ramène la vidéo au début (les noms et le premier serveur restent).
 - **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
 - **Temps forts** : montage automatique des plus beaux points (dernier point du match, aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
   - **Intro comme dans les tournois (au début)** : 9 secondes avant les points, avec le même graphisme et la même musique que les statistiques, en fondu : en haut tournoi et tour (ou club) et la date ; sur les côtés photo ou portrait, prénom et NOM et le classement FITP en grand ; au centre la comparaison avec les données que l'app connaît (classement TSM, âge, taille, main, revers, club, victoires – défaites) et le face-à-face avant ce match. Les données viennent de la fiche du joueur dans *Joueurs* : ce qui n'est pas rempli n'apparaît pas. Il suffit que la vidéo ait les noms des joueurs.
@@ -20768,7 +20768,7 @@ Un secondo telefono su un treppiede riprende la partita e mette sul video il pun
    - **Sagoma** (sagoma del campo): sull'anteprima compaiono le linee del campo come le vede l'obiettivo, e seguono il telefono mentre lo inclini. Muovi i cursori (**Distanza**, **Altezza**, **Direzione**, **Spostamento laterale** e, se serve, **Campo visivo** e **Correzione inclinazione**) finché combaciano con le linee vere: così si sistema anche la centratura, e l'inclinazione consigliata diventa precisa. La taratura viene ricordata per il campo della partita (*Circolo · Campo* dell'arbitro) e ripresa la volta dopo. Sagoma e cursori ci sono anche nel riquadro **Telecamera** dell'arbitro. Più in alto è il telefono, meglio si vede la metà lontana del campo: da 2,5 m è schiacciata appena sopra la rete.
 3. **Telecamera in alto, comandata dall'arbitro**: sul telefono dell'arbitro **Telecamera** (accanto a *Moviola* in partita, oppure *Inquadratura e comandi della telecamera* in Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono**, utile per sistemarla prima di iniziare) mostra l'inquadratura del telefono-telecamera com'è nel video, grafica compresa, con **Registra / Ferma**, **Diretta**, **Grafica** e lo **zoom**. Si vedono anche durata della registrazione, batteria e spazio libero (in arancione se sono bassi). L'immagine è piccola e a scatti (circa 3 fotogrammi al secondo) e passa solo mentre la si guarda; la chiave della diretta va messa sul telefono-telecamera.
 
-- **Progressi** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*.
+- **Progressi** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*. Importando di nuovo un video che ha già dei punti, l'app chiede se **riaprirlo** o **ricominciare da capo**; mentre segni, **Ricomincia da capo** cancella tutti i punti e riporta il video all'inizio (nomi e chi serve per primo restano).
 - **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
 - **Highlights**: montaggio automatico dei punti più belli (ultimo punto della partita, ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
   - **Intro come nei tornei (all'inizio)**: 9 secondi prima dei punti, con la stessa grafica e la stessa musica delle statistiche, in dissolvenza: in alto torneo e turno (o circolo) e la data; ai lati foto o ritratto, nome e COGNOME e la classifica FITP in grande; al centro il confronto con i dati che l'app conosce (rating TSM, età, altezza, mano, rovescio, circolo, vittorie – sconfitte) e gli scontri diretti prima di quella partita. I dati vengono dalla scheda del giocatore in *Giocatori*: mancano quelli non scritti. Basta che il video abbia i nomi dei giocatori.
@@ -21403,7 +21403,7 @@ Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do á
    - **Contorno** (contorno da quadra): a pré-visualização mostra as linhas da quadra como a lente as vê, e elas acompanham o telefone quando você o inclina. Mova os controles (**Distância**, **Altura**, **Direção**, **Deslocamento lateral** e, se preciso, **Campo de visão** e **Correção da inclinação**) até coincidirem com as linhas reais: assim se acerta também o centro, e a inclinação sugerida fica precisa. O ajuste é lembrado para a quadra da partida (*Clube · Quadra* do árbitro) e recuperado na próxima vez. Contorno e controles também estão na janela **Câmera** do árbitro. Quanto mais alto o telefone, melhor se vê a metade distante da quadra: a 2,5 m ela fica espremida logo acima da rede.
 3. **Câmera no alto, comandada pelo árbitro**: no telefone do árbitro, **Câmera** (ao lado de *Replay* durante a partida, ou *Enquadramento e comandos da câmera* na Mais › **Configurações** › **Dispositivos** › **Segundo telefone**, útil para ajustá-la antes de começar) mostra o enquadramento do telefone-câmera como fica no vídeo, com o gráfico, e **Gravar / Parar**, **Ao vivo**, **Gráfico** e o **zoom**. Mostra também a duração da gravação, a bateria e o espaço livre (em laranja quando baixos). A imagem é pequena e aos saltos (cerca de 3 quadros por segundo) e só é enviada enquanto se olha; a chave da transmissão é colocada no telefone-câmera.
 
-- **Progresso** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*.
+- **Progresso** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*. Ao importar de novo um vídeo que já tem pontos, o app pergunta se quer **reabri-lo** ou **recomeçar do zero**; enquanto marca, **Recomeçar do zero** apaga todos os pontos e leva o vídeo ao início (os nomes e quem saca primeiro ficam).
 - **Filtros do treinador** (ícone do filtro): só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points. **Reproduzir** coloca-os em sequência.
 - **Melhores momentos**: montagem automática dos melhores pontos (último ponto da partida, aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
   - **Intro como nos torneios (no início)**: 9 segundos antes dos pontos, com o mesmo visual e a mesma música das estatísticas, com transição suave: no topo torneio e ronda (ou clube) e a data; dos lados foto ou retrato, nome e APELIDO e o ranking FITP em grande; no centro a comparação com os dados que a app conhece (rating TSM, idade, altura, mão, backhand, clube, vitórias – derrotas) e os confrontos diretos antes dessa partida. Os dados vêm da ficha do jogador em *Jogadores*: o que não estiver preenchido não aparece. Basta que o vídeo tenha os nomes dos jogadores.
@@ -57201,6 +57201,11 @@ interface Strings {
     val videoTagTooEarly: String
     val videoPointFor: (String) -> String
     val videoUndoLast: String
+    val videoAgainTitle: String
+    val videoAgainText: (Int) -> String
+    val videoReopen: String
+    val videoRestart: String
+    val videoRestartAsk: (Int) -> String
     val videoTagSetupTitle: String
     val videoFirstServer: String
     val videoTagSetupHint: String
@@ -60072,6 +60077,11 @@ object ItStrings : Strings {
     override val videoTagTooEarly = "Porta il video dopo l'ultimo punto segnato."
     override val videoPointFor: (String) -> String = { "Punto $it" }
     override val videoUndoLast = "Annulla ultimo"
+    override val videoAgainTitle = "Video già importato"
+    override val videoAgainText: (Int) -> String = { n -> "Questo video ha già $n punti segnati. Puoi riaprirlo così com'è o ricominciare da capo: i punti segnati si cancellano (nomi e chi serve per primo restano)." }
+    override val videoReopen = "Riapri"
+    override val videoRestart = "Ricomincia da capo"
+    override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
     override val videoTagSetupTitle = "Chi gioca?"
     override val videoFirstServer = "Chi serve per primo"
     override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
@@ -62879,6 +62889,11 @@ object EnStrings : Strings {
     override val videoTagTooEarly = "Move the video past the last marked point."
     override val videoPointFor: (String) -> String = { "Point $it" }
     override val videoUndoLast = "Undo last"
+    override val videoAgainTitle = "Video already imported"
+    override val videoAgainText: (Int) -> String = { n -> "This video already has $n marked points. You can reopen it as it is or start over: the marked points are deleted (names and first server stay)." }
+    override val videoReopen = "Reopen"
+    override val videoRestart = "Start over"
+    override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
     override val videoTagSetupTitle = "Who is playing?"
     override val videoFirstServer = "Who serves first"
     override val videoTagSetupHint = "Format and rules are the ones on page 2."
@@ -65709,6 +65724,11 @@ object DeStrings : Strings {
     override val videoTagTooEarly = "Spule das Video hinter den zuletzt markierten Punkt."
     override val videoPointFor: (String) -> String = { "Punkt $it" }
     override val videoUndoLast = "Letzten rückgängig"
+    override val videoAgainTitle = "Video schon importiert"
+    override val videoAgainText: (Int) -> String = { n -> "Dieses Video hat schon $n markierte Punkte. Du kannst es so wieder öffnen oder von vorn beginnen: die markierten Punkte werden gelöscht (Namen und wer zuerst aufschlägt bleiben)." }
+    override val videoReopen = "Wieder öffnen"
+    override val videoRestart = "Von vorn beginnen"
+    override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
     override val videoTagSetupTitle = "Wer spielt?"
     override val videoFirstServer = "Wer schlägt zuerst auf"
     override val videoTagSetupHint = "Format und Regeln sind die von Seite 2."
@@ -68531,6 +68551,11 @@ object EsStrings : Strings {
     override val videoTagTooEarly = "Lleva el vídeo después del último punto marcado."
     override val videoPointFor: (String) -> String = { "Punto $it" }
     override val videoUndoLast = "Deshacer el último"
+    override val videoAgainTitle = "Vídeo ya importado"
+    override val videoAgainText: (Int) -> String = { n -> "Este vídeo ya tiene $n puntos marcados. Puedes volver a abrirlo tal cual o empezar de nuevo: los puntos marcados se borran (los nombres y quién saca primero se quedan)." }
+    override val videoReopen = "Volver a abrir"
+    override val videoRestart = "Empezar de nuevo"
+    override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
     override val videoTagSetupTitle = "¿Quién juega?"
     override val videoFirstServer = "Quién saca primero"
     override val videoTagSetupHint = "Formato y reglas son los de la página 2."
@@ -71357,6 +71382,11 @@ object FrStrings : Strings {
     override val videoTagTooEarly = "Placez la vidéo après le dernier point marqué."
     override val videoPointFor: (String) -> String = { "Point $it" }
     override val videoUndoLast = "Annuler le dernier"
+    override val videoAgainTitle = "Vidéo déjà importée"
+    override val videoAgainText: (Int) -> String = { n -> "Cette vidéo a déjà $n points marqués. Vous pouvez la rouvrir telle quelle ou recommencer depuis le début : les points marqués sont effacés (les noms et le premier serveur restent)." }
+    override val videoReopen = "Rouvrir"
+    override val videoRestart = "Recommencer"
+    override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
     override val videoTagSetupTitle = "Qui joue ?"
     override val videoFirstServer = "Qui sert en premier"
     override val videoTagSetupHint = "Format et règles sont ceux de la page 2."
@@ -74182,6 +74212,11 @@ object PtStrings : Strings {
     override val videoTagTooEarly = "Leve o vídeo para depois do último ponto marcado."
     override val videoPointFor: (String) -> String = { "Ponto $it" }
     override val videoUndoLast = "Desfazer o último"
+    override val videoAgainTitle = "Vídeo já importado"
+    override val videoAgainText: (Int) -> String = { n -> "Este vídeo já tem $n pontos marcados. Você pode reabri-lo como está ou recomeçar do zero: os pontos marcados são apagados (os nomes e quem saca primeiro ficam)." }
+    override val videoReopen = "Reabrir"
+    override val videoRestart = "Recomeçar do zero"
+    override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
     override val videoTagSetupTitle = "Quem joga?"
     override val videoFirstServer = "Quem saca primeiro"
     override val videoTagSetupHint = "Formato e regras são os da página 2."
@@ -90431,10 +90466,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -90478,10 +90515,23 @@ fun VideosScreen(c: MatchController) {
     val list by produceState(emptyList<VideoLibrary.Entry>(), tick) { value = withContext(Dispatchers.IO) { VideoLibrary.list(context) } }
     var toDelete by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
     // Video presi dal telefono: si apre subito il lettore per segnare i punti.
+    fun open(e: VideoLibrary.Entry) =
+        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+    // Lo stesso video importato di nuovo, coi punti già segnati: si chiede se riaprirlo o ricominciare da capo.
+    var again by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         val e = uri?.let { VideoLibrary.import(context, it) } ?: return@rememberLauncherForActivityResult
         tick++
-        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+        if (e.chapters.points.isNotEmpty()) again = e else open(e)
+    }
+    again?.let { e ->
+        AlertDialog(
+            onDismissRequest = { again = null },
+            title = { Text(s.videoAgainTitle) },
+            text = { Text(s.videoAgainText(e.chapters.points.size)) },
+            confirmButton = { TextButton(onClick = { again = null; open(e) }) { Text(s.videoReopen) } },
+            dismissButton = { TextButton(onClick = { again = null; open(VideoLibrary.restart(e)); tick++ }) { Text(s.videoRestart) } },
+        )
     }
     ScreenScaffold(
         onHelp = { c.openHelp("7.3") },
@@ -96871,6 +96921,13 @@ object VideoLibrary {
         e.chaptersFile.delete()
     }
 
+    /** Lo stesso video già importato (quello con più punti, se per caso ce n'è più d'uno); null se è nuovo. */
+    fun imported(context: Context, uri: Uri): Entry? =
+        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }.maxByOrNull { it.chapters.points.size }
+
+    /** Ricomincia da capo: via i punti segnati; nomi, regole e chi serve per primo restano. */
+    fun restart(e: Entry): Entry = save(e, e.chapters.copy(points = emptyList()))
+
     fun save(e: Entry, ch: VideoChapters): Entry {
         e.chaptersFile.writeText(json.encodeToString(VideoChapters.serializer(), ch))
         return e.copy(chapters = ch)
@@ -96882,8 +96939,7 @@ object VideoLibrary {
      */
     fun import(context: Context, uri: Uri): Entry? = runCatching {
         context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }
-            .maxByOrNull { it.chapters.points.size }?.let { return@runCatching it }
+        imported(context, uri)?.let { return@runCatching it }
         val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         } ?: "video"
@@ -96942,6 +96998,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FilterList
@@ -97242,6 +97299,22 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
+        // Ricomincia da capo (con conferma): via tutti i punti, il video torna all'inizio.
+        var restart by remember { mutableStateOf(false) }
+        if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestart, Modifier.fillMaxWidth()) { restart = true }
+        if (restart) AlertDialog(
+            onDismissRequest = { restart = false },
+            text = { Text(str.videoRestartAsk(points.size)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    restart = false
+                    askKind = false
+                    onChange(ch.copy(points = emptyList()))
+                    p.seekTo(0)
+                }) { Text(str.videoRestart) }
+            },
+            dismissButton = { TextButton(onClick = { restart = false }) { Text(str.back) } },
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             for (side in Side.entries) {
                 Surface(

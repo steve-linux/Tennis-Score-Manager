@@ -250,6 +250,11 @@ object DeStrings : Strings {
     override val videoTagTooEarly = "Spule das Video hinter den zuletzt markierten Punkt."
     override val videoPointFor: (String) -> String = { "Punkt $it" }
     override val videoUndoLast = "Letzten rückgängig"
+    override val videoAgainTitle = "Video schon importiert"
+    override val videoAgainText: (Int) -> String = { n -> "Dieses Video hat schon $n markierte Punkte. Du kannst es so wieder öffnen oder von vorn beginnen: die markierten Punkte werden gelöscht (Namen und wer zuerst aufschlägt bleiben)." }
+    override val videoReopen = "Wieder öffnen"
+    override val videoRestart = "Von vorn beginnen"
+    override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
     override val videoTagSetupTitle = "Wer spielt?"
     override val videoFirstServer = "Wer schlägt zuerst auf"
     override val videoTagSetupHint = "Format und Regeln sind die von Seite 2."

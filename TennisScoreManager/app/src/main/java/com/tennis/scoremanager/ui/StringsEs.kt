@@ -250,6 +250,11 @@ object EsStrings : Strings {
     override val videoTagTooEarly = "Lleva el vídeo después del último punto marcado."
     override val videoPointFor: (String) -> String = { "Punto $it" }
     override val videoUndoLast = "Deshacer el último"
+    override val videoAgainTitle = "Vídeo ya importado"
+    override val videoAgainText: (Int) -> String = { n -> "Este vídeo ya tiene $n puntos marcados. Puedes volver a abrirlo tal cual o empezar de nuevo: los puntos marcados se borran (los nombres y quién saca primero se quedan)." }
+    override val videoReopen = "Volver a abrir"
+    override val videoRestart = "Empezar de nuevo"
+    override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
     override val videoTagSetupTitle = "¿Quién juega?"
     override val videoFirstServer = "Quién saca primero"
     override val videoTagSetupHint = "Formato y reglas son los de la página 2."

@@ -265,6 +265,11 @@ interface Strings {
     val videoTagTooEarly: String
     val videoPointFor: (String) -> String
     val videoUndoLast: String
+    val videoAgainTitle: String
+    val videoAgainText: (Int) -> String
+    val videoReopen: String
+    val videoRestart: String
+    val videoRestartAsk: (Int) -> String
     val videoTagSetupTitle: String
     val videoFirstServer: String
     val videoTagSetupHint: String
@@ -3136,6 +3141,11 @@ object ItStrings : Strings {
     override val videoTagTooEarly = "Porta il video dopo l'ultimo punto segnato."
     override val videoPointFor: (String) -> String = { "Punto $it" }
     override val videoUndoLast = "Annulla ultimo"
+    override val videoAgainTitle = "Video già importato"
+    override val videoAgainText: (Int) -> String = { n -> "Questo video ha già $n punti segnati. Puoi riaprirlo così com'è o ricominciare da capo: i punti segnati si cancellano (nomi e chi serve per primo restano)." }
+    override val videoReopen = "Riapri"
+    override val videoRestart = "Ricomincia da capo"
+    override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
     override val videoTagSetupTitle = "Chi gioca?"
     override val videoFirstServer = "Chi serve per primo"
     override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
@@ -5943,6 +5953,11 @@ object EnStrings : Strings {
     override val videoTagTooEarly = "Move the video past the last marked point."
     override val videoPointFor: (String) -> String = { "Point $it" }
     override val videoUndoLast = "Undo last"
+    override val videoAgainTitle = "Video already imported"
+    override val videoAgainText: (Int) -> String = { n -> "This video already has $n marked points. You can reopen it as it is or start over: the marked points are deleted (names and first server stay)." }
+    override val videoReopen = "Reopen"
+    override val videoRestart = "Start over"
+    override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
     override val videoTagSetupTitle = "Who is playing?"
     override val videoFirstServer = "Who serves first"
     override val videoTagSetupHint = "Format and rules are the ones on page 2."

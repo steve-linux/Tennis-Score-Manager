@@ -60,6 +60,13 @@ object VideoLibrary {
         e.chaptersFile.delete()
     }
 
+    /** Lo stesso video già importato (quello con più punti, se per caso ce n'è più d'uno); null se è nuovo. */
+    fun imported(context: Context, uri: Uri): Entry? =
+        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }.maxByOrNull { it.chapters.points.size }
+
+    /** Ricomincia da capo: via i punti segnati; nomi, regole e chi serve per primo restano. */
+    fun restart(e: Entry): Entry = save(e, e.chapters.copy(points = emptyList()))
+
     fun save(e: Entry, ch: VideoChapters): Entry {
         e.chaptersFile.writeText(json.encodeToString(VideoChapters.serializer(), ch))
         return e.copy(chapters = ch)
@@ -71,8 +78,7 @@ object VideoLibrary {
      */
     fun import(context: Context, uri: Uri): Entry? = runCatching {
         context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }
-            .maxByOrNull { it.chapters.points.size }?.let { return@runCatching it }
+        imported(context, uri)?.let { return@runCatching it }
         val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         } ?: "video"

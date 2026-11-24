@@ -253,6 +253,11 @@ object FrStrings : Strings {
     override val videoTagTooEarly = "Placez la vidéo après le dernier point marqué."
     override val videoPointFor: (String) -> String = { "Point $it" }
     override val videoUndoLast = "Annuler le dernier"
+    override val videoAgainTitle = "Vidéo déjà importée"
+    override val videoAgainText: (Int) -> String = { n -> "Cette vidéo a déjà $n points marqués. Vous pouvez la rouvrir telle quelle ou recommencer depuis le début : les points marqués sont effacés (les noms et le premier serveur restent)." }
+    override val videoReopen = "Rouvrir"
+    override val videoRestart = "Recommencer"
+    override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
     override val videoTagSetupTitle = "Qui joue ?"
     override val videoFirstServer = "Qui sert en premier"
     override val videoTagSetupHint = "Format et règles sont ceux de la page 2."
