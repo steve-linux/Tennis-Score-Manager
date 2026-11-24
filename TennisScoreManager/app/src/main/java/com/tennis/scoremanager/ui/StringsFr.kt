@@ -252,13 +252,13 @@ object FrStrings : Strings {
     override val videoTagHowTo = "Regardez la vidéo et, à la fin de chaque point, touchez qui l'a gagné ; puis, si vous voulez, comment il s'est terminé. Le score se calcule tout seul."
     override val videoTagTooEarly = "Placez la vidéo après le dernier point marqué."
     override val videoPointFor: (String) -> String = { "Point $it" }
-    override val videoUndoLast = "Annuler le dernier"
     override val videoAgainTitle = "Vidéo déjà importée"
     override val videoAgainText: (Int) -> String = { n -> "Cette vidéo a déjà $n points marqués. Vous pouvez la rouvrir telle quelle ou recommencer depuis le début : les points marqués sont effacés (les noms et le premier serveur restent)." }
     override val videoReopen = "Rouvrir"
     override val videoRestart = "Recommencer"
     override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
     override val videoRestartShort = "Du début"
+    override val videoUndoShort = "Annuler"
     override val videoChaptersCopied = "Copiés : collez-les dans la description de la vidéo sur YouTube et les jeux deviennent des chapitres sur la barre de la vidéo."
     override val videoChaptersFew = "YouTube n'affiche les chapitres que s'il y en a au moins trois : marquez les points d'au moins trois jeux."
     override val videoTagStart = "Marquer les points"

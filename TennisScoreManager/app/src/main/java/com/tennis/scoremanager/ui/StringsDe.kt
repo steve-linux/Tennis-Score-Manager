@@ -249,13 +249,13 @@ object DeStrings : Strings {
     override val videoTagHowTo = "Schau das Video an und tippe am Ende jedes Punkts, wer ihn gewonnen hat; dann, wenn du willst, wie er endete. Der Spielstand rechnet sich selbst."
     override val videoTagTooEarly = "Spule das Video hinter den zuletzt markierten Punkt."
     override val videoPointFor: (String) -> String = { "Punkt $it" }
-    override val videoUndoLast = "Letzten rückgängig"
     override val videoAgainTitle = "Video schon importiert"
     override val videoAgainText: (Int) -> String = { n -> "Dieses Video hat schon $n markierte Punkte. Du kannst es so wieder öffnen oder von vorn beginnen: die markierten Punkte werden gelöscht (Namen und wer zuerst aufschlägt bleiben)." }
     override val videoReopen = "Wieder öffnen"
     override val videoRestart = "Von vorn beginnen"
     override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
     override val videoRestartShort = "Neu"
+    override val videoUndoShort = "Zurück"
     override val videoChaptersCopied = "Kopiert: in die Videobeschreibung auf YouTube einfügen, dann werden die Spiele zu Kapiteln auf der Videoleiste."
     override val videoChaptersFew = "YouTube zeigt Kapitel nur ab drei Stück: markiere die Punkte von mindestens drei Spielen."
     override val videoTagStart = "Punkte markieren"

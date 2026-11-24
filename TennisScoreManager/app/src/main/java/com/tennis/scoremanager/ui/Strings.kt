@@ -264,13 +264,13 @@ interface Strings {
     val videoTagHowTo: String
     val videoTagTooEarly: String
     val videoPointFor: (String) -> String
-    val videoUndoLast: String
     val videoAgainTitle: String
     val videoAgainText: (Int) -> String
     val videoReopen: String
     val videoRestart: String
     val videoRestartAsk: (Int) -> String
     val videoRestartShort: String
+    val videoUndoShort: String
     val videoChaptersCopied: String
     val videoChaptersFew: String
     val videoTagStart: String
@@ -3145,13 +3145,13 @@ object ItStrings : Strings {
     override val videoTagHowTo = "Guarda il video e, a fine punto, tocca chi l'ha vinto; poi, se vuoi, com'è finito. Il punteggio si calcola da solo."
     override val videoTagTooEarly = "Porta il video dopo l'ultimo punto segnato."
     override val videoPointFor: (String) -> String = { "Punto $it" }
-    override val videoUndoLast = "Annulla ultimo"
     override val videoAgainTitle = "Video già importato"
     override val videoAgainText: (Int) -> String = { n -> "Questo video ha già $n punti segnati. Puoi riaprirlo così com'è o ricominciare da capo: i punti segnati si cancellano (nomi e chi serve per primo restano)." }
     override val videoReopen = "Riapri"
     override val videoRestart = "Ricomincia da capo"
     override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
     override val videoRestartShort = "Da capo"
+    override val videoUndoShort = "Annulla"
     override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
     override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
     override val videoTagStart = "Segna i punti"
@@ -5962,13 +5962,13 @@ object EnStrings : Strings {
     override val videoTagHowTo = "Watch the video and, at the end of each point, tap who won it; then, if you like, how it ended. The score is worked out by itself."
     override val videoTagTooEarly = "Move the video past the last marked point."
     override val videoPointFor: (String) -> String = { "Point $it" }
-    override val videoUndoLast = "Undo last"
     override val videoAgainTitle = "Video already imported"
     override val videoAgainText: (Int) -> String = { n -> "This video already has $n marked points. You can reopen it as it is or start over: the marked points are deleted (names and first server stay)." }
     override val videoReopen = "Reopen"
     override val videoRestart = "Start over"
     override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
     override val videoRestartShort = "Restart"
+    override val videoUndoShort = "Undo"
     override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
     override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
     override val videoTagStart = "Mark the points"

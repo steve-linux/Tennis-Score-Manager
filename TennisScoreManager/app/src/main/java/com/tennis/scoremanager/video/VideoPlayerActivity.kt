@@ -40,10 +40,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FilterList
@@ -359,15 +357,20 @@ class VideoPlayerActivity : ComponentActivity() {
                     modifier = Modifier.padding(vertical = 7.dp),
                 )
             }
-            if (points.isNotEmpty()) {
-                NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.weight(1f)) {
-                    p.seekTo(Chapters.start(points, points.lastIndex))
-                    onChange(ch.copy(points = points.dropLast(1)))
-                    askKind = false
-                }
+            // Annulla e Ricomincia da capo (con conferma) nella stessa riga, perché in orizzontale lo spazio in altezza è
+            // poco; solo la scritta, come Fallo: con l'icona non ci starebbe in un terzo di riga.
+            @Composable fun word(text: String, onClick: () -> Unit) = Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = Modifier.weight(1f)) {
+                Text(
+                    text, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1,
+                    modifier = Modifier.padding(vertical = 7.dp),
+                )
             }
-            // Ricomincia da capo (con conferma): nella stessa riga, perché in orizzontale lo spazio in altezza è poco.
-            if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestartShort, Modifier.weight(1f)) { restart = true }
+            if (points.isNotEmpty()) word(str.videoUndoShort) {
+                p.seekTo(Chapters.start(points, points.lastIndex))
+                onChange(ch.copy(points = points.dropLast(1)))
+                askKind = false
+            }
+            if (points.size > 1) word(str.videoRestartShort) { restart = true }
         }
         if (restart) AlertDialog(
             onDismissRequest = { restart = false },

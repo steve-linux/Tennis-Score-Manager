@@ -249,13 +249,13 @@ object EsStrings : Strings {
     override val videoTagHowTo = "Mira el vídeo y, al final de cada punto, toca quién lo ganó; luego, si quieres, cómo terminó. El marcador se calcula solo."
     override val videoTagTooEarly = "Lleva el vídeo después del último punto marcado."
     override val videoPointFor: (String) -> String = { "Punto $it" }
-    override val videoUndoLast = "Deshacer el último"
     override val videoAgainTitle = "Vídeo ya importado"
     override val videoAgainText: (Int) -> String = { n -> "Este vídeo ya tiene $n puntos marcados. Puedes volver a abrirlo tal cual o empezar de nuevo: los puntos marcados se borran (los nombres y quién saca primero se quedan)." }
     override val videoReopen = "Volver a abrir"
     override val videoRestart = "Empezar de nuevo"
     override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
     override val videoRestartShort = "De nuevo"
+    override val videoUndoShort = "Deshacer"
     override val videoChaptersCopied = "Copiados: pégalos en la descripción del vídeo en YouTube y los juegos se convierten en capítulos en la barra del vídeo."
     override val videoChaptersFew = "YouTube solo muestra los capítulos si son al menos tres: marca los puntos de al menos tres juegos."
     override val videoTagStart = "Marcar los puntos"

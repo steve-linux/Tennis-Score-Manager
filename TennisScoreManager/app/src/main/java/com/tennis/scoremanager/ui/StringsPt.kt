@@ -252,13 +252,13 @@ object PtStrings : Strings {
     override val videoTagHowTo = "Assista ao vídeo e, no fim de cada ponto, toque em quem o ganhou; depois, se quiser, como terminou. O placar é calculado sozinho."
     override val videoTagTooEarly = "Leve o vídeo para depois do último ponto marcado."
     override val videoPointFor: (String) -> String = { "Ponto $it" }
-    override val videoUndoLast = "Desfazer o último"
     override val videoAgainTitle = "Vídeo já importado"
     override val videoAgainText: (Int) -> String = { n -> "Este vídeo já tem $n pontos marcados. Você pode reabri-lo como está ou recomeçar do zero: os pontos marcados são apagados (os nomes e quem saca primeiro ficam)." }
     override val videoReopen = "Reabrir"
     override val videoRestart = "Recomeçar do zero"
     override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
     override val videoRestartShort = "Do zero"
+    override val videoUndoShort = "Desfazer"
     override val videoChaptersCopied = "Copiados: cole-os na descrição do vídeo no YouTube e os games viram capítulos na barra do vídeo."
     override val videoChaptersFew = "O YouTube só mostra os capítulos se forem pelo menos três: marque os pontos de pelo menos três games."
     override val videoTagStart = "Marcar os pontos"
