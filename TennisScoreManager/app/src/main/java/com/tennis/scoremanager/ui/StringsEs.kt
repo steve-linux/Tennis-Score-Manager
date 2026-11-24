@@ -255,6 +255,10 @@ object EsStrings : Strings {
     override val videoReopen = "Volver a abrir"
     override val videoRestart = "Empezar de nuevo"
     override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
+    override val videoChaptersCopied = "Copiados: pégalos en la descripción del vídeo en YouTube y los juegos se convierten en capítulos en la barra del vídeo."
+    override val videoChaptersFew = "YouTube solo muestra los capítulos si son al menos tres: marca los puntos de al menos tres juegos."
+    override val videoTagStart = "Marcar los puntos"
+    override val videoTagDone = "He terminado de marcar"
     override val videoTagSetupTitle = "¿Quién juega?"
     override val videoFirstServer = "Quién saca primero"
     override val videoTagSetupHint = "Formato y reglas son los de la página 2."

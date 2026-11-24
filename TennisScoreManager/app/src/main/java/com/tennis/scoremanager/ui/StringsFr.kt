@@ -258,6 +258,10 @@ object FrStrings : Strings {
     override val videoReopen = "Rouvrir"
     override val videoRestart = "Recommencer"
     override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
+    override val videoChaptersCopied = "Copiés : collez-les dans la description de la vidéo sur YouTube et les jeux deviennent des chapitres sur la barre de la vidéo."
+    override val videoChaptersFew = "YouTube n'affiche les chapitres que s'il y en a au moins trois : marquez les points d'au moins trois jeux."
+    override val videoTagStart = "Marquer les points"
+    override val videoTagDone = "Marquage terminé"
     override val videoTagSetupTitle = "Qui joue ?"
     override val videoFirstServer = "Qui sert en premier"
     override val videoTagSetupHint = "Format et règles sont ceux de la page 2."

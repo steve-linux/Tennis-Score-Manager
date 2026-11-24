@@ -67,6 +67,12 @@ object Chapters {
         return lines.joinToString("\n")
     }
 
+    /** YouTube mostra i capitoli solo se sono almeno tre (il primo a 0:00, ognuno di almeno 10 s). */
+    const val YOUTUBE_MIN = 3
+
+    /** I capitoli bastano perché YouTube li mostri. */
+    fun youtubeEnough(text: String): Boolean = text.lines().count { it.isNotBlank() } >= YOUTUBE_MIN
+
     fun time(ms: Long): String {
         val s = ms / 1000
         return if (s >= 3600) String.format(Locale.ROOT, "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)

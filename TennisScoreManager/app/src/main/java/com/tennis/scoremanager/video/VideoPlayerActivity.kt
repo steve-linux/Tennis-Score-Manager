@@ -170,6 +170,8 @@ class VideoPlayerActivity : ComponentActivity() {
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
         var hlOpen by remember { mutableStateOf(false) }
+        // I capitoli per YouTube appena copiati, da mostrare (e condividere, se si preferisce).
+        var chapters by remember { mutableStateOf<String?>(null) }
         var filter by remember { mutableStateOf(CoachFilter()) }
         var filterOpen by remember { mutableStateOf(false) }
         val shown = remember(ch, filter) { if (filter.active) CoachFilter.matching(points, ch.rules, filter) else points.indices.toList() }
@@ -228,12 +230,13 @@ class VideoPlayerActivity : ComponentActivity() {
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
-                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { shareYoutube(ch) }
+                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
                     if (points.isNotEmpty() && !tagging) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
-                    if (ch.imported || ch.rules != null) {
-                        NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, null, Modifier.weight(0.6f)) {
-                            if (ch.rules == null) setup = true else tagging = !tagging
-                        }
+                }
+                // Segnare i punti: un pulsante con la scritta, in riga da solo (prima era solo un'icona).
+                if (ch.imported || ch.rules != null) {
+                    NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, if (tagging) str.videoTagDone else str.videoTagStart, Modifier.fillMaxWidth()) {
+                        if (ch.rules == null) setup = true else tagging = !tagging
                     }
                 }
                 if (tagging && ch.rules != null) {
@@ -280,6 +283,20 @@ class VideoPlayerActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+        chapters?.let { text ->
+            AlertDialog(
+                onDismissRequest = { chapters = null },
+                title = { Text(str.videoYoutubeChapters) },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(str.videoChaptersCopied, fontSize = 13.sp)
+                        Text(text, fontSize = 13.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, color = TsmColors.TextDim)
+                    }
+                },
+                confirmButton = { TextButton(onClick = { chapters = null }) { Text(str.ok) } },
+                dismissButton = { TextButton(onClick = { chapters = null; shareYoutube(text) }) { Text(str.share) } },
+            )
         }
         if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
         if (filterOpen) FilterDialog(ch, filter, { filter = it; queue = null }) { filterOpen = false }
@@ -780,9 +797,23 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Capitoli per game da incollare nella descrizione del video su YouTube. */
-    private fun shareYoutube(ch: VideoChapters) {
+    /**
+     * I capitoli per la descrizione di YouTube, già copiati negli appunti; null (con un avviso) se sono meno di tre,
+     * perché YouTube non li mostrerebbe.
+     */
+    private fun youtubeChapters(ch: VideoChapters): String? {
         val str = s
         val text = Chapters.youtube(ch.points, str.videoStart) { set, game -> "${str.videoSet} $set · ${str.videoGame} $game" }
+        if (!Chapters.youtubeEnough(text)) {
+            Toast.makeText(this, str.videoChaptersFew, Toast.LENGTH_LONG).show()
+            return null
+        }
+        getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText(str.videoYoutubeChapters, text))
+        return text
+    }
+
+    private fun shareYoutube(text: String) {
+        val str = s
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

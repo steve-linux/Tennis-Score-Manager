@@ -258,6 +258,10 @@ object PtStrings : Strings {
     override val videoReopen = "Reabrir"
     override val videoRestart = "Recomeçar do zero"
     override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
+    override val videoChaptersCopied = "Copiados: cole-os na descrição do vídeo no YouTube e os games viram capítulos na barra do vídeo."
+    override val videoChaptersFew = "O YouTube só mostra os capítulos se forem pelo menos três: marque os pontos de pelo menos três games."
+    override val videoTagStart = "Marcar os pontos"
+    override val videoTagDone = "Terminei de marcar"
     override val videoTagSetupTitle = "Quem joga?"
     override val videoFirstServer = "Quem saca primeiro"
     override val videoTagSetupHint = "Formato e regras são os da página 2."
