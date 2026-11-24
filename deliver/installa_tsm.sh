@@ -18227,7 +18227,7 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
    - **Umriss** (Platzumriss): In der Vorschau erscheinen die Platzlinien so, wie das Objektiv sie sieht, und sie folgen dem Telefon beim Neigen. Die Schieberegler (**Abstand**, **Höhe**, **Richtung**, **Seitlicher Versatz** und bei Bedarf **Bildwinkel** und **Neigungskorrektur**) bewegen, bis sie auf den echten Linien liegen: So stimmt auch die Mitte, und die empfohlene Neigung wird genau. Die Einstellung wird für den Platz des Matches (*Verein · Platz* des Schiedsrichters) gespeichert und beim nächsten Mal übernommen. Umriss und Regler gibt es auch im Fenster **Kamera** des Schiedsrichters. Je höher das Telefon, desto besser sieht man die entfernte Platzhälfte: aus 2,5 m ist sie knapp über dem Netz zusammengedrückt.
 3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Mehr › **Einstellungen** › **Geräte** › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
 
-- **Fortschritt** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*.
+- **Fortschritt** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** kopiert die Kapitel (eins pro Spiel) zum Einfügen in die Videobeschreibung auf YouTube; YouTube zeigt sie nur ab drei Stück, also mit mindestens drei markierten Spielen. **Teilen** schickt sie an eine andere App. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Zurück* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*. Wird ein Video mit schon markierten Punkten erneut importiert, fragt die App, ob es **wieder geöffnet** oder **von vorn begonnen** werden soll; beim Markieren löscht **Von vorn beginnen** alle Punkte und bringt das Video an den Anfang (Namen und wer zuerst aufschlägt bleiben). Im Player öffnet **Punkte markieren** das Feld zum Markieren, **Fertig markiert** schließt es.
 - **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
 - **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (letzter Punkt des Matches, Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
   - **Intro wie bei Turnieren (am Anfang)**: 9 Sekunden vor den Punkten, mit derselben Grafik und Musik wie die Statistiken, ein- und ausgeblendet: oben Turnier und Runde (oder Verein) und das Datum; an den Seiten Foto oder Porträt, Vorname und NACHNAME und das FITP-Ranking groß; in der Mitte der Vergleich mit den Daten, die die App kennt (TSM-Wertung, Alter, Größe, Spielhand, Rückhand, Verein, Siege – Niederlagen) und der direkte Vergleich vor diesem Match. Die Daten stammen aus der Spielerkarte unter *Spieler*: Was nicht eingetragen ist, fehlt. Das Video braucht nur die Namen der Spieler.
@@ -18863,7 +18863,7 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
    - **Outline** (court outline): the preview shows the court lines as the lens sees them, and they follow the phone as you tilt it. Move the sliders (**Distance**, **Height**, **Direction**, **Sideways offset** and, if needed, **Field of view** and **Tilt correction**) until they match the real lines: that also sets the centring, and the suggested tilt becomes accurate. The calibration is remembered for the match court (the umpire's *Club · Court*) and restored next time. Outline and sliders are also in the umpire's **Camera** window. The higher the phone, the better you see the far half of the court: from 2.5 m it is squeezed just above the net.
 3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in More › **Settings** › **Devices** › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
 
-- **Progress** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*.
+- **Progress** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** copies the chapters (one per game) to paste into the video description on YouTube; YouTube only shows them when there are at least three, that is with at least three marked games. **Share** sends them to another app. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo* removes the last one); format and rules are those of *Mode and rules*. Importing again a video that already has points, the app asks whether to **reopen** it or **start over**; while marking, **Start over** deletes all the points and takes the video back to the beginning (names and first server stay). In the player, **Mark the points** opens the panel to mark them and **Done marking** closes it.
 - **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
 - **Highlights**: automatic edit of the best points (last point of the match, aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
   - **Tournament-style intro (at the start)**: 9 seconds before the points, with the same graphics and music as the statistics, fading in and out: tournament and round (or club) and the date at the top; on the sides photo or portrait, first name and SURNAME and the FITP ranking in large type; in the middle the comparison with the data the app knows (TSM rating, age, height, hand, backhand, club, wins – losses) and the head to head before that match. The data come from the player card in *Players*: whatever is not filled in is left out. The video only needs the players' names.
@@ -19498,7 +19498,7 @@ Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marc
    - **Silueta** (silueta de la pista): la vista previa muestra las líneas de la pista como las ve el objetivo, y siguen al teléfono cuando lo inclinas. Mueve los controles (**Distancia**, **Altura**, **Dirección**, **Desplazamiento lateral** y, si hace falta, **Campo de visión** y **Corrección de inclinación**) hasta que coincidan con las reales: así se ajusta también el centrado, y la inclinación aconsejada se vuelve precisa. El ajuste se recuerda para la pista del partido (*Club · Pista* del árbitro) y se recupera la próxima vez. Silueta y controles también están en la ventana **Cámara** del árbitro. Cuanto más alto esté el teléfono, mejor se ve la mitad lejana de la pista: desde 2,5 m queda aplastada justo encima de la red.
 3. **Cámara en alto, manejada por el árbitro**: en el teléfono del árbitro, **Cámara** (junto a *Repetición* durante el partido, o *Encuadre y mandos de la cámara* en la Más › **Ajustes** › **Dispositivos** › **Segundo teléfono**, útil para colocarla antes de empezar) muestra el encuadre del teléfono-cámara tal como queda en el vídeo, con el gráfico, y **Grabar / Parar**, **Directo**, **Gráfico** y el **zoom**. También se ven la duración de la grabación, la batería y el espacio libre (en naranja si son bajos). La imagen es pequeña y a saltos (unos 3 fotogramas por segundo) y solo se envía mientras se mira; la clave del directo se pone en el teléfono-cámara.
 
-- **Progresos** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*.
+- **Progresos** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** copia los capítulos (uno por juego) para pegarlos en la descripción del vídeo en YouTube; YouTube solo los muestra si son al menos tres, es decir con al menos tres juegos marcados. **Compartir** los envía a otra app. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer* quita el último); formato y reglas son los de *Modo y reglas*. Al importar de nuevo un vídeo que ya tiene puntos, la app pregunta si **volver a abrirlo** o **empezar de nuevo**; mientras marcas, **Empezar de nuevo** borra todos los puntos y lleva el vídeo al principio (los nombres y quién saca primero se quedan). En el reproductor, **Marcar los puntos** abre el panel para marcarlos y **He terminado de marcar** lo cierra.
 - **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
 - **Mejores jugadas**: montaje automático de los mejores puntos (último punto del partido, aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
   - **Intro como en los torneos (al principio)**: 9 segundos antes de los puntos, con el mismo diseño y la misma música que las estadísticas, con fundido: arriba torneo y ronda (o club) y la fecha; a los lados foto o retrato, nombre y APELLIDO y la clasificación FITP en grande; en el centro la comparación con los datos que la app conoce (rating TSM, edad, altura, mano, revés, club, victorias – derrotas) y los enfrentamientos antes de ese partido. Los datos vienen de la ficha del jugador en *Jugadores*: lo que no está rellenado no aparece. Basta con que el vídeo tenga los nombres de los jugadores.
@@ -20133,7 +20133,7 @@ Un deuxième téléphone sur un trépied filme le match et met le score de l'arb
    - **Tracé** (tracé du terrain) : l'aperçu montre les lignes du terrain telles que l'objectif les voit, et elles suivent le téléphone quand on l'incline. Déplacez les curseurs (**Distance**, **Hauteur**, **Direction**, **Décalage latéral** et, si besoin, **Champ de vision** et **Correction d'inclinaison**) jusqu'à ce qu'elles coïncident avec les vraies : cela règle aussi le centrage, et l'inclinaison conseillée devient précise. Le réglage est mémorisé pour le terrain du match (*Club · Court* de l'arbitre) et repris la fois suivante. Tracé et curseurs sont aussi dans la fenêtre **Caméra** de l'arbitre. Plus le téléphone est haut, mieux on voit la moitié éloignée du terrain : à 2,5 m elle est écrasée juste au-dessus du filet.
 3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en Plus › **Réglages** › **Appareils** › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
 
-- **Progrès** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*.
+- **Progrès** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** copie les chapitres (un par jeu) à coller dans la description de la vidéo sur YouTube ; YouTube ne les affiche que s'il y en a au moins trois, c'est-à-dire avec au moins trois jeux marqués. **Partager** les envoie à une autre appli. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler* enlève le dernier) ; format et règles sont ceux de *Mode et règles*. En important de nouveau une vidéo qui a déjà des points, l'appli demande s'il faut la **rouvrir** ou **recommencer** ; pendant le marquage, **Recommencer** efface tous les points et ramène la vidéo au début (les noms et le premier serveur restent). Dans le lecteur, **Marquer les points** ouvre le panneau pour les marquer et **Marquage terminé** le ferme.
 - **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
 - **Temps forts** : montage automatique des plus beaux points (dernier point du match, aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
   - **Intro comme dans les tournois (au début)** : 9 secondes avant les points, avec le même graphisme et la même musique que les statistiques, en fondu : en haut tournoi et tour (ou club) et la date ; sur les côtés photo ou portrait, prénom et NOM et le classement FITP en grand ; au centre la comparaison avec les données que l'app connaît (classement TSM, âge, taille, main, revers, club, victoires – défaites) et le face-à-face avant ce match. Les données viennent de la fiche du joueur dans *Joueurs* : ce qui n'est pas rempli n'apparaît pas. Il suffit que la vidéo ait les noms des joueurs.
@@ -20768,7 +20768,7 @@ Un secondo telefono su un treppiede riprende la partita e mette sul video il pun
    - **Sagoma** (sagoma del campo): sull'anteprima compaiono le linee del campo come le vede l'obiettivo, e seguono il telefono mentre lo inclini. Muovi i cursori (**Distanza**, **Altezza**, **Direzione**, **Spostamento laterale** e, se serve, **Campo visivo** e **Correzione inclinazione**) finché combaciano con le linee vere: così si sistema anche la centratura, e l'inclinazione consigliata diventa precisa. La taratura viene ricordata per il campo della partita (*Circolo · Campo* dell'arbitro) e ripresa la volta dopo. Sagoma e cursori ci sono anche nel riquadro **Telecamera** dell'arbitro. Più in alto è il telefono, meglio si vede la metà lontana del campo: da 2,5 m è schiacciata appena sopra la rete.
 3. **Telecamera in alto, comandata dall'arbitro**: sul telefono dell'arbitro **Telecamera** (accanto a *Moviola* in partita, oppure *Inquadratura e comandi della telecamera* in Altro › **Impostazioni** › **Dispositivi** › **Secondo telefono**, utile per sistemarla prima di iniziare) mostra l'inquadratura del telefono-telecamera com'è nel video, grafica compresa, con **Registra / Ferma**, **Diretta**, **Grafica** e lo **zoom**. Si vedono anche durata della registrazione, batteria e spazio libero (in arancione se sono bassi). L'immagine è piccola e a scatti (circa 3 fotogrammi al secondo) e passa solo mentre la si guarda; la chiave della diretta va messa sul telefono-telecamera.
 
-- **Progressi** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*.
+- **Progressi** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** copia i capitoli (uno per game) da incollare nella descrizione del video su YouTube; YouTube li mostra solo se sono almeno tre, cioè con almeno tre game segnati. **Condividi** li manda a un'altra app. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*. Importando di nuovo un video che ha già dei punti, l'app chiede se **riaprirlo** o **ricominciare da capo**; mentre segni, **Ricomincia da capo** cancella tutti i punti e riporta il video all'inizio (nomi e chi serve per primo restano). Nel lettore, **Segna i punti** apre il pannello per segnarli e **Ho finito di segnare** lo chiude.
 - **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
 - **Highlights**: montaggio automatico dei punti più belli (ultimo punto della partita, ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
   - **Intro come nei tornei (all'inizio)**: 9 secondi prima dei punti, con la stessa grafica e la stessa musica delle statistiche, in dissolvenza: in alto torneo e turno (o circolo) e la data; ai lati foto o ritratto, nome e COGNOME e la classifica FITP in grande; al centro il confronto con i dati che l'app conosce (rating TSM, età, altezza, mano, rovescio, circolo, vittorie – sconfitte) e gli scontri diretti prima di quella partita. I dati vengono dalla scheda del giocatore in *Giocatori*: mancano quelli non scritti. Basta che il video abbia i nomi dei giocatori.
@@ -21403,7 +21403,7 @@ Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do á
    - **Contorno** (contorno da quadra): a pré-visualização mostra as linhas da quadra como a lente as vê, e elas acompanham o telefone quando você o inclina. Mova os controles (**Distância**, **Altura**, **Direção**, **Deslocamento lateral** e, se preciso, **Campo de visão** e **Correção da inclinação**) até coincidirem com as linhas reais: assim se acerta também o centro, e a inclinação sugerida fica precisa. O ajuste é lembrado para a quadra da partida (*Clube · Quadra* do árbitro) e recuperado na próxima vez. Contorno e controles também estão na janela **Câmera** do árbitro. Quanto mais alto o telefone, melhor se vê a metade distante da quadra: a 2,5 m ela fica espremida logo acima da rede.
 3. **Câmera no alto, comandada pelo árbitro**: no telefone do árbitro, **Câmera** (ao lado de *Replay* durante a partida, ou *Enquadramento e comandos da câmera* na Mais › **Configurações** › **Dispositivos** › **Segundo telefone**, útil para ajustá-la antes de começar) mostra o enquadramento do telefone-câmera como fica no vídeo, com o gráfico, e **Gravar / Parar**, **Ao vivo**, **Gráfico** e o **zoom**. Mostra também a duração da gravação, a bateria e o espaço livre (em laranja quando baixos). A imagem é pequena e aos saltos (cerca de 3 quadros por segundo) e só é enviada enquanto se olha; a chave da transmissão é colocada no telefone-câmera.
 
-- **Progresso** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*.
+- **Progresso** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** copia os capítulos (um por game) para colar na descrição do vídeo no YouTube; o YouTube só os mostra se forem pelo menos três, ou seja com pelo menos três games marcados. **Compartilhar** os envia para outro app. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer* tira o último); formato e regras são os de *Modo e regras*. Ao importar de novo um vídeo que já tem pontos, o app pergunta se quer **reabri-lo** ou **recomeçar do zero**; enquanto marca, **Recomeçar do zero** apaga todos os pontos e leva o vídeo ao início (os nomes e quem saca primeiro ficam). No reprodutor, **Marcar os pontos** abre o painel para marcá-los e **Terminei de marcar** o fecha.
 - **Filtros do treinador** (ícone do filtro): só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points. **Reproduzir** coloca-os em sequência.
 - **Melhores momentos**: montagem automática dos melhores pontos (último ponto da partida, aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
   - **Intro como nos torneios (no início)**: 9 segundos antes dos pontos, com o mesmo visual e a mesma música das estatísticas, com transição suave: no topo torneio e ronda (ou clube) e a data; dos lados foto ou retrato, nome e APELIDO e o ranking FITP em grande; no centro a comparação com os dados que a app conhece (rating TSM, idade, altura, mão, backhand, clube, vitórias – derrotas) e os confrontos diretos antes dessa partida. Os dados vêm da ficha do jogador em *Jogadores*: o que não estiver preenchido não aparece. Basta que o vídeo tenha os nomes dos jogadores.
@@ -57200,7 +57200,21 @@ interface Strings {
     val videoTagHowTo: String
     val videoTagTooEarly: String
     val videoPointFor: (String) -> String
-    val videoUndoLast: String
+    val videoAgainTitle: String
+    val videoAgainText: (Int) -> String
+    val videoReopen: String
+    val videoRestart: String
+    val videoRestartAsk: (Int) -> String
+    val videoRestartShort: String
+    val videoUndoShort: String
+    val introForm: String
+    val formWin: String
+    val formLoss: String
+    val introLastMeeting: String
+    val videoChaptersCopied: String
+    val videoChaptersFew: String
+    val videoTagStart: String
+    val videoTagDone: String
     val videoTagSetupTitle: String
     val videoFirstServer: String
     val videoTagSetupHint: String
@@ -57227,7 +57241,6 @@ interface Strings {
     val hlIntro: String
     val hlIntroHint: (Int) -> String
     val introHeight: String
-    val introHand: String
     val introClub: String
     val introRecord: String
     val introH2h: String
@@ -60071,7 +60084,21 @@ object ItStrings : Strings {
     override val videoTagHowTo = "Guarda il video e, a fine punto, tocca chi l'ha vinto; poi, se vuoi, com'è finito. Il punteggio si calcola da solo."
     override val videoTagTooEarly = "Porta il video dopo l'ultimo punto segnato."
     override val videoPointFor: (String) -> String = { "Punto $it" }
-    override val videoUndoLast = "Annulla ultimo"
+    override val videoAgainTitle = "Video già importato"
+    override val videoAgainText: (Int) -> String = { n -> "Questo video ha già $n punti segnati. Puoi riaprirlo così com'è o ricominciare da capo: i punti segnati si cancellano (nomi e chi serve per primo restano)." }
+    override val videoReopen = "Riapri"
+    override val videoRestart = "Ricomincia da capo"
+    override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
+    override val videoRestartShort = "Da capo"
+    override val videoUndoShort = "Annulla"
+    override val introForm = "Forma (ultime 5)"
+    override val formWin = "V"
+    override val formLoss = "S"
+    override val introLastMeeting = "Ultima volta"
+    override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
+    override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
+    override val videoTagStart = "Segna i punti"
+    override val videoTagDone = "Ho finito di segnare"
     override val videoTagSetupTitle = "Chi gioca?"
     override val videoFirstServer = "Chi serve per primo"
     override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
@@ -60098,7 +60125,6 @@ object ItStrings : Strings {
     override val hlIntro = "Intro come nei tornei (all'inizio)"
     override val hlIntroHint: (Int) -> String = { "Presentazione dei giocatori ($it s): foto o avatar, classifica e dati del giocatore, prima dei punti." }
     override val introHeight = "Altezza"
-    override val introHand = "Mano"
     override val introClub = "Circolo"
     override val introRecord = "Vittorie – sconfitte"
     override val introH2h = "Scontri diretti"
@@ -62878,7 +62904,21 @@ object EnStrings : Strings {
     override val videoTagHowTo = "Watch the video and, at the end of each point, tap who won it; then, if you like, how it ended. The score is worked out by itself."
     override val videoTagTooEarly = "Move the video past the last marked point."
     override val videoPointFor: (String) -> String = { "Point $it" }
-    override val videoUndoLast = "Undo last"
+    override val videoAgainTitle = "Video already imported"
+    override val videoAgainText: (Int) -> String = { n -> "This video already has $n marked points. You can reopen it as it is or start over: the marked points are deleted (names and first server stay)." }
+    override val videoReopen = "Reopen"
+    override val videoRestart = "Start over"
+    override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
+    override val videoRestartShort = "Restart"
+    override val videoUndoShort = "Undo"
+    override val introForm = "Form (last 5)"
+    override val formWin = "W"
+    override val formLoss = "L"
+    override val introLastMeeting = "Last time"
+    override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
+    override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
+    override val videoTagStart = "Mark the points"
+    override val videoTagDone = "Done marking"
     override val videoTagSetupTitle = "Who is playing?"
     override val videoFirstServer = "Who serves first"
     override val videoTagSetupHint = "Format and rules are the ones on page 2."
@@ -62905,7 +62945,6 @@ object EnStrings : Strings {
     override val hlIntro = "Tournament-style intro (at the start)"
     override val hlIntroHint: (Int) -> String = { "Player presentation ($it s): photo or avatar, ranking and player details, before the points." }
     override val introHeight = "Height"
-    override val introHand = "Hand"
     override val introClub = "Club"
     override val introRecord = "Wins – losses"
     override val introH2h = "Head to head"
@@ -65708,7 +65747,21 @@ object DeStrings : Strings {
     override val videoTagHowTo = "Schau das Video an und tippe am Ende jedes Punkts, wer ihn gewonnen hat; dann, wenn du willst, wie er endete. Der Spielstand rechnet sich selbst."
     override val videoTagTooEarly = "Spule das Video hinter den zuletzt markierten Punkt."
     override val videoPointFor: (String) -> String = { "Punkt $it" }
-    override val videoUndoLast = "Letzten rückgängig"
+    override val videoAgainTitle = "Video schon importiert"
+    override val videoAgainText: (Int) -> String = { n -> "Dieses Video hat schon $n markierte Punkte. Du kannst es so wieder öffnen oder von vorn beginnen: die markierten Punkte werden gelöscht (Namen und wer zuerst aufschlägt bleiben)." }
+    override val videoReopen = "Wieder öffnen"
+    override val videoRestart = "Von vorn beginnen"
+    override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
+    override val videoRestartShort = "Neu"
+    override val videoUndoShort = "Zurück"
+    override val introForm = "Form (letzte 5)"
+    override val formWin = "S"
+    override val formLoss = "N"
+    override val introLastMeeting = "Zuletzt"
+    override val videoChaptersCopied = "Kopiert: in die Videobeschreibung auf YouTube einfügen, dann werden die Spiele zu Kapiteln auf der Videoleiste."
+    override val videoChaptersFew = "YouTube zeigt Kapitel nur ab drei Stück: markiere die Punkte von mindestens drei Spielen."
+    override val videoTagStart = "Punkte markieren"
+    override val videoTagDone = "Fertig markiert"
     override val videoTagSetupTitle = "Wer spielt?"
     override val videoFirstServer = "Wer schlägt zuerst auf"
     override val videoTagSetupHint = "Format und Regeln sind die von Seite 2."
@@ -65735,7 +65788,6 @@ object DeStrings : Strings {
     override val hlIntro = "Intro wie bei Turnieren (am Anfang)"
     override val hlIntroHint: (Int) -> String = { "Vorstellung der Spieler ($it s): Foto oder Avatar, Ranking und Spielerdaten, vor den Punkten." }
     override val introHeight = "Größe"
-    override val introHand = "Spielhand"
     override val introClub = "Verein"
     override val introRecord = "Siege – Niederlagen"
     override val introH2h = "Direkter Vergleich"
@@ -68530,7 +68582,21 @@ object EsStrings : Strings {
     override val videoTagHowTo = "Mira el vídeo y, al final de cada punto, toca quién lo ganó; luego, si quieres, cómo terminó. El marcador se calcula solo."
     override val videoTagTooEarly = "Lleva el vídeo después del último punto marcado."
     override val videoPointFor: (String) -> String = { "Punto $it" }
-    override val videoUndoLast = "Deshacer el último"
+    override val videoAgainTitle = "Vídeo ya importado"
+    override val videoAgainText: (Int) -> String = { n -> "Este vídeo ya tiene $n puntos marcados. Puedes volver a abrirlo tal cual o empezar de nuevo: los puntos marcados se borran (los nombres y quién saca primero se quedan)." }
+    override val videoReopen = "Volver a abrir"
+    override val videoRestart = "Empezar de nuevo"
+    override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
+    override val videoRestartShort = "De nuevo"
+    override val videoUndoShort = "Deshacer"
+    override val introForm = "Forma (últimos 5)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Última vez"
+    override val videoChaptersCopied = "Copiados: pégalos en la descripción del vídeo en YouTube y los juegos se convierten en capítulos en la barra del vídeo."
+    override val videoChaptersFew = "YouTube solo muestra los capítulos si son al menos tres: marca los puntos de al menos tres juegos."
+    override val videoTagStart = "Marcar los puntos"
+    override val videoTagDone = "He terminado de marcar"
     override val videoTagSetupTitle = "¿Quién juega?"
     override val videoFirstServer = "Quién saca primero"
     override val videoTagSetupHint = "Formato y reglas son los de la página 2."
@@ -68557,7 +68623,6 @@ object EsStrings : Strings {
     override val hlIntro = "Intro como en los torneos (al principio)"
     override val hlIntroHint: (Int) -> String = { "Presentación de los jugadores ($it s): foto o avatar, clasificación y datos del jugador, antes de los puntos." }
     override val introHeight = "Altura"
-    override val introHand = "Mano"
     override val introClub = "Club"
     override val introRecord = "Victorias – derrotas"
     override val introH2h = "Enfrentamientos"
@@ -71356,7 +71421,21 @@ object FrStrings : Strings {
     override val videoTagHowTo = "Regardez la vidéo et, à la fin de chaque point, touchez qui l'a gagné ; puis, si vous voulez, comment il s'est terminé. Le score se calcule tout seul."
     override val videoTagTooEarly = "Placez la vidéo après le dernier point marqué."
     override val videoPointFor: (String) -> String = { "Point $it" }
-    override val videoUndoLast = "Annuler le dernier"
+    override val videoAgainTitle = "Vidéo déjà importée"
+    override val videoAgainText: (Int) -> String = { n -> "Cette vidéo a déjà $n points marqués. Vous pouvez la rouvrir telle quelle ou recommencer depuis le début : les points marqués sont effacés (les noms et le premier serveur restent)." }
+    override val videoReopen = "Rouvrir"
+    override val videoRestart = "Recommencer"
+    override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
+    override val videoRestartShort = "Du début"
+    override val videoUndoShort = "Annuler"
+    override val introForm = "Forme (5 derniers)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Dernière fois"
+    override val videoChaptersCopied = "Copiés : collez-les dans la description de la vidéo sur YouTube et les jeux deviennent des chapitres sur la barre de la vidéo."
+    override val videoChaptersFew = "YouTube n'affiche les chapitres que s'il y en a au moins trois : marquez les points d'au moins trois jeux."
+    override val videoTagStart = "Marquer les points"
+    override val videoTagDone = "Marquage terminé"
     override val videoTagSetupTitle = "Qui joue ?"
     override val videoFirstServer = "Qui sert en premier"
     override val videoTagSetupHint = "Format et règles sont ceux de la page 2."
@@ -71383,7 +71462,6 @@ object FrStrings : Strings {
     override val hlIntro = "Intro comme dans les tournois (au début)"
     override val hlIntroHint: (Int) -> String = { "Présentation des joueurs ($it s) : photo ou avatar, classement et infos du joueur, avant les points." }
     override val introHeight = "Taille"
-    override val introHand = "Main"
     override val introClub = "Club"
     override val introRecord = "Victoires – défaites"
     override val introH2h = "Face-à-face"
@@ -74181,7 +74259,21 @@ object PtStrings : Strings {
     override val videoTagHowTo = "Assista ao vídeo e, no fim de cada ponto, toque em quem o ganhou; depois, se quiser, como terminou. O placar é calculado sozinho."
     override val videoTagTooEarly = "Leve o vídeo para depois do último ponto marcado."
     override val videoPointFor: (String) -> String = { "Ponto $it" }
-    override val videoUndoLast = "Desfazer o último"
+    override val videoAgainTitle = "Vídeo já importado"
+    override val videoAgainText: (Int) -> String = { n -> "Este vídeo já tem $n pontos marcados. Você pode reabri-lo como está ou recomeçar do zero: os pontos marcados são apagados (os nomes e quem saca primeiro ficam)." }
+    override val videoReopen = "Reabrir"
+    override val videoRestart = "Recomeçar do zero"
+    override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
+    override val videoRestartShort = "Do zero"
+    override val videoUndoShort = "Desfazer"
+    override val introForm = "Forma (últimos 5)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Última vez"
+    override val videoChaptersCopied = "Copiados: cole-os na descrição do vídeo no YouTube e os games viram capítulos na barra do vídeo."
+    override val videoChaptersFew = "O YouTube só mostra os capítulos se forem pelo menos três: marque os pontos de pelo menos três games."
+    override val videoTagStart = "Marcar os pontos"
+    override val videoTagDone = "Terminei de marcar"
     override val videoTagSetupTitle = "Quem joga?"
     override val videoFirstServer = "Quem saca primeiro"
     override val videoTagSetupHint = "Formato e regras são os da página 2."
@@ -74208,7 +74300,6 @@ object PtStrings : Strings {
     override val hlIntro = "Intro como nos torneios (no início)"
     override val hlIntroHint: (Int) -> String = { "Apresentação dos jogadores ($it s): foto ou avatar, ranking e dados do jogador, antes dos pontos." }
     override val introHeight = "Altura"
-    override val introHand = "Mão"
     override val introClub = "Clube"
     override val introRecord = "Vitórias – derrotas"
     override val introH2h = "Confrontos diretos"
@@ -90431,10 +90522,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -90478,10 +90571,23 @@ fun VideosScreen(c: MatchController) {
     val list by produceState(emptyList<VideoLibrary.Entry>(), tick) { value = withContext(Dispatchers.IO) { VideoLibrary.list(context) } }
     var toDelete by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
     // Video presi dal telefono: si apre subito il lettore per segnare i punti.
+    fun open(e: VideoLibrary.Entry) =
+        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+    // Lo stesso video importato di nuovo, coi punti già segnati: si chiede se riaprirlo o ricominciare da capo.
+    var again by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         val e = uri?.let { VideoLibrary.import(context, it) } ?: return@rememberLauncherForActivityResult
         tick++
-        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+        if (e.chapters.points.isNotEmpty()) again = e else open(e)
+    }
+    again?.let { e ->
+        AlertDialog(
+            onDismissRequest = { again = null },
+            title = { Text(s.videoAgainTitle) },
+            text = { Text(s.videoAgainText(e.chapters.points.size)) },
+            confirmButton = { TextButton(onClick = { again = null; open(e) }) { Text(s.videoReopen) } },
+            dismissButton = { TextButton(onClick = { again = null; open(VideoLibrary.restart(e)); tick++ }) { Text(s.videoRestart) } },
+        )
     }
     ScreenScaffold(
         onHelp = { c.openHelp("7.3") },
@@ -92250,6 +92356,12 @@ object Chapters {
         return lines.joinToString("\n")
     }
 
+    /** YouTube mostra i capitoli solo se sono almeno tre (il primo a 0:00, ognuno di almeno 10 s). */
+    const val YOUTUBE_MIN = 3
+
+    /** I capitoli bastano perché YouTube li mostri. */
+    fun youtubeEnough(text: String): Boolean = text.lines().count { it.isNotBlank() } >= YOUTUBE_MIN
+
     fun time(ms: Long): String {
         val s = ms / 1000
         return if (s >= 3600) String.format(Locale.ROOT, "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
@@ -93356,25 +93468,27 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightIntro.kt" 
 package com.tennis.scoremanager.video
 
 import com.tennis.scoremanager.data.Backhand
-import com.tennis.scoremanager.data.Hand
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Players
 import com.tennis.scoremanager.data.Rating
+import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
-import java.util.Calendar
 
 /**
  * L'intro degli highlights, come la presentazione dei giocatori prima delle partite dei tornei: torneo e turno in
  * alto, i due giocatori ai lati (foto o avatar, nome e COGNOME) e al centro il confronto coi dati che l'app ha già
- * (classifica, rating TSM, età, altezza, mano, rovescio, circolo, bilancio e scontri diretti prima di questa partita).
+ * (classifica, rating TSM, altezza, rovescio, circolo, bilancio, forma e scontri diretti prima di questa partita).
  * Qui si decide cosa mostrare; il disegno, nello stesso stile delle statistiche, è in [StatsCardRenderer.intro].
  */
 object HighlightIntro {
+    /** Quante partite per la forma. */
+    const val FORM = 5
+
     /** Durata dell'intro nel video, dissolvenze comprese. */
     const val MS = 9_000L
 
@@ -93397,6 +93511,9 @@ object HighlightIntro {
         /** Scontri diretti prima di questa partita (solo singolare, e solo se si sono già incontrati). */
         val h2h: Pair<Int, Int>?,
         val h2hLabel: String = "",
+        /** L'ultimo scontro diretto prima di questa partita: data e punteggio visto dal lato 1 ("12/10/2026 · 6-4 6-3"). */
+        val lastMeeting: String? = null,
+        val lastMeetingLabel: String = "",
         /** In fondo al pannello di ogni lato, in grande: la classifica (nel doppio "4.1 / 4.3"), e la sua scritta. */
         val ranks: Map<Side, String> = emptyMap(),
         val rankLabel: String = "",
@@ -93409,6 +93526,8 @@ object HighlightIntro {
     fun card(
         rec: MatchRecord, s: Strings, profiles: List<PlayerProfile>, history: List<MatchRecord>, before: Long, date: String,
         female: (String) -> Boolean = { false },
+        /** Come scrivere la data dell'ultimo scontro diretto. */
+        day: (Long) -> String = { "" },
     ): Card {
         val su = rec.setup
         val names = Names(su, s)
@@ -93451,9 +93570,7 @@ object HighlightIntro {
         val rankRow = row(s.memberRankingLabel) { it.rank.ifEmpty { it.profile?.member?.ranking.orEmpty() } }
         val rows = listOfNotNull(
             row(s.ratingTitle) { sl -> sl.who?.let { rating.player(it.key)?.rating?.toString() } },
-            row(s.heartAge) { sl -> sl.profile?.birth?.let { age(it, before) }?.takeIf { it in 4..110 }?.toString() },
             row(s.introHeight) { sl -> sl.profile?.heightCm?.let { "$it cm" } },
-            row(s.introHand) { sl -> when (sl.profile?.hand) { Hand.RIGHT -> s.handRight; Hand.LEFT -> s.handLeft; null -> null } },
             row(s.playerBackhand) { sl -> when (sl.profile?.backhand) { Backhand.ONE -> s.backhandOne; Backhand.TWO -> s.backhandTwo; null -> null } },
             row(s.introClub) { it.profile?.club },
             row(s.introRecord) { sl ->
@@ -93465,6 +93582,14 @@ object HighlightIntro {
                     }
                 }
             },
+            // Le ultime 5 partite prima di questa, dalla più vecchia alla più recente: "V V S V V".
+            row(s.introForm) { sl ->
+                sl.who?.let { w ->
+                    PlayerStats.matchesOf(played, w.key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.takeLast(FORM)
+                        .takeIf { it.isNotEmpty() }
+                        ?.joinToString(" ") { if (it.winner == PlayerStats.sideOf(it.rec, w.key)) s.formWin else s.formLoss }
+                }
+            },
         )
 
         // Scontri diretti: nel singolare, tra due giocatori veri che si sono già incontrati.
@@ -93474,6 +93599,18 @@ object HighlightIntro {
             if (a == null || b == null) null
             else PlayerStats.rivals(played, a.key).firstOrNull { it.key == b.key }?.let { it.won to it.lost }
         }
+        // L'ultima volta che si sono incontrati: quando e come è finita, dal lato del giocatore a sinistra.
+        val lastMeeting = if (h2h == null) null else {
+            val a = slots.getValue(Side.P1).first().who!!
+            val b = slots.getValue(Side.P2).first().who!!
+            past.filter { (r, st) -> st.winner != null && PlayerStats.sideOf(r, a.key)?.let { PlayerStats.sideOf(r, b.key) == it.other } == true }
+                .maxByOrNull { (r, _) -> r.endedAt ?: r.updatedAt }
+                ?.let { (r, st) ->
+                    // Finita per ritiro o squalifica: lo si dice dopo il punteggio (anche se è 0-0).
+                    val end = if (st.retired == null) "" else " " + if (st.disqualified) s.ctDisqualified else s.ctRetired
+                    listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!) + end).filter { it.isNotBlank() }.joinToString(" · ")
+                }
+        }
 
         val event = su.event.trim()
         val club = su.club.trim()
@@ -93482,7 +93619,7 @@ object HighlightIntro {
         val subtitle = if (event.isNotEmpty()) listOf(su.category.trim(), su.round.trim()).filter { it.isNotEmpty() }.joinToString(" · ") else court
         val place = listOf(date, if (event.isNotEmpty()) listOf(club, court).filter { it.isNotEmpty() }.joinToString(" · ") else "").filter { it.isNotEmpty() }
         val ranks = if (rankRow == null) emptyMap() else mapOf(Side.P1 to rankRow.a, Side.P2 to rankRow.b)
-        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, ranks, s.memberRankingLabel)
+        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, lastMeeting, s.introLastMeeting, ranks, s.memberRankingLabel)
     }
 
     /** "Mario Rossi" → ("Mario", "Rossi"); un nome solo resta tutto grande. */
@@ -93490,16 +93627,6 @@ object HighlightIntro {
         val t = name.trim()
         val i = t.lastIndexOf(' ')
         return if (i <= 0) "" to t else t.substring(0, i).trim() to t.substring(i + 1)
-    }
-
-    /** Anni compiuti il giorno [at] da chi è nato il giorno [birth]. */
-    fun age(birth: Long, at: Long): Int {
-        val b = Calendar.getInstance().apply { timeInMillis = birth }
-        val n = Calendar.getInstance().apply { timeInMillis = at }
-        var y = n.get(Calendar.YEAR) - b.get(Calendar.YEAR)
-        val md = { c: Calendar -> c.get(Calendar.MONTH) * 100 + c.get(Calendar.DAY_OF_MONTH) }
-        if (md(n) < md(b)) y--
-        return y
     }
 }
 TSM_EOF
@@ -93578,6 +93705,24 @@ class HighlightMaker(context: Context) {
         stats: Stats? = null,
         onDone: (File?) -> Unit,
     ) {
+        // Nei video importati (già montati da altri) i pezzi si fermano ai tagli: si cercano prima, fuori dal thread principale.
+        if (!e.chapters.imported) { build(e, clips, onProgress, stats, onDone); return }
+        cancelled = false
+        Thread {
+            val cut = SceneCuts.trimAll(app, e.video, clips) { e.chapters.points[it.index].at }
+            main.post { if (!cancelled) build(e, cut, onProgress, stats, onDone) }
+        }.start()
+    }
+
+    @Volatile private var cancelled = false
+
+    private fun build(
+        e: VideoLibrary.Entry,
+        clips: List<Highlights.Clip>,
+        onProgress: (Int) -> Unit,
+        stats: Stats?,
+        onDone: (File?) -> Unit,
+    ) {
         val ch = e.chapters
         val (width, height) = frameSize(e) ?: (1920 to 1080)
         // Le misure della grafica sono pensate per 1920 di larghezza: si adattano al video.
@@ -93633,6 +93778,7 @@ class HighlightMaker(context: Context) {
     }
 
     fun cancel() {
+        cancelled = true
         transformer?.cancel()
         transformer = null
     }
@@ -94009,6 +94155,8 @@ object Highlights {
     const val BEFORE_MS = 12_000L
     /** Il minimo a cui si accorcia un pezzo quando il montaggio supera la durata scelta. */
     const val MIN_BEFORE_MS = 5_000L
+    /** Il punto più corto che si possa giocare (un ace): punti segnati più vicini di così sono tocchi a raffica. */
+    const val MIN_POINT_MS = 4_000L
     /** Dopo la fine: la reazione, il punteggio che cambia. */
     const val AFTER_MS = 2_000L
     /** Dagli 8 colpi in su lo scambio è lungo. */
@@ -94083,8 +94231,10 @@ object Highlights {
     /** Il pezzo di video del punto [i]: da [before] prima della fine (non prima del punto precedente) a 2 s dopo. */
     fun clip(points: List<PointMark>, i: Int, videoMs: Long, before: Long = BEFORE_MS): Clip? {
         val p = points[i]
-        // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto.
-        val prevEnd = points.getOrNull(i - 1)?.at?.plus(1_000) ?: 0L
+        // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto. Un punto vero dura almeno
+        // [MIN_POINT_MS]: quelli segnati a raffica subito prima (per rimettere a posto il punteggio) non contano, se no
+        // il pezzo diventerebbe di un secondo.
+        val prevEnd = (i - 1 downTo 0).firstOrNull { p.at - points[it].at >= MIN_POINT_MS }?.let { points[it].at + 1_000 } ?: 0L
         val start = maxOf(p.at - before, prevEnd, 0L)
         val end = (p.at + AFTER_MS).let { if (videoMs > 0) minOf(it, videoMs) else it }
         return if (end <= start) null else Clip(i, start, end)
@@ -94115,7 +94265,21 @@ object Highlights {
             kept += c
             total += c.durationMs
         }
-        return kept.sortedBy { it.index }
+        return continuous(kept.sortedBy { it.index })
+    }
+
+    /**
+     * Due punti di fila nel montaggio: il primo finisce [AFTER_MS] dopo la sua fine, il secondo comincerebbe 1 s dopo
+     * la stessa fine, e quel secondo di video si vedrebbe due volte (sembra uno spezzone ripetuto). Il secondo
+     * pezzo riparte da dove finisce il primo: il video scorre di seguito, senza ripetere niente.
+     */
+    fun continuous(clips: List<Clip>): List<Clip> {
+        val out = ArrayList<Clip>(clips.size)
+        for (c in clips) {
+            val prev = out.lastOrNull()
+            out += if (prev != null && c.startMs < prev.endMs) c.copy(startMs = prev.endMs) else c
+        }
+        return out.filter { it.durationMs > 0 }
     }
 }
 TSM_EOF
@@ -95485,6 +95649,167 @@ class ReplayRecorder(private val dir: File) : BaseRecordController() {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/SceneCuts.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/SceneCuts.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.media.MediaCodec
+import android.media.MediaCodecInfo
+import android.media.MediaExtractor
+import android.media.MediaFormat
+import android.net.Uri
+import android.util.Log
+
+/**
+ * Tagli netti nei video importati. Un video già montato (per esempio una partita pubblicata su YouTube) ha le pause tra
+ * i punti tagliate: il pezzo di un punto, che tiene 2 s dopo la sua fine e comincia 1 s dopo il punto prima, finirebbe
+ * per mostrare per un attimo l'altra parte del taglio. Si cercano i tagli vicino all'inizio e alla fine del pezzo e lo
+ * si ferma lì. Un taglio è un salto improvviso tra due fotogrammi di fila, molto più grande di quelli intorno (con la
+ * telecamera ferma un giocatore che corre cambia poco l'immagine, un taglio la cambia tutta).
+ */
+object SceneCuts {
+    /** L'immagine ridotta a 32×18 grigi: basta per i tagli e si calcola in fretta. */
+    private const val GRID_W = 32
+    private const val GRID_H = 18
+    /** Differenza media minima (0-1) e quante volte più grande di quelle vicine. Misurate su una partita montata vera. */
+    private const val ABS_MIN = 0.008f
+    private const val RATIO = 4f
+    /**
+     * Dove si cerca: i primi 1,5 s del pezzo (il taglio dopo il punto prima cade entro 1,6 s dal tocco, e il pezzo
+     * parte 1 s dopo), e da poco prima della fine del punto (tocco in ritardo) alla fine.
+     */
+    const val START_WINDOW_MS = 1_500L
+    const val LATE_TAP_MS = 1_500L
+    /** Oltre questo tempo si rinuncia (il pezzo resta com'è). */
+    private const val TIMEOUT_MS = 15_000L
+
+    /** Differenza media tra due immagini ridotte. */
+    fun diff(a: FloatArray, b: FloatArray): Float {
+        var s = 0f
+        for (i in a.indices) s += kotlin.math.abs(a[i] - b[i])
+        return s / a.size
+    }
+
+    /** I salti: [diffs] i = differenza tra il fotogramma i e i+1; si restituisce i+1, il primo dopo il taglio. */
+    fun spikes(diffs: FloatArray): List<Int> = (2 until diffs.size - 2).filter { i ->
+        val near = maxOf(diffs[i - 2], diffs[i - 1], diffs[i + 1], diffs[i + 2])
+        diffs[i] > ABS_MIN && diffs[i] > RATIO * near
+    }.map { it + 1 }
+
+    /**
+     * Il pezzo fermato ai tagli: comincia dopo l'ultimo taglio dei primi [START_WINDOW_MS] (prima di [pointAt]) e
+     * finisce al primo taglio dopo la fine del punto ([pointAt], o poco prima se il tocco è arrivato in ritardo).
+     */
+    fun trim(c: Highlights.Clip, pointAt: Long, cuts: List<Long>): Highlights.Clip {
+        val endFrom = pointAt - LATE_TAP_MS
+        val start = cuts.filter { it > c.startMs && it < minOf(c.startMs + START_WINDOW_MS, endFrom) }.maxOrNull() ?: c.startMs
+        val end = cuts.filter { it >= endFrom && it < c.endMs && it > start }.minOrNull() ?: c.endMs
+        return c.copy(startMs = start, endMs = end)
+    }
+
+    /** I pezzi di un video importato fermati ai suoi tagli; se qualcosa non va, i pezzi restano come sono. */
+    fun trimAll(context: Context, video: Uri, clips: List<Highlights.Clip>, pointAt: (Highlights.Clip) -> Long): List<Highlights.Clip> {
+        val t0 = System.currentTimeMillis()
+        return trimEach(context, video, clips, pointAt).also { Log.i(TAG, "tagli cercati in ${clips.size} pezzi: ${System.currentTimeMillis() - t0} ms") }
+    }
+
+    private fun trimEach(context: Context, video: Uri, clips: List<Highlights.Clip>, pointAt: (Highlights.Clip) -> Long): List<Highlights.Clip> = clips.map { c ->
+        runCatching {
+            val at = pointAt(c)
+            val cuts = detect(context, video, c.startMs, minOf(c.startMs + START_WINDOW_MS, at)) +
+                detect(context, video, maxOf(c.startMs, at - LATE_TAP_MS), c.endMs)
+            trim(c, at, cuts)
+        }.onFailure { Log.w(TAG, "tagli non cercati", it) }.getOrDefault(c)
+    }
+
+    /** I tagli tra [fromMs] e [toMs] (ms del video): l'ora del primo fotogramma dopo ogni taglio. */
+    fun detect(context: Context, video: Uri, fromMs: Long, toMs: Long): List<Long> {
+        if (toMs <= fromMs) return emptyList()
+        // Due fotogrammi in più per parte: il salto si confronta con i vicini.
+        val from = (fromMs - 200).coerceAtLeast(0) * 1000
+        val to = (toMs + 200) * 1000
+        val ex = MediaExtractor()
+        var codec: MediaCodec? = null
+        try {
+            ex.setDataSource(context, video, null)
+            val track = (0 until ex.trackCount).firstOrNull { ex.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true } ?: return emptyList()
+            ex.selectTrack(track)
+            val fmt = ex.getTrackFormat(track)
+            fmt.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
+            val dec = MediaCodec.createDecoderByType(fmt.getString(MediaFormat.KEY_MIME)!!)
+            codec = dec
+            dec.configure(fmt, null, null, 0)
+            dec.start()
+            ex.seekTo(from, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+            val times = ArrayList<Long>()
+            val diffs = ArrayList<Float>()
+            var prev: FloatArray? = null
+            val info = MediaCodec.BufferInfo()
+            var inputDone = false
+            val deadline = System.currentTimeMillis() + TIMEOUT_MS
+            while (System.currentTimeMillis() < deadline) {
+                if (!inputDone) {
+                    val i = dec.dequeueInputBuffer(5_000)
+                    if (i >= 0) {
+                        val n = ex.readSampleData(dec.getInputBuffer(i)!!, 0)
+                        if (n < 0 || ex.sampleTime > to) {
+                            dec.queueInputBuffer(i, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                            inputDone = true
+                        } else {
+                            dec.queueInputBuffer(i, 0, n, ex.sampleTime, 0)
+                            ex.advance()
+                        }
+                    }
+                }
+                val o = dec.dequeueOutputBuffer(info, 5_000)
+                if (o < 0) continue
+                val eos = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
+                if (info.size > 0 && info.presentationTimeUs in from..to) {
+                    dec.getOutputImage(o)?.use { img -> grid(img) }?.let { g ->
+                        prev?.let { diffs += diff(it, g) }
+                        times += info.presentationTimeUs / 1000
+                        prev = g
+                    }
+                }
+                dec.releaseOutputBuffer(o, false)
+                if (eos || info.presentationTimeUs > to) break
+            }
+            return spikes(diffs.toFloatArray()).map { times[it] }.filter { it in fromMs..toMs }
+        } finally {
+            runCatching { codec?.stop() }
+            runCatching { codec?.release() }
+            ex.release()
+        }
+    }
+
+    /** La luminanza ridotta a [GRID_W]×[GRID_H]: 4×4 campioni per casella, mediati. */
+    private fun grid(img: android.media.Image): FloatArray {
+        val plane = img.planes[0]
+        val buf = plane.buffer
+        val crop = img.cropRect
+        val out = FloatArray(GRID_W * GRID_H)
+        val cw = crop.width() / GRID_W.toFloat()
+        val ch = crop.height() / GRID_H.toFloat()
+        for (gy in 0 until GRID_H) for (gx in 0 until GRID_W) {
+            var s = 0
+            for (sy in 0 until 4) for (sx in 0 until 4) {
+                val x = crop.left + ((gx + (sx + 0.5f) / 4) * cw).toInt()
+                val y = crop.top + ((gy + (sy + 0.5f) / 4) * ch).toInt()
+                s += buf.get(y * plane.rowStride + x * plane.pixelStride).toInt() and 0xff
+            }
+            out[gy * GRID_W + gx] = s / 16f / 255f
+        }
+        return out
+    }
+
+    private const val TAG = "Tagli"
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ScoreOverlay.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ScoreOverlay.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -96416,7 +96741,15 @@ object StatsCardRenderer {
                 c.drawText(card.h2hLabel.uppercase(), mid, 933f, paint(26f, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
                 c.drawText("$a", left, 1022f, paint(64f, if (a > b) YELLOW else TEXT, bold = true).apply { alpha = al })
                 c.drawText("$b", right, 1022f, paint(64f, if (b > a) YELLOW else TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = al })
-                c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                val last = card.lastMeeting
+                if (last == null) c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                else {
+                    // Al posto del trattino: l'ultima volta (data e punteggio), piccola tra i due numeri.
+                    val lp = paint(22f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al }
+                    c.drawText(card.lastMeetingLabel.uppercase(), mid, 990f, lp)
+                    val vp = paint(30f, TEXT, bold = true, align = Paint.Align.CENTER).apply { alpha = al }
+                    c.drawText(fit(last, vp, right - left - 260f), mid, 1026f, vp)
+                }
             }
         }
         footer(c, credit, site)
@@ -96793,6 +97126,57 @@ object StatsMusic {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/VideoDates.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/VideoDates.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.net.Uri
+import java.util.Calendar
+import java.util.TimeZone
+
+/**
+ * Il giorno in cui è stato girato un video importato. La data del file non va bene: per un video scaricato o
+ * esportato è quella del download. Si usa la data scritta dentro il video dalla fotocamera, o quella nel nome del
+ * file ("2026-10-24 23-16-57.mp4", "VID_20261024_231657.mp4"); se non c'è né l'una né l'altra, null (meglio nessuna
+ * data che una sbagliata).
+ */
+object VideoDates {
+    fun guess(context: Context, video: Uri, fileName: String, now: Long = System.currentTimeMillis()): Long? {
+        val meta = runCatching {
+            val r = MediaMetadataRetriever()
+            try { r.setDataSource(context, video); r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE) } finally { r.release() }
+        }.getOrNull()
+        return fromMeta(meta, now) ?: fromName(fileName, now)
+    }
+
+    /** "20261024T211657.000Z" (ora UTC, come la scrivono le fotocamere); "19040101…" vuol dire nessuna data. */
+    fun fromMeta(meta: String?, now: Long): Long? {
+        val m = Regex("""^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})""").find(meta?.trim().orEmpty()) ?: return null
+        val (y, mo, d, h, mi, s) = m.destructured
+        return at(y.toInt(), mo.toInt(), d.toInt(), h.toInt(), mi.toInt(), s.toInt(), TimeZone.getTimeZone("UTC"), now)
+    }
+
+    /** Una data nel nome del file: anno-mese-giorno, con o senza separatori, e l'ora se segue. */
+    fun fromName(name: String, now: Long): Long? {
+        val m = Regex("""(?<!\d)(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})(?:[ _T-]?(\d{2})[-_.:]?(\d{2})(?:[-_.:]?(\d{2}))?)?(?!\d)""").find(name) ?: return null
+        val g = m.groupValues
+        return at(g[1].toInt(), g[2].toInt(), g[3].toInt(), g[4].toIntOrNull() ?: 12, g[5].toIntOrNull() ?: 0, g[6].toIntOrNull() ?: 0, TimeZone.getDefault(), now)
+    }
+
+    private fun at(y: Int, mo: Int, d: Int, h: Int, mi: Int, s: Int, tz: TimeZone, now: Long): Long? {
+        if (y < 2000 || mo !in 1..12 || d !in 1..31 || h > 23 || mi > 59 || s > 59) return null
+        val t = Calendar.getInstance(tz).apply { clear(); set(y, mo - 1, d, h, mi, s) }.timeInMillis
+        // Una data nel futuro non è quella del video.
+        return t.takeIf { it <= now + 24 * 3_600_000L }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/VideoLibrary.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/VideoLibrary.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -96857,6 +97241,13 @@ object VideoLibrary {
         e.chaptersFile.delete()
     }
 
+    /** Lo stesso video già importato (quello con più punti, se per caso ce n'è più d'uno); null se è nuovo. */
+    fun imported(context: Context, uri: Uri): Entry? =
+        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }.maxByOrNull { it.chapters.points.size }
+
+    /** Ricomincia da capo: via i punti segnati; nomi, regole e chi serve per primo restano. */
+    fun restart(e: Entry): Entry = save(e, e.chapters.copy(points = emptyList()))
+
     fun save(e: Entry, ch: VideoChapters): Entry {
         e.chaptersFile.writeText(json.encodeToString(VideoChapters.serializer(), ch))
         return e.copy(chapters = ch)
@@ -96868,8 +97259,7 @@ object VideoLibrary {
      */
     fun import(context: Context, uri: Uri): Entry? = runCatching {
         context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }
-            .maxByOrNull { it.chapters.points.size }?.let { return@runCatching it }
+        imported(context, uri)?.let { return@runCatching it }
         val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         } ?: "video"
@@ -96925,7 +97315,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -96938,7 +97327,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -97054,6 +97442,8 @@ class VideoPlayerActivity : ComponentActivity() {
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
         var hlOpen by remember { mutableStateOf(false) }
+        // I capitoli per YouTube appena copiati, da mostrare (e condividere, se si preferisce).
+        var chapters by remember { mutableStateOf<String?>(null) }
         var filter by remember { mutableStateOf(CoachFilter()) }
         var filterOpen by remember { mutableStateOf(false) }
         val shown = remember(ch, filter) { if (filter.active) CoachFilter.matching(points, ch.rules, filter) else points.indices.toList() }
@@ -97112,12 +97502,18 @@ class VideoPlayerActivity : ComponentActivity() {
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
-                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { shareYoutube(ch) }
-                    if (points.isNotEmpty() && !tagging) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
-                    if (ch.imported || ch.rules != null) {
-                        NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, null, Modifier.weight(0.6f)) {
-                            if (ch.rules == null) setup = true else tagging = !tagging
-                        }
+                    // Mentre si segnano i punti, in alto c'è solo come smettere: lo spazio sotto serve tutto al pannello.
+                    if (tagging) NavBtn(Icons.Filled.Check, str.videoTagDone, Modifier.weight(2f)) { tagging = false }
+                    else {
+                        // Solo la scritta: con l'icona, accanto al filtro, si leggeva solo "Capitoli".
+                        NavBtn(null, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
+                        if (points.isNotEmpty()) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
+                    }
+                }
+                // Segnare i punti: un pulsante con la scritta, in riga da solo (prima era solo un'icona).
+                if (!tagging && (ch.imported || ch.rules != null)) {
+                    NavBtn(Icons.Filled.EditNote, str.videoTagStart, Modifier.fillMaxWidth()) {
+                        if (ch.rules == null) setup = true else tagging = true
                     }
                 }
                 if (tagging && ch.rules != null) {
@@ -97149,7 +97545,8 @@ class VideoPlayerActivity : ComponentActivity() {
                         NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
                     }
                 }
-                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                // L'elenco prende lo spazio che resta (prima si vedono tutti i pulsanti per segnare).
+                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
                     itemsIndexed(shown) { k, i ->
                         val pt = points[i]
                         val newGame = k == 0 || points[shown[k - 1]].game != pt.game
@@ -97164,6 +97561,20 @@ class VideoPlayerActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+        chapters?.let { text ->
+            AlertDialog(
+                onDismissRequest = { chapters = null },
+                title = { Text(str.videoYoutubeChapters) },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(str.videoChaptersCopied, fontSize = 13.sp)
+                        Text(text, fontSize = 13.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, color = TsmColors.TextDim)
+                    }
+                },
+                confirmButton = { TextButton(onClick = { chapters = null }) { Text(str.ok) } },
+                dismissButton = { TextButton(onClick = { chapters = null; shareYoutube(text) }) { Text(str.share) } },
+            )
         }
         if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
         if (filterOpen) FilterDialog(ch, filter, { filter = it; queue = null }) { filterOpen = false }
@@ -97209,6 +97620,7 @@ class VideoPlayerActivity : ComponentActivity() {
             color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
         )
         if (state.isFinished) return
+        var restart by remember { mutableStateOf(false) }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(
                 onClick = { if (fault) add(state.receiver, PointKind.DOUBLE_FAULT) else fault = true },
@@ -97220,14 +97632,34 @@ class VideoPlayerActivity : ComponentActivity() {
                     modifier = Modifier.padding(vertical = 7.dp),
                 )
             }
-            if (points.isNotEmpty()) {
-                NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.weight(1f)) {
-                    p.seekTo(Chapters.start(points, points.lastIndex))
-                    onChange(ch.copy(points = points.dropLast(1)))
-                    askKind = false
-                }
+            // Annulla e Ricomincia da capo (con conferma) nella stessa riga, perché in orizzontale lo spazio in altezza è
+            // poco; solo la scritta, come Fallo: con l'icona non ci starebbe in un terzo di riga.
+            @Composable fun word(text: String, onClick: () -> Unit) = Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = Modifier.weight(1f)) {
+                Text(
+                    text, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1,
+                    modifier = Modifier.padding(vertical = 7.dp),
+                )
             }
+            if (points.isNotEmpty()) word(str.videoUndoShort) {
+                p.seekTo(Chapters.start(points, points.lastIndex))
+                onChange(ch.copy(points = points.dropLast(1)))
+                askKind = false
+            }
+            if (points.size > 1) word(str.videoRestartShort) { restart = true }
         }
+        if (restart) AlertDialog(
+            onDismissRequest = { restart = false },
+            text = { Text(str.videoRestartAsk(points.size)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    restart = false
+                    askKind = false
+                    onChange(ch.copy(points = emptyList()))
+                    p.seekTo(0)
+                }) { Text(str.videoRestart) }
+            },
+            dismissButton = { TextButton(onClick = { restart = false }) { Text(str.back) } },
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             for (side in Side.entries) {
                 Surface(
@@ -97243,8 +97675,10 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
-        if (points.isNotEmpty() && askKind) {
-            // Com'è finito l'ultimo punto (facoltativo): un tocco e il pannello torna pronto per il punto dopo.
+        if (points.isNotEmpty()) {
+            // Com'è finito l'ultimo punto: sempre in vista (servono alle statistiche: ace, doppi falli, vincenti,
+            // errori gratuiti e forzati); si cambia o si toglie con un altro tocco, finché non si segna il punto dopo.
+            Text(str.detailAskOutcome, color = if (askKind) TsmColors.Ball else TsmColors.TextDim, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
             androidx.compose.foundation.layout.FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -97452,9 +97886,15 @@ class VideoPlayerActivity : ComponentActivity() {
             if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
             // Intro: dati del database e storico fino all'inizio della partita del video.
             val intro = if (introRec == null) null else runCatching {
-                val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
-                val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.photos.isFemale(it) }
+                // Il giorno della partita: nei video importati quello in cui è stato girato (dal video o dal nome del
+                // file), non quello dell'importazione; se non si sa, niente data e lo storico fino a oggi.
+                val known = if (e.chapters.imported) VideoDates.guess(this, e.video, e.chapters.video)
+                else rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
+                val before = known ?: System.currentTimeMillis()
+                val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
+                // Data corta per l'ultimo scontro diretto ("23 nov 2026"): sta tra i due numeri.
+                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, controller.options.value.lang.locale)
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { short.format(java.util.Date(it)) }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,
@@ -97635,12 +98075,12 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String?, modifier: Modifier, onClick: () -> Unit) {
+    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector?, label: String?, modifier: Modifier, onClick: () -> Unit) {
         Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
             Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, tint = TsmColors.TextMain)
+                icon?.let { Icon(it, null, tint = TsmColors.TextMain) }
                 label?.let {
-                    Spacer(Modifier.width(6.dp))
+                    if (icon != null) Spacer(Modifier.width(6.dp))
                     Text(it, color = TsmColors.TextMain, fontSize = 12.sp, maxLines = 1)
                 }
             }
@@ -97648,9 +98088,23 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Capitoli per game da incollare nella descrizione del video su YouTube. */
-    private fun shareYoutube(ch: VideoChapters) {
+    /**
+     * I capitoli per la descrizione di YouTube, già copiati negli appunti; null (con un avviso) se sono meno di tre,
+     * perché YouTube non li mostrerebbe.
+     */
+    private fun youtubeChapters(ch: VideoChapters): String? {
         val str = s
         val text = Chapters.youtube(ch.points, str.videoStart) { set, game -> "${str.videoSet} $set · ${str.videoGame} $game" }
+        if (!Chapters.youtubeEnough(text)) {
+            Toast.makeText(this, str.videoChaptersFew, Toast.LENGTH_LONG).show()
+            return null
+        }
+        getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText(str.videoYoutubeChapters, text))
+        return text
+    }
+
+    private fun shareYoutube(text: String) {
+        val str = s
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)
@@ -117286,6 +117740,13 @@ class ChaptersTest {
         assertEquals("0:00 Inizio\n1:00 Set 1 · Game 2\n1:40 Set 2 · Game 1", text)
         assertEquals("1:02:03", Chapters.time(3_723_000))
     }
+
+    @Test
+    fun youtubeNeedsThreeChapters() {
+        assertEquals(false, Chapters.youtubeEnough("0:00 Inizio"))
+        assertEquals(false, Chapters.youtubeEnough("0:00 Inizio\n1:10 Set 1 · Game 2"))
+        assertEquals(true, Chapters.youtubeEnough("0:00 Inizio\n1:10 Set 1 · Game 2\n2:30 Set 1 · Game 3"))
+    }
 }
 TSM_EOF
 
@@ -117500,20 +117961,25 @@ class HighlightIntroTest {
             now,
             rec("dopo", day(2026, 12, 1), Side.P1),
         )
-        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026")
+        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026", day = { if (it in day(2026, 10, 1)..day(2026, 10, 2)) "ottobre-data" else "altra" })
         assertEquals("TC VERONA".lowercase(), c.title.lowercase())
         assertEquals(listOf("10 novembre 2026"), c.place)
         assertEquals(listOf(HighlightIntro.Person("Mario", "Rossi", null)), c.people.getValue(Side.P1))
         assertEquals(listOf(HighlightIntro.Person("", "Bianchi", null)), c.people.getValue(Side.P2))
         val rows = c.rows.associate { it.label to (it.a to it.b) }
         assertEquals(mapOf(Side.P1 to "4.1", Side.P2 to "–"), c.ranks)
-        assertEquals("36" to "–", rows[ItStrings.heartAge])
+        // Età e mano non si mostrano più (scelta del 24 nov): restano altezza, rovescio, circolo e bilancio.
+        assertEquals(null, rows[ItStrings.heartAge])
         assertEquals("183 cm" to "–", rows[ItStrings.introHeight])
-        assertEquals(ItStrings.handLeft to "–", rows[ItStrings.introHand])
+        assertEquals(false, c.rows.any { it.a == ItStrings.handLeft })
         assertEquals("CT Padova" to "–", rows[ItStrings.introClub])
         // Solo le due partite di prima: né questa né quella dopo.
         assertEquals("1–1" to "1–1", rows[ItStrings.introRecord])
         assertEquals(1 to 1, c.h2h)
+        // Forma: le due partite di prima, dalla più vecchia (vinta) alla più recente (persa).
+        assertEquals("V S" to "S V", rows[ItStrings.introForm])
+        // L'ultima volta: la partita di ottobre, data e punteggio.
+        assertEquals(true, c.lastMeeting?.startsWith("ottobre-data"))
     }
 
     @Test
@@ -117529,12 +117995,10 @@ class HighlightIntroTest {
     }
 
     @Test
-    fun splitsNamesAndCountsAge() {
+    fun splitsNames() {
         assertEquals("Mario" to "Rossi", HighlightIntro.split("Mario Rossi"))
         assertEquals("Anna Maria" to "Verdi", HighlightIntro.split(" Anna Maria Verdi "))
         assertEquals("" to "Neri", HighlightIntro.split("Neri"))
-        assertEquals(35, HighlightIntro.age(day(1990, 11, 11), day(2026, 11, 10)))
-        assertEquals(36, HighlightIntro.age(day(1990, 11, 10), day(2026, 11, 10)))
     }
 }
 TSM_EOF
@@ -117686,8 +118150,9 @@ class HighlightsTest {
         val clips = Highlights.select(pts, null, 0)
         assertEquals(listOf(1, 2, 3, 4), clips.map { it.index })
         assertEquals(Highlights.Reason.BREAK_POINT, clips[1].reason)
-        // Il vincente parte dopo la fine del punto prima (+1 s), non 12 s prima.
-        assertEquals(61_000L, clips[2].startMs)
+        // Il vincente non parte 12 s prima: riparte da dove finisce il pezzo della palla break (2 s dopo quel punto),
+        // senza rivedere il secondo che i due pezzi avrebbero in comune.
+        assertEquals(62_000L, clips[2].startMs)
         assertEquals(67_000L, clips[2].endMs)
         assertEquals(28_000L, clips[0].startMs)
     }
@@ -117743,6 +118208,30 @@ class HighlightsTest {
         val clips = Highlights.select(raw, rules, 0, Highlights.Options(enabled = setOf(Highlights.Category.BIG_POINTS)))
         assertEquals(listOf(7), clips.map { it.index })
         assertEquals(Highlights.Reason.BREAK_POINT, clips.single().reason)
+    }
+
+    @Test
+    fun consecutivePointsDoNotRepeatVideo() {
+        // Come nel video del 24 nov: tre palle break di fila, 13,4 s e 10 s tra un punto e l'altro.
+        val pts = listOf(p(30_122), p(37_808, pressure = "BREAK_POINT"), p(51_188, pressure = "BREAK_POINT"), p(61_140, pressure = "BREAK_POINT"))
+        val clips = Highlights.select(pts, null, 0, Highlights.Options(enabled = noLast))
+        assertEquals(listOf(1, 2, 3), clips.map { it.index })
+        // Ogni pezzo riparte esattamente dove finisce il precedente: nessun secondo visto due volte.
+        clips.zipWithNext { a, b -> assertEquals(a.endMs, b.startMs) }
+        assertEquals(37_808 + Highlights.AFTER_MS, clips[1].startMs)
+        // Punti lontani: niente cambia.
+        val far = listOf(p(20_000, kind = "ACE"), p(80_000, kind = "ACE"))
+        assertEquals(listOf(8_000L, 68_000L), Highlights.select(far, null, 0, Highlights.Options(enabled = noLast)).map { it.startMs })
+    }
+
+    @Test
+    fun pointsMarkedInARushDoNotShrinkTheClip() {
+        // Come nel video del 24 nov: tre punti segnati in 3 s alla fine (punteggio rimesso a posto) e poi il game.
+        val pts = listOf(p(183_804), p(196_984), p(199_137), p(199_953))
+        val last = Highlights.select(pts, null, 0).single()
+        assertEquals(3, last.index)
+        // Il pezzo non parte dopo i tocchi a raffica (sarebbe di 1,8 s) ma 12 s prima, come un punto normale.
+        assertEquals(199_953 - Highlights.BEFORE_MS, last.startMs)
     }
 }
 TSM_EOF
@@ -117809,6 +118298,43 @@ class PointMarksTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/SceneCutsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/SceneCutsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class SceneCutsTest {
+    @Test
+    fun spikeIsACutSteadyMotionIsNot() {
+        // Movimento normale (piccole differenze), poi un taglio tra il fotogramma 5 e il 6.
+        val d = floatArrayOf(0.001f, 0.002f, 0.0015f, 0.001f, 0.002f, 0.03f, 0.002f, 0.001f, 0.0012f, 0.001f)
+        assertEquals(listOf(6), SceneCuts.spikes(d))
+        // Una panoramica: differenze grandi ma tutte simili, nessun taglio.
+        assertEquals(emptyList<Int>(), SceneCuts.spikes(FloatArray(10) { 0.017f }))
+    }
+
+    @Test
+    fun clipStopsAtTheCuts() {
+        // Il punto delle 0:39 del 24 nov: tocco a 60,219 s, taglio a 61,83 s, pezzo fino a 62,219.
+        val c = Highlights.Clip(5, 53_047, 62_219)
+        assertEquals(Highlights.Clip(5, 53_047, 61_830), SceneCuts.trim(c, 60_219, listOf(61_830)))
+        // Un taglio nei primi secondi: il pezzo parte dopo (non si vede la fine dell'altro punto).
+        val d = Highlights.Clip(1, 7_104, 24_286)
+        assertEquals(Highlights.Clip(1, 7_740, 23_560), SceneCuts.trim(d, 22_286, listOf(7_740, 23_560)))
+        // Tocco in ritardo: il taglio poco prima del tocco ferma il pezzo lì.
+        val e = Highlights.Clip(8, 110_000, 123_362)
+        assertEquals(Highlights.Clip(8, 110_000, 120_990), SceneCuts.trim(e, 121_362, listOf(120_990)))
+        // Nessun taglio: niente cambia.
+        assertEquals(c, SceneCuts.trim(c, 60_219, emptyList()))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/StatsMusicTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/StatsMusicTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -117856,6 +118382,44 @@ class StatsMusicTest {
         assertEquals("RIFF", String(b, 0, 4))
         assertEquals("WAVE", String(b, 8, 4))
         assertEquals(44 + 4410 * 2 * 2, b.size)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/VideoDatesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/VideoDatesTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+import java.util.Calendar
+import java.util.TimeZone
+
+class VideoDatesTest {
+    private val now = 1_795_500_000_000L // 24 nov 2026
+
+    private fun day(ms: Long?, tz: TimeZone = TimeZone.getDefault()) = ms?.let { Calendar.getInstance(tz).apply { timeInMillis = it }.let { c -> Triple(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)) } }
+
+    @Test
+    fun dateWrittenByTheCamera() {
+        assertEquals(Triple(2026, 10, 24), day(VideoDates.fromMeta("20261024T211657.000Z", now), TimeZone.getTimeZone("UTC")))
+        // Data vuota delle fotocamere (1904) o nel futuro: nessuna data.
+        assertNull(VideoDates.fromMeta("19040101T000000.000Z", now))
+        assertNull(VideoDates.fromMeta("20301024T211657.000Z", now))
+        assertNull(VideoDates.fromMeta(null, now))
+    }
+
+    @Test
+    fun dateInTheFileName() {
+        assertEquals(Triple(2026, 10, 24), day(VideoDates.fromName("2026-10-24 23-16-57.mp4", now)))
+        assertEquals(Triple(2026, 10, 24), day(VideoDates.fromName("VID_20261024_231657.mp4", now)))
+        assertEquals(Triple(2025, 6, 1), day(VideoDates.fromName("PXL_20250601_101500123.mp4", now)))
+        // Il video scaricato da YouTube: numeri che non sono una data.
+        assertNull(VideoDates.fromName("Amateur Tennis - (Full) Match  - LK 16.0⧸NTRP 4.0 vs LK 15.1⧸NTRP 4.0 [4apx6gd5Uxs].mp4", now))
     }
 }
 TSM_EOF
@@ -132014,6 +132578,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 449 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 453 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

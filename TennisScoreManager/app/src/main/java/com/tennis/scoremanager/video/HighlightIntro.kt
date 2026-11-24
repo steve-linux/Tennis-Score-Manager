@@ -4,25 +4,27 @@
 package com.tennis.scoremanager.video
 
 import com.tennis.scoremanager.data.Backhand
-import com.tennis.scoremanager.data.Hand
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Players
 import com.tennis.scoremanager.data.Rating
+import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
-import java.util.Calendar
 
 /**
  * L'intro degli highlights, come la presentazione dei giocatori prima delle partite dei tornei: torneo e turno in
  * alto, i due giocatori ai lati (foto o avatar, nome e COGNOME) e al centro il confronto coi dati che l'app ha già
- * (classifica, rating TSM, età, altezza, mano, rovescio, circolo, bilancio e scontri diretti prima di questa partita).
+ * (classifica, rating TSM, altezza, rovescio, circolo, bilancio, forma e scontri diretti prima di questa partita).
  * Qui si decide cosa mostrare; il disegno, nello stesso stile delle statistiche, è in [StatsCardRenderer.intro].
  */
 object HighlightIntro {
+    /** Quante partite per la forma. */
+    const val FORM = 5
+
     /** Durata dell'intro nel video, dissolvenze comprese. */
     const val MS = 9_000L
 
@@ -45,6 +47,9 @@ object HighlightIntro {
         /** Scontri diretti prima di questa partita (solo singolare, e solo se si sono già incontrati). */
         val h2h: Pair<Int, Int>?,
         val h2hLabel: String = "",
+        /** L'ultimo scontro diretto prima di questa partita: data e punteggio visto dal lato 1 ("12/10/2026 · 6-4 6-3"). */
+        val lastMeeting: String? = null,
+        val lastMeetingLabel: String = "",
         /** In fondo al pannello di ogni lato, in grande: la classifica (nel doppio "4.1 / 4.3"), e la sua scritta. */
         val ranks: Map<Side, String> = emptyMap(),
         val rankLabel: String = "",
@@ -57,6 +62,8 @@ object HighlightIntro {
     fun card(
         rec: MatchRecord, s: Strings, profiles: List<PlayerProfile>, history: List<MatchRecord>, before: Long, date: String,
         female: (String) -> Boolean = { false },
+        /** Come scrivere la data dell'ultimo scontro diretto. */
+        day: (Long) -> String = { "" },
     ): Card {
         val su = rec.setup
         val names = Names(su, s)
@@ -99,9 +106,7 @@ object HighlightIntro {
         val rankRow = row(s.memberRankingLabel) { it.rank.ifEmpty { it.profile?.member?.ranking.orEmpty() } }
         val rows = listOfNotNull(
             row(s.ratingTitle) { sl -> sl.who?.let { rating.player(it.key)?.rating?.toString() } },
-            row(s.heartAge) { sl -> sl.profile?.birth?.let { age(it, before) }?.takeIf { it in 4..110 }?.toString() },
             row(s.introHeight) { sl -> sl.profile?.heightCm?.let { "$it cm" } },
-            row(s.introHand) { sl -> when (sl.profile?.hand) { Hand.RIGHT -> s.handRight; Hand.LEFT -> s.handLeft; null -> null } },
             row(s.playerBackhand) { sl -> when (sl.profile?.backhand) { Backhand.ONE -> s.backhandOne; Backhand.TWO -> s.backhandTwo; null -> null } },
             row(s.introClub) { it.profile?.club },
             row(s.introRecord) { sl ->
@@ -113,6 +118,14 @@ object HighlightIntro {
                     }
                 }
             },
+            // Le ultime 5 partite prima di questa, dalla più vecchia alla più recente: "V V S V V".
+            row(s.introForm) { sl ->
+                sl.who?.let { w ->
+                    PlayerStats.matchesOf(played, w.key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.takeLast(FORM)
+                        .takeIf { it.isNotEmpty() }
+                        ?.joinToString(" ") { if (it.winner == PlayerStats.sideOf(it.rec, w.key)) s.formWin else s.formLoss }
+                }
+            },
         )
 
         // Scontri diretti: nel singolare, tra due giocatori veri che si sono già incontrati.
@@ -122,6 +135,18 @@ object HighlightIntro {
             if (a == null || b == null) null
             else PlayerStats.rivals(played, a.key).firstOrNull { it.key == b.key }?.let { it.won to it.lost }
         }
+        // L'ultima volta che si sono incontrati: quando e come è finita, dal lato del giocatore a sinistra.
+        val lastMeeting = if (h2h == null) null else {
+            val a = slots.getValue(Side.P1).first().who!!
+            val b = slots.getValue(Side.P2).first().who!!
+            past.filter { (r, st) -> st.winner != null && PlayerStats.sideOf(r, a.key)?.let { PlayerStats.sideOf(r, b.key) == it.other } == true }
+                .maxByOrNull { (r, _) -> r.endedAt ?: r.updatedAt }
+                ?.let { (r, st) ->
+                    // Finita per ritiro o squalifica: lo si dice dopo il punteggio (anche se è 0-0).
+                    val end = if (st.retired == null) "" else " " + if (st.disqualified) s.ctDisqualified else s.ctRetired
+                    listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!) + end).filter { it.isNotBlank() }.joinToString(" · ")
+                }
+        }
 
         val event = su.event.trim()
         val club = su.club.trim()
@@ -130,7 +155,7 @@ object HighlightIntro {
         val subtitle = if (event.isNotEmpty()) listOf(su.category.trim(), su.round.trim()).filter { it.isNotEmpty() }.joinToString(" · ") else court
         val place = listOf(date, if (event.isNotEmpty()) listOf(club, court).filter { it.isNotEmpty() }.joinToString(" · ") else "").filter { it.isNotEmpty() }
         val ranks = if (rankRow == null) emptyMap() else mapOf(Side.P1 to rankRow.a, Side.P2 to rankRow.b)
-        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, ranks, s.memberRankingLabel)
+        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, lastMeeting, s.introLastMeeting, ranks, s.memberRankingLabel)
     }
 
     /** "Mario Rossi" → ("Mario", "Rossi"); un nome solo resta tutto grande. */
@@ -138,15 +163,5 @@ object HighlightIntro {
         val t = name.trim()
         val i = t.lastIndexOf(' ')
         return if (i <= 0) "" to t else t.substring(0, i).trim() to t.substring(i + 1)
-    }
-
-    /** Anni compiuti il giorno [at] da chi è nato il giorno [birth]. */
-    fun age(birth: Long, at: Long): Int {
-        val b = Calendar.getInstance().apply { timeInMillis = birth }
-        val n = Calendar.getInstance().apply { timeInMillis = at }
-        var y = n.get(Calendar.YEAR) - b.get(Calendar.YEAR)
-        val md = { c: Calendar -> c.get(Calendar.MONTH) * 100 + c.get(Calendar.DAY_OF_MONTH) }
-        if (md(n) < md(b)) y--
-        return y
     }
 }

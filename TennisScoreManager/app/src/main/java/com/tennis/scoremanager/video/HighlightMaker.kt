@@ -70,6 +70,24 @@ class HighlightMaker(context: Context) {
         stats: Stats? = null,
         onDone: (File?) -> Unit,
     ) {
+        // Nei video importati (già montati da altri) i pezzi si fermano ai tagli: si cercano prima, fuori dal thread principale.
+        if (!e.chapters.imported) { build(e, clips, onProgress, stats, onDone); return }
+        cancelled = false
+        Thread {
+            val cut = SceneCuts.trimAll(app, e.video, clips) { e.chapters.points[it.index].at }
+            main.post { if (!cancelled) build(e, cut, onProgress, stats, onDone) }
+        }.start()
+    }
+
+    @Volatile private var cancelled = false
+
+    private fun build(
+        e: VideoLibrary.Entry,
+        clips: List<Highlights.Clip>,
+        onProgress: (Int) -> Unit,
+        stats: Stats?,
+        onDone: (File?) -> Unit,
+    ) {
         val ch = e.chapters
         val (width, height) = frameSize(e) ?: (1920 to 1080)
         // Le misure della grafica sono pensate per 1920 di larghezza: si adattano al video.
@@ -125,6 +143,7 @@ class HighlightMaker(context: Context) {
     }
 
     fun cancel() {
+        cancelled = true
         transformer?.cancel()
         transformer = null
     }

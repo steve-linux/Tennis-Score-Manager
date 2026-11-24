@@ -40,7 +40,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -53,7 +52,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -169,6 +167,8 @@ class VideoPlayerActivity : ComponentActivity() {
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
         var hlOpen by remember { mutableStateOf(false) }
+        // I capitoli per YouTube appena copiati, da mostrare (e condividere, se si preferisce).
+        var chapters by remember { mutableStateOf<String?>(null) }
         var filter by remember { mutableStateOf(CoachFilter()) }
         var filterOpen by remember { mutableStateOf(false) }
         val shown = remember(ch, filter) { if (filter.active) CoachFilter.matching(points, ch.rules, filter) else points.indices.toList() }
@@ -227,12 +227,18 @@ class VideoPlayerActivity : ComponentActivity() {
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
-                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { shareYoutube(ch) }
-                    if (points.isNotEmpty() && !tagging) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
-                    if (ch.imported || ch.rules != null) {
-                        NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, null, Modifier.weight(0.6f)) {
-                            if (ch.rules == null) setup = true else tagging = !tagging
-                        }
+                    // Mentre si segnano i punti, in alto c'è solo come smettere: lo spazio sotto serve tutto al pannello.
+                    if (tagging) NavBtn(Icons.Filled.Check, str.videoTagDone, Modifier.weight(2f)) { tagging = false }
+                    else {
+                        // Solo la scritta: con l'icona, accanto al filtro, si leggeva solo "Capitoli".
+                        NavBtn(null, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
+                        if (points.isNotEmpty()) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
+                    }
+                }
+                // Segnare i punti: un pulsante con la scritta, in riga da solo (prima era solo un'icona).
+                if (!tagging && (ch.imported || ch.rules != null)) {
+                    NavBtn(Icons.Filled.EditNote, str.videoTagStart, Modifier.fillMaxWidth()) {
+                        if (ch.rules == null) setup = true else tagging = true
                     }
                 }
                 if (tagging && ch.rules != null) {
@@ -264,7 +270,8 @@ class VideoPlayerActivity : ComponentActivity() {
                         NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
                     }
                 }
-                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                // L'elenco prende lo spazio che resta (prima si vedono tutti i pulsanti per segnare).
+                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
                     itemsIndexed(shown) { k, i ->
                         val pt = points[i]
                         val newGame = k == 0 || points[shown[k - 1]].game != pt.game
@@ -279,6 +286,20 @@ class VideoPlayerActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+        chapters?.let { text ->
+            AlertDialog(
+                onDismissRequest = { chapters = null },
+                title = { Text(str.videoYoutubeChapters) },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(str.videoChaptersCopied, fontSize = 13.sp)
+                        Text(text, fontSize = 13.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, color = TsmColors.TextDim)
+                    }
+                },
+                confirmButton = { TextButton(onClick = { chapters = null }) { Text(str.ok) } },
+                dismissButton = { TextButton(onClick = { chapters = null; shareYoutube(text) }) { Text(str.share) } },
+            )
         }
         if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
         if (filterOpen) FilterDialog(ch, filter, { filter = it; queue = null }) { filterOpen = false }
@@ -324,6 +345,7 @@ class VideoPlayerActivity : ComponentActivity() {
             color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
         )
         if (state.isFinished) return
+        var restart by remember { mutableStateOf(false) }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(
                 onClick = { if (fault) add(state.receiver, PointKind.DOUBLE_FAULT) else fault = true },
@@ -335,14 +357,34 @@ class VideoPlayerActivity : ComponentActivity() {
                     modifier = Modifier.padding(vertical = 7.dp),
                 )
             }
-            if (points.isNotEmpty()) {
-                NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.weight(1f)) {
-                    p.seekTo(Chapters.start(points, points.lastIndex))
-                    onChange(ch.copy(points = points.dropLast(1)))
-                    askKind = false
-                }
+            // Annulla e Ricomincia da capo (con conferma) nella stessa riga, perché in orizzontale lo spazio in altezza è
+            // poco; solo la scritta, come Fallo: con l'icona non ci starebbe in un terzo di riga.
+            @Composable fun word(text: String, onClick: () -> Unit) = Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = Modifier.weight(1f)) {
+                Text(
+                    text, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1,
+                    modifier = Modifier.padding(vertical = 7.dp),
+                )
             }
+            if (points.isNotEmpty()) word(str.videoUndoShort) {
+                p.seekTo(Chapters.start(points, points.lastIndex))
+                onChange(ch.copy(points = points.dropLast(1)))
+                askKind = false
+            }
+            if (points.size > 1) word(str.videoRestartShort) { restart = true }
         }
+        if (restart) AlertDialog(
+            onDismissRequest = { restart = false },
+            text = { Text(str.videoRestartAsk(points.size)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    restart = false
+                    askKind = false
+                    onChange(ch.copy(points = emptyList()))
+                    p.seekTo(0)
+                }) { Text(str.videoRestart) }
+            },
+            dismissButton = { TextButton(onClick = { restart = false }) { Text(str.back) } },
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             for (side in Side.entries) {
                 Surface(
@@ -358,8 +400,10 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
-        if (points.isNotEmpty() && askKind) {
-            // Com'è finito l'ultimo punto (facoltativo): un tocco e il pannello torna pronto per il punto dopo.
+        if (points.isNotEmpty()) {
+            // Com'è finito l'ultimo punto: sempre in vista (servono alle statistiche: ace, doppi falli, vincenti,
+            // errori gratuiti e forzati); si cambia o si toglie con un altro tocco, finché non si segna il punto dopo.
+            Text(str.detailAskOutcome, color = if (askKind) TsmColors.Ball else TsmColors.TextDim, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
             androidx.compose.foundation.layout.FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -567,9 +611,15 @@ class VideoPlayerActivity : ComponentActivity() {
             if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
             // Intro: dati del database e storico fino all'inizio della partita del video.
             val intro = if (introRec == null) null else runCatching {
-                val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
-                val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.photos.isFemale(it) }
+                // Il giorno della partita: nei video importati quello in cui è stato girato (dal video o dal nome del
+                // file), non quello dell'importazione; se non si sa, niente data e lo storico fino a oggi.
+                val known = if (e.chapters.imported) VideoDates.guess(this, e.video, e.chapters.video)
+                else rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
+                val before = known ?: System.currentTimeMillis()
+                val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
+                // Data corta per l'ultimo scontro diretto ("23 nov 2026"): sta tra i due numeri.
+                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, controller.options.value.lang.locale)
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { short.format(java.util.Date(it)) }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,
@@ -750,12 +800,12 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String?, modifier: Modifier, onClick: () -> Unit) {
+    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector?, label: String?, modifier: Modifier, onClick: () -> Unit) {
         Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
             Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, tint = TsmColors.TextMain)
+                icon?.let { Icon(it, null, tint = TsmColors.TextMain) }
                 label?.let {
-                    Spacer(Modifier.width(6.dp))
+                    if (icon != null) Spacer(Modifier.width(6.dp))
                     Text(it, color = TsmColors.TextMain, fontSize = 12.sp, maxLines = 1)
                 }
             }
@@ -763,9 +813,23 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Capitoli per game da incollare nella descrizione del video su YouTube. */
-    private fun shareYoutube(ch: VideoChapters) {
+    /**
+     * I capitoli per la descrizione di YouTube, già copiati negli appunti; null (con un avviso) se sono meno di tre,
+     * perché YouTube non li mostrerebbe.
+     */
+    private fun youtubeChapters(ch: VideoChapters): String? {
         val str = s
         val text = Chapters.youtube(ch.points, str.videoStart) { set, game -> "${str.videoSet} $set · ${str.videoGame} $game" }
+        if (!Chapters.youtubeEnough(text)) {
+            Toast.makeText(this, str.videoChaptersFew, Toast.LENGTH_LONG).show()
+            return null
+        }
+        getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText(str.videoYoutubeChapters, text))
+        return text
+    }
+
+    private fun shareYoutube(text: String) {
+        val str = s
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

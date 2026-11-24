@@ -44,4 +44,11 @@ class ChaptersTest {
         assertEquals("0:00 Inizio\n1:00 Set 1 · Game 2\n1:40 Set 2 · Game 1", text)
         assertEquals("1:02:03", Chapters.time(3_723_000))
     }
+
+    @Test
+    fun youtubeNeedsThreeChapters() {
+        assertEquals(false, Chapters.youtubeEnough("0:00 Inizio"))
+        assertEquals(false, Chapters.youtubeEnough("0:00 Inizio\n1:10 Set 1 · Game 2"))
+        assertEquals(true, Chapters.youtubeEnough("0:00 Inizio\n1:10 Set 1 · Game 2\n2:30 Set 1 · Game 3"))
+    }
 }

@@ -264,7 +264,21 @@ interface Strings {
     val videoTagHowTo: String
     val videoTagTooEarly: String
     val videoPointFor: (String) -> String
-    val videoUndoLast: String
+    val videoAgainTitle: String
+    val videoAgainText: (Int) -> String
+    val videoReopen: String
+    val videoRestart: String
+    val videoRestartAsk: (Int) -> String
+    val videoRestartShort: String
+    val videoUndoShort: String
+    val introForm: String
+    val formWin: String
+    val formLoss: String
+    val introLastMeeting: String
+    val videoChaptersCopied: String
+    val videoChaptersFew: String
+    val videoTagStart: String
+    val videoTagDone: String
     val videoTagSetupTitle: String
     val videoFirstServer: String
     val videoTagSetupHint: String
@@ -291,7 +305,6 @@ interface Strings {
     val hlIntro: String
     val hlIntroHint: (Int) -> String
     val introHeight: String
-    val introHand: String
     val introClub: String
     val introRecord: String
     val introH2h: String
@@ -3135,7 +3148,21 @@ object ItStrings : Strings {
     override val videoTagHowTo = "Guarda il video e, a fine punto, tocca chi l'ha vinto; poi, se vuoi, com'è finito. Il punteggio si calcola da solo."
     override val videoTagTooEarly = "Porta il video dopo l'ultimo punto segnato."
     override val videoPointFor: (String) -> String = { "Punto $it" }
-    override val videoUndoLast = "Annulla ultimo"
+    override val videoAgainTitle = "Video già importato"
+    override val videoAgainText: (Int) -> String = { n -> "Questo video ha già $n punti segnati. Puoi riaprirlo così com'è o ricominciare da capo: i punti segnati si cancellano (nomi e chi serve per primo restano)." }
+    override val videoReopen = "Riapri"
+    override val videoRestart = "Ricomincia da capo"
+    override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
+    override val videoRestartShort = "Da capo"
+    override val videoUndoShort = "Annulla"
+    override val introForm = "Forma (ultime 5)"
+    override val formWin = "V"
+    override val formLoss = "S"
+    override val introLastMeeting = "Ultima volta"
+    override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
+    override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
+    override val videoTagStart = "Segna i punti"
+    override val videoTagDone = "Ho finito di segnare"
     override val videoTagSetupTitle = "Chi gioca?"
     override val videoFirstServer = "Chi serve per primo"
     override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
@@ -3162,7 +3189,6 @@ object ItStrings : Strings {
     override val hlIntro = "Intro come nei tornei (all'inizio)"
     override val hlIntroHint: (Int) -> String = { "Presentazione dei giocatori ($it s): foto o avatar, classifica e dati del giocatore, prima dei punti." }
     override val introHeight = "Altezza"
-    override val introHand = "Mano"
     override val introClub = "Circolo"
     override val introRecord = "Vittorie – sconfitte"
     override val introH2h = "Scontri diretti"
@@ -5942,7 +5968,21 @@ object EnStrings : Strings {
     override val videoTagHowTo = "Watch the video and, at the end of each point, tap who won it; then, if you like, how it ended. The score is worked out by itself."
     override val videoTagTooEarly = "Move the video past the last marked point."
     override val videoPointFor: (String) -> String = { "Point $it" }
-    override val videoUndoLast = "Undo last"
+    override val videoAgainTitle = "Video already imported"
+    override val videoAgainText: (Int) -> String = { n -> "This video already has $n marked points. You can reopen it as it is or start over: the marked points are deleted (names and first server stay)." }
+    override val videoReopen = "Reopen"
+    override val videoRestart = "Start over"
+    override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
+    override val videoRestartShort = "Restart"
+    override val videoUndoShort = "Undo"
+    override val introForm = "Form (last 5)"
+    override val formWin = "W"
+    override val formLoss = "L"
+    override val introLastMeeting = "Last time"
+    override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
+    override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
+    override val videoTagStart = "Mark the points"
+    override val videoTagDone = "Done marking"
     override val videoTagSetupTitle = "Who is playing?"
     override val videoFirstServer = "Who serves first"
     override val videoTagSetupHint = "Format and rules are the ones on page 2."
@@ -5969,7 +6009,6 @@ object EnStrings : Strings {
     override val hlIntro = "Tournament-style intro (at the start)"
     override val hlIntroHint: (Int) -> String = { "Player presentation ($it s): photo or avatar, ranking and player details, before the points." }
     override val introHeight = "Height"
-    override val introHand = "Hand"
     override val introClub = "Club"
     override val introRecord = "Wins – losses"
     override val introH2h = "Head to head"

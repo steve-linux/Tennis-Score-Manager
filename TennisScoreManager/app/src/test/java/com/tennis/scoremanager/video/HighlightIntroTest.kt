@@ -47,20 +47,25 @@ class HighlightIntroTest {
             now,
             rec("dopo", day(2026, 12, 1), Side.P1),
         )
-        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026")
+        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026", day = { if (it in day(2026, 10, 1)..day(2026, 10, 2)) "ottobre-data" else "altra" })
         assertEquals("TC VERONA".lowercase(), c.title.lowercase())
         assertEquals(listOf("10 novembre 2026"), c.place)
         assertEquals(listOf(HighlightIntro.Person("Mario", "Rossi", null)), c.people.getValue(Side.P1))
         assertEquals(listOf(HighlightIntro.Person("", "Bianchi", null)), c.people.getValue(Side.P2))
         val rows = c.rows.associate { it.label to (it.a to it.b) }
         assertEquals(mapOf(Side.P1 to "4.1", Side.P2 to "–"), c.ranks)
-        assertEquals("36" to "–", rows[ItStrings.heartAge])
+        // Età e mano non si mostrano più (scelta del 24 nov): restano altezza, rovescio, circolo e bilancio.
+        assertEquals(null, rows[ItStrings.heartAge])
         assertEquals("183 cm" to "–", rows[ItStrings.introHeight])
-        assertEquals(ItStrings.handLeft to "–", rows[ItStrings.introHand])
+        assertEquals(false, c.rows.any { it.a == ItStrings.handLeft })
         assertEquals("CT Padova" to "–", rows[ItStrings.introClub])
         // Solo le due partite di prima: né questa né quella dopo.
         assertEquals("1–1" to "1–1", rows[ItStrings.introRecord])
         assertEquals(1 to 1, c.h2h)
+        // Forma: le due partite di prima, dalla più vecchia (vinta) alla più recente (persa).
+        assertEquals("V S" to "S V", rows[ItStrings.introForm])
+        // L'ultima volta: la partita di ottobre, data e punteggio.
+        assertEquals(true, c.lastMeeting?.startsWith("ottobre-data"))
     }
 
     @Test
@@ -76,11 +81,9 @@ class HighlightIntroTest {
     }
 
     @Test
-    fun splitsNamesAndCountsAge() {
+    fun splitsNames() {
         assertEquals("Mario" to "Rossi", HighlightIntro.split("Mario Rossi"))
         assertEquals("Anna Maria" to "Verdi", HighlightIntro.split(" Anna Maria Verdi "))
         assertEquals("" to "Neri", HighlightIntro.split("Neri"))
-        assertEquals(35, HighlightIntro.age(day(1990, 11, 11), day(2026, 11, 10)))
-        assertEquals(36, HighlightIntro.age(day(1990, 11, 10), day(2026, 11, 10)))
     }
 }
