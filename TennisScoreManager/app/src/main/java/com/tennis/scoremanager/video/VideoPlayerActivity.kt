@@ -618,8 +618,13 @@ class VideoPlayerActivity : ComponentActivity() {
                 val before = known ?: System.currentTimeMillis()
                 val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
                 // Data corta per l'ultimo scontro diretto ("23 nov 2026"): sta tra i due numeri.
-                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, controller.options.value.lang.locale)
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { short.format(java.util.Date(it)) }
+                // In italiano, francese, spagnolo e portoghese il mese va minuscolo ("23 nov", non "23 Nov").
+                val loc = controller.options.value.lang.locale
+                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, loc)
+                val lower = loc.language in setOf("it", "fr", "es", "pt")
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) {
+                    short.format(java.util.Date(it)).let { d -> if (lower) d.lowercase(loc) else d }
+                }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,
