@@ -255,6 +255,7 @@ object DeStrings : Strings {
     override val videoReopen = "Wieder öffnen"
     override val videoRestart = "Von vorn beginnen"
     override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
+    override val videoRestartShort = "Neu"
     override val videoChaptersCopied = "Kopiert: in die Videobeschreibung auf YouTube einfügen, dann werden die Spiele zu Kapiteln auf der Videoleiste."
     override val videoChaptersFew = "YouTube zeigt Kapitel nur ab drei Stück: markiere die Punkte von mindestens drei Spielen."
     override val videoTagStart = "Punkte markieren"

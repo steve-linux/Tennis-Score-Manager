@@ -270,6 +270,7 @@ interface Strings {
     val videoReopen: String
     val videoRestart: String
     val videoRestartAsk: (Int) -> String
+    val videoRestartShort: String
     val videoChaptersCopied: String
     val videoChaptersFew: String
     val videoTagStart: String
@@ -3150,6 +3151,7 @@ object ItStrings : Strings {
     override val videoReopen = "Riapri"
     override val videoRestart = "Ricomincia da capo"
     override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
+    override val videoRestartShort = "Da capo"
     override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
     override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
     override val videoTagStart = "Segna i punti"
@@ -5966,6 +5968,7 @@ object EnStrings : Strings {
     override val videoReopen = "Reopen"
     override val videoRestart = "Start over"
     override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
+    override val videoRestartShort = "Restart"
     override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
     override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
     override val videoTagStart = "Mark the points"

@@ -57206,6 +57206,7 @@ interface Strings {
     val videoReopen: String
     val videoRestart: String
     val videoRestartAsk: (Int) -> String
+    val videoRestartShort: String
     val videoChaptersCopied: String
     val videoChaptersFew: String
     val videoTagStart: String
@@ -60086,6 +60087,7 @@ object ItStrings : Strings {
     override val videoReopen = "Riapri"
     override val videoRestart = "Ricomincia da capo"
     override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
+    override val videoRestartShort = "Da capo"
     override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
     override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
     override val videoTagStart = "Segna i punti"
@@ -62902,6 +62904,7 @@ object EnStrings : Strings {
     override val videoReopen = "Reopen"
     override val videoRestart = "Start over"
     override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
+    override val videoRestartShort = "Restart"
     override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
     override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
     override val videoTagStart = "Mark the points"
@@ -65741,6 +65744,7 @@ object DeStrings : Strings {
     override val videoReopen = "Wieder öffnen"
     override val videoRestart = "Von vorn beginnen"
     override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
+    override val videoRestartShort = "Neu"
     override val videoChaptersCopied = "Kopiert: in die Videobeschreibung auf YouTube einfügen, dann werden die Spiele zu Kapiteln auf der Videoleiste."
     override val videoChaptersFew = "YouTube zeigt Kapitel nur ab drei Stück: markiere die Punkte von mindestens drei Spielen."
     override val videoTagStart = "Punkte markieren"
@@ -68572,6 +68576,7 @@ object EsStrings : Strings {
     override val videoReopen = "Volver a abrir"
     override val videoRestart = "Empezar de nuevo"
     override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
+    override val videoRestartShort = "De nuevo"
     override val videoChaptersCopied = "Copiados: pégalos en la descripción del vídeo en YouTube y los juegos se convierten en capítulos en la barra del vídeo."
     override val videoChaptersFew = "YouTube solo muestra los capítulos si son al menos tres: marca los puntos de al menos tres juegos."
     override val videoTagStart = "Marcar los puntos"
@@ -71407,6 +71412,7 @@ object FrStrings : Strings {
     override val videoReopen = "Rouvrir"
     override val videoRestart = "Recommencer"
     override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
+    override val videoRestartShort = "Du début"
     override val videoChaptersCopied = "Copiés : collez-les dans la description de la vidéo sur YouTube et les jeux deviennent des chapitres sur la barre de la vidéo."
     override val videoChaptersFew = "YouTube n'affiche les chapitres que s'il y en a au moins trois : marquez les points d'au moins trois jeux."
     override val videoTagStart = "Marquer les points"
@@ -74241,6 +74247,7 @@ object PtStrings : Strings {
     override val videoReopen = "Reabrir"
     override val videoRestart = "Recomeçar do zero"
     override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
+    override val videoRestartShort = "Do zero"
     override val videoChaptersCopied = "Copiados: cole-os na descrição do vídeo no YouTube e os games viram capítulos na barra do vídeo."
     override val videoChaptersFew = "O YouTube só mostra os capítulos se forem pelo menos três: marque os pontos de pelo menos três games."
     override val videoTagStart = "Marcar os pontos"
@@ -97520,6 +97527,7 @@ class VideoPlayerActivity : ComponentActivity() {
             color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
         )
         if (state.isFinished) return
+        var restart by remember { mutableStateOf(false) }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(
                 onClick = { if (fault) add(state.receiver, PointKind.DOUBLE_FAULT) else fault = true },
@@ -97538,10 +97546,9 @@ class VideoPlayerActivity : ComponentActivity() {
                     askKind = false
                 }
             }
+            // Ricomincia da capo (con conferma): nella stessa riga, perché in orizzontale lo spazio in altezza è poco.
+            if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestartShort, Modifier.weight(1f)) { restart = true }
         }
-        // Ricomincia da capo (con conferma): via tutti i punti, il video torna all'inizio.
-        var restart by remember { mutableStateOf(false) }
-        if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestart, Modifier.fillMaxWidth()) { restart = true }
         if (restart) AlertDialog(
             onDismissRequest = { restart = false },
             text = { Text(str.videoRestartAsk(points.size)) },

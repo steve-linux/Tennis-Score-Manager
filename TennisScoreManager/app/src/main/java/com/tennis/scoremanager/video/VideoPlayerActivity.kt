@@ -347,6 +347,7 @@ class VideoPlayerActivity : ComponentActivity() {
             color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
         )
         if (state.isFinished) return
+        var restart by remember { mutableStateOf(false) }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(
                 onClick = { if (fault) add(state.receiver, PointKind.DOUBLE_FAULT) else fault = true },
@@ -365,10 +366,9 @@ class VideoPlayerActivity : ComponentActivity() {
                     askKind = false
                 }
             }
+            // Ricomincia da capo (con conferma): nella stessa riga, perché in orizzontale lo spazio in altezza è poco.
+            if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestartShort, Modifier.weight(1f)) { restart = true }
         }
-        // Ricomincia da capo (con conferma): via tutti i punti, il video torna all'inizio.
-        var restart by remember { mutableStateOf(false) }
-        if (points.size > 1) NavBtn(Icons.Filled.RestartAlt, str.videoRestart, Modifier.fillMaxWidth()) { restart = true }
         if (restart) AlertDialog(
             onDismissRequest = { restart = false },
             text = { Text(str.videoRestartAsk(points.size)) },
