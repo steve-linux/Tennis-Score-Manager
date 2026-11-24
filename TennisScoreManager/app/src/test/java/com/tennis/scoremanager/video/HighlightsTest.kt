@@ -113,4 +113,14 @@ class HighlightsTest {
         val far = listOf(p(20_000, kind = "ACE"), p(80_000, kind = "ACE"))
         assertEquals(listOf(8_000L, 68_000L), Highlights.select(far, null, 0, Highlights.Options(enabled = noLast)).map { it.startMs })
     }
+
+    @Test
+    fun pointsMarkedInARushDoNotShrinkTheClip() {
+        // Come nel video del 24 nov: tre punti segnati in 3 s alla fine (punteggio rimesso a posto) e poi il game.
+        val pts = listOf(p(183_804), p(196_984), p(199_137), p(199_953))
+        val last = Highlights.select(pts, null, 0).single()
+        assertEquals(3, last.index)
+        // Il pezzo non parte dopo i tocchi a raffica (sarebbe di 1,8 s) ma 12 s prima, come un punto normale.
+        assertEquals(199_953 - Highlights.BEFORE_MS, last.startMs)
+    }
 }

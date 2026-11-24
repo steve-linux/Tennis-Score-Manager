@@ -392,8 +392,10 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
-        if (points.isNotEmpty() && askKind) {
-            // Com'è finito l'ultimo punto (facoltativo): un tocco e il pannello torna pronto per il punto dopo.
+        if (points.isNotEmpty()) {
+            // Com'è finito l'ultimo punto: sempre in vista (servono alle statistiche: ace, doppi falli, vincenti,
+            // errori gratuiti e forzati); si cambia o si toglie con un altro tocco, finché non si segna il punto dopo.
+            Text(str.detailAskOutcome, color = if (askKind) TsmColors.Ball else TsmColors.TextDim, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
             androidx.compose.foundation.layout.FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp),

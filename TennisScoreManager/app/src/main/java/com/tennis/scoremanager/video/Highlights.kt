@@ -16,6 +16,8 @@ object Highlights {
     const val BEFORE_MS = 12_000L
     /** Il minimo a cui si accorcia un pezzo quando il montaggio supera la durata scelta. */
     const val MIN_BEFORE_MS = 5_000L
+    /** Il punto più corto che si possa giocare (un ace): punti segnati più vicini di così sono tocchi a raffica. */
+    const val MIN_POINT_MS = 4_000L
     /** Dopo la fine: la reazione, il punteggio che cambia. */
     const val AFTER_MS = 2_000L
     /** Dagli 8 colpi in su lo scambio è lungo. */
@@ -90,8 +92,10 @@ object Highlights {
     /** Il pezzo di video del punto [i]: da [before] prima della fine (non prima del punto precedente) a 2 s dopo. */
     fun clip(points: List<PointMark>, i: Int, videoMs: Long, before: Long = BEFORE_MS): Clip? {
         val p = points[i]
-        // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto.
-        val prevEnd = points.getOrNull(i - 1)?.at?.plus(1_000) ?: 0L
+        // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto. Un punto vero dura almeno
+        // [MIN_POINT_MS]: quelli segnati a raffica subito prima (per rimettere a posto il punteggio) non contano, se no
+        // il pezzo diventerebbe di un secondo.
+        val prevEnd = (i - 1 downTo 0).firstOrNull { p.at - points[it].at >= MIN_POINT_MS }?.let { points[it].at + 1_000 } ?: 0L
         val start = maxOf(p.at - before, prevEnd, 0L)
         val end = (p.at + AFTER_MS).let { if (videoMs > 0) minOf(it, videoMs) else it }
         return if (end <= start) null else Clip(i, start, end)
