@@ -259,6 +259,10 @@ object PtStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
     override val videoRestartShort = "Do zero"
     override val videoUndoShort = "Desfazer"
+    override val introForm = "Forma (últimos 5)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Última vez"
     override val videoChaptersCopied = "Copiados: cole-os na descrição do vídeo no YouTube e os games viram capítulos na barra do vídeo."
     override val videoChaptersFew = "O YouTube só mostra os capítulos se forem pelo menos três: marque os pontos de pelo menos três games."
     override val videoTagStart = "Marcar os pontos"
@@ -289,7 +293,6 @@ object PtStrings : Strings {
     override val hlIntro = "Intro como nos torneios (no início)"
     override val hlIntroHint: (Int) -> String = { "Apresentação dos jogadores ($it s): foto ou avatar, ranking e dados do jogador, antes dos pontos." }
     override val introHeight = "Altura"
-    override val introHand = "Mão"
     override val introClub = "Clube"
     override val introRecord = "Vitórias – derrotas"
     override val introH2h = "Confrontos diretos"

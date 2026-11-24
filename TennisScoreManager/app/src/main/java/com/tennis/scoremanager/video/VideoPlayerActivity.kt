@@ -611,9 +611,14 @@ class VideoPlayerActivity : ComponentActivity() {
             if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
             // Intro: dati del database e storico fino all'inizio della partita del video.
             val intro = if (introRec == null) null else runCatching {
-                val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
-                val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.photos.isFemale(it) }
+                // Il giorno della partita: nei video importati quello in cui è stato girato (dal video o dal nome del
+                // file), non quello dell'importazione; se non si sa, niente data e lo storico fino a oggi.
+                val known = if (e.chapters.imported) VideoDates.guess(this, e.video, e.chapters.video)
+                else rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
+                val before = known ?: System.currentTimeMillis()
+                val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
+                val lang = controller.options.value.lang
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { Reports.date(it, lang) }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,

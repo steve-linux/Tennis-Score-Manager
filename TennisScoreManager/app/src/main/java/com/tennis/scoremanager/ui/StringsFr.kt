@@ -259,6 +259,10 @@ object FrStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
     override val videoRestartShort = "Du début"
     override val videoUndoShort = "Annuler"
+    override val introForm = "Forme (5 derniers)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Dernière fois"
     override val videoChaptersCopied = "Copiés : collez-les dans la description de la vidéo sur YouTube et les jeux deviennent des chapitres sur la barre de la vidéo."
     override val videoChaptersFew = "YouTube n'affiche les chapitres que s'il y en a au moins trois : marquez les points d'au moins trois jeux."
     override val videoTagStart = "Marquer les points"
@@ -289,7 +293,6 @@ object FrStrings : Strings {
     override val hlIntro = "Intro comme dans les tournois (au début)"
     override val hlIntroHint: (Int) -> String = { "Présentation des joueurs ($it s) : photo ou avatar, classement et infos du joueur, avant les points." }
     override val introHeight = "Taille"
-    override val introHand = "Main"
     override val introClub = "Club"
     override val introRecord = "Victoires – défaites"
     override val introH2h = "Face-à-face"

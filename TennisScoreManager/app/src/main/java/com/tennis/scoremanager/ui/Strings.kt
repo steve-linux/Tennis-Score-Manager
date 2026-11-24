@@ -271,6 +271,10 @@ interface Strings {
     val videoRestartAsk: (Int) -> String
     val videoRestartShort: String
     val videoUndoShort: String
+    val introForm: String
+    val formWin: String
+    val formLoss: String
+    val introLastMeeting: String
     val videoChaptersCopied: String
     val videoChaptersFew: String
     val videoTagStart: String
@@ -301,7 +305,6 @@ interface Strings {
     val hlIntro: String
     val hlIntroHint: (Int) -> String
     val introHeight: String
-    val introHand: String
     val introClub: String
     val introRecord: String
     val introH2h: String
@@ -3152,6 +3155,10 @@ object ItStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
     override val videoRestartShort = "Da capo"
     override val videoUndoShort = "Annulla"
+    override val introForm = "Forma (ultime 5)"
+    override val formWin = "V"
+    override val formLoss = "S"
+    override val introLastMeeting = "Ultima volta"
     override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
     override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
     override val videoTagStart = "Segna i punti"
@@ -3182,7 +3189,6 @@ object ItStrings : Strings {
     override val hlIntro = "Intro come nei tornei (all'inizio)"
     override val hlIntroHint: (Int) -> String = { "Presentazione dei giocatori ($it s): foto o avatar, classifica e dati del giocatore, prima dei punti." }
     override val introHeight = "Altezza"
-    override val introHand = "Mano"
     override val introClub = "Circolo"
     override val introRecord = "Vittorie – sconfitte"
     override val introH2h = "Scontri diretti"
@@ -5969,6 +5975,10 @@ object EnStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
     override val videoRestartShort = "Restart"
     override val videoUndoShort = "Undo"
+    override val introForm = "Form (last 5)"
+    override val formWin = "W"
+    override val formLoss = "L"
+    override val introLastMeeting = "Last time"
     override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
     override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
     override val videoTagStart = "Mark the points"
@@ -5999,7 +6009,6 @@ object EnStrings : Strings {
     override val hlIntro = "Tournament-style intro (at the start)"
     override val hlIntroHint: (Int) -> String = { "Player presentation ($it s): photo or avatar, ranking and player details, before the points." }
     override val introHeight = "Height"
-    override val introHand = "Hand"
     override val introClub = "Club"
     override val introRecord = "Wins – losses"
     override val introH2h = "Head to head"

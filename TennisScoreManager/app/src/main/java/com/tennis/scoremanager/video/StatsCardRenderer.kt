@@ -155,7 +155,15 @@ object StatsCardRenderer {
                 c.drawText(card.h2hLabel.uppercase(), mid, 933f, paint(26f, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
                 c.drawText("$a", left, 1022f, paint(64f, if (a > b) YELLOW else TEXT, bold = true).apply { alpha = al })
                 c.drawText("$b", right, 1022f, paint(64f, if (b > a) YELLOW else TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = al })
-                c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                val last = card.lastMeeting
+                if (last == null) c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                else {
+                    // Al posto del trattino: l'ultima volta (data e punteggio), piccola tra i due numeri.
+                    val lp = paint(22f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al }
+                    c.drawText(card.lastMeetingLabel.uppercase(), mid, 990f, lp)
+                    val vp = paint(30f, TEXT, bold = true, align = Paint.Align.CENTER).apply { alpha = al }
+                    c.drawText(fit(last, vp, right - left - 260f), mid, 1026f, vp)
+                }
             }
         }
         footer(c, credit, site)

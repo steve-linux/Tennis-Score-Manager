@@ -256,6 +256,10 @@ object DeStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
     override val videoRestartShort = "Neu"
     override val videoUndoShort = "Zurück"
+    override val introForm = "Form (letzte 5)"
+    override val formWin = "S"
+    override val formLoss = "N"
+    override val introLastMeeting = "Zuletzt"
     override val videoChaptersCopied = "Kopiert: in die Videobeschreibung auf YouTube einfügen, dann werden die Spiele zu Kapiteln auf der Videoleiste."
     override val videoChaptersFew = "YouTube zeigt Kapitel nur ab drei Stück: markiere die Punkte von mindestens drei Spielen."
     override val videoTagStart = "Punkte markieren"
@@ -286,7 +290,6 @@ object DeStrings : Strings {
     override val hlIntro = "Intro wie bei Turnieren (am Anfang)"
     override val hlIntroHint: (Int) -> String = { "Vorstellung der Spieler ($it s): Foto oder Avatar, Ranking und Spielerdaten, vor den Punkten." }
     override val introHeight = "Größe"
-    override val introHand = "Spielhand"
     override val introClub = "Verein"
     override val introRecord = "Siege – Niederlagen"
     override val introH2h = "Direkter Vergleich"

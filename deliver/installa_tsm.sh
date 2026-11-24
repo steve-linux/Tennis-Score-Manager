@@ -57207,6 +57207,10 @@ interface Strings {
     val videoRestartAsk: (Int) -> String
     val videoRestartShort: String
     val videoUndoShort: String
+    val introForm: String
+    val formWin: String
+    val formLoss: String
+    val introLastMeeting: String
     val videoChaptersCopied: String
     val videoChaptersFew: String
     val videoTagStart: String
@@ -57237,7 +57241,6 @@ interface Strings {
     val hlIntro: String
     val hlIntroHint: (Int) -> String
     val introHeight: String
-    val introHand: String
     val introClub: String
     val introRecord: String
     val introH2h: String
@@ -60088,6 +60091,10 @@ object ItStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Cancellare i $n punti segnati e ricominciare da capo?" }
     override val videoRestartShort = "Da capo"
     override val videoUndoShort = "Annulla"
+    override val introForm = "Forma (ultime 5)"
+    override val formWin = "V"
+    override val formLoss = "S"
+    override val introLastMeeting = "Ultima volta"
     override val videoChaptersCopied = "Copiati: incollali nella descrizione del video su YouTube e i game diventano capitoli sulla barra del video."
     override val videoChaptersFew = "YouTube mostra i capitoli solo se sono almeno tre: segna i punti di almeno tre game."
     override val videoTagStart = "Segna i punti"
@@ -60118,7 +60125,6 @@ object ItStrings : Strings {
     override val hlIntro = "Intro come nei tornei (all'inizio)"
     override val hlIntroHint: (Int) -> String = { "Presentazione dei giocatori ($it s): foto o avatar, classifica e dati del giocatore, prima dei punti." }
     override val introHeight = "Altezza"
-    override val introHand = "Mano"
     override val introClub = "Circolo"
     override val introRecord = "Vittorie – sconfitte"
     override val introH2h = "Scontri diretti"
@@ -62905,6 +62911,10 @@ object EnStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Delete the $n marked points and start over?" }
     override val videoRestartShort = "Restart"
     override val videoUndoShort = "Undo"
+    override val introForm = "Form (last 5)"
+    override val formWin = "W"
+    override val formLoss = "L"
+    override val introLastMeeting = "Last time"
     override val videoChaptersCopied = "Copied: paste them into the video description on YouTube and the games become chapters on the video bar."
     override val videoChaptersFew = "YouTube only shows chapters when there are at least three: mark the points of at least three games."
     override val videoTagStart = "Mark the points"
@@ -62935,7 +62945,6 @@ object EnStrings : Strings {
     override val hlIntro = "Tournament-style intro (at the start)"
     override val hlIntroHint: (Int) -> String = { "Player presentation ($it s): photo or avatar, ranking and player details, before the points." }
     override val introHeight = "Height"
-    override val introHand = "Hand"
     override val introClub = "Club"
     override val introRecord = "Wins – losses"
     override val introH2h = "Head to head"
@@ -65745,6 +65754,10 @@ object DeStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Die $n markierten Punkte löschen und von vorn beginnen?" }
     override val videoRestartShort = "Neu"
     override val videoUndoShort = "Zurück"
+    override val introForm = "Form (letzte 5)"
+    override val formWin = "S"
+    override val formLoss = "N"
+    override val introLastMeeting = "Zuletzt"
     override val videoChaptersCopied = "Kopiert: in die Videobeschreibung auf YouTube einfügen, dann werden die Spiele zu Kapiteln auf der Videoleiste."
     override val videoChaptersFew = "YouTube zeigt Kapitel nur ab drei Stück: markiere die Punkte von mindestens drei Spielen."
     override val videoTagStart = "Punkte markieren"
@@ -65775,7 +65788,6 @@ object DeStrings : Strings {
     override val hlIntro = "Intro wie bei Turnieren (am Anfang)"
     override val hlIntroHint: (Int) -> String = { "Vorstellung der Spieler ($it s): Foto oder Avatar, Ranking und Spielerdaten, vor den Punkten." }
     override val introHeight = "Größe"
-    override val introHand = "Spielhand"
     override val introClub = "Verein"
     override val introRecord = "Siege – Niederlagen"
     override val introH2h = "Direkter Vergleich"
@@ -68577,6 +68589,10 @@ object EsStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "¿Borrar los $n puntos marcados y empezar de nuevo?" }
     override val videoRestartShort = "De nuevo"
     override val videoUndoShort = "Deshacer"
+    override val introForm = "Forma (últimos 5)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Última vez"
     override val videoChaptersCopied = "Copiados: pégalos en la descripción del vídeo en YouTube y los juegos se convierten en capítulos en la barra del vídeo."
     override val videoChaptersFew = "YouTube solo muestra los capítulos si son al menos tres: marca los puntos de al menos tres juegos."
     override val videoTagStart = "Marcar los puntos"
@@ -68607,7 +68623,6 @@ object EsStrings : Strings {
     override val hlIntro = "Intro como en los torneos (al principio)"
     override val hlIntroHint: (Int) -> String = { "Presentación de los jugadores ($it s): foto o avatar, clasificación y datos del jugador, antes de los puntos." }
     override val introHeight = "Altura"
-    override val introHand = "Mano"
     override val introClub = "Club"
     override val introRecord = "Victorias – derrotas"
     override val introH2h = "Enfrentamientos"
@@ -71413,6 +71428,10 @@ object FrStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Effacer les $n points marqués et recommencer depuis le début ?" }
     override val videoRestartShort = "Du début"
     override val videoUndoShort = "Annuler"
+    override val introForm = "Forme (5 derniers)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Dernière fois"
     override val videoChaptersCopied = "Copiés : collez-les dans la description de la vidéo sur YouTube et les jeux deviennent des chapitres sur la barre de la vidéo."
     override val videoChaptersFew = "YouTube n'affiche les chapitres que s'il y en a au moins trois : marquez les points d'au moins trois jeux."
     override val videoTagStart = "Marquer les points"
@@ -71443,7 +71462,6 @@ object FrStrings : Strings {
     override val hlIntro = "Intro comme dans les tournois (au début)"
     override val hlIntroHint: (Int) -> String = { "Présentation des joueurs ($it s) : photo ou avatar, classement et infos du joueur, avant les points." }
     override val introHeight = "Taille"
-    override val introHand = "Main"
     override val introClub = "Club"
     override val introRecord = "Victoires – défaites"
     override val introH2h = "Face-à-face"
@@ -74248,6 +74266,10 @@ object PtStrings : Strings {
     override val videoRestartAsk: (Int) -> String = { n -> "Apagar os $n pontos marcados e recomeçar do zero?" }
     override val videoRestartShort = "Do zero"
     override val videoUndoShort = "Desfazer"
+    override val introForm = "Forma (últimos 5)"
+    override val formWin = "V"
+    override val formLoss = "D"
+    override val introLastMeeting = "Última vez"
     override val videoChaptersCopied = "Copiados: cole-os na descrição do vídeo no YouTube e os games viram capítulos na barra do vídeo."
     override val videoChaptersFew = "O YouTube só mostra os capítulos se forem pelo menos três: marque os pontos de pelo menos três games."
     override val videoTagStart = "Marcar os pontos"
@@ -74278,7 +74300,6 @@ object PtStrings : Strings {
     override val hlIntro = "Intro como nos torneios (no início)"
     override val hlIntroHint: (Int) -> String = { "Apresentação dos jogadores ($it s): foto ou avatar, ranking e dados do jogador, antes dos pontos." }
     override val introHeight = "Altura"
-    override val introHand = "Mão"
     override val introClub = "Clube"
     override val introRecord = "Vitórias – derrotas"
     override val introH2h = "Confrontos diretos"
@@ -93447,25 +93468,27 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightIntro.kt" 
 package com.tennis.scoremanager.video
 
 import com.tennis.scoremanager.data.Backhand
-import com.tennis.scoremanager.data.Hand
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Players
 import com.tennis.scoremanager.data.Rating
+import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
-import java.util.Calendar
 
 /**
  * L'intro degli highlights, come la presentazione dei giocatori prima delle partite dei tornei: torneo e turno in
  * alto, i due giocatori ai lati (foto o avatar, nome e COGNOME) e al centro il confronto coi dati che l'app ha già
- * (classifica, rating TSM, età, altezza, mano, rovescio, circolo, bilancio e scontri diretti prima di questa partita).
+ * (classifica, rating TSM, altezza, rovescio, circolo, bilancio, forma e scontri diretti prima di questa partita).
  * Qui si decide cosa mostrare; il disegno, nello stesso stile delle statistiche, è in [StatsCardRenderer.intro].
  */
 object HighlightIntro {
+    /** Quante partite per la forma. */
+    const val FORM = 5
+
     /** Durata dell'intro nel video, dissolvenze comprese. */
     const val MS = 9_000L
 
@@ -93488,6 +93511,9 @@ object HighlightIntro {
         /** Scontri diretti prima di questa partita (solo singolare, e solo se si sono già incontrati). */
         val h2h: Pair<Int, Int>?,
         val h2hLabel: String = "",
+        /** L'ultimo scontro diretto prima di questa partita: data e punteggio visto dal lato 1 ("12/10/2026 · 6-4 6-3"). */
+        val lastMeeting: String? = null,
+        val lastMeetingLabel: String = "",
         /** In fondo al pannello di ogni lato, in grande: la classifica (nel doppio "4.1 / 4.3"), e la sua scritta. */
         val ranks: Map<Side, String> = emptyMap(),
         val rankLabel: String = "",
@@ -93500,6 +93526,8 @@ object HighlightIntro {
     fun card(
         rec: MatchRecord, s: Strings, profiles: List<PlayerProfile>, history: List<MatchRecord>, before: Long, date: String,
         female: (String) -> Boolean = { false },
+        /** Come scrivere la data dell'ultimo scontro diretto. */
+        day: (Long) -> String = { "" },
     ): Card {
         val su = rec.setup
         val names = Names(su, s)
@@ -93542,9 +93570,7 @@ object HighlightIntro {
         val rankRow = row(s.memberRankingLabel) { it.rank.ifEmpty { it.profile?.member?.ranking.orEmpty() } }
         val rows = listOfNotNull(
             row(s.ratingTitle) { sl -> sl.who?.let { rating.player(it.key)?.rating?.toString() } },
-            row(s.heartAge) { sl -> sl.profile?.birth?.let { age(it, before) }?.takeIf { it in 4..110 }?.toString() },
             row(s.introHeight) { sl -> sl.profile?.heightCm?.let { "$it cm" } },
-            row(s.introHand) { sl -> when (sl.profile?.hand) { Hand.RIGHT -> s.handRight; Hand.LEFT -> s.handLeft; null -> null } },
             row(s.playerBackhand) { sl -> when (sl.profile?.backhand) { Backhand.ONE -> s.backhandOne; Backhand.TWO -> s.backhandTwo; null -> null } },
             row(s.introClub) { it.profile?.club },
             row(s.introRecord) { sl ->
@@ -93556,6 +93582,14 @@ object HighlightIntro {
                     }
                 }
             },
+            // Le ultime 5 partite prima di questa, dalla più vecchia alla più recente: "V V S V V".
+            row(s.introForm) { sl ->
+                sl.who?.let { w ->
+                    PlayerStats.matchesOf(played, w.key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.takeLast(FORM)
+                        .takeIf { it.isNotEmpty() }
+                        ?.joinToString(" ") { if (it.winner == PlayerStats.sideOf(it.rec, w.key)) s.formWin else s.formLoss }
+                }
+            },
         )
 
         // Scontri diretti: nel singolare, tra due giocatori veri che si sono già incontrati.
@@ -93565,6 +93599,14 @@ object HighlightIntro {
             if (a == null || b == null) null
             else PlayerStats.rivals(played, a.key).firstOrNull { it.key == b.key }?.let { it.won to it.lost }
         }
+        // L'ultima volta che si sono incontrati: quando e come è finita, dal lato del giocatore a sinistra.
+        val lastMeeting = if (h2h == null) null else {
+            val a = slots.getValue(Side.P1).first().who!!
+            val b = slots.getValue(Side.P2).first().who!!
+            past.filter { (r, st) -> st.winner != null && PlayerStats.sideOf(r, a.key)?.let { PlayerStats.sideOf(r, b.key) == it.other } == true }
+                .maxByOrNull { (r, _) -> r.endedAt ?: r.updatedAt }
+                ?.let { (r, st) -> listOf(day(r.endedAt ?: r.updatedAt), Reports.scoreLine(st, PlayerStats.sideOf(r, a.key)!!)).filter { it.isNotBlank() }.joinToString(" · ") }
+        }
 
         val event = su.event.trim()
         val club = su.club.trim()
@@ -93573,7 +93615,7 @@ object HighlightIntro {
         val subtitle = if (event.isNotEmpty()) listOf(su.category.trim(), su.round.trim()).filter { it.isNotEmpty() }.joinToString(" · ") else court
         val place = listOf(date, if (event.isNotEmpty()) listOf(club, court).filter { it.isNotEmpty() }.joinToString(" · ") else "").filter { it.isNotEmpty() }
         val ranks = if (rankRow == null) emptyMap() else mapOf(Side.P1 to rankRow.a, Side.P2 to rankRow.b)
-        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, ranks, s.memberRankingLabel)
+        return Card(title, subtitle, place, people, rows, h2h, s.introH2h, lastMeeting, s.introLastMeeting, ranks, s.memberRankingLabel)
     }
 
     /** "Mario Rossi" → ("Mario", "Rossi"); un nome solo resta tutto grande. */
@@ -93581,16 +93623,6 @@ object HighlightIntro {
         val t = name.trim()
         val i = t.lastIndexOf(' ')
         return if (i <= 0) "" to t else t.substring(0, i).trim() to t.substring(i + 1)
-    }
-
-    /** Anni compiuti il giorno [at] da chi è nato il giorno [birth]. */
-    fun age(birth: Long, at: Long): Int {
-        val b = Calendar.getInstance().apply { timeInMillis = birth }
-        val n = Calendar.getInstance().apply { timeInMillis = at }
-        var y = n.get(Calendar.YEAR) - b.get(Calendar.YEAR)
-        val md = { c: Calendar -> c.get(Calendar.MONTH) * 100 + c.get(Calendar.DAY_OF_MONTH) }
-        if (md(n) < md(b)) y--
-        return y
     }
 }
 TSM_EOF
@@ -96705,7 +96737,15 @@ object StatsCardRenderer {
                 c.drawText(card.h2hLabel.uppercase(), mid, 933f, paint(26f, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
                 c.drawText("$a", left, 1022f, paint(64f, if (a > b) YELLOW else TEXT, bold = true).apply { alpha = al })
                 c.drawText("$b", right, 1022f, paint(64f, if (b > a) YELLOW else TEXT, bold = true, align = Paint.Align.RIGHT).apply { alpha = al })
-                c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                val last = card.lastMeeting
+                if (last == null) c.drawText("–", mid, 1022f, paint(64f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al })
+                else {
+                    // Al posto del trattino: l'ultima volta (data e punteggio), piccola tra i due numeri.
+                    val lp = paint(22f, DIM, bold = true, align = Paint.Align.CENTER).apply { alpha = al }
+                    c.drawText(card.lastMeetingLabel.uppercase(), mid, 990f, lp)
+                    val vp = paint(30f, TEXT, bold = true, align = Paint.Align.CENTER).apply { alpha = al }
+                    c.drawText(fit(last, vp, right - left - 260f), mid, 1026f, vp)
+                }
             }
         }
         footer(c, credit, site)
@@ -97078,6 +97118,57 @@ object StatsMusic {
             buf[2 * i + 1] = (v shr 8).toByte()
         }
         out.write(buf)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/VideoDates.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/VideoDates.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.net.Uri
+import java.util.Calendar
+import java.util.TimeZone
+
+/**
+ * Il giorno in cui è stato girato un video importato. La data del file non va bene: per un video scaricato o
+ * esportato è quella del download. Si usa la data scritta dentro il video dalla fotocamera, o quella nel nome del
+ * file ("2026-10-24 23-16-57.mp4", "VID_20261024_231657.mp4"); se non c'è né l'una né l'altra, null (meglio nessuna
+ * data che una sbagliata).
+ */
+object VideoDates {
+    fun guess(context: Context, video: Uri, fileName: String, now: Long = System.currentTimeMillis()): Long? {
+        val meta = runCatching {
+            val r = MediaMetadataRetriever()
+            try { r.setDataSource(context, video); r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE) } finally { r.release() }
+        }.getOrNull()
+        return fromMeta(meta, now) ?: fromName(fileName, now)
+    }
+
+    /** "20261024T211657.000Z" (ora UTC, come la scrivono le fotocamere); "19040101…" vuol dire nessuna data. */
+    fun fromMeta(meta: String?, now: Long): Long? {
+        val m = Regex("""^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})""").find(meta?.trim().orEmpty()) ?: return null
+        val (y, mo, d, h, mi, s) = m.destructured
+        return at(y.toInt(), mo.toInt(), d.toInt(), h.toInt(), mi.toInt(), s.toInt(), TimeZone.getTimeZone("UTC"), now)
+    }
+
+    /** Una data nel nome del file: anno-mese-giorno, con o senza separatori, e l'ora se segue. */
+    fun fromName(name: String, now: Long): Long? {
+        val m = Regex("""(?<!\d)(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})(?:[ _T-]?(\d{2})[-_.:]?(\d{2})(?:[-_.:]?(\d{2}))?)?(?!\d)""").find(name) ?: return null
+        val g = m.groupValues
+        return at(g[1].toInt(), g[2].toInt(), g[3].toInt(), g[4].toIntOrNull() ?: 12, g[5].toIntOrNull() ?: 0, g[6].toIntOrNull() ?: 0, TimeZone.getDefault(), now)
+    }
+
+    private fun at(y: Int, mo: Int, d: Int, h: Int, mi: Int, s: Int, tz: TimeZone, now: Long): Long? {
+        if (y < 2000 || mo !in 1..12 || d !in 1..31 || h > 23 || mi > 59 || s > 59) return null
+        val t = Calendar.getInstance(tz).apply { clear(); set(y, mo - 1, d, h, mi, s) }.timeInMillis
+        // Una data nel futuro non è quella del video.
+        return t.takeIf { it <= now + 24 * 3_600_000L }
     }
 }
 TSM_EOF
@@ -97791,9 +97882,14 @@ class VideoPlayerActivity : ComponentActivity() {
             if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
             // Intro: dati del database e storico fino all'inizio della partita del video.
             val intro = if (introRec == null) null else runCatching {
-                val before = rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
-                val date = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(before))
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date) { controller.photos.isFemale(it) }
+                // Il giorno della partita: nei video importati quello in cui è stato girato (dal video o dal nome del
+                // file), non quello dell'importazione; se non si sa, niente data e lo storico fino a oggi.
+                val known = if (e.chapters.imported) VideoDates.guess(this, e.video, e.chapters.video)
+                else rec.startedAt ?: e.chapters.recordedAt.takeIf { it > 0 } ?: rec.updatedAt
+                val before = known ?: System.currentTimeMillis()
+                val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
+                val lang = controller.options.value.lang
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { Reports.date(it, lang) }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,
@@ -117860,20 +117956,25 @@ class HighlightIntroTest {
             now,
             rec("dopo", day(2026, 12, 1), Side.P1),
         )
-        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026")
+        val c = HighlightIntro.card(now.copy(startedAt = start), ItStrings, listOf(rossi), history, start, "10 novembre 2026", day = { if (it in day(2026, 10, 1)..day(2026, 10, 2)) "ottobre-data" else "altra" })
         assertEquals("TC VERONA".lowercase(), c.title.lowercase())
         assertEquals(listOf("10 novembre 2026"), c.place)
         assertEquals(listOf(HighlightIntro.Person("Mario", "Rossi", null)), c.people.getValue(Side.P1))
         assertEquals(listOf(HighlightIntro.Person("", "Bianchi", null)), c.people.getValue(Side.P2))
         val rows = c.rows.associate { it.label to (it.a to it.b) }
         assertEquals(mapOf(Side.P1 to "4.1", Side.P2 to "–"), c.ranks)
-        assertEquals("36" to "–", rows[ItStrings.heartAge])
+        // Età e mano non si mostrano più (scelta del 24 nov): restano altezza, rovescio, circolo e bilancio.
+        assertEquals(null, rows[ItStrings.heartAge])
         assertEquals("183 cm" to "–", rows[ItStrings.introHeight])
-        assertEquals(ItStrings.handLeft to "–", rows[ItStrings.introHand])
+        assertEquals(false, c.rows.any { it.a == ItStrings.handLeft })
         assertEquals("CT Padova" to "–", rows[ItStrings.introClub])
         // Solo le due partite di prima: né questa né quella dopo.
         assertEquals("1–1" to "1–1", rows[ItStrings.introRecord])
         assertEquals(1 to 1, c.h2h)
+        // Forma: le due partite di prima, dalla più vecchia (vinta) alla più recente (persa).
+        assertEquals("V S" to "S V", rows[ItStrings.introForm])
+        // L'ultima volta: la partita di ottobre, data e punteggio.
+        assertEquals(true, c.lastMeeting?.startsWith("ottobre-data"))
     }
 
     @Test
@@ -117889,12 +117990,10 @@ class HighlightIntroTest {
     }
 
     @Test
-    fun splitsNamesAndCountsAge() {
+    fun splitsNames() {
         assertEquals("Mario" to "Rossi", HighlightIntro.split("Mario Rossi"))
         assertEquals("Anna Maria" to "Verdi", HighlightIntro.split(" Anna Maria Verdi "))
         assertEquals("" to "Neri", HighlightIntro.split("Neri"))
-        assertEquals(35, HighlightIntro.age(day(1990, 11, 11), day(2026, 11, 10)))
-        assertEquals(36, HighlightIntro.age(day(1990, 11, 10), day(2026, 11, 10)))
     }
 }
 TSM_EOF
@@ -118278,6 +118377,44 @@ class StatsMusicTest {
         assertEquals("RIFF", String(b, 0, 4))
         assertEquals("WAVE", String(b, 8, 4))
         assertEquals(44 + 4410 * 2 * 2, b.size)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/VideoDatesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/VideoDatesTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+import java.util.Calendar
+import java.util.TimeZone
+
+class VideoDatesTest {
+    private val now = 1_795_500_000_000L // 24 nov 2026
+
+    private fun day(ms: Long?, tz: TimeZone = TimeZone.getDefault()) = ms?.let { Calendar.getInstance(tz).apply { timeInMillis = it }.let { c -> Triple(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)) } }
+
+    @Test
+    fun dateWrittenByTheCamera() {
+        assertEquals(Triple(2026, 10, 24), day(VideoDates.fromMeta("20261024T211657.000Z", now), TimeZone.getTimeZone("UTC")))
+        // Data vuota delle fotocamere (1904) o nel futuro: nessuna data.
+        assertNull(VideoDates.fromMeta("19040101T000000.000Z", now))
+        assertNull(VideoDates.fromMeta("20301024T211657.000Z", now))
+        assertNull(VideoDates.fromMeta(null, now))
+    }
+
+    @Test
+    fun dateInTheFileName() {
+        assertEquals(Triple(2026, 10, 24), day(VideoDates.fromName("2026-10-24 23-16-57.mp4", now)))
+        assertEquals(Triple(2026, 10, 24), day(VideoDates.fromName("VID_20261024_231657.mp4", now)))
+        assertEquals(Triple(2025, 6, 1), day(VideoDates.fromName("PXL_20250601_101500123.mp4", now)))
+        // Il video scaricato da YouTube: numeri che non sono una data.
+        assertNull(VideoDates.fromName("Amateur Tennis - (Full) Match  - LK 16.0⧸NTRP 4.0 vs LK 15.1⧸NTRP 4.0 [4apx6gd5Uxs].mp4", now))
     }
 }
 TSM_EOF
@@ -132436,6 +132573,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 451 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 453 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
