@@ -97232,7 +97232,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -97411,7 +97410,8 @@ class VideoPlayerActivity : ComponentActivity() {
                     // Mentre si segnano i punti, in alto c'è solo come smettere: lo spazio sotto serve tutto al pannello.
                     if (tagging) NavBtn(Icons.Filled.Check, str.videoTagDone, Modifier.weight(2f)) { tagging = false }
                     else {
-                        NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
+                        // Solo la scritta: con l'icona, accanto al filtro, si leggeva solo "Capitoli".
+                        NavBtn(null, str.videoYoutubeChapters, Modifier.weight(1.4f)) { chapters = youtubeChapters(ch) }
                         if (points.isNotEmpty()) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
                     }
                 }
@@ -97974,12 +97974,12 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String?, modifier: Modifier, onClick: () -> Unit) {
+    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector?, label: String?, modifier: Modifier, onClick: () -> Unit) {
         Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
             Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, tint = TsmColors.TextMain)
+                icon?.let { Icon(it, null, tint = TsmColors.TextMain) }
                 label?.let {
-                    Spacer(Modifier.width(6.dp))
+                    if (icon != null) Spacer(Modifier.width(6.dp))
                     Text(it, color = TsmColors.TextMain, fontSize = 12.sp, maxLines = 1)
                 }
             }
