@@ -93,8 +93,8 @@ fun DataScreen(c: MatchController) {
             }
         }
     }
-    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip"), writeTo)
-    val createLocked = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream"), writeTo)
+    val create = rememberLauncherForActivityResult(com.tennis.scoremanager.ui.CreateInDocuments("application/zip"), writeTo)
+    val createLocked = rememberLauncherForActivityResult(com.tennis.scoremanager.ui.CreateInDocuments("application/octet-stream"), writeTo)
     // Un backup scelto: in chiaro o protetto (allora prima la password).
     val opener = remember { com.tennis.scoremanager.ui.BackupOpener({ input, m -> restoreAsk = input to m }) { message = it } }
     com.tennis.scoremanager.ui.BackupOpenerDialog(opener)
