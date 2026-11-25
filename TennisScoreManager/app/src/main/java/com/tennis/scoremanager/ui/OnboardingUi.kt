@@ -78,7 +78,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var role by remember { mutableStateOf(c.activeRole.value) }
     var club by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
-    var reminder by remember { mutableStateOf(true) }
+    // La prima volta acceso; rifatta da Altro, com'era.
+    var reminder by remember { mutableStateOf(if (c.storage.onboarded) c.storage.backupReminder else true) }
     var autoBackup by remember { mutableStateOf(c.storage.personalBackupAuto) }
     val steps = Step.entries.filter { st ->
         when (st) {
