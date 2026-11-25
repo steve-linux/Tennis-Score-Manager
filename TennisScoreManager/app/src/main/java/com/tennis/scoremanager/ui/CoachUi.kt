@@ -78,6 +78,11 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     var propose by remember { mutableStateOf(false) }
     var receipt by remember { mutableStateOf<String?>(null) }
     var deleteEntry by remember { mutableStateOf<String?>(null) }
+    // Pacchetti: conferma prima di segnarlo pagato; tenendolo premuto si toglie il pagamento o lo si elimina.
+    var payAsk by remember { mutableStateOf<LessonPack?>(null) }
+    var packMenu by remember { mutableStateOf<LessonPack?>(null) }
+    var unpayAsk by remember { mutableStateOf<LessonPack?>(null) }
+    var packDeleteAsk by remember { mutableStateOf<LessonPack?>(null) }
 
     // Diario: una riga per lezione, con la data; tenendo premuto si toglie.
     SectionCard(s.coDiary, Icons.Filled.EditNote) {
@@ -124,12 +129,14 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         if (bal.bought > 0 || bal.used > 0) Text(s.coBalance(bal.bought, bal.used, bal.left), color = if (bal.left < 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         if (bal.absences > 0 || bal.toRecover > 0) Text(listOfNotNull(s.evAbsences(bal.absences).takeIf { bal.absences > 0 }, s.laToRecover(bal.toRecover).takeIf { bal.toRecover > 0 }).joinToString(" · "),
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
-        for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
+        val packs = book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)
+        for (p in packs) Row(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { packMenu = p }), verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.coaching.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            if (p.paidAt == null) TextButton(onClick = { payAsk = p }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
             // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
             else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
+        if (packs.isNotEmpty()) Text(s.coPackHold, color = TsmColors.TextDim, fontSize = 12.sp)
         if (bal.dueCents > 0) Text(s.coDue(Fees.money(bal.dueCents, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.coLessonNew, Icons.Filled.Event, {
@@ -162,6 +169,44 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }
     if (packNew) PackDialog(c, st.id) { packNew = false }
     if (matchPick) StudentPickDialog(c, s.coMatchWith, exclude = setOf(st.id), multi = false) { picked -> matchPick = false; picked.firstOrNull()?.let { c.coaching.matchWith(st.id, it) } }
+    val packName = { p: LessonPack -> s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) }
+    payAsk?.let { p ->
+        AlertDialog(
+            onDismissRequest = { payAsk = null },
+            text = { Text(s.coPaidAsk(packName(p))) },
+            confirmButton = { TextButton(onClick = { c.coaching.markPackPaid(p); payAsk = null }) { Text(s.coMarkPaid) } },
+            dismissButton = { TextButton(onClick = { payAsk = null }) { Text(s.cancel) } },
+        )
+    }
+    packMenu?.let { p ->
+        AlertDialog(
+            onDismissRequest = { packMenu = null },
+            title = { Text(packName(p) + (p.receipt?.let { " · $it" } ?: "")) },
+            text = {
+                Column {
+                    if (p.paidAt != null) TextButton(onClick = { unpayAsk = p; packMenu = null }) { Text(s.coUnpaid, color = TsmColors.Orange) }
+                    TextButton(onClick = { packDeleteAsk = p; packMenu = null }) { Text(s.coPackDelete, color = TsmColors.Danger) }
+                }
+            },
+            confirmButton = { TextButton(onClick = { packMenu = null }) { Text(s.back) } },
+        )
+    }
+    unpayAsk?.let { p ->
+        AlertDialog(
+            onDismissRequest = { unpayAsk = null },
+            text = { Text(s.coUnpaidAsk(p.receipt.orEmpty())) },
+            confirmButton = { TextButton(onClick = { c.coaching.unmarkPackPaid(p); unpayAsk = null }) { Text(s.coUnpaid, color = TsmColors.Orange) } },
+            dismissButton = { TextButton(onClick = { unpayAsk = null }) { Text(s.cancel) } },
+        )
+    }
+    packDeleteAsk?.let { p ->
+        AlertDialog(
+            onDismissRequest = { packDeleteAsk = null },
+            text = { Text(s.coPackDeleteAsk(packName(p))) },
+            confirmButton = { TextButton(onClick = { c.coaching.deletePack(p.id); packDeleteAsk = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { packDeleteAsk = null }) { Text(s.cancel) } },
+        )
+    }
     deleteEntry?.let { id ->
         AlertDialog(
             onDismissRequest = { deleteEntry = null },

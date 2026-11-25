@@ -7684,6 +7684,9 @@ const APP_I18N = {
     coNoLessons: "Nessuna lezione in programma.",
     coNote: "Nota",
     coNotify: "Avvisa",
+    coPackDelete: "Elimina il pacchetto",
+    coPackDeleteAsk: (it) => `Eliminare il pacchetto (${it})? Le lezioni fatte restano.`,
+    coPackHold: "Tieni premuto un pacchetto per togliere il pagamento o eliminarlo.",
     coPackLessons: "Numero di lezioni",
     coPackLine: (n, p) => `${n} lezioni · ${p}`,
     coPackNew: "Nuovo pacchetto",
@@ -7691,6 +7694,7 @@ const APP_I18N = {
     coPackPrice: "Prezzo del pacchetto",
     coPacks: "Pacchetti di lezioni",
     coPaid: "Pagato",
+    coPaidAsk: (it) => `Segnare pagato il pacchetto (${it})? Prende il prossimo numero di ricevuta.`,
     coPlace: "Dove (campo, circolo)",
     coRemind: (it) => `Ti ricordo la lezione: ${it}.`,
     coRemindTomorrow: (it) => `Ricorda le lezioni di domani (${it})`,
@@ -7698,6 +7702,8 @@ const APP_I18N = {
     coSortLast: "Per ultima volta",
     coSortName: "Per nome",
     coToMark: "Passate, da segnare",
+    coUnpaid: "Segna non pagato",
+    coUnpaidAsk: (it) => `Togliere il pagamento e la ricevuta ${it}? Se l'hai già mandata, quella ricevuta non vale più.`,
     coUpcoming: "In programma",
     coWhen: "Quando",
     coWho: "Chi",
@@ -8614,6 +8620,9 @@ const APP_I18N = {
     coNoLessons: "No lessons scheduled.",
     coNote: "Note",
     coNotify: "Notify",
+    coPackDelete: "Delete the pack",
+    coPackDeleteAsk: (it) => `Delete the pack (${it})? Lessons already given stay.`,
+    coPackHold: "Press and hold a pack to remove the payment or delete it.",
     coPackLessons: "Number of lessons",
     coPackLine: (n, p) => `${n} lessons · ${p}`,
     coPackNew: "New pack",
@@ -8621,6 +8630,7 @@ const APP_I18N = {
     coPackPrice: "Pack price",
     coPacks: "Lesson packs",
     coPaid: "Paid",
+    coPaidAsk: (it) => `Mark the pack (${it}) as paid? It takes the next receipt number.`,
     coPlace: "Where (court, club)",
     coRemind: (it) => `A reminder of your lesson: ${it}.`,
     coRemindTomorrow: (it) => `Remind tomorrow's lessons (${it})`,
@@ -8628,6 +8638,8 @@ const APP_I18N = {
     coSortLast: "By last time",
     coSortName: "By name",
     coToMark: "Past, to be marked",
+    coUnpaid: "Mark as unpaid",
+    coUnpaidAsk: (it) => `Remove the payment and receipt ${it}? If you already sent it, that receipt is no longer valid.`,
     coUpcoming: "Scheduled",
     coWhen: "When",
     coWho: "Who",
@@ -9544,6 +9556,9 @@ const APP_I18N = {
     coNoLessons: "Aucun cours prévu.",
     coNote: "Remarque",
     coNotify: "Prévenir",
+    coPackDelete: "Supprimer le forfait",
+    coPackDeleteAsk: (it) => `Supprimer le forfait (${it}) ? Les cours déjà faits restent.`,
+    coPackHold: "Appuyez longuement sur un forfait pour retirer le paiement ou le supprimer.",
     coPackLessons: "Nombre de cours",
     coPackLine: (n, p) => `${n} cours · ${p}`,
     coPackNew: "Nouveau forfait",
@@ -9551,6 +9566,7 @@ const APP_I18N = {
     coPackPrice: "Prix du forfait",
     coPacks: "Forfaits de cours",
     coPaid: "Payé",
+    coPaidAsk: (it) => `Marquer payé le forfait (${it}) ? Il prend le prochain numéro de reçu.`,
     coPlace: "Où (terrain, club)",
     coRemind: (it) => `Je vous rappelle le cours : ${it}.`,
     coRemindTomorrow: (it) => `Rappeler les cours de demain (${it})`,
@@ -9558,6 +9574,8 @@ const APP_I18N = {
     coSortLast: "Par dernière fois",
     coSortName: "Par nom",
     coToMark: "Passés, à marquer",
+    coUnpaid: "Marquer non payé",
+    coUnpaidAsk: (it) => `Retirer le paiement et le reçu ${it} ? Si vous l'avez déjà envoyé, ce reçu n'est plus valable.`,
     coUpcoming: "Prévus",
     coWhen: "Quand",
     coWho: "Qui",
@@ -10474,6 +10492,9 @@ const APP_I18N = {
     coNoLessons: "Keine Stunden geplant.",
     coNote: "Notiz",
     coNotify: "Benachrichtigen",
+    coPackDelete: "Paket löschen",
+    coPackDeleteAsk: (it) => `Paket (${it}) löschen? Gegebene Stunden bleiben.`,
+    coPackHold: "Ein Paket lange drücken, um die Zahlung zu entfernen oder es zu löschen.",
     coPackLessons: "Anzahl Stunden",
     coPackLine: (n, p) => `${n} Stunden · ${p}`,
     coPackNew: "Neues Paket",
@@ -10481,6 +10502,7 @@ const APP_I18N = {
     coPackPrice: "Paketpreis",
     coPacks: "Stundenpakete",
     coPaid: "Bezahlt",
+    coPaidAsk: (it) => `Paket (${it}) als bezahlt markieren? Es bekommt die nächste Quittungsnummer.`,
     coPlace: "Wo (Platz, Verein)",
     coRemind: (it) => `Ich erinnere dich an die Stunde: ${it}.`,
     coRemindTomorrow: (it) => `An die Stunden von morgen erinnern (${it})`,
@@ -10488,6 +10510,8 @@ const APP_I18N = {
     coSortLast: "Nach letztem Mal",
     coSortName: "Nach Name",
     coToMark: "Vergangen, zu markieren",
+    coUnpaid: "Als unbezahlt markieren",
+    coUnpaidAsk: (it) => `Zahlung und Quittung ${it} entfernen? Falls schon verschickt, gilt diese Quittung nicht mehr.`,
     coUpcoming: "Geplant",
     coWhen: "Wann",
     coWho: "Wer",
@@ -11404,6 +11428,9 @@ const APP_I18N = {
     coNoLessons: "Ninguna clase programada.",
     coNote: "Nota",
     coNotify: "Avisar",
+    coPackDelete: "Eliminar el paquete",
+    coPackDeleteAsk: (it) => `¿Eliminar el paquete (${it})? Las clases ya dadas se quedan.`,
+    coPackHold: "Mantén pulsado un paquete para quitar el pago o eliminarlo.",
     coPackLessons: "Número de clases",
     coPackLine: (n, p) => `${n} clases · ${p}`,
     coPackNew: "Nuevo paquete",
@@ -11411,6 +11438,7 @@ const APP_I18N = {
     coPackPrice: "Precio del paquete",
     coPacks: "Paquetes de clases",
     coPaid: "Pagado",
+    coPaidAsk: (it) => `¿Marcar pagado el paquete (${it})? Toma el siguiente número de recibo.`,
     coPlace: "Dónde (pista, club)",
     coRemind: (it) => `Te recuerdo la clase: ${it}.`,
     coRemindTomorrow: (it) => `Recordar las clases de mañana (${it})`,
@@ -11418,6 +11446,8 @@ const APP_I18N = {
     coSortLast: "Por última vez",
     coSortName: "Por nombre",
     coToMark: "Pasadas, por marcar",
+    coUnpaid: "Marcar no pagado",
+    coUnpaidAsk: (it) => `¿Quitar el pago y el recibo ${it}? Si ya lo enviaste, ese recibo deja de valer.`,
     coUpcoming: "Programadas",
     coWhen: "Cuándo",
     coWho: "Quién",
@@ -12334,6 +12364,9 @@ const APP_I18N = {
     coNoLessons: "Nenhuma aula programada.",
     coNote: "Nota",
     coNotify: "Avisar",
+    coPackDelete: "Eliminar o pacote",
+    coPackDeleteAsk: (it) => `Eliminar o pacote (${it})? As aulas já dadas ficam.`,
+    coPackHold: "Mantenha premido um pacote para tirar o pagamento ou eliminá-lo.",
     coPackLessons: "Número de aulas",
     coPackLine: (n, p) => `${n} aulas · ${p}`,
     coPackNew: "Novo pacote",
@@ -12341,6 +12374,7 @@ const APP_I18N = {
     coPackPrice: "Preço do pacote",
     coPacks: "Pacotes de aulas",
     coPaid: "Pago",
+    coPaidAsk: (it) => `Marcar como pago o pacote (${it})? Recebe o próximo número de recibo.`,
     coPlace: "Onde (quadra, clube)",
     coRemind: (it) => `Lembro-te a aula: ${it}.`,
     coRemindTomorrow: (it) => `Lembrar as aulas de amanhã (${it})`,
@@ -12348,6 +12382,8 @@ const APP_I18N = {
     coSortLast: "Pela última vez",
     coSortName: "Por nome",
     coToMark: "Passadas, por marcar",
+    coUnpaid: "Marcar como não pago",
+    coUnpaidAsk: (it) => `Tirar o pagamento e o recibo ${it}? Se já o enviou, esse recibo deixa de valer.`,
     coUpcoming: "Programadas",
     coWhen: "Quando",
     coWho: "Quem",
@@ -15362,6 +15398,10 @@ function receiveProfile() {
 }
 
 async function showStudent(id) {
+  const packDo = async (p, method, tail, ask) => {
+    if (!confirm(ask)) return;
+    try { await api(method, '/coach/packs/' + encodeURIComponent(p.id) + tail, method === 'DELETE' ? undefined : {}); toast(T.saved); showStudent(id); } catch (e) { toast(errText(e)); }
+  };
   const d = await api('GET', '/coach/students/' + encodeURIComponent(id));
   const s = d.student;
   const back = h('button', { onclick: () => { coachStudent = null; showStudents(); }, 'aria-label': T.studentsTitle }, '←');
@@ -15407,7 +15447,10 @@ async function showStudent(id) {
         d.packs.length ? h('table', h('tbody', d.packs.map((p) => h('tr',
           h('td', T.coPackLine(p.lessons, eur(p.cents))), h('td.dim', dateText(p.created)),
           h('td', p.paid ? h('button', { onclick: () => openPdf('/coach/packs/' + encodeURIComponent(p.id) + '/receipt.pdf', T.receiptTitle + ' ' + (p.receipt || '')) }, T.rcReceipt + (p.receipt ? ' ' + p.receipt : ''))
-            : h('button', { onclick: async () => { try { await api('POST', '/coach/packs/' + encodeURIComponent(p.id) + '/paid', {}); toast(T.saved); showStudent(id); } catch (e) { toast(errText(e)); } } }, T.coMarkPaid)))))) : null),
+            : h('button', { onclick: () => packDo(p, 'POST', '/paid', T.coPaidAsk(T.coPackLine(p.lessons, eur(p.cents)))) }, T.coMarkPaid)),
+          // Per gli errori: togliere il pagamento (e la ricevuta) o eliminare il pacchetto, sempre chiedendo prima.
+          h('td', p.paid ? h('button', { onclick: () => packDo(p, 'POST', '/unpaid', T.coUnpaidAsk(p.receipt || '')) }, T.coUnpaid) : null,
+            ' ', h('button', { onclick: () => packDo(p, 'DELETE', '', T.coPackDeleteAsk(T.coPackLine(p.lessons, eur(p.cents)))) }, T.coPackDelete)))))) : null),
       d.courses.length ? card(T.ccTitle, d.courses.map((c) => h('p', c.name + ' · ' + T.scAttendance(c.present, c.total)))) : null));
 }
 
@@ -18290,7 +18333,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
   - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben. **Per Stimme**: **Notiz diktieren** (oder das 🎤 im Feld) nutzt die Spracheingabe des Telefons, auf neueren Telefonen auch offline: du sprichst und der Text kommt mit Datum ins Tagebuch. Das 🎤 gibt es auch in den Trainernotizen, in der Notiz einer Kursstunde und in der technischen Bewertung.
   - **Ziele**: *Neues Ziel* für einen Schlag, zum Beispiel Vorhand mit 70 % im Feld im Schnitt der letzten 3 Einheiten, mit optionalem Datum. Die Karte zeigt den Stand; wird es erreicht, bekommt das Ziel das Datum von selbst.
-  - **Stunden und Pakete**: die nächsten Stunden und mit *Neues Paket* die gekauften Stunden (Anzahl und Preis, bezahlt oder nicht). Der Stand zeigt gekauft, gemacht und übrig und was noch offen ist; *Als bezahlt markieren* schließt das Paket. Als bezahlt markiert bekommt das Paket eine **Quittungs**nummer (2026/001…, eine Reihe pro Jahr): antippen, und die PDF-Quittung (keine Steuerquittung, bei Minderjährigen auf die Eltern ausgestellt) lässt sich **an den Schüler schicken**, teilen oder vom Telefon **drucken**.
+  - **Stunden und Pakete**: die nächsten Stunden und mit *Neues Paket* die gekauften Stunden (Anzahl und Preis, bezahlt oder nicht). Der Stand zeigt gekauft, gemacht und übrig und was noch offen ist; *Als bezahlt markieren* schließt das Paket. Als bezahlt markiert bekommt das Paket eine **Quittungs**nummer (2026/001…, eine Reihe pro Jahr): antippen, und die PDF-Quittung (keine Steuerquittung, bei Minderjährigen auf die Eltern ausgestellt) lässt sich **an den Schüler schicken**, teilen oder vom Telefon **drucken**. *Als bezahlt markieren* fragt nach. Bei einem Fehler das Paket **lange drücken**: **Als unbezahlt markieren** (entfernt auch die Quittung: war es die letzte, wird die Nummer wieder frei, sonst bleibt eine Lücke) oder **Paket löschen**; am PC gibt es dieselben Schaltflächen.
   - **Schreiben**: Elternteil oder Vormund und die **Einwilligung zu Aufnahmen und Daten** (in *Bearbeiten* einzutragen, bei Minderjährigen; Mitteilungen gehen an das Telefon der Eltern). **Schreiben** öffnet eine WhatsApp-, SMS- oder E-Mail-Nachricht an den Schüler; **Match mit…** lässt den Gegner unter den Schülern wählen und bereitet das neue Match mit beiden Namen vor.
   - **Bericht für den Schüler**: *Letzte 30 Tage* oder *Alles* wählen, dann **Vollständiges PDF** (Schläge mit dem Anteil im Feld und dem Verlauf, Bewegung, für jeden Schlag einer im Feld und einer daneben mit den drei Bildern der Schlüsselmomente, Matches, Rating und deine Notizen) oder **Bild für WhatsApp** (eine Seite mit den Zahlen der Schläge und dem Treffpunkt eines Schlags). Das Teilen öffnet sich sofort: WhatsApp, E-Mail oder anders. Der Bericht trägt deinen Namen als Trainer (aus *Du*) und den Verein (aus *Verein › Plätze*).
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
@@ -18926,7 +18969,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
   - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top. **By voice**: **Dictate a note** (or the 🎤 in the field) uses the phone's dictation, offline too on recent phones: you speak and the text goes into the diary with the date. The 🎤 is also in the coach's notes, in a course lesson's note and in the technical assessment's note.
   - **Goals**: *New goal* on a stroke, for example forehand at 70% in over the average of the last 3 sessions, with an optional date. The card shows how far they are; when they reach it, the goal takes the date by itself.
-  - **Lessons and packs**: their next lessons and, with *New pack*, the lessons bought (number and price, paid or not). The balance shows bought, done and left and how much is due; *Mark as paid* closes the pack. Once marked paid, the pack gets a **receipt** number (2026/001…, one series per year): tapping it, the PDF receipt (not a tax receipt, made out to the parent for minors) can be **sent to the student**, shared or **printed** from the phone.
+  - **Lessons and packs**: their next lessons and, with *New pack*, the lessons bought (number and price, paid or not). The balance shows bought, done and left and how much is due; *Mark as paid* closes the pack. Once marked paid, the pack gets a **receipt** number (2026/001…, one series per year): tapping it, the PDF receipt (not a tax receipt, made out to the parent for minors) can be **sent to the student**, shared or **printed** from the phone. *Mark as paid* asks for confirmation. For a mistake, **press and hold** the pack: **Mark as unpaid** (also removes the receipt: if it was the last one the number is free again, otherwise a gap remains) or **Delete the pack**; the PC has the same buttons.
   - **Write**: the parent or guardian and the **Consent to filming and data** (entered in *Edit*, for minors; notices go to the parent's phone). **Write** opens a WhatsApp, SMS or email message to the student; **Match with…** lets you pick the opponent among the students and prepares the new match with both names.
   - **Report for the student**: pick *Last 30 days* or *Everything*, then **Full PDF** (strokes with the percentage in and its trend, movement, for each stroke one shot in and one out with the three key-moment pictures, matches, rating and your notes) or **Image for WhatsApp** (a single page with the stroke numbers and the contact of one shot). Sharing opens straight away: WhatsApp, email or wherever you like. The report carries your name as coach (from *You*) and the club (from *Club › Courts*).
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
@@ -19561,7 +19604,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
   - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba. **Por voz**: **Dictar una nota** (o el 🎤 del campo) usa el dictado del teléfono, también sin conexión en los teléfonos recientes: hablas y el texto va al diario con la fecha. El 🎤 está también en las notas del entrenador, en la nota de una clase del curso y en la de la evaluación técnica.
   - **Objetivos**: *Nuevo objetivo* sobre un golpe, por ejemplo derecha al 70 % dentro en la media de las últimas 3 sesiones, con una fecha opcional. La ficha muestra cómo va; cuando lo alcanza, el objetivo toma la fecha solo.
-  - **Clases y paquetes**: sus próximas clases y, con *Nuevo paquete*, las clases compradas (número y precio, pagado o no). El saldo indica compradas, hechas y restantes y cuánto falta por pagar; *Marcar pagado* cierra el paquete. Marcado como pagado, el paquete recibe un número de **recibo** (2026/001…, una serie por año): al tocarlo, el recibo en PDF (no fiscal, a nombre del padre o madre para los menores) se puede **enviar al alumno**, compartir o **imprimir** desde el teléfono.
+  - **Clases y paquetes**: sus próximas clases y, con *Nuevo paquete*, las clases compradas (número y precio, pagado o no). El saldo indica compradas, hechas y restantes y cuánto falta por pagar; *Marcar pagado* cierra el paquete. Marcado como pagado, el paquete recibe un número de **recibo** (2026/001…, una serie por año): al tocarlo, el recibo en PDF (no fiscal, a nombre del padre o madre para los menores) se puede **enviar al alumno**, compartir o **imprimir** desde el teléfono. *Marcar pagado* pide confirmación. Si te equivocas, **mantén pulsado** el paquete: **Marcar no pagado** (quita también el recibo: si era el último, el número queda libre; si no, queda un salto) o **Eliminar el paquete**; en el PC están los mismos botones.
   - **Escribir**: el padre, madre o tutor y el **Consentimiento a grabaciones y datos** (se introducen en *Editar*, para los menores; los avisos van al teléfono del padre o madre). **Escribir** abre un mensaje de WhatsApp, SMS o correo al alumno; **Partido con…** hace elegir el rival entre los alumnos y prepara el partido nuevo con los dos nombres.
   - **Informe para el alumno**: elige *Últimos 30 días* o *Todo*, luego **PDF completo** (golpes con el porcentaje dentro y su evolución, movimiento, de cada golpe uno dentro y uno fuera con las tres imágenes de los momentos clave, partidos, rating y tus notas) o **Imagen para WhatsApp** (una sola página con los números de los golpes y el impacto de un golpe). Se abre enseguida el compartir: WhatsApp, correo o donde quieras. El informe lleva tu nombre como entrenador (de *Tú*) y el club (de *Club › Pistas*).
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
@@ -20196,7 +20239,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
   - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut. **À la voix** : **Dicter une note** (ou le 🎤 dans le champ) utilise la dictée du téléphone, même hors ligne sur les téléphones récents : vous parlez et le texte va dans le journal avec la date. Le 🎤 est aussi dans les notes de l'entraîneur, dans la note d'une séance de cours et dans celle de l'évaluation technique.
   - **Objectifs**: *Nouvel objectif* sur un coup, par exemple coup droit à 70 % dedans sur la moyenne des 3 dernières séances, avec une date facultative. La fiche montre où il en est ; quand il l'atteint, l'objectif prend la date tout seul.
-  - **Cours et forfaits**: ses prochains cours et, avec *Nouveau forfait*, les cours achetés (nombre et prix, payé ou non). Le solde indique achetés, faits et restants et ce qui reste à payer ; *Marquer payé* clôt le forfait. Marqué payé, le forfait reçoit un numéro de **reçu** (2026/001…, une série par an) : en le touchant, le reçu PDF (non fiscal, au nom du parent pour les mineurs) peut être **envoyé à l'élève**, partagé ou **imprimé** depuis le téléphone.
+  - **Cours et forfaits**: ses prochains cours et, avec *Nouveau forfait*, les cours achetés (nombre et prix, payé ou non). Le solde indique achetés, faits et restants et ce qui reste à payer ; *Marquer payé* clôt le forfait. Marqué payé, le forfait reçoit un numéro de **reçu** (2026/001…, une série par an) : en le touchant, le reçu PDF (non fiscal, au nom du parent pour les mineurs) peut être **envoyé à l'élève**, partagé ou **imprimé** depuis le téléphone. *Marquer payé* demande confirmation. En cas d'erreur, **appui long** sur le forfait : **Marquer non payé** (retire aussi le reçu : si c'était le dernier, le numéro redevient libre, sinon il reste un saut) ou **Supprimer le forfait** ; sur le PC, les mêmes boutons.
   - **Écrire**: le parent ou tuteur et le **Consentement aux vidéos et aux données** (à saisir dans *Modifier*, pour les mineurs ; les avis vont au téléphone du parent). **Écrire** ouvre un message WhatsApp, SMS ou e-mail à l'élève ; **Match avec…** fait choisir l'adversaire parmi les élèves et prépare le nouveau match avec les deux noms.
   - **Bilan pour l'élève** : choisissez *30 derniers jours* ou *Tout*, puis **PDF complet** (coups avec le pourcentage dedans et son évolution, mouvement, pour chaque coup un dedans et un dehors avec les trois images des moments clés, matchs, classement et vos notes) ou **Image pour WhatsApp** (une seule page avec les chiffres des coups et l'impact d'un coup). Le partage s'ouvre tout de suite : WhatsApp, e-mail ou ailleurs. Le bilan porte votre nom comme entraîneur (depuis *Vous*) et le club (depuis *Club › Terrains*).
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
@@ -20831,7 +20874,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
   - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto. **A voce**: **Detta una nota** (o il 🎤 nel campo) usa la dettatura del telefono, anche senza rete sui telefoni recenti: parli e il testo va nel diario con la data. Il 🎤 c'è anche nelle note dell'allenatore, nella nota della lezione di un corso e in quella della valutazione tecnica.
   - **Obiettivi**: *Nuovo obiettivo* su un colpo, per esempio dritto al 70% dentro sulla media delle ultime 3 sessioni, con una data facoltativa. La scheda mostra a che punto è; quando lo raggiunge, l'obiettivo prende la data da solo.
-  - **Lezioni e pacchetti**: le sue prossime lezioni e, con *Nuovo pacchetto*, le lezioni comprate (numero e prezzo, già pagato o no). Il conto dice comprate, fatte e rimaste e quanto è da pagare; *Segna pagato* chiude il pacchetto. Segnato pagato, il pacchetto prende il numero di **ricevuta** (2026/001…, una serie per anno): toccandolo la ricevuta in PDF (non fiscale, intestata al genitore per i minorenni) si **manda all'allievo**, si condivide o si **stampa** dal telefono.
+  - **Lezioni e pacchetti**: le sue prossime lezioni e, con *Nuovo pacchetto*, le lezioni comprate (numero e prezzo, già pagato o no). Il conto dice comprate, fatte e rimaste e quanto è da pagare; *Segna pagato* chiude il pacchetto. Segnato pagato, il pacchetto prende il numero di **ricevuta** (2026/001…, una serie per anno): toccandolo la ricevuta in PDF (non fiscale, intestata al genitore per i minorenni) si **manda all'allievo**, si condivide o si **stampa** dal telefono. *Segna pagato* chiede conferma. Per un errore, **tenendo premuto** il pacchetto: **Segna non pagato** (toglie anche la ricevuta: se era l'ultima il numero torna libero, sennò resta un salto) o **Elimina il pacchetto**; sul PC ci sono gli stessi pulsanti.
   - **Scrivi**: il genitore o tutore e il **Consenso a riprese e dati** (si inseriscono in *Modifica*, per i minorenni; gli avvisi vanno al telefono del genitore). **Scrivi** apre un messaggio WhatsApp, SMS o email all'allievo; **Partita con…** fa scegliere l'avversario tra gli allievi e prepara la nuova partita con i due nomi.
   - **Report per l'allievo**: scegli *Ultimi 30 giorni* o *Tutto*, poi **PDF completo** (colpi con la percentuale dentro e l'andamento, il movimento, per ogni colpo uno dentro e uno fuori con le tre immagini dei momenti chiave, partite, rating e le tue note) o **Immagine per WhatsApp** (una pagina sola con i numeri dei colpi e l'impatto di un colpo). Si apre subito la condivisione: WhatsApp, email o dove vuoi. Il report porta il tuo nome come allenatore (da *Tu*) e il circolo (da *Circolo › Campi*).
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
@@ -21466,7 +21509,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
   - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo. **Por voz**: **Ditar uma nota** (ou o 🎤 no campo) usa o ditado do telefone, também sem rede nos telefones recentes: fala e o texto vai para o diário com a data. O 🎤 está também nas notas do treinador, na nota de uma aula do curso e na da avaliação técnica.
   - **Metas**: *Nova meta* num golpe, por exemplo direita a 70 % dentro na média das últimas 3 sessões, com uma data opcional. A ficha mostra em que ponto está; quando a atinge, a meta fica com a data sozinha.
-  - **Aulas e pacotes**: as próximas aulas e, com *Novo pacote*, as aulas compradas (número e preço, pago ou não). O saldo mostra compradas, feitas e restantes e quanto falta pagar; *Marcar como pago* fecha o pacote. Marcado como pago, o pacote recebe um número de **recibo** (2026/001…, uma série por ano): ao tocá-lo, o recibo em PDF (não fiscal, em nome do responsável para menores) pode ser **enviado ao aluno**, partilhado ou **impresso** a partir do telefone.
+  - **Aulas e pacotes**: as próximas aulas e, com *Novo pacote*, as aulas compradas (número e preço, pago ou não). O saldo mostra compradas, feitas e restantes e quanto falta pagar; *Marcar como pago* fecha o pacote. Marcado como pago, o pacote recebe um número de **recibo** (2026/001…, uma série por ano): ao tocá-lo, o recibo em PDF (não fiscal, em nome do responsável para menores) pode ser **enviado ao aluno**, partilhado ou **impresso** a partir do telefone. *Marcar como pago* pede confirmação. Em caso de erro, **mantenha premido** o pacote: **Marcar como não pago** (tira também o recibo: se era o último, o número fica livre; senão fica um salto) ou **Eliminar o pacote**; no PC há os mesmos botões.
   - **Escrever**: o pai, mãe ou tutor e o **Consentimento para filmagens e dados** (introduzem-se em *Editar*, para menores; os avisos vão para o telefone do responsável). **Escrever** abre uma mensagem de WhatsApp, SMS ou email ao aluno; **Partida com…** faz escolher o adversário entre os alunos e prepara a partida nova com os dois nomes.
   - **Relatório para o aluno**: escolha *Últimos 30 dias* ou *Tudo*, depois **PDF completo** (golpes com a porcentagem dentro e a evolução, movimento, de cada golpe um dentro e um fora com as três imagens dos momentos-chave, partidas, rating e suas notas) ou **Imagem para WhatsApp** (uma página só com os números dos golpes e o impacto de um golpe). O compartilhamento abre na hora: WhatsApp, e-mail ou onde quiser. O relatório leva seu nome como treinador (de *Você*) e o clube (de *Clube › Quadras*).
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
@@ -30659,6 +30702,12 @@ class CoachArea(
         val now = System.currentTimeMillis()
         savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
     }
+
+    /**
+     * Pagato per errore: torna da pagare e perde la ricevuta. Se era l'ultima il numero torna libero (lo riprende la
+     * prossima, [Coaching.nextReceipt]); sennò resta un salto, perché i numeri già dati non si riassegnano.
+     */
+    fun unmarkPackPaid(p: com.tennis.scoremanager.data.LessonPack) = savePack(p.copy(paidAt = null, receipt = null))
 
     /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
     fun packReceiptFile(packId: String): File? {
@@ -40623,6 +40672,9 @@ interface CoachData {
     fun addDiary(student: String, text: String)
     fun setNote(student: String, text: String)
     fun markPackPaid(packId: String)
+    /** Pagato per errore: torna da pagare, senza ricevuta. */
+    fun unmarkPackPaid(packId: String) {}
+    fun deletePack(packId: String) {}
     fun setLessonDone(lessonId: String, done: Boolean)
     fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String)
     /** Un corso dell'allenatore (non della segreteria): nuovo o cambiato, o tolto. */
@@ -40766,6 +40818,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "report.pdf" ->
             bytes(data.reportPdf(student(p[2]).id, r.query["days"]?.toIntOrNull()), "application/pdf")
         m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "paid" -> { pack(p[2]); data.markPackPaid(p[2]); done() }
+        m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "unpaid" -> { pack(p[2]); data.unmarkPackPaid(p[2]); done() }
+        m == "DELETE" && p.size == 3 && p[0] == "coach" && p[1] == "packs" -> { pack(p[2]); data.deletePack(p[2]); done() }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "receipt.pdf" -> { pack(p[2]); bytes(data.receiptPdf(p[2]), "application/pdf") }
         m == "GET" && p == listOf("coach", "lessons") -> ok(ListSerializer(CdLesson.serializer()), lessons())
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "lessons" && p[3] == "done" -> {
@@ -43128,6 +43182,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
     override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.markPackPaid(it) } }
+    override fun unmarkPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.unmarkPackPaid(it) } }
+    override fun deletePack(packId: String) = c.coaching.deletePack(packId)
     override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
         c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)
@@ -52006,6 +52062,11 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     var propose by remember { mutableStateOf(false) }
     var receipt by remember { mutableStateOf<String?>(null) }
     var deleteEntry by remember { mutableStateOf<String?>(null) }
+    // Pacchetti: conferma prima di segnarlo pagato; tenendolo premuto si toglie il pagamento o lo si elimina.
+    var payAsk by remember { mutableStateOf<LessonPack?>(null) }
+    var packMenu by remember { mutableStateOf<LessonPack?>(null) }
+    var unpayAsk by remember { mutableStateOf<LessonPack?>(null) }
+    var packDeleteAsk by remember { mutableStateOf<LessonPack?>(null) }
 
     // Diario: una riga per lezione, con la data; tenendo premuto si toglie.
     SectionCard(s.coDiary, Icons.Filled.EditNote) {
@@ -52052,12 +52113,14 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
         if (bal.bought > 0 || bal.used > 0) Text(s.coBalance(bal.bought, bal.used, bal.left), color = if (bal.left < 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
         if (bal.absences > 0 || bal.toRecover > 0) Text(listOfNotNull(s.evAbsences(bal.absences).takeIf { bal.absences > 0 }, s.laToRecover(bal.toRecover).takeIf { bal.toRecover > 0 }).joinToString(" · "),
             color = if (bal.toRecover > 0) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
-        for (p in book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)) Row(verticalAlignment = Alignment.CenterVertically) {
+        val packs = book.packs.filter { it.student == st.id }.sortedByDescending { it.createdAt }.take(4)
+        for (p in packs) Row(Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { packMenu = p }), verticalAlignment = Alignment.CenterVertically) {
             Text(s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) + " · " + shortDate(p.createdAt, lang), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            if (p.paidAt == null) TextButton(onClick = { c.coaching.markPackPaid(p) }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
+            if (p.paidAt == null) TextButton(onClick = { payAsk = p }) { Text(s.coMarkPaid, color = TsmColors.Orange) }
             // Pagato: la ricevuta (numerata) da mandare, condividere o stampare.
             else TextButton(onClick = { receipt = p.id }) { Text(s.rcReceipt + (p.receipt?.let { " $it" } ?: ""), color = TsmColors.Ok) }
         }
+        if (packs.isNotEmpty()) Text(s.coPackHold, color = TsmColors.TextDim, fontSize = 12.sp)
         if (bal.dueCents > 0) Text(s.coDue(Fees.money(bal.dueCents, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.coLessonNew, Icons.Filled.Event, {
@@ -52090,6 +52153,44 @@ fun StudentCoachSections(c: MatchController, st: PlayerProfile) {
     lesson?.let { l -> LessonDialog(c, l, isNew = book.lessons.none { it.id == l.id }) { lesson = null } }
     if (packNew) PackDialog(c, st.id) { packNew = false }
     if (matchPick) StudentPickDialog(c, s.coMatchWith, exclude = setOf(st.id), multi = false) { picked -> matchPick = false; picked.firstOrNull()?.let { c.coaching.matchWith(st.id, it) } }
+    val packName = { p: LessonPack -> s.coPackLine(p.lessons, Fees.money(p.cents, lang.locale)) }
+    payAsk?.let { p ->
+        AlertDialog(
+            onDismissRequest = { payAsk = null },
+            text = { Text(s.coPaidAsk(packName(p))) },
+            confirmButton = { TextButton(onClick = { c.coaching.markPackPaid(p); payAsk = null }) { Text(s.coMarkPaid) } },
+            dismissButton = { TextButton(onClick = { payAsk = null }) { Text(s.cancel) } },
+        )
+    }
+    packMenu?.let { p ->
+        AlertDialog(
+            onDismissRequest = { packMenu = null },
+            title = { Text(packName(p) + (p.receipt?.let { " · $it" } ?: "")) },
+            text = {
+                Column {
+                    if (p.paidAt != null) TextButton(onClick = { unpayAsk = p; packMenu = null }) { Text(s.coUnpaid, color = TsmColors.Orange) }
+                    TextButton(onClick = { packDeleteAsk = p; packMenu = null }) { Text(s.coPackDelete, color = TsmColors.Danger) }
+                }
+            },
+            confirmButton = { TextButton(onClick = { packMenu = null }) { Text(s.back) } },
+        )
+    }
+    unpayAsk?.let { p ->
+        AlertDialog(
+            onDismissRequest = { unpayAsk = null },
+            text = { Text(s.coUnpaidAsk(p.receipt.orEmpty())) },
+            confirmButton = { TextButton(onClick = { c.coaching.unmarkPackPaid(p); unpayAsk = null }) { Text(s.coUnpaid, color = TsmColors.Orange) } },
+            dismissButton = { TextButton(onClick = { unpayAsk = null }) { Text(s.cancel) } },
+        )
+    }
+    packDeleteAsk?.let { p ->
+        AlertDialog(
+            onDismissRequest = { packDeleteAsk = null },
+            text = { Text(s.coPackDeleteAsk(packName(p))) },
+            confirmButton = { TextButton(onClick = { c.coaching.deletePack(p.id); packDeleteAsk = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { packDeleteAsk = null }) { Text(s.cancel) } },
+        )
+    }
     deleteEntry?.let { id ->
         AlertDialog(
             onDismissRequest = { deleteEntry = null },
@@ -54304,7 +54405,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     var role by remember { mutableStateOf(c.activeRole.value) }
     var club by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
-    var reminder by remember { mutableStateOf(true) }
+    // La prima volta acceso; rifatta da Altro, com'era.
+    var reminder by remember { mutableStateOf(if (c.storage.onboarded) c.storage.backupReminder else true) }
     var autoBackup by remember { mutableStateOf(c.storage.personalBackupAuto) }
     val steps = Step.entries.filter { st ->
         when (st) {
@@ -55831,6 +55933,20 @@ import kotlinx.coroutines.withContext
  */
 private class OpenBackup : ActivityResultContracts.OpenDocument() {
     override fun createIntent(context: Context, input: Array<String>): Intent = super.createIntent(context, input).apply {
+        runCatching {
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI,
+                DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Documents/Tennis Score Manager/${Backup.AUTO_DIR}"))
+        }
+    }
+}
+
+/**
+ * Il salvataggio di un backup a mano, che parte da Documenti/Tennis Score Manager/Backup accanto alle copie automatiche
+ * (quelle tolte da sole hanno un altro nome, [Backup.autoList]): senza, Android riapre l'ultima cartella usata (spesso
+ * quella dei video importati).
+ */
+class CreateInDocuments(mime: String) : ActivityResultContracts.CreateDocument(mime) {
+    override fun createIntent(context: Context, input: String): Intent = super.createIntent(context, input).apply {
         runCatching {
             putExtra(DocumentsContract.EXTRA_INITIAL_URI,
                 DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Documents/Tennis Score Manager/${Backup.AUTO_DIR}"))
@@ -59452,6 +59568,12 @@ interface Strings {
     val coPackLessons: String
     val coPackPrice: String
     val coPackPaidNow: String
+    val coPaidAsk: (String) -> String
+    val coUnpaid: String
+    val coUnpaidAsk: (String) -> String
+    val coPackDelete: String
+    val coPackDeleteAsk: (String) -> String
+    val coPackHold: String
     val coWrite: String
     val coWriteTitle: String
     val coGuardian: String
@@ -62272,6 +62394,12 @@ object ItStrings : Strings {
     override val coPackLessons = "Numero di lezioni"
     override val coPackPrice = "Prezzo del pacchetto"
     override val coPackPaidNow = "Già pagato"
+    override val coPaidAsk: (String) -> String = { "Segnare pagato il pacchetto ($it)? Prende il prossimo numero di ricevuta." }
+    override val coUnpaid = "Segna non pagato"
+    override val coUnpaidAsk: (String) -> String = { "Togliere il pagamento e la ricevuta $it? Se l'hai già mandata, quella ricevuta non vale più." }
+    override val coPackDelete = "Elimina il pacchetto"
+    override val coPackDeleteAsk: (String) -> String = { "Eliminare il pacchetto ($it)? Le lezioni fatte restano." }
+    override val coPackHold = "Tieni premuto un pacchetto per togliere il pagamento o eliminarlo."
     override val coWrite = "Scrivi"
     override val coWriteTitle = "Messaggio agli allievi"
     override val coGuardian = "Genitore o tutore"
@@ -65093,6 +65221,12 @@ object EnStrings : Strings {
     override val coPackLessons = "Number of lessons"
     override val coPackPrice = "Pack price"
     override val coPackPaidNow = "Already paid"
+    override val coPaidAsk: (String) -> String = { "Mark the pack ($it) as paid? It takes the next receipt number." }
+    override val coUnpaid = "Mark as unpaid"
+    override val coUnpaidAsk: (String) -> String = { "Remove the payment and receipt $it? If you already sent it, that receipt is no longer valid." }
+    override val coPackDelete = "Delete the pack"
+    override val coPackDeleteAsk: (String) -> String = { "Delete the pack ($it)? Lessons already given stay." }
+    override val coPackHold = "Press and hold a pack to remove the payment or delete it."
     override val coWrite = "Write"
     override val coWriteTitle = "Message to students"
     override val coGuardian = "Parent or guardian"
@@ -67939,6 +68073,12 @@ object DeStrings : Strings {
     override val coPackLessons = "Anzahl Stunden"
     override val coPackPrice = "Paketpreis"
     override val coPackPaidNow = "Schon bezahlt"
+    override val coPaidAsk: (String) -> String = { "Paket ($it) als bezahlt markieren? Es bekommt die nächste Quittungsnummer." }
+    override val coUnpaid = "Als unbezahlt markieren"
+    override val coUnpaidAsk: (String) -> String = { "Zahlung und Quittung $it entfernen? Falls schon verschickt, gilt diese Quittung nicht mehr." }
+    override val coPackDelete = "Paket löschen"
+    override val coPackDeleteAsk: (String) -> String = { "Paket ($it) löschen? Gegebene Stunden bleiben." }
+    override val coPackHold = "Ein Paket lange drücken, um die Zahlung zu entfernen oder es zu löschen."
     override val coWrite = "Schreiben"
     override val coWriteTitle = "Nachricht an die Schüler"
     override val coGuardian = "Elternteil oder Vormund"
@@ -70775,6 +70915,12 @@ object EsStrings : Strings {
     override val coPackLessons = "Número de clases"
     override val coPackPrice = "Precio del paquete"
     override val coPackPaidNow = "Ya pagado"
+    override val coPaidAsk: (String) -> String = { "¿Marcar pagado el paquete ($it)? Toma el siguiente número de recibo." }
+    override val coUnpaid = "Marcar no pagado"
+    override val coUnpaidAsk: (String) -> String = { "¿Quitar el pago y el recibo $it? Si ya lo enviaste, ese recibo deja de valer." }
+    override val coPackDelete = "Eliminar el paquete"
+    override val coPackDeleteAsk: (String) -> String = { "¿Eliminar el paquete ($it)? Las clases ya dadas se quedan." }
+    override val coPackHold = "Mantén pulsado un paquete para quitar el pago o eliminarlo."
     override val coWrite = "Escribir"
     override val coWriteTitle = "Mensaje a los alumnos"
     override val coGuardian = "Padre, madre o tutor"
@@ -73613,6 +73759,12 @@ object FrStrings : Strings {
     override val coPackLessons = "Nombre de cours"
     override val coPackPrice = "Prix du forfait"
     override val coPackPaidNow = "Déjà payé"
+    override val coPaidAsk: (String) -> String = { "Marquer payé le forfait ($it) ? Il prend le prochain numéro de reçu." }
+    override val coUnpaid = "Marquer non payé"
+    override val coUnpaidAsk: (String) -> String = { "Retirer le paiement et le reçu $it ? Si vous l'avez déjà envoyé, ce reçu n'est plus valable." }
+    override val coPackDelete = "Supprimer le forfait"
+    override val coPackDeleteAsk: (String) -> String = { "Supprimer le forfait ($it) ? Les cours déjà faits restent." }
+    override val coPackHold = "Appuyez longuement sur un forfait pour retirer le paiement ou le supprimer."
     override val coWrite = "Écrire"
     override val coWriteTitle = "Message aux élèves"
     override val coGuardian = "Parent ou tuteur"
@@ -76452,6 +76604,12 @@ object PtStrings : Strings {
     override val coPackLessons = "Número de aulas"
     override val coPackPrice = "Preço do pacote"
     override val coPackPaidNow = "Já pago"
+    override val coPaidAsk: (String) -> String = { "Marcar como pago o pacote ($it)? Recebe o próximo número de recibo." }
+    override val coUnpaid = "Marcar como não pago"
+    override val coUnpaidAsk: (String) -> String = { "Tirar o pagamento e o recibo $it? Se já o enviou, esse recibo deixa de valer." }
+    override val coPackDelete = "Eliminar o pacote"
+    override val coPackDeleteAsk: (String) -> String = { "Eliminar o pacote ($it)? As aulas já dadas ficam." }
+    override val coPackHold = "Mantenha premido um pacote para tirar o pagamento ou eliminá-lo."
     override val coWrite = "Escrever"
     override val coWriteTitle = "Mensagem aos alunos"
     override val coGuardian = "Pai, mãe ou tutor"
@@ -80336,8 +80494,8 @@ fun DataScreen(c: MatchController) {
             }
         }
     }
-    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip"), writeTo)
-    val createLocked = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream"), writeTo)
+    val create = rememberLauncherForActivityResult(com.tennis.scoremanager.ui.CreateInDocuments("application/zip"), writeTo)
+    val createLocked = rememberLauncherForActivityResult(com.tennis.scoremanager.ui.CreateInDocuments("application/octet-stream"), writeTo)
     // Un backup scelto: in chiaro o protetto (allora prima la password).
     val opener = remember { com.tennis.scoremanager.ui.BackupOpener({ input, m -> restoreAsk = input to m }) { message = it } }
     com.tennis.scoremanager.ui.BackupOpenerDialog(opener)
@@ -97893,8 +98051,13 @@ class VideoPlayerActivity : ComponentActivity() {
                 val before = known ?: System.currentTimeMillis()
                 val date = known?.let { java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, controller.options.value.lang.locale).format(java.util.Date(it)) }.orEmpty()
                 // Data corta per l'ultimo scontro diretto ("23 nov 2026"): sta tra i due numeri.
-                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, controller.options.value.lang.locale)
-                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) { short.format(java.util.Date(it)) }
+                // In italiano, francese, spagnolo e portoghese il mese va minuscolo ("23 nov", non "23 Nov").
+                val loc = controller.options.value.lang.locale
+                val short = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, loc)
+                val lower = loc.language in setOf("it", "fr", "es", "pt")
+                HighlightIntro.card(rec, str, controller.players.value, controller.storage.loadFinished(), before, date, { controller.photos.isFemale(it) }) {
+                    short.format(java.util.Date(it)).let { d -> if (lower) d.lowercase(loc) else d }
+                }
             }.onFailure { Log.w("Highlights", "intro non preparata", it) }.getOrNull()
             HighlightMaker.Stats(
                 card.takeIf { statsRec != null }, photos, str.pointsWon,
@@ -111524,6 +111687,14 @@ class CourseCardsTest {
         assertEquals("2027/001", Coaching.nextReceipt(book, y2027))
     }
 
+    @Test fun receiptNumberComesBackOnlyIfItWasTheLast() {
+        val y2026 = java.util.Calendar.getInstance().apply { set(2026, 5, 1) }.timeInMillis
+        val packs = listOf(LessonPack("a", "s", 5, receipt = "2026/001"), LessonPack("b", "s", 5, receipt = "2026/002"))
+        // Tolta l'ultima, il numero torna libero; tolta una prima, resta il salto.
+        assertEquals("2026/002", Coaching.nextReceipt(CoachBook(packs = packs.filter { it.id != "b" }), y2026))
+        assertEquals("2026/003", Coaching.nextReceipt(CoachBook(packs = packs.filter { it.id != "a" }), y2026))
+    }
+
     @Test fun registerMarks() {
         val c = course.copy(attendance = mapOf("k1" to setOf("p1")), cancelled = setOf("k2"))
         assertEquals("✓", AttendancePdf.mark(c, "k1", "p1"))
@@ -114787,6 +114958,10 @@ class FakeCoach(var time: Long) : CoachData {
     override fun addDiary(student: String, text: String) { diary += student to text }
     override fun setNote(student: String, text: String) {}
     override fun markPackPaid(packId: String) { paid += packId }
+    val unpaid = mutableListOf<String>()
+    val deletedPacks = mutableListOf<String>()
+    override fun unmarkPackPaid(packId: String) { unpaid += packId }
+    override fun deletePack(packId: String) { deletedPacks += packId }
     override fun setLessonDone(lessonId: String, done: Boolean) {}
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) { marked += Triple(courseId, key, present) }
     val saved = mutableListOf<Course>()
@@ -114857,6 +115032,12 @@ class CoachDeskTest {
         assertEquals(200, req("POST", "/coach/packs/pk/paid", "{}", tk).first)
         assertEquals(listOf("pk"), coach.paid)
         assertEquals(404, req("POST", "/coach/packs/zz/paid", "{}", tk).first)
+        // Per gli errori: si toglie il pagamento o si elimina il pacchetto.
+        assertEquals(200, req("POST", "/coach/packs/pk/unpaid", "{}", tk).first)
+        assertEquals(listOf("pk"), coach.unpaid)
+        assertEquals(200, req("DELETE", "/coach/packs/pk", "", tk).first)
+        assertEquals(listOf("pk"), coach.deletedPacks)
+        assertEquals(404, req("DELETE", "/coach/packs/zz", "", tk).first)
         val pdf = api.handle(DeskApi.Req("GET", "/coach/packs/pk/receipt.pdf", emptyMap(), "", tk, ip))
         assertEquals("application/pdf", pdf.type)
     }

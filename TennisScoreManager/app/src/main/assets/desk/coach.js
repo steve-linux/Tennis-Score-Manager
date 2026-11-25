@@ -96,6 +96,10 @@ function receiveProfile() {
 }
 
 async function showStudent(id) {
+  const packDo = async (p, method, tail, ask) => {
+    if (!confirm(ask)) return;
+    try { await api(method, '/coach/packs/' + encodeURIComponent(p.id) + tail, method === 'DELETE' ? undefined : {}); toast(T.saved); showStudent(id); } catch (e) { toast(errText(e)); }
+  };
   const d = await api('GET', '/coach/students/' + encodeURIComponent(id));
   const s = d.student;
   const back = h('button', { onclick: () => { coachStudent = null; showStudents(); }, 'aria-label': T.studentsTitle }, '←');
@@ -141,7 +145,10 @@ async function showStudent(id) {
         d.packs.length ? h('table', h('tbody', d.packs.map((p) => h('tr',
           h('td', T.coPackLine(p.lessons, eur(p.cents))), h('td.dim', dateText(p.created)),
           h('td', p.paid ? h('button', { onclick: () => openPdf('/coach/packs/' + encodeURIComponent(p.id) + '/receipt.pdf', T.receiptTitle + ' ' + (p.receipt || '')) }, T.rcReceipt + (p.receipt ? ' ' + p.receipt : ''))
-            : h('button', { onclick: async () => { try { await api('POST', '/coach/packs/' + encodeURIComponent(p.id) + '/paid', {}); toast(T.saved); showStudent(id); } catch (e) { toast(errText(e)); } } }, T.coMarkPaid)))))) : null),
+            : h('button', { onclick: () => packDo(p, 'POST', '/paid', T.coPaidAsk(T.coPackLine(p.lessons, eur(p.cents)))) }, T.coMarkPaid)),
+          // Per gli errori: togliere il pagamento (e la ricevuta) o eliminare il pacchetto, sempre chiedendo prima.
+          h('td', p.paid ? h('button', { onclick: () => packDo(p, 'POST', '/unpaid', T.coUnpaidAsk(p.receipt || '')) }, T.coUnpaid) : null,
+            ' ', h('button', { onclick: () => packDo(p, 'DELETE', '', T.coPackDeleteAsk(T.coPackLine(p.lessons, eur(p.cents)))) }, T.coPackDelete)))))) : null),
       d.courses.length ? card(T.ccTitle, d.courses.map((c) => h('p', c.name + ' · ' + T.scAttendance(c.present, c.total)))) : null));
 }
 

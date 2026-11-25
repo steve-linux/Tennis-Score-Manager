@@ -2445,6 +2445,12 @@ object PtStrings : Strings {
     override val coPackLessons = "Número de aulas"
     override val coPackPrice = "Preço do pacote"
     override val coPackPaidNow = "Já pago"
+    override val coPaidAsk: (String) -> String = { "Marcar como pago o pacote ($it)? Recebe o próximo número de recibo." }
+    override val coUnpaid = "Marcar como não pago"
+    override val coUnpaidAsk: (String) -> String = { "Tirar o pagamento e o recibo $it? Se já o enviou, esse recibo deixa de valer." }
+    override val coPackDelete = "Eliminar o pacote"
+    override val coPackDeleteAsk: (String) -> String = { "Eliminar o pacote ($it)? As aulas já dadas ficam." }
+    override val coPackHold = "Mantenha premido um pacote para tirar o pagamento ou eliminá-lo."
     override val coWrite = "Escrever"
     override val coWriteTitle = "Mensagem aos alunos"
     override val coGuardian = "Pai, mãe ou tutor"

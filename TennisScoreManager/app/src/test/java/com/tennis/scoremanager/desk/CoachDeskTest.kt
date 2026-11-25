@@ -32,6 +32,10 @@ class FakeCoach(var time: Long) : CoachData {
     override fun addDiary(student: String, text: String) { diary += student to text }
     override fun setNote(student: String, text: String) {}
     override fun markPackPaid(packId: String) { paid += packId }
+    val unpaid = mutableListOf<String>()
+    val deletedPacks = mutableListOf<String>()
+    override fun unmarkPackPaid(packId: String) { unpaid += packId }
+    override fun deletePack(packId: String) { deletedPacks += packId }
     override fun setLessonDone(lessonId: String, done: Boolean) {}
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) { marked += Triple(courseId, key, present) }
     val saved = mutableListOf<Course>()
@@ -102,6 +106,12 @@ class CoachDeskTest {
         assertEquals(200, req("POST", "/coach/packs/pk/paid", "{}", tk).first)
         assertEquals(listOf("pk"), coach.paid)
         assertEquals(404, req("POST", "/coach/packs/zz/paid", "{}", tk).first)
+        // Per gli errori: si toglie il pagamento o si elimina il pacchetto.
+        assertEquals(200, req("POST", "/coach/packs/pk/unpaid", "{}", tk).first)
+        assertEquals(listOf("pk"), coach.unpaid)
+        assertEquals(200, req("DELETE", "/coach/packs/pk", "", tk).first)
+        assertEquals(listOf("pk"), coach.deletedPacks)
+        assertEquals(404, req("DELETE", "/coach/packs/zz", "", tk).first)
         val pdf = api.handle(DeskApi.Req("GET", "/coach/packs/pk/receipt.pdf", emptyMap(), "", tk, ip))
         assertEquals("application/pdf", pdf.type)
     }

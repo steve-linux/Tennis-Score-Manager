@@ -26,6 +26,9 @@ interface CoachData {
     fun addDiary(student: String, text: String)
     fun setNote(student: String, text: String)
     fun markPackPaid(packId: String)
+    /** Pagato per errore: torna da pagare, senza ricevuta. */
+    fun unmarkPackPaid(packId: String) {}
+    fun deletePack(packId: String) {}
     fun setLessonDone(lessonId: String, done: Boolean)
     fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String)
     /** Un corso dell'allenatore (non della segreteria): nuovo o cambiato, o tolto. */
@@ -169,6 +172,8 @@ class CoachApi(private val data: CoachData, private val zone: () -> ZoneId = Zon
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "students" && p[3] == "report.pdf" ->
             bytes(data.reportPdf(student(p[2]).id, r.query["days"]?.toIntOrNull()), "application/pdf")
         m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "paid" -> { pack(p[2]); data.markPackPaid(p[2]); done() }
+        m == "POST" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "unpaid" -> { pack(p[2]); data.unmarkPackPaid(p[2]); done() }
+        m == "DELETE" && p.size == 3 && p[0] == "coach" && p[1] == "packs" -> { pack(p[2]); data.deletePack(p[2]); done() }
         m == "GET" && p.size == 4 && p[0] == "coach" && p[1] == "packs" && p[3] == "receipt.pdf" -> { pack(p[2]); bytes(data.receiptPdf(p[2]), "application/pdf") }
         m == "GET" && p == listOf("coach", "lessons") -> ok(ListSerializer(CdLesson.serializer()), lessons())
         m == "PUT" && p.size == 4 && p[0] == "coach" && p[1] == "lessons" && p[3] == "done" -> {

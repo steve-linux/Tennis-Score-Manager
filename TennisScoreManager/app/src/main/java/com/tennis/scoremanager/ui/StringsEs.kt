@@ -2442,6 +2442,12 @@ object EsStrings : Strings {
     override val coPackLessons = "Número de clases"
     override val coPackPrice = "Precio del paquete"
     override val coPackPaidNow = "Ya pagado"
+    override val coPaidAsk: (String) -> String = { "¿Marcar pagado el paquete ($it)? Toma el siguiente número de recibo." }
+    override val coUnpaid = "Marcar no pagado"
+    override val coUnpaidAsk: (String) -> String = { "¿Quitar el pago y el recibo $it? Si ya lo enviaste, ese recibo deja de valer." }
+    override val coPackDelete = "Eliminar el paquete"
+    override val coPackDeleteAsk: (String) -> String = { "¿Eliminar el paquete ($it)? Las clases ya dadas se quedan." }
+    override val coPackHold = "Mantén pulsado un paquete para quitar el pago o eliminarlo."
     override val coWrite = "Escribir"
     override val coWriteTitle = "Mensaje a los alumnos"
     override val coGuardian = "Padre, madre o tutor"
