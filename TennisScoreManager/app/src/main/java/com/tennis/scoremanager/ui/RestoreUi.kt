@@ -47,6 +47,20 @@ private class OpenBackup : ActivityResultContracts.OpenDocument() {
 }
 
 /**
+ * Il salvataggio di un backup a mano, che parte da Documenti/Tennis Score Manager/Backup accanto alle copie automatiche
+ * (quelle tolte da sole hanno un altro nome, [Backup.autoList]): senza, Android riapre l'ultima cartella usata (spesso
+ * quella dei video importati).
+ */
+class CreateInDocuments(mime: String) : ActivityResultContracts.CreateDocument(mime) {
+    override fun createIntent(context: Context, input: String): Intent = super.createIntent(context, input).apply {
+        runCatching {
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI,
+                DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Documents/Tennis Score Manager/${Backup.AUTO_DIR}"))
+        }
+    }
+}
+
+/**
  * Prima apertura: chi aveva già l'app ritrova i suoi dati da una copia (quelle automatiche restano in Documenti anche
  * se si disinstalla). Dopo il ripristino l'app si chiude e si riapre con i dati di prima.
  */
