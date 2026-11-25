@@ -101,6 +101,14 @@ class CourseCardsTest {
         assertEquals("2027/001", Coaching.nextReceipt(book, y2027))
     }
 
+    @Test fun receiptNumberComesBackOnlyIfItWasTheLast() {
+        val y2026 = java.util.Calendar.getInstance().apply { set(2026, 5, 1) }.timeInMillis
+        val packs = listOf(LessonPack("a", "s", 5, receipt = "2026/001"), LessonPack("b", "s", 5, receipt = "2026/002"))
+        // Tolta l'ultima, il numero torna libero; tolta una prima, resta il salto.
+        assertEquals("2026/002", Coaching.nextReceipt(CoachBook(packs = packs.filter { it.id != "b" }), y2026))
+        assertEquals("2026/003", Coaching.nextReceipt(CoachBook(packs = packs.filter { it.id != "a" }), y2026))
+    }
+
     @Test fun registerMarks() {
         val c = course.copy(attendance = mapOf("k1" to setOf("p1")), cancelled = setOf("k2"))
         assertEquals("✓", AttendancePdf.mark(c, "k1", "p1"))

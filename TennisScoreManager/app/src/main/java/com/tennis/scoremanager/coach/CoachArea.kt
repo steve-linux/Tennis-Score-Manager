@@ -352,6 +352,12 @@ class CoachArea(
         savePack(p.copy(paidAt = p.paidAt ?: now, receipt = p.receipt ?: com.tennis.scoremanager.data.Coaching.nextReceipt(coachBook.value, now)))
     }
 
+    /**
+     * Pagato per errore: torna da pagare e perde la ricevuta. Se era l'ultima il numero torna libero (lo riprende la
+     * prossima, [Coaching.nextReceipt]); sennò resta un salto, perché i numeri già dati non si riassegnano.
+     */
+    fun unmarkPackPaid(p: com.tennis.scoremanager.data.LessonPack) = savePack(p.copy(paidAt = null, receipt = null))
+
     /** La ricevuta (non fiscale) di un pacchetto pagato, in PDF: in alto l'allenatore (e il circolo, se lo si sa). */
     fun packReceiptFile(packId: String): File? {
         val p0 = coachBook.value.packs.firstOrNull { it.id == packId && it.paidAt != null } ?: return null

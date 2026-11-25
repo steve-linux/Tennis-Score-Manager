@@ -2441,6 +2441,12 @@ object DeStrings : Strings {
     override val coPackLessons = "Anzahl Stunden"
     override val coPackPrice = "Paketpreis"
     override val coPackPaidNow = "Schon bezahlt"
+    override val coPaidAsk: (String) -> String = { "Paket ($it) als bezahlt markieren? Es bekommt die nächste Quittungsnummer." }
+    override val coUnpaid = "Als unbezahlt markieren"
+    override val coUnpaidAsk: (String) -> String = { "Zahlung und Quittung $it entfernen? Falls schon verschickt, gilt diese Quittung nicht mehr." }
+    override val coPackDelete = "Paket löschen"
+    override val coPackDeleteAsk: (String) -> String = { "Paket ($it) löschen? Gegebene Stunden bleiben." }
+    override val coPackHold = "Ein Paket lange drücken, um die Zahlung zu entfernen oder es zu löschen."
     override val coWrite = "Schreiben"
     override val coWriteTitle = "Nachricht an die Schüler"
     override val coGuardian = "Elternteil oder Vormund"

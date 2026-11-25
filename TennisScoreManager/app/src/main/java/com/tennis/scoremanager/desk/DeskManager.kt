@@ -206,6 +206,8 @@ class CoachBridge(private val c: MatchController) : CoachData {
     override fun addDiary(student: String, text: String) = c.coaching.addDiary(student, text)
     override fun setNote(student: String, text: String) { c.playerById(student)?.let { c.savePlayer(it.copy(note = text.take(4000))) } }
     override fun markPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.markPackPaid(it) } }
+    override fun unmarkPackPaid(packId: String) { c.coaching.coachBook.value.packs.firstOrNull { it.id == packId }?.let { c.coaching.unmarkPackPaid(it) } }
+    override fun deletePack(packId: String) = c.coaching.deletePack(packId)
     override fun setLessonDone(lessonId: String, done: Boolean) { c.coaching.coachBook.value.lessons.firstOrNull { it.id == lessonId }?.let { c.coaching.saveLesson(it.copy(done = done, cancelled = if (done) false else it.cancelled)) } }
     override fun markCourseLesson(courseId: String, key: String, start: Long, present: Set<String>, cancelled: Boolean, note: String) =
         c.coaching.markCourseLesson(courseId, key, start, present, cancelled, note)

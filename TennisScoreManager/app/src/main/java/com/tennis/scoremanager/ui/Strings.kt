@@ -2516,6 +2516,12 @@ interface Strings {
     val coPackLessons: String
     val coPackPrice: String
     val coPackPaidNow: String
+    val coPaidAsk: (String) -> String
+    val coUnpaid: String
+    val coUnpaidAsk: (String) -> String
+    val coPackDelete: String
+    val coPackDeleteAsk: (String) -> String
+    val coPackHold: String
     val coWrite: String
     val coWriteTitle: String
     val coGuardian: String
@@ -5336,6 +5342,12 @@ object ItStrings : Strings {
     override val coPackLessons = "Numero di lezioni"
     override val coPackPrice = "Prezzo del pacchetto"
     override val coPackPaidNow = "Già pagato"
+    override val coPaidAsk: (String) -> String = { "Segnare pagato il pacchetto ($it)? Prende il prossimo numero di ricevuta." }
+    override val coUnpaid = "Segna non pagato"
+    override val coUnpaidAsk: (String) -> String = { "Togliere il pagamento e la ricevuta $it? Se l'hai già mandata, quella ricevuta non vale più." }
+    override val coPackDelete = "Elimina il pacchetto"
+    override val coPackDeleteAsk: (String) -> String = { "Eliminare il pacchetto ($it)? Le lezioni fatte restano." }
+    override val coPackHold = "Tieni premuto un pacchetto per togliere il pagamento o eliminarlo."
     override val coWrite = "Scrivi"
     override val coWriteTitle = "Messaggio agli allievi"
     override val coGuardian = "Genitore o tutore"
@@ -8157,6 +8169,12 @@ object EnStrings : Strings {
     override val coPackLessons = "Number of lessons"
     override val coPackPrice = "Pack price"
     override val coPackPaidNow = "Already paid"
+    override val coPaidAsk: (String) -> String = { "Mark the pack ($it) as paid? It takes the next receipt number." }
+    override val coUnpaid = "Mark as unpaid"
+    override val coUnpaidAsk: (String) -> String = { "Remove the payment and receipt $it? If you already sent it, that receipt is no longer valid." }
+    override val coPackDelete = "Delete the pack"
+    override val coPackDeleteAsk: (String) -> String = { "Delete the pack ($it)? Lessons already given stay." }
+    override val coPackHold = "Press and hold a pack to remove the payment or delete it."
     override val coWrite = "Write"
     override val coWriteTitle = "Message to students"
     override val coGuardian = "Parent or guardian"

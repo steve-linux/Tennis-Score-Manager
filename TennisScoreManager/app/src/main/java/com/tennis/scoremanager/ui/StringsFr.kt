@@ -2444,6 +2444,12 @@ object FrStrings : Strings {
     override val coPackLessons = "Nombre de cours"
     override val coPackPrice = "Prix du forfait"
     override val coPackPaidNow = "Déjà payé"
+    override val coPaidAsk: (String) -> String = { "Marquer payé le forfait ($it) ? Il prend le prochain numéro de reçu." }
+    override val coUnpaid = "Marquer non payé"
+    override val coUnpaidAsk: (String) -> String = { "Retirer le paiement et le reçu $it ? Si vous l'avez déjà envoyé, ce reçu n'est plus valable." }
+    override val coPackDelete = "Supprimer le forfait"
+    override val coPackDeleteAsk: (String) -> String = { "Supprimer le forfait ($it) ? Les cours déjà faits restent." }
+    override val coPackHold = "Appuyez longuement sur un forfait pour retirer le paiement ou le supprimer."
     override val coWrite = "Écrire"
     override val coWriteTitle = "Message aux élèves"
     override val coGuardian = "Parent ou tuteur"
