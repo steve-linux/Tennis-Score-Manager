@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para llevar el tanteo del tenis según la
 | `deliver/installa_tsm.sh` | Alternativa a clonar el repositorio: crea **todo** el proyecto Android y el sketch solo con bloques `cat << 'TSM_EOF'` (el jar del Gradle wrapper va en base64). |
 | `deliver/GUIDE.es.md` | Esta guía (en español); el original en italiano es `deliver/GUIDA.md` y las demás traducciones son `deliver/GUIDE.en.md`, `.fr`, `.de`, `.pt`. |
 
-Versiones usadas y verificadas: app **2.7.0** · firmware **2.4** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licencia: GNU GPL versión 3 o posterior (`LICENSE`); la app muestra su versión y licencia en **Más › Ajustes › Acerca de**.
+Versiones usadas y verificadas: app **2.8.0** · firmware **2.5** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licencia: GNU GPL versión 3 o posterior (`LICENSE`); la app muestra su versión y licencia en **Más › Ajustes › Acerca de**.
 
 ---
 
@@ -694,7 +694,7 @@ Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LIST
 
 **Vista previa sin teléfonos**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` en un navegador (también `&lang=en`, `fr`, `de`, `es`, `pt` y `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) muestra el marcador con datos de prueba.
 
-### 8.4 TSM Arena: tenis en la tele con las pulseras (app 2.7, firmware 2.5)
+### 8.4 TSM Arena: tenis en la tele con las pulseras (app 2.8, firmware 2.5)
 
 Un juego de tenis en la tele, como los de las consolas, en el que **la pulsera es la raqueta**: útil en casa entre una clase y otra para entrenar el momento del golpe y la elección entre derecha y revés. El jugador de la pantalla corre solo: solo hay que pensar **cuándo** golpear. Anticipado la bola va cruzada, tarde va paralela; cuanto más rápida la muñeca, más fuerte el golpe.
 

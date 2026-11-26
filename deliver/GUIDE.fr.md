@@ -13,7 +13,7 @@ Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis sel
 | `deliver/installa_tsm.sh` | Alternative au clone : crée **tout** le projet Android et le sketch uniquement avec des blocs `cat << 'TSM_EOF'` (le jar du Gradle wrapper est en base64). |
 | `deliver/GUIDE.fr.md` | Ce guide (en français) ; l'original italien est `deliver/GUIDA.md`, les autres traductions sont `deliver/GUIDE.en.md`, `.de`, `.es`, `.pt`. |
 
-Versions utilisées et vérifiées : app **2.7.0** · firmware **2.4** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licence : GNU GPL version 3 ou ultérieure (`LICENSE`) ; l'application affiche sa version et sa licence dans **Plus › Réglages › À propos**.
+Versions utilisées et vérifiées : app **2.8.0** · firmware **2.5** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licence : GNU GPL version 3 ou ultérieure (`LICENSE`) ; l'application affiche sa version et sa licence dans **Plus › Réglages › À propos**.
 
 ---
 
@@ -694,7 +694,7 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 
 **Aperçu sans téléphone** : `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` dans un navigateur (aussi `&lang=en`, `fr`, `de`, `es`, `pt` et `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) affiche le tableau avec des données de test.
 
-### 8.4 TSM Arena : le tennis sur la télé avec les bracelets (app 2.7, firmware 2.5)
+### 8.4 TSM Arena : le tennis sur la télé avec les bracelets (app 2.8, firmware 2.5)
 
 Un jeu de tennis sur la télé, comme ceux des consoles, où **le bracelet est la raquette** : utile à la maison entre deux leçons pour travailler le timing et le choix entre coup droit et revers. Le joueur à l'écran court tout seul : on ne pense qu'au **moment** de frapper. En avance la balle part croisée, en retard le long de la ligne ; plus le poignet est rapide, plus le coup est fort.
 

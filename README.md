@@ -111,6 +111,8 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Scheda partita e risultato tra segreteria e giocatori (file .tsm, senza server), passaggio del profilo | `data/MatchCards.kt` (+ test), `data/ProfileCards.kt`, `data/ProgressCards.kt` |
 | Analisi video dei colpi (migliori colpi, postura, colpo riconosciuto dal video, catena cinetica, note sulle clip) | `data/StrokeCheck.kt`, `data/StrokeVision.kt`, `data/KineticChain.kt`, `video/ClipNotes.kt`, `video/ServeAnalysisActivity.kt` |
 | Intro degli highlights stile tornei | `video/HighlightIntro.kt` (+ test), `video/StatsCardRenderer.kt` (`intro`), `video/HighlightMaker.kt` |
+| TSM sulla TV (Android TV: voce LEANBACK, trova il telefono da sola, passa ad Arena, voce dell'arbitro della TV) | `tv/DisplayActivity.kt` (`TvLauncher`, `TvVoice`), `tv/ScoreboardFinder.kt`, `tv/TvServer.kt` (`/arena/say`), `assets/scoreboard.html` |
+| Pulsante del ruolo nella prima schermata | `ui/RolesUi.kt` (`RoleSwitchButton`), `ui/screens/HomeScreen.kt` |
 | Foto dei giocatori | `app/.../ui/PlayerPhoto.kt` (`PlayerAvatar`, `EditablePlayerAvatar`), `data/Storage.kt` (`savePhoto`), `player/PhotosArea.kt` (`setPhoto`), `/photo/` in `tv/TvServer.kt` e `assets/scoreboard.html` |
 | Fasce cardio Bluetooth (battito, calorie, zone, grafici) | `app/.../ble/HeartRateProtocol.kt` (+ test), `ble/HeartRateManager.kt`, `data/HeartStats.kt` (Keytel, zone, + test), `ui/HeartSection.kt`, `MatchController.kt` (`flushHeart`), `ui/screens/MatchStatsPanels.kt` (`HeartChart`, `HeartZones`) |
 | Tornei Americano e Mexicano | `app/.../data/Tournament.kt` (turni, coppie, classifica + test), `ui/screens/TournamentScreen.kt`, `MatchController.kt` (`createTournament`, `nextTournamentRound`) |

@@ -13,7 +13,7 @@ Android app (Kotlin + Jetpack Compose) for keeping the score in tennis according
 | `deliver/installa_tsm.sh` | An alternative to cloning: it creates the **whole** Android project and the sketch using only `cat << 'TSM_EOF'` blocks (the Gradle wrapper jar is in base64). |
 | `deliver/GUIDE.en.md` | This guide (in English); the Italian original is `deliver/GUIDA.md`, the other translations are `deliver/GUIDE.fr.md`, `.de`, `.es`, `.pt`. |
 
-Versions used and verified: app **2.7.0** · firmware **2.4** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x. License: GNU GPL version 3 or later (`LICENSE`); the app shows its version and license in **More › Settings › About**.
+Versions used and verified: app **2.8.0** · firmware **2.5** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x. License: GNU GPL version 3 or later (`LICENSE`); the app shows its version and license in **More › Settings › About**.
 
 ---
 
@@ -694,7 +694,7 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 
 **Preview without phones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in a browser (also `&lang=en`, `fr`, `de`, `es`, `pt` and `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) shows the scoreboard with test data.
 
-### 8.4 TSM Arena: tennis on the TV with the wristbands (app 2.7, firmware 2.5)
+### 8.4 TSM Arena: tennis on the TV with the wristbands (app 2.8, firmware 2.5)
 
 A tennis game on the TV, like the console ones, where **the wristband is the racket**: useful at home between lessons to train timing and the choice between forehand and backhand. The player on screen runs by itself: you only think about **when** to hit. Early sends the ball cross-court, late sends it down the line; the faster the wrist, the harder the shot.
 
