@@ -618,6 +618,11 @@ class Storage(context: Context) {
     fun firstStepsHidden(role: String): Boolean = prefs.getBoolean("first_steps_hidden_$role", false)
     fun setFirstStepsHidden(role: String) = prefs.edit { putBoolean("first_steps_hidden_$role", true) }
 
+    /** Il report dell'allievo con le note dell'allenatore (l'ultima scelta nel dialogo del report). */
+    var reportNotes: Boolean
+        get() = prefs.getBoolean("report_notes", true)
+        set(v) = prefs.edit { putBoolean("report_notes", v) }
+
     var playerFeaturesSeen: Boolean
         get() = prefs.getBoolean("player_features_seen", false)
         set(v) = prefs.edit { putBoolean("player_features_seen", v) }

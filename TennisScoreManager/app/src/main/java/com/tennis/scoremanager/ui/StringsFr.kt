@@ -2938,4 +2938,7 @@ object FrStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 note sera transmise" else "$it notes seront transmises" }
     override val cnAskOpen = "Ouvrir l'assistant"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Je suis entraîneur de tennis. Voici mes notes sur mon élève $name, de la plus ancienne à la plus récente (date, heure, sujet). Réponds en français, de façon brève et pratique, en utilisant seulement ce qui est dans les notes.\n\nDemande : $req" }
+
+    override val reportWithNotes = "Avec les notes de l'entraîneur"
+    override val reportWithNotesHint = "Note générale et notes de la période, par sujet. Désactivez-le si elles ne sont que pour vous."
 }

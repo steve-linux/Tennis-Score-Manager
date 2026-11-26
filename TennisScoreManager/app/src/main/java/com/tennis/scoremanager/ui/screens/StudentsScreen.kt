@@ -420,10 +420,12 @@ private fun ReportDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var all by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
+    // Le note dell'allenatore nel report: si ricorda l'ultima scelta (vale anche per il report dal PC).
+    var withNotes by remember { mutableStateOf(c.storage.reportNotes) }
     fun make(pdf: Boolean) {
         busy = true
         scope.launch {
-            val f = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.studentReportFile(st, if (all) null else 30, pdf) }
+            val f = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.studentReportFile(st, if (all) null else 30, pdf, withNotes) }
             busy = false
             if (f == null) android.widget.Toast.makeText(context, s.reportFailed, android.widget.Toast.LENGTH_LONG).show()
             else { context.startActivity(c.shareFileIntent(f, if (pdf) "application/pdf" else "image/png")); onDone() }
@@ -438,6 +440,10 @@ private fun ReportDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
                 com.tennis.scoremanager.ui.Segmented(
                     listOf(com.tennis.scoremanager.ui.SegOption(s.report30), com.tennis.scoremanager.ui.SegOption(s.reportAll)), if (all) 1 else 0, { all = it == 1 },
                 )
+                if (st.note.isNotBlank() || st.coachNotes.isNotEmpty()) com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.EditNote, s.reportWithNotes, s.reportWithNotesHint, withNotes) {
+                    withNotes = it
+                    c.storage.reportNotes = it
+                }
                 if (busy) Text(s.dataBusy, color = TsmColors.TextDim)
                 GhostButton(s.reportPdf, Icons.Filled.PictureAsPdf, { if (!busy) make(true) }, Modifier.fillMaxWidth())
                 GhostButton(s.reportImage, Icons.Filled.Image, { if (!busy) make(false) }, Modifier.fillMaxWidth())

@@ -2936,4 +2936,7 @@ object EsStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "Se pasa 1 nota" else "Se pasan $it notas" }
     override val cnAskOpen = "Abrir el asistente"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Soy entrenador de tenis. Abajo están mis notas sobre mi alumno $name, de la más antigua a la más reciente (fecha, hora, tema). Responde en español, de forma breve y práctica, usando solo lo que hay en las notas.\n\nPetición: $req" }
+
+    override val reportWithNotes = "Con las notas del entrenador"
+    override val reportWithNotesHint = "Nota general y notas del periodo, por tema. Desactívalo si son solo para ti."
 }

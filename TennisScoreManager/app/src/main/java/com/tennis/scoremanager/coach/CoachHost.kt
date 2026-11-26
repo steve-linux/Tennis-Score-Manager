@@ -33,7 +33,8 @@ interface CoachHost {
     fun savePlayers(changed: List<PlayerProfile>)
     /** Gli allenamenti dei colpi, per i progressi degli allievi. */
     val serveSessions: MutableStateFlow<List<ServeSession>>
-    fun studentReportFile(p: PlayerProfile, days: Int?, pdf: Boolean): File?
+    /** [notes]: con le note dell'allenatore (null = come l'ultima volta nel dialogo del report). */
+    fun studentReportFile(p: PlayerProfile, days: Int?, pdf: Boolean, notes: Boolean? = null): File?
     /** Partita tra due allievi: Nuova partita già pronta. */
     fun updateSetup(transform: (SetupData) -> SetupData)
 

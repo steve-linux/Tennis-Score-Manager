@@ -3007,6 +3007,8 @@ interface Strings {
     val cnAskSends: (Int) -> String
     val cnAskOpen: String
     val cnAskPrompt: (String, String) -> String
+    val reportWithNotes: String
+    val reportWithNotesHint: String
 }
 
 object ItStrings : Strings {
@@ -5934,6 +5936,9 @@ object ItStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "Si passa 1 nota" else "Si passano $it note" }
     override val cnAskOpen = "Apri l'assistente"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Sono un allenatore di tennis. Qui sotto ci sono le mie note sull'allievo $name, dalla più vecchia alla più recente (data, ora, argomento). Rispondi in italiano, in modo breve e pratico, usando solo quello che c'è nelle note.\n\nRichiesta: $req" }
+
+    override val reportWithNotes = "Con le note dell'allenatore"
+    override val reportWithNotesHint = "Nota generale e note del periodo, divise per argomento. Spegnilo se sono solo per te."
 }
 
 object EnStrings : Strings {
@@ -8862,6 +8867,9 @@ object EnStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 note will be passed on" else "$it notes will be passed on" }
     override val cnAskOpen = "Open the assistant"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "I am a tennis coach. Below are my notes on my student $name, from oldest to newest (date, time, topic). Answer in English, briefly and practically, using only what is in the notes.\n\nRequest: $req" }
+
+    override val reportWithNotes = "With the coach's notes"
+    override val reportWithNotesHint = "General note and the notes of the period, split by topic. Turn it off if they are just for you."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

@@ -2935,4 +2935,7 @@ object DeStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 Notiz wird weitergegeben" else "$it Notizen werden weitergegeben" }
     override val cnAskOpen = "Assistenten öffnen"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Ich bin Tennistrainer. Unten stehen meine Notizen zu meinem Schüler $name, von der ältesten zur neuesten (Datum, Uhrzeit, Thema). Antworte auf Deutsch, kurz und praktisch, und nutze nur, was in den Notizen steht.\n\nAnfrage: $req" }
+
+    override val reportWithNotes = "Mit den Trainernotizen"
+    override val reportWithNotesHint = "Allgemeine Notiz und die Notizen des Zeitraums, nach Thema. Schalte es aus, wenn sie nur für dich sind."
 }

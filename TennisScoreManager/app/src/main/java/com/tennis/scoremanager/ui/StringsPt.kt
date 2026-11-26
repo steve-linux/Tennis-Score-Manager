@@ -2939,4 +2939,7 @@ object PtStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 anotação será enviada" else "$it anotações serão enviadas" }
     override val cnAskOpen = "Abrir o assistente"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Sou treinador de tênis. Abaixo estão minhas anotações sobre meu aluno $name, da mais antiga à mais recente (data, hora, tema). Responda em português, de forma breve e prática, usando só o que está nas anotações.\n\nPedido: $req" }
+
+    override val reportWithNotes = "Com as anotações do treinador"
+    override val reportWithNotesHint = "Anotação geral e as do período, por tema. Desligue se forem só para você."
 }

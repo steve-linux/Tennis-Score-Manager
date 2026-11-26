@@ -18368,7 +18368,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Schläge**: für Aufschlag, Vorhand, Rückhand und Volley die Einheiten, die Schläge, das letzte Mal und die Linie der Schläge im Feld; ein Schlag antippen öffnet seine Einheiten.
   - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
   - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
-  - **Notizen** (Unter-Tab): oben die **allgemeine Notiz** (Ziele, Dinge, an die du immer denken willst); darunter eine **neue Notiz**, geschrieben oder per Mikrofon diktiert, auf Wunsch mit Thema (Aufschlag, Vorhand, Rückhand, Volley, Taktik, Kondition, Kopf) und **Notiz hinzufügen**. Die Notizen stehen in einer Liste, die neueste oben, nach Monat (vergangene Monate zugeklappt: antippen zum Öffnen) und nach Tag (📅 26.11.26, dann 🕐 18:45 für jede Notiz); eine Notiz antippen, um sie zu ändern oder zu löschen. Bei vielen Notizen: **Suche**, Zeitraum (alles, 30 Tage, 3 Monate, 12 Monate) und Thema. **Übersicht** teilt die angezeigten Notizen nach Thema; die Notizen des Zeitraums kommen auch in den Schülerbericht. **Zusammenfassung anfragen**: schreibe oder diktiere, was du wissen willst (oder wähle *Was besser geworden ist*, *Eine Nachricht für die Eltern*, *Ein Plan für die nächsten 4 Stunden*), und die App gibt Anfrage und Notizen an den Assistenten deiner Wahl weiter (Gemini, ChatGPT, Claude…), standardmäßig nur mit dem Vornamen; die App sendet nichts von selbst, aber die Notizen verlassen das Telefon.
+  - **Notizen** (Unter-Tab): oben die **allgemeine Notiz** (Ziele, Dinge, an die du immer denken willst); darunter eine **neue Notiz**, geschrieben oder per Mikrofon diktiert, auf Wunsch mit Thema (Aufschlag, Vorhand, Rückhand, Volley, Taktik, Kondition, Kopf) und **Notiz hinzufügen**. Die Notizen stehen in einer Liste, die neueste oben, nach Monat (vergangene Monate zugeklappt: antippen zum Öffnen) und nach Tag (📅 26.11.26, dann 🕐 18:45 für jede Notiz); eine Notiz antippen, um sie zu ändern oder zu löschen. Bei vielen Notizen: **Suche**, Zeitraum (alles, 30 Tage, 3 Monate, 12 Monate) und Thema. **Übersicht** teilt die angezeigten Notizen nach Thema; die Notizen des Zeitraums kommen auch in den Schülerbericht, außer du schaltest *Mit den Trainernotizen* im Berichtsdialog aus (die Wahl bleibt, auch für den Bericht vom PC). **Zusammenfassung anfragen**: schreibe oder diktiere, was du wissen willst (oder wähle *Was besser geworden ist*, *Eine Nachricht für die Eltern*, *Ein Plan für die nächsten 4 Stunden*), und die App gibt Anfrage und Notizen an den Assistenten deiner Wahl weiter (Gemini, ChatGPT, Claude…), standardmäßig nur mit dem Vornamen; die App sendet nichts von selbst, aber die Notizen verlassen das Telefon.
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
   - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben. **Per Stimme**: **Notiz diktieren** (oder das 🎤 im Feld) nutzt die Spracheingabe des Telefons, auf neueren Telefonen auch offline: du sprichst und der Text kommt mit Datum ins Tagebuch. Das 🎤 gibt es auch in den Trainernotizen, in der Notiz einer Kursstunde und in der technischen Bewertung.
   - **Ziele**: *Neues Ziel* für einen Schlag, zum Beispiel Vorhand mit 70 % im Feld im Schnitt der letzten 3 Einheiten, mit optionalem Datum. Die Karte zeigt den Stand; wird es erreicht, bekommt das Ziel das Datum von selbst.
@@ -19007,7 +19007,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Strokes**: for serve, forehand, backhand and volley the sessions, the shots, the last time and the line of shots in; tapping a stroke opens its sessions.
   - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
   - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
-  - **Notes** (sub-tab): at the top the **general note** (goals, things to always remember); below a **new note**, written or dictated with the microphone, with a topic if you like (serve, forehand, backhand, volley, tactics, fitness, mental) and **Add note**. Notes are listed newest first, by month (past months closed: tap to open) and by day (📅 26.11.26, then 🕐 18:45 for each note); tap a note to edit or delete it. With many notes: **search**, period (all, 30 days, 3 months, 12 months) and topic. **Summary** shares the notes you see, split by topic; the notes of the period also go into the student report. **Ask for a summary**: write or dictate what you want to know (or pick *What has improved*, *A message for the parents*, *A plan for the next 4 lessons*) and the app hands request and notes to the assistant you choose (Gemini, ChatGPT, Claude…), by default with the student's first name only; the app sends nothing by itself, but the notes leave the phone.
+  - **Notes** (sub-tab): at the top the **general note** (goals, things to always remember); below a **new note**, written or dictated with the microphone, with a topic if you like (serve, forehand, backhand, volley, tactics, fitness, mental) and **Add note**. Notes are listed newest first, by month (past months closed: tap to open) and by day (📅 26.11.26, then 🕐 18:45 for each note); tap a note to edit or delete it. With many notes: **search**, period (all, 30 days, 3 months, 12 months) and topic. **Summary** shares the notes you see, split by topic; the notes of the period also go into the student report, unless you turn off *With the coach's notes* in the report dialog (the choice is kept, also for the report from the PC). **Ask for a summary**: write or dictate what you want to know (or pick *What has improved*, *A message for the parents*, *A plan for the next 4 lessons*) and the app hands request and notes to the assistant you choose (Gemini, ChatGPT, Claude…), by default with the student's first name only; the app sends nothing by itself, but the notes leave the phone.
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
   - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top. **By voice**: **Dictate a note** (or the 🎤 in the field) uses the phone's dictation, offline too on recent phones: you speak and the text goes into the diary with the date. The 🎤 is also in the coach's notes, in a course lesson's note and in the technical assessment's note.
   - **Goals**: *New goal* on a stroke, for example forehand at 70% in over the average of the last 3 sessions, with an optional date. The card shows how far they are; when they reach it, the goal takes the date by itself.
@@ -19645,7 +19645,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Golpes**: para saque, derecha, revés y volea las sesiones, los golpes, la última vez y la línea de golpes dentro; al tocar un golpe se abren sus sesiones.
   - **Movimiento**: las medidas del análisis (6.4 y 7.5) de la última sesión analizada junto a la anterior, para ver qué cambia.
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
-  - **Notas** (subpestaña): arriba la **nota general** (objetivos, cosas que recordar siempre); debajo una **nota nueva**, escrita o dictada con el micrófono, con el tema si quieres (saque, derecha, revés, volea, táctica, físico, cabeza) y **Añadir nota**. Las notas están en lista, la más reciente arriba, por mes (meses pasados cerrados: un toque los abre) y por día (📅 26.11.26, luego 🕐 18:45 en cada nota); un toque en una nota la modifica o la borra. Con muchas notas: **buscar**, periodo (todo, 30 días, 3 meses, 12 meses) y tema. **Resumen** comparte las notas que ves, por tema; las notas del periodo van también al informe del alumno. **Pedir un resumen**: escribe o dicta qué quieres saber (o elige *Qué ha mejorado*, *Un mensaje para los padres*, *Un plan para las próximas 4 clases*) y la app pasa petición y notas al asistente que elijas (Gemini, ChatGPT, Claude…), por defecto solo con el nombre del alumno; la app no envía nada sola, pero las notas salen del teléfono.
+  - **Notas** (subpestaña): arriba la **nota general** (objetivos, cosas que recordar siempre); debajo una **nota nueva**, escrita o dictada con el micrófono, con el tema si quieres (saque, derecha, revés, volea, táctica, físico, cabeza) y **Añadir nota**. Las notas están en lista, la más reciente arriba, por mes (meses pasados cerrados: un toque los abre) y por día (📅 26.11.26, luego 🕐 18:45 en cada nota); un toque en una nota la modifica o la borra. Con muchas notas: **buscar**, periodo (todo, 30 días, 3 meses, 12 meses) y tema. **Resumen** comparte las notas que ves, por tema; las notas del periodo van también al informe del alumno, salvo que desactives *Con las notas del entrenador* en el diálogo del informe (la elección se mantiene, también para el informe desde el PC). **Pedir un resumen**: escribe o dicta qué quieres saber (o elige *Qué ha mejorado*, *Un mensaje para los padres*, *Un plan para las próximas 4 clases*) y la app pasa petición y notas al asistente que elijas (Gemini, ChatGPT, Claude…), por defecto solo con el nombre del alumno; la app no envía nada sola, pero las notas salen del teléfono.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
   - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba. **Por voz**: **Dictar una nota** (o el 🎤 del campo) usa el dictado del teléfono, también sin conexión en los teléfonos recientes: hablas y el texto va al diario con la fecha. El 🎤 está también en las notas del entrenador, en la nota de una clase del curso y en la de la evaluación técnica.
   - **Objetivos**: *Nuevo objetivo* sobre un golpe, por ejemplo derecha al 70 % dentro en la media de las últimas 3 sesiones, con una fecha opcional. La ficha muestra cómo va; cuando lo alcanza, el objetivo toma la fecha solo.
@@ -20283,7 +20283,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Coups** : pour le service, le coup droit, le revers et la volée les séances, les coups, la dernière fois et la courbe des coups dedans ; toucher un coup ouvre ses séances.
   - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
   - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
-  - **Mes notes** (sous-onglet) : en haut la **note générale** (objectifs, choses à toujours retenir) ; dessous une **nouvelle note**, écrite ou dictée au micro, avec le sujet si vous voulez (service, coup droit, revers, volée, tactique, physique, mental) et **Ajouter la note**. Les notes sont en liste, la plus récente en haut, par mois (mois passés fermés : un toucher les ouvre) et par jour (📅 26.11.26, puis 🕐 18:45 pour chaque note) ; un toucher sur une note la modifie ou la supprime. Avec beaucoup de notes : **recherche**, période (tout, 30 jours, 3 mois, 12 mois) et sujet. **Compte rendu** partage les notes affichées, par sujet ; les notes de la période vont aussi dans le rapport de l'élève. **Demander un résumé** : écrivez ou dictez ce que vous voulez savoir (ou choisissez *Ce qui s'est amélioré*, *Un message pour les parents*, *Un plan pour les 4 prochaines leçons*) et l'appli transmet demande et notes à l'assistant de votre choix (Gemini, ChatGPT, Claude…), par défaut avec le seul prénom de l'élève ; l'appli n'envoie rien toute seule, mais les notes quittent le téléphone.
+  - **Mes notes** (sous-onglet) : en haut la **note générale** (objectifs, choses à toujours retenir) ; dessous une **nouvelle note**, écrite ou dictée au micro, avec le sujet si vous voulez (service, coup droit, revers, volée, tactique, physique, mental) et **Ajouter la note**. Les notes sont en liste, la plus récente en haut, par mois (mois passés fermés : un toucher les ouvre) et par jour (📅 26.11.26, puis 🕐 18:45 pour chaque note) ; un toucher sur une note la modifie ou la supprime. Avec beaucoup de notes : **recherche**, période (tout, 30 jours, 3 mois, 12 mois) et sujet. **Compte rendu** partage les notes affichées, par sujet ; les notes de la période vont aussi dans le rapport de l'élève, sauf si vous désactivez *Avec les notes de l'entraîneur* dans la fenêtre du rapport (le choix est gardé, aussi pour le rapport depuis le PC). **Demander un résumé** : écrivez ou dictez ce que vous voulez savoir (ou choisissez *Ce qui s'est amélioré*, *Un message pour les parents*, *Un plan pour les 4 prochaines leçons*) et l'appli transmet demande et notes à l'assistant de votre choix (Gemini, ChatGPT, Claude…), par défaut avec le seul prénom de l'élève ; l'appli n'envoie rien toute seule, mais les notes quittent le téléphone.
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
   - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut. **À la voix** : **Dicter une note** (ou le 🎤 dans le champ) utilise la dictée du téléphone, même hors ligne sur les téléphones récents : vous parlez et le texte va dans le journal avec la date. Le 🎤 est aussi dans les notes de l'entraîneur, dans la note d'une séance de cours et dans celle de l'évaluation technique.
   - **Objectifs**: *Nouvel objectif* sur un coup, par exemple coup droit à 70 % dedans sur la moyenne des 3 dernières séances, avec une date facultative. La fiche montre où il en est ; quand il l'atteint, l'objectif prend la date tout seul.
@@ -20921,7 +20921,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Colpi**: per servizio, dritto, rovescio e volée le sessioni, i colpi, l'ultima volta e la linea dei colpi dentro; toccando un colpo si aprono le sue sessioni.
   - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
   - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
-  - **Note** (sotto-scheda): in alto la **nota generale** (obiettivi, cose da ricordare sempre); sotto una **nota nuova**, scritta o dettata col microfono, con l'argomento se vuoi (servizio, dritto, rovescio, volée, tattica, fisico, testa) e **Aggiungi nota**. Le note sono in elenco, la più recente in cima, divise per mese (i mesi passati chiusi: un tocco li apre) e per giorno (📅 26.11.26, poi 🕐 18:45 per ogni nota); un tocco su una nota la modifica o la elimina. Con molte note: **cerca**, periodo (tutto, 30 giorni, 3 mesi, 12 mesi) e argomento. **Resoconto** condivide le note che vedi, divise per argomento; le stesse note del periodo vanno anche nel report dell'allievo. **Chiedi un riassunto**: scrivi o detta cosa vuoi sapere (o scegli *Cosa è migliorato*, *Un messaggio per i genitori*, *Un piano per le prossime 4 lezioni*) e l'app passa richiesta e note all'assistente che scegli tu (Gemini, ChatGPT, Claude…), di serie col solo nome dell'allievo; l'app non manda niente da sola, ma le note escono dal telefono.
+  - **Note** (sotto-scheda): in alto la **nota generale** (obiettivi, cose da ricordare sempre); sotto una **nota nuova**, scritta o dettata col microfono, con l'argomento se vuoi (servizio, dritto, rovescio, volée, tattica, fisico, testa) e **Aggiungi nota**. Le note sono in elenco, la più recente in cima, divise per mese (i mesi passati chiusi: un tocco li apre) e per giorno (📅 26.11.26, poi 🕐 18:45 per ogni nota); un tocco su una nota la modifica o la elimina. Con molte note: **cerca**, periodo (tutto, 30 giorni, 3 mesi, 12 mesi) e argomento. **Resoconto** condivide le note che vedi, divise per argomento; le stesse note del periodo vanno anche nel report dell'allievo, a meno di spegnere *Con le note dell'allenatore* nel dialogo del report (la scelta resta, anche per il report dal PC). **Chiedi un riassunto**: scrivi o detta cosa vuoi sapere (o scegli *Cosa è migliorato*, *Un messaggio per i genitori*, *Un piano per le prossime 4 lezioni*) e l'app passa richiesta e note all'assistente che scegli tu (Gemini, ChatGPT, Claude…), di serie col solo nome dell'allievo; l'app non manda niente da sola, ma le note escono dal telefono.
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
   - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto. **A voce**: **Detta una nota** (o il 🎤 nel campo) usa la dettatura del telefono, anche senza rete sui telefoni recenti: parli e il testo va nel diario con la data. Il 🎤 c'è anche nelle note dell'allenatore, nella nota della lezione di un corso e in quella della valutazione tecnica.
   - **Obiettivi**: *Nuovo obiettivo* su un colpo, per esempio dritto al 70% dentro sulla media delle ultime 3 sessioni, con una data facoltativa. La scheda mostra a che punto è; quando lo raggiunge, l'obiettivo prende la data da solo.
@@ -21559,7 +21559,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Golpes**: para saque, forehand, backhand e voleio as sessões, os golpes, a última vez e a linha dos golpes dentro; tocando num golpe abrem-se as sessões dele.
   - **Movimento**: as medidas da análise (6.4 e 7.5) da última sessão analisada ao lado da anterior, para ver o que muda.
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
-  - **Anotações** (subaba): no alto a **anotação geral** (metas, coisas para lembrar sempre); abaixo uma **anotação nova**, escrita ou ditada com o microfone, com o tema se quiser (saque, forehand, backhand, voleio, tática, físico, cabeça) e **Adicionar anotação**. As anotações ficam em lista, a mais recente no topo, por mês (meses passados fechados: um toque abre) e por dia (📅 26.11.26, depois 🕐 18:45 em cada uma); um toque numa anotação a edita ou apaga. Com muitas anotações: **buscar**, período (tudo, 30 dias, 3 meses, 12 meses) e tema. **Resumo** compartilha as anotações que você vê, por tema; as do período vão também para o relatório do aluno. **Pedir um resumo**: escreva ou dite o que quer saber (ou escolha *O que melhorou*, *Uma mensagem para os pais*, *Um plano para as próximas 4 aulas*) e o app passa pedido e anotações ao assistente que você escolher (Gemini, ChatGPT, Claude…), por padrão só com o nome do aluno; o app não envia nada sozinho, mas as anotações saem do celular.
+  - **Anotações** (subaba): no alto a **anotação geral** (metas, coisas para lembrar sempre); abaixo uma **anotação nova**, escrita ou ditada com o microfone, com o tema se quiser (saque, forehand, backhand, voleio, tática, físico, cabeça) e **Adicionar anotação**. As anotações ficam em lista, a mais recente no topo, por mês (meses passados fechados: um toque abre) e por dia (📅 26.11.26, depois 🕐 18:45 em cada uma); um toque numa anotação a edita ou apaga. Com muitas anotações: **buscar**, período (tudo, 30 dias, 3 meses, 12 meses) e tema. **Resumo** compartilha as anotações que você vê, por tema; as do período vão também para o relatório do aluno, a menos que você desligue *Com as anotações do treinador* na janela do relatório (a escolha fica salva, também para o relatório pelo PC). **Pedir um resumo**: escreva ou dite o que quer saber (ou escolha *O que melhorou*, *Uma mensagem para os pais*, *Um plano para as próximas 4 aulas*) e o app passa pedido e anotações ao assistente que você escolher (Gemini, ChatGPT, Claude…), por padrão só com o nome do aluno; o app não envia nada sozinho, mas as anotações saem do celular.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
   - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo. **Por voz**: **Ditar uma nota** (ou o 🎤 no campo) usa o ditado do telefone, também sem rede nos telefones recentes: fala e o texto vai para o diário com a data. O 🎤 está também nas notas do treinador, na nota de uma aula do curso e na da avaliação técnica.
   - **Metas**: *Nova meta* num golpe, por exemplo direita a 70 % dentro na média das últimas 3 sessões, com uma data opcional. A ficha mostra em que ponto está; quando a atinge, a meta fica com a data sozinha.
@@ -25377,9 +25377,11 @@ class MatchController(
      * Il report di [p] come file da condividere: PDF completo ([pdf]) o immagine; [days] = gli ultimi giorni (null =
      * tutto). L'allenatore è il tuo giocatore, il circolo quello di Circolo › Campi. null se non si è potuto fare.
      */
-    override fun studentReportFile(p: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean): File? {
+    override fun studentReportFile(p0: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean, notes: Boolean?): File? {
         val s = strings
         val now = System.currentTimeMillis()
+        // Senza le note dell'allenatore: né la nota generale né quelle dell'elenco.
+        val p = if (notes ?: storage.reportNotes) p0 else p0.copy(note = "", coachNotes = emptyList())
         val r = com.tennis.scoremanager.data.StudentReport.build(
             storage, s, p, storage.loadServeSessions(), studentMatches(p), studentRating(p)?.rating,
             coach = me()?.takeIf { it.id != p.id }?.name, club = storage.clubName.ifBlank { null },
@@ -30932,7 +30934,8 @@ interface CoachHost {
     fun savePlayers(changed: List<PlayerProfile>)
     /** Gli allenamenti dei colpi, per i progressi degli allievi. */
     val serveSessions: MutableStateFlow<List<ServeSession>>
-    fun studentReportFile(p: PlayerProfile, days: Int?, pdf: Boolean): File?
+    /** [notes]: con le note dell'allenatore (null = come l'ultima volta nel dialogo del report). */
+    fun studentReportFile(p: PlayerProfile, days: Int?, pdf: Boolean, notes: Boolean? = null): File?
     /** Partita tra due allievi: Nuova partita già pronta. */
     fun updateSetup(transform: (SetupData) -> SetupData)
 
@@ -38959,6 +38962,11 @@ class Storage(context: Context) {
     /** I primi passi di un ruolo (Role.name) nascosti con Nascondi nella prima schermata. */
     fun firstStepsHidden(role: String): Boolean = prefs.getBoolean("first_steps_hidden_$role", false)
     fun setFirstStepsHidden(role: String) = prefs.edit { putBoolean("first_steps_hidden_$role", true) }
+
+    /** Il report dell'allievo con le note dell'allenatore (l'ultima scelta nel dialogo del report). */
+    var reportNotes: Boolean
+        get() = prefs.getBoolean("report_notes", true)
+        set(v) = prefs.edit { putBoolean("report_notes", v) }
 
     var playerFeaturesSeen: Boolean
         get() = prefs.getBoolean("player_features_seen", false)
@@ -60794,6 +60802,8 @@ interface Strings {
     val cnAskSends: (Int) -> String
     val cnAskOpen: String
     val cnAskPrompt: (String, String) -> String
+    val reportWithNotes: String
+    val reportWithNotesHint: String
 }
 
 object ItStrings : Strings {
@@ -63721,6 +63731,9 @@ object ItStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "Si passa 1 nota" else "Si passano $it note" }
     override val cnAskOpen = "Apri l'assistente"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Sono un allenatore di tennis. Qui sotto ci sono le mie note sull'allievo $name, dalla più vecchia alla più recente (data, ora, argomento). Rispondi in italiano, in modo breve e pratico, usando solo quello che c'è nelle note.\n\nRichiesta: $req" }
+
+    override val reportWithNotes = "Con le note dell'allenatore"
+    override val reportWithNotesHint = "Nota generale e note del periodo, divise per argomento. Spegnilo se sono solo per te."
 }
 
 object EnStrings : Strings {
@@ -66649,6 +66662,9 @@ object EnStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 note will be passed on" else "$it notes will be passed on" }
     override val cnAskOpen = "Open the assistant"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "I am a tennis coach. Below are my notes on my student $name, from oldest to newest (date, time, topic). Answer in English, briefly and practically, using only what is in the notes.\n\nRequest: $req" }
+
+    override val reportWithNotes = "With the coach's notes"
+    override val reportWithNotesHint = "General note and the notes of the period, split by topic. Turn it off if they are just for you."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -69602,6 +69618,9 @@ object DeStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 Notiz wird weitergegeben" else "$it Notizen werden weitergegeben" }
     override val cnAskOpen = "Assistenten öffnen"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Ich bin Tennistrainer. Unten stehen meine Notizen zu meinem Schüler $name, von der ältesten zur neuesten (Datum, Uhrzeit, Thema). Antworte auf Deutsch, kurz und praktisch, und nutze nur, was in den Notizen steht.\n\nAnfrage: $req" }
+
+    override val reportWithNotes = "Mit den Trainernotizen"
+    override val reportWithNotesHint = "Allgemeine Notiz und die Notizen des Zeitraums, nach Thema. Schalte es aus, wenn sie nur für dich sind."
 }
 TSM_EOF
 
@@ -72545,6 +72564,9 @@ object EsStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "Se pasa 1 nota" else "Se pasan $it notas" }
     override val cnAskOpen = "Abrir el asistente"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Soy entrenador de tenis. Abajo están mis notas sobre mi alumno $name, de la más antigua a la más reciente (fecha, hora, tema). Responde en español, de forma breve y práctica, usando solo lo que hay en las notas.\n\nPetición: $req" }
+
+    override val reportWithNotes = "Con las notas del entrenador"
+    override val reportWithNotesHint = "Nota general y notas del periodo, por tema. Desactívalo si son solo para ti."
 }
 TSM_EOF
 
@@ -75490,6 +75512,9 @@ object FrStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 note sera transmise" else "$it notes seront transmises" }
     override val cnAskOpen = "Ouvrir l'assistant"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Je suis entraîneur de tennis. Voici mes notes sur mon élève $name, de la plus ancienne à la plus récente (date, heure, sujet). Réponds en français, de façon brève et pratique, en utilisant seulement ce qui est dans les notes.\n\nDemande : $req" }
+
+    override val reportWithNotes = "Avec les notes de l'entraîneur"
+    override val reportWithNotesHint = "Note générale et notes de la période, par sujet. Désactivez-le si elles ne sont que pour vous."
 }
 TSM_EOF
 
@@ -78436,6 +78461,9 @@ object PtStrings : Strings {
     override val cnAskSends: (Int) -> String = { if (it == 1) "1 anotação será enviada" else "$it anotações serão enviadas" }
     override val cnAskOpen = "Abrir o assistente"
     override val cnAskPrompt: (String, String) -> String = { name, req -> "Sou treinador de tênis. Abaixo estão minhas anotações sobre meu aluno $name, da mais antiga à mais recente (data, hora, tema). Responda em português, de forma breve e prática, usando só o que está nas anotações.\n\nPedido: $req" }
+
+    override val reportWithNotes = "Com as anotações do treinador"
+    override val reportWithNotesHint = "Anotação geral e as do período, por tema. Desligue se forem só para você."
 }
 TSM_EOF
 
@@ -90639,10 +90667,12 @@ private fun ReportDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     var all by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
+    // Le note dell'allenatore nel report: si ricorda l'ultima scelta (vale anche per il report dal PC).
+    var withNotes by remember { mutableStateOf(c.storage.reportNotes) }
     fun make(pdf: Boolean) {
         busy = true
         scope.launch {
-            val f = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.studentReportFile(st, if (all) null else 30, pdf) }
+            val f = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.studentReportFile(st, if (all) null else 30, pdf, withNotes) }
             busy = false
             if (f == null) android.widget.Toast.makeText(context, s.reportFailed, android.widget.Toast.LENGTH_LONG).show()
             else { context.startActivity(c.shareFileIntent(f, if (pdf) "application/pdf" else "image/png")); onDone() }
@@ -90657,6 +90687,10 @@ private fun ReportDialog(c: MatchController, st: PlayerProfile, onDone: () -> Un
                 com.tennis.scoremanager.ui.Segmented(
                     listOf(com.tennis.scoremanager.ui.SegOption(s.report30), com.tennis.scoremanager.ui.SegOption(s.reportAll)), if (all) 1 else 0, { all = it == 1 },
                 )
+                if (st.note.isNotBlank() || st.coachNotes.isNotEmpty()) com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.EditNote, s.reportWithNotes, s.reportWithNotesHint, withNotes) {
+                    withNotes = it
+                    c.storage.reportNotes = it
+                }
                 if (busy) Text(s.dataBusy, color = TsmColors.TextDim)
                 GhostButton(s.reportPdf, Icons.Filled.PictureAsPdf, { if (!busy) make(true) }, Modifier.fillMaxWidth())
                 GhostButton(s.reportImage, Icons.Filled.Image, { if (!busy) make(false) }, Modifier.fillMaxWidth())

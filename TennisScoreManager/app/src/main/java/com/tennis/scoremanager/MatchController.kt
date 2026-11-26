@@ -2519,9 +2519,11 @@ class MatchController(
      * Il report di [p] come file da condividere: PDF completo ([pdf]) o immagine; [days] = gli ultimi giorni (null =
      * tutto). L'allenatore è il tuo giocatore, il circolo quello di Circolo › Campi. null se non si è potuto fare.
      */
-    override fun studentReportFile(p: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean): File? {
+    override fun studentReportFile(p0: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean, notes: Boolean?): File? {
         val s = strings
         val now = System.currentTimeMillis()
+        // Senza le note dell'allenatore: né la nota generale né quelle dell'elenco.
+        val p = if (notes ?: storage.reportNotes) p0 else p0.copy(note = "", coachNotes = emptyList())
         val r = com.tennis.scoremanager.data.StudentReport.build(
             storage, s, p, storage.loadServeSessions(), studentMatches(p), studentRating(p)?.rating,
             coach = me()?.takeIf { it.id != p.id }?.name, club = storage.clubName.ifBlank { null },
