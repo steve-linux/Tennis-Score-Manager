@@ -18368,7 +18368,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Schläge**: für Aufschlag, Vorhand, Rückhand und Volley die Einheiten, die Schläge, das letzte Mal und die Linie der Schläge im Feld; ein Schlag antippen öffnet seine Einheiten.
   - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
   - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
-  - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
+  - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst. Mit dem Mikrofon kommt jede diktierte Notiz ganz nach oben (die neueste zuerst): eine Zeile mit Datum und Uhrzeit (📅 26.11.26  🕐 18:30), darunter der Text.
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
   - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben. **Per Stimme**: **Notiz diktieren** (oder das 🎤 im Feld) nutzt die Spracheingabe des Telefons, auf neueren Telefonen auch offline: du sprichst und der Text kommt mit Datum ins Tagebuch. Das 🎤 gibt es auch in den Trainernotizen, in der Notiz einer Kursstunde und in der technischen Bewertung.
   - **Ziele**: *Neues Ziel* für einen Schlag, zum Beispiel Vorhand mit 70 % im Feld im Schnitt der letzten 3 Einheiten, mit optionalem Datum. Die Karte zeigt den Stand; wird es erreicht, bekommt das Ziel das Datum von selbst.
@@ -19007,7 +19007,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Strokes**: for serve, forehand, backhand and volley the sessions, the shots, the last time and the line of shots in; tapping a stroke opens its sessions.
   - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
   - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
-  - **Coach's notes**: what to work on, goals; they save by themselves.
+  - **Coach's notes**: what to work on, goals; they save by themselves. With the microphone each dictated note goes at the top (newest first): a line with date and time (📅 26.11.26  🕐 18:30), and the text below.
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
   - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top. **By voice**: **Dictate a note** (or the 🎤 in the field) uses the phone's dictation, offline too on recent phones: you speak and the text goes into the diary with the date. The 🎤 is also in the coach's notes, in a course lesson's note and in the technical assessment's note.
   - **Goals**: *New goal* on a stroke, for example forehand at 70% in over the average of the last 3 sessions, with an optional date. The card shows how far they are; when they reach it, the goal takes the date by itself.
@@ -19645,7 +19645,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Golpes**: para saque, derecha, revés y volea las sesiones, los golpes, la última vez y la línea de golpes dentro; al tocar un golpe se abren sus sesiones.
   - **Movimiento**: las medidas del análisis (6.4 y 7.5) de la última sesión analizada junto a la anterior, para ver qué cambia.
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
-  - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
+  - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas. Con el micrófono cada nota dictada va arriba del todo (la más reciente primero): una línea con fecha y hora (📅 26.11.26  🕐 18:30) y debajo el texto.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
   - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba. **Por voz**: **Dictar una nota** (o el 🎤 del campo) usa el dictado del teléfono, también sin conexión en los teléfonos recientes: hablas y el texto va al diario con la fecha. El 🎤 está también en las notas del entrenador, en la nota de una clase del curso y en la de la evaluación técnica.
   - **Objetivos**: *Nuevo objetivo* sobre un golpe, por ejemplo derecha al 70 % dentro en la media de las últimas 3 sesiones, con una fecha opcional. La ficha muestra cómo va; cuando lo alcanza, el objetivo toma la fecha solo.
@@ -20283,7 +20283,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Coups** : pour le service, le coup droit, le revers et la volée les séances, les coups, la dernière fois et la courbe des coups dedans ; toucher un coup ouvre ses séances.
   - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
   - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
-  - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
+  - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules. Avec le micro, chaque note dictée va en haut (la plus récente d'abord) : une ligne avec la date et l'heure (📅 26.11.26  🕐 18:30), et le texte en dessous.
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
   - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut. **À la voix** : **Dicter une note** (ou le 🎤 dans le champ) utilise la dictée du téléphone, même hors ligne sur les téléphones récents : vous parlez et le texte va dans le journal avec la date. Le 🎤 est aussi dans les notes de l'entraîneur, dans la note d'une séance de cours et dans celle de l'évaluation technique.
   - **Objectifs**: *Nouvel objectif* sur un coup, par exemple coup droit à 70 % dedans sur la moyenne des 3 dernières séances, avec une date facultative. La fiche montre où il en est ; quand il l'atteint, l'objectif prend la date tout seul.
@@ -20921,7 +20921,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Colpi**: per servizio, dritto, rovescio e volée le sessioni, i colpi, l'ultima volta e la linea dei colpi dentro; toccando un colpo si aprono le sue sessioni.
   - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
   - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
-  - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
+  - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole. Col microfono ogni nota dettata va in cima (la più recente è la prima): sopra una riga con data e ora (📅 26.11.26  🕐 18:30), sotto il testo.
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
   - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto. **A voce**: **Detta una nota** (o il 🎤 nel campo) usa la dettatura del telefono, anche senza rete sui telefoni recenti: parli e il testo va nel diario con la data. Il 🎤 c'è anche nelle note dell'allenatore, nella nota della lezione di un corso e in quella della valutazione tecnica.
   - **Obiettivi**: *Nuovo obiettivo* su un colpo, per esempio dritto al 70% dentro sulla media delle ultime 3 sessioni, con una data facoltativa. La scheda mostra a che punto è; quando lo raggiunge, l'obiettivo prende la data da solo.
@@ -21559,7 +21559,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Golpes**: para saque, forehand, backhand e voleio as sessões, os golpes, a última vez e a linha dos golpes dentro; tocando num golpe abrem-se as sessões dele.
   - **Movimento**: as medidas da análise (6.4 e 7.5) da última sessão analisada ao lado da anterior, para ver o que muda.
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
-  - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
+  - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas. Com o microfone cada nota ditada vai no topo (a mais recente primeiro): uma linha com data e hora (📅 26.11.26  🕐 18:30) e embaixo o texto.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
   - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo. **Por voz**: **Ditar uma nota** (ou o 🎤 no campo) usa o ditado do telefone, também sem rede nos telefones recentes: fala e o texto vai para o diário com a data. O 🎤 está também nas notas do treinador, na nota de uma aula do curso e na da avaliação técnica.
   - **Metas**: *Nova meta* num golpe, por exemplo direita a 70 % dentro na média das últimas 3 sessões, com uma data opcional. A ficha mostra em que ponto está; quando a atinge, a meta fica com a data sozinha.
@@ -53175,6 +53175,19 @@ fun appendDictated(text: String, add: String): String {
         text.trimEnd().endsWith(".") || text.trimEnd().endsWith("!") || text.trimEnd().endsWith("?") -> "$text $a"
         else -> "$text. $a"
     }
+}
+
+/**
+ * Una nota dettata come voce a sé, in cima a quelle che ci sono già (la più recente è sempre la prima): sopra la riga
+ * [stamp] con data e ora, sotto il testo. Per le Note dell'allenatore: "📅 26.11.26  🕐 18:10" e a capo "Servizio più
+ * sciolto".
+ */
+fun appendDictatedLine(text: String, add: String, stamp: String): String {
+    val a = add.trim().replaceFirstChar { it.uppercase() }
+    if (a.isEmpty()) return text
+    val line = "$stamp\n$a"
+    val rest = text.trim('\n', ' ')
+    return if (rest.isEmpty()) line else "$line\n$rest"
 }
 
 /**
@@ -89978,7 +89991,11 @@ fun StudentScreen(c: MatchController) {
                 c.savePlayer(st.copy(note = note))
             }
             OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
-                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
+                // Ogni nota dettata in cima (la più recente è la prima): una riga con calendario e data corta, orologio e
+                // ora, e sotto il testo.
+                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said ->
+                    note = com.tennis.scoremanager.ui.appendDictatedLine(note, said, noteStamp(System.currentTimeMillis())).take(4000)
+                } })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
         if (st.student && tab == StudentTab.LESSONS) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
@@ -90132,6 +90149,13 @@ private fun studentTabName(s: com.tennis.scoremanager.ui.Strings, t: StudentTab)
     StudentTab.LESSONS -> s.stTabLessons
     StudentTab.TRAINING -> s.stTabTraining
     StudentTab.MATCHES -> s.studentMatches
+}
+
+/** Data e ora di una nota dettata, uguali in ogni lingua: "📅 26.11.26  🕐 18:30". */
+internal fun noteStamp(at: Long): String {
+    val d = java.util.Date(at)
+    return "📅 " + java.text.SimpleDateFormat("dd.MM.yy", java.util.Locale.ROOT).format(d) +
+        "  🕐 " + java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(d)
 }
 TSM_EOF
 
@@ -118933,6 +118957,17 @@ class DictationTest {
         assertEquals("Bene il dritto. Rovescio", appendDictated("Bene il dritto.", "rovescio"))
         assertEquals("Riga\nNuova", appendDictated("Riga\n", "nuova"))
         assertEquals("Testo", appendDictated("Testo", "  "))
+    }
+
+    @Test fun dictatedNoteGoesOnItsOwnLineWithTheTime() {
+        val stamp = "📅 26.11.26  🕐 18:10"
+        assertEquals("$stamp\nServizio più sciolto", appendDictatedLine("", "servizio più sciolto", stamp))
+        // La più recente in cima.
+        assertEquals("$stamp\nRovescio da rivedere\nPrima nota", appendDictatedLine("\nPrima nota\n\n", " rovescio da rivedere ", stamp))
+        assertEquals("Testo", appendDictatedLine("Testo", "  ", stamp))
+        // Data corta e ora, uguali in ogni lingua.
+        val at = java.util.Calendar.getInstance().apply { set(2026, 10, 26, 18, 30) }.timeInMillis
+        assertEquals("📅 26.11.26  🕐 18:30", com.tennis.scoremanager.ui.screens.noteStamp(at))
     }
 }
 TSM_EOF

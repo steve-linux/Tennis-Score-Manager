@@ -379,7 +379,11 @@ fun StudentScreen(c: MatchController) {
                 c.savePlayer(st.copy(note = note))
             }
             OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
-                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
+                // Ogni nota dettata in cima (la più recente è la prima): una riga con calendario e data corta, orologio e
+                // ora, e sotto il testo.
+                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said ->
+                    note = com.tennis.scoremanager.ui.appendDictatedLine(note, said, noteStamp(System.currentTimeMillis())).take(4000)
+                } })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
         if (st.student && tab == StudentTab.LESSONS) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
@@ -533,4 +537,11 @@ private fun studentTabName(s: com.tennis.scoremanager.ui.Strings, t: StudentTab)
     StudentTab.LESSONS -> s.stTabLessons
     StudentTab.TRAINING -> s.stTabTraining
     StudentTab.MATCHES -> s.studentMatches
+}
+
+/** Data e ora di una nota dettata, uguali in ogni lingua: "📅 26.11.26  🕐 18:30". */
+internal fun noteStamp(at: Long): String {
+    val d = java.util.Date(at)
+    return "📅 " + java.text.SimpleDateFormat("dd.MM.yy", java.util.Locale.ROOT).format(d) +
+        "  🕐 " + java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(d)
 }
