@@ -9,7 +9,13 @@
    "Dopo ogni serie si riparte da zero e cambia chi comincia."
   ],
   "easier": "Si gioca da metà campo, con la palla più lenta e più alta sopra la rete.",
-  "harder": "La palla deve cadere oltre la linea del servizio e a non più di un metro dalla linea laterale."
+  "harder": "La palla deve cadere oltre la linea del servizio e a non più di un metro dalla linea laterale.",
+  "cue": "Palla alta sopra la rete e lontana dalle righe, in diagonale profonda.",
+  "stepCues": [
+   "Gira le spalle presto e chiudi il movimento sopra la spalla."
+  ],
+  "missTip": "Tre fuori di fila: più margine, punta un metro dentro le righe e alza la traiettoria.",
+  "streakTip": "Cinque dentro di fila: ora prova a tirare più forte o più vicino alla riga."
  },
  "bh_cross": {
   "name": "Rovescio incrociato in diagonale",
@@ -21,7 +27,13 @@
    "Tre serie da 10 colpi buoni di fila."
   ],
   "easier": "Quando serve si può girare attorno alla palla e giocare di dritto; bastano scambi da 5.",
-  "harder": "Alternare rovescio carico e rovescio in back, sempre incrociato."
+  "harder": "Alternare rovescio carico e rovescio in back, sempre incrociato.",
+  "cue": "Spalle girate e piede avanti: la palla va in diagonale profonda.",
+  "stepCues": [
+   "Prepara presto la racchetta e colpisci davanti al corpo."
+  ],
+  "missTip": "Tre fuori di fila: colpisci più davanti e alza un po' la palla sopra la rete.",
+  "streakTip": "Cinque dentro di fila: ora cerca più angolo."
  },
  "line_cross": {
   "name": "Uno lungolinea, l'altro incrociato",
@@ -33,7 +45,14 @@
    "Contate quanti colpi di fila riuscite a tenere."
   ],
   "easier": "Palla più lenta e alta; si possono lasciare due rimbalzi.",
-  "harder": "Chi sbaglia la direzione perde il punto; si gioca a 7 punti."
+  "harder": "Chi sbaglia la direzione perde il punto; si gioca a 7 punti.",
+  "cue": "Prima lungolinea, poi incrociato: decidi la direzione prima di colpire.",
+  "stepCues": [
+   "Lungolinea: spalle allineate alla riga e accompagna verso il bersaglio.",
+   "Ora incrociato: colpisci un po' prima, davanti al corpo."
+  ],
+  "missTip": "Tre fuori di fila: il lungolinea passa dove la rete è più alta, tieni più margine.",
+  "streakTip": "Cinque dentro di fila: ora cambia direzione senza farlo capire."
  },
  "deep_rally": {
   "name": "Palleggio profondo",
@@ -44,7 +63,13 @@
    "Una palla corta vale un punto all'altro: si gioca a 11."
   ],
   "easier": "Va bene anche una palla appena prima della linea del servizio.",
-  "harder": "Zona ridotta: l'ultimo metro e mezzo prima della linea di fondo."
+  "harder": "Zona ridotta: l'ultimo metro e mezzo prima della linea di fondo.",
+  "cue": "Palla profonda al centro, oltre la linea del servizio.",
+  "stepCues": [
+   "Colpisci dal basso verso l'alto e fai passare la palla alta sopra la rete."
+  ],
+  "missTip": "Tre fuori di fila: meno forza, più rotazione e più altezza.",
+  "streakTip": "Cinque dentro di fila: ora falla atterrare più vicina alla riga di fondo."
  },
  "mini_tennis": {
   "name": "Mini tennis",
@@ -56,7 +81,13 @@
    "Chi vuole conta gli scambi o gioca punti a 11."
   ],
   "easier": "Palla depressurizzata (rossa o arancione) e due rimbalzi permessi.",
-  "harder": "Solo colpi in back, oppure solo volée senza far rimbalzare la palla."
+  "harder": "Solo colpi in back, oppure solo volée senza far rimbalzare la palla.",
+  "cue": "Colpi morbidi dentro i quadrati del servizio, con controllo.",
+  "stepCues": [
+   "Movimento corto e racchetta ferma all'impatto."
+  ],
+  "missTip": "Tre fuori di fila: rallenta, apri il piatto e accompagna la palla.",
+  "streakTip": "Cinque dentro di fila: ora alterna dritto e rovescio."
  },
  "serve_targets": {
   "name": "Servizio ai tre bersagli",
@@ -68,7 +99,18 @@
    "Prima cerca la precisione, poi aggiungi un po' di velocità."
   ],
   "easier": "Servi da metà campo, oppure prova solo due bersagli (T ed esterno).",
-  "harder": "Una sola palla per bersaglio, a rotazione: T, corpo, esterno, senza ripetere."
+  "harder": "Una sola palla per bersaglio, a rotazione: T, corpo, esterno, senza ripetere.",
+  "cue": "Stesso lancio per tutti i bersagli: cambia solo la direzione.",
+  "stepCues": [
+   "Al centro, sulla T: punta la linea centrale.",
+   "Al corpo: punta l'anca di chi risponde.",
+   "Esterno: apri l'angolo verso la riga laterale.",
+   "Ora da sinistra, al centro sulla T.",
+   "Da sinistra, al corpo.",
+   "Da sinistra, esterno: apri l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: controlla il lancio, deve essere sempre nello stesso punto.",
+  "streakTip": "Cinque dentro di fila: ora punta più vicino alle righe."
  },
  "second_serve": {
   "name": "Seconda di servizio con margine",
@@ -80,7 +122,14 @@
    "Obiettivo: almeno 8 su 10 dentro."
   ],
   "easier": "Va bene qualsiasi punto del quadrato: conta il margine sopra la rete.",
-  "harder": "Zona ridotta al terzo più profondo del quadrato, verso il rovescio di chi risponde."
+  "harder": "Zona ridotta al terzo più profondo del quadrato, verso il rovescio di chi risponde.",
+  "cue": "Seconda carica: tanta rotazione, la palla passa alta sopra la rete.",
+  "stepCues": [
+   "Da destra: spazzola la palla dal basso verso l'alto.",
+   "Ora da sinistra: stesso movimento, braccio sciolto."
+  ],
+  "missTip": "Tre fuori di fila: più rotazione, non più forza, e lancia un po' sopra la testa.",
+  "streakTip": "Cinque dentro di fila: ora prova a farla rimbalzare più profonda."
  },
  "return_deep": {
   "name": "Risposta profonda al centro",
@@ -92,7 +141,13 @@
    "Contate le risposte nella zona."
   ],
   "easier": "B serve più piano, o solo seconde.",
-  "harder": "Dopo la risposta si gioca il punto: la risposta nella zona vale doppio."
+  "harder": "Dopo la risposta si gioca il punto: la risposta nella zona vale doppio.",
+  "cue": "Risposta profonda al centro: movimento corto e compatto.",
+  "stepCues": [
+   "Split step quando l'altro colpisce, poi blocca la palla davanti."
+  ],
+  "missTip": "Tre fuori di fila: accorcia il movimento e punta al centro, lontano dalle righe.",
+  "streakTip": "Cinque dentro di fila: ora prova ad aprire l'angolo."
  },
  "volley_feed": {
   "name": "Volée di dritto e di rovescio",
@@ -104,7 +159,14 @@
    "Due serie da 10 per parte."
   ],
   "easier": "Palle lanciate a mano, piano, all'altezza delle spalle.",
-  "harder": "Palle più veloci e più basse; dopo ogni volée un passo indietro e di nuovo avanti."
+  "harder": "Palle più veloci e più basse; dopo ogni volée un passo indietro e di nuovo avanti.",
+  "cue": "Volée ferme: piatto della racchetta stabile, niente apertura.",
+  "stepCues": [
+   "Volée di dritto: racchetta davanti, colpisci con un passo avanti.",
+   "Ora volée di rovescio: spalla girata e polso fermo."
+  ],
+  "missTip": "Tre fuori di fila: blocca la palla davanti al corpo, senza caricare.",
+  "streakTip": "Cinque dentro di fila: ora cerca più profondità."
  },
  "approach_volley": {
   "name": "Attacco e volée",
@@ -116,7 +178,13 @@
    "Si torna a fondo campo e si ripete: 10 volte."
   ],
   "easier": "Palla corta lenta e alta; la volée si gioca al centro.",
-  "harder": "L'allenatore alterna passante lungolinea e pallonetto: A deve leggere e scegliere."
+  "harder": "L'allenatore alterna passante lungolinea e pallonetto: A deve leggere e scegliere.",
+  "cue": "Attacca lungolinea, vai avanti e chiudi con la volée.",
+  "stepCues": [
+   "Dopo l'attacco fermati con lo split step, poi volée incrociata."
+  ],
+  "missTip": "Tre fuori di fila: fermati prima della volée, non colpire correndo.",
+  "streakTip": "Cinque dentro di fila: ora prova ad arrivare più vicino alla rete."
  },
  "smash": {
   "name": "Smash",
@@ -140,7 +208,14 @@
    "Dopo 2 minuti cambia chi va a rete."
   ],
   "easier": "B e C giocano piano e verso A.",
-  "harder": "B e C possono provare il passante o il pallonetto: si gioca il punto."
+  "harder": "B e C possono provare il passante o il pallonetto: si gioca il punto.",
+  "cue": "Una volée per parte: guarda chi colpisce e fermati prima.",
+  "stepCues": [
+   "Volée di dritto: piatto fermo e palla verso l'altro giocatore.",
+   "Ora volée di rovescio: spalla girata, colpisci davanti."
+  ],
+  "missTip": "Tre fuori di fila: meno potenza, cerca solo di rimandarla in campo.",
+  "streakTip": "Cinque dentro di fila: ora cerca lo spazio tra i due."
  },
  "drop_recover": {
   "name": "Smorzata e recupero",
@@ -152,7 +227,13 @@
    "Otto ripetizioni, poi si scambiano i ruoli."
   ],
   "easier": "Smorzata più lunga e lenta; A può partire da metà campo.",
-  "harder": "Dopo il recupero B alza un pallonetto: A torna indietro e lo rigioca."
+  "harder": "Dopo il recupero B alza un pallonetto: A torna indietro e lo rigioca.",
+  "cue": "Corri sulla palla corta, colpisci e torna subito dietro.",
+  "stepCues": [
+   "Arriva basso sulle gambe e gioca in diagonale corta."
+  ],
+  "missTip": "Tre fuori di fila: arriva prima sulla palla e piegati di più sulle gambe.",
+  "streakTip": "Cinque dentro di fila: ora torna indietro più veloce."
  },
  "spider": {
   "name": "Il ragno",
@@ -200,7 +281,13 @@
    "Poi si gioca il punto; dieci servizi e si scambiano i ruoli."
   ],
   "easier": "B risponde piano al centro e non si gioca il punto.",
-  "harder": "B risponde dove vuole: A deve scegliere il colpo giusto."
+  "harder": "B risponde dove vuole: A deve scegliere il colpo giusto.",
+  "cue": "Servizio esterno, poi il dritto nel campo aperto.",
+  "stepCues": [
+   "Servi da destra verso l'esterno e preparati subito al colpo dopo."
+  ],
+  "missTip": "Tre fuori di fila: meno angolo, punta un po' più dentro il quadrato.",
+  "streakTip": "Cinque dentro di fila: ora conta anche il dritto dopo il servizio."
  },
  "cross_points": {
   "name": "Punti solo in diagonale",
@@ -212,7 +299,13 @@
    "Partite a 11, poi si cambia diagonale."
   ],
   "easier": "La palla può rimbalzare due volte.",
-  "harder": "Dopo tre colpi si può giocare anche lungolinea, ma solo per un vincente."
+  "harder": "Dopo tre colpi si può giocare anche lungolinea, ma solo per un vincente.",
+  "cue": "Punti solo in diagonale: pazienza e palla profonda.",
+  "stepCues": [
+   "Gioca incrociato con margine e aspetta la palla corta per attaccare."
+  ],
+  "missTip": "Tre fuori di fila: niente fretta, rimetti la palla alta e profonda.",
+  "streakTip": "Cinque dentro di fila: ora cerca un angolo più stretto."
  },
  "king_court": {
   "name": "Re del campo",

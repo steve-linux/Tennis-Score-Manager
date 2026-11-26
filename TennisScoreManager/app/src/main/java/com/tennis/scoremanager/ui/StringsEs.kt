@@ -2959,7 +2959,7 @@ object EsStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 ejercicio" else "$it ejercicios" }
     override val dlNone = "Ningún ejercicio con estos filtros."
     override val dlOriginal = "Textos y dibujos escritos para la app. Por ahora en italiano."
-    override val dlLegend = "Línea continua: la bola (con número, el orden). Discontinua: quien se mueve. Naranja: quien lanza; triángulos: conos."
+    override val dlLegend = "La pista vista desde detrás de A. La bola vuela en arco, un color por golpe en orden (1 rojo, 2 naranja, 3 amarillo, 4 azul); óvalos numerados: dónde debe caer. Discontinua: quien se mueve; recuadro discontinuo: dónde volver. En naranja con el cesto: quien lanza; triángulos: conos."
     override val dlGoal = "Objetivo"
     override val dlHow = "Cómo se hace"
     override val dlEasier = "Más fácil"
@@ -2969,4 +2969,6 @@ object EsStrings : Strings {
 
     override val dlUse = "Usar este ejercicio"
     override val dlReady: (String) -> String = { "Listo en Entrenar › Un golpe › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Golpe $a" else "Golpes $a-$b" }
 }

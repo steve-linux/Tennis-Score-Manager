@@ -135,7 +135,17 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
         ) {
             Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             Text(meta(s, item), color = area, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            CourtDiagram(item.diagram, Modifier.fillMaxWidth(if (item.diagram.half) 0.85f else 0.7f).align(Alignment.CenterHorizontally).clip(RoundedCornerShape(12.dp)))
+            // Gli esercizi con tanti colpi in più riquadri, uno sotto l'altro: colpi 1-2, poi 3-4.
+            val d = item.diagram
+            for (n in 1..d.frames) {
+                val f = d.frame(n)
+                // "Passo 1 di 2 · Colpi 1-2".
+                if (d.frames > 1) Text(
+                    listOfNotNull(s.wzStep(n, d.frames), f.orders.takeIf { it.isNotEmpty() }?.let { o -> s.dlShots(o.first(), o.last()) }).joinToString(" · "),
+                    color = area, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp),
+                )
+                CourtDiagram(f, Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)), perspective = true)
+            }
             Text(s.dlLegend, color = TsmColors.TextDim, fontSize = 12.sp)
             Section(s.dlGoal) { Text(t.goal, color = TsmColors.TextMain, fontSize = 14.sp) }
             Section(s.dlHow) {

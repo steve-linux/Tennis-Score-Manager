@@ -18057,7 +18057,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Dopo ogni serie si riparte da zero e cambia chi comincia."
   ],
   "easier": "Si gioca da metà campo, con la palla più lenta e più alta sopra la rete.",
-  "harder": "La palla deve cadere oltre la linea del servizio e a non più di un metro dalla linea laterale."
+  "harder": "La palla deve cadere oltre la linea del servizio e a non più di un metro dalla linea laterale.",
+  "cue": "Palla alta sopra la rete e lontana dalle righe, in diagonale profonda.",
+  "stepCues": [
+   "Gira le spalle presto e chiudi il movimento sopra la spalla."
+  ],
+  "missTip": "Tre fuori di fila: più margine, punta un metro dentro le righe e alza la traiettoria.",
+  "streakTip": "Cinque dentro di fila: ora prova a tirare più forte o più vicino alla riga."
  },
  "bh_cross": {
   "name": "Rovescio incrociato in diagonale",
@@ -18069,7 +18075,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Tre serie da 10 colpi buoni di fila."
   ],
   "easier": "Quando serve si può girare attorno alla palla e giocare di dritto; bastano scambi da 5.",
-  "harder": "Alternare rovescio carico e rovescio in back, sempre incrociato."
+  "harder": "Alternare rovescio carico e rovescio in back, sempre incrociato.",
+  "cue": "Spalle girate e piede avanti: la palla va in diagonale profonda.",
+  "stepCues": [
+   "Prepara presto la racchetta e colpisci davanti al corpo."
+  ],
+  "missTip": "Tre fuori di fila: colpisci più davanti e alza un po' la palla sopra la rete.",
+  "streakTip": "Cinque dentro di fila: ora cerca più angolo."
  },
  "line_cross": {
   "name": "Uno lungolinea, l'altro incrociato",
@@ -18081,7 +18093,14 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Contate quanti colpi di fila riuscite a tenere."
   ],
   "easier": "Palla più lenta e alta; si possono lasciare due rimbalzi.",
-  "harder": "Chi sbaglia la direzione perde il punto; si gioca a 7 punti."
+  "harder": "Chi sbaglia la direzione perde il punto; si gioca a 7 punti.",
+  "cue": "Prima lungolinea, poi incrociato: decidi la direzione prima di colpire.",
+  "stepCues": [
+   "Lungolinea: spalle allineate alla riga e accompagna verso il bersaglio.",
+   "Ora incrociato: colpisci un po' prima, davanti al corpo."
+  ],
+  "missTip": "Tre fuori di fila: il lungolinea passa dove la rete è più alta, tieni più margine.",
+  "streakTip": "Cinque dentro di fila: ora cambia direzione senza farlo capire."
  },
  "deep_rally": {
   "name": "Palleggio profondo",
@@ -18092,7 +18111,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Una palla corta vale un punto all'altro: si gioca a 11."
   ],
   "easier": "Va bene anche una palla appena prima della linea del servizio.",
-  "harder": "Zona ridotta: l'ultimo metro e mezzo prima della linea di fondo."
+  "harder": "Zona ridotta: l'ultimo metro e mezzo prima della linea di fondo.",
+  "cue": "Palla profonda al centro, oltre la linea del servizio.",
+  "stepCues": [
+   "Colpisci dal basso verso l'alto e fai passare la palla alta sopra la rete."
+  ],
+  "missTip": "Tre fuori di fila: meno forza, più rotazione e più altezza.",
+  "streakTip": "Cinque dentro di fila: ora falla atterrare più vicina alla riga di fondo."
  },
  "mini_tennis": {
   "name": "Mini tennis",
@@ -18104,7 +18129,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Chi vuole conta gli scambi o gioca punti a 11."
   ],
   "easier": "Palla depressurizzata (rossa o arancione) e due rimbalzi permessi.",
-  "harder": "Solo colpi in back, oppure solo volée senza far rimbalzare la palla."
+  "harder": "Solo colpi in back, oppure solo volée senza far rimbalzare la palla.",
+  "cue": "Colpi morbidi dentro i quadrati del servizio, con controllo.",
+  "stepCues": [
+   "Movimento corto e racchetta ferma all'impatto."
+  ],
+  "missTip": "Tre fuori di fila: rallenta, apri il piatto e accompagna la palla.",
+  "streakTip": "Cinque dentro di fila: ora alterna dritto e rovescio."
  },
  "serve_targets": {
   "name": "Servizio ai tre bersagli",
@@ -18116,7 +18147,18 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Prima cerca la precisione, poi aggiungi un po' di velocità."
   ],
   "easier": "Servi da metà campo, oppure prova solo due bersagli (T ed esterno).",
-  "harder": "Una sola palla per bersaglio, a rotazione: T, corpo, esterno, senza ripetere."
+  "harder": "Una sola palla per bersaglio, a rotazione: T, corpo, esterno, senza ripetere.",
+  "cue": "Stesso lancio per tutti i bersagli: cambia solo la direzione.",
+  "stepCues": [
+   "Al centro, sulla T: punta la linea centrale.",
+   "Al corpo: punta l'anca di chi risponde.",
+   "Esterno: apri l'angolo verso la riga laterale.",
+   "Ora da sinistra, al centro sulla T.",
+   "Da sinistra, al corpo.",
+   "Da sinistra, esterno: apri l'angolo."
+  ],
+  "missTip": "Tre fuori di fila: controlla il lancio, deve essere sempre nello stesso punto.",
+  "streakTip": "Cinque dentro di fila: ora punta più vicino alle righe."
  },
  "second_serve": {
   "name": "Seconda di servizio con margine",
@@ -18128,7 +18170,14 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Obiettivo: almeno 8 su 10 dentro."
   ],
   "easier": "Va bene qualsiasi punto del quadrato: conta il margine sopra la rete.",
-  "harder": "Zona ridotta al terzo più profondo del quadrato, verso il rovescio di chi risponde."
+  "harder": "Zona ridotta al terzo più profondo del quadrato, verso il rovescio di chi risponde.",
+  "cue": "Seconda carica: tanta rotazione, la palla passa alta sopra la rete.",
+  "stepCues": [
+   "Da destra: spazzola la palla dal basso verso l'alto.",
+   "Ora da sinistra: stesso movimento, braccio sciolto."
+  ],
+  "missTip": "Tre fuori di fila: più rotazione, non più forza, e lancia un po' sopra la testa.",
+  "streakTip": "Cinque dentro di fila: ora prova a farla rimbalzare più profonda."
  },
  "return_deep": {
   "name": "Risposta profonda al centro",
@@ -18140,7 +18189,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Contate le risposte nella zona."
   ],
   "easier": "B serve più piano, o solo seconde.",
-  "harder": "Dopo la risposta si gioca il punto: la risposta nella zona vale doppio."
+  "harder": "Dopo la risposta si gioca il punto: la risposta nella zona vale doppio.",
+  "cue": "Risposta profonda al centro: movimento corto e compatto.",
+  "stepCues": [
+   "Split step quando l'altro colpisce, poi blocca la palla davanti."
+  ],
+  "missTip": "Tre fuori di fila: accorcia il movimento e punta al centro, lontano dalle righe.",
+  "streakTip": "Cinque dentro di fila: ora prova ad aprire l'angolo."
  },
  "volley_feed": {
   "name": "Volée di dritto e di rovescio",
@@ -18152,7 +18207,14 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Due serie da 10 per parte."
   ],
   "easier": "Palle lanciate a mano, piano, all'altezza delle spalle.",
-  "harder": "Palle più veloci e più basse; dopo ogni volée un passo indietro e di nuovo avanti."
+  "harder": "Palle più veloci e più basse; dopo ogni volée un passo indietro e di nuovo avanti.",
+  "cue": "Volée ferme: piatto della racchetta stabile, niente apertura.",
+  "stepCues": [
+   "Volée di dritto: racchetta davanti, colpisci con un passo avanti.",
+   "Ora volée di rovescio: spalla girata e polso fermo."
+  ],
+  "missTip": "Tre fuori di fila: blocca la palla davanti al corpo, senza caricare.",
+  "streakTip": "Cinque dentro di fila: ora cerca più profondità."
  },
  "approach_volley": {
   "name": "Attacco e volée",
@@ -18164,7 +18226,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Si torna a fondo campo e si ripete: 10 volte."
   ],
   "easier": "Palla corta lenta e alta; la volée si gioca al centro.",
-  "harder": "L'allenatore alterna passante lungolinea e pallonetto: A deve leggere e scegliere."
+  "harder": "L'allenatore alterna passante lungolinea e pallonetto: A deve leggere e scegliere.",
+  "cue": "Attacca lungolinea, vai avanti e chiudi con la volée.",
+  "stepCues": [
+   "Dopo l'attacco fermati con lo split step, poi volée incrociata."
+  ],
+  "missTip": "Tre fuori di fila: fermati prima della volée, non colpire correndo.",
+  "streakTip": "Cinque dentro di fila: ora prova ad arrivare più vicino alla rete."
  },
  "smash": {
   "name": "Smash",
@@ -18188,7 +18256,14 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Dopo 2 minuti cambia chi va a rete."
   ],
   "easier": "B e C giocano piano e verso A.",
-  "harder": "B e C possono provare il passante o il pallonetto: si gioca il punto."
+  "harder": "B e C possono provare il passante o il pallonetto: si gioca il punto.",
+  "cue": "Una volée per parte: guarda chi colpisce e fermati prima.",
+  "stepCues": [
+   "Volée di dritto: piatto fermo e palla verso l'altro giocatore.",
+   "Ora volée di rovescio: spalla girata, colpisci davanti."
+  ],
+  "missTip": "Tre fuori di fila: meno potenza, cerca solo di rimandarla in campo.",
+  "streakTip": "Cinque dentro di fila: ora cerca lo spazio tra i due."
  },
  "drop_recover": {
   "name": "Smorzata e recupero",
@@ -18200,7 +18275,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Otto ripetizioni, poi si scambiano i ruoli."
   ],
   "easier": "Smorzata più lunga e lenta; A può partire da metà campo.",
-  "harder": "Dopo il recupero B alza un pallonetto: A torna indietro e lo rigioca."
+  "harder": "Dopo il recupero B alza un pallonetto: A torna indietro e lo rigioca.",
+  "cue": "Corri sulla palla corta, colpisci e torna subito dietro.",
+  "stepCues": [
+   "Arriva basso sulle gambe e gioca in diagonale corta."
+  ],
+  "missTip": "Tre fuori di fila: arriva prima sulla palla e piegati di più sulle gambe.",
+  "streakTip": "Cinque dentro di fila: ora torna indietro più veloce."
  },
  "spider": {
   "name": "Il ragno",
@@ -18248,7 +18329,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Poi si gioca il punto; dieci servizi e si scambiano i ruoli."
   ],
   "easier": "B risponde piano al centro e non si gioca il punto.",
-  "harder": "B risponde dove vuole: A deve scegliere il colpo giusto."
+  "harder": "B risponde dove vuole: A deve scegliere il colpo giusto.",
+  "cue": "Servizio esterno, poi il dritto nel campo aperto.",
+  "stepCues": [
+   "Servi da destra verso l'esterno e preparati subito al colpo dopo."
+  ],
+  "missTip": "Tre fuori di fila: meno angolo, punta un po' più dentro il quadrato.",
+  "streakTip": "Cinque dentro di fila: ora conta anche il dritto dopo il servizio."
  },
  "cross_points": {
   "name": "Punti solo in diagonale",
@@ -18260,7 +18347,13 @@ cat > "$DEST/app/src/main/assets/drills/it.json" << 'TSM_EOF'
    "Partite a 11, poi si cambia diagonale."
   ],
   "easier": "La palla può rimbalzare due volte.",
-  "harder": "Dopo tre colpi si può giocare anche lungolinea, ma solo per un vincente."
+  "harder": "Dopo tre colpi si può giocare anche lungolinea, ma solo per un vincente.",
+  "cue": "Punti solo in diagonale: pazienza e palla profonda.",
+  "stepCues": [
+   "Gioca incrociato con margine e aspetta la palla corta per attaccare."
+  ],
+  "missTip": "Tre fuori di fila: niente fretta, rimetti la palla alta e profonda.",
+  "streakTip": "Cinque dentro di fila: ora cerca un angolo più stretto."
  },
  "king_court": {
   "name": "Re del campo",
@@ -18688,7 +18781,8 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - Eine **Übung** ist ein Schlag mit Schritten nacheinander: zum Beispiel *20 Vorhand cross, dann 20 longline*, oder beim Aufschlag *10 erste Aufschläge von der Einstandseite durch die Mitte, dann 10 nach außen…*. Es gibt vier fertige Beispiele, eines pro Schlag.
 - **Übungen** (über die Auswahl **Übung** unter *Starten*, im Schlagtraining): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
-- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 20 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung (durchgezogen der Ball, mit der Nummer der Reihenfolge; gestrichelt wer läuft; orange wer zuspielt; Dreiecke die Hütchen), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben **Zu meinen Übungen hinzufügen**: Sie werden geführte Übungen, unter *Ein Schlag* samt Schlag schon ausgewählt (ist sie schon da, wählt **Diese Übung verwenden** sie, ohne eine Kopie anzulegen). Vorerst sind die Texte nur auf Italienisch.
+- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 20 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben **Zu meinen Übungen hinzufügen**: Sie werden geführte Übungen, unter *Ein Schlag* samt Schlag schon ausgewählt (ist sie schon da, wählt **Diese Übung verwenden** sie, ohne eine Kopie anzulegen). Vorerst sind die Texte nur auf Italienisch.
+- **Die Stimme bei den Übungen der Sammlung** (mit eingeschaltetem Ton und der App auf Italienisch): am Anfang sagt sie Name, Ziel und Kernsatz der Übung und den ersten Schritt; bei jedem Schritt sagt sie auch, wie er geht (*Jetzt Rückhand-Volley: Schulter gedreht, Handgelenk fest*); nach drei Schlägen hintereinander im Aus gibt sie einen Tipp, nach fünf hintereinander im Feld schlägt sie vor, die Übung schwerer zu machen (einmal pro Schritt). Bei anderen Übungen und in anderen Sprachen bleiben die üblichen Ansagen.
 
 ### 7.11 Vereinsmitglieder
 
@@ -19328,7 +19422,8 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - A **drill** is a stroke and steps in a row: for example *20 cross-court forehands, then 20 down the line*, or for the serve *10 first serves from the deuce side to the T, then 10 wide…*. There are four ready examples, one per stroke.
 - **Drills** (from the **Drill** choice under *Start*, in stroke practice): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
-- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 20 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing (solid line the ball, with the order number; dashed who moves; orange who feeds; triangles the cones), the goal, the steps and an easier and a harder version. Those for a single stroke have **Add to my drills**: they become guided drills, already picked in *One stroke* with their stroke (if it is already there, **Use this drill** picks it without making a copy). For now the texts are in Italian only.
+- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 20 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have **Add to my drills**: they become guided drills, already picked in *One stroke* with their stroke (if it is already there, **Use this drill** picks it without making a copy). For now the texts are in Italian only.
+- **The voice in library drills** (with audio on and the app in Italian): at the start it says the drill's name, goal and key phrase and the first step; at each step it also says how to do it (*Now backhand volley: shoulder turned, firm wrist*); after three shots out in a row it gives a tip and after five in a row in it suggests making the drill harder (once per step). In other drills and other languages the usual announcements remain.
 
 ### 7.11 Club members
 
@@ -19967,7 +20062,8 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
 - **Ejercicios** (desde la elección **Ejercicio** bajo *Empezar*, en el entrenamiento de golpes): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
-- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 20 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista (línea continua la bola, con el número del orden; discontinua quien se mueve; en naranja quien lanza; triángulos los conos), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen **Añadir a mis ejercicios**: se convierten en ejercicios guiados, ya elegidos en *Un golpe* con su golpe (si ya está, **Usar este ejercicio** lo elige sin hacer una copia). Por ahora los textos están solo en italiano.
+- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 20 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen **Añadir a mis ejercicios**: se convierten en ejercicios guiados, ya elegidos en *Un golpe* con su golpe (si ya está, **Usar este ejercicio** lo elige sin hacer una copia). Por ahora los textos están solo en italiano.
+- **La voz en los ejercicios de la colección** (con el audio activado y la app en italiano): al principio dice el nombre, el objetivo y la frase clave del ejercicio y el primer paso; en cada paso dice también cómo hacerlo (*Ahora volea de revés: hombro girado y muñeca firme*); tras tres golpes fuera seguidos da un consejo y tras cinco dentro seguidos propone hacer el ejercicio más difícil (una vez por paso). En los demás ejercicios y en los demás idiomas quedan los avisos de siempre.
 
 ### 7.11 Socios del club
 
@@ -20606,7 +20702,8 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - Un **exercice** est un coup et des étapes à la suite : par exemple *20 coups droits croisés, puis 20 le long de la ligne*, ou pour le service *10 premières côté égalité au T, puis 10 extérieures…*. Il y a quatre exemples prêts, un par coup.
 - **Exercices** (depuis le choix **Exercice** sous *Commencer*, dans l'entraînement des coups) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
-- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 20 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court (ligne pleine la balle, avec le numéro de l'ordre ; pointillés qui se déplace ; en orange qui lance les balles ; triangles les plots), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont **Ajouter à mes exercices** : ils deviennent des exercices guidés, déjà choisis dans *Un seul coup* avec leur coup (s'il y est déjà, **Utiliser cet exercice** le choisit sans en faire une copie). Pour l'instant les textes sont seulement en italien.
+- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 20 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont **Ajouter à mes exercices** : ils deviennent des exercices guidés, déjà choisis dans *Un seul coup* avec leur coup (s'il y est déjà, **Utiliser cet exercice** le choisit sans en faire une copie). Pour l'instant les textes sont seulement en italien.
+- **La voix dans les exercices de la bibliothèque** (avec le son activé et l'appli en italien) : au début elle dit le nom, l'objectif et la phrase clé de l'exercice et la première étape ; à chaque étape elle dit aussi comment la faire (*Maintenant volée de revers : épaule tournée, poignet ferme*) ; après trois coups dehors d'affilée elle donne un conseil et après cinq dedans d'affilée elle propose de rendre l'exercice plus difficile (une fois par étape). Dans les autres exercices et les autres langues, les annonces habituelles restent.
 
 ### 7.11 Adhérents du club
 
@@ -21245,7 +21342,8 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - Un **esercizio** è un colpo e dei passi in fila: per esempio *20 dritti incrociati, poi 20 lungolinea*, o per il servizio *10 prime da destra al T, poi 10 esterne…*. Ci sono quattro esempi pronti, uno per colpo.
 - **Esercizi** (dalla scelta **Esercizio** sotto *Inizia*, nell'allenamento dei colpi): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
-- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 20 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo (linea piena la palla, col numero dell'ordine; tratteggio chi si sposta; in arancio chi lancia le palle; triangoli i coni), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno **Aggiungi ai miei esercizi**: diventano esercizi guidati, già scelti in *Un colpo* col loro colpo (se c'è già, **Usa questo esercizio** lo sceglie senza farne una copia). Per ora i testi sono solo in italiano.
+- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 20 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno **Aggiungi ai miei esercizi**: diventano esercizi guidati, già scelti in *Un colpo* col loro colpo (se c'è già, **Usa questo esercizio** lo sceglie senza farne una copia). Per ora i testi sono solo in italiano.
+- **La voce negli esercizi della raccolta** (con l'audio acceso e l'app in italiano): all'inizio dice nome, obiettivo e la frase chiave dell'esercizio e il primo passo; a ogni passo dice anche come farlo (*Ora volée di rovescio: spalla girata e polso fermo*); dopo tre colpi fuori di fila dà un consiglio e dopo cinque dentro di fila propone di rendere l'esercizio più difficile (una volta per passo). Negli altri esercizi e nelle altre lingue restano gli annunci di sempre.
 
 ### 7.11 Soci del circolo
 
@@ -21884,7 +21982,8 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
 - **Exercícios** (na escolha **Exercício** embaixo de *Começar*, no treino de golpes): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
-- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 20 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra (linha cheia a bola, com o número da ordem; tracejada quem se move; em laranja quem lança as bolas; triângulos os cones), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm **Adicionar aos meus exercícios**: viram exercícios guiados, já escolhidos em *Um golpe* com o seu golpe (se já estiver lá, **Usar este exercício** o escolhe sem fazer uma cópia). Por enquanto os textos estão só em italiano.
+- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 20 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm **Adicionar aos meus exercícios**: viram exercícios guiados, já escolhidos em *Um golpe* com o seu golpe (se já estiver lá, **Usar este exercício** o escolhe sem fazer uma cópia). Por enquanto os textos estão só em italiano.
+- **A voz nos exercícios da coleção** (com o áudio ligado e a app em italiano): no início diz o nome, o objetivo e a frase-chave do exercício e o primeiro passo; em cada passo diz também como fazê-lo (*Agora vólei de esquerda: ombro rodado e pulso firme*); depois de três pancadas fora seguidas dá um conselho e depois de cinco dentro seguidas propõe tornar o exercício mais difícil (uma vez por passo). Nos outros exercícios e nas outras línguas ficam os avisos de sempre.
 
 ### 7.11 Sócios do clube
 
@@ -33661,23 +33760,51 @@ object DrillLibrary {
      */
     data class Pt(val x: Float, val y: Float)
 
-    /** Chi è in campo: [label] "A", "B"... ; [feeder] = l'allenatore che lancia le palle (col cesto). */
-    data class Who(val at: Pt, val label: String, val feeder: Boolean = false)
+    /**
+     * Chi è in campo: [label] "A", "B"... ; [feeder] = l'allenatore che lancia le palle (col cesto); [backhand] = colpisce
+     * di rovescio (la racchetta nel disegno sta dall'altra parte).
+     */
+    data class Who(val at: Pt, val label: String, val feeder: Boolean = false, val backhand: Boolean = false, val frame: Int? = null)
 
-    /** Una traiettoria: la palla (linea piena, col numero [order] se l'ordine conta) o uno spostamento (tratteggiata). */
-    data class Path(val points: List<Pt>, val move: Boolean = false, val order: Int? = null)
+    /**
+     * Una traiettoria: la palla (piena, nel colore e col numero [order] se l'ordine conta) o uno spostamento
+     * (tratteggiata). [arc]: quanto sale la palla in metri (null = come un colpo normale; alto per i pallonetti).
+     */
+    data class Path(val points: List<Pt>, val move: Boolean = false, val order: Int? = null, val arc: Float? = null, val frame: Int? = null)
 
-    /** Una zona bersaglio (rettangolo da [a] a [b]). */
-    data class Zone(val a: Pt, val b: Pt)
+    /**
+     * Una zona da [a] a [b]: un bersaglio ovale (con dentro [label], di solito il numero del colpo) o, con [area], una
+     * parte di campo rettangolare (dove deve stare la palla).
+     */
+    data class Zone(val a: Pt, val b: Pt, val label: String = "", val area: Boolean = false, val frame: Int? = null)
 
     data class Diagram(
         val players: List<Who>,
         val paths: List<Path> = emptyList(),
         val zones: List<Zone> = emptyList(),
         val cones: List<Pt> = emptyList(),
+        /** Dove tornare dopo il colpo: riquadri tratteggiati. */
+        val recover: List<Zone> = emptyList(),
         /** Solo la metà vicina del campo (esercizi senza avversario): il disegno è più grande. */
         val half: Boolean = false,
-    )
+    ) {
+        /**
+         * Quanti riquadri: gli esercizi con tanti colpi si disegnano in più riquadri (colpi 1-2, poi 3-4). Persone,
+         * traiettorie e zone con [Who.frame] (e simili) stanno solo nel loro riquadro; senza, in tutti.
+         */
+        val frames: Int get() = (players.mapNotNull { it.frame } + paths.mapNotNull { it.frame } + zones.mapNotNull { it.frame } + recover.mapNotNull { it.frame }).maxOrNull() ?: 1
+
+        /** Il riquadro [n] (da 1): solo quello che ci sta dentro. */
+        fun frame(n: Int): Diagram = copy(
+            players = players.filter { it.frame == null || it.frame == n },
+            paths = paths.filter { it.frame == null || it.frame == n },
+            zones = zones.filter { it.frame == null || it.frame == n },
+            recover = recover.filter { it.frame == null || it.frame == n },
+        )
+
+        /** I numeri dei colpi di questo disegno, in ordine (per la scritta "Colpi 1-2"). */
+        val orders: List<Int> get() = paths.mapNotNull { it.order }.distinct().sorted()
+    }
 
     data class Item(
         val id: String,
@@ -33696,12 +33823,61 @@ object DrillLibrary {
 
     /** I testi di un esercizio in una lingua. */
     @Serializable
-    data class Text(val name: String, val goal: String, val steps: List<String>, val easier: String, val harder: String)
+    data class Text(
+        val name: String, val goal: String, val steps: List<String>, val easier: String, val harder: String,
+        /** Per la voce durante l'allenamento: la frase chiave detta all'inizio. */
+        val cue: String = "",
+        /** Come fare ogni passo dell'esercizio guidato, uno per passo, detto quando il passo comincia. */
+        val stepCues: List<String> = emptyList(),
+        /** Il consiglio dopo tre colpi fuori di fila. */
+        val missTip: String = "",
+        /** La proposta dopo cinque colpi dentro di fila. */
+        val streakTip: String = "",
+    )
 
     private val json = Json { ignoreUnknownKeys = true }
 
     /** I testi di una lingua dal file della raccolta (id → testi). */
     fun texts(file: String): Map<String, Text> = json.decodeFromString(file)
+
+    /** L'esercizio della raccolta da cui viene un esercizio guidato aggiunto ("lib-<id>-<ora>"), null se è uno dei propri. */
+    fun itemIdOf(drillId: String): String? = drillId.takeIf { it.startsWith("lib-") }?.removePrefix("lib-")?.substringBeforeLast("-")
+
+    /**
+     * La voce durante un esercizio della raccolta: all'inizio nome, obiettivo e frase chiave; a ogni passo come farlo;
+     * dopo [MISSES] colpi fuori di fila un consiglio, dopo [STREAK] dentro di fila una proposta più difficile (una volta
+     * per passo). I conti dei colpi li dice già l'allenamento; qui solo le frasi in più.
+     */
+    class Coach(private val text: Text) {
+        private var misses = 0
+        private var ins = 0
+        private var streakSaid = false
+
+        /** "Volée di dritto e di rovescio. Volée ferme e precise… Piatto della racchetta stabile." */
+        fun intro(): String = listOf(text.name, text.goal, text.cue).filter { it.isNotBlank() }.joinToString(" ") { it.trimEnd('.') + "." }
+
+        /** Come fare il passo [i] (da 0), null se non c'è la frase. Ricomincia i conti delle serie. */
+        fun step(i: Int): String? {
+            misses = 0; ins = 0; streakSaid = false
+            return text.stepCues.getOrNull(i)?.takeIf { it.isNotBlank() }
+        }
+
+        /** Dopo un colpo segnato: il consiglio o la proposta da dire, se è il momento. */
+        fun shot(inPlay: Boolean): String? {
+            if (inPlay) { ins++; misses = 0 } else { misses++; ins = 0 }
+            if (misses >= MISSES) { misses = 0; return text.missTip.takeIf { it.isNotBlank() } }
+            if (ins >= STREAK && !streakSaid) { streakSaid = true; return text.streakTip.takeIf { it.isNotBlank() } }
+            return null
+        }
+
+        /** Tolto un colpo: le serie ripartono da zero (non si sa più com'erano). */
+        fun undo() { misses = 0; ins = 0 }
+
+        companion object {
+            const val MISSES = 3
+            const val STREAK = 5
+        }
+    }
 
     /** Gli esercizi che passano i filtri (null = tutti). */
     fun filter(topic: Topic?, level: Level?, players: Int?): List<Item> =
@@ -33719,32 +33895,34 @@ object DrillLibrary {
     private const val SINGLES = 4.115f
 
     private fun p(x: Float, y: Float) = Pt(x, y)
-    private fun ball(vararg pts: Pt, order: Int? = null) = Path(pts.toList(), order = order)
-    private fun move(vararg pts: Pt) = Path(pts.toList(), move = true)
+    private fun ball(vararg pts: Pt, order: Int? = null, arc: Float? = null, frame: Int? = null) = Path(pts.toList(), order = order, arc = arc, frame = frame)
+    private fun move(vararg pts: Pt, frame: Int? = null) = Path(pts.toList(), move = true, frame = frame)
 
-    /** Le zone che tornano spesso: fondo campo lontano (tra la linea del servizio e quella di fondo), a sinistra o a destra. */
-    private val farDeepLeft = Zone(p(-SINGLES, -BASE), p(0f, -SERVICE))
-    private val farDeepRight = Zone(p(0f, -BASE), p(SINGLES, -SERVICE))
-    private val nearDeepLeft = Zone(p(-SINGLES, SERVICE), p(0f, BASE))
-    private val nearDeepRight = Zone(p(0f, SERVICE), p(SINGLES, BASE))
+    /** Un bersaglio ovale largo [w] e lungo [h] metri attorno a ([x], [y]), col numero del colpo. */
+    private fun target(x: Float, y: Float, label: String = "", w: Float = 2.4f, h: Float = 2.4f, frame: Int? = null) = Zone(p(x - w / 2, y - h / 2), p(x + w / 2, y + h / 2), label, frame = frame)
+    private fun area(x1: Float, y1: Float, x2: Float, y2: Float) = Zone(p(x1, y1), p(x2, y2), area = true)
+    private fun recover(x: Float, y: Float) = Zone(p(x - 0.8f, y - 0.7f), p(x + 0.8f, y + 0.7f))
 
     val ITEMS: List<Item> = listOf(
-        // Palleggio incrociato di dritto: la diagonale del pari, dritto contro dritto tra due destri.
+        // Palleggio incrociato di dritto: la diagonale del pari, dritto contro dritto tra due destri. Dopo il colpo non si
+        // torna al centro ma un po' verso il lato del vantaggio, a metà degli angoli possibili.
         Item(
             "fh_cross", Topic.FOREHAND, Level.INTERMEDIATE, 2, 15,
             Diagram(
                 listOf(Who(p(3f, 12.4f), "A"), Who(p(-3f, -12.4f), "B")),
-                paths = listOf(ball(p(3f, 12.4f), p(-2.6f, -9.5f)), ball(p(-3f, -12.4f), p(2.6f, 9.5f))),
-                zones = listOf(farDeepLeft, nearDeepRight),
+                paths = listOf(ball(p(3f, 12.4f), p(-2.6f, -9.3f), order = 1), ball(p(-3f, -12.4f), p(2.6f, 8.8f), order = 2)),
+                zones = listOf(target(-2.6f, -9.3f, "1"), target(2.6f, 8.8f, "2")),
+                recover = listOf(recover(1.4f, 12.6f)),
             ),
             guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
         ),
         Item(
             "bh_cross", Topic.BACKHAND, Level.INTERMEDIATE, 2, 15,
             Diagram(
-                listOf(Who(p(-3f, 12.4f), "A"), Who(p(3f, -12.4f), "B")),
-                paths = listOf(ball(p(-3f, 12.4f), p(2.6f, -9.5f)), ball(p(3f, -12.4f), p(-2.6f, 9.5f))),
-                zones = listOf(farDeepRight, nearDeepLeft),
+                listOf(Who(p(-3f, 12.4f), "A", backhand = true), Who(p(3f, -12.4f), "B", backhand = true)),
+                paths = listOf(ball(p(-3f, 12.4f), p(2.6f, -9.3f), order = 1), ball(p(3f, -12.4f), p(-2.6f, 8.8f), order = 2)),
+                zones = listOf(target(2.6f, -9.3f, "1"), target(-2.6f, 8.8f, "2")),
+                recover = listOf(recover(-1.4f, 12.6f)),
             ),
             guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
         ),
@@ -33752,15 +33930,13 @@ object DrillLibrary {
         Item(
             "line_cross", Topic.FOREHAND, Level.INTERMEDIATE, 2, 15,
             Diagram(
-                listOf(Who(p(3f, 12.4f), "A"), Who(p(3f, -12.4f), "B")),
+                listOf(Who(p(3f, 12.4f), "A"), Who(p(3f, -12.4f), "B", backhand = true)),
                 paths = listOf(
-                    ball(p(3f, 12.4f), p(3f, -10f), order = 1),
-                    ball(p(3f, -12.4f), p(-3f, 10f), order = 2),
-                    ball(p(-3f, 12.4f), p(-3f, -10f), order = 3),
-                    ball(p(-3f, -12.4f), p(3f, 10f), order = 4),
-                    move(p(3f, 12.6f), p(-2.6f, 12.6f)),
-                    move(p(3f, -12.6f), p(-2.6f, -12.6f)),
+                    ball(p(3f, 12.4f), p(3f, -9.5f), order = 1),
+                    ball(p(3f, -12.4f), p(-3f, 9.5f), order = 2),
+                    move(p(3f, 13.1f), p(-2.4f, 13.1f)),
                 ),
+                zones = listOf(target(3f, -9.5f, "1"), target(-3f, 9.5f, "2")),
             ),
             guided = TrainedStroke.FOREHAND to listOf(DrillStep(10, direction = ShotDirection.LINE), DrillStep(10, direction = ShotDirection.CROSS)),
         ),
@@ -33769,7 +33945,7 @@ object DrillLibrary {
             Diagram(
                 listOf(Who(p(0f, 12.4f), "A"), Who(p(0f, -12.4f), "B")),
                 paths = listOf(ball(p(0f, 12.4f), p(-1f, -9.5f)), ball(p(0f, -12.4f), p(1f, 9.5f))),
-                zones = listOf(Zone(p(-SINGLES, -BASE), p(SINGLES, -SERVICE)), Zone(p(-SINGLES, SERVICE), p(SINGLES, BASE))),
+                zones = listOf(area(-SINGLES, -BASE, SINGLES, -SERVICE), area(-SINGLES, SERVICE, SINGLES, BASE)),
             ),
             guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
         ),
@@ -33777,17 +33953,21 @@ object DrillLibrary {
             "mini_tennis", Topic.FOREHAND, Level.BEGINNER, 2, 10,
             Diagram(
                 listOf(Who(p(0f, 5f), "A"), Who(p(0f, -5f), "B")),
-                paths = listOf(ball(p(0f, 5f), p(-1.5f, -3.5f)), ball(p(0f, -5f), p(1.5f, 3.5f))),
-                zones = listOf(Zone(p(-SINGLES, -SERVICE), p(SINGLES, 0f)), Zone(p(-SINGLES, 0f), p(SINGLES, SERVICE))),
+                paths = listOf(ball(p(0f, 5f), p(-1.5f, -3.5f), arc = 1.2f), ball(p(0f, -5f), p(1.5f, 3.5f), arc = 1.2f)),
+                zones = listOf(area(-SINGLES, -SERVICE, SINGLES, 0f), area(-SINGLES, 0f, SINGLES, SERVICE)),
             ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
         ),
         // Servizio dal lato del pari: al centro (T), al corpo, esterno.
         Item(
             "serve_targets", Topic.SERVE, Level.INTERMEDIATE, 1, 15,
             Diagram(
-                listOf(Who(p(0.8f, 12.2f), "A")),
-                paths = listOf(ball(p(0.8f, 12.2f), p(-0.5f, -5.6f)), ball(p(0.8f, 12.2f), p(-2f, -5.6f)), ball(p(0.8f, 12.2f), p(-3.6f, -5.6f))),
-                cones = listOf(p(-0.5f, -5.6f), p(-2f, -5.6f), p(-3.6f, -5.6f)),
+                listOf(Who(p(0.8f, 12.3f), "A")),
+                paths = listOf(
+                    ball(p(0.8f, 12.3f), p(-0.6f, -5.4f), order = 1), ball(p(0.8f, 12.3f), p(-2f, -5.4f), order = 2),
+                    ball(p(0.8f, 12.3f), p(-3.5f, -5.4f), order = 3),
+                ),
+                zones = listOf(target(-0.7f, -5.3f, "1", 1.3f, 2.0f), target(-2.05f, -5.3f, "2", 1.3f, 2.0f), target(-3.4f, -5.3f, "3", 1.3f, 2.0f)),
             ),
             guided = TrainedStroke.SERVE to listOf(
                 DrillStep(5, side = ServeSide.DEUCE, kind = ServeKind.FIRST, target = ServeTarget.T),
@@ -33801,9 +33981,9 @@ object DrillLibrary {
         Item(
             "second_serve", Topic.SERVE, Level.INTERMEDIATE, 1, 15,
             Diagram(
-                listOf(Who(p(-0.8f, 12.2f), "A")),
-                paths = listOf(ball(p(-0.8f, 12.2f), p(3f, -5.2f))),
-                zones = listOf(Zone(p(0f, -SERVICE), p(SINGLES, -4.4f))),
+                listOf(Who(p(-0.8f, 12.3f), "A")),
+                paths = listOf(ball(p(-0.8f, 12.3f), p(2.4f, -5.3f), arc = 2.2f)),
+                zones = listOf(target(2.4f, -5.3f, "", 3.2f, 1.8f)),
             ),
             guided = TrainedStroke.SERVE to listOf(
                 DrillStep(10, side = ServeSide.DEUCE, kind = ServeKind.SECOND),
@@ -33814,20 +33994,21 @@ object DrillLibrary {
         Item(
             "return_deep", Topic.RETURN, Level.INTERMEDIATE, 2, 15,
             Diagram(
-                listOf(Who(p(-0.8f, -12.2f), "B"), Who(p(3.2f, 12f), "A")),
-                paths = listOf(ball(p(-0.8f, -12.2f), p(2.5f, 5f), order = 1), ball(p(3.2f, 12f), p(0f, -9.5f), order = 2)),
-                zones = listOf(Zone(p(-2f, -BASE), p(2f, -SERVICE))),
+                listOf(Who(p(-0.8f, -12.3f), "B"), Who(p(3.2f, 12.2f), "A")),
+                paths = listOf(ball(p(-0.8f, -12.3f), p(2.4f, 4.8f), order = 1), ball(p(3.2f, 12.2f), p(0f, -9.3f), order = 2)),
+                zones = listOf(target(0f, -9.3f, "2", 3.6f, 3.6f)),
             ),
+            guided = TrainedStroke.BACKHAND to listOf(DrillStep(20, direction = ShotDirection.MIDDLE)),
         ),
         Item(
             "volley_feed", Topic.VOLLEY, Level.BEGINNER, 1, 10,
             Diagram(
-                listOf(Who(p(0f, 3.5f), "A"), Who(p(0f, -7f), "", feeder = true)),
+                listOf(Who(p(0f, 3.6f), "A"), Who(p(0f, -7f), "", feeder = true)),
                 paths = listOf(
-                    ball(p(0f, -7f), p(1.2f, 3.3f), order = 1), ball(p(1.2f, 3.3f), p(-2.8f, -8.5f)),
-                    ball(p(0f, -7f), p(-1.2f, 3.3f), order = 2), ball(p(-1.2f, 3.3f), p(2.8f, -8.5f)),
+                    ball(p(0f, -7f), p(1f, 3.5f), order = 1, arc = 0.6f, frame = 1), ball(p(1f, 3.5f), p(-2.6f, -8.6f), order = 2, frame = 1),
+                    ball(p(0f, -7f), p(-1f, 3.5f), order = 3, arc = 0.6f, frame = 2), ball(p(-1f, 3.5f), p(2.6f, -8.6f), order = 4, frame = 2),
                 ),
-                zones = listOf(farDeepLeft, farDeepRight),
+                zones = listOf(target(-2.6f, -8.6f, "2", frame = 1), target(2.6f, -8.6f, "4", frame = 2)),
             ),
             guided = TrainedStroke.VOLLEY to listOf(
                 DrillStep(10, wing = Wing.FOREHAND, direction = ShotDirection.CROSS),
@@ -33838,62 +34019,66 @@ object DrillLibrary {
         Item(
             "approach_volley", Topic.VOLLEY, Level.INTERMEDIATE, 1, 15,
             Diagram(
-                listOf(Who(p(1f, 12f), "A"), Who(p(0f, -10f), "", feeder = true)),
+                // A due volte: dove attacca e dove gioca la volée.
+                listOf(Who(p(1.5f, 7.6f), "A", frame = 1), Who(p(0.6f, 3.6f), "A", frame = 2), Who(p(0f, -10f), "", feeder = true)),
                 paths = listOf(
-                    ball(p(0f, -10f), p(1.5f, 7.5f), order = 1),
-                    move(p(1f, 12f), p(1.5f, 8f)),
-                    ball(p(1.5f, 7.5f), p(3.3f, -9f), order = 2),
-                    move(p(1.5f, 7.8f), p(1f, 3.6f)),
-                    ball(p(0f, -10f), p(0.2f, 3.3f), order = 3),
-                    ball(p(0.2f, 3.3f), p(-3.2f, -7.5f), order = 4),
+                    move(p(1f, 12.2f), p(1.5f, 8.4f), frame = 1),
+                    ball(p(0f, -10f), p(1.5f, 7.4f), order = 1, frame = 1),
+                    ball(p(1.5f, 7.4f), p(3.2f, -9f), order = 2, frame = 1),
+                    move(p(1.5f, 7.2f), p(0.7f, 4.3f), frame = 2),
+                    ball(p(0f, -10f), p(0.6f, 3.4f), order = 3, frame = 2),
+                    ball(p(0.6f, 3.4f), p(-3f, -7.4f), order = 4, frame = 2),
                 ),
+                zones = listOf(target(3.2f, -9f, "2", frame = 1), target(-3f, -7.4f, "4", frame = 2)),
             ),
             guided = TrainedStroke.VOLLEY to listOf(DrillStep(10, direction = ShotDirection.CROSS)),
         ),
         Item(
             "smash", Topic.OVERHEAD, Level.INTERMEDIATE, 1, 10,
             Diagram(
-                listOf(Who(p(0f, 2.5f), "A"), Who(p(0f, -11f), "", feeder = true)),
+                listOf(Who(p(0.3f, 7f), "A"), Who(p(0f, -11f), "", feeder = true)),
                 paths = listOf(
-                    move(p(0f, 2.5f), p(0.3f, 7f)),
-                    ball(p(0f, -11f), p(0.4f, 7.3f), order = 1),
-                    ball(p(0.4f, 7.3f), p(-2.5f, -8f), order = 2),
-                    move(p(0.5f, 7.2f), p(0.2f, 2.8f)),
+                    move(p(0f, 2.6f), p(0.3f, 6.4f)),
+                    ball(p(0f, -11f), p(0.3f, 7f), order = 1, arc = 6f),
+                    ball(p(0.3f, 7f), p(-2.4f, -8.4f), order = 2, arc = 0.4f),
                 ),
-                zones = listOf(farDeepLeft),
+                zones = listOf(target(-2.4f, -8.4f, "2")),
             ),
         ),
         // A a rete contro due a fondo campo: volée alternate, una per parte.
         Item(
             "one_vs_two", Topic.VOLLEY, Level.ADVANCED, 3, 15,
             Diagram(
-                listOf(Who(p(0f, 3.4f), "A"), Who(p(-2.8f, -12.3f), "B"), Who(p(2.8f, -12.3f), "C")),
+                listOf(Who(p(0f, 3.5f), "A"), Who(p(-2.8f, -12.3f), "B"), Who(p(2.8f, -12.3f), "C", backhand = true)),
                 paths = listOf(
-                    ball(p(-2.8f, -12.3f), p(1f, 3.2f), order = 1), ball(p(1f, 3.2f), p(2.6f, -10f), order = 2),
-                    ball(p(2.8f, -12.3f), p(-1f, 3.2f), order = 3), ball(p(-1f, 3.2f), p(-2.6f, -10f), order = 4),
+                    ball(p(-2.8f, -12.3f), p(0.9f, 3.3f), order = 1, frame = 1), ball(p(0.9f, 3.3f), p(2.6f, -10f), order = 2, frame = 1),
+                    ball(p(2.8f, -12.3f), p(-0.9f, 3.3f), order = 3, frame = 2), ball(p(-0.9f, 3.3f), p(-2.6f, -10f), order = 4, frame = 2),
                 ),
             ),
+            guided = TrainedStroke.VOLLEY to listOf(DrillStep(10, wing = Wing.FOREHAND), DrillStep(10, wing = Wing.BACKHAND)),
         ),
         Item(
             "drop_recover", Topic.FOOTWORK, Level.INTERMEDIATE, 2, 10,
             Diagram(
-                listOf(Who(p(0f, 12.4f), "A"), Who(p(0f, -8f), "B")),
+                listOf(Who(p(1f, 2.8f), "A"), Who(p(0f, -8f), "B")),
                 paths = listOf(
-                    ball(p(0f, -8f), p(1.2f, 2.2f), order = 1),
-                    move(p(0f, 12.2f), p(1f, 2.8f)),
-                    ball(p(1f, 2.6f), p(-2f, -5f), order = 2),
-                    move(p(0.8f, 3.2f), p(0.2f, 11.8f)),
+                    ball(p(0f, -8f), p(1.2f, 2.3f), order = 1, arc = 1.4f),
+                    move(p(0f, 12.2f), p(0.9f, 3.4f)),
+                    ball(p(1f, 2.6f), p(-2.2f, -4.6f), order = 2, arc = 0.7f),
+                    move(p(0.6f, 3.4f), p(-0.2f, 11.8f)),
                 ),
+                recover = listOf(recover(0f, 12.6f)),
             ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(10, direction = ShotDirection.CROSS)),
         ),
         // Il ragno: dal centro della linea di fondo a ogni cono e ritorno.
         Item(
             "spider", Topic.FITNESS, Level.INTERMEDIATE, 1, 10,
             Diagram(
-                listOf(Who(p(0f, BASE), "A")),
+                listOf(Who(p(0f, 12.3f), "A")),
                 paths = listOf(
-                    move(p(0f, 11.6f), p(-3.8f, 11.6f)), move(p(0f, 11.4f), p(-3.6f, SERVICE + 0.3f)), move(p(0f, 11.3f), p(0f, SERVICE + 0.4f)),
-                    move(p(0f, 11.4f), p(3.6f, SERVICE + 0.3f)), move(p(0f, 11.6f), p(3.8f, 11.6f)),
+                    move(p(-0.2f, 11.9f), p(-3.8f, 11.9f)), move(p(-0.2f, 11.6f), p(-3.7f, SERVICE + 0.3f)), move(p(0f, 11.5f), p(0f, SERVICE + 0.4f)),
+                    move(p(0.2f, 11.6f), p(3.7f, SERVICE + 0.3f)), move(p(0.2f, 11.9f), p(3.8f, 11.9f)),
                 ),
                 cones = listOf(p(-SINGLES, BASE), p(-SINGLES, SERVICE), p(0f, SERVICE), p(SINGLES, SERVICE), p(SINGLES, BASE)),
                 half = true,
@@ -33902,18 +34087,19 @@ object DrillLibrary {
         Item(
             "split_step", Topic.FOOTWORK, Level.BEGINNER, 1, 10,
             Diagram(
-                listOf(Who(p(0f, 12.2f), "A"), Who(p(0f, -7f), "", feeder = true)),
+                listOf(Who(p(0f, 12.3f), "A"), Who(p(0f, -7f), "", feeder = true)),
                 paths = listOf(
-                    ball(p(0f, -7f), p(2.8f, 10.5f), order = 1), move(p(0f, 12.2f), p(2.6f, 11.6f)),
-                    ball(p(0f, -7f), p(-2.8f, 10.5f), order = 2), move(p(0f, 12.2f), p(-2.6f, 11.6f)),
+                    ball(p(0f, -7f), p(2.8f, 10.6f), order = 1), move(p(0.3f, 12.3f), p(2.4f, 11.7f)),
+                    ball(p(0f, -7f), p(-2.8f, 10.6f), order = 2), move(p(-0.3f, 12.3f), p(-2.4f, 11.7f)),
                 ),
+                recover = listOf(recover(0f, 12.6f)),
             ),
         ),
         Item(
             "baseline_shuffle", Topic.FITNESS, Level.BEGINNER, 1, 8,
             Diagram(
-                listOf(Who(p(0f, BASE), "A")),
-                paths = listOf(move(p(0f, 11.4f), p(-3.9f, 11.4f)), move(p(0f, 11.1f), p(3.9f, 11.1f))),
+                listOf(Who(p(0f, 12.3f), "A")),
+                paths = listOf(move(p(-0.3f, 12.4f), p(-3.9f, 12.4f)), move(p(0.3f, 12.4f), p(3.9f, 12.4f))),
                 cones = listOf(p(-SINGLES, BASE), p(0f, BASE), p(SINGLES, BASE)),
                 half = true,
             ),
@@ -33922,46 +34108,50 @@ object DrillLibrary {
         Item(
             "serve_plus_one", Topic.TACTICS, Level.INTERMEDIATE, 2, 15,
             Diagram(
-                listOf(Who(p(0.8f, 12.2f), "A"), Who(p(-3.4f, -12f), "B")),
+                listOf(Who(p(0.8f, 10.2f), "A"), Who(p(-3.6f, -12f), "B")),
                 paths = listOf(
-                    ball(p(0.8f, 12.2f), p(-3.6f, -5.4f), order = 1),
-                    ball(p(-3.6f, -12f), p(0.6f, 9.5f), order = 2),
-                    move(p(0.8f, 12.2f), p(0.8f, 10.2f)),
-                    ball(p(0.8f, 9.8f), p(3.2f, -9f), order = 3),
+                    ball(p(0.8f, 12.3f), p(-3.6f, -5.2f), order = 1),
+                    ball(p(-3.6f, -12f), p(0.7f, 9.6f), order = 2),
+                    move(p(0.8f, 12.3f), p(0.8f, 10.6f)),
+                    ball(p(0.7f, 9.8f), p(3f, -9f), order = 3),
                 ),
-                zones = listOf(farDeepRight),
+                zones = listOf(target(-3.4f, -5.2f, "1", 1.6f, 1.8f), target(3f, -9f, "3")),
             ),
+            guided = TrainedStroke.SERVE to listOf(DrillStep(10, side = ServeSide.DEUCE, kind = ServeKind.FIRST, target = ServeTarget.WIDE)),
         ),
         Item(
             "cross_points", Topic.TACTICS, Level.BEGINNER, 2, 20,
             Diagram(
                 listOf(Who(p(2.6f, 12.4f), "A"), Who(p(-2.6f, -12.4f), "B")),
                 paths = listOf(ball(p(2.6f, 12.4f), p(-2f, -8f)), ball(p(-2.6f, -12.4f), p(2f, 8f))),
-                zones = listOf(Zone(p(-SINGLES, -BASE), p(0f, 0f)), Zone(p(0f, 0f), p(SINGLES, BASE))),
+                zones = listOf(area(-SINGLES, -BASE, 0f, 0f), area(0f, 0f, SINGLES, BASE)),
             ),
+            guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
         ),
         // Re del campo: chi vince il punto resta (o sale) dalla parte del re.
         Item(
             "king_court", Topic.TACTICS, Level.INTERMEDIATE, 4, 20,
             Diagram(
-                listOf(Who(p(0f, -12.4f), "A"), Who(p(0f, 12.4f), "B"), Who(p(5.9f, 2f), "C"), Who(p(5.9f, 3.2f), "D")),
-                paths = listOf(ball(p(0f, 12.4f), p(-1.5f, -9f)), move(p(5.6f, 2.6f), p(1.5f, 12.4f))),
+                listOf(Who(p(0f, -12.4f), "A"), Who(p(0f, 12.4f), "B"), Who(p(6.2f, 9f), "C"), Who(p(6.2f, 10.6f), "D")),
+                paths = listOf(ball(p(0f, 12.4f), p(-1.5f, -9f), order = 1), move(p(5.8f, 9.8f), p(1.4f, 12.4f))),
             ),
         ),
-        // Doppio: B1 serve, B2 a rete incrocia sulla risposta incrociata e chiude in mezzo.
+        // Doppio: A1 serve, A2 a rete incrocia sulla risposta incrociata e chiude in mezzo.
         Item(
             "doubles_poach", Topic.TACTICS, Level.ADVANCED, 4, 20,
             Diagram(
                 listOf(
-                    Who(p(0.8f, 12.2f), "A1"), Who(p(-2.5f, 3.6f), "A2"),
+                    Who(p(0.8f, 12.3f), "A1"), Who(p(-2.5f, 3.6f), "A2", frame = 1), Who(p(0.2f, 3f), "A2", frame = 2),
                     Who(p(-3.2f, -12f), "B1"), Who(p(2.5f, -6.4f), "B2"),
                 ),
                 paths = listOf(
-                    ball(p(0.8f, 12.2f), p(-2.2f, -5f), order = 1),
-                    ball(p(-3.2f, -12f), p(0.2f, 3.2f), order = 2),
-                    move(p(-2.5f, 3.6f), p(0.2f, 3f)),
-                    ball(p(0.2f, 3f), p(0f, -7.5f), order = 3),
+                    ball(p(0.8f, 12.3f), p(-2.2f, -5f), order = 1, frame = 1),
+                    ball(p(-3.2f, -12f), p(0.2f, 3.2f), order = 2, frame = 1),
+                    move(p(-2.5f, 3.6f), p(-0.2f, 3.1f), frame = 2),
+                    ball(p(-3.2f, -12f), p(0.2f, 3.2f), order = 2, frame = 2),
+                    ball(p(0.2f, 3f), p(0f, -7.5f), order = 3, frame = 2),
                 ),
+                zones = listOf(target(0f, -7.5f, "3", 2f, 2.4f, frame = 2)),
             ),
         ),
     )
@@ -54215,6 +54405,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
@@ -54247,86 +54438,301 @@ private const val HALF_W = 5.485f
 private const val BASE = 11.885f
 private const val SERVICE = 6.40f
 private const val SINGLES = 4.115f
-private const val MARGIN_X = 1.6f
+private const val MARGIN_X = 1.8f
 private const val MARGIN_Y = 2.0f
 
+/** I colori dei colpi in ordine: 1 rosso, 2 arancio, 3 giallo, 4 azzurro (senza ordine: verde-giallo). */
+private val ORDER_COLORS = listOf(Color(0xFFFF4D4D), Color(0xFFFF9800), Color(0xFFFFEB3B), Color(0xFF4FC3F7))
+private fun shotColor(order: Int?): Color = order?.let { ORDER_COLORS[(it - 1).mod(ORDER_COLORS.size)] } ?: TsmColors.Ball
+
 /**
- * Il disegno di un esercizio, fatto dall'app: il campo visto dall'alto (la metà vicina in basso), le zone bersaglio, i
- * coni, chi è in campo (A in giallo, gli altri in rosso, l'allenatore che lancia in arancio), la palla (linea piena con
- * la freccia e, se conta, il numero dell'ordine) e gli spostamenti (tratteggiati).
+ * Come si passa da un punto del campo (metri) a un punto del disegno. Dall'alto ([perspective] false) è una scala;
+ * in prospettiva il campo si guarda da dietro la metà vicina, un po' dall'alto: le cose lontane sono più piccole
+ * ([scale]) e la palla in volo ([z], metri) sale verso l'alto del disegno.
+ */
+private class Projection(val perspective: Boolean, val w: Float, minY: Float, maxY: Float) {
+    private val spanX = 2 * (HALF_W + MARGIN_X)
+    private val k = w / spanX
+    private val minY = minY
+    private val maxY = maxY
+    // In prospettiva: il bordo lontano è largo il 58% di quello vicino.
+    private val d0 = 1.38f * (maxY - minY)
+    private val d1 = d0 + (maxY - minY)
+    private val tilt = 0.62f
+    val height: Float = if (perspective) (maxY - minY) * k * tilt else (maxY - minY) * k
+    private fun d(y: Float) = d0 + (maxY - y)
+    fun scale(y: Float): Float = if (perspective) d0 / d(y) else 1f
+    fun at(x: Float, y: Float, z: Float = 0f): Offset {
+        if (!perspective) return Offset((x + HALF_W + MARGIN_X) * k, (y - minY) * k - z * k * 0.5f)
+        val u = (1 / d(y) - 1 / d1) / (1 / d0 - 1 / d1)
+        return Offset(w / 2 + x * k * scale(y), u * height - z * k * scale(y) * 1.5f)
+    }
+    fun px(m: Float, y: Float) = m * k * scale(y)
+}
+
+/**
+ * Il disegno di un esercizio, fatto dall'app. In prospettiva ([perspective], la scheda dell'esercizio) il campo si vede
+ * da dietro A come in campo: la palla vola ad arco, un colore per ogni colpo dell'ordine (rosso, arancio, giallo,
+ * azzurro) col numero accanto, i bersagli ovali col numero del colpo, le persone come omini con la racchetta dalla parte
+ * del colpo (in arancio chi lancia le palle, col cesto), gli spostamenti tratteggiati e, tratteggiato, il riquadro dove
+ * tornare dopo il colpo. Dall'alto (le miniature dell'elenco) le stesse cose più semplici.
  */
 @Composable
-fun CourtDiagram(d: DrillLibrary.Diagram, modifier: Modifier = Modifier) {
+fun CourtDiagram(d: DrillLibrary.Diagram, modifier: Modifier = Modifier, perspective: Boolean = false) {
     val area = LocalArea.current
-    val minY = if (d.half) -1.2f else -BASE - MARGIN_Y
-    val maxY = BASE + MARGIN_Y
+    // In prospettiva più spazio dietro la linea di fondo lontana: gli omini sono in piedi e sporgono verso l'alto.
+    val minY = if (d.half) -1.2f else -BASE - MARGIN_Y - if (perspective) 4.4f else 0f
+    val maxY = BASE + MARGIN_Y + if (perspective) 0.6f else 0f
     val spanX = 2 * (HALF_W + MARGIN_X)
-    val spanY = maxY - minY
-    Canvas(modifier.fillMaxWidth().aspectRatio(spanX / spanY)) {
-        val k = size.width / spanX
-        fun o(p: DrillLibrary.Pt) = Offset((p.x + HALF_W + MARGIN_X) * k, (p.y - minY) * k)
-        fun o(x: Float, y: Float) = o(DrillLibrary.Pt(x, y))
-        // Il campo e le sue linee.
-        drawRect(TsmColors.Court, topLeft = Offset.Zero, size = size)
-        val line = TsmColors.CourtLine
-        val w = (0.08f * k).coerceAtLeast(1.5f)
+    val ratio = Projection(perspective, spanX, minY, maxY).let { spanX / it.height }
+    Canvas(modifier.fillMaxWidth().aspectRatio(ratio)) {
+        val pr = Projection(perspective, size.width, minY, maxY)
+        fun o(x: Float, y: Float, z: Float = 0f) = pr.at(x, y, z)
+        fun o(p: DrillLibrary.Pt) = pr.at(p.x, p.y)
+        fun poly(pts: List<Offset>) = Path().apply { moveTo(pts[0].x, pts[0].y); for (p in pts.drop(1)) lineTo(p.x, p.y); close() }
         val top = if (d.half) 0f else -BASE
-        drawRect(line, topLeft = o(-HALF_W, top), size = Size(2 * HALF_W * k, (BASE - top) * k), style = Stroke(w))
-        for (x in listOf(-SINGLES, SINGLES)) drawLine(line, o(x, top), o(x, BASE), w)
-        for (y in listOfNotNull(SERVICE, (-SERVICE).takeIf { !d.half })) drawLine(line, o(-SINGLES, y), o(SINGLES, y), w)
-        drawLine(line, o(0f, if (d.half) 0f else -SERVICE), o(0f, SERVICE), w)
-        drawLine(line, o(0f, BASE), o(0f, BASE - 0.3f), w)
-        if (!d.half) drawLine(line, o(0f, -BASE), o(0f, -BASE + 0.3f), w)
-        // La rete.
-        drawLine(Color.White, o(-HALF_W - 0.5f, 0f), o(HALF_W + 0.5f, 0f), w * 2.2f)
-        // Le zone bersaglio, nel colore dell'area.
+        // Il fondo (fuori dal campo) e il campo.
+        drawRect(TsmColors.Court.copy(alpha = if (perspective) 0.55f else 1f), size = size)
+        drawPath(poly(listOf(o(-HALF_W - 1f, top - 0.8f), o(HALF_W + 1f, top - 0.8f), o(HALF_W + 1f, BASE + 1.2f), o(-HALF_W - 1f, BASE + 1.2f))), TsmColors.Court)
+        val line = TsmColors.CourtLine
+        fun ln(x1: Float, y1: Float, x2: Float, y2: Float) = drawLine(line, o(x1, y1), o(x2, y2), (pr.px(0.07f, (y1 + y2) / 2)).coerceAtLeast(1.4f))
+        ln(-HALF_W, top, HALF_W, top); ln(-HALF_W, BASE, HALF_W, BASE)
+        for (x in listOf(-HALF_W, -SINGLES, SINGLES, HALF_W)) ln(x, top, x, BASE)
+        for (y in listOfNotNull(SERVICE, (-SERVICE).takeIf { !d.half })) ln(-SINGLES, y, SINGLES, y)
+        ln(0f, if (d.half) 0f else -SERVICE, 0f, SERVICE)
+        ln(0f, BASE, 0f, BASE - 0.3f)
+        if (!d.half) ln(0f, -BASE, 0f, -BASE + 0.3f)
+        // La rete: in prospettiva con la sua altezza.
+        if (perspective) {
+            val h = 0.95f
+            drawPath(poly(listOf(o(-HALF_W - 0.9f, 0f), o(HALF_W + 0.9f, 0f), o(HALF_W + 0.9f, 0f, h), o(-HALF_W - 0.9f, 0f, h))), Color.White.copy(alpha = 0.22f))
+            drawLine(Color.White, o(-HALF_W - 0.9f, 0f, h), o(HALF_W + 0.9f, 0f, h), pr.px(0.12f, 0f).coerceAtLeast(2f))
+            for (x in listOf(-HALF_W - 0.9f, HALF_W + 0.9f)) drawLine(Color.White, o(x, 0f), o(x, 0f, h), pr.px(0.12f, 0f).coerceAtLeast(2f))
+        } else {
+            drawLine(Color.White, o(-HALF_W - 0.5f, 0f), o(HALF_W + 0.5f, 0f), (pr.px(0.16f, 0f)).coerceAtLeast(2.5f))
+        }
+        // Le zone: le parti di campo (rettangoli) e i bersagli (ovali col numero del colpo).
         for (z in d.zones) {
-            val a = o(minOf(z.a.x, z.b.x), minOf(z.a.y, z.b.y))
-            val b = o(maxOf(z.a.x, z.b.x), maxOf(z.a.y, z.b.y))
-            drawRect(area.copy(alpha = 0.35f), topLeft = a, size = Size(b.x - a.x, b.y - a.y))
+            val x1 = minOf(z.a.x, z.b.x); val x2 = maxOf(z.a.x, z.b.x); val y1 = minOf(z.a.y, z.b.y); val y2 = maxOf(z.a.y, z.b.y)
+            if (z.area) {
+                drawPath(poly(listOf(o(x1, y1), o(x2, y1), o(x2, y2), o(x1, y2))), area.copy(alpha = 0.3f))
+                continue
+            }
+            val cx = (x1 + x2) / 2; val cy = (y1 + y2) / 2; val rx = (x2 - x1) / 2; val ry = (y2 - y1) / 2
+            val oval = Path().apply {
+                for (i in 0..36) {
+                    val a = i * Math.PI.toFloat() * 2 / 36
+                    val p = o(cx + rx * cos(a), cy + ry * sin(a))
+                    if (i == 0) moveTo(p.x, p.y) else lineTo(p.x, p.y)
+                }
+                close()
+            }
+            val fill = z.label.toIntOrNull()?.let { shotColor(it) } ?: TsmColors.Ball
+            drawPath(oval, fill.copy(alpha = 0.45f))
+            drawPath(oval, fill, style = Stroke(pr.px(0.08f, cy).coerceAtLeast(1.5f)))
+            if (z.label.isNotEmpty()) text(z.label, o(cx, cy), pr.px(1.2f, cy).coerceAtLeast(9f), Color.Black)
+        }
+        // Dove tornare dopo il colpo: riquadro tratteggiato.
+        for (r in d.recover) {
+            val x1 = minOf(r.a.x, r.b.x); val x2 = maxOf(r.a.x, r.b.x); val y1 = minOf(r.a.y, r.b.y); val y2 = maxOf(r.a.y, r.b.y)
+            drawPath(poly(listOf(o(x1, y1), o(x2, y1), o(x2, y2), o(x1, y2))), Color.White,
+                style = Stroke(pr.px(0.07f, y2).coerceAtLeast(1.5f), pathEffect = PathEffect.dashPathEffect(floatArrayOf(pr.px(0.3f, y2), pr.px(0.2f, y2)))))
         }
         // I coni.
         for (c in d.cones) {
-            val p = o(c); val r = 0.38f * k
-            drawPath(Path().apply { moveTo(p.x, p.y - r); lineTo(p.x + r, p.y + r * 0.8f); lineTo(p.x - r, p.y + r * 0.8f); close() }, TsmColors.Orange)
+            val p = o(c); val r = pr.px(0.42f, c.y)
+            drawPath(Path().apply { moveTo(p.x, p.y - r * 1.4f); lineTo(p.x + r * 0.8f, p.y); lineTo(p.x - r * 0.8f, p.y); close() }, TsmColors.Orange)
         }
-        // Traiettorie: prima gli spostamenti, poi la palla.
-        for (path in d.paths.sortedBy { !it.move }) drawTrajectory(path.points.map { o(it) }, path.move, path.order, k)
-        // Chi è in campo.
-        for (who in d.players) {
-            val p = o(who.at)
-            val r = 0.55f * k
-            val fill = when {
-                who.feeder -> TsmColors.Orange
-                who.label.startsWith("A") -> TsmColors.Player1
-                else -> TsmColors.Player2
+        // Gli spostamenti, poi le persone, poi la palla sopra a tutto.
+        for (path in d.paths.filter { it.move }) drawMove(path.points.map { o(it) }, pr.px(0.1f, path.points.last().y))
+        for (who in d.players.sortedBy { it.at.y }) {
+            if (perspective) drawFigure(who, pr, ::o, racketSide(d, who)) else drawDot(who, o(who.at), pr.px(0.6f, who.at.y))
+        }
+        d.paths.filter { !it.move }.forEachIndexed { idx, path ->
+            val pts = path.points
+            if (pts.size < 2) return@forEachIndexed
+            // La palla in volo: sale e scende tra un punto e l'altro (in prospettiva si vede l'arco sopra la rete) e
+            // piega un po' di lato, i colpi dispari da una parte e i pari dall'altra: andata e ritorno sulla stessa
+            // diagonale non si coprono.
+            var a = pts[0]; var b = pts.last()
+            // In prospettiva la palla parte dalla racchetta di chi colpisce e arriva sulla racchetta di chi la riceve
+            // (all'altezza dell'impatto), non a terra dietro di lui; sui bersagli arriva a terra.
+            var za = 0f; var zb = 0f
+            if (perspective) {
+                hitPoint(d, a)?.let { (p, z) -> a = p; za = z }
+                hitPoint(d, b)?.let { (p, z) -> b = p; zb = z }
             }
-            drawCircle(fill, r, p)
-            drawCircle(Color.Black.copy(alpha = 0.5f), r, p, style = Stroke(w))
-            val label = if (who.feeder) "●" else who.label
-            text(label, p, r * if (label.length > 1) 1.0f else 1.25f, if (fill == TsmColors.Player1 || who.feeder) Color.Black else Color.White)
+            val len = kotlin.math.hypot(b.x - a.x, b.y - a.y)
+            val hMax = path.arc ?: (len * 0.07f).coerceIn(0.5f, 1.8f)
+            // Il verso conta: un colpo verso il fondo lontano e il suo ritorno piegano da parti opposte.
+            val sign = (if (((path.order ?: (idx + 1)) % 2) == 1) 1f else -1f) * (if (b.y < a.y) 1f else -1f)
+            val bend = (len * 0.05f).coerceAtMost(1.1f) * sign
+            val nx = -(b.y - a.y) / len; val ny = (b.x - a.x) / len
+            fun curveWith(h: Float) = (0..32).map { i ->
+                val f = i / 32f
+                val side = 4 * f * (1 - f) * bend
+                val z = if (perspective) za * (1 - f) + zb * f + 4 * h * f * (1 - f) else 0f
+                o(a.x + (b.x - a.x) * f + nx * side, a.y + (b.y - a.y) * f + ny * side, z)
+            }
+            // Un pallonetto alto non esce dal disegno: se sfora in alto, l'arco si abbassa quanto basta.
+            var h = hMax
+            var curve = curveWith(h)
+            while (curve.minOf { it.y } < 6f && h > 0.3f) { h *= 0.85f; curve = curveWith(h) }
+            drawShot(curve, shotColor(path.order), path.order, pr.px(0.13f, (a.y + b.y) / 2).coerceAtLeast(2.2f), pr.px(0.75f, b.y).coerceAtLeast(7f))
         }
     }
 }
 
-/** Una traiettoria: piena con la freccia (palla) o tratteggiata (spostamento); col numero a metà se l'ordine conta. */
-private fun DrawScope.drawTrajectory(pts: List<Offset>, move: Boolean, order: Int?, k: Float) {
+/**
+ * Da che parte tiene la racchetta [who], nel disegno: +1 a destra di chi guarda, -1 a sinistra. Il giocatore ha due
+ * posizioni, dritto e rovescio (destrorso): chi è vicino si vede da dietro, quindi il suo rovescio è a sinistra; chi è
+ * lontano si vede di fronte, quindi il suo rovescio è a destra di chi guarda. Se l'esercizio dice rovescio, è rovescio;
+ * altrimenti decide la palla che gli arriva: dalla parte dove arriva (se arriva addosso, dritto).
+ */
+private fun racketSide(d: DrillLibrary.Diagram, who: DrillLibrary.Who): Float {
+    val near = who.at.y > 0
+    val forehand = if (near) 1f else -1f
+    if (who.backhand) return -forehand
+    val incoming = d.paths.filter { !it.move && it.points.size >= 2 }
+        .filter { kotlin.math.hypot(it.points.last().x - who.at.x, it.points.last().y - who.at.y) < 1.5f }
+        .minByOrNull { it.order ?: Int.MAX_VALUE } ?: return forehand
+    val dx = incoming.points.last().x - who.at.x
+    return if (kotlin.math.abs(dx) > 0.3f) kotlin.math.sign(dx) else forehand
+}
+
+/**
+ * Dove colpisce chi sta in [at] (entro un metro e mezzo): la testa della racchetta, dalla parte dove la tiene, e la sua
+ * altezza; per chi lancia le palle, la mano. null se lì non c'è nessuno (la palla arriva a terra, su un bersaglio).
+ */
+private fun hitPoint(d: DrillLibrary.Diagram, at: DrillLibrary.Pt): Pair<DrillLibrary.Pt, Float>? {
+    val who = d.players.minByOrNull { kotlin.math.hypot(it.at.x - at.x, it.at.y - at.y) }
+        ?.takeIf { kotlin.math.hypot(it.at.x - at.x, it.at.y - at.y) < 1.5f } ?: return null
+    val side = racketSide(d, who)
+    return if (who.feeder) DrillLibrary.Pt(who.at.x + side * 0.6f, who.at.y) to 1.16f
+    else DrillLibrary.Pt(who.at.x + side * 0.93f, who.at.y) to 1.52f
+}
+
+/** Chi è in campo, dall'alto: un cerchio con la lettera (giallo A, rosso gli altri, arancio chi lancia). */
+private fun DrawScope.drawDot(who: DrillLibrary.Who, p: Offset, r: Float) {
+    val fill = when {
+        who.feeder -> TsmColors.Orange
+        who.label.startsWith("A") -> TsmColors.Player1
+        else -> TsmColors.Player2
+    }
+    drawCircle(fill, r, p)
+    drawCircle(Color.Black.copy(alpha = 0.5f), r, p, style = Stroke(r * 0.15f))
+    val label = if (who.feeder) "●" else who.label
+    text(label, p, r * if (label.length > 1) 1.0f else 1.25f, if (fill == TsmColors.Player1 || who.feeder) Color.Black else Color.White)
+}
+
+/**
+ * Una persona in campo, in posizione di attesa (ginocchia un po' piegate): ombra a terra, scarpe, gambe, pantaloncini,
+ * maglia nel colore del giocatore (A giallo, gli altri rossi, chi lancia arancio), braccia, testa coi capelli e la
+ * racchetta con le corde dalla parte del colpo (dritto o rovescio; chi è vicino si vede da dietro, chi è lontano di
+ * fronte). Chi lancia tiene una palla e ha il cesto accanto. La lettera in un cerchietto di fianco.
+ */
+private fun DrawScope.drawFigure(who: DrillLibrary.Who, pr: Projection, o: (Float, Float, Float) -> Offset, side: Float) {
+    val x = who.at.x; val y = who.at.y
+    val shirt = when {
+        who.feeder -> TsmColors.Orange
+        who.label.startsWith("A") -> TsmColors.Player1
+        else -> TsmColors.Player2
+    }
+    val skin = Color(0xFFE2B48C)
+    val shorts = Color(0xFF1E2636)
+    val hair = Color(0xFF3B2A1E)
+    val outline = Color(0xFF0B0F18).copy(alpha = 0.55f)
+    val near = y > 0
+    // Un punto della sagoma: [dx] di lato (metri), [z] in altezza.
+    fun q(dx: Float, z: Float) = o(x + dx, y, z)
+    fun px(m: Float) = pr.px(m, y)
+    fun limb(color: Color, w: Float, vararg pts: Pair<Float, Float>) {
+        for (k in 0 until pts.size - 1) drawLine(color, q(pts[k].first, pts[k].second), q(pts[k + 1].first, pts[k + 1].second), px(w), cap = StrokeCap.Round)
+    }
+    fun shape(color: Color, vararg pts: Pair<Float, Float>) {
+        val path = Path().apply {
+            val first = q(pts[0].first, pts[0].second); moveTo(first.x, first.y)
+            for (p in pts.drop(1)) { val r = q(p.first, p.second); lineTo(r.x, r.y) }
+            close()
+        }
+        drawPath(path, color)
+        drawPath(path, outline, style = Stroke(px(0.025f).coerceAtLeast(1f)))
+    }
+    // Ombra a terra.
+    val c = o(x, y, 0f)
+    drawOval(Color.Black.copy(alpha = 0.28f), topLeft = Offset(c.x - px(0.5f), c.y - px(0.12f)), size = Size(px(1.0f), px(0.24f)))
+    // Gambe piegate (coscia, polpaccio) e scarpe.
+    for (s in listOf(-1f, 1f)) {
+        limb(skin, 0.16f, s * 0.12f to 0.82f, s * 0.3f to 0.46f, s * 0.3f to 0.1f)
+        drawOval(Color.White, topLeft = q(s * 0.3f - 0.12f, 0.11f), size = Size(px(0.24f), px(0.11f)))
+    }
+    // Pantaloncini e maglia.
+    shape(shorts, -0.22f to 0.98f, 0.22f to 0.98f, 0.27f to 0.7f, 0.03f to 0.7f, 0f to 0.8f, -0.03f to 0.7f, -0.27f to 0.7f)
+    shape(shirt, -0.25f to 1.47f, 0.25f to 1.47f, 0.23f to 1.2f, 0.21f to 0.94f, -0.21f to 0.94f, -0.23f to 1.2f)
+    // Braccio senza racchetta piegato davanti; braccio con la racchetta in fuori.
+    limb(shirt, 0.13f, -side * 0.24f to 1.44f, -side * 0.3f to 1.32f)
+    limb(skin, 0.11f, -side * 0.3f to 1.32f, -side * 0.36f to 1.14f, -side * 0.16f to 1.04f)
+    limb(shirt, 0.13f, side * 0.24f to 1.44f, side * 0.33f to 1.33f)
+    limb(skin, 0.11f, side * 0.33f to 1.33f, side * 0.46f to 1.19f, side * 0.58f to 1.12f)
+    if (who.feeder) {
+        // La palla in mano e il cesto accanto.
+        drawCircle(TsmColors.Ball, px(0.08f), q(side * 0.6f, 1.16f))
+        val bx = -side * 0.75f
+        shape(Color(0xFF555B66), bx - 0.22f to 0.55f, bx + 0.22f to 0.55f, bx + 0.18f to 0f, bx - 0.18f to 0f)
+        for (k in -1..1) drawCircle(TsmColors.Ball, px(0.07f), q(bx + k * 0.12f, 0.6f))
+    } else {
+        // La racchetta: manico, cuore, ovale con le corde.
+        limb(Color(0xFF222222), 0.045f, side * 0.58f to 1.12f, side * 0.76f to 1.32f)
+        val head = q(side * 0.93f, 1.52f)
+        val rw = px(0.3f); val rh = px(0.4f)
+        drawOval(Color.White.copy(alpha = 0.55f), topLeft = Offset(head.x - rw / 2, head.y - rh / 2), size = Size(rw, rh))
+        drawOval(Color(0xFF222222), topLeft = Offset(head.x - rw / 2, head.y - rh / 2), size = Size(rw, rh), style = Stroke(px(0.03f).coerceAtLeast(1.2f)))
+    }
+    // Collo, testa e capelli (visti da dietro i capelli coprono quasi tutta la testa).
+    limb(skin, 0.08f, 0f to 1.47f, 0f to 1.55f)
+    val headC = q(0f, 1.66f)
+    val hr = px(0.12f)
+    drawCircle(skin, hr, headC)
+    if (near) drawCircle(hair, hr * 0.95f, Offset(headC.x, headC.y - hr * 0.08f))
+    else drawArc(hair, 180f, 180f, useCenter = true, topLeft = Offset(headC.x - hr, headC.y - hr * 1.05f), size = Size(hr * 2, hr * 1.4f))
+    drawCircle(outline, hr, headC, style = Stroke(px(0.02f).coerceAtLeast(1f)))
+    // La lettera, in un cerchietto di fianco (dalla parte senza racchetta).
+    if (who.label.isNotEmpty()) {
+        val r = px(0.36f).coerceAtLeast(7f)
+        val lc = q(-side * 0.62f, 1.25f)
+        drawCircle(shirt, r, lc)
+        drawCircle(outline, r, lc, style = Stroke(px(0.025f).coerceAtLeast(1f)))
+        text(who.label, lc, r * if (who.label.length > 1) 1.0f else 1.3f, if (shirt == TsmColors.Player1 || who.feeder) Color.Black else Color.White)
+    }
+}
+
+/** Uno spostamento: tratteggiato, con la freccia. */
+private fun DrawScope.drawMove(pts: List<Offset>, w: Float) {
     if (pts.size < 2) return
-    val color = if (move) Color.White.copy(alpha = 0.85f) else TsmColors.Ball
-    val w = (0.11f * k).coerceAtLeast(2f)
+    val color = Color.White.copy(alpha = 0.9f)
+    val stroke = w.coerceAtLeast(1.8f)
     val path = Path().apply { moveTo(pts[0].x, pts[0].y); for (p in pts.drop(1)) lineTo(p.x, p.y) }
-    drawPath(path, color, style = Stroke(w, pathEffect = if (move) PathEffect.dashPathEffect(floatArrayOf(0.45f * k, 0.3f * k)) else null))
-    // La freccia alla fine.
-    val a = pts[pts.size - 2]; val b = pts.last()
-    val ang = atan2(b.y - a.y, b.x - a.x)
-    val len = 0.6f * k
-    for (d in listOf(2.6f, -2.6f)) drawLine(color, b, Offset(b.x + len * cos(ang + d), b.y + len * sin(ang + d)), w)
+    drawPath(path, color, style = Stroke(stroke, pathEffect = PathEffect.dashPathEffect(floatArrayOf(stroke * 3.5f, stroke * 2.5f))))
+    arrowHead(pts[pts.size - 2], pts.last(), color, stroke, stroke * 4.5f)
+}
+
+/** La palla: piena nel colore del suo numero, con la freccia e il numero a metà. */
+private fun DrawScope.drawShot(pts: List<Offset>, color: Color, order: Int?, w: Float, head: Float) {
+    val path = Path().apply { moveTo(pts[0].x, pts[0].y); for (p in pts.drop(1)) lineTo(p.x, p.y) }
+    drawPath(path, Color.Black.copy(alpha = 0.35f), style = Stroke(w * 1.8f))
+    drawPath(path, color, style = Stroke(w))
+    arrowHead(pts[pts.size - 2], pts.last(), color, w, head)
     order?.let {
-        val m = Offset((a.x + b.x) / 2, (a.y + b.y) / 2)
-        val r = 0.42f * k
-        drawCircle(Color.Black.copy(alpha = 0.75f), r, m)
+        val m = pts[pts.size * 3 / 10]
+        val r = head * 0.62f
+        drawCircle(Color.Black.copy(alpha = 0.8f), r, m)
         text("$it", m, r * 1.3f, color)
     }
+}
+
+private fun DrawScope.arrowHead(a: Offset, b: Offset, color: Color, w: Float, len: Float) {
+    val ang = atan2(b.y - a.y, b.x - a.x)
+    for (d in listOf(2.6f, -2.6f)) drawLine(color, b, Offset(b.x + len * cos(ang + d), b.y + len * sin(ang + d)), w)
 }
 
 /** Una scritta centrata in [c], alta [h] pixel. */
@@ -61638,6 +62044,7 @@ interface Strings {
     val dlAdd: String
     val dlUse: String
     val dlReady: (String) -> String
+    val dlShots: (Int, Int) -> String
 }
 
 object ItStrings : Strings {
@@ -64588,7 +64995,7 @@ object ItStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 esercizio" else "$it esercizi" }
     override val dlNone = "Nessun esercizio con questi filtri."
     override val dlOriginal = "Testi e disegni scritti per l'app. Per ora in italiano."
-    override val dlLegend = "Linea piena: la palla (col numero, l'ordine). Tratteggio: chi si sposta. Arancio: chi lancia le palle; triangoli: coni."
+    override val dlLegend = "Il campo visto da dietro A. La palla vola ad arco, un colore per ogni colpo in ordine (1 rosso, 2 arancio, 3 giallo, 4 azzurro); gli ovali col numero: dove deve arrivare. Tratteggio: chi si sposta; riquadro tratteggiato: dove tornare. In arancio col cesto: chi lancia le palle; triangoli: coni."
     override val dlGoal = "Obiettivo"
     override val dlHow = "Come si fa"
     override val dlEasier = "Più facile"
@@ -64598,6 +65005,8 @@ object ItStrings : Strings {
 
     override val dlUse = "Usa questo esercizio"
     override val dlReady: (String) -> String = { "Pronto in Allenati › Un colpo › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Colpo $a" else "Colpi $a-$b" }
 }
 
 object EnStrings : Strings {
@@ -67549,7 +67958,7 @@ object EnStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 drill" else "$it drills" }
     override val dlNone = "No drills with these filters."
     override val dlOriginal = "Texts and drawings written for the app. In Italian for now."
-    override val dlLegend = "Solid line: the ball (with a number, the order). Dashed: who moves. Orange: who feeds the balls; triangles: cones."
+    override val dlLegend = "The court seen from behind A. The ball flies in an arc, one colour per shot in order (1 red, 2 orange, 3 yellow, 4 blue); numbered ovals: where it should land. Dashed: who moves; dashed box: where to recover. Orange with a basket: who feeds; triangles: cones."
     override val dlGoal = "Goal"
     override val dlHow = "How to do it"
     override val dlEasier = "Easier"
@@ -67559,6 +67968,8 @@ object EnStrings : Strings {
 
     override val dlUse = "Use this drill"
     override val dlReady: (String) -> String = { "Ready in Practice › One stroke › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Shot $a" else "Shots $a-$b" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -70535,7 +70946,7 @@ object DeStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 Übung" else "$it Übungen" }
     override val dlNone = "Keine Übungen mit diesen Filtern."
     override val dlOriginal = "Texte und Zeichnungen für die App geschrieben. Vorerst auf Italienisch."
-    override val dlLegend = "Durchgezogen: der Ball (mit Nummer, die Reihenfolge). Gestrichelt: wer läuft. Orange: wer zuspielt; Dreiecke: Hütchen."
+    override val dlLegend = "Der Platz von hinter A gesehen. Der Ball fliegt im Bogen, eine Farbe pro Schlag in der Reihenfolge (1 rot, 2 orange, 3 gelb, 4 blau); nummerierte Ovale: wo er landen soll. Gestrichelt: wer läuft; gestricheltes Feld: wohin zurück. Orange mit Korb: wer zuspielt; Dreiecke: Hütchen."
     override val dlGoal = "Ziel"
     override val dlHow = "So geht es"
     override val dlEasier = "Leichter"
@@ -70545,6 +70956,8 @@ object DeStrings : Strings {
 
     override val dlUse = "Diese Übung verwenden"
     override val dlReady: (String) -> String = { "Bereit unter Trainieren › Ein Schlag › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Schlag $a" else "Schläge $a-$b" }
 }
 TSM_EOF
 
@@ -73511,7 +73924,7 @@ object EsStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 ejercicio" else "$it ejercicios" }
     override val dlNone = "Ningún ejercicio con estos filtros."
     override val dlOriginal = "Textos y dibujos escritos para la app. Por ahora en italiano."
-    override val dlLegend = "Línea continua: la bola (con número, el orden). Discontinua: quien se mueve. Naranja: quien lanza; triángulos: conos."
+    override val dlLegend = "La pista vista desde detrás de A. La bola vuela en arco, un color por golpe en orden (1 rojo, 2 naranja, 3 amarillo, 4 azul); óvalos numerados: dónde debe caer. Discontinua: quien se mueve; recuadro discontinuo: dónde volver. En naranja con el cesto: quien lanza; triángulos: conos."
     override val dlGoal = "Objetivo"
     override val dlHow = "Cómo se hace"
     override val dlEasier = "Más fácil"
@@ -73521,6 +73934,8 @@ object EsStrings : Strings {
 
     override val dlUse = "Usar este ejercicio"
     override val dlReady: (String) -> String = { "Listo en Entrenar › Un golpe › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Golpe $a" else "Golpes $a-$b" }
 }
 TSM_EOF
 
@@ -76489,7 +76904,7 @@ object FrStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 exercice" else "$it exercices" }
     override val dlNone = "Aucun exercice avec ces filtres."
     override val dlOriginal = "Textes et dessins écrits pour l'appli. En italien pour l'instant."
-    override val dlLegend = "Ligne pleine : la balle (avec un numéro, l'ordre). Pointillés : qui se déplace. Orange : qui lance les balles ; triangles : plots."
+    override val dlLegend = "Le court vu de derrière A. La balle vole en arc, une couleur par coup dans l'ordre (1 rouge, 2 orange, 3 jaune, 4 bleu) ; ovales numérotés : où elle doit tomber. Pointillés : qui se déplace ; cadre en pointillés : où se replacer. En orange avec le panier : qui lance les balles ; triangles : plots."
     override val dlGoal = "Objectif"
     override val dlHow = "Comment faire"
     override val dlEasier = "Plus facile"
@@ -76499,6 +76914,8 @@ object FrStrings : Strings {
 
     override val dlUse = "Utiliser cet exercice"
     override val dlReady: (String) -> String = { "Prêt dans S'entraîner › Un seul coup › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Coup $a" else "Coups $a-$b" }
 }
 TSM_EOF
 
@@ -79468,7 +79885,7 @@ object PtStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 exercício" else "$it exercícios" }
     override val dlNone = "Nenhum exercício com estes filtros."
     override val dlOriginal = "Textos e desenhos feitos para o app. Por enquanto em italiano."
-    override val dlLegend = "Linha cheia: a bola (com número, a ordem). Tracejada: quem se move. Laranja: quem lança as bolas; triângulos: cones."
+    override val dlLegend = "A quadra vista de trás de A. A bola voa em arco, uma cor por golpe na ordem (1 vermelho, 2 laranja, 3 amarelo, 4 azul); ovais numerados: onde deve cair. Tracejada: quem se move; quadro tracejado: para onde voltar. Em laranja com o cesto: quem lança; triângulos: cones."
     override val dlGoal = "Objetivo"
     override val dlHow = "Como fazer"
     override val dlEasier = "Mais fácil"
@@ -79478,6 +79895,8 @@ object PtStrings : Strings {
 
     override val dlUse = "Usar este exercício"
     override val dlReady: (String) -> String = { "Pronto em Treinar › Um golpe › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Golpe $a" else "Golpes $a-$b" }
 }
 TSM_EOF
 
@@ -83410,7 +83829,17 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
         ) {
             Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             Text(meta(s, item), color = area, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            CourtDiagram(item.diagram, Modifier.fillMaxWidth(if (item.diagram.half) 0.85f else 0.7f).align(Alignment.CenterHorizontally).clip(RoundedCornerShape(12.dp)))
+            // Gli esercizi con tanti colpi in più riquadri, uno sotto l'altro: colpi 1-2, poi 3-4.
+            val d = item.diagram
+            for (n in 1..d.frames) {
+                val f = d.frame(n)
+                // "Passo 1 di 2 · Colpi 1-2".
+                if (d.frames > 1) Text(
+                    listOfNotNull(s.wzStep(n, d.frames), f.orders.takeIf { it.isNotEmpty() }?.let { o -> s.dlShots(o.first(), o.last()) }).joinToString(" · "),
+                    color = area, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp),
+                )
+                CourtDiagram(f, Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)), perspective = true)
+            }
             Text(s.dlLegend, color = TsmColors.TextDim, fontSize = 12.sp)
             Section(s.dlGoal) { Text(t.goal, color = TsmColors.TextMain, fontSize = 14.sp) }
             Section(s.dlHow) {
@@ -94387,6 +94816,8 @@ class CameraActivity : ComponentActivity() {
 
     /** Esercizio guidato in corso (scelto sotto Inizia per questo colpo); null = allenamento libero. */
     private val drill = MutableStateFlow<com.tennis.scoremanager.data.Drill?>(null)
+    /** La voce dell'esercizio della raccolta (frase chiave, come fare ogni passo, consigli); null per gli altri esercizi. */
+    private var coach: com.tennis.scoremanager.data.DrillLibrary.Coach? = null
 
     /** Mette le impostazioni del passo in corso (quelle che il passo dice; le altre restano). */
     private fun applyDrillStep() {
@@ -94406,7 +94837,22 @@ class CameraActivity : ComponentActivity() {
         if (!p.stepJustEnded) return null
         if (p.finished) return s.drillSayDone
         applyDrillStep()
-        return s.drillSayNext(s.drillStepOf(p.step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[p.step]))
+        return stepSay(d, p.step)
+    }
+
+    /** "Ora passo 2 di 2: 10 · Rovescio · Incrociato. Spalla girata e polso fermo." (la seconda frase solo dalla raccolta). */
+    private fun stepSay(d: com.tennis.scoremanager.data.Drill, step: Int): String =
+        s.drillSayNext(s.drillStepOf(step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[step])) + (coach?.step(step)?.let { ". $it" } ?: "")
+
+    /**
+     * Gli esercizi presi dalla raccolta parlano anche di come si fa: i loro testi ci sono solo in italiano, quindi
+     * questo vale con l'app in italiano (nelle altre lingue restano gli annunci di sempre).
+     */
+    private fun coachFor(d: com.tennis.scoremanager.data.Drill?): com.tennis.scoremanager.data.DrillLibrary.Coach? {
+        if (d == null || controller.options.value.lang != com.tennis.scoremanager.model.Lang.IT) return null
+        val id = com.tennis.scoremanager.data.DrillLibrary.itemIdOf(d.id) ?: return null
+        val text = runCatching { com.tennis.scoremanager.data.DrillLibrary.texts(assets.open("drills/it.json").bufferedReader().use { it.readText() })[id] }.getOrNull()
+        return text?.let { com.tennis.scoremanager.data.DrillLibrary.Coach(it) }
     }
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
     private val servePending = MutableStateFlow(false)
@@ -94595,6 +95041,11 @@ class CameraActivity : ComponentActivity() {
             lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,
         )
         applyDrillStep()
+        // All'inizio dell'esercizio la voce dice cosa si fa (dalla raccolta: nome, obiettivo, frase chiave) e il primo passo.
+        coach = coachFor(drill.value)
+        drill.value?.let { d ->
+            if (serveSession.value.serves.isEmpty()) say(listOfNotNull(coach?.intro(), stepSay(d, 0)).joinToString(" "))
+        }
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (!lessonMode && controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -94740,7 +95191,9 @@ class CameraActivity : ComponentActivity() {
         val n = ServeTraining.count(serveSession.value.serves)
         // Con un esercizio, a fine passo la voce dice anche il prossimo (e le impostazioni cambiano da sole).
         val next = drillAdvance()
-        say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + (next?.let { ". $it" } ?: ""))
+        // Senza cambio di passo, dopo tre fuori di fila un consiglio e dopo cinque dentro una proposta (esercizi della raccolta).
+        val tip = if (next == null) coach?.shot(inPlay) else null
+        say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + listOfNotNull(next, tip).joinToString("") { ". $it" })
         if (next != null) bandShow(band, s.drillBandNext, next.take(20))
         else bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
         cutClip(at, clip)
@@ -94777,6 +95230,7 @@ class CameraActivity : ComponentActivity() {
         lastTrainActivity = System.currentTimeMillis()
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
+        coach?.undo()
         // Tolto un colpo, l'esercizio torna al passo di prima se serve.
         applyDrillStep()
         val dir = clipsDirOf(last)
@@ -115298,6 +115752,40 @@ class DrillLibraryTest {
         assertEquals(DrillLibrary.ITEMS.size, DrillLibrary.filter(null, null, null).size)
         assertTrue(DrillLibrary.filter(DrillLibrary.Topic.SERVE, null, null).all { it.topic == DrillLibrary.Topic.SERVE })
         assertTrue(DrillLibrary.filter(null, DrillLibrary.Level.BEGINNER, 2).all { it.level == DrillLibrary.Level.BEGINNER && it.players == 2 })
+    }
+
+    @Test
+    fun guidedDrillsHaveTheirVoice() {
+        for (item in DrillLibrary.ITEMS.filter { it.guided != null }) {
+            val t = texts.getValue(item.id)
+            assertTrue(item.id, t.cue.isNotBlank() && t.missTip.isNotBlank() && t.streakTip.isNotBlank())
+            assertEquals("${item.id}: una frase per passo", item.guided!!.second.size, t.stepCues.size)
+        }
+    }
+
+    @Test
+    fun coachSpeaksAtTheRightMoments() {
+        assertEquals("volley_feed", DrillLibrary.itemIdOf("lib-volley_feed-1764190000000"))
+        assertEquals(null, DrillLibrary.itemIdOf("t-serve-t-wide"))
+        val t = texts.getValue("volley_feed")
+        val c = DrillLibrary.Coach(t)
+        assertTrue(c.intro().startsWith(t.name))
+        assertEquals(t.stepCues[1], c.step(1))
+        // Due fuori: niente; il terzo: il consiglio; poi si riparte da zero.
+        assertEquals(null, c.shot(false)); assertEquals(null, c.shot(false))
+        assertEquals(t.missTip, c.shot(false))
+        assertEquals(null, c.shot(false))
+        // Cinque dentro di fila: la proposta, una volta sola nel passo.
+        repeat(4) { assertEquals(null, c.shot(true)) }
+        assertEquals(t.streakTip, c.shot(true))
+        repeat(5) { assertEquals(null, c.shot(true)) }
+        // Nuovo passo: la proposta torna possibile.
+        c.step(0)
+        repeat(4) { c.shot(true) }
+        assertEquals(t.streakTip, c.shot(true))
+        // Un colpo tolto azzera le serie.
+        c.shot(false); c.shot(false); c.undo()
+        assertEquals(null, c.shot(false))
     }
 }
 TSM_EOF

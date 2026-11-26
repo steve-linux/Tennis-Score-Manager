@@ -2958,7 +2958,7 @@ object DeStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 Übung" else "$it Übungen" }
     override val dlNone = "Keine Übungen mit diesen Filtern."
     override val dlOriginal = "Texte und Zeichnungen für die App geschrieben. Vorerst auf Italienisch."
-    override val dlLegend = "Durchgezogen: der Ball (mit Nummer, die Reihenfolge). Gestrichelt: wer läuft. Orange: wer zuspielt; Dreiecke: Hütchen."
+    override val dlLegend = "Der Platz von hinter A gesehen. Der Ball fliegt im Bogen, eine Farbe pro Schlag in der Reihenfolge (1 rot, 2 orange, 3 gelb, 4 blau); nummerierte Ovale: wo er landen soll. Gestrichelt: wer läuft; gestricheltes Feld: wohin zurück. Orange mit Korb: wer zuspielt; Dreiecke: Hütchen."
     override val dlGoal = "Ziel"
     override val dlHow = "So geht es"
     override val dlEasier = "Leichter"
@@ -2968,4 +2968,6 @@ object DeStrings : Strings {
 
     override val dlUse = "Diese Übung verwenden"
     override val dlReady: (String) -> String = { "Bereit unter Trainieren › Ein Schlag › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Schlag $a" else "Schläge $a-$b" }
 }

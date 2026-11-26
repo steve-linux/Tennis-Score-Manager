@@ -2961,7 +2961,7 @@ object FrStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 exercice" else "$it exercices" }
     override val dlNone = "Aucun exercice avec ces filtres."
     override val dlOriginal = "Textes et dessins écrits pour l'appli. En italien pour l'instant."
-    override val dlLegend = "Ligne pleine : la balle (avec un numéro, l'ordre). Pointillés : qui se déplace. Orange : qui lance les balles ; triangles : plots."
+    override val dlLegend = "Le court vu de derrière A. La balle vole en arc, une couleur par coup dans l'ordre (1 rouge, 2 orange, 3 jaune, 4 bleu) ; ovales numérotés : où elle doit tomber. Pointillés : qui se déplace ; cadre en pointillés : où se replacer. En orange avec le panier : qui lance les balles ; triangles : plots."
     override val dlGoal = "Objectif"
     override val dlHow = "Comment faire"
     override val dlEasier = "Plus facile"
@@ -2971,4 +2971,6 @@ object FrStrings : Strings {
 
     override val dlUse = "Utiliser cet exercice"
     override val dlReady: (String) -> String = { "Prêt dans S'entraîner › Un seul coup › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Coup $a" else "Coups $a-$b" }
 }

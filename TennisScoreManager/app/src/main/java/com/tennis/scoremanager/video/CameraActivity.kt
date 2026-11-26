@@ -242,6 +242,8 @@ class CameraActivity : ComponentActivity() {
 
     /** Esercizio guidato in corso (scelto sotto Inizia per questo colpo); null = allenamento libero. */
     private val drill = MutableStateFlow<com.tennis.scoremanager.data.Drill?>(null)
+    /** La voce dell'esercizio della raccolta (frase chiave, come fare ogni passo, consigli); null per gli altri esercizi. */
+    private var coach: com.tennis.scoremanager.data.DrillLibrary.Coach? = null
 
     /** Mette le impostazioni del passo in corso (quelle che il passo dice; le altre restano). */
     private fun applyDrillStep() {
@@ -261,7 +263,22 @@ class CameraActivity : ComponentActivity() {
         if (!p.stepJustEnded) return null
         if (p.finished) return s.drillSayDone
         applyDrillStep()
-        return s.drillSayNext(s.drillStepOf(p.step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[p.step]))
+        return stepSay(d, p.step)
+    }
+
+    /** "Ora passo 2 di 2: 10 · Rovescio · Incrociato. Spalla girata e polso fermo." (la seconda frase solo dalla raccolta). */
+    private fun stepSay(d: com.tennis.scoremanager.data.Drill, step: Int): String =
+        s.drillSayNext(s.drillStepOf(step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[step])) + (coach?.step(step)?.let { ". $it" } ?: "")
+
+    /**
+     * Gli esercizi presi dalla raccolta parlano anche di come si fa: i loro testi ci sono solo in italiano, quindi
+     * questo vale con l'app in italiano (nelle altre lingue restano gli annunci di sempre).
+     */
+    private fun coachFor(d: com.tennis.scoremanager.data.Drill?): com.tennis.scoremanager.data.DrillLibrary.Coach? {
+        if (d == null || controller.options.value.lang != com.tennis.scoremanager.model.Lang.IT) return null
+        val id = com.tennis.scoremanager.data.DrillLibrary.itemIdOf(d.id) ?: return null
+        val text = runCatching { com.tennis.scoremanager.data.DrillLibrary.texts(assets.open("drills/it.json").bufferedReader().use { it.readText() })[id] }.getOrNull()
+        return text?.let { com.tennis.scoremanager.data.DrillLibrary.Coach(it) }
     }
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
     private val servePending = MutableStateFlow(false)
@@ -450,6 +467,11 @@ class CameraActivity : ComponentActivity() {
             lesson = if (lessonMode) serveSession.value.id else null, coachLesson = agenda?.id,
         )
         applyDrillStep()
+        // All'inizio dell'esercizio la voce dice cosa si fa (dalla raccolta: nome, obiettivo, frase chiave) e il primo passo.
+        coach = coachFor(drill.value)
+        drill.value?.let { d ->
+            if (serveSession.value.serves.isEmpty()) say(listOfNotNull(coach?.intro(), stepSay(d, 0)).joinToString(" "))
+        }
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (!lessonMode && controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -595,7 +617,9 @@ class CameraActivity : ComponentActivity() {
         val n = ServeTraining.count(serveSession.value.serves)
         // Con un esercizio, a fine passo la voce dice anche il prossimo (e le impostazioni cambiano da sole).
         val next = drillAdvance()
-        say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + (next?.let { ". $it" } ?: ""))
+        // Senza cambio di passo, dopo tre fuori di fila un consiglio e dopo cinque dentro una proposta (esercizi della raccolta).
+        val tip = if (next == null) coach?.shot(inPlay) else null
+        say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + listOfNotNull(next, tip).joinToString("") { ". $it" })
         if (next != null) bandShow(band, s.drillBandNext, next.take(20))
         else bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
         cutClip(at, clip)
@@ -632,6 +656,7 @@ class CameraActivity : ComponentActivity() {
         lastTrainActivity = System.currentTimeMillis()
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
+        coach?.undo()
         // Tolto un colpo, l'esercizio torna al passo di prima se serve.
         applyDrillStep()
         val dir = clipsDirOf(last)

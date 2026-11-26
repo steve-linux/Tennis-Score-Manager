@@ -59,4 +59,38 @@ class DrillLibraryTest {
         assertTrue(DrillLibrary.filter(DrillLibrary.Topic.SERVE, null, null).all { it.topic == DrillLibrary.Topic.SERVE })
         assertTrue(DrillLibrary.filter(null, DrillLibrary.Level.BEGINNER, 2).all { it.level == DrillLibrary.Level.BEGINNER && it.players == 2 })
     }
+
+    @Test
+    fun guidedDrillsHaveTheirVoice() {
+        for (item in DrillLibrary.ITEMS.filter { it.guided != null }) {
+            val t = texts.getValue(item.id)
+            assertTrue(item.id, t.cue.isNotBlank() && t.missTip.isNotBlank() && t.streakTip.isNotBlank())
+            assertEquals("${item.id}: una frase per passo", item.guided!!.second.size, t.stepCues.size)
+        }
+    }
+
+    @Test
+    fun coachSpeaksAtTheRightMoments() {
+        assertEquals("volley_feed", DrillLibrary.itemIdOf("lib-volley_feed-1764190000000"))
+        assertEquals(null, DrillLibrary.itemIdOf("t-serve-t-wide"))
+        val t = texts.getValue("volley_feed")
+        val c = DrillLibrary.Coach(t)
+        assertTrue(c.intro().startsWith(t.name))
+        assertEquals(t.stepCues[1], c.step(1))
+        // Due fuori: niente; il terzo: il consiglio; poi si riparte da zero.
+        assertEquals(null, c.shot(false)); assertEquals(null, c.shot(false))
+        assertEquals(t.missTip, c.shot(false))
+        assertEquals(null, c.shot(false))
+        // Cinque dentro di fila: la proposta, una volta sola nel passo.
+        repeat(4) { assertEquals(null, c.shot(true)) }
+        assertEquals(t.streakTip, c.shot(true))
+        repeat(5) { assertEquals(null, c.shot(true)) }
+        // Nuovo passo: la proposta torna possibile.
+        c.step(0)
+        repeat(4) { c.shot(true) }
+        assertEquals(t.streakTip, c.shot(true))
+        // Un colpo tolto azzera le serie.
+        c.shot(false); c.shot(false); c.undo()
+        assertEquals(null, c.shot(false))
+    }
 }

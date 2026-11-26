@@ -3036,6 +3036,7 @@ interface Strings {
     val dlAdd: String
     val dlUse: String
     val dlReady: (String) -> String
+    val dlShots: (Int, Int) -> String
 }
 
 object ItStrings : Strings {
@@ -5986,7 +5987,7 @@ object ItStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 esercizio" else "$it esercizi" }
     override val dlNone = "Nessun esercizio con questi filtri."
     override val dlOriginal = "Testi e disegni scritti per l'app. Per ora in italiano."
-    override val dlLegend = "Linea piena: la palla (col numero, l'ordine). Tratteggio: chi si sposta. Arancio: chi lancia le palle; triangoli: coni."
+    override val dlLegend = "Il campo visto da dietro A. La palla vola ad arco, un colore per ogni colpo in ordine (1 rosso, 2 arancio, 3 giallo, 4 azzurro); gli ovali col numero: dove deve arrivare. Tratteggio: chi si sposta; riquadro tratteggiato: dove tornare. In arancio col cesto: chi lancia le palle; triangoli: coni."
     override val dlGoal = "Obiettivo"
     override val dlHow = "Come si fa"
     override val dlEasier = "Più facile"
@@ -5996,6 +5997,8 @@ object ItStrings : Strings {
 
     override val dlUse = "Usa questo esercizio"
     override val dlReady: (String) -> String = { "Pronto in Allenati › Un colpo › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Colpo $a" else "Colpi $a-$b" }
 }
 
 object EnStrings : Strings {
@@ -8947,7 +8950,7 @@ object EnStrings : Strings {
     override val dlCount: (Int) -> String = { if (it == 1) "1 drill" else "$it drills" }
     override val dlNone = "No drills with these filters."
     override val dlOriginal = "Texts and drawings written for the app. In Italian for now."
-    override val dlLegend = "Solid line: the ball (with a number, the order). Dashed: who moves. Orange: who feeds the balls; triangles: cones."
+    override val dlLegend = "The court seen from behind A. The ball flies in an arc, one colour per shot in order (1 red, 2 orange, 3 yellow, 4 blue); numbered ovals: where it should land. Dashed: who moves; dashed box: where to recover. Orange with a basket: who feeds; triangles: cones."
     override val dlGoal = "Goal"
     override val dlHow = "How to do it"
     override val dlEasier = "Easier"
@@ -8957,6 +8960,8 @@ object EnStrings : Strings {
 
     override val dlUse = "Use this drill"
     override val dlReady: (String) -> String = { "Ready in Practice › One stroke › $it" }
+
+    override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Shot $a" else "Shots $a-$b" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
