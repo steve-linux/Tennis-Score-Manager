@@ -2942,4 +2942,9 @@ object PtStrings : Strings {
 
     override val reportWithNotes = "Com as anotações do treinador"
     override val reportWithNotesHint = "Anotação geral e as do período, por tema. Desligue se forem só para você."
+
+    override val trModeStroke = "Um golpe"
+    override val trModeStrokeHint = "Escolha o golpe e marque cada um dentro ou fora: porcentagem e progresso."
+    override val trModeLesson = "A aula inteira"
+    override val trModeLessonHint = "Você não aperta nada: cada golpe vira um clipe, separado sozinho por tipo."
 }

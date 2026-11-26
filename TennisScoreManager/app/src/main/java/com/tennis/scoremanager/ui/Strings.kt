@@ -3009,6 +3009,10 @@ interface Strings {
     val cnAskPrompt: (String, String) -> String
     val reportWithNotes: String
     val reportWithNotesHint: String
+    val trModeStroke: String
+    val trModeStrokeHint: String
+    val trModeLesson: String
+    val trModeLessonHint: String
 }
 
 object ItStrings : Strings {
@@ -5939,6 +5943,11 @@ object ItStrings : Strings {
 
     override val reportWithNotes = "Con le note dell'allenatore"
     override val reportWithNotesHint = "Nota generale e note del periodo, divise per argomento. Spegnilo se sono solo per te."
+
+    override val trModeStroke = "Un colpo"
+    override val trModeStrokeHint = "Scegli il colpo e dopo ognuno segni dentro o fuori: percentuale e progressi."
+    override val trModeLesson = "Tutta la lezione"
+    override val trModeLessonHint = "Non premi niente: ogni colpo diventa una clip, divisa da sola per tipo."
 }
 
 object EnStrings : Strings {
@@ -8870,6 +8879,11 @@ object EnStrings : Strings {
 
     override val reportWithNotes = "With the coach's notes"
     override val reportWithNotesHint = "General note and the notes of the period, split by topic. Turn it off if they are just for you."
+
+    override val trModeStroke = "One stroke"
+    override val trModeStrokeHint = "Pick the stroke and mark each one in or out: percentage and progress."
+    override val trModeLesson = "The whole lesson"
+    override val trModeLessonHint = "You press nothing: every stroke becomes a clip, sorted by type by itself."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

@@ -194,3 +194,20 @@ fun ExpandRow(icon: ImageVector, title: String, summary: String?, open: Boolean,
         Icon(if (open) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, null, tint = TsmColors.TextDim)
     }
 }
+
+/**
+ * Una di due scelte affiancate e uguali (per esempio "Un colpo" o "Tutta la lezione"): icona, titolo e una riga che dice
+ * cosa fa; quella scelta [on] ha il colore dell'area.
+ */
+@Composable
+fun ChoiceTile(icon: ImageVector, title: String, hint: String, on: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val area = LocalArea.current
+    Column(
+        modifier.fillMaxHeight().clip(RoundedCornerShape(16.dp)).background(if (on) area else TsmColors.SurfaceHigh).clickable(onClick = onClick).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(icon, null, tint = if (on) TsmColors.OnArea else area, modifier = Modifier.size(26.dp))
+        Text(title, color = if (on) TsmColors.OnArea else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp, lineHeight = 18.sp)
+        Text(hint, color = if (on) TsmColors.OnArea else TsmColors.TextDim, fontSize = 12.sp, lineHeight = 15.sp)
+    }
+}

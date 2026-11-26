@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -163,6 +164,19 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             // Prima si sceglie chi si allena: il resto (colpo, esercizio, avvio, sessioni) è suo.
             if (trainee == null) return@SectionCard
         }
+        // Prima cosa si vuole fare: un colpo (con dentro/fuori e progressi) o tutta la lezione (smistata da sola).
+        var lesson by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        TrainModeChoice(lesson) { lesson = it }
+        if (lesson) {
+            Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            BigButton(s.lessonRecord, Icons.Filled.School, {
+                context.startActivity(
+                    Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
+                )
+            }, Modifier.fillMaxWidth())
+            GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+            return@SectionCard
+        }
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
@@ -182,13 +196,6 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             var fps60 by remember { mutableStateOf(c.storage.trainFps60) }
             SwitchRow(Icons.Filled.Speed, s.fps60Title, s.fps60Hint, fps60) { fps60 = it; c.storage.trainFps60 = it }
         }
-        // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
-        GhostButton(s.lessonRecord, Icons.Filled.School, {
-            context.startActivity(
-                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
-            )
-        }, Modifier.fillMaxWidth())
-        Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
         if (mine.isNotEmpty()) {
             Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
             StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
@@ -201,6 +208,16 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     }
     if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/** Le due cose che fa la telecamera dell'allenamento: un colpo con dentro/fuori, o tutta la lezione da sola. */
+@Composable
+fun TrainModeChoice(lesson: Boolean, onPick: (Boolean) -> Unit) {
+    val s = LocalStrings.current
+    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        ChoiceTile(Icons.Filled.SportsTennis, s.trModeStroke, s.trModeStrokeHint, !lesson, Modifier.weight(1f)) { onPick(false) }
+        ChoiceTile(Icons.Filled.School, s.trModeLesson, s.trModeLessonHint, lesson, Modifier.weight(1f)) { onPick(true) }
+    }
 }
 
 /**
@@ -229,17 +246,22 @@ fun TrainStrokeDialog(c: MatchController, student: com.tennis.scoremanager.data.
         title = { Text("${s.studentTrainNow} · ${student.name}") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                val strokes = TrainedStroke.entries
-                Segmented(
-                    strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == student.id }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
-                    strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
-                )
-                DrillRow(c, stroke)
-                BigButton(s.serveStart, Icons.Filled.Videocam, { camera(lesson = false) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                var lesson by rememberSaveable { mutableStateOf(false) }
+                TrainModeChoice(lesson) { lesson = it }
+                if (lesson) {
+                    Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                    BigButton(s.lessonRecord, Icons.Filled.School, { camera(lesson = true) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                } else {
+                    Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    val strokes = TrainedStroke.entries
+                    Segmented(
+                        strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == student.id }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+                        strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
+                    )
+                    DrillRow(c, stroke)
+                    BigButton(s.serveStart, Icons.Filled.Videocam, { camera(lesson = false) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                }
                 GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
-                GhostButton(s.lessonRecord, Icons.Filled.School, { camera(lesson = true) }, Modifier.fillMaxWidth())
-                Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
             }
         },
         confirmButton = {},

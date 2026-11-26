@@ -2939,4 +2939,9 @@ object EsStrings : Strings {
 
     override val reportWithNotes = "Con las notas del entrenador"
     override val reportWithNotesHint = "Nota general y notas del periodo, por tema. Desactívalo si son solo para ti."
+
+    override val trModeStroke = "Un golpe"
+    override val trModeStrokeHint = "Elige el golpe y marca cada uno dentro o fuera: porcentaje y progresos."
+    override val trModeLesson = "Toda la clase"
+    override val trModeLessonHint = "No pulsas nada: cada golpe se convierte en un clip, ordenado solo por tipo."
 }

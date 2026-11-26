@@ -2941,4 +2941,9 @@ object FrStrings : Strings {
 
     override val reportWithNotes = "Avec les notes de l'entraîneur"
     override val reportWithNotesHint = "Note générale et notes de la période, par sujet. Désactivez-le si elles ne sont que pour vous."
+
+    override val trModeStroke = "Un seul coup"
+    override val trModeStrokeHint = "Choisissez le coup et notez chacun dedans ou dehors : pourcentage et progrès."
+    override val trModeLesson = "Toute la leçon"
+    override val trModeLessonHint = "Vous n'appuyez sur rien : chaque coup devient un clip, classé tout seul par type."
 }

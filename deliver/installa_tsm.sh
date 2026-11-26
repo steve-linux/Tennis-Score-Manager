@@ -18332,7 +18332,7 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
 
 Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erkennt den Aufschlag, und mit den Tasten sagt man, wie er war. Ein Telefon reicht, ohne Schiedsrichter.
 
-1. **Trainieren** › **Schlagtraining**, den Schlag wählen (**Aufschlag**, **Vorhand**, **Rückhand**, **Volley**) › **Starten** (das Armband muss wie in 6.1 verbunden sein; sonst mit den Tasten auf dem Bildschirm markieren).
+1. **Trainieren** › **Schlagtraining** › **Ein Schlag** (die erste der zwei Wahlen nebeneinander), den Schlag wählen (**Aufschlag**, **Vorhand**, **Rückhand**, **Volley**) › **Starten** (das Armband muss wie in 6.1 verbunden sein; sonst mit den Tasten auf dem Bildschirm markieren).
 2. **Wo das Telefon hinkommt** (öffnet sich beim ersten Mal von selbst, dann über *Wo kommt das Telefon hin?*):
    - **neben dem Aufschläger**, auf der Seite des Schlagarms (rechts bei Rechtshändern), **3-4 m** entfernt, auf Höhe der Grundlinie oder einen halben Meter dahinter;
    - Objektiv **1-1,2 m** über dem Boden, Telefon **quer** und gerade, auf den Aufschläger gerichtet;
@@ -18354,7 +18354,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - Statt Seite, erster/zweiter und Ziel wählt man die gewünschte **Richtung** (**Cross**, **Mitte**, **Longline**) und beim Volley, ob **Vorhand** oder **Rückhand**; die Übersicht zählt sie getrennt.
 - **Bewegungsanalyse**: Die drei Momente sind **Ausholen** (wo das Handgelenk am Ende der Ausholbewegung stehen bleibt), **Treffpunkt** (Handgelenk am schnellsten; dort liest die App ein Bild alle 33 ms) und **Ausschwung** (Handgelenk nach dem Treffpunkt am höchsten; beim Volley, wo das Handgelenk stehen bleibt). Sind mehrere Schläge im Fenster, zählt der vom Armband erkannte; von MoveNet vertauschte Handgelenke (passiert von der Seite) werden von selbst richtiggestellt. Von **der Seite** filmen: von vorn geht das Ausholen in die Tiefe und ist nicht zu sehen. Die Messwerte (*—*, wenn Ellbogen oder Beine nicht zu sehen sind): stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts, wie weit **vor dem Körper** getroffen wird, **Weite des Ausholens**, Höhe des Ausschwungs (alle im Verhältnis zur Körpergröße) und die Zeit vom Ausholen zum Treffpunkt. Das Video mit Skelett hat die Tasten **Ausholen**, **Treffpunkt** und **Ausschwung**.
 
-**Stunde aufnehmen** (unter Starten): das Handy fest **hinter der Grundlinie**, hinter dem Spieler, und das Armband an seinem Handgelenk mit Schlagerkennung. Nichts zu drücken: **jeder erkannte Schlag** wird ein Clip und landet von selbst bei **Vorhand, Rückhand, Aufschlag und Volley** (erkennt das Armband ihn nicht, kommt er zur Vorhand). Direkt nach einem Schlag markieren KEY1 oder KEY2 ihn als **im Feld** oder **aus** (freiwillig); Schläge ohne Markierung zählen nicht in den Prozenten. Läuft im Kalender des Trainers gerade eine Stunde, gehört die Aufnahme zu ihr (und zum Schüler, wenn es nur einer ist). Am Ende hat jeder Schlag seine Einheit, markiert mit **Trainerstunde**, im Ordner **Schlagtraining/Trainerstunden**.
+**Stunde aufnehmen** (die zweite Wahl, **Die ganze Stunde**): das Handy fest **hinter der Grundlinie**, hinter dem Spieler, und das Armband an seinem Handgelenk mit Schlagerkennung. Nichts zu drücken: **jeder erkannte Schlag** wird ein Clip und landet von selbst bei **Vorhand, Rückhand, Aufschlag und Volley** (erkennt das Armband ihn nicht, kommt er zur Vorhand). Direkt nach einem Schlag markieren KEY1 oder KEY2 ihn als **im Feld** oder **aus** (freiwillig); Schläge ohne Markierung zählen nicht in den Prozenten. Läuft im Kalender des Trainers gerade eine Stunde, gehört die Aufnahme zu ihr (und zum Schüler, wenn es nur einer ist). Am Ende hat jeder Schlag seine Einheit, markiert mit **Trainerstunde**, im Ordner **Schlagtraining/Trainerstunden**.
 - **Der Schlag aus dem Video**: Sieht der Schlag in der Bewegungsanalyse laut Video nach einem anderen aus (z. B. *Laut Video wohl: Rückhand*), legt **Verschieben zu: Rückhand** ihn zum richtigen Schlag und die Analyse wird neu gemacht. Die Hinweise sind einfach (beide Arme über dem Kopf beim Aufschlag, wenig Weg des Handgelenks beim Volley, Hände nah beieinander bei der Rückhand): Verschieben wird nur angeboten, wenn sie klar sind oder das Armband ihn nicht erkannt hatte.
 - **Kommentieren** (der Stift in der Zeitlupe der Clips): Das Standbild, mit Skelett wenn eingeschaltet, lässt sich mit **Pfeilen**, **Kreisen** und **Freihand**-Strichen in drei Farben markieren, dazu eine **Sprachnotiz** (beim ersten Mal fragt die App nach dem Mikrofon). **Speichern** legt sie zum Clip, **Teilen** verschickt sie (Bild und Stimme). In der Analyse, beim Öffnen des Schlags, lassen sich die **Notizen zum Clip** ansehen, anhören, teilen oder löschen; sie bleiben auch mit *Nur Videos*.
 - **Kinetische Kette (Test)**: Beim Öffnen eines analysierten Schlags, wann Beine, Hüfte, Schultern, Ellbogen und Handgelenk ihre Höchstgeschwindigkeit bezogen auf den Treffpunkt erreichen und ob die Reihenfolge von den Beinen zum Handgelenk geht. Aus einem seitlichen Video mit wenigen Bildern pro Sekunde ist das eine grobe Schätzung: ein Bild Unterschied wird toleriert.
@@ -18971,7 +18971,7 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
 
 A phone on a tripod films the server; the wristband on the wrist recognises the serve and the buttons say how it went. One phone is enough, no umpire.
 
-1. **Train** › **Stroke practice**, choose the stroke (**Serve**, **Forehand**, **Backhand**, **Volley**) › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
+1. **Train** › **Stroke practice** › **One stroke** (the first of the two side-by-side choices), choose the stroke (**Serve**, **Forehand**, **Backhand**, **Volley**) › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
 2. **Where to put the phone** (it opens by itself the first time, then from the *Where to put the phone?* button):
    - **beside the server**, on the hitting-arm side (right for a right-hander), **3-4 m** away, level with the baseline or half a metre behind;
    - lens **1-1.2 m** above the ground, phone **in landscape** and level, pointed at the server;
@@ -18993,7 +18993,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - Instead of side, first/second and target you choose the intended **direction** (**cross-court**, **middle**, **down the line**) and, for the volley, whether it is a **forehand** or **backhand** volley; the summary counts them separately.
 - **Movement analysis**: the three moments are **preparation** (where the wrist stops at the end of the take-back), **contact** (wrist fastest; around it the app reads one frame every 33 ms) and **finish** (wrist highest after contact; for the volley, where the wrist stops). If there are several shots in the window, the one recognised by the wristband counts; wrists swapped by MoveNet (it happens from the side) are put right by themselves. Film **from the side**: from the front the take-back goes in depth and can't be seen. The measurements (*—* if the elbow or legs can't be seen): deepest knee bend, elbow at contact, contact height, how far **in front of the body** you hit, **preparation size**, finish height (all relative to body height) and the time from preparation to contact. The skeleton video has **Preparation**, **Contact** and **Finish** buttons.
 
-**Record the lesson** (under Start): the phone fixed **behind the baseline**, behind the player, and the band on their wrist with shot recognition. Nothing to press: **every recognized shot** becomes a clip and is filed on its own among **forehands, backhands, serves and volleys** (if the band does not recognize it, it goes with the forehands). Right after a shot, KEY1 or KEY2 marks it **in** or **out** (optional); shots without in/out do not count in the percentages. If the Coach agenda has a lesson going on, the recording belongs to it (and to the student, if there is only one). At the end each stroke has its own session, marked **Lesson**, in the **Stroke practice/Lessons** folder.
+**Record the lesson** (the second choice, **The whole lesson**): the phone fixed **behind the baseline**, behind the player, and the band on their wrist with shot recognition. Nothing to press: **every recognized shot** becomes a clip and is filed on its own among **forehands, backhands, serves and volleys** (if the band does not recognize it, it goes with the forehands). Right after a shot, KEY1 or KEY2 marks it **in** or **out** (optional); shots without in/out do not count in the percentages. If the Coach agenda has a lesson going on, the recording belongs to it (and to the student, if there is only one). At the end each stroke has its own session, marked **Lesson**, in the **Stroke practice/Lessons** folder.
 - **The stroke from the video**: in the movement analysis, when from the video the shot looks like another one (e.g. *From the video it looks like: Backhand*), **Move to: Backhand** puts it under the right stroke and the analysis is redone. The clues are simple (both arms above the head in the serve, little wrist travel in the volley, hands close together in the backhand): moving is only offered when they are clear, or when the band had not recognized it.
 - **Annotate** (the pencil in the clip replay): the still frame, with the skeleton if it is on, can be marked with **arrows**, **circles** and **freehand** strokes in three colours, plus a **voice note** (the first time the app asks for the microphone). **Save** keeps it with the clip, **Share** sends it (picture and voice). In the analysis, opening the shot, the **Notes on the clip** can be viewed, played, shared or deleted; they stay even with *Videos only*.
 - **Kinetic chain (trial)**: opening an analysed shot, when legs, hips, shoulders, elbow and wrist reach their top speed relative to contact, and whether the order goes from the legs to the wrist. From a side video with few frames per second it is a rough estimate: one frame of difference is tolerated.
@@ -19609,7 +19609,7 @@ Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marc
 
 Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoce el saque y con los botones se dice cómo ha ido. Basta un teléfono, sin árbitro.
 
-1. **Entrenar** › **Entrenamiento de golpes**, elige el golpe (**Saque**, **Derecha**, **Revés**, **Volea**) › **Empezar** (la pulsera debe estar conectada como en 6.1; sin ella, se marca con los botones de la pantalla).
+1. **Entrenar** › **Entrenamiento de golpes** › **Un golpe** (la primera de las dos opciones juntas), elige el golpe (**Saque**, **Derecha**, **Revés**, **Volea**) › **Empezar** (la pulsera debe estar conectada como en 6.1; sin ella, se marca con los botones de la pantalla).
 2. **Dónde poner el teléfono** (la primera vez se abre solo, luego con el botón *¿Dónde pongo el teléfono?*):
    - **al lado de quien saca**, en el lado del brazo que golpea (a la derecha para un diestro), a **3-4 m**, a la altura de la línea de fondo o medio metro detrás;
    - objetivo a **1-1,2 m** del suelo, teléfono **en horizontal** y recto, apuntando a quien saca;
@@ -19631,7 +19631,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - En lugar de lado, primero/segundo y objetivo se elige la **dirección** deseada (**cruzado**, **al centro**, **paralelo**) y, para la volea, si es **de derecha** o **de revés**; el resumen los cuenta por separado.
 - **Análisis del movimiento**: los tres momentos son **preparación** (donde la muñeca se para al final del armado), **impacto** (muñeca más rápida; alrededor la app vuelve a leer un fotograma cada 33 ms) y **final** (muñeca más alta tras el impacto; en la volea, donde la muñeca se para). Si hay varios golpes en la ventana, cuenta el que reconoció la pulsera; las muñecas intercambiadas por MoveNet (pasa de lado) se corrigen solas. Graba **de lado**: de frente el armado va en profundidad y no se ve. Las medidas (*—* si no se ven el codo o las piernas): rodilla más flexionada, codo en el impacto, altura del impacto, cuánto **delante del cuerpo** se golpea, **amplitud de la preparación**, altura del final (todas respecto a la estatura) y el tiempo de la preparación al impacto. El vídeo con el esqueleto tiene los botones **Preparación**, **Impacto** y **Final**.
 
-**Grabar la clase** (debajo de Empezar): el teléfono fijo **al fondo de la pista**, detrás de quien juega, y la pulsera en su muñeca con el reconocimiento de golpes. No hay que pulsar nada: **cada golpe reconocido** se convierte en un clip y se coloca solo entre **derechas, reveses, saques y voleas** (si la pulsera no lo reconoce, va con las derechas). Justo después de un golpe, KEY1 o KEY2 lo marcan **dentro** o **fuera** (opcional); los golpes sin dentro/fuera no cuentan en los porcentajes. Si en la agenda del Entrenador hay una clase en curso, la grabación es suya (y del alumno, si es uno solo). Al final cada golpe tiene su sesión, marcada **Clase**, en la carpeta **Entrenamiento de golpes/Clases**.
+**Grabar la clase** (la segunda opción, **Toda la clase**): el teléfono fijo **al fondo de la pista**, detrás de quien juega, y la pulsera en su muñeca con el reconocimiento de golpes. No hay que pulsar nada: **cada golpe reconocido** se convierte en un clip y se coloca solo entre **derechas, reveses, saques y voleas** (si la pulsera no lo reconoce, va con las derechas). Justo después de un golpe, KEY1 o KEY2 lo marcan **dentro** o **fuera** (opcional); los golpes sin dentro/fuera no cuentan en los porcentajes. Si en la agenda del Entrenador hay una clase en curso, la grabación es suya (y del alumno, si es uno solo). Al final cada golpe tiene su sesión, marcada **Clase**, en la carpeta **Entrenamiento de golpes/Clases**.
 - **El golpe por el vídeo**: en el análisis del movimiento, cuando por el vídeo el golpe parece otro (por ejemplo *Por el vídeo parece: Revés*), **Mover a: Revés** lo pone en el golpe correcto y el análisis se rehace. Los indicios son sencillos (los dos brazos por encima de la cabeza en el saque, poco recorrido de la muñeca en la volea, las manos juntas en el revés): solo se propone moverlo cuando son claros, o cuando la pulsera no lo había reconocido.
 - **Anotar** (el lápiz en la cámara lenta de los clips): el fotograma parado, con el esqueleto si está activado, se anota con **flechas**, **círculos** y trazos **a mano alzada** en tres colores, más una **nota de voz** (la primera vez la app pide el micrófono). **Guardar** la deja con el clip, **Compartir** la envía (imagen y voz). En el análisis, abriendo el golpe, las **Notas del clip** se vuelven a ver, se escuchan, se comparten o se eliminan; se quedan también con *Solo los vídeos*.
 - **Cadena cinética (de prueba)**: abriendo un golpe analizado, cuándo piernas, caderas, hombros, codo y muñeca llegan a su velocidad máxima respecto al impacto, y si el orden va de las piernas a la muñeca. Desde un vídeo de lado y con pocos fotogramas por segundo es una estimación aproximada: se tolera un fotograma de diferencia.
@@ -20247,7 +20247,7 @@ Un deuxième téléphone sur un trépied filme le match et met le score de l'arb
 
 Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît le service et les boutons disent comment il s'est passé. Un seul téléphone suffit, sans arbitre.
 
-1. **S'entraîner** › **Entraînement des coups**, choisissez le coup (**Service**, **Coup droit**, **Revers**, **Volée**) › **Commencer** (le bracelet doit être connecté comme en 6.1 ; sinon, on marque avec les boutons à l'écran).
+1. **S'entraîner** › **Entraînement des coups** › **Un seul coup** (le premier des deux choix côte à côte), choisissez le coup (**Service**, **Coup droit**, **Revers**, **Volée**) › **Commencer** (le bracelet doit être connecté comme en 6.1 ; sinon, on marque avec les boutons à l'écran).
 2. **Où placer le téléphone** (s'ouvre tout seul la première fois, puis avec le bouton *Où placer le téléphone ?*) :
    - **à côté du serveur**, du côté du bras qui frappe (à droite pour un droitier), à **3-4 m**, au niveau de la ligne de fond ou un demi-mètre derrière ;
    - objectif à **1-1,2 m** du sol, téléphone **à l'horizontale** et droit, pointé sur le serveur ;
@@ -20269,7 +20269,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - À la place du côté, premier/second et cible, on choisit la **direction** voulue (**croisé**, **au centre**, **le long de la ligne**) et, pour la volée, si elle est **de coup droit** ou **de revers** ; le bilan les compte à part.
 - **Analyse du mouvement** : les trois moments sont la **préparation** (là où le poignet s'arrête au bout de l'armé), l'**impact** (poignet le plus rapide ; autour, l'appli relit une image toutes les 33 ms) et le **finish** (poignet le plus haut après l'impact ; pour la volée, là où le poignet s'arrête). S'il y a plusieurs coups dans la fenêtre, c'est celui reconnu par le bracelet qui compte ; les poignets inversés par MoveNet (cela arrive de profil) sont remis en place tout seuls. Filmez **de profil** : de face, l'armé part en profondeur et ne se voit pas. Les mesures (*—* si le coude ou les jambes ne se voient pas) : genou le plus fléchi, coude à l'impact, hauteur de l'impact, distance de frappe **devant le corps**, **ampleur de la préparation**, hauteur du finish (toutes rapportées à la taille) et le temps de la préparation à l'impact. La vidéo avec le squelette a les boutons **Préparation**, **Impact** et **Finish**.
 
-**Enregistrer la leçon** (sous Commencer) : le téléphone fixe **au fond du court**, derrière le joueur, et le bracelet à son poignet avec la reconnaissance des coups. Rien à appuyer : **chaque coup reconnu** devient un clip et se range tout seul parmi **coups droits, revers, services et volées** (si le bracelet ne le reconnaît pas, il va avec les coups droits). Juste après un coup, KEY1 ou KEY2 le marque **bon** ou **faute** (facultatif) ; les coups sans bon/faute ne comptent pas dans les pourcentages. Si l'agenda de l'Entraîneur a une leçon en cours, l'enregistrement lui appartient (et à l'élève, s'il est seul). À la fin, chaque coup a sa séance, marquée **Leçon**, dans le dossier **Entraînement des coups/Leçons**.
+**Enregistrer la leçon** (le second choix, **Toute la leçon**) : le téléphone fixe **au fond du court**, derrière le joueur, et le bracelet à son poignet avec la reconnaissance des coups. Rien à appuyer : **chaque coup reconnu** devient un clip et se range tout seul parmi **coups droits, revers, services et volées** (si le bracelet ne le reconnaît pas, il va avec les coups droits). Juste après un coup, KEY1 ou KEY2 le marque **bon** ou **faute** (facultatif) ; les coups sans bon/faute ne comptent pas dans les pourcentages. Si l'agenda de l'Entraîneur a une leçon en cours, l'enregistrement lui appartient (et à l'élève, s'il est seul). À la fin, chaque coup a sa séance, marquée **Leçon**, dans le dossier **Entraînement des coups/Leçons**.
 - **Le coup d'après la vidéo** : dans l'analyse du mouvement, quand d'après la vidéo le coup semble être un autre (par exemple *D'après la vidéo, on dirait : Revers*), **Déplacer vers : Revers** le range dans le bon coup et l'analyse est refaite. Les indices sont simples (les deux bras au-dessus de la tête au service, peu de trajet du poignet à la volée, les mains proches au revers) : on ne propose de le déplacer que s'ils sont clairs, ou si le bracelet ne l'avait pas reconnu.
 - **Annoter** (le crayon dans le ralenti des clips) : l'image figée, avec le squelette s'il est affiché, s'annote avec des **flèches**, des **cercles** et des traits **à main levée** en trois couleurs, plus une **note vocale** (la première fois l'appli demande le micro). **Enregistrer** la garde avec le clip, **Partager** l'envoie (image et voix). Dans l'analyse, en ouvrant le coup, les **Notes sur le clip** se revoient, s'écoutent, se partagent ou se suppriment ; elles restent même avec *Vidéos seules*.
 - **Chaîne cinétique (à l'essai)** : en ouvrant un coup analysé, quand jambes, hanches, épaules, coude et poignet atteignent leur vitesse maximale par rapport à l'impact, et si l'ordre va des jambes au poignet. D'une vidéo de côté avec peu d'images par seconde, c'est une estimation grossière : une image d'écart est tolérée.
@@ -20885,7 +20885,7 @@ Un secondo telefono su un treppiede riprende la partita e mette sul video il pun
 
 Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosce il servizio e coi tasti si dice com'è andato. Basta un telefono, senza arbitro.
 
-1. **Allenati** › **Allenamento dei colpi**, scegli il colpo (**Servizio**, **Dritto**, **Rovescio**, **Volée**) › **Inizia** (serve il braccialetto collegato come in 6.1; senza, si segna dai tasti sullo schermo).
+1. **Allenati** › **Allenamento dei colpi** › **Un colpo** (la prima delle due scelte affiancate), scegli il colpo (**Servizio**, **Dritto**, **Rovescio**, **Volée**) › **Inizia** (serve il braccialetto collegato come in 6.1; senza, si segna dai tasti sullo schermo).
 2. **Dove mettere il telefono** (la prima volta si apre da solo, poi dal tasto *Dove mettere il telefono?*):
    - **a fianco di chi serve**, dal lato del braccio che colpisce (a destra per un destro), a **3-4 m**, all'altezza della linea di fondo o mezzo metro dietro;
    - obiettivo a **1-1,2 m** da terra, telefono **in orizzontale** e dritto, puntato su chi serve;
@@ -20907,7 +20907,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - Al posto di lato, prima/seconda e bersaglio si sceglie la **direzione** voluta (**incrociato**, **al centro**, **lungolinea**) e, per la volée, se è **di dritto** o **di rovescio**; il riepilogo li conta a parte.
 - **Analisi del movimento**: i tre momenti sono **preparazione** (dove il polso si ferma in fondo all'apertura), **impatto** (polso più veloce; lì intorno l'app rilegge un fotogramma ogni 33 ms) e **finale** (polso più in alto dopo l'impatto; nella volée, dove il polso si ferma). Se nella finestra ci sono più colpi vale quello riconosciuto dal braccialetto; i polsi scambiati da MoveNet (succede di lato) si rimettono a posto da soli. Riprendi **di lato**: di fronte l'apertura va in profondità e non si vede. Le misure (*—* se il gomito o le gambe non si vedono): ginocchio più piegato, gomito all'impatto, altezza dell'impatto, quanto **davanti al corpo** si colpisce, **ampiezza della preparazione**, altezza del finale (tutte in rapporto alla statura) e il tempo dalla preparazione all'impatto. Il video con lo scheletro ha i tasti **Preparazione**, **Impatto** e **Finale**.
 
-**Registra la lezione** (sotto Inizia): il telefono fisso **a fondo campo**, dietro a chi gioca, e il braccialetto al suo polso con il riconoscimento dei colpi. Non si preme niente: **ogni colpo riconosciuto** diventa una clip e va da solo tra **dritti, rovesci, servizi e volée** (se il braccialetto non lo riconosce va tra i dritti). Subito dopo un colpo, KEY1 o KEY2 lo segnano **dentro** o **fuori** (facoltativo); i colpi senza dentro/fuori non contano nelle percentuali. Se nell'agenda dell'Allenatore c'è una lezione in corso, la registrazione è sua (e dell'allievo, se è uno solo). A fine lezione ogni colpo ha la sua sessione, segnata **Lezione**, nella cartella **Allenamento colpi/Lezioni**.
+**Registra la lezione** (la seconda scelta, **Tutta la lezione**): il telefono fisso **a fondo campo**, dietro a chi gioca, e il braccialetto al suo polso con il riconoscimento dei colpi. Non si preme niente: **ogni colpo riconosciuto** diventa una clip e va da solo tra **dritti, rovesci, servizi e volée** (se il braccialetto non lo riconosce va tra i dritti). Subito dopo un colpo, KEY1 o KEY2 lo segnano **dentro** o **fuori** (facoltativo); i colpi senza dentro/fuori non contano nelle percentuali. Se nell'agenda dell'Allenatore c'è una lezione in corso, la registrazione è sua (e dell'allievo, se è uno solo). A fine lezione ogni colpo ha la sua sessione, segnata **Lezione**, nella cartella **Allenamento colpi/Lezioni**.
 - **Il colpo dal video**: nell'analisi del movimento, quando dal video il colpo sembra un altro (per esempio *Dal video sembra: Rovescio*), **Sposta tra: Rovescio** lo mette nel colpo giusto e l'analisi si rifà. Gli indizi sono semplici (le due braccia sopra la testa nel servizio, poca strada del polso nella volée, le mani vicine nel rovescio): si propone di spostarlo solo quando sono chiari, o quando il braccialetto non l'aveva riconosciuto.
 - **Annota** (la matita nella moviola delle clip): il fotogramma fermo, con lo scheletro se è acceso, si annota con **frecce**, **cerchi** e segni **a mano** in tre colori, più una **nota vocale** (la prima volta l'app chiede il microfono). **Salva** la mette con la clip, **Condividi** la manda (immagine e voce). Nell'analisi, aprendo il colpo, le **Note sulla clip** si riguardano, si ascoltano, si condividono o si eliminano; restano anche con *Solo i video*.
 - **Catena cinetica (in prova)**: aprendo un colpo analizzato, quando gambe, anche, spalle, gomito e polso arrivano alla loro velocità massima rispetto all'impatto, e se l'ordine va dalle gambe al polso. Da un video di lato e con pochi fotogrammi al secondo è una stima grossolana: un fotogramma di differenza si tollera.
@@ -21523,7 +21523,7 @@ Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do á
 
 Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e com os botões se diz como foi. Basta um telefone, sem árbitro.
 
-1. **Treinar** › **Treino de golpes**, escolha o golpe (**Saque**, **Forehand**, **Backhand**, **Voleio**) › **Começar** (a pulseira deve estar conectada como em 6.1; sem ela, marque pelos botões da tela).
+1. **Treinar** › **Treino de golpes** › **Um golpe** (a primeira das duas opções lado a lado), escolha o golpe (**Saque**, **Forehand**, **Backhand**, **Voleio**) › **Começar** (a pulseira deve estar conectada como em 6.1; sem ela, marque pelos botões da tela).
 2. **Onde colocar o telefone** (abre sozinho na primeira vez, depois pelo botão *Onde coloco o telefone?*):
    - **ao lado de quem saca**, do lado do braço que bate (à direita para um destro), a **3-4 m**, na altura da linha de fundo ou meio metro atrás;
    - lente a **1-1,2 m** do chão, telefone **na horizontal** e reto, apontado para quem saca;
@@ -21545,7 +21545,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - No lugar de lado, primeiro/segundo e alvo escolhe-se a **direção** desejada (**cruzado**, **no centro**, **paralela**) e, para o voleio, se é **de forehand** ou **de backhand**; o resumo conta-os à parte.
 - **Análise do movimento**: os três momentos são **preparação** (onde o pulso para no fim da preparação), **impacto** (pulso mais rápido; ali perto o app relê um quadro a cada 33 ms) e **final** (pulso mais alto depois do impacto; no voleio, onde o pulso para). Se houver vários golpes na janela, vale o reconhecido pela pulseira; os pulsos trocados pelo MoveNet (acontece de lado) se corrigem sozinhos. Filme **de lado**: de frente a preparação vai em profundidade e não aparece. As medidas (*—* se o cotovelo ou as pernas não aparecem): joelho mais flexionado, cotovelo no impacto, altura do impacto, quanto **à frente do corpo** se bate, **amplitude da preparação**, altura do final (todas em relação à altura) e o tempo da preparação ao impacto. O vídeo com o esqueleto tem os botões **Preparação**, **Impacto** e **Final**.
 
-**Gravar a aula** (embaixo de Começar): o telefone fixo **no fundo da quadra**, atrás de quem joga, e a pulseira no pulso dele com o reconhecimento de golpes. Não é preciso apertar nada: **cada golpe reconhecido** vira um clipe e vai sozinho para **forehands, backhands, saques e voleios** (se a pulseira não o reconhece, vai para os forehands). Logo após um golpe, KEY1 ou KEY2 o marcam **dentro** ou **fora** (opcional); os golpes sem dentro/fora não contam nas porcentagens. Se na agenda do Treinador há uma aula em andamento, a gravação é dela (e do aluno, se for um só). No fim cada golpe tem sua sessão, marcada **Aula**, na pasta **Treino de golpes/Aulas**.
+**Gravar a aula** (a segunda opção, **A aula inteira**): o telefone fixo **no fundo da quadra**, atrás de quem joga, e a pulseira no pulso dele com o reconhecimento de golpes. Não é preciso apertar nada: **cada golpe reconhecido** vira um clipe e vai sozinho para **forehands, backhands, saques e voleios** (se a pulseira não o reconhece, vai para os forehands). Logo após um golpe, KEY1 ou KEY2 o marcam **dentro** ou **fora** (opcional); os golpes sem dentro/fora não contam nas porcentagens. Se na agenda do Treinador há uma aula em andamento, a gravação é dela (e do aluno, se for um só). No fim cada golpe tem sua sessão, marcada **Aula**, na pasta **Treino de golpes/Aulas**.
 - **O golpe pelo vídeo**: na análise do movimento, quando pelo vídeo o golpe parece outro (por exemplo *Pelo vídeo parece: Backhand*), **Mover para: Backhand** o coloca no golpe certo e a análise é refeita. Os indícios são simples (os dois braços acima da cabeça no saque, pouco caminho do pulso no voleio, as mãos juntas no backhand): só se propõe mover quando são claros, ou quando a pulseira não o tinha reconhecido.
 - **Anotar** (o lápis na câmera lenta dos clipes): o quadro parado, com o esqueleto se estiver ligado, é anotado com **setas**, **círculos** e traços **à mão livre** em três cores, mais uma **nota de voz** (na primeira vez o app pede o microfone). **Salvar** a guarda com o clipe, **Compartilhar** a envia (imagem e voz). Na análise, abrindo o golpe, as **Notas do clipe** podem ser vistas, ouvidas, compartilhadas ou apagadas; ficam também com *Só os vídeos*.
 - **Cadeia cinética (em teste)**: abrindo um golpe analisado, quando pernas, quadris, ombros, cotovelo e pulso chegam à sua velocidade máxima em relação ao impacto, e se a ordem vai das pernas ao pulso. A partir de um vídeo de lado com poucos quadros por segundo é uma estimativa grosseira: um quadro de diferença é tolerado.
@@ -54310,6 +54310,23 @@ fun ExpandRow(icon: ImageVector, title: String, summary: String?, open: Boolean,
         Icon(if (open) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, null, tint = TsmColors.TextDim)
     }
 }
+
+/**
+ * Una di due scelte affiancate e uguali (per esempio "Un colpo" o "Tutta la lezione"): icona, titolo e una riga che dice
+ * cosa fa; quella scelta [on] ha il colore dell'area.
+ */
+@Composable
+fun ChoiceTile(icon: ImageVector, title: String, hint: String, on: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val area = LocalArea.current
+    Column(
+        modifier.fillMaxHeight().clip(RoundedCornerShape(16.dp)).background(if (on) area else TsmColors.SurfaceHigh).clickable(onClick = onClick).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(icon, null, tint = if (on) TsmColors.OnArea else area, modifier = Modifier.size(26.dp))
+        Text(title, color = if (on) TsmColors.OnArea else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp, lineHeight = 18.sp)
+        Text(hint, color = if (on) TsmColors.OnArea else TsmColors.TextDim, fontSize = 12.sp, lineHeight = 15.sp)
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt
@@ -57091,6 +57108,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -57242,6 +57260,19 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             // Prima si sceglie chi si allena: il resto (colpo, esercizio, avvio, sessioni) è suo.
             if (trainee == null) return@SectionCard
         }
+        // Prima cosa si vuole fare: un colpo (con dentro/fuori e progressi) o tutta la lezione (smistata da sola).
+        var lesson by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        TrainModeChoice(lesson) { lesson = it }
+        if (lesson) {
+            Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            BigButton(s.lessonRecord, Icons.Filled.School, {
+                context.startActivity(
+                    Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
+                )
+            }, Modifier.fillMaxWidth())
+            GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+            return@SectionCard
+        }
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
@@ -57261,13 +57292,6 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             var fps60 by remember { mutableStateOf(c.storage.trainFps60) }
             SwitchRow(Icons.Filled.Speed, s.fps60Title, s.fps60Hint, fps60) { fps60 = it; c.storage.trainFps60 = it }
         }
-        // Lezione registrata: tutti i colpi, ognuno nel suo tipo, senza tasti.
-        GhostButton(s.lessonRecord, Icons.Filled.School, {
-            context.startActivity(
-                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_LESSON, true),
-            )
-        }, Modifier.fillMaxWidth())
-        Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
         if (mine.isNotEmpty()) {
             Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
             StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
@@ -57280,6 +57304,16 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     }
     if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/** Le due cose che fa la telecamera dell'allenamento: un colpo con dentro/fuori, o tutta la lezione da sola. */
+@Composable
+fun TrainModeChoice(lesson: Boolean, onPick: (Boolean) -> Unit) {
+    val s = LocalStrings.current
+    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        ChoiceTile(Icons.Filled.SportsTennis, s.trModeStroke, s.trModeStrokeHint, !lesson, Modifier.weight(1f)) { onPick(false) }
+        ChoiceTile(Icons.Filled.School, s.trModeLesson, s.trModeLessonHint, lesson, Modifier.weight(1f)) { onPick(true) }
+    }
 }
 
 /**
@@ -57308,17 +57342,22 @@ fun TrainStrokeDialog(c: MatchController, student: com.tennis.scoremanager.data.
         title = { Text("${s.studentTrainNow} · ${student.name}") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
-                val strokes = TrainedStroke.entries
-                Segmented(
-                    strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == student.id }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
-                    strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
-                )
-                DrillRow(c, stroke)
-                BigButton(s.serveStart, Icons.Filled.Videocam, { camera(lesson = false) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                var lesson by rememberSaveable { mutableStateOf(false) }
+                TrainModeChoice(lesson) { lesson = it }
+                if (lesson) {
+                    Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                    BigButton(s.lessonRecord, Icons.Filled.School, { camera(lesson = true) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                } else {
+                    Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    val strokes = TrainedStroke.entries
+                    Segmented(
+                        strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == student.id }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+                        strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
+                    )
+                    DrillRow(c, stroke)
+                    BigButton(s.serveStart, Icons.Filled.Videocam, { camera(lesson = false) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                }
                 GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
-                GhostButton(s.lessonRecord, Icons.Filled.School, { camera(lesson = true) }, Modifier.fillMaxWidth())
-                Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
             }
         },
         confirmButton = {},
@@ -60843,6 +60882,10 @@ interface Strings {
     val cnAskPrompt: (String, String) -> String
     val reportWithNotes: String
     val reportWithNotesHint: String
+    val trModeStroke: String
+    val trModeStrokeHint: String
+    val trModeLesson: String
+    val trModeLessonHint: String
 }
 
 object ItStrings : Strings {
@@ -63773,6 +63816,11 @@ object ItStrings : Strings {
 
     override val reportWithNotes = "Con le note dell'allenatore"
     override val reportWithNotesHint = "Nota generale e note del periodo, divise per argomento. Spegnilo se sono solo per te."
+
+    override val trModeStroke = "Un colpo"
+    override val trModeStrokeHint = "Scegli il colpo e dopo ognuno segni dentro o fuori: percentuale e progressi."
+    override val trModeLesson = "Tutta la lezione"
+    override val trModeLessonHint = "Non premi niente: ogni colpo diventa una clip, divisa da sola per tipo."
 }
 
 object EnStrings : Strings {
@@ -66704,6 +66752,11 @@ object EnStrings : Strings {
 
     override val reportWithNotes = "With the coach's notes"
     override val reportWithNotesHint = "General note and the notes of the period, split by topic. Turn it off if they are just for you."
+
+    override val trModeStroke = "One stroke"
+    override val trModeStrokeHint = "Pick the stroke and mark each one in or out: percentage and progress."
+    override val trModeLesson = "The whole lesson"
+    override val trModeLessonHint = "You press nothing: every stroke becomes a clip, sorted by type by itself."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -69660,6 +69713,11 @@ object DeStrings : Strings {
 
     override val reportWithNotes = "Mit den Trainernotizen"
     override val reportWithNotesHint = "Allgemeine Notiz und die Notizen des Zeitraums, nach Thema. Schalte es aus, wenn sie nur für dich sind."
+
+    override val trModeStroke = "Ein Schlag"
+    override val trModeStrokeHint = "Wähle den Schlag und markiere jeden als drin oder aus: Quote und Fortschritt."
+    override val trModeLesson = "Die ganze Stunde"
+    override val trModeLessonHint = "Du drückst nichts: Jeder Schlag wird ein Clip, von selbst nach Art sortiert."
 }
 TSM_EOF
 
@@ -72606,6 +72664,11 @@ object EsStrings : Strings {
 
     override val reportWithNotes = "Con las notas del entrenador"
     override val reportWithNotesHint = "Nota general y notas del periodo, por tema. Desactívalo si son solo para ti."
+
+    override val trModeStroke = "Un golpe"
+    override val trModeStrokeHint = "Elige el golpe y marca cada uno dentro o fuera: porcentaje y progresos."
+    override val trModeLesson = "Toda la clase"
+    override val trModeLessonHint = "No pulsas nada: cada golpe se convierte en un clip, ordenado solo por tipo."
 }
 TSM_EOF
 
@@ -75554,6 +75617,11 @@ object FrStrings : Strings {
 
     override val reportWithNotes = "Avec les notes de l'entraîneur"
     override val reportWithNotesHint = "Note générale et notes de la période, par sujet. Désactivez-le si elles ne sont que pour vous."
+
+    override val trModeStroke = "Un seul coup"
+    override val trModeStrokeHint = "Choisissez le coup et notez chacun dedans ou dehors : pourcentage et progrès."
+    override val trModeLesson = "Toute la leçon"
+    override val trModeLessonHint = "Vous n'appuyez sur rien : chaque coup devient un clip, classé tout seul par type."
 }
 TSM_EOF
 
@@ -78503,6 +78571,11 @@ object PtStrings : Strings {
 
     override val reportWithNotes = "Com as anotações do treinador"
     override val reportWithNotesHint = "Anotação geral e as do período, por tema. Desligue se forem só para você."
+
+    override val trModeStroke = "Um golpe"
+    override val trModeStrokeHint = "Escolha o golpe e marque cada um dentro ou fora: porcentagem e progresso."
+    override val trModeLesson = "A aula inteira"
+    override val trModeLessonHint = "Você não aperta nada: cada golpe vira um clipe, separado sozinho por tipo."
 }
 TSM_EOF
 

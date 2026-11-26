@@ -2938,4 +2938,9 @@ object DeStrings : Strings {
 
     override val reportWithNotes = "Mit den Trainernotizen"
     override val reportWithNotesHint = "Allgemeine Notiz und die Notizen des Zeitraums, nach Thema. Schalte es aus, wenn sie nur für dich sind."
+
+    override val trModeStroke = "Ein Schlag"
+    override val trModeStrokeHint = "Wähle den Schlag und markiere jeden als drin oder aus: Quote und Fortschritt."
+    override val trModeLesson = "Die ganze Stunde"
+    override val trModeLessonHint = "Du drückst nichts: Jeder Schlag wird ein Clip, von selbst nach Art sortiert."
 }
