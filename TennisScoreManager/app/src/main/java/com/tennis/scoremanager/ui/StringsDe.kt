@@ -2943,4 +2943,29 @@ object DeStrings : Strings {
     override val trModeStrokeHint = "Wähle den Schlag und markiere jeden als drin oder aus: Quote und Fortschritt."
     override val trModeLesson = "Die ganze Stunde"
     override val trModeLessonHint = "Du drückst nichts: Jeder Schlag wird ein Clip, von selbst nach Art sortiert."
+
+    override val dlTitle = "Übungssammlung"
+    override val dlHint = "Illustrierte Übungen nach Schlag, Niveau und Spielern"
+    override val dlFromLibrary = "Fertige Übungen zum Hinzufügen"
+    override val dlReturn = "Rückschlag"
+    override val dlOverhead = "Schmetterball"
+    override val dlFootwork = "Beinarbeit"
+    override val dlBeginner = "Anfänger"
+    override val dlIntermediate = "Mittel"
+    override val dlAdvanced = "Fortgeschritten"
+    override val dlPlayers = "Spieler"
+    override val dlPlayersN: (Int) -> String = { "$it Spieler" }
+    override val dlCount: (Int) -> String = { if (it == 1) "1 Übung" else "$it Übungen" }
+    override val dlNone = "Keine Übungen mit diesen Filtern."
+    override val dlOriginal = "Texte und Zeichnungen für die App geschrieben. Vorerst auf Italienisch."
+    override val dlLegend = "Durchgezogen: der Ball (mit Nummer, die Reihenfolge). Gestrichelt: wer läuft. Orange: wer zuspielt; Dreiecke: Hütchen."
+    override val dlGoal = "Ziel"
+    override val dlHow = "So geht es"
+    override val dlEasier = "Leichter"
+    override val dlHarder = "Schwerer"
+    override val dlSafety = "An Alter und Verfassung der Person anpassen; ersetzt nicht den Rat eines Arztes oder Athletiktrainers."
+    override val dlAdd = "Zu meinen Übungen hinzufügen"
+
+    override val dlUse = "Diese Übung verwenden"
+    override val dlReady: (String) -> String = { "Bereit unter Trainieren › Ein Schlag › $it" }
 }

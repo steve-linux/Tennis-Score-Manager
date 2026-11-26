@@ -44,7 +44,7 @@ fun areaOf(screen: Screen, tab: HomeTab): Color = when (screen) {
     Screen.HOME -> areaOf(tab)
     Screen.SETUP, Screen.OPTIONS, Screen.TOSS, Screen.START, Screen.MATCH, Screen.SUMMARY, Screen.TOURNAMENT -> TsmColors.AreaPlay
     Screen.HISTORY, Screen.PROGRESS, Screen.VIDEOS, Screen.RACKETS -> TsmColors.AreaProgress
-    Screen.WORKOUT, Screen.STROKE_SESSIONS, Screen.DRILLS, Screen.ARENA -> TsmColors.AreaTrain
+    Screen.WORKOUT, Screen.STROKE_SESSIONS, Screen.DRILLS, Screen.ARENA, Screen.DRILL_LIBRARY -> TsmColors.AreaTrain
     Screen.DEVICES, Screen.VOICE, Screen.HELP, Screen.DATA, Screen.SETTINGS, Screen.PLAYERS -> TsmColors.AreaSettings
     Screen.STUDENTS, Screen.STUDENT, Screen.LESSONS, Screen.COACH_COURSE, Screen.MEMBERS, Screen.PAYMENTS, Screen.SCHOOL, Screen.COURSE -> TsmColors.AreaPeople
     Screen.BOOK_COURT, Screen.COURTS_PLAN, Screen.COURT_STATS, Screen.NOTICE, Screen.DESK -> TsmColors.AreaClub

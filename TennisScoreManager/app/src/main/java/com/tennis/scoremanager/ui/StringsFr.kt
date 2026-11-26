@@ -2946,4 +2946,29 @@ object FrStrings : Strings {
     override val trModeStrokeHint = "Choisissez le coup et notez chacun dedans ou dehors : pourcentage et progrès."
     override val trModeLesson = "Toute la leçon"
     override val trModeLessonHint = "Vous n'appuyez sur rien : chaque coup devient un clip, classé tout seul par type."
+
+    override val dlTitle = "Recueil d'exercices"
+    override val dlHint = "Exercices illustrés par coup, niveau et joueurs"
+    override val dlFromLibrary = "Exercices prêts à ajouter aux vôtres"
+    override val dlReturn = "Retour"
+    override val dlOverhead = "Smash"
+    override val dlFootwork = "Jeu de jambes"
+    override val dlBeginner = "Débutant"
+    override val dlIntermediate = "Intermédiaire"
+    override val dlAdvanced = "Avancé"
+    override val dlPlayers = "Joueurs"
+    override val dlPlayersN: (Int) -> String = { if (it == 1) "1 joueur" else "$it joueurs" }
+    override val dlCount: (Int) -> String = { if (it == 1) "1 exercice" else "$it exercices" }
+    override val dlNone = "Aucun exercice avec ces filtres."
+    override val dlOriginal = "Textes et dessins écrits pour l'appli. En italien pour l'instant."
+    override val dlLegend = "Ligne pleine : la balle (avec un numéro, l'ordre). Pointillés : qui se déplace. Orange : qui lance les balles ; triangles : plots."
+    override val dlGoal = "Objectif"
+    override val dlHow = "Comment faire"
+    override val dlEasier = "Plus facile"
+    override val dlHarder = "Plus difficile"
+    override val dlSafety = "À adapter à l'âge et à la condition de la personne ; ne remplace pas l'avis d'un médecin ou d'un préparateur."
+    override val dlAdd = "Ajouter à mes exercices"
+
+    override val dlUse = "Utiliser cet exercice"
+    override val dlReady: (String) -> String = { "Prêt dans S'entraîner › Un seul coup › $it" }
 }

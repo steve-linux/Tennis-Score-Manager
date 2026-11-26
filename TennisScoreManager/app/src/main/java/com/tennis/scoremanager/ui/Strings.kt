@@ -3013,6 +3013,29 @@ interface Strings {
     val trModeStrokeHint: String
     val trModeLesson: String
     val trModeLessonHint: String
+    val dlTitle: String
+    val dlHint: String
+    val dlFromLibrary: String
+    val dlReturn: String
+    val dlOverhead: String
+    val dlFootwork: String
+    val dlBeginner: String
+    val dlIntermediate: String
+    val dlAdvanced: String
+    val dlPlayers: String
+    val dlPlayersN: (Int) -> String
+    val dlCount: (Int) -> String
+    val dlNone: String
+    val dlOriginal: String
+    val dlLegend: String
+    val dlGoal: String
+    val dlHow: String
+    val dlEasier: String
+    val dlHarder: String
+    val dlSafety: String
+    val dlAdd: String
+    val dlUse: String
+    val dlReady: (String) -> String
 }
 
 object ItStrings : Strings {
@@ -5948,6 +5971,31 @@ object ItStrings : Strings {
     override val trModeStrokeHint = "Scegli il colpo e dopo ognuno segni dentro o fuori: percentuale e progressi."
     override val trModeLesson = "Tutta la lezione"
     override val trModeLessonHint = "Non premi niente: ogni colpo diventa una clip, divisa da sola per tipo."
+
+    override val dlTitle = "Raccolta di esercizi"
+    override val dlHint = "Esercizi illustrati per colpo, livello e giocatori"
+    override val dlFromLibrary = "Esercizi pronti da aggiungere ai tuoi"
+    override val dlReturn = "Risposta"
+    override val dlOverhead = "Smash"
+    override val dlFootwork = "Gioco di gambe"
+    override val dlBeginner = "Principiante"
+    override val dlIntermediate = "Intermedio"
+    override val dlAdvanced = "Avanzato"
+    override val dlPlayers = "Giocatori"
+    override val dlPlayersN: (Int) -> String = { if (it == 1) "1 giocatore" else "$it giocatori" }
+    override val dlCount: (Int) -> String = { if (it == 1) "1 esercizio" else "$it esercizi" }
+    override val dlNone = "Nessun esercizio con questi filtri."
+    override val dlOriginal = "Testi e disegni scritti per l'app. Per ora in italiano."
+    override val dlLegend = "Linea piena: la palla (col numero, l'ordine). Tratteggio: chi si sposta. Arancio: chi lancia le palle; triangoli: coni."
+    override val dlGoal = "Obiettivo"
+    override val dlHow = "Come si fa"
+    override val dlEasier = "Più facile"
+    override val dlHarder = "Più difficile"
+    override val dlSafety = "Da adattare all'età e alla condizione di chi si allena; non sostituisce il parere di un medico o di un preparatore."
+    override val dlAdd = "Aggiungi ai miei esercizi"
+
+    override val dlUse = "Usa questo esercizio"
+    override val dlReady: (String) -> String = { "Pronto in Allenati › Un colpo › $it" }
 }
 
 object EnStrings : Strings {
@@ -8884,6 +8932,31 @@ object EnStrings : Strings {
     override val trModeStrokeHint = "Pick the stroke and mark each one in or out: percentage and progress."
     override val trModeLesson = "The whole lesson"
     override val trModeLessonHint = "You press nothing: every stroke becomes a clip, sorted by type by itself."
+
+    override val dlTitle = "Drill library"
+    override val dlHint = "Illustrated drills by stroke, level and players"
+    override val dlFromLibrary = "Ready-made drills to add to yours"
+    override val dlReturn = "Return"
+    override val dlOverhead = "Overhead"
+    override val dlFootwork = "Footwork"
+    override val dlBeginner = "Beginner"
+    override val dlIntermediate = "Intermediate"
+    override val dlAdvanced = "Advanced"
+    override val dlPlayers = "Players"
+    override val dlPlayersN: (Int) -> String = { if (it == 1) "1 player" else "$it players" }
+    override val dlCount: (Int) -> String = { if (it == 1) "1 drill" else "$it drills" }
+    override val dlNone = "No drills with these filters."
+    override val dlOriginal = "Texts and drawings written for the app. In Italian for now."
+    override val dlLegend = "Solid line: the ball (with a number, the order). Dashed: who moves. Orange: who feeds the balls; triangles: cones."
+    override val dlGoal = "Goal"
+    override val dlHow = "How to do it"
+    override val dlEasier = "Easier"
+    override val dlHarder = "Harder"
+    override val dlSafety = "Adapt it to the age and fitness of whoever trains; it does not replace the advice of a doctor or a trainer."
+    override val dlAdd = "Add to my drills"
+
+    override val dlUse = "Use this drill"
+    override val dlReady: (String) -> String = { "Ready in Practice › One stroke › $it" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

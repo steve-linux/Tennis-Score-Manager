@@ -1,0 +1,241 @@
+{
+ "fh_cross": {
+  "name": "Dritto incrociato in diagonale",
+  "goal": "Costanza e profondità sul dritto incrociato, la diagonale più giocata nei palleggi.",
+  "steps": [
+   "A e B si mettono sulla diagonale del pari, dietro la linea di fondo.",
+   "Palleggiano solo di dritto incrociato, cercando la zona tra la linea del servizio e quella di fondo.",
+   "Contate gli scambi: l'obiettivo è 10 colpi di fila nella zona.",
+   "Dopo ogni serie si riparte da zero e cambia chi comincia."
+  ],
+  "easier": "Si gioca da metà campo, con la palla più lenta e più alta sopra la rete.",
+  "harder": "La palla deve cadere oltre la linea del servizio e a non più di un metro dalla linea laterale."
+ },
+ "bh_cross": {
+  "name": "Rovescio incrociato in diagonale",
+  "goal": "Rovescio incrociato sicuro e profondo, senza regalare palle corte.",
+  "steps": [
+   "A e B si mettono sulla diagonale del vantaggio, dietro la linea di fondo.",
+   "Solo rovesci incrociati nella zona profonda.",
+   "Ogni palla corta (prima della linea del servizio) azzera il conteggio.",
+   "Tre serie da 10 colpi buoni di fila."
+  ],
+  "easier": "Quando serve si può girare attorno alla palla e giocare di dritto; bastano scambi da 5.",
+  "harder": "Alternare rovescio carico e rovescio in back, sempre incrociato."
+ },
+ "line_cross": {
+  "name": "Uno lungolinea, l'altro incrociato",
+  "goal": "Spostarsi lungo la linea di fondo e cambiare direzione: la base del palleggio vero.",
+  "steps": [
+   "A gioca sempre lungolinea, B sempre incrociato: la palla disegna un otto.",
+   "Dopo ogni colpo si torna verso il centro della linea di fondo.",
+   "Dopo 2 minuti si scambiano i compiti.",
+   "Contate quanti colpi di fila riuscite a tenere."
+  ],
+  "easier": "Palla più lenta e alta; si possono lasciare due rimbalzi.",
+  "harder": "Chi sbaglia la direzione perde il punto; si gioca a 7 punti."
+ },
+ "deep_rally": {
+  "name": "Palleggio profondo",
+  "goal": "Abituarsi a giocare lungo: ogni palla oltre la linea del servizio.",
+  "steps": [
+   "A e B al centro, dietro la linea di fondo.",
+   "Palleggio libero, ma ogni palla deve cadere tra la linea del servizio e quella di fondo.",
+   "Una palla corta vale un punto all'altro: si gioca a 11."
+  ],
+  "easier": "Va bene anche una palla appena prima della linea del servizio.",
+  "harder": "Zona ridotta: l'ultimo metro e mezzo prima della linea di fondo."
+ },
+ "mini_tennis": {
+  "name": "Mini tennis",
+  "goal": "Sentire la palla e controllarla: per scaldarsi o per chi comincia.",
+  "steps": [
+   "A e B dentro i quadrati del servizio, vicino alla rete.",
+   "Palleggio morbido: la palla deve restare nei quadrati.",
+   "Tre-cinque minuti di dritti e rovesci, poi qualche volée.",
+   "Chi vuole conta gli scambi o gioca punti a 11."
+  ],
+  "easier": "Palla depressurizzata (rossa o arancione) e due rimbalzi permessi.",
+  "harder": "Solo colpi in back, oppure solo volée senza far rimbalzare la palla."
+ },
+ "serve_targets": {
+  "name": "Servizio ai tre bersagli",
+  "goal": "Variare la direzione del servizio: al centro, al corpo, esterno.",
+  "steps": [
+   "Metti tre coni nel quadrato del servizio: vicino alla T, al centro e vicino alla linea laterale.",
+   "Servi 5 palle verso ogni cono dal lato del pari, poi dal lato del vantaggio.",
+   "Segna dentro o fuori a ogni servizio: l'app conta la percentuale per bersaglio.",
+   "Prima cerca la precisione, poi aggiungi un po' di velocità."
+  ],
+  "easier": "Servi da metà campo, oppure prova solo due bersagli (T ed esterno).",
+  "harder": "Una sola palla per bersaglio, a rotazione: T, corpo, esterno, senza ripetere."
+ },
+ "second_serve": {
+  "name": "Seconda di servizio con margine",
+  "goal": "Una seconda sicura: più rotazione, alta sopra la rete e profonda.",
+  "steps": [
+   "Servi solo seconde, verso il fondo del quadrato del servizio.",
+   "Cerca una traiettoria alta sopra la rete, che scenda nella zona profonda.",
+   "Dieci servizi per lato, segnando dentro o fuori.",
+   "Obiettivo: almeno 8 su 10 dentro."
+  ],
+  "easier": "Va bene qualsiasi punto del quadrato: conta il margine sopra la rete.",
+  "harder": "Zona ridotta al terzo più profondo del quadrato, verso il rovescio di chi risponde."
+ },
+ "return_deep": {
+  "name": "Risposta profonda al centro",
+  "goal": "Rispondere lungo e al centro, per togliere angoli a chi serve.",
+  "steps": [
+   "B serve dal lato del pari, A risponde dall'altra parte.",
+   "A cerca la zona centrale profonda: niente rischi sulle righe.",
+   "Dopo 10 risposte si cambia lato di servizio, poi si scambiano i ruoli.",
+   "Contate le risposte nella zona."
+  ],
+  "easier": "B serve più piano, o solo seconde.",
+  "harder": "Dopo la risposta si gioca il punto: la risposta nella zona vale doppio."
+ },
+ "volley_feed": {
+  "name": "Volée di dritto e di rovescio",
+  "goal": "Volée ferme e precise, con il piatto della racchetta stabile.",
+  "steps": [
+   "A a rete, un passo davanti alla linea del servizio; l'allenatore lancia dal centro dell'altra metà.",
+   "Le palle arrivano una a destra e una a sinistra: volée di dritto, poi di rovescio.",
+   "Ogni volée va incrociata e profonda.",
+   "Due serie da 10 per parte."
+  ],
+  "easier": "Palle lanciate a mano, piano, all'altezza delle spalle.",
+  "harder": "Palle più veloci e più basse; dopo ogni volée un passo indietro e di nuovo avanti."
+ },
+ "approach_volley": {
+  "name": "Attacco e volée",
+  "goal": "Riconoscere la palla corta, attaccare e chiudere a rete.",
+  "steps": [
+   "L'allenatore lancia una palla corta verso A.",
+   "A avanza, attacca lungolinea e continua verso la rete.",
+   "Mentre l'allenatore colpisce, A fa lo split step, poi gioca la volée incrociata.",
+   "Si torna a fondo campo e si ripete: 10 volte."
+  ],
+  "easier": "Palla corta lenta e alta; la volée si gioca al centro.",
+  "harder": "L'allenatore alterna passante lungolinea e pallonetto: A deve leggere e scegliere."
+ },
+ "smash": {
+  "name": "Smash",
+  "goal": "Arretrare con i passi giusti e colpire lo smash in equilibrio.",
+  "steps": [
+   "A tocca la rete con la racchetta, poi arretra di fianco.",
+   "L'allenatore alza un pallonetto verso la linea del servizio.",
+   "A gioca lo smash verso la zona indicata e torna a rete.",
+   "Dieci smash, poi si cambia zona."
+  ],
+  "easier": "Pallonetti più bassi e vicini alla rete; A parte già di fianco.",
+  "harder": "Pallonetti più profondi: A colpisce in salto e torna subito a rete."
+ },
+ "one_vs_two": {
+  "name": "Uno a rete contro due",
+  "goal": "Riflessi e posizione a rete sotto pressione.",
+  "steps": [
+   "A a rete, B e C a fondo campo, ognuno su una metà.",
+   "B e C giocano verso A, che risponde di volée verso l'altro.",
+   "Le palle si alternano: dritto e rovescio, alte e basse.",
+   "Dopo 2 minuti cambia chi va a rete."
+  ],
+  "easier": "B e C giocano piano e verso A.",
+  "harder": "B e C possono provare il passante o il pallonetto: si gioca il punto."
+ },
+ "drop_recover": {
+  "name": "Smorzata e recupero",
+  "goal": "Scattare in avanti sulla palla corta e tornare in posizione.",
+  "steps": [
+   "A parte dal centro della linea di fondo, B gioca vicino alla rete.",
+   "B fa una smorzata, A scatta e la rigioca in diagonale.",
+   "A torna subito a fondo campo, di fianco o all'indietro.",
+   "Otto ripetizioni, poi si scambiano i ruoli."
+  ],
+  "easier": "Smorzata più lunga e lenta; A può partire da metà campo.",
+  "harder": "Dopo il recupero B alza un pallonetto: A torna indietro e lo rigioca."
+ },
+ "spider": {
+  "name": "Il ragno",
+  "goal": "Velocità e cambi di direzione verso tutte le parti del campo.",
+  "steps": [
+   "Metti cinque coni: i due angoli della linea di fondo, i due incroci con la linea del servizio e la T.",
+   "Dal centro della linea di fondo corri al primo cono, toccalo e torna al centro.",
+   "Poi al secondo, e così via fino al quinto.",
+   "Tre giri, con 1-2 minuti di recupero tra un giro e l'altro."
+  ],
+  "easier": "Cammina veloce invece di correre, oppure usa solo tre coni.",
+  "harder": "Con la racchetta in mano e un colpo simulato a ogni cono; misura il tempo."
+ },
+ "split_step": {
+  "name": "Split step",
+  "goal": "Farsi trovare pronti: un piccolo saltello mentre l'altro colpisce.",
+  "steps": [
+   "A al centro della linea di fondo, l'allenatore lancia dall'altra metà.",
+   "Quando l'allenatore colpisce, A fa un piccolo saltello a piedi larghi.",
+   "Appena atterrato, A parte verso la palla e la gioca.",
+   "Dopo ogni colpo torna al centro: 15 palle alternate."
+  ],
+  "easier": "Palle lanciate a mano e annunciate prima (destra o sinistra).",
+  "harder": "L'allenatore sceglie a caso lato e profondità."
+ },
+ "baseline_shuffle": {
+  "name": "Passi laterali sulla linea di fondo",
+  "goal": "Spostamenti laterali corti e rapidi, senza incrociare i piedi.",
+  "steps": [
+   "Metti tre coni: al centro della linea di fondo e nei due angoli del singolare.",
+   "Dal centro, a passi laterali fino a un angolo: tocca il cono e torna.",
+   "Poi l'altro angolo; un giro sono 4 tocchi.",
+   "Tre serie da 30 secondi con 1 minuto di recupero."
+  ],
+  "easier": "Più piano e con meno tocchi.",
+  "harder": "Con la racchetta in mano e un colpo simulato a ogni cono."
+ },
+ "serve_plus_one": {
+  "name": "Servizio e primo colpo",
+  "goal": "Preparare il colpo dopo il servizio: aprire il campo e chiudere dall'altra parte.",
+  "steps": [
+   "A serve esterno dal lato del pari.",
+   "B risponde verso il centro.",
+   "A fa un passo avanti e gioca il dritto nell'altra metà, lontano da B.",
+   "Poi si gioca il punto; dieci servizi e si scambiano i ruoli."
+  ],
+  "easier": "B risponde piano al centro e non si gioca il punto.",
+  "harder": "B risponde dove vuole: A deve scegliere il colpo giusto."
+ },
+ "cross_points": {
+  "name": "Punti solo in diagonale",
+  "goal": "Pazienza e scelta del colpo in uno spazio ridotto.",
+  "steps": [
+   "Si gioca solo nella metà diagonale del campo da singolare.",
+   "Si comincia con un lancio dal basso, poi punto libero dentro la diagonale.",
+   "Chi manda la palla fuori dalla diagonale perde il punto.",
+   "Partite a 11, poi si cambia diagonale."
+  ],
+  "easier": "La palla può rimbalzare due volte.",
+  "harder": "Dopo tre colpi si può giocare anche lungolinea, ma solo per un vincente."
+ },
+ "king_court": {
+  "name": "Re del campo",
+  "goal": "Giocare punti sotto pressione, come in partita, anche in tanti.",
+  "steps": [
+   "A è il re e resta dalla sua parte; B sfida dall'altra, C e D aspettano fuori.",
+   "Si gioca un punto: se vince lo sfidante, prende il posto del re.",
+   "Chi perde esce ed entra il prossimo della fila.",
+   "Si gioca 10-15 minuti: vince chi fa più punti da re."
+  ],
+  "easier": "Ogni punto comincia con un lancio facile dal basso dello sfidante.",
+  "harder": "Il re deve vincere due punti di fila per restare."
+ },
+ "doubles_poach": {
+  "name": "Doppio: l'incrocio a rete",
+  "goal": "Giocare in coppia: chi è a rete intercetta la risposta incrociata.",
+  "steps": [
+   "A1 serve e A2 è a rete; B1 risponde incrociato, B2 sta sulla linea del servizio.",
+   "Prima del servizio A1 e A2 decidono se A2 incrocia.",
+   "A2 parte quando B1 colpisce, intercetta e chiude in mezzo ai due avversari.",
+   "A1 copre il lato rimasto libero; dieci servizi, poi si ruota."
+  ],
+  "easier": "Senza servizio: l'allenatore lancia la palla della risposta.",
+  "harder": "B1 può rispondere lungolinea: A2 deve partire al momento giusto."
+ }
+}

@@ -113,7 +113,7 @@ fun CoachNotesSection(c: MatchController, st: PlayerProfile) {
         OutlinedTextField(draft, { draft = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2, maxLines = 5, placeholder = { Text(s.cnNewHint) },
             trailingIcon = { DictateIcon(c) { said -> draft = appendDictated(draft, said).take(2000) } })
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            for (t in NoteTag.entries) Chip(noteTagLabel(s, t), tag == t) { tag = if (tag == t) null else t }
+            for (t in NoteTag.entries) TagChip(noteTagLabel(s, t), tag == t) { tag = if (tag == t) null else t }
         }
         BigButton(s.cnAdd, Icons.Filled.Add, {
             save(st.coachNotes + CoachNote(CoachNotes.newId(), System.currentTimeMillis(), draft.trim(), tag))
@@ -139,8 +139,8 @@ fun CoachNotesSection(c: MatchController, st: PlayerProfile) {
     Segmented(listOf(SegOption(s.cnAll), SegOption(s.cn30), SegOption(s.cn90), SegOption(s.cnYear)), period, { period = it })
     val used = NoteTag.entries.filter { t -> st.coachNotes.any { it.tag == t } }
     if (used.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Chip(s.cnTagAll, filterTag == null) { filterTag = null }
-        for (t in used) Chip(noteTagLabel(s, t), filterTag == t) { filterTag = if (filterTag == t) null else t }
+        TagChip(s.cnTagAll, filterTag == null) { filterTag = null }
+        for (t in used) TagChip(noteTagLabel(s, t), filterTag == t) { filterTag = if (filterTag == t) null else t }
     }
 
     // Resoconto e riassunto, sulle note che si vedono.
@@ -194,7 +194,7 @@ fun CoachNotesSection(c: MatchController, st: PlayerProfile) {
 }
 
 @Composable
-private fun Chip(label: String, on: Boolean, onClick: () -> Unit) {
+internal fun TagChip(label: String, on: Boolean, onClick: () -> Unit) {
     val area = LocalArea.current
     Text(
         label, color = if (on) TsmColors.OnArea else TsmColors.TextMain, fontSize = 13.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal,
@@ -219,7 +219,7 @@ private fun NoteEditDialog(c: MatchController, n: CoachNote, onSave: (CoachNote)
                 OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 3, maxLines = 8,
                     trailingIcon = { DictateIcon(c) { said -> text = appendDictated(text, said).take(2000) } })
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (t in NoteTag.entries) Chip(noteTagLabel(s, t), tag == t) { tag = if (tag == t) null else t }
+                    for (t in NoteTag.entries) TagChip(noteTagLabel(s, t), tag == t) { tag = if (tag == t) null else t }
                 }
                 TextButton(onClick = { askDelete = true }) { Text(s.cnDelete, color = TsmColors.Danger) }
             }
@@ -255,7 +255,7 @@ private fun AskSummaryDialog(c: MatchController, st: PlayerProfile, notes: List<
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(s.cnAskHint, color = TsmColors.TextDim, fontSize = 13.sp)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (q in listOf(s.cnAskProgress, s.cnAskParents, s.cnAskPlan)) Chip(q, request == q) { request = q }
+                    for (q in listOf(s.cnAskProgress, s.cnAskParents, s.cnAskPlan)) TagChip(q, request == q) { request = q }
                 }
                 OutlinedTextField(request, { request = it.take(500) }, Modifier.fillMaxWidth(), minLines = 2, maxLines = 5, label = { Text(s.cnAskRequest) },
                     trailingIcon = { DictateIcon(c) { said -> request = appendDictated(request, said).take(500) } })

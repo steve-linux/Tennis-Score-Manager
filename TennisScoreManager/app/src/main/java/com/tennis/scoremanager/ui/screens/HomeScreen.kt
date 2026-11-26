@@ -39,6 +39,7 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Mail
@@ -362,6 +363,8 @@ private fun CoachTab(c: MatchController) {
     if (month) com.tennis.scoremanager.ui.MonthSummaryDialog(c) { month = false }
     // Gli esercizi si scelgono e si gestiscono dentro l'allenamento (Esercizio › Gestisci), una strada sola.
     ServeTrainingCard(c, coach = true)
+    // La raccolta di esercizi illustrati, per preparare le lezioni.
+    Entry(Icons.AutoMirrored.Filled.MenuBook, s.dlTitle, s.dlHint) { c.go(Screen.DRILL_LIBRARY) }
     // TSM Arena: tennis sulla TV coi braccialetti, da casa tra una lezione e l'altra.
     Entry(Icons.Filled.SportsEsports, s.arenaTitle, s.arenaHint) { c.openArena() }
 }
@@ -659,6 +662,8 @@ private fun TrainTab(c: MatchController) {
     if (PlayerFeature.HEART in pf) Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.workoutArea.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     if (PlayerFeature.TRAINING in pf) ServeTrainingCard(c, coach = false)
+    // La raccolta di esercizi illustrati (da aggiungere ai propri).
+    Entry(Icons.AutoMirrored.Filled.MenuBook, s.dlTitle, s.dlHint) { c.go(Screen.DRILL_LIBRARY) }
     // TSM Arena: tennis sulla TV coi braccialetti come racchette.
     if (PlayerFeature.BANDS in pf || PlayerFeature.TRAINING in pf) Entry(Icons.Filled.SportsEsports, s.arenaTitle, s.arenaHint) { c.openArena() }
 }

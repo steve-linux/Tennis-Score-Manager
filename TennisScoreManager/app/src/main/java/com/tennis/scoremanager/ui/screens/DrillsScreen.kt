@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -79,6 +80,8 @@ fun DrillsScreen(c: MatchController) {
             BigButton(s.drillNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {
+        // Dalla raccolta illustrata se ne aggiungono di pronti.
+        Entry(Icons.AutoMirrored.Filled.MenuBook, s.dlTitle, s.dlFromLibrary) { c.go(com.tennis.scoremanager.Screen.DRILL_LIBRARY) }
         if (drills.isEmpty()) Text(s.drillsNone, color = TsmColors.TextDim)
         for (t in TrainedStroke.entries) {
             val mine = drills.filter { it.stroke == t }

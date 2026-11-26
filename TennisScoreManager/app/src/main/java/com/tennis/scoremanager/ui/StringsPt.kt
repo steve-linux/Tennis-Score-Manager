@@ -2947,4 +2947,29 @@ object PtStrings : Strings {
     override val trModeStrokeHint = "Escolha o golpe e marque cada um dentro ou fora: porcentagem e progresso."
     override val trModeLesson = "A aula inteira"
     override val trModeLessonHint = "Você não aperta nada: cada golpe vira um clipe, separado sozinho por tipo."
+
+    override val dlTitle = "Coleção de exercícios"
+    override val dlHint = "Exercícios ilustrados por golpe, nível e jogadores"
+    override val dlFromLibrary = "Exercícios prontos para adicionar aos seus"
+    override val dlReturn = "Devolução"
+    override val dlOverhead = "Smash"
+    override val dlFootwork = "Trabalho de pernas"
+    override val dlBeginner = "Iniciante"
+    override val dlIntermediate = "Intermediário"
+    override val dlAdvanced = "Avançado"
+    override val dlPlayers = "Jogadores"
+    override val dlPlayersN: (Int) -> String = { if (it == 1) "1 jogador" else "$it jogadores" }
+    override val dlCount: (Int) -> String = { if (it == 1) "1 exercício" else "$it exercícios" }
+    override val dlNone = "Nenhum exercício com estes filtros."
+    override val dlOriginal = "Textos e desenhos feitos para o app. Por enquanto em italiano."
+    override val dlLegend = "Linha cheia: a bola (com número, a ordem). Tracejada: quem se move. Laranja: quem lança as bolas; triângulos: cones."
+    override val dlGoal = "Objetivo"
+    override val dlHow = "Como fazer"
+    override val dlEasier = "Mais fácil"
+    override val dlHarder = "Mais difícil"
+    override val dlSafety = "Adapte à idade e à condição de quem treina; não substitui a orientação de um médico ou preparador."
+    override val dlAdd = "Adicionar aos meus exercícios"
+
+    override val dlUse = "Usar este exercício"
+    override val dlReady: (String) -> String = { "Pronto em Treinar › Um golpe › $it" }
 }

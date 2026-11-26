@@ -164,6 +164,7 @@ fun AppRoot(c: MatchController) {
                 Screen.TEAMS -> com.tennis.scoremanager.ui.screens.TeamsScreen(c)
                 Screen.TEAM -> com.tennis.scoremanager.ui.screens.TeamScreen(c)
                 Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
+                Screen.DRILL_LIBRARY -> com.tennis.scoremanager.ui.screens.DrillLibraryScreen(c)
             }
             }
         }
