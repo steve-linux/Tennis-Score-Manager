@@ -123,8 +123,10 @@ data class MatchRecord(
     val batteryEnd: Map<Side, Int> = emptyMap(),
     /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
     val strokes: Map<Side, StrokeStats> = emptyMap(),
-    /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
+    /** Battito dalle fasce cardio, per lato (nel doppio: il primo giocatore della squadra). */
     val heart: Map<Side, HeartTrack> = emptyMap(),
+    /** Nel doppio, il battito del compagno (il secondo giocatore della squadra), se porta anche lui la fascia. */
+    val heartPartner: Map<Side, HeartTrack> = emptyMap(),
     /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
     val notes: String = "",
     /** Amichevole: resta nello storico ma non conta per il rating TSM. */
@@ -134,6 +136,33 @@ data class MatchRecord(
 )
 
 /** Chi indossa la fascia: serve solo a stimare le calorie. */
+/**
+ * Chi porta una fascia cardio: il giocatore di ciascun lato e, nel doppio, il compagno ([partner] = il secondo nome
+ * della squadra). P1 e P2 hanno gli stessi numeri di [Side]: il secondo telefono e i dati di prima restano validi.
+ */
+enum class Wearer(val side: Side, val partner: Boolean) {
+    P1(Side.P1, false), P2(Side.P2, false), P1B(Side.P1, true), P2B(Side.P2, true);
+
+    /** 0 = primo giocatore della squadra, 1 = compagno (come in [Names.player]). */
+    val index: Int get() = if (partner) 1 else 0
+
+    companion object {
+        fun of(side: Side, partner: Boolean = false): Wearer = entries.first { it.side == side && it.partner == partner }
+    }
+}
+
+/** Il battito di chi porta la fascia [w] in questa partita. */
+fun MatchRecord.heartOf(w: Wearer): HeartTrack? = if (w.partner) heartPartner[w.side] else heart[w.side]
+
+/** Tutte le tracce del battito della partita, compagni compresi. */
+fun MatchRecord.heartTracks(): Map<Wearer, HeartTrack> = Wearer.entries.mapNotNull { w -> heartOf(w)?.let { w to it } }.toMap()
+
+/** La partita con queste tracce del battito (al posto di quelle che aveva). */
+fun MatchRecord.withHeart(m: Map<Wearer, HeartTrack>): MatchRecord = copy(
+    heart = m.filterKeys { !it.partner }.mapKeys { it.key.side },
+    heartPartner = m.filterKeys { it.partner }.mapKeys { it.key.side },
+)
+
 @Serializable
 data class HeartProfile(val age: Int, val weightKg: Int, val female: Boolean = false)
 

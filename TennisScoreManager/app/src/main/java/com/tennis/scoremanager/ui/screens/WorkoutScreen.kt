@@ -82,7 +82,7 @@ fun WorkoutScreen(c: MatchController) {
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
         SectionCard(s.workoutTitle, Icons.Filled.MonitorHeart, accent = TsmColors.Danger) {
-            val strap = Side.entries.firstNotNullOfOrNull { straps[it] }
+            val strap = com.tennis.scoremanager.data.Wearer.entries.firstNotNullOfOrNull { straps[it] }
             if (ui.phase == WorkoutPhase.IDLE && strap == null) {
                 Text(s.workoutPickStrap, color = TsmColors.Orange)
                 return@SectionCard
@@ -183,8 +183,8 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
             if (WorkoutStats.rmssd(w.rr) != null) Text(s.workoutHrvHint, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(s.workoutRecoveryHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        if (w.heart.size > 1) StatCard(s.workoutChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
-        StatCard(s.heartZones) { HeartZones(mapOf(Side.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
+        if (w.heart.size > 1) StatCard(s.workoutChart) { HeartChart(mapOf(com.tennis.scoremanager.data.Wearer.P1 to w.heart)) }
+        StatCard(s.heartZones) { HeartZones(mapOf(com.tennis.scoremanager.data.Wearer.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
         val laps = WorkoutStats.laps(w)
         if (laps.size > 1) {
             StatCard(s.workoutLaps) {

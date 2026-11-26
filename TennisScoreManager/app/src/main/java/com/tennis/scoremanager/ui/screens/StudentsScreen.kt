@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -98,7 +100,8 @@ fun StudentsScreen(c: MatchController) {
             BigButton(s.studentNew, Icons.Filled.PersonAdd, { create = true }, Modifier.weight(1f))
         },
     ) {
-        if (students.isEmpty()) Text(s.studentNone, color = TsmColors.TextDim)
+        // Nessun allievo: cosa fare, passo per passo.
+        if (students.isEmpty()) com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.PersonAdd, s.egStudentsTitle, listOf(s.egStudents1, s.egStudents2, s.egStudents3), s.studentNew) { create = true }
         // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
         com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
@@ -197,7 +200,21 @@ fun StudentScreen(c: MatchController) {
             st.fullName.takeIf { it.isNotBlank() && it != st.name }, st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size),
         ).joinToString(" · "),
         icon = Icons.Filled.Groups,
-        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        // Modifica a vista; unire, togliere dagli allievi e cancellare nel menu ⋮, lontano dai tasti di tutti i giorni.
+        action = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = com.tennis.scoremanager.ui.LocalArea.current) }
+                var menu by remember { mutableStateOf(false) }
+                Box {
+                    androidx.compose.material3.IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, s.moreActions, tint = TsmColors.TextMain) }
+                    androidx.compose.material3.DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                        androidx.compose.material3.DropdownMenuItem(text = { Text(s.playerMerge) }, leadingIcon = { Icon(Icons.Filled.MergeType, null) }, onClick = { menu = false; merge = true })
+                        if (st.student) androidx.compose.material3.DropdownMenuItem(text = { Text(s.studentDelete, color = TsmColors.Danger) }, leadingIcon = { Icon(Icons.Filled.PersonRemove, null, tint = TsmColors.Danger) }, onClick = { menu = false; delete = true })
+                        androidx.compose.material3.DropdownMenuItem(text = { Text(s.studentPurge, color = TsmColors.Danger) }, leadingIcon = { Icon(Icons.Filled.DeleteForever, null, tint = TsmColors.Danger) }, onClick = { menu = false; purge = true })
+                    }
+                }
+            }
+        },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
@@ -223,6 +240,18 @@ fun StudentScreen(c: MatchController) {
         else GhostButton(s.meThisIsMe, Icons.Filled.Person, { c.setMe(st) }, Modifier.fillMaxWidth())
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
+        // Le parti della scheda in sotto-schede, invece di una pagina lunghissima: la scheda (socio, quote, squadre,
+        // racchetta, note), le lezioni dell'allenatore, l'allenamento (colpi, movimento, valutazioni) e le partite.
+        val tabs = buildList {
+            add(StudentTab.CARD)
+            if (st.student) add(StudentTab.LESSONS)
+            if (st.student || mine.isNotEmpty()) add(StudentTab.TRAINING)
+            add(StudentTab.MATCHES)
+        }
+        var tabPick by androidx.compose.runtime.saveable.rememberSaveable(st.id) { mutableStateOf(StudentTab.CARD) }
+        val tab = tabPick.takeIf { it in tabs } ?: StudentTab.CARD
+        com.tennis.scoremanager.ui.SubTabs(tabs.map { studentTabName(s, it) }, tabs.indexOf(tab)) { tabPick = tabs[it] }
+        if (tab == StudentTab.CARD) {
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         val features by c.clubFeatures.collectAsState()
         if (com.tennis.scoremanager.ClubFeature.MEMBERS in features) MemberSection(c, st)
@@ -271,6 +300,8 @@ fun StudentScreen(c: MatchController) {
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
         }
 
+        }
+        if (tab == StudentTab.TRAINING) {
         // Colpi: per ciascuno sessioni, colpi e la linea dei colpi dentro; toccando, le sue sessioni.
         SectionCard(s.studentStrokes, Icons.Filled.SportsTennis) {
             val lines = Students.strokeLines(mine)
@@ -314,7 +345,9 @@ fun StudentScreen(c: MatchController) {
             }
         }
 
+        }
         // Partite dallo storico con lo stesso nome, e il rating.
+        if (tab == StudentTab.MATCHES) {
         SectionCard(s.studentMatches, Icons.Filled.EmojiEvents) {
             val lines = remember(st, history) { c.studentMatches(st) }
             if (lines.isEmpty()) {
@@ -336,8 +369,9 @@ fun StudentScreen(c: MatchController) {
             }
         }
 
+        }
         // Note dell'allenatore: si salvano da sole mentre si scrive.
-        SectionCard(s.studentNotes, Icons.Filled.EditNote) {
+        if (tab == StudentTab.CARD) SectionCard(s.studentNotes, Icons.Filled.EditNote) {
             var note by remember(st.id) { mutableStateOf(st.note) }
             LaunchedEffect(note) {
                 if (note == st.note) return@LaunchedEffect
@@ -348,18 +382,15 @@ fun StudentScreen(c: MatchController) {
                 trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
-        if (st.student) {
-            com.tennis.scoremanager.ui.StudentCoachSections(c, st)
-            com.tennis.scoremanager.ui.StudentProgressSections(c, st)
+        if (st.student && tab == StudentTab.LESSONS) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
+        if (st.student && tab == StudentTab.TRAINING) com.tennis.scoremanager.ui.StudentProgressSections(c, st)
+        if (tab == StudentTab.CARD) {
+            // Il report da dare all'allievo (PDF o immagine per WhatsApp).
+            if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
+            // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
+            GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
         }
-        // Il report da dare all'allievo (PDF o immagine per WhatsApp).
-        if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
-        // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
-        GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
-        GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
-        if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
-        // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
-        GhostButton(s.studentPurge, Icons.Filled.DeleteForever, { purge = true }, Modifier.fillMaxWidth())
+        // Unire, togliere dagli allievi e cancellare (tutto quello che il telefono ha di suo) stanno nel menu ⋮.
     }
     if (purge) {
         AlertDialog(
@@ -492,4 +523,14 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
+}
+
+/** Le sotto-schede della scheda del giocatore. */
+private enum class StudentTab { CARD, LESSONS, TRAINING, MATCHES }
+
+private fun studentTabName(s: com.tennis.scoremanager.ui.Strings, t: StudentTab): String = when (t) {
+    StudentTab.CARD -> s.stTabCard
+    StudentTab.LESSONS -> s.stTabLessons
+    StudentTab.TRAINING -> s.stTabTraining
+    StudentTab.MATCHES -> s.studentMatches
 }

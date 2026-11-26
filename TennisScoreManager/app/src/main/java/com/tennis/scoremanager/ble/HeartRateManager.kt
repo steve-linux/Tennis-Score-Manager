@@ -27,6 +27,7 @@ import android.os.ParcelUuid
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.data.Wearer
 import com.tennis.scoremanager.model.Side
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -68,8 +69,9 @@ data class StrapInfo(
 )
 
 /**
- * Fasce cardio Bluetooth (servizio standard 0x180D), una per lato. Stesso schema dei braccialetti ([BleManager]),
- * ma la fascia manda solo: nessun messaggio da scriverle, nessuna conferma.
+ * Fasce cardio Bluetooth (servizio standard 0x180D), una per giocatore: una per lato e, nel doppio, fino a quattro.
+ * Stesso schema dei braccialetti ([BleManager]), ma la fascia manda solo: nessun messaggio da scriverle, nessuna
+ * conferma.
  */
 @SuppressLint("MissingPermission")
 class HeartRateManager(context: Context, private val ble: BleManager) {
@@ -82,13 +84,13 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
     val found: StateFlow<List<FoundStrap>> = _found
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning
-    private val _straps = MutableStateFlow<Map<Side, StrapInfo>>(emptyMap())
-    val straps: StateFlow<Map<Side, StrapInfo>> = _straps
-    private val _readings = MutableSharedFlow<Pair<Side, HeartMeasurement>>(extraBufferCapacity = 32)
+    private val _straps = MutableStateFlow<Map<Wearer, StrapInfo>>(emptyMap())
+    val straps: StateFlow<Map<Wearer, StrapInfo>> = _straps
+    private val _readings = MutableSharedFlow<Pair<Wearer, HeartMeasurement>>(extraBufferCapacity = 32)
     /** Ogni misura arrivata (circa una al secondo per fascia). */
-    val readings: SharedFlow<Pair<Side, HeartMeasurement>> = _readings
+    val readings: SharedFlow<Pair<Wearer, HeartMeasurement>> = _readings
 
-    private val links = mutableMapOf<Side, StrapLink>()
+    private val links = mutableMapOf<Wearer, StrapLink>()
     private var autoScan = false
     private var scanRunning = false
     private var scanStartJob: Job? = null
@@ -211,21 +213,27 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         }
     }
 
-    /** Associa (o toglie, con address null) la fascia a un lato. Una fascia non può stare su due lati. */
-    fun assign(side: Side, address: String?, name: String?) {
-        links.remove(side)?.close()
+    /**
+     * Associa (o toglie, con address null) la fascia a chi la porta (nel doppio anche ai compagni). Una fascia non
+     * può stare su due persone.
+     */
+    fun assign(who: Wearer, address: String?, name: String?) {
+        links.remove(who)?.close()
         if (address != null) {
             links.entries.firstOrNull { it.value.address == address }?.let { links.remove(it.key)?.close() }
-            links[side] = StrapLink(side, address, name ?: address).also { it.connect() }
+            links[who] = StrapLink(who, address, name ?: address).also { it.connect() }
         }
         publish()
     }
 
+    /** Scambia i lati: G1 con G2 e, nel doppio, anche i compagni. */
     fun swapSides() {
-        val a = links.remove(Side.P1)
-        val b = links.remove(Side.P2)
-        a?.let { it.side = Side.P2; links[Side.P2] = it }
-        b?.let { it.side = Side.P1; links[Side.P1] = it }
+        val moved = Wearer.entries.mapNotNull { w -> links.remove(w)?.let { w to it } }
+        for ((w, l) in moved) {
+            val to = Wearer.of(if (w.side == Side.P1) Side.P2 else Side.P1, w.partner)
+            l.side = to
+            links[to] = l
+        }
         publish()
     }
 
@@ -256,7 +264,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
 
     private enum class OpKind { DESCRIPTOR, READ }
 
-    private inner class StrapLink(var side: Side, val address: String, val name: String) {
+    private inner class StrapLink(var side: Wearer, val address: String, val name: String) {
         var state = StrapState.IDLE
             private set
         var battery: Int? = null

@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
@@ -89,6 +92,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
@@ -160,22 +165,45 @@ fun HomeScreen(c: MatchController) {
         // Il ruolo sempre in vista: un tocco e si passa a Tu, Allenatore o Circolo.
         action = { com.tennis.scoremanager.ui.RoleSwitchButton(c) },
     ) {
-        // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
+        // Tutto quello che chiede attenzione adesso, in un riquadro solo in cima: la casella del server, il backup, un
+        // archivio illeggibile, un obiettivo raggiunto, i risultati da rimandare alla segreteria.
+        val context = LocalContext.current
         val inbox by c.mailbox.inbox.collectAsState()
-        if (inbox.isNotEmpty()) Entry(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint, main = true) { c.mailbox.openInbox() }
-        // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
-        if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
-        // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
-        val unreadable = c.storage.unreadable.toList()
-        if (unreadable.isNotEmpty()) Entry(Icons.Filled.Warning, s.unreadableTitle, s.unreadableHint(unreadable.joinToString(", "))) {
-            c.storage.unreadable.clear()
-            c.go(Screen.DATA)
+        val goals by c.progress.goals.collectAsState()
+        val cards by c.cards.receivedCards.collectAsState()
+        val todo = buildList {
+            // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
+            if (inbox.isNotEmpty()) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint) { c.mailbox.openInbox() })
+            // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
+            val unreadable = c.storage.unreadable.toList()
+            if (unreadable.isNotEmpty()) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.Warning, s.unreadableTitle, s.unreadableHint(unreadable.joinToString(", "))) {
+                c.storage.unreadable.clear()
+                c.go(Screen.DATA)
+            })
+            // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
+            if (c.backupDue()) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) })
+            // Chi aveva già l'app: il backup automatico ora è acceso di serie, lo si dice una volta.
+            if (!c.storage.autoBackupNoticeSeen && c.storage.personalBackupAuto) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.Backup, s.autoBackupOnTitle, s.autoBackupOnHint) {
+                c.storage.autoBackupNoticeSeen = true
+                c.go(Screen.DATA)
+            })
+            if (role != com.tennis.scoremanager.Role.CLUB) {
+                // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
+                for (g in goals.filter { it.reachedAt != null && !it.seen }) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) {
+                    c.progress.goalSeen(g.id); c.progress.openProgress()
+                })
+                // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
+                for (rc in cards.filter { it.result != null && it.sentAt == null }) {
+                    val r = rc.result!!
+                    add(com.tennis.scoremanager.ui.TodoItem(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }) {
+                        com.tennis.scoremanager.ui.sendResult(context, c, rc.card.code)
+                    })
+                }
+            }
         }
-        // Chi aveva già l'app: il backup automatico ora è acceso di serie, lo si dice una volta.
-        if (!c.storage.autoBackupNoticeSeen && c.storage.personalBackupAuto) Entry(Icons.Filled.Backup, s.autoBackupOnTitle, s.autoBackupOnHint) {
-            c.storage.autoBackupNoticeSeen = true
-            c.go(Screen.DATA)
-        }
+        com.tennis.scoremanager.ui.TodoCard(todo)
+        // I primi passi del ruolo, nella prima scheda, finché non sono fatti (o li si nasconde).
+        if (tab == tabs.first()) FirstSteps(c, role)
         when (tab) {
             // Senza la scheda Progressi (spenta in Cosa usi) lo storico sta in Gioca.
             HomeTab.PLAY -> PlayTab(c, historyHere = HomeTab.PROGRESS !in tabs)
@@ -189,6 +217,89 @@ fun HomeScreen(c: MatchController) {
             HomeTab.PEOPLE -> PeopleTab(c)
             HomeTab.TODAY -> TodayTab(c)
         }
+        // Le funzioni spente in Cosa usi: in fondo alla prima scheda e in Altro, per ritrovarle.
+        if (tab == tabs.first() || tab == HomeTab.MORE) MoreFeaturesEntry(c, role)
+    }
+}
+
+/**
+ * I primi passi di ogni ruolo, con la spunta su quelli fatti: un tocco porta dove si fanno. Spariscono quando sono
+ * tutti fatti o con Nascondi (per ruolo).
+ */
+@Composable
+private fun FirstSteps(c: MatchController, role: com.tennis.scoremanager.Role) {
+    val s = LocalStrings.current
+    var hidden by remember(role) { mutableStateOf(c.storage.firstStepsHidden(role.name)) }
+    if (hidden) return
+    val players by c.players.collectAsState()
+    val history by c.history.collectAsState()
+    val bands by c.ble.bands.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
+    val cf by c.clubFeatures.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
+    val clubBook by c.clubBook.collectAsState()
+    var profile by remember { mutableStateOf(false) }
+    var club by remember { mutableStateOf(false) }
+    var manage by remember { mutableStateOf(false) }
+    val named = c.me() != null || c.storage.myName.isNotBlank()
+    // Ogni passo: fatto?, titolo, cosa fare.
+    val steps: List<Triple<Boolean, String, () -> Unit>> = when (role) {
+        com.tennis.scoremanager.Role.PLAYER -> listOfNotNull(
+            Triple(named, s.fsName) { profile = true },
+            Triple(bands.isNotEmpty(), s.fsBands) { c.go(Screen.DEVICES) }.takeIf { PlayerFeature.BANDS in pf },
+            Triple(history.isNotEmpty(), s.fsFirstMatch) { c.go(Screen.SETUP) },
+        )
+        com.tennis.scoremanager.Role.COACH -> listOf(
+            Triple(named, s.fsName) { profile = true },
+            Triple(players.any { it.student }, s.fsFirstStudent) { c.openStudents() },
+            Triple(book.lessons.isNotEmpty(), s.fsFirstLesson) { c.coaching.openLessons() },
+        )
+        com.tennis.scoremanager.Role.CLUB -> listOfNotNull(
+            Triple(c.storage.clubName.isNotBlank(), s.fsClubName) { club = true },
+            Triple(courts.isNotEmpty(), s.fsCourts) { manage = true },
+            Triple(players.any { it.member != null }, s.fsFirstMember) { c.openMembers() }.takeIf { ClubFeature.MEMBERS in cf },
+            Triple(clubBook.fees.isNotEmpty(), s.fsFirstFee) { c.openPayments() }.takeIf { ClubFeature.PAYMENTS in cf },
+        )
+    }
+    if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    if (club) com.tennis.scoremanager.ui.ClubDialog(c) { club = false }
+    if (manage) CourtsManageDialog(c) { manage = false }
+    val done = steps.count { it.first }
+    if (done == steps.size) return
+    com.tennis.scoremanager.ui.StripeBox(com.tennis.scoremanager.ui.LocalArea.current) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(s.fsTitle(done, steps.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+            androidx.compose.material3.TextButton(onClick = { hidden = true; c.storage.setFirstStepsHidden(role.name) }) { Text(s.fsHide, color = TsmColors.TextDim) }
+        }
+        for ((ok, title, go) in steps) Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(enabled = !ok) { go() }.padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(if (ok) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, null, tint = if (ok) TsmColors.Ok else com.tennis.scoremanager.ui.LocalArea.current)
+            Text(title, color = if (ok) TsmColors.TextDim else TsmColors.TextMain, fontSize = 15.sp, fontWeight = if (ok) FontWeight.Normal else FontWeight.Bold,
+                modifier = Modifier.weight(1f).padding(start = 10.dp))
+            if (!ok) Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
+        }
+    }
+}
+
+/** Le funzioni spente (Cosa usi, Funzioni del circolo): una riga per ritrovarle, che apre gli interruttori. */
+@Composable
+private fun MoreFeaturesEntry(c: MatchController, role: com.tennis.scoremanager.Role) {
+    val s = LocalStrings.current
+    val pf by c.features.playerFeatures.collectAsState()
+    val cf by c.clubFeatures.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    val off = if (role == com.tennis.scoremanager.Role.CLUB) ClubFeature.entries.filter { it !in cf }.map { com.tennis.scoremanager.ui.featureInfo(s, it).first }
+    else PlayerFeature.entries.filter { it !in pf }.map { com.tennis.scoremanager.ui.playerFeatureInfo(s, it).first }
+    if (off.isEmpty()) return
+    androidx.compose.runtime.CompositionLocalProvider(com.tennis.scoremanager.ui.LocalArea provides TsmColors.AreaSettings) {
+        Entry(Icons.Filled.Tune, s.mfTitle(off.size), off.joinToString(", ")) { open = true }
+    }
+    if (open) {
+        if (role == com.tennis.scoremanager.Role.CLUB) com.tennis.scoremanager.ui.ClubFeaturesDialog(c) { open = false; c.storage.clubFeaturesSeen = true }
+        else com.tennis.scoremanager.ui.PlayerFeaturesDialog(c) { open = false; c.storage.playerFeaturesSeen = true }
     }
 }
 
@@ -292,11 +403,13 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
                 .background(if (on) TsmColors.SurfaceHigh else Color.Transparent).padding(vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(icon, null, tint = if (on) TsmColors.Ball else TsmColors.TextDim)
+            // Ogni scheda col colore della sua area: lo stesso delle voci e delle schermate che apre.
+            val area = com.tennis.scoremanager.ui.areaOf(t)
+            Icon(icon, null, tint = if (on) area else TsmColors.TextDim)
             // In tedesco o francese le parole sono lunghe: il testo si rimpicciolisce invece di essere tagliato.
             androidx.compose.foundation.text.BasicText(
                 label, maxLines = 1,
-                style = androidx.compose.ui.text.TextStyle(color = if (on) TsmColors.Ball else TsmColors.TextDim, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
+                style = androidx.compose.ui.text.TextStyle(color = if (on) area else TsmColors.TextDim, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
                 autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = 12.sp, stepSize = 0.5.sp),
             )
         }
@@ -308,17 +421,24 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 internal fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, tint: androidx.compose.ui.graphics.Color? = null, onClick: () -> Unit) {
     // Con [onLongClick] la voce si tiene premuta per un'altra azione (eliminare la partita sospesa).
-    Surface(shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface,
+    // Il colore dell'area (Gioca, Circolo, Progressi...) nella striscia a sinistra e nell'icona; la voce principale
+    // è tutta di quel colore.
+    val area = com.tennis.scoremanager.ui.LocalArea.current
+    val on = com.tennis.scoremanager.ui.TsmColors.OnArea
+    Surface(shape = RoundedCornerShape(18.dp), color = if (main) area else TsmColors.Surface,
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            // [tint]: un colore per distinguere la voce (i corsi dell'allenatore da quelli della segreteria).
-            Icon(icon, null, tint = if (main) TsmColors.OnBall else tint ?: TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, color = if (main) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = if (main) 19.sp else 16.sp)
-                hint?.let { Text(it, color = if (main) TsmColors.OnBall else TsmColors.TextDim, fontSize = 13.sp) }
+        Row(Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
+            if (!main) Box(Modifier.width(5.dp).fillMaxHeight().background(tint ?: area))
+            Row(Modifier.weight(1f).padding(start = if (main) 16.dp else 11.dp, end = 16.dp, top = if (main) 18.dp else 14.dp, bottom = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                // [tint]: un colore per distinguere la voce (i corsi dell'allenatore da quelli della segreteria).
+                Icon(icon, null, tint = if (main) on else tint ?: area, modifier = Modifier.size(if (main) 30.dp else 24.dp))
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(title, color = if (main) on else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = if (main) 19.sp else 16.sp)
+                    hint?.let { Text(it, color = if (main) on else TsmColors.TextDim, fontSize = 13.sp) }
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = if (main) on else TsmColors.TextDim)
             }
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = if (main) TsmColors.OnBall else TsmColors.TextDim)
         }
     }
 }
@@ -338,7 +458,7 @@ private fun DeviceStatus(c: MatchController) {
     val relay by c.relay.ui.collectAsState()
     val tv by c.tv.collectAsState()
     val readyBands = Side.entries.count { bands[it]?.state == LinkState.READY }
-    val readyStraps = Side.entries.count { straps[it]?.state == StrapState.READY }
+    val readyStraps = straps.values.count { it.state == StrapState.READY }
     val chips = buildList {
         if (bands.isNotEmpty()) add(s.statusBands(readyBands) to (readyBands == bands.size))
         if (straps.isNotEmpty()) add(s.statusStraps(readyStraps) to (readyStraps == straps.size))
@@ -372,37 +492,30 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     val pf by c.features.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
-    // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
-    val goals by c.progress.goals.collectAsState()
-    for (g in goals.filter { it.reachedAt != null && !it.seen }) {
-        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.progress.goalSeen(g.id); c.progress.openProgress() }
-    }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
-    // La partita lasciata a metà (anche di un torneo del circolo) e la rivincita dell'ultima: quello che di solito si
-    // vuole fare subito.
-    ResumeEntries(c, club = null)
-    // Le partite di tornei, squadre e sfide del circolo pronte da giocare: si segnano da qui, il risultato torna lì.
+    // Sotto la partita, gli altri due modi di giocare, affiancati e uguali: le partite del circolo (tornei, squadre,
+    // sfide: si segnano da qui, il risultato torna lì) e il torneo tra amici. Il riquadro del circolo c'è sempre, così
+    // si sa che esiste; senza partite pronte lo dice e un tocco spiega quando compaiono. Le partite sospese e "Come
+    // l'ultima volta" stanno in cima a Nuova partita.
     val ready = com.tennis.scoremanager.ui.clubMatchesReady(c)
     var clubMatches by remember { mutableStateOf(false) }
-    if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
+    var clubEmpty by remember { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Tile(Icons.Filled.Business, s.cmTitle, if (ready.isEmpty()) s.cmNone else s.cmHint(ready.size), badge = ready.size, dim = ready.isEmpty(), modifier = Modifier.weight(1f)) {
+            if (ready.isEmpty()) clubEmpty = true else clubMatches = true
+        }
+        Tile(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint, modifier = Modifier.weight(1f)) { c.friends.show() }
+    }
     if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
-    // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
-    val cards by c.cards.receivedCards.collectAsState()
-    for (rc in cards.filter { it.result != null && it.sentAt == null }) {
-        val r = rc.result!!
-        Entry(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ")) {
-            com.tennis.scoremanager.ui.sendResult(context, c, rc.card.code)
-        }
-    }
-    history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
-        val su = last.record.setup
-        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
-            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
-            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
-        }
-    }
-    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.friends.show() }
+    if (clubEmpty) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { clubEmpty = false },
+        icon = { Icon(Icons.Filled.Business, null, tint = com.tennis.scoremanager.ui.LocalArea.current) },
+        title = { Text(s.cmTitle) },
+        text = { Text(s.cmEmptyText) },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { clubEmpty = false }) { Text(s.ok) } },
+    )
+    // Senza la scheda Progressi (spenta in Cosa usi) lo storico, con le partite sospese, resta qui.
     if (historyHere) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Questo telefono come tabellone, come telecamera dell'arbitro o per riprendere da solo.
     SectionLabel(s.playThisPhone)
@@ -412,30 +525,99 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
 }
 
 /**
- * Le partite sospese più recenti, da riprendere con un tocco; tenendo premuto si eliminano (con conferma). In Gioca
- * (Tu) tutte ([club] null), anche quelle di tornei, squadre e sfide del circolo; in Allievi le altre ([club] false).
+ * Un riquadro quadrato per due scelte affiancate (Partite del circolo, Torneo tra amici): icona nel colore dell'area,
+ * titolo e una riga di spiegazione; [badge] = quante cose aspettano; [dim] = per ora non c'è niente.
+ */
+@Composable
+private fun Tile(icon: ImageVector, title: String, hint: String, modifier: Modifier = Modifier, badge: Int = 0, dim: Boolean = false, onClick: () -> Unit) {
+    val area = com.tennis.scoremanager.ui.LocalArea.current
+    Column(
+        modifier.fillMaxHeight().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface).clickable(onClick = onClick).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(verticalAlignment = Alignment.Top) {
+            Box(
+                Modifier.size(42.dp).clip(RoundedCornerShape(12.dp)).background(if (dim) TsmColors.SurfaceHigh else area),
+                contentAlignment = Alignment.Center,
+            ) { Icon(icon, null, tint = if (dim) TsmColors.TextDim else com.tennis.scoremanager.ui.TsmColors.OnArea) }
+            Spacer(Modifier.weight(1f))
+            if (badge > 0) Text(
+                "$badge", color = com.tennis.scoremanager.ui.TsmColors.OnArea, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(com.tennis.scoremanager.ui.TsmColors.AreaTodo).padding(horizontal = 8.dp, vertical = 2.dp),
+            )
+        }
+        Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 19.sp)
+        Text(hint, color = TsmColors.TextDim, fontSize = 12.sp, lineHeight = 15.sp)
+    }
+}
+
+/**
+ * In cima a Nuova partita: le partite sospese da riprendere e, con la pagina ancora vuota ([likeLast]), "Come
+ * l'ultima volta" (stessi giocatori e regole, dritti al sorteggio). Stanno qui e non nella prima schermata: servono quando si sta per giocare.
+ */
+@Composable
+internal fun SetupShortcuts(c: MatchController, likeLast: Boolean) {
+    val s = LocalStrings.current
+    val saved by c.saved.collectAsState()
+    val history by c.history.collectAsState()
+    LaunchedEffect(Unit) { c.refreshSaved(); c.refreshHistory() }
+    ResumeEntries(c, club = null)
+    if (likeLast) history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
+        val su = last.record.setup
+        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
+            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
+            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
+        }
+    }
+}
+
+/**
+ * "Riprendi partita": una voce sola con quante sono le partite sospese, che apre l'elenco per scegliere quale
+ * riprendere (il cestino accanto la elimina, con conferma). In Nuova partita tutte ([club] null), anche quelle di
+ * tornei, squadre e sfide del circolo; in Allievi le altre ([club] false).
  */
 @Composable
 private fun ResumeEntries(c: MatchController, club: Boolean?) {
     val s = LocalStrings.current
     val saved by c.saved.collectAsState()
     LaunchedEffect(Unit) { c.refreshSaved() }
+    val lang = c.options.collectAsState().value.lang
+    val list = saved.filter { club == null || c.isClubRecord(it.id) == club }.sortedByDescending { it.updatedAt }
+    var open by remember { mutableStateOf(false) }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
-    for (rec in saved.filter { club == null || c.isClubRecord(it.id) == club }.take(2)) {
-        val lang = c.options.collectAsState().value.lang
-        val at = rec.startedAt ?: rec.updatedAt
-        // Il punteggio a cui ci si era fermati, accanto alla data.
-        val hint = listOf("${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}", suspendedScore(rec)).filter { it.isNotBlank() }.joinToString(" · ")
-        Entry(Icons.Filled.History, s.playResume(matchNames(rec, s)), hint,
-            onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
+    if (list.isNotEmpty()) {
+        // Una voce sola: quante sono e l'ultima; un tocco apre l'elenco per scegliere quale riprendere.
+        Entry(Icons.Filled.History, s.resumeMatch, s.historySuspended(list.size) + " · " + matchNames(list.first(), s)) { open = true }
     }
+    if (open) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { open = false },
+        icon = { Icon(Icons.Filled.History, null, tint = com.tennis.scoremanager.ui.LocalArea.current) },
+        title = { Text(s.savedMatchesTitle) },
+        text = {
+            if (list.isEmpty()) Text(s.noSavedMatches)
+            else androidx.compose.foundation.lazy.LazyColumn(Modifier.heightIn(max = 420.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(list.size, key = { list[it].id }) { k ->
+                    val rec = list[k]
+                    SavedRow(rec, lang, onOpen = { open = false; c.resumeSaved(rec) }, onDelete = { toDelete = rec })
+                }
+            }
+        },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { open = false }) { Text(s.back) } },
+    )
     toDelete?.let { rec ->
         val n = matchNames(rec, s, " ${s.vs} ")
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { toDelete = null },
             title = { Text(s.deleteSavedTitle) },
             text = { Text(s.deleteSavedText(n)) },
-            confirmButton = { androidx.compose.material3.TextButton(onClick = { c.deleteSaved(rec); toDelete = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    c.deleteSaved(rec)
+                    toDelete = null
+                    // Era l'ultima: l'elenco vuoto non serve più.
+                    if (list.size <= 1) open = false
+                }) { Text(s.delete, color = TsmColors.Danger) }
+            },
             dismissButton = { androidx.compose.material3.TextButton(onClick = { toDelete = null }) { Text(s.back) } },
         )
     }

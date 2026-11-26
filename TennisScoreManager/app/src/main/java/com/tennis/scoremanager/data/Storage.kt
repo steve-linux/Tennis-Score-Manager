@@ -614,6 +614,10 @@ class Storage(context: Context) {
         get() = prefs.getStringSet("player_features", null)?.toSet()
         set(v) = prefs.edit { putStringSet("player_features", v) }
 
+    /** I primi passi di un ruolo (Role.name) nascosti con Nascondi nella prima schermata. */
+    fun firstStepsHidden(role: String): Boolean = prefs.getBoolean("first_steps_hidden_$role", false)
+    fun setFirstStepsHidden(role: String) = prefs.edit { putBoolean("first_steps_hidden_$role", true) }
+
     var playerFeaturesSeen: Boolean
         get() = prefs.getBoolean("player_features_seen", false)
         set(v) = prefs.edit { putBoolean("player_features_seen", v) }
@@ -799,21 +803,23 @@ class Storage(context: Context) {
     }
 
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
-    fun strapAddress(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1" else "strap_p2", null)
-    fun strapName(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1_name" else "strap_p2_name", null)
-    fun setStrap(p1: Boolean, address: String?, name: String?) {
+    /** "p1", "p2" come prima; i compagni del doppio "p1b", "p2b". */
+    private fun wearerKey(w: Wearer) = when (w) { Wearer.P1 -> "p1"; Wearer.P2 -> "p2"; Wearer.P1B -> "p1b"; Wearer.P2B -> "p2b" }
+    fun strapAddress(w: Wearer): String? = prefs.getString("strap_${wearerKey(w)}", null)
+    fun strapName(w: Wearer): String? = prefs.getString("strap_${wearerKey(w)}_name", null)
+    fun setStrap(w: Wearer, address: String?, name: String?) {
         prefs.edit {
-            putString(if (p1) "strap_p1" else "strap_p2", address)
-                .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
+            putString("strap_${wearerKey(w)}", address)
+                .putString("strap_${wearerKey(w)}_name", name)
         }
     }
 
-    /** Chi indossa la fascia del lato (per le calorie); null = non detto. */
-    fun heartProfile(p1: Boolean): HeartProfile? =
-        prefs.getString(if (p1) "heart_p1" else "heart_p2", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
+    /** Chi indossa la fascia (per le calorie); null = non detto. */
+    fun heartProfile(w: Wearer): HeartProfile? =
+        prefs.getString("heart_${wearerKey(w)}", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
 
-    fun setHeartProfile(p1: Boolean, p: HeartProfile?) {
-        prefs.edit { putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }) }
+    fun setHeartProfile(w: Wearer, p: HeartProfile?) {
+        prefs.edit { putString("heart_${wearerKey(w)}", p?.let { json.encodeToString(HeartProfile.serializer(), it) }) }
     }
 
     fun bandBaseMa(address: String): Double? =

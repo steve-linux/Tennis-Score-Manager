@@ -338,8 +338,10 @@ private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
             Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
         }
         Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
-        for (side in Side.entries) {
-            Reports.heartLine(rec, side, s)?.let { InfoRow(Icons.Filled.Favorite, "${s.heartStat} ${names.short(side)}", it) }
+        // Nel doppio con le fasce dei compagni, una riga per giocatore.
+        val split = rec.heartPartner.isNotEmpty()
+        for (w in listOf(com.tennis.scoremanager.data.Wearer.P1, com.tennis.scoremanager.data.Wearer.P1B, com.tennis.scoremanager.data.Wearer.P2, com.tennis.scoremanager.data.Wearer.P2B)) {
+            Reports.heartLine(rec, w, s)?.let { InfoRow(Icons.Filled.Favorite, "${s.heartStat} ${com.tennis.scoremanager.ui.wearerName(names, w, split)}", it) }
         }
     }
 }

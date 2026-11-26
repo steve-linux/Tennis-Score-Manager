@@ -120,7 +120,8 @@ fun MembersScreen(c: MatchController) {
         },
     ) {
         if (members.isEmpty()) {
-            Text(s.membersNone, color = TsmColors.TextDim)
+            // Nessun socio: cosa fare, passo per passo.
+            com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.PersonAdd, s.egMembersTitle, listOf(s.egMembers1, s.egMembers2, s.egMembers3), s.membersNew) { adding = true }
         } else {
             Text(s.membersCount(members.size, todo), color = if (todo > 0) TsmColors.Orange else TsmColors.Ok, fontWeight = FontWeight.Bold)
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })

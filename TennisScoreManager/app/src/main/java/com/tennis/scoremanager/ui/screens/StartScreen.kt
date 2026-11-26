@@ -230,7 +230,7 @@ fun StartScreen(c: MatchController) {
 }
 
 @Composable
-private fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete: () -> Unit) {
+internal fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete: () -> Unit) {
     val s = LocalStrings.current
     val names = remember(rec.id) { Names(rec.setup, s) }
     val state = remember(rec.id, rec.events.size) { ScoreEngine.replay(rec.rules, rec.events) }

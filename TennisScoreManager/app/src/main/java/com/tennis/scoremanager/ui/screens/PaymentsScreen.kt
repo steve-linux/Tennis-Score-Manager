@@ -138,8 +138,9 @@ fun PaymentsScreen(c: MatchController) {
         Text(s.paymentsIncome(year, Fees.money(Fees.income(book, year), lang.locale)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
         if (openCents > 0) Text(s.paymentsOpen(Fees.money(openCents, lang.locale), openPeople), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
 
-        SectionCard(s.feesTitle, Icons.Filled.Receipt) {
-            if (book.fees.isEmpty()) Text(s.feesNone, color = TsmColors.TextDim, fontSize = 13.sp)
+        // Nessuna quota: cosa fare, passo per passo.
+        if (book.fees.isEmpty()) com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.Receipt, s.egFeesTitle, listOf(s.egFees1, s.egFees2, s.egFees3), s.feeNew) { newFee = true }
+        else SectionCard(s.feesTitle, Icons.Filled.Receipt) {
             for (f in book.fees.sortedByDescending { it.createdAt }) {
                 val (paid, total) = Fees.feeProgress(book, f)
                 Row(Modifier.fillMaxWidth().clickable { editFee = f }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -234,16 +235,32 @@ private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
         val book = c.clubBook.value
         c.saveClubBook(book.copy(fees = book.fees.filter { it.id != f.id } + f))
     }
+    // Una quota nuova in due passi: la quota, e poi a chi addebitarla (tutti i soci adesso, o dopo a mano).
+    val wz = fee == null
+    var step by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    var chargeNow by remember { mutableStateOf(false) }
+    val titles = listOf(s.wzFee, s.wzWhoPays)
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(if (fee == null) s.feeNew else fee.name) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (wz && step == 1) {
+                    val members = players.filter { it.member != null }
+                    if (members.isEmpty()) Text(s.wzNoMembers, color = TsmColors.TextDim)
+                    else {
+                        Text(s.wzChargeAsk, color = TsmColors.TextMain)
+                        Segmented(listOf(SegOption(s.wzChargeAll(members.size)), SegOption(s.wzChargeLater)), if (chargeNow) 0 else 1, { chargeNow = it == 0 }, columns = 1)
+                    }
+                }
+                if (!wz || step == 0) {
                 OutlinedTextField(name, { name = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.feeName) })
                 val kinds = FeeKind.entries
                 Segmented(kinds.map { SegOption(feeKindName(s, it)) }, kinds.indexOf(kind), { kind = kinds[it] }, columns = 3)
                 MoneyField(amount, s.feeAmount) { amount = it }
                 DateButton(s.feeDue, due, lang) { due = it }
+                }
                 if (fee != null) {
                     val members = players.filter { it.member != null }
                     GhostButton(s.feeChargeAll, Icons.Filled.GroupAdd, { askAll = true }, Modifier.fillMaxWidth(), enabled = members.isNotEmpty())
@@ -251,8 +268,17 @@ private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
                 }
             }
         },
-        confirmButton = { TextButton(enabled = current() != null, onClick = { current()?.let(::save); onDone() }) { Text(s.ok) } },
-        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+        confirmButton = {
+            if (wz && step == 0) com.tennis.scoremanager.ui.WizardNext(enabled = current() != null) { step++ }
+            else TextButton(enabled = current() != null, onClick = {
+                current()?.let { f ->
+                    save(f)
+                    if (wz && chargeNow) c.saveClubBook(Fees.chargeAll(c.clubBook.value, f, players.filter { it.member != null }, System.currentTimeMillis()).first)
+                }
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (askAll) {
         val f = current() ?: fee!!

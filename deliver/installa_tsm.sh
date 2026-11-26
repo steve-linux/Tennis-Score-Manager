@@ -7632,10 +7632,12 @@ const APP_I18N = {
     clClosed: "Circolo chiuso",
     cmCourses: (a, b) => `Lezioni dei corsi: ${a} (${b})`,
     cmEmpty: "Niente in questo mese.",
+    cmEmptyText: "Qui compaiono le partite di tornei, squadre e sfide del tuo circolo quando sono pronte da giocare: le segni col segnapunti e il risultato torna al circolo. Arrivano con la scheda partita della segreteria o, se sei nel circolo, da sole.",
     cmHint: (it) => it === 1 ? `1 partita di torneo, squadra o sfida da giocare` : `${it} partite di tornei, squadre e sfide da giocare`,
     cmMonth: "Riepilogo del mese",
     cmMonthHint: "Lezioni, ore, corsi e incassi: da mandare alla segreteria",
     cmMonthTitle: (it) => `Riepilogo ${it}`,
+    cmNone: "Nessuna da giocare adesso",
     cmPaid: (it) => `Pacchetti incassati: ${it}`,
     cmPick: "Tocca una partita: Nuova partita si apre con giocatori, torneo e turno già scritti e a fine partita il risultato torna nel circolo.",
     cmPresence: (it) => `presenze ${it}%`,
@@ -8133,6 +8135,7 @@ const APP_I18N = {
     planDay: "Giorno",
     planHint: "Prenotazioni, lezioni e chiusure, giorno per giorno; le partite dei tornei ci sono già",
     planLightsFrom: "Luci dalle",
+    planManage: "Campi, orari e chiusure",
     planOpen: "Apertura",
     planPrice: "Prezzo all'ora",
     planPriceLights: "Prezzo all'ora con le luci",
@@ -8349,6 +8352,9 @@ const APP_I18N = {
     stOnline: (it) => `Di cui online: ${it}`,
     stRevenue: "Incassi",
     stRevenueHint: "Incassi = prezzo delle prenotazioni di gioco e lezione, pagate o no.",
+    stTabCard: "Scheda",
+    stTabLessons: "Lezioni",
+    stTabTraining: "Allenamento",
     stTitle: "Statistiche dei campi",
     stTop: "Chi prenota di più",
     stTournaments: (it) => `Partite dei tornei: ${it} h`,
@@ -8568,10 +8574,12 @@ const APP_I18N = {
     clClosed: "Club closed",
     cmCourses: (a, b) => `Course lessons: ${a} (${b})`,
     cmEmpty: "Nothing this month.",
+    cmEmptyText: "Tournament, team and challenge matches from your club show up here when they are ready to play: you score them with the scoreboard and the result goes back to the club. They arrive with the match card from the club office or, if you have joined the club, by themselves.",
     cmHint: (it) => it === 1 ? `1 tournament, team or challenge match to play` : `${it} tournament, team and challenge matches to play`,
     cmMonth: "Monthly summary",
     cmMonthHint: "Lessons, hours, courses and takings: to send to the club office",
     cmMonthTitle: (it) => `Summary ${it}`,
+    cmNone: "None to play right now",
     cmPaid: (it) => `Packs paid: ${it}`,
     cmPick: "Tap a match: New match opens with players, event and round already filled in, and at the end the result goes back to the club.",
     cmPresence: (it) => `attendance ${it}%`,
@@ -9069,6 +9077,7 @@ const APP_I18N = {
     planDay: "Day",
     planHint: "Bookings, lessons and closures, day by day; tournament matches are already in",
     planLightsFrom: "Lights from",
+    planManage: "Courts, hours and closures",
     planOpen: "Opening",
     planPrice: "Price per hour",
     planPriceLights: "Price per hour with lights",
@@ -9285,6 +9294,9 @@ const APP_I18N = {
     stOnline: (it) => `Of which online: ${it}`,
     stRevenue: "Revenue",
     stRevenueHint: "Revenue = price of play and lesson bookings, paid or not.",
+    stTabCard: "Profile",
+    stTabLessons: "Lessons",
+    stTabTraining: "Training",
     stTitle: "Court statistics",
     stTop: "Who books most",
     stTournaments: (it) => `Tournament matches: ${it} h`,
@@ -9504,10 +9516,12 @@ const APP_I18N = {
     clClosed: "Club fermé",
     cmCourses: (a, b) => `Cours collectifs : ${a} (${b})`,
     cmEmpty: "Rien ce mois-ci.",
+    cmEmptyText: "Les matchs de tournois, d'équipes et de défis de votre club apparaissent ici quand ils sont prêts à jouer : vous les comptez avec le marqueur et le résultat retourne au club. Ils arrivent avec la fiche de match du secrétariat ou, si vous êtes membre du club, tout seuls.",
     cmHint: (it) => it === 1 ? `1 match de tournoi, d'équipe ou de défi à jouer` : `${it} matchs de tournois, d'équipes et de défis à jouer`,
     cmMonth: "Récapitulatif du mois",
     cmMonthHint: "Cours, heures, cours collectifs et encaissements : à envoyer au secrétariat",
     cmMonthTitle: (it) => `Récapitulatif ${it}`,
+    cmNone: "Aucun à jouer pour le moment",
     cmPaid: (it) => `Forfaits encaissés : ${it}`,
     cmPick: "Touchez un match : Nouveau match s'ouvre avec joueurs, tournoi et tour déjà remplis, et à la fin le résultat retourne au club.",
     cmPresence: (it) => `présences ${it}%`,
@@ -10005,6 +10019,7 @@ const APP_I18N = {
     planDay: "Jour",
     planHint: "Réservations, leçons et fermetures, jour par jour ; les matchs des tournois y sont déjà",
     planLightsFrom: "Éclairage à partir de",
+    planManage: "Terrains, horaires et fermetures",
     planOpen: "Ouverture",
     planPrice: "Tarif horaire",
     planPriceLights: "Tarif horaire avec éclairage",
@@ -10221,6 +10236,9 @@ const APP_I18N = {
     stOnline: (it) => `Dont en ligne : ${it}`,
     stRevenue: "Recettes",
     stRevenueHint: "Recettes = prix des réservations de jeu et de leçon, payées ou non.",
+    stTabCard: "Fiche",
+    stTabLessons: "Leçons",
+    stTabTraining: "Entraînement",
     stTitle: "Statistiques des terrains",
     stTop: "Qui réserve le plus",
     stTournaments: (it) => `Matchs des tournois : ${it} h`,
@@ -10440,10 +10458,12 @@ const APP_I18N = {
     clClosed: "Verein geschlossen",
     cmCourses: (a, b) => `Kursstunden: ${a} (${b})`,
     cmEmpty: "Nichts in diesem Monat.",
+    cmEmptyText: "Turnier-, Mannschafts- und Forderungsmatches deines Vereins erscheinen hier, sobald sie spielbereit sind: Du zählst sie mit der Anzeige und das Ergebnis geht an den Verein zurück. Sie kommen mit der Matchkarte der Geschäftsstelle oder, wenn du im Verein bist, von selbst.",
     cmHint: (it) => it === 1 ? `1 Turnier-, Mannschafts- oder Forderungsmatch zu spielen` : `${it} Turnier-, Mannschafts- und Forderungsmatches zu spielen`,
     cmMonth: "Monatsübersicht",
     cmMonthHint: "Stunden, Kurse und Einnahmen: ans Büro zu schicken",
     cmMonthTitle: (it) => `Übersicht ${it}`,
+    cmNone: "Gerade keins zu spielen",
     cmPaid: (it) => `Bezahlte Pakete: ${it}`,
     cmPick: "Tippe auf ein Match: Neues Match öffnet sich mit Spielern, Turnier und Runde schon eingetragen, und am Ende geht das Ergebnis an den Verein zurück.",
     cmPresence: (it) => `Anwesenheit ${it}%`,
@@ -10941,6 +10961,7 @@ const APP_I18N = {
     planDay: "Tag",
     planHint: "Buchungen, Stunden und Sperrungen, Tag für Tag; Turniermatches sind schon drin",
     planLightsFrom: "Licht ab",
+    planManage: "Plätze, Zeiten und Sperrungen",
     planOpen: "Öffnung",
     planPrice: "Preis pro Stunde",
     planPriceLights: "Preis pro Stunde mit Licht",
@@ -11157,6 +11178,9 @@ const APP_I18N = {
     stOnline: (it) => `Davon online: ${it}`,
     stRevenue: "Einnahmen",
     stRevenueHint: "Einnahmen = Preis der Spiel- und Stundenbuchungen, bezahlt oder nicht.",
+    stTabCard: "Profil",
+    stTabLessons: "Stunden",
+    stTabTraining: "Übungen",
     stTitle: "Platzstatistik",
     stTop: "Wer am meisten bucht",
     stTournaments: (it) => `Turnierspiele: ${it} Std.`,
@@ -11376,10 +11400,12 @@ const APP_I18N = {
     clClosed: "Club cerrado",
     cmCourses: (a, b) => `Clases de los cursos: ${a} (${b})`,
     cmEmpty: "Nada este mes.",
+    cmEmptyText: "Aquí aparecen los partidos de torneos, equipos y desafíos de tu club cuando están listos para jugarse: los apuntas con el marcador y el resultado vuelve al club. Llegan con la ficha de partido de la secretaría o, si estás en el club, solos.",
     cmHint: (it) => it === 1 ? `1 partido de torneo, equipo o desafío por jugar` : `${it} partidos de torneos, equipos y desafíos por jugar`,
     cmMonth: "Resumen del mes",
     cmMonthHint: "Clases, horas, cursos e ingresos: para enviar a la secretaría",
     cmMonthTitle: (it) => `Resumen ${it}`,
+    cmNone: "Ninguno por jugar ahora",
     cmPaid: (it) => `Paquetes cobrados: ${it}`,
     cmPick: "Toca un partido: Nuevo partido se abre con jugadores, torneo y ronda ya escritos y al final el resultado vuelve al club.",
     cmPresence: (it) => `asistencia ${it}%`,
@@ -11877,6 +11903,7 @@ const APP_I18N = {
     planDay: "Día",
     planHint: "Reservas, clases y cierres, día a día; los partidos de los torneos ya están",
     planLightsFrom: "Luz desde las",
+    planManage: "Pistas, horarios y cierres",
     planOpen: "Apertura",
     planPrice: "Precio por hora",
     planPriceLights: "Precio por hora con luz",
@@ -12093,6 +12120,9 @@ const APP_I18N = {
     stOnline: (it) => `De ellas en línea: ${it}`,
     stRevenue: "Ingresos",
     stRevenueHint: "Ingresos = precio de las reservas de juego y clase, pagadas o no.",
+    stTabCard: "Ficha",
+    stTabLessons: "Clases",
+    stTabTraining: "Entrenamiento",
     stTitle: "Estadísticas de las pistas",
     stTop: "Quién reserva más",
     stTournaments: (it) => `Partidos de torneo: ${it} h`,
@@ -12312,10 +12342,12 @@ const APP_I18N = {
     clClosed: "Clube fechado",
     cmCourses: (a, b) => `Aulas dos cursos: ${a} (${b})`,
     cmEmpty: "Nada neste mês.",
+    cmEmptyText: "Aqui aparecem as partidas de torneios, equipes e desafios do seu clube quando estão prontas para jogar: você marca com o placar e o resultado volta para o clube. Elas chegam com a ficha da partida da secretaria ou, se você está no clube, sozinhas.",
     cmHint: (it) => it === 1 ? `1 partida de torneio, equipe ou desafio para jogar` : `${it} partidas de torneios, equipes e desafios para jogar`,
     cmMonth: "Resumo do mês",
     cmMonthHint: "Aulas, horas, cursos e receitas: para enviar à secretaria",
     cmMonthTitle: (it) => `Resumo ${it}`,
+    cmNone: "Nenhuma para jogar agora",
     cmPaid: (it) => `Pacotes recebidos: ${it}`,
     cmPick: "Toque numa partida: Nova partida abre com jogadores, torneio e rodada já preenchidos e no fim o resultado volta ao clube.",
     cmPresence: (it) => `presenças ${it}%`,
@@ -12813,6 +12845,7 @@ const APP_I18N = {
     planDay: "Dia",
     planHint: "Reservas, aulas e fechamentos, dia a dia; as partidas dos torneios já estão",
     planLightsFrom: "Iluminação a partir das",
+    planManage: "Quadras, horários e bloqueios",
     planOpen: "Abertura",
     planPrice: "Preço por hora",
     planPriceLights: "Preço por hora com iluminação",
@@ -13029,6 +13062,9 @@ const APP_I18N = {
     stOnline: (it) => `Das quais online: ${it}`,
     stRevenue: "Receitas",
     stRevenueHint: "Receitas = preço das reservas de jogo e aula, pagas ou não.",
+    stTabCard: "Ficha",
+    stTabLessons: "Aulas",
+    stTabTraining: "Treino",
     stTitle: "Estatísticas das quadras",
     stTop: "Quem reserva mais",
     stTournaments: (it) => `Jogos de torneio: ${it} h`,
@@ -18013,13 +18049,15 @@ cat > "$DEST/app/src/main/assets/help/de.md" << 'TSM_EOF'
 
 Beim **ersten Start** fragt die App nach der Sprache, der Rolle (wer sie nutzt), deinem Namen, wie du sie nutzen wirst und, fürs Büro, nach dem Verein; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Man wählt **eine einzige Rolle**, unten stehen ihre Reiter; gewechselt wird unter **Mehr › Einstellungen**, ganz oben (die Daten bleiben). **Jede Funktion steht in nur einer Rolle** (7.9): Du spielst, der Trainer betreut die Schüler, der Verein führt das Büro. Mit der Rolle **Du**:
 
-- **Spielen**: **Neues Match**, die unterbrochenen Matches zum Fortsetzen (lange drücken löscht eines), **Wie beim letzten Mal** (gleiche Spieler, Platz und Regeln, direkt zum Münzwurf; *Modus oder Regeln ändern* öffnet sie wieder), das **Turnier unter Freunden** (Americano, Mexicano) und, unter **Dieses Telefon**, die Anzeigetafel, das Kamera-Telefon und **Mit diesem Telefon aufnehmen**. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Spielen**: **Neues Match** (oben **Match fortsetzen**, das die Liste der unterbrochenen Matches zur Auswahl öffnet, mit dem Papierkorb zum Löschen, und, solange es leer ist, **Wie beim letzten Mal**: gleiche Spieler, Platz und Regeln, direkt zum Münzwurf; *Modus oder Regeln ändern* öffnet sie wieder), darunter zwei Kästen nebeneinander, **Vereinsmatches** (spielbereite Turnier-, Mannschafts- und Forderungsmatches, mit Anzahl) und **Turnier unter Freunden** (Americano, Mexicano) und, unter **Dieses Telefon**, die Anzeigetafel, das Kamera-Telefon und **Mit diesem Telefon aufnehmen**. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
 - **Verein** (erst nach der Einladung deines Vereins, 7.18): die Neuigkeiten vom Vereinsbrett und aus den Chats, **Platz buchen**, deine Buchungen, **Partner gesucht** und der Vereinschat.
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Deine Videos** (Kapitel, Highlights, Filter, Import), **Mein Jahr**, **Meine Schläger**.
 - **Mehr**: **Du** (deine Karte), **Spieler** (die Datenbank: 7.7) und, in jeder Rolle gleich, **Einstellungen** (die Sprache; die Stimme des Schiedsrichters; die Geräte: Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel; Rolle und Funktionen; Sicherung und Daten, 7.8; ganz unten **Über die App** mit App-Version, Lizenz und Quellcode), **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen) und **App-Einführung**.
 
 **Neues Match** hat drei kurze Schritte: **wer spielt** (Einzel oder Doppel, Spieler aus der Datenbank, mit den letzten Spielern zum Antippen, und die Sportart; Ranking, Mann/Frau und Schläger stehen in einer Zeile unter den Namen und öffnen sich mit *Ändern*; Verein, Platz, Turnier und Ort unter *Weitere Angaben*), **wie gezählt wird und das Format** (die weiteren Regeln stehen in einer Zeile, *Ändern* öffnet sie) und der **Münzwurf**. Alles ist freiwillig: Es geht auch ohne Namen weiter. **Zurück** führt immer dorthin, woher du kamst.
+
+**Zurechtfinden**: Jeder Bereich hat seine Farbe, dieselbe auf dem Tab unten, auf dem Streifen seiner Einträge und oben auf jedem Bildschirm (gelbgrün Spielen, hellblau Verein und Belegung, orange Trainieren, violett Fortschritt, türkis Schüler und Mitglieder, rosa Turniere, grau Einstellungen). Oben auf dem ersten Bildschirm sammelt der Kasten **Zu erledigen**, was Aufmerksamkeit braucht (Postfach des Vereins, Backup, erreichte Ziele, zu sendende Ergebnisse), und **Erste Schritte** listet die ersten Aufgaben der Rolle auf, erledigte abgehakt (*Ausblenden* entfernt ihn). Ausgeschaltete Funktionen findest du unten unter **Weitere Funktionen** wieder. Das Profil eines Spielers ist in **Profil**, **Stunden**, **Übungen** und **Matches** aufgeteilt; *Mit einem anderen Spieler zusammenführen*, *Schüler entfernen* und *Spieler und seine Daten löschen* stehen oben im Menü **⋮**. Neues legst du **Schritt für Schritt** an (Buchung, Turnier, Beitrag, Kurs und **Armbänder Schritt für Schritt verbinden** unter *Geräte*, wo jedes Gerät eine Zeile zum Aufklappen ist); noch leere Seiten erklären, was zu tun ist. In der Belegung stehen Plätze, Sperrzeiten, Zeiten und Preise sowie Statistiken im Menü **Plätze, Zeiten und Sperrungen**.
 
 ## 4. Die Stimme (funktioniert ohne Internet)
 
@@ -18175,6 +18213,7 @@ Herzfrequenz und Kalorien von **Bluetooth-Brustgurten** mit dem Standard-Herzfre
 
 1. Befeuchte die Elektroden und lege den Gurt an: Er schaltet sich bei Hautkontakt selbst ein.
 2. *Modus und Regeln* (oder *Mehr › Einstellungen › Geräte*) › **Herzfrequenz** › **Brustgurte** einschalten und für jeden Spieler den Gurt wählen (nur einmal). **Tauschen** vertauscht sie.
+   - **Doppel, bis zu vier Gurte**: Bei einem Doppel (oder mit der Taste *Doppel: Gurte der Partner hinzufügen*) gibt es für jeden der vier Spieler einen Gurt; der erste jedes Teams gehört dem zuerst eingetragenen Spieler, der andere dem Partner. Im Match heißen die Anzeigen *S1*, *S1B*, *S2*, *S2B*; in der Zusammenfassung sind die Partner im Verlauf gestrichelt und jeder hat sein Zonendiagramm. Mit nur zwei Gurten bleibt alles wie bisher. **Tauschen** vertauscht die Teams samt Partnern.
 3. Optional **Alter, Gewicht und Geschlecht** der Person: für die Kalorien (Keytel-Formel, typischer Fehler ±20 %) und, mit dem Alter, für die Herzfrequenzzonen (geschätztes Maximum 208 − 0,7 × Alter).
 
 - Unter jedem Gurt: Status, Herzfrequenz, **Signal** in dBm (näher an 0 = stärker) und **Aussetzer**, also wie oft die Herzfrequenz länger als 3 Sekunden ausblieb, mit den verlorenen Sekunden (*2 Aussetzer (14 s)*). Sie zählen ab dem „Spiel“ des Matches, vorher ab der Wahl des Gurts. Sie zeigen, wie weit der Gurt reicht.
@@ -18274,7 +18313,7 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
 - **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
 - **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (letzter Punkt des Matches, Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
   - **Intro wie bei Turnieren (am Anfang)**: 9 Sekunden vor den Punkten, mit derselben Grafik und Musik wie die Statistiken, ein- und ausgeblendet: oben Turnier und Runde (oder Verein) und das Datum; an den Seiten Foto oder Porträt, Vorname und NACHNAME und das FITP-Ranking groß; in der Mitte der Vergleich mit den Daten, die die App kennt (TSM-Wertung, Alter, Größe, Spielhand, Rückhand, Verein, Siege – Niederlagen) und der direkte Vergleich vor diesem Match. Die Daten stammen aus der Spielerkarte unter *Spieler*: Was nicht eingetragen ist, fehlt. Das Video braucht nur die Namen der Spieler.
-  - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde. Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** unter *Neues Match*) (ohne Wahl der Mann; gilt in der ganzen App, auch unter *Neues Match*, im Verlauf, im Spielbericht, im PDF und auf der Anzeigetafel); darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (*Weitere Angaben* unter *Neues Match*) oder Club und Platz.
+  - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde (im Doppel mit vier Gurten die ersten Spieler und die Partner in zwei Blöcken). Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** unter *Neues Match*) (ohne Wahl der Mann; gilt in der ganzen App, auch unter *Neues Match*, im Verlauf, im Spielbericht, im PDF und auf der Anzeigetafel); darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (*Weitere Angaben* unter *Neues Match*) oder Club und Platz.
   - **Musik** unter den Statistiken, mit Ein- und Ausblendung: *Nowhere Land* von Kevin MacLeod (incompetech.com, Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn), oder ein eigener Titel mit **Titel wählen** (es wird der Anfang verwendet; nur Musik verwenden, die du in deinen Videos nutzen darfst).
   - Unten auf jeder Statistikseite steht **Erstellt mit Tennis Score Manager** mit der Adresse der Website.
 - **Zeitlupe**: Auf dem Telefon des Schiedsrichters fragt **Zeitlupe** bei verbundener Kamera den strittigen Punkt ab (*Letzter Punkt*, *Punkt davor* oder *Seit dem letzten gezählten Punkt*) und zeigt ihn, mit Pause und Bild für Bild. **Auch auf der Anzeigetafel** zeigt ihn zusätzlich auf der TV-Anzeigetafel.
@@ -18649,13 +18688,15 @@ cat > "$DEST/app/src/main/assets/help/en.md" << 'TSM_EOF'
 
 At the **first start** the app asks the language, the role (who uses it), your name, how you'll use it and, for the club office, the club; you can skip it and do it again from **More › App introduction**. You pick **one role** and its tabs are at the bottom; change it from **More › Settings**, at the top (the data stays). **Each feature lives in one role only** (7.9): You plays, the Coach follows the students, the Club runs the office. With the **You** role:
 
-- **Play**: **New match**, the suspended matches to resume (long-press one to delete it), **Like last time** (same players, court and rules, straight to the coin toss; *Change mode or rules* opens them again), the **friends tournament** (Americano, Mexicano) and, under **This phone**, the scoreboard, the camera phone and **Record with this phone**. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Play**: **New match** (at the top **Resume match**, which opens the list of suspended matches to pick from, with a bin to delete one, and, while it is empty, **Like last time**: same players, court and rules, straight to the coin toss; *Change mode or rules* opens them again), below it two side-by-side boxes, **Club matches** (tournament, team and challenge matches ready to play, with their number) and **Friends tournament** (Americano, Mexicano) and, under **This phone**, the scoreboard, the camera phone and **Record with this phone**. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
 - **Club** (only after your club's invitation, 7.18): the news from the notice board and the chats, **Book a court**, your bookings, **Looking for a partner** and the club chat.
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **Your videos** (chapters, highlights, filters, import), **My year**, **My rackets**.
 - **More**: **You** (your card), **Players** (the database: 7.7) and, the same in every role, **Settings** (the language; the umpire's voice; the devices: wristbands, remotes, straps, second phone, TV scoreboard; role and features; backup and data, 7.8; at the bottom **About** with the app version, the licence and the source code), **Help** (this guide, with search and tappable cross-references) and **App introduction**.
 
 **New match** has three short steps: **who plays** (singles or doubles, players from the database, with recent players to tap, and the sport; ranking, man/woman and racket fit in one line under the names and open with *Change*; club, court, tournament and location under *More details*), **how you keep score and the format** (the other rules fit in one line, *Change* opens them) and the **coin toss**. Everything is optional: you can go on even without names. **Back** always returns to where you came from.
+
+**Finding your way**: each area has its own colour, the same on the tab at the bottom, on the stripe of its entries and at the top of every screen (lime Play, light blue Club and Planner, orange Train, purple Progress, teal students and members, pink tournaments, grey settings). At the top of the first screen the **To do** box gathers what needs attention (club inbox, backup, goals reached, results to send) and **First steps** lists the first things to do in the role, ticking the ones done (*Hide* removes it). Features you switched off are found again under **More features**, at the bottom. A player's profile is split into **Profile**, **Lessons**, **Training** and **Matches**; *Merge with another player*, *Remove student* and *Delete player and their data* are in the **⋮** menu at the top. New things are created **step by step** (booking, tournament, fee, course, and **Connect the wristbands step by step** in *Devices*, where each device is a row that opens); pages that are still empty explain what to do. In the Planner, courts, closures, hours and prices and statistics are in the **Courts, hours and closures** menu.
 
 ## 4. The voice (works without internet)
 
@@ -18811,6 +18852,7 @@ Heart rate and calories from **Bluetooth chest straps** using the standard heart
 
 1. Wet the electrodes and put the strap on: it switches on by itself on contact with the skin.
 2. *Mode and rules* (or *More › Settings › Devices*) › **Heart rate** › turn on **Heart rate straps** and pick each player's strap (only once). **Swap** exchanges them.
+   - **Doubles, up to four straps**: with a doubles match (or with the *Doubles: add the partners' straps* button) there is one strap for each of the four players; the first of each team belongs to the player written first, the other to the partner. During the match the pills become *P1*, *P1B*, *P2*, *P2B*; in the summary the partners are dashed in the chart and each player has a zones pie. With only two straps everything stays as before. **Swap** exchanges the teams, partners included.
 3. Optional **age, weight and sex** of the wearer: used for calories (Keytel formula, typical error ±20%) and, with the age, for heart rate zones (estimated maximum 208 − 0.7 × age).
 
 - Under each strap: status, heart rate, **signal** in dBm (closer to 0 = stronger) and **dropouts**, i.e. the times the heart rate did not arrive for more than 3 seconds, with the seconds lost (*2 dropouts (14 s)*). They count from the match's "play"; before that, from when the strap was picked. They show how far the strap reaches.
@@ -18910,7 +18952,7 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
 - **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
 - **Highlights**: automatic edit of the best points (last point of the match, aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
   - **Tournament-style intro (at the start)**: 9 seconds before the points, with the same graphics and music as the statistics, fading in and out: tournament and round (or club) and the date at the top; on the sides photo or portrait, first name and SURNAME and the FITP ranking in large type; in the middle the comparison with the data the app knows (TSM rating, age, height, hand, backhand, club, wins – losses) and the head to head before that match. The data come from the player card in *Players*: whatever is not filled in is left out. The video only needs the players' names.
-  - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn. The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice in *New match*) (without a choice, the man; this applies across the app, also in *New match*, history, summary, PDF and TV scoreboard); below, the percentage of points won. At the top, tournament, category and round (*More details* in *New match*), or club and court.
+  - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn (in doubles with four straps, the first players and the partners in two blocks). The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice in *New match*) (without a choice, the man; this applies across the app, also in *New match*, history, summary, PDF and TV scoreboard); below, the percentage of points won. At the top, tournament, category and round (*More details* in *New match*), or club and court.
   - **Music** under the statistics, with fade in and out: *Nowhere Land* by Kevin MacLeod (incompetech.com, CC BY 4.0 licence: if you publish the video, credit it), or a track of yours with **Choose a track** (its beginning is used; only use music you have the right to put in your videos).
   - At the bottom of every statistics screen there is the line **Made with Tennis Score Manager** with the website address.
 - **Replay**: on the umpire's phone, with the camera connected, **Replay** asks the camera for the disputed point (*Last point*, *Previous point* or *Since the last scored point*) and shows it, with pause and frame by frame. **Also on the scoreboard** shows it on the TV scoreboard too.
@@ -19284,13 +19326,15 @@ cat > "$DEST/app/src/main/assets/help/es.md" << 'TSM_EOF'
 
 En el **primer arranque** la app pregunta el idioma, el rol (quién la usa), tu nombre, cómo la vas a usar y, para la secretaría, el club; se puede saltar y repetir desde **Más › Presentación de la app**. Se elige **un solo rol** y abajo están sus pestañas; se cambia desde **Más › Ajustes**, arriba del todo (los datos se quedan). **Cada función está en un solo rol** (7.9): Tú juega, el Entrenador sigue a los alumnos, el Club lleva la secretaría. Con el rol **Tú**:
 
-- **Jugar**: **Nuevo partido**, los partidos suspendidos para reanudar (manteniendo pulsado se borra uno), **Como la última vez** (mismos jugadores, pista y reglas, directo al sorteo; *Cambiar modo o reglas* las vuelve a abrir), el **torneo entre amigos** (Americano, Mexicano) y, bajo **Este teléfono**, el marcador, el teléfono-cámara y **Grabar con este teléfono**. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
+- **Jugar**: **Nuevo partido** (arriba **Reanudar partido**, que abre la lista de partidos suspendidos para elegir, con la papelera para borrar uno, y, mientras está vacío, **Como la última vez**: mismos jugadores, pista y reglas, directo al sorteo; *Cambiar modo o reglas* las vuelve a abrir), debajo dos recuadros juntos, **Partidos del club** (torneos, equipos y desafíos listos para jugar, con su número) y **Torneo entre amigos** (Americano, Mexicano) y, bajo **Este teléfono**, el marcador, el teléfono-cámara y **Grabar con este teléfono**. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
 - **Club** (solo después de la invitación de tu club, 7.18): las novedades del tablón y de los chats, **Reservar pista**, tus reservas, **Busco compañero** y el chat del club.
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
 - **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar), **Mi año**, **Mis raquetas**.
 - **Más**: **Tú** (tu ficha), **Jugadores** (la base: 7.7) y, iguales en todos los roles, **Ajustes** (el idioma; la voz del árbitro; los dispositivos: pulseras, mandos, bandas, segundo teléfono, marcador en TV; rol y funciones; copia de seguridad y datos, 7.8; al final **Acerca de** con la versión de la app, la licencia y el código fuente), **Ayuda** (esta guía, con búsqueda y referencias que se tocan) y **Presentación de la app**.
 
 **Nuevo partido** son tres pasos cortos: **quién juega** (individual o dobles, los jugadores de la base, con los recientes para tocar, y el deporte; clasificación, hombre/mujer y raqueta caben en una línea bajo los nombres y se abren con *Cambiar*; club, pista, torneo y lugar en *Más detalles*), **cómo llevas el marcador y el formato** (las otras reglas caben en una línea, *Cambiar* las abre) y el **sorteo**. Todo es opcional: se puede seguir sin nombres. **Atrás** vuelve siempre a donde estabas.
+
+**Para orientarse**: cada área tiene su color, el mismo en la pestaña de abajo, en la franja de sus entradas y arriba en cada pantalla (verde lima Jugar, azul claro Club y Reservas, naranja Entrenar, morado Progresos, verde agua alumnos y socios, rosa torneos, gris ajustes). Arriba en la primera pantalla, el recuadro **Pendiente** reúne lo que requiere atención (buzón del club, copia de seguridad, objetivos alcanzados, resultados por enviar) y **Primeros pasos** enumera lo primero que hay que hacer en el rol, marcando lo hecho (*Ocultar* lo quita). Las funciones desactivadas se encuentran en **Más funciones**, al final. La ficha de un jugador se divide en **Ficha**, **Clases**, **Entrenamiento** y **Partidos**; *Unir con otro jugador*, *Quitar alumno* y *Borrar jugador y sus datos* están en el menú **⋮** de arriba. Lo nuevo se crea **paso a paso** (reserva, torneo, cuota, curso y **Conectar las pulseras paso a paso** en *Dispositivos*, donde cada dispositivo es una fila que se abre); las páginas aún vacías explican qué hacer. En Reservas, pistas, periodos no reservables, horarios y precios y estadísticas están en el menú **Pistas, horarios y cierres**.
 
 ## 4. La voz (funciona sin internet)
 
@@ -19446,6 +19490,7 @@ Frecuencia cardíaca y calorías desde **bandas de pecho Bluetooth** con el serv
 
 1. Moja los electrodos y ponte la banda: se enciende sola al contacto con la piel.
 2. *Modo y reglas* (o *Más › Ajustes › Dispositivos*) › **Frecuencia cardíaca** › activa **Bandas de pecho** y elige la banda de cada jugador (una sola vez). **Intercambiar** las invierte.
+   - **Dobles, hasta cuatro bandas**: con un partido de dobles (o con el botón *Dobles: añadir las bandas de los compañeros*) hay una banda para cada uno de los cuatro jugadores; la primera de cada pareja es de quien está escrito primero, la otra del compañero. En el partido las etiquetas pasan a ser *J1*, *J1B*, *J2*, *J2B*; en el resumen los compañeros van discontinuos en el gráfico y cada uno tiene su gráfico de zonas. Con solo dos bandas todo queda como antes. **Intercambiar** invierte las parejas, compañeros incluidos.
 3. **Edad, peso y sexo** de quien la lleva (opcionales): para las calorías (fórmula de Keytel, error típico ±20 %) y, con la edad, para las zonas cardíacas (máximo estimado 208 − 0,7 × edad).
 
 - Bajo cada banda: estado, pulso, **señal** en dBm (más cerca de 0 = más fuerte) y **cortes**, es decir, las veces que el pulso no llegó durante más de 3 segundos, con los segundos perdidos (*2 cortes (14 s)*). Cuentan desde el «juego» del partido; antes, desde que se eligió la banda. Sirven para saber hasta dónde llega la banda.
@@ -19545,7 +19590,7 @@ Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marc
 - **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
 - **Mejores jugadas**: montaje automático de los mejores puntos (último punto del partido, aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
   - **Intro como en los torneos (al principio)**: 9 segundos antes de los puntos, con el mismo diseño y la misma música que las estadísticas, con fundido: arriba torneo y ronda (o club) y la fecha; a los lados foto o retrato, nombre y APELLIDO y la clasificación FITP en grande; en el centro la comparación con los datos que la app conoce (rating TSM, edad, altura, mano, revés, club, victorias – derrotas) y los enfrentamientos antes de ese partido. Los datos vienen de la ficha del jugador en *Jugadores*: lo que no está rellenado no aparece. Basta con que el vídeo tenga los nombres de los jugadores.
-  - **Estadísticas al final del vídeo**: 2 o 3 pantallas de 10 segundos como en las retransmisiones de los torneos: saque y bolas de break; puntos, errores y peloteos cortos y largos; pulso, si se llevaba la banda. El partido es el del historial jugado mientras se grababa, o el de los puntos marcados en un vídeo importado. A los lados, la foto del jugador; sin foto, un retrato estilizado de hombre o de mujer (elección **Hombre / Mujer** en *Nuevo partido*) (sin elección, el del hombre; vale en toda la app, también en *Nuevo partido*, el historial, el resumen, el PDF y el marcador de la TV); debajo, el porcentaje de puntos ganados. Arriba, torneo, categoría y ronda (*Más detalles* en *Nuevo partido*), o club y pista.
+  - **Estadísticas al final del vídeo**: 2 o 3 pantallas de 10 segundos como en las retransmisiones de los torneos: saque y bolas de break; puntos, errores y peloteos cortos y largos; pulso, si se llevaba la banda (en dobles con cuatro bandas, los primeros jugadores y los compañeros en dos bloques). El partido es el del historial jugado mientras se grababa, o el de los puntos marcados en un vídeo importado. A los lados, la foto del jugador; sin foto, un retrato estilizado de hombre o de mujer (elección **Hombre / Mujer** en *Nuevo partido*) (sin elección, el del hombre; vale en toda la app, también en *Nuevo partido*, el historial, el resumen, el PDF y el marcador de la TV); debajo, el porcentaje de puntos ganados. Arriba, torneo, categoría y ronda (*Más detalles* en *Nuevo partido*), o club y pista.
   - **Música** bajo las estadísticas, con fundido de entrada y de salida: *Nowhere Land* de Kevin MacLeod (incompetech.com, licencia CC BY 4.0: si publicas el vídeo, cítalo), o una pista tuya con **Elegir una pista** (se usa el principio; usa solo música que tengas derecho a poner en tus vídeos).
   - Al pie de cada pantalla de estadísticas aparece **Creado con Tennis Score Manager** con la dirección del sitio.
 - **Repetición**: en el teléfono del árbitro, con la cámara conectada, **Repetición** pide a la cámara el punto dudoso (*Último punto*, *Punto anterior* o *Desde el último punto marcado*) y lo muestra, con pausa y fotograma a fotograma. **También en el marcador** lo enseña también en el marcador de la TV.
@@ -19919,13 +19964,15 @@ cat > "$DEST/app/src/main/assets/help/fr.md" << 'TSM_EOF'
 
 Au **premier démarrage**, l'appli demande la langue, le rôle (qui l'utilise), votre nom, comment vous l'utiliserez et, pour le secrétariat, le club ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. On choisit **un seul rôle** et ses onglets sont en bas ; il se change depuis **Plus › Réglages**, tout en haut (les données restent). **Chaque fonction se trouve dans un seul rôle** (7.9) : Vous joue, l'Entraîneur suit les élèves, le Club tient le secrétariat. Avec le rôle **Vous** :
 
-- **Jouer** : **Nouveau match**, les matchs suspendus à reprendre (un appui long en supprime un), **Comme la dernière fois** (mêmes joueurs, court et règles, directement au tirage au sort ; *Changer de mode ou de règles* les rouvre), le **tournoi entre amis** (Americano, Mexicano) et, sous **Ce téléphone**, le tableau, le téléphone-caméra et **Filmer avec ce téléphone**. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **Jouer** : **Nouveau match** (en haut **Reprendre un match**, qui ouvre la liste des matchs suspendus à choisir, avec la corbeille pour en supprimer un, et, tant qu'il est vide, **Comme la dernière fois** : mêmes joueurs, court et règles, directement au tirage au sort ; *Changer de mode ou de règles* les rouvre), dessous deux cadres côte à côte, **Matchs du club** (tournois, équipes et défis prêts à jouer, avec leur nombre) et **Tournoi entre amis** (Americano, Mexicano) et, sous **Ce téléphone**, le tableau, le téléphone-caméra et **Filmer avec ce téléphone**. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
 - **Club** (seulement après l'invitation de votre club, 7.18) : les nouvelles du tableau du club et des discussions, **Réserver un terrain**, vos réservations, **Je cherche un partenaire** et la discussion du club.
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Vos vidéos** (chapitres, temps forts, filtres, import), **Mon année**, **Mes raquettes**.
 - **Plus** : **Vous** (votre fiche), **Joueurs** (la base : 7.7) et, identiques dans chaque rôle, **Réglages** (la langue ; la voix de l'arbitre ; les appareils : bracelets, télécommandes, ceintures, second téléphone, tableau TV ; rôle et fonctions ; sauvegarde et données, 7.8 ; tout en bas **À propos** avec la version de l'appli, la licence et le code source), **Aide** (ce guide, avec recherche et renvois cliquables) et **Présentation de l'appli**.
 
 **Nouveau match** se fait en trois étapes courtes : **qui joue** (simple ou double, les joueurs de la base, avec les récents à toucher, et le sport ; classement, homme/femme et raquette tiennent sur une ligne sous les noms et s'ouvrent avec *Changer* ; club, court, tournoi et lieu dans *Autres détails*), **façon de compter et format** (les autres règles tiennent sur une ligne, *Changer* les ouvre) et le **tirage au sort**. Tout est facultatif : on peut continuer sans noms. **Retour** ramène toujours d'où vous venez.
+
+**Pour s'y retrouver** : chaque espace a sa couleur, la même sur l'onglet en bas, sur la bande de ses entrées et en haut de chaque écran (vert-jaune Jouer, bleu clair Club et Planning, orange S'entraîner, violet Progrès, vert d'eau élèves et adhérents, rose tournois, gris réglages). En haut du premier écran, le cadre **À faire** regroupe ce qui demande votre attention (boîte du club, sauvegarde, objectifs atteints, résultats à envoyer) et **Premiers pas** liste les premières choses à faire dans le rôle, cochées une fois faites (*Masquer* l'enlève). Les fonctions désactivées se retrouvent sous **Autres fonctions**, en bas. La fiche d'un joueur est divisée en **Fiche**, **Leçons**, **Entraînement** et **Matchs** ; *Fusionner avec un autre joueur*, *Retirer l'élève* et *Supprimer le joueur et ses données* sont dans le menu **⋮** en haut. Les nouveautés se créent **pas à pas** (réservation, tournoi, cotisation, cours, et **Connecter les bracelets pas à pas** dans *Appareils*, où chaque appareil est une ligne qui s'ouvre) ; les pages encore vides expliquent quoi faire. Dans le Planning, terrains, périodes non réservables, horaires et prix et statistiques sont dans le menu **Terrains, horaires et fermetures**.
 
 ## 4. La voix (fonctionne sans internet)
 
@@ -20081,6 +20128,7 @@ Fréquence cardiaque et calories depuis des **ceintures pectorales Bluetooth** u
 
 1. Mouillez les électrodes et mettez la ceinture : elle s'allume toute seule au contact de la peau.
 2. *Mode et règles* (ou *Plus › Réglages › Appareils*) › **Fréquence cardiaque** › activez **Ceintures cardio** et choisissez la ceinture de chaque joueur (une seule fois). **Échanger** les inverse.
+   - **Double, jusqu'à quatre ceintures** : avec un match de double (ou avec le bouton *Double : ajouter les ceintures des partenaires*) il y a une ceinture pour chacun des quatre joueurs ; la première de chaque équipe est celle du joueur écrit en premier, l'autre celle du partenaire. Pendant le match les pastilles deviennent *J1*, *J1B*, *J2*, *J2B* ; dans le récapitulatif les partenaires sont en pointillés sur le graphique et chacun a son camembert des zones. Avec deux ceintures seulement, tout reste comme avant. **Échanger** inverse les équipes, partenaires compris.
 3. **Âge, poids et sexe** de la personne (facultatifs) : pour les calories (formule de Keytel, erreur typique ±20 %) et, avec l'âge, pour les zones cardio (maximum estimé 208 − 0,7 × âge).
 
 - Sous chaque ceinture : état, fréquence, **signal** en dBm (plus proche de 0 = plus fort) et **coupures**, c'est-à-dire les fois où la fréquence n'est pas arrivée pendant plus de 3 secondes, avec les secondes perdues (*2 coupures (14 s)*). Elles comptent depuis le « jeu » du match ; avant, depuis le choix de la ceinture. Elles indiquent jusqu'où porte la ceinture.
@@ -20180,7 +20228,7 @@ Un deuxième téléphone sur un trépied filme le match et met le score de l'arb
 - **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
 - **Temps forts** : montage automatique des plus beaux points (dernier point du match, aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
   - **Intro comme dans les tournois (au début)** : 9 secondes avant les points, avec le même graphisme et la même musique que les statistiques, en fondu : en haut tournoi et tour (ou club) et la date ; sur les côtés photo ou portrait, prénom et NOM et le classement FITP en grand ; au centre la comparaison avec les données que l'app connaît (classement TSM, âge, taille, main, revers, club, victoires – défaites) et le face-à-face avant ce match. Les données viennent de la fiche du joueur dans *Joueurs* : ce qui n'est pas rempli n'apparaît pas. Il suffit que la vidéo ait les noms des joueurs.
-  - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture. Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** dans *Nouveau match*) (sans choix, celui de l'homme ; valable dans toute l'application, aussi dans *Nouveau match*, l'historique, le résumé, le PDF et le tableau TV) ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (*Autres détails* dans *Nouveau match*), ou club et court.
+  - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture (en double avec quatre ceintures, les premiers joueurs et les partenaires en deux blocs). Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** dans *Nouveau match*) (sans choix, celui de l'homme ; valable dans toute l'application, aussi dans *Nouveau match*, l'historique, le résumé, le PDF et le tableau TV) ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (*Autres détails* dans *Nouveau match*), ou club et court.
   - **Musique** sous les statistiques, avec fondu en entrée et en sortie : *Nowhere Land* de Kevin MacLeod (incompetech.com, licence CC BY 4.0 : si vous publiez la vidéo, citez-le), ou un morceau à vous avec **Choisir un morceau** (on en utilise le début ; n'utilisez que de la musique que vous avez le droit de mettre dans vos vidéos).
   - En bas de chaque écran de statistiques figure la mention **Créé avec Tennis Score Manager** avec l'adresse du site.
 - **Ralenti** : sur le téléphone de l'arbitre, avec la caméra connectée, **Ralenti** demande à la caméra le point contesté (*Dernier point*, *Point précédent* ou *Depuis le dernier point marqué*) et l'affiche, avec pause et image par image. **Aussi sur le tableau** le montre aussi sur le tableau TV.
@@ -20554,13 +20602,15 @@ cat > "$DEST/app/src/main/assets/help/it.md" << 'TSM_EOF'
 
 Alla **prima accensione** l'app chiede la lingua, il ruolo (chi la usa), il tuo nome, come la userai e, per la segreteria, il circolo; si può saltare e rifare da **Altro › Presentazione dell'app**. Si sceglie **un ruolo solo** e in basso ci sono le sue schede; si cambia da **Altro › Impostazioni**, in cima (i dati restano). **Ogni funzione sta in un ruolo solo** (7.9): Tu gioca, l'Allenatore segue gli allievi, il Circolo fa la segreteria. Col ruolo **Tu**:
 
-- **Gioca**: **Nuova partita**, le partite sospese da riprendere (tenendo premuto se ne elimina una), **Come l'ultima volta** (stessi giocatori, campo e regole, e si va dritti al sorteggio; *Cambia modalità o regole* le riapre), il **torneo tra amici** (Americano, Mexicano) e, sotto **Questo telefono**, il tabellone, il telefono-telecamera e **Riprendi con questo telefono**. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
+- **Gioca**: **Nuova partita** (in cima **Riprendi partita**, che apre l'elenco delle partite sospese da scegliere, col cestino per eliminarne una, e, finché è vuota, **Come l'ultima volta**: stessi giocatori, campo e regole, e si va dritti al sorteggio; *Cambia modalità o regole* le riapre), sotto due riquadri affiancati, **Partite del circolo** (tornei, squadre e sfide pronte da giocare, col numero) e **Torneo tra amici** (Americano, Mexicano) e, sotto **Questo telefono**, il tabellone, il telefono-telecamera e **Riprendi con questo telefono**. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
 - **Circolo** (solo dopo l'invito del tuo circolo, 7.18): le novità della bacheca e delle chat, **Prenota un campo**, le tue prenotazioni, **Cerco compagno** e la chat del circolo.
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **I tuoi video** (capitoli, highlights, filtri, importa), **Il mio anno**, **Le mie racchette**.
 - **Altro**: **Tu** (la tua scheda), **Giocatori** (il database: 7.7) e, uguali in ogni ruolo, **Impostazioni** (la lingua; la voce dell'arbitro; i dispositivi: braccialetti, telecomandi, fasce, secondo telefono, tabellone TV; ruolo e funzioni; backup e dati, 7.8; in fondo **Informazioni** con la versione dell'app, la licenza e il codice sorgente), **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare) e **Presentazione dell'app**.
 
 **Nuova partita** sono tre passi corti: **chi gioca** (singolo o doppio, i giocatori scelti dal database, con i recenti da toccare, e lo sport; classifica, uomo/donna e racchetta stanno in una riga sotto i nomi e si aprono con *Cambia*; circolo, campo, torneo e luogo in *Altri dettagli*), **come segni il punteggio e il formato** (le altre regole stanno in una riga, *Cambia* le apre) e il **sorteggio**. Tutto è facoltativo: si può andare avanti anche senza nomi. **Indietro** torna sempre da dove sei arrivato.
+
+**Per orientarsi**: ogni area ha il suo colore, uguale nella scheda in basso, nella striscia delle voci e in alto in ogni schermata (verde-giallo Gioca, azzurro Circolo e Planning, arancio Allenati, viola Progressi, verde acqua allievi e soci, rosa tornei, grigio impostazioni). In cima alla prima schermata il riquadro **Da fare** raccoglie quello che chiede attenzione (casella del circolo, backup, obiettivi raggiunti, risultati da mandare) e **Primi passi** elenca le prime cose da fare nel ruolo, con la spunta su quelle fatte (*Nascondi* lo toglie). Le funzioni spente si ritrovano da **Altre funzioni**, in fondo. La scheda di un giocatore è divisa in **Scheda**, **Lezioni**, **Allenamento** e **Partite**; *Unisci con un altro giocatore*, *Togli l'allievo* e *Cancella il giocatore e i suoi dati* stanno nel menu **⋮** in alto. Le cose nuove si creano **a passi** (prenotazione, torneo, quota, corso, e **Collega i braccialetti passo passo** in *Dispositivi*, dove ogni dispositivo è una riga che si apre); le pagine ancora vuote spiegano cosa fare. Nel Planning campi, non prenotabili, orari e prezzi e statistiche stanno nel menu **Campi, orari e chiusure**.
 
 ## 4. La voce (funziona senza internet)
 
@@ -20716,6 +20766,7 @@ Battito e calorie da **fasce toraciche Bluetooth** che usano il servizio cardio 
 
 1. Bagna gli elettrodi e indossa la fascia: si accende da sola a contatto con la pelle.
 2. *Modalità e regole* (o *Altro › Impostazioni › Dispositivi*) › **Battito cardiaco** › attiva **Fasce cardio** e scegli la fascia di ciascun giocatore (si sceglie una volta sola). **Scambia** le inverte.
+   - **Doppio, fino a quattro fasce**: con una partita di doppio (o col tasto *Doppio: aggiungi le fasce dei compagni*) ci sono una fascia per ciascuno dei quattro giocatori; la prima di ogni squadra è di chi è scritto per primo, l'altra del compagno. In partita le pastiglie diventano *G1*, *G1B*, *G2*, *G2B*; nel riepilogo il grafico ha i compagni tratteggiati e c'è una torta delle zone per ciascuno. Con due sole fasce tutto resta come prima. **Scambia** inverte le squadre, compagni compresi.
 3. Facoltativi **età, peso e sesso** di chi la indossa: servono per le calorie (formula di Keytel, errore tipico ±20%) e, con l'età, per le zone cardio (massimo stimato 208 − 0,7 × età).
 
 - Sotto ogni fascia: stato, battito, **segnale** in dBm (più vicino a 0 = più forte) e **stacchi**, cioè le volte in cui il battito non è arrivato per più di 3 secondi, con i secondi persi (*2 stacchi (14 s)*). Contano dal «gioco» della partita; prima, da quando la fascia è stata scelta. Servono a capire fin dove arriva la fascia.
@@ -20815,7 +20866,7 @@ Un secondo telefono su un treppiede riprende la partita e mette sul video il pun
 - **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
 - **Highlights**: montaggio automatico dei punti più belli (ultimo punto della partita, ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
   - **Intro come nei tornei (all'inizio)**: 9 secondi prima dei punti, con la stessa grafica e la stessa musica delle statistiche, in dissolvenza: in alto torneo e turno (o circolo) e la data; ai lati foto o ritratto, nome e COGNOME e la classifica FITP in grande; al centro il confronto con i dati che l'app conosce (rating TSM, età, altezza, mano, rovescio, circolo, vittorie – sconfitte) e gli scontri diretti prima di quella partita. I dati vengono dalla scheda del giocatore in *Giocatori*: mancano quelli non scritti. Basta che il video abbia i nomi dei giocatori.
-  - **Statistiche a fine video**: 2 o 3 schermate da 10 secondi come nelle dirette dei tornei: servizio e palle break; punti, errori e scambi corti e lunghi; battito, se c'era la fascia. La partita è quella dello storico giocata mentre si registrava, o quella dei punti segnati su un video importato. Ai lati la foto del giocatore; senza foto un ritratto stilizzato di uomo o di donna (scelta **Uomo / Donna** in *Nuova partita*) (senza scelta, quello dell'uomo; vale in tutta l'app, anche in *Nuova partita*, storico, riepilogo, PDF e tabellone TV); sotto, la percentuale di punti vinti. In alto torneo, categoria e turno (*Altri dettagli* in *Nuova partita*), oppure circolo e campo.
+  - **Statistiche a fine video**: 2 o 3 schermate da 10 secondi come nelle dirette dei tornei: servizio e palle break; punti, errori e scambi corti e lunghi; battito, se c'era la fascia (nel doppio con quattro fasce, i primi giocatori e i compagni in due blocchi). La partita è quella dello storico giocata mentre si registrava, o quella dei punti segnati su un video importato. Ai lati la foto del giocatore; senza foto un ritratto stilizzato di uomo o di donna (scelta **Uomo / Donna** in *Nuova partita*) (senza scelta, quello dell'uomo; vale in tutta l'app, anche in *Nuova partita*, storico, riepilogo, PDF e tabellone TV); sotto, la percentuale di punti vinti. In alto torneo, categoria e turno (*Altri dettagli* in *Nuova partita*), oppure circolo e campo.
   - **Musica** sotto le statistiche, con dissolvenza in entrata e in uscita: *Nowhere Land* di Kevin MacLeod (incompetech.com, licenza CC BY 4.0: se pubblichi il video, citalo nei crediti), oppure un brano tuo con **Scegli un brano** (se ne usa l'inizio; usa solo musica che hai il diritto di mettere nei tuoi video).
   - In fondo a ogni schermata delle statistiche c'è la scritta **Creato con Tennis Score Manager** con l'indirizzo del sito.
 - **Moviola**: sul telefono dell'arbitro, con la telecamera collegata, **Moviola** chiede alla telecamera il punto contestato (*Ultimo punto*, *Punto prima* o *Dall'ultimo punto segnato*) e lo mostra, con pausa e fotogramma per fotogramma. **Anche sul tabellone** lo fa vedere anche sul tabellone TV.
@@ -21189,13 +21240,15 @@ cat > "$DEST/app/src/main/assets/help/pt.md" << 'TSM_EOF'
 
 Na **primeira vez** o app pergunta o idioma, o papel (quem o usa), o seu nome, como vai usá-lo e, para a secretaria, o clube; dá para pular e refazer em **Mais › Apresentação do app**. Escolhe-se **um só papel** e embaixo ficam as suas abas; muda-se em **Mais › Configurações**, no topo (os dados ficam). **Cada função fica num só papel** (7.9): Você joga, o Treinador acompanha os alunos, o Clube cuida da secretaria. Com o papel **Você**:
 
-- **Jogar**: **Nova partida**, as partidas suspensas para retomar (mantendo pressionado apaga-se uma), **Como da última vez** (mesmos jogadores, quadra e regras, direto para o sorteio; *Mudar modo ou regras* reabre-as), o **torneio entre amigos** (Americano, Mexicano) e, em **Este telefone**, o placar, o telefone-câmera e **Gravar com este telefone**. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
+- **Jogar**: **Nova partida** (no alto **Retomar partida**, que abre a lista das partidas suspensas para escolher, com a lixeira para apagar uma, e, enquanto está vazia, **Como da última vez**: mesmos jogadores, quadra e regras, direto para o sorteio; *Mudar modo ou regras* reabre-as), abaixo dois quadros lado a lado, **Partidas do clube** (torneios, equipes e desafios prontos para jogar, com o número) e **Torneio entre amigos** (Americano, Mexicano) e, em **Este telefone**, o placar, o telefone-câmera e **Gravar com este telefone**. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
 - **Clube** (só depois do convite do seu clube, 7.18): as novidades do mural e das conversas, **Reservar quadra**, as suas reservas, **Procuro parceiro** e o chat do clube.
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
 - **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar), **O meu ano**, **As minhas raquetes**.
 - **Mais**: **Você** (a sua ficha), **Jogadores** (o banco: 7.7) e, iguais em todos os papéis, **Configurações** (o idioma; a voz do árbitro; os dispositivos: pulseiras, controles, cintas, segundo telefone, placar na TV; papel e funções; backup e dados, 7.8; no fim **Sobre o app** com a versão do app, a licença e o código-fonte), **Ajuda** (este guia, com pesquisa e referências para tocar) e **Apresentação do app**.
 
 **Nova partida** são três passos curtos: **quem joga** (simples ou duplas, os jogadores do banco, com os recentes para tocar, e o esporte; classificação, homem/mulher e raquete cabem numa linha sob os nomes e abrem-se com *Trocar*; clube, quadra, torneio e local em *Mais detalhes*), **como você marca o placar e o formato** (as outras regras cabem numa linha, *Trocar* abre-as) e o **sorteio**. Tudo é opcional: dá para seguir mesmo sem nomes. **Voltar** retorna sempre de onde você veio.
+
+**Para se orientar**: cada área tem sua cor, a mesma na aba de baixo, na faixa das entradas e no alto de cada tela (verde-limão Jogar, azul-claro Clube e Agenda, laranja Treinar, roxo Progresso, verde-água alunos e sócios, rosa torneios, cinza configurações). No alto da primeira tela, o quadro **A fazer** reúne o que pede atenção (caixa do clube, backup, metas atingidas, resultados a enviar) e **Primeiros passos** lista as primeiras coisas a fazer no papel, marcando as já feitas (*Ocultar* o remove). As funções desligadas ficam em **Mais funções**, no final. A ficha de um jogador é dividida em **Ficha**, **Aulas**, **Treino** e **Partidas**; *Juntar com outro jogador*, *Remover aluno* e *Apagar jogador e os dados dele* ficam no menu **⋮** no alto. O que é novo se cria **passo a passo** (reserva, torneio, mensalidade, curso e **Conectar as pulseiras passo a passo** em *Dispositivos*, onde cada dispositivo é uma linha que se abre); as páginas ainda vazias explicam o que fazer. Na Agenda, quadras, bloqueios, horários e preços e estatísticas ficam no menu **Quadras, horários e bloqueios**.
 
 ## 4. A voz (funciona sem internet)
 
@@ -21351,6 +21404,7 @@ Frequência cardíaca e calorias de **cintas peitorais Bluetooth** com o serviç
 
 1. Molhe os eletrodos e coloque a cinta: ela liga sozinha em contato com a pele.
 2. *Modo e regras* (ou *Mais › Configurações › Dispositivos*) › **Frequência cardíaca** › ative **Cintas cardíacas** e escolha a cinta de cada jogador (uma vez só). **Trocar** as inverte.
+   - **Duplas, até quatro cintas**: com uma partida de duplas (ou com o botão *Duplas: adicionar as cintas dos parceiros*) há uma cinta para cada um dos quatro jogadores; a primeira de cada dupla é de quem está escrito primeiro, a outra do parceiro. Na partida as etiquetas viram *J1*, *J1B*, *J2*, *J2B*; no resumo os parceiros ficam tracejados no gráfico e cada um tem seu gráfico de zonas. Com só duas cintas tudo fica como antes. **Trocar** inverte as duplas, parceiros incluídos.
 3. **Idade, peso e sexo** de quem a usa (opcionais): para as calorias (fórmula de Keytel, erro típico ±20%) e, com a idade, para as zonas cardíacas (máximo estimado 208 − 0,7 × idade).
 
 - Sob cada cinta: estado, frequência, **sinal** em dBm (mais perto de 0 = mais forte) e **quedas**, ou seja, as vezes em que a frequência não chegou por mais de 3 segundos, com os segundos perdidos (*2 quedas (14 s)*). Contam a partir do «jogo» da partida; antes, desde a escolha da cinta. Mostram até onde a cinta alcança.
@@ -21450,7 +21504,7 @@ Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do á
 - **Filtros do treinador** (ícone do filtro): só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points. **Reproduzir** coloca-os em sequência.
 - **Melhores momentos**: montagem automática dos melhores pontos (último ponto da partida, aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
   - **Intro como nos torneios (no início)**: 9 segundos antes dos pontos, com o mesmo visual e a mesma música das estatísticas, com transição suave: no topo torneio e ronda (ou clube) e a data; dos lados foto ou retrato, nome e APELIDO e o ranking FITP em grande; no centro a comparação com os dados que a app conhece (rating TSM, idade, altura, mão, backhand, clube, vitórias – derrotas) e os confrontos diretos antes dessa partida. Os dados vêm da ficha do jogador em *Jogadores*: o que não estiver preenchido não aparece. Basta que o vídeo tenha os nomes dos jogadores.
-  - **Estatísticas no fim do vídeo**: 2 ou 3 telas de 10 segundos como nas transmissões dos torneios: saque e break points; pontos, erros e trocas de bola curtas e longas; batimentos, se a cinta foi usada. A partida é a do histórico jogada durante a gravação, ou a dos pontos marcados num vídeo importado. Nas laterais, a foto do jogador; sem foto, um retrato estilizado de homem ou de mulher (escolha **Homem / Mulher** em *Nova partida*) (sem escolha, o do homem; vale em todo o app, também em *Nova partida*, no histórico, no resumo, no PDF e no placar da TV); embaixo, a porcentagem de pontos ganhos. No alto, torneio, categoria e fase (*Mais detalhes* em *Nova partida*), ou clube e quadra.
+  - **Estatísticas no fim do vídeo**: 2 ou 3 telas de 10 segundos como nas transmissões dos torneios: saque e break points; pontos, erros e trocas de bola curtas e longas; batimentos, se a cinta foi usada (em duplas com quatro cintas, os primeiros jogadores e os parceiros em dois blocos). A partida é a do histórico jogada durante a gravação, ou a dos pontos marcados num vídeo importado. Nas laterais, a foto do jogador; sem foto, um retrato estilizado de homem ou de mulher (escolha **Homem / Mulher** em *Nova partida*) (sem escolha, o do homem; vale em todo o app, também em *Nova partida*, no histórico, no resumo, no PDF e no placar da TV); embaixo, a porcentagem de pontos ganhos. No alto, torneio, categoria e fase (*Mais detalhes* em *Nova partida*), ou clube e quadra.
   - **Música** sob as estatísticas, com fade de entrada e de saída: *Nowhere Land* de Kevin MacLeod (incompetech.com, licença CC BY 4.0: se publicar o vídeo, dê o crédito), ou uma faixa sua com **Escolher uma faixa** (usa-se o começo; use só músicas que você tem o direito de colocar nos seus vídeos).
   - No rodapé de cada tela de estatísticas aparece **Criado com Tennis Score Manager** com o endereço do site.
 - **Replay**: no telefone do árbitro, com a câmera conectada, **Replay** pede à câmera o ponto contestado (*Último ponto*, *Ponto anterior* ou *Desde o último ponto marcado*) e o mostra, com pausa e quadro a quadro. **Também no placar** mostra também no placar da TV.
@@ -22841,6 +22895,8 @@ import com.tennis.scoremanager.ble.StrapGaps
 import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartBucket
+import com.tennis.scoremanager.data.heartTracks
+import com.tennis.scoremanager.data.withHeart
 import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.HeartTrack
@@ -23084,7 +23140,7 @@ class MatchController(
     val voiceArea = com.tennis.scoremanager.player.VoiceSettings(this, app, storage, scope, io)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
     /** Chi indossa la fascia cardio di ciascun lato (per le calorie). */
-    override val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
+    override val heartProfiles = MutableStateFlow(com.tennis.scoremanager.data.Wearer.entries.mapNotNull { w -> storage.heartProfile(w)?.let { w to it } }.toMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
     /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
     private val statusStart = mutableMapOf<Side, BandStatus>()
@@ -23135,7 +23191,7 @@ class MatchController(
     /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
     private var rallyStrokes = 0
     /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
-    private val heartBuckets = Side.entries.associateWith { HeartBucket() }
+    private val heartBuckets = com.tennis.scoremanager.data.Wearer.entries.associateWith { HeartBucket() }
     /**
      * Stacchi di ciascuna fascia (per indirizzo), con le misure di questo telefono e del satellite insieme: conta
      * quando il battito non è arrivato da nessuno dei due. Ripartono a ogni partita.
@@ -23144,8 +23200,8 @@ class MatchController(
     /** Batte ogni 2 secondi: uno stacco in corso si vede crescere anche senza misure nuove. */
     private val gapTick = MutableStateFlow(0L)
 
-    /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
-    private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
+    /** Misure arrivate in ritardo dal telefono satellite: (chi porta la fascia, secondo della partita, battito). */
+    private val lateHeart = mutableListOf<Triple<com.tennis.scoremanager.data.Wearer, Int, Int>>()
 
     /** Due telefoni per le fasce cardio: principale o satellite (vedi [PhoneRelay]). */
     val relay: PhoneRelay = PhoneRelay(
@@ -23171,7 +23227,7 @@ class MatchController(
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
      * arriva dal satellite.
      */
-    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote, gapTick) { local, remote, _ ->
+    val straps: StateFlow<Map<com.tennis.scoremanager.data.Wearer, StrapInfo>> = combine(heart.straps, relay.remote, gapTick) { local, remote, _ ->
         val now = SystemClock.elapsedRealtime()
         local.mapValues { (_, st) ->
             val r = remote[st.address]?.status
@@ -23215,11 +23271,11 @@ class MatchController(
         scope.launch { ble.status.collect { (side, st) -> if (!relay.isSatellite) onBandStatus(side, st) } }
         scope.launch { ble.strokes.collect { if (!relay.isSatellite) onBandStroke(it) } }
         scope.launch {
-            heart.readings.collect { (side, m) ->
-                heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
-                workoutArea.workout.onReading(side, m)
-                onHeartReading(side, m)
-                relay.onLocalReading(side, m)
+            heart.readings.collect { (who, m) ->
+                heart.straps.value[who]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
+                workoutArea.workout.onReading(who, m)
+                onHeartReading(who, m)
+                relay.onLocalReading(who, m)
             }
         }
         scope.launch {
@@ -24502,28 +24558,31 @@ class MatchController(
     // ---------------------------------------------------------------- fasce cardio
 
     private fun restoreStraps() {
-        storage.strapAddress(true)?.let { heart.assign(Side.P1, it, storage.strapName(true)) }
-        storage.strapAddress(false)?.let { heart.assign(Side.P2, it, storage.strapName(false)) }
+        for (w in com.tennis.scoremanager.data.Wearer.entries) storage.strapAddress(w)?.let { heart.assign(w, it, storage.strapName(w)) }
     }
 
-    fun assignStrap(side: Side, address: String?, name: String?) {
-        if (address != null && storage.strapAddress(side == Side.P2) == address) storage.setStrap(side == Side.P2, null, null)
-        storage.setStrap(side == Side.P1, address, name)
-        heart.assign(side, address, name)
+    /** La fascia di chi la porta (nel doppio anche i compagni); tolta a chi l'aveva prima. */
+    fun assignStrap(who: com.tennis.scoremanager.data.Wearer, address: String?, name: String?) {
+        if (address != null) for (o in com.tennis.scoremanager.data.Wearer.entries) if (o != who && storage.strapAddress(o) == address) storage.setStrap(o, null, null)
+        storage.setStrap(who, address, name)
+        heart.assign(who, address, name)
     }
 
     /** Ricerca delle fasce mentre la loro sezione è aperta (e l'app in primo piano). */
     fun setStrapScan(on: Boolean) = heart.setAutoScan(on && options.value.heartRate)
 
     fun swapStraps() {
-        val p1 = storage.strapAddress(true) to storage.strapName(true)
-        val p2 = storage.strapAddress(false) to storage.strapName(false)
-        storage.setStrap(true, p2.first, p2.second)
-        storage.setStrap(false, p1.first, p1.second)
+        // G1 con G2 e, nel doppio, i compagni tra loro.
+        for ((a, b) in listOf(com.tennis.scoremanager.data.Wearer.P1 to com.tennis.scoremanager.data.Wearer.P2, com.tennis.scoremanager.data.Wearer.P1B to com.tennis.scoremanager.data.Wearer.P2B)) {
+            val sa = storage.strapAddress(a) to storage.strapName(a)
+            val sb = storage.strapAddress(b) to storage.strapName(b)
+            storage.setStrap(a, sb.first, sb.second)
+            storage.setStrap(b, sa.first, sa.second)
+            val prof = heartProfiles.value
+            setHeartProfile(a, prof[b])
+            setHeartProfile(b, prof[a])
+        }
         heart.swapSides()
-        val prof = heartProfiles.value
-        setHeartProfile(Side.P1, prof[Side.P2])
-        setHeartProfile(Side.P2, prof[Side.P1])
     }
 
     /** I dati per le calorie dalla scheda del giocatore (età, peso, sesso); null se ne manca uno. */
@@ -24534,18 +24593,18 @@ class MatchController(
         return HeartProfile(age, kg, female = p.sex == "F")
     }
 
-    override fun setHeartProfile(side: Side, p: HeartProfile?) {
-        storage.setHeartProfile(side == Side.P1, p)
-        heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
+    override fun setHeartProfile(who: com.tennis.scoremanager.data.Wearer, p: HeartProfile?) {
+        storage.setHeartProfile(who, p)
+        heartProfiles.value = if (p == null) heartProfiles.value - who else heartProfiles.value + (who to p)
     }
 
     /** Il battito conta come i colpi: a partita avviata e in corso, non nelle pause. */
     private fun recordingHeart(lm: LiveMatch): Boolean =
         screen.value == Screen.MATCH && lm.record.startedAt != null && !lm.record.suspended && !lm.state.isFinished
 
-    private fun onHeartReading(side: Side, m: HeartMeasurement) {
+    private fun onHeartReading(who: com.tennis.scoremanager.data.Wearer, m: HeartMeasurement) {
         val lm = live.value ?: return
-        if (m.valid && recordingHeart(lm)) heartBuckets.getValue(side).add(m.bpm)
+        if (m.valid && recordingHeart(lm)) heartBuckets.getValue(who).add(m.bpm)
     }
 
     /**
@@ -24553,20 +24612,20 @@ class MatchController(
      * ritardo (il Wi-Fi tra i telefoni era caduto) va a riempire i buchi della partita a cui appartiene.
      */
     private fun onRemoteHeart(addr: String, m: HeartMeasurement, at: Long, match: String) {
-        val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
+        val who = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
         val age = System.currentTimeMillis() - at
         // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
         if (age <= PhoneRelay.LIVE_MS) {
             strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
-            workoutArea.workout.onReading(side, m)
+            workoutArea.workout.onReading(who, m)
         }
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
         if (System.currentTimeMillis() - at <= PhoneRelay.LIVE_MS) {
-            onHeartReading(side, m)
+            onHeartReading(who, m)
         } else {
             val start = lm.record.startedAt ?: return
-            if (at >= start && !lm.state.isFinished) lateHeart += Triple(side, ((at - start) / 1000).toInt(), m.bpm)
+            if (at >= start && !lm.state.isFinished) lateHeart += Triple(who, ((at - start) / 1000).toInt(), m.bpm)
         }
     }
 
@@ -24592,17 +24651,17 @@ class MatchController(
         val now = values.takeIf { recordingHeart(lm) }.orEmpty()
         if (now.isEmpty() && late.isEmpty()) return
         val sec = ((System.currentTimeMillis() - start) / 1000).toInt()
-        var heartMap = lm.record.heart
-        for (side in Side.entries) {
-            val bpm = now[side]
-            val points = late[side].orEmpty()
+        var heartMap = lm.record.heartTracks()
+        for (w in com.tennis.scoremanager.data.Wearer.entries) {
+            val bpm = now[w]
+            val points = late[w].orEmpty()
             if (bpm == null && points.isEmpty()) continue
-            var track = heartMap[side] ?: HeartTrack()
+            var track = heartMap[w] ?: HeartTrack()
             if (bpm != null) track = track.add(sec, bpm)
             track = track.fill(points, HeartStats.STEP_S)
-            heartMap = heartMap + (side to track.copy(profile = track.profile ?: heartProfiles.value[side]))
+            heartMap = heartMap + (w to track.copy(profile = track.profile ?: heartProfiles.value[w]))
         }
-        setRecord(lm.record.copy(heart = heartMap))
+        setRecord(lm.record.withHeart(heartMap))
     }
 
     // ---------------------------------------------------------------- due telefoni
@@ -24674,8 +24733,13 @@ class MatchController(
         // Ogni nome scritto diventa un giocatore del database (quello che c'è già, o uno nuovo): la partita è di persone.
         val (withIds, created) = com.tennis.scoremanager.data.Players.assign(su, players.value, now)
         // Chi ha età e peso nella scheda: le calorie della fascia cardio li prendono da lì.
-        heartProfileOf(playerById(withIds.p1aId))?.let { setHeartProfile(Side.P1, it) }
-        heartProfileOf(playerById(withIds.p2aId))?.let { setHeartProfile(Side.P2, it) }
+        heartProfileOf(playerById(withIds.p1aId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P1, it) }
+        heartProfileOf(playerById(withIds.p2aId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P2, it) }
+        // Nel doppio anche i compagni, se portano la fascia.
+        if (su.doubles) {
+            heartProfileOf(playerById(withIds.p1bId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P1B, it) }
+            heartProfileOf(playerById(withIds.p2bId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P2B, it) }
+        }
         if (created.isNotEmpty()) {
             val list = players.value + created
             players.value = list.sortedBy { it.name.lowercase() }
@@ -25130,11 +25194,11 @@ class MatchController(
             bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
         } else emptyMap()
         // Età e peso detti a partita iniziata valgono lo stesso per le calorie.
-        val heartMap = lm.record.heart.mapValues { (side, t) -> t.copy(profile = t.profile ?: heartProfiles.value[side]) }
+        val heartMap = lm.record.heartTracks().mapValues { (w, t) -> t.copy(profile = t.profile ?: heartProfiles.value[w]) }
         val rec = lm.record.copy(
             finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
-            batteryEnd = endBattery, heart = heartMap,
-        )
+            batteryEnd = endBattery,
+        ).withHeart(heartMap)
         runningSince = null
         competitions.clubMatchFinished(rec, lm.state)
         competitions.teamRubberFinished(rec, lm.state)
@@ -27513,6 +27577,7 @@ import android.os.ParcelUuid
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.data.Wearer
 import com.tennis.scoremanager.model.Side
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -27554,8 +27619,9 @@ data class StrapInfo(
 )
 
 /**
- * Fasce cardio Bluetooth (servizio standard 0x180D), una per lato. Stesso schema dei braccialetti ([BleManager]),
- * ma la fascia manda solo: nessun messaggio da scriverle, nessuna conferma.
+ * Fasce cardio Bluetooth (servizio standard 0x180D), una per giocatore: una per lato e, nel doppio, fino a quattro.
+ * Stesso schema dei braccialetti ([BleManager]), ma la fascia manda solo: nessun messaggio da scriverle, nessuna
+ * conferma.
  */
 @SuppressLint("MissingPermission")
 class HeartRateManager(context: Context, private val ble: BleManager) {
@@ -27568,13 +27634,13 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
     val found: StateFlow<List<FoundStrap>> = _found
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning
-    private val _straps = MutableStateFlow<Map<Side, StrapInfo>>(emptyMap())
-    val straps: StateFlow<Map<Side, StrapInfo>> = _straps
-    private val _readings = MutableSharedFlow<Pair<Side, HeartMeasurement>>(extraBufferCapacity = 32)
+    private val _straps = MutableStateFlow<Map<Wearer, StrapInfo>>(emptyMap())
+    val straps: StateFlow<Map<Wearer, StrapInfo>> = _straps
+    private val _readings = MutableSharedFlow<Pair<Wearer, HeartMeasurement>>(extraBufferCapacity = 32)
     /** Ogni misura arrivata (circa una al secondo per fascia). */
-    val readings: SharedFlow<Pair<Side, HeartMeasurement>> = _readings
+    val readings: SharedFlow<Pair<Wearer, HeartMeasurement>> = _readings
 
-    private val links = mutableMapOf<Side, StrapLink>()
+    private val links = mutableMapOf<Wearer, StrapLink>()
     private var autoScan = false
     private var scanRunning = false
     private var scanStartJob: Job? = null
@@ -27697,21 +27763,27 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         }
     }
 
-    /** Associa (o toglie, con address null) la fascia a un lato. Una fascia non può stare su due lati. */
-    fun assign(side: Side, address: String?, name: String?) {
-        links.remove(side)?.close()
+    /**
+     * Associa (o toglie, con address null) la fascia a chi la porta (nel doppio anche ai compagni). Una fascia non
+     * può stare su due persone.
+     */
+    fun assign(who: Wearer, address: String?, name: String?) {
+        links.remove(who)?.close()
         if (address != null) {
             links.entries.firstOrNull { it.value.address == address }?.let { links.remove(it.key)?.close() }
-            links[side] = StrapLink(side, address, name ?: address).also { it.connect() }
+            links[who] = StrapLink(who, address, name ?: address).also { it.connect() }
         }
         publish()
     }
 
+    /** Scambia i lati: G1 con G2 e, nel doppio, anche i compagni. */
     fun swapSides() {
-        val a = links.remove(Side.P1)
-        val b = links.remove(Side.P2)
-        a?.let { it.side = Side.P2; links[Side.P2] = it }
-        b?.let { it.side = Side.P1; links[Side.P1] = it }
+        val moved = Wearer.entries.mapNotNull { w -> links.remove(w)?.let { w to it } }
+        for ((w, l) in moved) {
+            val to = Wearer.of(if (w.side == Side.P1) Side.P2 else Side.P1, w.partner)
+            l.side = to
+            links[to] = l
+        }
         publish()
     }
 
@@ -27742,7 +27814,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
 
     private enum class OpKind { DESCRIPTOR, READ }
 
-    private inner class StrapLink(var side: Side, val address: String, val name: String) {
+    private inner class StrapLink(var side: Wearer, val address: String, val name: String) {
         var state = StrapState.IDLE
             private set
         var battery: Int? = null
@@ -34879,8 +34951,10 @@ data class MatchRecord(
     val batteryEnd: Map<Side, Int> = emptyMap(),
     /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
     val strokes: Map<Side, StrokeStats> = emptyMap(),
-    /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
+    /** Battito dalle fasce cardio, per lato (nel doppio: il primo giocatore della squadra). */
     val heart: Map<Side, HeartTrack> = emptyMap(),
+    /** Nel doppio, il battito del compagno (il secondo giocatore della squadra), se porta anche lui la fascia. */
+    val heartPartner: Map<Side, HeartTrack> = emptyMap(),
     /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
     val notes: String = "",
     /** Amichevole: resta nello storico ma non conta per il rating TSM. */
@@ -34890,6 +34964,33 @@ data class MatchRecord(
 )
 
 /** Chi indossa la fascia: serve solo a stimare le calorie. */
+/**
+ * Chi porta una fascia cardio: il giocatore di ciascun lato e, nel doppio, il compagno ([partner] = il secondo nome
+ * della squadra). P1 e P2 hanno gli stessi numeri di [Side]: il secondo telefono e i dati di prima restano validi.
+ */
+enum class Wearer(val side: Side, val partner: Boolean) {
+    P1(Side.P1, false), P2(Side.P2, false), P1B(Side.P1, true), P2B(Side.P2, true);
+
+    /** 0 = primo giocatore della squadra, 1 = compagno (come in [Names.player]). */
+    val index: Int get() = if (partner) 1 else 0
+
+    companion object {
+        fun of(side: Side, partner: Boolean = false): Wearer = entries.first { it.side == side && it.partner == partner }
+    }
+}
+
+/** Il battito di chi porta la fascia [w] in questa partita. */
+fun MatchRecord.heartOf(w: Wearer): HeartTrack? = if (w.partner) heartPartner[w.side] else heart[w.side]
+
+/** Tutte le tracce del battito della partita, compagni compresi. */
+fun MatchRecord.heartTracks(): Map<Wearer, HeartTrack> = Wearer.entries.mapNotNull { w -> heartOf(w)?.let { w to it } }.toMap()
+
+/** La partita con queste tracce del battito (al posto di quelle che aveva). */
+fun MatchRecord.withHeart(m: Map<Wearer, HeartTrack>): MatchRecord = copy(
+    heart = m.filterKeys { !it.partner }.mapKeys { it.key.side },
+    heartPartner = m.filterKeys { it.partner }.mapKeys { it.key.side },
+)
+
 @Serializable
 data class HeartProfile(val age: Int, val weightKg: Int, val female: Boolean = false)
 
@@ -36949,9 +37050,9 @@ object Reports {
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
 
-    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di quel lato non ha mandato niente. */
-    fun heartLine(rec: MatchRecord, side: Side, s: Strings): String? {
-        val h = HeartStats.summary(rec.heart[side]) ?: return null
+    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di chi la porta non ha mandato niente. */
+    fun heartLine(rec: MatchRecord, who: Wearer, s: Strings): String? {
+        val h = HeartStats.summary(rec.heartOf(who)) ?: return null
         return s.heartLine(h.avg, h.max) + (h.kcal?.let { " · ${s.caloriesLine(it)}" } ?: "")
     }
 
@@ -37036,7 +37137,11 @@ object Reports {
         for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
         for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
         rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
-        for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
+        // Nel doppio con le fasce dei compagni, una riga per giocatore.
+        val split = rec.heartPartner.isNotEmpty()
+        for (w in listOf(Wearer.P1, Wearer.P1B, Wearer.P2, Wearer.P2B)) heartLine(rec, w, s)?.let {
+            sb.appendLine("❤️ ${s.heartStat} ${if (split) names.player(w.side, w.index) else names.short(w.side)}: $it")
+        }
         if (rec.notes.isNotBlank()) {
             sb.appendLine()
             sb.appendLine("📝 ${s.matchNotesTitle}")
@@ -38744,6 +38849,10 @@ class Storage(context: Context) {
         get() = prefs.getStringSet("player_features", null)?.toSet()
         set(v) = prefs.edit { putStringSet("player_features", v) }
 
+    /** I primi passi di un ruolo (Role.name) nascosti con Nascondi nella prima schermata. */
+    fun firstStepsHidden(role: String): Boolean = prefs.getBoolean("first_steps_hidden_$role", false)
+    fun setFirstStepsHidden(role: String) = prefs.edit { putBoolean("first_steps_hidden_$role", true) }
+
     var playerFeaturesSeen: Boolean
         get() = prefs.getBoolean("player_features_seen", false)
         set(v) = prefs.edit { putBoolean("player_features_seen", v) }
@@ -38929,21 +39038,23 @@ class Storage(context: Context) {
     }
 
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
-    fun strapAddress(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1" else "strap_p2", null)
-    fun strapName(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1_name" else "strap_p2_name", null)
-    fun setStrap(p1: Boolean, address: String?, name: String?) {
+    /** "p1", "p2" come prima; i compagni del doppio "p1b", "p2b". */
+    private fun wearerKey(w: Wearer) = when (w) { Wearer.P1 -> "p1"; Wearer.P2 -> "p2"; Wearer.P1B -> "p1b"; Wearer.P2B -> "p2b" }
+    fun strapAddress(w: Wearer): String? = prefs.getString("strap_${wearerKey(w)}", null)
+    fun strapName(w: Wearer): String? = prefs.getString("strap_${wearerKey(w)}_name", null)
+    fun setStrap(w: Wearer, address: String?, name: String?) {
         prefs.edit {
-            putString(if (p1) "strap_p1" else "strap_p2", address)
-                .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
+            putString("strap_${wearerKey(w)}", address)
+                .putString("strap_${wearerKey(w)}_name", name)
         }
     }
 
-    /** Chi indossa la fascia del lato (per le calorie); null = non detto. */
-    fun heartProfile(p1: Boolean): HeartProfile? =
-        prefs.getString(if (p1) "heart_p1" else "heart_p2", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
+    /** Chi indossa la fascia (per le calorie); null = non detto. */
+    fun heartProfile(w: Wearer): HeartProfile? =
+        prefs.getString("heart_${wearerKey(w)}", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
 
-    fun setHeartProfile(p1: Boolean, p: HeartProfile?) {
-        prefs.edit { putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }) }
+    fun setHeartProfile(w: Wearer, p: HeartProfile?) {
+        prefs.edit { putString("heart_${wearerKey(w)}", p?.let { json.encodeToString(HeartProfile.serializer(), it) }) }
     }
 
     fun bandBaseMa(address: String): Double? =
@@ -44660,10 +44771,10 @@ interface PlayerHost {
     fun me(): PlayerProfile?
     /** Le fasce cardio collegate. */
     val heart: HeartRateManager
-    /** Età, peso e sesso per lato, per calorie e zone del battito. */
-    val heartProfiles: MutableStateFlow<Map<Side, HeartProfile>>
+    /** Età, peso e sesso di chi porta ciascuna fascia, per calorie e zone del battito. */
+    val heartProfiles: MutableStateFlow<Map<com.tennis.scoremanager.data.Wearer, HeartProfile>>
     fun heartProfileOf(p: PlayerProfile?): HeartProfile?
-    fun setHeartProfile(side: Side, p: HeartProfile?)
+    fun setHeartProfile(who: com.tennis.scoremanager.data.Wearer, p: HeartProfile?)
     /** Serve il servizio in primo piano (braccialetti, tabellone, fascia, allenamento)? */
     fun needsService(): Boolean
     val racketArea: RacketsArea
@@ -45412,7 +45523,7 @@ class WorkoutArea(
     val workout = WorkoutSession(scope) { rec -> onWorkoutFinished(rec) }
     /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
     val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
-    internal var workoutSide = Side.P1
+    internal var workoutSide = com.tennis.scoremanager.data.Wearer.P1
     /** Racchetta dell'allenamento in corso, presa all'avvio. */
     internal var workoutUse: RacketUse? = null
 
@@ -45426,7 +45537,7 @@ class WorkoutArea(
     /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
     fun startWorkout(): Boolean {
         val straps = heart.straps.value
-        val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
+        val side = com.tennis.scoremanager.data.Wearer.entries.firstOrNull { straps[it] != null } ?: return false
         workoutSide = side
         // Ti alleni tu: età, peso e sesso dalla tua scheda, se ci sono.
         heartProfileOf(me())?.let { setHeartProfile(side, it) }
@@ -45681,6 +45792,7 @@ import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.ble.RemoteBand
 import com.tennis.scoremanager.ble.StrapInfo
+import com.tennis.scoremanager.data.Wearer
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.TvServer
@@ -46322,16 +46434,19 @@ class PhoneRelay(
         }
     }
 
-    /** Il satellite segue le fasce del principale, sugli stessi lati. */
+    /**
+     * Il satellite segue le fasce del principale, sulle stesse persone ([RelayStrap.side] = numero di [Wearer]: 0-1 i
+     * lati come prima, 2-3 i compagni del doppio).
+     */
     private fun follow(list: List<RelayStrap>) {
-        val want = list.mapNotNull { r -> Side.entries.getOrNull(r.side)?.let { it to r } }.toMap()
+        val want = list.mapNotNull { r -> Wearer.entries.getOrNull(r.side)?.let { it to r } }.toMap()
         val have = heart.straps.value
-        for (side in Side.entries) {
-            val r = want[side]
+        for (w in Wearer.entries) {
+            val r = want[w]
             if (r == null) {
-                if (have[side] != null) heart.assign(side, null, null)
-            } else if (have[side]?.address != r.addr) {
-                heart.assign(side, r.addr, r.name)
+                if (have[w] != null) heart.assign(w, null, null)
+            } else if (have[w]?.address != r.addr) {
+                heart.assign(w, r.addr, r.name)
             }
         }
     }
@@ -46351,9 +46466,9 @@ class PhoneRelay(
     }
 
     /** Satellite: ogni misura delle fasce seguite va nella coda per il principale. */
-    fun onLocalReading(side: Side, m: HeartMeasurement) {
+    fun onLocalReading(who: Wearer, m: HeartMeasurement) {
         if (!isSatellite) return
-        val addr = heart.straps.value[side]?.address ?: return
+        val addr = heart.straps.value[who]?.address ?: return
         queue(RelayMsg(RelayMsg.HR, addr = addr, bpm = m.bpm, contact = m.contact))
     }
 
@@ -46708,7 +46823,7 @@ data class RelayMsg(
     }
 }
 
-/** Fascia che il satellite deve seguire: [side] 0 = giocatore 1, 1 = giocatore 2. */
+/** Fascia che il satellite deve seguire: [side] 0 = giocatore 1, 1 = giocatore 2, nel doppio 2-3 i compagni (Wearer). */
 @Serializable
 data class RelayStrap(val addr: String, val name: String, val side: Int)
 
@@ -52550,6 +52665,9 @@ fun AppRoot(c: MatchController) {
         },
     ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
+            // Il colore dell'area (giocare, circolo, progressi...): in alto in ogni schermata, così si sa dove si è.
+            val tab by c.homeTab.collectAsState()
+            androidx.compose.runtime.CompositionLocalProvider(LocalArea provides areaOf(s, tab)) {
             when (s) {
                 Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
@@ -52593,6 +52711,7 @@ fun AppRoot(c: MatchController) {
                 Screen.TEAMS -> com.tennis.scoremanager.ui.screens.TeamsScreen(c)
                 Screen.TEAM -> com.tennis.scoremanager.ui.screens.TeamScreen(c)
                 Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
+            }
             }
         }
         // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
@@ -52673,9 +52792,9 @@ fun ScreenScaffold(
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball),
+                Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(LocalArea.current),
                 contentAlignment = Alignment.Center,
-            ) { Icon(icon, null, tint = TsmColors.OnBall) }
+            ) { Icon(icon, null, tint = TsmColors.OnArea) }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)
@@ -53594,6 +53713,206 @@ private fun Dot(color: androidx.compose.ui.graphics.Color) =
     androidx.compose.foundation.layout.Box(Modifier.size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(color))
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Guided.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Guided.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.HomeTab
+import com.tennis.scoremanager.Screen
+
+/** L'area di ogni schermata (il colore in alto): giocare, circolo, allenarsi, progressi, persone, tornei, impostazioni. */
+fun areaOf(screen: Screen, tab: HomeTab): Color = when (screen) {
+    Screen.HOME -> areaOf(tab)
+    Screen.SETUP, Screen.OPTIONS, Screen.TOSS, Screen.START, Screen.MATCH, Screen.SUMMARY, Screen.TOURNAMENT -> TsmColors.AreaPlay
+    Screen.HISTORY, Screen.PROGRESS, Screen.VIDEOS, Screen.RACKETS -> TsmColors.AreaProgress
+    Screen.WORKOUT, Screen.STROKE_SESSIONS, Screen.DRILLS, Screen.ARENA -> TsmColors.AreaTrain
+    Screen.DEVICES, Screen.VOICE, Screen.HELP, Screen.DATA, Screen.SETTINGS, Screen.PLAYERS -> TsmColors.AreaSettings
+    Screen.STUDENTS, Screen.STUDENT, Screen.LESSONS, Screen.COACH_COURSE, Screen.MEMBERS, Screen.PAYMENTS, Screen.SCHOOL, Screen.COURSE -> TsmColors.AreaPeople
+    Screen.BOOK_COURT, Screen.COURTS_PLAN, Screen.COURT_STATS, Screen.NOTICE, Screen.DESK -> TsmColors.AreaClub
+    Screen.CLUB_TOURNAMENTS, Screen.CLUB_TOURNAMENT, Screen.TEAMS, Screen.TEAM, Screen.FIXTURE, Screen.LADDERS, Screen.LADDER -> TsmColors.AreaTournaments
+}
+
+/** Il colore di una scheda della prima schermata. */
+fun areaOf(tab: HomeTab): Color = when (tab) {
+    HomeTab.PLAY -> TsmColors.AreaPlay
+    HomeTab.BOOKING, HomeTab.COURTS, HomeTab.TODAY -> TsmColors.AreaClub
+    HomeTab.TRAIN -> TsmColors.AreaTrain
+    HomeTab.PROGRESS -> TsmColors.AreaProgress
+    HomeTab.STUDENTS, HomeTab.PEOPLE -> TsmColors.AreaPeople
+    HomeTab.TOURNAMENTS -> TsmColors.AreaTournaments
+    HomeTab.MORE -> TsmColors.AreaSettings
+}
+
+/**
+ * Sotto-schede di una schermata lunga (la scheda del giocatore): una riga di etichette che scorre di lato se non ci
+ * sta, così in tedesco o francese i nomi restano interi.
+ */
+@Composable
+fun SubTabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    val area = LocalArea.current
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        labels.forEachIndexed { i, label ->
+            val on = i == selected
+            Text(
+                label, color = if (on) TsmColors.OnArea else TsmColors.TextMain, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal, fontSize = 14.sp,
+                maxLines = 1,
+                modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) area else TsmColors.SurfaceHigh).clickable { onSelect(i) }
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+            )
+        }
+    }
+}
+
+/** Una cosa da fare adesso, nel riquadro [TodoCard]. */
+data class TodoItem(val icon: ImageVector, val title: String, val hint: String?, val onClick: () -> Unit)
+
+/** In cima alla prima schermata: tutti gli avvisi in un riquadro solo, invece di tante righe sparse. */
+@Composable
+fun TodoCard(items: List<TodoItem>) {
+    if (items.isEmpty()) return
+    val s = LocalStrings.current
+    StripeBox(TsmColors.AreaTodo) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.NotificationsActive, null, tint = TsmColors.AreaTodo)
+            Text(s.todoTitle(items.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(start = 10.dp))
+        }
+        for (it in items) Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable(onClick = it.onClick).padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(it.icon, null, tint = TsmColors.AreaTodo, modifier = Modifier.size(22.dp))
+            Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                Text(it.title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                it.hint?.let { h -> Text(h, color = TsmColors.TextDim, fontSize = 12.sp) }
+            }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
+        }
+    }
+}
+
+/** Un riquadro con la striscia colorata a sinistra: il colore dice di che area è. */
+@Composable
+fun StripeBox(color: Color, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface)) {
+        Box(Modifier.width(5.dp).fillMaxHeight().background(color))
+        Column(Modifier.weight(1f).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
+    }
+}
+
+/**
+ * Il segno del passo nelle procedure guidate (nuovo torneo, nuova prenotazione, collegare i braccialetti...): una
+ * barretta per passo, colorata fin dove si è arrivati, e "Passo 2 di 3 · Chi gioca".
+ */
+@Composable
+fun StepHeader(step: Int, titles: List<String>) {
+    val s = LocalStrings.current
+    val area = LocalArea.current
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            for (i in titles.indices) Box(Modifier.weight(1f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(if (i <= step) area else TsmColors.Outline))
+        }
+        Text(s.wzStep(step + 1, titles.size) + " · " + titles[step], color = area, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+    }
+}
+
+/** Il tasto "Avanti" delle procedure guidate dentro un dialogo. */
+@Composable
+fun WizardNext(enabled: Boolean = true, onClick: () -> Unit) {
+    androidx.compose.material3.TextButton(enabled = enabled, onClick = onClick) { Text(LocalStrings.current.next + " ›") }
+}
+
+/** Il tasto "Indietro" di un passo (al primo passo il dialogo usa il suo, che chiude). */
+@Composable
+fun WizardBack(onClick: () -> Unit) {
+    androidx.compose.material3.TextButton(onClick = onClick) { Text("‹ " + LocalStrings.current.back) }
+}
+
+/**
+ * Una pagina ancora vuota spiega cosa fare: l'icona dell'area, un titolo, i passi numerati e il pulsante per il primo.
+ */
+@Composable
+fun EmptyGuide(icon: ImageVector, title: String, steps: List<String>, button: String? = null, onClick: () -> Unit = {}) {
+    val area = LocalArea.current
+    StripeBox(area) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(area), contentAlignment = Alignment.Center) {
+                Icon(icon, null, tint = TsmColors.OnArea)
+            }
+            Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(start = 12.dp))
+        }
+        steps.forEachIndexed { i, st ->
+            Row {
+                Text("${i + 1}.", color = area, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.width(22.dp))
+                Text(st, color = TsmColors.TextMain, fontSize = 14.sp)
+            }
+        }
+        if (button != null) {
+            Spacer(Modifier.height(2.dp))
+            BigButton(button, icon, onClick, Modifier.fillMaxWidth(), color = area, onColor = TsmColors.OnArea)
+        }
+    }
+}
+
+/**
+ * Una riga che si apre e si chiude (le pagine con tante parti, come Dispositivi): titolo, come sta adesso e la
+ * freccia. Il contenuto si vede solo da aperta.
+ */
+@Composable
+fun ExpandRow(icon: ImageVector, title: String, summary: String?, open: Boolean, ok: Boolean? = null, onToggle: () -> Unit) {
+    val area = LocalArea.current
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(if (open) TsmColors.SurfaceHigh else TsmColors.Surface).clickable(onClick = onToggle)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = area, modifier = Modifier.size(24.dp))
+        Column(Modifier.weight(1f).padding(start = 14.dp)) {
+            Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            summary?.let {
+                Text(it, fontSize = 13.sp, color = when (ok) { true -> TsmColors.Ok; false -> TsmColors.Orange; null -> TsmColors.TextDim })
+            }
+        }
+        Icon(if (open) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, null, tint = TsmColors.TextDim)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -53629,6 +53948,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -53663,6 +53983,7 @@ import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.Wearer
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.relay.HotspotPermissions
 import com.tennis.scoremanager.relay.JoinState
@@ -53703,10 +54024,10 @@ fun HeartSection(
         val relay by c.relay.ui.collectAsState()
         if (relay.role == RelayRole.SATELLITE) {
             // Il satellite segue le fasce scelte sul principale: qui solo come le sente (vedi RelaySection).
-            for (side in Side.entries) {
-                val st = straps[side] ?: continue
+            for (w in Wearer.entries) {
+                val st = straps[w] ?: continue
                 Column {
-                    Text(st.name, color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    Text(st.name, color = TsmColors.player(w.side), fontWeight = FontWeight.Bold)
                     Text(strapStatus(st, s), color = TsmColors.TextDim, fontSize = 12.sp)
                 }
             }
@@ -53722,22 +54043,29 @@ fun HeartSection(
             Spacer(Modifier.width(10.dp))
             Text(if (scanning) s.strapSearching else s.autoSearchOff, color = if (scanning) TsmColors.TextMain else TsmColors.Orange, fontSize = 13.sp)
         }
-        for (side in Side.entries) {
-            StrapPicker(c, side, names.short(side), straps[side], found, straps)
+        // Nel doppio fino a quattro fasce: anche i compagni (il secondo nome di ogni squadra). Si vedono col doppio, se
+        // un compagno ha già la fascia, o col tasto per aggiungerle.
+        val doubles = c.setup.collectAsState().value.doubles
+        var addPartners by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        val partners = doubles || addPartners || straps.keys.any { it.partner }
+        val wearers = if (partners) listOf(Wearer.P1, Wearer.P1B, Wearer.P2, Wearer.P2B) else listOf(Wearer.P1, Wearer.P2)
+        for (w in wearers) {
+            StrapPicker(c, w, wearerName(names, w, partners), straps[w], found, straps)
             // Scambiando le fasce i campi ripartono dal profilo che segue la fascia.
-            straps[side]?.let { key(it.address) { ProfileRow(profiles[side]) { p -> c.setHeartProfile(side, p) } } }
+            straps[w]?.let { key(it.address) { ProfileRow(profiles[w]) { p -> c.setHeartProfile(w, p) } } }
         }
-        if (straps.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
+        if (!partners) GhostButton(s.strapPartnersAdd, Icons.Filled.GroupAdd, { addPartners = true }, Modifier.fillMaxWidth())
+        if (straps.keys.any { it.side == Side.P1 } && straps.keys.any { it.side == Side.P2 }) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
     }
 }
 
 @Composable
-private fun StrapPicker(c: MatchController, side: Side, playerName: String, current: StrapInfo?, found: List<FoundStrap>, all: Map<Side, StrapInfo>) {
+private fun StrapPicker(c: MatchController, side: Wearer, playerName: String, current: StrapInfo?, found: List<FoundStrap>, all: Map<Wearer, StrapInfo>) {
     val s = LocalStrings.current
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
-        Text(s.strapFor(playerName), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+        Text(s.strapFor(playerName), color = TsmColors.player(side.side), fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
         Box {
             OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
@@ -53764,7 +54092,7 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
                 for ((address, label) in options) {
                     val usedBy = all.entries.firstOrNull { it.value.address == address && it.key != side }?.key
                     DropdownMenuItem(
-                        text = { Text(label + (usedBy?.let { " → ${s.playerTag(it.ordinal + 1)}" } ?: "")) },
+                        text = { Text(label + (usedBy?.let { " → ${wearerTag(s, it)}" } ?: "")) },
                         leadingIcon = { Icon(Icons.Filled.Favorite, null) },
                         onClick = {
                             open = false
@@ -53776,6 +54104,15 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
         }
     }
 }
+
+/** "G1", "G2" e, per i compagni del doppio, "G1B", "G2B". */
+fun wearerTag(s: Strings, w: Wearer): String = s.playerTag(w.side.ordinal + 1) + if (w.partner) "B" else ""
+
+/**
+ * Di chi è la fascia: con le fasce dei compagni ([split]) il nome di ciascun giocatore, altrimenti la squadra
+ * ("Rossi / Bianchi", come prima: la fascia la porta uno dei due).
+ */
+fun wearerName(names: Names, w: Wearer, split: Boolean): String = if (split) names.player(w.side, w.index) else names.short(w.side)
 
 /**
  * "Collegata · 72 bpm · −68 dBm · 2 stacchi (14 s) · Batteria 90%", oppure perché il battito non arriva. Segnale e
@@ -53881,8 +54218,8 @@ fun WorkoutStrapCard(c: MatchController) {
             if (!permsOk) permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions())
             else runCatching { btLauncher.launch(android.content.Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
         }
-        StrapPicker(c, Side.P1, s.playerTag(1), straps[Side.P1], found, straps)
-        straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
+        StrapPicker(c, Wearer.P1, s.playerTag(1), straps[Wearer.P1], found, straps)
+        straps[Wearer.P1]?.let { key(it.address) { ProfileRow(profiles[Wearer.P1]) { p -> c.setHeartProfile(Wearer.P1, p) } } }
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
     }
 }
@@ -55559,8 +55896,9 @@ private fun SatelliteDevices(c: MatchController, names: Names) {
     val straps by c.straps.collectAsState()
     for (side in Side.entries) {
         val b = bands[side]
-        val st = straps[side]
-        if (b == null && st == null) continue
+        // Le fasce del lato: nel doppio anche quella del compagno.
+        val sts = listOfNotNull(straps[com.tennis.scoremanager.data.Wearer.of(side)], straps[com.tennis.scoremanager.data.Wearer.of(side, partner = true)])
+        if (b == null && sts.isEmpty()) continue
         Column {
             Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
             b?.let {
@@ -55572,7 +55910,7 @@ private fun SatelliteDevices(c: MatchController, names: Names) {
                 }
                 Text("${it.name} · $state" + (it.battery?.let { p -> " · ${s.battery} $p%" } ?: ""), color = TsmColors.TextDim, fontSize = 12.sp)
             }
-            st?.let { Text("${it.name} · ${strapStatus(it, s)}", color = TsmColors.TextDim, fontSize = 12.sp) }
+            for (st in sts) Text("${st.name} · ${strapStatus(st, s)}", color = TsmColors.TextDim, fontSize = 12.sp)
         }
     }
 }
@@ -59961,6 +60299,73 @@ interface Strings {
     val mrWinner: (String) -> String
     val mrPending: (String) -> String
     val mrConflict: (String) -> String
+
+    // Prima schermata più semplice: aree, da fare, primi passi, procedure guidate, pagine vuote spiegate
+    val todoTitle: (Int) -> String
+    val wzStep: (Int, Int) -> String
+    val fsTitle: (Int, Int) -> String
+    val fsHide: String
+    val fsName: String
+    val fsBands: String
+    val fsFirstMatch: String
+    val fsFirstStudent: String
+    val fsFirstLesson: String
+    val fsClubName: String
+    val fsCourts: String
+    val fsFirstMember: String
+    val fsFirstFee: String
+    val mfTitle: (Int) -> String
+    val moreActions: String
+    val stTabCard: String
+    val stTabLessons: String
+    val stTabTraining: String
+    val planManage: String
+    val wzWhen: String
+    val wzWho: String
+    val wzPay: String
+    val wzTournament: String
+    val wzFormula: String
+    val wzDates: String
+    val wzFee: String
+    val wzWhoPays: String
+    val wzNoMembers: String
+    val wzChargeAsk: String
+    val wzChargeAll: (Int) -> String
+    val wzChargeLater: String
+    val wzCourse: String
+    val wzSchedule: String
+    val wzSeats: String
+    val bwTitle: String
+    val bwPrep: String
+    val bwPrepHint: String
+    val bwBandHint: (String) -> String
+    val bwReady: String
+    val bwDoneHint: String
+    val dvRemotes: (Int) -> String
+    val dvOn: String
+    val dvOff: String
+    val egStudentsTitle: String
+    val egStudents1: String
+    val egStudents2: String
+    val egStudents3: String
+    val egMembersTitle: String
+    val egMembers1: String
+    val egMembers2: String
+    val egMembers3: String
+    val egTournamentsTitle: String
+    val egTournaments1: String
+    val egTournaments2: String
+    val egTournaments3: String
+    val egFeesTitle: String
+    val egFees1: String
+    val egFees2: String
+    val egFees3: String
+    val cmNone: String
+    val cmEmptyText: String
+    val strapPartnersAdd: String
+    val heartPartners: String
+    val heartFirsts: String
+    val resumeMatch: String
 }
 
 object ItStrings : Strings {
@@ -62787,6 +63192,75 @@ object ItStrings : Strings {
     override val mrWinner: (String) -> String = { "Vince $it" }
     override val mrPending: (String) -> String = { "Risultato da mandare: $it" }
     override val mrConflict: (String) -> String = { "Nel tabellone c'è già un altro risultato ($it): vuoi sostituirlo?" }
+
+    override val todoTitle: (Int) -> String = { "Da fare ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Passo $a di $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "Primi passi · $a di $b" }
+    override val fsHide = "Nascondi"
+    override val fsName = "Scrivi il tuo nome"
+    override val fsBands = "Collega i braccialetti"
+    override val fsFirstMatch = "Gioca la prima partita"
+    override val fsFirstStudent = "Aggiungi il primo allievo"
+    override val fsFirstLesson = "Metti la prima lezione in agenda"
+    override val fsClubName = "Scrivi il nome del circolo"
+    override val fsCourts = "Aggiungi i campi"
+    override val fsFirstMember = "Iscrivi il primo socio"
+    override val fsFirstFee = "Crea la prima quota"
+    override val mfTitle: (Int) -> String = { "Altre funzioni ($it spente)" }
+    override val moreActions = "Altre azioni"
+    override val stTabCard = "Scheda"
+    override val stTabLessons = "Lezioni"
+    override val stTabTraining = "Allenamento"
+    override val planManage = "Campi, orari e chiusure"
+    override val wzWhen = "Quando e dove"
+    override val wzWho = "Chi gioca"
+    override val wzPay = "Prezzo e ripetizione"
+    override val wzTournament = "Il torneo"
+    override val wzFormula = "Formula e regole"
+    override val wzDates = "Date e iscrizioni"
+    override val wzFee = "La quota"
+    override val wzWhoPays = "A chi addebitarla"
+    override val wzNoMembers = "Non ci sono ancora soci: potrai addebitarla più avanti dalla quota o dalla scheda di ciascuno."
+    override val wzChargeAsk = "Addebitarla subito a tutti i soci, o più avanti a mano a chi serve?"
+    override val wzChargeAll: (Int) -> String = { "A tutti i soci ($it)" }
+    override val wzChargeLater = "Più avanti, a mano"
+    override val wzCourse = "Il corso"
+    override val wzSchedule = "Giorni e orari"
+    override val wzSeats = "Posti e quota"
+    override val bwTitle = "Collega i braccialetti passo passo"
+    override val bwPrep = "Prepara il telefono"
+    override val bwPrepHint = "Il telefono cerca i braccialetti vicini col Bluetooth: servono il Bluetooth acceso, il permesso e la posizione attiva. Tocca i pulsanti finché sono tutti verdi."
+    override val bwBandHint: (String) -> String = { n -> "Accendi il braccialetto di $n e tienilo vicino al telefono, poi sceglilo qui sotto. Con Identifica si illumina: così sei sicuro che sia quello giusto." }
+    override val bwReady = "Pronti"
+    override val bwDoneHint = "Valgono per tutte le partite: non serve rifarlo ogni volta. Se i giocatori sono invertiti, scambiali col pulsante qui sotto."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "Nessuno associato" else "$it associati" }
+    override val dvOn = "Acceso"
+    override val dvOff = "Spento"
+    override val egStudentsTitle = "Il tuo primo allievo"
+    override val egStudents1 = "Tocca Nuovo allievo e scrivi nome e cognome."
+    override val egStudents2 = "Se ha già l'app, fatti mandare il suo profilo col QR."
+    override val egStudents3 = "Dalla sua scheda: Allena ora, lezioni, obiettivi e report."
+    override val egMembersTitle = "Il primo socio"
+    override val egMembers1 = "Tocca Nuovo socio e scegli il giocatore, o crealo."
+    override val egMembers2 = "Segna tessera, certificato medico e consensi."
+    override val egMembers3 = "Le quote si addebitano da Quote e pagamenti, a tutti in un tocco."
+    override val egTournamentsTitle = "Il primo torneo"
+    override val egTournaments1 = "Tocca Nuovo torneo: nome, formula e date, un passo alla volta."
+    override val egTournaments2 = "Iscrivi i giocatori, poi fai il sorteggio."
+    override val egTournaments3 = "Le partite si segnano col segnapunti dal ruolo Tu: il risultato torna qui."
+    override val egFeesTitle = "La prima quota"
+    override val egFees1 = "Tocca Nuova quota: nome, importo e scadenza."
+    override val egFees2 = "Addebitala a tutti i soci in un tocco, o a mano a chi serve."
+    override val egFees3 = "Quando pagano, segna il pagamento: la ricevuta è pronta."
+
+    override val cmNone = "Nessuna da giocare adesso"
+    override val cmEmptyText = "Qui compaiono le partite di tornei, squadre e sfide del tuo circolo quando sono pronte da giocare: le segni col segnapunti e il risultato torna al circolo. Arrivano con la scheda partita della segreteria o, se sei nel circolo, da sole."
+
+    override val strapPartnersAdd = "Doppio: aggiungi le fasce dei compagni"
+    override val heartPartners = "compagni"
+    override val heartFirsts = "primi giocatori"
+
+    override val resumeMatch = "Riprendi partita"
 }
 
 object EnStrings : Strings {
@@ -65614,6 +66088,75 @@ object EnStrings : Strings {
     override val mrWinner: (String) -> String = { "Winner: $it" }
     override val mrPending: (String) -> String = { "Result to send: $it" }
     override val mrConflict: (String) -> String = { "There is already a different result ($it): replace it?" }
+
+    override val todoTitle: (Int) -> String = { "To do ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Step $a of $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "First steps · $a of $b" }
+    override val fsHide = "Hide"
+    override val fsName = "Enter your name"
+    override val fsBands = "Connect the wristbands"
+    override val fsFirstMatch = "Play your first match"
+    override val fsFirstStudent = "Add your first student"
+    override val fsFirstLesson = "Put your first lesson in the diary"
+    override val fsClubName = "Enter the club name"
+    override val fsCourts = "Add the courts"
+    override val fsFirstMember = "Sign up your first member"
+    override val fsFirstFee = "Create your first fee"
+    override val mfTitle: (Int) -> String = { "More features ($it off)" }
+    override val moreActions = "More actions"
+    override val stTabCard = "Profile"
+    override val stTabLessons = "Lessons"
+    override val stTabTraining = "Training"
+    override val planManage = "Courts, hours and closures"
+    override val wzWhen = "When and where"
+    override val wzWho = "Who's playing"
+    override val wzPay = "Price and repeat"
+    override val wzTournament = "The tournament"
+    override val wzFormula = "Format and rules"
+    override val wzDates = "Dates and entries"
+    override val wzFee = "The fee"
+    override val wzWhoPays = "Who to charge"
+    override val wzNoMembers = "There are no members yet: you can charge it later from the fee or from each player's profile."
+    override val wzChargeAsk = "Charge it now to all members, or later by hand to whoever needs it?"
+    override val wzChargeAll: (Int) -> String = { "All members ($it)" }
+    override val wzChargeLater = "Later, by hand"
+    override val wzCourse = "The course"
+    override val wzSchedule = "Days and times"
+    override val wzSeats = "Places and fee"
+    override val bwTitle = "Connect the wristbands step by step"
+    override val bwPrep = "Get the phone ready"
+    override val bwPrepHint = "The phone looks for nearby wristbands over Bluetooth: it needs Bluetooth on, the permission and location turned on. Tap the buttons until they are all green."
+    override val bwBandHint: (String) -> String = { n -> "Turn on $n's wristband and keep it close to the phone, then pick it below. Identify makes it light up, so you know it is the right one." }
+    override val bwReady = "Ready"
+    override val bwDoneHint = "They work for every match: no need to do this again each time. If the players are the wrong way round, swap them with the button below."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "None paired" else "$it paired" }
+    override val dvOn = "On"
+    override val dvOff = "Off"
+    override val egStudentsTitle = "Your first student"
+    override val egStudents1 = "Tap New student and enter first and last name."
+    override val egStudents2 = "If they already have the app, have them send you their profile by QR."
+    override val egStudents3 = "From their profile: Practise now, lessons, goals and reports."
+    override val egMembersTitle = "Your first member"
+    override val egMembers1 = "Tap New member and pick the player, or create one."
+    override val egMembers2 = "Record the membership card, medical certificate and consents."
+    override val egMembers3 = "Fees are charged from Fees and payments, to everyone in one tap."
+    override val egTournamentsTitle = "Your first tournament"
+    override val egTournaments1 = "Tap New tournament: name, format and dates, one step at a time."
+    override val egTournaments2 = "Enter the players, then make the draw."
+    override val egTournaments3 = "Matches are scored with the scoreboard from the You role: the result comes back here."
+    override val egFeesTitle = "Your first fee"
+    override val egFees1 = "Tap New fee: name, amount and due date."
+    override val egFees2 = "Charge it to all members in one tap, or by hand to whoever needs it."
+    override val egFees3 = "When they pay, record the payment: the receipt is ready."
+
+    override val cmNone = "None to play right now"
+    override val cmEmptyText = "Tournament, team and challenge matches from your club show up here when they are ready to play: you score them with the scoreboard and the result goes back to the club. They arrive with the match card from the club office or, if you have joined the club, by themselves."
+
+    override val strapPartnersAdd = "Doubles: add the partners' straps"
+    override val heartPartners = "partners"
+    override val heartFirsts = "first players"
+
+    override val resumeMatch = "Resume match"
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -68466,6 +69009,75 @@ object DeStrings : Strings {
     override val mrWinner: (String) -> String = { "Sieger: $it" }
     override val mrPending: (String) -> String = { "Ergebnis zu schicken: $it" }
     override val mrConflict: (String) -> String = { "Es gibt schon ein anderes Ergebnis ($it): ersetzen?" }
+
+    override val todoTitle: (Int) -> String = { "Zu erledigen ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Schritt $a von $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "Erste Schritte · $a von $b" }
+    override val fsHide = "Ausblenden"
+    override val fsName = "Gib deinen Namen ein"
+    override val fsBands = "Verbinde die Armbänder"
+    override val fsFirstMatch = "Spiele dein erstes Match"
+    override val fsFirstStudent = "Lege deinen ersten Schüler an"
+    override val fsFirstLesson = "Trage die erste Stunde in den Kalender ein"
+    override val fsClubName = "Gib den Namen des Vereins ein"
+    override val fsCourts = "Lege die Plätze an"
+    override val fsFirstMember = "Nimm das erste Mitglied auf"
+    override val fsFirstFee = "Lege den ersten Beitrag an"
+    override val mfTitle: (Int) -> String = { "Weitere Funktionen ($it aus)" }
+    override val moreActions = "Weitere Aktionen"
+    override val stTabCard = "Profil"
+    override val stTabLessons = "Stunden"
+    override val stTabTraining = "Übungen"
+    override val planManage = "Plätze, Zeiten und Sperrungen"
+    override val wzWhen = "Wann und wo"
+    override val wzWho = "Wer spielt"
+    override val wzPay = "Preis und Wiederholung"
+    override val wzTournament = "Das Turnier"
+    override val wzFormula = "Modus und Regeln"
+    override val wzDates = "Termine und Anmeldungen"
+    override val wzFee = "Der Beitrag"
+    override val wzWhoPays = "Wem berechnen"
+    override val wzNoMembers = "Noch keine Mitglieder: Du kannst ihn später über den Beitrag oder das Profil jedes Spielers berechnen."
+    override val wzChargeAsk = "Jetzt allen Mitgliedern berechnen oder später von Hand, wem es nötig ist?"
+    override val wzChargeAll: (Int) -> String = { "Alle Mitglieder ($it)" }
+    override val wzChargeLater = "Später, von Hand"
+    override val wzCourse = "Der Kurs"
+    override val wzSchedule = "Tage und Zeiten"
+    override val wzSeats = "Plätze und Gebühr"
+    override val bwTitle = "Armbänder Schritt für Schritt verbinden"
+    override val bwPrep = "Telefon vorbereiten"
+    override val bwPrepHint = "Das Telefon sucht Armbänder in der Nähe per Bluetooth: Bluetooth, die Berechtigung und der Standort müssen an sein. Tippe auf die Tasten, bis alle grün sind."
+    override val bwBandHint: (String) -> String = { n -> "Schalte das Armband von $n ein, halte es nah ans Telefon und wähle es unten aus. Mit Erkennen leuchtet es auf, so weißt du, dass es das richtige ist." }
+    override val bwReady = "Bereit"
+    override val bwDoneHint = "Sie gelten für alle Matches: Du musst das nicht jedes Mal wiederholen. Sind die Spieler vertauscht, tausche sie mit der Taste unten."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "Keine gekoppelt" else "$it gekoppelt" }
+    override val dvOn = "An"
+    override val dvOff = "Aus"
+    override val egStudentsTitle = "Dein erster Schüler"
+    override val egStudents1 = "Tippe auf Neuer Schüler und gib Vor- und Nachnamen ein."
+    override val egStudents2 = "Hat er die App schon, lass dir sein Profil per QR schicken."
+    override val egStudents3 = "In seinem Profil: Jetzt trainieren, Stunden, Ziele und Berichte."
+    override val egMembersTitle = "Das erste Mitglied"
+    override val egMembers1 = "Tippe auf Neues Mitglied und wähle den Spieler oder lege ihn an."
+    override val egMembers2 = "Trage Ausweis, ärztliches Attest und Einwilligungen ein."
+    override val egMembers3 = "Beiträge berechnest du unter Beiträge und Zahlungen, allen mit einem Tipp."
+    override val egTournamentsTitle = "Das erste Turnier"
+    override val egTournaments1 = "Tippe auf Neues Turnier: Name, Modus und Termine, Schritt für Schritt."
+    override val egTournaments2 = "Melde die Spieler an und mach dann die Auslosung."
+    override val egTournaments3 = "Matches zählst du mit der Anzeige in der Rolle Du: das Ergebnis kommt hierher zurück."
+    override val egFeesTitle = "Der erste Beitrag"
+    override val egFees1 = "Tippe auf Neuer Beitrag: Name, Betrag und Fälligkeit."
+    override val egFees2 = "Berechne ihn allen Mitgliedern mit einem Tipp oder von Hand, wem nötig."
+    override val egFees3 = "Wenn sie zahlen, trage die Zahlung ein: die Quittung ist fertig."
+
+    override val cmNone = "Gerade keins zu spielen"
+    override val cmEmptyText = "Turnier-, Mannschafts- und Forderungsmatches deines Vereins erscheinen hier, sobald sie spielbereit sind: Du zählst sie mit der Anzeige und das Ergebnis geht an den Verein zurück. Sie kommen mit der Matchkarte der Geschäftsstelle oder, wenn du im Verein bist, von selbst."
+
+    override val strapPartnersAdd = "Doppel: Gurte der Partner hinzufügen"
+    override val heartPartners = "Partner"
+    override val heartFirsts = "erste Spieler"
+
+    override val resumeMatch = "Match fortsetzen"
 }
 TSM_EOF
 
@@ -71308,6 +71920,75 @@ object EsStrings : Strings {
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
+
+    override val todoTitle: (Int) -> String = { "Pendiente ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Paso $a de $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "Primeros pasos · $a de $b" }
+    override val fsHide = "Ocultar"
+    override val fsName = "Escribe tu nombre"
+    override val fsBands = "Conecta las pulseras"
+    override val fsFirstMatch = "Juega tu primer partido"
+    override val fsFirstStudent = "Añade tu primer alumno"
+    override val fsFirstLesson = "Añade la primera clase a la agenda"
+    override val fsClubName = "Escribe el nombre del club"
+    override val fsCourts = "Añade las pistas"
+    override val fsFirstMember = "Inscribe al primer socio"
+    override val fsFirstFee = "Crea la primera cuota"
+    override val mfTitle: (Int) -> String = { "Más funciones ($it desactivadas)" }
+    override val moreActions = "Más acciones"
+    override val stTabCard = "Ficha"
+    override val stTabLessons = "Clases"
+    override val stTabTraining = "Entrenamiento"
+    override val planManage = "Pistas, horarios y cierres"
+    override val wzWhen = "Cuándo y dónde"
+    override val wzWho = "Quién juega"
+    override val wzPay = "Precio y repetición"
+    override val wzTournament = "El torneo"
+    override val wzFormula = "Formato y reglas"
+    override val wzDates = "Fechas e inscripciones"
+    override val wzFee = "La cuota"
+    override val wzWhoPays = "A quién cobrarla"
+    override val wzNoMembers = "Aún no hay socios: podrás cobrarla más adelante desde la cuota o la ficha de cada uno."
+    override val wzChargeAsk = "¿Cobrarla ya a todos los socios, o más adelante a mano a quien corresponda?"
+    override val wzChargeAll: (Int) -> String = { "Todos los socios ($it)" }
+    override val wzChargeLater = "Más adelante, a mano"
+    override val wzCourse = "El curso"
+    override val wzSchedule = "Días y horarios"
+    override val wzSeats = "Plazas y cuota"
+    override val bwTitle = "Conectar las pulseras paso a paso"
+    override val bwPrep = "Preparar el teléfono"
+    override val bwPrepHint = "El teléfono busca las pulseras cercanas por Bluetooth: hacen falta el Bluetooth activado, el permiso y la ubicación activada. Toca los botones hasta que estén todos en verde."
+    override val bwBandHint: (String) -> String = { n -> "Enciende la pulsera de $n y mantenla cerca del teléfono; luego elígela abajo. Con Identificar se ilumina: así sabes que es la correcta." }
+    override val bwReady = "Listo"
+    override val bwDoneHint = "Sirven para todos los partidos: no hace falta repetirlo cada vez. Si los jugadores están al revés, intercámbialos con el botón de abajo."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "Ninguno vinculado" else "$it vinculados" }
+    override val dvOn = "Activado"
+    override val dvOff = "Desactivado"
+    override val egStudentsTitle = "Tu primer alumno"
+    override val egStudents1 = "Toca Nuevo alumno y escribe nombre y apellidos."
+    override val egStudents2 = "Si ya tiene la app, pídele que te mande su perfil con el QR."
+    override val egStudents3 = "Desde su ficha: Entrenar ahora, clases, objetivos e informes."
+    override val egMembersTitle = "El primer socio"
+    override val egMembers1 = "Toca Nuevo socio y elige al jugador, o créalo."
+    override val egMembers2 = "Anota la licencia, el certificado médico y los consentimientos."
+    override val egMembers3 = "Las cuotas se cobran desde Cuotas y pagos, a todos con un toque."
+    override val egTournamentsTitle = "El primer torneo"
+    override val egTournaments1 = "Toca Nuevo torneo: nombre, formato y fechas, paso a paso."
+    override val egTournaments2 = "Inscribe a los jugadores y luego haz el sorteo."
+    override val egTournaments3 = "Los partidos se apuntan con el marcador desde el rol Tú: el resultado vuelve aquí."
+    override val egFeesTitle = "La primera cuota"
+    override val egFees1 = "Toca Nueva cuota: nombre, importe y vencimiento."
+    override val egFees2 = "Cóbrala a todos los socios con un toque, o a mano a quien corresponda."
+    override val egFees3 = "Cuando pagan, anota el pago: el recibo está listo."
+
+    override val cmNone = "Ninguno por jugar ahora"
+    override val cmEmptyText = "Aquí aparecen los partidos de torneos, equipos y desafíos de tu club cuando están listos para jugarse: los apuntas con el marcador y el resultado vuelve al club. Llegan con la ficha de partido de la secretaría o, si estás en el club, solos."
+
+    override val strapPartnersAdd = "Dobles: añadir las bandas de los compañeros"
+    override val heartPartners = "compañeros"
+    override val heartFirsts = "primeros jugadores"
+
+    override val resumeMatch = "Reanudar partido"
 }
 TSM_EOF
 
@@ -74152,6 +74833,75 @@ object FrStrings : Strings {
     override val mrWinner: (String) -> String = { "Vainqueur : $it" }
     override val mrPending: (String) -> String = { "Résultat à envoyer : $it" }
     override val mrConflict: (String) -> String = { "Il y a déjà un autre résultat ($it) : le remplacer ?" }
+
+    override val todoTitle: (Int) -> String = { "À faire ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Étape $a sur $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "Premiers pas · $a sur $b" }
+    override val fsHide = "Masquer"
+    override val fsName = "Indiquez votre nom"
+    override val fsBands = "Connectez les bracelets"
+    override val fsFirstMatch = "Jouez votre premier match"
+    override val fsFirstStudent = "Ajoutez votre premier élève"
+    override val fsFirstLesson = "Ajoutez la première leçon à l'agenda"
+    override val fsClubName = "Indiquez le nom du club"
+    override val fsCourts = "Ajoutez les terrains"
+    override val fsFirstMember = "Inscrivez le premier adhérent"
+    override val fsFirstFee = "Créez la première cotisation"
+    override val mfTitle: (Int) -> String = { "Autres fonctions ($it désactivées)" }
+    override val moreActions = "Autres actions"
+    override val stTabCard = "Fiche"
+    override val stTabLessons = "Leçons"
+    override val stTabTraining = "Entraînement"
+    override val planManage = "Terrains, horaires et fermetures"
+    override val wzWhen = "Quand et où"
+    override val wzWho = "Qui joue"
+    override val wzPay = "Prix et répétition"
+    override val wzTournament = "Le tournoi"
+    override val wzFormula = "Formule et règles"
+    override val wzDates = "Dates et inscriptions"
+    override val wzFee = "La cotisation"
+    override val wzWhoPays = "À qui la facturer"
+    override val wzNoMembers = "Pas encore d'adhérents : vous pourrez la facturer plus tard depuis la cotisation ou la fiche de chacun."
+    override val wzChargeAsk = "La facturer tout de suite à tous les adhérents, ou plus tard à la main à qui il faut ?"
+    override val wzChargeAll: (Int) -> String = { "Tous les adhérents ($it)" }
+    override val wzChargeLater = "Plus tard, à la main"
+    override val wzCourse = "Le cours"
+    override val wzSchedule = "Jours et horaires"
+    override val wzSeats = "Places et tarif"
+    override val bwTitle = "Connecter les bracelets pas à pas"
+    override val bwPrep = "Préparer le téléphone"
+    override val bwPrepHint = "Le téléphone cherche les bracelets proches en Bluetooth : il faut le Bluetooth activé, l'autorisation et la localisation activée. Touchez les boutons jusqu'à ce qu'ils soient tous verts."
+    override val bwBandHint: (String) -> String = { n -> "Allumez le bracelet ${de(n)} et gardez-le près du téléphone, puis choisissez-le ci-dessous. Identifier l'allume : vous êtes sûr que c'est le bon." }
+    override val bwReady = "Prêt"
+    override val bwDoneHint = "Ils servent pour tous les matchs : inutile de recommencer à chaque fois. Si les joueurs sont inversés, échangez-les avec le bouton ci-dessous."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "Aucune associée" else "$it associées" }
+    override val dvOn = "Activé"
+    override val dvOff = "Désactivé"
+    override val egStudentsTitle = "Votre premier élève"
+    override val egStudents1 = "Touchez Nouvel élève et indiquez nom et prénom."
+    override val egStudents2 = "S'il a déjà l'appli, demandez-lui d'envoyer son profil par QR."
+    override val egStudents3 = "Depuis sa fiche : S'entraîner maintenant, leçons, objectifs et rapports."
+    override val egMembersTitle = "Le premier adhérent"
+    override val egMembers1 = "Touchez Nouvel adhérent et choisissez le joueur, ou créez-le."
+    override val egMembers2 = "Notez la licence, le certificat médical et les consentements."
+    override val egMembers3 = "Les cotisations se facturent depuis Cotisations et paiements, à tous en un geste."
+    override val egTournamentsTitle = "Le premier tournoi"
+    override val egTournaments1 = "Touchez Nouveau tournoi : nom, formule et dates, une étape à la fois."
+    override val egTournaments2 = "Inscrivez les joueurs, puis faites le tirage."
+    override val egTournaments3 = "Les matchs se comptent avec le marqueur depuis le rôle Vous : le résultat revient ici."
+    override val egFeesTitle = "La première cotisation"
+    override val egFees1 = "Touchez Nouvelle cotisation : nom, montant et échéance."
+    override val egFees2 = "Facturez-la à tous les adhérents en un geste, ou à la main à qui il faut."
+    override val egFees3 = "Quand ils paient, notez le paiement : le reçu est prêt."
+
+    override val cmNone = "Aucun à jouer pour le moment"
+    override val cmEmptyText = "Les matchs de tournois, d'équipes et de défis de votre club apparaissent ici quand ils sont prêts à jouer : vous les comptez avec le marqueur et le résultat retourne au club. Ils arrivent avec la fiche de match du secrétariat ou, si vous êtes membre du club, tout seuls."
+
+    override val strapPartnersAdd = "Double : ajouter les ceintures des partenaires"
+    override val heartPartners = "partenaires"
+    override val heartFirsts = "premiers joueurs"
+
+    override val resumeMatch = "Reprendre un match"
 }
 TSM_EOF
 
@@ -76997,6 +77747,75 @@ object PtStrings : Strings {
     override val mrWinner: (String) -> String = { "Vence $it" }
     override val mrPending: (String) -> String = { "Resultado a enviar: $it" }
     override val mrConflict: (String) -> String = { "Já há outro resultado ($it): substituí-lo?" }
+
+    override val todoTitle: (Int) -> String = { "A fazer ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Etapa $a de $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "Primeiros passos · $a de $b" }
+    override val fsHide = "Ocultar"
+    override val fsName = "Informe seu nome"
+    override val fsBands = "Conecte as pulseiras"
+    override val fsFirstMatch = "Jogue sua primeira partida"
+    override val fsFirstStudent = "Adicione seu primeiro aluno"
+    override val fsFirstLesson = "Marque a primeira aula na agenda"
+    override val fsClubName = "Informe o nome do clube"
+    override val fsCourts = "Adicione as quadras"
+    override val fsFirstMember = "Cadastre o primeiro sócio"
+    override val fsFirstFee = "Crie a primeira mensalidade"
+    override val mfTitle: (Int) -> String = { "Mais funções ($it desativadas)" }
+    override val moreActions = "Mais ações"
+    override val stTabCard = "Ficha"
+    override val stTabLessons = "Aulas"
+    override val stTabTraining = "Treino"
+    override val planManage = "Quadras, horários e bloqueios"
+    override val wzWhen = "Quando e onde"
+    override val wzWho = "Quem joga"
+    override val wzPay = "Preço e repetição"
+    override val wzTournament = "O torneio"
+    override val wzFormula = "Formato e regras"
+    override val wzDates = "Datas e inscrições"
+    override val wzFee = "A mensalidade"
+    override val wzWhoPays = "De quem cobrar"
+    override val wzNoMembers = "Ainda não há sócios: você poderá cobrá-la depois pela mensalidade ou pela ficha de cada um."
+    override val wzChargeAsk = "Cobrar já de todos os sócios, ou depois manualmente de quem precisar?"
+    override val wzChargeAll: (Int) -> String = { "Todos os sócios ($it)" }
+    override val wzChargeLater = "Depois, manualmente"
+    override val wzCourse = "O curso"
+    override val wzSchedule = "Dias e horários"
+    override val wzSeats = "Vagas e mensalidade"
+    override val bwTitle = "Conectar as pulseiras passo a passo"
+    override val bwPrep = "Preparar o celular"
+    override val bwPrepHint = "O celular procura as pulseiras próximas por Bluetooth: é preciso o Bluetooth ligado, a permissão e a localização ativada. Toque nos botões até ficarem todos verdes."
+    override val bwBandHint: (String) -> String = { n -> "Ligue a pulseira de $n e mantenha perto do celular; depois escolha abaixo. Com Identificar ela acende: assim você sabe que é a certa." }
+    override val bwReady = "Pronto"
+    override val bwDoneHint = "Valem para todas as partidas: não precisa repetir toda vez. Se os jogadores estiverem trocados, inverta com o botão abaixo."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "Nenhum pareado" else "$it pareados" }
+    override val dvOn = "Ligado"
+    override val dvOff = "Desligado"
+    override val egStudentsTitle = "Seu primeiro aluno"
+    override val egStudents1 = "Toque em Novo aluno e informe nome e sobrenome."
+    override val egStudents2 = "Se ele já tem o app, peça para mandar o perfil pelo QR."
+    override val egStudents3 = "Na ficha dele: Treinar agora, aulas, metas e relatórios."
+    override val egMembersTitle = "O primeiro sócio"
+    override val egMembers1 = "Toque em Novo sócio e escolha o jogador, ou crie um."
+    override val egMembers2 = "Registre a carteirinha, o atestado médico e os consentimentos."
+    override val egMembers3 = "As mensalidades são cobradas em Mensalidades e pagamentos, de todos com um toque."
+    override val egTournamentsTitle = "O primeiro torneio"
+    override val egTournaments1 = "Toque em Novo torneio: nome, formato e datas, uma etapa por vez."
+    override val egTournaments2 = "Inscreva os jogadores e depois faça o sorteio."
+    override val egTournaments3 = "As partidas são marcadas com o placar no papel Você: o resultado volta para cá."
+    override val egFeesTitle = "A primeira mensalidade"
+    override val egFees1 = "Toque em Nova mensalidade: nome, valor e vencimento."
+    override val egFees2 = "Cobre de todos os sócios com um toque, ou manualmente de quem precisar."
+    override val egFees3 = "Quando pagarem, registre o pagamento: o recibo fica pronto."
+
+    override val cmNone = "Nenhuma para jogar agora"
+    override val cmEmptyText = "Aqui aparecem as partidas de torneios, equipes e desafios do seu clube quando estão prontas para jogar: você marca com o placar e o resultado volta para o clube. Elas chegam com a ficha da partida da secretaria ou, se você está no clube, sozinhas."
+
+    override val strapPartnersAdd = "Duplas: adicionar as cintas dos parceiros"
+    override val heartPartners = "parceiros"
+    override val heartFirsts = "primeiros jogadores"
+
+    override val resumeMatch = "Retomar partida"
 }
 TSM_EOF
 
@@ -77040,6 +77859,21 @@ object TsmColors {
     /** Il secondo colpo nel confronto dei video; i corsi dell'allenatore (quelli della segreteria sono in [Ball]). */
     val Cyan = Color(0xFF29B6F6)
 
+    /**
+     * Un colore per ogni area dell'app, così si capisce sempre dove si è: la striscia delle voci nella prima schermata,
+     * l'icona in alto in ogni schermata e le sotto-schede. Tutti chiari, col testo scuro [OnArea] sopra.
+     */
+    val AreaPlay = Ball
+    val AreaClub = Color(0xFF4FC3F7)
+    val AreaTrain = Color(0xFFFFB74D)
+    val AreaProgress = Color(0xFFB39DDB)
+    val AreaPeople = Color(0xFF80CBC4)
+    val AreaTournaments = Color(0xFFF48FB1)
+    val AreaSettings = Color(0xFF90A4AE)
+    /** Le cose da fare adesso (avvisi, risultati da mandare, backup). */
+    val AreaTodo = Orange
+    val OnArea = Color(0xFF10151F)
+
     fun player(side: Side) = if (side == Side.P1) Player1 else Player2
     fun onPlayer(side: Side) = if (side == Side.P1) OnPlayer1 else OnPlayer2
 }
@@ -77074,6 +77908,9 @@ private val typography = Typography(
 fun TsmTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = scheme, typography = typography, content = content)
 }
+
+/** Il colore dell'area in cui si è (vedi [TsmColors.AreaPlay] e seguenti): lo decide [AppRoot] per ogni schermata. */
+val LocalArea = androidx.compose.runtime.staticCompositionLocalOf { TsmColors.AreaPlay }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/TvSection.kt
@@ -78895,7 +79732,8 @@ fun ClubTournamentsScreen(c: MatchController) {
             BigButton(s.ctNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {
-        if (list.isEmpty()) Text(s.ctNone, color = TsmColors.TextDim)
+        // Nessun torneo: cosa fare, passo per passo.
+        if (list.isEmpty()) com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.EmojiEvents, s.egTournamentsTitle, listOf(s.egTournaments1, s.egTournaments2, s.egTournaments3), s.ctNew) { creating = true }
         val groups = listOf(
             s.ctOpen to list.filter { !it.drawn },
             s.ctRunning to list.filter { it.drawn && it.champion == null },
@@ -79412,26 +80250,33 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
         Text("$v", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
         IconButton(onClick = { onChange((v + 1).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
     }
+    val wz = t == null
+    var step by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val titles = listOf(s.wzTournament, s.wzFormula, s.wzDates)
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (t == null) s.ctNew else t.name) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Un torneo nuovo si crea a passi: il torneo, la formula con le regole, le date e le iscrizioni.
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (!wz || step == 0) {
                 field(name, s.ctName) { name = it }
                 Segmented(listOf(SegOption(s.ctSocial), SegOption("FITP")), if (kind == CTKind.FITP) 1 else 0, { kind = if (it == 1) CTKind.FITP else CTKind.SOCIAL }, enabled = !drawn)
                 Text(if (kind == CTKind.FITP) s.ctFitpHint else s.ctSocialHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 Segmented(listOf(SegOption(s.ctSingles), SegOption(s.ctDoubles)), if (doubles) 1 else 0, { doubles = it == 1 }, enabled = !drawn && t?.entries.isNullOrEmpty())
                 field(category, s.ctCategory) { category = it }
+                if (kind == CTKind.FITP) {
+                    field(code, s.ctFitpCode) { code = it }
+                    field(referee, s.ctReferee) { referee = it }
+                }
+                }
+                if (!wz || step == 1) {
                 Segmented(listOf(SegOption(s.ctFormatKnockout), SegOption(s.ctFormatGroups)), if (format == CTFormat.GROUPS) 1 else 0, { format = if (it == 1) CTFormat.GROUPS else CTFormat.KNOCKOUT }, enabled = !drawn)
                 if (format == CTFormat.GROUPS && !drawn) {
                     stepper(s.ctGroupsCount, groups, 1, 8) { groups = it }
                     stepper(s.ctQualify, qualify, 1, 4) { qualify = it }
                 }
-                DateButton(s.ctStart, start, lang) { start = it; if (end == null || end!! < it) end = it }
-                DateButton(s.ctEnd, end, lang) { end = it }
-                MoneyField(fee, s.ctFee) { fee = it }
-                if ((Fees.parse(fee) ?: 0) > 0) SwitchRow(Icons.Filled.EmojiEvents, s.ctPaidOnly, s.ctPaidOnlyHint, requirePaid) { requirePaid = it }
-                field(limit, s.ctLimit) { limit = it.trim().uppercase() }
                 // Le regole delle partite: vanno nella scheda partita e in campo non si cambiano per errore.
                 Text(s.ctRules, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
                 val formats = listOf(null, MatchFormat.BEST_OF_THREE, MatchFormat.TWO_SETS_MATCH_TIEBREAK, MatchFormat.PRO_SET)
@@ -79451,15 +80296,20 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                     SwitchRow(Icons.Filled.EmojiEvents, s.noAd, null, r.noAd) { rules = r.copy(noAd = it) }
                 }
                 Text(s.ctRulesHint, color = TsmColors.TextDim, fontSize = 12.sp)
-                if (kind == CTKind.FITP) {
-                    field(code, s.ctFitpCode) { code = it }
-                    field(referee, s.ctReferee) { referee = it }
+                }
+                if (!wz || step == 2) {
+                DateButton(s.ctStart, start, lang) { start = it; if (end == null || end!! < it) end = it }
+                DateButton(s.ctEnd, end, lang) { end = it }
+                MoneyField(fee, s.ctFee) { fee = it }
+                if ((Fees.parse(fee) ?: 0) > 0) SwitchRow(Icons.Filled.EmojiEvents, s.ctPaidOnly, s.ctPaidOnlyHint, requirePaid) { requirePaid = it }
+                field(limit, s.ctLimit) { limit = it.trim().uppercase() }
                 }
                 if (t != null) TextButton(onClick = { askDelete = true }) { Text(s.ctDelete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
-            TextButton(enabled = name.isNotBlank() && feeOk, onClick = {
+            if (wz && step < titles.lastIndex) com.tennis.scoremanager.ui.WizardNext(enabled = step != 0 || name.isNotBlank()) { step++ }
+            else TextButton(enabled = name.isNotBlank() && feeOk, onClick = {
                 val base = t ?: ClubTournament(ClubTournaments.newId("t"), "", createdAt = System.currentTimeMillis())
                 val saved = base.copy(
                     name = name.trim(), kind = kind, doubles = doubles, category = category.trim(), format = format, groups = groups, qualify = qualify,
@@ -79471,7 +80321,7 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
-        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
     if (askDelete && t != null) AlertDialog(
         onDismissRequest = { askDelete = false },
@@ -79853,13 +80703,18 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
             Text("${s.clClosed}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
-            GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
-        }
-        if (inTab) GhostButton(s.planSettings, Icons.Filled.Settings, { settings = true }, Modifier.fillMaxWidth())
+        // Campi, chiusure, orari e prezzi, statistiche: in un menu solo, così il planning del giorno si vede subito.
         val features by c.clubFeatures.collectAsState()
-        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
+        var manageMenu by remember { mutableStateOf(false) }
+        Box {
+            GhostButton(s.planManage, Icons.Filled.Settings, { manageMenu = true }, Modifier.fillMaxWidth())
+            androidx.compose.material3.DropdownMenu(expanded = manageMenu, onDismissRequest = { manageMenu = false }) {
+                androidx.compose.material3.DropdownMenuItem(text = { Text(s.crtTitle) }, leadingIcon = { Icon(Icons.Filled.SportsTennis, null) }, onClick = { manageMenu = false; manage = true })
+                androidx.compose.material3.DropdownMenuItem(text = { Text(s.blkShort) }, leadingIcon = { Icon(Icons.Filled.Block, null) }, onClick = { manageMenu = false; blocks = true })
+                androidx.compose.material3.DropdownMenuItem(text = { Text(s.planSettings) }, leadingIcon = { Icon(Icons.Filled.Schedule, null) }, onClick = { manageMenu = false; settings = true })
+                if (com.tennis.scoremanager.ClubFeature.STATS in features) androidx.compose.material3.DropdownMenuItem(text = { Text(s.stTitle) }, leadingIcon = { Icon(Icons.Filled.BarChart, null) }, onClick = { manageMenu = false; c.openCourtStats() })
+            }
+        }
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
         // Solo lo stato (e la sincronizzazione ogni minuto): il server si apre da Altro.
         if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c)
@@ -79939,11 +80794,17 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val cents = if (manualPrice) Fees.parse(priceText) ?: 0 else autoPrice
     val conflicts = CourtPlans.conflicts(plan, tournaments, b.court, b.start, b.end, except = b.id)
     val blocked = CourtPlans.blockedBy(plan, b.court, b.start, b.end, b.kind)
+    // Una prenotazione nuova si fa a passi (quando e dove, chi gioca, prezzo); quella da cambiare si vede tutta.
+    val wz = isNew
+    var step by remember { mutableIntStateOf(0) }
+    val titles = listOf(s.wzWhen, s.wzWho, s.wzPay)
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (isNew) s.bkNew else c.planning.bookingLabel(b0)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (!wz || step == 0) {
                 if (courts.size > 1) Segmented(courts.map { SegOption(it) }, courts.indexOf(b.court), { b = b.copy(court = courts[it]) }, columns = minOf(3, courts.size))
                 DateButton(s.planDay, b.start, lang) { d ->
                     val old = Calendar.getInstance().apply { timeInMillis = b.start }
@@ -79963,6 +80824,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                 Segmented(kinds.map { SegOption(bookingKindName(s, it)) }, kinds.indexOf(b.kind), { b = b.copy(kind = kinds[it]) }, columns = 2)
                 if (conflicts.isNotEmpty()) Text(s.bkConflict, color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 for (k in blocked) Text(s.blkBlocked(k.label.ifBlank { blockReasonName(s, k.reason) }), color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+                if (!wz || step == 1) {
                 if (b.kind != BookingKind.CLOSED) {
                     // Chi gioca: dal database (si possono addebitare) e ospiti scritti a mano.
                     for (id in b.players) c.playerById(id)?.let { p ->
@@ -79975,6 +80838,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     OutlinedTextField(guests, { guests = it.take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bkGuests) })
                 }
                 OutlinedTextField(b.note, { b = b.copy(note = it.take(80)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bkNote) })
+                }
+                if (!wz || step == 2) {
                 if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) {
                     if (info.heating) SwitchRow(Icons.Filled.Thermostat, s.crtHeating, info.heatingCentsPerHour.takeIf { it > 0 }?.let { s.crtHeatingPrice(Fees.money(it, lang.locale)) }, b.heating) { b = b.copy(heating = it); manualPrice = false }
                     MoneyField(if (manualPrice) priceText else plain(autoPrice, lang), s.bkPrice) { priceText = it; manualPrice = true }
@@ -80014,10 +80879,12 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.planning.noticeBooking(b0) }, Modifier.fillMaxWidth())
                     TextButton(onClick = { askDelete = true }) { Text(s.bkDelete, color = TsmColors.Danger) }
                 }
+                }
             }
         },
         confirmButton = {
-            TextButton(enabled = conflicts.isEmpty() && blocked.isEmpty(), onClick = {
+            if (wz && step < titles.lastIndex) com.tennis.scoremanager.ui.WizardNext(enabled = step != 0 || (conflicts.isEmpty() && blocked.isEmpty())) { step++ }
+            else TextButton(enabled = conflicts.isEmpty() && blocked.isEmpty(), onClick = {
                 val saved = b.copy(
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
@@ -80025,7 +80892,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                 onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
-        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
     if (picking) PlayerPickDialog(c, b.players.toSet()) { p -> picking = false; p?.let { b = b.copy(players = b.players + it.id) } }
     if (askDelete) AlertDialog(
@@ -81500,6 +82367,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
@@ -81570,6 +82440,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import com.tennis.scoremanager.HomeTab
 import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
@@ -81641,22 +82513,45 @@ fun HomeScreen(c: MatchController) {
         // Il ruolo sempre in vista: un tocco e si passa a Tu, Allenatore o Circolo.
         action = { com.tennis.scoremanager.ui.RoleSwitchButton(c) },
     ) {
-        // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
+        // Tutto quello che chiede attenzione adesso, in un riquadro solo in cima: la casella del server, il backup, un
+        // archivio illeggibile, un obiettivo raggiunto, i risultati da rimandare alla segreteria.
+        val context = LocalContext.current
         val inbox by c.mailbox.inbox.collectAsState()
-        if (inbox.isNotEmpty()) Entry(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint, main = true) { c.mailbox.openInbox() }
-        // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
-        if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
-        // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
-        val unreadable = c.storage.unreadable.toList()
-        if (unreadable.isNotEmpty()) Entry(Icons.Filled.Warning, s.unreadableTitle, s.unreadableHint(unreadable.joinToString(", "))) {
-            c.storage.unreadable.clear()
-            c.go(Screen.DATA)
+        val goals by c.progress.goals.collectAsState()
+        val cards by c.cards.receivedCards.collectAsState()
+        val todo = buildList {
+            // I file arrivati dal server del circolo (convocazioni, schede corso, risultati da controllare): uno alla volta.
+            if (inbox.isNotEmpty()) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.MarkEmailUnread, s.ibTitle(inbox.size), s.ibHint) { c.mailbox.openInbox() })
+            // Un archivio che non si leggeva è stato messo da parte (non sovrascritto): di qui al ripristino del backup.
+            val unreadable = c.storage.unreadable.toList()
+            if (unreadable.isNotEmpty()) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.Warning, s.unreadableTitle, s.unreadableHint(unreadable.joinToString(", "))) {
+                c.storage.unreadable.clear()
+                c.go(Screen.DATA)
+            })
+            // Promemoria del backup (se acceso in Backup e dati): ogni 30 giorni.
+            if (c.backupDue()) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) })
+            // Chi aveva già l'app: il backup automatico ora è acceso di serie, lo si dice una volta.
+            if (!c.storage.autoBackupNoticeSeen && c.storage.personalBackupAuto) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.Backup, s.autoBackupOnTitle, s.autoBackupOnHint) {
+                c.storage.autoBackupNoticeSeen = true
+                c.go(Screen.DATA)
+            })
+            if (role != com.tennis.scoremanager.Role.CLUB) {
+                // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
+                for (g in goals.filter { it.reachedAt != null && !it.seen }) add(com.tennis.scoremanager.ui.TodoItem(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) {
+                    c.progress.goalSeen(g.id); c.progress.openProgress()
+                })
+                // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
+                for (rc in cards.filter { it.result != null && it.sentAt == null }) {
+                    val r = rc.result!!
+                    add(com.tennis.scoremanager.ui.TodoItem(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null }) {
+                        com.tennis.scoremanager.ui.sendResult(context, c, rc.card.code)
+                    })
+                }
+            }
         }
-        // Chi aveva già l'app: il backup automatico ora è acceso di serie, lo si dice una volta.
-        if (!c.storage.autoBackupNoticeSeen && c.storage.personalBackupAuto) Entry(Icons.Filled.Backup, s.autoBackupOnTitle, s.autoBackupOnHint) {
-            c.storage.autoBackupNoticeSeen = true
-            c.go(Screen.DATA)
-        }
+        com.tennis.scoremanager.ui.TodoCard(todo)
+        // I primi passi del ruolo, nella prima scheda, finché non sono fatti (o li si nasconde).
+        if (tab == tabs.first()) FirstSteps(c, role)
         when (tab) {
             // Senza la scheda Progressi (spenta in Cosa usi) lo storico sta in Gioca.
             HomeTab.PLAY -> PlayTab(c, historyHere = HomeTab.PROGRESS !in tabs)
@@ -81670,6 +82565,89 @@ fun HomeScreen(c: MatchController) {
             HomeTab.PEOPLE -> PeopleTab(c)
             HomeTab.TODAY -> TodayTab(c)
         }
+        // Le funzioni spente in Cosa usi: in fondo alla prima scheda e in Altro, per ritrovarle.
+        if (tab == tabs.first() || tab == HomeTab.MORE) MoreFeaturesEntry(c, role)
+    }
+}
+
+/**
+ * I primi passi di ogni ruolo, con la spunta su quelli fatti: un tocco porta dove si fanno. Spariscono quando sono
+ * tutti fatti o con Nascondi (per ruolo).
+ */
+@Composable
+private fun FirstSteps(c: MatchController, role: com.tennis.scoremanager.Role) {
+    val s = LocalStrings.current
+    var hidden by remember(role) { mutableStateOf(c.storage.firstStepsHidden(role.name)) }
+    if (hidden) return
+    val players by c.players.collectAsState()
+    val history by c.history.collectAsState()
+    val bands by c.ble.bands.collectAsState()
+    val pf by c.features.playerFeatures.collectAsState()
+    val cf by c.clubFeatures.collectAsState()
+    val book by c.coaching.coachBook.collectAsState()
+    val courts by c.planning.clubCourts.collectAsState()
+    val clubBook by c.clubBook.collectAsState()
+    var profile by remember { mutableStateOf(false) }
+    var club by remember { mutableStateOf(false) }
+    var manage by remember { mutableStateOf(false) }
+    val named = c.me() != null || c.storage.myName.isNotBlank()
+    // Ogni passo: fatto?, titolo, cosa fare.
+    val steps: List<Triple<Boolean, String, () -> Unit>> = when (role) {
+        com.tennis.scoremanager.Role.PLAYER -> listOfNotNull(
+            Triple(named, s.fsName) { profile = true },
+            Triple(bands.isNotEmpty(), s.fsBands) { c.go(Screen.DEVICES) }.takeIf { PlayerFeature.BANDS in pf },
+            Triple(history.isNotEmpty(), s.fsFirstMatch) { c.go(Screen.SETUP) },
+        )
+        com.tennis.scoremanager.Role.COACH -> listOf(
+            Triple(named, s.fsName) { profile = true },
+            Triple(players.any { it.student }, s.fsFirstStudent) { c.openStudents() },
+            Triple(book.lessons.isNotEmpty(), s.fsFirstLesson) { c.coaching.openLessons() },
+        )
+        com.tennis.scoremanager.Role.CLUB -> listOfNotNull(
+            Triple(c.storage.clubName.isNotBlank(), s.fsClubName) { club = true },
+            Triple(courts.isNotEmpty(), s.fsCourts) { manage = true },
+            Triple(players.any { it.member != null }, s.fsFirstMember) { c.openMembers() }.takeIf { ClubFeature.MEMBERS in cf },
+            Triple(clubBook.fees.isNotEmpty(), s.fsFirstFee) { c.openPayments() }.takeIf { ClubFeature.PAYMENTS in cf },
+        )
+    }
+    if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    if (club) com.tennis.scoremanager.ui.ClubDialog(c) { club = false }
+    if (manage) CourtsManageDialog(c) { manage = false }
+    val done = steps.count { it.first }
+    if (done == steps.size) return
+    com.tennis.scoremanager.ui.StripeBox(com.tennis.scoremanager.ui.LocalArea.current) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(s.fsTitle(done, steps.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+            androidx.compose.material3.TextButton(onClick = { hidden = true; c.storage.setFirstStepsHidden(role.name) }) { Text(s.fsHide, color = TsmColors.TextDim) }
+        }
+        for ((ok, title, go) in steps) Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(enabled = !ok) { go() }.padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(if (ok) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, null, tint = if (ok) TsmColors.Ok else com.tennis.scoremanager.ui.LocalArea.current)
+            Text(title, color = if (ok) TsmColors.TextDim else TsmColors.TextMain, fontSize = 15.sp, fontWeight = if (ok) FontWeight.Normal else FontWeight.Bold,
+                modifier = Modifier.weight(1f).padding(start = 10.dp))
+            if (!ok) Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
+        }
+    }
+}
+
+/** Le funzioni spente (Cosa usi, Funzioni del circolo): una riga per ritrovarle, che apre gli interruttori. */
+@Composable
+private fun MoreFeaturesEntry(c: MatchController, role: com.tennis.scoremanager.Role) {
+    val s = LocalStrings.current
+    val pf by c.features.playerFeatures.collectAsState()
+    val cf by c.clubFeatures.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    val off = if (role == com.tennis.scoremanager.Role.CLUB) ClubFeature.entries.filter { it !in cf }.map { com.tennis.scoremanager.ui.featureInfo(s, it).first }
+    else PlayerFeature.entries.filter { it !in pf }.map { com.tennis.scoremanager.ui.playerFeatureInfo(s, it).first }
+    if (off.isEmpty()) return
+    androidx.compose.runtime.CompositionLocalProvider(com.tennis.scoremanager.ui.LocalArea provides TsmColors.AreaSettings) {
+        Entry(Icons.Filled.Tune, s.mfTitle(off.size), off.joinToString(", ")) { open = true }
+    }
+    if (open) {
+        if (role == com.tennis.scoremanager.Role.CLUB) com.tennis.scoremanager.ui.ClubFeaturesDialog(c) { open = false; c.storage.clubFeaturesSeen = true }
+        else com.tennis.scoremanager.ui.PlayerFeaturesDialog(c) { open = false; c.storage.playerFeaturesSeen = true }
     }
 }
 
@@ -81773,11 +82751,13 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
                 .background(if (on) TsmColors.SurfaceHigh else Color.Transparent).padding(vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(icon, null, tint = if (on) TsmColors.Ball else TsmColors.TextDim)
+            // Ogni scheda col colore della sua area: lo stesso delle voci e delle schermate che apre.
+            val area = com.tennis.scoremanager.ui.areaOf(t)
+            Icon(icon, null, tint = if (on) area else TsmColors.TextDim)
             // In tedesco o francese le parole sono lunghe: il testo si rimpicciolisce invece di essere tagliato.
             androidx.compose.foundation.text.BasicText(
                 label, maxLines = 1,
-                style = androidx.compose.ui.text.TextStyle(color = if (on) TsmColors.Ball else TsmColors.TextDim, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
+                style = androidx.compose.ui.text.TextStyle(color = if (on) area else TsmColors.TextDim, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
                 autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = 12.sp, stepSize = 0.5.sp),
             )
         }
@@ -81789,17 +82769,24 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 internal fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, tint: androidx.compose.ui.graphics.Color? = null, onClick: () -> Unit) {
     // Con [onLongClick] la voce si tiene premuta per un'altra azione (eliminare la partita sospesa).
-    Surface(shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface,
+    // Il colore dell'area (Gioca, Circolo, Progressi...) nella striscia a sinistra e nell'icona; la voce principale
+    // è tutta di quel colore.
+    val area = com.tennis.scoremanager.ui.LocalArea.current
+    val on = com.tennis.scoremanager.ui.TsmColors.OnArea
+    Surface(shape = RoundedCornerShape(18.dp), color = if (main) area else TsmColors.Surface,
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            // [tint]: un colore per distinguere la voce (i corsi dell'allenatore da quelli della segreteria).
-            Icon(icon, null, tint = if (main) TsmColors.OnBall else tint ?: TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, color = if (main) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = if (main) 19.sp else 16.sp)
-                hint?.let { Text(it, color = if (main) TsmColors.OnBall else TsmColors.TextDim, fontSize = 13.sp) }
+        Row(Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
+            if (!main) Box(Modifier.width(5.dp).fillMaxHeight().background(tint ?: area))
+            Row(Modifier.weight(1f).padding(start = if (main) 16.dp else 11.dp, end = 16.dp, top = if (main) 18.dp else 14.dp, bottom = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                // [tint]: un colore per distinguere la voce (i corsi dell'allenatore da quelli della segreteria).
+                Icon(icon, null, tint = if (main) on else tint ?: area, modifier = Modifier.size(if (main) 30.dp else 24.dp))
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(title, color = if (main) on else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = if (main) 19.sp else 16.sp)
+                    hint?.let { Text(it, color = if (main) on else TsmColors.TextDim, fontSize = 13.sp) }
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = if (main) on else TsmColors.TextDim)
             }
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = if (main) TsmColors.OnBall else TsmColors.TextDim)
         }
     }
 }
@@ -81819,7 +82806,7 @@ private fun DeviceStatus(c: MatchController) {
     val relay by c.relay.ui.collectAsState()
     val tv by c.tv.collectAsState()
     val readyBands = Side.entries.count { bands[it]?.state == LinkState.READY }
-    val readyStraps = Side.entries.count { straps[it]?.state == StrapState.READY }
+    val readyStraps = straps.values.count { it.state == StrapState.READY }
     val chips = buildList {
         if (bands.isNotEmpty()) add(s.statusBands(readyBands) to (readyBands == bands.size))
         if (straps.isNotEmpty()) add(s.statusStraps(readyStraps) to (readyStraps == straps.size))
@@ -81853,37 +82840,30 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
     val pf by c.features.playerFeatures.collectAsState()
     // La prima volta: l'invito a tenere solo quello che si usa.
     com.tennis.scoremanager.ui.PlayerFeaturesHint(c)
-    // Un obiettivo appena raggiunto: l'avviso resta finché non lo si guarda.
-    val goals by c.progress.goals.collectAsState()
-    for (g in goals.filter { it.reachedAt != null && !it.seen }) {
-        Entry(Icons.Filled.EmojiEvents, s.goalReachedBanner(com.tennis.scoremanager.ui.goalLine(s, g)), s.goalsTitle) { c.progress.goalSeen(g.id); c.progress.openProgress() }
-    }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
-    // La partita lasciata a metà (anche di un torneo del circolo) e la rivincita dell'ultima: quello che di solito si
-    // vuole fare subito.
-    ResumeEntries(c, club = null)
-    // Le partite di tornei, squadre e sfide del circolo pronte da giocare: si segnano da qui, il risultato torna lì.
+    // Sotto la partita, gli altri due modi di giocare, affiancati e uguali: le partite del circolo (tornei, squadre,
+    // sfide: si segnano da qui, il risultato torna lì) e il torneo tra amici. Il riquadro del circolo c'è sempre, così
+    // si sa che esiste; senza partite pronte lo dice e un tocco spiega quando compaiono. Le partite sospese e "Come
+    // l'ultima volta" stanno in cima a Nuova partita.
     val ready = com.tennis.scoremanager.ui.clubMatchesReady(c)
     var clubMatches by remember { mutableStateOf(false) }
-    if (ready.isNotEmpty()) Entry(Icons.Filled.EmojiEvents, s.cmTitle, s.cmHint(ready.size)) { clubMatches = true }
+    var clubEmpty by remember { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Tile(Icons.Filled.Business, s.cmTitle, if (ready.isEmpty()) s.cmNone else s.cmHint(ready.size), badge = ready.size, dim = ready.isEmpty(), modifier = Modifier.weight(1f)) {
+            if (ready.isEmpty()) clubEmpty = true else clubMatches = true
+        }
+        Tile(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint, modifier = Modifier.weight(1f)) { c.friends.show() }
+    }
     if (clubMatches) com.tennis.scoremanager.ui.ClubMatchesDialog(c, ready) { clubMatches = false }
-    // Risultati di partite giocate da una scheda della segreteria e non ancora mandati.
-    val cards by c.cards.receivedCards.collectAsState()
-    for (rc in cards.filter { it.result != null && it.sentAt == null }) {
-        val r = rc.result!!
-        Entry(Icons.AutoMirrored.Filled.Send, s.mrPending("${r.side1} – ${r.side2}"), listOf(r.event, r.round).filter { it.isNotBlank() }.joinToString(" · ")) {
-            com.tennis.scoremanager.ui.sendResult(context, c, rc.card.code)
-        }
-    }
-    history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
-        val su = last.record.setup
-        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
-            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
-            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
-        }
-    }
-    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.friends.show() }
+    if (clubEmpty) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { clubEmpty = false },
+        icon = { Icon(Icons.Filled.Business, null, tint = com.tennis.scoremanager.ui.LocalArea.current) },
+        title = { Text(s.cmTitle) },
+        text = { Text(s.cmEmptyText) },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { clubEmpty = false }) { Text(s.ok) } },
+    )
+    // Senza la scheda Progressi (spenta in Cosa usi) lo storico, con le partite sospese, resta qui.
     if (historyHere) Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     // Questo telefono come tabellone, come telecamera dell'arbitro o per riprendere da solo.
     SectionLabel(s.playThisPhone)
@@ -81893,30 +82873,99 @@ private fun PlayTab(c: MatchController, historyHere: Boolean) {
 }
 
 /**
- * Le partite sospese più recenti, da riprendere con un tocco; tenendo premuto si eliminano (con conferma). In Gioca
- * (Tu) tutte ([club] null), anche quelle di tornei, squadre e sfide del circolo; in Allievi le altre ([club] false).
+ * Un riquadro quadrato per due scelte affiancate (Partite del circolo, Torneo tra amici): icona nel colore dell'area,
+ * titolo e una riga di spiegazione; [badge] = quante cose aspettano; [dim] = per ora non c'è niente.
+ */
+@Composable
+private fun Tile(icon: ImageVector, title: String, hint: String, modifier: Modifier = Modifier, badge: Int = 0, dim: Boolean = false, onClick: () -> Unit) {
+    val area = com.tennis.scoremanager.ui.LocalArea.current
+    Column(
+        modifier.fillMaxHeight().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface).clickable(onClick = onClick).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(verticalAlignment = Alignment.Top) {
+            Box(
+                Modifier.size(42.dp).clip(RoundedCornerShape(12.dp)).background(if (dim) TsmColors.SurfaceHigh else area),
+                contentAlignment = Alignment.Center,
+            ) { Icon(icon, null, tint = if (dim) TsmColors.TextDim else com.tennis.scoremanager.ui.TsmColors.OnArea) }
+            Spacer(Modifier.weight(1f))
+            if (badge > 0) Text(
+                "$badge", color = com.tennis.scoremanager.ui.TsmColors.OnArea, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(com.tennis.scoremanager.ui.TsmColors.AreaTodo).padding(horizontal = 8.dp, vertical = 2.dp),
+            )
+        }
+        Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 19.sp)
+        Text(hint, color = TsmColors.TextDim, fontSize = 12.sp, lineHeight = 15.sp)
+    }
+}
+
+/**
+ * In cima a Nuova partita: le partite sospese da riprendere e, con la pagina ancora vuota ([likeLast]), "Come
+ * l'ultima volta" (stessi giocatori e regole, dritti al sorteggio). Stanno qui e non nella prima schermata: servono quando si sta per giocare.
+ */
+@Composable
+internal fun SetupShortcuts(c: MatchController, likeLast: Boolean) {
+    val s = LocalStrings.current
+    val saved by c.saved.collectAsState()
+    val history by c.history.collectAsState()
+    LaunchedEffect(Unit) { c.refreshSaved(); c.refreshHistory() }
+    ResumeEntries(c, club = null)
+    if (likeLast) history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
+        val su = last.record.setup
+        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
+            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
+            Entry(Icons.Filled.Replay, s.playLikeLast(names), s.playLikeLastHint) { c.startLikeLast(last.record) }
+        }
+    }
+}
+
+/**
+ * "Riprendi partita": una voce sola con quante sono le partite sospese, che apre l'elenco per scegliere quale
+ * riprendere (il cestino accanto la elimina, con conferma). In Nuova partita tutte ([club] null), anche quelle di
+ * tornei, squadre e sfide del circolo; in Allievi le altre ([club] false).
  */
 @Composable
 private fun ResumeEntries(c: MatchController, club: Boolean?) {
     val s = LocalStrings.current
     val saved by c.saved.collectAsState()
     LaunchedEffect(Unit) { c.refreshSaved() }
+    val lang = c.options.collectAsState().value.lang
+    val list = saved.filter { club == null || c.isClubRecord(it.id) == club }.sortedByDescending { it.updatedAt }
+    var open by remember { mutableStateOf(false) }
     var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
-    for (rec in saved.filter { club == null || c.isClubRecord(it.id) == club }.take(2)) {
-        val lang = c.options.collectAsState().value.lang
-        val at = rec.startedAt ?: rec.updatedAt
-        // Il punteggio a cui ci si era fermati, accanto alla data.
-        val hint = listOf("${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}", suspendedScore(rec)).filter { it.isNotBlank() }.joinToString(" · ")
-        Entry(Icons.Filled.History, s.playResume(matchNames(rec, s)), hint,
-            onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
+    if (list.isNotEmpty()) {
+        // Una voce sola: quante sono e l'ultima; un tocco apre l'elenco per scegliere quale riprendere.
+        Entry(Icons.Filled.History, s.resumeMatch, s.historySuspended(list.size) + " · " + matchNames(list.first(), s)) { open = true }
     }
+    if (open) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { open = false },
+        icon = { Icon(Icons.Filled.History, null, tint = com.tennis.scoremanager.ui.LocalArea.current) },
+        title = { Text(s.savedMatchesTitle) },
+        text = {
+            if (list.isEmpty()) Text(s.noSavedMatches)
+            else androidx.compose.foundation.lazy.LazyColumn(Modifier.heightIn(max = 420.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(list.size, key = { list[it].id }) { k ->
+                    val rec = list[k]
+                    SavedRow(rec, lang, onOpen = { open = false; c.resumeSaved(rec) }, onDelete = { toDelete = rec })
+                }
+            }
+        },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { open = false }) { Text(s.back) } },
+    )
     toDelete?.let { rec ->
         val n = matchNames(rec, s, " ${s.vs} ")
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { toDelete = null },
             title = { Text(s.deleteSavedTitle) },
             text = { Text(s.deleteSavedText(n)) },
-            confirmButton = { androidx.compose.material3.TextButton(onClick = { c.deleteSaved(rec); toDelete = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    c.deleteSaved(rec)
+                    toDelete = null
+                    // Era l'ultima: l'elenco vuoto non serve più.
+                    if (list.size <= 1) open = false
+                }) { Text(s.delete, color = TsmColors.Danger) }
+            },
             dismissButton = { androidx.compose.material3.TextButton(onClick = { toDelete = null }) { Text(s.back) } },
         )
     }
@@ -83130,16 +84179,18 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
 
 /** Battito dal vivo delle fasce: "♥ G1 142"; "--" se la fascia non manda (staccata, asciutta, lontana). */
 @Composable
-private fun HeartRow(straps: Map<Side, StrapInfo>) {
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+private fun HeartRow(straps: Map<com.tennis.scoremanager.data.Wearer, StrapInfo>) {
     val s = LocalStrings.current
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        for (side in Side.entries) {
-            val st = straps[side] ?: continue
+    // Nel doppio fino a quattro (G1, G1B, G2, G2B): vanno a capo se non ci stanno.
+    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (w in listOf(com.tennis.scoremanager.data.Wearer.P1, com.tennis.scoremanager.data.Wearer.P1B, com.tennis.scoremanager.data.Wearer.P2, com.tennis.scoremanager.data.Wearer.P2B)) {
+            val st = straps[w] ?: continue
             val bpm = st.bpm
             Pill(
-                "${s.playerTag(side.ordinal + 1)} · ${bpm ?: "--"} bpm",
-                if (bpm != null) TsmColors.player(side) else TsmColors.SurfaceHigh,
-                if (bpm != null) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                "${com.tennis.scoremanager.ui.wearerTag(s, w)} · ${bpm ?: "--"} bpm",
+                if (bpm != null) TsmColors.player(w.side) else TsmColors.SurfaceHigh,
+                if (bpm != null) TsmColors.onPlayer(w.side) else TsmColors.TextDim,
                 Icons.Filled.Favorite,
             )
         }
@@ -83501,6 +84552,10 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MatchStatsPane
 
 package com.tennis.scoremanager.ui.screens
 
+import com.tennis.scoremanager.data.Wearer
+import com.tennis.scoremanager.data.heartOf
+import com.tennis.scoremanager.data.heartTracks
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -83653,8 +84708,11 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         // Battito delle fasce cardio: sulla partita intera, con il grafico nel tempo.
         if (period == null) heartStats(rec, s)?.let { rows ->
             StatSection(s.heartStat, rows)
-            StatCard(s.heartChart) { HeartChart(rec.heart) }
-            StatCard(s.heartZones) { HeartZones(rec.heart) { names.short(it) } }
+            // Nel doppio anche i compagni (linea tratteggiata, torta col loro nome).
+            val tracks = rec.heartTracks()
+            val split = tracks.keys.any { it.partner }
+            StatCard(s.heartChart) { HeartChart(tracks) }
+            StatCard(s.heartZones) { HeartZones(tracks) { com.tennis.scoremanager.ui.wearerName(names, it, split) } }
         }
         MatchStats.rally(pts, period)?.let { r ->
             StatCard(s.strokesPerPoint) {
@@ -83687,20 +84745,27 @@ private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
 }
 
 private fun heartStats(rec: MatchRecord, s: Strings): List<Stat>? {
-    val a = HeartStats.summary(rec.heart[Side.P1])
-    val b = HeartStats.summary(rec.heart[Side.P2])
-    if (a == null && b == null) return null
-    return listOfNotNull(
-        Stat("${s.heartAvg} (bpm)", a?.avg ?: -1, b?.avg ?: -1),
-        Stat("${s.heartMax} (bpm)", a?.max ?: -1, b?.max ?: -1),
-        Stat("${s.heartCalories} (kcal)", a?.kcal ?: -1, b?.kcal ?: -1).takeIf { it.a > 0 || it.b > 0 },
-    )
+    fun rows(a: HeartStats.Summary?, b: HeartStats.Summary?, tag: String): List<Stat> {
+        if (a == null && b == null) return emptyList()
+        return listOfNotNull(
+            Stat("${s.heartAvg}$tag (bpm)", a?.avg ?: -1, b?.avg ?: -1),
+            Stat("${s.heartMax}$tag (bpm)", a?.max ?: -1, b?.max ?: -1),
+            Stat("${s.heartCalories}$tag (kcal)", a?.kcal ?: -1, b?.kcal ?: -1).takeIf { it.a > 0 || it.b > 0 },
+        )
+    }
+    // Nel doppio con quattro fasce: prima chi è scritto per primo in ogni squadra, poi i compagni.
+    val partners = rows(HeartStats.summary(rec.heartOf(Wearer.P1B)), HeartStats.summary(rec.heartOf(Wearer.P2B)), " · ${s.heartPartners}")
+    val tag = if (partners.isEmpty()) "" else " · ${s.heartFirsts}"
+    return (rows(HeartStats.summary(rec.heart[Side.P1]), HeartStats.summary(rec.heart[Side.P2]), tag) + partners).ifEmpty { null }
 }
 
-/** Battito nel tempo, una linea per lato nel suo colore; i buchi (pause, fascia staccata) interrompono la linea. */
+/**
+ * Battito nel tempo, una linea per lato nel suo colore (i compagni del doppio tratteggiati); i buchi (pause, fascia
+ * staccata) interrompono la linea.
+ */
 @Composable
-internal fun HeartChart(heart: Map<Side, HeartTrack>) {
-    val tracks = Side.entries.mapNotNull { side -> heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
+internal fun HeartChart(heart: Map<Wearer, HeartTrack>) {
+    val tracks = Wearer.entries.mapNotNull { w -> heart[w]?.takeIf { it.size > 1 }?.let { w to it } }
     if (tracks.isEmpty()) return
     val all = tracks.flatMap { (_, t) -> t.bpm.take(t.size) }
     val lo = (all.min() - 5).coerceAtLeast(30)
@@ -83721,7 +84786,10 @@ internal fun HeartChart(heart: Map<Side, HeartTrack>) {
                     val gap = i == 0 || t.t[i] - t.t[i - 1] > 2 * HeartStats.STEP_S
                     if (gap) path.moveTo(x(t.t[i]), y(t.bpm[i])) else path.lineTo(x(t.t[i]), y(t.bpm[i]))
                 }
-                drawPath(path, TsmColors.player(side), style = Stroke(width = 2.dp.toPx()))
+                drawPath(path, TsmColors.player(side.side), style = Stroke(
+                    width = 2.dp.toPx(),
+                    pathEffect = if (side.partner) androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8.dp.toPx(), 5.dp.toPx())) else null,
+                ))
             }
         }
     }
@@ -83731,11 +84799,16 @@ internal fun HeartChart(heart: Map<Side, HeartTrack>) {
 /** Dalla zona 1 alla 5: dal grigio al rosso. */
 private val ZoneColors = listOf(Color(0xFF9AA8BD), Color(0xFF4CAF50), Color(0xFFC6F432), Color(0xFFFF9800), Color(0xFFFF3B30))
 
-/** Una torta per lato con il tempo in ciascuna zona, e sotto la legenda con le percentuali dei due lati. */
+/**
+ * Una torta per chi porta la fascia con il tempo in ciascuna zona (nel doppio fino a quattro, più piccole), e sotto la
+ * legenda con le percentuali.
+ */
 @Composable
-internal fun HeartZones(heart: Map<Side, HeartTrack>, label: (Side) -> String) {
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+internal fun HeartZones(heart: Map<Wearer, HeartTrack>, label: (Wearer) -> String) {
     val s = LocalStrings.current
-    val zones = Side.entries.associateWith { side ->
+    val order = listOf(Wearer.P1, Wearer.P1B, Wearer.P2, Wearer.P2B)
+    val zones = order.associateWith { side ->
         val t = heart[side]
         t?.profile?.let { HeartStats.zoneSeconds(t, it.age) }?.takeIf { it.sum() > 0 }
     }
@@ -83743,14 +84816,15 @@ internal fun HeartZones(heart: Map<Side, HeartTrack>, label: (Side) -> String) {
         Text(s.heartZonesHint, color = TsmColors.TextDim, fontSize = 12.sp)
         return
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        for (side in Side.entries) {
+    val pie = if (zones.values.count { it != null } > 2) 72.dp else 110.dp
+    androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        for (side in order) {
             val z = zones[side] ?: continue
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Canvas(Modifier.size(110.dp)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(pie + 24.dp)) {
+                Canvas(Modifier.size(pie)) {
                     val total = z.sum().toFloat()
                     var start = -90f
-                    val w = 22.dp.toPx()
+                    val w = (if (pie < 100.dp) 16 else 22).dp.toPx()
                     for (i in z.indices) {
                         val sweep = z[i] / total * 360f
                         if (sweep > 0f) {
@@ -83762,7 +84836,7 @@ internal fun HeartZones(heart: Map<Side, HeartTrack>, label: (Side) -> String) {
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(label(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
+                Text(label(side), color = TsmColors.player(side.side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             }
         }
@@ -83773,7 +84847,7 @@ internal fun HeartZones(heart: Map<Side, HeartTrack>, label: (Side) -> String) {
             Spacer(Modifier.width(8.dp))
             Text(s.zoneName(i), color = TsmColors.TextMain, fontSize = 12.sp, modifier = Modifier.weight(1f))
             Text(
-                Side.entries.mapNotNull { side -> zones[side]?.let { z -> "${s.playerTag(side.ordinal + 1)} ${pct(z[i], z.sum())}%" } }
+                order.mapNotNull { side -> zones[side]?.let { z -> "${com.tennis.scoremanager.ui.wearerTag(s, side)} ${pct(z[i], z.sum())}%" } }
                     .joinToString(" · "),
                 color = TsmColors.TextDim, fontSize = 12.sp,
             )
@@ -84064,7 +85138,8 @@ fun MembersScreen(c: MatchController) {
         },
     ) {
         if (members.isEmpty()) {
-            Text(s.membersNone, color = TsmColors.TextDim)
+            // Nessun socio: cosa fare, passo per passo.
+            com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.PersonAdd, s.egMembersTitle, listOf(s.egMembers1, s.egMembers2, s.egMembers3), s.membersNew) { adding = true }
         } else {
             Text(s.membersCount(members.size, todo), color = if (todo > 0) TsmColors.Orange else TsmColors.Ok, fontWeight = FontWeight.Bold)
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
@@ -84546,6 +85621,12 @@ import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.PhonelinkRing
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -84723,16 +85804,32 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         },
     ) {
         // Dispositivi (da Altro): braccialetti, telecomandi e fasce si collegano qui una volta, valgono per tutte le partite.
+        // Una riga per dispositivo con com'è adesso; se ne apre una alla volta. I braccialetti anche passo passo.
+        var openPart by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
+        fun toggle(k: String) { openPart = if (openPart == k) "" else k }
+        var bandWizard by remember { mutableStateOf(false) }
         if (devices) {
-            SectionCard(s.modeBands, Icons.Filled.Watch) {
+            val bandsNow by c.ble.bands.collectAsState()
+            val readyBands = Side.entries.count { bandsNow[it]?.state == com.tennis.scoremanager.ble.LinkState.READY }
+            BigButton(s.bwTitle, Icons.Filled.Watch, { bandWizard = true }, Modifier.fillMaxWidth())
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.Watch, s.modeBands, s.statusBands(readyBands), openPart == "bands", ok = if (bandsNow.isEmpty()) null else readyBands == bandsNow.size) { toggle("bands") }
+            if (openPart == "bands") SectionCard(s.modeBands, Icons.Filled.Watch) {
                 Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
                 RequirementRow(Icons.Filled.LocationOn, s.location, blePerms && locPerm, s.allow) { requestBandPermissions() }
                 RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
                 BandsSection(c, names, enabled = bandsReadyEnv, devicesPage = true)
             }
-            SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
+            val remotesNow by c.remotes.assigned.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.SettingsRemote, s.modeRemotes, s.dvRemotes(remotesNow.size), openPart == "remotes", ok = if (remotesNow.isEmpty()) null else true) { toggle("remotes") }
+            if (openPart == "remotes") SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
+            val strapsNow by c.straps.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.MonitorHeart, s.heartSection, s.statusStraps(strapsNow.size), openPart == "heart", ok = if (strapsNow.isEmpty()) null else true) { toggle("heart") }
         }
+        if (bandWizard) BandWizard(
+            c, names, btOn = btOn, permsOk = blePerms && locPerm, locOn = locOn,
+            onBluetooth = { enableBluetooth() }, onPermissions = { requestBandPermissions() }, onLocation = { openLocationSettings() },
+        ) { bandWizard = false }
         // Come l'ultima volta: le regole in una riga, e si va dritti al sorteggio (Cambia le riapre tutte).
         val quick by c.quickStart.collectAsState()
         val short = match && quick
@@ -84776,7 +85873,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        if (devices || (match && c.features.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
+        if ((devices && openPart == "heart") || (match && c.features.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -84784,13 +85881,21 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         )
 
         // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
-        if (devices) RelaySection(c, names)
+        if (devices) {
+            val relayNow by c.relay.ui.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.PhonelinkRing, s.relayTitle, if (relayNow.cameras > 0) s.statusCamera else null, openPart == "relay", ok = if (relayNow.cameras > 0) true else null) { toggle("relay") }
+            if (openPart == "relay") RelaySection(c, names)
+        }
 
         // Audio e voce (la lingua si sceglie in Impostazioni)
         if (page == OptionsPage.VOICE) VoiceSection(c, o)
 
         // Tabellone su TV
-        if (devices) TvSection(c)
+        if (devices) {
+            val tvNow by c.tv.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.Tv, s.tvSection, if (tvNow.enabled) s.dvOn else s.dvOff, openPart == "tv", ok = if (tvNow.enabled) true else null) { toggle("tv") }
+            if (openPart == "tv") TvSection(c)
+        }
 
         // Formato
         if (match && !short) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
@@ -85171,6 +86276,75 @@ private fun BandPicker(
                 Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, accent.copy(alpha = 0.5f), RoundedCornerShape(14.dp)).padding(12.dp),
                 ) { BandSettingsPanel(c, side) }
+            }
+        }
+    }
+}
+
+/**
+ * Collegare i braccialetti passo passo: il telefono pronto (Bluetooth, permesso, posizione), il braccialetto del
+ * giocatore 1, quello del giocatore 2, e il riepilogo. Valgono per tutte le partite, come dalla pagina Dispositivi.
+ */
+@Composable
+private fun BandWizard(
+    c: MatchController, names: Names, btOn: Boolean, permsOk: Boolean, locOn: Boolean,
+    onBluetooth: () -> Unit, onPermissions: () -> Unit, onLocation: () -> Unit, onDone: () -> Unit,
+) {
+    val s = LocalStrings.current
+    var step by remember { mutableIntStateOf(0) }
+    val ready = btOn && permsOk && locOn
+    val found by c.ble.found.collectAsState()
+    val bands by c.ble.bands.collectAsState()
+    val batteries by c.bandBattery.collectAsState()
+    val scanning by c.ble.scanning.collectAsState()
+    val titles = listOf(s.bwPrep, s.bandFor(names.short(Side.P1)), s.bandFor(names.short(Side.P2)), s.bwReady)
+    // La ricerca gira mentre si sceglie un braccialetto.
+    val searching = ready && step in 1..2
+    LifecycleResumeEffect(searching) {
+        c.setBandScan(searching, true)
+        onPauseOrDispose { c.setBandScan(false, true) }
+    }
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDone, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+        Column(
+            Modifier.fillMaxWidth().padding(16.dp).clip(RoundedCornerShape(24.dp)).background(TsmColors.Background).padding(20.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(s.bwTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            com.tennis.scoremanager.ui.StepHeader(step, titles)
+            when (step) {
+                0 -> {
+                    Text(s.bwPrepHint, color = TsmColors.TextMain)
+                    RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { onBluetooth() }
+                    RequirementRow(Icons.Filled.LocationOn, s.location, permsOk, s.allow) { onPermissions() }
+                    RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { onLocation() }
+                }
+                1, 2 -> {
+                    val side = if (step == 1) Side.P1 else Side.P2
+                    Text(s.bwBandHint(names.short(side)), color = TsmColors.TextMain)
+                    if (scanning) Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(Modifier.size(20.dp), color = com.tennis.scoremanager.ui.LocalArea.current, strokeWidth = 3.dp)
+                        Text(s.autoSearch, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 10.dp))
+                    }
+                    BandPicker(c, side, names.short(side), bands[side], found, bands, batteries[side])
+                }
+                else -> {
+                    for (side in Side.entries) {
+                        val b = bands[side]
+                        val ok = b?.state == LinkState.READY
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(if (ok) Icons.Filled.BluetoothConnected else Icons.Filled.BluetoothDisabled, null, tint = if (ok) TsmColors.Ok else TsmColors.Orange)
+                            Text("${names.short(side)}: ${b?.name ?: s.noBand}", color = TsmColors.TextMain, modifier = Modifier.padding(start = 10.dp))
+                        }
+                    }
+                    Text(s.bwDoneHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (bands.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapBands() }, Modifier.fillMaxWidth())
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (step == 0) onDone() else step-- }, Modifier.weight(1f))
+                if (step < titles.lastIndex) BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { step++ }, Modifier.weight(1f), enabled = step != 0 || ready)
+                else BigButton(s.done, Icons.Filled.Check, onDone, Modifier.weight(1f))
             }
         }
     }
@@ -85667,8 +86841,9 @@ fun PaymentsScreen(c: MatchController) {
         Text(s.paymentsIncome(year, Fees.money(Fees.income(book, year), lang.locale)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
         if (openCents > 0) Text(s.paymentsOpen(Fees.money(openCents, lang.locale), openPeople), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
 
-        SectionCard(s.feesTitle, Icons.Filled.Receipt) {
-            if (book.fees.isEmpty()) Text(s.feesNone, color = TsmColors.TextDim, fontSize = 13.sp)
+        // Nessuna quota: cosa fare, passo per passo.
+        if (book.fees.isEmpty()) com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.Receipt, s.egFeesTitle, listOf(s.egFees1, s.egFees2, s.egFees3), s.feeNew) { newFee = true }
+        else SectionCard(s.feesTitle, Icons.Filled.Receipt) {
             for (f in book.fees.sortedByDescending { it.createdAt }) {
                 val (paid, total) = Fees.feeProgress(book, f)
                 Row(Modifier.fillMaxWidth().clickable { editFee = f }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -85763,16 +86938,32 @@ private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
         val book = c.clubBook.value
         c.saveClubBook(book.copy(fees = book.fees.filter { it.id != f.id } + f))
     }
+    // Una quota nuova in due passi: la quota, e poi a chi addebitarla (tutti i soci adesso, o dopo a mano).
+    val wz = fee == null
+    var step by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    var chargeNow by remember { mutableStateOf(false) }
+    val titles = listOf(s.wzFee, s.wzWhoPays)
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(if (fee == null) s.feeNew else fee.name) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (wz && step == 1) {
+                    val members = players.filter { it.member != null }
+                    if (members.isEmpty()) Text(s.wzNoMembers, color = TsmColors.TextDim)
+                    else {
+                        Text(s.wzChargeAsk, color = TsmColors.TextMain)
+                        Segmented(listOf(SegOption(s.wzChargeAll(members.size)), SegOption(s.wzChargeLater)), if (chargeNow) 0 else 1, { chargeNow = it == 0 }, columns = 1)
+                    }
+                }
+                if (!wz || step == 0) {
                 OutlinedTextField(name, { name = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.feeName) })
                 val kinds = FeeKind.entries
                 Segmented(kinds.map { SegOption(feeKindName(s, it)) }, kinds.indexOf(kind), { kind = kinds[it] }, columns = 3)
                 MoneyField(amount, s.feeAmount) { amount = it }
                 DateButton(s.feeDue, due, lang) { due = it }
+                }
                 if (fee != null) {
                     val members = players.filter { it.member != null }
                     GhostButton(s.feeChargeAll, Icons.Filled.GroupAdd, { askAll = true }, Modifier.fillMaxWidth(), enabled = members.isNotEmpty())
@@ -85780,8 +86971,17 @@ private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
                 }
             }
         },
-        confirmButton = { TextButton(enabled = current() != null, onClick = { current()?.let(::save); onDone() }) { Text(s.ok) } },
-        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+        confirmButton = {
+            if (wz && step == 0) com.tennis.scoremanager.ui.WizardNext(enabled = current() != null) { step++ }
+            else TextButton(enabled = current() != null, onClick = {
+                current()?.let { f ->
+                    save(f)
+                    if (wz && chargeNow) c.saveClubBook(Fees.chargeAll(c.clubBook.value, f, players.filter { it.member != null }, System.currentTimeMillis()).first)
+                }
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (askAll) {
         val f = current() ?: fee!!
@@ -87334,11 +88534,17 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     val plan by c.courtPlan.collectAsState()
     val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null || CourtPlans.closedOn(plan, t) != null }
     val skip = { t: Long -> skipHolidays && isHoliday(t) }
+    // Un corso nuovo a passi: il corso, i giorni e gli orari, i posti e la quota.
+    val wz = co == null
+    var step by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val titles = listOf(s.wzCourse, s.wzSchedule, s.wzSeats)
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (co == null) s.scNew else co.name) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (!wz || step == 0) {
                 OutlinedTextField(x.name, { x = x.copy(name = it.take(50)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scName) })
                 OutlinedTextField(x.level, { x = x.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scLevel) })
                 // L'istruttore: dal database o scritto a mano.
@@ -87350,6 +88556,8 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                     OutlinedTextField(x.coachName, { x = x.copy(coachName = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scCoach) })
                     GhostButton(s.scCoachPick, Icons.Filled.PersonAdd, { pickCoach = true }, Modifier.fillMaxWidth())
                 }
+                }
+                if (!wz || step == 1) {
                 DateButton(s.blkFrom, x.from, lang) { d -> x = x.copy(from = CourtPlans.dayStart(d), to = maxOf(x.to, CourtPlans.dayStart(d))) }
                 Text(s.scSchedule, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 for (sl in x.slots) Row(verticalAlignment = Alignment.CenterVertically) {
@@ -87365,6 +88573,8 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) }
                 if (autoEnd != null) Text(s.ccEndAuto(com.tennis.scoremanager.data.Reports.date(autoEnd, lang)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
                 else DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }
+                }
+                if (!wz || step == 2) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(if (x.maxStudents == 0) s.scNoMax else s.scMax(x.maxStudents), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
                     IconButton(onClick = { x = x.copy(maxStudents = (x.maxStudents - 1).coerceAtLeast(0)) }) { Icon(Icons.Filled.Remove, null) }
@@ -87373,11 +88583,13 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 MoneyField(fee, s.scFee) { fee = it }
                 Segmented(listOf(SegOption(s.scMonthly), SegOption(s.scSeasonFee)), if (x.feeKind == CourseFee.MONTHLY) 0 else 1, { x = x.copy(feeKind = if (it == 0) CourseFee.MONTHLY else CourseFee.SEASON) })
                 OutlinedTextField(x.note, { x = x.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.bkNote) })
+                }
                 if (co != null) TextButton(onClick = { askDelete = true }) { Text(s.scDelete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
-            TextButton(enabled = x.name.isNotBlank() && (fee.isBlank() || Fees.parse(fee) != null), onClick = {
+            if (wz && step < titles.lastIndex) com.tennis.scoremanager.ui.WizardNext(enabled = step != 0 || x.name.isNotBlank()) { step++ }
+            else TextButton(enabled = x.name.isNotBlank() && (fee.isBlank() || Fees.parse(fee) != null), onClick = {
                 val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) } ?: x.to
                 val y = x.copy(name = x.name.trim(), feeCents = Fees.parse(fee.ifBlank { "0" }) ?: 0, to = end)
                 // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
@@ -87386,7 +88598,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
-        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
     if (pickCoach) PlayerPickDialog(c, emptySet()) { p -> pickCoach = false; p?.let { x = x.copy(coach = it.id, coachName = it.name) } }
     newSlot?.let { sl0 ->
@@ -87677,6 +88889,8 @@ fun SetupScreen(c: MatchController) {
             }
         },
     ) {
+        // In cima le partite sospese da riprendere e, con la pagina ancora vuota, "Come l'ultima volta".
+        SetupShortcuts(c, likeLast = com.tennis.scoremanager.data.Players.slots(su).all { it.name.isBlank() })
         // Prima chi gioca (con i giocatori recenti da toccare), poi lo sport; circolo e torneo sotto, chiusi.
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(
@@ -87701,11 +88915,13 @@ fun SetupScreen(c: MatchController) {
         // Circolo, campo e torneo: facoltativi, chiusi finché non servono (aperti se già scritti).
         val filled = listOf(su.club, su.court, su.event, su.category, su.round).any { it.isNotBlank() }
         var details by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(filled) }
-        SectionCard(s.moreDetails, Icons.Filled.Business) {
-            if (!details) {
-                Text(s.moreDetailsHint, color = TsmColors.TextDim)
-                GhostButton(s.moreDetails, Icons.Filled.Business, { details = true }, Modifier.fillMaxWidth())
-            } else {
+        // Tutta la riga si tocca per aprire (e richiudere): la freccia dice che sotto c'è dell'altro.
+        com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.Business, s.moreDetails, s.moreDetailsHint, details) { details = !details }
+        if (details) androidx.compose.foundation.layout.Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            run {
                 Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
                 Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
                 // I campi del circolo (Circolo › Campi): un tocco e circolo e campo sono scritti.
@@ -88162,7 +89378,7 @@ fun StartScreen(c: MatchController) {
 }
 
 @Composable
-private fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete: () -> Unit) {
+internal fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete: () -> Unit) {
     val s = LocalStrings.current
     val names = remember(rec.id) { Names(rec.setup, s) }
     val state = remember(rec.id, rec.events.size) { ScoreEngine.replay(rec.rules, rec.events) }
@@ -88401,6 +89617,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -88481,7 +89699,8 @@ fun StudentsScreen(c: MatchController) {
             BigButton(s.studentNew, Icons.Filled.PersonAdd, { create = true }, Modifier.weight(1f))
         },
     ) {
-        if (students.isEmpty()) Text(s.studentNone, color = TsmColors.TextDim)
+        // Nessun allievo: cosa fare, passo per passo.
+        if (students.isEmpty()) com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.PersonAdd, s.egStudentsTitle, listOf(s.egStudents1, s.egStudents2, s.egStudents3), s.studentNew) { create = true }
         // Un allievo nuovo che porta il suo profilo (QR dal suo telefono; il file si apre con Condividi › TSM).
         com.tennis.scoremanager.ui.ReceiveProfileButton(c)
         // Con tanti allievi: cerca, ordina (nome o ultima volta), un gruppo o "da rivedere" (non visti da 2 settimane).
@@ -88580,7 +89799,21 @@ fun StudentScreen(c: MatchController) {
             st.fullName.takeIf { it.isNotBlank() && it != st.name }, st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size),
         ).joinToString(" · "),
         icon = Icons.Filled.Groups,
-        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        // Modifica a vista; unire, togliere dagli allievi e cancellare nel menu ⋮, lontano dai tasti di tutti i giorni.
+        action = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = com.tennis.scoremanager.ui.LocalArea.current) }
+                var menu by remember { mutableStateOf(false) }
+                Box {
+                    androidx.compose.material3.IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, s.moreActions, tint = TsmColors.TextMain) }
+                    androidx.compose.material3.DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                        androidx.compose.material3.DropdownMenuItem(text = { Text(s.playerMerge) }, leadingIcon = { Icon(Icons.Filled.MergeType, null) }, onClick = { menu = false; merge = true })
+                        if (st.student) androidx.compose.material3.DropdownMenuItem(text = { Text(s.studentDelete, color = TsmColors.Danger) }, leadingIcon = { Icon(Icons.Filled.PersonRemove, null, tint = TsmColors.Danger) }, onClick = { menu = false; delete = true })
+                        androidx.compose.material3.DropdownMenuItem(text = { Text(s.studentPurge, color = TsmColors.Danger) }, leadingIcon = { Icon(Icons.Filled.DeleteForever, null, tint = TsmColors.Danger) }, onClick = { menu = false; purge = true })
+                    }
+                }
+            }
+        },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
@@ -88606,6 +89839,18 @@ fun StudentScreen(c: MatchController) {
         else GhostButton(s.meThisIsMe, Icons.Filled.Person, { c.setMe(st) }, Modifier.fillMaxWidth())
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
+        // Le parti della scheda in sotto-schede, invece di una pagina lunghissima: la scheda (socio, quote, squadre,
+        // racchetta, note), le lezioni dell'allenatore, l'allenamento (colpi, movimento, valutazioni) e le partite.
+        val tabs = buildList {
+            add(StudentTab.CARD)
+            if (st.student) add(StudentTab.LESSONS)
+            if (st.student || mine.isNotEmpty()) add(StudentTab.TRAINING)
+            add(StudentTab.MATCHES)
+        }
+        var tabPick by androidx.compose.runtime.saveable.rememberSaveable(st.id) { mutableStateOf(StudentTab.CARD) }
+        val tab = tabPick.takeIf { it in tabs } ?: StudentTab.CARD
+        com.tennis.scoremanager.ui.SubTabs(tabs.map { studentTabName(s, it) }, tabs.indexOf(tab)) { tabPick = tabs[it] }
+        if (tab == StudentTab.CARD) {
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         val features by c.clubFeatures.collectAsState()
         if (com.tennis.scoremanager.ClubFeature.MEMBERS in features) MemberSection(c, st)
@@ -88654,6 +89899,8 @@ fun StudentScreen(c: MatchController) {
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
         }
 
+        }
+        if (tab == StudentTab.TRAINING) {
         // Colpi: per ciascuno sessioni, colpi e la linea dei colpi dentro; toccando, le sue sessioni.
         SectionCard(s.studentStrokes, Icons.Filled.SportsTennis) {
             val lines = Students.strokeLines(mine)
@@ -88697,7 +89944,9 @@ fun StudentScreen(c: MatchController) {
             }
         }
 
+        }
         // Partite dallo storico con lo stesso nome, e il rating.
+        if (tab == StudentTab.MATCHES) {
         SectionCard(s.studentMatches, Icons.Filled.EmojiEvents) {
             val lines = remember(st, history) { c.studentMatches(st) }
             if (lines.isEmpty()) {
@@ -88719,8 +89968,9 @@ fun StudentScreen(c: MatchController) {
             }
         }
 
+        }
         // Note dell'allenatore: si salvano da sole mentre si scrive.
-        SectionCard(s.studentNotes, Icons.Filled.EditNote) {
+        if (tab == StudentTab.CARD) SectionCard(s.studentNotes, Icons.Filled.EditNote) {
             var note by remember(st.id) { mutableStateOf(st.note) }
             LaunchedEffect(note) {
                 if (note == st.note) return@LaunchedEffect
@@ -88731,18 +89981,15 @@ fun StudentScreen(c: MatchController) {
                 trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said -> note = com.tennis.scoremanager.ui.appendDictated(note, said).take(4000) } })
         }
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
-        if (st.student) {
-            com.tennis.scoremanager.ui.StudentCoachSections(c, st)
-            com.tennis.scoremanager.ui.StudentProgressSections(c, st)
+        if (st.student && tab == StudentTab.LESSONS) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
+        if (st.student && tab == StudentTab.TRAINING) com.tennis.scoremanager.ui.StudentProgressSections(c, st)
+        if (tab == StudentTab.CARD) {
+            // Il report da dare all'allievo (PDF o immagine per WhatsApp).
+            if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
+            // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
+            GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
         }
-        // Il report da dare all'allievo (PDF o immagine per WhatsApp).
-        if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
-        // I suoi dati principali a un nuovo circolo o allenatore (file o QR).
-        GhostButton(s.pfSend, Icons.Filled.SwapHoriz, { sendProfile = true }, Modifier.fillMaxWidth())
-        GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
-        if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
-        // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
-        GhostButton(s.studentPurge, Icons.Filled.DeleteForever, { purge = true }, Modifier.fillMaxWidth())
+        // Unire, togliere dagli allievi e cancellare (tutto quello che il telefono ha di suo) stanno nel menu ⋮.
     }
     if (purge) {
         AlertDialog(
@@ -88875,6 +90122,16 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
+}
+
+/** Le sotto-schede della scheda del giocatore. */
+private enum class StudentTab { CARD, LESSONS, TRAINING, MATCHES }
+
+private fun studentTabName(s: com.tennis.scoremanager.ui.Strings, t: StudentTab): String = when (t) {
+    StudentTab.CARD -> s.stTabCard
+    StudentTab.LESSONS -> s.stTabLessons
+    StudentTab.TRAINING -> s.stTabTraining
+    StudentTab.MATCHES -> s.studentMatches
 }
 TSM_EOF
 
@@ -89220,8 +90477,10 @@ private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
             Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
         }
         Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
-        for (side in Side.entries) {
-            Reports.heartLine(rec, side, s)?.let { InfoRow(Icons.Filled.Favorite, "${s.heartStat} ${names.short(side)}", it) }
+        // Nel doppio con le fasce dei compagni, una riga per giocatore.
+        val split = rec.heartPartner.isNotEmpty()
+        for (w in listOf(com.tennis.scoremanager.data.Wearer.P1, com.tennis.scoremanager.data.Wearer.P1B, com.tennis.scoremanager.data.Wearer.P2, com.tennis.scoremanager.data.Wearer.P2B)) {
+            Reports.heartLine(rec, w, s)?.let { InfoRow(Icons.Filled.Favorite, "${s.heartStat} ${com.tennis.scoremanager.ui.wearerName(names, w, split)}", it) }
         }
     }
 }
@@ -90887,7 +92146,7 @@ fun WorkoutScreen(c: MatchController) {
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
         SectionCard(s.workoutTitle, Icons.Filled.MonitorHeart, accent = TsmColors.Danger) {
-            val strap = Side.entries.firstNotNullOfOrNull { straps[it] }
+            val strap = com.tennis.scoremanager.data.Wearer.entries.firstNotNullOfOrNull { straps[it] }
             if (ui.phase == WorkoutPhase.IDLE && strap == null) {
                 Text(s.workoutPickStrap, color = TsmColors.Orange)
                 return@SectionCard
@@ -90988,8 +92247,8 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
             if (WorkoutStats.rmssd(w.rr) != null) Text(s.workoutHrvHint, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(s.workoutRecoveryHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        if (w.heart.size > 1) StatCard(s.workoutChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
-        StatCard(s.heartZones) { HeartZones(mapOf(Side.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
+        if (w.heart.size > 1) StatCard(s.workoutChart) { HeartChart(mapOf(com.tennis.scoremanager.data.Wearer.P1 to w.heart)) }
+        StatCard(s.heartZones) { HeartZones(mapOf(com.tennis.scoremanager.data.Wearer.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
         val laps = WorkoutStats.laps(w)
         if (laps.size > 1) {
             StatCard(s.workoutLaps) {
@@ -94074,6 +95333,8 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightStats.kt" 
 package com.tennis.scoremanager.video
 
 import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.Wearer
+import com.tennis.scoremanager.data.heartOf
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.MatchStats
@@ -94213,20 +95474,24 @@ object HighlightStats {
                 count(s.cardLongRallies, won(Side.P1, true), won(Side.P2, true)),
             ))
         }
-        val heart = Side.entries.associateWith { HeartStats.summary(rec.heart[it]) }
-        val heartSection = if (heart.values.all { it == null }) null else {
-            val ha = heart[Side.P1]
-            val hb = heart[Side.P2]
-            Section(s.heartStat, listOfNotNull(
+        // Il battito: nel doppio con le fasce dei compagni, due blocchi sulla stessa pagina (chi è scritto per primo in
+        // ogni squadra, poi i compagni), come nelle statistiche della partita.
+        fun heartSection(wa: Wearer, wb: Wearer, title: String): Section? {
+            val ha = HeartStats.summary(rec.heartOf(wa))
+            val hb = HeartStats.summary(rec.heartOf(wb))
+            if (ha == null && hb == null) return null
+            return Section(title, listOfNotNull(
                 plain("${s.heartAvg} (bpm)", ha?.avg, hb?.avg),
                 plain("${s.heartMax} (bpm)", ha?.max, hb?.max),
                 plain("${s.heartCalories} (kcal)", ha?.kcal, hb?.kcal).takeIf { ha?.kcal != null || hb?.kcal != null },
             ))
         }
+        val partners = heartSection(Wearer.P1B, Wearer.P2B, "${s.heartStat} · ${s.heartPartners}")
+        val firsts = heartSection(Wearer.P1, Wearer.P2, if (partners == null) s.heartStat else "${s.heartStat} · ${s.heartFirsts}")
         val pages = listOf(
             listOf(serve, breaks),
             listOfNotNull(points, rallies),
-            listOfNotNull(heartSection),
+            listOfNotNull(firsts, partners),
         ).filter { page -> page.any { it.rows.isNotEmpty() } }
 
         val winner = state.winner
@@ -99516,7 +100781,7 @@ import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.data.HeartTrack
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.WorkoutStats
-import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.data.Wearer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -99552,7 +100817,7 @@ class WorkoutSession(
 
     val active: Boolean get() = _ui.value.phase != WorkoutPhase.IDLE
 
-    private var side: Side = Side.P1
+    private var side: Wearer = Wearer.P1
     private var strapName: String? = null
     private var id = ""
     private var startedAt = 0L
@@ -99567,7 +100832,7 @@ class WorkoutSession(
     private var ticker: Job? = null
 
     /** Misura di una fascia: conta solo quella del lato scelto all'avvio. */
-    fun onReading(from: Side, m: HeartMeasurement) {
+    fun onReading(from: Wearer, m: HeartMeasurement) {
         if (from != side || !m.valid) return
         last = m.bpm
         lastAt = SystemClock.elapsedRealtime()
@@ -99575,7 +100840,7 @@ class WorkoutSession(
         _ui.value = _ui.value.copy(bpm = m.bpm)
     }
 
-    fun start(side: Side, strapName: String?) {
+    fun start(side: Wearer, strapName: String?) {
         if (active) return
         this.side = side
         this.strapName = strapName
@@ -114809,6 +116074,68 @@ class TournamentTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/WearerTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/WearerTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/** Quattro fasce nel doppio: chi le porta, e il battito dei compagni salvato accanto a quello di prima. */
+class WearerTest {
+
+    private fun rec() = MatchRecord(id = "m", setup = SetupData(doubles = true), options = MatchOptions(), rules = RulesConfig())
+
+    @Test
+    fun mainWearersKeepTheSideNumbers() {
+        // Il secondo telefono manda il numero: 0 e 1 devono restare i lati di prima.
+        assertEquals(Side.P1.ordinal, Wearer.P1.ordinal)
+        assertEquals(Side.P2.ordinal, Wearer.P2.ordinal)
+        assertEquals(Wearer.P2B, Wearer.of(Side.P2, partner = true))
+        assertEquals(1, Wearer.P1B.index)
+    }
+
+    @Test
+    fun partnerTracksGoBesideTheOldOnes() {
+        val tracks = mapOf(
+            Wearer.P1 to HeartTrack(listOf(0, 5), listOf(120, 130)),
+            Wearer.P1B to HeartTrack(listOf(0, 5), listOf(140, 150)),
+            Wearer.P2B to HeartTrack(listOf(0), listOf(110)),
+        )
+        val r = rec().withHeart(tracks)
+        assertEquals(setOf(Side.P1), r.heart.keys)
+        assertEquals(setOf(Side.P1, Side.P2), r.heartPartner.keys)
+        assertEquals(tracks, r.heartTracks())
+        assertEquals(listOf(140, 150), r.heartOf(Wearer.P1B)?.bpm)
+        assertNull(r.heartOf(Wearer.P2))
+    }
+
+    @Test
+    fun savedAndReadBackWithPartners() {
+        val r = rec().withHeart(mapOf(Wearer.P2 to HeartTrack(listOf(0), listOf(100)), Wearer.P2B to HeartTrack(listOf(0), listOf(160))))
+        val back = Storage.JSON.decodeFromString(MatchRecord.serializer(), Storage.JSON.encodeToString(MatchRecord.serializer(), r))
+        assertEquals(r.heartTracks(), back.heartTracks())
+    }
+
+    @Test
+    fun oldMatchesWithoutPartnersStillOpen() {
+        // Una partita salvata prima: solo "heart", per lato.
+        val old = Storage.JSON.encodeToString(MatchRecord.serializer(), rec().copy(heart = mapOf(Side.P1 to HeartTrack(listOf(0), listOf(90)))))
+            .replace(",\"heartPartner\":{}", "")
+        val back = Storage.JSON.decodeFromString(MatchRecord.serializer(), old)
+        assertTrue(back.heartPartner.isEmpty())
+        assertEquals(listOf(90), back.heartOf(Wearer.P1)?.bpm)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/WorkoutStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/WorkoutStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -117550,8 +118877,11 @@ class AppFlowTest {
         val saved = c.storage.loadUnfinished().single()
         assertEquals(3, saved.events.count { it is com.tennis.scoremanager.model.MatchEvent.Point })
 
-        // Ripresa dalla prima schermata: stesso punteggio, e il punto successivo chiude il game.
-        tap("Riprendi:")
+        // Ripresa da Nuova partita (dove stanno le sospese): stesso punteggio, e il punto successivo chiude il game.
+        tap("Nuova partita")
+        assertEquals(Screen.SETUP, c.screen.value)
+        tap("Riprendi partita")
+        tap("Giocatore 1 vs")
         assertEquals(Screen.MATCH, c.screen.value)
         assertScore(g1 = 0, pt1 = 3)
         if (c.live.value!!.record.suspended) tap("Riprendi")
@@ -118283,6 +119613,21 @@ class HighlightStatsTest {
         // Senza torneo in alto a destra non c'è niente da scrivere (niente circolo).
         assertTrue(card.eventLines.isEmpty())
         assertEquals(Side.P2, card.winner)
+    }
+    @Test
+    fun doublesWithFourStrapsShowThePartnersToo() {
+        fun track(v: Int) = com.tennis.scoremanager.data.HeartTrack(listOf(0, 5, 10), listOf(v, v + 10, v + 20))
+        val r = rec("m", 0L, 1L, setup = SetupData(doubles = true)).copy(
+            heart = mapOf(Side.P1 to track(120), Side.P2 to track(130)),
+            heartPartner = mapOf(Side.P1 to track(140), Side.P2 to track(150)),
+        )
+        val page = HighlightStats.card(r, ItStrings).pages.last()
+        assertEquals(listOf("Battito · primi giocatori", "Battito · compagni"), page.map { it.title })
+        // Battito medio dei compagni: 150 contro 160.
+        assertEquals("150" to "160", page[1].rows.first().let { it.a to it.b })
+        // Con due fasce sola: un blocco come prima.
+        val two = HighlightStats.card(r.copy(heartPartner = emptyMap()), ItStrings).pages.last()
+        assertEquals(listOf("Battito"), two.map { it.title })
     }
 }
 TSM_EOF
@@ -132759,6 +134104,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 453 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 455 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

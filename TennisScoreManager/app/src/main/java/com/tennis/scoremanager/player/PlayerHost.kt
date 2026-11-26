@@ -55,10 +55,10 @@ interface PlayerHost {
     fun me(): PlayerProfile?
     /** Le fasce cardio collegate. */
     val heart: HeartRateManager
-    /** Età, peso e sesso per lato, per calorie e zone del battito. */
-    val heartProfiles: MutableStateFlow<Map<Side, HeartProfile>>
+    /** Età, peso e sesso di chi porta ciascuna fascia, per calorie e zone del battito. */
+    val heartProfiles: MutableStateFlow<Map<com.tennis.scoremanager.data.Wearer, HeartProfile>>
     fun heartProfileOf(p: PlayerProfile?): HeartProfile?
-    fun setHeartProfile(side: Side, p: HeartProfile?)
+    fun setHeartProfile(who: com.tennis.scoremanager.data.Wearer, p: HeartProfile?)
     /** Serve il servizio in primo piano (braccialetti, tabellone, fascia, allenamento)? */
     fun needsService(): Boolean
     val racketArea: RacketsArea

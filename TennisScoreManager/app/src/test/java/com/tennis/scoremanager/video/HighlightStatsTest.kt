@@ -96,4 +96,19 @@ class HighlightStatsTest {
         assertTrue(card.eventLines.isEmpty())
         assertEquals(Side.P2, card.winner)
     }
+    @Test
+    fun doublesWithFourStrapsShowThePartnersToo() {
+        fun track(v: Int) = com.tennis.scoremanager.data.HeartTrack(listOf(0, 5, 10), listOf(v, v + 10, v + 20))
+        val r = rec("m", 0L, 1L, setup = SetupData(doubles = true)).copy(
+            heart = mapOf(Side.P1 to track(120), Side.P2 to track(130)),
+            heartPartner = mapOf(Side.P1 to track(140), Side.P2 to track(150)),
+        )
+        val page = HighlightStats.card(r, ItStrings).pages.last()
+        assertEquals(listOf("Battito · primi giocatori", "Battito · compagni"), page.map { it.title })
+        // Battito medio dei compagni: 150 contro 160.
+        assertEquals("150" to "160", page[1].rows.first().let { it.a to it.b })
+        // Con due fasce sola: un blocco come prima.
+        val two = HighlightStats.card(r.copy(heartPartner = emptyMap()), ItStrings).pages.last()
+        assertEquals(listOf("Battito"), two.map { it.title })
+    }
 }

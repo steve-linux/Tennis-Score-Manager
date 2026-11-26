@@ -4,6 +4,8 @@
 package com.tennis.scoremanager.video
 
 import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.Wearer
+import com.tennis.scoremanager.data.heartOf
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.MatchStats
@@ -143,20 +145,24 @@ object HighlightStats {
                 count(s.cardLongRallies, won(Side.P1, true), won(Side.P2, true)),
             ))
         }
-        val heart = Side.entries.associateWith { HeartStats.summary(rec.heart[it]) }
-        val heartSection = if (heart.values.all { it == null }) null else {
-            val ha = heart[Side.P1]
-            val hb = heart[Side.P2]
-            Section(s.heartStat, listOfNotNull(
+        // Il battito: nel doppio con le fasce dei compagni, due blocchi sulla stessa pagina (chi è scritto per primo in
+        // ogni squadra, poi i compagni), come nelle statistiche della partita.
+        fun heartSection(wa: Wearer, wb: Wearer, title: String): Section? {
+            val ha = HeartStats.summary(rec.heartOf(wa))
+            val hb = HeartStats.summary(rec.heartOf(wb))
+            if (ha == null && hb == null) return null
+            return Section(title, listOfNotNull(
                 plain("${s.heartAvg} (bpm)", ha?.avg, hb?.avg),
                 plain("${s.heartMax} (bpm)", ha?.max, hb?.max),
                 plain("${s.heartCalories} (kcal)", ha?.kcal, hb?.kcal).takeIf { ha?.kcal != null || hb?.kcal != null },
             ))
         }
+        val partners = heartSection(Wearer.P1B, Wearer.P2B, "${s.heartStat} · ${s.heartPartners}")
+        val firsts = heartSection(Wearer.P1, Wearer.P2, if (partners == null) s.heartStat else "${s.heartStat} · ${s.heartFirsts}")
         val pages = listOf(
             listOf(serve, breaks),
             listOfNotNull(points, rallies),
-            listOfNotNull(heartSection),
+            listOfNotNull(firsts, partners),
         ).filter { page -> page.any { it.rows.isNotEmpty() } }
 
         val winner = state.winner

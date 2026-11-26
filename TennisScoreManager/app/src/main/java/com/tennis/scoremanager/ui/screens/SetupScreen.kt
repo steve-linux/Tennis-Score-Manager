@@ -135,6 +135,8 @@ fun SetupScreen(c: MatchController) {
             }
         },
     ) {
+        // In cima le partite sospese da riprendere e, con la pagina ancora vuota, "Come l'ultima volta".
+        SetupShortcuts(c, likeLast = com.tennis.scoremanager.data.Players.slots(su).all { it.name.isBlank() })
         // Prima chi gioca (con i giocatori recenti da toccare), poi lo sport; circolo e torneo sotto, chiusi.
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(
@@ -159,11 +161,13 @@ fun SetupScreen(c: MatchController) {
         // Circolo, campo e torneo: facoltativi, chiusi finché non servono (aperti se già scritti).
         val filled = listOf(su.club, su.court, su.event, su.category, su.round).any { it.isNotBlank() }
         var details by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(filled) }
-        SectionCard(s.moreDetails, Icons.Filled.Business) {
-            if (!details) {
-                Text(s.moreDetailsHint, color = TsmColors.TextDim)
-                GhostButton(s.moreDetails, Icons.Filled.Business, { details = true }, Modifier.fillMaxWidth())
-            } else {
+        // Tutta la riga si tocca per aprire (e richiudere): la freccia dice che sotto c'è dell'altro.
+        com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.Business, s.moreDetails, s.moreDetailsHint, details) { details = !details }
+        if (details) androidx.compose.foundation.layout.Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            run {
                 Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
                 Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
                 // I campi del circolo (Circolo › Campi): un tocco e circolo e campo sono scritti.

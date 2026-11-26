@@ -2835,4 +2835,73 @@ object EsStrings : Strings {
     override val mrWinner: (String) -> String = { "Gana $it" }
     override val mrPending: (String) -> String = { "Resultado por enviar: $it" }
     override val mrConflict: (String) -> String = { "Ya hay otro resultado ($it): ¿sustituirlo?" }
+
+    override val todoTitle: (Int) -> String = { "Pendiente ($it)" }
+    override val wzStep: (Int, Int) -> String = { a, b -> "Paso $a de $b" }
+    override val fsTitle: (Int, Int) -> String = { a, b -> "Primeros pasos · $a de $b" }
+    override val fsHide = "Ocultar"
+    override val fsName = "Escribe tu nombre"
+    override val fsBands = "Conecta las pulseras"
+    override val fsFirstMatch = "Juega tu primer partido"
+    override val fsFirstStudent = "Añade tu primer alumno"
+    override val fsFirstLesson = "Añade la primera clase a la agenda"
+    override val fsClubName = "Escribe el nombre del club"
+    override val fsCourts = "Añade las pistas"
+    override val fsFirstMember = "Inscribe al primer socio"
+    override val fsFirstFee = "Crea la primera cuota"
+    override val mfTitle: (Int) -> String = { "Más funciones ($it desactivadas)" }
+    override val moreActions = "Más acciones"
+    override val stTabCard = "Ficha"
+    override val stTabLessons = "Clases"
+    override val stTabTraining = "Entrenamiento"
+    override val planManage = "Pistas, horarios y cierres"
+    override val wzWhen = "Cuándo y dónde"
+    override val wzWho = "Quién juega"
+    override val wzPay = "Precio y repetición"
+    override val wzTournament = "El torneo"
+    override val wzFormula = "Formato y reglas"
+    override val wzDates = "Fechas e inscripciones"
+    override val wzFee = "La cuota"
+    override val wzWhoPays = "A quién cobrarla"
+    override val wzNoMembers = "Aún no hay socios: podrás cobrarla más adelante desde la cuota o la ficha de cada uno."
+    override val wzChargeAsk = "¿Cobrarla ya a todos los socios, o más adelante a mano a quien corresponda?"
+    override val wzChargeAll: (Int) -> String = { "Todos los socios ($it)" }
+    override val wzChargeLater = "Más adelante, a mano"
+    override val wzCourse = "El curso"
+    override val wzSchedule = "Días y horarios"
+    override val wzSeats = "Plazas y cuota"
+    override val bwTitle = "Conectar las pulseras paso a paso"
+    override val bwPrep = "Preparar el teléfono"
+    override val bwPrepHint = "El teléfono busca las pulseras cercanas por Bluetooth: hacen falta el Bluetooth activado, el permiso y la ubicación activada. Toca los botones hasta que estén todos en verde."
+    override val bwBandHint: (String) -> String = { n -> "Enciende la pulsera de $n y mantenla cerca del teléfono; luego elígela abajo. Con Identificar se ilumina: así sabes que es la correcta." }
+    override val bwReady = "Listo"
+    override val bwDoneHint = "Sirven para todos los partidos: no hace falta repetirlo cada vez. Si los jugadores están al revés, intercámbialos con el botón de abajo."
+    override val dvRemotes: (Int) -> String = { if (it == 0) "Ninguno vinculado" else "$it vinculados" }
+    override val dvOn = "Activado"
+    override val dvOff = "Desactivado"
+    override val egStudentsTitle = "Tu primer alumno"
+    override val egStudents1 = "Toca Nuevo alumno y escribe nombre y apellidos."
+    override val egStudents2 = "Si ya tiene la app, pídele que te mande su perfil con el QR."
+    override val egStudents3 = "Desde su ficha: Entrenar ahora, clases, objetivos e informes."
+    override val egMembersTitle = "El primer socio"
+    override val egMembers1 = "Toca Nuevo socio y elige al jugador, o créalo."
+    override val egMembers2 = "Anota la licencia, el certificado médico y los consentimientos."
+    override val egMembers3 = "Las cuotas se cobran desde Cuotas y pagos, a todos con un toque."
+    override val egTournamentsTitle = "El primer torneo"
+    override val egTournaments1 = "Toca Nuevo torneo: nombre, formato y fechas, paso a paso."
+    override val egTournaments2 = "Inscribe a los jugadores y luego haz el sorteo."
+    override val egTournaments3 = "Los partidos se apuntan con el marcador desde el rol Tú: el resultado vuelve aquí."
+    override val egFeesTitle = "La primera cuota"
+    override val egFees1 = "Toca Nueva cuota: nombre, importe y vencimiento."
+    override val egFees2 = "Cóbrala a todos los socios con un toque, o a mano a quien corresponda."
+    override val egFees3 = "Cuando pagan, anota el pago: el recibo está listo."
+
+    override val cmNone = "Ninguno por jugar ahora"
+    override val cmEmptyText = "Aquí aparecen los partidos de torneos, equipos y desafíos de tu club cuando están listos para jugarse: los apuntas con el marcador y el resultado vuelve al club. Llegan con la ficha de partido de la secretaría o, si estás en el club, solos."
+
+    override val strapPartnersAdd = "Dobles: añadir las bandas de los compañeros"
+    override val heartPartners = "compañeros"
+    override val heartFirsts = "primeros jugadores"
+
+    override val resumeMatch = "Reanudar partido"
 }

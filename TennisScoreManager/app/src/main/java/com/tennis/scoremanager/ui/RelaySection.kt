@@ -199,8 +199,9 @@ private fun SatelliteDevices(c: MatchController, names: Names) {
     val straps by c.straps.collectAsState()
     for (side in Side.entries) {
         val b = bands[side]
-        val st = straps[side]
-        if (b == null && st == null) continue
+        // Le fasce del lato: nel doppio anche quella del compagno.
+        val sts = listOfNotNull(straps[com.tennis.scoremanager.data.Wearer.of(side)], straps[com.tennis.scoremanager.data.Wearer.of(side, partner = true)])
+        if (b == null && sts.isEmpty()) continue
         Column {
             Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
             b?.let {
@@ -212,7 +213,7 @@ private fun SatelliteDevices(c: MatchController, names: Names) {
                 }
                 Text("${it.name} · $state" + (it.battery?.let { p -> " · ${s.battery} $p%" } ?: ""), color = TsmColors.TextDim, fontSize = 12.sp)
             }
-            st?.let { Text("${it.name} · ${strapStatus(it, s)}", color = TsmColors.TextDim, fontSize = 12.sp) }
+            for (st in sts) Text("${st.name} · ${strapStatus(st, s)}", color = TsmColors.TextDim, fontSize = 12.sp)
         }
     }
 }

@@ -104,9 +104,9 @@ object Reports {
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
 
-    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di quel lato non ha mandato niente. */
-    fun heartLine(rec: MatchRecord, side: Side, s: Strings): String? {
-        val h = HeartStats.summary(rec.heart[side]) ?: return null
+    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di chi la porta non ha mandato niente. */
+    fun heartLine(rec: MatchRecord, who: Wearer, s: Strings): String? {
+        val h = HeartStats.summary(rec.heartOf(who)) ?: return null
         return s.heartLine(h.avg, h.max) + (h.kcal?.let { " · ${s.caloriesLine(it)}" } ?: "")
     }
 
@@ -191,7 +191,11 @@ object Reports {
         for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
         for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
         rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
-        for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
+        // Nel doppio con le fasce dei compagni, una riga per giocatore.
+        val split = rec.heartPartner.isNotEmpty()
+        for (w in listOf(Wearer.P1, Wearer.P1B, Wearer.P2, Wearer.P2B)) heartLine(rec, w, s)?.let {
+            sb.appendLine("❤️ ${s.heartStat} ${if (split) names.player(w.side, w.index) else names.short(w.side)}: $it")
+        }
         if (rec.notes.isNotBlank()) {
             sb.appendLine()
             sb.appendLine("📝 ${s.matchNotesTitle}")

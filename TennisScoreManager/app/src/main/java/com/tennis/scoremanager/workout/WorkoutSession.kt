@@ -8,7 +8,7 @@ import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.data.HeartTrack
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.WorkoutStats
-import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.data.Wearer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -44,7 +44,7 @@ class WorkoutSession(
 
     val active: Boolean get() = _ui.value.phase != WorkoutPhase.IDLE
 
-    private var side: Side = Side.P1
+    private var side: Wearer = Wearer.P1
     private var strapName: String? = null
     private var id = ""
     private var startedAt = 0L
@@ -59,7 +59,7 @@ class WorkoutSession(
     private var ticker: Job? = null
 
     /** Misura di una fascia: conta solo quella del lato scelto all'avvio. */
-    fun onReading(from: Side, m: HeartMeasurement) {
+    fun onReading(from: Wearer, m: HeartMeasurement) {
         if (from != side || !m.valid) return
         last = m.bpm
         lastAt = SystemClock.elapsedRealtime()
@@ -67,7 +67,7 @@ class WorkoutSession(
         _ui.value = _ui.value.copy(bpm = m.bpm)
     }
 
-    fun start(side: Side, strapName: String?) {
+    fun start(side: Wearer, strapName: String?) {
         if (active) return
         this.side = side
         this.strapName = strapName

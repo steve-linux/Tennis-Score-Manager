@@ -194,13 +194,18 @@ fun ColumnScope.PlanBody(c: MatchController, inTab: Boolean = false) {
             Text("${s.clClosed}: $name", color = TsmColors.Danger, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
-            GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
-        }
-        if (inTab) GhostButton(s.planSettings, Icons.Filled.Settings, { settings = true }, Modifier.fillMaxWidth())
+        // Campi, chiusure, orari e prezzi, statistiche: in un menu solo, così il planning del giorno si vede subito.
         val features by c.clubFeatures.collectAsState()
-        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
+        var manageMenu by remember { mutableStateOf(false) }
+        Box {
+            GhostButton(s.planManage, Icons.Filled.Settings, { manageMenu = true }, Modifier.fillMaxWidth())
+            androidx.compose.material3.DropdownMenu(expanded = manageMenu, onDismissRequest = { manageMenu = false }) {
+                androidx.compose.material3.DropdownMenuItem(text = { Text(s.crtTitle) }, leadingIcon = { Icon(Icons.Filled.SportsTennis, null) }, onClick = { manageMenu = false; manage = true })
+                androidx.compose.material3.DropdownMenuItem(text = { Text(s.blkShort) }, leadingIcon = { Icon(Icons.Filled.Block, null) }, onClick = { manageMenu = false; blocks = true })
+                androidx.compose.material3.DropdownMenuItem(text = { Text(s.planSettings) }, leadingIcon = { Icon(Icons.Filled.Schedule, null) }, onClick = { manageMenu = false; settings = true })
+                if (com.tennis.scoremanager.ClubFeature.STATS in features) androidx.compose.material3.DropdownMenuItem(text = { Text(s.stTitle) }, leadingIcon = { Icon(Icons.Filled.BarChart, null) }, onClick = { manageMenu = false; c.openCourtStats() })
+            }
+        }
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
         // Solo lo stato (e la sincronizzazione ogni minuto): il server si apre da Altro.
         if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c)
@@ -280,11 +285,17 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
     val cents = if (manualPrice) Fees.parse(priceText) ?: 0 else autoPrice
     val conflicts = CourtPlans.conflicts(plan, tournaments, b.court, b.start, b.end, except = b.id)
     val blocked = CourtPlans.blockedBy(plan, b.court, b.start, b.end, b.kind)
+    // Una prenotazione nuova si fa a passi (quando e dove, chi gioca, prezzo); quella da cambiare si vede tutta.
+    val wz = isNew
+    var step by remember { mutableIntStateOf(0) }
+    val titles = listOf(s.wzWhen, s.wzWho, s.wzPay)
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (isNew) s.bkNew else c.planning.bookingLabel(b0)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (!wz || step == 0) {
                 if (courts.size > 1) Segmented(courts.map { SegOption(it) }, courts.indexOf(b.court), { b = b.copy(court = courts[it]) }, columns = minOf(3, courts.size))
                 DateButton(s.planDay, b.start, lang) { d ->
                     val old = Calendar.getInstance().apply { timeInMillis = b.start }
@@ -304,6 +315,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                 Segmented(kinds.map { SegOption(bookingKindName(s, it)) }, kinds.indexOf(b.kind), { b = b.copy(kind = kinds[it]) }, columns = 2)
                 if (conflicts.isNotEmpty()) Text(s.bkConflict, color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 for (k in blocked) Text(s.blkBlocked(k.label.ifBlank { blockReasonName(s, k.reason) }), color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+                if (!wz || step == 1) {
                 if (b.kind != BookingKind.CLOSED) {
                     // Chi gioca: dal database (si possono addebitare) e ospiti scritti a mano.
                     for (id in b.players) c.playerById(id)?.let { p ->
@@ -316,6 +329,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     OutlinedTextField(guests, { guests = it.take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bkGuests) })
                 }
                 OutlinedTextField(b.note, { b = b.copy(note = it.take(80)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bkNote) })
+                }
+                if (!wz || step == 2) {
                 if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) {
                     if (info.heating) SwitchRow(Icons.Filled.Thermostat, s.crtHeating, info.heatingCentsPerHour.takeIf { it > 0 }?.let { s.crtHeatingPrice(Fees.money(it, lang.locale)) }, b.heating) { b = b.copy(heating = it); manualPrice = false }
                     MoneyField(if (manualPrice) priceText else plain(autoPrice, lang), s.bkPrice) { priceText = it; manualPrice = true }
@@ -355,10 +370,12 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.planning.noticeBooking(b0) }, Modifier.fillMaxWidth())
                     TextButton(onClick = { askDelete = true }) { Text(s.bkDelete, color = TsmColors.Danger) }
                 }
+                }
             }
         },
         confirmButton = {
-            TextButton(enabled = conflicts.isEmpty() && blocked.isEmpty(), onClick = {
+            if (wz && step < titles.lastIndex) com.tennis.scoremanager.ui.WizardNext(enabled = step != 0 || (conflicts.isEmpty() && blocked.isEmpty())) { step++ }
+            else TextButton(enabled = conflicts.isEmpty() && blocked.isEmpty(), onClick = {
                 val saved = b.copy(
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
@@ -366,7 +383,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                 onDone(c.planning.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.features.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
-        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
     if (picking) PlayerPickDialog(c, b.players.toSet()) { p -> picking = false; p?.let { b = b.copy(players = b.players + it.id) } }
     if (askDelete) AlertDialog(

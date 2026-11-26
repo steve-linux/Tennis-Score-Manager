@@ -72,6 +72,12 @@ import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.PhonelinkRing
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -249,16 +255,32 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         },
     ) {
         // Dispositivi (da Altro): braccialetti, telecomandi e fasce si collegano qui una volta, valgono per tutte le partite.
+        // Una riga per dispositivo con com'è adesso; se ne apre una alla volta. I braccialetti anche passo passo.
+        var openPart by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
+        fun toggle(k: String) { openPart = if (openPart == k) "" else k }
+        var bandWizard by remember { mutableStateOf(false) }
         if (devices) {
-            SectionCard(s.modeBands, Icons.Filled.Watch) {
+            val bandsNow by c.ble.bands.collectAsState()
+            val readyBands = Side.entries.count { bandsNow[it]?.state == com.tennis.scoremanager.ble.LinkState.READY }
+            BigButton(s.bwTitle, Icons.Filled.Watch, { bandWizard = true }, Modifier.fillMaxWidth())
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.Watch, s.modeBands, s.statusBands(readyBands), openPart == "bands", ok = if (bandsNow.isEmpty()) null else readyBands == bandsNow.size) { toggle("bands") }
+            if (openPart == "bands") SectionCard(s.modeBands, Icons.Filled.Watch) {
                 Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
                 RequirementRow(Icons.Filled.LocationOn, s.location, blePerms && locPerm, s.allow) { requestBandPermissions() }
                 RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
                 BandsSection(c, names, enabled = bandsReadyEnv, devicesPage = true)
             }
-            SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
+            val remotesNow by c.remotes.assigned.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.SettingsRemote, s.modeRemotes, s.dvRemotes(remotesNow.size), openPart == "remotes", ok = if (remotesNow.isEmpty()) null else true) { toggle("remotes") }
+            if (openPart == "remotes") SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
+            val strapsNow by c.straps.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.MonitorHeart, s.heartSection, s.statusStraps(strapsNow.size), openPart == "heart", ok = if (strapsNow.isEmpty()) null else true) { toggle("heart") }
         }
+        if (bandWizard) BandWizard(
+            c, names, btOn = btOn, permsOk = blePerms && locPerm, locOn = locOn,
+            onBluetooth = { enableBluetooth() }, onPermissions = { requestBandPermissions() }, onLocation = { openLocationSettings() },
+        ) { bandWizard = false }
         // Come l'ultima volta: le regole in una riga, e si va dritti al sorteggio (Cambia le riapre tutte).
         val quick by c.quickStart.collectAsState()
         val short = match && quick
@@ -302,7 +324,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        if (devices || (match && c.features.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
+        if ((devices && openPart == "heart") || (match && c.features.uses(com.tennis.scoremanager.PlayerFeature.HEART))) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -310,13 +332,21 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
         )
 
         // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
-        if (devices) RelaySection(c, names)
+        if (devices) {
+            val relayNow by c.relay.ui.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.PhonelinkRing, s.relayTitle, if (relayNow.cameras > 0) s.statusCamera else null, openPart == "relay", ok = if (relayNow.cameras > 0) true else null) { toggle("relay") }
+            if (openPart == "relay") RelaySection(c, names)
+        }
 
         // Audio e voce (la lingua si sceglie in Impostazioni)
         if (page == OptionsPage.VOICE) VoiceSection(c, o)
 
         // Tabellone su TV
-        if (devices) TvSection(c)
+        if (devices) {
+            val tvNow by c.tv.collectAsState()
+            com.tennis.scoremanager.ui.ExpandRow(Icons.Filled.Tv, s.tvSection, if (tvNow.enabled) s.dvOn else s.dvOff, openPart == "tv", ok = if (tvNow.enabled) true else null) { toggle("tv") }
+            if (openPart == "tv") TvSection(c)
+        }
 
         // Formato
         if (match && !short) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
@@ -697,6 +727,75 @@ private fun BandPicker(
                 Column(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, accent.copy(alpha = 0.5f), RoundedCornerShape(14.dp)).padding(12.dp),
                 ) { BandSettingsPanel(c, side) }
+            }
+        }
+    }
+}
+
+/**
+ * Collegare i braccialetti passo passo: il telefono pronto (Bluetooth, permesso, posizione), il braccialetto del
+ * giocatore 1, quello del giocatore 2, e il riepilogo. Valgono per tutte le partite, come dalla pagina Dispositivi.
+ */
+@Composable
+private fun BandWizard(
+    c: MatchController, names: Names, btOn: Boolean, permsOk: Boolean, locOn: Boolean,
+    onBluetooth: () -> Unit, onPermissions: () -> Unit, onLocation: () -> Unit, onDone: () -> Unit,
+) {
+    val s = LocalStrings.current
+    var step by remember { mutableIntStateOf(0) }
+    val ready = btOn && permsOk && locOn
+    val found by c.ble.found.collectAsState()
+    val bands by c.ble.bands.collectAsState()
+    val batteries by c.bandBattery.collectAsState()
+    val scanning by c.ble.scanning.collectAsState()
+    val titles = listOf(s.bwPrep, s.bandFor(names.short(Side.P1)), s.bandFor(names.short(Side.P2)), s.bwReady)
+    // La ricerca gira mentre si sceglie un braccialetto.
+    val searching = ready && step in 1..2
+    LifecycleResumeEffect(searching) {
+        c.setBandScan(searching, true)
+        onPauseOrDispose { c.setBandScan(false, true) }
+    }
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDone, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+        Column(
+            Modifier.fillMaxWidth().padding(16.dp).clip(RoundedCornerShape(24.dp)).background(TsmColors.Background).padding(20.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(s.bwTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            com.tennis.scoremanager.ui.StepHeader(step, titles)
+            when (step) {
+                0 -> {
+                    Text(s.bwPrepHint, color = TsmColors.TextMain)
+                    RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { onBluetooth() }
+                    RequirementRow(Icons.Filled.LocationOn, s.location, permsOk, s.allow) { onPermissions() }
+                    RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { onLocation() }
+                }
+                1, 2 -> {
+                    val side = if (step == 1) Side.P1 else Side.P2
+                    Text(s.bwBandHint(names.short(side)), color = TsmColors.TextMain)
+                    if (scanning) Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(Modifier.size(20.dp), color = com.tennis.scoremanager.ui.LocalArea.current, strokeWidth = 3.dp)
+                        Text(s.autoSearch, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 10.dp))
+                    }
+                    BandPicker(c, side, names.short(side), bands[side], found, bands, batteries[side])
+                }
+                else -> {
+                    for (side in Side.entries) {
+                        val b = bands[side]
+                        val ok = b?.state == LinkState.READY
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(if (ok) Icons.Filled.BluetoothConnected else Icons.Filled.BluetoothDisabled, null, tint = if (ok) TsmColors.Ok else TsmColors.Orange)
+                            Text("${names.short(side)}: ${b?.name ?: s.noBand}", color = TsmColors.TextMain, modifier = Modifier.padding(start = 10.dp))
+                        }
+                    }
+                    Text(s.bwDoneHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (bands.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapBands() }, Modifier.fillMaxWidth())
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (step == 0) onDone() else step-- }, Modifier.weight(1f))
+                if (step < titles.lastIndex) BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { step++ }, Modifier.weight(1f), enabled = step != 0 || ready)
+                else BigButton(s.done, Icons.Filled.Check, onDone, Modifier.weight(1f))
             }
         }
     }

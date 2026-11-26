@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -65,6 +66,7 @@ import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.Wearer
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.relay.HotspotPermissions
 import com.tennis.scoremanager.relay.JoinState
@@ -105,10 +107,10 @@ fun HeartSection(
         val relay by c.relay.ui.collectAsState()
         if (relay.role == RelayRole.SATELLITE) {
             // Il satellite segue le fasce scelte sul principale: qui solo come le sente (vedi RelaySection).
-            for (side in Side.entries) {
-                val st = straps[side] ?: continue
+            for (w in Wearer.entries) {
+                val st = straps[w] ?: continue
                 Column {
-                    Text(st.name, color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    Text(st.name, color = TsmColors.player(w.side), fontWeight = FontWeight.Bold)
                     Text(strapStatus(st, s), color = TsmColors.TextDim, fontSize = 12.sp)
                 }
             }
@@ -124,22 +126,29 @@ fun HeartSection(
             Spacer(Modifier.width(10.dp))
             Text(if (scanning) s.strapSearching else s.autoSearchOff, color = if (scanning) TsmColors.TextMain else TsmColors.Orange, fontSize = 13.sp)
         }
-        for (side in Side.entries) {
-            StrapPicker(c, side, names.short(side), straps[side], found, straps)
+        // Nel doppio fino a quattro fasce: anche i compagni (il secondo nome di ogni squadra). Si vedono col doppio, se
+        // un compagno ha già la fascia, o col tasto per aggiungerle.
+        val doubles = c.setup.collectAsState().value.doubles
+        var addPartners by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        val partners = doubles || addPartners || straps.keys.any { it.partner }
+        val wearers = if (partners) listOf(Wearer.P1, Wearer.P1B, Wearer.P2, Wearer.P2B) else listOf(Wearer.P1, Wearer.P2)
+        for (w in wearers) {
+            StrapPicker(c, w, wearerName(names, w, partners), straps[w], found, straps)
             // Scambiando le fasce i campi ripartono dal profilo che segue la fascia.
-            straps[side]?.let { key(it.address) { ProfileRow(profiles[side]) { p -> c.setHeartProfile(side, p) } } }
+            straps[w]?.let { key(it.address) { ProfileRow(profiles[w]) { p -> c.setHeartProfile(w, p) } } }
         }
-        if (straps.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
+        if (!partners) GhostButton(s.strapPartnersAdd, Icons.Filled.GroupAdd, { addPartners = true }, Modifier.fillMaxWidth())
+        if (straps.keys.any { it.side == Side.P1 } && straps.keys.any { it.side == Side.P2 }) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
     }
 }
 
 @Composable
-private fun StrapPicker(c: MatchController, side: Side, playerName: String, current: StrapInfo?, found: List<FoundStrap>, all: Map<Side, StrapInfo>) {
+private fun StrapPicker(c: MatchController, side: Wearer, playerName: String, current: StrapInfo?, found: List<FoundStrap>, all: Map<Wearer, StrapInfo>) {
     val s = LocalStrings.current
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
-        Text(s.strapFor(playerName), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+        Text(s.strapFor(playerName), color = TsmColors.player(side.side), fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
         Box {
             OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
@@ -166,7 +175,7 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
                 for ((address, label) in options) {
                     val usedBy = all.entries.firstOrNull { it.value.address == address && it.key != side }?.key
                     DropdownMenuItem(
-                        text = { Text(label + (usedBy?.let { " → ${s.playerTag(it.ordinal + 1)}" } ?: "")) },
+                        text = { Text(label + (usedBy?.let { " → ${wearerTag(s, it)}" } ?: "")) },
                         leadingIcon = { Icon(Icons.Filled.Favorite, null) },
                         onClick = {
                             open = false
@@ -178,6 +187,15 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
         }
     }
 }
+
+/** "G1", "G2" e, per i compagni del doppio, "G1B", "G2B". */
+fun wearerTag(s: Strings, w: Wearer): String = s.playerTag(w.side.ordinal + 1) + if (w.partner) "B" else ""
+
+/**
+ * Di chi è la fascia: con le fasce dei compagni ([split]) il nome di ciascun giocatore, altrimenti la squadra
+ * ("Rossi / Bianchi", come prima: la fascia la porta uno dei due).
+ */
+fun wearerName(names: Names, w: Wearer, split: Boolean): String = if (split) names.player(w.side, w.index) else names.short(w.side)
 
 /**
  * "Collegata · 72 bpm · −68 dBm · 2 stacchi (14 s) · Batteria 90%", oppure perché il battito non arriva. Segnale e
@@ -283,8 +301,8 @@ fun WorkoutStrapCard(c: MatchController) {
             if (!permsOk) permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions())
             else runCatching { btLauncher.launch(android.content.Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
         }
-        StrapPicker(c, Side.P1, s.playerTag(1), straps[Side.P1], found, straps)
-        straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
+        StrapPicker(c, Wearer.P1, s.playerTag(1), straps[Wearer.P1], found, straps)
+        straps[Wearer.P1]?.let { key(it.address) { ProfileRow(profiles[Wearer.P1]) { p -> c.setHeartProfile(Wearer.P1, p) } } }
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
     }
 }

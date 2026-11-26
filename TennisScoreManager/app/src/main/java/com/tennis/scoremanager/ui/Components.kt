@@ -118,6 +118,9 @@ fun AppRoot(c: MatchController) {
         },
     ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
+            // Il colore dell'area (giocare, circolo, progressi...): in alto in ogni schermata, così si sa dove si è.
+            val tab by c.homeTab.collectAsState()
+            androidx.compose.runtime.CompositionLocalProvider(LocalArea provides areaOf(s, tab)) {
             when (s) {
                 Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
@@ -161,6 +164,7 @@ fun AppRoot(c: MatchController) {
                 Screen.TEAMS -> com.tennis.scoremanager.ui.screens.TeamsScreen(c)
                 Screen.TEAM -> com.tennis.scoremanager.ui.screens.TeamScreen(c)
                 Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
+            }
             }
         }
         // La scheda partita appena aperta (da WhatsApp o dai file), sopra qualunque schermata.
@@ -241,9 +245,9 @@ fun ScreenScaffold(
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball),
+                Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(LocalArea.current),
                 contentAlignment = Alignment.Center,
-            ) { Icon(icon, null, tint = TsmColors.OnBall) }
+            ) { Icon(icon, null, tint = TsmColors.OnArea) }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)

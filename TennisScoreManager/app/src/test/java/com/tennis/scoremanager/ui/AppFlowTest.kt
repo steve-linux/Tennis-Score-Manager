@@ -73,8 +73,11 @@ class AppFlowTest {
         val saved = c.storage.loadUnfinished().single()
         assertEquals(3, saved.events.count { it is com.tennis.scoremanager.model.MatchEvent.Point })
 
-        // Ripresa dalla prima schermata: stesso punteggio, e il punto successivo chiude il game.
-        tap("Riprendi:")
+        // Ripresa da Nuova partita (dove stanno le sospese): stesso punteggio, e il punto successivo chiude il game.
+        tap("Nuova partita")
+        assertEquals(Screen.SETUP, c.screen.value)
+        tap("Riprendi partita")
+        tap("Giocatore 1 vs")
         assertEquals(Screen.MATCH, c.screen.value)
         assertScore(g1 = 0, pt1 = 3)
         if (c.live.value!!.record.suspended) tap("Riprendi")

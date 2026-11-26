@@ -15,6 +15,7 @@ import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.ble.RemoteBand
 import com.tennis.scoremanager.ble.StrapInfo
+import com.tennis.scoremanager.data.Wearer
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.TvServer
@@ -656,16 +657,19 @@ class PhoneRelay(
         }
     }
 
-    /** Il satellite segue le fasce del principale, sugli stessi lati. */
+    /**
+     * Il satellite segue le fasce del principale, sulle stesse persone ([RelayStrap.side] = numero di [Wearer]: 0-1 i
+     * lati come prima, 2-3 i compagni del doppio).
+     */
     private fun follow(list: List<RelayStrap>) {
-        val want = list.mapNotNull { r -> Side.entries.getOrNull(r.side)?.let { it to r } }.toMap()
+        val want = list.mapNotNull { r -> Wearer.entries.getOrNull(r.side)?.let { it to r } }.toMap()
         val have = heart.straps.value
-        for (side in Side.entries) {
-            val r = want[side]
+        for (w in Wearer.entries) {
+            val r = want[w]
             if (r == null) {
-                if (have[side] != null) heart.assign(side, null, null)
-            } else if (have[side]?.address != r.addr) {
-                heart.assign(side, r.addr, r.name)
+                if (have[w] != null) heart.assign(w, null, null)
+            } else if (have[w]?.address != r.addr) {
+                heart.assign(w, r.addr, r.name)
             }
         }
     }
@@ -685,9 +689,9 @@ class PhoneRelay(
     }
 
     /** Satellite: ogni misura delle fasce seguite va nella coda per il principale. */
-    fun onLocalReading(side: Side, m: HeartMeasurement) {
+    fun onLocalReading(who: Wearer, m: HeartMeasurement) {
         if (!isSatellite) return
-        val addr = heart.straps.value[side]?.address ?: return
+        val addr = heart.straps.value[who]?.address ?: return
         queue(RelayMsg(RelayMsg.HR, addr = addr, bpm = m.bpm, contact = m.contact))
     }
 

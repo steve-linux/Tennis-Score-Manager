@@ -40,7 +40,7 @@ class WorkoutArea(
     val workout = WorkoutSession(scope) { rec -> onWorkoutFinished(rec) }
     /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
     val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
-    internal var workoutSide = Side.P1
+    internal var workoutSide = com.tennis.scoremanager.data.Wearer.P1
     /** Racchetta dell'allenamento in corso, presa all'avvio. */
     internal var workoutUse: RacketUse? = null
 
@@ -54,7 +54,7 @@ class WorkoutArea(
     /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
     fun startWorkout(): Boolean {
         val straps = heart.straps.value
-        val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
+        val side = com.tennis.scoremanager.data.Wearer.entries.firstOrNull { straps[it] != null } ?: return false
         workoutSide = side
         // Ti alleni tu: età, peso e sesso dalla tua scheda, se ci sono.
         heartProfileOf(me())?.let { setHeartProfile(side, it) }

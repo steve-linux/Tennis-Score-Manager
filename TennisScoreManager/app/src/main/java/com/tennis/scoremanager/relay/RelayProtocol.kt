@@ -111,7 +111,7 @@ data class RelayMsg(
     }
 }
 
-/** Fascia che il satellite deve seguire: [side] 0 = giocatore 1, 1 = giocatore 2. */
+/** Fascia che il satellite deve seguire: [side] 0 = giocatore 1, 1 = giocatore 2, nel doppio 2-3 i compagni (Wearer). */
 @Serializable
 data class RelayStrap(val addr: String, val name: String, val side: Int)
 

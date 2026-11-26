@@ -334,11 +334,17 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
     val plan by c.courtPlan.collectAsState()
     val isHoliday = { t: Long -> com.tennis.scoremanager.data.Holidays.on(t, country) != null || CourtPlans.closedOn(plan, t) != null }
     val skip = { t: Long -> skipHolidays && isHoliday(t) }
+    // Un corso nuovo a passi: il corso, i giorni e gli orari, i posti e la quota.
+    val wz = co == null
+    var step by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val titles = listOf(s.wzCourse, s.wzSchedule, s.wzSeats)
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (co == null) s.scNew else co.name) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (!wz || step == 0) {
                 OutlinedTextField(x.name, { x = x.copy(name = it.take(50)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scName) })
                 OutlinedTextField(x.level, { x = x.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scLevel) })
                 // L'istruttore: dal database o scritto a mano.
@@ -350,6 +356,8 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                     OutlinedTextField(x.coachName, { x = x.copy(coachName = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scCoach) })
                     GhostButton(s.scCoachPick, Icons.Filled.PersonAdd, { pickCoach = true }, Modifier.fillMaxWidth())
                 }
+                }
+                if (!wz || step == 1) {
                 DateButton(s.blkFrom, x.from, lang) { d -> x = x.copy(from = CourtPlans.dayStart(d), to = maxOf(x.to, CourtPlans.dayStart(d))) }
                 Text(s.scSchedule, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                 for (sl in x.slots) Row(verticalAlignment = Alignment.CenterVertically) {
@@ -365,6 +373,8 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 val autoEnd = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) }
                 if (autoEnd != null) Text(s.ccEndAuto(com.tennis.scoremanager.data.Reports.date(autoEnd, lang)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
                 else DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }
+                }
+                if (!wz || step == 2) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(if (x.maxStudents == 0) s.scNoMax else s.scMax(x.maxStudents), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
                     IconButton(onClick = { x = x.copy(maxStudents = (x.maxStudents - 1).coerceAtLeast(0)) }) { Icon(Icons.Filled.Remove, null) }
@@ -373,11 +383,13 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 MoneyField(fee, s.scFee) { fee = it }
                 Segmented(listOf(SegOption(s.scMonthly), SegOption(s.scSeasonFee)), if (x.feeKind == CourseFee.MONTHLY) 0 else 1, { x = x.copy(feeKind = if (it == 0) CourseFee.MONTHLY else CourseFee.SEASON) })
                 OutlinedTextField(x.note, { x = x.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.bkNote) })
+                }
                 if (co != null) TextButton(onClick = { askDelete = true }) { Text(s.scDelete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
-            TextButton(enabled = x.name.isNotBlank() && (fee.isBlank() || Fees.parse(fee) != null), onClick = {
+            if (wz && step < titles.lastIndex) com.tennis.scoremanager.ui.WizardNext(enabled = step != 0 || x.name.isNotBlank()) { step++ }
+            else TextButton(enabled = x.name.isNotBlank() && (fee.isBlank() || Fees.parse(fee) != null), onClick = {
                 val end = lessonsText.toIntOrNull()?.let { Courses.endAfter(x.from, x.slots, it, skip) } ?: x.to
                 val y = x.copy(name = x.name.trim(), feeCents = Fees.parse(fee.ifBlank { "0" }) ?: 0, to = end)
                 // Le lezioni nei giorni di festa risultano annullate (si rimettono dall'appello).
@@ -386,7 +398,7 @@ private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) 
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
-        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
     if (pickCoach) PlayerPickDialog(c, emptySet()) { p -> pickCoach = false; p?.let { x = x.copy(coach = it.id, coachName = it.name) } }
     newSlot?.let { sl0 ->

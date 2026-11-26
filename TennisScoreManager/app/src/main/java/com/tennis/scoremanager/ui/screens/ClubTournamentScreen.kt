@@ -114,7 +114,8 @@ fun ClubTournamentsScreen(c: MatchController) {
             BigButton(s.ctNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {
-        if (list.isEmpty()) Text(s.ctNone, color = TsmColors.TextDim)
+        // Nessun torneo: cosa fare, passo per passo.
+        if (list.isEmpty()) com.tennis.scoremanager.ui.EmptyGuide(Icons.Filled.EmojiEvents, s.egTournamentsTitle, listOf(s.egTournaments1, s.egTournaments2, s.egTournaments3), s.ctNew) { creating = true }
         val groups = listOf(
             s.ctOpen to list.filter { !it.drawn },
             s.ctRunning to list.filter { it.drawn && it.champion == null },
@@ -631,26 +632,33 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
         Text("$v", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
         IconButton(onClick = { onChange((v + 1).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
     }
+    val wz = t == null
+    var step by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val titles = listOf(s.wzTournament, s.wzFormula, s.wzDates)
     AlertDialog(
         onDismissRequest = { onDone(null) },
         title = { Text(if (t == null) s.ctNew else t.name) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Un torneo nuovo si crea a passi: il torneo, la formula con le regole, le date e le iscrizioni.
+                if (wz) com.tennis.scoremanager.ui.StepHeader(step, titles)
+                if (!wz || step == 0) {
                 field(name, s.ctName) { name = it }
                 Segmented(listOf(SegOption(s.ctSocial), SegOption("FITP")), if (kind == CTKind.FITP) 1 else 0, { kind = if (it == 1) CTKind.FITP else CTKind.SOCIAL }, enabled = !drawn)
                 Text(if (kind == CTKind.FITP) s.ctFitpHint else s.ctSocialHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 Segmented(listOf(SegOption(s.ctSingles), SegOption(s.ctDoubles)), if (doubles) 1 else 0, { doubles = it == 1 }, enabled = !drawn && t?.entries.isNullOrEmpty())
                 field(category, s.ctCategory) { category = it }
+                if (kind == CTKind.FITP) {
+                    field(code, s.ctFitpCode) { code = it }
+                    field(referee, s.ctReferee) { referee = it }
+                }
+                }
+                if (!wz || step == 1) {
                 Segmented(listOf(SegOption(s.ctFormatKnockout), SegOption(s.ctFormatGroups)), if (format == CTFormat.GROUPS) 1 else 0, { format = if (it == 1) CTFormat.GROUPS else CTFormat.KNOCKOUT }, enabled = !drawn)
                 if (format == CTFormat.GROUPS && !drawn) {
                     stepper(s.ctGroupsCount, groups, 1, 8) { groups = it }
                     stepper(s.ctQualify, qualify, 1, 4) { qualify = it }
                 }
-                DateButton(s.ctStart, start, lang) { start = it; if (end == null || end!! < it) end = it }
-                DateButton(s.ctEnd, end, lang) { end = it }
-                MoneyField(fee, s.ctFee) { fee = it }
-                if ((Fees.parse(fee) ?: 0) > 0) SwitchRow(Icons.Filled.EmojiEvents, s.ctPaidOnly, s.ctPaidOnlyHint, requirePaid) { requirePaid = it }
-                field(limit, s.ctLimit) { limit = it.trim().uppercase() }
                 // Le regole delle partite: vanno nella scheda partita e in campo non si cambiano per errore.
                 Text(s.ctRules, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
                 val formats = listOf(null, MatchFormat.BEST_OF_THREE, MatchFormat.TWO_SETS_MATCH_TIEBREAK, MatchFormat.PRO_SET)
@@ -670,15 +678,20 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                     SwitchRow(Icons.Filled.EmojiEvents, s.noAd, null, r.noAd) { rules = r.copy(noAd = it) }
                 }
                 Text(s.ctRulesHint, color = TsmColors.TextDim, fontSize = 12.sp)
-                if (kind == CTKind.FITP) {
-                    field(code, s.ctFitpCode) { code = it }
-                    field(referee, s.ctReferee) { referee = it }
+                }
+                if (!wz || step == 2) {
+                DateButton(s.ctStart, start, lang) { start = it; if (end == null || end!! < it) end = it }
+                DateButton(s.ctEnd, end, lang) { end = it }
+                MoneyField(fee, s.ctFee) { fee = it }
+                if ((Fees.parse(fee) ?: 0) > 0) SwitchRow(Icons.Filled.EmojiEvents, s.ctPaidOnly, s.ctPaidOnlyHint, requirePaid) { requirePaid = it }
+                field(limit, s.ctLimit) { limit = it.trim().uppercase() }
                 }
                 if (t != null) TextButton(onClick = { askDelete = true }) { Text(s.ctDelete, color = TsmColors.Danger) }
             }
         },
         confirmButton = {
-            TextButton(enabled = name.isNotBlank() && feeOk, onClick = {
+            if (wz && step < titles.lastIndex) com.tennis.scoremanager.ui.WizardNext(enabled = step != 0 || name.isNotBlank()) { step++ }
+            else TextButton(enabled = name.isNotBlank() && feeOk, onClick = {
                 val base = t ?: ClubTournament(ClubTournaments.newId("t"), "", createdAt = System.currentTimeMillis())
                 val saved = base.copy(
                     name = name.trim(), kind = kind, doubles = doubles, category = category.trim(), format = format, groups = groups, qualify = qualify,
@@ -690,7 +703,7 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
                 onDone(saved.id)
             }) { Text(s.ok) }
         },
-        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+        dismissButton = { if (wz && step > 0) com.tennis.scoremanager.ui.WizardBack { step-- } else TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
     if (askDelete && t != null) AlertDialog(
         onDismissRequest = { askDelete = false },

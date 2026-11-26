@@ -36,6 +36,21 @@ object TsmColors {
     /** Il secondo colpo nel confronto dei video; i corsi dell'allenatore (quelli della segreteria sono in [Ball]). */
     val Cyan = Color(0xFF29B6F6)
 
+    /**
+     * Un colore per ogni area dell'app, così si capisce sempre dove si è: la striscia delle voci nella prima schermata,
+     * l'icona in alto in ogni schermata e le sotto-schede. Tutti chiari, col testo scuro [OnArea] sopra.
+     */
+    val AreaPlay = Ball
+    val AreaClub = Color(0xFF4FC3F7)
+    val AreaTrain = Color(0xFFFFB74D)
+    val AreaProgress = Color(0xFFB39DDB)
+    val AreaPeople = Color(0xFF80CBC4)
+    val AreaTournaments = Color(0xFFF48FB1)
+    val AreaSettings = Color(0xFF90A4AE)
+    /** Le cose da fare adesso (avvisi, risultati da mandare, backup). */
+    val AreaTodo = Orange
+    val OnArea = Color(0xFF10151F)
+
     fun player(side: Side) = if (side == Side.P1) Player1 else Player2
     fun onPlayer(side: Side) = if (side == Side.P1) OnPlayer1 else OnPlayer2
 }
@@ -70,3 +85,6 @@ private val typography = Typography(
 fun TsmTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = scheme, typography = typography, content = content)
 }
+
+/** Il colore dell'area in cui si è (vedi [TsmColors.AreaPlay] e seguenti): lo decide [AppRoot] per ogni schermata. */
+val LocalArea = androidx.compose.runtime.staticCompositionLocalOf { TsmColors.AreaPlay }

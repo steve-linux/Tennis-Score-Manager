@@ -37,6 +37,8 @@ import com.tennis.scoremanager.ble.StrapGaps
 import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartBucket
+import com.tennis.scoremanager.data.heartTracks
+import com.tennis.scoremanager.data.withHeart
 import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.HeartTrack
@@ -280,7 +282,7 @@ class MatchController(
     val voiceArea = com.tennis.scoremanager.player.VoiceSettings(this, app, storage, scope, io)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
     /** Chi indossa la fascia cardio di ciascun lato (per le calorie). */
-    override val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
+    override val heartProfiles = MutableStateFlow(com.tennis.scoremanager.data.Wearer.entries.mapNotNull { w -> storage.heartProfile(w)?.let { w to it } }.toMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
     /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
     private val statusStart = mutableMapOf<Side, BandStatus>()
@@ -331,7 +333,7 @@ class MatchController(
     /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
     private var rallyStrokes = 0
     /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
-    private val heartBuckets = Side.entries.associateWith { HeartBucket() }
+    private val heartBuckets = com.tennis.scoremanager.data.Wearer.entries.associateWith { HeartBucket() }
     /**
      * Stacchi di ciascuna fascia (per indirizzo), con le misure di questo telefono e del satellite insieme: conta
      * quando il battito non è arrivato da nessuno dei due. Ripartono a ogni partita.
@@ -340,8 +342,8 @@ class MatchController(
     /** Batte ogni 2 secondi: uno stacco in corso si vede crescere anche senza misure nuove. */
     private val gapTick = MutableStateFlow(0L)
 
-    /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
-    private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
+    /** Misure arrivate in ritardo dal telefono satellite: (chi porta la fascia, secondo della partita, battito). */
+    private val lateHeart = mutableListOf<Triple<com.tennis.scoremanager.data.Wearer, Int, Int>>()
 
     /** Due telefoni per le fasce cardio: principale o satellite (vedi [PhoneRelay]). */
     val relay: PhoneRelay = PhoneRelay(
@@ -367,7 +369,7 @@ class MatchController(
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
      * arriva dal satellite.
      */
-    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote, gapTick) { local, remote, _ ->
+    val straps: StateFlow<Map<com.tennis.scoremanager.data.Wearer, StrapInfo>> = combine(heart.straps, relay.remote, gapTick) { local, remote, _ ->
         val now = SystemClock.elapsedRealtime()
         local.mapValues { (_, st) ->
             val r = remote[st.address]?.status
@@ -411,11 +413,11 @@ class MatchController(
         scope.launch { ble.status.collect { (side, st) -> if (!relay.isSatellite) onBandStatus(side, st) } }
         scope.launch { ble.strokes.collect { if (!relay.isSatellite) onBandStroke(it) } }
         scope.launch {
-            heart.readings.collect { (side, m) ->
-                heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
-                workoutArea.workout.onReading(side, m)
-                onHeartReading(side, m)
-                relay.onLocalReading(side, m)
+            heart.readings.collect { (who, m) ->
+                heart.straps.value[who]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
+                workoutArea.workout.onReading(who, m)
+                onHeartReading(who, m)
+                relay.onLocalReading(who, m)
             }
         }
         scope.launch {
@@ -1698,28 +1700,31 @@ class MatchController(
     // ---------------------------------------------------------------- fasce cardio
 
     private fun restoreStraps() {
-        storage.strapAddress(true)?.let { heart.assign(Side.P1, it, storage.strapName(true)) }
-        storage.strapAddress(false)?.let { heart.assign(Side.P2, it, storage.strapName(false)) }
+        for (w in com.tennis.scoremanager.data.Wearer.entries) storage.strapAddress(w)?.let { heart.assign(w, it, storage.strapName(w)) }
     }
 
-    fun assignStrap(side: Side, address: String?, name: String?) {
-        if (address != null && storage.strapAddress(side == Side.P2) == address) storage.setStrap(side == Side.P2, null, null)
-        storage.setStrap(side == Side.P1, address, name)
-        heart.assign(side, address, name)
+    /** La fascia di chi la porta (nel doppio anche i compagni); tolta a chi l'aveva prima. */
+    fun assignStrap(who: com.tennis.scoremanager.data.Wearer, address: String?, name: String?) {
+        if (address != null) for (o in com.tennis.scoremanager.data.Wearer.entries) if (o != who && storage.strapAddress(o) == address) storage.setStrap(o, null, null)
+        storage.setStrap(who, address, name)
+        heart.assign(who, address, name)
     }
 
     /** Ricerca delle fasce mentre la loro sezione è aperta (e l'app in primo piano). */
     fun setStrapScan(on: Boolean) = heart.setAutoScan(on && options.value.heartRate)
 
     fun swapStraps() {
-        val p1 = storage.strapAddress(true) to storage.strapName(true)
-        val p2 = storage.strapAddress(false) to storage.strapName(false)
-        storage.setStrap(true, p2.first, p2.second)
-        storage.setStrap(false, p1.first, p1.second)
+        // G1 con G2 e, nel doppio, i compagni tra loro.
+        for ((a, b) in listOf(com.tennis.scoremanager.data.Wearer.P1 to com.tennis.scoremanager.data.Wearer.P2, com.tennis.scoremanager.data.Wearer.P1B to com.tennis.scoremanager.data.Wearer.P2B)) {
+            val sa = storage.strapAddress(a) to storage.strapName(a)
+            val sb = storage.strapAddress(b) to storage.strapName(b)
+            storage.setStrap(a, sb.first, sb.second)
+            storage.setStrap(b, sa.first, sa.second)
+            val prof = heartProfiles.value
+            setHeartProfile(a, prof[b])
+            setHeartProfile(b, prof[a])
+        }
         heart.swapSides()
-        val prof = heartProfiles.value
-        setHeartProfile(Side.P1, prof[Side.P2])
-        setHeartProfile(Side.P2, prof[Side.P1])
     }
 
     /** I dati per le calorie dalla scheda del giocatore (età, peso, sesso); null se ne manca uno. */
@@ -1730,18 +1735,18 @@ class MatchController(
         return HeartProfile(age, kg, female = p.sex == "F")
     }
 
-    override fun setHeartProfile(side: Side, p: HeartProfile?) {
-        storage.setHeartProfile(side == Side.P1, p)
-        heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
+    override fun setHeartProfile(who: com.tennis.scoremanager.data.Wearer, p: HeartProfile?) {
+        storage.setHeartProfile(who, p)
+        heartProfiles.value = if (p == null) heartProfiles.value - who else heartProfiles.value + (who to p)
     }
 
     /** Il battito conta come i colpi: a partita avviata e in corso, non nelle pause. */
     private fun recordingHeart(lm: LiveMatch): Boolean =
         screen.value == Screen.MATCH && lm.record.startedAt != null && !lm.record.suspended && !lm.state.isFinished
 
-    private fun onHeartReading(side: Side, m: HeartMeasurement) {
+    private fun onHeartReading(who: com.tennis.scoremanager.data.Wearer, m: HeartMeasurement) {
         val lm = live.value ?: return
-        if (m.valid && recordingHeart(lm)) heartBuckets.getValue(side).add(m.bpm)
+        if (m.valid && recordingHeart(lm)) heartBuckets.getValue(who).add(m.bpm)
     }
 
     /**
@@ -1749,20 +1754,20 @@ class MatchController(
      * ritardo (il Wi-Fi tra i telefoni era caduto) va a riempire i buchi della partita a cui appartiene.
      */
     private fun onRemoteHeart(addr: String, m: HeartMeasurement, at: Long, match: String) {
-        val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
+        val who = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
         val age = System.currentTimeMillis() - at
         // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
         if (age <= PhoneRelay.LIVE_MS) {
             strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
-            workoutArea.workout.onReading(side, m)
+            workoutArea.workout.onReading(who, m)
         }
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
         if (System.currentTimeMillis() - at <= PhoneRelay.LIVE_MS) {
-            onHeartReading(side, m)
+            onHeartReading(who, m)
         } else {
             val start = lm.record.startedAt ?: return
-            if (at >= start && !lm.state.isFinished) lateHeart += Triple(side, ((at - start) / 1000).toInt(), m.bpm)
+            if (at >= start && !lm.state.isFinished) lateHeart += Triple(who, ((at - start) / 1000).toInt(), m.bpm)
         }
     }
 
@@ -1788,17 +1793,17 @@ class MatchController(
         val now = values.takeIf { recordingHeart(lm) }.orEmpty()
         if (now.isEmpty() && late.isEmpty()) return
         val sec = ((System.currentTimeMillis() - start) / 1000).toInt()
-        var heartMap = lm.record.heart
-        for (side in Side.entries) {
-            val bpm = now[side]
-            val points = late[side].orEmpty()
+        var heartMap = lm.record.heartTracks()
+        for (w in com.tennis.scoremanager.data.Wearer.entries) {
+            val bpm = now[w]
+            val points = late[w].orEmpty()
             if (bpm == null && points.isEmpty()) continue
-            var track = heartMap[side] ?: HeartTrack()
+            var track = heartMap[w] ?: HeartTrack()
             if (bpm != null) track = track.add(sec, bpm)
             track = track.fill(points, HeartStats.STEP_S)
-            heartMap = heartMap + (side to track.copy(profile = track.profile ?: heartProfiles.value[side]))
+            heartMap = heartMap + (w to track.copy(profile = track.profile ?: heartProfiles.value[w]))
         }
-        setRecord(lm.record.copy(heart = heartMap))
+        setRecord(lm.record.withHeart(heartMap))
     }
 
     // ---------------------------------------------------------------- due telefoni
@@ -1870,8 +1875,13 @@ class MatchController(
         // Ogni nome scritto diventa un giocatore del database (quello che c'è già, o uno nuovo): la partita è di persone.
         val (withIds, created) = com.tennis.scoremanager.data.Players.assign(su, players.value, now)
         // Chi ha età e peso nella scheda: le calorie della fascia cardio li prendono da lì.
-        heartProfileOf(playerById(withIds.p1aId))?.let { setHeartProfile(Side.P1, it) }
-        heartProfileOf(playerById(withIds.p2aId))?.let { setHeartProfile(Side.P2, it) }
+        heartProfileOf(playerById(withIds.p1aId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P1, it) }
+        heartProfileOf(playerById(withIds.p2aId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P2, it) }
+        // Nel doppio anche i compagni, se portano la fascia.
+        if (su.doubles) {
+            heartProfileOf(playerById(withIds.p1bId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P1B, it) }
+            heartProfileOf(playerById(withIds.p2bId))?.let { setHeartProfile(com.tennis.scoremanager.data.Wearer.P2B, it) }
+        }
         if (created.isNotEmpty()) {
             val list = players.value + created
             players.value = list.sortedBy { it.name.lowercase() }
@@ -2326,11 +2336,11 @@ class MatchController(
             bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
         } else emptyMap()
         // Età e peso detti a partita iniziata valgono lo stesso per le calorie.
-        val heartMap = lm.record.heart.mapValues { (side, t) -> t.copy(profile = t.profile ?: heartProfiles.value[side]) }
+        val heartMap = lm.record.heartTracks().mapValues { (w, t) -> t.copy(profile = t.profile ?: heartProfiles.value[w]) }
         val rec = lm.record.copy(
             finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
-            batteryEnd = endBattery, heart = heartMap,
-        )
+            batteryEnd = endBattery,
+        ).withHeart(heartMap)
         runningSince = null
         competitions.clubMatchFinished(rec, lm.state)
         competitions.teamRubberFinished(rec, lm.state)

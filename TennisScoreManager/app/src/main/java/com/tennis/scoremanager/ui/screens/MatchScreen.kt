@@ -582,16 +582,18 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
 
 /** Battito dal vivo delle fasce: "♥ G1 142"; "--" se la fascia non manda (staccata, asciutta, lontana). */
 @Composable
-private fun HeartRow(straps: Map<Side, StrapInfo>) {
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+private fun HeartRow(straps: Map<com.tennis.scoremanager.data.Wearer, StrapInfo>) {
     val s = LocalStrings.current
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        for (side in Side.entries) {
-            val st = straps[side] ?: continue
+    // Nel doppio fino a quattro (G1, G1B, G2, G2B): vanno a capo se non ci stanno.
+    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (w in listOf(com.tennis.scoremanager.data.Wearer.P1, com.tennis.scoremanager.data.Wearer.P1B, com.tennis.scoremanager.data.Wearer.P2, com.tennis.scoremanager.data.Wearer.P2B)) {
+            val st = straps[w] ?: continue
             val bpm = st.bpm
             Pill(
-                "${s.playerTag(side.ordinal + 1)} · ${bpm ?: "--"} bpm",
-                if (bpm != null) TsmColors.player(side) else TsmColors.SurfaceHigh,
-                if (bpm != null) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                "${com.tennis.scoremanager.ui.wearerTag(s, w)} · ${bpm ?: "--"} bpm",
+                if (bpm != null) TsmColors.player(w.side) else TsmColors.SurfaceHigh,
+                if (bpm != null) TsmColors.onPlayer(w.side) else TsmColors.TextDim,
                 Icons.Filled.Favorite,
             )
         }
