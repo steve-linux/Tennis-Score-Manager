@@ -1090,7 +1090,7 @@ object DeStrings : Strings {
     override val studentLost = "Verloren"
     override val studentNotes = "Notizen des Trainers"
     override val studentNotesHint = "Woran arbeiten, Ziele, Eindrücke …"
-    override val studentTrainNow = "Jetzt trainieren"
+    override val studentTrainNow = "Schläge trainieren"
     override val studentDelete = "Schüler entfernen"
     override val studentPhotoHint = "Antippen für das Foto: dasselbe wie in den Matches."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 Einheit" else "$n Einheiten" }
@@ -2881,7 +2881,7 @@ object DeStrings : Strings {
     override val egStudentsTitle = "Dein erster Schüler"
     override val egStudents1 = "Tippe auf Neuer Schüler und gib Vor- und Nachnamen ein."
     override val egStudents2 = "Hat er die App schon, lass dir sein Profil per QR schicken."
-    override val egStudents3 = "In seinem Profil: Jetzt trainieren, Stunden, Ziele und Berichte."
+    override val egStudents3 = "In seinem Profil: Schläge trainieren, Stunden, Ziele und Berichte."
     override val egMembersTitle = "Das erste Mitglied"
     override val egMembers1 = "Tippe auf Neues Mitglied und wähle den Spieler oder lege ihn an."
     override val egMembers2 = "Trage Ausweis, ärztliches Attest und Einwilligungen ein."

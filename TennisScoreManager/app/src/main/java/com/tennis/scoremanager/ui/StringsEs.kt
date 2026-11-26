@@ -1091,7 +1091,7 @@ object EsStrings : Strings {
     override val studentLost = "Perdido"
     override val studentNotes = "Notas del entrenador"
     override val studentNotesHint = "Qué trabajar, objetivos, sensaciones…"
-    override val studentTrainNow = "Entrenar ahora"
+    override val studentTrainNow = "Entrenar golpes"
     override val studentDelete = "Quitar alumno"
     override val studentPhotoHint = "Toca para la foto: la misma de los partidos."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sesión" else "$n sesiones" }
@@ -2882,7 +2882,7 @@ object EsStrings : Strings {
     override val egStudentsTitle = "Tu primer alumno"
     override val egStudents1 = "Toca Nuevo alumno y escribe nombre y apellidos."
     override val egStudents2 = "Si ya tiene la app, pídele que te mande su perfil con el QR."
-    override val egStudents3 = "Desde su ficha: Entrenar ahora, clases, objetivos e informes."
+    override val egStudents3 = "Desde su ficha: Entrenar golpes, clases, objetivos e informes."
     override val egMembersTitle = "El primer socio"
     override val egMembers1 = "Toca Nuevo socio y elige al jugador, o créalo."
     override val egMembers2 = "Anota la licencia, el certificado médico y los consentimientos."

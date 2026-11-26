@@ -18375,7 +18375,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Stunden und Pakete**: die nächsten Stunden und mit *Neues Paket* die gekauften Stunden (Anzahl und Preis, bezahlt oder nicht). Der Stand zeigt gekauft, gemacht und übrig und was noch offen ist; *Als bezahlt markieren* schließt das Paket. Als bezahlt markiert bekommt das Paket eine **Quittungs**nummer (2026/001…, eine Reihe pro Jahr): antippen, und die PDF-Quittung (keine Steuerquittung, bei Minderjährigen auf die Eltern ausgestellt) lässt sich **an den Schüler schicken**, teilen oder vom Telefon **drucken**. *Als bezahlt markieren* fragt nach. Bei einem Fehler das Paket **lange drücken**: **Als unbezahlt markieren** (entfernt auch die Quittung: war es die letzte, wird die Nummer wieder frei, sonst bleibt eine Lücke) oder **Paket löschen**; am PC gibt es dieselben Schaltflächen.
   - **Schreiben**: Elternteil oder Vormund und die **Einwilligung zu Aufnahmen und Daten** (in *Bearbeiten* einzutragen, bei Minderjährigen; Mitteilungen gehen an das Telefon der Eltern). **Schreiben** öffnet eine WhatsApp-, SMS- oder E-Mail-Nachricht an den Schüler; **Match mit…** lässt den Gegner unter den Schülern wählen und bereitet das neue Match mit beiden Namen vor.
   - **Bericht für den Schüler**: *Letzte 30 Tage* oder *Alles* wählen, dann **Vollständiges PDF** (Schläge mit dem Anteil im Feld und dem Verlauf, Bewegung, für jeden Schlag einer im Feld und einer daneben mit den drei Bildern der Schlüsselmomente, Matches, Rating und deine Notizen) oder **Bild für WhatsApp** (eine Seite mit den Zahlen der Schläge und dem Treffpunkt eines Schlags). Das Teilen öffnet sich sofort: WhatsApp, E-Mail oder anders. Der Bericht trägt deinen Namen als Trainer (aus *Du*) und den Verein (aus *Verein › Plätze*).
-  - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
+  - **Schläge trainieren** öffnet über dem Profil das Schlagtraining schon mit seinem Namen: Schlag und Übung wählen, *Starten* öffnet die Kamera (auch *Wo kommt das Telefon hin?* und *Stunde aufnehmen*). **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
 - **Die Schülerliste**: **Schüler suchen** nach Name, sortieren *Nach Name* oder *Nach letztem Mal*, filtern *Alle*, *Lange nicht gesehen* (seit mehr als 2 Wochen) oder eine Gruppe. Unter jedem Namen steht, wann du ihn zuletzt gesehen hast (Einheit oder gemachte Stunde).
 - **Gruppen** (*Gruppen ›* oben in der Liste): *Neue Gruppe* mit Name und Schülern (zum Beispiel „Turnier U14“); eine Gruppe lässt sich filtern, in eine Stunde setzen und mit **Schreiben** auf einmal benachrichtigen.
 - **Stundenplan** (Reiter Schüler): *Neue Stunde* mit Zeit, Dauer, wer (ein oder mehrere Schüler oder eine Gruppe), Ort und Notiz; sie lässt sich absagen. **An die Stunden von morgen erinnern** schickt die Erinnerung an jeden Schüler (bei Minderjährigen an die Eltern). Unter *Vergangen, zu markieren* tippe **Erledigt**: die Stunde zählt im Paket des Schülers. **Meine Termine** (unten im Stundenplan): **Termin** markiert die Tage, an denen du nicht kannst (von… bis…, belegt, Urlaub, Turnier, krank, Sonstiges und eine Notiz). Sie erscheinen orange in den Stunden und im Kalender; fällt eine Privat- oder Kursstunde darauf, erscheint oben eine Warnung mit der Liste. Deine Termine gehen mit den Anwesenheiten seiner Kurse ans Büro (nur der Grund, nicht die Notiz): Wenn du sie änderst, sind die Kurse zu senden. Beim Anlegen eines Kurses zählt **Meine Termine überspringen** diese Stunden nicht, wie Feiertage. Oben wählst du **Monat** oder **Liste**: Der Monat zeigt einen Punkt für jede Privatstunde (weiß), Kursstunde (in der Kursfarbe) und jedes Schülerturnier (lila), Feiertage mit roter Zahl und deine Termine in Orange; tippe auf einen Tag, um seine Einträge zu sehen, und auf einen Eintrag, um ihn zu öffnen (‹ › wechseln den Monat, der Titel springt zu heute).
@@ -19014,7 +19014,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Lessons and packs**: their next lessons and, with *New pack*, the lessons bought (number and price, paid or not). The balance shows bought, done and left and how much is due; *Mark as paid* closes the pack. Once marked paid, the pack gets a **receipt** number (2026/001…, one series per year): tapping it, the PDF receipt (not a tax receipt, made out to the parent for minors) can be **sent to the student**, shared or **printed** from the phone. *Mark as paid* asks for confirmation. For a mistake, **press and hold** the pack: **Mark as unpaid** (also removes the receipt: if it was the last one the number is free again, otherwise a gap remains) or **Delete the pack**; the PC has the same buttons.
   - **Write**: the parent or guardian and the **Consent to filming and data** (entered in *Edit*, for minors; notices go to the parent's phone). **Write** opens a WhatsApp, SMS or email message to the student; **Match with…** lets you pick the opponent among the students and prepares the new match with both names.
   - **Report for the student**: pick *Last 30 days* or *Everything*, then **Full PDF** (strokes with the percentage in and its trend, movement, for each stroke one shot in and one out with the three key-moment pictures, matches, rating and your notes) or **Image for WhatsApp** (a single page with the stroke numbers and the contact of one shot). Sharing opens straight away: WhatsApp, email or wherever you like. The report carries your name as coach (from *You*) and the club (from *Club › Courts*).
-  - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
+  - **Practise strokes** opens, over the profile, stroke training already with their name: pick the stroke and the drill and *Start* opens the camera (also *Where to put the phone?* and *Record the lesson*). **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
 - **The students list**: **Search a student** by name, sort *By name* or *By last time*, filter *All*, *Not seen lately* (not seen for more than 2 weeks) or a group. Under each name is the last time you saw them (session or lesson done).
 - **Groups** (*Groups ›* at the top of the list): *New group* with a name and students (for example "U14 squad"); a group can be filtered, put in a lesson and notified all together with **Write**.
 - **Lesson schedule** (Students tab): *New lesson* with when, length, who (one or more students, or a group), where and a note; it can be cancelled. **Remind tomorrow's lessons** sends the reminder to every student (to the parent for minors). In *Past, to be marked* tap **Done**: the lesson counts in the student's pack. **My commitments** (at the bottom of the Agenda): **Commitment** marks the days you're not available (from… to…, busy, holiday, tournament, sick, other and a note). They show in orange in the lessons and the calendar; if a private or course lesson falls on them, a warning with the list appears at the top. Your commitments go to the club office with the attendance of its courses (only the reason, not the note): when you change them, the courses show as to send. When creating a course, **Skip my commitments** doesn't count those lessons, like holidays. At the top choose **Month** or **List**: the month shows a dot for each private lesson (white), course lesson (in the course colour) and student tournament (purple), holidays with the number in red and your commitments in orange; tap a day to see its items and one to open it (‹ › change month, the title goes back to today).
@@ -19652,7 +19652,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Clases y paquetes**: sus próximas clases y, con *Nuevo paquete*, las clases compradas (número y precio, pagado o no). El saldo indica compradas, hechas y restantes y cuánto falta por pagar; *Marcar pagado* cierra el paquete. Marcado como pagado, el paquete recibe un número de **recibo** (2026/001…, una serie por año): al tocarlo, el recibo en PDF (no fiscal, a nombre del padre o madre para los menores) se puede **enviar al alumno**, compartir o **imprimir** desde el teléfono. *Marcar pagado* pide confirmación. Si te equivocas, **mantén pulsado** el paquete: **Marcar no pagado** (quita también el recibo: si era el último, el número queda libre; si no, queda un salto) o **Eliminar el paquete**; en el PC están los mismos botones.
   - **Escribir**: el padre, madre o tutor y el **Consentimiento a grabaciones y datos** (se introducen en *Editar*, para los menores; los avisos van al teléfono del padre o madre). **Escribir** abre un mensaje de WhatsApp, SMS o correo al alumno; **Partido con…** hace elegir el rival entre los alumnos y prepara el partido nuevo con los dos nombres.
   - **Informe para el alumno**: elige *Últimos 30 días* o *Todo*, luego **PDF completo** (golpes con el porcentaje dentro y su evolución, movimiento, de cada golpe uno dentro y uno fuera con las tres imágenes de los momentos clave, partidos, rating y tus notas) o **Imagen para WhatsApp** (una sola página con los números de los golpes y el impacto de un golpe). Se abre enseguida el compartir: WhatsApp, correo o donde quieras. El informe lleva tu nombre como entrenador (de *Tú*) y el club (de *Club › Pistas*).
-  - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
+  - **Entrenar golpes** abre, sobre la ficha, el entrenamiento de golpes ya con su nombre: se elige el golpe y el ejercicio y *Empezar* abre la cámara (también *¿Dónde pongo el teléfono?* y *Grabar la clase*). **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 - **La lista de alumnos**: **Buscar un alumno** por nombre, ordenar *Por nombre* o *Por última vez*, filtrar *Todos*, *Por volver a ver* (no los ves desde hace más de 2 semanas) o un grupo. Bajo cada nombre aparece la última vez que lo viste (sesión o clase hecha).
 - **Grupos** (*Grupos ›* arriba de la lista): *Nuevo grupo* con nombre y alumnos (por ejemplo "Competición U14"); el grupo se filtra, se pone en una clase y se avisa todo junto con **Escribir**.
 - **Agenda de clases** (pestaña Alumnos): *Nueva clase* con cuándo, duración, quién (uno o más alumnos, o un grupo), dónde y una nota; se puede anular. **Recordar las clases de mañana** envía el recordatorio a cada alumno (al padre o madre si es menor). En *Pasadas, por marcar* toca **Hecha**: la clase cuenta en el paquete del alumno. **Mis compromisos** (al final de la Agenda): **Compromiso** marca los días en que no estás (del… al…, ocupado, vacaciones, torneo, enfermo, otro y una nota). Salen en naranja en las clases y en el calendario; si una clase privada o de un curso cae en ellos, arriba aparece el aviso con la lista. Tus compromisos van a la secretaría con las asistencias de sus cursos (solo el motivo, no la nota): al cambiarlos, los cursos quedan por enviar. Al crear un curso, **Saltar mis compromisos** no cuenta esas clases, como los festivos. Arriba eliges **Mes** o **Lista**: el mes muestra un punto por cada clase privada (blanco), clase de curso (en el color del curso) y torneo de un alumno (morado), los festivos con el número en rojo y tus compromisos en naranja; toca un día para ver lo que tiene y una cosa para abrirla (‹ › cambian de mes, el título vuelve a hoy).
@@ -20290,7 +20290,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Cours et forfaits**: ses prochains cours et, avec *Nouveau forfait*, les cours achetés (nombre et prix, payé ou non). Le solde indique achetés, faits et restants et ce qui reste à payer ; *Marquer payé* clôt le forfait. Marqué payé, le forfait reçoit un numéro de **reçu** (2026/001…, une série par an) : en le touchant, le reçu PDF (non fiscal, au nom du parent pour les mineurs) peut être **envoyé à l'élève**, partagé ou **imprimé** depuis le téléphone. *Marquer payé* demande confirmation. En cas d'erreur, **appui long** sur le forfait : **Marquer non payé** (retire aussi le reçu : si c'était le dernier, le numéro redevient libre, sinon il reste un saut) ou **Supprimer le forfait** ; sur le PC, les mêmes boutons.
   - **Écrire**: le parent ou tuteur et le **Consentement aux vidéos et aux données** (à saisir dans *Modifier*, pour les mineurs ; les avis vont au téléphone du parent). **Écrire** ouvre un message WhatsApp, SMS ou e-mail à l'élève ; **Match avec…** fait choisir l'adversaire parmi les élèves et prépare le nouveau match avec les deux noms.
   - **Bilan pour l'élève** : choisissez *30 derniers jours* ou *Tout*, puis **PDF complet** (coups avec le pourcentage dedans et son évolution, mouvement, pour chaque coup un dedans et un dehors avec les trois images des moments clés, matchs, classement et vos notes) ou **Image pour WhatsApp** (une seule page avec les chiffres des coups et l'impact d'un coup). Le partage s'ouvre tout de suite : WhatsApp, e-mail ou ailleurs. Le bilan porte votre nom comme entraîneur (depuis *Vous*) et le club (depuis *Club › Terrains*).
-  - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
+  - **Travailler les coups** ouvre, par-dessus la fiche, l'entraînement des coups déjà à son nom : on choisit le coup et l'exercice et *Commencer* ouvre la caméra (aussi *Où placer le téléphone ?* et *Enregistrer la leçon*). **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
 - **La liste des élèves**: **Chercher un élève** par nom, trier *Par nom* ou *Par dernière fois*, filtrer *Tous*, *À revoir* (pas vus depuis plus de 2 semaines) ou un groupe. Sous chaque nom, la dernière fois que vous l'avez vu (séance ou cours fait).
 - **Groupes** (*Groupes ›* en haut de la liste) : *Nouveau groupe* avec un nom et des élèves (par exemple « Compétition U14 ») ; un groupe se filtre, se met dans un cours et se prévient d'un coup avec **Écrire**.
 - **Agenda des cours** (onglet Élèves) : *Nouveau cours* avec quand, durée, qui (un ou plusieurs élèves, ou un groupe), où et une note ; on peut l'annuler. **Rappeler les cours de demain** envoie le rappel à chaque élève (au parent s'il est mineur). Dans *Passés, à marquer* touchez **Fait** : le cours compte dans le forfait de l'élève. **Mes indisponibilités** (en bas de l'Agenda) : **Indisponibilité** marque les jours où tu n'es pas là (du… au…, occupé, congés, tournoi, malade, autre et une note). Elles sont en orange dans les leçons et le calendrier ; si une leçon privée ou une séance de cours tombe dessus, un avertissement avec la liste apparaît en haut. Tes indisponibilités partent au secrétariat avec les présences de ses cours (seulement le motif, pas la note) : quand tu les changes, les cours sont à envoyer. En créant un cours, **Sauter mes indisponibilités** ne compte pas ces séances, comme les jours fériés. En haut, choisis **Mois** ou **Liste** : le mois montre un point pour chaque leçon privée (blanc), séance de cours (dans la couleur du cours) et tournoi d'un élève (violet), les jours fériés avec le numéro en rouge et tes indisponibilités en orange ; touche un jour pour voir son contenu et un élément pour l'ouvrir (‹ › changent de mois, le titre revient à aujourd'hui).
@@ -20928,7 +20928,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Lezioni e pacchetti**: le sue prossime lezioni e, con *Nuovo pacchetto*, le lezioni comprate (numero e prezzo, già pagato o no). Il conto dice comprate, fatte e rimaste e quanto è da pagare; *Segna pagato* chiude il pacchetto. Segnato pagato, il pacchetto prende il numero di **ricevuta** (2026/001…, una serie per anno): toccandolo la ricevuta in PDF (non fiscale, intestata al genitore per i minorenni) si **manda all'allievo**, si condivide o si **stampa** dal telefono. *Segna pagato* chiede conferma. Per un errore, **tenendo premuto** il pacchetto: **Segna non pagato** (toglie anche la ricevuta: se era l'ultima il numero torna libero, sennò resta un salto) o **Elimina il pacchetto**; sul PC ci sono gli stessi pulsanti.
   - **Scrivi**: il genitore o tutore e il **Consenso a riprese e dati** (si inseriscono in *Modifica*, per i minorenni; gli avvisi vanno al telefono del genitore). **Scrivi** apre un messaggio WhatsApp, SMS o email all'allievo; **Partita con…** fa scegliere l'avversario tra gli allievi e prepara la nuova partita con i due nomi.
   - **Report per l'allievo**: scegli *Ultimi 30 giorni* o *Tutto*, poi **PDF completo** (colpi con la percentuale dentro e l'andamento, il movimento, per ogni colpo uno dentro e uno fuori con le tre immagini dei momenti chiave, partite, rating e le tue note) o **Immagine per WhatsApp** (una pagina sola con i numeri dei colpi e l'impatto di un colpo). Si apre subito la condivisione: WhatsApp, email o dove vuoi. Il report porta il tuo nome come allenatore (da *Tu*) e il circolo (da *Circolo › Campi*).
-  - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
+  - **Allena i colpi** apre, sopra la scheda, l'allenamento dei colpi già col suo nome: si sceglie il colpo e l'esercizio e *Inizia* apre la telecamera (anche *Dove mettere il telefono?* e *Registra la lezione*). **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
 - **L'elenco degli allievi**: **Cerca un allievo** per nome, ordina *Per nome* o *Per ultima volta*, filtra *Tutti*, *Da rivedere* (non li vedi da più di 2 settimane) o un gruppo. Sotto ogni nome c'è l'ultima volta che l'hai visto (sessione o lezione fatta).
 - **Gruppi** (*Gruppi ›* in cima all'elenco): *Nuovo gruppo* con nome e allievi (per esempio "Agonisti U14"); il gruppo si filtra, si mette in una lezione e con **Scrivi** si avvisa tutto insieme.
 - **Agenda delle lezioni** (scheda Allievi): *Nuova lezione* con quando, durata, chi (uno o più allievi, o un gruppo), dove e una nota; si può annullare. **Ricorda le lezioni di domani** manda il promemoria a ogni allievo (al genitore se è minorenne). In *Passate, da segnare* tocca **Fatta**: la lezione conta nel pacchetto dell'allievo. **I miei impegni** (in fondo all'Agenda): **Impegno** segna i giorni in cui non ci sei (dal… al…, occupato, ferie, torneo, malattia, altro e una nota). Sono in arancione nelle lezioni e nel calendario; se una lezione privata o di un corso ci cade, in cima compare l'avviso con l'elenco. I tuoi impegni vanno alla segreteria con le presenze dei suoi corsi (solo il motivo, non la nota): cambiandoli, i corsi risultano da mandare. Creando un corso, **Salta i miei impegni** non conta quelle lezioni, come le feste. In cima scegli **Mese** o **Elenco**: il mese mostra un pallino per ogni lezione privata (bianco), lezione di corso (nel colore del corso) e torneo di un allievo (viola), le feste col numero in rosso e i tuoi impegni in arancione; tocca un giorno per vederne le cose e una per aprirla (‹ › cambiano mese, il titolo torna a oggi).
@@ -21566,7 +21566,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Aulas e pacotes**: as próximas aulas e, com *Novo pacote*, as aulas compradas (número e preço, pago ou não). O saldo mostra compradas, feitas e restantes e quanto falta pagar; *Marcar como pago* fecha o pacote. Marcado como pago, o pacote recebe um número de **recibo** (2026/001…, uma série por ano): ao tocá-lo, o recibo em PDF (não fiscal, em nome do responsável para menores) pode ser **enviado ao aluno**, partilhado ou **impresso** a partir do telefone. *Marcar como pago* pede confirmação. Em caso de erro, **mantenha premido** o pacote: **Marcar como não pago** (tira também o recibo: se era o último, o número fica livre; senão fica um salto) ou **Eliminar o pacote**; no PC há os mesmos botões.
   - **Escrever**: o pai, mãe ou tutor e o **Consentimento para filmagens e dados** (introduzem-se em *Editar*, para menores; os avisos vão para o telefone do responsável). **Escrever** abre uma mensagem de WhatsApp, SMS ou email ao aluno; **Partida com…** faz escolher o adversário entre os alunos e prepara a partida nova com os dois nomes.
   - **Relatório para o aluno**: escolha *Últimos 30 dias* ou *Tudo*, depois **PDF completo** (golpes com a porcentagem dentro e a evolução, movimento, de cada golpe um dentro e um fora com as três imagens dos momentos-chave, partidas, rating e suas notas) ou **Imagem para WhatsApp** (uma página só com os números dos golpes e o impacto de um golpe). O compartilhamento abre na hora: WhatsApp, e-mail ou onde quiser. O relatório leva seu nome como treinador (de *Você*) e o clube (de *Clube › Quadras*).
-  - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
+  - **Treinar golpes** abre, sobre a ficha, o treino de golpes já com o nome dele: escolhe-se o golpe e o exercício e *Começar* abre a câmera (também *Onde coloco o telefone?* e *Gravar a aula*). **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 - **A lista de alunos**: **Procurar um aluno** pelo nome, ordenar *Por nome* ou *Pela última vez*, filtrar *Todos*, *Por rever* (não os vês há mais de 2 semanas) ou um grupo. Debaixo de cada nome aparece a última vez que o viste (sessão ou aula feita).
 - **Grupos** (*Grupos ›* no topo da lista): *Novo grupo* com nome e alunos (por exemplo "Competição U14"); o grupo filtra-se, põe-se numa aula e avisa-se todo de uma vez com **Escrever**.
 - **Agenda das aulas** (separador Alunos): *Nova aula* com quando, duração, quem (um ou mais alunos, ou um grupo), onde e uma nota; pode ser anulada. **Lembrar as aulas de amanhã** envia o lembrete a cada aluno (ao responsável se for menor). Em *Passadas, por marcar* toca **Feita**: a aula conta no pacote do aluno. **Os meus compromissos** (no fim da Agenda): **Compromisso** marca os dias em que não estás (de… até…, ocupado, férias, torneio, doente, outro e uma nota). Aparecem a laranja nas aulas e no calendário; se uma aula privada ou de um curso calhar neles, no topo aparece o aviso com a lista. Os teus compromissos vão para a secretaria com as presenças dos cursos dela (só o motivo, não a nota): ao mudá-los, os cursos ficam por enviar. Ao criar um curso, **Saltar os meus compromissos** não conta essas aulas, como os feriados. Em cima escolhes **Mês** ou **Lista**: o mês mostra um ponto por cada aula privada (branco), aula de curso (na cor do curso) e torneio de um aluno (roxo), os feriados com o número a vermelho e os teus compromissos a laranja; toca num dia para ver o que tem e numa coisa para a abrir (‹ › mudam de mês, o título volta a hoje).
@@ -24058,12 +24058,6 @@ class MatchController(
     fun restoreCoachStudent() {
         if (trainStudent.value != null) return
         storage.coachStudent.takeIf { id -> students.value.any { it.id == id } }?.let { setTrainStudent(it) }
-    }
-
-    /** "Allena ora" dalla scheda di un allievo (ruolo Allenatore): lui scelto, pronto per Inizia. */
-    fun coachNow(id: String) {
-        setTrainStudent(id)
-        home(HomeTab.STUDENTS)
     }
 
     // ---------------------------------------------------------------- TSM Arena
@@ -57288,6 +57282,51 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
+/**
+ * "Allena i colpi" dalla scheda dell'allievo: tutto qui, senza cambiare schermata (e in ogni ruolo). L'allievo è già
+ * scelto; si sceglie il colpo (col numero delle sue sessioni) e l'esercizio, e Inizia apre la telecamera. Anche dove
+ * mettere il telefono e la lezione registrata.
+ */
+@Composable
+fun TrainStrokeDialog(c: MatchController, student: com.tennis.scoremanager.data.PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val sessions by c.serveSessions.collectAsState()
+    val stroke by c.trainStroke.collectAsState()
+    var help by remember { mutableStateOf(false) }
+    // Le sessioni di questa volta vanno all'allievo della scheda.
+    LaunchedEffect(student.id) { c.setTrainStudent(student.id) }
+    fun camera(lesson: Boolean) {
+        c.setTrainStudent(student.id)
+        val i = Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true)
+        context.startActivity(if (lesson) i.putExtra(CameraActivity.EXTRA_LESSON, true) else i.putExtra(CameraActivity.EXTRA_STROKE, stroke.name))
+        onDone()
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { Icon(Icons.Filled.Videocam, null, tint = LocalArea.current) },
+        title = { Text("${s.studentTrainNow} · ${student.name}") },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                val strokes = TrainedStroke.entries
+                Segmented(
+                    strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == student.id }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+                    strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
+                )
+                DrillRow(c, stroke)
+                BigButton(s.serveStart, Icons.Filled.Videocam, { camera(lesson = false) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+                GhostButton(s.lessonRecord, Icons.Filled.School, { camera(lesson = true) }, Modifier.fillMaxWidth())
+                Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (help) ServePlacementDialog(stroke) { help = false }
+}
+
 /** Chi si allena con l'allenatore: uno dei suoi allievi (le sessioni, le cartelle e l'andamento sono suoi). */
 @Composable
 fun TraineeRow(c: MatchController) {
@@ -61890,7 +61929,7 @@ object ItStrings : Strings {
     override val studentLost = "Persa"
     override val studentNotes = "Note dell'allenatore"
     override val studentNotesHint = "Cosa lavorare, obiettivi, sensazioni…"
-    override val studentTrainNow = "Allena ora"
+    override val studentTrainNow = "Allena i colpi"
     override val studentDelete = "Togli l'allievo"
     override val studentPhotoHint = "Tocca per la foto: la stessa delle partite."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sessione" else "$n sessioni" }
@@ -63677,7 +63716,7 @@ object ItStrings : Strings {
     override val egStudentsTitle = "Il tuo primo allievo"
     override val egStudents1 = "Tocca Nuovo allievo e scrivi nome e cognome."
     override val egStudents2 = "Se ha già l'app, fatti mandare il suo profilo col QR."
-    override val egStudents3 = "Dalla sua scheda: Allena ora, lezioni, obiettivi e report."
+    override val egStudents3 = "Dalla sua scheda: Allena i colpi, lezioni, obiettivi e report."
     override val egMembersTitle = "Il primo socio"
     override val egMembers1 = "Tocca Nuovo socio e scegli il giocatore, o crealo."
     override val egMembers2 = "Segna tessera, certificato medico e consensi."
@@ -64820,7 +64859,7 @@ object EnStrings : Strings {
     override val studentLost = "Lost"
     override val studentNotes = "Coach's notes"
     override val studentNotesHint = "What to work on, goals, feelings…"
-    override val studentTrainNow = "Practise now"
+    override val studentTrainNow = "Practise strokes"
     override val studentDelete = "Remove student"
     override val studentPhotoHint = "Tap for the photo: the same as in matches."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 session" else "$n sessions" }
@@ -66608,7 +66647,7 @@ object EnStrings : Strings {
     override val egStudentsTitle = "Your first student"
     override val egStudents1 = "Tap New student and enter first and last name."
     override val egStudents2 = "If they already have the app, have them send you their profile by QR."
-    override val egStudents3 = "From their profile: Practise now, lessons, goals and reports."
+    override val egStudents3 = "From their profile: Practise strokes, lessons, goals and reports."
     override val egMembersTitle = "Your first member"
     override val egMembers1 = "Tap New member and pick the player, or create one."
     override val egMembers2 = "Record the membership card, medical certificate and consents."
@@ -67773,7 +67812,7 @@ object DeStrings : Strings {
     override val studentLost = "Verloren"
     override val studentNotes = "Notizen des Trainers"
     override val studentNotesHint = "Woran arbeiten, Ziele, Eindrücke …"
-    override val studentTrainNow = "Jetzt trainieren"
+    override val studentTrainNow = "Schläge trainieren"
     override val studentDelete = "Schüler entfernen"
     override val studentPhotoHint = "Antippen für das Foto: dasselbe wie in den Matches."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 Einheit" else "$n Einheiten" }
@@ -69564,7 +69603,7 @@ object DeStrings : Strings {
     override val egStudentsTitle = "Dein erster Schüler"
     override val egStudents1 = "Tippe auf Neuer Schüler und gib Vor- und Nachnamen ein."
     override val egStudents2 = "Hat er die App schon, lass dir sein Profil per QR schicken."
-    override val egStudents3 = "In seinem Profil: Jetzt trainieren, Stunden, Ziele und Berichte."
+    override val egStudents3 = "In seinem Profil: Schläge trainieren, Stunden, Ziele und Berichte."
     override val egMembersTitle = "Das erste Mitglied"
     override val egMembers1 = "Tippe auf Neues Mitglied und wähle den Spieler oder lege ihn an."
     override val egMembers2 = "Trage Ausweis, ärztliches Attest und Einwilligungen ein."
@@ -70719,7 +70758,7 @@ object EsStrings : Strings {
     override val studentLost = "Perdido"
     override val studentNotes = "Notas del entrenador"
     override val studentNotesHint = "Qué trabajar, objetivos, sensaciones…"
-    override val studentTrainNow = "Entrenar ahora"
+    override val studentTrainNow = "Entrenar golpes"
     override val studentDelete = "Quitar alumno"
     override val studentPhotoHint = "Toca para la foto: la misma de los partidos."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sesión" else "$n sesiones" }
@@ -72510,7 +72549,7 @@ object EsStrings : Strings {
     override val egStudentsTitle = "Tu primer alumno"
     override val egStudents1 = "Toca Nuevo alumno y escribe nombre y apellidos."
     override val egStudents2 = "Si ya tiene la app, pídele que te mande su perfil con el QR."
-    override val egStudents3 = "Desde su ficha: Entrenar ahora, clases, objetivos e informes."
+    override val egStudents3 = "Desde su ficha: Entrenar golpes, clases, objetivos e informes."
     override val egMembersTitle = "El primer socio"
     override val egMembers1 = "Toca Nuevo socio y elige al jugador, o créalo."
     override val egMembers2 = "Anota la licencia, el certificado médico y los consentimientos."
@@ -73667,7 +73706,7 @@ object FrStrings : Strings {
     override val studentLost = "Perdu"
     override val studentNotes = "Notes de l'entraîneur"
     override val studentNotesHint = "Ce qu'il faut travailler, objectifs, sensations…"
-    override val studentTrainNow = "S'entraîner maintenant"
+    override val studentTrainNow = "Travailler les coups"
     override val studentDelete = "Retirer l'élève"
     override val studentPhotoHint = "Touchez pour la photo : la même que dans les matchs."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 séance" else "$n séances" }
@@ -75458,7 +75497,7 @@ object FrStrings : Strings {
     override val egStudentsTitle = "Votre premier élève"
     override val egStudents1 = "Touchez Nouvel élève et indiquez nom et prénom."
     override val egStudents2 = "S'il a déjà l'appli, demandez-lui d'envoyer son profil par QR."
-    override val egStudents3 = "Depuis sa fiche : S'entraîner maintenant, leçons, objectifs et rapports."
+    override val egStudents3 = "Depuis sa fiche : Travailler les coups, leçons, objectifs et rapports."
     override val egMembersTitle = "Le premier adhérent"
     override val egMembers1 = "Touchez Nouvel adhérent et choisissez le joueur, ou créez-le."
     override val egMembers2 = "Notez la licence, le certificat médical et les consentements."
@@ -76616,7 +76655,7 @@ object PtStrings : Strings {
     override val studentLost = "Perdida"
     override val studentNotes = "Notas do treinador"
     override val studentNotesHint = "O que trabalhar, objetivos, sensações…"
-    override val studentTrainNow = "Treinar agora"
+    override val studentTrainNow = "Treinar golpes"
     override val studentDelete = "Remover aluno"
     override val studentPhotoHint = "Toque para a foto: a mesma das partidas."
     override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sessão" else "$n sessões" }
@@ -78407,7 +78446,7 @@ object PtStrings : Strings {
     override val egStudentsTitle = "Seu primeiro aluno"
     override val egStudents1 = "Toque em Novo aluno e informe nome e sobrenome."
     override val egStudents2 = "Se ele já tem o app, peça para mandar o perfil pelo QR."
-    override val egStudents3 = "Na ficha dele: Treinar agora, aulas, metas e relatórios."
+    override val egStudents3 = "Na ficha dele: Treinar golpes, aulas, metas e relatórios."
     override val egMembersTitle = "O primeiro sócio"
     override val egMembers1 = "Toque em Novo sócio e escolha o jogador, ou crie um."
     override val egMembers2 = "Registre a carteirinha, o atestado médico e os consentimentos."
@@ -90439,6 +90478,8 @@ fun StudentScreen(c: MatchController) {
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
     var sendProfile by remember { mutableStateOf(false) }
+    var trainStrokes by remember { mutableStateOf(false) }
+    if (trainStrokes) com.tennis.scoremanager.ui.TrainStrokeDialog(c, st) { trainStrokes = false }
     if (sendProfile) com.tennis.scoremanager.ui.SendProfileDialog(c, st) { sendProfile = false }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
@@ -90464,8 +90505,9 @@ fun StudentScreen(c: MatchController) {
         },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.coachNow(st.id) }, Modifier.weight(1f))
+            // L'allenamento dei colpi di questo allievo, qui sopra la scheda: colpo, esercizio e Inizia.
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { trainStrokes = true }, Modifier.weight(1f),
+                color = com.tennis.scoremanager.ui.LocalArea.current, onColor = com.tennis.scoremanager.ui.TsmColors.OnArea)
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

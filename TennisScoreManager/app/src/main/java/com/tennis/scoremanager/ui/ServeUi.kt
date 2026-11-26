@@ -203,6 +203,51 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
+/**
+ * "Allena i colpi" dalla scheda dell'allievo: tutto qui, senza cambiare schermata (e in ogni ruolo). L'allievo è già
+ * scelto; si sceglie il colpo (col numero delle sue sessioni) e l'esercizio, e Inizia apre la telecamera. Anche dove
+ * mettere il telefono e la lezione registrata.
+ */
+@Composable
+fun TrainStrokeDialog(c: MatchController, student: com.tennis.scoremanager.data.PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val sessions by c.serveSessions.collectAsState()
+    val stroke by c.trainStroke.collectAsState()
+    var help by remember { mutableStateOf(false) }
+    // Le sessioni di questa volta vanno all'allievo della scheda.
+    LaunchedEffect(student.id) { c.setTrainStudent(student.id) }
+    fun camera(lesson: Boolean) {
+        c.setTrainStudent(student.id)
+        val i = Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true)
+        context.startActivity(if (lesson) i.putExtra(CameraActivity.EXTRA_LESSON, true) else i.putExtra(CameraActivity.EXTRA_STROKE, stroke.name))
+        onDone()
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { Icon(Icons.Filled.Videocam, null, tint = LocalArea.current) },
+        title = { Text("${s.studentTrainNow} · ${student.name}") },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                val strokes = TrainedStroke.entries
+                Segmented(
+                    strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == student.id }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+                    strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
+                )
+                DrillRow(c, stroke)
+                BigButton(s.serveStart, Icons.Filled.Videocam, { camera(lesson = false) }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+                GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+                GhostButton(s.lessonRecord, Icons.Filled.School, { camera(lesson = true) }, Modifier.fillMaxWidth())
+                Text(s.lessonRecordHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (help) ServePlacementDialog(stroke) { help = false }
+}
+
 /** Chi si allena con l'allenatore: uno dei suoi allievi (le sessioni, le cartelle e l'andamento sono suoi). */
 @Composable
 fun TraineeRow(c: MatchController) {

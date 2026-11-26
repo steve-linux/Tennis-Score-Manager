@@ -1202,12 +1202,6 @@ class MatchController(
         storage.coachStudent.takeIf { id -> students.value.any { it.id == id } }?.let { setTrainStudent(it) }
     }
 
-    /** "Allena ora" dalla scheda di un allievo (ruolo Allenatore): lui scelto, pronto per Inizia. */
-    fun coachNow(id: String) {
-        setTrainStudent(id)
-        home(HomeTab.STUDENTS)
-    }
-
     // ---------------------------------------------------------------- TSM Arena
 
     /**

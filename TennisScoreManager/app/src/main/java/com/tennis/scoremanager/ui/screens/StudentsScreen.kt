@@ -192,6 +192,8 @@ fun StudentScreen(c: MatchController) {
     var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
     var sendProfile by remember { mutableStateOf(false) }
+    var trainStrokes by remember { mutableStateOf(false) }
+    if (trainStrokes) com.tennis.scoremanager.ui.TrainStrokeDialog(c, st) { trainStrokes = false }
     if (sendProfile) com.tennis.scoremanager.ui.SendProfileDialog(c, st) { sendProfile = false }
     ScreenScaffold(
         onHelp = { c.openHelp("7.6") },
@@ -217,8 +219,9 @@ fun StudentScreen(c: MatchController) {
         },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.coachNow(st.id) }, Modifier.weight(1f))
+            // L'allenamento dei colpi di questo allievo, qui sopra la scheda: colpo, esercizio e Inizia.
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { trainStrokes = true }, Modifier.weight(1f),
+                color = com.tennis.scoremanager.ui.LocalArea.current, onColor = com.tennis.scoremanager.ui.TsmColors.OnArea)
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
