@@ -245,6 +245,7 @@ fun StudentScreen(c: MatchController) {
         val tabs = buildList {
             add(StudentTab.CARD)
             if (st.student) add(StudentTab.LESSONS)
+            add(StudentTab.NOTES)
             if (st.student || mine.isNotEmpty()) add(StudentTab.TRAINING)
             add(StudentTab.MATCHES)
         }
@@ -370,21 +371,8 @@ fun StudentScreen(c: MatchController) {
         }
 
         }
-        // Note dell'allenatore: si salvano da sole mentre si scrive.
-        if (tab == StudentTab.CARD) SectionCard(s.studentNotes, Icons.Filled.EditNote) {
-            var note by remember(st.id) { mutableStateOf(st.note) }
-            LaunchedEffect(note) {
-                if (note == st.note) return@LaunchedEffect
-                delay(800)
-                c.savePlayer(st.copy(note = note))
-            }
-            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
-                // Ogni nota dettata in cima (la più recente è la prima): una riga con calendario e data corta, orologio e
-                // ora, e sotto il testo.
-                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said ->
-                    note = com.tennis.scoremanager.ui.appendDictatedLine(note, said, noteStamp(System.currentTimeMillis())).take(4000)
-                } })
-        }
+        // Le note dell'allenatore, una per una, nella loro sotto-scheda (nota generale, elenco, resoconto, riassunto).
+        if (tab == StudentTab.NOTES) com.tennis.scoremanager.ui.CoachNotesSection(c, st)
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
         if (st.student && tab == StudentTab.LESSONS) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
         if (st.student && tab == StudentTab.TRAINING) com.tennis.scoremanager.ui.StudentProgressSections(c, st)
@@ -530,18 +518,17 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
 }
 
 /** Le sotto-schede della scheda del giocatore. */
-private enum class StudentTab { CARD, LESSONS, TRAINING, MATCHES }
+private enum class StudentTab { CARD, LESSONS, NOTES, TRAINING, MATCHES }
 
 private fun studentTabName(s: com.tennis.scoremanager.ui.Strings, t: StudentTab): String = when (t) {
     StudentTab.CARD -> s.stTabCard
     StudentTab.LESSONS -> s.stTabLessons
+    StudentTab.NOTES -> s.cnTabNotes
     StudentTab.TRAINING -> s.stTabTraining
     StudentTab.MATCHES -> s.studentMatches
 }
 
-/** Data e ora di una nota dettata, uguali in ogni lingua: "📅 26.11.26  🕐 18:30". */
-internal fun noteStamp(at: Long): String {
-    val d = java.util.Date(at)
-    return "📅 " + java.text.SimpleDateFormat("dd.MM.yy", java.util.Locale.ROOT).format(d) +
-        "  🕐 " + java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(d)
-}
+/** Giorno e ora di una nota dettata, uguali in ogni lingua: "26.11.26", "18:30". */
+internal fun noteDay(at: Long): String = java.text.SimpleDateFormat("dd.MM.yy", java.util.Locale.ROOT).format(java.util.Date(at))
+internal fun noteTime(at: Long): String = java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(java.util.Date(at))
+

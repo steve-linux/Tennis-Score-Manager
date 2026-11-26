@@ -18368,7 +18368,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Schläge**: für Aufschlag, Vorhand, Rückhand und Volley die Einheiten, die Schläge, das letzte Mal und die Linie der Schläge im Feld; ein Schlag antippen öffnet seine Einheiten.
   - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
   - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
-  - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst. Mit dem Mikrofon kommt jede diktierte Notiz ganz nach oben (die neueste zuerst): eine Zeile mit Datum und Uhrzeit (📅 26.11.26  🕐 18:30), darunter der Text.
+  - **Notizen** (Unter-Tab): oben die **allgemeine Notiz** (Ziele, Dinge, an die du immer denken willst); darunter eine **neue Notiz**, geschrieben oder per Mikrofon diktiert, auf Wunsch mit Thema (Aufschlag, Vorhand, Rückhand, Volley, Taktik, Kondition, Kopf) und **Notiz hinzufügen**. Die Notizen stehen in einer Liste, die neueste oben, nach Monat (vergangene Monate zugeklappt: antippen zum Öffnen) und nach Tag (📅 26.11.26, dann 🕐 18:45 für jede Notiz); eine Notiz antippen, um sie zu ändern oder zu löschen. Bei vielen Notizen: **Suche**, Zeitraum (alles, 30 Tage, 3 Monate, 12 Monate) und Thema. **Übersicht** teilt die angezeigten Notizen nach Thema; die Notizen des Zeitraums kommen auch in den Schülerbericht. **Zusammenfassung anfragen**: schreibe oder diktiere, was du wissen willst (oder wähle *Was besser geworden ist*, *Eine Nachricht für die Eltern*, *Ein Plan für die nächsten 4 Stunden*), und die App gibt Anfrage und Notizen an den Assistenten deiner Wahl weiter (Gemini, ChatGPT, Claude…), standardmäßig nur mit dem Vornamen; die App sendet nichts von selbst, aber die Notizen verlassen das Telefon.
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
   - **Stundentagebuch**: *Ins Tagebuch* eine Zeile pro Stunde (was ihr gemacht habt, was noch zu tun ist), mit Datum; die neueste oben. **Per Stimme**: **Notiz diktieren** (oder das 🎤 im Feld) nutzt die Spracheingabe des Telefons, auf neueren Telefonen auch offline: du sprichst und der Text kommt mit Datum ins Tagebuch. Das 🎤 gibt es auch in den Trainernotizen, in der Notiz einer Kursstunde und in der technischen Bewertung.
   - **Ziele**: *Neues Ziel* für einen Schlag, zum Beispiel Vorhand mit 70 % im Feld im Schnitt der letzten 3 Einheiten, mit optionalem Datum. Die Karte zeigt den Stand; wird es erreicht, bekommt das Ziel das Datum von selbst.
@@ -19007,7 +19007,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Strokes**: for serve, forehand, backhand and volley the sessions, the shots, the last time and the line of shots in; tapping a stroke opens its sessions.
   - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
   - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
-  - **Coach's notes**: what to work on, goals; they save by themselves. With the microphone each dictated note goes at the top (newest first): a line with date and time (📅 26.11.26  🕐 18:30), and the text below.
+  - **Notes** (sub-tab): at the top the **general note** (goals, things to always remember); below a **new note**, written or dictated with the microphone, with a topic if you like (serve, forehand, backhand, volley, tactics, fitness, mental) and **Add note**. Notes are listed newest first, by month (past months closed: tap to open) and by day (📅 26.11.26, then 🕐 18:45 for each note); tap a note to edit or delete it. With many notes: **search**, period (all, 30 days, 3 months, 12 months) and topic. **Summary** shares the notes you see, split by topic; the notes of the period also go into the student report. **Ask for a summary**: write or dictate what you want to know (or pick *What has improved*, *A message for the parents*, *A plan for the next 4 lessons*) and the app hands request and notes to the assistant you choose (Gemini, ChatGPT, Claude…), by default with the student's first name only; the app sends nothing by itself, but the notes leave the phone.
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
   - **Lesson diary**: *Add to the diary* one line per lesson (what you did, what is left to do), with the date; the newest on top. **By voice**: **Dictate a note** (or the 🎤 in the field) uses the phone's dictation, offline too on recent phones: you speak and the text goes into the diary with the date. The 🎤 is also in the coach's notes, in a course lesson's note and in the technical assessment's note.
   - **Goals**: *New goal* on a stroke, for example forehand at 70% in over the average of the last 3 sessions, with an optional date. The card shows how far they are; when they reach it, the goal takes the date by itself.
@@ -19645,7 +19645,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Golpes**: para saque, derecha, revés y volea las sesiones, los golpes, la última vez y la línea de golpes dentro; al tocar un golpe se abren sus sesiones.
   - **Movimiento**: las medidas del análisis (6.4 y 7.5) de la última sesión analizada junto a la anterior, para ver qué cambia.
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
-  - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas. Con el micrófono cada nota dictada va arriba del todo (la más reciente primero): una línea con fecha y hora (📅 26.11.26  🕐 18:30) y debajo el texto.
+  - **Notas** (subpestaña): arriba la **nota general** (objetivos, cosas que recordar siempre); debajo una **nota nueva**, escrita o dictada con el micrófono, con el tema si quieres (saque, derecha, revés, volea, táctica, físico, cabeza) y **Añadir nota**. Las notas están en lista, la más reciente arriba, por mes (meses pasados cerrados: un toque los abre) y por día (📅 26.11.26, luego 🕐 18:45 en cada nota); un toque en una nota la modifica o la borra. Con muchas notas: **buscar**, periodo (todo, 30 días, 3 meses, 12 meses) y tema. **Resumen** comparte las notas que ves, por tema; las notas del periodo van también al informe del alumno. **Pedir un resumen**: escribe o dicta qué quieres saber (o elige *Qué ha mejorado*, *Un mensaje para los padres*, *Un plan para las próximas 4 clases*) y la app pasa petición y notas al asistente que elijas (Gemini, ChatGPT, Claude…), por defecto solo con el nombre del alumno; la app no envía nada sola, pero las notas salen del teléfono.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
   - **Diario de clases**: *Añadir al diario* una línea por clase (qué habéis hecho, qué queda por hacer), con la fecha; la más reciente arriba. **Por voz**: **Dictar una nota** (o el 🎤 del campo) usa el dictado del teléfono, también sin conexión en los teléfonos recientes: hablas y el texto va al diario con la fecha. El 🎤 está también en las notas del entrenador, en la nota de una clase del curso y en la de la evaluación técnica.
   - **Objetivos**: *Nuevo objetivo* sobre un golpe, por ejemplo derecha al 70 % dentro en la media de las últimas 3 sesiones, con una fecha opcional. La ficha muestra cómo va; cuando lo alcanza, el objetivo toma la fecha solo.
@@ -20283,7 +20283,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Coups** : pour le service, le coup droit, le revers et la volée les séances, les coups, la dernière fois et la courbe des coups dedans ; toucher un coup ouvre ses séances.
   - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
   - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
-  - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules. Avec le micro, chaque note dictée va en haut (la plus récente d'abord) : une ligne avec la date et l'heure (📅 26.11.26  🕐 18:30), et le texte en dessous.
+  - **Mes notes** (sous-onglet) : en haut la **note générale** (objectifs, choses à toujours retenir) ; dessous une **nouvelle note**, écrite ou dictée au micro, avec le sujet si vous voulez (service, coup droit, revers, volée, tactique, physique, mental) et **Ajouter la note**. Les notes sont en liste, la plus récente en haut, par mois (mois passés fermés : un toucher les ouvre) et par jour (📅 26.11.26, puis 🕐 18:45 pour chaque note) ; un toucher sur une note la modifie ou la supprime. Avec beaucoup de notes : **recherche**, période (tout, 30 jours, 3 mois, 12 mois) et sujet. **Compte rendu** partage les notes affichées, par sujet ; les notes de la période vont aussi dans le rapport de l'élève. **Demander un résumé** : écrivez ou dictez ce que vous voulez savoir (ou choisissez *Ce qui s'est amélioré*, *Un message pour les parents*, *Un plan pour les 4 prochaines leçons*) et l'appli transmet demande et notes à l'assistant de votre choix (Gemini, ChatGPT, Claude…), par défaut avec le seul prénom de l'élève ; l'appli n'envoie rien toute seule, mais les notes quittent le téléphone.
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
   - **Journal des cours**: *Ajouter au journal* une ligne par cours (ce que vous avez fait, ce qui reste à faire), avec la date ; le plus récent en haut. **À la voix** : **Dicter une note** (ou le 🎤 dans le champ) utilise la dictée du téléphone, même hors ligne sur les téléphones récents : vous parlez et le texte va dans le journal avec la date. Le 🎤 est aussi dans les notes de l'entraîneur, dans la note d'une séance de cours et dans celle de l'évaluation technique.
   - **Objectifs**: *Nouvel objectif* sur un coup, par exemple coup droit à 70 % dedans sur la moyenne des 3 dernières séances, avec une date facultative. La fiche montre où il en est ; quand il l'atteint, l'objectif prend la date tout seul.
@@ -20921,7 +20921,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Colpi**: per servizio, dritto, rovescio e volée le sessioni, i colpi, l'ultima volta e la linea dei colpi dentro; toccando un colpo si aprono le sue sessioni.
   - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
   - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
-  - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole. Col microfono ogni nota dettata va in cima (la più recente è la prima): sopra una riga con data e ora (📅 26.11.26  🕐 18:30), sotto il testo.
+  - **Note** (sotto-scheda): in alto la **nota generale** (obiettivi, cose da ricordare sempre); sotto una **nota nuova**, scritta o dettata col microfono, con l'argomento se vuoi (servizio, dritto, rovescio, volée, tattica, fisico, testa) e **Aggiungi nota**. Le note sono in elenco, la più recente in cima, divise per mese (i mesi passati chiusi: un tocco li apre) e per giorno (📅 26.11.26, poi 🕐 18:45 per ogni nota); un tocco su una nota la modifica o la elimina. Con molte note: **cerca**, periodo (tutto, 30 giorni, 3 mesi, 12 mesi) e argomento. **Resoconto** condivide le note che vedi, divise per argomento; le stesse note del periodo vanno anche nel report dell'allievo. **Chiedi un riassunto**: scrivi o detta cosa vuoi sapere (o scegli *Cosa è migliorato*, *Un messaggio per i genitori*, *Un piano per le prossime 4 lezioni*) e l'app passa richiesta e note all'assistente che scegli tu (Gemini, ChatGPT, Claude…), di serie col solo nome dell'allievo; l'app non manda niente da sola, ma le note escono dal telefono.
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
   - **Diario delle lezioni**: *Aggiungi al diario* una riga per lezione (cosa avete fatto, cosa resta da fare), con la data; il più recente in alto. **A voce**: **Detta una nota** (o il 🎤 nel campo) usa la dettatura del telefono, anche senza rete sui telefoni recenti: parli e il testo va nel diario con la data. Il 🎤 c'è anche nelle note dell'allenatore, nella nota della lezione di un corso e in quella della valutazione tecnica.
   - **Obiettivi**: *Nuovo obiettivo* su un colpo, per esempio dritto al 70% dentro sulla media delle ultime 3 sessioni, con una data facoltativa. La scheda mostra a che punto è; quando lo raggiunge, l'obiettivo prende la data da solo.
@@ -21559,7 +21559,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Golpes**: para saque, forehand, backhand e voleio as sessões, os golpes, a última vez e a linha dos golpes dentro; tocando num golpe abrem-se as sessões dele.
   - **Movimento**: as medidas da análise (6.4 e 7.5) da última sessão analisada ao lado da anterior, para ver o que muda.
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
-  - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas. Com o microfone cada nota ditada vai no topo (a mais recente primeiro): uma linha com data e hora (📅 26.11.26  🕐 18:30) e embaixo o texto.
+  - **Anotações** (subaba): no alto a **anotação geral** (metas, coisas para lembrar sempre); abaixo uma **anotação nova**, escrita ou ditada com o microfone, com o tema se quiser (saque, forehand, backhand, voleio, tática, físico, cabeça) e **Adicionar anotação**. As anotações ficam em lista, a mais recente no topo, por mês (meses passados fechados: um toque abre) e por dia (📅 26.11.26, depois 🕐 18:45 em cada uma); um toque numa anotação a edita ou apaga. Com muitas anotações: **buscar**, período (tudo, 30 dias, 3 meses, 12 meses) e tema. **Resumo** compartilha as anotações que você vê, por tema; as do período vão também para o relatório do aluno. **Pedir um resumo**: escreva ou dite o que quer saber (ou escolha *O que melhorou*, *Uma mensagem para os pais*, *Um plano para as próximas 4 aulas*) e o app passa pedido e anotações ao assistente que você escolher (Gemini, ChatGPT, Claude…), por padrão só com o nome do aluno; o app não envia nada sozinho, mas as anotações saem do celular.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
   - **Diário das aulas**: *Adicionar ao diário* uma linha por aula (o que fizeram, o que falta fazer), com a data; a mais recente no topo. **Por voz**: **Ditar uma nota** (ou o 🎤 no campo) usa o ditado do telefone, também sem rede nos telefones recentes: fala e o texto vai para o diário com a data. O 🎤 está também nas notas do treinador, na nota de uma aula do curso e na da avaliação técnica.
   - **Metas**: *Nova meta* num golpe, por exemplo direita a 70 % dentro na média das últimas 3 sessões, com uma data opcional. A ficha mostra em que ponto está; quando a atinge, a meta fica com a data sozinha.
@@ -25430,7 +25430,13 @@ class MatchController(
             listOf(d(it.at), it.event, it.opponent + (it.opponentRanking.ifBlank { null }?.let { r -> " ($r)" } ?: ""), it.score, if (it.won) s.studentWon else s.studentLost)
                 .filter { x -> x.isNotBlank() }.joinToString(" · ")
         }
-        return listOf(s.evTitle to evalLines, s.ftTitle to testLines, s.rkTitle to rankLines, s.evPresence to courseLines, s.mmTitle to manual)
+        // Le note dell'allenatore del periodo, divise per argomento.
+        val notes = com.tennis.scoremanager.data.CoachNotes.report(
+            p.coachNotes.filter { inPeriod(it.at) },
+            label = { t -> "${s.studentNotes} · ${com.tennis.scoremanager.ui.noteTagLabel(s, t)}" },
+            stamp = { at -> com.tennis.scoremanager.ui.screens.noteDay(at) },
+        )
+        return listOf(s.evTitle to evalLines, s.ftTitle to testLines, s.rkTitle to rankLines, s.evPresence to courseLines, s.mmTitle to manual) + notes
     }
 
     /** Condivide un file; [text] va con il file (la didascalia su WhatsApp, il testo del post). */
@@ -32660,6 +32666,107 @@ object ClubTournaments {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/CoachNotes.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/CoachNotes.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import java.util.Calendar
+import java.util.UUID
+
+/** Di cosa parla una nota dell'allenatore: facoltativo, serve a filtrare e a dividere il resoconto. */
+@Serializable
+enum class NoteTag { SERVE, FOREHAND, BACKHAND, VOLLEY, TACTICS, FITNESS, MENTAL }
+
+/** Una nota dell'allenatore su un allievo: quando ([at]), cosa e, se detto, di cosa parla. */
+@Serializable
+data class CoachNote(val id: String, val at: Long, val text: String, val tag: NoteTag? = null)
+
+/** Le note dell'allenatore come elenco: dal testo di prima, per giorno e mese, filtri e resoconto. */
+object CoachNotes {
+
+    fun newId(): String = "n" + UUID.randomUUID().toString().take(8)
+
+    /** "📅 26.11.26  🕐 18:45" (la prima nota del giorno) o "🕐 18:30" (le altre): come le scriveva la dettatura. */
+    private val dayLine = Regex("""^📅 (\d{2})\.(\d{2})\.(\d{2})\s+🕐 (\d{2}):(\d{2})\s*$""")
+    private val timeLine = Regex("""^🕐 (\d{2}):(\d{2})\s*$""")
+
+    /**
+     * Le note dettate scritte nel testo libero (righe "📅 giorno 🕐 ora" e "🕐 ora" con sotto il testo) diventano note
+     * singole; quello che non sta sotto una data resta testo libero. Restituisce (testo libero, note).
+     */
+    fun split(text: String): Pair<String, List<CoachNote>> {
+        val free = mutableListOf<String>()
+        val notes = mutableListOf<CoachNote>()
+        var day: Triple<Int, Int, Int>? = null
+        var at: Long? = null
+        val body = mutableListOf<String>()
+        fun flush() {
+            val t = body.joinToString("\n").trim()
+            if (at != null && t.isNotEmpty()) notes += CoachNote(newId(), at!!, t)
+            body.clear()
+        }
+        for (line in text.lines()) {
+            val d = dayLine.matchEntire(line.trim())
+            val h = timeLine.matchEntire(line.trim())
+            when {
+                d != null -> {
+                    flush()
+                    val (dd, mm, yy, hh, mi) = d.destructured
+                    day = Triple(dd.toInt(), mm.toInt(), 2000 + yy.toInt())
+                    at = time(day!!, hh.toInt(), mi.toInt())
+                }
+                h != null && day != null -> {
+                    flush()
+                    at = time(day!!, h.groupValues[1].toInt(), h.groupValues[2].toInt())
+                }
+                at != null -> body += line
+                else -> free += line
+            }
+        }
+        flush()
+        return free.joinToString("\n").trim() to notes.sortedByDescending { it.at }
+    }
+
+    private fun time(day: Triple<Int, Int, Int>, h: Int, m: Int): Long =
+        Calendar.getInstance().apply { clear(); set(day.third, day.second - 1, day.first, h, m) }.timeInMillis
+
+    /** Ha ancora note dettate dentro il testo libero (da passare all'elenco)? */
+    fun hasLegacy(text: String): Boolean = text.lines().any { dayLine.matches(it.trim()) }
+
+    /** Le note che corrispondono: dal giorno [from] (null = tutte), dell'etichetta [tag] (null = tutte), con [query]. */
+    fun filter(notes: List<CoachNote>, from: Long?, tag: NoteTag?, query: String): List<CoachNote> {
+        val q = query.trim().lowercase()
+        return notes.filter { n ->
+            (from == null || n.at >= from) && (tag == null || n.tag == tag) && (q.isEmpty() || q in n.text.lowercase())
+        }.sortedByDescending { it.at }
+    }
+
+    /** Inizio del giorno di [at] (per raggruppare). */
+    fun dayStart(at: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = at; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    /** Inizio del mese di [at] (per i mesi che si chiudono). */
+    fun monthStart(at: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = dayStart(at); set(Calendar.DAY_OF_MONTH, 1)
+    }.timeInMillis
+
+    /**
+     * Il resoconto: le note divise per etichetta (nell'ordine delle etichette, poi quelle senza), dalla più vecchia
+     * alla più recente dentro ogni gruppo. [label] dà il nome di un'etichetta (null = senza), [stamp] la data.
+     */
+    fun report(notes: List<CoachNote>, label: (NoteTag?) -> String, stamp: (Long) -> String): List<Pair<String, List<String>>> =
+        (NoteTag.entries.map { it as NoteTag? } + null).mapNotNull { tag ->
+            val mine = notes.filter { it.tag == tag }.sortedBy { it.at }
+            if (mine.isEmpty()) null else label(tag) to mine.map { "${stamp(it.at)} – ${it.text}" }
+        }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Coaching.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Coaching.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -39789,6 +39896,8 @@ data class PlayerProfile(
     val guardianPhone: String = "",
     /** Consenso (dell'allievo o del genitore) a essere ripreso e a tenerne i dati: quando è stato dato, null = non segnato. */
     val consentAt: Long? = null,
+    /** Le note dell'allenatore una per una (giorno, ora, etichetta); [note] resta il testo libero, la nota generale. */
+    val coachNotes: List<CoachNote> = emptyList(),
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")
@@ -44872,6 +44981,7 @@ class PlayersArea(
             phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
             sex = a.sex.ifBlank { b.sex }, heightCm = a.heightCm ?: b.heightCm, weightKg = a.weightKg ?: b.weightKg, club = a.club.ifBlank { b.club }, backhand = a.backhand ?: b.backhand,
             note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
+            coachNotes = (a.coachNotes + b.coachNotes).distinctBy { it.id }.sortedByDescending { it.at },
         )
         val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
         players.value = list.sortedBy { it.name.lowercase() }
@@ -51816,6 +51926,293 @@ fun MonthSummaryDialog(c: MatchController, onDone: () -> Unit) {
 private fun money(cents: Int, lang: com.tennis.scoremanager.model.Lang) = Fees.money(cents, lang.locale)
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CoachNotesUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CoachNotesUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Intent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.CoachNote
+import com.tennis.scoremanager.data.CoachNotes
+import com.tennis.scoremanager.data.NoteTag
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.ui.screens.noteDay
+import com.tennis.scoremanager.ui.screens.noteTime
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+
+/** Il nome di un'etichetta delle note (null = senza etichetta). I colpi hanno gli stessi nomi dell'allenamento. */
+fun noteTagLabel(s: Strings, t: NoteTag?): String = when (t) {
+    NoteTag.SERVE -> strokeLabel(s, TrainedStroke.SERVE)
+    NoteTag.FOREHAND -> strokeLabel(s, TrainedStroke.FOREHAND)
+    NoteTag.BACKHAND -> strokeLabel(s, TrainedStroke.BACKHAND)
+    NoteTag.VOLLEY -> strokeLabel(s, TrainedStroke.VOLLEY)
+    NoteTag.TACTICS -> s.cnTactics
+    NoteTag.FITNESS -> s.cnFitness
+    NoteTag.MENTAL -> s.cnMental
+    null -> s.cnTagNone
+}
+
+/** I periodi del filtro: tutto, 30 giorni, 3 mesi, 12 mesi. */
+private val PERIOD_DAYS = listOf<Int?>(null, 30, 90, 365)
+
+/**
+ * Le note dell'allenatore su un allievo, una per una: la nota generale (testo libero), una nota nuova (scritta o
+ * dettata, con l'argomento), la ricerca e i filtri, l'elenco per mese e per giorno (i mesi passati chiusi), il
+ * resoconto da condividere e la richiesta di un riassunto all'assistente che l'allenatore ha sul telefono.
+ */
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
+fun CoachNotesSection(c: MatchController, st: PlayerProfile) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.collectAsState().value.lang
+    val area = LocalArea.current
+    // Le note dettate finite nel testo libero (versione di prova di prima) diventano note dell'elenco, una volta.
+    LaunchedEffect(st.id) {
+        if (CoachNotes.hasLegacy(st.note)) {
+            val (free, notes) = CoachNotes.split(st.note)
+            c.savePlayer(st.copy(note = free, coachNotes = (notes + st.coachNotes).sortedByDescending { it.at }))
+        }
+    }
+    fun save(list: List<CoachNote>) = c.savePlayer(st.copy(coachNotes = list.sortedByDescending { it.at }))
+
+    // La nota generale: obiettivi e cose da ricordare sempre (si salva da sola mentre si scrive).
+    SectionCard(s.cnGeneral, Icons.Filled.EditNote) {
+        var note by remember(st.id) { mutableStateOf(st.note) }
+        LaunchedEffect(note) {
+            if (note == st.note) return@LaunchedEffect
+            delay(800)
+            c.savePlayer(st.copy(note = note))
+        }
+        OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 2, maxLines = 6, placeholder = { Text(s.cnGeneralHint) },
+            trailingIcon = { DictateIcon(c) { said -> note = appendDictated(note, said).take(4000) } })
+    }
+
+    // Una nota nuova: scritta o dettata, con l'argomento se si vuole.
+    SectionCard(s.studentNotes, Icons.AutoMirrored.Filled.Notes) {
+        var draft by rememberSaveable(st.id) { mutableStateOf("") }
+        var tag by rememberSaveable(st.id) { mutableStateOf<NoteTag?>(null) }
+        OutlinedTextField(draft, { draft = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 2, maxLines = 5, placeholder = { Text(s.cnNewHint) },
+            trailingIcon = { DictateIcon(c) { said -> draft = appendDictated(draft, said).take(2000) } })
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (t in NoteTag.entries) Chip(noteTagLabel(s, t), tag == t) { tag = if (tag == t) null else t }
+        }
+        BigButton(s.cnAdd, Icons.Filled.Add, {
+            save(st.coachNotes + CoachNote(CoachNotes.newId(), System.currentTimeMillis(), draft.trim(), tag))
+            draft = ""
+            tag = null
+        }, Modifier.fillMaxWidth(), enabled = draft.isNotBlank(), color = area, onColor = TsmColors.OnArea)
+    }
+
+    if (st.coachNotes.isEmpty()) {
+        Text(s.cnNone, color = TsmColors.TextDim, fontSize = 13.sp)
+        return
+    }
+
+    // Ricerca e filtri: valgono anche per il resoconto e per il riassunto.
+    var query by rememberSaveable(st.id) { mutableStateOf("") }
+    var period by rememberSaveable(st.id) { mutableStateOf(0) }
+    var filterTag by rememberSaveable(st.id) { mutableStateOf<NoteTag?>(null) }
+    val now = remember { System.currentTimeMillis() }
+    val from = PERIOD_DAYS[period]?.let { now - it * 24L * 3600 * 1000 }
+    val shown = CoachNotes.filter(st.coachNotes, from, filterTag, query)
+    if (st.coachNotes.size > 5) OutlinedTextField(query, { query = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true,
+        placeholder = { Text(s.cnSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+    Segmented(listOf(SegOption(s.cnAll), SegOption(s.cn30), SegOption(s.cn90), SegOption(s.cnYear)), period, { period = it })
+    val used = NoteTag.entries.filter { t -> st.coachNotes.any { it.tag == t } }
+    if (used.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Chip(s.cnTagAll, filterTag == null) { filterTag = null }
+        for (t in used) Chip(noteTagLabel(s, t), filterTag == t) { filterTag = if (filterTag == t) null else t }
+    }
+
+    // Resoconto e riassunto, sulle note che si vedono.
+    var ask by remember { mutableStateOf(false) }
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        GhostButton(s.cnReport, Icons.Filled.Share, {
+            val text = s.cnReportTitle(st.name) + "\n\n" + CoachNotes.report(shown, { noteTagLabel(s, it) }, { noteDay(it) })
+                .joinToString("\n\n") { (title, lines) -> title + "\n" + lines.joinToString("\n") }
+            context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), s.cnReport))
+        }, Modifier.weight(1f), enabled = shown.isNotEmpty())
+        GhostButton(s.cnAsk, Icons.Filled.AutoAwesome, { ask = true }, Modifier.weight(1f), enabled = shown.isNotEmpty())
+    }
+    if (ask) AskSummaryDialog(c, st, shown) { ask = false }
+
+    Text(s.cnCount(shown.size), color = TsmColors.TextDim, fontSize = 13.sp)
+    // L'elenco per mese (il mese della nota più recente aperto, gli altri chiusi; con ricerca o filtri tutti aperti) e,
+    // dentro, per giorno.
+    val filtering = query.isNotBlank() || filterTag != null
+    var openMonths by remember(st.id) { mutableStateOf(setOfNotNull(shown.firstOrNull()?.let { CoachNotes.monthStart(it.at) })) }
+    var editing by remember { mutableStateOf<CoachNote?>(null) }
+    for ((month, inMonth) in shown.groupBy { CoachNotes.monthStart(it.at) }) {
+        val open = filtering || month in openMonths
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh)
+                .clickable { openMonths = if (month in openMonths) openMonths - month else openMonths + month }.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(SimpleDateFormat("LLLL yyyy", lang.locale).format(Date(month)).replaceFirstChar { it.uppercase() },
+                color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("${inMonth.size}", color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(end = 6.dp))
+            Icon(if (open) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, null, tint = TsmColors.TextDim)
+        }
+        if (!open) continue
+        for ((day, inDay) in inMonth.groupBy { CoachNotes.dayStart(it.at) }) {
+            Text("📅 ${noteDay(day)}", color = area, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
+            for (n in inDay) Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface).clickable { editing = n }.padding(10.dp),
+            ) {
+                Text("🕐 ${noteTime(n.at)}", color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.width(72.dp))
+                Column(Modifier.weight(1f)) {
+                    n.tag?.let { Text(noteTagLabel(s, it), color = area, fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    Text(n.text, color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+            }
+        }
+    }
+    editing?.let { n ->
+        NoteEditDialog(c, n, onSave = { e -> save(st.coachNotes.map { if (it.id == e.id) e else it }); editing = null },
+            onDelete = { save(st.coachNotes.filter { it.id != n.id }); editing = null }) { editing = null }
+    }
+}
+
+@Composable
+private fun Chip(label: String, on: Boolean, onClick: () -> Unit) {
+    val area = LocalArea.current
+    Text(
+        label, color = if (on) TsmColors.OnArea else TsmColors.TextMain, fontSize = 13.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal,
+        modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(if (on) area else TsmColors.SurfaceHigh).clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+    )
+}
+
+/** Cambiare il testo o l'argomento di una nota, o eliminarla (con conferma). */
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun NoteEditDialog(c: MatchController, n: CoachNote, onSave: (CoachNote) -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
+    val s = LocalStrings.current
+    var text by remember(n.id) { mutableStateOf(n.text) }
+    var tag by remember(n.id) { mutableStateOf(n.tag) }
+    var askDelete by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("📅 ${noteDay(n.at)}  🕐 ${noteTime(n.at)}") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(text, { text = it.take(2000) }, Modifier.fillMaxWidth(), minLines = 3, maxLines = 8,
+                    trailingIcon = { DictateIcon(c) { said -> text = appendDictated(text, said).take(2000) } })
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (t in NoteTag.entries) Chip(noteTagLabel(s, t), tag == t) { tag = if (tag == t) null else t }
+                }
+                TextButton(onClick = { askDelete = true }) { Text(s.cnDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = { TextButton(enabled = text.isNotBlank(), onClick = { onSave(n.copy(text = text.trim(), tag = tag)) }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(s.back) } },
+    )
+    if (askDelete) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.cnDeleteAsk) },
+        confirmButton = { TextButton(onClick = { askDelete = false; onDelete() }) { Text(s.delete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
+}
+
+/**
+ * Il riassunto con l'assistente che l'allenatore ha già (Gemini, ChatGPT, Claude…): la richiesta, scritta o scelta tra
+ * quelle pronte, con le note che si vedono; l'app la passa con Condividi e non manda niente da sola. Di serie solo il
+ * nome dell'allievo, senza cognome.
+ */
+@Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun AskSummaryDialog(c: MatchController, st: PlayerProfile, notes: List<CoachNote>, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    var request by rememberSaveable { mutableStateOf("") }
+    var firstOnly by rememberSaveable { mutableStateOf(true) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { Icon(Icons.Filled.AutoAwesome, null, tint = LocalArea.current) },
+        title = { Text(s.cnAsk) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.cnAskHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (q in listOf(s.cnAskProgress, s.cnAskParents, s.cnAskPlan)) Chip(q, request == q) { request = q }
+                }
+                OutlinedTextField(request, { request = it.take(500) }, Modifier.fillMaxWidth(), minLines = 2, maxLines = 5, label = { Text(s.cnAskRequest) },
+                    trailingIcon = { DictateIcon(c) { said -> request = appendDictated(request, said).take(500) } })
+                SwitchRow(Icons.Filled.EditNote, s.cnAskFirstName, null, firstOnly) { firstOnly = it }
+                Text(s.cnAskSends(notes.size), color = TsmColors.TextMain, fontSize = 13.sp)
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = request.isNotBlank(), onClick = {
+                val name = if (firstOnly) firstName(st) else st.fullName.ifBlank { st.name }
+                val lines = notes.sortedBy { it.at }.joinToString("\n") { n ->
+                    listOfNotNull("${noteDay(n.at)} ${noteTime(n.at)}", n.tag?.let { "[${noteTagLabel(s, it)}]" }, n.text).joinToString(" ")
+                }
+                val text = s.cnAskPrompt(name, request.trim()) + "\n\n" + lines
+                context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), s.cnAskOpen))
+                onDone()
+            }) { Text(s.cnAskOpen) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Il nome senza cognome: il nome scritto, o il soprannome, o la prima parola del nome. */
+private fun firstName(p: PlayerProfile): String =
+    p.firstName.ifBlank { p.nickname }.ifBlank { p.name.trim().substringBefore(' ') }.ifBlank { p.name }
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CoachProgressUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CoachProgressUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -53175,19 +53572,6 @@ fun appendDictated(text: String, add: String): String {
         text.trimEnd().endsWith(".") || text.trimEnd().endsWith("!") || text.trimEnd().endsWith("?") -> "$text $a"
         else -> "$text. $a"
     }
-}
-
-/**
- * Una nota dettata come voce a sé, in cima a quelle che ci sono già (la più recente è sempre la prima): sopra la riga
- * [stamp] con data e ora, sotto il testo. Per le Note dell'allenatore: "📅 26.11.26  🕐 18:10" e a capo "Servizio più
- * sciolto".
- */
-fun appendDictatedLine(text: String, add: String, stamp: String): String {
-    val a = add.trim().replaceFirstChar { it.uppercase() }
-    if (a.isEmpty()) return text
-    val line = "$stamp\n$a"
-    val rest = text.trim('\n', ' ')
-    return if (rest.isEmpty()) line else "$line\n$rest"
 }
 
 /**
@@ -60379,6 +60763,37 @@ interface Strings {
     val heartPartners: String
     val heartFirsts: String
     val resumeMatch: String
+    val cnTabNotes: String
+    val cnGeneral: String
+    val cnGeneralHint: String
+    val cnNewHint: String
+    val cnAdd: String
+    val cnNone: String
+    val cnSearch: String
+    val cnAll: String
+    val cn30: String
+    val cn90: String
+    val cnYear: String
+    val cnTagAll: String
+    val cnTagNone: String
+    val cnTactics: String
+    val cnFitness: String
+    val cnMental: String
+    val cnCount: (Int) -> String
+    val cnDelete: String
+    val cnDeleteAsk: String
+    val cnReport: String
+    val cnReportTitle: (String) -> String
+    val cnAsk: String
+    val cnAskHint: String
+    val cnAskRequest: String
+    val cnAskProgress: String
+    val cnAskParents: String
+    val cnAskPlan: String
+    val cnAskFirstName: String
+    val cnAskSends: (Int) -> String
+    val cnAskOpen: String
+    val cnAskPrompt: (String, String) -> String
 }
 
 object ItStrings : Strings {
@@ -63274,6 +63689,38 @@ object ItStrings : Strings {
     override val heartFirsts = "primi giocatori"
 
     override val resumeMatch = "Riprendi partita"
+
+    override val cnTabNotes = "Note"
+    override val cnGeneral = "Nota generale"
+    override val cnGeneralHint = "Obiettivi e cose da ricordare sempre"
+    override val cnNewHint = "Scrivi o detta una nota…"
+    override val cnAdd = "Aggiungi nota"
+    override val cnNone = "Ancora nessuna nota: scrivila o dettala qui sopra."
+    override val cnSearch = "Cerca nelle note"
+    override val cnAll = "Tutto"
+    override val cn30 = "30 giorni"
+    override val cn90 = "3 mesi"
+    override val cnYear = "12 mesi"
+    override val cnTagAll = "Tutte"
+    override val cnTagNone = "Senza argomento"
+    override val cnTactics = "Tattica"
+    override val cnFitness = "Fisico"
+    override val cnMental = "Testa"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 nota" else "$it note" }
+    override val cnDelete = "Elimina nota"
+    override val cnDeleteAsk = "Eliminare questa nota? Non si può annullare."
+    override val cnReport = "Resoconto"
+    override val cnReportTitle: (String) -> String = { "Note dell'allenatore su $it" }
+    override val cnAsk = "Chiedi un riassunto"
+    override val cnAskHint = "L'app prepara la richiesta con le note che vedi (filtri compresi) e la passa all'assistente che scegli tu (Gemini, ChatGPT, Claude…). Le note escono dal telefono: controlla che non ci sia niente che non vuoi condividere."
+    override val cnAskRequest = "Cosa vuoi sapere?"
+    override val cnAskProgress = "Cosa è migliorato e cosa lavorare adesso"
+    override val cnAskParents = "Un messaggio breve per i genitori"
+    override val cnAskPlan = "Un piano per le prossime 4 lezioni"
+    override val cnAskFirstName = "Solo il nome, senza cognome"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "Si passa 1 nota" else "Si passano $it note" }
+    override val cnAskOpen = "Apri l'assistente"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Sono un allenatore di tennis. Qui sotto ci sono le mie note sull'allievo $name, dalla più vecchia alla più recente (data, ora, argomento). Rispondi in italiano, in modo breve e pratico, usando solo quello che c'è nelle note.\n\nRichiesta: $req" }
 }
 
 object EnStrings : Strings {
@@ -66170,6 +66617,38 @@ object EnStrings : Strings {
     override val heartFirsts = "first players"
 
     override val resumeMatch = "Resume match"
+
+    override val cnTabNotes = "Notes"
+    override val cnGeneral = "General note"
+    override val cnGeneralHint = "Goals and things to always remember"
+    override val cnNewHint = "Write or dictate a note…"
+    override val cnAdd = "Add note"
+    override val cnNone = "No notes yet: write or dictate one above."
+    override val cnSearch = "Search the notes"
+    override val cnAll = "All"
+    override val cn30 = "30 days"
+    override val cn90 = "3 months"
+    override val cnYear = "12 months"
+    override val cnTagAll = "All"
+    override val cnTagNone = "No topic"
+    override val cnTactics = "Tactics"
+    override val cnFitness = "Fitness"
+    override val cnMental = "Mental"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 note" else "$it notes" }
+    override val cnDelete = "Delete note"
+    override val cnDeleteAsk = "Delete this note? It cannot be undone."
+    override val cnReport = "Summary"
+    override val cnReportTitle: (String) -> String = { "Coach's notes on $it" }
+    override val cnAsk = "Ask for a summary"
+    override val cnAskHint = "The app prepares the request with the notes you see (filters included) and hands it to the assistant you choose (Gemini, ChatGPT, Claude…). The notes leave the phone: check there is nothing you don't want to share."
+    override val cnAskRequest = "What do you want to know?"
+    override val cnAskProgress = "What has improved and what to work on now"
+    override val cnAskParents = "A short message for the parents"
+    override val cnAskPlan = "A plan for the next 4 lessons"
+    override val cnAskFirstName = "First name only, no surname"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 note will be passed on" else "$it notes will be passed on" }
+    override val cnAskOpen = "Open the assistant"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "I am a tennis coach. Below are my notes on my student $name, from oldest to newest (date, time, topic). Answer in English, briefly and practically, using only what is in the notes.\n\nRequest: $req" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -69091,6 +69570,38 @@ object DeStrings : Strings {
     override val heartFirsts = "erste Spieler"
 
     override val resumeMatch = "Match fortsetzen"
+
+    override val cnTabNotes = "Notizen"
+    override val cnGeneral = "Allgemeine Notiz"
+    override val cnGeneralHint = "Ziele und Dinge, an die du immer denken willst"
+    override val cnNewHint = "Schreibe oder diktiere eine Notiz…"
+    override val cnAdd = "Notiz hinzufügen"
+    override val cnNone = "Noch keine Notizen: schreibe oder diktiere oben eine."
+    override val cnSearch = "In den Notizen suchen"
+    override val cnAll = "Alles"
+    override val cn30 = "30 Tage"
+    override val cn90 = "3 Monate"
+    override val cnYear = "12 Monate"
+    override val cnTagAll = "Alle"
+    override val cnTagNone = "Ohne Thema"
+    override val cnTactics = "Taktik"
+    override val cnFitness = "Kondition"
+    override val cnMental = "Kopf"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 Notiz" else "$it Notizen" }
+    override val cnDelete = "Notiz löschen"
+    override val cnDeleteAsk = "Diese Notiz löschen? Das lässt sich nicht rückgängig machen."
+    override val cnReport = "Übersicht"
+    override val cnReportTitle: (String) -> String = { "Trainernotizen zu $it" }
+    override val cnAsk = "Zusammenfassung anfragen"
+    override val cnAskHint = "Die App bereitet die Anfrage mit den angezeigten Notizen (samt Filtern) vor und gibt sie an den Assistenten deiner Wahl weiter (Gemini, ChatGPT, Claude…). Die Notizen verlassen das Telefon: prüfe, dass nichts dabei ist, was du nicht teilen willst."
+    override val cnAskRequest = "Was möchtest du wissen?"
+    override val cnAskProgress = "Was besser geworden ist und woran jetzt zu arbeiten ist"
+    override val cnAskParents = "Eine kurze Nachricht für die Eltern"
+    override val cnAskPlan = "Ein Plan für die nächsten 4 Stunden"
+    override val cnAskFirstName = "Nur der Vorname, ohne Nachname"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 Notiz wird weitergegeben" else "$it Notizen werden weitergegeben" }
+    override val cnAskOpen = "Assistenten öffnen"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Ich bin Tennistrainer. Unten stehen meine Notizen zu meinem Schüler $name, von der ältesten zur neuesten (Datum, Uhrzeit, Thema). Antworte auf Deutsch, kurz und praktisch, und nutze nur, was in den Notizen steht.\n\nAnfrage: $req" }
 }
 TSM_EOF
 
@@ -72002,6 +72513,38 @@ object EsStrings : Strings {
     override val heartFirsts = "primeros jugadores"
 
     override val resumeMatch = "Reanudar partido"
+
+    override val cnTabNotes = "Notas"
+    override val cnGeneral = "Nota general"
+    override val cnGeneralHint = "Objetivos y cosas que recordar siempre"
+    override val cnNewHint = "Escribe o dicta una nota…"
+    override val cnAdd = "Añadir nota"
+    override val cnNone = "Todavía no hay notas: escríbela o díctala arriba."
+    override val cnSearch = "Buscar en las notas"
+    override val cnAll = "Todo"
+    override val cn30 = "30 días"
+    override val cn90 = "3 meses"
+    override val cnYear = "12 meses"
+    override val cnTagAll = "Todas"
+    override val cnTagNone = "Sin tema"
+    override val cnTactics = "Táctica"
+    override val cnFitness = "Físico"
+    override val cnMental = "Cabeza"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 nota" else "$it notas" }
+    override val cnDelete = "Borrar nota"
+    override val cnDeleteAsk = "¿Borrar esta nota? No se puede deshacer."
+    override val cnReport = "Resumen"
+    override val cnReportTitle: (String) -> String = { "Notas del entrenador sobre $it" }
+    override val cnAsk = "Pedir un resumen"
+    override val cnAskHint = "La app prepara la petición con las notas que ves (filtros incluidos) y la pasa al asistente que elijas (Gemini, ChatGPT, Claude…). Las notas salen del teléfono: comprueba que no haya nada que no quieras compartir."
+    override val cnAskRequest = "¿Qué quieres saber?"
+    override val cnAskProgress = "Qué ha mejorado y qué trabajar ahora"
+    override val cnAskParents = "Un mensaje breve para los padres"
+    override val cnAskPlan = "Un plan para las próximas 4 clases"
+    override val cnAskFirstName = "Solo el nombre, sin apellidos"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "Se pasa 1 nota" else "Se pasan $it notas" }
+    override val cnAskOpen = "Abrir el asistente"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Soy entrenador de tenis. Abajo están mis notas sobre mi alumno $name, de la más antigua a la más reciente (fecha, hora, tema). Responde en español, de forma breve y práctica, usando solo lo que hay en las notas.\n\nPetición: $req" }
 }
 TSM_EOF
 
@@ -74915,6 +75458,38 @@ object FrStrings : Strings {
     override val heartFirsts = "premiers joueurs"
 
     override val resumeMatch = "Reprendre un match"
+
+    override val cnTabNotes = "Mes notes"
+    override val cnGeneral = "Note générale"
+    override val cnGeneralHint = "Objectifs et choses à toujours retenir"
+    override val cnNewHint = "Écrivez ou dictez une note…"
+    override val cnAdd = "Ajouter la note"
+    override val cnNone = "Pas encore de note : écrivez-la ou dictez-la ci-dessus."
+    override val cnSearch = "Chercher dans les notes"
+    override val cnAll = "Tout"
+    override val cn30 = "30 jours"
+    override val cn90 = "3 mois"
+    override val cnYear = "12 mois"
+    override val cnTagAll = "Toutes"
+    override val cnTagNone = "Sans sujet"
+    override val cnTactics = "Tactique"
+    override val cnFitness = "Physique"
+    override val cnMental = "Le mental"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 note affichée" else "$it notes affichées" }
+    override val cnDelete = "Supprimer la note"
+    override val cnDeleteAsk = "Supprimer cette note ? Impossible d'annuler."
+    override val cnReport = "Compte rendu"
+    override val cnReportTitle: (String) -> String = { "Notes de l'entraîneur sur $it" }
+    override val cnAsk = "Demander un résumé"
+    override val cnAskHint = "L'appli prépare la demande avec les notes affichées (filtres compris) et la transmet à l'assistant de votre choix (Gemini, ChatGPT, Claude…). Les notes quittent le téléphone : vérifiez qu'il n'y a rien que vous ne voulez pas partager."
+    override val cnAskRequest = "Que voulez-vous savoir ?"
+    override val cnAskProgress = "Ce qui s'est amélioré et ce qu'il faut travailler maintenant"
+    override val cnAskParents = "Un court message pour les parents"
+    override val cnAskPlan = "Un plan pour les 4 prochaines leçons"
+    override val cnAskFirstName = "Prénom seulement, sans nom de famille"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 note sera transmise" else "$it notes seront transmises" }
+    override val cnAskOpen = "Ouvrir l'assistant"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Je suis entraîneur de tennis. Voici mes notes sur mon élève $name, de la plus ancienne à la plus récente (date, heure, sujet). Réponds en français, de façon brève et pratique, en utilisant seulement ce qui est dans les notes.\n\nDemande : $req" }
 }
 TSM_EOF
 
@@ -77829,6 +78404,38 @@ object PtStrings : Strings {
     override val heartFirsts = "primeiros jogadores"
 
     override val resumeMatch = "Retomar partida"
+
+    override val cnTabNotes = "Anotações"
+    override val cnGeneral = "Anotação geral"
+    override val cnGeneralHint = "Metas e coisas para lembrar sempre"
+    override val cnNewHint = "Escreva ou dite uma anotação…"
+    override val cnAdd = "Adicionar anotação"
+    override val cnNone = "Ainda não há anotações: escreva ou dite uma acima."
+    override val cnSearch = "Buscar nas anotações"
+    override val cnAll = "Tudo"
+    override val cn30 = "30 dias"
+    override val cn90 = "3 meses"
+    override val cnYear = "12 meses"
+    override val cnTagAll = "Todas"
+    override val cnTagNone = "Sem tema"
+    override val cnTactics = "Tática"
+    override val cnFitness = "Físico"
+    override val cnMental = "Cabeça"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 anotação" else "$it anotações" }
+    override val cnDelete = "Apagar anotação"
+    override val cnDeleteAsk = "Apagar esta anotação? Não dá para desfazer."
+    override val cnReport = "Resumo"
+    override val cnReportTitle: (String) -> String = { "Anotações do treinador sobre $it" }
+    override val cnAsk = "Pedir um resumo"
+    override val cnAskHint = "O app prepara o pedido com as anotações que você vê (filtros incluídos) e o passa ao assistente que você escolher (Gemini, ChatGPT, Claude…). As anotações saem do celular: confira se não há nada que você não queira compartilhar."
+    override val cnAskRequest = "O que você quer saber?"
+    override val cnAskProgress = "O que melhorou e o que trabalhar agora"
+    override val cnAskParents = "Uma mensagem curta para os pais"
+    override val cnAskPlan = "Um plano para as próximas 4 aulas"
+    override val cnAskFirstName = "Só o nome, sem sobrenome"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 anotação será enviada" else "$it anotações serão enviadas" }
+    override val cnAskOpen = "Abrir o assistente"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Sou treinador de tênis. Abaixo estão minhas anotações sobre meu aluno $name, da mais antiga à mais recente (data, hora, tema). Responda em português, de forma breve e prática, usando só o que está nas anotações.\n\nPedido: $req" }
 }
 TSM_EOF
 
@@ -89857,6 +90464,7 @@ fun StudentScreen(c: MatchController) {
         val tabs = buildList {
             add(StudentTab.CARD)
             if (st.student) add(StudentTab.LESSONS)
+            add(StudentTab.NOTES)
             if (st.student || mine.isNotEmpty()) add(StudentTab.TRAINING)
             add(StudentTab.MATCHES)
         }
@@ -89982,21 +90590,8 @@ fun StudentScreen(c: MatchController) {
         }
 
         }
-        // Note dell'allenatore: si salvano da sole mentre si scrive.
-        if (tab == StudentTab.CARD) SectionCard(s.studentNotes, Icons.Filled.EditNote) {
-            var note by remember(st.id) { mutableStateOf(st.note) }
-            LaunchedEffect(note) {
-                if (note == st.note) return@LaunchedEffect
-                delay(800)
-                c.savePlayer(st.copy(note = note))
-            }
-            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) },
-                // Ogni nota dettata in cima (la più recente è la prima): una riga con calendario e data corta, orologio e
-                // ora, e sotto il testo.
-                trailingIcon = { com.tennis.scoremanager.ui.DictateIcon(c) { said ->
-                    note = com.tennis.scoremanager.ui.appendDictatedLine(note, said, noteStamp(System.currentTimeMillis())).take(4000)
-                } })
-        }
+        // Le note dell'allenatore, una per una, nella loro sotto-scheda (nota generale, elenco, resoconto, riassunto).
+        if (tab == StudentTab.NOTES) com.tennis.scoremanager.ui.CoachNotesSection(c, st)
         // Diario, obiettivi, lezioni e pacchetti, contatti: la parte dell'allenatore.
         if (st.student && tab == StudentTab.LESSONS) com.tennis.scoremanager.ui.StudentCoachSections(c, st)
         if (st.student && tab == StudentTab.TRAINING) com.tennis.scoremanager.ui.StudentProgressSections(c, st)
@@ -90142,21 +90737,19 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
 }
 
 /** Le sotto-schede della scheda del giocatore. */
-private enum class StudentTab { CARD, LESSONS, TRAINING, MATCHES }
+private enum class StudentTab { CARD, LESSONS, NOTES, TRAINING, MATCHES }
 
 private fun studentTabName(s: com.tennis.scoremanager.ui.Strings, t: StudentTab): String = when (t) {
     StudentTab.CARD -> s.stTabCard
     StudentTab.LESSONS -> s.stTabLessons
+    StudentTab.NOTES -> s.cnTabNotes
     StudentTab.TRAINING -> s.stTabTraining
     StudentTab.MATCHES -> s.studentMatches
 }
 
-/** Data e ora di una nota dettata, uguali in ogni lingua: "📅 26.11.26  🕐 18:30". */
-internal fun noteStamp(at: Long): String {
-    val d = java.util.Date(at)
-    return "📅 " + java.text.SimpleDateFormat("dd.MM.yy", java.util.Locale.ROOT).format(d) +
-        "  🕐 " + java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(d)
-}
+/** Giorno e ora di una nota dettata, uguali in ogni lingua: "26.11.26", "18:30". */
+internal fun noteDay(at: Long): String = java.text.SimpleDateFormat("dd.MM.yy", java.util.Locale.ROOT).format(java.util.Date(at))
+internal fun noteTime(at: Long): String = java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(java.util.Date(at))
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SummaryScreen.kt
@@ -112775,6 +113368,78 @@ class ClubTournamentTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/CoachNotesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/CoachNotesTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+/** Le note dell'allenatore come elenco: dal testo dettato di prima, filtri e resoconto per argomento. */
+class CoachNotesTest {
+
+    private fun at(d: Int, m: Int, h: Int, min: Int) = Calendar.getInstance().apply { clear(); set(2026, m - 1, d, h, min) }.timeInMillis
+
+    @Test
+    fun dictatedTextBecomesSingleNotes() {
+        val text = """
+            Obiettivo: seconda di servizio più carica
+            📅 26.11.26  🕐 18:45
+            Rovescio da rivedere
+            🕐 18:30
+            Servizio più sciolto
+            📅 25.11.26  🕐 17:05
+            Volée
+            sul piede giusto
+        """.trimIndent()
+        assertTrue(CoachNotes.hasLegacy(text))
+        val (free, notes) = CoachNotes.split(text)
+        assertEquals("Obiettivo: seconda di servizio più carica", free)
+        assertEquals(listOf("Rovescio da rivedere", "Servizio più sciolto", "Volée\nsul piede giusto"), notes.map { it.text })
+        assertEquals(listOf(at(26, 11, 18, 45), at(26, 11, 18, 30), at(25, 11, 17, 5)), notes.map { it.at })
+        assertFalse(CoachNotes.hasLegacy(free))
+    }
+
+    @Test
+    fun filtersByPeriodTopicAndText() {
+        val notes = listOf(
+            CoachNote("a", at(1, 9, 10, 0), "Rovescio corto", NoteTag.BACKHAND),
+            CoachNote("b", at(20, 11, 10, 0), "Servizio: lancio più alto", NoteTag.SERVE),
+            CoachNote("c", at(25, 11, 10, 0), "Rovescio lungolinea bene", NoteTag.BACKHAND),
+        )
+        assertEquals(listOf("c", "b"), CoachNotes.filter(notes, at(1, 11, 0, 0), null, "").map { it.id })
+        assertEquals(listOf("c", "a"), CoachNotes.filter(notes, null, NoteTag.BACKHAND, "").map { it.id })
+        assertEquals(listOf("b"), CoachNotes.filter(notes, null, null, "LANCIO").map { it.id })
+    }
+
+    @Test
+    fun reportGroupsByTopicOldestFirst() {
+        val notes = listOf(
+            CoachNote("c", at(25, 11, 10, 0), "Lungolinea bene", NoteTag.BACKHAND),
+            CoachNote("x", at(24, 11, 10, 0), "Stanco"),
+            CoachNote("a", at(1, 11, 10, 0), "Corto", NoteTag.BACKHAND),
+            CoachNote("b", at(20, 11, 10, 0), "Lancio alto", NoteTag.SERVE),
+        )
+        val r = CoachNotes.report(notes, { it?.name ?: "-" }, { "d$it".take(3) })
+        assertEquals(listOf("SERVE", "BACKHAND", "-"), r.map { it.first })
+        assertEquals(listOf("Corto", "Lungolinea bene"), r[1].second.map { it.substringAfter(" – ") })
+    }
+
+    @Test
+    fun oldPlayersWithoutNotesStillLoad() {
+        val p = Storage.JSON.decodeFromString(PlayerProfile.serializer(), """{"id":"p","name":"Rossi","note":"vecchia nota"}""")
+        assertTrue(p.coachNotes.isEmpty())
+        assertEquals("vecchia nota", p.note)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/CoachingTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/CoachingTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -118959,15 +119624,10 @@ class DictationTest {
         assertEquals("Testo", appendDictated("Testo", "  "))
     }
 
-    @Test fun dictatedNoteGoesOnItsOwnLineWithTheTime() {
-        val stamp = "📅 26.11.26  🕐 18:10"
-        assertEquals("$stamp\nServizio più sciolto", appendDictatedLine("", "servizio più sciolto", stamp))
-        // La più recente in cima.
-        assertEquals("$stamp\nRovescio da rivedere\nPrima nota", appendDictatedLine("\nPrima nota\n\n", " rovescio da rivedere ", stamp))
-        assertEquals("Testo", appendDictatedLine("Testo", "  ", stamp))
-        // Data corta e ora, uguali in ogni lingua.
+    @Test fun noteDayAndTimeAreShort() {
         val at = java.util.Calendar.getInstance().apply { set(2026, 10, 26, 18, 30) }.timeInMillis
-        assertEquals("📅 26.11.26  🕐 18:30", com.tennis.scoremanager.ui.screens.noteStamp(at))
+        assertEquals("26.11.26", com.tennis.scoremanager.ui.screens.noteDay(at))
+        assertEquals("18:30", com.tennis.scoremanager.ui.screens.noteTime(at))
     }
 }
 TSM_EOF
@@ -134139,6 +134799,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 455 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 458 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -2572,7 +2572,13 @@ class MatchController(
             listOf(d(it.at), it.event, it.opponent + (it.opponentRanking.ifBlank { null }?.let { r -> " ($r)" } ?: ""), it.score, if (it.won) s.studentWon else s.studentLost)
                 .filter { x -> x.isNotBlank() }.joinToString(" · ")
         }
-        return listOf(s.evTitle to evalLines, s.ftTitle to testLines, s.rkTitle to rankLines, s.evPresence to courseLines, s.mmTitle to manual)
+        // Le note dell'allenatore del periodo, divise per argomento.
+        val notes = com.tennis.scoremanager.data.CoachNotes.report(
+            p.coachNotes.filter { inPeriod(it.at) },
+            label = { t -> "${s.studentNotes} · ${com.tennis.scoremanager.ui.noteTagLabel(s, t)}" },
+            stamp = { at -> com.tennis.scoremanager.ui.screens.noteDay(at) },
+        )
+        return listOf(s.evTitle to evalLines, s.ftTitle to testLines, s.rkTitle to rankLines, s.evPresence to courseLines, s.mmTitle to manual) + notes
     }
 
     /** Condivide un file; [text] va con il file (la didascalia su WhatsApp, il testo del post). */

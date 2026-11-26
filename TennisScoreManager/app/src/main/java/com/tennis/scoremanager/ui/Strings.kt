@@ -2976,6 +2976,37 @@ interface Strings {
     val heartPartners: String
     val heartFirsts: String
     val resumeMatch: String
+    val cnTabNotes: String
+    val cnGeneral: String
+    val cnGeneralHint: String
+    val cnNewHint: String
+    val cnAdd: String
+    val cnNone: String
+    val cnSearch: String
+    val cnAll: String
+    val cn30: String
+    val cn90: String
+    val cnYear: String
+    val cnTagAll: String
+    val cnTagNone: String
+    val cnTactics: String
+    val cnFitness: String
+    val cnMental: String
+    val cnCount: (Int) -> String
+    val cnDelete: String
+    val cnDeleteAsk: String
+    val cnReport: String
+    val cnReportTitle: (String) -> String
+    val cnAsk: String
+    val cnAskHint: String
+    val cnAskRequest: String
+    val cnAskProgress: String
+    val cnAskParents: String
+    val cnAskPlan: String
+    val cnAskFirstName: String
+    val cnAskSends: (Int) -> String
+    val cnAskOpen: String
+    val cnAskPrompt: (String, String) -> String
 }
 
 object ItStrings : Strings {
@@ -5871,6 +5902,38 @@ object ItStrings : Strings {
     override val heartFirsts = "primi giocatori"
 
     override val resumeMatch = "Riprendi partita"
+
+    override val cnTabNotes = "Note"
+    override val cnGeneral = "Nota generale"
+    override val cnGeneralHint = "Obiettivi e cose da ricordare sempre"
+    override val cnNewHint = "Scrivi o detta una nota…"
+    override val cnAdd = "Aggiungi nota"
+    override val cnNone = "Ancora nessuna nota: scrivila o dettala qui sopra."
+    override val cnSearch = "Cerca nelle note"
+    override val cnAll = "Tutto"
+    override val cn30 = "30 giorni"
+    override val cn90 = "3 mesi"
+    override val cnYear = "12 mesi"
+    override val cnTagAll = "Tutte"
+    override val cnTagNone = "Senza argomento"
+    override val cnTactics = "Tattica"
+    override val cnFitness = "Fisico"
+    override val cnMental = "Testa"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 nota" else "$it note" }
+    override val cnDelete = "Elimina nota"
+    override val cnDeleteAsk = "Eliminare questa nota? Non si può annullare."
+    override val cnReport = "Resoconto"
+    override val cnReportTitle: (String) -> String = { "Note dell'allenatore su $it" }
+    override val cnAsk = "Chiedi un riassunto"
+    override val cnAskHint = "L'app prepara la richiesta con le note che vedi (filtri compresi) e la passa all'assistente che scegli tu (Gemini, ChatGPT, Claude…). Le note escono dal telefono: controlla che non ci sia niente che non vuoi condividere."
+    override val cnAskRequest = "Cosa vuoi sapere?"
+    override val cnAskProgress = "Cosa è migliorato e cosa lavorare adesso"
+    override val cnAskParents = "Un messaggio breve per i genitori"
+    override val cnAskPlan = "Un piano per le prossime 4 lezioni"
+    override val cnAskFirstName = "Solo il nome, senza cognome"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "Si passa 1 nota" else "Si passano $it note" }
+    override val cnAskOpen = "Apri l'assistente"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Sono un allenatore di tennis. Qui sotto ci sono le mie note sull'allievo $name, dalla più vecchia alla più recente (data, ora, argomento). Rispondi in italiano, in modo breve e pratico, usando solo quello che c'è nelle note.\n\nRichiesta: $req" }
 }
 
 object EnStrings : Strings {
@@ -8767,6 +8830,38 @@ object EnStrings : Strings {
     override val heartFirsts = "first players"
 
     override val resumeMatch = "Resume match"
+
+    override val cnTabNotes = "Notes"
+    override val cnGeneral = "General note"
+    override val cnGeneralHint = "Goals and things to always remember"
+    override val cnNewHint = "Write or dictate a note…"
+    override val cnAdd = "Add note"
+    override val cnNone = "No notes yet: write or dictate one above."
+    override val cnSearch = "Search the notes"
+    override val cnAll = "All"
+    override val cn30 = "30 days"
+    override val cn90 = "3 months"
+    override val cnYear = "12 months"
+    override val cnTagAll = "All"
+    override val cnTagNone = "No topic"
+    override val cnTactics = "Tactics"
+    override val cnFitness = "Fitness"
+    override val cnMental = "Mental"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 note" else "$it notes" }
+    override val cnDelete = "Delete note"
+    override val cnDeleteAsk = "Delete this note? It cannot be undone."
+    override val cnReport = "Summary"
+    override val cnReportTitle: (String) -> String = { "Coach's notes on $it" }
+    override val cnAsk = "Ask for a summary"
+    override val cnAskHint = "The app prepares the request with the notes you see (filters included) and hands it to the assistant you choose (Gemini, ChatGPT, Claude…). The notes leave the phone: check there is nothing you don't want to share."
+    override val cnAskRequest = "What do you want to know?"
+    override val cnAskProgress = "What has improved and what to work on now"
+    override val cnAskParents = "A short message for the parents"
+    override val cnAskPlan = "A plan for the next 4 lessons"
+    override val cnAskFirstName = "First name only, no surname"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 note will be passed on" else "$it notes will be passed on" }
+    override val cnAskOpen = "Open the assistant"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "I am a tennis coach. Below are my notes on my student $name, from oldest to newest (date, time, topic). Answer in English, briefly and practically, using only what is in the notes.\n\nRequest: $req" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

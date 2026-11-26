@@ -2906,4 +2906,36 @@ object FrStrings : Strings {
     override val heartFirsts = "premiers joueurs"
 
     override val resumeMatch = "Reprendre un match"
+
+    override val cnTabNotes = "Mes notes"
+    override val cnGeneral = "Note générale"
+    override val cnGeneralHint = "Objectifs et choses à toujours retenir"
+    override val cnNewHint = "Écrivez ou dictez une note…"
+    override val cnAdd = "Ajouter la note"
+    override val cnNone = "Pas encore de note : écrivez-la ou dictez-la ci-dessus."
+    override val cnSearch = "Chercher dans les notes"
+    override val cnAll = "Tout"
+    override val cn30 = "30 jours"
+    override val cn90 = "3 mois"
+    override val cnYear = "12 mois"
+    override val cnTagAll = "Toutes"
+    override val cnTagNone = "Sans sujet"
+    override val cnTactics = "Tactique"
+    override val cnFitness = "Physique"
+    override val cnMental = "Le mental"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 note affichée" else "$it notes affichées" }
+    override val cnDelete = "Supprimer la note"
+    override val cnDeleteAsk = "Supprimer cette note ? Impossible d'annuler."
+    override val cnReport = "Compte rendu"
+    override val cnReportTitle: (String) -> String = { "Notes de l'entraîneur sur $it" }
+    override val cnAsk = "Demander un résumé"
+    override val cnAskHint = "L'appli prépare la demande avec les notes affichées (filtres compris) et la transmet à l'assistant de votre choix (Gemini, ChatGPT, Claude…). Les notes quittent le téléphone : vérifiez qu'il n'y a rien que vous ne voulez pas partager."
+    override val cnAskRequest = "Que voulez-vous savoir ?"
+    override val cnAskProgress = "Ce qui s'est amélioré et ce qu'il faut travailler maintenant"
+    override val cnAskParents = "Un court message pour les parents"
+    override val cnAskPlan = "Un plan pour les 4 prochaines leçons"
+    override val cnAskFirstName = "Prénom seulement, sans nom de famille"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 note sera transmise" else "$it notes seront transmises" }
+    override val cnAskOpen = "Ouvrir l'assistant"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Je suis entraîneur de tennis. Voici mes notes sur mon élève $name, de la plus ancienne à la plus récente (date, heure, sujet). Réponds en français, de façon brève et pratique, en utilisant seulement ce qui est dans les notes.\n\nDemande : $req" }
 }

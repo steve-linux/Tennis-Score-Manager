@@ -56,6 +56,8 @@ data class PlayerProfile(
     val guardianPhone: String = "",
     /** Consenso (dell'allievo o del genitore) a essere ripreso e a tenerne i dati: quando è stato dato, null = non segnato. */
     val consentAt: Long? = null,
+    /** Le note dell'allenatore una per una (giorno, ora, etichetta); [note] resta il testo libero, la nota generale. */
+    val coachNotes: List<CoachNote> = emptyList(),
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")

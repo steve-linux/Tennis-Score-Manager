@@ -2907,4 +2907,36 @@ object PtStrings : Strings {
     override val heartFirsts = "primeiros jogadores"
 
     override val resumeMatch = "Retomar partida"
+
+    override val cnTabNotes = "Anotações"
+    override val cnGeneral = "Anotação geral"
+    override val cnGeneralHint = "Metas e coisas para lembrar sempre"
+    override val cnNewHint = "Escreva ou dite uma anotação…"
+    override val cnAdd = "Adicionar anotação"
+    override val cnNone = "Ainda não há anotações: escreva ou dite uma acima."
+    override val cnSearch = "Buscar nas anotações"
+    override val cnAll = "Tudo"
+    override val cn30 = "30 dias"
+    override val cn90 = "3 meses"
+    override val cnYear = "12 meses"
+    override val cnTagAll = "Todas"
+    override val cnTagNone = "Sem tema"
+    override val cnTactics = "Tática"
+    override val cnFitness = "Físico"
+    override val cnMental = "Cabeça"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 anotação" else "$it anotações" }
+    override val cnDelete = "Apagar anotação"
+    override val cnDeleteAsk = "Apagar esta anotação? Não dá para desfazer."
+    override val cnReport = "Resumo"
+    override val cnReportTitle: (String) -> String = { "Anotações do treinador sobre $it" }
+    override val cnAsk = "Pedir um resumo"
+    override val cnAskHint = "O app prepara o pedido com as anotações que você vê (filtros incluídos) e o passa ao assistente que você escolher (Gemini, ChatGPT, Claude…). As anotações saem do celular: confira se não há nada que você não queira compartilhar."
+    override val cnAskRequest = "O que você quer saber?"
+    override val cnAskProgress = "O que melhorou e o que trabalhar agora"
+    override val cnAskParents = "Uma mensagem curta para os pais"
+    override val cnAskPlan = "Um plano para as próximas 4 aulas"
+    override val cnAskFirstName = "Só o nome, sem sobrenome"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "1 anotação será enviada" else "$it anotações serão enviadas" }
+    override val cnAskOpen = "Abrir o assistente"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Sou treinador de tênis. Abaixo estão minhas anotações sobre meu aluno $name, da mais antiga à mais recente (data, hora, tema). Responda em português, de forma breve e prática, usando só o que está nas anotações.\n\nPedido: $req" }
 }

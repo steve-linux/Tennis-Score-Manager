@@ -38,19 +38,6 @@ fun appendDictated(text: String, add: String): String {
 }
 
 /**
- * Una nota dettata come voce a sé, in cima a quelle che ci sono già (la più recente è sempre la prima): sopra la riga
- * [stamp] con data e ora, sotto il testo. Per le Note dell'allenatore: "📅 26.11.26  🕐 18:10" e a capo "Servizio più
- * sciolto".
- */
-fun appendDictatedLine(text: String, add: String, stamp: String): String {
-    val a = add.trim().replaceFirstChar { it.uppercase() }
-    if (a.isEmpty()) return text
-    val line = "$stamp\n$a"
-    val rest = text.trim('\n', ' ')
-    return if (rest.isEmpty()) line else "$line\n$rest"
-}
-
-/**
  * La dettatura di Android (sui telefoni recenti anche senza rete) nella lingua dell'app: si parla e [onText] riceve il
  * testo. Restituisce la funzione che la avvia, o null se sul telefono non c'è nessuna app di dettatura.
  */

@@ -66,6 +66,7 @@ class PlayersArea(
             phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
             sex = a.sex.ifBlank { b.sex }, heightCm = a.heightCm ?: b.heightCm, weightKg = a.weightKg ?: b.weightKg, club = a.club.ifBlank { b.club }, backhand = a.backhand ?: b.backhand,
             note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
+            coachNotes = (a.coachNotes + b.coachNotes).distinctBy { it.id }.sortedByDescending { it.at },
         )
         val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
         players.value = list.sortedBy { it.name.lowercase() }

@@ -2904,4 +2904,36 @@ object EsStrings : Strings {
     override val heartFirsts = "primeros jugadores"
 
     override val resumeMatch = "Reanudar partido"
+
+    override val cnTabNotes = "Notas"
+    override val cnGeneral = "Nota general"
+    override val cnGeneralHint = "Objetivos y cosas que recordar siempre"
+    override val cnNewHint = "Escribe o dicta una nota…"
+    override val cnAdd = "Añadir nota"
+    override val cnNone = "Todavía no hay notas: escríbela o díctala arriba."
+    override val cnSearch = "Buscar en las notas"
+    override val cnAll = "Todo"
+    override val cn30 = "30 días"
+    override val cn90 = "3 meses"
+    override val cnYear = "12 meses"
+    override val cnTagAll = "Todas"
+    override val cnTagNone = "Sin tema"
+    override val cnTactics = "Táctica"
+    override val cnFitness = "Físico"
+    override val cnMental = "Cabeza"
+    override val cnCount: (Int) -> String = { if (it == 1) "1 nota" else "$it notas" }
+    override val cnDelete = "Borrar nota"
+    override val cnDeleteAsk = "¿Borrar esta nota? No se puede deshacer."
+    override val cnReport = "Resumen"
+    override val cnReportTitle: (String) -> String = { "Notas del entrenador sobre $it" }
+    override val cnAsk = "Pedir un resumen"
+    override val cnAskHint = "La app prepara la petición con las notas que ves (filtros incluidos) y la pasa al asistente que elijas (Gemini, ChatGPT, Claude…). Las notas salen del teléfono: comprueba que no haya nada que no quieras compartir."
+    override val cnAskRequest = "¿Qué quieres saber?"
+    override val cnAskProgress = "Qué ha mejorado y qué trabajar ahora"
+    override val cnAskParents = "Un mensaje breve para los padres"
+    override val cnAskPlan = "Un plan para las próximas 4 clases"
+    override val cnAskFirstName = "Solo el nombre, sin apellidos"
+    override val cnAskSends: (Int) -> String = { if (it == 1) "Se pasa 1 nota" else "Se pasan $it notas" }
+    override val cnAskOpen = "Abrir el asistente"
+    override val cnAskPrompt: (String, String) -> String = { name, req -> "Soy entrenador de tenis. Abajo están mis notas sobre mi alumno $name, de la más antigua a la más reciente (fecha, hora, tema). Responde en español, de forma breve y práctica, usando solo lo que hay en las notas.\n\nPetición: $req" }
 }
