@@ -21,7 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -162,20 +164,27 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
                 Icon(Icons.Filled.Info, null, tint = TsmColors.Orange)
                 Text(s.dlSafety, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
             }
-            // Gli esercizi di un colpo diventano esercizi guidati e restano scelti: in Allenati › Un colpo sono già pronti,
-            // col loro colpo. Se c'è già (aggiunto prima), lo si sceglie invece di farne una copia.
+            // Gli esercizi di un colpo diventano esercizi guidati, con due tasti: "Avvia esercizio" lo sceglie (aggiungendolo
+            // se non c'è) e porta all'allenamento (Allenati o Allenatore, da dove si era partiti) col colpo e l'esercizio
+            // pronti, basta premere Inizia; "Aggiungi ai miei esercizi" lo mette solo nella lista e si resta qui. Se c'è
+            // già (aggiunto prima), si usa quello invece di farne una copia.
             item.guided?.let { (stroke, _) ->
                 val drills by c.drillArea.drills.collectAsState()
                 val existing = drills.firstOrNull { it.id.startsWith("lib-${item.id}-") }
-                BigButton(if (existing != null) s.dlUse else s.dlAdd, Icons.Filled.Add, {
-                    val d = existing ?: DrillLibrary.toDrill(item, t.name, System.currentTimeMillis())?.also { c.drillArea.saveDrill(it) }
-                    if (d != null) {
+                fun ensure() = existing ?: DrillLibrary.toDrill(item, t.name, System.currentTimeMillis())?.also { c.drillArea.saveDrill(it) }
+                BigButton(s.dlStart, Icons.Filled.PlayArrow, {
+                    ensure()?.let { d ->
                         c.trainStroke.value = stroke
                         c.drillArea.trainDrill.value = d.id
                     }
                     android.widget.Toast.makeText(context, s.dlReady(com.tennis.scoremanager.ui.strokeLabel(s, stroke)), android.widget.Toast.LENGTH_LONG).show()
                     onDone()
+                    c.trainFocus.value = true
+                    c.home()
                 }, Modifier.fillMaxWidth(), color = area, onColor = TsmColors.OnArea)
+                GhostButton(if (existing != null) s.dlInList else s.dlAdd, if (existing != null) Icons.Filled.Check else Icons.Filled.Add, {
+                    if (ensure() != null) android.widget.Toast.makeText(context, s.dlAdded, android.widget.Toast.LENGTH_SHORT).show()
+                }, Modifier.fillMaxWidth(), enabled = existing == null)
             }
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onDone, Modifier.fillMaxWidth())
         }

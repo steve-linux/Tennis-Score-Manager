@@ -2968,7 +2968,15 @@ object EsStrings : Strings {
     override val dlAdd = "Añadir a mis ejercicios"
 
     override val dlUse = "Usar este ejercicio"
-    override val dlReady: (String) -> String = { "Listo en Entrenar › Un golpe › $it" }
+    override val dlReady: (String) -> String = { "Ejercicio elegido ($it): pulsa Empezar" }
 
     override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Golpe $a" else "Golpes $a-$b" }
+
+    override val drillMineCount: (Int) -> String = { "$it ejercicios para este golpe: toca Cambiar para elegir otro" }
+
+    override val dlStart = "Iniciar ejercicio"
+    override val dlAdded = "Añadido a tus ejercicios"
+    override val dlInList = "Ya en mis ejercicios"
+
+    override val trainStartKeys = "También se inicia con KEY1 de la pulsera o un clic del mando."
 }

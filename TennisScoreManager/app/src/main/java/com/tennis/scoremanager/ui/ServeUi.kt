@@ -37,7 +37,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -114,6 +116,8 @@ fun DrillRow(c: MatchController, stroke: TrainedStroke) {
             Text(s.drillChoose, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(cur?.name ?: s.drillFree, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
             cur?.let { Text(drillSummary(s, it), color = TsmColors.TextDim, fontSize = 12.sp) }
+            // Qui si vede solo quello scelto: se ce ne sono altri di questo colpo, lo si dice (la lista è in Cambia).
+            if (mine.size > 1) Text(s.drillMineCount(mine.size), color = TsmColors.Ball, fontSize = 12.sp)
         }
         Text(s.trainChange, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
     }
@@ -183,12 +187,32 @@ fun ServeTrainingCard(c: MatchController, coach: Boolean) {
             strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == trainee }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
             strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
         )
-        DrillRow(c, stroke)
-        BigButton(s.serveStart, Icons.Filled.Videocam, {
+        // Da "Avvia esercizio" della raccolta: si scorre fin qui, esercizio e Inizia in vista.
+        val focus = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+        val wantFocus by c.trainFocus.collectAsState()
+        LaunchedEffect(wantFocus) {
+            if (wantFocus) {
+                kotlinx.coroutines.delay(300)
+                focus.bringIntoView()
+                c.trainFocus.value = false
+            }
+        }
+        val start = {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
             )
-        }, Modifier.fillMaxWidth())
+        }
+        Column(Modifier.fillMaxWidth().bringIntoViewRequester(focus), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            DrillRow(c, stroke)
+            BigButton(s.serveStart, Icons.Filled.Videocam, start, Modifier.fillMaxWidth())
+            // Si avvia anche dal campo: KEY1 del braccialetto o un clic del telecomando, finché questa pagina è aperta.
+            Text(s.trainStartKeys, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        DisposableEffect(Unit) {
+            c.trainStartReady = true
+            onDispose { c.trainStartReady = false }
+        }
+        LaunchedEffect(stroke) { c.trainStartRequests.collect { start() } }
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
         // 60 fotogrammi al secondo: solo sui telefoni che ce la fanno (molti si fermano a 30).
         val can60 = remember { com.tennis.scoremanager.video.CameraLenses.supports60(context) }

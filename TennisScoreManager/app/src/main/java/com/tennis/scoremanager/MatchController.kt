@@ -985,6 +985,15 @@ class MatchController(
      * Allenamento dei colpi aperto: i tasti del braccialetto vanno a lui, non alla partita, e il riconoscimento dei colpi
      * si accende da sé (serve l'istante del colpo per la clip e l'analisi; non serve la calibrazione).
      */
+    /**
+     * La pagina dell'allenamento di un colpo è aperta e pronta (con chi si allena): KEY1 del braccialetto o un clic del
+     * telecomando la avviano come il tasto Inizia ([trainStartRequests], raccolto dalla pagina).
+     */
+    @Volatile var trainStartReady = false
+    /** Arrivati da "Avvia esercizio" della raccolta: la pagina dell'allenamento scorre fino all'esercizio e a Inizia. */
+    val trainFocus = MutableStateFlow(false)
+    val trainStartRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
     @Volatile var serveTraining = false
         set(v) {
             field = v
@@ -1598,6 +1607,7 @@ class MatchController(
     private fun playerPoint(side: Side) {
         when (screen.value) {
             Screen.START -> startMatch()
+            Screen.HOME -> if (trainStartReady) trainStartRequests.tryEmit(Unit)
             // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
             Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(side, fromBand = true)
             else -> Unit

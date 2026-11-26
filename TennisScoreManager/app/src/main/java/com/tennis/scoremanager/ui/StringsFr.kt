@@ -2970,7 +2970,15 @@ object FrStrings : Strings {
     override val dlAdd = "Ajouter à mes exercices"
 
     override val dlUse = "Utiliser cet exercice"
-    override val dlReady: (String) -> String = { "Prêt dans S'entraîner › Un seul coup › $it" }
+    override val dlReady: (String) -> String = { "Exercice choisi ($it) : appuyez sur Commencer" }
 
     override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Coup $a" else "Coups $a-$b" }
+
+    override val drillMineCount: (Int) -> String = { "$it exercices pour ce coup : touchez Changer pour en choisir un autre" }
+
+    override val dlStart = "Lancer l'exercice"
+    override val dlAdded = "Ajouté à vos exercices"
+    override val dlInList = "Déjà dans mes exercices"
+
+    override val trainStartKeys = "On peut aussi lancer avec KEY1 du bracelet ou un clic de la télécommande."
 }

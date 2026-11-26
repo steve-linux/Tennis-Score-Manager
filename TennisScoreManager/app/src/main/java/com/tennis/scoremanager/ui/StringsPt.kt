@@ -2971,7 +2971,15 @@ object PtStrings : Strings {
     override val dlAdd = "Adicionar aos meus exercícios"
 
     override val dlUse = "Usar este exercício"
-    override val dlReady: (String) -> String = { "Pronto em Treinar › Um golpe › $it" }
+    override val dlReady: (String) -> String = { "Exercício escolhido ($it): toca em Começar" }
 
     override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Golpe $a" else "Golpes $a-$b" }
+
+    override val drillMineCount: (Int) -> String = { "$it exercícios para este golpe: toca em Trocar para escolher outro" }
+
+    override val dlStart = "Iniciar exercício"
+    override val dlAdded = "Adicionado aos teus exercícios"
+    override val dlInList = "Já nos meus exercícios"
+
+    override val trainStartKeys = "Também se inicia com KEY1 da pulseira ou um clique do comando."
 }

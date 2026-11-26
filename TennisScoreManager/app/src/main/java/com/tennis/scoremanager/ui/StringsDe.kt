@@ -2967,7 +2967,15 @@ object DeStrings : Strings {
     override val dlAdd = "Zu meinen Übungen hinzufügen"
 
     override val dlUse = "Diese Übung verwenden"
-    override val dlReady: (String) -> String = { "Bereit unter Trainieren › Ein Schlag › $it" }
+    override val dlReady: (String) -> String = { "Übung gewählt ($it): Starten drücken" }
 
     override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Schlag $a" else "Schläge $a-$b" }
+
+    override val drillMineCount: (Int) -> String = { "$it Übungen für diesen Schlag: Ändern tippen, um eine andere zu wählen" }
+
+    override val dlStart = "Übung starten"
+    override val dlAdded = "Zu deinen Übungen hinzugefügt"
+    override val dlInList = "Schon in meinen Übungen"
+
+    override val trainStartKeys = "Starten geht auch mit KEY1 am Armband oder einem Klick der Fernbedienung."
 }

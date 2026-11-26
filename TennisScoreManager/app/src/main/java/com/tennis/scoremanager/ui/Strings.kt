@@ -3037,6 +3037,11 @@ interface Strings {
     val dlUse: String
     val dlReady: (String) -> String
     val dlShots: (Int, Int) -> String
+    val drillMineCount: (Int) -> String
+    val dlStart: String
+    val dlAdded: String
+    val dlInList: String
+    val trainStartKeys: String
 }
 
 object ItStrings : Strings {
@@ -5996,9 +6001,17 @@ object ItStrings : Strings {
     override val dlAdd = "Aggiungi ai miei esercizi"
 
     override val dlUse = "Usa questo esercizio"
-    override val dlReady: (String) -> String = { "Pronto in Allenati › Un colpo › $it" }
+    override val dlReady: (String) -> String = { "Esercizio scelto ($it): premi Inizia" }
 
     override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Colpo $a" else "Colpi $a-$b" }
+
+    override val drillMineCount: (Int) -> String = { "$it esercizi per questo colpo: tocca Cambia per sceglierne un altro" }
+
+    override val dlStart = "Avvia esercizio"
+    override val dlAdded = "Aggiunto ai tuoi esercizi"
+    override val dlInList = "Già nei miei esercizi"
+
+    override val trainStartKeys = "Si avvia anche con KEY1 del braccialetto o con un clic del telecomando."
 }
 
 object EnStrings : Strings {
@@ -8959,9 +8972,17 @@ object EnStrings : Strings {
     override val dlAdd = "Add to my drills"
 
     override val dlUse = "Use this drill"
-    override val dlReady: (String) -> String = { "Ready in Practice › One stroke › $it" }
+    override val dlReady: (String) -> String = { "Drill picked ($it): press Start" }
 
     override val dlShots: (Int, Int) -> String = { a, b -> if (a == b) "Shot $a" else "Shots $a-$b" }
+
+    override val drillMineCount: (Int) -> String = { "$it drills for this stroke: tap Change to pick another" }
+
+    override val dlStart = "Start drill"
+    override val dlAdded = "Added to your drills"
+    override val dlInList = "Already in my drills"
+
+    override val trainStartKeys = "You can also start with the band's KEY1 or a click of the remote."
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
