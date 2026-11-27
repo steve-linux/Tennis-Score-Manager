@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -189,6 +190,13 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
                 GhostButton(if (existing != null) s.dlInList else s.dlAdd, if (existing != null) Icons.Filled.Check else Icons.Filled.Add, {
                     if (ensure() != null) android.widget.Toast.makeText(context, s.dlAdded, android.widget.Toast.LENGTH_SHORT).show()
                 }, Modifier.fillMaxWidth(), enabled = existing == null)
+            }
+            // Senza colpi da contare: il timer a voce, coi giri di lavoro e recupero dell'esercizio.
+            item.timer?.let { plan ->
+                var timer by remember { mutableStateOf(false) }
+                Text(s.dtPlan(plan.rounds, plan.work, plan.rest), color = TsmColors.TextDim, fontSize = 13.sp)
+                BigButton(s.dlTimer, Icons.Filled.Timer, { timer = true }, Modifier.fillMaxWidth(), color = area, onColor = TsmColors.OnArea)
+                if (timer) com.tennis.scoremanager.ui.DrillTimerDialog(c, item, t) { timer = false }
             }
             // Sul tabellone TV: i disegni in grande che girano da soli, con accanto come si fa (per tutto il gruppo in campo).
             val onTv by c.tvDrill.collectAsState()

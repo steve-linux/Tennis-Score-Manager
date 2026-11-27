@@ -2981,4 +2981,20 @@ object FrStrings : Strings {
     override val dlInList = "Déjà dans mes exercices"
 
     override val trainStartKeys = "On peut aussi lancer avec KEY1 du bracelet ou un clic de la télécommande."
+    override val dlTimer = "Lancer avec le minuteur"
+    override val dtPrep = "Prépare-toi"
+    override val dtWork = "Effort"
+    override val dtRest = "Récupération"
+    override val dtDone = "Terminé"
+    override val dtPause = "Mettre en pause"
+    override val dtResume = "Reprendre"
+    override val dtStop = "Arrêter le minuteur"
+    override val dtVoiceOff = "La voix est coupée : le minuteur s'affiche mais ne parle pas."
+    override val dtSayLast = "Dernier tour : partez !"
+    override val dtSayTen = "Encore dix secondes"
+    override val dtSayDone = "Terminé, beau travail !"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Tour $a sur $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Tour $a sur $b : partez !" }
+    override val dtSayRest: (Int) -> String = { "Récupération, $it secondes" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r tours · effort $w s · récupération $p s" }
 }

@@ -24389,7 +24389,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - Eine **Übung** ist ein Schlag mit Schritten nacheinander: zum Beispiel *20 Vorhand cross, dann 20 longline*, oder beim Aufschlag *10 erste Aufschläge von der Einstandseite durch die Mitte, dann 10 nach außen…*. Es gibt vier fertige Beispiele, eines pro Schlag.
 - **Übungen** (über die Auswahl **Übung** unter *Starten*, im Schlagtraining): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
-- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 60 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben zwei Tasten: **Übung starten** geht zurück zum Training, Schlag und Übung sind schon gewählt (einfach **Starten** drücken, oder vom Platz aus KEY1 am Armband oder ein Klick der Fernbedienung); **Zu meinen Übungen hinzufügen** legt sie nur in die Liste der geführten Übungen und du bleibst in der Sammlung (ist sie schon da, steht auf der Taste *Schon in meinen Übungen*, Kopien gibt es nicht). Hast du mehrere Übungen für einen Schlag, zeigt die Zeile *Übung* die gewählte und wie viele es sind; die anderen wählst du mit *Ändern*. Die Texte sind in der Sprache der App. Mit eingeschalteter TV-Anzeigetafel bringt **Auf der TV-Anzeigetafel zeigen** die Übung auf den Fernseher, über den Spielstand: die Zeichnungen groß, alle 10 Sekunden wechselnd, daneben wie es geht, damit die ganze Gruppe auf dem Platz sieht, was zu tun ist; **Von der TV-Anzeigetafel nehmen** nimmt sie weg (ist die Anzeigetafel aus, führt die Taste zu den Geräten, um sie einzuschalten).
+- **Übungssammlung** (unter **Trainieren**, im Tab **Schüler** des Trainers und oben in den *Übungen*): 60 illustrierte Übungen, für die App geschrieben (Vorhand, Rückhand, Aufschlag, Return, Volley, Schmetterball, Beinarbeit, Taktik, Kondition), mit Filtern nach Thema, Niveau und Spielerzahl. Jede hat eine Platzzeichnung von hinter A gesehen, wie auf dem Platz (der Ball im Bogen, eine Farbe pro Schlag in der Reihenfolge mit seiner Nummer; nummerierte Ovale: wo er landen soll; gestrichelt wer läuft und, im gestrichelten Feld, wohin man nach dem Schlag zurückgeht; Figuren mit dem Schläger auf der Seite des Schlags; orange mit Korb wer zuspielt; Dreiecke die Hütchen; in der Liste eine Miniatur von oben; Übungen mit vielen Schlägen sind in Schritte geteilt, *Schritt 1 von 2 · Schläge 1-2*, untereinander; die Flugbahnen beginnen und enden am Schläger des Spielers), das Ziel, die Schritte und eine leichtere und eine schwerere Variante. Übungen für einen einzelnen Schlag haben zwei Tasten: **Übung starten** geht zurück zum Training, Schlag und Übung sind schon gewählt (einfach **Starten** drücken, oder vom Platz aus KEY1 am Armband oder ein Klick der Fernbedienung); **Zu meinen Übungen hinzufügen** legt sie nur in die Liste der geführten Übungen und du bleibst in der Sammlung (ist sie schon da, steht auf der Taste *Schon in meinen Übungen*, Kopien gibt es nicht). Hast du mehrere Übungen für einen Schlag, zeigt die Zeile *Übung* die gewählte und wie viele es sind; die anderen wählst du mit *Ändern*. Die Texte sind in der Sprache der App. Die anderen (Beinarbeit, Fitness, Taktik, Schmetterball) haben **Mit Timer starten**: im Vollbild die verbleibende Zeit, die Phase (mach dich bereit, Belastung, Erholung) und die Runde; die Stimme sagt Name und Ziel, dann „los“, die Erholung, die letzten zehn Sekunden und den Countdown (mit **Anhalten** und **Timer beenden**; der Bildschirm bleibt an). Mit eingeschalteter TV-Anzeigetafel bringt **Auf der TV-Anzeigetafel zeigen** die Übung auf den Fernseher, über den Spielstand: die Zeichnungen groß, alle 10 Sekunden wechselnd, daneben wie es geht, damit die ganze Gruppe auf dem Platz sieht, was zu tun ist; **Von der TV-Anzeigetafel nehmen** nimmt sie weg (ist die Anzeigetafel aus, führt die Taste zu den Geräten, um sie einzuschalten).
 - **Die Stimme bei den Übungen der Sammlung** (mit eingeschaltetem Ton, in der Sprache der App): am Anfang sagt sie Name, Ziel und Kernsatz der Übung und den ersten Schritt; bei jedem Schritt sagt sie auch, wie er geht (*Jetzt Rückhand-Volley: Schulter gedreht, Handgelenk fest*); nach drei Schlägen hintereinander im Aus gibt sie einen Tipp, nach fünf hintereinander im Feld schlägt sie vor, die Übung schwerer zu machen (einmal pro Schritt). Bei selbst erstellten Übungen bleiben die üblichen Ansagen.
 
 ### 7.11 Vereinsmitglieder
@@ -25030,7 +25030,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - A **drill** is a stroke and steps in a row: for example *20 cross-court forehands, then 20 down the line*, or for the serve *10 first serves from the deuce side to the T, then 10 wide…*. There are four ready examples, one per stroke.
 - **Drills** (from the **Drill** choice under *Start*, in stroke practice): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
-- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 60 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have two buttons: **Start drill** goes back to practice with the stroke and drill already picked (just press **Start**, or from the court the band's KEY1 or a click of the remote); **Add to my drills** only puts it in the list of guided drills and you stay in the library (if it is already there the button says *Already in my drills*, and no copies are made). If you have several drills for a stroke, the *Drill* row shows the chosen one and how many there are; pick another with *Change*. The texts are in the app's language. With the TV scoreboard on, **Show on the TV scoreboard** puts the drill on the TV, over the score: the drawings in large size, changing every 10 seconds, with how to do it next to them, so the whole group on court sees what to do; **Remove from the TV scoreboard** takes it off (if the scoreboard is off, the button leads to Devices to turn it on).
+- **Drill library** (in **Practice**, in the coach's **Students** tab and at the top of *Drills*): 60 illustrated drills written for the app (forehand, backhand, serve, return, volley, overhead, footwork, tactics, fitness), with filters by topic, level and number of players. Each one has a court drawing seen from behind A, as on court (the ball in an arc, one colour per shot in order with its number; numbered ovals: where it should land; dashed who moves and, in the dashed box, where to recover after the shot; figures holding the racket on the side of the stroke; orange with a basket who feeds; triangles the cones; a top-down thumbnail in the list; drills with many shots are split into steps, *Step 1 of 2 · Shots 1-2*, one below the other; paths start and end on the hitter's racket), the goal, the steps and an easier and a harder version. Those for a single stroke have two buttons: **Start drill** goes back to practice with the stroke and drill already picked (just press **Start**, or from the court the band's KEY1 or a click of the remote); **Add to my drills** only puts it in the list of guided drills and you stay in the library (if it is already there the button says *Already in my drills*, and no copies are made). If you have several drills for a stroke, the *Drill* row shows the chosen one and how many there are; pick another with *Change*. The texts are in the app's language. The others (footwork, fitness, tactics, overhead) have **Start with the timer**: full screen, the time left, the phase (get ready, work, rest) and the round; the voice says the name and goal, then "go", the rest, the last ten seconds and the countdown (with **Pause** and **Stop the timer**; the screen stays on). With the TV scoreboard on, **Show on the TV scoreboard** puts the drill on the TV, over the score: the drawings in large size, changing every 10 seconds, with how to do it next to them, so the whole group on court sees what to do; **Remove from the TV scoreboard** takes it off (if the scoreboard is off, the button leads to Devices to turn it on).
 - **The voice in library drills** (with audio on, in the app's language): at the start it says the drill's name, goal and key phrase and the first step; at each step it also says how to do it (*Now backhand volley: shoulder turned, firm wrist*); after three shots out in a row it gives a tip and after five in a row in it suggests making the drill harder (once per step). In drills you create yourself the usual announcements remain.
 
 ### 7.11 Club members
@@ -25670,7 +25670,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
 - **Ejercicios** (desde la elección **Ejercicio** bajo *Empezar*, en el entrenamiento de golpes): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
-- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 60 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen dos botones: **Iniciar ejercicio** vuelve al entrenamiento con el golpe y el ejercicio ya elegidos (basta con pulsar **Empezar**, o desde la pista KEY1 de la pulsera o un clic del mando); **Añadir a mis ejercicios** solo lo pone en la lista de ejercicios guiados y te quedas en la colección (si ya está, el botón dice *Ya en mis ejercicios* y no se hacen copias). Si tienes varios ejercicios para un golpe, la fila *Ejercicio* muestra el elegido y cuántos hay; los demás se eligen con *Cambiar*. Los textos están en el idioma de la app. Con el marcador de la TV encendido, **Mostrar en el marcador de la TV** lleva el ejercicio a la TV, encima del marcador: los dibujos en grande que cambian cada 10 segundos, con al lado cómo se hace, para que todo el grupo en la pista vea qué hacer; **Quitar del marcador de la TV** lo quita (si el marcador está apagado, el botón lleva a Dispositivos para encenderlo).
+- **Colección de ejercicios** (en **Entrenar**, en la pestaña **Alumnos** del entrenador y arriba en *Ejercicios*): 60 ejercicios ilustrados escritos para la app (derecha, revés, saque, resto, volea, remate, juego de pies, táctica, físico), con filtros por tema, nivel y número de jugadores. Cada uno tiene el dibujo de la pista visto desde detrás de A, como en la pista (la bola en arco, un color por golpe en orden con su número; óvalos numerados: dónde debe caer; discontinua quien se mueve y, en el recuadro discontinuo, dónde volver tras el golpe; figuras con la raqueta del lado del golpe; en naranja con el cesto quien lanza; triángulos los conos; en la lista una miniatura vista desde arriba; los ejercicios con muchos golpes se dividen en pasos, *Paso 1 de 2 · Golpes 1-2*, uno debajo del otro; las trayectorias salen y llegan a la raqueta de quien golpea), el objetivo, los pasos y una versión más fácil y otra más difícil. Los de un solo golpe tienen dos botones: **Iniciar ejercicio** vuelve al entrenamiento con el golpe y el ejercicio ya elegidos (basta con pulsar **Empezar**, o desde la pista KEY1 de la pulsera o un clic del mando); **Añadir a mis ejercicios** solo lo pone en la lista de ejercicios guiados y te quedas en la colección (si ya está, el botón dice *Ya en mis ejercicios* y no se hacen copias). Si tienes varios ejercicios para un golpe, la fila *Ejercicio* muestra el elegido y cuántos hay; los demás se eligen con *Cambiar*. Los textos están en el idioma de la app. Los demás (desplazamientos, preparación física, táctica, remate) tienen **Iniciar con el temporizador**: a pantalla completa el tiempo que falta, la fase (prepárate, trabajo, descanso) y la vuelta; la voz dice el nombre y el objetivo, luego «ya», el descanso, los últimos diez segundos y la cuenta atrás (con **Pausa** y **Parar el temporizador**; la pantalla queda encendida). Con el marcador de la TV encendido, **Mostrar en el marcador de la TV** lleva el ejercicio a la TV, encima del marcador: los dibujos en grande que cambian cada 10 segundos, con al lado cómo se hace, para que todo el grupo en la pista vea qué hacer; **Quitar del marcador de la TV** lo quita (si el marcador está apagado, el botón lleva a Dispositivos para encenderlo).
 - **La voz en los ejercicios de la colección** (con el audio activado, en el idioma de la app): al principio dice el nombre, el objetivo y la frase clave del ejercicio y el primer paso; en cada paso dice también cómo hacerlo (*Ahora volea de revés: hombro girado y muñeca firme*); tras tres golpes fuera seguidos da un consejo y tras cinco dentro seguidos propone hacer el ejercicio más difícil (una vez por paso). En los ejercicios que creas tú quedan los avisos de siempre.
 
 ### 7.11 Socios del club
@@ -26310,7 +26310,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - Un **exercice** est un coup et des étapes à la suite : par exemple *20 coups droits croisés, puis 20 le long de la ligne*, ou pour le service *10 premières côté égalité au T, puis 10 extérieures…*. Il y a quatre exemples prêts, un par coup.
 - **Exercices** (depuis le choix **Exercice** sous *Commencer*, dans l'entraînement des coups) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
-- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 60 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont deux boutons : **Lancer l'exercice** revient à l'entraînement avec le coup et l'exercice déjà choisis (il suffit d'appuyer sur **Commencer**, ou depuis le court KEY1 du bracelet ou un clic de la télécommande) ; **Ajouter à mes exercices** le met seulement dans la liste des exercices guidés et vous restez dans la bibliothèque (s'il y est déjà, le bouton indique *Déjà dans mes exercices*, et aucune copie n'est faite). Si vous avez plusieurs exercices pour un coup, la ligne *Exercice* montre celui choisi et combien il y en a ; les autres se choisissent avec *Changer*. Les textes sont dans la langue de l'appli. Avec le tableau TV allumé, **Afficher sur le tableau TV** met l'exercice sur la TV, par-dessus le score : les dessins en grand qui changent toutes les 10 secondes, avec à côté comment le faire, pour que tout le groupe sur le court voie quoi faire ; **Retirer du tableau TV** l'enlève (si le tableau est éteint, le bouton mène aux Appareils pour l'allumer).
+- **Recueil d'exercices** (dans **S'entraîner**, dans l'onglet **Élèves** de l'entraîneur et en haut des *Exercices*) : 60 exercices illustrés écrits pour l'appli (coup droit, revers, service, retour, volée, smash, jeu de jambes, tactique, physique), avec des filtres par sujet, niveau et nombre de joueurs. Chacun a le dessin du court vu de derrière A, comme sur le terrain (la balle en arc, une couleur par coup dans l'ordre avec son numéro ; ovales numérotés : où elle doit tomber ; pointillés qui se déplace et, dans le cadre en pointillés, où se replacer après le coup ; des silhouettes tenant la raquette du côté du coup ; en orange avec le panier qui lance les balles ; triangles les plots ; dans la liste une vignette vue de dessus ; les exercices avec beaucoup de coups sont divisés en étapes, *Étape 1 sur 2 · Coups 1-2*, l'une sous l'autre ; les trajectoires partent et arrivent sur la raquette de celui qui frappe), l'objectif, les étapes et une version plus facile et une plus difficile. Ceux d'un seul coup ont deux boutons : **Lancer l'exercice** revient à l'entraînement avec le coup et l'exercice déjà choisis (il suffit d'appuyer sur **Commencer**, ou depuis le court KEY1 du bracelet ou un clic de la télécommande) ; **Ajouter à mes exercices** le met seulement dans la liste des exercices guidés et vous restez dans la bibliothèque (s'il y est déjà, le bouton indique *Déjà dans mes exercices*, et aucune copie n'est faite). Si vous avez plusieurs exercices pour un coup, la ligne *Exercice* montre celui choisi et combien il y en a ; les autres se choisissent avec *Changer*. Les textes sont dans la langue de l'appli. Les autres (déplacements, préparation physique, tactique, smash) ont **Lancer avec le minuteur** : en plein écran le temps restant, la phase (prépare-toi, effort, récupération) et le tour ; la voix dit le nom et l'objectif, puis « partez », la récupération, les dix dernières secondes et le compte à rebours (avec **Mettre en pause** et **Arrêter le minuteur** ; l'écran reste allumé). Avec le tableau TV allumé, **Afficher sur le tableau TV** met l'exercice sur la TV, par-dessus le score : les dessins en grand qui changent toutes les 10 secondes, avec à côté comment le faire, pour que tout le groupe sur le court voie quoi faire ; **Retirer du tableau TV** l'enlève (si le tableau est éteint, le bouton mène aux Appareils pour l'allumer).
 - **La voix dans les exercices de la bibliothèque** (avec le son activé, dans la langue de l'appli) : au début elle dit le nom, l'objectif et la phrase clé de l'exercice et la première étape ; à chaque étape elle dit aussi comment la faire (*Maintenant volée de revers : épaule tournée, poignet ferme*) ; après trois coups dehors d'affilée elle donne un conseil et après cinq dedans d'affilée elle propose de rendre l'exercice plus difficile (une fois par étape). Dans les exercices que vous créez vous-même, les annonces habituelles restent.
 
 ### 7.11 Adhérents du club
@@ -26950,7 +26950,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - Un **esercizio** è un colpo e dei passi in fila: per esempio *20 dritti incrociati, poi 20 lungolinea*, o per il servizio *10 prime da destra al T, poi 10 esterne…*. Ci sono quattro esempi pronti, uno per colpo.
 - **Esercizi** (dalla scelta **Esercizio** sotto *Inizia*, nell'allenamento dei colpi): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
-- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 60 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno due tasti: **Avvia esercizio** torna all'allenamento col colpo e l'esercizio già scelti (basta premere **Inizia**, oppure dal campo KEY1 del braccialetto o un clic del telecomando); **Aggiungi ai miei esercizi** lo mette solo nella lista degli esercizi guidati e resti nella raccolta (se c'è già il tasto dice *Già nei miei esercizi*, e non si fanno copie). Se per un colpo hai più esercizi, la riga *Esercizio* mostra quello scelto e quanti sono; gli altri si scelgono con *Cambia*. I testi sono nella lingua dell'app. Con il tabellone TV acceso, **Mostra sul tabellone TV** porta l'esercizio sulla TV, sopra il punteggio: i disegni in grande che si alternano ogni 10 secondi, con accanto come si fa, così tutto il gruppo in campo vede cosa fare; **Togli dal tabellone TV** lo toglie (se il tabellone è spento, il tasto porta ai Dispositivi per accenderlo).
+- **Raccolta di esercizi** (in **Allenati**, nella scheda **Allievi** dell'allenatore e in cima agli *Esercizi*): 60 esercizi illustrati, scritti per l'app (dritto, rovescio, servizio, risposta, volée, smash, gioco di gambe, tattica, fisico), con filtri per argomento, livello e numero di giocatori. Ognuno ha il disegno del campo visto da dietro A, come in campo (la palla ad arco, un colore per ogni colpo in ordine col suo numero; gli ovali col numero: dove deve arrivare; tratteggio chi si sposta e, nel riquadro tratteggiato, dove tornare dopo il colpo; gli omini con la racchetta dalla parte del colpo; in arancio col cesto chi lancia le palle; triangoli i coni; nell'elenco una miniatura vista dall'alto; gli esercizi con tanti colpi sono divisi in passi, *Passo 1 di 2 · Colpi 1-2*, uno sotto l'altro; le traiettorie partono e finiscono sulla racchetta di chi colpisce), l'obiettivo, i passi e una versione più facile e una più difficile. Quelli di un colpo solo hanno due tasti: **Avvia esercizio** torna all'allenamento col colpo e l'esercizio già scelti (basta premere **Inizia**, oppure dal campo KEY1 del braccialetto o un clic del telecomando); **Aggiungi ai miei esercizi** lo mette solo nella lista degli esercizi guidati e resti nella raccolta (se c'è già il tasto dice *Già nei miei esercizi*, e non si fanno copie). Se per un colpo hai più esercizi, la riga *Esercizio* mostra quello scelto e quanti sono; gli altri si scelgono con *Cambia*. I testi sono nella lingua dell'app. Gli altri (gambe, preparazione fisica, tattica, smash) hanno **Avvia con il timer**: a tutto schermo il tempo che manca, la fase (preparati, lavoro, recupero) e il giro; la voce dice nome e obiettivo, poi "via", il recupero, gli ultimi dieci secondi e il conto alla rovescia (con **Pausa** e **Ferma il timer**; lo schermo resta acceso). Con il tabellone TV acceso, **Mostra sul tabellone TV** porta l'esercizio sulla TV, sopra il punteggio: i disegni in grande che si alternano ogni 10 secondi, con accanto come si fa, così tutto il gruppo in campo vede cosa fare; **Togli dal tabellone TV** lo toglie (se il tabellone è spento, il tasto porta ai Dispositivi per accenderlo).
 - **La voce negli esercizi della raccolta** (con l'audio acceso, nella lingua dell'app): all'inizio dice nome, obiettivo e la frase chiave dell'esercizio e il primo passo; a ogni passo dice anche come farlo (*Ora volée di rovescio: spalla girata e polso fermo*); dopo tre colpi fuori di fila dà un consiglio e dopo cinque dentro di fila propone di rendere l'esercizio più difficile (una volta per passo). Negli esercizi creati da te restano gli annunci di sempre.
 
 ### 7.11 Soci del circolo
@@ -27590,7 +27590,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
 - **Exercícios** (na escolha **Exercício** embaixo de *Começar*, no treino de golpes): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
-- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 60 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm dois botões: **Iniciar exercício** volta ao treino com o golpe e o exercício já escolhidos (basta tocar em **Começar**, ou da quadra KEY1 da pulseira ou um clique do controle); **Adicionar aos meus exercícios** só o coloca na lista de exercícios guiados e você continua na coleção (se já estiver lá, o botão diz *Já nos meus exercícios* e não se fazem cópias). Se você tem vários exercícios para um golpe, a linha *Exercício* mostra o escolhido e quantos são; os outros escolhem-se com *Trocar*. Os textos ficam no idioma do app. Com o placar da TV ligado, **Mostrar no placar da TV** leva o exercício para a TV, por cima do placar: os desenhos em tamanho grande que mudam a cada 10 segundos, com ao lado como se faz, para todo o grupo na quadra ver o que fazer; **Tirar do placar da TV** tira (se o placar estiver desligado, o botão leva aos Dispositivos para ligá-lo).
+- **Coleção de exercícios** (em **Treinar**, na aba **Alunos** do treinador e no alto de *Exercícios*): 60 exercícios ilustrados feitos para o app (forehand, backhand, saque, devolução, voleio, smash, trabalho de pernas, tática, físico), com filtros por tema, nível e número de jogadores. Cada um tem o desenho da quadra visto de trás de A, como na quadra (a bola em arco, uma cor por golpe na ordem com seu número; ovais numerados: onde deve cair; tracejada quem se move e, no quadro tracejado, para onde voltar depois do golpe; bonecos com a raquete do lado do golpe; em laranja com o cesto quem lança as bolas; triângulos os cones; na lista uma miniatura vista de cima; os exercícios com muitos golpes são divididos em etapas, *Etapa 1 de 2 · Golpes 1-2*, uma embaixo da outra; as trajetórias saem e chegam na raquete de quem bate), o objetivo, os passos e uma versão mais fácil e outra mais difícil. Os de um só golpe têm dois botões: **Iniciar exercício** volta ao treino com o golpe e o exercício já escolhidos (basta tocar em **Começar**, ou da quadra KEY1 da pulseira ou um clique do controle); **Adicionar aos meus exercícios** só o coloca na lista de exercícios guiados e você continua na coleção (se já estiver lá, o botão diz *Já nos meus exercícios* e não se fazem cópias). Se você tem vários exercícios para um golpe, a linha *Exercício* mostra o escolhido e quantos são; os outros escolhem-se com *Trocar*. Os textos ficam no idioma do app. Os outros (deslocamento, preparação física, tática, smash) têm **Iniciar com o cronômetro**: em tela cheia o tempo que falta, a fase (prepare-se, trabalho, descanso) e a rodada; a voz diz o nome e o objetivo, depois "já", o descanso, os últimos dez segundos e a contagem regressiva (com **Pausar** e **Parar o cronômetro**; a tela fica ligada). Com o placar da TV ligado, **Mostrar no placar da TV** leva o exercício para a TV, por cima do placar: os desenhos em tamanho grande que mudam a cada 10 segundos, com ao lado como se faz, para todo o grupo na quadra ver o que fazer; **Tirar do placar da TV** tira (se o placar estiver desligado, o botão leva aos Dispositivos para ligá-lo).
 - **A voz nos exercícios da coleção** (com o áudio ligado, no idioma do app): no início diz o nome, o objetivo e a frase-chave do exercício e o primeiro passo; em cada passo diz também como fazê-lo (*Agora vólei de esquerda: ombro rodado e pulso firme*); depois de três pancadas fora seguidas dá um conselho e depois de cinco dentro seguidas propõe tornar o exercício mais difícil (uma vez por passo). Nos exercícios criados por você ficam os avisos de sempre.
 
 ### 7.11 Sócios do clube
@@ -39492,6 +39492,8 @@ object DrillLibrary {
         val diagram: Diagram,
         /** L'esercizio guidato da aggiungere ai propri (colpo e passi), per gli esercizi di un colpo solo. */
         val guided: Pair<TrainedStroke, List<DrillStep>>? = null,
+        /** Per gli esercizi senza colpi da contare: il timer a voce (giri di lavoro e recupero). */
+        val timer: DrillTimer.Plan? = null,
     ) {
         /** Gioco di gambe e preparazione fisica: con l'avviso di adattarli a chi si allena. */
         val physical: Boolean get() = topic == Topic.FOOTWORK || topic == Topic.FITNESS
@@ -39720,6 +39722,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(-2.4f, -8.4f, "2")),
             ),
+            timer = DrillTimer.Plan(60, 30, 6),
         ),
         // A a rete contro due a fondo campo: volée alternate, una per parte.
         Item(
@@ -39759,6 +39762,7 @@ object DrillLibrary {
                 cones = listOf(p(-SINGLES, BASE), p(-SINGLES, SERVICE), p(0f, SERVICE), p(SINGLES, SERVICE), p(SINGLES, BASE)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 90, 3),
         ),
         Item(
             "split_step", Topic.FOOTWORK, Level.BEGINNER, 1, 10,
@@ -39770,6 +39774,7 @@ object DrillLibrary {
                 ),
                 recover = listOf(recover(0f, 12.6f)),
             ),
+            timer = DrillTimer.Plan(60, 30, 4),
         ),
         Item(
             "baseline_shuffle", Topic.FITNESS, Level.BEGINNER, 1, 8,
@@ -39779,6 +39784,7 @@ object DrillLibrary {
                 cones = listOf(p(-SINGLES, BASE), p(0f, BASE), p(SINGLES, BASE)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 60, 3),
         ),
         // Servizio esterno, risposta al centro, dritto nel campo aperto.
         Item(
@@ -39811,6 +39817,7 @@ object DrillLibrary {
                 listOf(Who(p(0f, -12.4f), "A"), Who(p(0f, 12.4f), "B"), Who(p(6.2f, 9f), "C"), Who(p(6.2f, 10.6f), "D")),
                 paths = listOf(ball(p(0f, 12.4f), p(-1.5f, -9f), order = 1), move(p(5.8f, 9.8f), p(1.4f, 12.4f))),
             ),
+            timer = DrillTimer.Plan(300, 30, 3),
         ),
         // Doppio: A1 serve, A2 a rete incrocia sulla risposta incrociata e chiude in mezzo.
         Item(
@@ -39829,6 +39836,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(0f, -7.5f, "3", 2f, 2.4f, frame = 2)),
             ),
+            timer = DrillTimer.Plan(240, 60, 4),
         ),
 
         // ------------------------------------------------------------ altri 40 (27 nov)
@@ -40094,6 +40102,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(2.8f, -10f, "2", 2.6f, 2.4f)),
             ),
+            timer = DrillTimer.Plan(120, 60, 4),
         ),
         // Volée bassa: palla sui piedi, ginocchia piegate, profonda al centro.
         Item(
@@ -40178,6 +40187,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(1.6f, -9.4f, "2", 3f, 2.6f)),
             ),
+            timer = DrillTimer.Plan(60, 30, 4),
         ),
         // Pallonetto e smash a coppie: B tira il pallonetto, A a rete arretra e schiaccia.
         Item(
@@ -40190,6 +40200,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(2.6f, -8.4f, "2")),
             ),
+            timer = DrillTimer.Plan(120, 60, 4),
         ),
         // Volée e smash: prima una volée, poi il pallonetto da schiacciare.
         Item(
@@ -40203,6 +40214,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(-2.5f, -9f, "2", frame = 1), target(2.6f, -8.5f, "4", frame = 2)),
             ),
+            timer = DrillTimer.Plan(60, 45, 4),
         ),
         // Slalom tra i coni a passi corti.
         Item(
@@ -40213,6 +40225,7 @@ object DrillLibrary {
                 cones = listOf(p(-3f, 10f), p(-1.5f, 8.5f), p(0f, 10f), p(1.5f, 8.5f), p(3f, 10f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 60, 4),
         ),
         // Colpisci e torna: palle larghe a destra e a sinistra, dopo ogni colpo al centro.
         Item(
@@ -40227,6 +40240,7 @@ object DrillLibrary {
                 ),
                 recover = listOf(recover(0f, 12.6f)),
             ),
+            timer = DrillTimer.Plan(45, 45, 4),
         ),
         // Fuori dalla palla al corpo: un passo di lato per colpire di dritto.
         Item(
@@ -40239,6 +40253,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(0f, -9.4f, "2", 3.6f, 2.6f)),
             ),
+            timer = DrillTimer.Plan(60, 30, 4),
         ),
         // Avanti e indietro: prima la palla corta, poi quella profonda.
         Item(
@@ -40253,6 +40268,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(-2f, -9f, "2", frame = 1), target(2f, -9f, "4", frame = 2)),
             ),
+            timer = DrillTimer.Plan(45, 45, 4),
         ),
         // Scatti alle linee: linea del servizio, rete, metà, sempre ritorno alla linea di fondo.
         Item(
@@ -40263,6 +40279,7 @@ object DrillLibrary {
                 cones = listOf(p(-1.2f, SERVICE), p(0f, 0.3f), p(1.2f, 3.1f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 60, 3),
         ),
         // Colpi a vuoto: dritto, rovescio e avanti, a intervalli, senza palla.
         Item(
@@ -40273,6 +40290,7 @@ object DrillLibrary {
                 recover = listOf(recover(0f, 12.6f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 30, 6),
         ),
         // Il quadrato del servizio: di lato, indietro, di lato, avanti, attorno ai coni.
         Item(
@@ -40286,6 +40304,7 @@ object DrillLibrary {
                 cones = listOf(p(0.2f, 6.4f), p(4f, 6.4f), p(4f, 1f), p(0.2f, 1f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(40, 60, 6),
         ),
         // Attacco e passante: A attacca lungolinea e va a rete, B prova il passante; poi si gioca il punto.
         Item(
@@ -40302,6 +40321,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(3.3f, -9.4f, "2", 2f, 2.6f, frame = 1), target(3.8f, 8.6f, "3", 1.6f, 2.6f, frame = 2)),
             ),
+            timer = DrillTimer.Plan(300, 60, 3),
         ),
         // Doppio: tutto al centro, tra i due avversari.
         Item(
@@ -40311,6 +40331,7 @@ object DrillLibrary {
                 paths = listOf(ball(p(1.6f, 12.2f), p(0f, -8.8f), order = 1)),
                 zones = listOf(area(-1f, -BASE, 1f, -1f)),
             ),
+            timer = DrillTimer.Plan(300, 60, 3),
         ),
         // Palla alta e palla tesa: cambiare ritmo nel palleggio incrociato.
         Item(
@@ -40326,6 +40347,80 @@ object DrillLibrary {
             guided = TrainedStroke.FOREHAND to listOf(DrillStep(20, direction = ShotDirection.CROSS)),
         ),
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/DrillTimer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/DrillTimer.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+/**
+ * Il timer degli esercizi senza colpi da contare (gioco di gambe, preparazione fisica, tattica, smash): giri di lavoro e
+ * recupero, con la voce che dice quando partire, quando riposare e il conto alla rovescia. Qui solo i conti, a secondi
+ * interi dall'avvio: la schermata li chiede ogni secondo e dice a voce quello che capita in quel secondo.
+ */
+object DrillTimer {
+
+    /** [work] secondi di lavoro e [rest] di recupero, per [rounds] giri; prima [lead] secondi per prepararsi (e sentire nome e obiettivo). */
+    data class Plan(val work: Int, val rest: Int, val rounds: Int, val lead: Int = 10) {
+        /** Quanto dura tutto, in secondi (dopo l'ultimo giro niente recupero). */
+        val total: Int get() = lead + rounds * work + (rounds - 1) * rest
+    }
+
+    enum class Kind { PREP, WORK, REST, DONE }
+
+    /** Dove si è: che fase, che giro (da 1) e quanti secondi mancano alla fine della fase. */
+    data class State(val kind: Kind, val round: Int, val left: Int)
+
+    /** Quello che la voce dice in un certo secondo. */
+    sealed interface Cue {
+        /** Parte il giro [round] (l'ultimo se [last]). */
+        data class Go(val round: Int, val rounds: Int, val last: Boolean) : Cue
+        /** Comincia il recupero, di [seconds] secondi. */
+        data class Rest(val seconds: Int) : Cue
+        /** Conto alla rovescia: 3, 2, 1 prima che la fase finisca. */
+        data class Count(val n: Int) : Cue
+        /** Mancano dieci secondi alla fine del lavoro (solo nei lavori lunghi). */
+        data object TenLeft : Cue
+        /** Tutto finito. */
+        data object Done : Cue
+    }
+
+    fun state(p: Plan, t: Int): State {
+        if (t < p.lead) return State(Kind.PREP, 1, p.lead - t)
+        if (t >= p.total) return State(Kind.DONE, p.rounds, 0)
+        var s = t - p.lead
+        for (r in 1..p.rounds) {
+            if (s < p.work) return State(Kind.WORK, r, p.work - s)
+            s -= p.work
+            if (r < p.rounds) {
+                if (s < p.rest) return State(Kind.REST, r, p.rest - s)
+                s -= p.rest
+            }
+        }
+        return State(Kind.DONE, p.rounds, 0)
+    }
+
+    /** Quello che capita esattamente al secondo [t] (all'inizio di una fase, o negli ultimi 3 secondi). */
+    fun cues(p: Plan, t: Int): List<Cue> {
+        val st = state(p, t)
+        return when (st.kind) {
+            Kind.DONE -> if (t == p.total) listOf(Cue.Done) else emptyList()
+            Kind.WORK -> buildList {
+                if (st.left == p.work) add(Cue.Go(st.round, p.rounds, st.round == p.rounds))
+                else if (st.left in 1..3) add(Cue.Count(st.left))
+                else if (st.left == 10 && p.work >= 30) add(Cue.TenLeft)
+            }
+            Kind.REST -> buildList {
+                if (st.left == p.rest) add(Cue.Rest(p.rest))
+                else if (st.left in 1..3) add(Cue.Count(st.left))
+            }
+            Kind.PREP -> if (st.left in 1..3) listOf(Cue.Count(st.left)) else emptyList()
+        }
+    }
 }
 TSM_EOF
 
@@ -60979,6 +61074,126 @@ private fun DrawScope.text(t: String, c: Offset, h: Float, color: Color) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/DrillTimerUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/DrillTimerUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.DrillLibrary
+import com.tennis.scoremanager.data.DrillTimer
+import com.tennis.scoremanager.voice.Seg
+import kotlinx.coroutines.delay
+
+/**
+ * Il timer a voce di un esercizio senza colpi da contare, a tutto schermo: il tempo che manca in grande, la fase
+ * (preparati, lavoro, recupero) col suo colore e il giro. All'inizio la voce dice nome e obiettivo, poi "via", il
+ * recupero, gli ultimi dieci secondi dei lavori lunghi e il conto alla rovescia. Lo schermo resta acceso.
+ */
+@Composable
+fun DrillTimerDialog(c: MatchController, item: DrillLibrary.Item, t: DrillLibrary.Text, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val plan = item.timer ?: return
+    val view = LocalView.current
+    val audio = c.options.collectAsState().value.audio
+    var sec by remember { mutableIntStateOf(0) }
+    var paused by remember { mutableStateOf(false) }
+    fun say(text: String) {
+        if (c.options.value.audio) c.announcer.announce(listOf(Seg.Say(text)), force = true)
+    }
+    DisposableEffect(Unit) {
+        view.keepScreenOn = true
+        onDispose { view.keepScreenOn = false; c.announcer.stop() }
+    }
+    LaunchedEffect(Unit) { say(listOf(t.name, t.goal).joinToString(" ") { it.trimEnd('.') + "." }) }
+    // Un secondo alla volta (in pausa si ferma): a ogni secondo la voce dice quello che capita.
+    LaunchedEffect(paused) {
+        while (!paused && sec < plan.total) {
+            delay(1000)
+            sec++
+            for (cue in DrillTimer.cues(plan, sec)) say(
+                when (cue) {
+                    is DrillTimer.Cue.Go -> if (cue.last && cue.rounds > 1) s.dtSayLast else s.dtSayGo(cue.round, cue.rounds)
+                    is DrillTimer.Cue.Rest -> s.dtSayRest(cue.seconds)
+                    is DrillTimer.Cue.Count -> cue.n.toString()
+                    DrillTimer.Cue.TenLeft -> s.dtSayTen
+                    DrillTimer.Cue.Done -> s.dtSayDone
+                },
+            )
+        }
+    }
+    val st = DrillTimer.state(plan, sec)
+    val (label, color) = when (st.kind) {
+        DrillTimer.Kind.PREP -> s.dtPrep to TsmColors.Orange
+        DrillTimer.Kind.WORK -> s.dtWork to TsmColors.Ok
+        DrillTimer.Kind.REST -> s.dtRest to TsmColors.Cyan
+        DrillTimer.Kind.DONE -> s.dtDone to TsmColors.Ball
+    }
+    Dialog(onDismissRequest = onDone, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Column(
+            Modifier.fillMaxSize().background(TsmColors.Background).padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 22.sp, textAlign = TextAlign.Center)
+            Text(s.dtPlan(plan.rounds, plan.work, plan.rest), color = TsmColors.TextDim, fontSize = 14.sp, textAlign = TextAlign.Center)
+            Spacer(Modifier.weight(1f))
+            Text(label.uppercase(), color = color, fontWeight = FontWeight.Black, fontSize = 40.sp)
+            if (st.kind != DrillTimer.Kind.DONE) {
+                Text("%d:%02d".format(st.left / 60, st.left % 60), color = color, fontWeight = FontWeight.Black, fontSize = 120.sp)
+                if (st.kind != DrillTimer.Kind.PREP) Text(s.dtRound(st.round, plan.rounds), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.weight(1f))
+            if (!audio) Text(s.dtVoiceOff, color = TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+            if (st.kind == DrillTimer.Kind.DONE) {
+                BigButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onDone, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea)
+            } else {
+                BigButton(
+                    if (paused) s.dtResume else s.dtPause, if (paused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    { paused = !paused; if (paused) c.announcer.stop() }, Modifier.fillMaxWidth(), color = LocalArea.current, onColor = TsmColors.OnArea,
+                )
+                GhostButton(s.dtStop, Icons.Filled.Stop, onDone, Modifier.fillMaxWidth())
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/FramingUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/FramingUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -68308,6 +68523,22 @@ interface Strings {
     val dlAdded: String
     val dlInList: String
     val trainStartKeys: String
+    val dlTimer: String
+    val dtPrep: String
+    val dtWork: String
+    val dtRest: String
+    val dtDone: String
+    val dtPause: String
+    val dtResume: String
+    val dtStop: String
+    val dtVoiceOff: String
+    val dtSayLast: String
+    val dtSayTen: String
+    val dtSayDone: String
+    val dtRound: (Int, Int) -> String
+    val dtSayGo: (Int, Int) -> String
+    val dtSayRest: (Int) -> String
+    val dtPlan: (Int, Int, Int) -> String
 }
 
 object ItStrings : Strings {
@@ -71278,6 +71509,22 @@ object ItStrings : Strings {
     override val dlInList = "Già nei miei esercizi"
 
     override val trainStartKeys = "Si avvia anche con KEY1 del braccialetto o con un clic del telecomando."
+    override val dlTimer = "Avvia con il timer"
+    override val dtPrep = "Preparati"
+    override val dtWork = "Lavoro"
+    override val dtRest = "Recupero"
+    override val dtDone = "Finito"
+    override val dtPause = "Pausa"
+    override val dtResume = "Riprendi"
+    override val dtStop = "Ferma il timer"
+    override val dtVoiceOff = "La voce è spenta: il timer si vede ma non parla."
+    override val dtSayLast = "Ultimo giro: via!"
+    override val dtSayTen = "Ancora dieci secondi"
+    override val dtSayDone = "Finito, ottimo lavoro!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Giro $a di $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Giro $a di $b: via!" }
+    override val dtSayRest: (Int) -> String = { "Recupero, $it secondi" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r giri · lavoro $w s · recupero $p s" }
 }
 
 object EnStrings : Strings {
@@ -74249,6 +74496,22 @@ object EnStrings : Strings {
     override val dlInList = "Already in my drills"
 
     override val trainStartKeys = "You can also start with the band's KEY1 or a click of the remote."
+    override val dlTimer = "Start with the timer"
+    override val dtPrep = "Get ready"
+    override val dtWork = "Work"
+    override val dtRest = "Rest"
+    override val dtDone = "Done"
+    override val dtPause = "Pause"
+    override val dtResume = "Resume"
+    override val dtStop = "Stop the timer"
+    override val dtVoiceOff = "The voice is off: the timer is shown but does not speak."
+    override val dtSayLast = "Last round: go!"
+    override val dtSayTen = "Ten seconds left"
+    override val dtSayDone = "Done, great work!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Round $a of $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Round $a of $b: go!" }
+    override val dtSayRest: (Int) -> String = { "Rest, $it seconds" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r rounds · work $w s · rest $p s" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
@@ -77245,6 +77508,22 @@ object DeStrings : Strings {
     override val dlInList = "Schon in meinen Übungen"
 
     override val trainStartKeys = "Starten geht auch mit KEY1 am Armband oder einem Klick der Fernbedienung."
+    override val dlTimer = "Mit Timer starten"
+    override val dtPrep = "Mach dich bereit"
+    override val dtWork = "Belastung"
+    override val dtRest = "Erholung"
+    override val dtDone = "Fertig"
+    override val dtPause = "Anhalten"
+    override val dtResume = "Fortsetzen"
+    override val dtStop = "Timer beenden"
+    override val dtVoiceOff = "Die Stimme ist aus: der Timer wird angezeigt, spricht aber nicht."
+    override val dtSayLast = "Letzte Runde: los!"
+    override val dtSayTen = "Noch zehn Sekunden"
+    override val dtSayDone = "Fertig, gute Arbeit!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Runde $a von $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Runde $a von $b: los!" }
+    override val dtSayRest: (Int) -> String = { "Erholung, $it Sekunden" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r Runden · Belastung $w s · Erholung $p s" }
 }
 TSM_EOF
 
@@ -80231,6 +80510,22 @@ object EsStrings : Strings {
     override val dlInList = "Ya en mis ejercicios"
 
     override val trainStartKeys = "También se inicia con KEY1 de la pulsera o un clic del mando."
+    override val dlTimer = "Iniciar con el temporizador"
+    override val dtPrep = "Prepárate"
+    override val dtWork = "Trabajo"
+    override val dtRest = "Descanso"
+    override val dtDone = "Terminado"
+    override val dtPause = "Pausa"
+    override val dtResume = "Reanudar"
+    override val dtStop = "Parar el temporizador"
+    override val dtVoiceOff = "La voz está apagada: el temporizador se ve pero no habla."
+    override val dtSayLast = "Última vuelta: ¡ya!"
+    override val dtSayTen = "Quedan diez segundos"
+    override val dtSayDone = "Terminado, ¡buen trabajo!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Vuelta $a de $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Vuelta $a de $b: ¡ya!" }
+    override val dtSayRest: (Int) -> String = { "Descanso, $it segundos" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r vueltas · trabajo $w s · descanso $p s" }
 }
 TSM_EOF
 
@@ -83219,6 +83514,22 @@ object FrStrings : Strings {
     override val dlInList = "Déjà dans mes exercices"
 
     override val trainStartKeys = "On peut aussi lancer avec KEY1 du bracelet ou un clic de la télécommande."
+    override val dlTimer = "Lancer avec le minuteur"
+    override val dtPrep = "Prépare-toi"
+    override val dtWork = "Effort"
+    override val dtRest = "Récupération"
+    override val dtDone = "Terminé"
+    override val dtPause = "Mettre en pause"
+    override val dtResume = "Reprendre"
+    override val dtStop = "Arrêter le minuteur"
+    override val dtVoiceOff = "La voix est coupée : le minuteur s'affiche mais ne parle pas."
+    override val dtSayLast = "Dernier tour : partez !"
+    override val dtSayTen = "Encore dix secondes"
+    override val dtSayDone = "Terminé, beau travail !"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Tour $a sur $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Tour $a sur $b : partez !" }
+    override val dtSayRest: (Int) -> String = { "Récupération, $it secondes" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r tours · effort $w s · récupération $p s" }
 }
 TSM_EOF
 
@@ -86208,6 +86519,22 @@ object PtStrings : Strings {
     override val dlInList = "Já nos meus exercícios"
 
     override val trainStartKeys = "Também dá para começar com KEY1 da pulseira ou um clique do controle."
+    override val dlTimer = "Iniciar com o cronômetro"
+    override val dtPrep = "Prepare-se"
+    override val dtWork = "Trabalho"
+    override val dtRest = "Descanso"
+    override val dtDone = "Terminado"
+    override val dtPause = "Pausar"
+    override val dtResume = "Retomar"
+    override val dtStop = "Parar o cronômetro"
+    override val dtVoiceOff = "A voz está desligada: o cronômetro aparece mas não fala."
+    override val dtSayLast = "Última rodada: já!"
+    override val dtSayTen = "Faltam dez segundos"
+    override val dtSayDone = "Terminou, ótimo trabalho!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Rodada $a de $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Rodada $a de $b: já!" }
+    override val dtSayRest: (Int) -> String = { "Descanso, $it segundos" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r rodadas · trabalho $w s · descanso $p s" }
 }
 TSM_EOF
 
@@ -90029,6 +90356,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -90194,6 +90522,13 @@ private fun DrillDetail(c: MatchController, item: DrillLibrary.Item, t: DrillLib
                 GhostButton(if (existing != null) s.dlInList else s.dlAdd, if (existing != null) Icons.Filled.Check else Icons.Filled.Add, {
                     if (ensure() != null) android.widget.Toast.makeText(context, s.dlAdded, android.widget.Toast.LENGTH_SHORT).show()
                 }, Modifier.fillMaxWidth(), enabled = existing == null)
+            }
+            // Senza colpi da contare: il timer a voce, coi giri di lavoro e recupero dell'esercizio.
+            item.timer?.let { plan ->
+                var timer by remember { mutableStateOf(false) }
+                Text(s.dtPlan(plan.rounds, plan.work, plan.rest), color = TsmColors.TextDim, fontSize = 13.sp)
+                BigButton(s.dlTimer, Icons.Filled.Timer, { timer = true }, Modifier.fillMaxWidth(), color = area, onColor = TsmColors.OnArea)
+                if (timer) com.tennis.scoremanager.ui.DrillTimerDialog(c, item, t) { timer = false }
             }
             // Sul tabellone TV: i disegni in grande che girano da soli, con accanto come si fa (per tutto il gruppo in campo).
             val onTv by c.tvDrill.collectAsState()
@@ -122149,6 +122484,55 @@ class DrillLibraryTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DrillTimerTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DrillTimerTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/** Il timer a voce: fasi, giri e quello che la voce dice a ogni secondo. */
+class DrillTimerTest {
+
+    private val plan = DrillTimer.Plan(work = 30, rest = 20, rounds = 3, lead = 10)
+
+    @Test
+    fun phasesAndRounds() {
+        assertEquals(10 + 3 * 30 + 2 * 20, plan.total)
+        assertEquals(DrillTimer.State(DrillTimer.Kind.PREP, 1, 10), DrillTimer.state(plan, 0))
+        assertEquals(DrillTimer.State(DrillTimer.Kind.WORK, 1, 30), DrillTimer.state(plan, 10))
+        assertEquals(DrillTimer.State(DrillTimer.Kind.REST, 1, 20), DrillTimer.state(plan, 40))
+        assertEquals(DrillTimer.State(DrillTimer.Kind.WORK, 2, 30), DrillTimer.state(plan, 60))
+        assertEquals(DrillTimer.State(DrillTimer.Kind.WORK, 3, 1), DrillTimer.state(plan, plan.total - 1))
+        assertEquals(DrillTimer.Kind.DONE, DrillTimer.state(plan, plan.total).kind)
+    }
+
+    @Test
+    fun voiceCues() {
+        val all = (0..plan.total).flatMap { t -> DrillTimer.cues(plan, t).map { t to it } }
+        // Prima del via: 3, 2, 1; poi "via" a ogni giro (l'ultimo segnato), recupero tra un giro e l'altro.
+        assertEquals(listOf(7, 8, 9), all.filter { it.second is DrillTimer.Cue.Count && it.first < 10 }.map { it.first })
+        assertEquals(listOf(DrillTimer.Cue.Go(1, 3, false), DrillTimer.Cue.Go(2, 3, false), DrillTimer.Cue.Go(3, 3, true)), all.map { it.second }.filterIsInstance<DrillTimer.Cue.Go>())
+        assertEquals(listOf(40, 90), all.filter { it.second is DrillTimer.Cue.Rest }.map { it.first })
+        assertEquals(3, all.count { it.second == DrillTimer.Cue.TenLeft })
+        assertEquals(listOf(plan.total), all.filter { it.second == DrillTimer.Cue.Done }.map { it.first })
+        // Lavori corti: niente "ancora dieci secondi".
+        val short = DrillTimer.Plan(20, 10, 2)
+        assertTrue((0..short.total).none { DrillTimer.cues(short, it).contains(DrillTimer.Cue.TenLeft) })
+    }
+
+    @Test
+    fun everyDrillCanStart() {
+        // Ogni esercizio della raccolta si avvia: o come esercizio guidato (colpi contati) o col timer, mai tutti e due.
+        for (item in DrillLibrary.ITEMS) assertTrue(item.id, (item.guided != null) != (item.timer != null))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DrillsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DrillsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -142967,6 +143351,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 468 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 471 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

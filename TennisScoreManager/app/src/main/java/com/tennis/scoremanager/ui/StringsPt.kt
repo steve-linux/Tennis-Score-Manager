@@ -2982,4 +2982,20 @@ object PtStrings : Strings {
     override val dlInList = "Já nos meus exercícios"
 
     override val trainStartKeys = "Também dá para começar com KEY1 da pulseira ou um clique do controle."
+    override val dlTimer = "Iniciar com o cronômetro"
+    override val dtPrep = "Prepare-se"
+    override val dtWork = "Trabalho"
+    override val dtRest = "Descanso"
+    override val dtDone = "Terminado"
+    override val dtPause = "Pausar"
+    override val dtResume = "Retomar"
+    override val dtStop = "Parar o cronômetro"
+    override val dtVoiceOff = "A voz está desligada: o cronômetro aparece mas não fala."
+    override val dtSayLast = "Última rodada: já!"
+    override val dtSayTen = "Faltam dez segundos"
+    override val dtSayDone = "Terminou, ótimo trabalho!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Rodada $a de $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Rodada $a de $b: já!" }
+    override val dtSayRest: (Int) -> String = { "Descanso, $it segundos" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r rodadas · trabalho $w s · descanso $p s" }
 }

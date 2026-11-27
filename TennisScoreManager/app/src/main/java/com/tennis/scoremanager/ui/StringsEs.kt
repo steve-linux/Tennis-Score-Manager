@@ -2979,4 +2979,20 @@ object EsStrings : Strings {
     override val dlInList = "Ya en mis ejercicios"
 
     override val trainStartKeys = "También se inicia con KEY1 de la pulsera o un clic del mando."
+    override val dlTimer = "Iniciar con el temporizador"
+    override val dtPrep = "Prepárate"
+    override val dtWork = "Trabajo"
+    override val dtRest = "Descanso"
+    override val dtDone = "Terminado"
+    override val dtPause = "Pausa"
+    override val dtResume = "Reanudar"
+    override val dtStop = "Parar el temporizador"
+    override val dtVoiceOff = "La voz está apagada: el temporizador se ve pero no habla."
+    override val dtSayLast = "Última vuelta: ¡ya!"
+    override val dtSayTen = "Quedan diez segundos"
+    override val dtSayDone = "Terminado, ¡buen trabajo!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Vuelta $a de $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Vuelta $a de $b: ¡ya!" }
+    override val dtSayRest: (Int) -> String = { "Descanso, $it segundos" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r vueltas · trabajo $w s · descanso $p s" }
 }

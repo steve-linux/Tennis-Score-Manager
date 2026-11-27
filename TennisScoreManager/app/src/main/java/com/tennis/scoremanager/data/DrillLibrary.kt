@@ -80,6 +80,8 @@ object DrillLibrary {
         val diagram: Diagram,
         /** L'esercizio guidato da aggiungere ai propri (colpo e passi), per gli esercizi di un colpo solo. */
         val guided: Pair<TrainedStroke, List<DrillStep>>? = null,
+        /** Per gli esercizi senza colpi da contare: il timer a voce (giri di lavoro e recupero). */
+        val timer: DrillTimer.Plan? = null,
     ) {
         /** Gioco di gambe e preparazione fisica: con l'avviso di adattarli a chi si allena. */
         val physical: Boolean get() = topic == Topic.FOOTWORK || topic == Topic.FITNESS
@@ -308,6 +310,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(-2.4f, -8.4f, "2")),
             ),
+            timer = DrillTimer.Plan(60, 30, 6),
         ),
         // A a rete contro due a fondo campo: volée alternate, una per parte.
         Item(
@@ -347,6 +350,7 @@ object DrillLibrary {
                 cones = listOf(p(-SINGLES, BASE), p(-SINGLES, SERVICE), p(0f, SERVICE), p(SINGLES, SERVICE), p(SINGLES, BASE)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 90, 3),
         ),
         Item(
             "split_step", Topic.FOOTWORK, Level.BEGINNER, 1, 10,
@@ -358,6 +362,7 @@ object DrillLibrary {
                 ),
                 recover = listOf(recover(0f, 12.6f)),
             ),
+            timer = DrillTimer.Plan(60, 30, 4),
         ),
         Item(
             "baseline_shuffle", Topic.FITNESS, Level.BEGINNER, 1, 8,
@@ -367,6 +372,7 @@ object DrillLibrary {
                 cones = listOf(p(-SINGLES, BASE), p(0f, BASE), p(SINGLES, BASE)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 60, 3),
         ),
         // Servizio esterno, risposta al centro, dritto nel campo aperto.
         Item(
@@ -399,6 +405,7 @@ object DrillLibrary {
                 listOf(Who(p(0f, -12.4f), "A"), Who(p(0f, 12.4f), "B"), Who(p(6.2f, 9f), "C"), Who(p(6.2f, 10.6f), "D")),
                 paths = listOf(ball(p(0f, 12.4f), p(-1.5f, -9f), order = 1), move(p(5.8f, 9.8f), p(1.4f, 12.4f))),
             ),
+            timer = DrillTimer.Plan(300, 30, 3),
         ),
         // Doppio: A1 serve, A2 a rete incrocia sulla risposta incrociata e chiude in mezzo.
         Item(
@@ -417,6 +424,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(0f, -7.5f, "3", 2f, 2.4f, frame = 2)),
             ),
+            timer = DrillTimer.Plan(240, 60, 4),
         ),
 
         // ------------------------------------------------------------ altri 40 (27 nov)
@@ -682,6 +690,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(2.8f, -10f, "2", 2.6f, 2.4f)),
             ),
+            timer = DrillTimer.Plan(120, 60, 4),
         ),
         // Volée bassa: palla sui piedi, ginocchia piegate, profonda al centro.
         Item(
@@ -766,6 +775,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(1.6f, -9.4f, "2", 3f, 2.6f)),
             ),
+            timer = DrillTimer.Plan(60, 30, 4),
         ),
         // Pallonetto e smash a coppie: B tira il pallonetto, A a rete arretra e schiaccia.
         Item(
@@ -778,6 +788,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(2.6f, -8.4f, "2")),
             ),
+            timer = DrillTimer.Plan(120, 60, 4),
         ),
         // Volée e smash: prima una volée, poi il pallonetto da schiacciare.
         Item(
@@ -791,6 +802,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(-2.5f, -9f, "2", frame = 1), target(2.6f, -8.5f, "4", frame = 2)),
             ),
+            timer = DrillTimer.Plan(60, 45, 4),
         ),
         // Slalom tra i coni a passi corti.
         Item(
@@ -801,6 +813,7 @@ object DrillLibrary {
                 cones = listOf(p(-3f, 10f), p(-1.5f, 8.5f), p(0f, 10f), p(1.5f, 8.5f), p(3f, 10f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 60, 4),
         ),
         // Colpisci e torna: palle larghe a destra e a sinistra, dopo ogni colpo al centro.
         Item(
@@ -815,6 +828,7 @@ object DrillLibrary {
                 ),
                 recover = listOf(recover(0f, 12.6f)),
             ),
+            timer = DrillTimer.Plan(45, 45, 4),
         ),
         // Fuori dalla palla al corpo: un passo di lato per colpire di dritto.
         Item(
@@ -827,6 +841,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(0f, -9.4f, "2", 3.6f, 2.6f)),
             ),
+            timer = DrillTimer.Plan(60, 30, 4),
         ),
         // Avanti e indietro: prima la palla corta, poi quella profonda.
         Item(
@@ -841,6 +856,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(-2f, -9f, "2", frame = 1), target(2f, -9f, "4", frame = 2)),
             ),
+            timer = DrillTimer.Plan(45, 45, 4),
         ),
         // Scatti alle linee: linea del servizio, rete, metà, sempre ritorno alla linea di fondo.
         Item(
@@ -851,6 +867,7 @@ object DrillLibrary {
                 cones = listOf(p(-1.2f, SERVICE), p(0f, 0.3f), p(1.2f, 3.1f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 60, 3),
         ),
         // Colpi a vuoto: dritto, rovescio e avanti, a intervalli, senza palla.
         Item(
@@ -861,6 +878,7 @@ object DrillLibrary {
                 recover = listOf(recover(0f, 12.6f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(30, 30, 6),
         ),
         // Il quadrato del servizio: di lato, indietro, di lato, avanti, attorno ai coni.
         Item(
@@ -874,6 +892,7 @@ object DrillLibrary {
                 cones = listOf(p(0.2f, 6.4f), p(4f, 6.4f), p(4f, 1f), p(0.2f, 1f)),
                 half = true,
             ),
+            timer = DrillTimer.Plan(40, 60, 6),
         ),
         // Attacco e passante: A attacca lungolinea e va a rete, B prova il passante; poi si gioca il punto.
         Item(
@@ -890,6 +909,7 @@ object DrillLibrary {
                 ),
                 zones = listOf(target(3.3f, -9.4f, "2", 2f, 2.6f, frame = 1), target(3.8f, 8.6f, "3", 1.6f, 2.6f, frame = 2)),
             ),
+            timer = DrillTimer.Plan(300, 60, 3),
         ),
         // Doppio: tutto al centro, tra i due avversari.
         Item(
@@ -899,6 +919,7 @@ object DrillLibrary {
                 paths = listOf(ball(p(1.6f, 12.2f), p(0f, -8.8f), order = 1)),
                 zones = listOf(area(-1f, -BASE, 1f, -1f)),
             ),
+            timer = DrillTimer.Plan(300, 60, 3),
         ),
         // Palla alta e palla tesa: cambiare ritmo nel palleggio incrociato.
         Item(

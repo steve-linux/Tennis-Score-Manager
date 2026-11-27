@@ -3042,6 +3042,22 @@ interface Strings {
     val dlAdded: String
     val dlInList: String
     val trainStartKeys: String
+    val dlTimer: String
+    val dtPrep: String
+    val dtWork: String
+    val dtRest: String
+    val dtDone: String
+    val dtPause: String
+    val dtResume: String
+    val dtStop: String
+    val dtVoiceOff: String
+    val dtSayLast: String
+    val dtSayTen: String
+    val dtSayDone: String
+    val dtRound: (Int, Int) -> String
+    val dtSayGo: (Int, Int) -> String
+    val dtSayRest: (Int) -> String
+    val dtPlan: (Int, Int, Int) -> String
 }
 
 object ItStrings : Strings {
@@ -6012,6 +6028,22 @@ object ItStrings : Strings {
     override val dlInList = "Già nei miei esercizi"
 
     override val trainStartKeys = "Si avvia anche con KEY1 del braccialetto o con un clic del telecomando."
+    override val dlTimer = "Avvia con il timer"
+    override val dtPrep = "Preparati"
+    override val dtWork = "Lavoro"
+    override val dtRest = "Recupero"
+    override val dtDone = "Finito"
+    override val dtPause = "Pausa"
+    override val dtResume = "Riprendi"
+    override val dtStop = "Ferma il timer"
+    override val dtVoiceOff = "La voce è spenta: il timer si vede ma non parla."
+    override val dtSayLast = "Ultimo giro: via!"
+    override val dtSayTen = "Ancora dieci secondi"
+    override val dtSayDone = "Finito, ottimo lavoro!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Giro $a di $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Giro $a di $b: via!" }
+    override val dtSayRest: (Int) -> String = { "Recupero, $it secondi" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r giri · lavoro $w s · recupero $p s" }
 }
 
 object EnStrings : Strings {
@@ -8983,6 +9015,22 @@ object EnStrings : Strings {
     override val dlInList = "Already in my drills"
 
     override val trainStartKeys = "You can also start with the band's KEY1 or a click of the remote."
+    override val dlTimer = "Start with the timer"
+    override val dtPrep = "Get ready"
+    override val dtWork = "Work"
+    override val dtRest = "Rest"
+    override val dtDone = "Done"
+    override val dtPause = "Pause"
+    override val dtResume = "Resume"
+    override val dtStop = "Stop the timer"
+    override val dtVoiceOff = "The voice is off: the timer is shown but does not speak."
+    override val dtSayLast = "Last round: go!"
+    override val dtSayTen = "Ten seconds left"
+    override val dtSayDone = "Done, great work!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Round $a of $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Round $a of $b: go!" }
+    override val dtSayRest: (Int) -> String = { "Rest, $it seconds" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r rounds · work $w s · rest $p s" }
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {

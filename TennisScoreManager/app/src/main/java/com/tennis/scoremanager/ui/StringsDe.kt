@@ -2978,4 +2978,20 @@ object DeStrings : Strings {
     override val dlInList = "Schon in meinen Übungen"
 
     override val trainStartKeys = "Starten geht auch mit KEY1 am Armband oder einem Klick der Fernbedienung."
+    override val dlTimer = "Mit Timer starten"
+    override val dtPrep = "Mach dich bereit"
+    override val dtWork = "Belastung"
+    override val dtRest = "Erholung"
+    override val dtDone = "Fertig"
+    override val dtPause = "Anhalten"
+    override val dtResume = "Fortsetzen"
+    override val dtStop = "Timer beenden"
+    override val dtVoiceOff = "Die Stimme ist aus: der Timer wird angezeigt, spricht aber nicht."
+    override val dtSayLast = "Letzte Runde: los!"
+    override val dtSayTen = "Noch zehn Sekunden"
+    override val dtSayDone = "Fertig, gute Arbeit!"
+    override val dtRound: (Int, Int) -> String = { a, b -> "Runde $a von $b" }
+    override val dtSayGo: (Int, Int) -> String = { a, b -> "Runde $a von $b: los!" }
+    override val dtSayRest: (Int) -> String = { "Erholung, $it Sekunden" }
+    override val dtPlan: (Int, Int, Int) -> String = { r, w, p -> "$r Runden · Belastung $w s · Erholung $p s" }
 }
